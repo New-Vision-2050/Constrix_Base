@@ -1,0 +1,28 @@
+import { LoginType } from "./_validator/login-schema";
+
+export const LOGIN_PHASES = {
+  IDENTIFIER: "IDENTIFIER",
+  PASSWORD: "PASSWORD",
+  FORGET_PASSWORD: "FORGET_PASSWORD",
+  RESET_PASSWORD: "RESET_PASSWORD",
+  VALIDATE_EMAIL: "VALIDATE_EMAIL",
+  SECURITY_QUESTIONS: "SECURITY_QUESTIONS",
+  CHANGE_EMAIL: "CHANGE_EMAIL",
+  VALIDATE_PHONE: "VALIDATE_PHONE",
+} as const;
+
+export type LoginPhase = keyof typeof LOGIN_PHASES;
+
+export const formDefaultValues: LoginType = {
+  identifier: "",
+  password: "",
+  forgetPasswordOtp: "",
+  newPassword: "",
+  confirmNewPassword: "",
+  validateEmailOtp: "",
+  animal: "",
+  team: "",
+  confirmNewEmail: "",
+  newEmail: "",
+  validatePhoneOtp: "",
+};
