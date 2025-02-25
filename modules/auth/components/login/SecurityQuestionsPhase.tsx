@@ -1,6 +1,6 @@
 import React from "react";
 import { LOGIN_PHASES, LoginPhase } from "../../constant";
-import { SecurityQuestionsType } from "../../_validator/login-schema";
+import { SecurityQuestionsType } from "../../validator/login-schema";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

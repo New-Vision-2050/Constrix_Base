@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { useCountDown } from "../../_hooks/useCountDown";
+import { useCountDown } from "../../hooks/useCountDown";
 import { Controller, useFormContext } from "react-hook-form";
 import {
   IdentifierType,
   ValidatePhoneType,
-} from "../../_validator/login-schema";
+} from "../../validator/login-schema";
 import AutoHeight from "@/components/animation/AutoHeight";
 import ClockIcon from "@/public/icons/ClockIcon";
 import { Button } from "@/components/ui/button";

@@ -1,4 +1,4 @@
-import { LoginType } from "./_validator/login-schema";
+import { LoginType } from "./validator/login-schema";
 
 export const LOGIN_PHASES = {
   IDENTIFIER: "IDENTIFIER",

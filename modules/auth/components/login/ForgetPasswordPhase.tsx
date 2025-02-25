@@ -4,7 +4,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import {
   ForgetPasswordType,
   IdentifierType,
-} from "../../_validator/login-schema";
+} from "../../validator/login-schema";
 import {
   InputOTP,
   InputOTPGroup,

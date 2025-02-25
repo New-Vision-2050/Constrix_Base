@@ -3,7 +3,7 @@ import { LOGIN_PHASES, LoginPhase } from "../../constant";
 import {
   ChangeEmailType,
   ValidateEmailType,
-} from "../../_validator/login-schema";
+} from "../../validator/login-schema";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

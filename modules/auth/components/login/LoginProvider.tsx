@@ -1,7 +1,7 @@
 "use client";
 
 import { FormProvider } from "react-hook-form";
-import useLogin from "../../_hooks/useLogin";
+import useLogin from "../../hooks/useLogin";
 import IdentifierPhase from "./IdentifierPhase";
 import PasswordPhase from "./PasswordPhase";
 import { LOGIN_PHASES } from "../../constant";

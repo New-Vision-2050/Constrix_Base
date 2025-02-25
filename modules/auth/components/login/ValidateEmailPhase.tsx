@@ -5,7 +5,7 @@ import {
   ChangeEmailType,
   IdentifierType,
   ValidateEmailType,
-} from "../../_validator/login-schema";
+} from "../../validator/login-schema";
 import {
   InputOTP,
   InputOTPGroup,
@@ -13,7 +13,7 @@ import {
   InputError,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { useCountDown } from "../../_hooks/useCountDown";
+import { useCountDown } from "../../hooks/useCountDown";
 import { useEffect } from "react";
 import AutoHeight from "@/components/animation/AutoHeight";
 import { ClockIcon } from "lucide-react";

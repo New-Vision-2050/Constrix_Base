@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { loginSchema, LoginType } from "../_validator/login-schema";
+import { loginSchema, LoginType } from "../validator/login-schema";
 import { formDefaultValues, LOGIN_PHASES, LoginPhase } from "../constant";
 
 const useLogin = () => {
