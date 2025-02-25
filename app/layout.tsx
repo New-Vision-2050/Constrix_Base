@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
 const theSans = localFont({
   src: [
@@ -31,7 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" className="dark">
-      <body className={theSans.variable}>{children}</body>
+      <body className={theSans.variable}>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </body>
     </html>
   );
 }
