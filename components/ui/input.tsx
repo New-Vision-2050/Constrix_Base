@@ -44,8 +44,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           type={inputType}
           id={label}
           className={cn(inputClassNames, {
-            "pr-8": type === "password" && variant === "secondary",
-            "pr-6": type === "password" && variant === "default",
+            "rtl:pl-8 rtl:pr-0 pr-8":
+              type === "password" && variant === "secondary",
+            "rtl:pl-6 rtl:pr-0 pr-6":
+              type === "password" && variant === "default",
           })}
           placeholder=" "
           ref={ref}

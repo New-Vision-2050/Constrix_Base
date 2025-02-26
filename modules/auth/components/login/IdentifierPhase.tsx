@@ -4,75 +4,80 @@ import { IdentifierType } from "../../validator/loginSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
-
+import { useModal } from "../../../../hooks/use-modal";
+import ErrorDialog from "@/components/shared/ErrorDialog";
 
 const IdentifierPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-  const { mutateAsync, isError, error, isPending } = useLoginWays();
-
-  const [value, setValue] = useState("pass");
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
+  const { mutate, isPending } = useLoginWays();
   const {
     register,
     formState: { errors },
     handleSubmit,
+    setValue,
   } = useFormContext<IdentifierType>();
 
-  console.log({ isError, error, isPending });
-
-  const onSubmit = async (data: IdentifierType) => {
-    await mutateAsync({ identifier: data.identifier });
-    /*   switch (value) {
-      case "pass":
-        handleSetStep(LOGIN_PHASES.PASSWORD);
-        break;
-      case "email":
-        handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
-        break;
-      case "phone":
-        handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
-        break;
-      default:
-        return;
-    } */
+  const onSubmit = (data: IdentifierType) => {
+    mutate(
+      { identifier: data.identifier },
+      {
+        onSuccess(data, variable) {
+          setValue("token", data.payload.token);
+          const nextStep = data.payload.login_way.name;
+          switch (nextStep) {
+            case "password":
+              handleSetStep(LOGIN_PHASES.PASSWORD);
+              break;
+            case "otp":
+              if (variable.identifier.includes("@")) {
+                handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
+              } else {
+                handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
+              }
+              break;
+            default:
+              return;
+          }
+        },
+        onError(error) {
+          const description = error.response?.data?.message?.description;
+          setErrorMessage(description ?? "حدث خطأ");
+          handleOpen();
+        },
+      }
+    );
   };
 
   return (
     <>
       <h1 className="text-2xl text-center">تسجيل الدخول</h1>
-
-      <RadioGroup
-        onValueChange={(s: string) => setValue(s)}
-        defaultValue={value}
-      >
-        <div className="flex items-center gap-3">
-          <RadioGroupItem value="pass" id="pass" />
-          <label htmlFor="pass">كلمة المرور</label>
-        </div>{" "}
-        <div className="flex items-center gap-3">
-          <RadioGroupItem value="email" id="email" />
-          <label htmlFor="email">البريد الالكتروني</label>
-        </div>{" "}
-        <div className="flex items-center gap-3">
-          <RadioGroupItem value="phone" id="phone" />
-          <label htmlFor="phone">رقم الجوال</label>
-        </div>
-      </RadioGroup>
-
       <Input
         {...register("identifier")}
         label="رقم الجوال / البريد الالكتروني / رقم المعرف (يحدد من الاعدادات)"
         error={errors?.identifier?.message}
       />
-      <Button size={"lg"} className="w-full" onClick={handleSubmit(onSubmit)}>
+
+      <Button
+        size={"lg"}
+        className="w-full"
+        loading={isPending}
+        onClick={handleSubmit(onSubmit)}
+      >
         التالي
       </Button>
+
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };

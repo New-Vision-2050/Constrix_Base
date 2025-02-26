@@ -9,6 +9,7 @@ const passwordValidation = z
 
 const identifierSchema = z.object({
   identifier: z.string().min(5, "هذا الحقل مطلوب"),
+  token: z.string().optional(),
 });
 
 const passwordSchema = z.object({

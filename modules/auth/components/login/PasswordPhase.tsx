@@ -1,26 +1,42 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { PasswordType } from "../../validator/loginSchema";
+import { LoginType } from "../../validator/loginSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
+import { useLoginSteps } from "../../store/mutations";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const { mutate, isPending } = useLoginSteps();
   const {
     register,
     formState: { errors },
     handleSubmit,
     getValues,
-  } = useFormContext<PasswordType>();
+  } = useFormContext<LoginType>();
 
   const handleLogin = () => {
     const data = getValues();
-    console.log("formSubmitted: ", data);
+    mutate(
+      {
+        identifier: data.identifier,
+        password: data.password,
+        token: data.token ?? "",
+      },
+      {
+        onSuccess: (data) => {
+          console.log(data.payload);
+        },
+        onError(error) {
+          console.log(error);
+        },
+      }
+    );
   };
 
   const handleForgetPhase = () => {
@@ -39,6 +55,7 @@ const PasswordPhase = ({
       <Button
         size={"lg"}
         className="w-full"
+        loading={isPending}
         onClick={handleSubmit(handleLogin)}
       >
         دخول
