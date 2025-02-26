@@ -5,7 +5,7 @@ import {
   ChangeEmailType,
   IdentifierType,
   ValidateEmailType,
-} from "../../validator/login-schema";
+} from "../../validator/loginSchema";
 import {
   InputOTP,
   InputOTPGroup,
@@ -17,7 +17,7 @@ import { useCountDown } from "../../hooks/useCountDown";
 import { useEffect } from "react";
 import AutoHeight from "@/components/animation/AutoHeight";
 import { ClockIcon } from "lucide-react";
-import { LOGIN_PHASES, LoginPhase } from "../../constant";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 import AnotherCheckingWay from "../AnotherCheckingWay";
 
 const ValidateEmailPhase = ({

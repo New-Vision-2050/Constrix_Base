@@ -4,7 +4,7 @@ import { FormProvider } from "react-hook-form";
 import useLogin from "../../hooks/useLogin";
 import IdentifierPhase from "./IdentifierPhase";
 import PasswordPhase from "./PasswordPhase";
-import { LOGIN_PHASES } from "../../constant";
+import { LOGIN_PHASES } from "../../constant/loginPhases";
 import ForgetPasswordPhase from "./ForgetPasswordPhase";
 import ResetPasswordPhase from "./ResetPasswordPhase";
 import ValidateEmailPhase from "./ValidateEmailPhase";

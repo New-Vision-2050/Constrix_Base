@@ -1,5 +1,5 @@
-import Login from "@/modules/auth/pages/Login";
+import LoginProvider from "@/modules/auth/components/login/LoginProvider";
 
-const LoginPage = () => <Login />;
+const LoginPage = () => <LoginProvider />;
 
 export default LoginPage;

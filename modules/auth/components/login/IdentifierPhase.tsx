@@ -1,9 +1,9 @@
 "use client";
 import { useFormContext } from "react-hook-form";
-import { IdentifierType } from "../../validator/login-schema";
+import { IdentifierType } from "../../validator/loginSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
 
@@ -12,6 +12,7 @@ const IdentifierPhase = ({
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  
   const [value, setValue] = useState("pass");
 
   const {

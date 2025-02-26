@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LOGIN_PHASES } from "../constant";
+import { LOGIN_PHASES } from "../constant/loginPhases";
 
 const passwordValidation = z
   .string()
@@ -75,6 +75,7 @@ export const loginSchema = {
   [LOGIN_PHASES.CHANGE_EMAIL]: changeEmailSchema,
   [LOGIN_PHASES.VALIDATE_PHONE]: validatePhoneSchema,
 };
+
 export type LoginType = IdentifierType &
   PasswordType &
   ForgetPasswordType &

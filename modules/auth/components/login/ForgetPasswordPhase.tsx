@@ -4,7 +4,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import {
   ForgetPasswordType,
   IdentifierType,
-} from "../../validator/login-schema";
+} from "../../validator/loginSchema";
 import {
   InputOTP,
   InputOTPGroup,
@@ -12,7 +12,7 @@ import {
   InputError,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 
 const ForgetPasswordPhase = ({
   handleSetStep,

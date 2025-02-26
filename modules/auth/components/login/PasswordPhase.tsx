@@ -1,10 +1,10 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { PasswordType } from "../../validator/login-schema";
+import { PasswordType } from "../../validator/loginSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 
 const PasswordPhase = ({
   handleSetStep,
