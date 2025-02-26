@@ -1,4 +1,4 @@
-import { loginWays } from "../services/loginServices";
+import { loginWays } from "../service/loginServices";
 
 export const loginRepository = {
   loginWays: async (identifier: string) => {

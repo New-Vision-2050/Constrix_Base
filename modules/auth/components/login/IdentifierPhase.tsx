@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
+import { useLoginWays } from "../../store/mutations";
 
 const IdentifierPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-  
+  const { mutateAsync, isError, error, isPending } = useLoginWays();
+
   const [value, setValue] = useState("pass");
 
   const {
@@ -21,7 +23,10 @@ const IdentifierPhase = ({
     handleSubmit,
   } = useFormContext<IdentifierType>();
 
-  const onSubmit = () => {
+  console.log({ isError, error, isPending });
+
+  const onSubmit = async (data: IdentifierType) => {
+    await mutateAsync({ identifier: data.identifier });
     switch (value) {
       case "pass":
         handleSetStep(LOGIN_PHASES.PASSWORD);

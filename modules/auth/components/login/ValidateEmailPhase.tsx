@@ -13,7 +13,7 @@ import {
   InputError,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { useCountDown } from "../../hooks/useCountDown";
+import { useCountDown } from "../../hook/useCountDown";
 import { useEffect } from "react";
 import AutoHeight from "@/components/animation/AutoHeight";
 import { ClockIcon } from "lucide-react";

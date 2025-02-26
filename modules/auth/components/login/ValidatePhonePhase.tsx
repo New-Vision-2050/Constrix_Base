@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useCountDown } from "../../hooks/useCountDown";
+import { useCountDown } from "../../hook/useCountDown";
 import { Controller, useFormContext } from "react-hook-form";
 import { IdentifierType, ValidatePhoneType } from "../../validator/loginSchema";
 import AutoHeight from "@/components/animation/AutoHeight";
