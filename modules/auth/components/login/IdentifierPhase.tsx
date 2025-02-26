@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
 
+
 const IdentifierPhase = ({
   handleSetStep,
 }: {
@@ -27,7 +28,7 @@ const IdentifierPhase = ({
 
   const onSubmit = async (data: IdentifierType) => {
     await mutateAsync({ identifier: data.identifier });
-    switch (value) {
+    /*   switch (value) {
       case "pass":
         handleSetStep(LOGIN_PHASES.PASSWORD);
         break;
@@ -39,7 +40,7 @@ const IdentifierPhase = ({
         break;
       default:
         return;
-    }
+    } */
   };
 
   return (
