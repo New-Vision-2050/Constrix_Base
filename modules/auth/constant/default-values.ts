@@ -1,4 +1,4 @@
-import { LoginType } from "../validator/loginSchema";
+import { LoginType } from "../validator/login-schema";
 
 export const formDefaultValues: LoginType = {
   identifier: "",

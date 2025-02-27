@@ -1,10 +1,10 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { LoginType } from "../../validator/loginSchema";
+import { LoginType } from "../../validator/login-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useResetPassword } from "../../store/mutations";
 
 const ResetPasswordPhase = ({

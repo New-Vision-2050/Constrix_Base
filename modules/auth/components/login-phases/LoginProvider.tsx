@@ -1,16 +1,16 @@
 "use client";
 
 import { FormProvider } from "react-hook-form";
-import useLogin from "../../hook/useLogin";
-import IdentifierPhase from "./IdentifierPhase";
-import PasswordPhase from "./PasswordPhase";
-import { LOGIN_PHASES } from "../../constant/loginPhases";
-import ForgetPasswordPhase from "./ForgetPasswordPhase";
-import ResetPasswordPhase from "./ResetPasswordPhase";
-import ValidateEmailPhase from "./ValidateEmailPhase";
-import SecurityQuestionsPhase from "./SecurityQuestionsPhase";
-import ChangeEmailPhase from "./ChangeEmailPhase";
-import ValidatePhonePhase from "./ValidatePhonePhase";
+import useLogin from "../../hook/use-login";
+import IdentifierPhase from "./identifier";
+import PasswordPhase from "./password";
+import { LOGIN_PHASES } from "../../constant/login-phase";
+import ForgetPasswordPhase from "./forget-password";
+import ResetPasswordPhase from "./reset-password";
+import ValidateEmailPhase from "./validate-email";
+import SecurityQuestionsPhase from "./security-questions";
+import ChangeEmailPhase from "./change-email";
+import ValidatePhonePhase from "./validate-phone";
 
 const LoginProvider = () => {
   const { form, step, handleSetStep } = useLogin();

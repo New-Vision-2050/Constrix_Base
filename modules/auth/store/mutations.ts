@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { loginRepository } from "../repository/loginRepository";
+import { loginRepository } from "../repository/login-repository";
 import {
   LoginStepsSuccessResponse,
   LoginWaysSuccessResponse,
-} from "../types/loginRepositoryTypes";
+} from "../types/login-responses";
 import { AxiosError } from "axios";
 import {
   ServerErrorResponse,

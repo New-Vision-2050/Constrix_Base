@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LOGIN_PHASES } from "../constant/loginPhases";
+import { LOGIN_PHASES } from "../constant/login-phase";
 
 const passwordValidation = z
   .string()
@@ -16,10 +16,10 @@ const identifierSchema = z.object({
         if (value.includes("@")) {
           return z.string().email().safeParse(value).success;
         }
-        return true; 
+        return true;
       },
       { message: "البريد الإلكتروني غير صالح" }
-    ) 
+    )
     .refine(
       (value) => {
         if (value.startsWith("0")) {
@@ -28,7 +28,7 @@ const identifierSchema = z.object({
         return true;
       },
       { message: "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx" }
-    ), 
+    ),
   token: z.string().optional(),
 });
 

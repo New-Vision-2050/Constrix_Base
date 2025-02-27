@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import PasswordIcon from "@/public/icons/Password";
+import PasswordIcon from "@/public/icons/password";
 import { forwardRef, useMemo, useState } from "react";
-import AutoHeight from "../animation/AutoHeight";
+import AutoHeight from "../animation/auto-height";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   containerClassName?: string;

@@ -1,9 +1,9 @@
 import React from "react";
-import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import {
   ChangeEmailType,
   ValidateEmailType,
-} from "../../validator/loginSchema";
+} from "../../validator/login-schema";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

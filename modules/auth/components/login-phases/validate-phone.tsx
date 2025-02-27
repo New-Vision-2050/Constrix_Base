@@ -1,18 +1,21 @@
 import React, { useEffect } from "react";
-import { useCountDown } from "../../../../hooks/useCountDown";
+import { useCountDown } from "../../../../hooks/use-countdown";
 import { Controller, useFormContext } from "react-hook-form";
-import { IdentifierType, ValidatePhoneType } from "../../validator/loginSchema";
-import AutoHeight from "@/components/animation/AutoHeight";
-import ClockIcon from "@/public/icons/ClockIcon";
+import {
+  IdentifierType,
+  ValidatePhoneType,
+} from "../../validator/login-schema";
+import AutoHeight from "@/components/animation/auto-height";
+import ClockIcon from "@/public/icons/clock";
 import { Button } from "@/components/ui/button";
-import AnotherCheckingWay from "../AnotherCheckingWay";
+import AnotherCheckingWay from "../another-checking-way";
 import {
   InputError,
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 
 const ValidatePhonePhase = ({
   handleSetStep,

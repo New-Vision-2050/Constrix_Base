@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import InfoIcon from "@/public/icons/InfoIcon";
+import InfoIcon from "@/public/icons/info";
 import { Button } from "../ui/button";
 
 interface IErrorDialog {

@@ -1,13 +1,13 @@
 "use client";
 import { useFormContext } from "react-hook-form";
-import { IdentifierType } from "../../validator/loginSchema";
+import { IdentifierType } from "../../validator/login-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
-import { useModal } from "../../../../hooks/useModal";
-import ErrorDialog from "@/components/shared/ErrorDialog";
+import { useModal } from "../../../../hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
 
 const IdentifierPhase = ({
   handleSetStep,

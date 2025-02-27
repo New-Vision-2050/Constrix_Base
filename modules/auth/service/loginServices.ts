@@ -1,5 +1,5 @@
-import { apiClient } from "@/config/axiosConfig";
-import { endPoints } from "../constant/endPoints";
+import { apiClient } from "@/config/axios-config";
+import { endPoints } from "../constant/end-points";
 
 export const loginWays = async (identifier: string) =>
   await apiClient.post(endPoints.loginWays, { identifier });

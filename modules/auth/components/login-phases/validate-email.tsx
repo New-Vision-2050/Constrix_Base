@@ -5,7 +5,7 @@ import {
   ChangeEmailType,
   IdentifierType,
   ValidateEmailType,
-} from "../../validator/loginSchema";
+} from "../../validator/login-schema";
 import {
   InputOTP,
   InputOTPGroup,
@@ -13,10 +13,10 @@ import {
   InputError,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
-import AnotherCheckingWay from "../AnotherCheckingWay";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
+import AnotherCheckingWay from "../another-checking-way";
 import { useLoginSteps } from "../../store/mutations";
-import OtpHub from "../resend-otp/OtpHub";
+import OtpHub from "../resend-otp/otp-hub";
 
 const ValidateEmailPhase = ({
   handleSetStep,

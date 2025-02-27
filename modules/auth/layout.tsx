@@ -1,7 +1,7 @@
-import ConstrixIcon from "@/public/icons/ConstrixIcon";
-import NewVision from "@/public/icons/NewVision";
-import NewVisionWhite from "@/public/icons/NewVisionWhite";
-import { SparklesCore } from "./components/SparklesCore";
+import ConstrixIcon from "@/public/icons/constrix";
+import NewVision from "@/public/icons/new-vision";
+import NewVisionWhite from "@/public/icons/new-vision-white";
+import { SparklesCore } from "./components/sparkles-core";
 
 export default function AuthLayout({
   children,

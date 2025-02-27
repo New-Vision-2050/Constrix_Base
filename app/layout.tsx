@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
-import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import ReactQueryProvider from "@/providers/react-query";
 
 const theSans = localFont({
   src: [

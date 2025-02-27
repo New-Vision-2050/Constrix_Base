@@ -7,10 +7,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import MobileIcon from "@/public/icons/MobileIcon";
-import PassIcon from "@/public/icons/PassIcon";
-import BarCodeIcon from "@/public/icons/BarCodeIcon";
-import NetworkIcon from "@/public/icons/NetworkIcon";
+import MobileIcon from "@/public/icons/mobile";
+import PassIcon from "@/public/icons/pass";
+import BarCodeIcon from "@/public/icons/barcode";
+import NetworkIcon from "@/public/icons/netwrok";
 import { ChevronDown } from "lucide-react";
 import { memo } from "react";
 

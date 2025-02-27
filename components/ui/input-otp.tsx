@@ -5,7 +5,7 @@ import { OTPInput, OTPInputContext } from "input-otp";
 import { Minus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import AutoHeight from "../animation/AutoHeight";
+import AutoHeight from "../animation/auto-height";
 
 const InputOTP = React.forwardRef<
   React.ComponentRef<typeof OTPInput>,

@@ -1,9 +1,9 @@
 "use client";
-import { useCountDown } from "@/hooks/useCountDown";
+import { useCountDown } from "@/hooks/use-countdown";
 import { useEffect } from "react";
-import OtpTimer from "./OtpTimer";
-import AutoHeight from "@/components/animation/AutoHeight";
-import ResendOtp from "./ResendOTP";
+import OtpTimer from "./otp-timer";
+import AutoHeight from "@/components/animation/auto-height";
+import ResendOtp from "./resend-otp";
 
 const OtpHub = ({
   identifier,

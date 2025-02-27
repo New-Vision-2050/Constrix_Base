@@ -4,7 +4,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import {
   ForgetPasswordType,
   IdentifierType,
-} from "../../validator/loginSchema";
+} from "../../validator/login-schema";
 import {
   InputOTP,
   InputOTPGroup,
@@ -12,8 +12,8 @@ import {
   InputError,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
-import OtpHub from "../resend-otp/OtpHub";
+import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
+import OtpHub from "../resend-otp/otp-hub";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
@@ -70,7 +70,7 @@ const ForgetPasswordPhase = ({
       <Button onClick={handleSubmit(onSubmit)} className="w-full">
         تأكيد
       </Button>{" "}
-      <OtpHub identifier={identifier} resendFor={'forget-password'}/>
+      <OtpHub identifier={identifier} resendFor={"forget-password"} />
     </>
   );
 };
