@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
-import { useModal } from "../../../../hooks/use-modal";
+import { useModal } from "../../../../hooks/useModal";
 import ErrorDialog from "@/components/shared/ErrorDialog";
 
 const IdentifierPhase = ({
@@ -30,7 +30,7 @@ const IdentifierPhase = ({
       {
         onSuccess(data, variable) {
           setValue("token", data.payload.token);
-          const nextStep = data.payload.login_way.name;
+          const nextStep = data.payload.login_way.step?.login_option;
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);

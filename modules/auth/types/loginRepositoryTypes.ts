@@ -4,9 +4,9 @@ export type LoginWaysSuccessResponse = {
   payload: {
     login_way: {
       id: string;
-      name: "password" | "otp";
+      name: string;
       step: {
-        login_option: string;
+        login_option: "password" | "otp";
         drivers: string[];
       };
     };
@@ -21,7 +21,10 @@ export type LoginStepsSuccessResponse = {
     login_way: {
       id: string;
       name: string;
-      step: "password" | "opt" | null;
+      step: {
+        login_option: "password" | "otp";
+        drivers: string[];
+      } | null;
     };
     token: string;
     user: {

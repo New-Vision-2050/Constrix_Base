@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useCountDown } from "../../hook/useCountDown";
+import { useCountDown } from "../../../../hooks/useCountDown";
 import { Controller, useFormContext } from "react-hook-form";
 import { IdentifierType, ValidatePhoneType } from "../../validator/loginSchema";
 import AutoHeight from "@/components/animation/AutoHeight";
@@ -55,21 +55,23 @@ const ValidatePhonePhase = ({
         control={control}
         render={({ field }) => (
           <div className="flex flex-col px-4">
-            <InputOTP
-              maxLength={5}
-              value={field.value}
-              onChange={field.onChange}
-            >
-              <InputOTPGroup>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <InputOTPSlot
-                    key={index}
-                    index={index}
-                    isError={!!errors?.validatePhoneOtp?.message}
-                  />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
+            <div dir="ltr">
+              <InputOTP
+                maxLength={5}
+                value={field.value}
+                onChange={field.onChange}
+              >
+                <InputOTPGroup>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <InputOTPSlot
+                      key={index}
+                      index={index}
+                      isError={!!errors?.validatePhoneOtp?.message}
+                    />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
             <InputError error={errors?.validatePhoneOtp?.message} />
           </div>
         )}

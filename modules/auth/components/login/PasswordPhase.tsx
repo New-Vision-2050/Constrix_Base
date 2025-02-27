@@ -5,13 +5,15 @@ import { LoginType } from "../../validator/loginSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
-import { useLoginSteps } from "../../store/mutations";
+import { useForgetPassword, useLoginSteps } from "../../store/mutations";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
+    useForgetPassword();
   const { mutate, isPending } = useLoginSteps();
   const {
     register,
@@ -40,7 +42,16 @@ const PasswordPhase = ({
   };
 
   const handleForgetPhase = () => {
-    handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
+    const data = getValues();
+
+    forgetPasswordMutation(
+      { identifier: data.identifier },
+      {
+        onSuccess: () => {
+          handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
+        },
+      }
+    );
   };
 
   return (
@@ -60,8 +71,12 @@ const PasswordPhase = ({
       >
         دخول
       </Button>
-      <Button variant={"link"} onClick={handleForgetPhase}>
-        هل نسيت كلمة المرور؟{" "}
+      <Button
+        loading={isPendingForgetPassword}
+        variant={"link"}
+        onClick={handleForgetPhase}
+      >
+        هل نسيت كلمة المرور؟
       </Button>
     </>
   );

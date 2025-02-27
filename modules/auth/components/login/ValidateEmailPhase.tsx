@@ -13,12 +13,10 @@ import {
   InputError,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { useCountDown } from "../../hook/useCountDown";
-import { useEffect } from "react";
-import AutoHeight from "@/components/animation/AutoHeight";
-import { ClockIcon } from "lucide-react";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
 import AnotherCheckingWay from "../AnotherCheckingWay";
+import { useLoginSteps } from "../../store/mutations";
+import OtpHub from "../resend-otp/OtpHub";
 
 const ValidateEmailPhase = ({
   handleSetStep,
@@ -26,30 +24,54 @@ const ValidateEmailPhase = ({
   handleSetStep: (step: LoginPhase) => void;
 }) => {
   const {
-    counter: time,
-    start: timerStart,
-    reset: timerReset,
-  } = useCountDown(30);
-  const {
     formState: { errors },
     handleSubmit,
     control,
     getValues,
+    setValue,
   } = useFormContext<IdentifierType & ValidateEmailType & ChangeEmailType>();
+  const { mutate, isPending } = useLoginSteps();
+
   const identifier = getValues("newEmail") || getValues("identifier");
 
-  const onSubmit = (data: ValidateEmailType) => {
-    console.log("formSubmitted: ", data);
-    handleSetStep(LOGIN_PHASES.IDENTIFIER);
+  const onSubmit = () => {
+    const data = getValues();
+
+    mutate(
+      {
+        identifier: data.identifier,
+        password: data.validateEmailOtp,
+        token: data.token ?? "",
+      },
+      {
+        onSuccess: (data, variable) => {
+          setValue("token", data.payload.token);
+          const nextStep = data.payload.login_way.step?.login_option;
+          switch (nextStep) {
+            case "password":
+              handleSetStep(LOGIN_PHASES.PASSWORD);
+              break;
+            case "otp":
+              if (variable.identifier.includes("@")) {
+                handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
+              } else {
+                handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
+              }
+              break;
+            default:
+              return;
+          }
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      }
+    );
   };
 
   const handleSecurityQuestionsPhase = () => {
     handleSetStep(LOGIN_PHASES.SECURITY_QUESTIONS);
   };
-
-  useEffect(() => {
-    timerStart();
-  }, []);
 
   return (
     <>
@@ -65,39 +87,35 @@ const ValidateEmailPhase = ({
         control={control}
         render={({ field }) => (
           <div className="flex flex-col px-4">
-            <InputOTP
-              maxLength={5}
-              value={field.value}
-              onChange={field.onChange}
-            >
-              <InputOTPGroup>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <InputOTPSlot
-                    key={index}
-                    index={index}
-                    isError={!!errors?.validateEmailOtp?.message}
-                  />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
+            <div dir="ltr">
+              <InputOTP
+                maxLength={5}
+                value={field.value}
+                onChange={field.onChange}
+              >
+                <InputOTPGroup>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <InputOTPSlot
+                      key={index}
+                      index={index}
+                      isError={!!errors?.validateEmailOtp?.message}
+                    />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
             <InputError error={errors?.validateEmailOtp?.message} />
           </div>
         )}
       />
-      <Button onClick={handleSubmit(onSubmit)} className="w-full">
-        دخول
+      <Button
+        loading={isPending}
+        onClick={handleSubmit(onSubmit)}
+        className="w-full"
+      >
+        التالي
       </Button>
-      <div className="h-6">
-        <AutoHeight condition={time === 0}>
-          <ResendEmail timerReset={timerReset} />
-        </AutoHeight>
-        <AutoHeight condition={time > 0}>
-          <div className="flex items-center gap-2 w-full justify-center">
-            <ClockIcon />
-            <p>0:{time}</p>
-          </div>
-        </AutoHeight>
-      </div>
+      <OtpHub identifier={getValues("identifier")} resendFor="resend-otp" />
       <div className="flex items-center gap-2">
         <Button
           onClick={handleSecurityQuestionsPhase}
@@ -111,22 +129,6 @@ const ValidateEmailPhase = ({
         <AnotherCheckingWay />
       </div>
     </>
-  );
-};
-
-const ResendEmail = ({ timerReset }: { timerReset: () => void }) => {
-  return (
-    <div className="flex gap-1">
-      <p>لم يصلك رمز التحقق؟</p>{" "}
-      <Button
-        onClick={timerReset}
-        variant={"link"}
-        className="p-0 h-auto underline"
-        type="button"
-      >
-        إعادة الإرسال
-      </Button>
-    </div>
   );
 };
 

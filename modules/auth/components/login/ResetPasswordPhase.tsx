@@ -1,25 +1,43 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { ResetPasswordType } from "../../validator/loginSchema";
+import { LoginType } from "../../validator/loginSchema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/loginPhases";
+import { useResetPassword } from "../../store/mutations";
 
 const ResetPasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const { mutate, isPending } = useResetPassword();
   const {
     formState: { errors },
     handleSubmit,
     register,
-  } = useFormContext<ResetPasswordType>();
+    getValues,
+    reset,
+  } = useFormContext<LoginType>();
 
-  const onSubmit = (data: ResetPasswordType) => {
-    console.log(data);
-    handleSetStep(LOGIN_PHASES.IDENTIFIER);
+  const onSubmit = () => {
+    const data = getValues();
+
+    mutate(
+      {
+        identifier: data.identifier,
+        otp: data.forgetPasswordOtp,
+        password: data.newPassword,
+        password_confirmation: data.confirmNewPassword,
+      },
+      {
+        onSuccess: () => {
+          reset();
+          handleSetStep(LOGIN_PHASES.IDENTIFIER);
+        },
+      }
+    );
   };
 
   return (
@@ -43,7 +61,11 @@ const ResetPasswordPhase = ({
           error={errors?.confirmNewPassword?.message}
         />
       </div>
-      <Button onClick={handleSubmit(onSubmit)} className="w-full">
+      <Button
+        loading={isPending}
+        onClick={handleSubmit(onSubmit)}
+        className="w-full"
+      >
         تأكيد
       </Button>
     </>

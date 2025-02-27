@@ -51,6 +51,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       asChild = false,
       loading = false,
       children,
+      type = "button",
       ...props
     },
     ref
@@ -61,6 +62,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         disabled={loading || props.disabled}
+        type={type}
         {...props}
       >
         {loading ? <LoadingSpinner /> : children}

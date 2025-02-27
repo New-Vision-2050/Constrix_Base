@@ -24,11 +24,10 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/* apiClient.interceptors.response.use(
+apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error.response?.data?.message || error.message);
+    console.log("API Error:", error.response?.data?.message || error.message);
     return Promise.reject(error);
   }
 );
- */
