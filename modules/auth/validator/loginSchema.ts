@@ -8,7 +8,27 @@ const passwordValidation = z
   .regex(/[^A-Za-z0-9]/, "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل");
 
 const identifierSchema = z.object({
-  identifier: z.string().min(5, "هذا الحقل مطلوب"),
+  identifier: z
+    .string()
+    .min(5, "هذا الحقل مطلوب")
+    .refine(
+      (value) => {
+        if (value.includes("@")) {
+          return z.string().email().safeParse(value).success;
+        }
+        return true; 
+      },
+      { message: "البريد الإلكتروني غير صالح" }
+    ) 
+    .refine(
+      (value) => {
+        if (value.startsWith("0")) {
+          return /^0(5[0-9]{8})$/.test(value);
+        }
+        return true;
+      },
+      { message: "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx" }
+    ), 
   token: z.string().optional(),
 });
 
