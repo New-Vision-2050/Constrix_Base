@@ -4,7 +4,7 @@ import {
   loginWays,
   resendOtp,
   resetPassword,
-} from "../service/loginServices";
+} from "../service/login-services";
 
 export const loginRepository = {
   loginWays: async (identifier: string) => {

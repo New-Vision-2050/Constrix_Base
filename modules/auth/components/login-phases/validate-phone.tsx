@@ -1,12 +1,8 @@
-import React, { useEffect } from "react";
-import { useCountDown } from "../../../../hooks/use-countdown";
 import { Controller, useFormContext } from "react-hook-form";
 import {
   IdentifierType,
   ValidatePhoneType,
 } from "../../validator/login-schema";
-import AutoHeight from "@/components/animation/auto-height";
-import ClockIcon from "@/public/icons/clock";
 import { Button } from "@/components/ui/button";
 import AnotherCheckingWay from "../another-checking-way";
 import {
@@ -16,33 +12,60 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
+import { useLoginSteps } from "../../store/mutations";
+import OtpHub from "../resend-otp/otp-hub";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-  const {
-    counter: time,
-    start: timerStart,
-    reset: timerReset,
-  } = useCountDown(30);
+  const { mutate, isPending } = useLoginSteps();
+
   const {
     formState: { errors },
     handleSubmit,
     control,
     getValues,
+    setValue,
   } = useFormContext<IdentifierType & ValidatePhoneType>();
   const identifier = getValues("identifier");
 
-  const onSubmit = (data: ValidatePhoneType) => {
-    console.log("formSubmitted: ", data);
-    handleSetStep(LOGIN_PHASES.IDENTIFIER);
+  const onSubmit = () => {
+    const data = getValues();
+
+    mutate(
+      {
+        identifier: data.identifier,
+        password: data.validatePhoneOtp,
+        token: data.token ?? "",
+      },
+      {
+        onSuccess: (data, variable) => {
+          setValue("token", data.payload.token);
+          const nextStep = data.payload.login_way.step?.login_option;
+          switch (nextStep) {
+            case "password":
+              handleSetStep(LOGIN_PHASES.PASSWORD);
+              break;
+            case "otp":
+              if (variable.identifier.includes("@")) {
+                handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
+              } else {
+                handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
+              }
+              break;
+            default:
+              return;
+          }
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      }
+    );
   };
 
-  useEffect(() => {
-    timerStart();
-  }, []);
 
   return (
     <>
@@ -79,20 +102,15 @@ const ValidatePhonePhase = ({
           </div>
         )}
       />
-      <Button onClick={handleSubmit(onSubmit)} className="w-full">
+      <Button
+        loading={isPending}
+        onClick={handleSubmit(onSubmit)}
+        className="w-full"
+      >
         دخول
       </Button>
-      <div className="h-6">
-        <AutoHeight condition={time === 0}>
-          <ResendSMS timerReset={timerReset} />
-        </AutoHeight>
-        <AutoHeight condition={time > 0}>
-          <div className="flex items-center gap-2 w-full justify-center">
-            <ClockIcon />
-            <p>0:{time}</p>
-          </div>
-        </AutoHeight>
-      </div>
+      <OtpHub resendFor="resend-otp" identifier={identifier} />
+
       <div className="flex items-center gap-2">
         <Button
           type="button"
@@ -108,19 +126,5 @@ const ValidatePhonePhase = ({
   );
 };
 
-const ResendSMS = ({ timerReset }: { timerReset: () => void }) => {
-  return (
-    <div className="flex gap-1">
-      <p>لم يصلك رمز التحقق؟</p>{" "}
-      <Button
-        onClick={timerReset}
-        variant={"link"}
-        className="p-0 h-auto underline"
-        type="button"
-      >
-        إعادة الإرسال
-      </Button>
-    </div>
-  );
-};
+
 export default ValidatePhonePhase;

@@ -1,4 +1,4 @@
-import LoginProvider from "@/modules/auth/components/login-phases/LoginProvider";
+import LoginProvider from "@/modules/auth/components/login-phases/login-provider";
 
 const LoginPage = () => <LoginProvider />;
 
