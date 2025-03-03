@@ -1,0 +1,82 @@
+// form hook
+import {
+  Controller,
+  FieldValues,
+  Path,
+  Control,
+  ControllerRenderProps,
+} from "react-hook-form";
+
+// shad-cn-ui
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// types
+import { Option } from "@/types/Option";
+
+type CustomSelectProps<T extends FieldValues> = {
+  name: Path<T>;
+  control: Control<T>;
+  options: Option[];
+  placeholder?: string;
+};
+
+// Main CustomSelect component
+const CustomSelect = <T extends FieldValues>({
+  name,
+  control,
+  options,
+  placeholder = "Select an option",
+}: CustomSelectProps<T>) => {
+  // Return the Controller component for handling form control
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <SelectField
+          field={field}
+          options={options}
+          placeholder={placeholder}
+        />
+      )}
+    />
+  );
+};
+
+// Separate SelectField component for rendering the dropdown UI
+const SelectField = <T extends FieldValues>({
+  field,
+  options,
+  placeholder,
+}: {
+  field: ControllerRenderProps<T, Path<T>>;
+  options: Option[];
+  placeholder: string;
+}) => {
+  return (
+    <Select value={field.value} onValueChange={field.onChange}>
+      <SelectTrigger className="w-full max-w-sm border-2 border-gray-300 dark:border-gray-700 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+        {options.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+            className="px-4 py-2 hover:bg-blue-500 hover:text-white rounded-md transition-all duration-150 cursor-pointer"
+          >
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
+
+export default CustomSelect;
