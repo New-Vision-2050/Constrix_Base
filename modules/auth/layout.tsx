@@ -2,18 +2,23 @@ import ConstrixIcon from "@/public/icons/constrix";
 import NewVision from "@/public/icons/new-vision";
 import NewVisionWhite from "@/public/icons/new-vision-white";
 import { SparklesCore } from "./components/sparkles-core";
+import { useTranslations } from "next-intl";
+import RenderLocaleSwitch from "@/components/ui/RenderLocaleSwitch";
 
 export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const t = useTranslations();
   return (
     <main className="h-screen overflow-hidden relative ">
+      <RenderLocaleSwitch />
+
       <div className="w-full bg-[#280B4A] absolute top-0 rounded-[100%] pt-[530px] -translate-y-1/2 -z-10">
         <div className="absolute top-2/3 w-full max-w-5xl start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex justify-between items-end">
           <NewVision />
-          <h1 className="text-4xl">لوحة التحكم</h1>
+          <h1 className="text-4xl">{t("Login.Control_panel")}</h1>
           <ConstrixIcon />
         </div>
       </div>
