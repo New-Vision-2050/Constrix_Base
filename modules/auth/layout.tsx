@@ -10,8 +10,8 @@ export default function AuthLayout({
 }>) {
   return (
     <main className="h-screen overflow-hidden relative w-[90%] mx-auto">
-      <div className="w-full md:bg-[#280B4A] absolute top-0 rounded-[100%] md:pt-[530px] pt-[150px]  -translate-y-1/2 -z-10">
-        <div className="absolute top-2/3 w-full max-w-5xl start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex justify-between items-end">
+      <div className="w-full md:bg-[#280B4A] absolute top-0 rounded-[100%] md:pt-[400px] pt-[150px]  -translate-y-1/2 -z-10 pb-[50px]">
+        <div className="absolute top-2/3 w-full max-w-5xl start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex justify-evenly items-center ">
           <NewVision />
           <h1 className="md:text-4xl text-xl">لوحة التحكم</h1>
           <ConstrixIcon />
@@ -31,9 +31,9 @@ export default function AuthLayout({
           {children}
         </div>
       </section>
-      <div className="w-full md:bg-[#280B4A] absolute bottom-0 rounded-[100%] md:pt-[530px] pt-[350px] translate-y-1/2 -z-10">
+      <div className="w-full md:bg-[#280B4A] absolute bottom-0 rounded-[100%] md:pt-[400px] pt-[150px] translate-y-1/2 -z-10 pb-[50px]">
         <div className="absolute bottom-2/3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex justify-center items-center gap-5 mt-6 w-full ">
-          <p className="text-center md:text-4xl text-xl">
+          <p className="text-center md:text-3xl text-xl">
             جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية .
           </p>
           <NewVisionWhite />
