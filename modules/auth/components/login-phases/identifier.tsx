@@ -56,8 +56,8 @@ const IdentifierPhase = ({
   };
 
   return (
-    <div>
-      <h1 className="text-2xl text-center my-5">تسجيل الدخول</h1>
+    <>
+      <h1 className="text-2xl text-center my-5 ">تسجيل الدخول</h1>
       <Input
         {...register("identifier")}
         label="رقم الجوال / البريد الالكتروني / رقم المعرف (يحدد من الاعدادات)"
@@ -66,7 +66,7 @@ const IdentifierPhase = ({
 
       <Button
         size={"lg"}
-        className="w-full my-4"
+        className="w-full"
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
       >
@@ -78,7 +78,7 @@ const IdentifierPhase = ({
         handleClose={handleClose}
         desc={errorMessage}
       />
-    </div>
+    </>
   );
 };
 

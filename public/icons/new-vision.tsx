@@ -1,4 +1,4 @@
-const NewVision = () => {
+const NewVision = ({ ...props }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -6,12 +6,13 @@ const NewVision = () => {
       height="80"
       fill="none"
       viewBox="0 0 100 80"
+      {...props}
     >
       <g clipPath="url(#clip0_30915_58317)">
         <path
-    fill="url(#paint0_linear_30915_58317)"
-    d="m34.694 67.668-1.569-1.57-1.758 1.737 1.736 1.715 1.725-1.649 1.59 1.515 1.748-1.748-1.736-1.715z"
-    />
+          fill="url(#paint0_linear_30915_58317)"
+          d="m34.694 67.668-1.569-1.57-1.758 1.737 1.736 1.715 1.725-1.649 1.59 1.515 1.748-1.748-1.736-1.715z"
+        />
         <path
           fill="url(#paint1_linear_30915_58317)"
           d="m81.819 67.668-1.568-1.57-1.759 1.737 1.736 1.715 1.725-1.649 1.59 1.515 1.748-1.748-1.736-1.715z"
@@ -438,7 +439,7 @@ const NewVision = () => {
           <stop offset="1" stopColor="#1CCFDF"></stop>
         </linearGradient>
         <clipPath id="clip0_30915_58317">
-          <path fill="#fff" d="M0 0h100v80H0z"/>
+          <path fill="#fff" d="M0 0h100v80H0z" />
         </clipPath>
       </defs>
     </svg>
