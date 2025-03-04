@@ -1,11 +1,11 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { SetCompanySchema } from "@/modules/companies-demo/schema/SetCompany";
+import { SetCompanySchema } from "@/modules/companies/schema/SetCompany";
 import CustomSelect from "./fields/CustomSelect";
 import { Input } from "@/components/ui/input";
 import PhoneInput from "./fields/PhoneField";
-import { CompanyService } from "@/modules/companies-demo/services/CompanyService";
-import { CompanyRepository } from "@/modules/companies-demo/repositories/CompanyRepository";
+import { CompanyService } from "@/modules/companies/services/CompanyService";
+import { CompanyRepository } from "@/modules/companies/repositories/CompanyRepository";
 
 export default function SetCompanyFormContent() {
   const companyRepository = new CompanyRepository();

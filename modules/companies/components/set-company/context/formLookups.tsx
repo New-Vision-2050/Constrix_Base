@@ -1,4 +1,4 @@
-import { useCountriesData } from "@/modules/companies-demo/hooks/useCountriesData";
+import { useCountriesData } from "@/modules/companies/hooks/useCountriesData";
 import { createContext, useContext, useMemo } from "react";
 
 // define context type

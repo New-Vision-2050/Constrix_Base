@@ -1,4 +1,4 @@
-import CompaniesMainView from "@/modules/companies-demo/views/CompaniesMainView";
+import CompaniesMainView from "@/modules/companies/views/CompaniesMainView";
 
 export default function CompaniesPage() {
   return <CompaniesMainView />;
