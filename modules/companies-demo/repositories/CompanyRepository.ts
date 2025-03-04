@@ -1,6 +1,6 @@
 import { ICompanyRepository } from "./ICompanyRepository";
 import { Company } from "../entities/Company";
-import { companiesEndPoints } from "../constant/CompaniesEndPoints";
+import { companiesEndPoints } from "../constant/end-points";
 import { apiClient } from "@/config/axios-config";
 
 export class CompanyRepository implements ICompanyRepository {
