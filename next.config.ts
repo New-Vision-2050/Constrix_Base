@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/en/login", // Change this
-        permanent: false, // `true` for 301, `false` for 302
+        destination: "/login",
+        permanent: false,
       },
     ];
   },
