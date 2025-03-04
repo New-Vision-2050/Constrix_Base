@@ -8,7 +8,6 @@ export class CompanyService {
 
   async createCompany(data: Omit<Company, "id">): Promise<Company> {
     const newCompany = new Company(
-      "id-121",
       data.name,
       data.email,
       data.phone,
@@ -18,7 +17,6 @@ export class CompanyService {
       data.generalManagerId,
       data.registrationTypeId,
       data.registrationNo,
-      data.registrationType,
       data.classificationNo
     );
     return this.companyRepository.create(newCompany);

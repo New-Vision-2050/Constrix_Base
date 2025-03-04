@@ -24,6 +24,8 @@ type CustomSelectProps<T extends FieldValues> = {
   control: Control<T>;
   options: Option[];
   placeholder?: string;
+  error?: boolean;
+  errorMessage?: string;
 };
 
 // Main CustomSelect component
@@ -32,20 +34,25 @@ const CustomSelect = <T extends FieldValues>({
   control,
   options,
   placeholder = "Select an option",
+  error = false,
+  errorMessage,
 }: CustomSelectProps<T>) => {
   // Return the Controller component for handling form control
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <SelectField
-          field={field}
-          options={options}
-          placeholder={placeholder}
-        />
-      )}
-    />
+    <>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <SelectField
+            field={field}
+            options={options}
+            placeholder={placeholder}
+          />
+        )}
+      />
+      {error && <p className="text-red-500">{errorMessage}</p>}
+    </>
   );
 };
 

@@ -15,10 +15,7 @@ export class CompanyRepository implements ICompanyRepository {
   async create(company: Company): Promise<Company> {
     const url = this.apiUrl + companiesEndPoints.create;
 
-    const response = await apiClient.post<{ data: Company }>(
-      url,
-      JSON.stringify(company)
-    );
+    const response = await apiClient.post<{ data: Company }>(url, company);
 
     if (!response.data) throw new Error("Failed to create company");
 
