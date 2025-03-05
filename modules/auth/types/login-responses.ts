@@ -34,3 +34,11 @@ export type LoginStepsSuccessResponse = {
     };
   };
 };
+
+interface IUser {
+  name: string;
+  createEmail: (email: string) => void;
+}
+
+const ss: IUser[] = [];
+ss[0].createEmail("omar@gmail.com");
