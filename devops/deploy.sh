@@ -48,4 +48,4 @@ yarn build
 cd "$DEPLOY_DIR/devops"
 
 # Start the containers and remove any orphaned containers
-docker compose -p $DEPLOYMENT_ID -p $DEPLOY_DIR up --force-recreate --remove-orphans -d
+docker compose -p $DEPLOYMENT_ID up --force-recreate --remove-orphans -d
