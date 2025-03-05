@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useForgetPassword, useLoginSteps } from "../../store/mutations";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const router = useRouter();
+
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
   const { mutate, isPending } = useLoginSteps();
@@ -33,6 +37,13 @@ const PasswordPhase = ({
       {
         onSuccess: (data) => {
           console.log(data.payload);
+          if (!data.payload.login_way.step) {
+            useAuthStore
+              .getState()
+              .setUser(data.payload.user, data.payload.token);
+            router.push("/companies");
+            return;
+          }
         },
         onError(error) {
           console.log(error);

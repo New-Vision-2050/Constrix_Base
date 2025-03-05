@@ -17,12 +17,16 @@ import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import AnotherCheckingWay from "../another-checking-way";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
 
 const ValidateEmailPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const router = useRouter();
+
   const {
     formState: { errors },
     handleSubmit,
@@ -47,6 +51,13 @@ const ValidateEmailPhase = ({
         onSuccess: (data, variable) => {
           setValue("token", data.payload.token);
           const nextStep = data.payload.login_way.step?.login_option;
+          if (!data.payload.login_way.step) {
+            useAuthStore
+              .getState()
+              .setUser(data.payload.user, data.payload.token);
+            router.push("/companies");
+            return;
+          }
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);

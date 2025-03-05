@@ -14,12 +14,16 @@ import {
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const router = useRouter();
+
   const { mutate, isPending } = useLoginSteps();
 
   const {
@@ -43,6 +47,13 @@ const ValidatePhonePhase = ({
       {
         onSuccess: (data, variable) => {
           setValue("token", data.payload.token);
+          if (!data.payload.login_way.step) {
+            useAuthStore
+              .getState()
+              .setUser(data.payload.user, data.payload.token);
+            router.push("/companies");
+            return;
+          }
           const nextStep = data.payload.login_way.step?.login_option;
           switch (nextStep) {
             case "password":
@@ -65,7 +76,6 @@ const ValidatePhonePhase = ({
       }
     );
   };
-
 
   return (
     <>
@@ -125,6 +135,5 @@ const ValidatePhonePhase = ({
     </>
   );
 };
-
 
 export default ValidatePhonePhase;
