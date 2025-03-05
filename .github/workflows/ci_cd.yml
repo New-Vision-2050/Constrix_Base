@@ -133,6 +133,7 @@ jobs:
               set -e
               set -x
               export BE_URL=${{env.BE_URL}}
+              export DEPLOYMENT_ID=${{env.DEPLOYMENT_ID}}
               DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
               mkdir -p $DEPLOY_DIR
               cd $DEPLOY_DIR
