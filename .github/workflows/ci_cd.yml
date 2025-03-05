@@ -119,16 +119,16 @@ jobs:
           echo "NODE_ENV: $NODE_ENV"
 
       - name: Deploy to Server via SSH
-          uses: appleboy/ssh-action@v0.1.10
-          env:
-            BE_URL: ${{ env.BE_URL }}
-            NODE_ENV: ${{ env.NODE_ENV }}
-          with:
-            host: ${{ secrets.DEPLOY_HOST }}
-            username: ${{ secrets.DEPLOY_USER }}
-            port: ${{ secrets.DEPLOY_PORT }}
-            key: ${{ secrets.DEPLOY_SSH_KEY }}
-            script: |
+        uses: appleboy/ssh-action@v0.1.10
+        env:
+          BE_URL: ${{ env.BE_URL }}
+          NODE_ENV: ${{ env.NODE_ENV }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
               #!/bin/bash
               set -e
               set -x
