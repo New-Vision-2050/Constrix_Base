@@ -7,17 +7,18 @@ WORKDIR /app
 
 # Declare build argument again for the runtime stage
 ARG DEPLOYMENT_ID
+ARG DEPLOY_DIR
 
 # Set environment variable
 ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
 
 # Copy built artifacts
-COPY ./.next ./.next
-COPY ./public ./public
-COPY ./package.json ./
-COPY ./yarn.lock ./
-COPY ./node-modules ./
-COPY ./.env ./
+COPY ${DEPLOYMENT_ID}/.next ./.next
+COPY ${DEPLOYMENT_ID}/public ./public
+COPY ${DEPLOYMENT_ID}/package.json ./
+COPY ${DEPLOYMENT_ID}/yarn.lock ./
+COPY ${DEPLOYMENT_ID}/node-modules ./
+COPY ${DEPLOYMENT_ID}/.env ./
 
 
 RUN rm -rf ./deployments/${DEPLOYMENT_ID}
