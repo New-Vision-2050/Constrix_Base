@@ -9,9 +9,9 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="h-screen overflow-hidden relative md:w-full w-5/6 mx-auto">
+    <main className="h-screen overflow-hidden relative md:w-full ">
       <div className="w-full md:bg-[#280B4A] absolute top-0 rounded-[100%] md:pt-[550px] pt-28   -translate-y-1/2 -z-10 pb-[50px]">
-        <div className="absolute top-2/3 w-full max-w-5xl start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex justify-between items-center ">
+        <div className="absolute top-2/3 md:w-full max-w-5xl start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex justify-between items-center w-5/6 mx-auto">
           <NewVision className="max-sm:w-12" />
           <h1 className="md:text-4xl text-lg">لوحة التحكم</h1>
           <ConstrixIcon className="max-sm:w-12" />
@@ -26,7 +26,7 @@ export default function AuthLayout({
         className="h-full w-full absolute -z-20"
         particleColor="#FFFFFF"
       />
-      <section className="w-full min-h-screen flex items-center justify-center">
+      <section className="md:w-full min-h-screen flex items-center justify-center w-5/6 mx-auto">
         <div className="w-full max-w-lg rounded-md px-4 py-[20px] bg-background border border-lines/20 ">
           {children}
         </div>
