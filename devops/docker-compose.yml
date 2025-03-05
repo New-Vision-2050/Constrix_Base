@@ -1,8 +1,8 @@
 services:
   nextjs:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: devops/Dockerfile
       args:
         - DEPLOYMENT_ID=${DEPLOYMENT_ID}
         - NODE_ENV=${NODE_ENV}

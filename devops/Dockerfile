@@ -21,7 +21,7 @@ COPY ./node-modules ./
 COPY ./.env ./
 
 
-RUN rm -rf ./${DEPLOYMENT_ID}
+RUN rm -rf ../${DEPLOYMENT_ID}
 
 # Install only production dependencies
 #RUN yarn install --only=production
