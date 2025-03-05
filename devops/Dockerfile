@@ -17,7 +17,7 @@ COPY ./.next ./.next
 COPY ./public ./public
 COPY ./package.json ./
 COPY ./yarn.lock ./
-COPY ./node-modules ./
+COPY ./node_modules ./
 COPY ./.env ./
 
 
