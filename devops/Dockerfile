@@ -12,12 +12,12 @@ ARG DEPLOYMENT_ID
 ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
 
 # Copy built artifacts
-COPY ./deployments/${DEPLOYMENT_ID}/.next ./.next
-COPY ./deployments/${DEPLOYMENT_ID}/public ./public
-COPY ./deployments/${DEPLOYMENT_ID}/package.json ./
-COPY ./deployments/${DEPLOYMENT_ID}/yarn.lock ./
-COPY ./deployments/${DEPLOYMENT_ID}/node-modules ./
-COPY ./deployments/${DEPLOYMENT_ID}/.env ./
+COPY ./.next ./.next
+COPY ./public ./public
+COPY ./package.json ./
+COPY ./yarn.lock ./
+COPY ./node-modules ./
+COPY ./.env ./
 
 
 RUN rm -rf ./deployments/${DEPLOYMENT_ID}
