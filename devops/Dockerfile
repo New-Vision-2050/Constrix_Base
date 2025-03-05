@@ -17,14 +17,13 @@ COPY ./.next ./.next
 COPY ./public ./public
 COPY ./package.json ./
 COPY ./yarn.lock ./
-COPY ./node_modules ./
 COPY ./.env ./
 
 
 RUN rm -rf ../${DEPLOYMENT_ID}
 
 # Install only production dependencies
-#RUN yarn install --only=production
+RUN yarn install --only=production
 
 EXPOSE 3000
 
