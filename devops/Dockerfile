@@ -1,6 +1,8 @@
 # Use an official Node runtime as a parent image
 FROM node:22-alpine
 
+RUN apk add --no-cache yarn
+
 WORKDIR /app
 
 # Declare build argument again for the runtime stage
