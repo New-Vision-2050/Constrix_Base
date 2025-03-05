@@ -13,15 +13,15 @@ ARG DEPLOY_DIR
 ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
 
 # Copy built artifacts
-COPY ${DEPLOY_DIR}/.next ./.next
-COPY ${DEPLOY_DIR}/public ./public
-COPY ${DEPLOY_DIR}/package.json ./
-COPY ${DEPLOY_DIR}/yarn.lock ./
-COPY ${DEPLOY_DIR}/node-modules ./
-COPY ${DEPLOY_DIR}/.env ./
+COPY ../.next ./.next
+COPY ../public ./public
+COPY ../package.json ./
+COPY ../yarn.lock ./
+COPY ../node-modules ./
+COPY ../.env ./
 
 
-RUN rm -rf ${DEPLOY_DIR}
+RUN rm -rf ../../${DEPLOYMENT_ID}
 
 # Install only production dependencies
 #RUN yarn install --only=production
