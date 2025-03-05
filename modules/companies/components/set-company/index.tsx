@@ -12,7 +12,9 @@ export function SetCompanySheet() {
       <div className="grid grid-cols-2 gap-2">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline">Set Company</Button>
+            <Button variant="outline" className="w-[200px]">
+              Set Company
+            </Button>
           </SheetTrigger>
           <SheetContent side={"left"}>
             <SetCompanyHeader />
