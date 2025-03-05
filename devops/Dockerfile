@@ -13,8 +13,8 @@ ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
 RUN ls -la
 RUN pwd
 # Copy built artifacts
-COPY ./.next ./.next
-COPY ./public ./public
+COPY ./.next ./
+COPY ./public ./
 COPY ./package.json ./
 COPY ./yarn.lock ./
 COPY ./.env ./
