@@ -1,4 +1,4 @@
-import { SetCompanySheet } from "../components/set-company";
+import CreateBuilderModule from "@/features/create-builder";
 
 export default function CompaniesMainView() {
   return (
@@ -8,7 +8,13 @@ export default function CompaniesMainView() {
         <div className="aspect-video rounded-xl bg-muted/90" />
         <div className="aspect-video rounded-xl bg-muted/90" />
       </div>
-      <SetCompanySheet />
+      {/* <SetCompanySheet /> */}
+      <hr />
+      <CreateBuilderModule btnLabel="أنشاء" />
+      <CreateBuilderModule
+        btnLabel="أنشاء شركة"
+        moduleId={'create-company'}
+      />
       <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/90 md:min-h-min" />
     </div>
   );
