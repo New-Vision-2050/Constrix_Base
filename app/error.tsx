@@ -1,7 +1,7 @@
 'use client';
 const GlobalError = () => {
   return (
-    <section className="container px-4 py-8 text-center">
+    <section className="px-4 py-8 text-center">
       <div className="max-w-auto mx-auto">
         <div className="mx-auto md:max-w-lg">
           <p className="text-[150px] font-semibold text-gray-300 md:text-[200px]">

@@ -1,0 +1,83 @@
+"use client";
+
+import { Checkbox } from "@/components/ui/checkbox";
+import { ColumnDef } from "@tanstack/react-table";
+import { ArabicDataItem } from "./data";
+import Company from "./cells/company";
+import DataStatus from "./cells/data-status";
+import TheStatus from "./cells/the-status";
+import Execution from "./cells/execution";
+
+// This type is used to define the shape of our data.
+// You can use a Zod schema here if you want.
+
+export const columns: ColumnDef<ArabicDataItem>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "title",
+    header: "الشركات",
+    cell: ({ row }) => <Company row={row} />,
+  },
+  {
+    accessorKey: "email",
+    header: "البريد الاليكتروني",
+  },
+  {
+    accessorKey: "type",
+    header: "نوع الشركة",
+  },
+  {
+    accessorKey: "Bouquet",
+    header: "الباقة",
+  },
+  {
+    accessorKey: "responsible",
+    header: "المسؤول",
+  },
+  {
+    accessorKey: "expireAt",
+    header: "تاريخ الانتهاء",
+  },
+
+  {
+    accessorKey: "dataStatus",
+    header: "حالة البيانات",
+    cell: ({ row }) => <DataStatus dataStatus={row.getValue("dataStatus")} />,
+  },
+  {
+    accessorKey: "theStatus",
+    header: "الحالة",
+    cell: ({ row }) => (
+      <TheStatus
+        theStatus={row.getValue("theStatus")}
+        id={row.getValue("id")}
+      />
+    ),
+  },
+  {
+    accessorKey: "id",
+    header: "الاجراء",
+    cell: ({ row }) => <Execution id={row.getValue("id")} />,
+  },
+];
