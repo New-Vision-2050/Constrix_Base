@@ -1,12 +1,14 @@
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useCreateBuilderCxt } from "../../context/create-builder-cxt";
+import { useCreateBuilderStore } from "../../store/useCreateBuilderStore";
 
 export default function CreateBuilderSheetHeader() {
-  const { selectedModule } = useCreateBuilderCxt();
+  const { selectedModule } = useCreateBuilderStore();
 
   const title = Boolean(selectedModule)
     ? selectedModule?.title
     : "Choose Module";
+
+  console.log("selectedModuleselectedModule", selectedModule);
 
   return (
     <SheetHeader>

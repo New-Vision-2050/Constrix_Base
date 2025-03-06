@@ -11,6 +11,7 @@ type CreateBuilderState = {
   originalModuleId: string | undefined;
   setModuleId: (id: string) => void;
   setBtnLabel: (label: string) => void;
+  setOriginalModuleId: (label: string) => void;
 };
 
 // Zustand store
@@ -27,9 +28,15 @@ export const useCreateBuilderStore = create<CreateBuilderState>((set, get) => ({
     set({ btnLabel: label });
   },
 
+  // set originalModuleId
+  setOriginalModuleId: (id: string) => {
+    set({ originalModuleId: id });
+  },
+
   // Set module ID and update selectedModule
   setModuleId: (id: string) => {
     const selected = get().modules.find((ele) => ele.id === id);
+    console.log("insead store", selected);
     set({ moduleId: id, selectedModule: selected });
   },
 }));
