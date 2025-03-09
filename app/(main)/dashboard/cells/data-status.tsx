@@ -2,12 +2,12 @@ import PendingStatusIcon from "@/public/icons/pending-status";
 import SuccessStatusIcon from "@/public/icons/success-status";
 import React from "react";
 
-const DataStatus = ({ dataStatus }: { dataStatus: "pending" | "success" }) => {
+const DataStatus = ({ dataStatus }: { dataStatus: 0 | 1 }) => {
   const renderIcon = () => {
     switch (dataStatus) {
-      case "pending":
+      case 0:
         return <PendingStatusIcon />;
-      case "success":
+      case 1:
         return <SuccessStatusIcon />;
       default:
         return null;

@@ -1,17 +1,22 @@
 import { Row } from "@tanstack/react-table";
 import React from "react";
-import { ArabicDataItem } from "../data";
+import type { Company } from "../data";
 import { AvatarGroup } from "@/components/shared/avatar-group";
 
-const Company = ({ row }: { row: Row<ArabicDataItem> }) => {
-  const { companyLogo, title, userName } = row.original; 
+const Company = ({ row }: { row: Row<Company> }) => {
+  const { name, user_name } = row.original;
   return (
     <div className="flex gap-3 border-e-2">
-      <AvatarGroup fullName={title} src={companyLogo} alt={title} />
+      <AvatarGroup
+        fullName={name}
+        src={"/images/el-anwar-company.png"}
+        alt={name}
+      />
+
       <div>
-        <p className="font-medium">{title}</p>
+        <p className="font-medium">{name}</p>
         <p dir="ltr" className="text-xs">
-          @{userName}
+          @{user_name}
         </p>
       </div>
     </div>

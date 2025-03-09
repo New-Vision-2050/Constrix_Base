@@ -2,7 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArabicDataItem } from "./data";
+import { Company as CompanyType } from "./data";
 import Company from "./cells/company";
 import DataStatus from "./cells/data-status";
 import TheStatus from "./cells/the-status";
@@ -11,7 +11,7 @@ import Execution from "./cells/execution";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-export const columns: ColumnDef<ArabicDataItem>[] = [
+export const columns: ColumnDef<CompanyType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -44,33 +44,26 @@ export const columns: ColumnDef<ArabicDataItem>[] = [
     header: "البريد الاليكتروني",
   },
   {
-    accessorKey: "type",
+    accessorKey: "company_type",
     header: "نوع الشركة",
   },
   {
-    accessorKey: "Bouquet",
-    header: "الباقة",
-  },
-  {
-    accessorKey: "responsible",
+    accessorKey: "general_manager_name",
     header: "المسؤول",
   },
   {
-    accessorKey: "expireAt",
-    header: "تاريخ الانتهاء",
-  },
-
-  {
-    accessorKey: "dataStatus",
+    accessorKey: "complete_data",
     header: "حالة البيانات",
-    cell: ({ row }) => <DataStatus dataStatus={row.getValue("dataStatus")} />,
+    cell: ({ row }) => (
+      <DataStatus dataStatus={row.getValue("complete_data")} />
+    ),
   },
   {
-    accessorKey: "theStatus",
+    accessorKey: "is_active",
     header: "الحالة",
     cell: ({ row }) => (
       <TheStatus
-        theStatus={row.getValue("theStatus")}
+        theStatus={row.getValue("is_active")}
         id={row.getValue("id")}
       />
     ),

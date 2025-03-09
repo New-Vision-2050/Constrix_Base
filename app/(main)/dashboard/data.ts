@@ -1,55 +1,21 @@
-export type ArabicDataItem = {
-  id: number;
-  companyLogo: string;
-  title: string;
-  userName: string;
+export interface Company {
+  id: string;
+  name: string;
+  user_name: string;
   email: string;
-  type: string;
-  Bouquet: string;
-  responsible: string;
-  expireAt: string;
-  dataStatus: "pending" | "success"; 
-  theStatus: "active" | "inactive"; 
-};
-
-export const arabicData: ArabicDataItem[] = [
-  {
-    id: 0,
-    companyLogo: "/images/el-anwar-company.png",
-    title: "شركة الانوار",
-    userName: "amiccoo",
-    email: "susanna.Lind57@gmail.com",
-    type: "خدمات اليكترونية",
-    Bouquet: "plus",
-    responsible: "محمد خالد",
-    expireAt: "08/10/2025",
-    dataStatus: "pending",
-    theStatus: "inactive",
-  },
-  {
-    id: 1,
-    companyLogo: "/images/el-anwar-company.png",
-    title: "شركة الانوار",
-    userName: "amiccoo",
-    email: "susanna.Lind57@gmail.com",
-    type: "خدمات اليكترونية",
-    Bouquet: "plus",
-    responsible: "محمد خالد",
-    expireAt: "08/10/2025",
-    dataStatus: "success",
-    theStatus: "active",
-  },
-  {
-    id: 2,
-    companyLogo: "/images/el-anwar-company.png",
-    title: "شركة الانوار",
-    userName: "amiccoo",
-    email: "susanna.Lind57@gmail.com",
-    type: "خدمات اليكترونية",
-    Bouquet: "plus",
-    responsible: "محمد خالد",
-    expireAt: "08/10/2025",
-    dataStatus: "pending",
-    theStatus: "active",
-  },
-];
+  phone: string;
+  serial_no: string;
+  country_id: string;
+  company_type_id: string;
+  company_field_id: string;
+  registration_type_id: string;
+  general_manager_id: string;
+  registration_no: string;
+  general_manager_name: string;
+  company_type: string;
+  company_field: string;
+  registration_type: string;
+  is_active: 0 | 1;
+  complete_data: 0 | 1;
+  date_activate: string | null;
+}

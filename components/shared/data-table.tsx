@@ -14,11 +14,15 @@ import {
 interface DataTableProps<TData> {
   table: TableType<TData>;
   columnLength: number;
+  isPending: boolean;
+  isFetching: boolean;
 }
 
 export function DataTable<TData>({
   table,
   columnLength,
+  isPending,
+  isFetching,
 }: DataTableProps<TData>) {
   return (
     <Table>
@@ -41,6 +45,17 @@ export function DataTable<TData>({
         ))}
       </TableHeader>
       <TableBody>
+        {isFetching && !isPending && (
+          <TableRow>
+            <TableCell colSpan={columnLength} className=" text-center p-0">
+              <div className="flex flex-col gap-2">
+                <div className="h-0.5 w-full bg-muted relative overflow-hidden">
+                  <div className="absolute left-0 h-full w-1/3 bg-primary animate-slide"></div>
+                </div>
+              </div>
+            </TableCell>
+          </TableRow>
+        )}
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row) => (
             <TableRow
@@ -57,9 +72,17 @@ export function DataTable<TData>({
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={columnLength} className="h-24 text-center">
-              No results.
-            </TableCell>
+            {isPending ? (
+              <TableCell colSpan={columnLength} className="h-24 text-center">
+                <div className="flex flex-col gap-2 animate-pulse">
+                  <div className="h-12 bg-muted/90 w-full"></div>
+                </div>
+              </TableCell>
+            ) : (
+              <TableCell colSpan={columnLength} className="h-24 text-center">
+                No results.
+              </TableCell>
+            )}
           </TableRow>
         )}
       </TableBody>

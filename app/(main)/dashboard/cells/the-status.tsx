@@ -9,7 +9,7 @@ const TheStatus = ({
   theStatus: "active" | "inActive";
   id: string;
 }) => {
-  const [isActive, setIsActive] = useState(theStatus === "active");
+  const [isActive, setIsActive] = useState(!!theStatus);
   return (
     <div className="flex items-center gap-2">
       <Label htmlFor={`${id}-switcher`} className="font-normal">

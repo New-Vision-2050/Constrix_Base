@@ -23,7 +23,7 @@ const Pagination = ({ totalCount }: PaginationProps) => {
     pageSizesOptions,
   } = usePaginate();
   
-  const totalPages = Math.floor(totalCount / pageSize);
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   const pages = generatePages(totalPages, currentPage);
 
