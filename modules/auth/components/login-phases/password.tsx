@@ -10,6 +10,7 @@ import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
+import AnotherCheckingWay from "../another-checking-way";
 
 const PasswordPhase = ({
   handleSetStep,
@@ -27,6 +28,8 @@ const PasswordPhase = ({
     handleSubmit,
     getValues,
   } = useFormContext<LoginType>();
+
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const handleLogin = () => {
     const data = getValues();
@@ -93,6 +96,12 @@ const PasswordPhase = ({
       >
         هل نسيت كلمة المرور؟
       </Button>
+      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+        <AnotherCheckingWay
+          loginOptionAlternatives={loginOptionAlternatives}
+          handleSetStep={handleSetStep}
+        />
+      )}
     </>
   );
 };

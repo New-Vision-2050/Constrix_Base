@@ -30,6 +30,9 @@ const identifierSchema = z.object({
       { message: "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx" }
     ),
   token: z.string().optional(),
+  type: z.string().optional(),
+  by: z.string().optional(),
+  login_option_alternatives: z.array(z.string()).optional().nullable(),
 });
 
 const passwordSchema = z.object({

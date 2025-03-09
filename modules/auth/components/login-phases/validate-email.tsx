@@ -38,7 +38,8 @@ const ValidateEmailPhase = ({
   } = useFormContext<IdentifierType & ValidateEmailType & ChangeEmailType>();
   const { mutate, isPending } = useLoginSteps();
 
-  const identifier = getValues("newEmail") || getValues("identifier");
+  const by = getValues("by");
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const onSubmit = () => {
     const data = getValues();
@@ -94,7 +95,7 @@ const ValidateEmailPhase = ({
         <h1 className="text-2xl text-start">التحقق من البريد الالكتروني</h1>
         <p>
           <span className="opacity-50">ادخل رمز التحقق المرسل على </span>
-          {identifier}
+          <span dir="ltr">{by}</span>
         </p>
       </div>
       <Controller
@@ -140,8 +141,12 @@ const ValidateEmailPhase = ({
         >
           تغيير البريد الالكتروني{" "}
         </Button>
-
-        <AnotherCheckingWay />
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <AnotherCheckingWay
+            loginOptionAlternatives={loginOptionAlternatives}
+            handleSetStep={handleSetStep}
+          />
+        )}
       </div>
     </>
   );

@@ -36,6 +36,9 @@ const ValidatePhonePhase = ({
     setValue,
   } = useFormContext<IdentifierType & ValidatePhoneType>();
   const identifier = getValues("identifier");
+  const by = getValues("by");
+
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const onSubmit = () => {
     const data = getValues();
@@ -87,7 +90,7 @@ const ValidatePhonePhase = ({
         <h1 className="text-2xl text-start">التحقق من رقم الجوال</h1>
         <p>
           <span className="opacity-50">ادخل رمز التحقق المرسل الى </span>
-          {identifier}
+          <span dir="ltr">{by}</span>
         </p>
       </div>
       <Controller
@@ -133,8 +136,12 @@ const ValidatePhonePhase = ({
         >
           تغيير رقم الجوال{" "}
         </Button>
-
-        <AnotherCheckingWay />
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <AnotherCheckingWay
+            loginOptionAlternatives={loginOptionAlternatives}
+            handleSetStep={handleSetStep}
+          />
+        )}
       </div>
     </>
   );
