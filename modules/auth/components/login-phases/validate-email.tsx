@@ -19,6 +19,8 @@ import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
 import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
+import { setCookie } from "cookies-next";
 
 const ValidateEmailPhase = ({
   handleSetStep,
@@ -52,10 +54,12 @@ const ValidateEmailPhase = ({
           setValue("token", data.payload.token);
           const nextStep = data.payload.login_way.step?.login_option;
           if (!data.payload.login_way.step) {
-            useAuthStore
-              .getState()
-              .setUser(data.payload.user, data.payload.token);
-            router.push("/companies");
+            useAuthStore.getState().setUser(data.payload.user);
+            setCookie("new-vision-token", data.payload.token, {
+              maxAge: 7 * 24 * 60 * 60,
+              path: "/",
+            });
+            router.push(ROUTER.COMPANIES);
             return;
           }
           switch (nextStep) {

@@ -1,4 +1,7 @@
+import { useAuthStore } from "@/modules/auth/store/use-auth";
+import { ROUTER } from "@/router";
 import axios from "axios";
+import { deleteCookie, getCookie } from "cookies-next";
 
 const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL +
@@ -13,12 +16,10 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const nvToken = getCookie("new-vision-token");
+    if (nvToken) {
+      config.headers.Authorization = `Bearer ${nvToken}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -27,6 +28,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    const status = error.response?.status;
+    if (status === 401 || status === 403) {
+      deleteCookie("new-vision-token");
+      useAuthStore.getState().clearUser();
+      if (typeof window !== "undefined") {
+        window.location.href = ROUTER.LOGIN;
+      }
+    }
     console.log("API Error:", error.response?.data?.message || error.message);
     return Promise.reject(error);
   }
