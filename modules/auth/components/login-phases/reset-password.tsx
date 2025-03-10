@@ -27,7 +27,7 @@ const ResetPasswordPhase = ({
     mutate(
       {
         identifier: data.identifier,
-        otp: data.forgetPasswordOtp,
+        token: data.token ?? "",
         password: data.newPassword,
         password_confirmation: data.confirmNewPassword,
       },

@@ -47,15 +47,15 @@ export const useResetPassword = () =>
       identifier: string;
       password: string;
       password_confirmation: string;
-      otp: string;
+      token: string;
     }
   >({
-    mutationFn: ({ identifier, password, password_confirmation, otp }) =>
+    mutationFn: ({ identifier, password, password_confirmation, token }) =>
       loginRepository.resetPassword(
         identifier,
         password,
         password_confirmation,
-        otp
+        token
       ),
   });
 
@@ -76,4 +76,14 @@ export const useLoginAlternative = () =>
   >({
     mutationFn: ({ identifier, loginOption, token }) =>
       loginRepository.loginAlternative(identifier, loginOption, token),
+  });
+
+export const useValidateResetPasswordOtp = () =>
+  useMutation<
+    LoginStepsSuccessResponse,
+    AxiosError<ServerErrorResponse>,
+    { identifier: string; otp: string }
+  >({
+    mutationFn: ({ identifier, otp }) =>
+      loginRepository.validateResetPasswordOtp(identifier, otp),
   });

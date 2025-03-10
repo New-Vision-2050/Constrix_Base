@@ -5,4 +5,5 @@ export const endPoints = {
   resetPassword: "/auths/reset-password",
   resendOtp: "/auths/resend-otp",
   loginAlternative: "/auths/alternative-step-login",
+  validateResetPasswordOtp: "/auths/validate-reset-password-otp",
 };
