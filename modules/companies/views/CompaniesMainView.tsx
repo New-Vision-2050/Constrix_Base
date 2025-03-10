@@ -16,7 +16,13 @@ export default function CompaniesMainView() {
       </div>
       {/* <SetCompanySheet /> */}
       <hr />
-      <CreateBuilderModule btnLabel="أنشاء" ref={builderModuleRef} />
+      <CreateBuilderModule
+        btnLabel="أنشاء"
+        ref={builderModuleRef}
+        onSheetClose={() => {
+          console.log("onSheetClose-onSheetClose");
+        }}
+      />
       <button onClick={() => builderModuleRef.current?.closeSheet()}>
         Close Sheet
       </button>

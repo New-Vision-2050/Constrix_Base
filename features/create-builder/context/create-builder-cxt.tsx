@@ -22,6 +22,7 @@ type CxtType = {
   selectedModule: CreateBuilderModuleT | undefined;
   handleChangeModuleId: (id: string) => void;
   originalModuleId: string | undefined;
+  onSheetClose?: () => void;
 };
 
 // Create a context
@@ -35,6 +36,8 @@ const CreateBuilderCxt = createContext<CxtType>({
   handleChangeModuleId: () => {},
   // original sended module id
   originalModuleId: undefined,
+  // fun to execute on sheet close
+  onSheetClose: () => {},
 });
 
 // Custom hook to use the FormLookupCxt
@@ -51,12 +54,18 @@ export const useCreateBuilderCxt = () => {
 type PropsT = React.PropsWithChildren & {
   btnLabel: string;
   moduleId?: string;
+  onSheetClose?: () => void;
 };
 
 // Provider to wrap the children components
 export default function CreateBuilderCxtProvider(props: PropsT) {
   // declare and define state and variables
-  const { children, btnLabel, moduleId: originalModuleId } = props;
+  const {
+    children,
+    btnLabel,
+    moduleId: originalModuleId,
+    onSheetClose,
+  } = props;
   const [moduleId, setModuleId] = useState(originalModuleId);
 
   const selectedModule = useMemo(() => {
@@ -80,6 +89,8 @@ export default function CreateBuilderCxtProvider(props: PropsT) {
         handleChangeModuleId,
         // original sended module id
         originalModuleId,
+        // fun to execute on sheet close
+        onSheetClose,
       }}
     >
       {children}

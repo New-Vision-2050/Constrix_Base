@@ -12,7 +12,7 @@ type PropsT = {
 };
 export default function CreateBuilderViewsEndPoint(props: PropsT) {
   const { isOpen, setIsOpen } = props;
-  const { btnLabel, originalModuleId, handleChangeModuleId } =
+  const { btnLabel, originalModuleId, handleChangeModuleId, onSheetClose } =
     useCreateBuilderCxt();
 
   const handleToggleSheet = (open: boolean) => {
@@ -20,6 +20,7 @@ export default function CreateBuilderViewsEndPoint(props: PropsT) {
       // remove selected module if use not-selected specific module case
       handleChangeModuleId("");
     }
+    if (!open && Boolean(onSheetClose)) onSheetClose?.();
     setIsOpen(open);
   };
 

@@ -6,6 +6,7 @@ import CreateBuilderCxtProvider from "./context/create-builder-cxt";
 type PropsT = {
   btnLabel: string;
   moduleId?: string;
+  onSheetClose?: () => void;
 };
 
 export type CreateBuilderModuleRef = {
@@ -13,7 +14,7 @@ export type CreateBuilderModuleRef = {
 };
 
 const CreateBuilderModule = forwardRef<CreateBuilderModuleRef, PropsT>(
-  ({ btnLabel, moduleId }, ref) => {
+  ({ btnLabel, moduleId, onSheetClose }, ref) => {
     // Control open/close sheet
     const [isOpen, setIsOpen] = useState(false);
 
@@ -26,7 +27,11 @@ const CreateBuilderModule = forwardRef<CreateBuilderModuleRef, PropsT>(
     }));
 
     return (
-      <CreateBuilderCxtProvider btnLabel={btnLabel} moduleId={moduleId}>
+      <CreateBuilderCxtProvider
+        btnLabel={btnLabel}
+        moduleId={moduleId}
+        onSheetClose={onSheetClose}
+      >
         <CreateBuilderViewsEndPoint isOpen={isOpen} setIsOpen={setIsOpen} />
       </CreateBuilderCxtProvider>
     );
