@@ -32,7 +32,7 @@ const TableBody: React.FC<TableBodyProps> = ({ data, columns, searchQuery }) => 
       {data.map((row, rowIndex) => (
         <tr
           key={rowIndex}
-          className="border-b border-border last:border-0 odd:bg-white even:bg-secondary/20 hover:bg-secondary/40 transition-colors"
+          className="border-b border-border last:border-0 transition-colors"
         >
           {columns.map((column, colIndex) => {
             const value = getNestedValue(row, column.key);
