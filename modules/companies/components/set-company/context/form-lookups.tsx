@@ -1,7 +1,7 @@
 import { useCompanyFields } from "@/modules/companies/hooks/useCompanyFields";
 import { useCompanyUsers } from "@/modules/companies/hooks/useCompanyUsers";
 import { useCountriesData } from "@/modules/companies/hooks/useCountriesData";
-import { User } from "@/modules/companies/must-be-deleted/User";
+import { User } from "@/modules/users/types/User";
 import { CompanyField } from "@/modules/companies/types/CompanyField";
 import { Country } from "@/types/Country";
 import { createContext, useContext } from "react";

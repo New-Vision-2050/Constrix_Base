@@ -3,7 +3,7 @@ import { apiUrl } from "../constant/base-url";
 import { lookupsEndPoints } from "../constant/end-points";
 import axios from "axios";
 import { CompanyField } from "../types/CompanyField";
-import { User } from "../must-be-deleted/User";
+import { User } from "../../users/types/User";
 
 type fetchCountriesResponseT = {
   countries: Country[];

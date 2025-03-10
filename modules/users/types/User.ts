@@ -1,6 +1,5 @@
-import { Company } from "../types/Company";
+import { Company } from "../../companies/types/Company";
 
-// ! This declaration of User must be in users domain so when users domain created move this to there
 export interface User {
   border_number: string;
   company: Company;
@@ -11,4 +10,12 @@ export interface User {
   passport: string;
   phone: string;
   residence: string;
+}
+
+export interface CreateUserI {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  title: string;
 }
