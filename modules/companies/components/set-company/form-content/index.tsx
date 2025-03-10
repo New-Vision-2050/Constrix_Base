@@ -1,3 +1,4 @@
+"use client";
 import { FormProvider, useForm } from "react-hook-form";
 import { CompanyRepository } from "../../../repositories/CompanyRepository";
 import { CompanyService } from "../../../services/CompanyService";
@@ -7,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import AdornedInput from "./components/StartAdornedInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCompanyFormLookupsCxt } from "../context/form-lookups";
+import { toast, Toaster } from "sonner";
+import { AxiosError } from "axios";
 
 export default function SetCompanyFormContent() {
   // control and state for
@@ -25,23 +28,39 @@ export default function SetCompanyFormContent() {
   } = form;
 
   // component helpers
-  const onSubmit = (data: SetCompanySchema) => {
-    console.log("Data Submitted", data);
+  const onSubmit = async (data: SetCompanySchema) => {
     try {
-      companyService.createCompany({
+      await companyService.createCompany({
         name: data.name,
         domainName: data.domainName,
         countryId: data.countryId,
         companyFieldId: data.companyFieldId,
         supportNvEmployeeId: data.supportNvEmployeeId,
       });
+
+      // Show error message
+      toast.success("Success", {
+        description: "Company Created Successfully",
+        duration: 3000,
+        dismissible: true,
+      });
+      
     } catch (error) {
-      console.log("error in onsubmit", error);
+      const axError = error as AxiosError;
+      // Show error message
+      toast.error("Failed", {
+        description:
+          axError?.message ?? "Please check your inputs and try again.",
+        duration: 3000,
+        dismissible: true,
+      });
     }
   };
 
   return (
     <FormProvider {...form}>
+      {/* Sonner Toast Provider */}
+      <Toaster position="bottom-right" richColors />
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
         {/* country */}
         <CustomSelect

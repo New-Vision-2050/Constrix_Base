@@ -7,7 +7,6 @@ export class CompanyService {
   constructor(private readonly companyRepository: ICompanyRepository) {}
 
   async createCompany(data: Omit<Company, "id">): Promise<Company> {
-    console.log("Service createCompany", data);
     const newCompany = new Company(
       data.name,
       data.domainName,

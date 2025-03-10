@@ -2,7 +2,7 @@ import { ICompanyRepository } from "./ICompanyRepository";
 import { Company } from "../types/Company";
 import { companiesEndPoints } from "../constant/end-points";
 import { apiClient } from "@/config/axios-config";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 export class CompanyRepository implements ICompanyRepository {
   private readonly apiUrl =
@@ -26,13 +26,16 @@ export class CompanyRepository implements ICompanyRepository {
     const token = `eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vY29yZS1iZS1wcjE3LmNvbnN0cml4LW52LmNvbS9hcGkvdjEvYXV0aHMvbG9naW4iLCJpYXQiOjE3NDE1NTk3ODcsImV4cCI6MTc0MTY0NjE4NywibmJmIjoxNzQxNTU5Nzg3LCJqdGkiOiJWaTBhU2dCNTBxeDJTSVlDIiwic3ViIjoiYzcxMTkxYjUtZWJjZS00ZmQxLTlhNjgtYzIwOTljMmEzZjM5IiwicHJ2IjoiYmI2NWQ5YjhmYmYwZGE5ODI3YzhlZDIzMWQ5YzU0YzgxN2YwZmJiMiJ9.F1Z1iZ6rFPW6y6K-46nWvELVNlmUhm_p4qek6vzGe4Y`;
     url = `https://core-be-pr17.constrix-nv.com/api/v1${companiesEndPoints.create}`;
 
-    const response = await axios.post(url, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    console.log("CompanyRepository create", company);
+    const response = await axios
+      .post(url, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .catch((err) => {
+        const _err = err as AxiosError;
+        throw _err;
+      });
 
     if (!response.data) throw new Error("Failed to create company");
 
