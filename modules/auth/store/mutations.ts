@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { loginRepository } from "../repository/login-repository";
 import {
+  LoginOption,
   LoginStepsSuccessResponse,
   LoginWaysSuccessResponse,
 } from "../types/login-responses";
@@ -65,4 +66,14 @@ export const useResendOtp = () =>
     { identifier: string }
   >({
     mutationFn: ({ identifier }) => loginRepository.resendOtp(identifier),
+  });
+
+export const useLoginAlternative = () =>
+  useMutation<
+    LoginWaysSuccessResponse,
+    AxiosError<ServerErrorResponse>,
+    { identifier: string; loginOption: LoginOption; token: string }
+  >({
+    mutationFn: ({ identifier, loginOption, token }) =>
+      loginRepository.loginAlternative(identifier, loginOption, token),
   });

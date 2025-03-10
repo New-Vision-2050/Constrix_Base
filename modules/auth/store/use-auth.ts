@@ -9,8 +9,7 @@ type User = {
 
 type AuthState = {
   user: User | null;
-  token: string | null;
-  setUser: (user: User, token: string) => void;
+  setUser: (user: User) => void;
   clearUser: () => void;
 };
 
@@ -18,12 +17,11 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      token: null,
-      setUser: (user, token) => set({ user, token }),
-      clearUser: () => set({ user: null, token: null }),
+      setUser: (user) => set({ user }),
+      clearUser: () => set({ user: null }),
     }),
     {
-      name: "constrix-auth", 
+      name: "constrix-auth",
     }
   )
 );
