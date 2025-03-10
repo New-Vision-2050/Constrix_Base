@@ -1,4 +1,4 @@
-
+"use client"
 import React, { useCallback, memo, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { TableConfig } from '@/modules/table/utils/configs/tableConfig';

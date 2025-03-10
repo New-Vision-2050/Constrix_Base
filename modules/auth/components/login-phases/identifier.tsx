@@ -8,8 +8,6 @@ import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
-import {usersConfig} from "@/modules/table/utils/configs/usersConfig";
-import TableBuilder from "@/modules/table/components/TableBuilder";
 
 const IdentifierPhase = ({
   handleSetStep,
