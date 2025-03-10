@@ -13,7 +13,7 @@ export default function CompaniesMainView() {
       <CreateBuilderModule btnLabel="أنشاء" />
       <CreateBuilderModule
         btnLabel="أنشاء شركة"
-        moduleId={'create-company'}
+        moduleId={"create-company-user"}
       />
       <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/90 md:min-h-min" />
     </div>
