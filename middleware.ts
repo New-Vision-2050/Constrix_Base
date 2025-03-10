@@ -8,7 +8,7 @@ export function middleware(req: NextRequest) {
   const nvToken = req.cookies.get("new-vision-token")?.value;
   const pathname = req.nextUrl.pathname;
 
-  const isLoginPage = pathname === "/login";
+  const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
 
   if (!nvToken && !isLoginPage) {
     return NextResponse.redirect(new URL("/login", req.url));
