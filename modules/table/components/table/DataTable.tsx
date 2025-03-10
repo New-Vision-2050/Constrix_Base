@@ -42,10 +42,10 @@ const DataTable: React.FC<DataTableProps> = ({
   loading = false
 }) => {
   const hasColumns = columns && columns.length > 0;
-  
+
   return (
-    <motion.div 
-      className="bg-white/50 backdrop-blur-sm rounded-lg border border-border shadow-sm overflow-hidden"
+    <motion.div
+      className="backdrop-blur-sm rounded-lg border border-border shadow-sm overflow-hidden"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
@@ -54,9 +54,9 @@ const DataTable: React.FC<DataTableProps> = ({
       <div className="overflow-x-auto">
         {hasColumns ? (
           <table className="w-full table-auto">
-            <TableHeader 
-              columns={columns} 
-              sortState={sortState} 
+            <TableHeader
+              columns={columns}
+              sortState={sortState}
               onSort={onSort}
               enableSorting={enableSorting}
             />
@@ -70,9 +70,9 @@ const DataTable: React.FC<DataTableProps> = ({
                   </tr>
                 </tbody>
               ) : (
-                <TableBody 
-                  data={data} 
-                  columns={columns} 
+                <TableBody
+                  data={data}
+                  columns={columns}
                   searchQuery={searchQuery}
                 />
               )}
@@ -84,7 +84,7 @@ const DataTable: React.FC<DataTableProps> = ({
           </div>
         )}
       </div>
-      
+
       {enablePagination && hasColumns && (
         <Pagination
           currentPage={currentPage}
