@@ -1,4 +1,4 @@
-import { Company } from "../entities/Company";
+import { Company } from "../types/Company";
 
 export interface ICompanyRepository {
   create(company: Company): Promise<Company>;

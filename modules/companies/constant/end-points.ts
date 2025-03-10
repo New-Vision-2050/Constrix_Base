@@ -4,4 +4,6 @@ export const companiesEndPoints = {
 
 export const lookupsEndPoints = {
   countries: `/countries`,
+  companyFields: "/company_fields",
+  companyUsers: "/company-users",
 };

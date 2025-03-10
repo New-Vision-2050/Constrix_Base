@@ -1,4 +1,4 @@
-import SetCompanyFormContent from "@/modules/companies/components/set-company/components/formContent";
+import SetCompanyModule from "@/modules/companies/components/set-comapany-v2";
 import { CreateBuilderModuleT } from "../types/CreateBuilderModule";
 
 export enum ModuleIdEnum {
@@ -7,7 +7,7 @@ export enum ModuleIdEnum {
   CREATE_MODULE3 = "create-module3",
   CREATE_MODULE4 = "create-module4",
   CREATE_MODULE5 = "create-module5",
-};
+}
 
 export const MODULES_LIST: CreateBuilderModuleT[] = [
   {
@@ -20,7 +20,7 @@ export const MODULES_LIST: CreateBuilderModuleT[] = [
     title: "Create Company",
     formContent: (
       <>
-        <SetCompanyFormContent />
+        <SetCompanyModule />
       </>
     ),
   },

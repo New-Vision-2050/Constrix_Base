@@ -1,23 +1,19 @@
 // domains/companies/services/CompanyService.ts
 
 import { ICompanyRepository } from "../repositories/ICompanyRepository";
-import { Company } from "../entities/Company";
+import { Company } from "../types/Company";
 
 export class CompanyService {
   constructor(private readonly companyRepository: ICompanyRepository) {}
 
   async createCompany(data: Omit<Company, "id">): Promise<Company> {
+    console.log("Service createCompany", data);
     const newCompany = new Company(
       data.name,
-      data.email,
-      data.phone,
+      data.domainName,
       data.countryId,
-      data.companyTypeId,
-      data.companyFieldId,
-      data.generalManagerId,
-      data.registrationTypeId,
-      data.registrationNo,
-      data.classificationNo
+      data.supportNvEmployeeId,
+      data.companyFieldId
     );
     return this.companyRepository.create(newCompany);
   }
