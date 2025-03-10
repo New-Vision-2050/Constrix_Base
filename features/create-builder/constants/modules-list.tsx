@@ -1,4 +1,4 @@
-import SetCompanyModule from "@/modules/companies/components/set-comapany-v2";
+import SetCompanyModule from "@/modules/companies/components/set-company";
 import { CreateBuilderModuleT } from "../types/CreateBuilderModule";
 
 export enum ModuleIdEnum {
