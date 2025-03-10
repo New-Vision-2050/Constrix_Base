@@ -1,3 +1,5 @@
+"use client";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import CreateBuilderViewsEndPoint from "./components/end-point";
 import CreateBuilderCxtProvider from "./context/create-builder-cxt";
 
@@ -6,10 +8,32 @@ type PropsT = {
   moduleId?: string;
 };
 
-export default function CreateBuilderModule({ btnLabel, moduleId }: PropsT) {
-  return (
-    <CreateBuilderCxtProvider btnLabel={btnLabel} moduleId={moduleId}>
-      <CreateBuilderViewsEndPoint />
-    </CreateBuilderCxtProvider>
-  );
-}
+export type CreateBuilderModuleRef = {
+  closeSheet: () => void;
+};
+
+const CreateBuilderModule = forwardRef<CreateBuilderModuleRef, PropsT>(
+  ({ btnLabel, moduleId }, ref) => {
+    // Control open/close sheet
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Allow parent to close the sheet
+    useImperativeHandle(ref, () => ({
+      closeSheet: () => {
+        if (!isOpen) console.log("Sheet is already closed");
+        setIsOpen(false);
+      },
+    }));
+
+    return (
+      <CreateBuilderCxtProvider btnLabel={btnLabel} moduleId={moduleId}>
+        <CreateBuilderViewsEndPoint isOpen={isOpen} setIsOpen={setIsOpen} />
+      </CreateBuilderCxtProvider>
+    );
+  }
+);
+
+// Add display name to fix React warning
+CreateBuilderModule.displayName = "CreateBuilderModule";
+
+export default CreateBuilderModule;
