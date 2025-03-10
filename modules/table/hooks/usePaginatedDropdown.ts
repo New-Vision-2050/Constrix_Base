@@ -49,8 +49,8 @@ export const usePaginatedDropdown = ({
   const isPaginationEnabled = dynamicConfig?.paginationEnabled ?? false;
   const itemsPerPage = dynamicConfig?.itemsPerPage ?? 10;
   const searchParam = dynamicConfig?.searchParam ?? 'q';
-  const pageParam = dynamicConfig?.pageParam ?? '_page';
-  const limitParam = dynamicConfig?.limitParam ?? '_limit';
+  const pageParam = dynamicConfig?.pageParam ?? 'page';
+  const limitParam = dynamicConfig?.limitParam ?? 'per_page';
   const totalCountHeader = dynamicConfig?.totalCountHeader ?? 'x-total-count';
   
   // Function to manually trigger a refresh of options

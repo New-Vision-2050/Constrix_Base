@@ -65,8 +65,8 @@ export const usersConfig: TableConfig = {
                 paginationEnabled: true,
                 itemsPerPage: 5,
                 searchParam: 'q',
-                pageParam: '_page',
-                limitParam: '_limit',
+                pageParam: 'page',
+                limitParam: 'per_page',
                 totalCountHeader: 'x-total-count'
             }
         }
@@ -87,7 +87,30 @@ export const usersConfig: TableConfig = {
           filterParam: 'country'
         }
       }
-    }
+    },
+      {
+          key: 'city2',
+          label: 'City2',
+          sortable: true,
+          searchable: true,
+          searchType: {
+              type: 'dropdown',
+              placeholder: 'Select Country',
+              dynamicDropdown: {
+                  url: 'https://jsonplaceholder.typicode.com/users',
+                  valueField: 'id',
+                  labelField: 'name',
+                  paginationEnabled: true,
+                  itemsPerPage: 10,
+                  searchParam: 'q',
+                  pageParam: 'page',
+                  limitParam: 'per_page',
+                  totalCountHeader: 'x-total-count',
+                  dependsOn: 'city',
+                  filterParam: 'city2'
+              }
+          }
+      },
   ],
   defaultSortColumn: 'id',
   defaultSortDirection: 'asc',
@@ -98,6 +121,6 @@ export const usersConfig: TableConfig = {
   enableColumnSearch: true,
   searchFields: ['name', 'email'],
   searchParamName: 'q',
-  searchFieldParamName: '_fields',
+  searchFieldParamName: 'fields',
   allowSearchFieldSelection: true
 };

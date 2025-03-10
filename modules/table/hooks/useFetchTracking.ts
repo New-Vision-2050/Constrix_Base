@@ -64,8 +64,8 @@ export const buildPaginatedUrl = (
   searchParam: string = 'q',
   page: number = 1,
   limit: number = 10,
-  pageParam: string = '_page',
-  limitParam: string = '_limit',
+  pageParam: string = 'page',
+  limitParam: string = 'per_page',
   additionalParams: Record<string, string> = {}
 ): URL => {
   // Fix URL handling: ensure URL is properly formatted

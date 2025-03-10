@@ -20,8 +20,8 @@ export const postsConfig: TableConfig = {
           paginationEnabled: true,
           itemsPerPage: 5,
           searchParam: 'q',
-          pageParam: '_page',
-          limitParam: '_limit',
+          pageParam: 'page',
+          limitParam: 'per_page',
           totalCountHeader: 'x-total-count'
         }
       }

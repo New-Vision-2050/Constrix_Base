@@ -56,8 +56,8 @@ export const useDropdownSearch = ({
     
     // Add pagination parameters if enabled
     if (dynamicConfig.paginationEnabled) {
-      const pageParam = dynamicConfig.pageParam || '_page';
-      const limitParam = dynamicConfig.limitParam || '_limit';
+      const pageParam = dynamicConfig.pageParam || 'page';
+      const limitParam = dynamicConfig.limitParam || 'per_page';
       const itemsPerPage = dynamicConfig.itemsPerPage || 10;
       
       params.append(pageParam, '1');

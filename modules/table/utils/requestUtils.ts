@@ -29,38 +29,38 @@ export const buildRequestUrl = (
     // Fallback to relative URL if all else fails
     apiUrl = new URL(baseUrl, window.location.origin);
   }
-  
+
   // Cache any existing parameters from the original URL
   const existingParams = new URLSearchParams(apiUrl.search);
   const newUrl = new URL(apiUrl.origin + apiUrl.pathname);
-  
+
   // Keep existing parameters
   existingParams.forEach((value, key) => {
     newUrl.searchParams.append(key, value);
   });
-  
+
   // Add pagination parameters
-  newUrl.searchParams.append('_page', currentPage.toString());
-  newUrl.searchParams.append('_limit', itemsPerPage.toString());
-  
+  newUrl.searchParams.append('page', currentPage.toString());
+  newUrl.searchParams.append('limit', itemsPerPage.toString());
+
   // Add sorting parameters
   if (sortColumn && sortDirection) {
     newUrl.searchParams.append('_sort', sortColumn);
     newUrl.searchParams.append('_order', sortDirection);
   }
-  
+
   // Add global search parameters
   if (searchQuery) {
     // Use the configured search parameter name or default to 'q'
     const searchParamName = searchConfig?.paramName || 'q';
     newUrl.searchParams.append(searchParamName, searchQuery);
-    
+
     // Add search fields if specified and a fieldParamName is provided
     if (searchFields?.length && searchConfig?.fieldParamName) {
       newUrl.searchParams.append(searchConfig.fieldParamName, searchFields.join(','));
     }
   }
-  
+
   // Add column-specific search parameters
   if (columnSearchState && Object.keys(columnSearchState).length > 0) {
     Object.entries(columnSearchState).forEach(([columnKey, searchValue]) => {
@@ -71,7 +71,7 @@ export const buildRequestUrl = (
       }
     });
   }
-  
+
   console.log("Built URL with parameters:", newUrl.toString());
   return newUrl;
 };
