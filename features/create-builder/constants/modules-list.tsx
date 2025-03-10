@@ -1,5 +1,6 @@
 import SetCompanyModule from "@/modules/companies/components/set-company";
 import { CreateBuilderModuleT } from "../types/CreateBuilderModule";
+import SetUserModule from "@/modules/users/components/set-user";
 
 export enum ModuleIdEnum {
   CREATE_USER = "create-user",
@@ -13,7 +14,7 @@ export const MODULES_LIST: CreateBuilderModuleT[] = [
   {
     id: ModuleIdEnum.CREATE_USER,
     title: "Create User",
-    formContent: <>Create User Form Content</>,
+    formContent: <SetUserModule />,
   },
   {
     id: ModuleIdEnum.CREATE_COMPANY,

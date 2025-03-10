@@ -3,13 +3,13 @@ import { FormProvider, useForm } from "react-hook-form";
 import { CompanyRepository } from "../../../repositories/CompanyRepository";
 import { CompanyService } from "../../../services/CompanyService";
 import { companySchema, SetCompanySchema } from "../../../schema/SetCompany";
-import CustomSelect from "./components/CustomSelect";
 import { Button } from "@/components/ui/button";
-import AdornedInput from "./components/StartAdornedInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCompanyFormLookupsCxt } from "../context/form-lookups";
 import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
+import CustomSelect from "@/components/shared/CustomSelect";
+import AdornedInput from "@/components/shared/AdornedInput";
 
 export default function SetCompanyFormContent() {
   // control and state for
@@ -44,7 +44,6 @@ export default function SetCompanyFormContent() {
         duration: 3000,
         dismissible: true,
       });
-      
     } catch (error) {
       const axError = error as AxiosError;
       // Show error message
