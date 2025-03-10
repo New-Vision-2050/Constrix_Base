@@ -1,5 +1,5 @@
 
-import { useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 
 /**
  * A hook that returns a debounced version of the provided function.
@@ -24,10 +24,10 @@ export function useDebounce<T extends (...args: any[]) => any>(
 
   // Return a memoized callback that won't change on re-renders
   return useCallback(
-    (...args) => {
+    (...args :any[]) => {
       // Clear existing timeout
       if (timeoutRef.current !== null) {
-        window.clearTimeout(timeoutRef.current);
+        window.clearTimeout(timeoutRef.current || 0);
       }
 
       // Set new timeout

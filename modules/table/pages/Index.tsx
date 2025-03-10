@@ -2,13 +2,13 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { create } from 'zustand';
-import URLInput from '@/components/URLInput';
-import TableBuilder from '@/components/TableBuilder';
-import ConfigurableTable from '@/components/ConfigurableTable';
+import URLInput from '@/modules/table/components/URLInput';
+import TableBuilder from '@/modules/table/components/TableBuilder';
+import ConfigurableTable from '@/modules/table/components/ConfigurableTable';
 import { exampleConfigs } from '@/modules/table/utils/configs/exampleConfigs';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import LoadingSpinner from '@/components/table/LoadingSpinner';
-import ExportButton from '@/components/ExportButton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/modules/table/components/ui/tabs';
+import LoadingSpinner from '@/modules/table/components/table/LoadingSpinner';
+import ExportButton from '@/modules/table/components/ExportButton';
 
 // Create a Zustand store for the Index page state
 interface IndexState {

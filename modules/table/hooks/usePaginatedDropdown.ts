@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DropdownOption, DynamicDropdownConfig } from '@/modules/table/utils/tableTypes';
-import { extractDropdownOptions } from '@/components/table/dropdowns/DropdownUtils';
+import { extractDropdownOptions } from '@/modules/table/components/table/dropdowns/DropdownUtils';
 import { useFetchTracking, buildPaginatedUrl } from './useFetchTracking';
 import { useDebounce } from './useDebounce';
 
