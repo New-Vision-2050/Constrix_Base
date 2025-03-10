@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
-import { useModal } from "../../../../hooks/use-modal";
+import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
+import {usersConfig} from "@/modules/table/utils/configs/usersConfig";
+import TableBuilder from "@/modules/table/components/TableBuilder";
 
 const IdentifierPhase = ({
   handleSetStep,
@@ -72,7 +74,6 @@ const IdentifierPhase = ({
       >
         التالي
       </Button>
-
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}

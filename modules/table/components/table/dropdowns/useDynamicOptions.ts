@@ -1,0 +1,200 @@
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { DropdownOption } from "@/modules/table/utils/tableTypes";
+import { DynamicDropdownConfig, getFetchUrl, extractDropdownOptions } from './DropdownUtils';
+
+interface UseDynamicOptionsProps {
+  dynamicConfig?: DynamicDropdownConfig;
+  dependencies?: Record<string, string>;
+}
+
+interface UseDynamicOptionsResult {
+  options: DropdownOption[];
+  loading: boolean;
+  error: string | null;
+  refresh: () => void;
+}
+
+export const useDynamicOptions = ({
+  dynamicConfig,
+  dependencies
+}: UseDynamicOptionsProps): UseDynamicOptionsResult => {
+  const [options, setOptions] = useState<DropdownOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  const previousDependenciesRef = useRef<Record<string, string>>({});
+  const fetchControllerRef = useRef<AbortController | null>(null);
+  const isMountedRef = useRef(true);
+  const fetchTimeoutRef = useRef<number | null>(null);
+  const urlRef = useRef<string>('');
+  const processingFetchRef = useRef(false);
+  
+  // Function to manually trigger a refresh of options
+  const refresh = useCallback(() => {
+    setRefreshCounter(prev => prev + 1);
+  }, []);
+
+  // Memoizing the fetch function to avoid recreating it on every render
+  const fetchOptions = useCallback(async (url: string) => {
+    try {
+      console.log('Fetching dynamic options from:', url);
+      
+      // Abort any in-flight requests
+      if (fetchControllerRef.current) {
+        fetchControllerRef.current.abort();
+      }
+      
+      // Create a new controller for this request
+      const controller = new AbortController();
+      fetchControllerRef.current = controller;
+      
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) throw new Error('Failed to fetch dropdown options');
+      
+      // Check if component is still mounted
+      if (!isMountedRef.current) return [];
+      
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error('Expected array response');
+      
+      // Update the URL ref
+      urlRef.current = url;
+      
+      return extractDropdownOptions(
+        data,
+        dynamicConfig?.valueField || 'id',
+        dynamicConfig?.labelField || 'name'
+      );
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Fetch aborted');
+        return [];
+      }
+      console.error('Error fetching dropdown options:', error);
+      throw error;
+    }
+  }, [dynamicConfig]);
+
+  // Effect to fetch options whenever dependencies or refresh counter changes
+  useEffect(() => {
+    // Skip if already processing a fetch to prevent loops
+    if (processingFetchRef.current) {
+      return;
+    }
+    
+    // Set processing flag
+    processingFetchRef.current = true;
+    
+    // Set mounted ref to true
+    isMountedRef.current = true;
+    
+    // Skip if no config
+    if (!dynamicConfig) {
+      setOptions([]);
+      processingFetchRef.current = false;
+      return;
+    }
+    
+    // Clear any existing timeout
+    if (fetchTimeoutRef.current) {
+      window.clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = null;
+    }
+    
+    // Check if dependencies have actually changed
+    let shouldRefetch = refreshCounter > 0;
+    
+    if (dynamicConfig?.dependsOn && dependencies) {
+      const dependencyKey = dynamicConfig.dependsOn;
+      const currentValue = dependencies[dependencyKey] || '';
+      const previousValue = previousDependenciesRef.current[dependencyKey] || '';
+      
+      // Update the previous dependencies ref
+      previousDependenciesRef.current = {
+        ...previousDependenciesRef.current,
+        [dependencyKey]: currentValue
+      };
+      
+      // If dependency changed, we should refetch and clear options
+      if (currentValue !== previousValue) {
+        shouldRefetch = true;
+        // Clear options immediately when dependency changes
+        setOptions([]); 
+        
+        if (!currentValue) {
+          setLoading(false);
+          processingFetchRef.current = false;
+          return;
+        }
+      }
+    }
+    
+    // Skip fetch if URL hasn't changed and no other reason to refetch
+    const url = getFetchUrl(
+      dynamicConfig.url,
+      dynamicConfig.filterParam,
+      dynamicConfig.dependsOn,
+      dependencies
+    );
+    
+    if (url === urlRef.current && !shouldRefetch) {
+      setLoading(false);
+      processingFetchRef.current = false;
+      return;
+    }
+    
+    // Set loading state
+    setLoading(true);
+    setError(null);
+    
+    console.log(`Fetching options (${refreshCounter}): ${url}`);
+    
+    // Introduce a small delay to prevent rapid consecutive fetches
+    fetchTimeoutRef.current = window.setTimeout(() => {
+      fetchOptions(url)
+        .then(fetchedOptions => {
+          if (isMountedRef.current) {
+            console.log(`Fetched ${fetchedOptions.length} options for dropdown`);
+            setOptions(fetchedOptions);
+            setError(null);
+          }
+        })
+        .catch(err => {
+          if (isMountedRef.current) {
+            setError(err instanceof Error ? err.message : 'Unknown error');
+            console.error('Error fetching options:', err);
+            // Initialize options as empty array when there's an error
+            setOptions([]);
+          }
+        })
+        .finally(() => {
+          if (isMountedRef.current) {
+            setLoading(false);
+          }
+          // Reset processing flag
+          processingFetchRef.current = false;
+        });
+    }, 100); // Small delay to debounce rapid changes
+    
+    // Cleanup function
+    return () => {
+      isMountedRef.current = false;
+      if (fetchControllerRef.current) {
+        fetchControllerRef.current.abort();
+      }
+      if (fetchTimeoutRef.current) {
+        window.clearTimeout(fetchTimeoutRef.current);
+      }
+      // Ensure we reset the processing flag on cleanup
+      processingFetchRef.current = false;
+    };
+  }, [dynamicConfig, dependencies, fetchOptions, refreshCounter]);
+
+  return {
+    options: Array.isArray(options) ? options : [],
+    loading,
+    error,
+    refresh
+  };
+};
