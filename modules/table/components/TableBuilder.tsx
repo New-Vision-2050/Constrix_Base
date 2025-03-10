@@ -95,9 +95,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     }
   }, [error, toast]);
 
-  if (error) {
-    return <ErrorMessage message={error} onRetry={onReset} />;
-  }
+  // if (error) {
+  //   return <ErrorMessage message={error} onRetry={onReset} />;
+  // }
 
   return (
     <AnimatePresence mode="wait">
