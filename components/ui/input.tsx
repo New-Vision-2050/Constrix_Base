@@ -113,15 +113,18 @@ export const getLabelClassNames = (
   error?: string | null
 ) => {
   return cn("absolute duration-300 transform peer-focus:z-10 ", {
-    "top-3 origin-left rtl:origin-right start-0 ": variant === "default",
-    "-translate-y-6 scale-75  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 peer-placeholder-shown:opacity-50 peer-focus:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-6":
+    // Default Variant
+    "top-3 origin-left rtl:origin-right start-0 bg-[#170038]": variant === "default",
+    "-translate-y-6 scale-75 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 peer-placeholder-shown:opacity-50 peer-focus:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-6":
       variant === "default" && !error,
-    " text-red-500 -translate-y-6 scale-75": variant === "default" && !!error,
-    "start-2 top-0 bg-white px-1 text-xs transition-all peer-disabled:bg-transparent":
+    "text-red-500 -translate-y-6 scale-75": variant === "default" && !!error,
+
+    // Secondary Variant
+    "start-2 top-0 px-1 text-xs transition-all peer-disabled:bg-transparent ":
       variant === "secondary",
-    "-translate-y-2.5 z-10 peer-focus:base peer-focus:z-10 peer-placeholder-shown:translate-y-2.5 peer-placeholder-shown:text-sm peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-indigo-600 ":
+    "-translate-y-2.5 z-10 peer-focus:base peer-focus:z-10 peer-placeholder-shown:translate-y-2.5 peer-placeholder-shown:text-sm peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-indigo-600":
       variant === "secondary" && !error,
-    "text-red-500 -translate-y-2.5  z-10 ": variant === "secondary" && !!error,
+    "text-red-500 -translate-y-2.5 z-10": variant === "secondary" && !!error,
   });
 };
 
