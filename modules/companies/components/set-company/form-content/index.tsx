@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import CustomSelect from "@/components/shared/CustomSelect";
 import InputField from "../../../../../components/shared/InputField";
 import InputFieldWithAdorned from "../../../../../components/shared/InputFieldWithAdorned";
+import TimeZoneDialog from "../../change-time-zone";
 
 export default function SetCompanyFormContent() {
   // control and state for
@@ -130,9 +131,10 @@ export default function SetCompanyFormContent() {
             className="ms-2 text-lg font-medium text-[#e7e3fc61] dark:text-gray-300"
           >
             لتأكيد تغيير المنطقة الزمنية،
-            <span className="text-[#f42589] cursor-pointer">اضغط هنا</span>.
+            <TimeZoneDialog />.
           </label>
         </div>
+
         {/* next */}
         <Button type="submit" className="w-full max-w-sm">
           التالي
