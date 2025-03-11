@@ -1,5 +1,5 @@
-
-import { SortDirection, SearchConfig, ColumnSearchState } from './tableTypes';
+import { getCookie } from "cookies-next";
+import { SortDirection, SearchConfig, ColumnSearchState } from "./tableTypes";
 
 /**
  * Constructs a URL with query parameters for table data fetching
@@ -19,7 +19,7 @@ export const buildRequestUrl = (
   let apiUrl: URL;
   try {
     // Check if URL already contains protocol
-    if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+    if (baseUrl.startsWith("http://") || baseUrl.startsWith("https://")) {
       apiUrl = new URL(baseUrl);
     } else {
       // Try to create URL with https:// prefix
@@ -40,24 +40,27 @@ export const buildRequestUrl = (
   });
 
   // Add pagination parameters
-  newUrl.searchParams.append('page', currentPage.toString());
-  newUrl.searchParams.append('limit', itemsPerPage.toString());
+  newUrl.searchParams.append("page", currentPage.toString());
+  newUrl.searchParams.append("limit", itemsPerPage.toString());
 
   // Add sorting parameters
   if (sortColumn && sortDirection) {
-    newUrl.searchParams.append('_sort', sortColumn);
-    newUrl.searchParams.append('_order', sortDirection);
+    newUrl.searchParams.append("_sort", sortColumn);
+    newUrl.searchParams.append("_order", sortDirection);
   }
 
   // Add global search parameters
   if (searchQuery) {
     // Use the configured search parameter name or default to 'q'
-    const searchParamName = searchConfig?.paramName || 'q';
+    const searchParamName = searchConfig?.paramName || "q";
     newUrl.searchParams.append(searchParamName, searchQuery);
 
     // Add search fields if specified and a fieldParamName is provided
     if (searchFields?.length && searchConfig?.fieldParamName) {
-      newUrl.searchParams.append(searchConfig.fieldParamName, searchFields.join(','));
+      newUrl.searchParams.append(
+        searchConfig.fieldParamName,
+        searchFields.join(",")
+      );
     }
   }
 
@@ -65,7 +68,11 @@ export const buildRequestUrl = (
   if (columnSearchState && Object.keys(columnSearchState).length > 0) {
     Object.entries(columnSearchState).forEach(([columnKey, searchValue]) => {
       // Skip empty values and special "_clear_" value
-      if (searchValue && searchValue !== "_clear_" && searchValue !== "__clear__") {
+      if (
+        searchValue &&
+        searchValue !== "_clear_" &&
+        searchValue !== "__clear__"
+      ) {
         // For JSON placeholder API, use the column name directly
         newUrl.searchParams.append(columnKey, searchValue);
       }
@@ -79,17 +86,21 @@ export const buildRequestUrl = (
 /**
  * Creates fetch options for the API request
  */
-export const createFetchOptions = (controller: AbortController): RequestInit => {
+export const createFetchOptions = (
+  controller: AbortController
+): RequestInit => {
+  const token = getCookie("new-vision-token");
   return {
     signal: controller.signal,
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    method: 'GET',
-    credentials: 'omit', // Don't send credentials by default
-    mode: 'cors',  // Explicitly request CORS
-    cache: 'no-store' // Disable caching to prevent duplicate requests from using cached data
+    method: "GET",
+    credentials: "omit", // Don't send credentials by default
+    mode: "cors", // Explicitly request CORS
+    cache: "no-store", // Disable caching to prevent duplicate requests from using cached data
   };
 };
 

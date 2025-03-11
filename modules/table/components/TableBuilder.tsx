@@ -1,14 +1,14 @@
-"use client"
-import React, { useCallback, memo, useEffect } from 'react';
+"use client";
+import React, { memo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { TableConfig } from '@/modules/table/utils/configs/tableConfig';
+import { TableConfig } from "@/modules/table/utils/configs/tableConfig";
 import { Button } from "@/modules/table/components/ui/button";
-import ErrorMessage from './ErrorMessage';
+import ErrorMessage from "./ErrorMessage";
 import { useToast } from "@/modules/table/hooks/use-toast";
-import SearchBar from './table/SearchBar';
-import ColumnSearch from './table/ColumnSearch';
-import DataTable from './table/DataTable';
-import { useTableData } from '@/modules/table/hooks/useTableData';
+import SearchBar from "./table/SearchBar";
+import ColumnSearch from "./table/ColumnSearch";
+import DataTable from "./table/DataTable";
+import { useTableData } from "@/modules/table/hooks/useTableData";
 
 interface TableBuilderProps {
   url?: string;
@@ -21,22 +21,27 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   url,
   config,
   onReset,
-  searchBarActions
+  searchBarActions,
 }) => {
   const { toast } = useToast();
   // Use URL from config if direct URL not provided
-  const dataUrl = url || (config ? config.url : '');
+  const dataUrl = url || (config ? config.url : "");
 
   if (!dataUrl) {
-    return <ErrorMessage message="No URL or configuration provided" onRetry={onReset} />;
+    return (
+      <ErrorMessage
+        message="No URL or configuration provided"
+        onRetry={onReset}
+      />
+    );
   }
 
   // Extract search configuration from the config
   const searchConfig = {
     defaultFields: config?.searchFields,
-    paramName: config?.searchParamName || 'q',
+    paramName: config?.searchParamName || "q",
     fieldParamName: config?.searchFieldParamName,
-    allowFieldSelection: config?.allowSearchFieldSelection
+    allowFieldSelection: config?.allowSearchFieldSelection,
   };
 
   const {
@@ -58,14 +63,14 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     handleColumnSearch,
     handlePageChange,
     handleItemsPerPageChange,
-    setColumns
+    setColumns,
   } = useTableData(
     dataUrl,
     config?.columns,
     config?.defaultItemsPerPage || 10,
     config?.defaultSortColumn || null,
     config?.defaultSortDirection || null,
-    config?.defaultSearchQuery || '',
+    config?.defaultSearchQuery || "",
     config?.dataMapper,
     searchConfig
   );
@@ -81,7 +86,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const enablePagination = config?.enablePagination !== false;
   const enableSearch = config?.enableSearch !== false;
   const enableColumnSearch = config?.enableColumnSearch === true;
-  const searchableColumns = columns.filter(col => col.searchable);
+  const searchableColumns = columns.filter((col) => col.searchable);
   const hasSearchableColumns = searchableColumns.length > 0;
 
   // Show error toast when an error occurs
@@ -102,12 +107,21 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className="space-y-4 w-full"
+        className="space-y-4 w-full bg-sidebar rounded-lg "
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
+        
+        {enableColumnSearch && hasSearchableColumns && (
+          <ColumnSearch
+            columns={columns}
+            columnSearchState={columnSearchState}
+            onColumnSearch={handleColumnSearch}
+          />
+        )}
+
         {enableSearch && hasSearchableColumns && (
           <SearchBar
             searchQuery={searchQuery}
@@ -117,15 +131,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             actions={searchBarActions} // Pass custom actions to SearchBar
           />
         )}
-
-        {enableColumnSearch && hasSearchableColumns && (
-          <ColumnSearch
-            columns={columns}
-            columnSearchState={columnSearchState}
-            onColumnSearch={handleColumnSearch}
-          />
-        )}
-
         <DataTable
           data={data}
           columns={config?.columns || columns}
@@ -145,11 +150,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
 
         {onReset && (
           <div className="flex justify-center">
-            <Button
-              variant="outline"
-              onClick={onReset}
-              className="text-sm"
-            >
+            <Button variant="outline" onClick={onReset} className="text-sm">
               Try Different URL
             </Button>
           </div>

@@ -1,8 +1,13 @@
-
-import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/modules/table/components/ui/button";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/modules/table/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/modules/table/components/ui/select";
 
 interface PaginationProps {
   currentPage: number;
@@ -15,18 +20,20 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
-  totalPages,
   itemsPerPage,
+  totalPages,
   totalItems,
   onPageChange,
-  onItemsPerPageChange
+  onItemsPerPageChange,
 }) => {
-
   const renderPageButtons = () => {
     const pages = [];
     const MAX_VISIBLE_PAGES = 5;
 
-    let startPage = Math.max(1, currentPage - Math.floor(MAX_VISIBLE_PAGES / 2));
+    let startPage = Math.max(
+      1,
+      currentPage - Math.floor(MAX_VISIBLE_PAGES / 2)
+    );
     let endPage = Math.min(totalPages, startPage + MAX_VISIBLE_PAGES - 1);
 
     if (endPage - startPage + 1 < MAX_VISIBLE_PAGES) {
@@ -43,7 +50,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         className="h-8 w-8"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
       </Button>
     );
 
@@ -64,7 +71,9 @@ const Pagination: React.FC<PaginationProps> = ({
       // Ellipsis if needed
       if (startPage > 2) {
         pages.push(
-          <span key="ellipsis1" className="px-1">...</span>
+          <span key="ellipsis1" className="px-1">
+            ...
+          </span>
         );
       }
     }
@@ -89,7 +98,9 @@ const Pagination: React.FC<PaginationProps> = ({
       // Ellipsis if needed
       if (endPage < totalPages - 1) {
         pages.push(
-          <span key="ellipsis2" className="px-1">...</span>
+          <span key="ellipsis2" className="px-1">
+            ...
+          </span>
         );
       }
 
@@ -116,7 +127,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         className="h-8 w-8"
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className="h-4 w-4 rtl:rotate-180" />
       </Button>
     );
 
@@ -124,33 +135,28 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="p-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="text-sm text-muted-foreground flex-shrink-0">
-        Showing {totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} items
+    <div className="p-4 relative border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="flex items-center grow justify-center space-x-2 ">
+        {renderPageButtons()}
       </div>
-
-      <div className="flex items-center justify-end gap-4 w-full sm:w-auto">
-        <div className="flex items-center">
-          <span className="text-sm text-muted-foreground mr-2">Items per page:</span>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {renderPageButtons()}
-        </div>
+      <div className="flex items-center absolute left-10 top-1/2 -translate-y-1/2">
+        <span className="text-sm text-muted-foreground mr-2">
+          الصفوف لكل صفحة :
+        </span>
+        <Select
+          value={itemsPerPage.toString()}
+          onValueChange={(value) => onItemsPerPageChange(parseInt(value))}
+        >
+          <SelectTrigger className="h-8 w-[70px]">
+            <SelectValue placeholder="10" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="5">5</SelectItem>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

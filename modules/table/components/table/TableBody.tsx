@@ -37,7 +37,7 @@ const TableBody: React.FC<TableBodyProps> = ({ data, columns, searchQuery }) => 
           {columns.map((column, colIndex) => {
             const value = getNestedValue(row, column.key);
             const isMobileHidden = column.hideOnMobile ? 'hidden sm:table-cell' : '';
-            const alignment = column.align ? `text-${column.align}` : 'text-left';
+            const alignment = column.align ? `text-${column.align}` : 'text-start';
 
             return (
               <td

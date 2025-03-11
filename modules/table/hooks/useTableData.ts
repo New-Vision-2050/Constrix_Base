@@ -1,19 +1,18 @@
-
-import { useTableStore } from '@/modules/table/store//useTableStore';
-import { ColumnConfig } from '@/modules/table/utils/tableConfig';
-import { SearchConfig } from '@/modules/table/utils/tableTypes';
-import { createTableFetcher } from './useTableFetcher';
-import { useTableActions } from './useTableActions';
-import { useTableInitialization } from './useTableInitialization';
-import { useTableFetchEffect } from './useTableFetchEffect';
+import { useTableStore } from "@/modules/table/store//useTableStore";
+import { ColumnConfig } from "@/modules/table/utils/tableConfig";
+import { SearchConfig } from "@/modules/table/utils/tableTypes";
+import { createTableFetcher } from "./useTableFetcher";
+import { useTableActions } from "./useTableActions";
+import { useTableInitialization } from "./useTableInitialization";
+import { useTableFetchEffect } from "./useTableFetchEffect";
 
 export const useTableData = (
   url: string,
   configColumns?: ColumnConfig[],
   defaultItemsPerPage = 10,
   defaultSortColumn: string | null = null,
-  defaultSortDirection: 'asc' | 'desc' | null = null,
-  defaultSearchQuery = '',
+  defaultSortDirection: "asc" | "desc" | null = null,
+  defaultSearchQuery = "",
   dataMapper?: (data: any) => any[],
   searchConfig?: SearchConfig
 ) => {
@@ -33,7 +32,7 @@ export const useTableData = (
     searchQuery,
     searchFields,
     columnSearchState,
-    
+
     setData,
     setColumns,
     setLoading,
@@ -44,9 +43,9 @@ export const useTableData = (
     setSort,
     setSearch,
     setColumnSearch,
-    resetTable
+    resetTable,
   } = useTableStore();
-  
+
   // Initialize table state
   useTableInitialization({
     configColumns,
@@ -58,12 +57,12 @@ export const useTableData = (
     setPagination,
     setSort,
     setSearch,
-    setColumns
+    setColumns,
   });
-  
+
   // Get data fetcher
   const { fetchData } = createTableFetcher();
-  
+
   // Setup data fetching with dependencies
   useTableFetchEffect({
     url,
@@ -75,30 +74,31 @@ export const useTableData = (
     searchFields,
     columnSearchState,
     searchConfig,
-    fetchData: (params) => fetchData({
-      ...params,
-      setLoading,
-      setError,
-      setTotalItems,
-      setPagination,
-      setColumns,
-      setData,
-      dataMapper
-    }),
+    fetchData: (params) =>
+      fetchData({
+        ...params,
+        setLoading,
+        setError,
+        setTotalItems,
+        setPagination,
+        setColumns,
+        setData,
+        dataMapper,
+      }),
     setData,
     setColumns,
     setError,
     setIsFirstLoad,
-    configColumns
+    configColumns,
   });
-  
+
   // Get table action handlers
-  const { 
-    handleSort, 
-    handleSearch, 
+  const {
+    handleSort,
+    handleSearch,
     handleColumnSearch,
-    handlePageChange, 
-    handleItemsPerPageChange 
+    handlePageChange,
+    handleItemsPerPageChange,
   } = useTableActions({
     setSort,
     setSearch,
@@ -108,9 +108,9 @@ export const useTableData = (
     itemsPerPage,
     sortColumn,
     sortDirection,
-    totalItems
+    totalItems,
   });
-  
+
   return {
     // State
     data,
@@ -126,7 +126,7 @@ export const useTableData = (
     searchQuery,
     searchFields,
     columnSearchState,
-    
+
     // Actions
     handleSort,
     handleSearch,
@@ -134,6 +134,6 @@ export const useTableData = (
     handlePageChange,
     handleItemsPerPageChange,
     resetTable,
-    setColumns  // Export setColumns so it can be used directly
+    setColumns, // Export setColumns so it can be used directly
   };
 };
