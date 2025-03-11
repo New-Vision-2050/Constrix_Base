@@ -36,7 +36,12 @@ const IdentifierPhase = ({
           );
           setValue("by", data.payload.login_way.by);
           setValue("type", data.payload.login_way.type);
+
           const nextStep = data.payload.login_way.step?.login_option;
+          if (!!data.payload.can_set_pass) {
+            handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
+            return;
+          }
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);
