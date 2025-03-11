@@ -9,11 +9,19 @@ import PhoneInput from "../../../../../components/shared/PhoneField";
 import { UserRepository } from "@/modules/users/repositories/UserRepository";
 import { UserService } from "@/modules/users/services/UserService";
 import { AxiosError } from "axios";
+import { useState } from "react";
+import { useSetUserLookupsCxt } from "../context/SetUserLookups";
 
-export default function UserFormContent() {
+type PropsT = {
+  companyId?: string;
+};
+
+export default function UserFormContent({ companyId }: PropsT) {
   // declare and define component state and variables
   const userRepository = new UserRepository();
   const userService = new UserService(userRepository);
+  const [countryCode, setCountryCode] = useState("");
+  const { jobTitles } = useSetUserLookupsCxt();
   const form = useForm<UserSchemaT>({
     resolver: zodResolver(userSchema),
     defaultValues: {},
@@ -34,6 +42,8 @@ export default function UserFormContent() {
         phone: data.phone,
         email: data.email,
         title: data.title,
+        companyId,
+        countryCode,
       });
 
       // Show error message
@@ -79,16 +89,15 @@ export default function UserFormContent() {
           errMsg={errors?.email?.message ?? ""}
         />
         {/* phone */}
-        <PhoneInput name="phone" />
+        <PhoneInput name="phone" setCountryCode={setCountryCode} />
         {/* title */}
         <CustomSelect
           name="title"
           control={control}
-          options={[
-            { label: "title 1", value: "tit-1" },
-            { label: "title 2", value: "tit-2" },
-            { label: "title 3", value: "tit-3" },
-          ]}
+          options={jobTitles?.map((ele) => ({
+            label: ele.name,
+            value: ele.id,
+          }))}
           placeholder="المسمى الوظيفي"
           error={Boolean(errors.title)}
           errorMessage={errors?.title?.message ?? ""}

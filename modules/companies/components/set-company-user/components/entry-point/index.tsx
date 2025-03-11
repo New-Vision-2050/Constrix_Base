@@ -9,14 +9,28 @@ import { useCreateCompanyUserCxt } from "../../context/CreateCompanyUserCxt";
 
 import { CircleCheck } from "lucide-react";
 import SetUserModule from "@/modules/users/components/set-user";
+import { Company } from "@/modules/companies/types/Company";
 
 export default function CreateCompanyUserModuleEntryPoint() {
-  const { isCompanyCreated, handleSetCompanyCreated } =
-    useCreateCompanyUserCxt();
+  const {
+    isCompanyCreated,
+    companyId,
+    handleSetCompanyCreated,
+    handleSetCompanyId,
+  } = useCreateCompanyUserCxt();
+
+  const handleCloseCompanyModule = (com?: Company) => {
+    handleSetCompanyId(com?.id ?? "");
+    handleSetCompanyCreated(true);
+  };
 
   return (
-    <Accordion type="single" collapsible>
-      <AccordionItem value="create-company">
+    <Accordion
+      type="single"
+      collapsible
+      value={!isCompanyCreated ? "create-company" : "create-user"}
+    >
+      <AccordionItem value={"create-company"}>
         <AccordionTrigger>
           {isCompanyCreated && (
             <div>
@@ -26,7 +40,7 @@ export default function CreateCompanyUserModuleEntryPoint() {
           <h4 className="text-lg font-bold text-white">بيانات الشركة</h4>
         </AccordionTrigger>
         <AccordionContent>
-          <SetCompanyModule />
+          <SetCompanyModule onModuleClose={handleCloseCompanyModule} />
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="create-user">
@@ -36,7 +50,7 @@ export default function CreateCompanyUserModuleEntryPoint() {
           </h4>
         </AccordionTrigger>
         <AccordionContent>
-          <SetUserModule />
+          <SetUserModule companyId={companyId} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

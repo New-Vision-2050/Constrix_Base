@@ -18,4 +18,6 @@ export interface CreateUserI {
   email: string;
   phone: string;
   title: string;
+  companyId?: string;
+  countryCode?: string;
 }

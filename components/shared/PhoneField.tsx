@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { SetStateAction, useCallback, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -16,15 +16,17 @@ const COUNTRY_CODES = [
 
 type PhoneInputProps = {
   name: string;
+  setCountryCode: React.Dispatch<SetStateAction<string>>;
 };
 
-export default function PhoneInput({ name }: PhoneInputProps) {
+export default function PhoneInput({ name, setCountryCode }: PhoneInputProps) {
   const [selectedCode, setSelectedCode] = useState<string>(
     COUNTRY_CODES[0].value
   );
 
   const handleChange = useCallback((str: string) => {
     setSelectedCode(str);
+    setCountryCode(str);
   }, []);
 
   return (

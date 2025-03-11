@@ -15,7 +15,8 @@ export default function SetCompanyFormContent() {
   // control and state for
   const companyRepository = new CompanyRepository();
   const companyService = new CompanyService(companyRepository);
-  const { countries, fields, users } = useCompanyFormLookupsCxt();
+  const { countries, fields, users, onModuleClose } =
+    useCompanyFormLookupsCxt();
   const form = useForm<SetCompanySchema>({
     resolver: zodResolver(companySchema),
     defaultValues: {},
@@ -30,13 +31,15 @@ export default function SetCompanyFormContent() {
   // component helpers
   const onSubmit = async (data: SetCompanySchema) => {
     try {
-      await companyService.createCompany({
+      const response = await companyService.createCompany({
         name: data.name,
         domainName: data.domainName,
         countryId: data.countryId,
         companyFieldId: data.companyFieldId,
         supportNvEmployeeId: data.supportNvEmployeeId,
       });
+
+      if (Boolean(onModuleClose)) onModuleClose?.(response);
 
       // Show error message
       toast.success("Success", {

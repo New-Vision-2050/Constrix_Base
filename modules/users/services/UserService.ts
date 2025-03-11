@@ -11,8 +11,9 @@ export class UserService {
       email: data.email,
       phone: data.phone,
       title: data.title,
+      companyId: data.companyId,
+      countryCode: data.countryCode,
     };
-    console.log('UserService newUser',newUser)
     return this.userRepository.create(newUser);
   }
 }

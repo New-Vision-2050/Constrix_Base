@@ -5,12 +5,15 @@ import { User } from "@/modules/users/types/User";
 import { CompanyField } from "@/modules/companies/types/CompanyField";
 import { Country } from "@/types/Country";
 import { createContext, useContext } from "react";
+import { Company } from "@/modules/companies/types/Company";
 
 // define context type
 type CxtType = {
   countries: Country[];
   fields: CompanyField[];
   users: User[];
+
+  onModuleClose?: (com?: Company) => void;
 };
 
 // Create a context
@@ -18,6 +21,8 @@ const CompanyFormLookupsCxt = createContext<CxtType>({
   countries: [],
   fields: [],
   users: [],
+
+  onModuleClose: () => {},
 });
 
 // Custom hook to use the FormLookupCxt
@@ -31,11 +36,13 @@ export const useCompanyFormLookupsCxt = () => {
   return context;
 };
 
-type PropsT = React.PropsWithChildren;
+type PropsT = React.PropsWithChildren & {
+  onModuleClose?: () => void;
+};
 
 // Provider to wrap the children components
 export default function CompanyFormLookupsCxtProvider(props: PropsT) {
-  const { children } = props;
+  const { children, onModuleClose } = props;
   // fetch template data
   const { data: countries } = useCountriesData();
   const { data: fields } = useCompanyFields();
@@ -47,6 +54,7 @@ export default function CompanyFormLookupsCxtProvider(props: PropsT) {
         countries: countries ?? [],
         fields: fields ?? [],
         users: users ?? [],
+        onModuleClose,
       }}
     >
       {children}

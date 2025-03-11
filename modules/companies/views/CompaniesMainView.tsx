@@ -6,6 +6,7 @@ import { useRef } from "react";
 
 export default function CompaniesMainView() {
   const builderModuleRef = useRef<CreateBuilderModuleRef>(null);
+  const companyUserModuleRef = useRef<CreateBuilderModuleRef>(null);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -18,6 +19,7 @@ export default function CompaniesMainView() {
       <hr />
       <CreateBuilderModule
         btnLabel="أنشاء"
+        moduleId={"create-user"}
         ref={builderModuleRef}
         onSheetClose={() => {
           console.log("onSheetClose-onSheetClose");
@@ -29,6 +31,7 @@ export default function CompaniesMainView() {
       <CreateBuilderModule
         btnLabel="أنشاء شركة"
         moduleId={"create-company-user"}
+        ref={companyUserModuleRef}
       />
       <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/90 md:min-h-min" />
     </div>
