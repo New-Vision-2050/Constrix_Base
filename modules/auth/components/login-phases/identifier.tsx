@@ -57,7 +57,7 @@ const IdentifierPhase = ({
 
   return (
     <>
-      <h1 className="text-2xl text-center my-5 ">تسجيل الدخول</h1>
+      <h1 className="text-2xl text-center ">تسجيل الدخول</h1>
       <Input
         {...register("identifier")}
         label="رقم الجوال / البريد الالكتروني / رقم المعرف (يحدد من الاعدادات)"

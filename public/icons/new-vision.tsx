@@ -1,4 +1,6 @@
-const NewVision = ({ ...props }) => {
+import { ComponentProps } from "react";
+
+const NewVision = ({ ...props }: ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

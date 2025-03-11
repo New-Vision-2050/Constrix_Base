@@ -53,7 +53,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           {...props}
         />
-        <label htmlFor={label} className={`${labelClassNames}`}>
+        <label htmlFor={label} className={labelClassNames}>
           {label}
         </label>
         {type === "password" && (

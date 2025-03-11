@@ -1,4 +1,6 @@
-const ConstrixIcon = ({ ...props }) => {
+import { ComponentProps } from "react";
+
+const ConstrixIcon = ({ ...props }: ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
