@@ -1,4 +1,3 @@
-import AdornedInput from "@/components/shared/AdornedInput";
 import CustomSelect from "@/components/shared/CustomSelect";
 import { Button } from "@/components/ui/button";
 import { userSchema, UserSchemaT } from "@/modules/users/schema/set-user";
@@ -11,6 +10,7 @@ import { UserService } from "@/modules/users/services/UserService";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { useSetUserLookupsCxt } from "../context/SetUserLookups";
+import InputField from "@/components/shared/InputField";
 
 type PropsT = {
   companyId?: string;
@@ -71,28 +71,40 @@ export default function UserFormContent({ companyId }: PropsT) {
       <Toaster position="bottom-right" richColors />
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
         {/* first name */}
-        <AdornedInput
+        <InputField
+          required={true}
           fieldName="firstName"
           label="اسم المستخدم الاول"
+          placeholder="اسم المستخدم الاول"
           errMsg={errors?.firstName?.message ?? ""}
         />
         {/* last name */}
-        <AdornedInput
+        <InputField
+          required={true}
           fieldName="lastName"
           label="اسم المستخدم الاخير"
+          placeholder="اسم المستخدم الاخير"
           errMsg={errors?.lastName?.message ?? ""}
         />
         {/* email */}
-        <AdornedInput
+        <InputField
+          required={true}
           fieldName="email"
           label="البريد الالكتروني"
+          placeholder="البريد الالكتروني"
           errMsg={errors?.email?.message ?? ""}
         />
         {/* phone */}
-        <PhoneInput name="phone" setCountryCode={setCountryCode} />
+        <PhoneInput
+          name="phone"
+          required={true}
+          errMsg={errors?.phone?.message ?? ""}
+          setCountryCode={setCountryCode}
+        />
         {/* title */}
         <CustomSelect
           name="title"
+          required={true}
           control={control}
           options={jobTitles?.map((ele) => ({
             label: ele.name,

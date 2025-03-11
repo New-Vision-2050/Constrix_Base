@@ -9,7 +9,8 @@ import { useCompanyFormLookupsCxt } from "../context/form-lookups";
 import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
 import CustomSelect from "@/components/shared/CustomSelect";
-import AdornedInput from "@/components/shared/AdornedInput";
+import InputField from "../../../../../components/shared/InputField";
+import InputFieldWithAdorned from "../../../../../components/shared/InputFieldWithAdorned";
 
 export default function SetCompanyFormContent() {
   // control and state for
@@ -68,6 +69,7 @@ export default function SetCompanyFormContent() {
         <CustomSelect
           name="countryId"
           control={control}
+          required={true}
           options={countries?.map((ele) => ({
             label: ele.name,
             value: ele.id,
@@ -80,6 +82,7 @@ export default function SetCompanyFormContent() {
         <CustomSelect
           name="companyFieldId"
           control={control}
+          required={true}
           options={fields?.map((ele) => ({ label: ele.name, value: ele.id }))}
           placeholder="النشاط"
           error={Boolean(errors.companyFieldId)}
@@ -87,16 +90,20 @@ export default function SetCompanyFormContent() {
         />
 
         {/* company name */}
-        <AdornedInput
+        <InputField
+          required={true}
           fieldName="name"
           label="الاسم التجاري"
+          placeholder="الاسم التجاري"
           errMsg={errors?.name?.message ?? ""}
         />
         {/* domain name */}
-        <AdornedInput
+        <InputFieldWithAdorned
+          required={true}
           fieldName="domainName"
           label="الاسم المختصر"
-          sAdornment=".constrix.com"
+          placeholder="الاسم المختصر"
+          endAdornment={<p>.constrix.com</p>}
           errMsg={errors?.domainName?.message ?? ""}
         />
 
@@ -104,6 +111,7 @@ export default function SetCompanyFormContent() {
         <CustomSelect
           name="supportNvEmployeeId"
           control={control}
+          required={true}
           options={users?.map((ele) => ({ label: ele.name, value: ele.id }))}
           placeholder="مسؤول الدعم"
           error={Boolean(errors.supportNvEmployeeId)}

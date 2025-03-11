@@ -18,6 +18,8 @@ import {
 
 // types
 import { Option } from "@/types/Option";
+import { useMemo } from "react";
+import { Asterisk } from "lucide-react";
 
 type CustomSelectProps<T extends FieldValues> = {
   name: Path<T>;
@@ -25,6 +27,7 @@ type CustomSelectProps<T extends FieldValues> = {
   options: Option[];
   placeholder?: string;
   error?: boolean;
+  required?: boolean;
   errorMessage?: string;
 };
 
@@ -33,13 +36,22 @@ const CustomSelect = <T extends FieldValues>({
   name,
   control,
   options,
+  required,
   placeholder = "Select an option",
   error = false,
   errorMessage,
 }: CustomSelectProps<T>) => {
   // Return the Controller component for handling form control
   return (
-    <>
+    <div className="w-full px-2 my-2">
+      {/* Label with Required Asterisk */}
+      <label
+        htmlFor={name}
+        className="flex items-center gap-1 text-lg font-medium text-[#E7E3FC61]"
+      >
+        {placeholder}
+        {required && <Asterisk className="text-red-500 w-[12px]" />}
+      </label>
       <Controller
         name={name}
         control={control}
@@ -47,12 +59,13 @@ const CustomSelect = <T extends FieldValues>({
           <SelectField
             field={field}
             options={options}
+            error={error}
             placeholder={placeholder}
           />
         )}
       />
       {error && <p className="text-red-500">{errorMessage}</p>}
-    </>
+    </div>
   );
 };
 
@@ -61,17 +74,22 @@ const SelectField = <T extends FieldValues>({
   field,
   options,
   placeholder,
+  error = false,
 }: {
+  error?: boolean;
   field: ControllerRenderProps<T, Path<T>>;
   options: Option[];
   placeholder: string;
 }) => {
+  const borderColor = useMemo(() => (Boolean(error) ? "red" : "gray"), [error]);
   return (
     <Select value={field.value} onValueChange={field.onChange}>
-      <SelectTrigger className="w-full max-w-sm border-2 border-gray-300 dark:border-gray-700 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+      <SelectTrigger
+        className={`w-full  h-[56px] max-w-sm border-2 border-${borderColor}-300 dark:border-${borderColor}-700 px-4 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200`}
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+      <SelectContent className="bg-white rtl dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
         {options.map((option) => (
           <SelectItem
             key={option.value}
