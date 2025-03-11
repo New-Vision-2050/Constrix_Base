@@ -62,8 +62,7 @@ export const contactFormConfig: FormConfig = {
             }
           ]
         }
-      ],
-      columns: 2
+      ]
     },
     {
       title: 'Message Details',
@@ -172,11 +171,11 @@ export const contactFormConfig: FormConfig = {
   resetButtonText: 'Clear Form',
   showSubmitLoader: true,
   resetOnSuccess: true,
-  
+
   // Example submit handler
   onSubmit: async (values) => {
     console.log('Form submitted with values:', values);
-    
+
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {

@@ -9,9 +9,11 @@ import { useToast } from "@/modules/table/hooks//use-toast";
 
 interface FormBuilderFormProps {
   onFormSubmit: (values: Record<string, any>) => void;
+  title?: string,
+  description?: string
 }
 
-const FormBuilderForm: React.FC<FormBuilderFormProps> = ({ onFormSubmit }) => {
+const FormBuilderForm: React.FC<FormBuilderFormProps> = ({ onFormSubmit , title , description}) => {
   const [sheetOpen, setSheetOpen] = useState(true);
   const { toast } = useToast();
 
@@ -94,9 +96,9 @@ const FormBuilderForm: React.FC<FormBuilderFormProps> = ({ onFormSubmit }) => {
         }}
       >
         <SheetHeader className="mb-6">
-          <SheetTitle>Contact Form with Laravel Validation</SheetTitle>
+          <SheetTitle>{title}</SheetTitle>
           <SheetDescription>
-            Fill out the form to see Laravel-style validation
+              {description}
           </SheetDescription>
         </SheetHeader>
 
