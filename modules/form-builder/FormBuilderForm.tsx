@@ -14,7 +14,7 @@ interface FormBuilderFormProps {
 }
 
 const FormBuilderForm: React.FC<FormBuilderFormProps> = ({ onFormSubmit , title , description}) => {
-  const [sheetOpen, setSheetOpen] = useState(true);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { toast } = useToast();
 
   // Function to handle validation errors - keeps the form open and displays toast
