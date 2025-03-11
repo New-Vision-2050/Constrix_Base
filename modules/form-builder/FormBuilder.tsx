@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, {memo, useEffect} from 'react';
 import { FormConfig } from './types/formTypes';
 import { useFormBuilder } from '@/modules/form-builder/hooks/useFormBuilder';
 import FormSection from './FormSection';
@@ -122,4 +122,4 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ config, className }) => {
   );
 };
 
-export default FormBuilder;
+export default memo(FormBuilder);

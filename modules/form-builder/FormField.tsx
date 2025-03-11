@@ -26,15 +26,13 @@ const FormField: React.FC<FormFieldProps> = ({
   error,
   touched,
 }) => {
-  const { values, setValue, setTouched } = useFormStore(state => ({
-    values: state.values,
-    setValue: state.setValue,
-    setTouched: state.setTouched,
-  }));
+    const values = useFormStore(state => state.values);
+    const setValue = useFormStore(state => state.setValue);
+    const setTouched = useFormStore(state => state.setTouched);
 
   const onChange = useCallback((newValue: any) => {
     setValue(field.name, newValue);
-    
+
     // Run field-specific onChange handler if provided
     if (field.onChange) {
       field.onChange(newValue, values);
@@ -43,7 +41,7 @@ const FormField: React.FC<FormFieldProps> = ({
 
   const onBlur = useCallback(() => {
     setTouched(field.name, true);
-    
+
     // Run field-specific onBlur handler if provided
     if (field.onBlur) {
       field.onBlur(value, values);
@@ -68,78 +66,78 @@ const FormField: React.FC<FormFieldProps> = ({
       case 'password':
       case 'number':
         return (
-          <TextField 
-            field={field} 
-            value={value} 
-            error={error} 
-            touched={touched} 
-            type={field.type} 
-            onChange={onChange} 
-            onBlur={onBlur} 
+          <TextField
+            field={field}
+            value={value}
+            error={error}
+            touched={touched}
+            type={field.type}
+            onChange={onChange}
+            onBlur={onBlur}
           />
         );
-        
+
       case 'textarea':
         return (
-          <TextareaField 
-            field={field} 
-            value={value} 
-            error={error} 
-            touched={touched} 
-            onChange={onChange} 
-            onBlur={onBlur} 
+          <TextareaField
+            field={field}
+            value={value}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
           />
         );
-        
+
       case 'checkbox':
         return (
-          <CheckboxField 
-            field={field} 
-            value={value} 
-            error={error} 
-            touched={touched} 
-            onChange={onChange} 
-            onBlur={onBlur} 
+          <CheckboxField
+            field={field}
+            value={value}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
           />
         );
-        
+
       case 'radio':
         return (
-          <RadioField 
-            field={field} 
-            value={value} 
-            error={error} 
-            touched={touched} 
-            onChange={onChange} 
-            onBlur={onBlur} 
+          <RadioField
+            field={field}
+            value={value}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
           />
         );
-        
+
       case 'select':
         return (
-          <SelectField 
-            field={field} 
-            value={value} 
-            error={error} 
-            touched={touched} 
-            onChange={onChange} 
-            onBlur={onBlur} 
-            dependencyValues={values} 
+          <SelectField
+            field={field}
+            value={value}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            dependencyValues={values}
           />
         );
-        
+
       case 'date':
         return (
-          <DateField 
-            field={field} 
-            value={value} 
-            error={error} 
-            touched={touched} 
-            onChange={onChange} 
-            onBlur={onBlur} 
+          <DateField
+            field={field}
+            value={value}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
           />
         );
-        
+
       default:
         return <div>Unsupported field type: {field.type}</div>;
     }
@@ -150,10 +148,10 @@ const FormField: React.FC<FormFieldProps> = ({
     return (
       <div className="mb-4">
         {renderField()}
-        <FieldHelperText 
-          error={error} 
-          touched={touched} 
-          helperText={field.helperText} 
+        <FieldHelperText
+          error={error}
+          touched={touched}
+          helperText={field.helperText}
         />
       </div>
     );
@@ -167,10 +165,10 @@ const FormField: React.FC<FormFieldProps> = ({
         {field.required && <span className="text-destructive ml-1">*</span>}
       </Label>
       {renderField()}
-      <FieldHelperText 
-        error={error} 
-        touched={touched} 
-        helperText={field.helperText} 
+      <FieldHelperText
+        error={error}
+        touched={touched}
+        helperText={field.helperText}
       />
     </div>
   );

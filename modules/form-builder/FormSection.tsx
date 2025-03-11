@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, {memo} from 'react';
 import { FormSection as FormSectionType } from './types/formTypes';
 import FormField from './FormField';
 import { cn } from '@/lib/utils';
@@ -19,8 +19,8 @@ const FormSection: React.FC<FormSectionProps> = ({
   touched,
 }) => {
   // Create the grid template columns based on the number of columns
-  const gridStyle = section.columns 
-    ? { 
+  const gridStyle = section.columns
+    ? {
         display: 'grid',
         gridTemplateColumns: `repeat(${section.columns}, minmax(0, 1fr))`,
         gap: '1rem',
@@ -35,7 +35,7 @@ const FormSection: React.FC<FormSectionProps> = ({
           {section.description && <CardDescription>{section.description}</CardDescription>}
         </CardHeader>
       )}
-      
+
       <CardContent>
         <div style={gridStyle}>
           {section.fields.map((field) => {
@@ -46,11 +46,11 @@ const FormSection: React.FC<FormSectionProps> = ({
 
             // Field-specific styling for width, grid area, etc.
             const fieldStyle: React.CSSProperties = {};
-            
+
             if (field.width) {
               fieldStyle.width = field.width;
             }
-            
+
             if (field.gridArea) {
               fieldStyle.gridArea = field.gridArea;
             }
@@ -72,4 +72,4 @@ const FormSection: React.FC<FormSectionProps> = ({
   );
 };
 
-export default FormSection;
+export default memo(FormSection);
