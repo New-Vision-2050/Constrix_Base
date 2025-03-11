@@ -6,12 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useForgetPassword, useLoginSteps } from "../../store/mutations";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
+import { setCookie } from "cookies-next";
+import AnotherCheckingWay from "../another-checking-way";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const router = useRouter();
+
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
   const { mutate, isPending } = useLoginSteps();
@@ -21,6 +28,8 @@ const PasswordPhase = ({
     handleSubmit,
     getValues,
   } = useFormContext<LoginType>();
+
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const handleLogin = () => {
     const data = getValues();
@@ -33,6 +42,15 @@ const PasswordPhase = ({
       {
         onSuccess: (data) => {
           console.log(data.payload);
+          if (!data.payload.login_way.step) {
+            useAuthStore.getState().setUser(data.payload.user);
+            setCookie("new-vision-token", data.payload.token, {
+              maxAge: 7 * 24 * 60 * 60,
+              path: "/",
+            });
+            router.push(ROUTER.COMPANIES);
+            return;
+          }
         },
         onError(error) {
           console.log(error);
@@ -78,6 +96,12 @@ const PasswordPhase = ({
       >
         هل نسيت كلمة المرور؟
       </Button>
+      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+        <AnotherCheckingWay
+          loginOptionAlternatives={loginOptionAlternatives}
+          handleSetStep={handleSetStep}
+        />
+      )}
     </>
   );
 };

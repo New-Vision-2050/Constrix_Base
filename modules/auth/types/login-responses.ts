@@ -1,3 +1,5 @@
+export type LoginOption = "sms" | "mail" | "password" | "social";
+
 export type LoginWaysSuccessResponse = {
   code: "SUCCESS_WITH_SINGLE_PAYLOAD_OBJECT";
   message: string | null;
@@ -7,8 +9,10 @@ export type LoginWaysSuccessResponse = {
       name: string;
       step: {
         login_option: "password" | "otp";
-        drivers: string[];
+        login_option_alternatives: LoginOption[] | null;
       };
+      by: string;
+      type: "sms" | "mail";
     };
     token: string;
   };
