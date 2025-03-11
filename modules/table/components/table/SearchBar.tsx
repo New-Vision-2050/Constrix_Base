@@ -1,13 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
-import { Search, X, Filter } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Search, X, Filter } from "lucide-react";
 import { Button } from "@/modules/table/components/ui/button";
 import { Input } from "@/modules/table/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/modules/table/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/modules/table/components/ui/popover";
 import { Checkbox } from "@/modules/table/components/ui/checkbox";
 import { Label } from "@/modules/table/components/ui/label";
-import { SearchConfig } from '@/modules/table/utils/tableTypes';
-import { useDebounce } from '@/modules/table/hooks/useDebounce';
+import { SearchConfig } from "@/modules/table/utils/tableTypes";
+import { useDebounce } from "@/modules/table/hooks/useDebounce";
 
 interface SearchBarProps {
   searchQuery: string;
@@ -22,7 +25,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   searchConfig,
   searchableColumns,
-  actions
+  actions,
 }) => {
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const [selectedSearchColumns, setSelectedSearchColumns] = useState<string[]>(
@@ -31,18 +34,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   useEffect(() => {
     // Initialize selectedSearchColumns with all searchable columns if not provided in config
-    if (searchableColumns.length > 0 && selectedSearchColumns.length === 0 && searchConfig.allowFieldSelection) {
-      setSelectedSearchColumns(searchableColumns.map(col => col.key));
+    if (
+      searchableColumns.length > 0 &&
+      selectedSearchColumns.length === 0 &&
+      searchConfig.allowFieldSelection
+    ) {
+      setSelectedSearchColumns(searchableColumns.map((col) => col.key));
     }
-  }, [searchableColumns, selectedSearchColumns.length, searchConfig.allowFieldSelection]);
+  }, [
+    searchableColumns,
+    selectedSearchColumns.length,
+    searchConfig.allowFieldSelection,
+  ]);
 
   // Create the debounced search function
   const debouncedSearch = useDebounce((query: string) => {
     // Only pass fields if column selection is allowed
-    const fieldsToPass = searchConfig.allowFieldSelection 
-      ? selectedSearchColumns 
+    const fieldsToPass = searchConfig.allowFieldSelection
+      ? selectedSearchColumns
       : searchConfig.defaultFields;
-      
+
     onSearch(query, fieldsToPass);
   }, 500);
 
@@ -54,16 +65,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const clearSearch = () => {
-    setLocalSearchQuery('');
-    onSearch('');
+    setLocalSearchQuery("");
+    onSearch("");
   };
 
   const toggleSearchColumn = (columnKey: string) => {
     if (!searchConfig.allowFieldSelection) return;
-    
-    setSelectedSearchColumns(prev => {
+
+    setSelectedSearchColumns((prev) => {
       if (prev.includes(columnKey)) {
-        return prev.filter(key => key !== columnKey);
+        return prev.filter((key) => key !== columnKey);
       } else {
         return [...prev, columnKey];
       }
@@ -72,7 +83,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const selectAllSearchColumns = () => {
     if (!searchConfig.allowFieldSelection) return;
-    setSelectedSearchColumns(searchableColumns.map(col => col.key));
+    setSelectedSearchColumns(searchableColumns.map((col) => col.key));
   };
 
   const clearAllSearchColumns = () => {
@@ -83,21 +94,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
   if (searchableColumns.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-end gap-3 mb-4">
-      <div className="flex w-full max-w-sm items-center space-x-2">
+    <div className="flex p-5 flex-wrap items-center gap-3 mb-4 ">
+      <div className="flex grow items-center space-x-2">
         <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search..."
+            placeholder="بحث"
             value={localSearchQuery}
             onChange={handleInputChange}
             className="w-full pl-8 pr-10"
           />
           {localSearchQuery && (
-            <button 
-              type="button" 
-              onClick={clearSearch} 
+            <button
+              type="button"
+              onClick={clearSearch}
               className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
@@ -107,7 +118,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {searchConfig.allowFieldSelection && (
           <Popover>
             <PopoverTrigger asChild>
-              <Button type="button" variant="outline" size="icon" className="flex-shrink-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="flex-shrink-0"
+              >
                 <Filter className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -116,19 +132,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium text-sm">Filter Columns</h4>
                   <div className="flex gap-2">
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       className="h-auto py-1 px-2 text-xs"
                       onClick={selectAllSearchColumns}
                     >
                       All
                     </Button>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       className="h-auto py-1 px-2 text-xs"
                       onClick={clearAllSearchColumns}
                     >
@@ -137,14 +153,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  {searchableColumns.map(column => (
-                    <div key={column.key} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`filter-${column.key}`} 
+                  {searchableColumns.map((column) => (
+                    <div
+                      key={column.key}
+                      className="flex items-center space-x-2"
+                    >
+                      <Checkbox
+                        id={`filter-${column.key}`}
                         checked={selectedSearchColumns.includes(column.key)}
                         onCheckedChange={() => toggleSearchColumn(column.key)}
                       />
-                      <Label 
+                      <Label
                         htmlFor={`filter-${column.key}`}
                         className="text-sm cursor-pointer"
                       >
@@ -155,7 +174,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 </div>
                 <div className="pt-2 border-t">
                   <p className="text-xs text-muted-foreground">
-                    {selectedSearchColumns.length} of {searchableColumns.length} columns selected
+                    {selectedSearchColumns.length} of {searchableColumns.length}{" "}
+                    columns selected
                   </p>
                 </div>
               </div>
@@ -163,7 +183,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </Popover>
         )}
       </div>
-      
+
       {/* Custom actions area */}
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
