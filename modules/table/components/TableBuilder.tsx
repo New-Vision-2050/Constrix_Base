@@ -88,6 +88,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const enableColumnSearch = config?.enableColumnSearch === true;
   const searchableColumns = columns.filter((col) => col.searchable);
   const hasSearchableColumns = searchableColumns.length > 0;
+  const allSearchedFields = config?.allSearchedFields;
+  
 
   // Show error toast when an error occurs
   React.useEffect(() => {
@@ -113,12 +115,12 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
-        
         {enableColumnSearch && hasSearchableColumns && (
           <ColumnSearch
             columns={columns}
             columnSearchState={columnSearchState}
             onColumnSearch={handleColumnSearch}
+            allSearchedFields={allSearchedFields}
           />
         )}
 

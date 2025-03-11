@@ -10,14 +10,12 @@ export const companiesConfig = {
       key: "name",
       label: "الشركات",
       sortable: true,
-      searchable: true,
       render: (_, row) => <Company row={row} />,
     },
     {
       key: "email",
       label: "البريد الاليكتروني",
       sortable: true,
-      searchable: true,
     },
     {
       key: "company_type",
@@ -29,25 +27,70 @@ export const companiesConfig = {
       key: "general_manager_name",
       label: "المسؤول",
       sortable: true,
-      searchable: true,
     },
     {
       key: "complete_data",
       label: "حالة البيانات",
       sortable: true,
-      searchable: true,
       render: (value) => <DataStatus dataStatus={value} />,
     },
     {
       key: "is_active",
       label: "الحالة",
       render: (value, row) => <TheStatus theStatus={value} id={row.id} />,
-      
     },
     {
       key: "id",
       label: "الاجراء",
       render: (_, row) => <Execution id={row.id} />,
+    },
+  ],
+  allSearchedFields: [
+    {
+      key: "country",
+      searchType: {
+        type: "dropdown",
+        placeholder: "دولة الشركة",
+        dynamicDropdown: {
+          url: "https://jsonplaceholder.typicode.com/users",
+          valueField: "id",
+          labelField: "name",
+          paginationEnabled: true,
+          itemsPerPage: 5,
+          searchParam: "q",
+          pageParam: "page",
+          limitParam: "per_page",
+          totalCountHeader: "x-total-count",
+        },
+      },
+    },
+    {
+      key: "companyType",
+      searchType: {
+        type: "dropdown",
+        placeholder: "نوع الشركة",
+        dynamicDropdown: {
+          url: "https://jsonplaceholder.typicode.com/users",
+          valueField: "address.city",
+          labelField: "address.city",
+          dependsOn: "country",
+          filterParam: "country",
+        },
+      },
+    },
+    {
+      key: "companyField",
+      searchType: {
+        type: "dropdown",
+        placeholder: "نوع الشركة",
+        dynamicDropdown: {
+          url: "https://jsonplaceholder.typicode.com/users",
+          valueField: "address.city",
+          labelField: "address.city",
+          dependsOn: "companyType",
+          filterParam: "companyType",
+        },
+      },
     },
   ],
   defaultSortColumn: "id",

@@ -12,14 +12,17 @@ interface ColumnSearchProps {
   columns: ColumnConfig[];
   columnSearchState: ColumnSearchState;
   onColumnSearch: (columnKey: string, value: string) => void;
+  allSearchedFields?: any[];
 }
 
 const ColumnSearch: React.FC<ColumnSearchProps> = ({
   columns,
   columnSearchState,
   onColumnSearch,
+  allSearchedFields,
 }) => {
-  const searchableColumns = columns.filter((col) => col.searchable);
+  const searchableColumns =
+    allSearchedFields ?? columns.filter((col) => col.searchable);
 
   // Store local state for text inputs to prevent immediate API calls
   const [localInputValues, setLocalInputValues] = useState<ColumnSearchState>(
@@ -89,7 +92,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   return (
     <div className="space-y-4">
       <h2 className="px-5 pt-5 font-medium text-xl">فلتر البحث</h2>
-      <div className="grid p-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 ">
+      <div className="grid p-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 ">
         {searchableColumns.map((column) => {
           const searchType = column.searchType || { type: "text" };
           const stateValue = columnSearchState[column.key] || "";

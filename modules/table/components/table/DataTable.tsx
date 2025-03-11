@@ -45,7 +45,7 @@ const DataTable: React.FC<DataTableProps> = ({
 
   return (
     <motion.div
-      className="backdrop-blur-sm rounded-lg border border-border shadow-sm overflow-hidden"
+      className="backdrop-blur-sm rounded-b-lg border border-border shadow-sm overflow-hidden"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}

@@ -31,7 +31,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({
 
   return (
     <thead>
-      <tr className="border-b border-border bg-secondary/50">
+      <tr className="border-b border-border bg-background">
         {columns.map((column) => {
           const isMobileHidden = column.hideOnMobile ? 'hidden sm:table-cell' : '';
           const alignment = column.align ? `text-${column.align}` : 'text-start';

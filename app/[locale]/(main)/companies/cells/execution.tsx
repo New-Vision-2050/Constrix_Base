@@ -5,23 +5,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Info } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import EnterIcon from "@/public/icons/enter";
+import GearIcon from "@/public/icons/gear";
+import TrashIcon from "@/public/icons/trash";
 
 const Execution = ({ id }: { id: string }) => {
   const menuItems = [
     {
       label: "الدخول كـ مدير شركة (تعديل)",
-      icon: <Info className="w-4 h-4 me-2" />,
+      icon: <EnterIcon className="w-4 h-4 me-2" />,
       func: () => console.log(id),
     },
     {
       label: "اعدادات الباقة والبرامج",
-      icon: <Info className="w-4 h-4 me-2" />,
+      icon: <GearIcon className="w-4 h-4 me-2" />,
       func: () => null,
     },
     {
       label: "حذف (أرشفة)",
-      icon: <Info className="w-4 h-4 me-2" />,
+      icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: () => null,
     },
   ];

@@ -10,7 +10,11 @@ const page = () => {
     <div className="px-8">
       <TableBuilder
         config={companiesConfig}
-     
+        searchBarActions={
+          <div>
+            <ExportButton data={["omar"]} />
+          </div>
+        }
       />
     </div>
   );
