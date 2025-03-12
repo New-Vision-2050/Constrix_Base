@@ -8,7 +8,27 @@
     "ForgotPassword": "Forgot your password?",
     "Identifier": "Mobile number / Email / ID number",
     "Password": "Password",
-    "Copyright": "All programming rights reserved for New Vision Technology."
+    "Copyright": "All programming rights reserved for New Vision Technology.",
+    "Verification": {
+      "Mobile": "Mobile Number",
+      "Password": "Password",
+      "Email": "Email",
+      "Social": "Social",
+      "Barcode": "Barcode",
+      "LocalNetwork": "Local Network",
+      "ChooseAnotherMethod": "Or choose another verification method",
+      "VerifyVia": "Verify via"
+    },
+    "PhoneVerification": {
+      "Title": "Phone Number Verification",
+      "EnterVerificationCode": "Enter the verification code sent to",
+      "ChangePhoneNumber": "Change phone number"
+    },
+    "EmailVerification": {
+      "Title": "Email Verification",
+      "EnterVerificationCode": "Enter the verification code sent to",
+      "ChangeEmailAddress": "Change email address"
+    }
   },
   "Errors": {
     "Authentication": {

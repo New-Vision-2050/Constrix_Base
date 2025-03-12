@@ -18,12 +18,15 @@ import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { ROUTER } from "@/router";
+import { useTranslations } from "next-intl";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations("Login.PhoneVerification");
+  const loginT = useTranslations("Login");
   const router = useRouter();
 
   const { mutate, isPending } = useLoginSteps();
@@ -87,9 +90,9 @@ const ValidatePhonePhase = ({
   return (
     <>
       <div className="space-y-4">
-        <h1 className="text-2xl text-start">التحقق من رقم الجوال</h1>
+        <h1 className="text-2xl text-start">{t("Title")}</h1>
         <p>
-          <span className="opacity-50">ادخل رمز التحقق المرسل الى </span>
+          <span className="opacity-50">{t("EnterVerificationCode")} </span>
           <span dir="ltr">{by}</span>
         </p>
       </div>
@@ -124,7 +127,7 @@ const ValidatePhonePhase = ({
         onClick={handleSubmit(onSubmit)}
         className="w-full"
       >
-        دخول
+        {loginT("Login")}
       </Button>
       <OtpHub resendFor="resend-otp" identifier={identifier} />
 
@@ -134,7 +137,7 @@ const ValidatePhonePhase = ({
           variant={"link"}
           className="text-primary p-0 h-auto underline"
         >
-          تغيير رقم الجوال{" "}
+          {t("ChangePhoneNumber")}
         </Button>
         {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
           <AnotherCheckingWay

@@ -8,7 +8,27 @@
     "ForgotPassword": "هل نسيت كلمة المرور؟",
     "Identifier": "رقم الجوال / البريد الالكتروني / رقم المعرف",
     "Password": "كلمة المرور",
-    "Copyright": "جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية."
+    "Copyright": "جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية.",
+    "Verification": {
+      "Mobile": "رقم الجوال",
+      "Password": "كلمة المرور",
+      "Email": "البريد الإليكتروني",
+      "Social": "اجتماعي",
+      "Barcode": "الباركود",
+      "LocalNetwork": "الشبكة المحلية",
+      "ChooseAnotherMethod": "او اختر طريقة تحقق اخرى",
+      "VerifyVia": "التحقق عن طريق"
+    },
+    "PhoneVerification": {
+      "Title": "التحقق من رقم الجوال",
+      "EnterVerificationCode": "ادخل رمز التحقق المرسل الى",
+      "ChangePhoneNumber": "تغيير رقم الجوال"
+    },
+    "EmailVerification": {
+      "Title": "التحقق من البريد الالكتروني",
+      "EnterVerificationCode": "ادخل رمز التحقق المرسل على",
+      "ChangeEmailAddress": "تغيير البريد الالكتروني"
+    }
   },
   "Errors": {
     "Authentication": {
