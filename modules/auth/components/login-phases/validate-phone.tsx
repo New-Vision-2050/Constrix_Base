@@ -19,6 +19,10 @@ import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { ROUTER } from "@/router";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidatePhonePhase = ({
   handleSetStep,
@@ -28,6 +32,8 @@ const ValidatePhonePhase = ({
   const t = useTranslations("Login.PhoneVerification");
   const loginT = useTranslations("Login");
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const { mutate, isPending } = useLoginSteps();
 
@@ -81,7 +87,9 @@ const ValidatePhonePhase = ({
           }
         },
         onError: (error) => {
-          console.log(error);
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(t(messageKey));
+          handleOpen();
         },
       }
     );
@@ -146,6 +154,11 @@ const ValidatePhonePhase = ({
           />
         )}
       </div>
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };

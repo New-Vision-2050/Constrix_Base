@@ -22,6 +22,10 @@ import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidateEmailPhase = ({
   handleSetStep,
@@ -31,6 +35,8 @@ const ValidateEmailPhase = ({
   const t = useTranslations("Login.EmailVerification");
   const loginT = useTranslations("Login");
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const {
     formState: { errors },
@@ -82,7 +88,9 @@ const ValidateEmailPhase = ({
           }
         },
         onError: (error) => {
-          console.log(error);
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(t(messageKey));
+          handleOpen();
         },
       }
     );
@@ -151,6 +159,11 @@ const ValidateEmailPhase = ({
           />
         )}
       </div>
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };

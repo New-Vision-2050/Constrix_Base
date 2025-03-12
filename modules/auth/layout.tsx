@@ -14,9 +14,9 @@ export default function AuthLayout({
   return (
     <main className="min-h-screen flex flex-col bg-[#18003A] relative overflow-hidden">
       {/* Language switcher */}
-      <div className="fixed top-4 end-4 z-50">
+      {/* <div className="fixed top-4 end-4 z-50">
         <RenderLocaleSwitch />
-      </div>
+      </div> */}
       
       {/* Background particles */}
       <SparklesCore
