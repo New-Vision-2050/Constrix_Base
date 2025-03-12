@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {getCookie} from "cookies-next";
 
 // Define error messages for different locales
 const errorMessages = {
@@ -30,17 +31,10 @@ const errorMessages = {
   },
 };
 
-// Set default locale
-let currentLocale: "en" | "ar" = "ar";
-
-// Function to set the current locale
-export const setZodLocale = (locale: "en" | "ar") => {
-  currentLocale = locale;
-};
-
 // Get error message based on current locale
 export const getMessage = (key: keyof typeof errorMessages.en, param?: any) => {
-  const message = errorMessages[currentLocale][key];
+    const locale = getCookie("NEXT_LOCALE") || 'en';
+  const message = errorMessages[locale][key];
   if (typeof message === "function" && param !== undefined) {
     return message(param);
   }
