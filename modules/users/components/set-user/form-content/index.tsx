@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import { useSetUserLookupsCxt } from "../context/SetUserLookups";
 import InputField from "@/components/shared/InputField";
+import TimeZoneDialog from "../change-time-zone";
 
 type PropsT = {
   companyId?: string;
@@ -36,6 +37,7 @@ export default function UserFormContent({ companyId }: PropsT) {
   // declare and define component methods
   const onSubmit = async (data: UserSchemaT) => {
     try {
+      console.log("datadata", data);
       await userService.createUser({
         firstName: data.firstName,
         lastName: data.lastName,
@@ -114,6 +116,22 @@ export default function UserFormContent({ companyId }: PropsT) {
           error={Boolean(errors.title)}
           errorMessage={errors?.title?.message ?? ""}
         />
+
+        {/* Change Time Zone ? */}
+        <div className="flex items-center mb-4 text-lg font-medium">
+          <input
+            type="checkbox"
+            value=""
+            className="w-4 h-4 text-blue-600 bg-[#140F35] border-gray-300 rounded-sm "
+          />
+          <label
+            htmlFor="default-checkbox"
+            className="ms-2 text-lg font-medium text-[#e7e3fc61] dark:text-gray-300"
+          >
+            لتأكيد تغيير المنطقة الزمنية،
+          </label>
+          <TimeZoneDialog />.
+        </div>
 
         <Button type="submit" className="w-full max-w-sm">
           حفظ

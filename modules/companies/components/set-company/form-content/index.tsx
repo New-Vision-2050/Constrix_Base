@@ -11,7 +11,6 @@ import { AxiosError } from "axios";
 import CustomSelect from "@/components/shared/CustomSelect";
 import InputField from "../../../../../components/shared/InputField";
 import InputFieldWithAdorned from "../../../../../components/shared/InputFieldWithAdorned";
-import TimeZoneDialog from "../../change-time-zone";
 
 export default function SetCompanyFormContent() {
   // control and state for
@@ -118,22 +117,6 @@ export default function SetCompanyFormContent() {
           error={Boolean(errors.supportNvEmployeeId)}
           errorMessage={errors?.supportNvEmployeeId?.message ?? ""}
         />
-
-        {/*  */}
-        <div className="flex items-center mb-4">
-          <input
-            type="checkbox"
-            value=""
-            className="w-4 h-4 text-blue-600 bg-[#140F35] border-gray-300 rounded-sm "
-          />
-          <label
-            htmlFor="default-checkbox"
-            className="ms-2 text-lg font-medium text-[#e7e3fc61] dark:text-gray-300"
-          >
-            لتأكيد تغيير المنطقة الزمنية،
-            <TimeZoneDialog />.
-          </label>
-        </div>
 
         {/* next */}
         <Button type="submit" className="w-full max-w-sm">
