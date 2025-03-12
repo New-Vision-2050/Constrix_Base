@@ -8,6 +8,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import CompaniesIcon from "@/public/icons/companies";
 import UserIcon from "@/public/icons/user";
@@ -56,6 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" side="right" {...props}>
       <SidebarHeader className=" pt-10">
+        <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
         <SidebarHeaderContent />
       </SidebarHeader>
       <SidebarContent>
