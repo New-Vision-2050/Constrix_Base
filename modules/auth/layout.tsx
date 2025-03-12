@@ -33,7 +33,7 @@ export default function AuthLayout({
       {/* Bottom curved background */}
       <div className="w-full bg-[#280B4A] absolute bottom-0 rounded-[100%] pt-[530px] translate-y-1/2 -z-10">
         <div className="absolute bottom-2/3 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-5 px-4 text-center sm:text-start">
-          <p className="text-xs sm:text-sm">جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية .</p>
+          <p className="text-xs sm:text-sm">{t("Login.Copyright")}</p>
           <div className="scale-75 sm:scale-100">
             <NewVisionWhite />
           </div>

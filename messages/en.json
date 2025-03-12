@@ -1,5 +1,22 @@
 {
   "Login": {
-    "Control_panel": "Control panel"
+    "Control_panel": "Control panel",
+    "SignIn": "Sign In",
+    "EnterPassword": "Enter Password",
+    "Next": "Next",
+    "Login": "Login",
+    "ForgotPassword": "Forgot your password?",
+    "Identifier": "Mobile number / Email / ID number",
+    "Password": "Password",
+    "Copyright": "All programming rights reserved for New Vision Technology."
+  },
+  "Errors": {
+    "Authentication": {
+      "Title": "Authentication Error",
+      "SessionExpired": "Your session has expired. Please log in again.",
+      "InvalidCredentials": "Invalid username or password",
+      "InvalidIdentifier": "Invalid identifier or not found",
+      "GenericError": "An error occurred"
+    }
   }
 }

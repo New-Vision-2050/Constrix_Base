@@ -9,12 +9,14 @@ import { useLoginWays } from "../../store/mutations";
 import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
+import { useTranslations } from "next-intl";
 
 const IdentifierPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
   const { mutate, isPending } = useLoginWays();
@@ -30,7 +32,7 @@ const IdentifierPhase = ({
     const handleAuthError = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
-        setErrorMessage(customEvent.detail.message);
+        setErrorMessage(t(customEvent.detail.messageKey));
         handleOpen();
       }
     };
@@ -40,7 +42,7 @@ const IdentifierPhase = ({
     return () => {
       errorEvent.removeEventListener('auth-error', handleAuthError);
     };
-  }, [handleOpen]);
+  }, [handleOpen, t]);
 
   const onSubmit = (data: IdentifierType) => {
     mutate(
@@ -71,8 +73,8 @@ const IdentifierPhase = ({
           }
         },
         onError(error) {
-          const message = getErrorMessage(error);
-          setErrorMessage(message);
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(t(messageKey) || t("Errors.Authentication.InvalidIdentifier"));
           handleOpen();
         },
       }
@@ -81,11 +83,11 @@ const IdentifierPhase = ({
 
   return (
     <>
-      <h1 className="text-xl sm:text-2xl text-center mb-4">تسجيل الدخول</h1>
+      <h1 className="text-xl sm:text-2xl text-center mb-4">{t("Login.SignIn")}</h1>
       <div className="space-y-4">
         <Input
           {...register("identifier")}
-          label="رقم الجوال / البريد الالكتروني / رقم المعرف"
+          label={t("Login.Identifier")}
           error={errors?.identifier?.message}
         />
 
@@ -97,7 +99,7 @@ const IdentifierPhase = ({
           type="submit"
           form="login-form"
         >
-          التالي
+          {t("Login.Next")}
         </Button>
       </div>
       

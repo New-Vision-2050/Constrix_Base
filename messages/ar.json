@@ -1,5 +1,22 @@
 {
   "Login": {
-    "Control_panel": "لوحة التحكم"
+    "Control_panel": "لوحة التحكم",
+    "SignIn": "تسجيل الدخول",
+    "EnterPassword": "ادخل كلمة المرور",
+    "Next": "التالي",
+    "Login": "دخول",
+    "ForgotPassword": "هل نسيت كلمة المرور؟",
+    "Identifier": "رقم الجوال / البريد الالكتروني / رقم المعرف",
+    "Password": "كلمة المرور",
+    "Copyright": "جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية."
+  },
+  "Errors": {
+    "Authentication": {
+      "Title": "خطأ في المصادقة",
+      "SessionExpired": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+      "InvalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة",
+      "InvalidIdentifier": "المعرف غير صحيح أو غير موجود",
+      "GenericError": "حدث خطأ"
+    }
   }
 }

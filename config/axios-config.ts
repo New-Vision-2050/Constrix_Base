@@ -30,7 +30,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
-    const errorMessage = getErrorMessage(error);
+    const errorMessageKey = getErrorMessage(error);
     
     // Handle authentication errors
     if (status === 401 || status === 403) {
@@ -44,8 +44,8 @@ apiClient.interceptors.response.use(
         
         // Show toast notification
         showErrorToast(
-          "خطأ في المصادقة",
-          "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى."
+          "Errors.Authentication.Title",
+          "Errors.Authentication.SessionExpired"
         );
         
         if (typeof window !== "undefined") {
@@ -53,7 +53,7 @@ apiClient.interceptors.response.use(
         }
       } else {
         // Dispatch error event for login page components to handle
-        dispatchErrorEvent(status, errorMessage);
+        dispatchErrorEvent(status, errorMessageKey);
       }
     }
     

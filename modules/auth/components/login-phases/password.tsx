@@ -15,12 +15,14 @@ import { useEffect, useState } from "react";
 import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
+import { useTranslations } from "next-intl";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -42,7 +44,7 @@ const PasswordPhase = ({
     const handleAuthError = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
-        setErrorMessage(customEvent.detail.message);
+        setErrorMessage(t(customEvent.detail.messageKey));
         handleOpen();
       }
     };
@@ -52,7 +54,7 @@ const PasswordPhase = ({
     return () => {
       errorEvent.removeEventListener('auth-error', handleAuthError);
     };
-  }, [handleOpen]);
+  }, [handleOpen, t]);
 
   const handleLogin = () => {
     const data = getValues();
@@ -75,8 +77,8 @@ const PasswordPhase = ({
           }
         },
         onError(error) {
-          const message = getErrorMessage(error);
-          setErrorMessage(message || "كلمة المرور غير صحيحة");
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(t(messageKey) || t("Errors.Authentication.InvalidCredentials"));
           handleOpen();
         },
       }
@@ -98,15 +100,15 @@ const PasswordPhase = ({
 
   return (
     <>
-      <h1 className="text-xl sm:text-2xl text-center mb-4">ادخل كلمة المرور</h1>
+      <h1 className="text-xl sm:text-2xl text-center mb-4">{t("Login.EnterPassword")}</h1>
       <div className="space-y-4">
         <Input
           type="password"
           {...register("password")}
-          label="كلمة المرور"
+          label={t("Login.Password")}
           error={errors?.password?.message}
         />
-
+        
         <Button
           size={"lg"}
           className="w-full mt-4"
@@ -115,9 +117,9 @@ const PasswordPhase = ({
           type="submit"
           form="login-form"
         >
-          دخول
+          {t("Login.Login")}
         </Button>
-
+        
         <div className="flex justify-center">
           <Button
             loading={isPendingForgetPassword}
@@ -125,10 +127,10 @@ const PasswordPhase = ({
             onClick={handleForgetPhase}
             className="text-sm sm:text-base"
           >
-            هل نسيت كلمة المرور؟
+            {t("Login.ForgotPassword")}
           </Button>
         </div>
-
+        
         {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
           <div className="mt-2">
             <AnotherCheckingWay
