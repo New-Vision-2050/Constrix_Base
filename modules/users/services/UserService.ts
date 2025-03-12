@@ -13,6 +13,11 @@ export class UserService {
       title: data.title,
       companyId: data.companyId,
       countryCode: data.countryCode,
+      takeTimeZone: data.takeTimeZone,
+      country: data.country,
+      timeZone: data.timeZone,
+      currency: data.currency,
+      lang: data.lang,
     };
     return this.userRepository.create(newUser);
   }

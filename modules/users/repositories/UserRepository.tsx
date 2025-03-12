@@ -12,12 +12,21 @@ export class UserRepository {
 
   async create(user: CreateUserI) {
     // const url = this.apiUrl + usersEndPoints.create;
+    const timeZoneBody = user.takeTimeZone
+      ? {
+          country_id: user.country,
+          time_zone_id: user.timeZone,
+          currency_id: user.currency,
+          language_id: user.lang,
+        }
+      : {};
     const body = {
       email: user.email,
       job_title_id: user.title,
       name: `${user.firstName} ${user.lastName}`,
       phone: `${user.countryCode} ${user.phone}`,
       company_id: user.companyId,
+      ...timeZoneBody,
     };
     console.log("UserRepository create", user);
     // ! The following line is a temporary override for testing purposes.

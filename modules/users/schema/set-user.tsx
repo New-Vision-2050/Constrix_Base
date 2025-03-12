@@ -6,6 +6,7 @@ export const userSchema = z.object({
   email: z.string().email("Invalid email"),
   phone: z.string().min(1, "Phone is required"),
   title: z.string().min(1, "Title is required"),
+  takeTimeZone: z.boolean().default(false),
   country: z.string().min(1, "Name is required"),
   timeZone: z.string().min(1, "Time Zone is required"),
   currency: z.string().min(1, "Currency is required"),

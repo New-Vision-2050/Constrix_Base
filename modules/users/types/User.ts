@@ -20,4 +20,9 @@ export interface CreateUserI {
   title: string;
   companyId?: string;
   countryCode?: string;
+  takeTimeZone?: boolean;
+  country?: string;
+  timeZone?: string;
+  currency?: string;
+  lang?: string;
 }

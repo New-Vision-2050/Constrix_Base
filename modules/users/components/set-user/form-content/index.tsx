@@ -30,6 +30,7 @@ export default function UserFormContent({ companyId }: PropsT) {
   });
   const {
     control,
+    register,
     handleSubmit,
     formState: { errors },
   } = form;
@@ -46,6 +47,11 @@ export default function UserFormContent({ companyId }: PropsT) {
         title: data.title,
         companyId,
         countryCode,
+        takeTimeZone: data.takeTimeZone,
+        country: data.country,
+        timeZone: data.timeZone,
+        currency: data.currency,
+        lang: data.lang,
       });
 
       // Show error message
@@ -54,12 +60,36 @@ export default function UserFormContent({ companyId }: PropsT) {
         duration: 3000,
         dismissible: true,
       });
+
+      // close sheet
     } catch (error) {
       const axError = error as AxiosError;
+      const errorMessage =
+        axError?.message ?? "Please check your inputs and try again.";
+      const backErrors = error?.response?.data?.errors,
+        errorMessages: string[] = [];
+
+      if (typeof backErrors === "object" && backErrors !== null) {
+        for (const [key, value] of Object.entries(backErrors)) {
+          console.log(`${key}: ${value}`);
+          if (Array.isArray(value)) {
+            errorMessages.push(...value);
+          }
+        }
+      }
+
       // Show error message
-      toast.error("Failed", {
-        description:
-          axError?.message ?? "Please check your inputs and try again.",
+      toast.error(`Failed | ${axError.status}`, {
+        description: (
+          <div className="flex flex-col gap-2">
+            <p className="text-md">{errorMessage}</p>
+            <ul>
+              {errorMessages?.map((ele) => (
+                <li key={ele}>{ele}</li>
+              ))}
+            </ul>
+          </div>
+        ),
         duration: 3000,
         dismissible: true,
       });
@@ -121,7 +151,7 @@ export default function UserFormContent({ companyId }: PropsT) {
         <div className="flex items-center mb-4 text-lg font-medium">
           <input
             type="checkbox"
-            value=""
+            {...register("takeTimeZone")}
             className="w-4 h-4 text-blue-600 bg-[#140F35] border-gray-300 rounded-sm "
           />
           <label

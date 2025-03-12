@@ -7,11 +7,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import TimeZoneForm from "./TimeZoneForm";
+import { useState } from "react";
 
 export default function TimeZoneDialog() {
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
+
   return (
-    <Dialog>
-      <DialogTrigger className="inline text-[#f42589] cursor-pointer">
+    <Dialog open={open}>
+      <DialogTrigger
+        className="inline text-[#f42589] cursor-pointer"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
         اضغط هنا
       </DialogTrigger>
       <DialogContent className="w-[60%] max-w-screen-lg">
@@ -20,7 +29,7 @@ export default function TimeZoneDialog() {
             تغيير المنطقة الزمنية
           </DialogTitle>
           <DialogDescription>
-            <TimeZoneForm />
+            <TimeZoneForm handleClose={handleClose} />
           </DialogDescription>
         </DialogHeader>
       </DialogContent>

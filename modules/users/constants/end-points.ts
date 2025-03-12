@@ -4,4 +4,8 @@ export const usersEndPoints = {
 
 export const lookupsEndPoints = {
   jobTitles: "/job_titles",
+  timeZones: "/time_zones",
+  currencies: "/currencies",
+  languages: "/languages",
+  countries: "/countries",
 };
