@@ -5,6 +5,11 @@ export const contactFormConfig: FormConfig = {
   title: 'Contact Us',
   description: 'Fill out the form below to get in touch with us.',
   // Enable Laravel validation support
+    apiUrl: "https://your-laravel-api.com/contact",
+    apiHeaders: {
+        "Authorization": "Bearer your-token-if-needed",
+        "X-Custom-Header": "Custom value"
+    },
   laravelValidation: {
     enabled: true,
     errorsPath: 'errors' // This is the default in Laravel

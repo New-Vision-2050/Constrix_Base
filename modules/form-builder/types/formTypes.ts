@@ -67,6 +67,9 @@ export interface FormConfig {
   showSubmitLoader?: boolean;
   initialValues?: Record<string, any>;
   resetOnSuccess?: boolean;
+  // Backend API configuration
+  apiUrl?: string; // URL to submit the form data to
+  apiHeaders?: Record<string, string>; // Custom headers for the API request
   // Laravel validation response support
   laravelValidation?: {
     enabled: boolean;
