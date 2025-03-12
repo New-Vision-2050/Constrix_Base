@@ -15,9 +15,30 @@ import ValidatePhonePhase from "./validate-phone";
 const LoginProvider = () => {
   const { form, step, handleSetStep } = useLogin();
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Handle form submission based on current step
+    if (step === LOGIN_PHASES.IDENTIFIER) {
+      const identifierPhaseElement = document.querySelector('button[form="login-form"]');
+      if (identifierPhaseElement) {
+        identifierPhaseElement.click();
+      }
+    } else if (step === LOGIN_PHASES.PASSWORD) {
+      const passwordPhaseElement = document.querySelector('button[form="login-form"]');
+      if (passwordPhaseElement) {
+        passwordPhaseElement.click();
+      }
+    }
+  };
+
   return (
     <FormProvider {...form}>
-      <form className="space-y-8">
+      <form
+        id="login-form"
+        className="space-y-6 sm:space-y-8"
+        onSubmit={handleFormSubmit}
+      >
         {step === LOGIN_PHASES.IDENTIFIER && (
           <IdentifierPhase handleSetStep={handleSetStep} />
         )}
@@ -38,10 +59,10 @@ const LoginProvider = () => {
         )}
         {step === LOGIN_PHASES.SECURITY_QUESTIONS && (
           <SecurityQuestionsPhase handleSetStep={handleSetStep} />
-        )}{" "}
+        )}
         {step === LOGIN_PHASES.CHANGE_EMAIL && (
           <ChangeEmailPhase handleSetStep={handleSetStep} />
-        )}{" "}
+        )}
         {/* End Email Flow */}
         {/* Start Phone Flow */}
         {step === LOGIN_PHASES.VALIDATE_PHONE && (

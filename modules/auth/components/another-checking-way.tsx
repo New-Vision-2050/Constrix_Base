@@ -117,28 +117,30 @@ const AnotherCheckingWay = memo(
     ];
 
     return (
-      <DropdownMenu dir="rtl">
-        <DropdownMenuTrigger className="underline group flex items-end gap-1">
-          او اختر طريقة تحقق اخرى
-          <ChevronDown className="h-4 w-4 transition group-data-[state=open]:rotate-180" />
-        </DropdownMenuTrigger>
-        {isPending && <LoadingSpinner />}
-        <DropdownMenuContent>
-          <DropdownMenuLabel>التحقق عن طريق</DropdownMenuLabel>
-          {menuItems
-            .filter((item) => loginOptionAlternatives?.includes(item.optionKey))
-            .map((item) => (
-              <DropdownMenuItem
-                key={item.id}
-                className="gap-4"
-                onClick={item.func}
-              >
-                {item.icon}
-                {item.label}
-              </DropdownMenuItem>
-            ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex justify-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="underline group flex items-center gap-1 text-sm sm:text-base">
+            او اختر طريقة تحقق اخرى
+            <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 transition group-data-[state=open]:rotate-180" />
+          </DropdownMenuTrigger>
+          {isPending && <LoadingSpinner />}
+          <DropdownMenuContent className="min-w-[200px]">
+            <DropdownMenuLabel className="text-center">التحقق عن طريق</DropdownMenuLabel>
+            {menuItems
+              .filter((item) => loginOptionAlternatives?.includes(item.optionKey))
+              .map((item) => (
+                <DropdownMenuItem
+                  key={item.id}
+                  className="gap-4 flex items-center justify-start"
+                  onClick={item.func}
+                >
+                  <span className="flex-shrink-0">{item.icon}</span>
+                  <span>{item.label}</span>
+                </DropdownMenuItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     );
   }
 );

@@ -74,34 +74,46 @@ const PasswordPhase = ({
 
   return (
     <>
-      <h1 className="text-2xl text-center">ادخل كلمة المرور</h1>
-      <Input
-        type="password"
-        {...register("password")}
-        label="كلمة المرور"
-        error={errors?.password?.message}
-      />
-      <Button
-        size={"lg"}
-        className="w-full"
-        loading={isPending}
-        onClick={handleSubmit(handleLogin)}
-      >
-        دخول
-      </Button>
-      <Button
-        loading={isPendingForgetPassword}
-        variant={"link"}
-        onClick={handleForgetPhase}
-      >
-        هل نسيت كلمة المرور؟
-      </Button>
-      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
-        <AnotherCheckingWay
-          loginOptionAlternatives={loginOptionAlternatives}
-          handleSetStep={handleSetStep}
+      <h1 className="text-xl sm:text-2xl text-center mb-4">ادخل كلمة المرور</h1>
+      <div className="space-y-4">
+        <Input
+          type="password"
+          {...register("password")}
+          label="كلمة المرور"
+          error={errors?.password?.message}
         />
-      )}
+
+        <Button
+          size={"lg"}
+          className="w-full mt-4"
+          loading={isPending}
+          onClick={handleSubmit(handleLogin)}
+          type="submit"
+          form="login-form"
+        >
+          دخول
+        </Button>
+
+        <div className="flex justify-center">
+          <Button
+            loading={isPendingForgetPassword}
+            variant={"link"}
+            onClick={handleForgetPhase}
+            className="text-sm sm:text-base"
+          >
+            هل نسيت كلمة المرور؟
+          </Button>
+        </div>
+
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <div className="mt-2">
+            <AnotherCheckingWay
+              loginOptionAlternatives={loginOptionAlternatives}
+              handleSetStep={handleSetStep}
+            />
+          </div>
+        )}
+      </div>
     </>
   );
 };
