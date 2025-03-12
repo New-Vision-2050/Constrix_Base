@@ -4,8 +4,9 @@ import { IdentifierType } from "../../validator/login-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLoginWays } from "../../store/mutations";
+import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 
@@ -23,6 +24,23 @@ const IdentifierPhase = ({
     handleSubmit,
     setValue,
   } = useFormContext<IdentifierType>();
+
+  // Listen for auth errors from the interceptor
+  useEffect(() => {
+    const handleAuthError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        setErrorMessage(customEvent.detail.message);
+        handleOpen();
+      }
+    };
+
+    errorEvent.addEventListener('auth-error', handleAuthError);
+    
+    return () => {
+      errorEvent.removeEventListener('auth-error', handleAuthError);
+    };
+  }, [handleOpen]);
 
   const onSubmit = (data: IdentifierType) => {
     mutate(
@@ -53,8 +71,8 @@ const IdentifierPhase = ({
           }
         },
         onError(error) {
-          const description = error.response?.data?.message?.description;
-          setErrorMessage(description ?? "حدث خطأ");
+          const message = getErrorMessage(error);
+          setErrorMessage(message);
           handleOpen();
         },
       }
@@ -82,6 +100,7 @@ const IdentifierPhase = ({
           التالي
         </Button>
       </div>
+      
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}

@@ -11,6 +11,10 @@ import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
 import AnotherCheckingWay from "../another-checking-way";
+import { useEffect, useState } from "react";
+import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
 
 const PasswordPhase = ({
   handleSetStep,
@@ -18,6 +22,8 @@ const PasswordPhase = ({
   handleSetStep: (step: LoginPhase) => void;
 }) => {
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
@@ -30,6 +36,23 @@ const PasswordPhase = ({
   } = useFormContext<LoginType>();
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
+  
+  // Listen for auth errors from the interceptor
+  useEffect(() => {
+    const handleAuthError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        setErrorMessage(customEvent.detail.message);
+        handleOpen();
+      }
+    };
+
+    errorEvent.addEventListener('auth-error', handleAuthError);
+    
+    return () => {
+      errorEvent.removeEventListener('auth-error', handleAuthError);
+    };
+  }, [handleOpen]);
 
   const handleLogin = () => {
     const data = getValues();
@@ -41,7 +64,6 @@ const PasswordPhase = ({
       },
       {
         onSuccess: (data) => {
-          console.log(data.payload);
           if (!data.payload.login_way.step) {
             useAuthStore.getState().setUser(data.payload.user);
             setCookie("new-vision-token", data.payload.token, {
@@ -53,7 +75,9 @@ const PasswordPhase = ({
           }
         },
         onError(error) {
-          console.log(error);
+          const message = getErrorMessage(error);
+          setErrorMessage(message || "كلمة المرور غير صحيحة");
+          handleOpen();
         },
       }
     );
@@ -114,6 +138,11 @@ const PasswordPhase = ({
           </div>
         )}
       </div>
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };
