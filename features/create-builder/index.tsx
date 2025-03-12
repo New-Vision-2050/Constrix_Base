@@ -26,11 +26,14 @@ const CreateBuilderModule = forwardRef<CreateBuilderModuleRef, PropsT>(
       },
     }));
 
+    const handleManuelCloseSheet = () => setIsOpen(false);
+
     return (
       <CreateBuilderCxtProvider
         btnLabel={btnLabel}
         moduleId={moduleId}
         onSheetClose={onSheetClose}
+        handleManuelCloseSheet={handleManuelCloseSheet}
       >
         <CreateBuilderViewsEndPoint isOpen={isOpen} setIsOpen={setIsOpen} />
       </CreateBuilderCxtProvider>

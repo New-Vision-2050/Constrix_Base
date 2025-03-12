@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useSetUserLookupsCxt } from "../context/SetUserLookups";
 import InputField from "@/components/shared/InputField";
 import TimeZoneDialog from "../change-time-zone";
+import { useCreateBuilderCxt } from "@/features/create-builder/context/create-builder-cxt";
 
 type PropsT = {
   companyId?: string;
@@ -34,6 +35,7 @@ export default function UserFormContent({ companyId }: PropsT) {
     handleSubmit,
     formState: { errors },
   } = form;
+  const { handleManuelCloseSheet } = useCreateBuilderCxt();
 
   // declare and define component methods
   const onSubmit = async (data: UserSchemaT) => {
@@ -62,6 +64,7 @@ export default function UserFormContent({ companyId }: PropsT) {
       });
 
       // close sheet
+      handleManuelCloseSheet();
     } catch (error) {
       const axError = error as AxiosError;
       const errorMessage =

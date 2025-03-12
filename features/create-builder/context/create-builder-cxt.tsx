@@ -23,6 +23,7 @@ type CxtType = {
   handleChangeModuleId: (id: string) => void;
   originalModuleId: string | undefined;
   onSheetClose?: () => void;
+  handleManuelCloseSheet: () => void;
 };
 
 // Create a context
@@ -38,6 +39,7 @@ const CreateBuilderCxt = createContext<CxtType>({
   originalModuleId: undefined,
   // fun to execute on sheet close
   onSheetClose: () => {},
+  handleManuelCloseSheet: () => {},
 });
 
 // Custom hook to use the FormLookupCxt
@@ -55,6 +57,7 @@ type PropsT = React.PropsWithChildren & {
   btnLabel: string;
   moduleId?: string;
   onSheetClose?: () => void;
+  handleManuelCloseSheet: () => void;
 };
 
 // Provider to wrap the children components
@@ -65,6 +68,7 @@ export default function CreateBuilderCxtProvider(props: PropsT) {
     btnLabel,
     moduleId: originalModuleId,
     onSheetClose,
+    handleManuelCloseSheet,
   } = props;
   const [moduleId, setModuleId] = useState(originalModuleId);
 
@@ -91,6 +95,7 @@ export default function CreateBuilderCxtProvider(props: PropsT) {
         originalModuleId,
         // fun to execute on sheet close
         onSheetClose,
+        handleManuelCloseSheet,
       }}
     >
       {children}
