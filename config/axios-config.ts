@@ -29,9 +29,12 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
-    if (status === 401 || status === 403) {
+    const code = error.response?.data?.message?.code;
+    const isLoginAuthError = code === "unauthorized_login";
+    if ((status === 401 || status === 403) && !isLoginAuthError) {
       deleteCookie("new-vision-token");
       useAuthStore.getState().clearUser();
+      console.log({ error });
       if (typeof window !== "undefined") {
         window.location.href = ROUTER.LOGIN;
       }
