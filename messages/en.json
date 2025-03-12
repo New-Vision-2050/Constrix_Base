@@ -22,12 +22,14 @@
     "PhoneVerification": {
       "Title": "Phone Number Verification",
       "EnterVerificationCode": "Enter the verification code sent to",
-      "ChangePhoneNumber": "Change phone number"
+      "ChangePhoneNumber": "Change phone number",
+      "invalid token": "Invalid verification code"
     },
     "EmailVerification": {
       "Title": "Email Verification",
       "EnterVerificationCode": "Enter the verification code sent to",
-      "ChangeEmailAddress": "Change email address"
+      "ChangeEmailAddress": "Change email address",
+      "invalid token": "Invalid verification code"
     }
   },
   "Errors": {
@@ -36,6 +38,7 @@
       "SessionExpired": "Your session has expired. Please log in again.",
       "InvalidCredentials": "Invalid username or password",
       "InvalidIdentifier": "Invalid identifier or not found",
+      "UserNotFound": "User not found",
       "GenericError": "An error occurred"
     }
   },

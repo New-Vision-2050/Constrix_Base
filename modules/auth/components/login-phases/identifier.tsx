@@ -38,7 +38,7 @@ const IdentifierPhase = ({
     };
 
     errorEvent.addEventListener('auth-error', handleAuthError);
-    
+
     return () => {
       errorEvent.removeEventListener('auth-error', handleAuthError);
     };
@@ -74,7 +74,7 @@ const IdentifierPhase = ({
         },
         onError(error) {
           const messageKey = getErrorMessage(error);
-          setErrorMessage(t(messageKey) || t("Errors.Authentication.InvalidIdentifier"));
+          setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
           handleOpen();
         },
       }
@@ -102,7 +102,7 @@ const IdentifierPhase = ({
           {t("Login.Next")}
         </Button>
       </div>
-      
+
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}

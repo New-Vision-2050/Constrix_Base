@@ -22,12 +22,14 @@
     "PhoneVerification": {
       "Title": "التحقق من رقم الجوال",
       "EnterVerificationCode": "ادخل رمز التحقق المرسل الى",
-      "ChangePhoneNumber": "تغيير رقم الجوال"
+      "ChangePhoneNumber": "تغيير رقم الجوال",
+      "invalid token": "رمز التحقق غير صالح"
     },
     "EmailVerification": {
       "Title": "التحقق من البريد الالكتروني",
       "EnterVerificationCode": "ادخل رمز التحقق المرسل على",
-      "ChangeEmailAddress": "تغيير البريد الالكتروني"
+      "ChangeEmailAddress": "تغيير البريد الالكتروني",
+      "invalid token": "رمز التحقق غير صالح"
     }
   },
   "Errors": {

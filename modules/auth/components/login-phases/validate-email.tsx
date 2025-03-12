@@ -89,7 +89,7 @@ const ValidateEmailPhase = ({
         },
         onError: (error) => {
           const messageKey = getErrorMessage(error);
-          setErrorMessage(t(messageKey));
+            setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
           handleOpen();
         },
       }

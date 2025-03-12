@@ -38,7 +38,7 @@ const PasswordPhase = ({
   } = useFormContext<LoginType>();
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
-  
+
   // Listen for auth errors from the interceptor
   useEffect(() => {
     const handleAuthError = (event: Event) => {
@@ -50,7 +50,7 @@ const PasswordPhase = ({
     };
 
     errorEvent.addEventListener('auth-error', handleAuthError);
-    
+
     return () => {
       errorEvent.removeEventListener('auth-error', handleAuthError);
     };
@@ -78,7 +78,7 @@ const PasswordPhase = ({
         },
         onError(error) {
           const messageKey = getErrorMessage(error);
-          setErrorMessage(t(messageKey) || t("Errors.Authentication.InvalidCredentials"));
+          setErrorMessage((messageKey) || t("Errors.Authentication.InvalidCredentials"));
           handleOpen();
         },
       }
@@ -108,7 +108,7 @@ const PasswordPhase = ({
           label={t("Login.Password")}
           error={errors?.password?.message}
         />
-        
+
         <Button
           size={"lg"}
           className="w-full mt-4"
@@ -119,7 +119,7 @@ const PasswordPhase = ({
         >
           {t("Login.Login")}
         </Button>
-        
+
         <div className="flex justify-center">
           <Button
             loading={isPendingForgetPassword}
@@ -130,7 +130,7 @@ const PasswordPhase = ({
             {t("Login.ForgotPassword")}
           </Button>
         </div>
-        
+
         {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
           <div className="mt-2">
             <AnotherCheckingWay

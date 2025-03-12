@@ -1,12 +1,11 @@
 import { toast } from "@/modules/table/hooks/use-toast";
 
 // Simple function to extract error message from API error response
-export const getErrorMessage = (error: any): string => {
-  if (!error) return "Errors.Authentication.GenericError";
-  
+export const getErrorMessage = (error: any): undefined|string => {
+  if (!error) return undefined;
   // Try to get the error message from the response
   const description = error.response?.data?.message?.description;
-  return description || "Errors.Authentication.GenericError";
+  return description || undefined;
 };
 
 // Function to show a toast notification for errors
