@@ -46,17 +46,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         })
       : { options: [], loading: false, error: null, refresh: () => {} };
   
-  // Log component rendering and props for debugging
-  useEffect(() => {
-    console.log(`DropdownSearch - ${columnKey} render:`, {
-      value,
-      dependencies,
-      dynamicConfig,
-      options: options.length > 0 ? options : 'empty static options',
-      dynamicOptions: dynamicOptions.length > 0 ? dynamicOptions : 'empty dynamic options',
-      paginationEnabled: dynamicConfig?.paginationEnabled || false
-    });
-  }, [value, dependencies, dynamicConfig, dynamicOptions.length, options, columnKey]);
+  // Remove logging effect that causes unnecessary rerenders
   
   // Handle dependency changes to clear child values - this effect runs only when dependencies change
   useEffect(() => {
@@ -117,10 +107,9 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   // Memoize the change handler
   const handleChange = useCallback((newValue: string) => {
     if (newValue !== value) {
-      console.log(`DropdownSearch - onChange for ${columnKey}: ${newValue}`);
       onChange(newValue);
     }
-  }, [onChange, columnKey, value]);
+  }, [onChange, value]);
   
   // Determine if the dropdown should be disabled
   const isDisabled = !!(

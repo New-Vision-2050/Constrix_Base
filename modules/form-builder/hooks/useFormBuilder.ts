@@ -1,43 +1,82 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { FormConfig, ValidationRule } from '../types/formTypes';
 import { useFormStore, validateField } from '../store/useFormStore';
 import { useToast } from '@/modules/table/hooks/use-toast';
+import { fetchWithAuth } from '@/utils/fetchUtils';
 
 export const useFormBuilder = (config: FormConfig) => {
-    const formStore = useFormStore();
+    // Create a stable reference to the config
+    const stableConfig = useMemo(() => config, [
+        // Only include the properties that should trigger a rerender when changed
+        config.apiUrl,
+        config.laravelValidation,
+        config.onSubmit,
+        config.onCancel,
+        config.onValidationError,
+        config.resetOnSuccess,
+        // Don't include sections or fields in the dependency array
+        // as they can cause unnecessary rerenders
+    ]);
+    
+    // IMPORTANT: Don't subscribe to values, errors, or touched
+    // Only subscribe to isSubmitting and submitCount which are needed for UI updates
+    const isSubmitting = useFormStore(state => state.isSubmitting);
+    const submitCount = useFormStore(state => state.submitCount);
+    
+    // Get actions from the store without subscribing
+    const storeActions = useMemo(() => {
+        const store = useFormStore.getState();
+        return {
+            setValue: store.setValue,
+            setValues: store.setValues,
+            setError: store.setError,
+            setErrors: store.setErrors,
+            setTouched: store.setTouched,
+            setAllTouched: store.setAllTouched,
+            resetForm: store.resetForm,
+            setSubmitting: store.setSubmitting,
+            setIsValid: store.setIsValid,
+            incrementSubmitCount: store.incrementSubmitCount
+        };
+    }, []);
+    
     const [initialValuesLoaded, setInitialValuesLoaded] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
         if (config.initialValues && !initialValuesLoaded) {
-            formStore.resetForm(config.initialValues);
+            storeActions.resetForm(config.initialValues);
             setInitialValuesLoaded(true);
         }
-    }, [config.initialValues, formStore, initialValuesLoaded]);
+    }, [config.initialValues, storeActions, initialValuesLoaded]);
 
-    const handleReset = () => {
-        formStore.resetForm(config.initialValues);
-    };
+    const handleReset = useCallback(() => {
+        storeActions.resetForm(config.initialValues);
+    }, [storeActions.resetForm, config.initialValues]);
 
-    const handleCancel = () => {
+    const handleCancel = useCallback(() => {
         if (config.onCancel) {
             config.onCancel();
         }
-    };
+    }, [config.onCancel]);
 
+    // Function to check if a section should be displayed
+    // This doesn't subscribe to values, it gets them directly when needed
     const shouldDisplaySection = useCallback((condition?: (values: Record<string, any>) => boolean) => {
         if (!condition) {
             return true;
         }
-
-        return condition(formStore.values);
-    }, [formStore.values]);
+        
+        // Get values directly from the store without subscribing
+        const values = useFormStore.getState().values;
+        return condition(values);
+    }, []);
 
     // Function to handle Laravel validation errors
     const handleLaravelValidationErrors = useCallback((response: any) => {
-        if (!config.laravelValidation?.enabled) return false;
+        if (!stableConfig.laravelValidation?.enabled) return false;
 
-        const errorsPath = config.laravelValidation.errorsPath || 'errors';
+        const errorsPath = stableConfig.laravelValidation.errorsPath || 'errors';
         const laravelErrors = response[errorsPath];
 
         if (!laravelErrors || typeof laravelErrors !== 'object') {
@@ -59,39 +98,36 @@ export const useFormBuilder = (config: FormConfig) => {
         });
 
         if (Object.keys(formattedErrors).length > 0) {
-            console.log('Laravel validation errors:', formattedErrors);
-            formStore.setErrors(formattedErrors);
-            formStore.setAllTouched();
+            storeActions.setErrors(formattedErrors);
+            storeActions.setAllTouched();
 
-            if (config.onValidationError) {
-                config.onValidationError(formattedErrors);
+            if (stableConfig.onValidationError) {
+                stableConfig.onValidationError(formattedErrors);
             }
             return true;
         }
 
         return false;
-    }, [config.laravelValidation, config.onValidationError, formStore]);
+    }, [stableConfig, storeActions]);
 
     // Function to submit form data to backend API
-    const submitToApi = async (values: Record<string, any>) => {
-        if (!config.apiUrl) {
+    const submitToApi = useCallback(async (values: Record<string, any>) => {
+        if (!stableConfig.apiUrl) {
             return { success: true }; // No API URL, consider it successful
         }
 
         try {
-            const response = await fetch(config.apiUrl, {
+            // Use the centralized fetch utility for POST requests
+            const response = await fetchWithAuth(stableConfig.apiUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(config.apiHeaders || {})
-                },
+                headers: stableConfig.apiHeaders,
                 body: JSON.stringify(values)
             });
 
             const data = await response.json();
 
             // Check for Laravel validation errors
-            if (!response.ok && config.laravelValidation?.enabled) {
+            if (!response.ok && stableConfig.laravelValidation?.enabled) {
                 const hasLaravelErrors = handleLaravelValidationErrors(data);
                 if (hasLaravelErrors) {
                     return { success: false, errors: data.errors };
@@ -104,7 +140,6 @@ export const useFormBuilder = (config: FormConfig) => {
                 errors: data.errors
             };
         } catch (error) {
-            console.error('API submission error:', error);
             toast({
                 title: "Submission Error",
                 description: "Failed to submit the form. Please try again.",
@@ -112,42 +147,38 @@ export const useFormBuilder = (config: FormConfig) => {
             });
             return { success: false };
         }
-    };
+    }, [stableConfig, handleLaravelValidationErrors, toast]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const formStore = useFormStore.getState();
-
+        // Get the current state directly without subscribing
+        const store = useFormStore.getState();
+        const values = store.values;
+        
         // Mark all fields as touched first to display validation errors
-        formStore.setAllTouched();
-        formStore.incrementSubmitCount();
+        storeActions.setAllTouched();
+        storeActions.incrementSubmitCount();
 
         const formErrors: Record<string, string> = {};
         let hasErrors = false;
 
-        console.log('Starting validation process...');
-
         // Validate all fields in visible sections
-        config.sections.forEach(section => {
+        stableConfig.sections.forEach(section => {
             if (shouldDisplaySection(section.condition)) {
-                console.log('Validating section:', section.title);
-
                 section.fields.forEach(field => {
                     // Skip validation for fields that are conditionally hidden or disabled
-                    if ((field.condition && !field.condition(formStore.values)) ||
+                    if ((field.condition && !field.condition(values)) ||
                         field.disabled || field.readOnly) {
                         return;
                     }
 
-                    const value = formStore.values[field.name];
-                    console.log(`Validating field: ${field.name}, value:`, value);
+                    const value = values[field.name];
 
                     if (field.validation && field.validation.length > 0) {
-                        const error = validateField(value, field.validation, formStore.values);
+                        const error = validateField(value, field.validation, values);
 
                         if (error) {
-                            console.log(`Validation error for ${field.name}:`, error);
                             formErrors[field.name] = error;
                             hasErrors = true;
                         }
@@ -156,47 +187,40 @@ export const useFormBuilder = (config: FormConfig) => {
             }
         });
 
-        console.log('Validation complete. Errors found:', hasErrors);
-        console.log('Error map:', formErrors);
-
         // Update the form state with validation errors
-        formStore.setErrors(formErrors);
+        storeActions.setErrors(formErrors);
 
         if (hasErrors) {
-            console.log('Form has validation errors, not submitting');
-            if (config.onValidationError) {
-                config.onValidationError(formErrors);
+            if (stableConfig.onValidationError) {
+                stableConfig.onValidationError(formErrors);
             }
             return;
         }
 
-        console.log('Form is valid, proceeding with submission');
-
-        formStore.setSubmitting(true);
+        storeActions.setSubmitting(true);
 
         try {
             // First, submit to the API if URL is provided
-            if (config.apiUrl) {
-                const apiResult = await submitToApi(formStore.values);
+            if (stableConfig.apiUrl) {
+                const apiResult = await submitToApi(values);
 
                 if (!apiResult.success) {
-                    formStore.setSubmitting(false);
+                    storeActions.setSubmitting(false);
                     return;
                 }
             }
 
             // Then call the onSubmit callback
-            const result = await config.onSubmit(formStore.values);
+            const result = await stableConfig.onSubmit(values);
 
             // Check for Laravel validation errors in the response
-            if (result.errors && config.laravelValidation?.enabled) {
+            if (result.errors && stableConfig.laravelValidation?.enabled) {
                 const hasLaravelErrors = handleLaravelValidationErrors({
                     errors: result.errors
                 });
 
                 if (hasLaravelErrors) {
-                    console.log('Laravel validation errors found in response');
-                    formStore.setSubmitting(false);
+                    storeActions.setSubmitting(false);
                     return;
                 }
             }
@@ -208,20 +232,17 @@ export const useFormBuilder = (config: FormConfig) => {
                     variant: "default",
                 });
 
-                if (config.resetOnSuccess !== false && config.initialValues) {
-                    formStore.resetForm(config.initialValues);
+                if (stableConfig.resetOnSuccess !== false && stableConfig.initialValues) {
+                    storeActions.resetForm(stableConfig.initialValues);
                 }
             }
         } catch (error: any) {
-            console.error('Form submission error:', error);
-
             // Try to handle Laravel validation errors from the caught error
-            if (config.laravelValidation?.enabled && error.response?.data) {
+            if (stableConfig.laravelValidation?.enabled && error.response?.data) {
                 const hasLaravelErrors = handleLaravelValidationErrors(error.response.data);
                 if (!hasLaravelErrors) {
                     // If no Laravel errors were found, check for a standard error message
                     const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
-                    console.error('Error message:', errorMessage);
 
                     toast({
                         title: "Error",
@@ -237,26 +258,52 @@ export const useFormBuilder = (config: FormConfig) => {
                 });
             }
         } finally {
-            formStore.setSubmitting(false);
+            storeActions.setSubmitting(false);
         }
-    };
+    }, [
+        stableConfig,
+        storeActions,
+        shouldDisplaySection,
+        handleLaravelValidationErrors,
+        submitToApi,
+        toast
+    ]);
+
+    // For the return values, we need to provide values, errors, and touched
+    // for backward compatibility, but we get them directly from the store
+    // without subscribing
+    const getStoreValues = useCallback(() => {
+        return useFormStore.getState().values;
+    }, []);
+    
+    const getStoreErrors = useCallback(() => {
+        return useFormStore.getState().errors;
+    }, []);
+    
+    const getStoreTouched = useCallback(() => {
+        return useFormStore.getState().touched;
+    }, []);
 
     return {
-        values: formStore.values,
-        errors: formStore.errors,
-        touched: formStore.touched,
-        isSubmitting: formStore.isSubmitting,
-        isValid: formStore.isValid,
-        submitCount: formStore.submitCount,
-        setValue: formStore.setValue,
-        setValues: formStore.setValues,
-        setError: formStore.setError,
-        setTouched: formStore.setTouched,
-        setAllTouched: formStore.setAllTouched,
-        resetForm: formStore.resetForm,
-        setSubmitting: formStore.setSubmitting,
-        setIsValid: formStore.setIsValid,
-        incrementSubmitCount: formStore.incrementSubmitCount,
+        // These are functions that get the latest values without subscribing
+        get values() { return getStoreValues(); },
+        get errors() { return getStoreErrors(); },
+        get touched() { return getStoreTouched(); },
+        
+        // These are actual subscriptions that will cause rerenders
+        isSubmitting,
+        submitCount,
+        
+        // Actions and handlers
+        setValue: storeActions.setValue,
+        setValues: storeActions.setValues,
+        setError: storeActions.setError,
+        setTouched: storeActions.setTouched,
+        setAllTouched: storeActions.setAllTouched,
+        resetForm: storeActions.resetForm,
+        setSubmitting: storeActions.setSubmitting,
+        setIsValid: storeActions.setIsValid,
+        incrementSubmitCount: storeActions.incrementSubmitCount,
         handleSubmit,
         handleReset,
         handleCancel,

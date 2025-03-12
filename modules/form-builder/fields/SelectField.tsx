@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/modules/table/components/ui/select';
 import DropdownSearch from '@/modules/table/components/table/DropdownSearch';
 import PaginatedDropdown from '@/modules/table/components/table/dropdowns/PaginatedDropdown';
@@ -18,21 +18,30 @@ const SelectField: React.FC<FieldProps & {
   onBlur,
   dependencyValues
 }) => {
+  // Memoize the dynamic config to prevent unnecessary rerenders
+  const dynamicConfig = useMemo(() => field.dynamicOptions, [field.dynamicOptions]);
   // If we have dynamic options with pagination enabled, use PaginatedDropdown
-  if (field.dynamicOptions && field.dynamicOptions.paginationEnabled) {
-    // Create compatible config by mapping properties
-    const paginatedConfig = {
-      url: field.dynamicOptions.url,
-      valueField: field.dynamicOptions.valueKey,
-      labelField: field.dynamicOptions.labelKey,
-      searchParam: field.dynamicOptions.searchParamName,
+  if (dynamicConfig && dynamicConfig.paginationEnabled) {
+    // Create compatible config by mapping properties and memoize it
+    const paginatedConfig = useMemo(() => ({
+      url: dynamicConfig.url,
+      valueField: dynamicConfig.valueKey,
+      labelField: dynamicConfig.labelKey,
+      searchParam: dynamicConfig.searchParamName,
       pageParam: 'page',
       limitParam: 'limit',
-      itemsPerPage: field.dynamicOptions.pageSize || 10,
-      headers: field.dynamicOptions.headers,
-      queryParams: field.dynamicOptions.queryParameters,
-      transformResponse: field.dynamicOptions.transformResponse
-    };
+      itemsPerPage: dynamicConfig.pageSize || 10,
+      headers: dynamicConfig.headers,
+      queryParams: dynamicConfig.queryParameters,
+      transformResponse: dynamicConfig.transformResponse
+    }), [dynamicConfig]);
+
+    // Check if server search is disabled in field config
+    // Default is true (server search enabled), so we only check for explicit false values
+    const enableServerSearch = useMemo(() =>
+      field.enableServerSearch !== false &&
+      !(dynamicConfig && dynamicConfig.enableServerSearch === false),
+    [field.enableServerSearch, dynamicConfig?.enableServerSearch]);
 
     return (
       <PaginatedDropdown
@@ -44,23 +53,26 @@ const SelectField: React.FC<FieldProps & {
         isDisabled={field.disabled}
         dynamicConfig={paginatedConfig}
         dependencies={dependencyValues}
-        sectionId={undefined}
+        enableServerSearch={enableServerSearch} // Pass the enableServerSearch prop
       />
     );
   }
 
   // If we have dynamic options without pagination, use DropdownSearch
-  if (field.dynamicOptions) {
-    // Create compatible config by mapping properties
-    const dynamicConfig = {
-      url: field.dynamicOptions.url,
-      valueField: field.dynamicOptions.valueKey,
-      labelField: field.dynamicOptions.labelKey,
-      searchParam: field.dynamicOptions.searchParamName,
-      headers: field.dynamicOptions.headers,
-      queryParams: field.dynamicOptions.queryParameters,
-      transformResponse: field.dynamicOptions.transformResponse
-    };
+  if (dynamicConfig) {
+    // Create compatible config by mapping properties and memoize it
+    const dropdownConfig = useMemo(() => ({
+      url: dynamicConfig.url,
+      valueField: dynamicConfig.valueKey,
+      labelField: dynamicConfig.labelKey,
+      searchParam: dynamicConfig.searchParamName,
+      headers: dynamicConfig.headers,
+      queryParams: dynamicConfig.queryParameters,
+      transformResponse: dynamicConfig.transformResponse
+    }), [dynamicConfig]);
+
+    // Memoize options to prevent unnecessary rerenders
+    const options = useMemo(() => field.options, [field.options]);
 
     return (
       <DropdownSearch
@@ -68,8 +80,8 @@ const SelectField: React.FC<FieldProps & {
         label=""  // Empty label as we handle it separately
         value={value || ''}
         onChange={onChange}
-        options={field.options}
-        dynamicConfig={dynamicConfig}
+        options={options}
+        dynamicConfig={dropdownConfig}
         dependencies={dependencyValues}
         placeholder={field.placeholder}
       />
@@ -77,6 +89,9 @@ const SelectField: React.FC<FieldProps & {
   }
 
   // Otherwise use regular Select
+  // Memoize options to prevent unnecessary rerenders
+  const options = useMemo(() => field.options || [], [field.options]);
+  
   return (
     <Select
       value={value || ''}
@@ -86,7 +101,7 @@ const SelectField: React.FC<FieldProps & {
         <SelectValue placeholder={field.placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {field.options?.map((option) => (
+        {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>
@@ -96,4 +111,5 @@ const SelectField: React.FC<FieldProps & {
   );
 };
 
-export default SelectField;
+// Use memo to prevent unnecessary rerenders
+export default memo(SelectField);

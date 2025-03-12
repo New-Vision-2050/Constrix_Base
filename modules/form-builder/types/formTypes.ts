@@ -21,6 +21,7 @@ export interface DynamicOptionsConfig {
   transformResponse?: (data: any) => FieldOption[];
   paginationEnabled?: boolean;
   pageSize?: number;
+  enableServerSearch?: boolean; // Whether to enable server-side search
 }
 
 export interface FieldConfig {
@@ -44,6 +45,7 @@ export interface FieldConfig {
   onBlur?: (value: any, values: Record<string, any>) => void;
   render?: (field: FieldConfig, value: any, onChange: (newValue: any) => void) => React.ReactNode;
   dynamicOptions?: DynamicOptionsConfig;
+  enableServerSearch?: boolean; // Whether to enable server-side search for this field
 }
 
 export interface FormSection {

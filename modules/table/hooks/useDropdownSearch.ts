@@ -1,6 +1,6 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DropdownOption, DynamicDropdownConfig } from '@/modules/table/utils/tableTypes';
+import { fetchWithAuth } from '@/utils/fetchUtils';
 import { useDebounce } from './useDebounce';
 
 interface UseDropdownSearchProps {
@@ -37,7 +37,8 @@ export const useDropdownSearch = ({
     const params = new URLSearchParams();
     
     // Add search parameter if configured and search term exists
-    if (dynamicConfig.searchParam && debouncedSearchTerm) {
+    // Note: We now allow empty search terms to fetch all results
+    if (dynamicConfig.searchParam && debouncedSearchTerm !== undefined) {
       params.append(dynamicConfig.searchParam, debouncedSearchTerm);
     }
     
@@ -80,7 +81,7 @@ export const useDropdownSearch = ({
     
     // Skip if we have a dependsOn value but don't have the dependency
     if (
-      dynamicConfig.dependsOn && 
+      dynamicConfig.dependsOn &&
       (!dependencies || !dependencies[dynamicConfig.dependsOn])
     ) {
       setOptions([]);
@@ -99,12 +100,16 @@ export const useDropdownSearch = ({
     const controller = new AbortController();
     abortControllerRef.current = controller;
     
+    // Set loading state to true and log it
     setLoading(true);
+    console.log('useDropdownSearch - setLoading(true)');
     setError(null);
     
     try {
-      console.log(`Fetching dropdown options for search: ${debouncedSearchTerm}`, url);
-      const response = await fetch(url, { signal: controller.signal });
+      // Use the centralized fetch utility
+      const response = await fetchWithAuth(url, {
+        signal: controller.signal
+      });
       
       if (!isMountedRef.current) return;
       
@@ -112,50 +117,64 @@ export const useDropdownSearch = ({
         throw new Error(`Failed to fetch options: ${response.status}`);
       }
       
-      const data = await response.json();
+      let data = await response.json();
       
       if (!isMountedRef.current) return;
-      
+         
+      if (typeof data === 'object') {
+        const arrayCandidate = Object.values(data).find(val => Array.isArray(val));
+        if (arrayCandidate && Array.isArray(arrayCandidate)) {
+          data = arrayCandidate;
+        } else {
+          data = [data];
+        }
+      }
       if (!Array.isArray(data)) {
         throw new Error('Expected array response from API');
       }
       
-      // Extract values and labels from the response
-      const extractedOptions = data.map(item => {
-        const getValue = (obj: any, path: string) => {
-          return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-        };
+      // If data is empty array, set empty options
+      if (Array.isArray(data) && data.length === 0) {
+        // Set empty options when search returns no results
+        setOptions([]);
+      } else {
+        // Extract values and labels from the response
+        const extractedOptions = data.map(item => {
+          const getValue = (obj: any, path: string) => {
+            return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+          };
+          
+          return {
+            value: String(getValue(item, dynamicConfig.valueField)),
+            label: String(getValue(item, dynamicConfig.labelField))
+          };
+        });
         
-        return {
-          value: String(getValue(item, dynamicConfig.valueField)),
-          label: String(getValue(item, dynamicConfig.labelField))
-        };
-      });
-      
-      // Filter out invalid options and remove duplicates
-      const validOptions = extractedOptions
-        .filter(opt => opt.value && opt.value.trim() !== '')
-        .reduce((acc: DropdownOption[], current) => {
-          const x = acc.find(item => item.value === current.value);
-          if (!x) return acc.concat([current]);
-          return acc;
-        }, []);
-      
-      setOptions(validOptions);
+        // Filter out invalid options and remove duplicates
+        const validOptions = extractedOptions
+          .filter(opt => opt.value && opt.value.trim() !== '')
+          .reduce((acc: DropdownOption[], current) => {
+            const x = acc.find(item => item.value === current.value);
+            if (!x) return acc.concat([current]);
+            return acc;
+          }, []);
+        
+        setOptions(validOptions);
+      }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
-        console.log('Request aborted');
+        // Silently handle aborted requests
         return;
       }
       
       if (isMountedRef.current) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        console.error('Error fetching dropdown options:', errorMessage);
         setError(errorMessage);
       }
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
+        console.log('useDropdownSearch - setLoading(false)');
       }
     }
   }, [dynamicConfig, dependencies, buildSearchUrl, debouncedSearchTerm]);
@@ -163,7 +182,16 @@ export const useDropdownSearch = ({
   // Fetch options when dependencies or search term change
   useEffect(() => {
     isMountedRef.current = true;
-    fetchOptions();
+    
+    // Fetch in two cases:
+    // 1. When the search term is completely empty (to fetch all results)
+    // 2. When the search term has at least 3 characters
+    if (debouncedSearchTerm === '' || (debouncedSearchTerm && debouncedSearchTerm.trim().length > 2)) {
+      fetchOptions();
+    } else if (debouncedSearchTerm && debouncedSearchTerm.trim().length > 0 && debouncedSearchTerm.trim().length <= 2) {
+      // For short searches (1-2 characters), clear the options
+      setOptions([]);
+    }
     
     return () => {
       isMountedRef.current = false;

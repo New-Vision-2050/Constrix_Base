@@ -79,9 +79,9 @@ export const contactFormConfig: FormConfig = {
           placeholder: 'Select your country',
           required: true,
           dynamicOptions: {
-            url: 'https://restcountries.com/v3.1/all',
-            valueKey: 'cca2',
-            labelKey: 'name.common',
+            url: 'https://core-be-pr16.constrix-nv.com/api/v1/countries?page=1&limit=5&_sort=id&_order=asc',
+              valueKey: 'id',
+            labelKey: 'name',
             paginationEnabled: true,
             searchParamName: 'name',
             pageSize: 10
