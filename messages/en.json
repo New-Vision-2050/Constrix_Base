@@ -18,5 +18,20 @@
       "InvalidIdentifier": "Invalid identifier or not found",
       "GenericError": "An error occurred"
     }
+  },
+  "Validation": {
+    "Required": "This field is required",
+    "MinLength": "Must be at least {min} characters",
+    "InvalidEmail": "Invalid email address",
+    "InvalidPhone": "Invalid phone number, must be in the format 05xxxxxxxx",
+    "Password": {
+      "MinLength": "Password must be at least 8 characters",
+      "UpperCase": "Password must contain at least one uppercase letter",
+      "SpecialChar": "Password must contain at least one special character",
+      "Required": "Password is required"
+    },
+    "PasswordMatch": "Passwords must match",
+    "EmailMatch": "Email addresses must match",
+    "OTP": "Temporary password is required"
   }
 }
