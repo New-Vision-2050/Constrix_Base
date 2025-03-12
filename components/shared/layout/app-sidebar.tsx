@@ -13,6 +13,7 @@ import CompaniesIcon from "@/public/icons/companies";
 import UserIcon from "@/public/icons/user";
 import SidebarHeaderContent from "./sidebar-header-content";
 import SidebarFooterContent from "./sidebar-footer-content";
+import { useLocale } from "next-intl";
 
 // This is sample data.
 const data = {
@@ -53,9 +54,16 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+  
+  // For RTL languages like Arabic, the sidebar should be on the right
+  // For LTR languages like English, the sidebar should be on the left
+  const sidebarSide = isRtl ? "right" : "left";
+  
   return (
-    <Sidebar collapsible="icon" side="right" {...props}>
-      <SidebarHeader className=" pt-10">
+    <Sidebar collapsible="icon" side={sidebarSide} {...props}>
+      <SidebarHeader className="pt-10">
         <SidebarHeaderContent />
       </SidebarHeader>
       <SidebarContent>

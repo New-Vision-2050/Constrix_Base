@@ -45,13 +45,13 @@ const DataTable: React.FC<DataTableProps> = ({
 
   return (
     <motion.div
-      className="backdrop-blur-sm rounded-b-lg border border-border shadow-sm overflow-hidden"
+      className="backdrop-blur-sm rounded-b-lg border border-border shadow-sm overflow-hidden w-full"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full max-w-full">
         {hasColumns ? (
           <table className="w-full table-auto">
             <TableHeader

@@ -50,7 +50,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         className="h-8 w-8"
       >
-        <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+        <ChevronLeft className="h-4 w-4" />
       </Button>
     );
 
@@ -127,7 +127,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         className="h-8 w-8"
       >
-        <ChevronRight className="h-4 w-4 rtl:rotate-180" />
+        <ChevronRight className="h-4 w-4" />
       </Button>
     );
 
@@ -135,12 +135,9 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="p-4 relative border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="flex items-center grow justify-center space-x-2 ">
-        {renderPageButtons()}
-      </div>
-      <div className="flex items-center absolute left-10 top-1/2 -translate-y-1/2">
-        <span className="text-sm text-muted-foreground mr-2">
+    <div className="p-2 md:p-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="flex items-center order-2 sm:order-1 sm:w-auto">
+        <span className="text-sm text-muted-foreground me-2">
           الصفوف لكل صفحة :
         </span>
         <Select
@@ -157,6 +154,9 @@ const Pagination: React.FC<PaginationProps> = ({
             <SelectItem value="50">50</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+      <div className="flex items-center grow justify-center space-x-2 rtl:space-x-reverse order-1 sm:order-2">
+        {renderPageButtons()}
       </div>
     </div>
   );
