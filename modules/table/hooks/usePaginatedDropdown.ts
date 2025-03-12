@@ -1,9 +1,9 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DropdownOption, DynamicDropdownConfig } from '@/modules/table/utils/tableTypes';
 import { extractDropdownOptions } from '@/modules/table/components/table/dropdowns/DropdownUtils';
 import { useFetchTracking, buildPaginatedUrl } from './useFetchTracking';
 import { useDebounce } from './useDebounce';
+import { fetchWithAuth } from '@/utils/fetchUtils';
 
 interface UsePaginatedDropdownProps {
   dynamicConfig?: DynamicDropdownConfig;
@@ -92,7 +92,10 @@ export const usePaginatedDropdown = ({
       
       const controller = setupAbortController();
       
-      const response = await fetch(url, { signal: controller.signal });
+      // Use the centralized fetch utility
+      const response = await fetchWithAuth(url, {
+        signal: controller.signal
+      });
       
       if (!isMountedRef.current) return { data: [], total: 0 };
       
@@ -101,7 +104,16 @@ export const usePaginatedDropdown = ({
       const total = response.headers.get(totalCountHeader);
       const totalCount = total ? parseInt(total, 10) : 0;
       
-      const data = await response.json();
+      let data = await response.json();
+      console.log(data)
+      if (typeof data === 'object') {
+        const arrayCandidate = Object.values(data).find(val => Array.isArray(val));
+        if (arrayCandidate && Array.isArray(arrayCandidate)) {
+          data = arrayCandidate;
+        } else {
+          data = [data];
+        }
+      }
       if (!Array.isArray(data)) throw new Error('Expected array response');
       
       const newOptions = extractDropdownOptions(
