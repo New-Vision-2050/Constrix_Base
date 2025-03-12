@@ -34,7 +34,6 @@ apiClient.interceptors.response.use(
     if ((status === 401 || status === 403) && !isLoginAuthError) {
       deleteCookie("new-vision-token");
       useAuthStore.getState().clearUser();
-      console.log({ error });
       if (typeof window !== "undefined") {
         window.location.href = ROUTER.LOGIN;
       }

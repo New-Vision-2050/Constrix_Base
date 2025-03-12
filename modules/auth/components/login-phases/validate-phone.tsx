@@ -18,12 +18,14 @@ import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { ROUTER } from "@/router";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const openDialog = useErrorDialogStore((state) => state.openDialog);
   const router = useRouter();
 
   const { mutate, isPending } = useLoginSteps();
@@ -77,8 +79,9 @@ const ValidatePhonePhase = ({
               return;
           }
         },
-        onError: (error) => {
-          console.log(error);
+        onError(error) {
+          const description = error.response?.data?.message?.description;
+          openDialog(description);
         },
       }
     );

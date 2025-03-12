@@ -4,18 +4,15 @@ import { IdentifierType } from "../../validator/login-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
-import { useState } from "react";
 import { useLoginWays } from "../../store/mutations";
-import { useModal } from "../../../../hooks/use-modal";
-import ErrorDialog from "@/components/shared/error-dialog";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
 const IdentifierPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isOpen, handleOpen, handleClose] = useModal();
+  const openDialog = useErrorDialogStore((state) => state.openDialog);
   const { mutate, isPending } = useLoginWays();
   const {
     register,
@@ -59,8 +56,7 @@ const IdentifierPhase = ({
         },
         onError(error) {
           const description = error.response?.data?.message?.description;
-          setErrorMessage(description ?? "حدث خطأ");
-          handleOpen();
+          openDialog(description);
         },
       }
     );
@@ -84,11 +80,6 @@ const IdentifierPhase = ({
         التالي
       </Button>
 
-      <ErrorDialog
-        isOpen={isOpen}
-        handleClose={handleClose}
-        desc={errorMessage}
-      />
     </>
   );
 };

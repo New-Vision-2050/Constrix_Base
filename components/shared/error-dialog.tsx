@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -8,16 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
 import { Button } from "../ui/button";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
-interface IErrorDialog {
-  isOpen: boolean;
-  handleClose: () => void;
-  desc: string;
-}
+const ErrorDialog = () => {
+  const { isOpen, desc, closeDialog } = useErrorDialogStore();
 
-const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={closeDialog}>
       <DialogContent className="max-w-80 w-full rounded-2xl p-10 flex flex-col">
         <DialogHeader>
           <DialogTitle className="mx-auto">
@@ -29,12 +28,12 @@ const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
           className="text-2xl text-white font-bold text-center mb-6"
         >
           <p>{desc}</p>
-        </DialogDescription>{" "}
+        </DialogDescription>
         <DialogFooter>
           <Button
             type="button"
             color="primary"
-            onClick={handleClose}
+            onClick={closeDialog}
             className="w-full"
           >
             رجوع

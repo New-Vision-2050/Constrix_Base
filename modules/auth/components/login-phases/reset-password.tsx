@@ -6,12 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useResetPassword } from "../../store/mutations";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
 const ResetPasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const openDialog = useErrorDialogStore((state) => state.openDialog);
+
   const { mutate, isPending } = useResetPassword();
   const {
     formState: { errors },
@@ -35,6 +38,10 @@ const ResetPasswordPhase = ({
         onSuccess: () => {
           reset();
           handleSetStep(LOGIN_PHASES.IDENTIFIER);
+        },
+        onError(error) {
+          const description = error.response?.data?.message?.description;
+          openDialog(description);
         },
       }
     );

@@ -15,18 +15,21 @@ import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import OtpHub from "../resend-otp/otp-hub";
 import { useValidateResetPasswordOtp } from "../../store/mutations";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const openDialog = useErrorDialogStore((state) => state.openDialog);
+
   const {
     formState: { errors },
     handleSubmit,
     control,
     getValues,
-    setValue
+    setValue,
   } = useFormContext<IdentifierType & ForgetPasswordType>();
   const { mutate, isPending } = useValidateResetPasswordOtp();
   const identifier = getValues("identifier");
@@ -38,8 +41,12 @@ const ForgetPasswordPhase = ({
       { identifier, otp },
       {
         onSuccess: (res) => {
-          setValue('token' , res.payload.token)
+          setValue("token", res.payload.token);
           handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
+        },
+        onError(error) {
+          const description = error.response?.data?.message?.description;
+          openDialog(description);
         },
       }
     );

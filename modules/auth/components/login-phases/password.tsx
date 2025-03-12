@@ -11,12 +11,15 @@ import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
 import AnotherCheckingWay from "../another-checking-way";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const openDialog = useErrorDialogStore((state) => state.openDialog);
+
   const router = useRouter();
 
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
@@ -53,7 +56,8 @@ const PasswordPhase = ({
           }
         },
         onError(error) {
-          console.log(error);
+          const description = error.response?.data?.message?.description;
+          openDialog(description);
         },
       }
     );

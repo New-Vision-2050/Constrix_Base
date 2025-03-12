@@ -21,12 +21,15 @@ import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
+import { useErrorDialogStore } from "@/store/use-error-dialog-store";
 
 const ValidateEmailPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const openDialog = useErrorDialogStore((state) => state.openDialog);
+
   const router = useRouter();
 
   const {
@@ -79,7 +82,8 @@ const ValidateEmailPhase = ({
           }
         },
         onError: (error) => {
-          console.log(error);
+          const description = error.response?.data?.message?.description;
+          openDialog(description);
         },
       }
     );
