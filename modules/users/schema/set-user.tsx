@@ -6,11 +6,11 @@ export const userSchema = z.object({
   email: z.string().email("Invalid email"),
   phone: z.string().min(1, "Phone is required"),
   title: z.string().min(1, "Title is required"),
-  takeTimeZone: z.boolean().default(false),
-  country: z.string().min(1, "Name is required"),
-  timeZone: z.string().min(1, "Time Zone is required"),
-  currency: z.string().min(1, "Currency is required"),
-  lang: z.string().min(1, "Lang is required"),
+  takeTimeZone: z.boolean().default(false).optional(),
+  country: z.string().optional(),
+  timeZone: z.string().optional(),
+  currency: z.string().optional(),
+  lang: z.string().optional(),
 });
 
 export type UserSchemaT = z.infer<typeof userSchema>;

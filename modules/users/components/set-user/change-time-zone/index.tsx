@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -14,7 +13,7 @@ export default function TimeZoneDialog() {
   const handleClose = () => setOpen(false);
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         className="inline text-[#f42589] cursor-pointer"
         onClick={() => {
@@ -28,9 +27,9 @@ export default function TimeZoneDialog() {
           <DialogTitle className="text-center">
             تغيير المنطقة الزمنية
           </DialogTitle>
-          <DialogDescription>
+          <DialogContent>
             <TimeZoneForm handleClose={handleClose} />
-          </DialogDescription>
+          </DialogContent>
         </DialogHeader>
       </DialogContent>
     </Dialog>

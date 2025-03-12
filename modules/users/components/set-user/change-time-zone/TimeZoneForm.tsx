@@ -3,6 +3,8 @@ import { useFormContext } from "react-hook-form";
 import CustomSelect from "@/components/shared/CustomSelect";
 import { Button } from "@/components/ui/button";
 import { useSetUserLookupsCxt } from "../context/SetUserLookups";
+import { toast } from "sonner";
+import { useState } from "react";
 
 type PropsT = {
   handleClose: () => void;
@@ -12,10 +14,29 @@ export default function TimeZoneForm({ handleClose }: PropsT) {
   const {
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext();
   const { timeZones, currencies, languages, countries } =
     useSetUserLookupsCxt();
+  const formFields = ["country", "timeZone", "currency", "lang"];
+  const [error, setError] = useState("");
+
+  const validToSave = () => {
+    for (let i = 0; i < formFields.length; i++)
+      if (!getValues(formFields[i])) return false;
+    return true;
+  };
+
+  const handleSave = () => {
+    if (validToSave()) {
+      setError("");
+      setValue("takeTimeZone", true);
+      handleClose();
+    } else {
+      setError("All Fields are required");
+    }
+  };
 
   return (
     <div className="py-4">
@@ -73,16 +94,11 @@ export default function TimeZoneForm({ handleClose }: PropsT) {
           // errorMessage={errors?.lang?.message ?? ""}
         />
       </div>
-      <div className="my-4 flex items-center justify-center">
-        <Button
-          className="w-full max-w-sm"
-          onClick={() => {
-            setValue("takeTimeZone", true);
-            handleClose();
-          }}
-        >
+      <div className="my-4 flex flex-col items-center justify-center">
+        <Button className="w-full max-w-sm" onClick={handleSave}>
           حفظ
         </Button>
+        {error && <p className="text-red-500">{error}</p>}
       </div>
     </div>
   );
