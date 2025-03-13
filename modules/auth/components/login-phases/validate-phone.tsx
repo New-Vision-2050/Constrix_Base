@@ -45,6 +45,7 @@ const ValidatePhonePhase = ({
     setValue,
   } = useFormContext<IdentifierType & ValidatePhoneType>();
   const identifier = getValues("identifier");
+  const token = getValues("token");
   const by = getValues("by");
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
@@ -88,7 +89,9 @@ const ValidatePhonePhase = ({
         },
         onError: (error) => {
           const messageKey = getErrorMessage(error);
-          setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.InvalidIdentifier")
+          );
           handleOpen();
         },
       }
@@ -137,7 +140,11 @@ const ValidatePhonePhase = ({
       >
         {loginT("Login")}
       </Button>
-      <OtpHub resendFor="resend-otp" identifier={identifier} />
+      <OtpHub
+        resendFor="resend-otp"
+        token={token ?? ""}
+        identifier={identifier}
+      />
 
       <div className="flex items-center gap-2">
         <Button

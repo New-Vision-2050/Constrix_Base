@@ -89,7 +89,9 @@ const ValidateEmailPhase = ({
         },
         onError: (error) => {
           const messageKey = getErrorMessage(error);
-            setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.InvalidIdentifier")
+          );
           handleOpen();
         },
       }
@@ -142,7 +144,11 @@ const ValidateEmailPhase = ({
       >
         {loginT("Next")}
       </Button>
-      <OtpHub identifier={getValues("identifier")} resendFor="resend-otp" />
+      <OtpHub
+        identifier={getValues("identifier")}
+        token={getValues("token") ?? ""}
+        resendFor="resend-otp"
+      />
       <div className="flex items-center gap-2">
         <Button
           onClick={handleSecurityQuestionsPhase}
