@@ -114,6 +114,7 @@
   "Sidebar": {
     "Companies": "Companies",
     "Users": "Users",
-    "Welcome": "Hello, Mohammed Saad!"
+    "Welcome": "Hello, Mohammed Saad!",
+    "CompanyName" : "New Vision"
   }
 }
