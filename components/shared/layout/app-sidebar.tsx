@@ -13,53 +13,54 @@ import CompaniesIcon from "@/public/icons/companies";
 import UserIcon from "@/public/icons/user";
 import SidebarHeaderContent from "./sidebar-header-content";
 import SidebarFooterContent from "./sidebar-footer-content";
-import { useLocale } from "next-intl";
-
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  projects: [
-    {
-      name: "الشركات",
-      url: "#",
-      icon: CompaniesIcon,
-    },
-    {
-      name: "المستخدمين",
-      url: "#",
-      icon: UserIcon,
-    },
-  ],
-};
+import { useLocale, useTranslations } from "next-intl";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const locale = useLocale();
+  const t = useTranslations();
   const isRtl = locale === "ar";
   
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
+  
+  // This is sample data with translated names
+  const data = {
+    user: {
+      name: "shadcn",
+      email: "m@example.com",
+      avatar: "/avatars/shadcn.jpg",
+    },
+    teams: [
+      {
+        name: "Acme Inc",
+        logo: GalleryVerticalEnd,
+        plan: "Enterprise",
+      },
+      {
+        name: "Acme Corp.",
+        logo: AudioWaveform,
+        plan: "Startup",
+      },
+      {
+        name: "Evil Corp.",
+        logo: Command,
+        plan: "Free",
+      },
+    ],
+    projects: [
+      {
+        name: t("Sidebar.Companies"),
+        url: "#",
+        icon: CompaniesIcon,
+      },
+      {
+        name: t("Sidebar.Users"),
+        url: "#",
+        icon: UserIcon,
+      },
+    ],
+  };
   
   return (
     <Sidebar collapsible="icon" side={sidebarSide} {...props}>
