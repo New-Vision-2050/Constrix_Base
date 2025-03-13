@@ -34,9 +34,10 @@ export const useForgetPassword = () =>
   useMutation<
     ServerSuccessResponse,
     AxiosError<ServerErrorResponse>,
-    { identifier: string }
+    { identifier: string; token: string }
   >({
-    mutationFn: ({ identifier }) => loginRepository.forgetPassword(identifier),
+    mutationFn: ({ identifier, token }) =>
+      loginRepository.forgetPassword(identifier, token),
   });
 
 export const useResetPassword = () =>
@@ -63,9 +64,10 @@ export const useResendOtp = () =>
   useMutation<
     ServerSuccessResponse,
     AxiosError<ServerErrorResponse>,
-    { identifier: string }
+    { identifier: string; token: string }
   >({
-    mutationFn: ({ identifier }) => loginRepository.resendOtp(identifier),
+    mutationFn: ({ identifier, token }) =>
+      loginRepository.resendOtp(identifier, token),
   });
 
 export const useLoginAlternative = () =>

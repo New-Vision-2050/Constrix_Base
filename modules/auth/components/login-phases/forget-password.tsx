@@ -29,6 +29,7 @@ const ForgetPasswordPhase = ({
     getValues,
   } = useFormContext<IdentifierType & ForgetPasswordType>();
   const identifier = getValues("identifier");
+  const token = getValues("token");
 
   const onSubmit = () => {
     handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
@@ -72,7 +73,11 @@ const ForgetPasswordPhase = ({
       <Button onClick={handleSubmit(onSubmit)} className="w-full">
         {t("ForgotPassword.Confirm")}
       </Button>{" "}
-      <OtpHub identifier={identifier} resendFor={"forget-password"} />
+      <OtpHub
+        identifier={identifier}
+        resendFor={"forget-password"}
+        token={token??""}
+      />
     </>
   );
 };
