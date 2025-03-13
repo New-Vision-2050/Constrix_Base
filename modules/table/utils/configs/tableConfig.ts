@@ -1,4 +1,3 @@
-
 import { ColumnSearchConfig } from '../tableTypes';
 import { ColumnConfig } from './columnConfig';
 
@@ -21,4 +20,6 @@ export interface TableConfig {
   // New option for per-column search
   enableColumnSearch?: boolean;
   columnSearchConfig?: ColumnSearchConfig;
+  // Additional search fields for advanced filtering
+  allSearchedFields?: any[];
 }

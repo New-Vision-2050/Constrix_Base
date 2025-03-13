@@ -32,13 +32,17 @@ const errorMessages = {
 };
 
 // Get error message based on current locale
-export const getMessage = (key: keyof typeof errorMessages.en, param?: any) => {
-    const locale = getCookie("NEXT_LOCALE") || 'en';
+export const getMessage = (key: keyof typeof errorMessages.en, param?: any): string => {
+  const localeValue = getCookie("NEXT_LOCALE");
+  const locale = (typeof localeValue === 'string' && (localeValue === 'en' || localeValue === 'ar'))
+    ? localeValue as 'en' | 'ar'
+    : 'en';
+    
   const message = errorMessages[locale][key];
   if (typeof message === "function" && param !== undefined) {
     return message(param);
   }
-  return message;
+  return message as string;
 };
 
 // Create a password validation schema with translated messages

@@ -3,6 +3,19 @@ import DataStatus from "@/app/[locale]/(main)/companies/cells/data-status";
 import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 
+// Define types for the company data
+interface CompanyData {
+  id: string;
+  name: string;
+  user_name: string;
+  email: string;
+  company_type: string;
+  general_manager_name: string;
+  complete_data: 0 | 1; // 0 = pending, 1 = success
+  is_active: "active" | "inActive";
+  [key: string]: any; // For any other properties
+}
+
 export const companiesConfig = {
   url: "https://core-be-pr16.constrix-nv.com/api/v1/companies",
   columns: [
@@ -10,7 +23,7 @@ export const companiesConfig = {
       key: "name",
       label: "الشركات",
       sortable: true,
-      render: (_, row) => <Company row={row} />,
+      render: (_: unknown, row: CompanyData) => <Company row={row} />,
     },
     {
       key: "email",
@@ -32,17 +45,17 @@ export const companiesConfig = {
       key: "complete_data",
       label: "حالة البيانات",
       sortable: true,
-      render: (value) => <DataStatus dataStatus={value} />,
+      render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
     },
     {
       key: "is_active",
       label: "الحالة",
-      render: (value, row) => <TheStatus theStatus={value} id={row.id} />,
+      render: (value: "active" | "inActive", row: CompanyData) => <TheStatus theStatus={value} id={row.id} />,
     },
     {
       key: "id",
       label: "الاجراء",
-      render: (_, row) => <Execution id={row.id} />,
+      render: (_: unknown, row: CompanyData) => <Execution id={row.id} />,
     },
   ],
   allSearchedFields: [
@@ -94,7 +107,7 @@ export const companiesConfig = {
     },
   ],
   defaultSortColumn: "id",
-  defaultSortDirection: "asc",
+  defaultSortDirection: "asc" as const,
   enableSorting: true,
   enablePagination: true,
   defaultItemsPerPage: 5,

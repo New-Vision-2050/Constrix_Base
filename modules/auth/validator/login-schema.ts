@@ -14,11 +14,11 @@ const identifierSchema = z.object({
 });
 
 const passwordSchema = z.object({
-  password: z.string().min(1, getMessage("passwordRequired")),
+  password: z.string().min(1, getMessage("passwordRequired") as string),
 });
 
 const forgetPasswordSchema = z.object({
-  forgetPasswordOtp: z.string().min(5, getMessage("otpRequired")),
+  forgetPasswordOtp: z.string().min(5, getMessage("otpRequired") as string),
 });
 
 const resetPasswordSchema = z
@@ -26,35 +26,43 @@ const resetPasswordSchema = z
     newPassword: passwordValidation,
     confirmNewPassword: z.string(),
   })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: getMessage("passwordMatch"),
-    path: ["confirmNewPassword"],
-  });
+  .refine(
+    (data): data is { newPassword: string; confirmNewPassword: string } =>
+      data.newPassword === data.confirmNewPassword,
+    {
+      message: getMessage("passwordMatch") as string,
+      path: ["confirmNewPassword"],
+    }
+  );
 
 const validateEmailSchema = z.object({
-  validateEmailOtp: z.string().min(5, getMessage("otpRequired")),
+  validateEmailOtp: z.string().min(5, getMessage("otpRequired") as string),
 });
 
 const securityQuestionsSchema = z.object({
-  animal: z.string().min(1, getMessage("required")),
-  team: z.string().min(1, getMessage("required")),
+  animal: z.string().min(1, getMessage("required") as string),
+  team: z.string().min(1, getMessage("required") as string),
 });
 
 const changeEmailSchema = z
   .object({
     newEmail: z
       .string()
-      .min(1, getMessage("required"))
-      .email(getMessage("invalidEmail")),
+      .min(1, getMessage("required") as string)
+      .email(getMessage("invalidEmail") as string),
     confirmNewEmail: z.string(),
   })
-  .refine((data) => data.newEmail === data.confirmNewEmail, {
-    message: getMessage("emailMatch"),
-    path: ["confirmNewEmail"],
-  });
+  .refine(
+    (data): data is { newEmail: string; confirmNewEmail: string } =>
+      data.newEmail === data.confirmNewEmail,
+    {
+      message: getMessage("emailMatch") as string,
+      path: ["confirmNewEmail"],
+    }
+  );
 
 const validatePhoneSchema = z.object({
-  validatePhoneOtp: z.string().min(5, getMessage("otpRequired")),
+  validatePhoneOtp: z.string().min(5, getMessage("otpRequired") as string),
 });
 
 export type IdentifierType = z.infer<typeof identifierSchema>;

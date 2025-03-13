@@ -1,9 +1,15 @@
 import React from "react";
 import { AvatarGroup } from "@/components/shared/avatar-group";
 
-const Company = ({ row }: { row: any }) => {
+// Define a proper type for the company row
+interface CompanyRow {
+  name: string;
+  user_name: string;
+  [key: string]: unknown; // Allow for other properties
+}
+
+const Company = ({ row }: { row: CompanyRow }) => {
   const { name, user_name } = row;
-  console.log({ row });
   return (
     <div className="flex gap-3 border-e-2">
       <AvatarGroup

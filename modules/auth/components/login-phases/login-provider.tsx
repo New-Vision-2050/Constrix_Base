@@ -20,12 +20,12 @@ const LoginProvider = () => {
     
     // Handle form submission based on current step
     if (step === LOGIN_PHASES.IDENTIFIER) {
-      const identifierPhaseElement = document.querySelector('button[form="login-form"]');
+      const identifierPhaseElement = document.querySelector('button[form="login-form"]') as HTMLButtonElement;
       if (identifierPhaseElement) {
         identifierPhaseElement.click();
       }
     } else if (step === LOGIN_PHASES.PASSWORD) {
-      const passwordPhaseElement = document.querySelector('button[form="login-form"]');
+      const passwordPhaseElement = document.querySelector('button[form="login-form"]') as HTMLButtonElement;
       if (passwordPhaseElement) {
         passwordPhaseElement.click();
       }

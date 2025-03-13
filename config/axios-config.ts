@@ -53,7 +53,7 @@ apiClient.interceptors.response.use(
         }
       } else {
         // Dispatch error event for login page components to handle
-        dispatchErrorEvent(status, errorMessageKey);
+        dispatchErrorEvent(status, errorMessageKey || "Errors.Authentication.GenericError");
       }
     }
     
