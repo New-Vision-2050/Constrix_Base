@@ -116,5 +116,8 @@
     "Users": "المستخدمين",
     "Welcome": "مرحبا، محمد سعد!",
     "CompanyName" : "نيو فيجن"
+  },
+  "Header": {
+    "MainSystemManagement": "ادارة النظام الرئيسي"
   }
 }

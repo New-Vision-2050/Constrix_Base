@@ -116,5 +116,8 @@
     "Users": "Users",
     "Welcome": "Hello, Mohammed Saad!",
     "CompanyName" : "New Vision"
+  },
+  "Header": {
+    "MainSystemManagement": "Main System Management"
   }
 }
