@@ -79,7 +79,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       }, 100);
     } else {
       // Clear search when dropdown closes
-      setSearchValue("");
+      //setSearchValue("");
     }
   }, [open]);
 
@@ -123,6 +123,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 e.preventDefault();
                 e.stopPropagation();
                 onChange("");
+                setSearchValue("")
               }}
             >
               <X className="h-4 w-4 opacity-50 hover:opacity-80" />
