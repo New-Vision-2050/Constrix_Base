@@ -32,34 +32,34 @@
       "EnterVerificationCode": "Enter the verification code sent to",
       "ChangeEmailAddress": "Change email address",
       "invalid token": "Invalid verification code"
-    },
-    "ForgotPassword": {
-      "Title": "Forgot Password",
-      "EnterTemporaryPassword": "Enter the temporary password sent to your email",
-      "Confirm": "Confirm",
-      "BackToLogin": "Back to login"
-    },
-    "ResetPassword": {
-      "Title": "Reset Password",
-      "NewPassword": "New Password",
-      "ConfirmNewPassword": "Confirm New Password",
-      "PasswordRequirements": "Password must be at least 8 characters, contain at least one uppercase letter, and one special character.",
-      "Confirm": "Confirm"
-    },
-    "ChangeEmail": {
-      "Title": "Change Email Address",
-      "NewEmail": "New Email Address",
-      "ConfirmNewEmail": "Confirm New Email Address",
-      "NoCopy": "Email cannot be copied, please type it manually",
-      "Confirm": "Confirm",
-      "BackToLogin": "Back to login"
-    },
-    "SecurityQuestions": {
-      "Title": "Security Questions",
-      "PetQuestion": "What is your favorite pet's name?",
-      "TeamQuestion": "What is your favorite sports team?",
-      "Next": "Next"
     }
+  },
+  "ForgotPassword": {
+    "Title": "Forgot Password",
+    "EnterTemporaryPassword": "Enter the temporary password sent to your email",
+    "Confirm": "Confirm",
+    "BackToLogin": "Back to login"
+  },
+  "ResetPassword": {
+    "Title": "Reset Password",
+    "NewPassword": "New Password",
+    "ConfirmNewPassword": "Confirm New Password",
+    "PasswordRequirements": "Password must be at least 8 characters, contain at least one uppercase letter, and one special character.",
+    "Confirm": "Confirm"
+  },
+  "ChangeEmail": {
+    "Title": "Change Email Address",
+    "NewEmail": "New Email Address",
+    "ConfirmNewEmail": "Confirm New Email Address",
+    "NoCopy": "Email cannot be copied, please type it manually",
+    "Confirm": "Confirm",
+    "BackToLogin": "Back to login"
+  },
+  "SecurityQuestions": {
+    "Title": "Security Questions",
+    "PetQuestion": "What is your favorite pet's name?",
+    "TeamQuestion": "What is your favorite sports team?",
+    "Next": "Next"
   },
   "Errors": {
     "Authentication": {
@@ -114,6 +114,7 @@
   "Sidebar": {
     "Companies": "Companies",
     "Users": "Users",
-    "Welcome": "Hello, Mohammed Saad!"
+    "Welcome": "Hello, Mohammed Saad!",
+    "CompanyName" : "New Vision"
   }
 }

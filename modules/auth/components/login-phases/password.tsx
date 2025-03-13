@@ -44,7 +44,7 @@ const PasswordPhase = ({
     const handleAuthError = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
-        setErrorMessage(t(customEvent.detail.messageKey));
+        setErrorMessage(customEvent.detail.messageKey);
         handleOpen();
       }
     };

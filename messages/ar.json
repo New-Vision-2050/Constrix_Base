@@ -32,34 +32,34 @@
       "EnterVerificationCode": "ادخل رمز التحقق المرسل على",
       "ChangeEmailAddress": "تغيير البريد الالكتروني",
       "invalid token": "رمز التحقق غير صالح"
-    },
-    "ForgotPassword": {
-      "Title": "نسيت كلمة المرور",
-      "EnterTemporaryPassword": "ادخل كلمة المرور المؤقتة المرسلة على البريد الالكتروني",
-      "Confirm": "تأكيد",
-      "BackToLogin": "الرجوع للدخول"
-    },
-    "ResetPassword": {
-      "Title": "اعادة تعيين كلمة المرور",
-      "NewPassword": "كلمة المرور الجديدة",
-      "ConfirmNewPassword": "تأكيد كلمة المرور الجديدة",
-      "PasswordRequirements": "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل، حرف كبير واحد على الأقل، استخدام رمز خاص واحد على الأقل.",
-      "Confirm": "تأكيد"
-    },
-    "ChangeEmail": {
-      "Title": "تغيير البريد الالكتروني",
-      "NewEmail": "البريد الالكتروني الجديد",
-      "ConfirmNewEmail": "تأكيد البريد الالكتروني الجديد",
-      "NoCopy": "لا يمكن نسخ البريد الالكتروني يجب اعادة كتابتها يدويا",
-      "Confirm": "تأكيد",
-      "BackToLogin": "الرجوع للدخول"
-    },
-    "SecurityQuestions": {
-      "Title": "اسئلة الامان",
-      "PetQuestion": "ما هو اسم حيوانك الأليف المفضل؟",
-      "TeamQuestion": "ما اسم فريقك الرياضي المفضل؟",
-      "Next": "التالي"
     }
+  },
+  "ForgotPassword": {
+    "Title": "نسيت كلمة المرور",
+    "EnterTemporaryPassword": "ادخل كلمة المرور المؤقتة المرسلة على البريد الالكتروني",
+    "Confirm": "تأكيد",
+    "BackToLogin": "الرجوع للدخول"
+  },
+  "ResetPassword": {
+    "Title": "اعادة تعيين كلمة المرور",
+    "NewPassword": "كلمة المرور الجديدة",
+    "ConfirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "PasswordRequirements": "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل، حرف كبير واحد على الأقل، استخدام رمز خاص واحد على الأقل.",
+    "Confirm": "تأكيد"
+  },
+  "ChangeEmail": {
+    "Title": "تغيير البريد الالكتروني",
+    "NewEmail": "البريد الالكتروني الجديد",
+    "ConfirmNewEmail": "تأكيد البريد الالكتروني الجديد",
+    "NoCopy": "لا يمكن نسخ البريد الالكتروني يجب اعادة كتابتها يدويا",
+    "Confirm": "تأكيد",
+    "BackToLogin": "الرجوع للدخول"
+  },
+  "SecurityQuestions": {
+    "Title": "اسئلة الامان",
+    "PetQuestion": "ما هو اسم حيوانك الأليف المفضل؟",
+    "TeamQuestion": "ما اسم فريقك الرياضي المفضل؟",
+    "Next": "التالي"
   },
   "Errors": {
     "Authentication": {
@@ -114,6 +114,7 @@
   "Sidebar": {
     "Companies": "الشركات",
     "Users": "المستخدمين",
-    "Welcome": "مرحبا، محمد سعد!"
+    "Welcome": "مرحبا، محمد سعد!",
+    "CompanyName" : "نيو فيجن"
   }
 }

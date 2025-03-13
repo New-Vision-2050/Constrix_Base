@@ -14,12 +14,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import OtpHub from "../resend-otp/otp-hub";
+import { useTranslations } from "next-intl";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const {
     formState: { errors },
     handleSubmit,
@@ -35,10 +37,10 @@ const ForgetPasswordPhase = ({
 
   return (
     <>
-      <h1 className="text-2xl text-center">نسيت كلمة المرور</h1>
+      <h1 className="text-2xl text-center">{t("ForgotPassword.Title")}</h1>
       <p>
         <span className="opacity-50 block">
-          ادخل كلمة المرور المؤقتة المرسلة على البريد الالكتروني
+          {t("ForgotPassword.EnterTemporaryPassword")}
         </span>
         {identifier}
       </p>
@@ -69,7 +71,7 @@ const ForgetPasswordPhase = ({
         )}
       />
       <Button onClick={handleSubmit(onSubmit)} className="w-full">
-        تأكيد
+        {t("ForgotPassword.Confirm")}
       </Button>{" "}
       <OtpHub
         identifier={identifier}

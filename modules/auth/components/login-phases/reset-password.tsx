@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useResetPassword } from "../../store/mutations";
+import { useTranslations } from "next-intl";
 
 const ResetPasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const { mutate, isPending } = useResetPassword();
   const {
     formState: { errors },
@@ -43,20 +45,19 @@ const ResetPasswordPhase = ({
   return (
     <>
       <div className="space-y-5">
-        <h1 className="text-2xl text-center">اعادة تعيين كلمة المرور</h1>
+        <h1 className="text-2xl text-center">{t("ResetPassword.Title")}</h1>
         <Input
           type="password"
-          label="كلمة المرور الجديدة"
+          label={t("ResetPassword.NewPassword")}
           {...register("newPassword")}
           error={errors?.newPassword?.message}
         />
         <p className="opacity-50">
-          يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل، حرف كبير واحد على
-          الأقل، استخدام رمز خاص واحد على الأقل.
+          {t("ResetPassword.PasswordRequirements")}
         </p>
         <Input
           type="password"
-          label="تأكيد كلمة المرور الجديدة"
+          label={t("ResetPassword.ConfirmNewPassword")}
           {...register("confirmNewPassword")}
           error={errors?.confirmNewPassword?.message}
         />
@@ -66,7 +67,7 @@ const ResetPasswordPhase = ({
         onClick={handleSubmit(onSubmit)}
         className="w-full"
       >
-        تأكيد
+        {t("ResetPassword.Confirm")}
       </Button>
     </>
   );

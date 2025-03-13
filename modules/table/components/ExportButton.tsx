@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/modules/table/components/ui/dropdown-menu";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 interface ExportButtonProps {
   data: any[];
@@ -19,12 +20,13 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   filename = "exported-data",
 }) => {
   const { toast } = useToast();
+  const t = useTranslations();
 
   if (!data || data.length === 0) {
     return (
       <Button variant="outline" size="sm" disabled>
         <Download className="mr-2 h-4 w-4" />
-        تصدير
+        {t("Table.Export")}
       </Button>
     );
   }
@@ -111,15 +113,15 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
           <Download className="mr-2 h-4 w-4" />
-          تصدير
+          {t("Table.Export")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={exportAsCSV} dir="rtl">
-          تصدير كـ CSV
+          {t("Table.ExportAsCSV")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={exportAsJSON} dir="rtl">
-          تصدير كـ JSON
+          {t("Table.ExportAsJSON")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
