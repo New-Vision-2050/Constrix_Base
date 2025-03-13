@@ -10,6 +10,7 @@ import LangIcon from "@/public/icons/lang";
 import { useRouter, usePathname } from 'next/navigation';
 import { SA, US } from 'country-flag-icons/react/3x2'
 import { useLocale } from 'next-intl';
+import {navigate} from "next/dist/client/components/segment-cache/navigation";
 
 const ToggleLang = () => {
   const locale = useLocale();
@@ -18,12 +19,11 @@ const ToggleLang = () => {
 
   const handleLocaleChange = (newLocale: string) => {
     // Get the base path (e.g., /companies)
-    const basePath = pathname.replace(/^\/(en|ar)/, `/${newLocale}`);
-    
+    const basePath = pathname.replace(/^\/(en|ar)/, ``);
+
     // Construct the new path with the new locale
     const newPathname = `/${newLocale}${basePath}`;
-    
-    router.push(newPathname);
+      window.location = newPathname;
   };
 
   return (
