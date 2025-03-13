@@ -8,11 +8,13 @@ import PhoneInput from "../../../../../components/shared/PhoneField";
 import { UserRepository } from "@/modules/users/repositories/UserRepository";
 import { UserService } from "@/modules/users/services/UserService";
 import { AxiosError } from "axios";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSetUserLookupsCxt } from "../context/SetUserLookups";
 import InputField from "@/components/shared/InputField";
 import TimeZoneDialog from "../change-time-zone";
 import { useCreateBuilderCxt } from "@/features/create-builder/context/create-builder-cxt";
+import { EMAIL_EXIST } from "@/modules/users/constants/end-points";
+import RecivedUserDataDialog from "../retrieved-user-data";
 
 type PropsT = {
   companyId?: string;
@@ -36,6 +38,12 @@ export default function UserFormContent({ companyId }: PropsT) {
     formState: { errors },
   } = form;
   const { handleManuelCloseSheet } = useCreateBuilderCxt();
+  const emailError = useMemo(() => {
+    if (errors?.email) {
+      const mailErr = errors?.email?.message?.split("#");
+      return mailErr;
+    }
+  }, [errors?.email]);
 
   // declare and define component methods
   const onSubmit = async (data: UserSchemaT) => {
@@ -127,8 +135,11 @@ export default function UserFormContent({ companyId }: PropsT) {
           fieldName="email"
           label="البريد الالكتروني"
           placeholder="البريد الالكتروني"
-          errMsg={errors?.email?.message ?? ""}
+          errMsg={errors.email ? EMAIL_EXIST : ""}
         />
+        {emailError?.[0] === EMAIL_EXIST && (
+          <RecivedUserDataDialog uId={emailError?.[1]} companyId={companyId} />
+        )}
         {/* phone */}
         <PhoneInput
           name="phone"

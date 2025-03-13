@@ -1,3 +1,5 @@
+export const EMAIL_EXIST = `تم تسجيل البريد الإلكتروني مسبقًا`;
+
 export const usersEndPoints = {
   create: "/company-users",
 };
