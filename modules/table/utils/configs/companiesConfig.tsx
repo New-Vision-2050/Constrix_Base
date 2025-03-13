@@ -20,7 +20,7 @@ interface CompanyData {
 // Create a component that uses the translations
 export const CompaniesConfig = () => {
   const t = useTranslations();
-  
+
   return {
     url: "https://core-be-pr16.constrix-nv.com/api/v1/companies",
     columns: [
@@ -75,7 +75,7 @@ export const CompaniesConfig = () => {
             labelField: "name",
             paginationEnabled: true,
             itemsPerPage: 5,
-            searchParam: "q",
+            searchParam: "name",
             pageParam: "page",
             limitParam: "per_page",
             totalCountHeader: "x-total-count",
@@ -88,12 +88,12 @@ export const CompaniesConfig = () => {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
           dynamicDropdown: {
-            url: "https://core-be-pr16.constrix-nv.com/api/v1/countries",
+            url: "https://core-be-pr16.constrix-nv.com/api/v1/company_types",
             valueField: "id",
             labelField: "name",
             paginationEnabled: true,
             itemsPerPage: 5,
-            searchParam: "q",
+            searchParam: "name",
             pageParam: "page",
             limitParam: "per_page",
             totalCountHeader: "x-total-count",
@@ -106,11 +106,15 @@ export const CompaniesConfig = () => {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
           dynamicDropdown: {
-            url: "https://jsonplaceholder.typicode.com/users",
-            valueField: "address.city",
-            labelField: "address.city",
-            dependsOn: "companyType",
-            filterParam: "companyType",
+              url: "https://core-be-pr16.constrix-nv.com/api/v1/company_fields",
+              valueField: "id",
+              labelField: "name",
+              paginationEnabled: true,
+              itemsPerPage: 5,
+              searchParam: "name",
+              pageParam: "page",
+              limitParam: "per_page",
+              totalCountHeader: "x-total-count",
           },
         },
       },
