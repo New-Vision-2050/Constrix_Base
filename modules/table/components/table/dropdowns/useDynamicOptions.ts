@@ -1,7 +1,8 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DropdownOption } from "@/modules/table/utils/tableTypes";
 import { DynamicDropdownConfig, getFetchUrl, extractDropdownOptions } from './DropdownUtils';
+import { useApiClient } from '@/utils/apiClient';
+import axios, { AxiosError } from 'axios';
 
 interface UseDynamicOptionsProps {
   dynamicConfig?: DynamicDropdownConfig;
@@ -29,6 +30,7 @@ export const useDynamicOptions = ({
   const fetchTimeoutRef = useRef<number | null>(null);
   const urlRef = useRef<string>('');
   const processingFetchRef = useRef(false);
+  const apiClient = useApiClient();
   
   // Function to manually trigger a refresh of options
   const refresh = useCallback(() => {
@@ -49,13 +51,16 @@ export const useDynamicOptions = ({
       const controller = new AbortController();
       fetchControllerRef.current = controller;
       
-      const response = await fetch(url, { signal: controller.signal });
-      if (!response.ok) throw new Error('Failed to fetch dropdown options');
+      const response = await apiClient.get(url, { signal: controller.signal });
+      
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(`Failed to fetch dropdown options: ${response.status} ${response.statusText}`);
+      }
       
       // Check if component is still mounted
       if (!isMountedRef.current) return [];
       
-      const data = await response.json();
+      const data = response.data;
       if (!Array.isArray(data)) throw new Error('Expected array response');
       
       // Update the URL ref
@@ -66,15 +71,15 @@ export const useDynamicOptions = ({
         dynamicConfig?.valueField || 'id',
         dynamicConfig?.labelField || 'name'
       );
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.name === 'AbortError') {
         console.log('Fetch aborted');
         return [];
       }
-      console.error('Error fetching dropdown options:', error);
-      throw error;
+      console.error('Error fetching dropdown options:', err.message);
+      throw new Error('Failed to fetch dropdown options');
     }
-  }, [dynamicConfig]);
+  }, [dynamicConfig, apiClient]);
 
   // Effect to fetch options whenever dependencies or refresh counter changes
   useEffect(() => {
@@ -189,7 +194,7 @@ export const useDynamicOptions = ({
       // Ensure we reset the processing flag on cleanup
       processingFetchRef.current = false;
     };
-  }, [dynamicConfig, dependencies, fetchOptions, refreshCounter]);
+  }, [dynamicConfig, dependencies, fetchOptions, refreshCounter, apiClient]);
 
   return {
     options: Array.isArray(options) ? options : [],
