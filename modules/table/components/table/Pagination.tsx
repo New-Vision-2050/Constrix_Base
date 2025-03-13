@@ -27,8 +27,9 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   onItemsPerPageChange,
 }) => {
+
   const t = useTranslations();
-  
+
   const renderPageButtons = () => {
     const pages = [];
     const MAX_VISIBLE_PAGES = 5;
@@ -53,7 +54,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         className="h-8 w-8"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
       </Button>
     );
 
@@ -89,7 +90,7 @@ const Pagination: React.FC<PaginationProps> = ({
           variant={currentPage === i ? "default" : "outline"}
           size="sm"
           onClick={() => onPageChange(i)}
-          className="h-8 w-8 px-0"
+          className="h-8 w-8 px-0 "
         >
           {i}
         </Button>
@@ -113,7 +114,7 @@ const Pagination: React.FC<PaginationProps> = ({
           variant={currentPage === totalPages ? "default" : "outline"}
           size="sm"
           onClick={() => onPageChange(totalPages)}
-          className="h-8 w-8 px-0"
+          className="h-8 w-8 px-0 "
         >
           {totalPages}
         </Button>
@@ -130,7 +131,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         className="h-8 w-8"
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className="h-4 w-4 rtl:rotate-180" />
       </Button>
     );
 
@@ -138,8 +139,11 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="p-2 md:p-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="flex items-center order-2 sm:order-1 sm:w-auto">
+    <div className="relative p-2 md:p-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="flex items-center grow justify-center space-x-2 rtl:space-x-reverse order-1 sm:order-2">
+        {renderPageButtons()}
+      </div>{" "}
+      <div className=" absolute end-10 top-1/2 -translate-y-1/2 flex items-center order-2 sm:order-1 sm:w-auto">
         <span className="text-sm text-muted-foreground me-2">
           {t("Table.RowsPerPage")}
         </span>
@@ -157,9 +161,6 @@ const Pagination: React.FC<PaginationProps> = ({
             <SelectItem value="50">50</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      <div className="flex items-center grow justify-center space-x-2 rtl:space-x-reverse order-1 sm:order-2">
-        {renderPageButtons()}
       </div>
     </div>
   );
