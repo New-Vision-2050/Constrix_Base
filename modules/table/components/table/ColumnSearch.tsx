@@ -7,6 +7,7 @@ import {
 } from "@/modules/table/utils/tableTypes";
 import DropdownSearch from "./DropdownSearch";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
+import { useTranslations } from "next-intl";
 
 interface ColumnSearchProps {
   columns: ColumnConfig[];
@@ -21,6 +22,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   onColumnSearch,
   allSearchedFields,
 }) => {
+  const t = useTranslations();
   const searchableColumns =
     allSearchedFields ?? columns.filter((col) => col.searchable);
 
@@ -91,7 +93,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
 
   return (
     <div className="space-y-4">
-      <h2 className="px-5 pt-5 font-medium text-xl">فلتر البحث</h2>
+      <h2 className="px-5 pt-5 font-medium text-xl">{t("Table.FilterSearch")}</h2>
       <div className="grid p-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 ">
         {searchableColumns.map((column) => {
           const searchType = column.searchType || { type: "text" };

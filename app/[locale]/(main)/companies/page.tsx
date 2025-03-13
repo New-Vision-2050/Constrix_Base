@@ -1,15 +1,18 @@
 "use client";
 import ExportButton from "@/modules/table/components/ExportButton";
 import TableBuilder from "@/modules/table/components/TableBuilder";
-import { companiesConfig } from "@/modules/table/utils/configs/companiesConfig";
+import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
 
 import React from "react";
 
-const page = () => {
+const CompaniesPage = () => {
+  // Get the translated config using the component
+  const config = CompaniesConfig();
+  
   return (
     <div className="px-8">
       <TableBuilder
-        config={companiesConfig}
+        config={config}
         searchBarActions={
           <div>
             <ExportButton data={["omar"]} />
@@ -20,4 +23,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default CompaniesPage;

@@ -17,59 +17,110 @@ interface CompanyData {
   [key: string]: any; // For any other properties
 }
 
-// Export a default config for static imports
-export const companiesConfig = {
-  url: "https://core-be-pr16.constrix-nv.com/api/v1/companies",
-  columns: [
-    {
-      key: "name",
-      label: "Companies",
-      sortable: true,
-      render: (_: unknown, row: any) => <Company row={row} />,
-    },
-    {
-      key: "email",
-      label: "Email",
-      sortable: true,
-    },
-    {
-      key: "company_type",
-      label: "Company Type",
-      sortable: true,
-      searchable: true,
-    },
-    {
-      key: "general_manager_name",
-      label: "Manager",
-      sortable: true,
-    },
-    {
-      key: "complete_data",
-      label: "Data Status",
-      sortable: true,
-      render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
-    },
-    {
-      key: "is_active",
-      label: "Status",
-      render: (value: "active" | "inActive", row: any) => <TheStatus theStatus={value} id={row.id} />,
-    },
-    {
-      key: "id",
-      label: "Actions",
-      render: (_: unknown, row: any) => <Execution id={row.id} />,
-    },
-  ],
-  allSearchedFields: [],
-  defaultSortColumn: "id",
-  defaultSortDirection: "asc" as const,
-  enableSorting: true,
-  enablePagination: true,
-  defaultItemsPerPage: 5,
-  enableSearch: true,
-  enableColumnSearch: true,
-  searchFields: ["name", "email"],
-  searchParamName: "q",
-  searchFieldParamName: "fields",
-  allowSearchFieldSelection: true,
+// Create a component that uses the translations
+export const CompaniesConfig = () => {
+  const t = useTranslations();
+  
+  return {
+    url: "https://core-be-pr16.constrix-nv.com/api/v1/companies",
+    columns: [
+      {
+        key: "name",
+        label: t("Companies.Companies"),
+        sortable: true,
+        render: (_: unknown, row: CompanyData) => <Company row={row} />,
+      },
+      {
+        key: "email",
+        label: t("Companies.Email"),
+        sortable: true,
+      },
+      {
+        key: "company_type",
+        label: t("Companies.CompanyType"),
+        sortable: true,
+        searchable: true,
+      },
+      {
+        key: "general_manager_name",
+        label: t("Companies.Manager"),
+        sortable: true,
+      },
+      {
+        key: "complete_data",
+        label: t("Companies.DataStatus"),
+        sortable: true,
+        render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
+      },
+      {
+        key: "is_active",
+        label: t("Companies.Status"),
+        render: (value: "active" | "inActive", row: CompanyData) => <TheStatus theStatus={value} id={row.id} />,
+      },
+      {
+        key: "id",
+        label: t("Companies.Actions"),
+        render: (_: unknown, row: CompanyData) => <Execution id={row.id} />,
+      },
+    ],
+    allSearchedFields: [
+      {
+        key: "country",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("Companies.CountryFilter"),
+          dynamicDropdown: {
+            url: "https://jsonplaceholder.typicode.com/users",
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 5,
+            searchParam: "q",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
+      },
+      {
+        key: "companyType",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("Companies.TypeFilter"),
+          dynamicDropdown: {
+            url: "https://jsonplaceholder.typicode.com/users",
+            valueField: "address.city",
+            labelField: "address.city",
+            dependsOn: "country",
+            filterParam: "country",
+          },
+        },
+      },
+      {
+        key: "companyField",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("Companies.TypeFilter"),
+          dynamicDropdown: {
+            url: "https://jsonplaceholder.typicode.com/users",
+            valueField: "address.city",
+            labelField: "address.city",
+            dependsOn: "companyType",
+            filterParam: "companyType",
+          },
+        },
+      },
+    ],
+    defaultSortColumn: "id",
+    defaultSortDirection: "asc" as const,
+    enableSorting: true,
+    enablePagination: true,
+    defaultItemsPerPage: 5,
+    enableSearch: true,
+    enableColumnSearch: true,
+    searchFields: ["name", "email"],
+    searchParamName: "q",
+    searchFieldParamName: "fields",
+    allowSearchFieldSelection: true,
+  };
 };

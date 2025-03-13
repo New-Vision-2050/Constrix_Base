@@ -8,6 +8,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/modules/table/components/ui/select";
+import { useTranslations } from "next-intl";
 
 interface PaginationProps {
   currentPage: number;
@@ -26,6 +27,8 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   onItemsPerPageChange,
 }) => {
+  const t = useTranslations();
+  
   const renderPageButtons = () => {
     const pages = [];
     const MAX_VISIBLE_PAGES = 5;
@@ -138,7 +141,7 @@ const Pagination: React.FC<PaginationProps> = ({
     <div className="p-2 md:p-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="flex items-center order-2 sm:order-1 sm:w-auto">
         <span className="text-sm text-muted-foreground me-2">
-          الصفوف لكل صفحة :
+          {t("Table.RowsPerPage")}
         </span>
         <Select
           value={itemsPerPage.toString()}
