@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/modules/table/components/ui/select';
-import DropdownSearch from '@/modules/table/components/table/DropdownSearch';
-import PaginatedDropdown from '@/modules/table/components/table/dropdowns/PaginatedDropdown';
+import DropdownSearch from '@/components/shared/dropdowns/DropdownSearch';
+import PaginatedDropdown from '@/components/shared/dropdowns/PaginatedDropdown';
 import { FieldProps } from '../field-types';
 import { cn } from '@/lib/utils';
 

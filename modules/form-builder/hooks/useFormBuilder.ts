@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { FormConfig, ValidationRule } from '../types/formTypes';
 import { useFormStore, validateField } from '../store/useFormStore';
 import { useToast } from '@/modules/table/hooks/use-toast';
-import { fetchWithAuth } from '@/utils/fetchUtils';
+import { apiClient } from '@/config/axios-config';
 
 export const useFormBuilder = (config: FormConfig) => {
     // Create a stable reference to the config
@@ -117,32 +117,30 @@ export const useFormBuilder = (config: FormConfig) => {
         }
 
         try {
-            // Use the centralized fetch utility for POST requests
-            const response = await fetchWithAuth(stableConfig.apiUrl, {
-                method: 'POST',
-                headers: stableConfig.apiHeaders,
-                body: JSON.stringify(values)
+            // Use the axios client for POST requests
+            const response = await apiClient.post(stableConfig.apiUrl, values, {
+                headers: stableConfig.apiHeaders
             });
 
-            const data = await response.json();
-
-            // Check for Laravel validation errors
-            if (!response.ok && stableConfig.laravelValidation?.enabled) {
-                const hasLaravelErrors = handleLaravelValidationErrors(data);
-                if (hasLaravelErrors) {
-                    return { success: false, errors: data.errors };
-                }
-            }
+            const data = response.data;
 
             return {
-                success: response.ok,
+                success: true,
                 message: data.message,
                 errors: data.errors
             };
-        } catch (error) {
+        } catch (error: any) {
+            // Handle axios error
+            if (error.response && stableConfig.laravelValidation?.enabled) {
+                const hasLaravelErrors = handleLaravelValidationErrors(error.response.data);
+                if (hasLaravelErrors) {
+                    return { success: false, errors: error.response.data.errors };
+                }
+            }
+            
             toast({
                 title: "Submission Error",
-                description: "Failed to submit the form. Please try again.",
+                description: error.response?.data?.message || "Failed to submit the form. Please try again.",
                 variant: "destructive",
             });
             return { success: false };
@@ -253,7 +251,7 @@ export const useFormBuilder = (config: FormConfig) => {
             } else {
                 toast({
                     title: "Error",
-                    description: error.message || "An error occurred during submission",
+                    description: error.response?.data?.message || error.message || "An error occurred during submission",
                     variant: "destructive",
                 });
             }
