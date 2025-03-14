@@ -14,12 +14,18 @@ import {
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next";
+import { ROUTER } from "@/router";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const router = useRouter();
+
   const { mutate, isPending } = useLoginSteps();
 
   const {
@@ -30,6 +36,9 @@ const ValidatePhonePhase = ({
     setValue,
   } = useFormContext<IdentifierType & ValidatePhoneType>();
   const identifier = getValues("identifier");
+  const by = getValues("by");
+
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const onSubmit = () => {
     const data = getValues();
@@ -43,6 +52,15 @@ const ValidatePhonePhase = ({
       {
         onSuccess: (data, variable) => {
           setValue("token", data.payload.token);
+          if (!data.payload.login_way.step) {
+            useAuthStore.getState().setUser(data.payload.user);
+            setCookie("new-vision-token", data.payload.token, {
+              maxAge: 7 * 24 * 60 * 60,
+              path: "/",
+            });
+            router.push(ROUTER.COMPANIES);
+            return;
+          }
           const nextStep = data.payload.login_way.step?.login_option;
           switch (nextStep) {
             case "password":
@@ -72,7 +90,7 @@ const ValidatePhonePhase = ({
         <h1 className="text-2xl text-start">التحقق من رقم الجوال</h1>
         <p>
           <span className="opacity-50">ادخل رمز التحقق المرسل الى </span>
-          {identifier}
+          <span dir="ltr">{by}</span>
         </p>
       </div>
       <Controller
@@ -119,8 +137,12 @@ const ValidatePhonePhase = ({
         >
           تغيير رقم الجوال{" "}
         </Button>
-
-        <AnotherCheckingWay />
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <AnotherCheckingWay
+            loginOptionAlternatives={loginOptionAlternatives}
+            handleSetStep={handleSetStep}
+          />
+        )}
       </div>
     </>
   );

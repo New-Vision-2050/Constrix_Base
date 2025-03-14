@@ -17,12 +17,18 @@ import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import AnotherCheckingWay from "../another-checking-way";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
+import { setCookie } from "cookies-next";
 
 const ValidateEmailPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const router = useRouter();
+
   const {
     formState: { errors },
     handleSubmit,
@@ -32,7 +38,8 @@ const ValidateEmailPhase = ({
   } = useFormContext<IdentifierType & ValidateEmailType & ChangeEmailType>();
   const { mutate, isPending } = useLoginSteps();
 
-  const identifier = getValues("newEmail") || getValues("identifier");
+  const by = getValues("by");
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const onSubmit = () => {
     const data = getValues();
@@ -47,6 +54,15 @@ const ValidateEmailPhase = ({
         onSuccess: (data, variable) => {
           setValue("token", data.payload.token);
           const nextStep = data.payload.login_way.step?.login_option;
+          if (!data.payload.login_way.step) {
+            useAuthStore.getState().setUser(data.payload.user);
+            setCookie("new-vision-token", data.payload.token, {
+              maxAge: 7 * 24 * 60 * 60,
+              path: "/",
+            });
+            router.push(ROUTER.COMPANIES);
+            return;
+          }
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);
@@ -79,7 +95,7 @@ const ValidateEmailPhase = ({
         <h1 className="text-2xl text-start">التحقق من البريد الالكتروني</h1>
         <p>
           <span className="opacity-50">ادخل رمز التحقق المرسل على </span>
-          {identifier}
+          <span dir="ltr">{by}</span>
         </p>
       </div>
       <Controller
@@ -126,8 +142,12 @@ const ValidateEmailPhase = ({
         >
           تغيير البريد الالكتروني{" "}
         </Button>
-
-        <AnotherCheckingWay />
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <AnotherCheckingWay
+            loginOptionAlternatives={loginOptionAlternatives}
+            handleSetStep={handleSetStep}
+          />
+        )}
       </div>
     </>
   );

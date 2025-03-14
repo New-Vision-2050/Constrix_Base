@@ -28,17 +28,23 @@ const IdentifierPhase = ({
     mutate(
       { identifier: data.identifier },
       {
-        onSuccess(data, variable) {
+        onSuccess(data) {
           setValue("token", data.payload.token);
+          setValue(
+            "login_option_alternatives",
+            data.payload.login_way.step.login_option_alternatives
+          );
+          setValue("by", data.payload.login_way.by);
+          setValue("type", data.payload.login_way.type);
           const nextStep = data.payload.login_way.step?.login_option;
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);
               break;
             case "otp":
-              if (variable.identifier.includes("@")) {
+              if (data.payload.login_way.type === "mail") {
                 handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
-              } else {
+              } else if (data.payload.login_way.type === "sms") {
                 handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
               }
               break;

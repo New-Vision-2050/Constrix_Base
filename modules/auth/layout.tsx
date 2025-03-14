@@ -2,12 +2,15 @@ import ConstrixIcon from "@/public/icons/constrix";
 import NewVision from "@/public/icons/new-vision";
 import NewVisionWhite from "@/public/icons/new-vision-white";
 import { SparklesCore } from "./components/sparkles-core";
+import { useTranslations } from "next-intl";
+import RenderLocaleSwitch from "@/components/ui/RenderLocaleSwitch";
 
 export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const t = useTranslations();
   return (
     <main className="h-screen overflow-hidden relative md:w-full ">
       <div className="w-full bg-[#280B4A] absolute top-0 md:rounded-[100%] md:pt-[550px] pt-[350px]  -translate-y-1/2 -z-10 md:pb-[50px] pb-[40px]">

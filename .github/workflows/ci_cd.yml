@@ -9,41 +9,13 @@ on:
       - stage
       - master
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-
-      - name: Install Dependencies
-        run: yarn install
-
-    # - name: Build Icons
-     #   run: npm run build:icons
-
-      - name: Build Next.js App
-        run: yarn build
-
-      - name: Archive Build Artifact
-        run: tar -czf nextjs-build.tar.gz .next public package.json yarn.lock
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nextjs-build
-          path: nextjs-build.tar.gz
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    steps:
       - name: Set Deployment ID
         id: set_deployment_id
         run: |
@@ -92,12 +64,12 @@ jobs:
                BRANCH_NAME="master"
              fi
 
-             BE_URL="core-be-${BRANCH_NAME}.constrix-nv.com"
+             BE_URL="https://core-be-${BRANCH_NAME}.constrix-nv.com"
            fi
           else
            # For push events, extract the branch name from GITHUB_REF
            BRANCH_NAME="${GITHUB_REF##*/}"
-           BE_URL="core-be-${BRANCH_NAME}.constrix-nv.com"
+           BE_URL="https://core-be-${BRANCH_NAME}.constrix-nv.com"
           fi
           echo "BE_URL=${BE_URL}" >> $GITHUB_ENV
 
@@ -105,22 +77,7 @@ jobs:
         run: |
           echo "BE URL: $BE_URL"
 
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-
-      - name: Copy Artifact via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          port: ${{ secrets.DEPLOY_PORT }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: 'nextjs-build.tar.gz'
-          target: '/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}/'
-
-      - name: Deploy to Server via SSH
+      - name: Clean Old Data
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -128,43 +85,64 @@ jobs:
           port: ${{ secrets.DEPLOY_PORT }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            DEPLOYMENT_ID=${{ env.DEPLOYMENT_ID }}
-            BE_URL=${{ env.BE_URL }}
+            DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
+            rm -rf $DEPLOY_DIR
 
-            echo "Deployment ID inside SSH: $DEPLOYMENT_ID"
-            echo "BE URL inside SSH: $BE_URL"
+      - name: Transfer Repo Files to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "."
+          target: "/home/deployer/nextjs/deployments/${{ env.DEPLOYMENT_ID }}/"
 
-            # Create deployment directory
-            mkdir -p /home/deployer/nextjs/deployments/${DEPLOYMENT_ID}
+      - name: Set Environment Variables Based on Branch
+        id: set_env
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" || "${GITHUB_REF}" == "refs/heads/master" ]]; then
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
+            echo "NODE_ENV=development" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+            echo "NODE_ENV=staging" >> $GITHUB_ENV
+          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            echo "NODE_ENV=pr" >> $GITHUB_ENV
+          else
+            echo "NODE_ENV=development" >> $GITHUB_ENV
+          fi
 
-            cd /home/deployer/nextjs/deployments/${DEPLOYMENT_ID}
+      - name: Echo Environment Variables
+        run: |
+          echo "BE_URL: $BE_URL"
+          echo "NODE_ENV: $NODE_ENV"
 
-            # Transfer the build artifact
-            tar -xzvf nextjs-build.tar.gz -C /home/deployer/nextjs/deployments/${DEPLOYMENT_ID}
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        env:
+          BE_URL: ${{ env.BE_URL }}
+          NODE_ENV: ${{ env.NODE_ENV }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+              #!/bin/bash
+              set -e
+              set -x
+              export BE_URL=${{env.BE_URL}}
+              export DEPLOYMENT_ID=${{env.DEPLOYMENT_ID}}
+              DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
+              mkdir -p $DEPLOY_DIR
+              cd $DEPLOY_DIR
+              echo $DEPLOY_DIR
+              chmod +x ./devops/deploy.sh
+              ./devops/deploy.sh
+              rm -rf $DEPLOY_DIR
+              echo "Deployment of $CONTAINER_NAME completed successfully."
 
-            # Navigate to Next.js directory
-            cd /home/deployer/nextjs
-
-            export DEPLOYMENT_ID=${DEPLOYMENT_ID}
-            export BE_URL=${BE_URL}
-
-             # Set Docker Compose project name
-            export COMPOSE_PROJECT_NAME=nextjs-${DEPLOYMENT_ID}
-
-            PROJECT_NAME=nextjs-$DEPLOYMENT_ID
-            echo "Starting remove old ID: $PROJECT_NAME"
-            # Check if the project is already running
-            if docker ps -a --filter "name=$PROJECT_NAME" | grep -w "$PROJECT_NAME"; then
-            echo "Existing deployment found for $PROJECT_NAME. Removing..."
-            docker rm -f $PROJECT_NAME
-            yes|docker image prune
-            echo "Existing deployment removed."
-            else
-            echo "No existing deployment found for $PROJECT_NAME."
-            fi
-
-            # Deploy using Docker Compose
-            docker-compose -p nextjs-${DEPLOYMENT_ID} up -d --build
       - name: Post Deployment Comment
         if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v3

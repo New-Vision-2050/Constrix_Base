@@ -1,10 +1,12 @@
 import {
   forgetPassword,
+  loginAlternative,
   loginSteps,
   loginWays,
   resendOtp,
   resetPassword,
 } from "../service/login-services";
+import { LoginOption } from "../types/login-responses";
 
 export const loginRepository = {
   loginWays: async (identifier: string) => {
@@ -35,6 +37,14 @@ export const loginRepository = {
   },
   resendOtp: async (identifier: string) => {
     const response = await resendOtp(identifier);
+    return response.data;
+  },
+  loginAlternative: async (
+    identifier: string,
+    login_option: LoginOption,
+    token: string
+  ) => {
+    const response = await loginAlternative(identifier, login_option, token);
     return response.data;
   },
 };
