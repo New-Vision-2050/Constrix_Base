@@ -23,7 +23,7 @@ const ToggleLang = () => {
 
     // Construct the new path with the new locale
     const newPathname = `/${newLocale}${basePath}`;
-      window.location = newPathname;
+      window.location.href = newPathname;
   };
 
   return (

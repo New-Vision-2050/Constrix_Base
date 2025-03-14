@@ -152,7 +152,7 @@ export const sheetFormConfig: FormConfig = {
             placeholder: 'Select a city',
             required: true,
             dynamicOptions: {
-              url: '/api/cities',
+              url: 'https://core-be-pr16.constrix-nv.com/api/v1/countries',
               valueField: 'id',
               labelField: 'name',
               dependsOn: 'country',
