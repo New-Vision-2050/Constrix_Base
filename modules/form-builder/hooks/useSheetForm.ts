@@ -181,6 +181,7 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
   // Handle form submission
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Stop event propagation to prevent rerendering
     
     // Reset submission state
     setIsSubmitting(true);

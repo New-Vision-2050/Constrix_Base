@@ -47,6 +47,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     setTouched,
     handleSubmit,
     handleCancel,
+    resetForm,
   } = useSheetForm({
     config,
     onSuccess,
@@ -78,7 +79,11 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           {config.description && <SheetDescription>{config.description}</SheetDescription>}
         </SheetHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6 py-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6 py-6"
+          onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling up
+        >
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
             {/* Render form sections */}
             {config.sections.map((section, index) => (
@@ -113,7 +118,10 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             {config.cancelButtonText && (
               <Button
                 type="button"
-                onClick={handleCancel}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent click events from bubbling up
+                  handleCancel();
+                }}
                 variant="ghost"
                 disabled={isSubmitting}
               >
@@ -126,6 +134,11 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 type="reset"
                 variant="outline"
                 disabled={isSubmitting}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent click events from bubbling up
+                  // Manually reset the form
+                  resetForm();
+                }}
               >
                 {config.resetButtonText || 'Reset'}
               </Button>
@@ -135,6 +148,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
               type="submit"
               disabled={isSubmitting}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling up
             >
               {isSubmitting && config.showSubmitLoader ? (
                 <span className="flex items-center">
