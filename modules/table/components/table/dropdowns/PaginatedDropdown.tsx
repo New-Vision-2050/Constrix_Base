@@ -152,7 +152,11 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 className="flex-1 py-3 outline-none"
               />
             </div>
-            <CommandList ref={listRef} className="max-h-[200px] overflow-auto">
+            <CommandList
+              onWheel={(e) => e.stopPropagation()}
+              ref={listRef}
+              className="max-h-[200px] overflow-auto"
+            >
               <CommandEmpty>
                 {loading ? (
                   <div className="py-6 text-center text-sm">
