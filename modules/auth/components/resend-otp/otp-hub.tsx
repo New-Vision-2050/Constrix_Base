@@ -8,9 +8,11 @@ import ResendOtp from "./resend-otp";
 const OtpHub = ({
   identifier,
   resendFor,
+  token,
 }: {
   identifier: string;
   resendFor: "resend-otp" | "forget-password";
+  token: string;
 }) => {
   const {
     counter: time,
@@ -32,6 +34,7 @@ const OtpHub = ({
           timerReset={timerReset}
           identifier={identifier}
           resendFor={resendFor}
+          token={token}
         />
       </AutoHeight>
     </div>

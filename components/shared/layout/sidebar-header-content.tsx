@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils";
 import NewVision from "@/public/icons/new-vision";
 import React from "react";
 import { AvatarGroup } from "../avatar-group";
+import { useTranslations } from "next-intl";
 
 const SidebarHeaderContent = () => {
   const { open } = useSidebar();
+  const t = useTranslations();
 
   return (
     <>
@@ -21,7 +23,7 @@ const SidebarHeaderContent = () => {
             open ? "opacity-100" : "opacity-0"
           )}
         >
-          نيو فيجن
+            {t("Sidebar.CompanyName")}
         </p>
       </div>
       <div
@@ -41,7 +43,7 @@ const SidebarHeaderContent = () => {
             open ? "opacity-100" : "opacity-0"
           )}
         >
-          مرحبا، محمد سعد!
+          {t("Sidebar.Welcome")}
         </p>
       </div>
     </>

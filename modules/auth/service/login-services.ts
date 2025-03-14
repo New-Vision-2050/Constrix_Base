@@ -1,6 +1,9 @@
 import { apiClient } from "@/config/axios-config";
 import { endPoints } from "../constant/end-points";
-import { LoginOption, LoginWaysSuccessResponse } from "../types/login-responses";
+import {
+  LoginOption,
+  LoginWaysSuccessResponse,
+} from "../types/login-responses";
 
 export const loginWays = async (identifier: string) =>
   await apiClient.post<LoginWaysSuccessResponse>(endPoints.loginWays, {
@@ -14,8 +17,8 @@ export const loginSteps = async (
 ) =>
   await apiClient.post(endPoints.loginSteps, { identifier, password, token });
 
-export const forgetPassword = async (identifier: string) =>
-  await apiClient.post(endPoints.forgetPassword, { identifier });
+export const forgetPassword = async (identifier: string, token: string) =>
+  await apiClient.post(endPoints.forgetPassword, { identifier, token });
 
 export const resetPassword = async (
   identifier: string,
@@ -30,8 +33,8 @@ export const resetPassword = async (
     otp,
   });
 
-export const resendOtp = async (identifier: string) =>
-  await apiClient.post(endPoints.resendOtp, { identifier });
+export const resendOtp = async (identifier: string, token: string) =>
+  await apiClient.post(endPoints.resendOtp, { identifier, token });
 
 export const loginAlternative = async (
   identifier: string,

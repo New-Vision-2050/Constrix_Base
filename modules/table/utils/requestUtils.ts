@@ -1,5 +1,7 @@
 import { getCookie } from "cookies-next";
 import { SortDirection, SearchConfig, ColumnSearchState } from "./tableTypes";
+import { createApiRequestOptions } from "@/utils/apiClient";
+import { useLocale } from "next-intl";
 
 /**
  * Constructs a URL with query parameters for table data fetching
@@ -84,7 +86,19 @@ export const buildRequestUrl = (
 };
 
 /**
+ * Hook to create fetch options for the API request with proper locale
+ */
+export const useCreateFetchOptions = () => {
+  const locale = useLocale();
+  
+  return (controller: AbortController): RequestInit => {
+    return createApiRequestOptions(locale, controller);
+  };
+};
+
+/**
  * Creates fetch options for the API request
+ * @deprecated Use useCreateFetchOptions hook instead for proper locale support
  */
 export const createFetchOptions = (
   controller: AbortController

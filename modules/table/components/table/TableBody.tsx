@@ -37,12 +37,16 @@ const TableBody: React.FC<TableBodyProps> = ({ data, columns, searchQuery }) => 
           {columns.map((column, colIndex) => {
             const value = getNestedValue(row, column.key);
             const isMobileHidden = column.hideOnMobile ? 'hidden sm:table-cell' : '';
-            const alignment = column.align ? `text-${column.align}` : 'text-start';
-
+            
+            // Use logical properties for RTL/LTR support
+            const alignment = column.align
+              ? `text-${column.align}`
+              : 'text-start'; // text-start respects RTL/LTR
+            
             return (
               <td
                 key={`${rowIndex}-${column.key}`}
-                className={`p-3 text-sm table-cell-fade-in ${alignment} ${isMobileHidden}`}
+                className={`p-2 md:p-3 text-sm table-cell-fade-in ${alignment} ${isMobileHidden}`}
                 style={{ '--index': colIndex } as React.CSSProperties}
               >
                 {formatValue(value, column, row)}

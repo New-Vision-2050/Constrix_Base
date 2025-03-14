@@ -2,15 +2,16 @@
 import { useCallback } from 'react';
 import { SearchConfig, ColumnSearchState } from '@/modules/table/utils/tableTypes';
 import { ColumnConfig } from '@/modules/table/utils/tableConfig';
-import { 
+import {
   processApiResponse,
-  extractColumnsFromData 
+  extractColumnsFromData
 } from '@/modules/table/utils/dataUtils';
 import {
   buildRequestUrl,
-  createFetchOptions,
-  setupRequestTimeout
+  setupRequestTimeout,
+  useCreateFetchOptions
 } from '@/modules/table/utils/requestUtils';
+import { useLocale } from "next-intl";
 
 type FetchDataBaseProps = {
   url: string;
@@ -41,6 +42,8 @@ type FetchDataProps = FetchDataBaseProps & FetchDataAdditionalProps;
 
 export const createTableFetcher = () => {
   let requestCounter = 0;
+  const useApiRequestOptions = useCreateFetchOptions();
+  const locale = useLocale();
   
   const fetchData = useCallback(async (props: FetchDataProps) => {
     const {
@@ -97,9 +100,10 @@ export const createTableFetcher = () => {
         }
       });
       
+      const requestOptions = useApiRequestOptions(controller);
       const response = await fetch(
-        apiUrl.toString(), 
-        createFetchOptions(controller)
+        apiUrl.toString(),
+        requestOptions
       );
       
       clearTimeout(timeoutId);

@@ -1,34 +1,12 @@
 import { z } from "zod";
 import { LOGIN_PHASES } from "../constant/login-phase";
+import { createPasswordValidation, createIdentifierValidation, getMessage } from "@/utils/zodTranslations";
 
-const passwordValidation = z
-  .string()
-  .min(8, "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل")
-  .regex(/[A-Z]/, "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل")
-  .regex(/[^A-Za-z0-9]/, "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل");
+// Create schemas with translated messages
+const passwordValidation = createPasswordValidation();
 
 const identifierSchema = z.object({
-  identifier: z
-    .string()
-    .min(5, "هذا الحقل مطلوب")
-    .refine(
-      (value) => {
-        if (value.includes("@")) {
-          return z.string().email().safeParse(value).success;
-        }
-        return true;
-      },
-      { message: "البريد الإلكتروني غير صالح" }
-    )
-    .refine(
-      (value) => {
-        if (value.startsWith("0")) {
-          return /^0(5[0-9]{8})$/.test(value);
-        }
-        return true;
-      },
-      { message: "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx" }
-    ),
+  identifier: createIdentifierValidation(),
   token: z.string().optional(),
   type: z.string().optional(),
   by: z.string().optional(),
@@ -36,11 +14,11 @@ const identifierSchema = z.object({
 });
 
 const passwordSchema = z.object({
-  password: z.string().min(1, "يجب إدخال كلمة المرور"),
+  password: z.string().min(1, getMessage("passwordRequired") as string),
 });
 
 const forgetPasswordSchema = z.object({
-  forgetPasswordOtp: z.string().min(5, "يجب إدخال كلمة المرور المؤقتة"),
+  forgetPasswordOtp: z.string().min(5, getMessage("otpRequired") as string),
 });
 
 const resetPasswordSchema = z
@@ -48,36 +26,43 @@ const resetPasswordSchema = z
     newPassword: passwordValidation,
     confirmNewPassword: z.string(),
   })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "يجب أن تتطابق كلمة المرور الجديدة مع تأكيد كلمة المرور",
-    path: ["confirmNewPassword"],
-  });
+  .refine(
+    (data): data is { newPassword: string; confirmNewPassword: string } =>
+      data.newPassword === data.confirmNewPassword,
+    {
+      message: getMessage("passwordMatch") as string,
+      path: ["confirmNewPassword"],
+    }
+  );
 
 const validateEmailSchema = z.object({
-  validateEmailOtp: z.string().min(5, "يجب إدخال كلمة المرور المؤقتة"),
+  validateEmailOtp: z.string().min(5, getMessage("otpRequired") as string),
 });
 
 const securityQuestionsSchema = z.object({
-  animal: z.string().min(1, "هذا الحقل مطلوب"),
-  team: z.string().min(1, "هذا الحقل مطلوب"),
+  animal: z.string().min(1, getMessage("required") as string),
+  team: z.string().min(1, getMessage("required") as string),
 });
 
 const changeEmailSchema = z
   .object({
     newEmail: z
       .string()
-      .min(1, "يجب إدخال البريد الاليكتروني")
-      .email("بريد اليكتروني غير صالح"),
+      .min(1, getMessage("required") as string)
+      .email(getMessage("invalidEmail") as string),
     confirmNewEmail: z.string(),
   })
-  .refine((data) => data.newEmail === data.confirmNewEmail, {
-    message:
-      "يجب أن تتطابق البريد الاليكتروني الجديد مع تأكيد البريد الاليكتروني",
-    path: ["confirmNewEmail"],
-  });
+  .refine(
+    (data): data is { newEmail: string; confirmNewEmail: string } =>
+      data.newEmail === data.confirmNewEmail,
+    {
+      message: getMessage("emailMatch") as string,
+      path: ["confirmNewEmail"],
+    }
+  );
 
 const validatePhoneSchema = z.object({
-  validatePhoneOtp: z.string().min(5, "يجب إدخال كلمة المرور المؤقتة"),
+  validatePhoneOtp: z.string().min(5, getMessage("otpRequired") as string),
 });
 
 export type IdentifierType = z.infer<typeof identifierSchema>;

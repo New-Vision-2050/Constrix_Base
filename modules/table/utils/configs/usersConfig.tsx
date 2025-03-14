@@ -1,126 +1,125 @@
-
-import { TableConfig } from './tableConfig';
+import { TableConfig } from "./tableConfig";
 
 export const usersConfig: TableConfig = {
-  url: 'https://jsonplaceholder.typicode.com/users',
+  url: "https://jsonplaceholder.typicode.com/users",
   columns: [
-    { key: 'id', label: 'ID', sortable: true, searchable: false },
+    { key: "id", label: "ID", sortable: true, searchable: false },
     {
-      key: 'name',
-      label: 'Name',
+      key: "name",
+      label: "Name",
       sortable: true,
-      searchable: true
+      searchable: true,
     },
     {
-      key: 'username',
-      label: 'Username',
+      key: "username",
+      label: "Username",
       sortable: true,
-      searchable: true
+      searchable: true,
     },
     {
-      key: 'email',
-      label: 'Email',
+      key: "email",
+      label: "Email",
       sortable: true,
-      searchable: true
+      searchable: true,
     },
     {
-      key: 'phone',
-      label: 'Phone',
+      key: "phone",
+      label: "Phone",
       sortable: true,
-      searchable: true
+      searchable: true,
     },
     {
-      key: 'website',
-      label: 'Website',
+      key: "website",
+      label: "Website",
       sortable: true,
-      searchable: true
+      searchable: true,
     },
     {
-      key: 'status',
-      label: 'Status',
+      key: "status",
+      label: "Status",
       sortable: true,
       searchable: true,
       searchType: {
-        type: 'dropdown',
-        placeholder: 'Select status',
+        type: "dropdown",
+        placeholder: "Select status",
         dropdownOptions: [
-          { value: 'active', label: 'Active' },
-          { value: 'inactive', label: 'Inactive' },
-          { value: 'pending', label: 'Pending' }
-        ]
-      }
+          { value: "active", label: "Active" },
+          { value: "inactive", label: "Inactive" },
+          { value: "pending", label: "Pending" },
+        ],
+      },
     },
     {
-      key: 'country',
-      label: 'Country',
-      sortable: true,
-      searchable: true,
-        searchType: {
-            type: 'dropdown',
-            placeholder: 'Select Country',
-            dynamicDropdown: {
-                url: 'https://jsonplaceholder.typicode.com/users',
-                valueField: 'id',
-                labelField: 'name',
-                paginationEnabled: true,
-                itemsPerPage: 5,
-                searchParam: 'q',
-                pageParam: 'page',
-                limitParam: 'per_page',
-                totalCountHeader: 'x-total-count'
-            }
-        }
-    },
-    {
-      key: 'city',
-      label: 'City',
+      key: "country",
+      label: "Country",
       sortable: true,
       searchable: true,
       searchType: {
-        type: 'dropdown',
-        placeholder: 'Select city',
+        type: "dropdown",
+        placeholder: "Select Country",
         dynamicDropdown: {
-          url: 'https://jsonplaceholder.typicode.com/users',
-          valueField: 'address.city',
-          labelField: 'address.city',
-          dependsOn: 'country',
-          filterParam: 'country'
-        }
-      }
-    },
-      {
-          key: 'city2',
-          label: 'City2',
-          sortable: true,
-          searchable: true,
-          searchType: {
-              type: 'dropdown',
-              placeholder: 'Select Country',
-              dynamicDropdown: {
-                  url: 'https://jsonplaceholder.typicode.com/users',
-                  valueField: 'id',
-                  labelField: 'name',
-                  paginationEnabled: true,
-                  itemsPerPage: 10,
-                  searchParam: 'q',
-                  pageParam: 'page',
-                  limitParam: 'per_page',
-                  totalCountHeader: 'x-total-count',
-                  dependsOn: 'city',
-                  filterParam: 'city2'
-              }
-          }
+          url: "https://jsonplaceholder.typicode.com/users",
+          valueField: "id",
+          labelField: "name",
+          paginationEnabled: true,
+          itemsPerPage: 5,
+          searchParam: "q",
+          pageParam: "page",
+          limitParam: "per_page",
+          totalCountHeader: "x-total-count",
+        },
       },
+    },
+    {
+      key: "city",
+      label: "City",
+      sortable: true,
+      searchable: true,
+      searchType: {
+        type: "dropdown",
+        placeholder: "Select city",
+        dynamicDropdown: {
+          url: "https://jsonplaceholder.typicode.com/users",
+          valueField: "address.city",
+          labelField: "address.city",
+          dependsOn: "country",
+          filterParam: "country",
+        },
+      },
+    },
+    {
+      key: "city2",
+      label: "City2",
+      sortable: true,
+      searchable: true,
+      searchType: {
+        type: "dropdown",
+        placeholder: "Select Country",
+        dynamicDropdown: {
+          url: "https://jsonplaceholder.typicode.com/users",
+          valueField: "id",
+          labelField: "name",
+          paginationEnabled: true,
+          itemsPerPage: 10,
+          searchParam: "q",
+          pageParam: "page",
+          limitParam: "per_page",
+          totalCountHeader: "x-total-count",
+          dependsOn: "city",
+          filterParam: "city2",
+        },
+      },
+    },
   ],
-  defaultSortColumn: 'id',
-  defaultSortDirection: 'asc',
+  defaultSortColumn: "id",
+  defaultSortDirection: "asc",
   enableSorting: true,
   enablePagination: true,
   defaultItemsPerPage: 5,
   enableSearch: true,
   enableColumnSearch: true,
-  searchFields: ['name', 'email'],
-  searchParamName: 'q',
-  searchFieldParamName: 'fields',
-  allowSearchFieldSelection: true
+  searchFields: ["name", "email"],
+  searchParamName: "q",
+  searchFieldParamName: "fields",
+  allowSearchFieldSelection: true,
 };

@@ -8,6 +8,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/modules/table/components/ui/select";
+import { useTranslations } from "next-intl";
 
 interface PaginationProps {
   currentPage: number;
@@ -26,6 +27,9 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
   onItemsPerPageChange,
 }) => {
+
+  const t = useTranslations();
+
   const renderPageButtons = () => {
     const pages = [];
     const MAX_VISIBLE_PAGES = 5;
@@ -86,7 +90,7 @@ const Pagination: React.FC<PaginationProps> = ({
           variant={currentPage === i ? "default" : "outline"}
           size="sm"
           onClick={() => onPageChange(i)}
-          className="h-8 w-8 px-0"
+          className="h-8 w-8 px-0 "
         >
           {i}
         </Button>
@@ -110,7 +114,7 @@ const Pagination: React.FC<PaginationProps> = ({
           variant={currentPage === totalPages ? "default" : "outline"}
           size="sm"
           onClick={() => onPageChange(totalPages)}
-          className="h-8 w-8 px-0"
+          className="h-8 w-8 px-0 "
         >
           {totalPages}
         </Button>
@@ -135,13 +139,13 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="p-4 relative border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div className="flex items-center grow justify-center space-x-2 ">
+    <div className="relative p-2 md:p-4 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="flex items-center grow justify-center space-x-2 rtl:space-x-reverse order-1 sm:order-2">
         {renderPageButtons()}
-      </div>
-      <div className="flex items-center absolute left-10 top-1/2 -translate-y-1/2">
-        <span className="text-sm text-muted-foreground mr-2">
-          الصفوف لكل صفحة :
+      </div>{" "}
+      <div className=" absolute end-10 top-1/2 -translate-y-1/2 flex items-center order-2 sm:order-1 sm:w-auto">
+        <span className="text-sm text-muted-foreground me-2">
+          {t("Table.RowsPerPage")}
         </span>
         <Select
           value={itemsPerPage.toString()}

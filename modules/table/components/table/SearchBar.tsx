@@ -11,6 +11,7 @@ import { Checkbox } from "@/modules/table/components/ui/checkbox";
 import { Label } from "@/modules/table/components/ui/label";
 import { SearchConfig } from "@/modules/table/utils/tableTypes";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
+import { useTranslations } from "next-intl";
 
 interface SearchBarProps {
   searchQuery: string;
@@ -27,6 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searchableColumns,
   actions,
 }) => {
+  const t = useTranslations();
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const [selectedSearchColumns, setSelectedSearchColumns] = useState<string[]>(
     searchConfig.defaultFields || []
@@ -97,10 +99,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <div className="flex p-5 flex-wrap items-center gap-3 mb-4 ">
       <div className="flex grow items-center space-x-2">
         <div className="relative w-full">
-          <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute  start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="بحث"
+            placeholder={t("Table.Search")}
             value={localSearchQuery}
             onChange={handleInputChange}
             className="w-full pl-8 pr-10"
@@ -122,7 +124,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 type="button"
                 variant="outline"
                 size="icon"
-                className="flex-shrink-0"
+                className="flex-shrink-0 bg-sidebar"
               >
                 <Filter className="h-4 w-4" />
               </Button>
@@ -130,7 +132,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <PopoverContent className="w-56">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">Filter Columns</h4>
+                  <h4 className="font-medium text-sm">
+                    {t("Table.FilterSearch")}
+                  </h4>
                   <div className="flex gap-2">
                     <Button
                       type="button"
