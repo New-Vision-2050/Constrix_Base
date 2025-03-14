@@ -143,7 +143,6 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             shouldFilter={false} // Disable client-side filtering
           >
             <div className="flex items-center border-b px-3">
-              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <CommandInput
                 ref={inputRef}
                 placeholder="Search..."
