@@ -6,7 +6,7 @@ import { LOGIN_PHASES, LoginPhase } from "../constant/login-phase";
 import { formDefaultValues } from "../constant/default-values";
 
 const useLogin = () => {
-  const [step, setStep] = useState<LoginPhase>(LOGIN_PHASES.IDENTIFIER);
+  const [step, setStep] = useState<LoginPhase>(LOGIN_PHASES.SECURITY_QUESTIONS);
   const form = useForm<LoginType>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(loginSchema[step] as any),

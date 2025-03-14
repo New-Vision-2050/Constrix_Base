@@ -96,6 +96,7 @@ const ValidateEmailPhase = ({
                 <InputOTPGroup>
                   {Array.from({ length: 5 }).map((_, index) => (
                     <InputOTPSlot
+                      style={{ marginLeft: "5px" }}
                       key={index}
                       index={index}
                       isError={!!errors?.validateEmailOtp?.message}
@@ -116,7 +117,7 @@ const ValidateEmailPhase = ({
         التالي
       </Button>
       <OtpHub identifier={getValues("identifier")} resendFor="resend-otp" />
-      <div className="flex items-center gap-2">
+      <div className="flex md:flex-row flex-col md:items-center items-start gap-2">
         <Button
           onClick={handleSecurityQuestionsPhase}
           type="button"

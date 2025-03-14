@@ -55,6 +55,7 @@ const ForgetPasswordPhase = ({
                 <InputOTPGroup>
                   {Array.from({ length: 5 }).map((_, index) => (
                     <InputOTPSlot
+                      style={{ marginLeft: "5px" }}
                       key={index}
                       index={index}
                       isError={!!errors?.forgetPasswordOtp?.message}

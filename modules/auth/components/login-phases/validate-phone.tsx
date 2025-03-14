@@ -66,7 +66,6 @@ const ValidatePhonePhase = ({
     );
   };
 
-
   return (
     <>
       <div className="space-y-4">
@@ -90,6 +89,7 @@ const ValidatePhonePhase = ({
                 <InputOTPGroup>
                   {Array.from({ length: 5 }).map((_, index) => (
                     <InputOTPSlot
+                      style={{ marginLeft: "5px" }}
                       key={index}
                       index={index}
                       isError={!!errors?.validatePhoneOtp?.message}
@@ -111,7 +111,7 @@ const ValidatePhonePhase = ({
       </Button>
       <OtpHub resendFor="resend-otp" identifier={identifier} />
 
-      <div className="flex items-center gap-2">
+      <div className="flex md:flex-row flex-col md:items-center items-start gap-2">
         <Button
           type="button"
           variant={"link"}
@@ -125,6 +125,5 @@ const ValidatePhonePhase = ({
     </>
   );
 };
-
 
 export default ValidatePhonePhase;
