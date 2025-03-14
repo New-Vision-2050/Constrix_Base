@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DropdownOption, DynamicDropdownConfig } from '@/modules/table/utils/tableTypes';
 import { useDebounce } from './useDebounce';
@@ -9,6 +8,7 @@ interface UseDropdownSearchProps {
   searchTerm: string;
   dynamicConfig?: DynamicDropdownConfig;
   dependencies?: Record<string, string>;
+  selectedValue?: string;
 }
 
 interface UseDropdownSearchResult {
@@ -20,9 +20,11 @@ interface UseDropdownSearchResult {
 export const useDropdownSearch = ({
   searchTerm,
   dynamicConfig,
-  dependencies
+  dependencies,
+  selectedValue
 }: UseDropdownSearchProps): UseDropdownSearchResult => {
   const [options, setOptions] = useState<DropdownOption[]>([]);
+  const [backupOption, setBackupOption] = useState<DropdownOption | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -30,6 +32,18 @@ export const useDropdownSearch = ({
 
   // Create a debounced search term
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+
+  // Store the selected option as a backup when it changes
+  useEffect(() => {
+    if (selectedValue) {
+      const selectedOption = options.find(option => option.value === selectedValue);
+      if (selectedOption) {
+        setBackupOption(selectedOption);
+      } else if (selectedValue) {
+        setBackupOption({ value: selectedValue, label: selectedValue });
+      }
+    }
+  }, [selectedValue]);
 
   // Build the URL for the request
   const buildSearchUrl = useCallback(() => {
@@ -107,7 +121,6 @@ export const useDropdownSearch = ({
     try {
       console.log(`Fetching dropdown options for search: ${debouncedSearchTerm}`, url);
       const response = await apiClient.get(url, { signal: controller.signal });
-response.data
       if (!isMountedRef.current) return;
 
       if (response.status !== 200) {
@@ -142,7 +155,13 @@ response.data
           return acc;
         }, []);
 
-      setOptions(validOptions);
+      // Merge the backup option with the new options if it exists and there is a selected value
+      let mergedOptions = validOptions;
+      if (selectedValue && backupOption && !mergedOptions.find(option => option.value === backupOption.value)) {
+        mergedOptions = [backupOption, ...mergedOptions];
+      }
+
+      setOptions(mergedOptions);
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         console.log('Request aborted');

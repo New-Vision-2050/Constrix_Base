@@ -48,6 +48,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
+    selectedValue: value,
   });
 
   // Find the label for the current value
@@ -123,7 +124,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 e.preventDefault();
                 e.stopPropagation();
                 onChange("");
-                setSearchValue("")
+                setSearchValue("");
               }}
             >
               <X className="h-4 w-4 opacity-50 hover:opacity-80" />
