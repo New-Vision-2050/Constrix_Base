@@ -157,7 +157,7 @@ export const sheetFormConfig: FormConfig = {
               labelField: 'name',
               dependsOn: 'country',
               filterParam: 'country_id',
-              searchParam: 'query',
+              searchParam: 'name',
               paginationEnabled: true,
               pageParam: 'page',
               limitParam: 'limit',
