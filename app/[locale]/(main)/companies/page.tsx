@@ -5,6 +5,8 @@ import TableBuilder from "@/modules/table/components/TableBuilder";
 import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
 
 import React from "react";
+import {contactFormConfig} from "@/modules/form-builder/configs/contactFormConfig";
+import FormBuilderForm from "@/modules/form-builder/FormBuilderForm";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -17,7 +19,9 @@ const CompaniesPage = () => {
         config={config}
         searchBarActions={
           <div>
-            <ExportButton data={["omar"]} />
+              <FormBuilderForm config={contactFormConfig} onFormSubmit={() => {}} />
+
+              <ExportButton data={["omar"]} />
           </div>
         }
       />
