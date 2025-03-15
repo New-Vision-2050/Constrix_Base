@@ -18,35 +18,6 @@ const countrySearchConfig: SearchTypeConfig = {
   }
 };
 
-const citySearchConfig: SearchTypeConfig = {
-  type: 'dropdown',
-  placeholder: 'Select a city',
-  dropdownOptions: [
-    { value: 'new_york', label: 'New York' },
-    { value: 'london', label: 'London' },
-    { value: 'paris', label: 'Paris' },
-    { value: 'tokyo', label: 'Tokyo' },
-    { value: 'sydney', label: 'Sydney' },
-    { value: 'berlin', label: 'Berlin' },
-    { value: 'madrid', label: 'Madrid' },
-    { value: 'rome', label: 'Rome' },
-    { value: 'toronto', label: 'Toronto' },
-    { value: 'dubai', label: 'Dubai' }
-  ]
-};
-
-const subjectSearchConfig: SearchTypeConfig = {
-  type: 'dropdown',
-  placeholder: 'Select a subject',
-  dropdownOptions: [
-    { value: 'general', label: 'General Inquiry' },
-    { value: 'support', label: 'Technical Support' },
-    { value: 'billing', label: 'Billing Question' },
-    { value: 'feedback', label: 'Product Feedback' },
-    { value: 'other', label: 'Other' }
-  ]
-};
-
 // Define the form configuration
 export const sheetFormConfig: FormConfig = {
   title: 'Contact Us',
