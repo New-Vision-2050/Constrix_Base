@@ -182,7 +182,7 @@ export const sheetFormConfig: FormConfig = {
   resetOnSuccess: true,
   
   // Enable wizard mode
-  wizard: true,
+  wizard: false,
   wizardOptions: {
     showStepIndicator: true,
     showStepTitles: true,
