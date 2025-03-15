@@ -67,7 +67,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
       )}
       <SheetContent
         side={side}
-        className={`h-fit max-h-[80vh] overflow-visible ${className || ''}`}
+        className={`h-fit max-h-[100vh] overflow-visible ${className || ''}`}
         onInteractOutside={(e) => {
         // Prevent closing the sheet when interacting with dropdown components
         if (e.target &&
@@ -87,7 +87,12 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           className="space-y-6 py-6"
           onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling up
         >
-          <div className="max-h-[calc(60vh-120px)] overflow-y-auto pr-1">
+          <div className="max-h-[calc(80vh-120px)] overflow-y-auto pr-2
+            [&::-webkit-scrollbar]:w-2
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-gray-300
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
             {/* Render form sections */}
             {config.sections.map((section, index) => (
               <ExpandableFormSection
