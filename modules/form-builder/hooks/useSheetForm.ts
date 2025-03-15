@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { FormConfig } from '../types/formTypes';
+import { defaultSubmitHandler } from '../utils/defaultSubmitHandler';
 
 interface UseSheetFormProps {
   config: FormConfig;
@@ -201,15 +202,21 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     }
     
     try {
-      // Call the onSubmit handler from config
-      const result = await config.onSubmit(values);
+      // Call the onSubmit handler from config or use default handler
+      const submitHandler = config.onSubmit || ((values) => defaultSubmitHandler(values, config));
+      const result = await submitHandler(values);
       
       if (result.success) {
         setSubmitSuccess(true);
         
-        // Call onSuccess callback if provided
+        // Call onSuccess callback from props if provided
         if (onSuccess) {
           onSuccess(values);
+        }
+        
+        // Call onSuccess callback from config if provided
+        if (config.onSuccess) {
+          config.onSuccess(values, { success: true, message: result.message });
         }
         
         // Close the sheet after successful submission
@@ -250,14 +257,15 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
       setIsSubmitting(false);
     }
   }, [
-    config, 
-    values, 
-    validateAllFields, 
-    setAllTouched, 
-    closeSheet, 
-    resetForm, 
-    onSuccess, 
-    setFieldTouched
+    config,
+    values,
+    validateAllFields,
+    setAllTouched,
+    closeSheet,
+    resetForm,
+    onSuccess,
+    setFieldTouched,
+    config.onSuccess
   ]);
 
   // Handle form cancel

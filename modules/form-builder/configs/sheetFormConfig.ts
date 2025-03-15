@@ -22,7 +22,7 @@ const countrySearchConfig: SearchTypeConfig = {
 export const sheetFormConfig: FormConfig = {
   title: 'Contact Us',
   description: 'Fill out the form below to get in touch with us.',
-  apiUrl: "https://your-laravel-api.com/contact",
+  apiUrl: "https://core-be-pr17.constrix-nv.com/api/v1/companies",
   apiHeaders: {
     "Authorization": "Bearer your-token-if-needed",
     "X-Custom-Header": "Custom value"
@@ -165,16 +165,19 @@ export const sheetFormConfig: FormConfig = {
   resetButtonText: 'Clear Form',
   showSubmitLoader: true,
   resetOnSuccess: true,
-
-  // Example submit handler
-  onSubmit: async (values) => {
-    console.log('Form submitted with values:', values);
-
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true });
-      }, 1500);
-    });
+  
+  // Example onSuccess handler
+  onSuccess: (values, result) => {
+    console.log('Form submitted successfully with values:', values);
+    console.log('Result from API:', result);
+    
+    // You can perform additional actions here, such as:
+    // - Show a custom notification
+    // - Navigate to another page
+    // - Update application state
+    // - Trigger analytics events
+    // - etc.
   }
+  
+  // No onSubmit handler needed - will use the default handler
 };

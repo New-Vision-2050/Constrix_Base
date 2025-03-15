@@ -91,7 +91,8 @@ export interface FormConfig {
     enabled: boolean;
     errorsPath?: string; // Default is 'errors'
   };
-  onSubmit: (values: Record<string, any>) => Promise<{ success: boolean; message?: string; errors?: Record<string, string | string[]> }>;
+  onSubmit?: (values: Record<string, any>) => Promise<{ success: boolean; message?: string; errors?: Record<string, string | string[]> }>;
+  onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
   onCancel?: () => void;
   onValidationError?: (errors: Record<string, string>) => void;
   // Additional search fields for advanced filtering (similar to table config)
