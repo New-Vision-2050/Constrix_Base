@@ -1,4 +1,3 @@
-import { FormConfig } from '../types/formTypesShared';
 import { SearchTypeConfig } from '@/components/shared/dropdowns/sharedTypes';
 
 // Define search configurations for form fields
@@ -61,10 +60,11 @@ export const sheetFormConfig: FormConfig = {
     errorsPath: 'errors' // This is the default in Laravel
   },
   sections: [
-    {
-      title: 'Personal Information',
-      description: 'Tell us about yourself',
-      fields: [
+        {
+          title: 'Personal Information',
+          description: 'Tell us about yourself',
+          collapsible: false,
+          fields: [
         {
           name: 'name',
           label: 'Full Name',

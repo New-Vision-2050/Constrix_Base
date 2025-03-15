@@ -13,6 +13,7 @@ interface ExpandableFormSectionProps {
   errors: Record<string, string>;
   touched: Record<string, boolean>;
   defaultOpen?: boolean;
+  collapsible?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
 }
@@ -25,15 +26,61 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   defaultOpen = false,
   onChange,
   onBlur,
+  collapsible = true,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  
+
   // Check if section has any errors
   const hasErrors = section.fields.some(field => errors[field.name] && touched[field.name]);
-  
+
   // Check if section should be rendered based on condition
   if (section.condition && !section.condition(values)) {
     return null;
+  }
+
+  if (!collapsible) {
+    return (
+      <div className="w-full border rounded-md mb-4 overflow-hidden border-border">
+        <div className="p-4 bg-muted/50">
+          <div className="flex items-center">
+            {hasErrors && (
+              <div className="w-2 h-2 bg-destructive rounded-full mr-2" />
+            )}
+            <div>
+              {section.title && (
+                <h3 className="text-lg font-medium">{section.title}</h3>
+              )}
+              {section.description && (
+                <p className="text-sm text-muted-foreground">{section.description}</p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="p-4 bg-background">
+          <div className={`grid gap-4 ${section.columns ? `grid-cols-${section.columns}` : 'grid-cols-1'}`}>
+            {section.fields.map((field) => {
+              // Check field condition if provided
+              if (field.condition && !field.condition(values)) {
+                return null;
+              }
+
+              return (
+                <FormField
+                  key={field.name}
+                  field={field}
+                  value={values[field.name]}
+                  error={errors[field.name]}
+                  touched={touched[field.name]}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  values={values}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -74,7 +121,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
             if (field.condition && !field.condition(values)) {
               return null;
             }
-            
+
             return (
               <FormField
                 key={field.name}

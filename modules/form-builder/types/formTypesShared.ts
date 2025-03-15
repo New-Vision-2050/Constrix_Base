@@ -37,9 +37,10 @@ export interface FormSection {
   description?: string;
   className?: string;
   columns?: number;
-  fields: FieldConfig[];
-  condition?: (values: Record<string, any>) => boolean;
-}
+    fields: FieldConfig[];
+    condition?: (values: Record<string, any>) => boolean;
+    collapsible?: boolean;
+  }
 
 export interface FormConfig {
   title?: string;

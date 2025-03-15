@@ -67,6 +67,7 @@ export interface FormSection {
   className?: string;
   columns?: number;
   fields: FieldConfig[];
+  collapsible?: boolean
   condition?: (values: Record<string, any>) => boolean;
 }
 

@@ -96,6 +96,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 defaultOpen={index === 0} // Open first section by default
                 onChange={(field, value) => setValue(field, value)}
                 onBlur={(field) => setTouched(field, true)}
+                collapsible={section.collapsible}
               />
             ))}
           </div>
