@@ -84,6 +84,11 @@ export interface WizardOptions {
   // New options for step submission
   submitEachStep?: boolean; // Whether to submit each step individually
   submitButtonTextPerStep?: string; // Text for the submit button on each step
+  
+  // API configuration for each step
+  stepApiUrls?: Record<number, string>; // API URLs for each step (key is step index)
+  stepApiHeaders?: Record<number, Record<string, string>>; // API headers for each step (key is step index)
+  
   onStepSubmit?: (step: number, values: Record<string, any>) => Promise<{
     success: boolean;
     message?: string;

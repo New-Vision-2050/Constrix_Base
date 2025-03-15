@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { FormConfig } from '../types/formTypes';
 import { defaultSubmitHandler } from '../utils/defaultSubmitHandler';
+import { defaultStepSubmitHandler } from '../utils/defaultStepSubmitHandler';
 
 interface UseSheetFormProps {
   config: FormConfig;
@@ -466,8 +467,8 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
 
   // Submit the current step
   const submitCurrentStep = useCallback(async (): Promise<boolean> => {
-    // If not in wizard mode or no onStepSubmit handler, return true
-    if (!isWizard || !config.wizardOptions?.onStepSubmit) {
+    // If not in wizard mode, return true
+    if (!isWizard) {
       return true;
     }
     
@@ -485,8 +486,11 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     try {
       setIsSubmittingStep(true);
       
-      // Call the onStepSubmit handler
-      const result = await config.wizardOptions.onStepSubmit(currentStep, values);
+      // Call the onStepSubmit handler or use the default handler
+      const submitHandler = config.wizardOptions?.onStepSubmit ||
+        ((step, values) => defaultStepSubmitHandler(step, values, config));
+      
+      const result = await submitHandler(currentStep, values);
       
       // Store the response
       setStepResponses(prev => ({
@@ -532,9 +536,7 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     }
   }, [
     isWizard,
-    config.wizardOptions,
-    config.sections,
-    config.onValidationError,
+    config,
     currentStep,
     values,
     touched,

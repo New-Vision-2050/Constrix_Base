@@ -194,7 +194,24 @@ export const sheetFormConfig: FormConfig = {
     // Enable submitting each step individually
     submitEachStep: true,
     submitButtonTextPerStep: 'Save & Continue',
-    // Handle step submission
+    
+    // API URLs for each step
+    stepApiUrls: {
+      0: 'https://core-be-pr16.constrix-nv.com/api/v1/locations', // Location step
+      1: 'https://core-be-pr16.constrix-nv.com/api/v1/users',     // Personal info step
+    },
+    
+    // API headers for each step
+    stepApiHeaders: {
+      0: {
+        'X-Location-API-Key': 'location-api-key',
+      },
+      1: {
+        'X-User-API-Key': 'user-api-key',
+      }
+    },
+    
+    // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
       console.log(`Submitting step ${step + 1}`);
       console.log('Values:', values);
@@ -210,7 +227,7 @@ export const sheetFormConfig: FormConfig = {
               stepId: step,
               timestamp: new Date().toISOString(),
               // For step 0 (location), return a generated ID
-              ...(step === 0 && { locationId: `LOC-${Math.floor(Math.random() * 10000)}` }),
+              ...(step === 0 && { full_name: `LOC-${Math.floor(Math.random() * 10000)}` }),
               // For step 1 (personal info), return a generated user ID
               ...(step === 1 && { userId: `USR-${Math.floor(Math.random() * 10000)}` })
             }
