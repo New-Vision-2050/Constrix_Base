@@ -89,7 +89,7 @@ const PasswordPhase = ({
     const data = getValues();
 
     forgetPasswordMutation(
-      { identifier: data.identifier },
+      { identifier: data.identifier , token: data.token ?? "" },
       {
         onSuccess: () => {
           handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);

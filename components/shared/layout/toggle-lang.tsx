@@ -7,14 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LangIcon from "@/public/icons/lang";
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { SA, US } from 'country-flag-icons/react/3x2'
-import { useLocale } from 'next-intl';
-import {navigate} from "next/dist/client/components/segment-cache/navigation";
 
 const ToggleLang = () => {
-  const locale = useLocale();
-  const router = useRouter();
   const pathname = usePathname();
 
   const handleLocaleChange = (newLocale: string) => {
