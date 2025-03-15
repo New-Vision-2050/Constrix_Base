@@ -62,7 +62,7 @@ export const sheetFormConfig: FormConfig = {
   },
   sections: [
         {
-       
+
           description: 'Tell us about yourself',
           collapsible: false,
           fields: [
@@ -183,74 +183,6 @@ export const sheetFormConfig: FormConfig = {
               value: '^[0-9a-zA-Z\\s\\-]+$',
               message: 'Please enter a valid postal code'
             }
-          ]
-        }
-      ]
-    },
-    {
-      title: 'Message Details',
-      description: 'Tell us how we can help you',
-      fields: [
-        {
-          name: 'subject',
-          label: 'Subject',
-          type: 'select',
-          placeholder: 'Select a subject',
-          required: true,
-          searchType: subjectSearchConfig,
-          validation: [
-            {
-              type: 'required',
-              message: 'Please select a subject'
-            }
-          ]
-        },
-        {
-          name: 'message',
-          label: 'Message',
-          type: 'textarea',
-          placeholder: 'Type your message here',
-          required: true,
-          validation: [
-            {
-              type: 'required',
-              message: 'Message is required'
-            },
-            {
-              type: 'minLength',
-              value: 10,
-              message: 'Message must be at least 10 characters'
-            }
-          ]
-        }
-      ]
-    },
-    {
-      title: 'Additional Information',
-      description: 'Optional information that helps us serve you better',
-      fields: [
-        {
-          name: 'preferredDate',
-          label: 'Preferred Contact Date',
-          type: 'date',
-          placeholder: 'Select a date'
-        },
-        {
-          name: 'subscribe',
-          label: 'Subscribe to newsletter',
-          type: 'checkbox'
-        },
-        {
-          name: 'howDidYouHear',
-          label: 'How did you hear about us?',
-          type: 'select',
-          placeholder: 'Select an option',
-          options: [
-            { value: 'search', label: 'Search Engine' },
-            { value: 'social', label: 'Social Media' },
-            { value: 'friend', label: 'Friend or Colleague' },
-            { value: 'ad', label: 'Advertisement' },
-            { value: 'other', label: 'Other' }
           ]
         }
       ]
