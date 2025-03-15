@@ -22,9 +22,8 @@ const countrySearchConfig: SearchTypeConfig = {
 export const sheetFormConfig: FormConfig = {
   title: 'Contact Us',
   description: 'Fill out the form below to get in touch with us.',
-  apiUrl: "https://core-be-pr17.constrix-nv.com/api/v1/companies",
+  apiUrl: "https://core-be-pr16.constrix-nv.com/api/v1/companies",
   apiHeaders: {
-    "Authorization": "Bearer your-token-if-needed",
     "X-Custom-Header": "Custom value"
   },
   laravelValidation: {
@@ -165,7 +164,7 @@ export const sheetFormConfig: FormConfig = {
   resetButtonText: 'Clear Form',
   showSubmitLoader: true,
   resetOnSuccess: true,
-  
+
   // Example onSuccess handler
   onSuccess: (values, result) => {
     console.log('Form submitted successfully with values:', values);
@@ -176,6 +175,18 @@ export const sheetFormConfig: FormConfig = {
     // - Navigate to another page
     // - Update application state
     // - Trigger analytics events
+    // - etc.
+  },
+  
+  // Example onError handler
+  onError: (values, error) => {
+    console.log('Form submission failed with values:', values);
+    console.log('Error details:', error);
+    
+    // You can perform additional actions here, such as:
+    // - Show a custom error notification
+    // - Log the error to an analytics service
+    // - Attempt to recover from the error
     // - etc.
   }
   

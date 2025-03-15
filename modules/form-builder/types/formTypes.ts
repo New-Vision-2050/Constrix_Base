@@ -93,6 +93,7 @@ export interface FormConfig {
   };
   onSubmit?: (values: Record<string, any>) => Promise<{ success: boolean; message?: string; errors?: Record<string, string | string[]> }>;
   onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
+  onError?: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => void;
   onCancel?: () => void;
   onValidationError?: (errors: Record<string, string>) => void;
   // Additional search fields for advanced filtering (similar to table config)

@@ -232,6 +232,14 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
         // Handle API error message
         setSubmitError(result.message || 'Form submission failed');
         
+        // Call onError callback from config if provided
+        if (config.onError) {
+          config.onError(values, {
+            message: result.message,
+            errors: result.errors
+          });
+        }
+        
         // Handle Laravel validation errors if enabled
         if (config.laravelValidation?.enabled && result.errors) {
           const formattedErrors: Record<string, string> = {};
@@ -248,6 +256,11 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
           Object.keys(formattedErrors).forEach(field => {
             setFieldTouched(field, true);
           });
+          
+          // Call onValidationError callback if provided
+          if (config.onValidationError) {
+            config.onValidationError(formattedErrors);
+          }
         }
       }
     } catch (error) {
@@ -265,7 +278,9 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     resetForm,
     onSuccess,
     setFieldTouched,
-    config.onSuccess
+    config.onSuccess,
+    config.onError,
+    config.onValidationError
   ]);
 
   // Handle form cancel

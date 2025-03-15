@@ -65,7 +65,10 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           <Button variant="outline">Open Form</Button>
         </SheetTrigger>
       )}
-      <SheetContent side={side} className={className} onInteractOutside={(e) => {
+      <SheetContent
+        side={side}
+        className={`h-fit max-h-[80vh] overflow-visible ${className || ''}`}
+        onInteractOutside={(e) => {
         // Prevent closing the sheet when interacting with dropdown components
         if (e.target &&
           ((e.target as HTMLElement).closest('[role="option"]') ||
@@ -84,7 +87,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           className="space-y-6 py-6"
           onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling up
         >
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
+          <div className="max-h-[calc(60vh-120px)] overflow-y-auto pr-1">
             {/* Render form sections */}
             {config.sections.map((section, index) => (
               <ExpandableFormSection
@@ -101,19 +104,22 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             ))}
           </div>
           
-          {/* Form submission error */}
-          {submitError && (
-            <div className="bg-destructive/10 text-destructive p-3 rounded mb-4">
-              {submitError}
-            </div>
-          )}
-          
-          {/* Form submission success */}
-          {submitSuccess && (
-            <div className="bg-green-100 text-green-800 p-3 rounded mb-4">
-              Form submitted successfully!
-            </div>
-          )}
+          {/* Form submission messages */}
+          <div className="mb-4 text-sm">
+            {/* Form submission error - more subtle styling */}
+            {submitError && (
+              <div className="text-destructive border border-destructive/20 p-2 rounded">
+                <span className="font-medium">Error: </span>{submitError}
+              </div>
+            )}
+            
+            {/* Form submission success */}
+            {submitSuccess && (
+              <div className="text-green-600 border border-green-200 p-2 rounded">
+                <span className="font-medium">Success: </span>Form submitted successfully!
+              </div>
+            )}
+          </div>
           
           <SheetFooter>
             {config.cancelButtonText && (
