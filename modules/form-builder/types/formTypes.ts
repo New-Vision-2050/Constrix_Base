@@ -71,6 +71,30 @@ export interface FormSection {
   condition?: (values: Record<string, any>) => boolean;
 }
 
+// Step submission result interface
+export interface StepSubmissionResult {
+  success: boolean;
+  message?: string;
+  data?: Record<string, any>; // Data that can be used in subsequent steps
+  errors?: Record<string, string | string[]>;
+}
+
+// Wizard step that can contain multiple sections
+export interface WizardStep {
+  title?: string;
+  description?: string;
+  sections: FormSection[]; // Each step can have multiple sections
+  condition?: (values: Record<string, any>) => boolean;
+  
+  // Step-specific API configuration
+  apiUrl?: string; // API URL for this specific step
+  apiHeaders?: Record<string, string>; // API headers for this specific step
+  
+  // Step-specific handlers
+  onSubmit?: (step: number, values: Record<string, any>) => Promise<StepSubmissionResult>;
+  onChange?: (prevStep: number, nextStep: number, values: Record<string, any>) => void;
+}
+
 export interface WizardOptions {
   showStepIndicator?: boolean; // Whether to show step indicators
   showStepTitles?: boolean; // Whether to show step titles in the indicator
@@ -119,6 +143,7 @@ export interface FormConfig {
   // Wizard mode configuration
   wizard?: boolean; // Enable wizard mode (multi-step form)
   wizardOptions?: WizardOptions; // Configuration options for wizard mode
+  wizardSteps?: WizardStep[]; // Steps for wizard mode, each containing multiple sections
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
   apiHeaders?: Record<string, string>; // Custom headers for the API request

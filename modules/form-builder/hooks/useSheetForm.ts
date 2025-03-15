@@ -57,17 +57,41 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
   
   // Wizard state
   const isWizard = config.wizard || false;
-  const totalSteps = isWizard ? config.sections.length : 1;
+  // Use wizardSteps if available, otherwise use sections as steps
+  const hasWizardSteps = isWizard && config.wizardSteps && config.wizardSteps.length > 0;
+  const totalSteps = isWizard
+    ? hasWizardSteps
+      ? config.wizardSteps!.length
+      : config.sections.length
+    : 1;
   const [currentStep, setCurrentStep] = useState(0);
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
+  
+  // Get sections for the current step
+  const getCurrentStepSections = useCallback(() => {
+    if (!isWizard) {
+      return config.sections;
+    }
+    
+    if (hasWizardSteps) {
+      return config.wizardSteps![currentStep].sections;
+    }
+    
+    // Fallback to the old behavior: one section per step
+    return [config.sections[currentStep]];
+  }, [isWizard, hasWizardSteps, config.sections, config.wizardSteps, currentStep]);
   
   // Step submission state
   const [isSubmittingStep, setIsSubmittingStep] = useState(false);
   const [stepResponses, setStepResponses] = useState<Record<number, {
     success: boolean;
     message?: string;
-    data?: Record<string, any>
+    data?: Record<string, any>;
+    stepInfo?: {
+      title?: string;
+      sections?: string[];
+    };
   }>>({});
 
   // Reset form when config changes
@@ -117,14 +141,26 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     const allTouched: Record<string, boolean> = {};
     
     // Mark all fields as touched
-    config.sections.forEach(section => {
-      section.fields.forEach(field => {
-        allTouched[field.name] = true;
+    if (isWizard && hasWizardSteps) {
+      // If using wizardSteps, mark all fields in all sections of all steps
+      config.wizardSteps!.forEach(step => {
+        step.sections.forEach(section => {
+          section.fields.forEach(field => {
+            allTouched[field.name] = true;
+          });
+        });
       });
-    });
+    } else {
+      // Otherwise, mark all fields in all sections
+      config.sections.forEach(section => {
+        section.fields.forEach(field => {
+          allTouched[field.name] = true;
+        });
+      });
+    }
     
     setTouched(allTouched);
-  }, [config.sections]);
+  }, [config.sections, config.wizardSteps, isWizard, hasWizardSteps]);
 
   const resetForm = useCallback(() => {
     setValues(config.initialValues || {});
@@ -140,14 +176,14 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     const newErrors: Record<string, string> = {};
     let isValid = true;
     
-    // Iterate through all sections and fields
-    config.sections.forEach(section => {
+    // Function to validate a single section
+    const validateSection = (section: any) => {
       // Skip sections that don't meet their condition
       if (section.condition && !section.condition(values)) {
         return;
       }
       
-      section.fields.forEach(field => {
+      section.fields.forEach((field: any) => {
         // Skip fields that don't meet their condition
         if (field.condition && !field.condition(values)) {
           return;
@@ -210,13 +246,24 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
           }
         }
       });
-    });
+    };
+    
+    // Validate all fields in all sections
+    if (isWizard && hasWizardSteps) {
+      // If using wizardSteps, validate all fields in all sections of all steps
+      config.wizardSteps!.forEach(step => {
+        step.sections.forEach(validateSection);
+      });
+    } else {
+      // Otherwise, validate all fields in all sections
+      config.sections.forEach(validateSection);
+    }
     
     // Update form state with errors
     setErrors(newErrors);
     
     return isValid;
-  }, [config.sections, values]);
+  }, [config.sections, config.wizardSteps, values, isWizard, hasWizardSteps]);
 
   // Handle form submission
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -329,84 +376,87 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     const newErrors: Record<string, string> = {};
     let isValid = true;
     
-    // Get the current section
-    const currentSection = config.sections[currentStep];
+    // Get all sections for the current step
+    const currentStepSections = getCurrentStepSections();
     
-    // Skip section if it doesn't meet its condition
-    if (currentSection.condition && !currentSection.condition(values)) {
-      return true;
-    }
-    
-    // Validate fields in the current section
-    currentSection.fields.forEach(field => {
-      // Skip fields that don't meet their condition
-      if (field.condition && !field.condition(values)) {
+    // Validate fields in all sections for the current step
+    currentStepSections.forEach(section => {
+      // Skip section if it doesn't meet its condition
+      if (section.condition && !section.condition(values)) {
         return;
       }
       
-      // Skip fields that are hidden or disabled
-      if (field.hidden || field.disabled) {
-        return;
-      }
-      
-      // Check required fields
-      if (field.required && (!values[field.name] || values[field.name] === '')) {
-        newErrors[field.name] = `${field.label} is required`;
-        isValid = false;
-      }
-      
-      // Check validation rules
-      if (field.validation && field.validation.length > 0) {
-        for (const rule of field.validation) {
-          const value = values[field.name];
-          
-          switch (rule.type) {
-            case 'required':
-              if (value === undefined || value === null || value === '') {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
+      // Validate fields in the section
+      section.fields.forEach(field => {
+        // Skip fields that don't meet their condition
+        if (field.condition && !field.condition(values)) {
+          return;
+        }
+        
+        // Skip fields that are hidden or disabled
+        if (field.hidden || field.disabled) {
+          return;
+        }
+        
+        // Check required fields
+        if (field.required && (!values[field.name] || values[field.name] === '')) {
+          newErrors[field.name] = `${field.label} is required`;
+          isValid = false;
+        }
+        
+        // Check validation rules
+        if (field.validation && field.validation.length > 0) {
+          for (const rule of field.validation) {
+            const value = values[field.name];
+            
+            switch (rule.type) {
+              case 'required':
+                if (value === undefined || value === null || value === '') {
+                  newErrors[field.name] = rule.message;
+                  isValid = false;
+                }
+                break;
+              case 'minLength':
+                if (typeof value === 'string' && value.length < rule.value) {
+                  newErrors[field.name] = rule.message;
+                  isValid = false;
+                }
+                break;
+              case 'maxLength':
+                if (typeof value === 'string' && value.length > rule.value) {
+                  newErrors[field.name] = rule.message;
+                  isValid = false;
+                }
+                break;
+              case 'pattern':
+                if (typeof value === 'string' && !new RegExp(rule.value).test(value)) {
+                  newErrors[field.name] = rule.message;
+                  isValid = false;
+                }
+                break;
+              case 'email':
+                if (typeof value === 'string' && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+                  newErrors[field.name] = rule.message;
+                  isValid = false;
+                }
+                break;
+              // Add other validation types as needed
+            }
+            
+            // Break the loop if we already found an error for this field
+            if (newErrors[field.name]) {
               break;
-            case 'minLength':
-              if (typeof value === 'string' && value.length < rule.value) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case 'maxLength':
-              if (typeof value === 'string' && value.length > rule.value) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case 'pattern':
-              if (typeof value === 'string' && !new RegExp(rule.value).test(value)) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case 'email':
-              if (typeof value === 'string' && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            // Add other validation types as needed
-          }
-          
-          // Break the loop if we already found an error for this field
-          if (newErrors[field.name]) {
-            break;
+            }
           }
         }
-      }
+      });
     });
     
     // Update form state with errors
     setErrors(newErrors);
     
     return isValid;
-  }, [config.sections, currentStep, isWizard, values]);
+  }, [isWizard, getCurrentStepSections, values]);
 
   // Wizard navigation functions
   const goToNextStep = useCallback(() => {
@@ -414,9 +464,17 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     if (config.wizardOptions?.validateStepBeforeNext && !validateCurrentStep()) {
       // Mark all fields in the current step as touched
       const currentStepTouched: Record<string, boolean> = { ...touched };
-      config.sections[currentStep].fields.forEach(field => {
-        currentStepTouched[field.name] = true;
+      
+      // Get all sections for the current step
+      const currentStepSections = getCurrentStepSections();
+      
+      // Mark all fields in all sections as touched
+      currentStepSections.forEach(section => {
+        section.fields.forEach(field => {
+          currentStepTouched[field.name] = true;
+        });
       });
+      
       setTouched(currentStepTouched);
       return;
     }
@@ -425,28 +483,36 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     if (currentStep < totalSteps - 1) {
       const nextStep = currentStep + 1;
       
-      // Call onStepChange callback if provided
-      if (config.wizardOptions?.onStepChange) {
+      // Call step-specific onChange handler if available
+      if (hasWizardSteps && config.wizardSteps && config.wizardSteps[currentStep]?.onChange) {
+        config.wizardSteps[currentStep].onChange!(currentStep, nextStep, values);
+      }
+      // Or call global onStepChange callback if provided
+      else if (config.wizardOptions?.onStepChange) {
         config.wizardOptions.onStepChange(currentStep, nextStep, values);
       }
       
       setCurrentStep(nextStep);
     }
-  }, [config.wizardOptions, currentStep, totalSteps, validateCurrentStep, values, touched, config.sections]);
+  }, [config.wizardOptions, config.wizardSteps, hasWizardSteps, currentStep, totalSteps, validateCurrentStep, values, touched, getCurrentStepSections]);
 
   const goToPrevStep = useCallback(() => {
     // Don't go before the first step
     if (currentStep > 0) {
       const prevStep = currentStep - 1;
       
-      // Call onStepChange callback if provided
-      if (config.wizardOptions?.onStepChange) {
+      // Call step-specific onChange handler if available
+      if (hasWizardSteps && config.wizardSteps && config.wizardSteps[currentStep]?.onChange) {
+        config.wizardSteps[currentStep].onChange!(currentStep, prevStep, values);
+      }
+      // Or call global onStepChange callback if provided
+      else if (config.wizardOptions?.onStepChange) {
         config.wizardOptions.onStepChange(currentStep, prevStep, values);
       }
       
       setCurrentStep(prevStep);
     }
-  }, [config.wizardOptions, currentStep, values]);
+  }, [config.wizardOptions, config.wizardSteps, hasWizardSteps, currentStep, values]);
 
   const goToStep = useCallback((step: number) => {
     // Ensure step is within bounds
@@ -456,14 +522,18 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
         return;
       }
       
-      // Call onStepChange callback if provided
-      if (config.wizardOptions?.onStepChange) {
+      // Call step-specific onChange handler if available
+      if (hasWizardSteps && config.wizardSteps && config.wizardSteps[currentStep]?.onChange) {
+        config.wizardSteps[currentStep].onChange!(currentStep, step, values);
+      }
+      // Or call global onStepChange callback if provided
+      else if (config.wizardOptions?.onStepChange) {
         config.wizardOptions.onStepChange(currentStep, step, values);
       }
       
       setCurrentStep(step);
     }
-  }, [config.wizardOptions, currentStep, totalSteps, values]);
+  }, [config.wizardOptions, config.wizardSteps, hasWizardSteps, currentStep, totalSteps, values]);
 
   // Submit the current step
   const submitCurrentStep = useCallback(async (): Promise<boolean> => {
@@ -476,9 +546,17 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     if (!validateCurrentStep()) {
       // Mark all fields in the current step as touched
       const currentStepTouched: Record<string, boolean> = { ...touched };
-      config.sections[currentStep].fields.forEach(field => {
-        currentStepTouched[field.name] = true;
+      
+      // Get all sections for the current step
+      const currentStepSections = getCurrentStepSections();
+      
+      // Mark all fields in all sections as touched
+      currentStepSections.forEach(section => {
+        section.fields.forEach(field => {
+          currentStepTouched[field.name] = true;
+        });
       });
+      
       setTouched(currentStepTouched);
       return false;
     }
@@ -493,14 +571,34 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
       const result = await submitHandler(currentStep, values);
       
       // Store the response
-      setStepResponses(prev => ({
-        ...prev,
-        [currentStep]: {
+      setStepResponses(prev => {
+        // Create a new step response object
+        const stepResponse = {
           success: result.success,
           message: result.message,
-          data: result.data
+          data: result.data,
+        } as any; // Use 'as any' to avoid TypeScript errors during construction
+        
+        // Add step info if available
+        if (hasWizardSteps && config.wizardSteps && config.wizardSteps[currentStep]) {
+          stepResponse.stepInfo = {
+            title: config.wizardSteps[currentStep].title,
+            sections: config.wizardSteps[currentStep].sections
+              .map(s => s.title)
+              .filter(title => typeof title === 'string') as string[] // Filter out undefined titles
+          };
+        } else if (config.sections && config.sections[currentStep]) {
+          stepResponse.stepInfo = {
+            title: config.sections[currentStep].title
+          };
         }
-      }));
+        
+        // Return the updated state
+        return {
+          ...prev,
+          [currentStep]: stepResponse
+        };
+      });
       
       // Handle validation errors if any
       if (!result.success && result.errors) {
@@ -541,7 +639,8 @@ export function useSheetForm({ config, onSuccess, onCancel }: UseSheetFormProps)
     values,
     touched,
     validateCurrentStep,
-    setFieldTouched
+    setFieldTouched,
+    getCurrentStepSections
   ]);
   
   // Get data from a step response

@@ -16,7 +16,15 @@ interface ExpandableFormSectionProps {
   collapsible?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
-  stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
+  stepResponses?: Record<number, {
+    success: boolean;
+    message?: string;
+    data?: Record<string, any>;
+    stepInfo?: {
+      title?: string;
+      sections?: string[];
+    };
+  }>;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
 }

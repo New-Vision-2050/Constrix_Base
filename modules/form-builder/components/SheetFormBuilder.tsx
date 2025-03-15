@@ -12,10 +12,21 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { FormConfig } from '../types/formTypes';
+import { FormConfig, FormSection, WizardStep } from '../types/formTypes';
 import { useSheetForm } from '../hooks/useSheetForm';
 import ExpandableFormSection from './ExpandableFormSection';
 import { Loader2, ChevronRight, ChevronLeft } from 'lucide-react';
+
+// Define the step response type for better type safety
+interface StepResponse {
+  success: boolean;
+  message?: string;
+  data?: Record<string, any>;
+  stepInfo?: {
+    title?: string;
+    sections?: string[];
+  };
+}
 
 interface SheetFormBuilderProps {
   config: FormConfig;
@@ -75,6 +86,20 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     onSuccess,
     onCancel,
   });
+  
+  // Get all sections for the current step
+  const currentStepSections = React.useMemo(() => {
+    if (!isWizard) {
+      return config.sections;
+    }
+    
+    if (config.wizardSteps && config.wizardSteps.length > 0) {
+      return config.wizardSteps[currentStep].sections;
+    }
+    
+    // Fallback to the old behavior: one section per step
+    return [config.sections[currentStep]];
+  }, [isWizard, config.sections, config.wizardSteps, currentStep]);
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => open ? openSheet() : closeSheet()}>
@@ -113,36 +138,44 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           {isWizard && config.wizardOptions?.showStepIndicator && (
             <div className="mb-6">
               <div className="flex items-center justify-between">
-                {config.sections.map((section, index) => (
-                  <div
-                    key={index}
-                    className={`flex flex-col items-center ${
-                      config.wizardOptions?.allowStepNavigation
-                        ? 'cursor-pointer'
-                        : index <= currentStep ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-                    }`}
-                    onClick={() => {
-                      if (config.wizardOptions?.allowStepNavigation || index <= currentStep) {
-                        goToStep(index);
-                      }
-                    }}
-                  >
+                {/* Use wizardSteps if available, otherwise fallback to sections */}
+                {(config.wizardSteps || config.sections).map((stepOrSection, index) => {
+                  // Get the step title - either from wizardStep or from section
+                  const stepTitle = config.wizardSteps
+                    ? stepOrSection.title
+                    : (stepOrSection as FormSection).title;
+                  
+                  return (
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                        index < currentStep
-                          ? 'bg-green-500 text-white'
-                          : index === currentStep
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-gray-200 text-gray-500'
+                      key={index}
+                      className={`flex flex-col items-center ${
+                        config.wizardOptions?.allowStepNavigation
+                          ? 'cursor-pointer'
+                          : index <= currentStep ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
                       }`}
+                      onClick={() => {
+                        if (config.wizardOptions?.allowStepNavigation || index <= currentStep) {
+                          goToStep(index);
+                        }
+                      }}
                     >
-                      {index + 1}
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+                          index < currentStep
+                            ? 'bg-green-500 text-white'
+                            : index === currentStep
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        {index + 1}
+                      </div>
+                      {config.wizardOptions?.showStepTitles && stepTitle && (
+                        <span className="text-xs text-center">{stepTitle}</span>
+                      )}
                     </div>
-                    {config.wizardOptions?.showStepTitles && section.title && (
-                      <span className="text-xs text-center">{section.title}</span>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div className="relative mt-2">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200"></div>
@@ -160,23 +193,51 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
               {Object.keys(stepResponses).map((stepKey) => {
                 const stepIndex = parseInt(stepKey);
                 if (stepIndex < currentStep && stepResponses[stepIndex]?.data) {
+                  // Get the step info from the response if available
+                  const stepInfo = (stepResponses[stepIndex] as StepResponse)?.stepInfo;
+                  const stepTitle = stepInfo?.title ||
+                    (config.wizardSteps
+                      ? config.wizardSteps[stepIndex].title
+                      : config.sections[stepIndex].title);
+                  
                   return (
                     <div key={stepIndex} className="mb-2 p-3 bg-gray-50 rounded-md border border-gray-200">
                       <h4 className="text-sm font-medium mb-1">
-                        {config.sections[stepIndex].title || `Step ${stepIndex + 1} Data`}
+                        {stepTitle || `Step ${stepIndex + 1} Data`}
                       </h4>
-                      <div className="text-xs text-gray-600">
-                        {Object.entries(stepResponses[stepIndex].data || {}).map(([key, value]) => (
-                          <div key={key} className="flex items-start mb-1">
-                            <span className="font-medium mr-2">{key}:</span>
-                            <span>
-                              {typeof value === 'object'
-                                ? JSON.stringify(value)
-                                : String(value)}
-                            </span>
+                      
+                      {/* If we have section info, group the data by section */}
+                      {stepInfo?.sections && stepInfo.sections.length > 0 ? (
+                        <div className="space-y-2">
+                          {/* Display data grouped by sections if possible */}
+                          <div className="text-xs text-gray-600">
+                            {Object.entries(stepResponses[stepIndex].data || {}).map(([key, value]) => (
+                              <div key={key} className="flex items-start mb-1">
+                                <span className="font-medium mr-2">{key}:</span>
+                                <span>
+                                  {typeof value === 'object'
+                                    ? JSON.stringify(value)
+                                    : String(value)}
+                                </span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ) : (
+                        // Default display for data without section info
+                        <div className="text-xs text-gray-600">
+                          {Object.entries(stepResponses[stepIndex].data || {}).map(([key, value]) => (
+                            <div key={key} className="flex items-start mb-1">
+                              <span className="font-medium mr-2">{key}:</span>
+                              <span>
+                                {typeof value === 'object'
+                                  ? JSON.stringify(value)
+                                  : String(value)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 }
@@ -191,23 +252,26 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             [&::-webkit-scrollbar-thumb]:bg-gray-300
             [&::-webkit-scrollbar-thumb]:rounded-full
             hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
-            {/* Render form sections - in wizard mode, only show current step */}
+            {/* Render form sections - in wizard mode, only show sections for the current step */}
             {isWizard
               ? (
-                <ExpandableFormSection
-                  key={currentStep}
-                  section={config.sections[currentStep]}
-                  values={values}
-                  errors={errors}
-                  touched={touched}
-                  defaultOpen={true}
-                  onChange={(field, value) => setValue(field, value)}
-                  onBlur={(field) => setTouched(field, true)}
-                  collapsible={false} // In wizard mode, sections are not collapsible
-                  stepResponses={stepResponses}
-                  getStepResponseData={getStepResponseData}
-                  currentStep={currentStep}
-                />
+                // Wizard mode - render all sections for the current step
+                currentStepSections.map((section, index) => (
+                  <ExpandableFormSection
+                    key={`step-${currentStep}-section-${index}`}
+                    section={section}
+                    values={values}
+                    errors={errors}
+                    touched={touched}
+                    defaultOpen={true}
+                    onChange={(field, value) => setValue(field, value)}
+                    onBlur={(field) => setTouched(field, true)}
+                    collapsible={false} // In wizard mode, sections are not collapsible
+                    stepResponses={stepResponses as Record<number, StepResponse>}
+                    getStepResponseData={getStepResponseData}
+                    currentStep={currentStep}
+                  />
+                ))
               )
               : (
                 // Regular mode - render all sections
