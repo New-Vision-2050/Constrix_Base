@@ -1,4 +1,5 @@
 import { SearchTypeConfig } from '@/components/shared/dropdowns/sharedTypes';
+import { FormConfig } from '../types/formTypes';
 
 // Define search configurations for form fields
 const countrySearchConfig: SearchTypeConfig = {
@@ -61,7 +62,7 @@ export const sheetFormConfig: FormConfig = {
   },
   sections: [
         {
-          title: 'Personal Information',
+       
           description: 'Tell us about yourself',
           collapsible: false,
           fields: [

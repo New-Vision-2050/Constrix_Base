@@ -38,9 +38,10 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
     return null;
   }
 
-  if (!collapsible) {
+  if (!collapsible || !section.title ) {
     return (
       <div className="w-full border rounded-md mb-4 overflow-hidden border-border">
+          {section.title && (
         <div className="p-4 bg-muted/50">
           <div className="flex items-center">
             {hasErrors && (
@@ -55,7 +56,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
               )}
             </div>
           </div>
-        </div>
+        </div>)}
         <div className="p-4 bg-background">
           <div className={`grid gap-4 ${section.columns ? `grid-cols-${section.columns}` : 'grid-cols-1'}`}>
             {section.fields.map((field) => {
