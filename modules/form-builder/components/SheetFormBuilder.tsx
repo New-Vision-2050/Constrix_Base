@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useLocale } from 'next-intl';
 import {
   Sheet,
   SheetContent,
@@ -30,9 +31,15 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   trigger,
   onSuccess,
   onCancel,
-  side = 'right',
+  side,
   className,
 }) => {
+  // Get the current locale and determine direction
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+  
+  // Set the default side based on locale direction if not explicitly provided
+  const sheetSide = side || (isRtl ? 'left' : 'right');
   const {
     isOpen,
     openSheet,
@@ -66,7 +73,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
         </SheetTrigger>
       )}
       <SheetContent
-        side={side}
+        side={sheetSide}
         className={`h-fit max-h-[100vh] overflow-visible ${className || ''}`}
         onInteractOutside={(e) => {
         // Prevent closing the sheet when interacting with dropdown components

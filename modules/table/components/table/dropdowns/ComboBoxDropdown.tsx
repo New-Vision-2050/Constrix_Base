@@ -50,7 +50,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
         >
           {label}
         </Label>
-      )}{" "}
+      )}
       <Select
         id={`select-${columnKey}`}
         value={selectedOption}
