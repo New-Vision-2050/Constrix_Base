@@ -1,8 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { DropdownOption, DynamicDropdownConfig } from '@/modules/table/utils/tableTypes';
-import { useDebounce } from './useDebounce';
-import {processApiResponse} from "@/modules/table/utils/dataUtils";
-import {apiClient} from "@/config/axios-config";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  DropdownOption,
+  DynamicDropdownConfig,
+} from "@/modules/table/utils/tableTypes";
+import { useDebounce } from "./useDebounce";
+import { processApiResponse } from "@/modules/table/utils/dataUtils";
+import { apiClient } from "@/config/axios-config";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface UseDropdownSearchProps {
   searchTerm: string;
@@ -21,8 +25,9 @@ export const useDropdownSearch = ({
   searchTerm,
   dynamicConfig,
   dependencies,
-  selectedValue
+  selectedValue,
 }: UseDropdownSearchProps): UseDropdownSearchResult => {
+  const queryClient = useQueryClient();
   const [options, setOptions] = useState<DropdownOption[]>([]);
   const [backupOption, setBackupOption] = useState<DropdownOption | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,7 +41,9 @@ export const useDropdownSearch = ({
   // Store the selected option as a backup when it changes
   useEffect(() => {
     if (selectedValue) {
-      const selectedOption = options.find(option => option.value === selectedValue);
+      const selectedOption = options.find(
+        (option) => option.value === selectedValue
+      );
       if (selectedOption) {
         setBackupOption(selectedOption);
       } else if (selectedValue) {
@@ -72,18 +79,18 @@ export const useDropdownSearch = ({
 
     // Add pagination parameters if enabled
     if (dynamicConfig.paginationEnabled) {
-      const pageParam = dynamicConfig.pageParam || 'page';
-      const limitParam = dynamicConfig.limitParam || 'per_page';
+      const pageParam = dynamicConfig.pageParam || "page";
+      const limitParam = dynamicConfig.limitParam || "per_page";
       const itemsPerPage = dynamicConfig.itemsPerPage || 10;
 
-      params.append(pageParam, '1');
+      params.append(pageParam, "1");
       params.append(limitParam, String(itemsPerPage));
     }
 
     // Append params to URL
     const queryString = params.toString();
     if (queryString) {
-      url = `${url}${url.includes('?') ? '&' : '?'}${queryString}`;
+      url = `${url}${url.includes("?") ? "&" : "?"}${queryString}`;
     }
 
     return url;
@@ -119,8 +126,21 @@ export const useDropdownSearch = ({
     setError(null);
 
     try {
-      console.log(`Fetching dropdown options for search: ${debouncedSearchTerm}`, url);
-      const response = await apiClient.get(url, { signal: controller.signal });
+      console.log(
+        `Fetching dropdown options for search: ${debouncedSearchTerm}`,
+        url
+      );
+/*       const response = await apiClient.get(url, { signal: controller.signal });
+ */
+      const response = await queryClient.fetchQuery({
+        queryKey: ["data", url],
+        queryFn: async () => {
+          const response = await apiClient.get(url);
+          return response;
+        },
+        staleTime: 1000 * 60 * 5,
+      });
+
       if (!isMountedRef.current) return;
 
       if (response.status !== 200) {
@@ -131,45 +151,50 @@ export const useDropdownSearch = ({
       if (!isMountedRef.current) return;
 
       if (!Array.isArray(data)) {
-        throw new Error('Expected array response from API');
+        throw new Error("Expected array response from API");
       }
 
       // Extract values and labels from the response
-      const extractedOptions = data.map(item => {
+      const extractedOptions = data.map((item) => {
         const getValue = (obj: any, path: string) => {
-          return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+          return path.split(".").reduce((acc, part) => acc && acc[part], obj);
         };
 
         return {
           value: String(getValue(item, dynamicConfig.valueField)),
-          label: String(getValue(item, dynamicConfig.labelField))
+          label: String(getValue(item, dynamicConfig.labelField)),
         };
       });
 
       // Filter out invalid options and remove duplicates
       const validOptions = extractedOptions
-        .filter(opt => opt.value && opt.value.trim() !== '')
+        .filter((opt) => opt.value && opt.value.trim() !== "")
         .reduce((acc: DropdownOption[], current) => {
-          const x = acc.find(item => item.value === current.value);
+          const x = acc.find((item) => item.value === current.value);
           if (!x) return acc.concat([current]);
           return acc;
         }, []);
 
       // Merge the backup option with the new options if it exists and there is a selected value
       let mergedOptions = validOptions;
-      if (selectedValue && backupOption && !mergedOptions.find(option => option.value === backupOption.value)) {
+      if (
+        selectedValue &&
+        backupOption &&
+        !mergedOptions.find((option) => option.value === backupOption.value)
+      ) {
         mergedOptions = [backupOption, ...mergedOptions];
       }
 
       setOptions(mergedOptions);
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        console.log('Request aborted');
+      if (err instanceof Error && err.name === "AbortError") {
+        console.log("Request aborted");
         return;
       }
 
       if (isMountedRef.current) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
         setError(errorMessage);
       }
     } finally {
@@ -195,7 +220,7 @@ export const useDropdownSearch = ({
   return {
     options,
     loading,
-    error
+    error,
   };
 };
 
