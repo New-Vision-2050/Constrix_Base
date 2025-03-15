@@ -16,6 +16,9 @@ interface ExpandableFormSectionProps {
   collapsible?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
+  stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
+  getStepResponseData?: (step: number, key?: string) => any;
+  currentStep?: number;
 }
 
 const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
@@ -27,6 +30,9 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   onChange,
   onBlur,
   collapsible = true,
+  stepResponses,
+  getStepResponseData,
+  currentStep,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -75,6 +81,9 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                   onChange={onChange}
                   onBlur={onBlur}
                   values={values}
+                  stepResponses={stepResponses}
+                  getStepResponseData={getStepResponseData}
+                  currentStep={currentStep}
                 />
               );
             })}
@@ -133,6 +142,9 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                 onChange={onChange}
                 onBlur={onBlur}
                 values={values}
+                stepResponses={stepResponses}
+                getStepResponseData={getStepResponseData}
+                currentStep={currentStep}
               />
             );
           })}

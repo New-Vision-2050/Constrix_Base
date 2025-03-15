@@ -204,6 +204,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                   onChange={(field, value) => setValue(field, value)}
                   onBlur={(field) => setTouched(field, true)}
                   collapsible={false} // In wizard mode, sections are not collapsible
+                  stepResponses={stepResponses}
+                  getStepResponseData={getStepResponseData}
+                  currentStep={currentStep}
                 />
               )
               : (

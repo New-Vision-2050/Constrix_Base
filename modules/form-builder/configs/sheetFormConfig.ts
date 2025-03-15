@@ -1,5 +1,6 @@
 import { SearchTypeConfig } from '@/components/shared/dropdowns/sharedTypes';
 import { FormConfig } from '../types/formTypes';
+import {defaultStepSubmitHandler} from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 
 // Define search configurations for form fields
 const countrySearchConfig: SearchTypeConfig = {
@@ -180,9 +181,9 @@ export const sheetFormConfig: FormConfig = {
   resetButtonText: 'Clear Form',
   showSubmitLoader: true,
   resetOnSuccess: true,
-  
+
   // Enable wizard mode
-  wizard: false,
+  wizard: true,
   wizardOptions: {
     showStepIndicator: true,
     showStepTitles: true,
@@ -194,13 +195,13 @@ export const sheetFormConfig: FormConfig = {
     // Enable submitting each step individually
     submitEachStep: true,
     submitButtonTextPerStep: 'Save & Continue',
-    
+
     // API URLs for each step
     stepApiUrls: {
       0: 'https://core-be-pr16.constrix-nv.com/api/v1/locations', // Location step
       1: 'https://core-be-pr16.constrix-nv.com/api/v1/users',     // Personal info step
     },
-    
+
     // API headers for each step
     stepApiHeaders: {
       0: {
@@ -210,12 +211,14 @@ export const sheetFormConfig: FormConfig = {
         'X-User-API-Key': 'user-api-key',
       }
     },
-    
+
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
+     // Option to call default way to handle the step
+     // const result =   await defaultStepSubmitHandler(step, values, sheetFormConfig)
       console.log(`Submitting step ${step + 1}`);
       console.log('Values:', values);
-      
+
       // Simulate API call
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -227,7 +230,7 @@ export const sheetFormConfig: FormConfig = {
               stepId: step,
               timestamp: new Date().toISOString(),
               // For step 0 (location), return a generated ID
-              ...(step === 0 && { full_name: `LOC-${Math.floor(Math.random() * 10000)}` }),
+              ...(step === 0 && { name: `LOC-${Math.floor(Math.random() * 10000)}` }),
               // For step 1 (personal info), return a generated user ID
               ...(step === 1 && { userId: `USR-${Math.floor(Math.random() * 10000)}` })
             }
@@ -239,6 +242,7 @@ export const sheetFormConfig: FormConfig = {
     onStepChange: (prevStep, nextStep, values) => {
       console.log(`Moving from step ${prevStep + 1} to step ${nextStep + 1}`);
       console.log('Current values:', values);
+
     }
   },
 
@@ -246,7 +250,7 @@ export const sheetFormConfig: FormConfig = {
   onSuccess: (values, result) => {
     console.log('Form submitted successfully with values:', values);
     console.log('Result from API:', result);
-    
+
     // You can perform additional actions here, such as:
     // - Show a custom notification
     // - Navigate to another page
@@ -254,18 +258,18 @@ export const sheetFormConfig: FormConfig = {
     // - Trigger analytics events
     // - etc.
   },
-  
+
   // Example onError handler
   onError: (values, error) => {
     console.log('Form submission failed with values:', values);
     console.log('Error details:', error);
-    
+
     // You can perform additional actions here, such as:
     // - Show a custom error notification
     // - Log the error to an analytics service
     // - Attempt to recover from the error
     // - etc.
   }
-  
+
   // No onSubmit handler needed - will use the default handler
 };

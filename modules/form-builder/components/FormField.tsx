@@ -18,6 +18,9 @@ interface FormFieldProps {
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
   values?: Record<string, any>;
+  stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
+  getStepResponseData?: (step: number, key?: string) => any;
+  currentStep?: number;
 }
 
 // This component doesn't subscribe to any store values
@@ -29,7 +32,24 @@ const FormField: React.FC<FormFieldProps> = ({
   onChange: propOnChange,
   onBlur: propOnBlur,
   values = {},
+  stepResponses,
+  getStepResponseData,
+  currentStep,
 }) => {
+  // Check if this field's value exists in any previous step's response
+  let fieldValue = value;
+  if (getStepResponseData && currentStep && currentStep > 0 && stepResponses) {
+    // Check all previous steps for this field's value
+    for (let step = 0; step < currentStep; step++) {
+      const stepResponse = stepResponses[step];
+      if (stepResponse && stepResponse.data && stepResponse.data[field.name] !== undefined) {
+        // Use the value from the previous step's response
+        fieldValue = stepResponse.data[field.name];
+        break; // Use the most recent value if it appears in multiple steps
+      }
+    }
+  }
+
   // Memoize callbacks to prevent recreating them on every render
   const onChange = useCallback((newValue: any) => {
     // Call the onChange prop if provided
@@ -51,13 +71,13 @@ const FormField: React.FC<FormFieldProps> = ({
 
     // Run field-specific onBlur handler if provided
     if (field.onBlur) {
-      field.onBlur(value, values);
+      field.onBlur(fieldValue, values);
     }
-  }, [field.name, field.onBlur, propOnBlur, value, values]);
+  }, [field.name, field.onBlur, propOnBlur, fieldValue, values]);
 
   // Use custom renderer if provided
   if (field.render) {
-    return field.render(field, value, onChange);
+    return field.render(field, fieldValue, onChange);
   }
 
   // Skip rendering if field is hidden
@@ -75,7 +95,7 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <TextField
             field={field}
-            value={value}
+            value={fieldValue}
             error={error}
             touched={touched}
             type={field.type}
@@ -88,7 +108,7 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <TextareaField
             field={field}
-            value={value}
+            value={fieldValue}
             error={error}
             touched={touched}
             onChange={onChange}
@@ -100,7 +120,7 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <CheckboxField
             field={field}
-            value={value}
+            value={fieldValue}
             error={error}
             touched={touched}
             onChange={onChange}
@@ -112,7 +132,7 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <RadioField
             field={field}
-            value={value}
+            value={fieldValue}
             error={error}
             touched={touched}
             onChange={onChange}
@@ -126,7 +146,7 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <DateField
             field={field}
-            value={value}
+            value={fieldValue}
             error={error}
             touched={touched}
             onChange={onChange}
@@ -138,7 +158,7 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <SearchField
             field={field}
-            value={value}
+            value={fieldValue}
             error={error}
             touched={touched}
             onChange={onChange}
