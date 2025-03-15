@@ -71,6 +71,34 @@ export interface FormSection {
   condition?: (values: Record<string, any>) => boolean;
 }
 
+export interface WizardOptions {
+  showStepIndicator?: boolean; // Whether to show step indicators
+  showStepTitles?: boolean; // Whether to show step titles in the indicator
+  validateStepBeforeNext?: boolean; // Whether to validate the current step before proceeding to the next
+  allowStepNavigation?: boolean; // Whether to allow navigation to any step (if false, only sequential navigation is allowed)
+  nextButtonText?: string; // Text for the next button
+  prevButtonText?: string; // Text for the previous button
+  finishButtonText?: string; // Text for the finish button on the last step
+  onStepChange?: (prevStep: number, nextStep: number, values: Record<string, any>) => void; // Callback when step changes
+  
+  // New options for step submission
+  submitEachStep?: boolean; // Whether to submit each step individually
+  submitButtonTextPerStep?: string; // Text for the submit button on each step
+  onStepSubmit?: (step: number, values: Record<string, any>) => Promise<{
+    success: boolean;
+    message?: string;
+    data?: Record<string, any>; // Data that can be used in subsequent steps
+    errors?: Record<string, string | string[]>;
+  }>;
+  
+  // Store responses from each step
+  stepResponses?: Record<number, {
+    success: boolean;
+    message?: string;
+    data?: Record<string, any>;
+  }>;
+}
+
 export interface FormConfig {
   title?: string;
   description?: string;
@@ -83,6 +111,9 @@ export interface FormConfig {
   showSubmitLoader?: boolean;
   initialValues?: Record<string, any>;
   resetOnSuccess?: boolean;
+  // Wizard mode configuration
+  wizard?: boolean; // Enable wizard mode (multi-step form)
+  wizardOptions?: WizardOptions; // Configuration options for wizard mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
   apiHeaders?: Record<string, string>; // Custom headers for the API request

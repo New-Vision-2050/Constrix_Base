@@ -31,61 +31,6 @@ export const sheetFormConfig: FormConfig = {
     errorsPath: 'errors' // This is the default in Laravel
   },
   sections: [
-        {
-
-          description: 'Tell us about yourself',
-          collapsible: false,
-          fields: [
-        {
-          name: 'name',
-          label: 'Full Name',
-          type: 'text',
-          placeholder: 'Enter your name',
-          required: true,
-          validation: [
-            {
-              type: 'required',
-              message: 'Name is required'
-            },
-            {
-              type: 'minLength',
-              value: 2,
-              message: 'Name must be at least 2 characters'
-            }
-          ]
-        },
-        {
-          name: 'email',
-          label: 'Email Address',
-          type: 'email',
-          placeholder: 'Enter your email',
-          required: true,
-          validation: [
-            {
-              type: 'required',
-              message: 'Email is required'
-            },
-            {
-              type: 'email',
-              message: 'Please enter a valid email address'
-            }
-          ]
-        },
-        {
-          name: 'phone',
-          label: 'Phone Number',
-          type: 'text',
-          placeholder: 'Enter your phone number',
-          validation: [
-            {
-              type: 'pattern',
-              value: '^[0-9\\-\\+\\s\\(\\)]+$',
-              message: 'Please enter a valid phone number'
-            }
-          ]
-        }
-      ]
-    },
     {
       title: 'Location Information',
       description: 'Tell us where you are located',
@@ -156,6 +101,77 @@ export const sheetFormConfig: FormConfig = {
           ]
         }
       ]
+    },
+        {
+          title: 'User Info',
+          collapsible: false,
+          fields: [
+        {
+          name: 'name',
+          label: 'Full Name',
+          type: 'text',
+          placeholder: 'Enter your name',
+          required: true,
+          // Example of using a condition based on previous step data
+          condition: (values) => {
+            // This field will only be shown if the country is not empty
+            return !!values.country;
+          },
+          validation: [
+            {
+              type: 'required',
+              message: 'Name is required'
+            },
+            {
+              type: 'minLength',
+              value: 2,
+              message: 'Name must be at least 2 characters'
+            }
+          ]
+        },
+        {
+          name: 'locationId',
+          label: 'Location ID (from previous step)',
+          type: 'text',
+          // This field is read-only and will be populated from the previous step's response
+          readOnly: true,
+          // This is just a placeholder - the actual value will come from the step response
+          placeholder: 'Will be generated after location submission',
+          // In a real implementation, you would use the getStepResponseData function
+          // from the useSheetForm hook to get the locationId from step 0's response
+          helperText: 'This ID is generated from the previous step submission'
+        },
+        {
+          name: 'email',
+          label: 'Email Address',
+          type: 'email',
+          placeholder: 'Enter your email',
+          required: true,
+          validation: [
+            {
+              type: 'required',
+              message: 'Email is required'
+            },
+            {
+              type: 'email',
+              message: 'Please enter a valid email address'
+            }
+          ]
+        },
+        {
+          name: 'phone',
+          label: 'Phone Number',
+          type: 'text',
+          placeholder: 'Enter your phone number',
+          validation: [
+            {
+              type: 'pattern',
+              value: '^[0-9\\-\\+\\s\\(\\)]+$',
+              message: 'Please enter a valid phone number'
+            }
+          ]
+        }
+      ]
     }
   ],
   submitButtonText: 'Send Message',
@@ -164,6 +180,50 @@ export const sheetFormConfig: FormConfig = {
   resetButtonText: 'Clear Form',
   showSubmitLoader: true,
   resetOnSuccess: true,
+  
+  // Enable wizard mode
+  wizard: true,
+  wizardOptions: {
+    showStepIndicator: true,
+    showStepTitles: true,
+    validateStepBeforeNext: true,
+    allowStepNavigation: true,
+    nextButtonText: 'Continue',
+    prevButtonText: 'Back',
+    finishButtonText: 'Submit Form',
+    // Enable submitting each step individually
+    submitEachStep: true,
+    submitButtonTextPerStep: 'Save & Continue',
+    // Handle step submission
+    onStepSubmit: async (step, values) => {
+      console.log(`Submitting step ${step + 1}`);
+      console.log('Values:', values);
+      
+      // Simulate API call
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          // Return success with data that can be used in subsequent steps
+          resolve({
+            success: true,
+            message: `Step ${step + 1} submitted successfully`,
+            data: {
+              stepId: step,
+              timestamp: new Date().toISOString(),
+              // For step 0 (location), return a generated ID
+              ...(step === 0 && { locationId: `LOC-${Math.floor(Math.random() * 10000)}` }),
+              // For step 1 (personal info), return a generated user ID
+              ...(step === 1 && { userId: `USR-${Math.floor(Math.random() * 10000)}` })
+            }
+          });
+        }, 1000);
+      });
+    },
+    // Handle step change
+    onStepChange: (prevStep, nextStep, values) => {
+      console.log(`Moving from step ${prevStep + 1} to step ${nextStep + 1}`);
+      console.log('Current values:', values);
+    }
+  },
 
   // Example onSuccess handler
   onSuccess: (values, result) => {
