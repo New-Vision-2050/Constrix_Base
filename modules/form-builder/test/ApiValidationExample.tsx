@@ -62,7 +62,31 @@ const ApiValidationExample: React.FC = () => {
                   method: 'GET',
                   debounceMs: 800, // Wait 800ms after typing stops before validating
                   paramName: 'email',
-                  successCondition: (response) => response.available === true,
+                  successCondition: (response) => response.available === false,
+                },
+              },
+            ],
+          },
+          {
+            type: 'text',
+            name: 'companyName',
+            label: 'Company Name',
+            placeholder: 'Enter company name to check availability',
+            validation: [
+              {
+                type: 'apiValidation',
+                message: 'Company name is already registered',
+                apiConfig: {
+                  url: '/api/validate-username', // Reusing the same endpoint for demo
+                  method: 'POST',
+                  debounceMs: 500,
+                  paramName: 'username',
+                  // No successCondition provided - will use default behavior
+                  // The system will check for common response patterns:
+                  // - response.available === true
+                  // - response.success === true
+                  // - response.valid === true
+                  // - response.isValid === true
                 },
               },
             ],
@@ -83,6 +107,22 @@ const ApiValidationExample: React.FC = () => {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">API Validation Demo</h1>
       <SheetFormBuilder config={formConfig} />
+
+      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+        <h2 className="text-lg font-semibold mb-2">About the Examples</h2>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            <strong>Username field:</strong> Uses API validation with an explicit success condition function.
+          </li>
+          <li>
+            <strong>Email field:</strong> Uses API validation with an explicit success condition function and a longer debounce time.
+          </li>
+          <li>
+            <strong>Company Name field:</strong> Uses API validation without a success condition function.
+            The system will automatically check for common response patterns like <code>response.available === true</code>.
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };

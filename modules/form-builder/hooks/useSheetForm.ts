@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { FormConfig } from "../types/formTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
+import { useFormStore } from "./useFormStore";
 
 interface UseSheetFormProps {
   config: FormConfig;
@@ -259,8 +260,14 @@ export function useSheetForm({
       // Validate all fields before submission
       const isValid = validateAllFields();
 
-      // If form is not valid, stop submission
-      if (!isValid) {
+      // Check if any fields are currently being validated via API
+      const hasValidatingFields = useFormStore.getState().hasValidatingFields();
+
+      // If form is not valid or fields are being validated, stop submission
+      if (!isValid || hasValidatingFields) {
+        if (hasValidatingFields) {
+          setSubmitError("Please wait for field validation to complete");
+        }
         setIsSubmitting(false);
         return;
       }
@@ -536,6 +543,13 @@ export function useSheetForm({
         currentStepTouched[field.name] = true;
       });
       setTouched(currentStepTouched);
+      return false;
+    }
+
+    // Check if any fields are currently being validated via API
+    const hasValidatingFields = useFormStore.getState().hasValidatingFields();
+    if (hasValidatingFields) {
+      setSubmitError("Please wait for field validation to complete");
       return false;
     }
 

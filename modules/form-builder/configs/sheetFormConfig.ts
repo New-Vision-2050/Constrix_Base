@@ -108,7 +108,7 @@ export const sheetFormConfig: FormConfig = {
                       method: 'POST',
                       debounceMs: 500,
                       paramName: 'username',
-                      successCondition: (response) => response.available === true,
+                      successCondition: (response) => response.available === false,
                   },
               },
           ],

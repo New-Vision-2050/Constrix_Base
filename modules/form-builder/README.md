@@ -92,10 +92,29 @@ The form builder now supports API validation with debounce, allowing you to vali
 - `headers`: Optional headers to include in the request
 - `successCondition`: Function to determine if validation passed based on the API response
 
+If no `successCondition` is provided, the system will automatically check for common response patterns:
+1. `response.available === true`
+2. `response.success === true`
+3. `response.valid === true`
+4. `response.isValid === true`
+
+Important notes about validation:
+- All validation checks use strict equality (`=== true`) to ensure proper validation
+- Truthy values that are not strictly `true` will be considered invalid
+- If none of these patterns are found, the validation will fail by default
+- This ensures that API validation is strict and requires explicit success indicators
+
+#### API Validation Features
+
 When using API validation:
 1. The field will show a loading indicator while validation is in progress
 2. The validation happens after the user stops typing (debounce)
-3. The error message is displayed if validation fails
+3. A checkmark (✓) icon is displayed when validation succeeds
+4. An X icon is displayed if validation fails
+5. Form submission is prevented while API validation is in progress
+6. Form submission is prevented if any API validation fails
+
+This ensures that users cannot submit forms with invalid data, and provides clear visual feedback about the validation status. The checkmark icon gives users confidence that their input is valid and ready for submission.
 
 ## Field Types
 

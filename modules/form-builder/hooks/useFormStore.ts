@@ -15,7 +15,7 @@ interface FormState {
   isValid: boolean;
   submitCount: number;
   validatingFields: Record<string, boolean>;
-  
+
   // Form actions
   setValue: (field: string, value: any) => void;
   setValues: (values: Record<string, any>) => void;
@@ -29,6 +29,7 @@ interface FormState {
   incrementSubmitCount: () => void;
   setFieldValidating: (field: string, isValidating: boolean) => void;
   validateFieldWithApi: (field: string, value: any, rule: ValidationRule) => void;
+  hasValidatingFields: () => boolean;
 }
 
 // Create a more efficient store structure
@@ -41,27 +42,27 @@ export const useFormStore = create<FormState>((set, get) => ({
   isValid: true,
   submitCount: 0,
   validatingFields: {},
-  
+
   // Actions
   setValue: (field, value) => {
     // Get the current state
     const currentState = get();
-    
+
     // Only update if the value has actually changed
     if (currentState.values[field] === value) {
       return;
     }
-    
+
     // Update the value
     set((state) => ({
       values: { ...state.values, [field]: value }
     }), false); // Use false for shallow merge to prevent unnecessary rerenders
   },
-  
+
   setValues: (values) => set((state) => ({
     values: { ...state.values, ...values }
   })),
-  
+
   setError: (field, error) => set((state) => ({
     errors: error
       ? { ...state.errors, [field]: error }
@@ -71,25 +72,25 @@ export const useFormStore = create<FormState>((set, get) => ({
       [field]: null
     }).every(err => !err)
   })),
-  
+
   setErrors: (errors) => set(() => ({
     errors,
     isValid: Object.values(errors).every(error => !error)
   })),
-  
+
   setTouched: (field, isTouched) => set((state) => ({
     touched: { ...state.touched, [field]: isTouched }
   })),
-  
+
   setAllTouched: () => set((state) => {
     const allTouched = Object.keys(state.values).reduce((acc, key) => {
       acc[key] = true;
       return acc;
     }, {} as Record<string, boolean>);
-    
+
     return { touched: allTouched };
   }),
-  
+
   resetForm: (values = {}) => set({
     values,
     errors: {},
@@ -98,11 +99,11 @@ export const useFormStore = create<FormState>((set, get) => ({
     isValid: true,
     validatingFields: {}
   }),
-  
+
   setSubmitting: (isSubmitting) => set({ isSubmitting }),
-  
+
   setIsValid: (isValid) => set({ isValid }),
-  
+
   incrementSubmitCount: () => set((state) => ({
     submitCount: state.submitCount + 1
   })),
@@ -125,7 +126,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
     // Get the current state
     const store = get();
-    
+
     // Set field as validating
     store.setFieldValidating(field, true);
 
@@ -145,12 +146,34 @@ export const useFormStore = create<FormState>((set, get) => ({
 
           // Make the API request
           const response = await axios(config);
-          
+
           // Check if validation passed
-          const isValid = successCondition
-            ? successCondition(response.data)
-            : true; // Default to valid if no condition provided
-          
+          // If successCondition is provided, use it to determine validity
+          // If not provided, check if the response has an 'available' property
+          // or a 'success' property, which are common API validation patterns
+          let isValid = false;
+
+          if (successCondition) {
+            // Use the provided success condition
+            isValid = successCondition(response.data);
+             } else if (response.data.available !== undefined) {
+            // Check if the API returns an 'available' property
+            isValid = response.data.available === true;
+          } else if (response.data.success !== undefined) {
+            // Check if the API returns a 'success' property
+            isValid = response.data.success === true;
+          } else if (response.data.valid !== undefined) {
+            // Check if the API returns a 'valid' property
+            isValid = response.data.valid === true;
+          } else if (response.data.isValid !== undefined) {
+            // Check if the API returns an 'isValid' property
+            isValid = response.data.isValid === true;
+          } else {
+            // Default to invalid if no condition is provided and no standard properties found
+            // This forces the API to explicitly indicate success
+            isValid = false;
+          }
+
           // Update form state based on validation result
           if (!isValid) {
             store.setError(fieldName, rule.message);
@@ -175,6 +198,12 @@ export const useFormStore = create<FormState>((set, get) => ({
     if (debouncedFn) {
       debouncedFn(field, value);
     }
+  },
+
+  // Check if any fields are currently being validated
+  hasValidatingFields: () => {
+    const state = get();
+    return Object.values(state.validatingFields).some(isValidating => isValidating);
   }
 }));
 
@@ -186,7 +215,7 @@ export const validateField = (
   fieldName?: string
 ): string | null => {
   if (!rules) return null;
-  
+
   for (const rule of rules) {
     switch (rule.type) {
       case 'required':
@@ -240,10 +269,10 @@ export const validateField = (
         if (fieldName && rule.apiConfig) {
           // Get the form store instance
           const store = useFormStore.getState();
-          
+
           // Trigger API validation
           store.validateFieldWithApi(fieldName, value, rule);
-          
+
           // Return null here as the validation is async and will update the form state later
           // We'll check the validatingFields state to show a loading indicator
           return null;
@@ -251,6 +280,6 @@ export const validateField = (
         break;
     }
   }
-  
+
   return null;
 };
