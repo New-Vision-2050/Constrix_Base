@@ -335,13 +335,12 @@ export function useSheetForm({
         const submitHandler =
           config.onSubmit || ((values) => defaultSubmitHandler(values, config));
         const result = await submitHandler(finalValues);
-
         if (result.success) {
           setSubmitSuccess(true);
 
           // Call onSuccess callback from props if provided
           if (onSuccess) {
-            onSuccess(values);
+            onSuccess({ values, result });
           }
 
           // Call onSuccess callback from config if provided
