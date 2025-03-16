@@ -28,8 +28,10 @@ interface UseSheetFormResult {
   resetForm: () => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   handleCancel: () => void;
-  // Wizard related properties and methods
+  // Wizard/Accordion related properties and methods
   isWizard: boolean;
+  isAccordion: boolean;
+  isStepBased: boolean;
   currentStep: number;
   totalSteps: number;
   goToNextStep: () => void;
@@ -66,9 +68,11 @@ export function useSheetForm({
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Wizard state
+  // Wizard/Accordion state
   const isWizard = config.wizard || false;
-  const totalSteps = isWizard ? config.sections.length : 1;
+  const isAccordion = config.accordion || false;
+  const isStepBased = isWizard || isAccordion;
+  const totalSteps = isStepBased ? config.sections.length : 1;
   const [currentStep, setCurrentStep] = useState(0);
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
@@ -96,11 +100,11 @@ export function useSheetForm({
   // Open and close sheet
   const openSheet = useCallback(() => {
     setIsOpen(true);
-    // Reset to first step when opening the sheet in wizard mode
-    if (isWizard) {
+    // Reset to first step when opening the sheet in step-based mode
+    if (isStepBased) {
       setCurrentStep(0);
     }
-  }, [isWizard]);
+  }, [isStepBased]);
 
   const closeSheet = useCallback(() => {
     setIsOpen(false);
@@ -108,11 +112,11 @@ export function useSheetForm({
     if (config.resetOnSuccess) {
       resetForm();
     }
-    // Always reset to first step when closing the sheet in wizard mode
-    if (isWizard) {
+    // Always reset to first step when closing the sheet in step-based mode
+    if (isStepBased) {
       setCurrentStep(0);
     }
-  }, [config.resetOnSuccess, isWizard]);
+  }, [config.resetOnSuccess, isStepBased]);
 
   // Form actions
   const setValue = useCallback((field: string, value: any) => {
@@ -364,7 +368,7 @@ export function useSheetForm({
 
   // Validate only the fields in the current step
   const validateCurrentStep = useCallback(() => {
-    if (!isWizard) return true; // If not in wizard mode, return true
+    if (!isStepBased) return true; // If not in step-based mode (wizard or accordion), return true
 
     const newErrors: Record<string, string> = {};
     let isValid = true;
@@ -455,7 +459,7 @@ export function useSheetForm({
     setErrors(newErrors);
 
     return isValid;
-  }, [config.sections, currentStep, isWizard, values]);
+  }, [config.sections, currentStep, isStepBased, values]);
 
   // Wizard navigation functions
   const goToNextStep = useCallback(() => {
@@ -530,8 +534,8 @@ export function useSheetForm({
 
   // Submit the current step
   const submitCurrentStep = useCallback(async (): Promise<boolean> => {
-    // If not in wizard mode, return true
-    if (!isWizard) {
+    // If not in step-based mode (wizard or accordion), return true
+    if (!isStepBased) {
       return true;
     }
 
@@ -608,7 +612,7 @@ export function useSheetForm({
       setIsSubmittingStep(false);
     }
   }, [
-    isWizard,
+    isStepBased,
     config,
     currentStep,
     values,
@@ -663,8 +667,10 @@ export function useSheetForm({
     resetForm,
     handleSubmit,
     handleCancel,
-    // Wizard related properties and methods
+    // Wizard/Accordion related properties and methods
     isWizard,
+    isAccordion,
+    isStepBased,
     currentStep,
     totalSteps,
     goToNextStep,

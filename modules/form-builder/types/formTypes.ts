@@ -125,9 +125,10 @@ export interface FormConfig {
   showSubmitLoader?: boolean;
   initialValues?: Record<string, any>;
   resetOnSuccess?: boolean;
-  // Wizard mode configuration
+  // Form mode configuration
   wizard?: boolean; // Enable wizard mode (multi-step form)
-  wizardOptions?: WizardOptions; // Configuration options for wizard mode
+  accordion?: boolean; // Enable accordion mode (collapsible sections with step navigation)
+  wizardOptions?: WizardOptions; // Configuration options for wizard/accordion mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
   apiHeaders?: Record<string, string>; // Custom headers for the API request

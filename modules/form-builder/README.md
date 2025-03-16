@@ -116,6 +116,52 @@ When using API validation:
 
 This ensures that users cannot submit forms with invalid data, and provides clear visual feedback about the validation status. The checkmark icon gives users confidence that their input is valid and ready for submission.
 
+## Form Modes
+
+The form builder supports different modes for displaying and navigating through forms:
+
+### Regular Mode (Default)
+
+All sections are displayed at once, and sections can be individually collapsible.
+
+### Wizard Mode
+
+A step-by-step form where only one section is visible at a time, with navigation buttons to move between steps.
+
+```typescript
+const formConfig: FormConfig = {
+  // ...
+  wizard: true,
+  wizardOptions: {
+    // Wizard options here
+  }
+};
+```
+
+### Accordion Mode
+
+All sections are displayed as collapsible accordions, but only one section is expanded at a time. Navigation buttons allow moving between sections, and clicking on a section header makes it the active step.
+
+Key features:
+- Shows all sections at once, but only one is expanded
+- Only the active step can be expanded; other sections are disabled and automatically closed
+- The active step is automatically expanded when it becomes active
+- Supports submitting each step individually with the `submitEachStep` option, just like in wizard mode
+- Completed sections show a green checkmark (✓) in the header
+- A section is considered completed when all required fields are filled and valid
+- Navigation buttons work the same as in wizard mode
+- Clicking a section header makes it the active step (when allowed)
+
+```typescript
+const formConfig: FormConfig = {
+  // ...
+  accordion: true,
+  wizardOptions: {
+    // Same options as wizard mode
+  }
+};
+```
+
 ## Field Types
 
 - `text`: Text input
@@ -128,6 +174,7 @@ This ensures that users cannot submit forms with invalid data, and provides clea
 - `number`: Number input
 - `date`: Date picker
 - `search`: Search input with autocomplete
+- `phone`: Phone input with country code selection
 
 ## Validation Rules
 

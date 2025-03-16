@@ -37,7 +37,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   // Get the current locale and determine direction
   const locale = useLocale();
   const isRtl = locale === "ar";
-  
+
   // Set the default side based on locale direction if not explicitly provided
   const sheetSide = side || (isRtl ? 'left' : 'right');
   const {
@@ -57,6 +57,8 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     resetForm,
     // Wizard related properties and methods
     isWizard,
+    isAccordion,
+    isStepBased,
     currentStep,
     totalSteps,
     goToNextStep,
@@ -103,14 +105,14 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           {config.title && <SheetTitle>{config.title}</SheetTitle>}
           {config.description && <SheetDescription>{config.description}</SheetDescription>}
         </SheetHeader>
-        
+
         <form
           onSubmit={handleSubmit}
           className="space-y-6 py-6"
           onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling up
         >
-          {/* Step indicator for wizard mode */}
-          {isWizard && config.wizardOptions?.showStepIndicator && (
+          {/* Step indicator for wizard/accordion mode */}
+          {isStepBased && config.wizardOptions?.showStepIndicator && (
             <div className="mb-6">
               <div className="flex items-center justify-between">
                 {config.sections.map((section, index) => (
@@ -154,80 +156,73 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             </div>
           )}
 
-          {/* Display data from previous steps */}
-          {isWizard && currentStep > 0 && (
-            <div className="mb-4">
-              {Object.keys(stepResponses).map((stepKey) => {
-                const stepIndex = parseInt(stepKey);
-                if (stepIndex < currentStep && stepResponses[stepIndex]?.data) {
-                  return (
-                    <div key={stepIndex} className="mb-2 p-3 bg-gray-50 rounded-md border border-gray-200">
-                      <h4 className="text-sm font-medium mb-1">
-                        {config.sections[stepIndex].title || `Step ${stepIndex + 1} Data`}
-                      </h4>
-                      <div className="text-xs text-gray-600">
-                        {Object.entries(stepResponses[stepIndex].data || {}).map(([key, value]) => (
-                          <div key={key} className="flex items-start mb-1">
-                            <span className="font-medium mr-2">{key}:</span>
-                            <span>
-                              {typeof value === 'object'
-                                ? JSON.stringify(value)
-                                : String(value)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          )}
-          
+
           <div className="max-h-[calc(80vh-120px)] overflow-y-auto pr-2
             [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:bg-transparent
             [&::-webkit-scrollbar-thumb]:bg-gray-300
             [&::-webkit-scrollbar-thumb]:rounded-full
             hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
-            {/* Render form sections - in wizard mode, only show current step */}
-            {isWizard
-              ? (
+            {/* Render form sections based on mode */}
+            {isWizard ? (
+              // Wizard mode - only show current step
+              <ExpandableFormSection
+                key={currentStep}
+                section={config.sections[currentStep]}
+                values={values}
+                errors={errors}
+                touched={touched}
+                defaultOpen={true}
+                onChange={(field, value) => setValue(field, value)}
+                onBlur={(field) => setTouched(field, true)}
+                collapsible={false} // In wizard mode, sections are not collapsible
+                stepResponses={stepResponses}
+                getStepResponseData={getStepResponseData}
+                currentStep={currentStep}
+              />
+            ) : isAccordion ? (
+              // Accordion mode - render all sections but control which one is open
+              config.sections.map((section, index) => (
                 <ExpandableFormSection
-                  key={currentStep}
-                  section={config.sections[currentStep]}
+                  key={index}
+                  section={section}
                   values={values}
                   errors={errors}
                   touched={touched}
-                  defaultOpen={true}
+                  defaultOpen={index === currentStep} // Only open the current step
                   onChange={(field, value) => setValue(field, value)}
                   onBlur={(field) => setTouched(field, true)}
-                  collapsible={false} // In wizard mode, sections are not collapsible
+                  collapsible={true} // Always collapsible in accordion mode
+                  forceDisabled={index !== currentStep} // Only allow expanding the current step
                   stepResponses={stepResponses}
                   getStepResponseData={getStepResponseData}
                   currentStep={currentStep}
+                  onToggle={(isOpen) => {
+                    // When a section is opened, make it the current step
+                    if (isOpen) {
+                      goToStep(index);
+                    }
+                  }}
                 />
-              )
-              : (
-                // Regular mode - render all sections
-                config.sections.map((section, index) => (
-                  <ExpandableFormSection
-                    key={index}
-                    section={section}
-                    values={values}
-                    errors={errors}
-                    touched={touched}
-                    defaultOpen={index === 0} // Open first section by default
-                    onChange={(field, value) => setValue(field, value)}
-                    onBlur={(field) => setTouched(field, true)}
-                    collapsible={section.collapsible}
-                  />
-                ))
-              )
-            }
+              ))
+            ) : (
+              // Regular mode - render all sections
+              config.sections.map((section, index) => (
+                <ExpandableFormSection
+                  key={index}
+                  section={section}
+                  values={values}
+                  errors={errors}
+                  touched={touched}
+                  defaultOpen={index === 0} // Open first section by default
+                  onChange={(field, value) => setValue(field, value)}
+                  onBlur={(field) => setTouched(field, true)}
+                  collapsible={section.collapsible}
+                />
+              ))
+            )}
           </div>
-          
+
           {/* Form submission messages */}
           <div className="mb-4 text-sm">
             {/* Form submission error - more subtle styling */}
@@ -236,7 +231,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 <span className="font-medium">Error: </span>{submitError}
               </div>
             )}
-            
+
             {/* Form submission success */}
             {submitSuccess && (
               <div className="text-green-600 border border-green-200 p-2 rounded">
@@ -244,7 +239,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
               </div>
             )}
           </div>
-          
+
           <SheetFooter>
             {config.cancelButtonText && (
               <Button
@@ -259,9 +254,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 {config.cancelButtonText}
               </Button>
             )}
-            
-            {/* Reset button - only show in non-wizard mode or on first step */}
-            {config.showReset && (!isWizard || isFirstStep) && (
+
+            {/* Reset button - only show in non-step-based mode or on first step */}
+            {config.showReset && (!isStepBased || isFirstStep) && (
               <Button
                 type="reset"
                 variant="outline"
@@ -275,9 +270,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 {config.resetButtonText || 'Reset'}
               </Button>
             )}
-            
-            {/* Wizard navigation buttons */}
-            {isWizard && (
+
+            {/* Wizard/Accordion navigation buttons */}
+            {isStepBased && (
               <div className="flex items-center space-x-2">
                 {/* Previous button */}
                 {!isFirstStep && (
@@ -295,7 +290,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     {config.wizardOptions?.prevButtonText || 'Previous'}
                   </Button>
                 )}
-                
+
                 {/* Submit step button - show when submitEachStep is enabled and not on the last step */}
                 {config.wizardOptions?.submitEachStep && !isLastStep && (
                   <Button
@@ -320,7 +315,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     )}
                   </Button>
                 )}
-                
+
                 {/* Next button - only show if not on last step and not in submitEachStep mode */}
                 {!isLastStep && !config.wizardOptions?.submitEachStep && (
                   <Button
@@ -336,7 +331,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 )}
-                
+
                 {/* Submit button - only show on last step in wizard mode */}
                 {isLastStep && (
                   <Button
@@ -357,9 +352,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 )}
               </div>
             )}
-            
-            {/* Regular submit button - only show in non-wizard mode */}
-            {!isWizard && (
+
+            {/* Regular submit button - only show in non-step-based mode */}
+            {!isStepBased && (
               <Button
                 type="submit"
                 disabled={isSubmitting}

@@ -123,7 +123,7 @@ export const sheetFormConfig: FormConfig = {
                       method: 'POST',
                       debounceMs: 500,
                       paramName: 'username',
-                      successCondition: (response) => response.available === false,
+                      successCondition: (response) => response.available === true,
                   },
               },
           ],
@@ -209,12 +209,13 @@ export const sheetFormConfig: FormConfig = {
   resetOnSuccess: true,
 
   // Enable wizard mode
-  wizard: true,
+  //   wizard: true,
+    accordion: true,
   wizardOptions: {
-    showStepIndicator: true,
-    showStepTitles: true,
+    showStepIndicator: false,
+    showStepTitles: false,
     validateStepBeforeNext: true,
-    allowStepNavigation: true,
+    allowStepNavigation: false,
     nextButtonText: "Continue",
     prevButtonText: "Back",
     finishButtonText: "Submit Form",
