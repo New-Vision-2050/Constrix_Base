@@ -8,7 +8,7 @@ import DropdownSearch from './DropdownSearch';
 interface EnhancedColumnSearchProps {
   columns: ColumnConfig[];
   columnSearchState: ColumnSearchState;
-  onColumnSearch: (columnKey: string, value: string) => void;
+  onColumnSearch: (columnKey: string, value: string | string[]) => void;
 }
 
 const EnhancedColumnSearch: React.FC<EnhancedColumnSearchProps> = ({
@@ -21,7 +21,7 @@ const EnhancedColumnSearch: React.FC<EnhancedColumnSearchProps> = ({
   
   // Track dependencies between dropdowns
   const getDependencyValues = () => {
-    const dependencies: Record<string, string> = {};
+    const dependencies: Record<string, string | string[]> = {};
     searchableColumns.forEach(column => {
       if (column.key in columnSearchState) {
         dependencies[column.key] = columnSearchState[column.key];
@@ -30,7 +30,7 @@ const EnhancedColumnSearch: React.FC<EnhancedColumnSearchProps> = ({
     return dependencies;
   };
   
-  const handleSearchChange = (columnKey: string, value: string) => {
+  const handleSearchChange = (columnKey: string, value: string | string[]) => {
     // Clear any existing timeout for this column
     if (searchTimeouts[columnKey]) {
       clearTimeout(searchTimeouts[columnKey]);

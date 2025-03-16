@@ -27,7 +27,7 @@ export interface SearchConfig {
 }
 
 export interface ColumnSearchState {
-  [columnKey: string]: string;
+  [columnKey: string]: string | string[];
 }
 
 // New types for enhanced dropdown search functionality

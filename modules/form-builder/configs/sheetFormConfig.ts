@@ -199,10 +199,13 @@ export const sheetFormConfig: FormConfig = {
   ],
   submitButtonText: "Send Message",
   cancelButtonText: "Cancel",
-  showReset: true,
+  showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,
   resetOnSuccess: true,
+  showCancelButton:false,
+  showBackButton:false,
+
 
   // Enable wizard mode
   //   wizard: true,

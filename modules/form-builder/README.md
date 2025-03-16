@@ -121,6 +121,27 @@ This ensures that users cannot submit forms with invalid data, and provides clea
 
 The form system now checks for API validation errors during both regular form submission and step submission in wizard/accordion modes. This enhancement ensures that all API validations must be successful before allowing the form or step to be submitted, maintaining data integrity and preventing submission of invalid data.
 
+## Button Visibility Options
+
+The form builder now supports options to control the visibility of various buttons:
+
+- `showReset`: Whether to show the reset/clear button (default: false)
+- `showCancelButton`: Whether to show the cancel button (default: true if cancelButtonText is provided)
+- `showBackButton`: Whether to show the back button in step-based forms (default: true)
+
+Example:
+
+```typescript
+const formConfig: FormConfig = {
+  // ...
+  showReset: true, // Show the reset button
+  showCancelButton: false, // Hide the cancel button
+  showBackButton: false, // Hide the back button in wizard/accordion mode
+  resetButtonText: 'Clear', // Custom text for reset button
+  cancelButtonText: 'Cancel', // Only used if showCancelButton is true
+};
+```
+
 ## Form Modes
 
 The form builder supports different modes for displaying and navigating through forms:

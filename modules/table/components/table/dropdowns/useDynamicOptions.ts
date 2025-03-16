@@ -6,7 +6,7 @@ import axios, { AxiosError } from 'axios';
 
 interface UseDynamicOptionsProps {
   dynamicConfig?: DynamicDropdownConfig;
-  dependencies?: Record<string, string>;
+  dependencies?: Record<string, string | string[]>;
 }
 
 interface UseDynamicOptionsResult {
@@ -24,7 +24,7 @@ export const useDynamicOptions = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshCounter, setRefreshCounter] = useState(0);
-  const previousDependenciesRef = useRef<Record<string, string>>({});
+  const previousDependenciesRef = useRef<Record<string, string | string[]>>({});
   const fetchControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
   const fetchTimeoutRef = useRef<number | null>(null);

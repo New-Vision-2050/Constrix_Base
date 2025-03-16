@@ -11,7 +11,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 interface UseDropdownSearchProps {
   searchTerm: string;
   dynamicConfig?: DynamicDropdownConfig;
-  dependencies?: Record<string, string>;
+  dependencies?: Record<string, string | string[]>;
   selectedValue?: string | string[];
   isMulti?: boolean;
 }
@@ -90,9 +90,15 @@ export const useDropdownSearch = ({
       dependencies &&
       dependencies[dynamicConfig.dependsOn]
     ) {
+      const dependencyValue = dependencies[dynamicConfig.dependsOn];
+      // Handle both string and string[] values
+      const paramValue = Array.isArray(dependencyValue)
+        ? dependencyValue.join(',')
+        : dependencyValue;
+      
       params.append(
         dynamicConfig.filterParam,
-        dependencies[dynamicConfig.dependsOn]
+        paramValue
       );
     }
 

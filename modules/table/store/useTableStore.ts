@@ -40,7 +40,7 @@ interface TableState {
   setPagination: (currentPage: number, totalPages: number, itemsPerPage: number) => void;
   setSort: (column: string | null, direction: SortDirection) => void;
   setSearch: (query: string, fields?: string[]) => void;
-  setColumnSearch: (columnKey: string, value: string) => void;
+  setColumnSearch: (columnKey: string, value: string | string[]) => void;
   resetTable: () => void;
 }
 

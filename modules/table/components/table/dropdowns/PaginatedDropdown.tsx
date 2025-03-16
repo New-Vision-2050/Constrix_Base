@@ -26,7 +26,7 @@ interface PaginatedDropdownProps {
   placeholder?: string;
   isDisabled?: boolean;
   dynamicConfig?: DynamicDropdownConfig;
-  dependencies?: Record<string, string>;
+  dependencies?: Record<string, string | string[]>;
   isMulti?: boolean;
 }
 

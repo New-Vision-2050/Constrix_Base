@@ -119,6 +119,8 @@ export interface FormConfig {
   className?: string;
   sections: FormSection[];
   showReset?: boolean;
+  showCancelButton?: boolean; // Whether to show the cancel button
+  showBackButton?: boolean; // Whether to show the back button in step-based forms
   submitButtonText?: string;
   resetButtonText?: string;
   cancelButtonText?: string;

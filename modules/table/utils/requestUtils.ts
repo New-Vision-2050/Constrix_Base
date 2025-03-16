@@ -67,19 +67,27 @@ export const buildRequestUrl = (
   }
 
   // Add column-specific search parameters
-  if (columnSearchState && Object.keys(columnSearchState).length > 0) {
-    Object.entries(columnSearchState).forEach(([columnKey, searchValue]) => {
-      // Skip empty values and special "_clear_" value
-      if (
-        searchValue &&
-        searchValue !== "_clear_" &&
-        searchValue !== "__clear__"
-      ) {
-        // For JSON placeholder API, use the column name directly
-        newUrl.searchParams.append(columnKey, searchValue);
+if (columnSearchState && Object.keys(columnSearchState).length > 0) {
+Object.entries(columnSearchState).forEach(([columnKey, searchValue]) => {
+  // Skip empty values and special "_clear_" value
+  if (
+    searchValue &&
+    searchValue !== "_clear_" &&
+    searchValue !== "__clear__"
+  ) {
+    // Handle both string and string[] values
+    if (Array.isArray(searchValue)) {
+      // For array values, join them with commas or add multiple parameters
+      if (searchValue.length > 0) {
+        newUrl.searchParams.append(columnKey, searchValue.join(','));
       }
-    });
+    } else {
+      // For string values, add as normal
+      newUrl.searchParams.append(columnKey, searchValue);
+    }
   }
+});
+}
 
   console.log("Built URL with parameters:", newUrl.toString());
   return newUrl;

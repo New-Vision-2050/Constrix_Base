@@ -240,8 +240,25 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             )}
           </div>
 
-          <SheetFooter>
-            {config.cancelButtonText && (
+          <SheetFooter
+            className={(() => {
+              // Check if cancel button will be shown
+              const showCancel = config.cancelButtonText && (config.showCancelButton !== false);
+              
+              // Check if reset button will be shown
+              const showReset = config.showReset && (!isStepBased || isFirstStep);
+              
+              // Check if back button will be shown in step-based forms
+              const showBack = isStepBased && !isFirstStep && (config.showBackButton !== false);
+              
+              // If only one button will be visible (the submit/next/finish button), use center alignment
+              return !showCancel && !showReset && !showBack ?
+                "flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2" :
+                undefined;
+            })()}
+          >
+            {/* Cancel button - show if cancelButtonText is provided and showCancelButton is true (or undefined) */}
+            {config.cancelButtonText && (config.showCancelButton !== false) && (
               <Button
                 type="button"
                 onClick={(e) => {
@@ -255,7 +272,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
               </Button>
             )}
 
-            {/* Reset button - only show in non-step-based mode or on first step */}
+            {/* Reset button - only show in non-step-based mode or on first step, and if showReset is true */}
             {config.showReset && (!isStepBased || isFirstStep) && (
               <Button
                 type="reset"
@@ -274,8 +291,8 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             {/* Wizard/Accordion navigation buttons */}
             {isStepBased && (
               <div className="flex items-center space-x-2">
-                {/* Previous button */}
-                {!isFirstStep && (
+                {/* Previous button - show if not on first step and showBackButton is true (or undefined) */}
+                {!isFirstStep && (config.showBackButton !== false) && (
                   <Button
                     type="button"
                     variant="outline"
@@ -303,7 +320,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                       }
                     }}
                     disabled={isSubmitting || isSubmittingStep}
-                    className="flex items-center bg-green-600 text-white hover:bg-green-700"
+                    className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     {isSubmittingStep ? (
                       <span className="flex items-center">
@@ -325,7 +342,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                       goToNextStep();
                     }}
                     disabled={isSubmitting || isSubmittingStep}
-                    className="flex items-center"
+                    className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     {config.wizardOptions?.nextButtonText || 'Next'}
                     <ChevronRight className="w-4 h-4 ml-1" />

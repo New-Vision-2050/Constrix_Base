@@ -12,7 +12,7 @@ import { useTranslations } from "next-intl";
 interface ColumnSearchProps {
   columns: ColumnConfig[];
   columnSearchState: ColumnSearchState;
-  onColumnSearch: (columnKey: string, value: string) => void;
+  onColumnSearch: (columnKey: string, value: string | string[]) => void;
   allSearchedFields?: any[];
 }
 
@@ -38,7 +38,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
 
   // Create a debounced version of onColumnSearch
   const debouncedColumnSearch = useDebounce(
-    (columnKey: string, value: string) => {
+    (columnKey: string, value: string | string[]) => {
       onColumnSearch(columnKey, value);
     },
     500
@@ -46,7 +46,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
 
   // Create dependencies object for each dropdown
   const buildDependenciesMap = useCallback(() => {
-    const dependenciesMap: Record<string, Record<string, string>> = {};
+    const dependenciesMap: Record<string, Record<string, string | string[]>> = {};
 
     searchableColumns.forEach((column) => {
       if (
@@ -76,7 +76,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   }, [columnSearchState, dependenciesMap]);
 
   // Handle input change without immediately triggering the API call
-  const handleInputChange = (columnKey: string, value: string) => {
+  const handleInputChange = (columnKey: string, value: string | string[]) => {
     // Update local state immediately for responsive UI
     setLocalInputValues((prev) => ({
       ...prev,

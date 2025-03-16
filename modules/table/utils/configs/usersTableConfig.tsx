@@ -10,6 +10,15 @@ import { useTranslations } from "next-intl";
 import React from "react";
 
 // Define types for the company data
+interface CompanyData {
+  id: string;
+  name: string;
+  roles: Array<{
+    role: '1' | '2' | '3'; // Keys in rulesIcons
+    status: number;
+  }>;
+}
+
 interface UsersData {
   id: string;
   name: string;
@@ -19,6 +28,7 @@ interface UsersData {
   general_manager_name: string;
   complete_data: 0 | 1; // 0 = pending, 1 = success
   is_active: "active" | "inActive";
+  company: CompanyData[];
   [key: string]: any; // For any other properties
 }
 
@@ -84,8 +94,12 @@ export const UsersConfig = () => {
                   {[
                     ...company.roles,
                     ...Array(3 - company.roles.length).fill(null),
-                  ].map((role, index) =>
-                    role && rulesIcons[role.role] ? (
+                  ].map((role, index) => {
+                    // Type guard to check if role exists and has a valid role property
+                    const isValidRole = role &&
+                      (role.role === '1' || role.role === '2' || role.role === '3');
+                    
+                    return isValidRole ? (
                       <span
                         key={index}
                         className={cn(
@@ -95,15 +109,15 @@ export const UsersConfig = () => {
                           role.status === -1 && "text-[#F19B02]"
                         )}
                       >
-                        {React.createElement(rulesIcons[role.role])}
+                        {React.createElement(rulesIcons[role.role as keyof typeof rulesIcons])}
                       </span>
                     ) : (
                       <span
                         key={index}
                         className="w-5 h-5 flex items-center"
                       ></span>
-                    )
-                  )}
+                    );
+                  })}
                 </div>
               ))}
             </div>

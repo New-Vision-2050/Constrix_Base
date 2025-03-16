@@ -14,7 +14,7 @@ interface DropdownSearchProps {
   onChange: (value: string | string[]) => void;
   options?: DropdownOption[];
   dynamicConfig?: DynamicDropdownConfig;
-  dependencies?: Record<string, string>;
+  dependencies?: Record<string, string | string[]>;
   placeholder?: string;
   isMulti?: boolean;
 }
@@ -32,7 +32,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
 }) => {
   const { toast } = useToast();
   const [previousDependencyValues, setPreviousDependencyValues] = useState<
-    Record<string, string>
+    Record<string, string | string[]>
   >({});
   const onChangeRef = useRef(onChange);
   const processingDependencyChange = useRef(false);
