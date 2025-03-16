@@ -1,13 +1,13 @@
 name: CI/CD Pipeline
 
-#on:
-#  pull_request:
-#    types: [opened, synchronize, reopened, closed, edited]
-#  push:
-#    branches:
-#      - dev
-#      - stage
-#      - master
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed, edited]
+  push:
+    branches:
+      - dev
+      - stage
+      - master
 jobs:
   deploy:
     runs-on: ubuntu-latest
