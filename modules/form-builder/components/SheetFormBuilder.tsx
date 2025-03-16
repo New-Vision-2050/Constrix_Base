@@ -71,7 +71,8 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     submitCurrentStep,
     isSubmittingStep,
     stepResponses,
-    getStepResponseData
+    getStepResponseData,
+    clearFiledError,
   } = useSheetForm({
     config,
     onSuccess,
@@ -79,11 +80,12 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   });
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => open ? openSheet() : closeSheet()}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => (open ? openSheet() : closeSheet())}
+    >
       {trigger ? (
-        <SheetTrigger asChild>
-          {trigger}
-        </SheetTrigger>
+        <SheetTrigger asChild>{trigger}</SheetTrigger>
       ) : (
         <SheetTrigger asChild>
           <Button variant="outline">Open Form</Button>
@@ -91,19 +93,24 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
       )}
       <SheetContent
         side={sheetSide}
-        className={`h-fit max-h-[100vh] overflow-visible ${className || ''}`}
+        className={`h-fit max-h-[100vh] overflow-visible ${className || ""}`}
         onInteractOutside={(e) => {
-        // Prevent closing the sheet when interacting with dropdown components
-        if (e.target &&
-          ((e.target as HTMLElement).closest('[role="option"]') ||
-           (e.target as HTMLElement).closest('[data-dropdown-id]') ||
-           (e.target as HTMLElement).closest('.cmdp-popover'))) {
-          e.preventDefault();
-        }
-      }}>
+          // Prevent closing the sheet when interacting with dropdown components
+          if (
+            e.target &&
+            ((e.target as HTMLElement).closest('[role="option"]') ||
+              (e.target as HTMLElement).closest("[data-dropdown-id]") ||
+              (e.target as HTMLElement).closest(".cmdp-popover"))
+          ) {
+            e.preventDefault();
+          }
+        }}
+      >
         <SheetHeader>
           {config.title && <SheetTitle>{config.title}</SheetTitle>}
-          {config.description && <SheetDescription>{config.description}</SheetDescription>}
+          {config.description && (
+            <SheetDescription>{config.description}</SheetDescription>
+          )}
         </SheetHeader>
 
         <form
@@ -120,11 +127,16 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     key={index}
                     className={`flex flex-col items-center ${
                       config.wizardOptions?.allowStepNavigation
-                        ? 'cursor-pointer'
-                        : index <= currentStep ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                        ? "cursor-pointer"
+                        : index <= currentStep
+                        ? "cursor-pointer"
+                        : "cursor-not-allowed opacity-50"
                     }`}
                     onClick={() => {
-                      if (config.wizardOptions?.allowStepNavigation || index <= currentStep) {
+                      if (
+                        config.wizardOptions?.allowStepNavigation ||
+                        index <= currentStep
+                      ) {
                         goToStep(index);
                       }
                     }}
@@ -132,16 +144,18 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                         index < currentStep
-                          ? 'bg-green-500 text-white'
+                          ? "bg-green-500 text-white"
                           : index === currentStep
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-gray-200 text-gray-500'
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-gray-200 text-gray-500"
                       }`}
                     >
                       {index + 1}
                     </div>
                     {config.wizardOptions?.showStepTitles && section.title && (
-                      <span className="text-xs text-center">{section.title}</span>
+                      <span className="text-xs text-center">
+                        {section.title}
+                      </span>
                     )}
                   </div>
                 ))}
@@ -150,19 +164,22 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200"></div>
                 <div
                   className="absolute top-0 left-0 h-1 bg-primary transition-all duration-300"
-                  style={{ width: `${(currentStep / (totalSteps - 1)) * 100}%` }}
+                  style={{
+                    width: `${(currentStep / (totalSteps - 1)) * 100}%`,
+                  }}
                 ></div>
               </div>
             </div>
           )}
 
-
-          <div className="max-h-[calc(80vh-120px)] overflow-y-auto pr-2
+          <div
+            className="max-h-[calc(80vh-120px)] overflow-y-auto pr-2
             [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:bg-transparent
             [&::-webkit-scrollbar-thumb]:bg-gray-300
             [&::-webkit-scrollbar-thumb]:rounded-full
-            hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+            hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
+          >
             {/* Render form sections based on mode */}
             {isWizard ? (
               // Wizard mode - only show current step
@@ -203,6 +220,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                       goToStep(index);
                     }
                   }}
+                  clearFiledError={clearFiledError}
                 />
               ))
             ) : (
@@ -228,14 +246,16 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             {/* Form submission error - more subtle styling */}
             {submitError && (
               <div className="text-destructive border border-destructive/20 p-2 rounded">
-                <span className="font-medium">Error: </span>{submitError}
+                <span className="font-medium">Error: </span>
+                {submitError}
               </div>
             )}
 
             {/* Form submission success */}
             {submitSuccess && (
               <div className="text-green-600 border border-green-200 p-2 rounded">
-                <span className="font-medium">Success: </span>Form submitted successfully!
+                <span className="font-medium">Success: </span>Form submitted
+                successfully!
               </div>
             )}
           </div>
@@ -243,22 +263,25 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           <SheetFooter
             className={(() => {
               // Check if cancel button will be shown
-              const showCancel = config.cancelButtonText && (config.showCancelButton !== false);
-              
+              const showCancel =
+                config.cancelButtonText && config.showCancelButton !== false;
+
               // Check if reset button will be shown
-              const showReset = config.showReset && (!isStepBased || isFirstStep);
-              
+              const showReset =
+                config.showReset && (!isStepBased || isFirstStep);
+
               // Check if back button will be shown in step-based forms
-              const showBack = isStepBased && !isFirstStep && (config.showBackButton !== false);
-              
+              const showBack =
+                isStepBased && !isFirstStep && config.showBackButton !== false;
+
               // If only one button will be visible (the submit/next/finish button), use center alignment
-              return !showCancel && !showReset && !showBack ?
-                "flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2" :
-                undefined;
+              return !showCancel && !showReset && !showBack
+                ? "flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2"
+                : undefined;
             })()}
           >
             {/* Cancel button - show if cancelButtonText is provided and showCancelButton is true (or undefined) */}
-            {config.cancelButtonText && (config.showCancelButton !== false) && (
+            {config.cancelButtonText && config.showCancelButton !== false && (
               <Button
                 type="button"
                 onClick={(e) => {
@@ -284,7 +307,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                   resetForm();
                 }}
               >
-                {config.resetButtonText || 'Reset'}
+                {config.resetButtonText || "Reset"}
               </Button>
             )}
 
@@ -292,7 +315,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
             {isStepBased && (
               <div className="flex items-center space-x-2">
                 {/* Previous button - show if not on first step and showBackButton is true (or undefined) */}
-                {!isFirstStep && (config.showBackButton !== false) && (
+                {!isFirstStep && config.showBackButton !== false && (
                   <Button
                     type="button"
                     variant="outline"
@@ -304,7 +327,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     className="flex items-center"
                   >
                     <ChevronLeft className="w-4 h-4 mr-1" />
-                    {config.wizardOptions?.prevButtonText || 'Previous'}
+                    {config.wizardOptions?.prevButtonText || "Previous"}
                   </Button>
                 )}
 
@@ -328,7 +351,8 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                         Submitting...
                       </span>
                     ) : (
-                      config.wizardOptions?.submitButtonTextPerStep || 'Submit Step'
+                      config.wizardOptions?.submitButtonTextPerStep ||
+                      "Submit Step"
                     )}
                   </Button>
                 )}
@@ -344,7 +368,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     disabled={isSubmitting || isSubmittingStep}
                     className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90"
                   >
-                    {config.wizardOptions?.nextButtonText || 'Next'}
+                    {config.wizardOptions?.nextButtonText || "Next"}
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 )}
@@ -363,7 +387,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                         Submitting...
                       </span>
                     ) : (
-                      config.wizardOptions?.finishButtonText || config.submitButtonText || 'Submit'
+                      config.wizardOptions?.finishButtonText ||
+                      config.submitButtonText ||
+                      "Submit"
                     )}
                   </Button>
                 )}
@@ -384,7 +410,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
                     Submitting...
                   </span>
                 ) : (
-                  config.submitButtonText || 'Submit'
+                  config.submitButtonText || "Submit"
                 )}
               </Button>
             )}

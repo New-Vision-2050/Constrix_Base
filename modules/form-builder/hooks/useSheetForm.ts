@@ -257,6 +257,14 @@ export function useSheetForm({
     return isValid;
   }, [config.sections, values]);
 
+  const clearFiledError = (fieldName: string) => {
+    setErrors((prevErrors) => {
+      const updatedErrors = { ...prevErrors };
+      delete updatedErrors[fieldName];
+      return updatedErrors;
+    });
+  };
+
   // Handle form submission
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -291,7 +299,10 @@ export function useSheetForm({
         let finalValues = { ...values };
 
         if (isStepBased) {
-          console.log("Submitting step-based form with step responses:", stepResponses);
+          console.log(
+            "Submitting step-based form with step responses:",
+            stepResponses
+          );
 
           // Include data from step responses in the final values
           Object.entries(stepResponses).forEach(([stepIndex, response]) => {
@@ -405,7 +416,7 @@ export function useSheetForm({
       config.onError,
       config.onValidationError,
       isStepBased,
-      stepResponses
+      stepResponses,
     ]
   );
 
@@ -737,5 +748,6 @@ export function useSheetForm({
     isSubmittingStep,
     stepResponses,
     getStepResponseData,
+    clearFiledError,
   };
 }

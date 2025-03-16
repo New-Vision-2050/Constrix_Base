@@ -16,7 +16,10 @@ interface ExpandableFormSectionProps {
   collapsible?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
-  stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
+  stepResponses?: Record<
+    number,
+    { success: boolean; message?: string; data?: Record<string, any> }
+  >;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
   onToggle?: (isOpen: boolean) => void; // Callback when section is toggled
@@ -37,6 +40,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   currentStep,
   onToggle,
   forceDisabled = false,
+  clearFiledError,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   
@@ -59,27 +63,27 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
     if (hasErrors) return false;
     
     // Check if all required fields have values
-    const allRequiredFieldsFilled = section.fields.every(field => {
+    const allRequiredFieldsFilled = section.fields.every((field) => {
       // Skip fields that don't meet their condition
       if (field.condition && !field.condition(values)) {
         return true;
       }
-      
+
       // Skip fields that are hidden or disabled
       if (field.hidden || field.disabled) {
         return true;
       }
-      
+
       // Check if required field has a value
       if (field.required) {
         const value = values[field.name];
-        return value !== undefined && value !== null && value !== '';
+        return value !== undefined && value !== null && value !== "";
       }
-      
+
       // Non-required fields are considered filled
       return true;
     });
-    
+
     return allRequiredFieldsFilled;
   }, [section.fields, values, hasErrors, errors, touched]);
 
@@ -88,32 +92,41 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
     return null;
   }
 
-  if (!collapsible || !section.title ) {
+  console.log({ errors });
+
+  if (!collapsible || !section.title) {
     return (
       <div className="w-full border rounded-md mb-4 overflow-hidden border-border">
-          {section.title && (
-        <div className="p-4 bg-muted/50">
-          <div className="flex items-center">
-            {hasErrors && (
-              <div className="w-2 h-2 bg-destructive rounded-full mr-2" />
-            )}
-            {isCompleted && !hasErrors && (
-              <div className="mr-2 text-green-500">
-                <Check className="h-4 w-4" />
+        {section.title && (
+          <div className="p-4 bg-muted/50">
+            <div className="flex items-center">
+              {hasErrors && (
+                <div className="w-2 h-2 bg-destructive rounded-full mr-2" />
+              )}
+              {isCompleted && !hasErrors && (
+                <div className="mr-2 text-green-500">
+                  <Check className="h-4 w-4" />
+                </div>
+              )}
+              <div>
+                {section.title && (
+                  <h3 className="text-lg font-medium">{section.title}</h3>
+                )}
+                {section.description && (
+                  <p className="text-sm text-muted-foreground">
+                    {section.description}
+                  </p>
+                )}
               </div>
-            )}
-            <div>
-              {section.title && (
-                <h3 className="text-lg font-medium">{section.title}</h3>
-              )}
-              {section.description && (
-                <p className="text-sm text-muted-foreground">{section.description}</p>
-              )}
             </div>
           </div>
-        </div>)}
+        )}
         <div className="p-4 bg-background">
-          <div className={`grid gap-4 ${section.columns ? `grid-cols-${section.columns}` : 'grid-cols-1'}`}>
+          <div
+            className={`grid gap-4 ${
+              section.columns ? `grid-cols-${section.columns}` : "grid-cols-1"
+            }`}
+          >
             {section.fields.map((field) => {
               // Check field condition if provided
               if (field.condition && !field.condition(values)) {
@@ -127,7 +140,10 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                   value={values[field.name]}
                   error={errors[field.name]}
                   touched={touched[field.name]}
-                  onChange={onChange}
+                  onChange={(filed, value) => {
+                    onChange(filed, value);
+                    clearFiledError(field.name);
+                  }}
                   onBlur={onBlur}
                   values={values}
                   stepResponses={stepResponses}
@@ -177,7 +193,9 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
               <h3 className="text-lg font-medium">{section.title}</h3>
             )}
             {section.description && (
-              <p className="text-sm text-muted-foreground">{section.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {section.description}
+              </p>
             )}
           </div>
         </div>
@@ -190,7 +208,11 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="p-4 bg-background">
-        <div className={`grid gap-4 ${section.columns ? `grid-cols-${section.columns}` : 'grid-cols-1'}`}>
+        <div
+          className={`grid gap-4 ${
+            section.columns ? `grid-cols-${section.columns}` : "grid-cols-1"
+          }`}
+        >
           {section.fields.map((field) => {
             // Check field condition if provided
             if (field.condition && !field.condition(values)) {
@@ -204,7 +226,10 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                 value={values[field.name]}
                 error={errors[field.name]}
                 touched={touched[field.name]}
-                onChange={onChange}
+                onChange={(filed, value) => {
+                  onChange(filed, value);
+                  clearFiledError(field.name);
+                }}
                 onBlur={onBlur}
                 values={values}
                 stepResponses={stepResponses}
