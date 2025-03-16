@@ -21,6 +21,9 @@ apiClient.interceptors.request.use(
     if (nvToken) {
       config.headers.Authorization = `Bearer ${nvToken}`;
     }
+      const lang = getCookie("NEXT_LOCALE");
+      config.headers.Lang = lang || 'ar';
+      config.headers['Accept-Language'] = lang || 'ar';
     return config;
   },
   (error) => Promise.reject(error)
@@ -31,23 +34,23 @@ apiClient.interceptors.response.use(
   (error) => {
     const status = error.response?.status;
     const errorMessageKey = getErrorMessage(error);
-    
+
     // Handle authentication errors
     if (status === 401 || status === 403) {
       // Don't redirect if we're already on the login page
       const isLoginPage = typeof window !== "undefined" &&
         window.location.pathname.includes(ROUTER.LOGIN);
-      
+
       if (!isLoginPage) {
         deleteCookie("new-vision-token");
         useAuthStore.getState().clearUser();
-        
+
         // Show toast notification
         showErrorToast(
           "Errors.Authentication.Title",
           "Errors.Authentication.SessionExpired"
         );
-        
+
         if (typeof window !== "undefined") {
           window.location.href = ROUTER.LOGIN;
         }
@@ -56,7 +59,7 @@ apiClient.interceptors.response.use(
         dispatchErrorEvent(status, errorMessageKey || "Errors.Authentication.GenericError");
       }
     }
-    
+
     console.log("API Error:", error.response?.data?.message || error.message);
     return Promise.reject(error);
   }
