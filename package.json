@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preview:worker": "npm run build && wrangler dev",
+    "deploy:worker": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.2",
@@ -73,6 +75,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/lodash": "^4.17.16",
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/react": "^19",
