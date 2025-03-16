@@ -29,9 +29,12 @@ const formConfig: FormConfig = {
     },
   ],
   // This would be your actual API endpoint for form submission
-  onSubmit: async (values: Record<string, any>) => {
+  onSubmit: async (formData: Record<string, unknown>) => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    // Log the form data (to use the parameter)
+    console.log("Form data received:", formData);
     
     // Return success response
     return {
@@ -73,7 +76,7 @@ const tableConfig: TableConfig = {
 
 export default function FormTestPage() {
   // Create a function to handle form success and reload the table
-  const handleFormSuccess = (values: any) => {
+  const handleFormSuccess = (formData: Record<string, unknown>) => {
     // Import the store directly to avoid hooks in callbacks
     const tableStore = useTableStore.getState();
     
@@ -83,7 +86,7 @@ export default function FormTestPage() {
       tableStore.setLoading(false);
     }, 100);
     
-    console.log("Form submitted successfully:", values);
+    console.log("Form submitted successfully:", formData);
   };
 
   return (
