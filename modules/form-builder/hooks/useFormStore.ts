@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 import { ValidationRule } from '../types/formTypes';
+import axios from 'axios';
+import { debounce } from 'lodash';
+
+// Store debounced validation functions for each field
+const debouncedValidations = new Map<string, ReturnType<typeof debounce>>();
 
 interface FormState {
   // Form values and state
@@ -9,6 +14,7 @@ interface FormState {
   isSubmitting: boolean;
   isValid: boolean;
   submitCount: number;
+  validatingFields: Record<string, boolean>;
   
   // Form actions
   setValue: (field: string, value: any) => void;
@@ -21,6 +27,8 @@ interface FormState {
   setSubmitting: (isSubmitting: boolean) => void;
   setIsValid: (isValid: boolean) => void;
   incrementSubmitCount: () => void;
+  setFieldValidating: (field: string, isValidating: boolean) => void;
+  validateFieldWithApi: (field: string, value: any, rule: ValidationRule) => void;
 }
 
 // Create a more efficient store structure
@@ -32,6 +40,7 @@ export const useFormStore = create<FormState>((set, get) => ({
   isSubmitting: false,
   isValid: true,
   submitCount: 0,
+  validatingFields: {},
   
   // Actions
   setValue: (field, value) => {
@@ -86,23 +95,95 @@ export const useFormStore = create<FormState>((set, get) => ({
     errors: {},
     touched: {},
     isSubmitting: false,
-    isValid: true
+    isValid: true,
+    validatingFields: {}
   }),
   
   setSubmitting: (isSubmitting) => set({ isSubmitting }),
   
   setIsValid: (isValid) => set({ isValid }),
   
-  incrementSubmitCount: () => set((state) => ({ 
-    submitCount: state.submitCount + 1 
-  }))
+  incrementSubmitCount: () => set((state) => ({
+    submitCount: state.submitCount + 1
+  })),
+
+  setFieldValidating: (field, isValidating) => set((state) => ({
+    validatingFields: { ...state.validatingFields, [field]: isValidating }
+  })),
+
+  validateFieldWithApi: (field, value, rule) => {
+    if (!rule.apiConfig) return;
+
+    const {
+      url,
+      method = 'GET',
+      debounceMs = 500,
+      paramName = 'value',
+      headers = {},
+      successCondition
+    } = rule.apiConfig;
+
+    // Get the current state
+    const store = get();
+    
+    // Set field as validating
+    store.setFieldValidating(field, true);
+
+    // Create or get the debounced validation function for this field
+    if (!debouncedValidations.has(field)) {
+      const debouncedFn = debounce(async (fieldName: string, fieldValue: any) => {
+        try {
+          // Prepare request config
+          const config = {
+            method,
+            url,
+            headers,
+            ...(method === 'GET'
+              ? { params: { [paramName]: fieldValue } }
+              : { data: { [paramName]: fieldValue } })
+          };
+
+          // Make the API request
+          const response = await axios(config);
+          
+          // Check if validation passed
+          const isValid = successCondition
+            ? successCondition(response.data)
+            : true; // Default to valid if no condition provided
+          
+          // Update form state based on validation result
+          if (!isValid) {
+            store.setError(fieldName, rule.message);
+          } else {
+            store.setError(fieldName, null);
+          }
+        } catch (error) {
+          // Handle API error
+          console.error('API validation error:', error);
+          store.setError(fieldName, rule.message);
+        } finally {
+          // Set field as no longer validating
+          store.setFieldValidating(fieldName, false);
+        }
+      }, debounceMs);
+
+      debouncedValidations.set(field, debouncedFn);
+    }
+
+    // Execute the debounced validation
+    const debouncedFn = debouncedValidations.get(field);
+    if (debouncedFn) {
+      debouncedFn(field, value);
+    }
+  }
 }));
 
 // Helper function to validate fields based on validation rules
 export const validateField = (
   value: any,
   rules?: ValidationRule[],
-  formValues: Record<string, any> = {}
+  formValues: Record<string, any> = {},
+  fieldName?: string
 ): string | null => {
   if (!rules) return null;
   
@@ -151,6 +232,21 @@ export const validateField = (
       case 'custom':
         if (rule.validator && !rule.validator(value, formValues)) {
           return rule.message;
+        }
+        break;
+      case 'apiValidation':
+        // For API validation, we trigger the validation but don't return an error immediately
+        // The error will be set by the API validation function when it completes
+        if (fieldName && rule.apiConfig) {
+          // Get the form store instance
+          const store = useFormStore.getState();
+          
+          // Trigger API validation
+          store.validateFieldWithApi(fieldName, value, rule);
+          
+          // Return null here as the validation is async and will update the form state later
+          // We'll check the validatingFields state to show a loading indicator
+          return null;
         }
         break;
     }

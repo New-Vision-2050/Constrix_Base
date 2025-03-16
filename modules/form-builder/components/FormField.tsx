@@ -9,6 +9,8 @@ import SelectField from './fields/SelectField';
 import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
 import FieldHelperText from './fields/FieldHelperText';
+import { useFormStore } from '../hooks/useFormStore';
+import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
 
 interface FormFieldProps {
   field: FieldConfig;
@@ -23,7 +25,7 @@ interface FormFieldProps {
   currentStep?: number;
 }
 
-// This component doesn't subscribe to any store values
+// This component subscribes to validating state
 const FormField: React.FC<FormFieldProps> = ({
   field,
   value,
@@ -36,6 +38,8 @@ const FormField: React.FC<FormFieldProps> = ({
   getStepResponseData,
   currentStep,
 }) => {
+  // Get validating state from the store
+  const validatingFields = useFormStore((state) => state.validatingFields);
   // Check if this field's value exists in any previous step's response
   let fieldValue = value;
   if (getStepResponseData && currentStep && currentStep > 0 && stepResponses) {
@@ -61,7 +65,16 @@ const FormField: React.FC<FormFieldProps> = ({
     if (field.onChange) {
       field.onChange(newValue, values);
     }
-  }, [field.name, field.onChange, propOnChange, values]);
+
+    // Check if field has API validation rules and trigger validation
+    if (field.validation && hasApiValidation(field.validation)) {
+      field.validation.forEach(rule => {
+        if (rule.type === 'apiValidation') {
+          triggerApiValidation(field.name, newValue, rule);
+        }
+      });
+    }
+  }, [field.name, field.onChange, field.validation, propOnChange, values]);
 
   const onBlur = useCallback(() => {
     // Call the onBlur prop if provided
@@ -101,6 +114,7 @@ const FormField: React.FC<FormFieldProps> = ({
             type={field.type}
             onChange={onChange}
             onBlur={onBlur}
+            isValidating={validatingFields[field.name]}
           />
         );
 
