@@ -268,7 +268,7 @@ export const companiesFormConfig: FormConfig = {
     // API URLs for each step
     stepApiUrls: {
       0: `${baseURL}/companies`,
-      1: `${baseURL}/company_users`,
+      1: `${baseURL}/company-users`,
     },
 
     // API headers for each step

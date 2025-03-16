@@ -11,16 +11,26 @@ export const defaultStepSubmitHandler = async (
   config: FormConfig
 ): Promise<{ success: boolean; message?: string; data?: Record<string, any>; errors?: Record<string, string | string[]> }> => {
   try {
+    // Log the step being submitted for debugging
+    console.log(`Default step submit handler - Submitting step ${step + 1}`);
+    
     // Get the API URL for this step
+    // Make sure we're using the correct step index for the API URL
     const stepApiUrl = config.wizardOptions?.stepApiUrls?.[step];
     const apiUrl = stepApiUrl || config.apiUrl;
+    
+    // Log the API URL being used
+    console.log(`Default step submit handler - Using API URL: ${apiUrl} for step ${step}`);
+    
+    // Log all available step API URLs for debugging
+    console.log("Available step API URLs:", config.wizardOptions?.stepApiUrls);
     
     // Check if apiUrl is provided
     if (!apiUrl) {
       console.error(`No apiUrl provided for step ${step}`);
-      return { 
-        success: false, 
-        message: 'API URL not configured for this step' 
+      return {
+        success: false,
+        message: 'API URL not configured for this step'
       };
     }
 
