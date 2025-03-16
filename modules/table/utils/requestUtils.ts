@@ -43,7 +43,7 @@ export const buildRequestUrl = (
 
   // Add pagination parameters
   newUrl.searchParams.append("page", currentPage.toString());
-  newUrl.searchParams.append("limit", itemsPerPage.toString());
+  newUrl.searchParams.append("per_page", itemsPerPage.toString());
 
   // Add sorting parameters
   if (sortColumn && sortDirection) {
@@ -90,7 +90,7 @@ export const buildRequestUrl = (
  */
 export const useCreateFetchOptions = () => {
   const locale = useLocale();
-  
+
   return (controller: AbortController): RequestInit => {
     return createApiRequestOptions(locale, controller);
   };

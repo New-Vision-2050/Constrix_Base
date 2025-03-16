@@ -1,24 +1,19 @@
 "use client";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { Button } from "@/components/ui/button";
+import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
 import ExportButton from "@/modules/table/components/ExportButton";
 import TableBuilder from "@/modules/table/components/TableBuilder";
-import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
-
+import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
+import { statisticsConfig } from "@/modules/users/components/statistics-config";
 import React from "react";
-import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
-import { Button } from "@/components/ui/button";
-import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 
-const CompaniesPage = () => {
-    const companyUserModuleRef = useRef<CreateBuilderModuleRef>(null);
-
-    // Get the translated config using the component
-  const config = CompaniesConfig();
+const UsersPage = () => {
+  const config = UsersConfig();
 
   return (
     <div className="px-8 space-y-7">
-      <StatisticsRow config={statisticsConfig} />
-
+      <StatisticsRow config={statisticsConfig} />{" "}
       <TableBuilder
         config={config}
         searchBarActions={
@@ -38,4 +33,4 @@ const CompaniesPage = () => {
   );
 };
 
-export default CompaniesPage;
+export default UsersPage;

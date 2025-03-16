@@ -1,10 +1,18 @@
 import React from 'react';
 
 export interface ValidationRule {
-  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom';
+  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
   value?: any;
   message: string;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
+  apiConfig?: {
+    url: string;
+    method?: 'GET' | 'POST' | 'PUT';
+    debounceMs?: number;
+    paramName?: string;
+    headers?: Record<string, string>;
+    successCondition?: (response: any) => boolean;
+  };
 }
 
 export interface DropdownOption {

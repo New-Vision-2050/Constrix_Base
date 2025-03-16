@@ -17,3 +17,6 @@ export type { FormConfig, FormSection, FieldConfig, DropdownOption, DynamicDropd
 export { formConfig } from './configs/formConfig';
 export { sheetFormConfig } from './configs/sheetFormConfig';
 export { searchFormConfig } from './configs/searchFormConfig';
+
+// Export utilities
+export { triggerApiValidation, hasApiValidation } from './utils/apiValidation';

@@ -52,12 +52,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     projects: [
       {
         name: t("Sidebar.Companies"),
-        url: "#",
+        url: "/companies",
         icon: CompaniesIcon,
       },
       {
         name: t("Sidebar.Users"),
-        url: "#",
+        url: "/users",
         icon: UserIcon,
       },
     ],
