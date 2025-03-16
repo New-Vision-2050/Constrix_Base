@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { ValidationRule } from '../types/formTypes';
-import axios from 'axios';
-import { debounce } from 'lodash';
+import { create } from "zustand";
+import { ValidationRule } from "../types/formTypes";
+import axios from "axios";
+import { debounce } from "lodash";
 
 // Store debounced validation functions for each field
 const debouncedValidations = new Map<string, ReturnType<typeof debounce>>();
@@ -28,7 +28,11 @@ interface FormState {
   setIsValid: (isValid: boolean) => void;
   incrementSubmitCount: () => void;
   setFieldValidating: (field: string, isValidating: boolean) => void;
-  validateFieldWithApi: (field: string, value: any, rule: ValidationRule) => void;
+  validateFieldWithApi: (
+    field: string,
+    value: any,
+    rule: ValidationRule
+  ) => void;
   hasValidatingFields: () => boolean;
 }
 
@@ -54,74 +58,89 @@ export const useFormStore = create<FormState>((set, get) => ({
     }
 
     // Update the value
-    set((state) => ({
-      values: { ...state.values, [field]: value }
-    }), false); // Use false for shallow merge to prevent unnecessary rerenders
+    set(
+      (state) => ({
+        values: { ...state.values, [field]: value },
+      }),
+      false
+    ); // Use false for shallow merge to prevent unnecessary rerenders
   },
 
-  setValues: (values) => set((state) => ({
-    values: { ...state.values, ...values }
-  })),
+  setValues: (values) =>
+    set((state) => ({
+      values: { ...state.values, ...values },
+    })),
 
-  setError: (field, error) => set((state) => ({
-    errors: error
-      ? { ...state.errors, [field]: error }
-      : Object.fromEntries(Object.entries(state.errors).filter(([key]) => key !== field)),
-    isValid: error ? false : Object.values({
-      ...state.errors,
-      [field]: null
-    }).every(err => !err)
-  })),
+  setError: (field, error) =>
+    set((state) => ({
+      errors: error
+        ? { ...state.errors, [field]: error }
+        : Object.fromEntries(
+            Object.entries(state.errors).filter(([key]) => key !== field)
+          ),
+      isValid: error
+        ? false
+        : Object.values({
+            ...state.errors,
+            [field]: null,
+          }).every((err) => !err),
+    })),
 
-  setErrors: (errors) => set(() => ({
-    errors,
-    isValid: Object.values(errors).every(error => !error)
-  })),
+  setErrors: (errors) =>
+    set(() => ({
+      errors,
+      isValid: Object.values(errors).every((error) => !error),
+    })),
 
-  setTouched: (field, isTouched) => set((state) => ({
-    touched: { ...state.touched, [field]: isTouched }
-  })),
+  setTouched: (field, isTouched) =>
+    set((state) => ({
+      touched: { ...state.touched, [field]: isTouched },
+    })),
 
-  setAllTouched: () => set((state) => {
-    const allTouched = Object.keys(state.values).reduce((acc, key) => {
-      acc[key] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
+  setAllTouched: () =>
+    set((state) => {
+      const allTouched = Object.keys(state.values).reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
 
-    return { touched: allTouched };
-  }),
+      return { touched: allTouched };
+    }),
 
-  resetForm: (values = {}) => set({
-    values,
-    errors: {},
-    touched: {},
-    isSubmitting: false,
-    isValid: true,
-    validatingFields: {}
-  }),
+  resetForm: (values = {}) =>
+    set({
+      values,
+      errors: {},
+      touched: {},
+      isSubmitting: false,
+      isValid: true,
+      validatingFields: {},
+    }),
 
   setSubmitting: (isSubmitting) => set({ isSubmitting }),
 
   setIsValid: (isValid) => set({ isValid }),
 
-  incrementSubmitCount: () => set((state) => ({
-    submitCount: state.submitCount + 1
-  })),
+  incrementSubmitCount: () =>
+    set((state) => ({
+      submitCount: state.submitCount + 1,
+    })),
 
-  setFieldValidating: (field, isValidating) => set((state) => ({
-    validatingFields: { ...state.validatingFields, [field]: isValidating }
-  })),
+  setFieldValidating: (field, isValidating) =>
+    set((state) => ({
+      validatingFields: { ...state.validatingFields, [field]: isValidating },
+    })),
 
   validateFieldWithApi: (field, value, rule) => {
     if (!rule.apiConfig) return;
 
     const {
       url,
-      method = 'GET',
+      method = "GET",
       debounceMs = 500,
-      paramName = 'value',
+      paramName = "value",
       headers = {},
-      successCondition
+      successCondition,
     } = rule.apiConfig;
 
     // Get the current state
@@ -132,63 +151,66 @@ export const useFormStore = create<FormState>((set, get) => ({
 
     // Create or get the debounced validation function for this field
     if (!debouncedValidations.has(field)) {
-      const debouncedFn = debounce(async (fieldName: string, fieldValue: any) => {
-        try {
-          // Prepare request config
-          const config = {
-            method,
-            url,
-            headers,
-            ...(method === 'GET'
-              ? { params: { [paramName]: fieldValue } }
-              : { data: { [paramName]: fieldValue } })
-          };
+      const debouncedFn = debounce(
+        async (fieldName: string, fieldValue: any) => {
+          try {
+            // Prepare request config
+            const config = {
+              method,
+              url,
+              headers,
+              ...(method === "GET"
+                ? { params: { [paramName]: fieldValue } }
+                : { data: { [paramName]: fieldValue } }),
+            };
 
-          // Make the API request
-          const response = await axios(config);
+            // Make the API request
+            const response = await axios(config);
 
-          // Check if validation passed
-          // If successCondition is provided, use it to determine validity
-          // If not provided, check if the response has an 'available' property
-          // or a 'success' property, which are common API validation patterns
-          let isValid = false;
+            // Check if validation passed
+            // If successCondition is provided, use it to determine validity
+            // If not provided, check if the response has an 'available' property
+            // or a 'success' property, which are common API validation patterns
+            let isValid = false;
 
-          if (successCondition) {
-            // Use the provided success condition
-            isValid = successCondition(response.data);
-             } else if (response.data.available !== undefined) {
-            // Check if the API returns an 'available' property
-            isValid = response.data.available === true;
-          } else if (response.data.success !== undefined) {
-            // Check if the API returns a 'success' property
-            isValid = response.data.success === true;
-          } else if (response.data.valid !== undefined) {
-            // Check if the API returns a 'valid' property
-            isValid = response.data.valid === true;
-          } else if (response.data.isValid !== undefined) {
-            // Check if the API returns an 'isValid' property
-            isValid = response.data.isValid === true;
-          } else {
-            // Default to invalid if no condition is provided and no standard properties found
-            // This forces the API to explicitly indicate success
-            isValid = false;
-          }
+            if (successCondition) {
+              // Use the provided success condition
+              isValid = successCondition(response.data);
+            } else if (response.data.available !== undefined) {
+              // Check if the API returns an 'available' property
+              isValid = response.data.available === true;
+            } else if (response.data.success !== undefined) {
+              // Check if the API returns a 'success' property
+              isValid = response.data.success === true;
+            } else if (response.data.valid !== undefined) {
+              // Check if the API returns a 'valid' property
+              isValid = response.data.valid === true;
+            } else if (response.data.isValid !== undefined) {
+              // Check if the API returns an 'isValid' property
+              isValid = response.data.isValid === true;
+            } else {
+              // Default to invalid if no condition is provided and no standard properties found
+              // This forces the API to explicitly indicate success
+              isValid = false;
+            }
 
-          // Update form state based on validation result
-          if (!isValid) {
+            // Update form state based on validation result
+            if (!isValid) {
+              store.setError(fieldName, rule.message);
+            } else {
+              store.setError(fieldName, null);
+            }
+          } catch (error) {
+            // Handle API error
+            console.log("API validation error:", error);
             store.setError(fieldName, rule.message);
-          } else {
-            store.setError(fieldName, null);
+          } finally {
+            // Set field as no longer validating
+            store.setFieldValidating(fieldName, false);
           }
-        } catch (error) {
-          // Handle API error
-          console.error('API validation error:', error);
-          store.setError(fieldName, rule.message);
-        } finally {
-          // Set field as no longer validating
-          store.setFieldValidating(fieldName, false);
-        }
-      }, debounceMs);
+        },
+        debounceMs
+      );
 
       debouncedValidations.set(field, debouncedFn);
     }
@@ -203,8 +225,10 @@ export const useFormStore = create<FormState>((set, get) => ({
   // Check if any fields are currently being validated
   hasValidatingFields: () => {
     const state = get();
-    return Object.values(state.validatingFields).some(isValidating => isValidating);
-  }
+    return Object.values(state.validatingFields).some(
+      (isValidating) => isValidating
+    );
+  },
 }));
 
 // Helper function to validate fields based on validation rules
@@ -219,52 +243,60 @@ export const validateField = (
 
   for (const rule of rules) {
     switch (rule.type) {
-      case 'required':
-        if (value === undefined || value === null || value === '') {
+      case "required":
+        if (value === undefined || value === null || value === "") {
           return rule.message;
         }
         break;
-      case 'min':
-        if (typeof value === 'number' && value < rule.value) {
+      case "min":
+        if (typeof value === "number" && value < rule.value) {
           return rule.message;
         }
         break;
-      case 'max':
-        if (typeof value === 'number' && value > rule.value) {
+      case "max":
+        if (typeof value === "number" && value > rule.value) {
           return rule.message;
         }
         break;
-      case 'minLength':
-        if (typeof value === 'string' && value.length < rule.value) {
+      case "minLength":
+        if (typeof value === "string" && value.length < rule.value) {
           return rule.message;
         }
         break;
-      case 'maxLength':
-        if (typeof value === 'string' && value.length > rule.value) {
+      case "maxLength":
+        if (typeof value === "string" && value.length > rule.value) {
           return rule.message;
         }
         break;
-      case 'pattern':
-        if (typeof value === 'string' && !new RegExp(rule.value).test(value)) {
+      case "pattern":
+        if (typeof value === "string" && !new RegExp(rule.value).test(value)) {
           return rule.message;
         }
         break;
-      case 'email':
-        if (typeof value === 'string' && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+      case "email":
+        if (
+          typeof value === "string" &&
+          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
+        ) {
           return rule.message;
         }
         break;
-      case 'url':
-        if (typeof value === 'string' && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(value)) {
+      case "url":
+        if (
+          typeof value === "string" &&
+          !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(
+            value
+          )
+        ) {
           return rule.message;
         }
         break;
-      case 'custom':
+      case "custom":
         if (rule.validator && !rule.validator(value, formValues)) {
           return rule.message;
         }
         break;
-      case 'apiValidation':
+      case "apiValidation":
         // For API validation, we trigger the validation but also check if there's an existing error
         if (fieldName && rule.apiConfig) {
           // Use the provided store or get it from the global state

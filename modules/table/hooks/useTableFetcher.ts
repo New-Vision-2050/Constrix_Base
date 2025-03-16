@@ -1,16 +1,18 @@
-
-import { useCallback } from 'react';
-import { SearchConfig, ColumnSearchState } from '@/modules/table/utils/tableTypes';
-import { ColumnConfig } from '@/modules/table/utils/tableConfig';
+import { useCallback } from "react";
+import {
+  SearchConfig,
+  ColumnSearchState,
+} from "@/modules/table/utils/tableTypes";
+import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import {
   processApiResponse,
-  extractColumnsFromData
-} from '@/modules/table/utils/dataUtils';
+  extractColumnsFromData,
+} from "@/modules/table/utils/dataUtils";
 import {
   buildRequestUrl,
   setupRequestTimeout,
-  useCreateFetchOptions
-} from '@/modules/table/utils/requestUtils';
+  useCreateFetchOptions,
+} from "@/modules/table/utils/requestUtils";
 import { useLocale } from "next-intl";
 
 type FetchDataBaseProps = {
@@ -18,7 +20,7 @@ type FetchDataBaseProps = {
   currentPage: number;
   itemsPerPage: number;
   sortColumn: string | null;
-  sortDirection: 'asc' | 'desc' | null;
+  sortDirection: "asc" | "desc" | null;
   searchQuery: string;
   searchFields?: string[];
   columnSearchState?: ColumnSearchState;
@@ -32,7 +34,11 @@ type FetchDataAdditionalProps = {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setTotalItems: (totalItems: number) => void;
-  setPagination: (currentPage: number, totalPages: number, itemsPerPage: number) => void;
+  setPagination: (
+    currentPage: number,
+    totalPages: number,
+    itemsPerPage: number
+  ) => void;
   setColumns: (columns: ColumnConfig[]) => void;
   setData: (data: any[]) => void;
   dataMapper?: (data: any) => any[];
@@ -65,7 +71,7 @@ export const createTableFetcher = () => {
       setPagination,
       setColumns,
       setData,
-      dataMapper
+      dataMapper,
     } = props;
 
     if (!url) return;
@@ -95,33 +101,34 @@ export const createTableFetcher = () => {
 
       const timeoutId = setupRequestTimeout(controller, () => {
         if (isMountedRef.current && abortControllerRef.current === controller) {
-          setError('Request timed out');
+          setError("Request timed out");
           setLoading(false);
         }
       });
 
       const requestOptions = useApiRequestOptions(controller);
-      const response = await fetch(
-        apiUrl.toString(),
-        requestOptions
-      );
+      const response = await fetch(apiUrl.toString(), requestOptions);
 
       clearTimeout(timeoutId);
 
       if (!isMountedRef.current) {
         // Component unmounted, but we'll still process the response
         // to cache it for when the user returns to this page
-        console.log('Component unmounted but continuing to process response for caching');
+        console.log(
+          "Component unmounted but continuing to process response for caching"
+        );
       } else if (requestCounter !== currentRequestId) {
         // A newer request has been made, ignore this response
         return;
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch data: ${response.status} ${response.statusText}`
+        );
       }
 
-      const totalCount = response.headers.get('X-TOTAL-COUNT');
+      const totalCount = response.headers.get("X-TOTAL-COUNT");
       const totalItemsCount = totalCount ? parseInt(totalCount, 10) : 0;
 
       // Always process the response, even if the component is unmounted
@@ -138,7 +145,9 @@ export const createTableFetcher = () => {
       if (!isMountedRef.current) {
         // Component unmounted, but we'll still process the response
         // to cache it for when the user returns to this page
-        console.log('Component unmounted but continuing to process response for caching');
+        console.log(
+          "Component unmounted but continuing to process response for caching"
+        );
       } else if (requestCounter !== currentRequestId) {
         // A newer request has been made, ignore this response
         return;
@@ -151,7 +160,7 @@ export const createTableFetcher = () => {
         setPagination(currentPage, calculatedTotalPages, itemsPerPage);
       } else if (!totalCount && tableData.length === 0) {
         // Always process the response, even if the component is unmounted
-        setError('No data found or data format not supported');
+        setError("No data found or data format not supported");
       }
 
       if (dataMapper) {
@@ -169,16 +178,19 @@ export const createTableFetcher = () => {
 
       setData(tableData);
       setLoading(false);
-
     } catch (err: any) {
       // Don't handle AbortError as an actual error
-      if (!(err instanceof Error && err.name === 'AbortError')) {
-        console.error('Error fetching data:', err);
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      if (!(err instanceof Error && err.name === "AbortError")) {
+        console.log("Error fetching data:", err);
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred"
+        );
         setData([]);
         setLoading(false);
       } else {
-        console.log('Request was aborted, likely due to component unmount or new request');
+        console.log(
+          "Request was aborted, likely due to component unmount or new request"
+        );
       }
     }
   }, []);

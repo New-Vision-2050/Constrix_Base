@@ -399,7 +399,7 @@ export function useSheetForm({
           }
         }
       } catch (error) {
-        console.error("Form submission error:", error);
+        console.log("Form submission error:", error);
         setSubmitError("An unexpected error occurred");
       } finally {
         setIsSubmitting(false);
@@ -672,7 +672,7 @@ export function useSheetForm({
 
       return result.success;
     } catch (error) {
-      console.error("Step submission error:", error);
+      console.log("Step submission error:", error);
       return false;
     } finally {
       setIsSubmittingStep(false);
