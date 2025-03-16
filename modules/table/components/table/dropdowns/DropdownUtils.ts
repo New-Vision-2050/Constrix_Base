@@ -17,13 +17,14 @@ export interface DynamicDropdownConfig {
 export interface DropdownBaseProps {
     columnKey: string;
     label: string;
-    value: string;
-    onChange: (value: string) => void;
+    value: string | string[];
+    onChange: (value: string | string[]) => void;
     options?: DropdownOption[];
     dynamicConfig?: DynamicDropdownConfig;
     dependencies?: Record<string, string>;
     placeholder?: string;
     isDisabled?: boolean;
+    isMulti?: boolean;
 }
 
 export const useDependencyMessage = (

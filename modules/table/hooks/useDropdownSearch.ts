@@ -12,7 +12,8 @@ interface UseDropdownSearchProps {
   searchTerm: string;
   dynamicConfig?: DynamicDropdownConfig;
   dependencies?: Record<string, string>;
-  selectedValue?: string;
+  selectedValue?: string | string[];
+  isMulti?: boolean;
 }
 
 interface UseDropdownSearchResult {
@@ -26,10 +27,11 @@ export const useDropdownSearch = ({
   dynamicConfig,
   dependencies,
   selectedValue,
+  isMulti = false,
 }: UseDropdownSearchProps): UseDropdownSearchResult => {
   const queryClient = useQueryClient();
   const [options, setOptions] = useState<DropdownOption[]>([]);
-  const [backupOption, setBackupOption] = useState<DropdownOption | null>(null);
+  const [backupOptions, setBackupOptions] = useState<DropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -38,19 +40,36 @@ export const useDropdownSearch = ({
   // Create a debounced search term
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
 
-  // Store the selected option as a backup when it changes
+  // Store the selected option(s) as backup when they change
   useEffect(() => {
-    if (selectedValue) {
-      const selectedOption = options.find(
-        (option) => option.value === selectedValue
-      );
+    if (!selectedValue) return;
+    
+    if (isMulti && Array.isArray(selectedValue)) {
+      // For multi-select, handle array of values
+      const newBackupOptions: DropdownOption[] = [];
+      
+      selectedValue.forEach(value => {
+        const selectedOption = options.find(option => option.value === value);
+        if (selectedOption) {
+          newBackupOptions.push(selectedOption);
+        } else if (value) {
+          newBackupOptions.push({ value, label: value });
+        }
+      });
+      
+      if (newBackupOptions.length > 0) {
+        setBackupOptions(newBackupOptions);
+      }
+    } else if (!isMulti && typeof selectedValue === 'string') {
+      // For single select, handle string value
+      const selectedOption = options.find(option => option.value === selectedValue);
       if (selectedOption) {
-        setBackupOption(selectedOption);
+        setBackupOptions([selectedOption]);
       } else if (selectedValue) {
-        setBackupOption({ value: selectedValue, label: selectedValue });
+        setBackupOptions([{ value: selectedValue, label: selectedValue }]);
       }
     }
-  }, [selectedValue]);
+  }, [selectedValue, options, isMulti]);
 
   // Build the URL for the request
   const buildSearchUrl = useCallback(() => {
@@ -175,14 +194,18 @@ export const useDropdownSearch = ({
           return acc;
         }, []);
 
-      // Merge the backup option with the new options if it exists and there is a selected value
+      // Merge the backup options with the new options if they exist and there is a selected value
       let mergedOptions = validOptions;
-      if (
-        selectedValue &&
-        backupOption &&
-        !mergedOptions.find((option) => option.value === backupOption.value)
-      ) {
-        mergedOptions = [backupOption, ...mergedOptions];
+      
+      if (selectedValue && backupOptions.length > 0) {
+        // Add any backup options that aren't already in the results
+        const optionsToAdd = backupOptions.filter(
+          backupOpt => !mergedOptions.some(option => option.value === backupOpt.value)
+        );
+        
+        if (optionsToAdd.length > 0) {
+          mergedOptions = [...optionsToAdd, ...mergedOptions];
+        }
       }
 
       setOptions(mergedOptions);

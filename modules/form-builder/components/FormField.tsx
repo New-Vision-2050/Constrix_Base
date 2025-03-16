@@ -6,8 +6,10 @@ import TextareaField from './fields/TextareaField';
 import CheckboxField from './fields/CheckboxField';
 import RadioField from './fields/RadioField';
 import SelectField from './fields/SelectField';
+import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
+import PhoneField from './fields/PhoneField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
@@ -167,21 +169,45 @@ const FormField: React.FC<FormFieldProps> = ({
             onBlur={onBlur}
           />
         );
-        
-      case 'select':
-        return (
-          <SearchField
-            field={field}
-            value={fieldValue}
-            error={error}
-            touched={touched}
-            onChange={onChange}
-            onBlur={onBlur}
-            dependencyValues={values}
-          />
-        );
-
-      default:
+        case 'select':
+          return (
+            <SearchField
+              field={field}
+              value={fieldValue}
+              error={error}
+              touched={touched}
+              onChange={onChange}
+              onBlur={onBlur}
+              dependencyValues={values}
+            />
+          );
+          case 'multiSelect':
+            return (
+              <MultiSelectField
+                field={field}
+                value={Array.isArray(fieldValue) ? fieldValue : []}
+                error={error}
+                touched={touched}
+                onChange={onChange}
+                onBlur={onBlur}
+                dependencyValues={values}
+              />
+            );
+            
+          case 'phone':
+            return (
+              <PhoneField
+                field={field}
+                value={fieldValue || ''}
+                error={error}
+                touched={touched}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            );
+    
+          default:
+            return <div>Unsupported field type: {field.type}</div>;
         return <div>Unsupported field type: {field.type}</div>;
     }
   };

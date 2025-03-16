@@ -10,12 +10,13 @@ import PaginatedDropdown from "./dropdowns/PaginatedDropdown";
 interface DropdownSearchProps {
   columnKey: string;
   label: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | string[];
+  onChange: (value: string | string[]) => void;
   options?: DropdownOption[];
   dynamicConfig?: DynamicDropdownConfig;
   dependencies?: Record<string, string>;
   placeholder?: string;
+  isMulti?: boolean;
 }
 
 const DropdownSearch: React.FC<DropdownSearchProps> = ({
@@ -27,6 +28,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   dynamicConfig,
   dependencies,
   placeholder = "Select option",
+  isMulti = false,
 }) => {
   const { toast } = useToast();
   const [previousDependencyValues, setPreviousDependencyValues] = useState<
@@ -104,9 +106,13 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
       // Set flag to prevent re-triggering the effect
       processingDependencyChange.current = true;
 
-      // Clear the value immediately without checking if it's already empty
-      if (value !== "") {
-        onChangeRef.current("");
+      // Clear the value based on whether it's multi-select or not
+      const isEmpty = isMulti
+        ? Array.isArray(value) && value.length === 0
+        : value === "";
+        
+      if (!isEmpty) {
+        onChangeRef.current(isMulti ? [] : "");
       }
 
       // Update the stored previous value
@@ -120,7 +126,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         processingDependencyChange.current = false;
       }, 0);
     }
-  }, [dependencies, dynamicConfig?.dependsOn, columnKey, value]);
+  }, [dependencies, dynamicConfig?.dependsOn, columnKey, value, isMulti]);
 
   // Handle API errors
   useEffect(() => {
@@ -135,13 +141,18 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
 
   // Memoize the change handler
   const handleChange = useCallback(
-    (newValue: string) => {
-      if (newValue !== value) {
-        console.log(`DropdownSearch - onChange for ${columnKey}: ${newValue}`);
+    (newValue: string | string[]) => {
+      const isEqual = isMulti
+        ? Array.isArray(value) && Array.isArray(newValue) &&
+          JSON.stringify(value) === JSON.stringify(newValue)
+        : newValue === value;
+        
+      if (!isEqual) {
+        console.log(`DropdownSearch - onChange for ${columnKey}:`, newValue);
         onChange(newValue);
       }
     },
-    [onChange, columnKey, value]
+    [onChange, columnKey, value, isMulti]
   );
 
   // Determine if the dropdown should be disabled
@@ -152,18 +163,24 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
       dependencies[dynamicConfig.dependsOn] === "")
   );
 
+  // Convert value to appropriate type based on isMulti
+  const processedValue = isMulti
+    ? (Array.isArray(value) ? value : value ? [value] : [])
+    : (Array.isArray(value) && value.length > 0 ? value[0] : value || '');
+
   // If we're using the paginated dropdown with search
   if (dynamicConfig?.paginationEnabled) {
     return (
       <PaginatedDropdown
         columnKey={columnKey}
         label={label}
-        value={value}
+        value={processedValue}
         onChange={handleChange}
         placeholder={placeholder}
         isDisabled={isDisabled}
         dynamicConfig={dynamicConfig}
         dependencies={dependencies}
+        isMulti={isMulti}
       />
     );
   }
@@ -173,13 +190,14 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     <ComboBoxDropdown
       columnKey={columnKey}
       label={label}
-      value={value}
+      value={processedValue}
       onChange={handleChange}
       options={dynamicConfig ? dynamicOptions : options}
       dynamicConfig={dynamicConfig}
       dependencies={dependencies}
       placeholder={placeholder}
       isDisabled={isDisabled}
+      isMulti={isMulti}
     />
   );
 };

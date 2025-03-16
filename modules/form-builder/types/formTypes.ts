@@ -46,7 +46,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'email' | 'password' | 'number' | 'date' | 'search';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone';
   name: string;
   label: string;
   placeholder?: string;
@@ -67,6 +67,7 @@ export interface FieldConfig {
   render?: (field: FieldConfig, value: any, onChange: (newValue: any) => void) => React.ReactNode;
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
+  isMulti?: boolean; // Whether to enable multi-select functionality
 }
 
 export interface FormSection {

@@ -43,6 +43,7 @@ export const sheetFormConfig: FormConfig = {
           type: "select",
           placeholder: "Select your country",
           required: true,
+         // isMulti:true,
           searchType: countrySearchConfig,
           options: [
             { value: "1", label: "United States" },
@@ -63,12 +64,25 @@ export const sheetFormConfig: FormConfig = {
             },
           ],
         },
+          {
+              name: "phone",
+              label: "Phone",
+              type: "phone",
+              placeholder: "Enter your phone",
+              validation: [
+                  {
+                      type: "required",
+                      message: "Please enter phone",
+                  },
+              ],
+          },
         {
           type: "select",
           name: "city",
           label: "City",
           placeholder: "Select a city",
           required: true,
+            isMulti:true,
           dynamicOptions: {
             url: `${baseURL}/countries`,
             valueField: "id",
@@ -81,6 +95,7 @@ export const sheetFormConfig: FormConfig = {
             limitParam: "per_page",
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
+
           },
           validation: [
             {
@@ -177,11 +192,10 @@ export const sheetFormConfig: FormConfig = {
           type: "text",
           placeholder: "Enter your phone number",
           validation: [
-            {
-              type: "pattern",
-              value: "^[0-9\\-\\+\\s\\(\\)]+$",
-              message: "Please enter a valid phone number",
-            },
+              {
+                  type: "required",
+                  message: "Phone is required",
+              },
           ],
         },
       ],
