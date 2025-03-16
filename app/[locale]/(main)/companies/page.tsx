@@ -5,7 +5,7 @@ import TableBuilder from "@/modules/table/components/TableBuilder";
 import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
 
 import React from "react";
-import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
+import { SheetFormBuilder } from "@/modules/form-builder";
 import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import {companiesFormConfig} from "@/modules/form-builder/configs/companiesFormConfig";
@@ -17,7 +17,7 @@ const CompaniesPage = () => {
 
   // Create a function that will get the reloadTable function when needed
   // This avoids the infinite update loop
-  const handleFormSuccess = (values: any) => {
+  const handleFormSuccess = (values: Record<string, unknown>) => {
     // Import the store directly to avoid hooks in callbacks
     const tableStore = useTableStore.getState();
     

@@ -299,7 +299,7 @@ export const companiesFormConfig: FormConfig = {
                   message: `Step ${step + 1} submitted successfully`,
                   data: {
                       // For step 0 (location), return a generated ID
-                      ...(step === 0 && {
+                      ...(step === 0 && result.data?.payload?.id && {
                           company_id: result.data.payload.id
                       }),
 
