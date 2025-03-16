@@ -1,1 +1,6 @@
-export type Country = { id: string; name: string };
+export type Country = {
+  id: string;
+  name: string;
+  status: number;
+  sms_driver: string;
+};

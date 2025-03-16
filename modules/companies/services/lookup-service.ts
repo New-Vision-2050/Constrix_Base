@@ -4,17 +4,17 @@ import { lookupsEndPoints } from "../constant/end-points";
 import axios from "axios";
 import { CompanyField } from "../types/CompanyField";
 import { User } from "../../users/types/User";
-import {getCookie} from "cookies-next";
+import { getCookie } from "cookies-next";
 
 type fetchCountriesResponseT = {
-  countries: Country[];
+  payload: Country[];
 };
 
 export const fetchCountries = async () => {
   let url = apiUrl + lookupsEndPoints.countries;
   // ! The following line is a temporary override for testing purposes.
   // Remove it once the backend URL is stable and ready for production.
-  const token =  getCookie("new-vision-token");
+  const token = getCookie("new-vision-token");
   url = `https://core-be-stage.constrix-nv.com/api/v1${lookupsEndPoints.countries}`;
 
   const response = await axios.get<fetchCountriesResponseT>(url, {
@@ -23,7 +23,9 @@ export const fetchCountries = async () => {
     },
   });
 
-  return response.data.countries;
+  console.log("response.dataresponse.data", response.data);
+
+  return response.data.payload;
 };
 
 type fetchCompanyFieldsResponseT = {
@@ -33,7 +35,7 @@ export const fetchCompanyFields = async () => {
   let url = apiUrl + lookupsEndPoints.countries;
   // ! The following line is a temporary override for testing purposes.
   // Remove it once the backend URL is stable and ready for production.
-    const token = getCookie("new-vision-token");
+  const token = getCookie("new-vision-token");
   url = `https://core-be-stage.constrix-nv.com/api/v1${lookupsEndPoints.companyFields}`;
 
   const response = await axios.get<fetchCompanyFieldsResponseT>(url, {
@@ -46,15 +48,15 @@ export const fetchCompanyFields = async () => {
 };
 
 type fetchCompanyUsersResponseT = {
-  data: User[];
+  payload: User[];
 };
 
 export const fetchCompanyUsers = async () => {
   let url = apiUrl + lookupsEndPoints.countries;
   // ! The following line is a temporary override for testing purposes.
   // Remove it once the backend URL is stable and ready for production.
-  const token = getCookie("new-vision-token");;
-    url = `https://core-be-stage.constrix-nv.com/api/v1${lookupsEndPoints.companyUsers}`;
+  const token = getCookie("new-vision-token");
+  url = `https://core-be-stage.constrix-nv.com/api/v1${lookupsEndPoints.companyUsers}`;
 
   const response = await axios.get<fetchCompanyUsersResponseT>(url, {
     headers: {
@@ -62,5 +64,5 @@ export const fetchCompanyUsers = async () => {
     },
   });
 
-  return response.data.data;
+  return response.data.payload;
 };
