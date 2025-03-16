@@ -215,7 +215,6 @@ const FormField: React.FC<FormFieldProps> = ({
     
           default:
             return <div>Unsupported field type: {field.type}</div>;
-        return <div>Unsupported field type: {field.type}</div>;
     }
   };
 

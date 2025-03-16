@@ -101,14 +101,6 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
   return (
     <div>
-      {!!label && (
-        <label
-          htmlFor={columnKey}
-          className={cn("block text-sm font-medium text-gray-700 mb-2")}
-        >
-          {label}
-        </label>
-      )}{" "}
       <Popover open={open} onOpenChange={setOpen}>
         <div className="flex gap-2">
           <PopoverTrigger asChild>
