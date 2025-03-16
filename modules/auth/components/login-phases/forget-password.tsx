@@ -14,12 +14,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import OtpHub from "../resend-otp/otp-hub";
+import { useTranslations } from "next-intl";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const {
     formState: { errors },
     handleSubmit,
@@ -27,6 +29,7 @@ const ForgetPasswordPhase = ({
     getValues,
   } = useFormContext<IdentifierType & ForgetPasswordType>();
   const identifier = getValues("identifier");
+  const token = getValues("token");
 
   const onSubmit = () => {
     handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
@@ -34,10 +37,10 @@ const ForgetPasswordPhase = ({
 
   return (
     <>
-      <h1 className="text-2xl text-center">نسيت كلمة المرور</h1>
+      <h1 className="text-2xl text-center">{t("ForgotPassword.Title")}</h1>
       <p>
         <span className="opacity-50 block">
-          ادخل كلمة المرور المؤقتة المرسلة على البريد الالكتروني
+          {t("ForgotPassword.EnterTemporaryPassword")}
         </span>
         {identifier}
       </p>
@@ -67,10 +70,19 @@ const ForgetPasswordPhase = ({
           </div>
         )}
       />
-      <Button onClick={handleSubmit(onSubmit)} className="w-full">
-        تأكيد
+      <Button
+        onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
+        className="w-full"
+      >
+        {t("ForgotPassword.Confirm")}
       </Button>{" "}
-      <OtpHub identifier={identifier} resendFor={"forget-password"} />
+      <OtpHub
+        identifier={identifier}
+        resendFor={"forget-password"}
+        token={token ?? ""}
+      />
     </>
   );
 };

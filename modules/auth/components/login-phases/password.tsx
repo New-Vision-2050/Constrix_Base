@@ -11,13 +11,21 @@ import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
 import AnotherCheckingWay from "../another-checking-way";
+import { useEffect, useState } from "react";
+import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { useTranslations } from "next-intl";
 
 const PasswordPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const { mutate: forgetPasswordMutation, isPending: isPendingForgetPassword } =
     useForgetPassword();
@@ -31,6 +39,23 @@ const PasswordPhase = ({
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
 
+  // Listen for auth errors from the interceptor
+  useEffect(() => {
+    const handleAuthError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        setErrorMessage(customEvent.detail.messageKey);
+        handleOpen();
+      }
+    };
+
+    errorEvent.addEventListener('auth-error', handleAuthError);
+
+    return () => {
+      errorEvent.removeEventListener('auth-error', handleAuthError);
+    };
+  }, [handleOpen, t]);
+
   const handleLogin = () => {
     const data = getValues();
     mutate(
@@ -41,7 +66,6 @@ const PasswordPhase = ({
       },
       {
         onSuccess: (data) => {
-          console.log(data.payload);
           if (!data.payload.login_way.step) {
             useAuthStore.getState().setUser(data.payload.user);
             setCookie("new-vision-token", data.payload.token, {
@@ -53,7 +77,9 @@ const PasswordPhase = ({
           }
         },
         onError(error) {
-          console.log(error);
+          const messageKey = getErrorMessage(error);
+          setErrorMessage((messageKey) || t("Errors.Authentication.InvalidCredentials"));
+          handleOpen();
         },
       }
     );
@@ -63,7 +89,7 @@ const PasswordPhase = ({
     const data = getValues();
 
     forgetPasswordMutation(
-      { identifier: data.identifier },
+      { identifier: data.identifier , token: data.token ?? "" },
       {
         onSuccess: () => {
           handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
@@ -74,34 +100,51 @@ const PasswordPhase = ({
 
   return (
     <>
-      <h1 className="text-2xl text-center">ادخل كلمة المرور</h1>
-      <Input
-        type="password"
-        {...register("password")}
-        label="كلمة المرور"
-        error={errors?.password?.message}
-      />
-      <Button
-        size={"lg"}
-        className="w-full"
-        loading={isPending}
-        onClick={handleSubmit(handleLogin)}
-      >
-        دخول
-      </Button>
-      <Button
-        loading={isPendingForgetPassword}
-        variant={"link"}
-        onClick={handleForgetPhase}
-      >
-        هل نسيت كلمة المرور؟
-      </Button>
-      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
-        <AnotherCheckingWay
-          loginOptionAlternatives={loginOptionAlternatives}
-          handleSetStep={handleSetStep}
+      <h1 className="text-xl sm:text-2xl text-center mb-4">{t("Login.EnterPassword")}</h1>
+      <div className="space-y-4">
+        <Input
+          type="password"
+          {...register("password")}
+          label={t("Login.Password")}
+          error={errors?.password?.message}
         />
-      )}
+
+        <Button
+          size={"lg"}
+          className="w-full mt-4"
+          loading={isPending}
+          onClick={handleSubmit(handleLogin)}
+          type="submit"
+          form="login-form"
+        >
+          {t("Login.Login")}
+        </Button>
+
+        <div className="flex justify-center">
+          <Button
+            loading={isPendingForgetPassword}
+            variant={"link"}
+            onClick={handleForgetPhase}
+            className="text-sm sm:text-base"
+          >
+            {t("Login.ForgotPassword")}
+          </Button>
+        </div>
+
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <div className="mt-2">
+            <AnotherCheckingWay
+              loginOptionAlternatives={loginOptionAlternatives}
+              handleSetStep={handleSetStep}
+            />
+          </div>
+        )}
+      </div>
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };

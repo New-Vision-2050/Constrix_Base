@@ -2,8 +2,9 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { ROUTER } from "@/router";
 import axios from "axios";
 import { deleteCookie, getCookie } from "cookies-next";
+import { getErrorMessage, showErrorToast, dispatchErrorEvent, errorEvent } from "@/utils/errorHandler";
 
-const baseURL =
+export const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL +
   "/" +
   process.env.NEXT_PUBLIC_API_PATH +
@@ -29,13 +30,33 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
+    const errorMessageKey = getErrorMessage(error);
+    
+    // Handle authentication errors
     if (status === 401 || status === 403) {
-      deleteCookie("new-vision-token");
-      useAuthStore.getState().clearUser();
-      if (typeof window !== "undefined") {
-        window.location.href = ROUTER.LOGIN;
+      // Don't redirect if we're already on the login page
+      const isLoginPage = typeof window !== "undefined" &&
+        window.location.pathname.includes(ROUTER.LOGIN);
+      
+      if (!isLoginPage) {
+        deleteCookie("new-vision-token");
+        useAuthStore.getState().clearUser();
+        
+        // Show toast notification
+        showErrorToast(
+          "Errors.Authentication.Title",
+          "Errors.Authentication.SessionExpired"
+        );
+        
+        if (typeof window !== "undefined") {
+          window.location.href = ROUTER.LOGIN;
+        }
+      } else {
+        // Dispatch error event for login page components to handle
+        dispatchErrorEvent(status, errorMessageKey || "Errors.Authentication.GenericError");
       }
     }
+    
     console.log("API Error:", error.response?.data?.message || error.message);
     return Promise.reject(error);
   }

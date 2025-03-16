@@ -21,13 +21,22 @@ import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidateEmailPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations("Login.EmailVerification");
+  const loginT = useTranslations("Login");
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const {
     formState: { errors },
@@ -79,7 +88,11 @@ const ValidateEmailPhase = ({
           }
         },
         onError: (error) => {
-          console.log(error);
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.InvalidIdentifier")
+          );
+          handleOpen();
         },
       }
     );
@@ -92,9 +105,9 @@ const ValidateEmailPhase = ({
   return (
     <>
       <div className="space-y-4">
-        <h1 className="text-2xl text-start">التحقق من البريد الالكتروني</h1>
+        <h1 className="text-2xl text-start">{t("Title")}</h1>
         <p>
-          <span className="opacity-50">ادخل رمز التحقق المرسل على </span>
+          <span className="opacity-50">{t("EnterVerificationCode")} </span>
           <span dir="ltr">{by}</span>
         </p>
       </div>
@@ -127,11 +140,17 @@ const ValidateEmailPhase = ({
       <Button
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
         className="w-full"
       >
-        التالي
+        {loginT("Next")}
       </Button>
-      <OtpHub identifier={getValues("identifier")} resendFor="resend-otp" />
+      <OtpHub
+        identifier={getValues("identifier")}
+        token={getValues("token") ?? ""}
+        resendFor="resend-otp"
+      />
       <div className="flex items-center gap-2">
         <Button
           onClick={handleSecurityQuestionsPhase}
@@ -139,7 +158,7 @@ const ValidateEmailPhase = ({
           variant={"link"}
           className="text-primary p-0 h-auto underline"
         >
-          تغيير البريد الالكتروني{" "}
+          {t("ChangeEmailAddress")}
         </Button>
         {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
           <AnotherCheckingWay
@@ -148,6 +167,11 @@ const ValidateEmailPhase = ({
           />
         )}
       </div>
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };

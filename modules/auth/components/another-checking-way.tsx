@@ -17,6 +17,7 @@ import { useLoginAlternative } from "../store/mutations";
 import { LoginWaysSuccessResponse } from "../types/login-responses";
 import { LOGIN_PHASES, LoginPhase } from "../constant/login-phase";
 import LoadingSpinner from "@/components/ui/loadding-dots";
+import { useTranslations } from "next-intl";
 
 const AnotherCheckingWay = memo(
   ({
@@ -26,6 +27,7 @@ const AnotherCheckingWay = memo(
     loginOptionAlternatives: string[] | null;
     handleSetStep: (step: LoginPhase) => void;
   }) => {
+    const t = useTranslations("Login.Verification");
     const { mutate, isPending } = useLoginAlternative();
     const { setValue, getValues } = useFormContext<IdentifierType>();
     const identifier = getValues("identifier");
@@ -57,7 +59,7 @@ const AnotherCheckingWay = memo(
     const menuItems = [
       {
         id: 0,
-        label: "رقم الجوال",
+        label: t("Mobile"),
         icon: <MobileIcon />,
         func: () =>
           mutate(
@@ -70,7 +72,7 @@ const AnotherCheckingWay = memo(
       },
       {
         id: 1,
-        label: "كلمة المرور",
+        label: t("Password"),
         icon: <PassIcon />,
         func: () =>
           mutate(
@@ -83,7 +85,7 @@ const AnotherCheckingWay = memo(
       },
       {
         id: 3,
-        label: "البريد الإليكتروني",
+        label: t("Email"),
         icon: <Mail className="text-primary" />,
         func: () =>
           mutate(
@@ -96,7 +98,7 @@ const AnotherCheckingWay = memo(
       },
       {
         id: 4,
-        label: "اجتماعي",
+        label: t("Social"),
         icon: <CircleFadingPlus className="text-primary" />,
         func: () =>
           mutate(
@@ -107,34 +109,36 @@ const AnotherCheckingWay = memo(
           ),
         optionKey: "social",
       },
-      /*     { id: 5, label: "الباركود", icon: <BarCodeIcon />, func: () => null },
-    {
-      id: 6,
-      label: "الشبكة المحلية",
-      icon: <NetworkIcon />,
-      func: () => null,
-    }, */
+      /*     { id: 5, label: t("Barcode"), icon: <BarCodeIcon />, func: () => null },
+      {
+        id: 6,
+        label: t("LocalNetwork"),
+        icon: <NetworkIcon />,
+        func: () => null,
+      }, */
     ];
 
     return (
-      <DropdownMenu dir="rtl">
-        <DropdownMenuTrigger className="underline group flex items-end gap-1">
-          او اختر طريقة تحقق اخرى
-          <ChevronDown className="h-4 w-4 transition group-data-[state=open]:rotate-180" />
+      <DropdownMenu>
+        <DropdownMenuTrigger className="underline group flex items-center gap-1 text-sm sm:text-base">
+          {t("ChooseAnotherMethod")}
+          <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 transition group-data-[state=open]:rotate-180" />
         </DropdownMenuTrigger>
         {isPending && <LoadingSpinner />}
-        <DropdownMenuContent>
-          <DropdownMenuLabel>التحقق عن طريق</DropdownMenuLabel>
+        <DropdownMenuContent className="min-w-[200px]">
+          <DropdownMenuLabel className="text-center">
+            {t("VerifyVia")}
+          </DropdownMenuLabel>
           {menuItems
             .filter((item) => loginOptionAlternatives?.includes(item.optionKey))
             .map((item) => (
               <DropdownMenuItem
                 key={item.id}
-                className="gap-4"
+                className="gap-4 flex items-center justify-start"
                 onClick={item.func}
               >
-                {item.icon}
-                {item.label}
+                <span className="flex-shrink-0">{item.icon}</span>
+                <span>{item.label}</span>
               </DropdownMenuItem>
             ))}
         </DropdownMenuContent>

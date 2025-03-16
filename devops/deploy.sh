@@ -47,5 +47,9 @@ yarn build
 
 cd "$DEPLOY_DIR/devops"
 
+#RUN chmod +x entrypoint.sh
+#
+#ENTRYPOINT ["devops/entrypoint.sh"]
+
 # Start the containers and remove any orphaned containers
 docker compose -p $DEPLOYMENT_ID up --force-recreate --remove-orphans -d

@@ -1,17 +1,38 @@
 "use client";
-import React from "react";
+import StatisticsRow from "@/components/shared/layout/statistics-row";
+import ExportButton from "@/modules/table/components/ExportButton";
+import TableBuilder from "@/modules/table/components/TableBuilder";
+import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
 
-const page = () => {
+import React from "react";
+import {SheetFormBuilder, sheetFormConfig} from "@/modules/form-builder";
+import {Button} from "@/components/ui/button";
+
+const CompaniesPage = () => {
+  // Get the translated config using the component
+  const config = CompaniesConfig();
+
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="aspect-video rounded-xl bg-muted/90" />
-        <div className="aspect-video rounded-xl bg-muted/90" />
-        <div className="aspect-video rounded-xl bg-muted/90" />
-      </div>
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/90 md:min-h-min" />
+    <div className="px-8 space-y-7">
+      <StatisticsRow />
+
+      <TableBuilder
+        config={config}
+        searchBarActions={
+          <div>
+            <ExportButton data={["omar"]} />
+              <SheetFormBuilder
+                  config={sheetFormConfig}
+                  trigger={<Button>Open Form</Button>}
+                  onSuccess={(values) => {
+                      console.log('Form submitted successfully:', values);
+                  }}
+              />
+          </div>
+        }
+      />
     </div>
   );
 };
 
-export default page;
+export default CompaniesPage;

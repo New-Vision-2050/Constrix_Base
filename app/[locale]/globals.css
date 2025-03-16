@@ -73,6 +73,8 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --purple: 248 44% 38%;
   }
   .dark {
     --background: 265 100% 11%;
@@ -142,6 +144,8 @@
     --sidebar-border: 240 3.7% 15.9%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --purple: 248 44% 38%;
   }
 }
 
@@ -161,4 +165,8 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.rotate-svg-child {
+  @apply [&>svg]:transition-transform [&>svg]:data-[state=open]:rotate-180;
 }

@@ -1,5 +1,123 @@
 {
   "Login": {
-    "Control_panel": "Control panel"
+    "Control_panel": "Control panel",
+    "SignIn": "Sign In",
+    "EnterPassword": "Enter Password",
+    "Next": "Next",
+    "Login": "Login",
+    "ForgotPassword": "Forgot your password?",
+    "Identifier": "Mobile number / Email / ID number",
+    "Password": "Password",
+    "Copyright": "All programming rights reserved for New Vision Technology.",
+    "Verification": {
+      "Mobile": "Mobile Number",
+      "Password": "Password",
+      "Email": "Email",
+      "Social": "Social",
+      "Barcode": "Barcode",
+      "LocalNetwork": "Local Network",
+      "ChooseAnotherMethod": "Or choose another verification method",
+      "VerifyVia": "Verify via"
+    },
+    "PhoneVerification": {
+      "Title": "Phone Number Verification",
+      "EnterVerificationCode": "Enter the verification code sent to",
+      "ChangePhoneNumber": "Change phone number",
+      "invalid token": "Invalid verification code",
+      "ResendCode": "Didn't receive the verification code?",
+      "Resend": "Resend"
+    },
+    "EmailVerification": {
+      "Title": "Email Verification",
+      "EnterVerificationCode": "Enter the verification code sent to",
+      "ChangeEmailAddress": "Change email address",
+      "invalid token": "Invalid verification code"
+    }
+  },
+  "ForgotPassword": {
+    "Title": "Forgot Password",
+    "EnterTemporaryPassword": "Enter the temporary password sent to your email",
+    "Confirm": "Confirm",
+    "BackToLogin": "Back to login"
+  },
+  "ResetPassword": {
+    "Title": "Reset Password",
+    "NewPassword": "New Password",
+    "ConfirmNewPassword": "Confirm New Password",
+    "PasswordRequirements": "Password must be at least 8 characters, contain at least one uppercase letter, and one special character.",
+    "Confirm": "Confirm"
+  },
+  "ChangeEmail": {
+    "Title": "Change Email Address",
+    "NewEmail": "New Email Address",
+    "ConfirmNewEmail": "Confirm New Email Address",
+    "NoCopy": "Email cannot be copied, please type it manually",
+    "Confirm": "Confirm",
+    "BackToLogin": "Back to login"
+  },
+  "SecurityQuestions": {
+    "Title": "Security Questions",
+    "PetQuestion": "What is your favorite pet's name?",
+    "TeamQuestion": "What is your favorite sports team?",
+    "Next": "Next"
+  },
+  "Errors": {
+    "Authentication": {
+      "Title": "Authentication Error",
+      "SessionExpired": "Your session has expired. Please log in again.",
+      "InvalidCredentials": "Invalid username or password",
+      "InvalidIdentifier": "Invalid identifier or not found",
+      "UserNotFound": "User not found",
+      "GenericError": "An error occurred"
+    },
+    "Back": "Back"
+  },
+  "Validation": {
+    "Required": "This field is required",
+    "MinLength": "Must be at least {min} characters",
+    "InvalidEmail": "Invalid email address",
+    "InvalidPhone": "Invalid phone number, must be in the format 05xxxxxxxx",
+    "Password": {
+      "MinLength": "Password must be at least 8 characters",
+      "UpperCase": "Password must contain at least one uppercase letter",
+      "SpecialChar": "Password must contain at least one special character",
+      "Required": "Password is required"
+    },
+    "PasswordMatch": "Passwords must match",
+    "EmailMatch": "Email addresses must match",
+    "OTP": "Temporary password is required"
+  },
+  "Table": {
+    "Export": "Export",
+    "ExportAsCSV": "Export as CSV",
+    "ExportAsJSON": "Export as JSON",
+    "FilterSearch": "Filter Search",
+    "RowsPerPage": "Rows per page:",
+    "Search": "Search",
+    "Actions": "Actions"
+  },
+  "Companies": {
+    "Companies": "Companies",
+    "Email": "Email",
+    "CompanyType": "Company Type",
+    "Manager": "Manager",
+    "DataStatus": "Data Status",
+    "Status": "Status",
+    "Actions": "Actions",
+    "CountryFilter": "Company Country",
+    "TypeFilter": "Company Type",
+    "Active": "Active",
+    "LoginAsManager": "Login as Company Manager (Edit)",
+    "PackageSettings": "Package and Program Settings",
+    "Delete": "Delete (Archive)"
+  },
+  "Sidebar": {
+    "Companies": "Companies",
+    "Users": "Users",
+    "Welcome": "Hello, Mohammed Saad!",
+    "CompanyName" : "New Vision"
+  },
+  "Header": {
+    "MainSystemManagement": "Main System Management"
   }
 }
