@@ -34,6 +34,7 @@ export default function SetCompanyFormContent() {
     try {
       const response = await companyService.createCompany({
         name: data.name,
+        email: data.email,
         domainName: data.domainName,
         countryId: data.countryId,
         companyFieldId: data.companyFieldId,
@@ -97,6 +98,16 @@ export default function SetCompanyFormContent() {
           placeholder="الاسم التجاري"
           errMsg={errors?.name?.message ?? ""}
         />
+
+        {/* company name */}
+        <InputField
+          required={true}
+          fieldName="email"
+          label="الأيميل"
+          placeholder="الأيميل"
+          errMsg={errors?.email?.message ?? ""}
+        />
+
         {/* domain name */}
         <InputFieldWithAdorned
           required={true}

@@ -3,7 +3,7 @@ import { Company } from "../types/Company";
 import { companiesEndPoints } from "../constant/end-points";
 import { apiClient } from "@/config/axios-config";
 import axios, { AxiosError } from "axios";
-import {getCookie} from "cookies-next";
+import { getCookie } from "cookies-next";
 
 export class CompanyRepository implements ICompanyRepository {
   private readonly apiUrl =
@@ -17,6 +17,7 @@ export class CompanyRepository implements ICompanyRepository {
     let url = this.apiUrl + companiesEndPoints.create;
     const body = {
       name: company.name,
+      email: company.email,
       user_name: company.domainName,
       country_id: company.countryId,
       company_field_id: company.companyFieldId,
@@ -24,7 +25,7 @@ export class CompanyRepository implements ICompanyRepository {
     };
     // ! The following line is a temporary override for testing purposes.
     // Remove it once the backend URL is stable and ready for production.
-    const token =  getCookie("new-vision-token");;
+    const token = getCookie("new-vision-token");
     url = `https://core-be-stage.constrix-nv.com/api/v1${companiesEndPoints.create}`;
 
     const response = await axios

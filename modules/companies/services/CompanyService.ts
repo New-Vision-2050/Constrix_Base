@@ -9,6 +9,7 @@ export class CompanyService {
   async createCompany(data: Omit<Company, "id">): Promise<Company> {
     const newCompany = new Company(
       data.name,
+      data.email,
       data.domainName,
       data.countryId,
       data.supportNvEmployeeId,

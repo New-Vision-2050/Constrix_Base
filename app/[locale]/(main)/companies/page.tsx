@@ -8,16 +8,19 @@ import React from "react";
 import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
 import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
+import CreateBuilderModule from "@/features/create-builder";
 
 const CompaniesPage = () => {
-    const companyUserModuleRef = useRef<CreateBuilderModuleRef>(null);
-
-    // Get the translated config using the component
+  // Get the translated config using the component
   const config = CompaniesConfig();
 
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />
+      <CreateBuilderModule
+        btnLabel="أنشاء شركة"
+        moduleId={"create-company-user"}
+      />
 
       <TableBuilder
         config={config}
