@@ -7,6 +7,7 @@ import TableBuilder from "@/modules/table/components/TableBuilder";
 import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
 import { statisticsConfig } from "@/modules/users/components/statistics-config";
 import React from "react";
+import {companyUserFormConfig} from "@/modules/form-builder/configs/companyUserFormConfig";
 
 const UsersPage = () => {
   const config = UsersConfig();
@@ -20,7 +21,7 @@ const UsersPage = () => {
           <div>
             <ExportButton data={["omar"]} />
             <SheetFormBuilder
-              config={sheetFormConfig}
+              config={companyUserFormConfig}
               trigger={<Button>Open Form</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);

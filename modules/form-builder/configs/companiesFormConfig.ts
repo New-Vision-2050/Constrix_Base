@@ -262,7 +262,7 @@ export const companiesFormConfig: FormConfig = {
     finishButtonText: "حفظ",
     // Enable submitting each step individually
     submitEachStep: true,
-    submitButtonTextPerStep: "حفظ",
+    submitButtonTextPerStep: "التالي",
 
     // API URLs for each step
     stepApiUrls: {
