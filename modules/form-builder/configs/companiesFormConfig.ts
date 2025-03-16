@@ -202,7 +202,7 @@ export const companiesFormConfig: FormConfig = {
         },
           {
               name: "phone",
-              label: "Phone",
+              label: "الهاتف",
               type: "phone",
               placeholder: "Enter your phone",
               validation: [
