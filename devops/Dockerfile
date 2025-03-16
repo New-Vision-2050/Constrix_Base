@@ -7,24 +7,23 @@ WORKDIR /app
 
 # Declare build argument again for the runtime stage
 ARG DEPLOYMENT_ID
-ARG DEPLOY_DIR
 
 # Set environment variable
 ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
-
+RUN ls -la
+RUN pwd
 # Copy built artifacts
-COPY ${DEPLOY_DIR}/.next ./.next
-COPY ${DEPLOY_DIR}/public ./public
-COPY ${DEPLOY_DIR}/package.json ./
-COPY ${DEPLOY_DIR}/yarn.lock ./
-COPY ${DEPLOY_DIR}/node-modules ./
-COPY ${DEPLOY_DIR}/.env ./
+COPY ./.next ./.next
+COPY ./public ./public
+COPY ./package.json ./package.json
+COPY ./yarn.lock ./yarn.lock
+COPY ./.env ./.env
 
 
-RUN rm -rf ${DEPLOY_DIR}
+RUN rm -rf ../${DEPLOYMENT_ID}
 
 # Install only production dependencies
-#RUN yarn install --only=production
+RUN yarn install --only=production
 
 EXPOSE 3000
 

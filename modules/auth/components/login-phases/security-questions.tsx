@@ -4,12 +4,14 @@ import { SecurityQuestionsType } from "../../validator/login-schema";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 const SecurityQuestionsPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations();
   const {
     register,
     formState: { errors },
@@ -22,20 +24,25 @@ const SecurityQuestionsPhase = ({
 
   return (
     <>
-      {" "}
-      <h1 className="text-2xl text-center">اسئلة الامان</h1>{" "}
+      <h1 className="text-2xl text-center">{t("SecurityQuestions.Title")}</h1>
       <Input
         {...register("animal")}
-        label="ما هو اسم حيوانك الأليف المفضل؟"
+        label={t("SecurityQuestions.PetQuestion")}
         error={errors?.animal?.message}
-      />{" "}
+      />
       <Input
         {...register("team")}
-        label="ما اسم فريقك الرياضي المفضل؟"
+        label={t("SecurityQuestions.TeamQuestion")}
         error={errors?.team?.message}
       />
-      <Button size={"lg"} className="w-full" onClick={handleSubmit(onSubmit)}>
-        التالي
+      <Button
+        size={"lg"}
+        className="w-full"
+        type="submit"
+        form="login-form"
+        onClick={handleSubmit(onSubmit)}
+      >
+        {t("SecurityQuestions.Next")}
       </Button>
     </>
   );

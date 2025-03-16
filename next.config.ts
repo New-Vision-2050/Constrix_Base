@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -6,11 +7,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/login", // Change this
-        permanent: false, // `true` for 301, `false` for 302
+        destination: "/login",
+        permanent: false,
       },
     ];
   },
 };
+const withNextIntl = createNextIntlPlugin();
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { loginRepository } from "../repository/login-repository";
 import {
+  LoginOption,
   LoginStepsSuccessResponse,
   LoginWaysSuccessResponse,
 } from "../types/login-responses";
@@ -33,9 +34,10 @@ export const useForgetPassword = () =>
   useMutation<
     ServerSuccessResponse,
     AxiosError<ServerErrorResponse>,
-    { identifier: string }
+    { identifier: string; token: string }
   >({
-    mutationFn: ({ identifier }) => loginRepository.forgetPassword(identifier),
+    mutationFn: ({ identifier, token }) =>
+      loginRepository.forgetPassword(identifier, token),
   });
 
 export const useResetPassword = () =>
@@ -62,7 +64,18 @@ export const useResendOtp = () =>
   useMutation<
     ServerSuccessResponse,
     AxiosError<ServerErrorResponse>,
-    { identifier: string }
+    { identifier: string; token: string }
   >({
-    mutationFn: ({ identifier }) => loginRepository.resendOtp(identifier),
+    mutationFn: ({ identifier, token }) =>
+      loginRepository.resendOtp(identifier, token),
+  });
+
+export const useLoginAlternative = () =>
+  useMutation<
+    LoginWaysSuccessResponse,
+    AxiosError<ServerErrorResponse>,
+    { identifier: string; loginOption: LoginOption; token: string }
+  >({
+    mutationFn: ({ identifier, loginOption, token }) =>
+      loginRepository.loginAlternative(identifier, loginOption, token),
   });

@@ -14,12 +14,27 @@ import {
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
+import { useAuthStore } from "../../store/use-auth";
+import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next";
+import { ROUTER } from "@/router";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+  const t = useTranslations("Login.PhoneVerification");
+  const loginT = useTranslations("Login");
+  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
+
   const { mutate, isPending } = useLoginSteps();
 
   const {
@@ -30,6 +45,10 @@ const ValidatePhonePhase = ({
     setValue,
   } = useFormContext<IdentifierType & ValidatePhoneType>();
   const identifier = getValues("identifier");
+  const token = getValues("token");
+  const by = getValues("by");
+
+  const loginOptionAlternatives = getValues("login_option_alternatives");
 
   const onSubmit = () => {
     const data = getValues();
@@ -43,6 +62,15 @@ const ValidatePhonePhase = ({
       {
         onSuccess: (data, variable) => {
           setValue("token", data.payload.token);
+          if (!data.payload.login_way.step) {
+            useAuthStore.getState().setUser(data.payload.user);
+            setCookie("new-vision-token", data.payload.token, {
+              maxAge: 7 * 24 * 60 * 60,
+              path: "/",
+            });
+            router.push(ROUTER.COMPANIES);
+            return;
+          }
           const nextStep = data.payload.login_way.step?.login_option;
           switch (nextStep) {
             case "password":
@@ -60,20 +88,23 @@ const ValidatePhonePhase = ({
           }
         },
         onError: (error) => {
-          console.log(error);
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.InvalidIdentifier")
+          );
+          handleOpen();
         },
       }
     );
   };
 
-
   return (
     <>
       <div className="space-y-4">
-        <h1 className="text-2xl text-start">التحقق من رقم الجوال</h1>
+        <h1 className="text-2xl text-start">{t("Title")}</h1>
         <p>
-          <span className="opacity-50">ادخل رمز التحقق المرسل الى </span>
-          {identifier}
+          <span className="opacity-50">{t("EnterVerificationCode")} </span>
+          <span dir="ltr">{by}</span>
         </p>
       </div>
       <Controller
@@ -105,26 +136,47 @@ const ValidatePhonePhase = ({
       <Button
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
         className="w-full"
       >
-        دخول
+        {loginT("Login")}
       </Button>
-      <OtpHub resendFor="resend-otp" identifier={identifier} />
+      <OtpHub
+        resendFor="resend-otp"
+        token={token ?? ""}
+        identifier={identifier}
+      />
 
-      <div className="flex items-center gap-2">
+      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+        <AnotherCheckingWay
+          loginOptionAlternatives={loginOptionAlternatives}
+          handleSetStep={handleSetStep}
+        />
+      )}
+
+{/*       <div className="flex items-center gap-2">
         <Button
           type="button"
           variant={"link"}
           className="text-primary p-0 h-auto underline"
         >
-          تغيير رقم الجوال{" "}
+          {t("ChangePhoneNumber")}
         </Button>
-
-        <AnotherCheckingWay />
-      </div>
+        {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+          <AnotherCheckingWay
+            loginOptionAlternatives={loginOptionAlternatives}
+            handleSetStep={handleSetStep}
+          />
+        )}
+      </div> */}
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };
-
 
 export default ValidatePhonePhase;
