@@ -120,12 +120,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               disabled={isDisabled}
               className={cn(
                 "w-full justify-between bg-sidebar",
-                !value && "text-muted-foreground"
+                (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground"
               )}
               onKeyDown={handleKeyDown}
             >
               <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-start">
-                {value ? selectedLabel : placeholder}
+                {(value && (!isMulti || (Array.isArray(value) && value.length > 0)))
+                  ? selectedLabel
+                  : placeholder}
               </div>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
