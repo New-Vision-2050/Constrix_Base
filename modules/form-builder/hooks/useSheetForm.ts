@@ -162,7 +162,7 @@ export function useSheetForm({
 
     // Get existing errors from API validation
     const formStoreErrors = useFormStore.getState().errors;
-    
+
     // Iterate through all sections and fields
     config.sections.forEach((section) => {
       // Skip sections that don't meet their condition
@@ -289,10 +289,10 @@ export function useSheetForm({
       try {
         // For step-based forms, include step response data in the form values
         let finalValues = { ...values };
-        
+
         if (isStepBased) {
           console.log("Submitting step-based form with step responses:", stepResponses);
-          
+
           // Include data from step responses in the final values
           Object.entries(stepResponses).forEach(([stepIndex, response]) => {
             if (response.data) {
@@ -301,10 +301,10 @@ export function useSheetForm({
               Object.entries(response.data).forEach(([key, value]) => {
                 // Skip if the key already exists in values
                 if (!(key in finalValues)) {
-                  finalValues[`${stepPrefix}${key}`] = value;
+                  finalValues[`${key}`] = value;
                 }
               });
-              
+
               // Also include IDs directly if they exist
               if (response.data.companyId) {
                 finalValues.companyId = response.data.companyId;
@@ -314,10 +314,10 @@ export function useSheetForm({
               }
             }
           });
-          
+
           console.log("Final values for submission:", finalValues);
         }
-        
+
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
           config.onSubmit || ((values) => defaultSubmitHandler(values, config));

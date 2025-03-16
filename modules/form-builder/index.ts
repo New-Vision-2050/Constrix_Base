@@ -8,6 +8,7 @@ export * from './components/fields';
 
 // Export hooks
 export { useSheetForm } from './hooks/useSheetForm';
+export { useSheetFormWithTableReload } from './hooks/useSheetFormWithTableReload';
 export { useFormStore, validateField } from './hooks/useFormStore';
 
 // Export types

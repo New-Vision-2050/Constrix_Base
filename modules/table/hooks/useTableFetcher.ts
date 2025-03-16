@@ -44,7 +44,7 @@ export const createTableFetcher = () => {
   let requestCounter = 0;
   const useApiRequestOptions = useCreateFetchOptions();
   const locale = useLocale();
-  
+
   const fetchData = useCallback(async (props: FetchDataProps) => {
     const {
       url,
@@ -67,14 +67,14 @@ export const createTableFetcher = () => {
       setData,
       dataMapper
     } = props;
-    
+
     if (!url) return;
-    
+
     const currentRequestId = ++requestCounter;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const apiUrl = buildRequestUrl(
         url,
@@ -87,27 +87,27 @@ export const createTableFetcher = () => {
         columnSearchState,
         searchConfig
       );
-      
+
       console.log(`Fetching data from: ${apiUrl.toString()}`);
-      
+
       const controller = abortControllerRef.current;
       if (!controller) return;
-      
+
       const timeoutId = setupRequestTimeout(controller, () => {
         if (isMountedRef.current && abortControllerRef.current === controller) {
           setError('Request timed out');
           setLoading(false);
         }
       });
-      
+
       const requestOptions = useApiRequestOptions(controller);
       const response = await fetch(
         apiUrl.toString(),
         requestOptions
       );
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!isMountedRef.current) {
         // Component unmounted, but we'll still process the response
         // to cache it for when the user returns to this page
@@ -116,26 +116,30 @@ export const createTableFetcher = () => {
         // A newer request has been made, ignore this response
         return;
       }
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
       }
-      
-      const totalCount = response.headers.get('x-total-count');
+
+      const totalCount = response.headers.get('X-TOTAL-COUNT');
       const totalItemsCount = totalCount ? parseInt(totalCount, 10) : 0;
-      
+
       // Always process the response, even if the component is unmounted
       // This ensures the data is cached for when the user returns to this page
       setTotalItems(totalItemsCount);
-      
+      console.log('TOTAL ITEMS COUNT:',totalItemsCount)
+        response.headers.forEach((value)=>{
+            console.log('TOTAL ITEMS COUNT:',value)
+        })
+
       if (totalItemsCount > 0) {
         const calculatedTotalPages = Math.ceil(totalItemsCount / itemsPerPage);
         setPagination(currentPage, calculatedTotalPages, itemsPerPage);
       }
-      
+
       const result = await response.json();
       let tableData = processApiResponse(result);
-      
+
       if (!isMountedRef.current) {
         // Component unmounted, but we'll still process the response
         // to cache it for when the user returns to this page
@@ -144,7 +148,7 @@ export const createTableFetcher = () => {
         // A newer request has been made, ignore this response
         return;
       }
-      
+
       if (!totalCount && tableData.length > 0) {
         // Always process the response, even if the component is unmounted
         setTotalItems(tableData.length);
@@ -154,11 +158,11 @@ export const createTableFetcher = () => {
         // Always process the response, even if the component is unmounted
         setError('No data found or data format not supported');
       }
-      
+
       if (dataMapper) {
         tableData = dataMapper(tableData);
       }
-      
+
       // Always process the response, even if the component is unmounted
       if (configColumns && configColumns.length > 0) {
         setColumns(configColumns);
@@ -167,10 +171,10 @@ export const createTableFetcher = () => {
         const extractedColumns = extractColumnsFromData(sampleRow);
         setColumns(extractedColumns);
       }
-      
+
       setData(tableData);
       setLoading(false);
-      
+
     } catch (err: any) {
       // Don't handle AbortError as an actual error
       if (!(err instanceof Error && err.name === 'AbortError')) {

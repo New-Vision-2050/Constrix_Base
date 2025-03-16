@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { SheetFormBuilder, useSheetForm, FormConfig } from "@/modules/form-builder";
-import { TableBuilder, useTableReload, TableConfig } from "@/modules/table";
+import { SheetFormBuilder, useSheetFormWithTableReload, FormConfig } from "@/modules/form-builder";
+import { TableBuilder, TableConfig } from "@/modules/table";
 import { Button } from "@/components/ui/button";
 
 // Example form configuration
@@ -46,23 +46,23 @@ const tableConfig: TableConfig = {
   columns: [
     {
       key: "id",
-      label: "ID", // Changed from header to label
-      width: "80px", // Changed from number to string with px
+      label: "ID",
+      width: "80px",
     },
     {
       key: "name",
-      label: "Name", // Changed from header to label
+      label: "Name",
       searchable: true,
     },
     {
       key: "description",
-      label: "Description", // Changed from header to label
+      label: "Description",
       searchable: true,
     },
     {
       key: "createdAt",
-      label: "Created At", // Changed from header to label
-      render: (value: string) => new Date(value).toLocaleDateString(), // Changed from formatter to render
+      label: "Created At",
+      render: (value: string) => new Date(value).toLocaleDateString(),
     },
   ],
   enableSearch: true,
@@ -71,16 +71,11 @@ const tableConfig: TableConfig = {
 };
 
 export default function FormTestPage() {
-  // Get the table reload function
-  const { reloadTable } = useTableReload();
-
-  // Initialize the form with the reload function in the onSuccess callback
-  const formHook = useSheetForm({
+  // Initialize the form with automatic table reload
+  const formHook = useSheetFormWithTableReload({
     config: formConfig,
-    onSuccess: () => {
-      // Reload the table after successful form submission
-      reloadTable();
-    },
+    // The table will automatically reload after successful form submission
+    // No need to manually call reloadTable in onSuccess
   });
 
   return (
@@ -95,7 +90,10 @@ export default function FormTestPage() {
       <SheetFormBuilder
         config={formConfig}
         trigger={<Button>Open Form</Button>}
-        onSuccess={() => reloadTable()}
+        onSuccess={() => {
+          // The table will automatically reload because we're using useSheetFormWithTableReload
+          console.log("Form submitted successfully");
+        }}
       />
       
       {/* Table component */}
