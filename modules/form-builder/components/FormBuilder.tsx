@@ -246,7 +246,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
         )}
 
         {isStepBased && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 w-full">
             {!isFirstStep && config.showBackButton !== false && (
               <Button
                 type="button"
@@ -256,7 +256,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                   goToPrevStep();
                 }}
                 disabled={isSubmitting}
-                className="flex items-center"
+                className="flex items-center grow"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 {config.wizardOptions?.prevButtonText || "Previous"}
@@ -274,7 +274,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                   }
                 }}
                 disabled={isSubmitting || isSubmittingStep}
-                className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90"
+                className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90 grow"
               >
                 {isSubmittingStep ? (
                   <span className="flex items-center">
@@ -295,7 +295,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                   goToNextStep();
                 }}
                 disabled={isSubmitting || isSubmittingStep}
-                className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90"
+                className="flex items-center bg-primary text-primary-foreground hover:bg-primary/90 grow"
               >
                 {config.wizardOptions?.nextButtonText || "Next"}
                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -306,7 +306,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 grow"
                 onClick={(e) => e.stopPropagation()}
               >
                 {isSubmitting && config.showSubmitLoader ? (
@@ -328,7 +328,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 grow"
             onClick={(e) => e.stopPropagation()}
           >
             {isSubmitting && config.showSubmitLoader ? (
