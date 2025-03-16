@@ -30,32 +30,44 @@ const TextField: React.FC<TextFieldProps> = ({
   // Track whether the field has been API validated
   const [hasBeenApiValidated, setHasBeenApiValidated] = useState(false);
 
-  // Get validating state from the store
-  const validatingFields = useFormStore((state) => state.validatingFields);
-  const errors = useFormStore((state) => state.errors);
+  // Get validating state and errors from the store
+  const formStore = useFormStore();
+  const validatingFields = formStore.validatingFields;
+  const storeErrors = formStore.errors;
   const isFieldValidating = isValidating || validatingFields[field.name];
-  const showError = error && touched;
+  
+  // Check for errors in both the form store and the local state
+  const hasStoreError = !!storeErrors[field.name];
+  const hasLocalError = error && touched;
+  const showError = hasLocalError || hasStoreError;
+  
+  // Clear store error when value is empty
+  useEffect(() => {
+    if (hasStoreError && (!value || value === '')) {
+      formStore.setError(field.name, null);
+    }
+  }, [field.name, value, hasStoreError, formStore]);
 
   // Check if this field has API validation
   const hasApiVal = field.validation ? hasApiValidation(field.validation) : false;
 
   // Track when API validation completes
   useEffect(() => {
-    if (hasApiVal && touched && !isFieldValidating && value) {
+    if (hasApiVal && !isFieldValidating && value) {
       setHasBeenApiValidated(true);
     }
-  }, [hasApiVal, touched, isFieldValidating, value]);
+  }, [hasApiVal, isFieldValidating, value]);
 
   // Determine if field has been validated successfully
   // A field is considered successfully validated if:
   // 1. It has API validation rules
-  // 2. It has been touched (user interacted with it)
-  // 3. It has a value (not empty)
-  // 4. It has no errors
-  // 5. It's not currently being validated
-  // 6. It has been validated by the API
+  // 2. It has a value (not empty)
+  // 3. It has no errors (both in local state and store)
+  // 4. It's not currently being validated
+  // 5. It has been validated by the API
   const hasValue = value !== undefined && value !== null && value !== '';
-  const isValidated = hasApiVal && touched && hasValue && !error && !isFieldValidating && hasBeenApiValidated;
+  const hasNoErrors = !hasLocalError && !hasStoreError;
+  const isValidated = hasApiVal && hasValue && hasNoErrors && !isFieldValidating && hasBeenApiValidated;
 
   // Show icon if field is validating, has error, or has been successfully validated with API
   const showIcon = isFieldValidating || showError || isValidated;

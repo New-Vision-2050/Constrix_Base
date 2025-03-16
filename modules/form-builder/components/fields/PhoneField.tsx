@@ -53,7 +53,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   onBlur,
 }) => {
   // Parse the value into country code and phone number
-  const [countryCode, setCountryCode] = useState('+1');
+  const [countryCode, setCountryCode] = useState('+966');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [open, setOpen] = useState(false);
   const [localError, setLocalError] = useState<string | undefined>(undefined);
@@ -146,8 +146,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             required={field.required}
           />
         </div>
-        
-        <div className="w-[100px] flex-shrink-0">
+
+        <div className="w-[120px] flex-shrink-0">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button

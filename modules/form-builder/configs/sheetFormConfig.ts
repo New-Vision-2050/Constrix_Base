@@ -110,11 +110,7 @@ export const sheetFormConfig: FormConfig = {
           type: "text",
           placeholder: "Enter your postal code",
           validation: [
-            {
-              type: "pattern",
-              value: "^[0-9a-zA-Z\\s\\-]+$",
-              message: "Please enter a valid postal code",
-            },
+
               {
                   type: 'apiValidation',
                   message: 'This username is already taken',

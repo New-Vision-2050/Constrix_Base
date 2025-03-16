@@ -56,6 +56,9 @@ const FormField: React.FC<FormFieldProps> = ({
     }
   }
 
+  // Get the form store
+  const formStore = useFormStore();
+
   // Memoize callbacks to prevent recreating them on every render
   const onChange = useCallback((newValue: any) => {
     // Call the onChange prop if provided
@@ -68,6 +71,9 @@ const FormField: React.FC<FormFieldProps> = ({
       field.onChange(newValue, values);
     }
 
+    // Clear any existing errors for this field when the value changes
+    formStore.setError(field.name, null);
+
     // Check if field has API validation rules and trigger validation
     if (field.validation && hasApiValidation(field.validation)) {
       field.validation.forEach(rule => {
@@ -76,7 +82,7 @@ const FormField: React.FC<FormFieldProps> = ({
         }
       });
     }
-  }, [field.name, field.onChange, field.validation, propOnChange, values]);
+  }, [field.name, field.onChange, field.validation, propOnChange, values, formStore]);
 
   const onBlur = useCallback(() => {
     // Call the onBlur prop if provided
