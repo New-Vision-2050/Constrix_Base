@@ -14,7 +14,7 @@ interface CompanyData {
   id: string;
   name: string;
   roles: Array<{
-    role: '1' | '2' | '3'; // Keys in rulesIcons
+    role: 1 | 2 | 3; // Keys in rulesIcons
     status: number;
   }>;
 }
@@ -74,11 +74,12 @@ export const UsersConfig = () => {
         label: "الشركة",
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
-            {value && value.map((company) => (
-              <p key={company.id} className="line-clamp-1 h-5">
-                {company.name}
-              </p>
-            ))}
+            {value &&
+              value.map((company) => (
+                <p key={company.id} className="line-clamp-1 h-5">
+                  {company.name}
+                </p>
+              ))}
           </div>
         ),
       },
@@ -90,26 +91,28 @@ export const UsersConfig = () => {
           return (
             <div className="line-clamp-3 ">
               {companies.map((company) => (
-                <div key={company.id} className="flex items-center">
-                  {[
-                    ...company.roles,
-                    ...Array(3 - company.roles.length).fill(null),
-                  ].map((role, index) => {
-                    // Type guard to check if role exists and has a valid role property
-                    const isValidRole = role &&
-                      (role.role === '1' || role.role === '2' || role.role === '3');
-                    
-                    return isValidRole ? (
+                <div
+                  key={company.id}
+                  className="flex items-center gap-x-1"
+                >
+                  {Array.from({ length: 3 }).map((_, index) => {
+                    // Find role matching index + 1
+                    const role =
+                      company.roles.find((r) => r.role === index + 1) || null;
+
+                    return role ? (
                       <span
                         key={index}
                         className={cn(
-                          "w-5 h-5 flex items-center",
+                          "w-5 h-5 flex items-center justify-center",
                           role.status === 1 && "text-[#18CB5F]",
                           role.status === 0 && "text-[#FF4747]",
                           role.status === -1 && "text-[#F19B02]"
                         )}
                       >
-                        {React.createElement(rulesIcons[role.role as keyof typeof rulesIcons])}
+                        {React.createElement(
+                          rulesIcons[(index + 1) as keyof typeof rulesIcons]
+                        )}
                       </span>
                     ) : (
                       <span
