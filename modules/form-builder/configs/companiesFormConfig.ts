@@ -12,6 +12,7 @@ export const companiesFormConfig: FormConfig = {
   },
   sections: [
     {
+        title: "إنشاء شركة",
       fields: [
           {
               type: "select",
@@ -34,12 +35,12 @@ export const companiesFormConfig: FormConfig = {
               validation: [
                   {
                       type: "required",
-                      message: "City is required",
+                      message: "ادخل دولة الشركة",
                   },
               ],
           },
         {
-          name: "country_field_id",
+          name: "company_field_id",
           label: "النشاط",
           type: "select",
             isMulti:true,
@@ -86,7 +87,7 @@ export const companiesFormConfig: FormConfig = {
               ],
           },
           {
-              name: "domain",
+              name: "user_name",
               label: "الاسم المختصر",
               type: "text",
               placeholder: "برجاء إدخال الاسم المختصر",
@@ -130,27 +131,38 @@ export const companiesFormConfig: FormConfig = {
                   },
               ],
           },
-          {
-              name: "phone",
-              label: "Phone",
-              type: "phone",
-              placeholder: "Enter your phone",
-              validation: [
-                  {
-                      type: "required",
-                      message: "برجاء إدخال رقم الهاتف",
-                  },
-              ],
-          },
+
       ],
     },
     {
-      title: "User Info",
+      title: "إنشاء مستخدم",
       collapsible: false,
       fields: [
         {
-          name: "name",
-          label: "Full Name",
+          name: "first_name",
+          label: "اسم المستخدم الاول",
+          type: "text",
+          placeholder: "Enter your name",
+          required: true,
+          // Example of using a condition based on previous step data
+          condition: (values) => {
+            // This field will only be shown if the country is not empty
+            return !!values.country;
+          },
+          validation: [
+            {
+              type: "required",
+              message: "Name is required",
+            },
+            {
+              type: "minLength",
+              value: 2,
+              message: "Name must be at least 2 characters",
+            },
+          ],
+        },{
+          name: "last_name",
+          label: "اسم المستخدم ألأحير",
           type: "text",
           placeholder: "Enter your name",
           required: true,
@@ -173,7 +185,7 @@ export const companiesFormConfig: FormConfig = {
         },
         {
           name: "email",
-          label: "Email Address",
+          label: "البريد الإلكتروني",
           type: "email",
           placeholder: "Enter your email",
           required: true,
@@ -188,18 +200,43 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-        {
-          name: "phone",
-          label: "Phone Number",
-          type: "text",
-          placeholder: "Enter your phone number",
-          validation: [
-              {
-                  type: "required",
-                  message: "Phone is required",
+          {
+              name: "phone",
+              label: "Phone",
+              type: "phone",
+              placeholder: "Enter your phone",
+              validation: [
+                  {
+                      type: "required",
+                      message: "برجاء إدخال رقم الهاتف",
+                  },
+              ],
+          },
+          {
+              type: "select",
+              name: "job_title_id",
+              label: "المسمى الوظيفي",
+              placeholder: "اختر المسمى الوظيفي",
+              required: true,
+              dynamicOptions: {
+                  url: `${baseURL}/job_titles`,
+                  valueField: "id",
+                  labelField: "name",
+                  searchParam: "name",
+                  paginationEnabled: true,
+                  pageParam: "page",
+                  limitParam: "per_page",
+                  itemsPerPage: 10,
+                  totalCountHeader: "X-Total-Count",
+
               },
-          ],
-        },
+              validation: [
+                  {
+                      type: "required",
+                      message: "المسمى الوظيفي",
+                  },
+              ],
+          },
       ],
     },
   ],
