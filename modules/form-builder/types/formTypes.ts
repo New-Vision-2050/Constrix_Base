@@ -57,6 +57,7 @@ export interface FieldConfig {
   hidden?: boolean;
   autoFocus?: boolean;
   className?: string;
+  containerClassName?: string; // Class name for the container element
   width?: string;
   gridArea?: string;
   options?: DropdownOption[]; // Using shared DropdownOption type

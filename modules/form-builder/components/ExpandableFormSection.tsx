@@ -24,6 +24,7 @@ interface ExpandableFormSectionProps {
   currentStep?: number;
   onToggle?: (isOpen: boolean) => void; // Callback when section is toggled
   forceDisabled?: boolean; // Force disable the collapsible trigger
+  clearFiledError?: (field: string) => void; // Function to clear field errors
 }
 
 const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
@@ -141,8 +142,8 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                   error={errors[field.name]}
                   touched={touched[field.name]}
                   onChange={(filed, value) => {
-                    onChange(filed, value);
-                    clearFiledError(field.name);
+                    onChange?.(filed, value);
+                    clearFiledError?.(field.name);
                   }}
                   onBlur={onBlur}
                   values={values}
@@ -227,8 +228,8 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                 error={errors[field.name]}
                 touched={touched[field.name]}
                 onChange={(filed, value) => {
-                  onChange(filed, value);
-                  clearFiledError(field.name);
+                  onChange?.(filed, value);
+                  clearFiledError?.(field.name);
                 }}
                 onBlur={onBlur}
                 values={values}

@@ -48,6 +48,8 @@ interface UseSheetFormResult {
     { success: boolean; message?: string; data?: Record<string, any> }
   >;
   getStepResponseData: (step: number, key?: string) => any;
+  // Error handling
+  clearFiledError: (fieldName: string) => void;
 }
 
 export function useSheetForm({
