@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useFormStore } from '../../hooks/useFormStore';
 import { XCircle, CheckCircle } from 'lucide-react';
 import { hasApiValidation } from '../../utils/apiValidation';
+import { useLocale } from 'next-intl';
 
 interface TextFieldProps {
   field: FieldConfig;
@@ -29,6 +30,10 @@ const TextField: React.FC<TextFieldProps> = ({
 }) => {
   // Track whether the field has been API validated
   const [hasBeenApiValidated, setHasBeenApiValidated] = useState(false);
+
+  // Get the current locale to determine text direction
+  const locale = useLocale();
+  const isRtl = locale === "ar";
 
   // Get validating state and errors from the store
   const formStore = useFormStore();
@@ -71,30 +76,50 @@ const TextField: React.FC<TextFieldProps> = ({
 
   // Show icon if field is validating, has error, or has been successfully validated with API
   const showIcon = isFieldValidating || showError || isValidated;
+  
+  // Determine if we need to show a postfix
+  const hasPostfix = !!field.postfix;
 
   return (
     <div className="relative">
-      <Input
-        id={field.name}
-        name={field.name}
-        type={type}
-        value={value || ''}
-        placeholder={field.placeholder}
-        disabled={field.disabled}
-        readOnly={field.readOnly}
-        autoFocus={field.autoFocus}
-        className={cn(
-          field.className,
-          showError ? 'border-destructive pr-10' : '',
-          isValidated ? 'border-green-500 pr-10' : '',
-          isFieldValidating ? 'pr-10' : '',
-          field.width ? field.width : 'w-full'
+      <div className={cn("flex flex-row", field.width ? field.width : 'w-full')}>
+        <Input
+          id={field.name}
+          name={field.name}
+          type={type}
+          value={value || ''}
+          placeholder={field.placeholder}
+          disabled={field.disabled}
+          readOnly={field.readOnly}
+          autoFocus={field.autoFocus}
+          className={cn(
+            field.className,
+            showError ? 'border-destructive' : '',
+            isValidated ? 'border-green-500' : '',
+            hasPostfix ? 'rounded-e-none' : '', // Use logical properties (end) instead of directional (right)
+            showIcon ? (isRtl ? 'pl-10' : 'pr-10') : '', // Add padding based on text direction
+            hasPostfix ? '' : (field.width ? field.width : 'w-full')
+          )}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          dir={isRtl ? "rtl" : "ltr"} // Set direction based on locale
+        />
+        {hasPostfix && (
+          <div
+            className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-s-0 border-input rounded-e-md relative z-10"
+            dir="ltr" // Force LTR direction for the postfix
+          >
+            {field.postfix}
+          </div>
         )}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={onBlur}
-      />
+      </div>
       {showIcon && (
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+        <div className={cn(
+          "absolute top-1/2 transform -translate-y-1/2 z-20",
+          isRtl
+            ? "left-3"
+            : "right-3"
+        )}>
           {isFieldValidating ? (
             <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
           ) : showError ? (

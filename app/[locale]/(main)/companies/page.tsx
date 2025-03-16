@@ -8,6 +8,7 @@ import React from "react";
 import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
 import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
+import {companiesFormConfig} from "@/modules/form-builder/configs/companiesFormConfig";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -23,8 +24,8 @@ const CompaniesPage = () => {
           <div>
             <ExportButton data={["omar"]} />
             <SheetFormBuilder
-              config={sheetFormConfig}
-              trigger={<Button>Open Form</Button>}
+              config={companiesFormConfig}
+              trigger={<Button>انشاء شركة</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);
               }}

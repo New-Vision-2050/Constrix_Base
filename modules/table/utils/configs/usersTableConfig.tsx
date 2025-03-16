@@ -72,9 +72,9 @@ export const UsersConfig = () => {
       {
         key: "company",
         label: "الشركة",
-        render: (value: any[]) => (
+        render: (value: any[] | null) => (
           <div className="line-clamp-3">
-            {value.map((company) => (
+            {value && value.map((company) => (
               <p key={company.id} className="line-clamp-1 h-5">
                 {company.name}
               </p>

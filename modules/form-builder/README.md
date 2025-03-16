@@ -202,6 +202,36 @@ const formConfig: FormConfig = {
 - `search`: Search input with autocomplete
 - `phone`: Phone input with country code selection
 
+## Text Field Options
+
+Text fields support additional options:
+
+- `postfix`: Text to display after the input field (e.g., units, currency symbols). The postfix is always displayed in LTR (left-to-right) mode regardless of the application's text direction, making it consistent across all locales.
+
+Example with postfix:
+
+```tsx
+{
+  type: 'text',
+  name: 'weight',
+  label: 'Weight',
+  postfix: 'kg',
+  required: true,
+}
+```
+
+```tsx
+{
+  type: 'number',
+  name: 'price',
+  label: 'Price',
+  postfix: 'USD',
+  required: true,
+}
+```
+
+The postfix feature is designed to work consistently in both LTR and RTL layouts, ensuring that units and symbols always appear in the correct position and orientation regardless of the application's language direction. While the postfix is always displayed in LTR mode, the input field itself (including placeholder text) respects the localization direction, providing a natural experience for users of all languages.
+
 ## Validation Rules
 
 - `required`: Field is required

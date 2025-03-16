@@ -48,6 +48,26 @@ export default function FormTestPage() {
             <li>If validation fails, an error message will be displayed</li>
           </ol>
         </div>
+
+        <div className="mb-6">
+          <h3 className="text-lg font-medium mb-2">Text Field Postfix</h3>
+          <p className="mb-4">
+            The form builder now supports adding a postfix to text and number fields. This is useful for displaying units, currency symbols, or other indicators.
+          </p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Check out the <strong>Price</strong> field with a &quot;USD&quot; postfix</li>
+            <li>Check out the <strong>Weight</strong> field with a &quot;kg&quot; postfix</li>
+          </ul>
+          <p className="mt-2">
+            Postfixes are displayed directly after the input field, making it clear what unit or format the input should be in.
+          </p>
+          <p className="mt-2 text-blue-600">
+            <strong>New:</strong> Postfixes now work consistently in both LTR and RTL layouts! The postfix is always displayed in the correct position and orientation regardless of the application&apos;s language direction.
+          </p>
+          <p className="mt-2 text-blue-600">
+            <strong>Enhanced:</strong> Input fields now properly respect localization direction, ensuring that placeholder text is displayed correctly in both LTR and RTL languages.
+          </p>
+        </div>
         
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
           <p className="text-sm text-blue-800">

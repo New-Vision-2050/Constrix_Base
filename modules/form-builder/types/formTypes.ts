@@ -68,6 +68,7 @@ export interface FieldConfig {
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isMulti?: boolean; // Whether to enable multi-select functionality
+  postfix?: string; // Text to display after the input field
 }
 
 export interface FormSection {

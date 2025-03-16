@@ -97,6 +97,27 @@ const ApiValidationExample: React.FC = () => {
               },
             ],
           },
+          {
+            type: 'number',
+            name: 'price',
+            label: 'Price',
+            placeholder: 'Enter price',
+            postfix: 'USD',
+            validation: [
+              {
+                type: 'min',
+                value: 0,
+                message: 'Price must be a positive number',
+              },
+            ],
+          },
+          {
+            type: 'text',
+            name: 'weight',
+            label: 'Weight',
+            placeholder: 'Enter weight',
+            postfix: 'kg',
+          },
         ],
       },
     ],
