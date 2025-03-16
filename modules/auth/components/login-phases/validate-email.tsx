@@ -140,6 +140,8 @@ const ValidateEmailPhase = ({
       <Button
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
         className="w-full"
       >
         {loginT("Next")}

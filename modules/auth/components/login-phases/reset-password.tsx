@@ -52,9 +52,7 @@ const ResetPasswordPhase = ({
           {...register("newPassword")}
           error={errors?.newPassword?.message}
         />
-        <p className="opacity-50">
-          {t("ResetPassword.PasswordRequirements")}
-        </p>
+        <p className="opacity-50">{t("ResetPassword.PasswordRequirements")}</p>
         <Input
           type="password"
           label={t("ResetPassword.ConfirmNewPassword")}
@@ -66,6 +64,8 @@ const ResetPasswordPhase = ({
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
         className="w-full"
+        type="submit"
+        form="login-form"
       >
         {t("ResetPassword.Confirm")}
       </Button>

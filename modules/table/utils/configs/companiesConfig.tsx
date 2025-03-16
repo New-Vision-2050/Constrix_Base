@@ -2,6 +2,7 @@ import Company from "@/app/[locale]/(main)/companies/cells/company";
 import DataStatus from "@/app/[locale]/(main)/companies/cells/data-status";
 import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
+import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 
 // Define types for the company data
@@ -22,7 +23,7 @@ export const CompaniesConfig = () => {
   const t = useTranslations();
 
   return {
-    url: "https://core-be-pr16.constrix-nv.com/api/v1/companies",
+    url: `${baseURL}/companies`,
     columns: [
       {
         key: "name",
@@ -55,7 +56,9 @@ export const CompaniesConfig = () => {
       {
         key: "is_active",
         label: t("Companies.Status"),
-        render: (value: "active" | "inActive", row: CompanyData) => <TheStatus theStatus={value} id={row.id} />,
+        render: (value: "active" | "inActive", row: CompanyData) => (
+          <TheStatus theStatus={value} id={row.id} />
+        ),
       },
       {
         key: "id",
@@ -70,7 +73,7 @@ export const CompaniesConfig = () => {
           type: "dropdown",
           placeholder: t("Companies.CountryFilter"),
           dynamicDropdown: {
-            url: "https://core-be-pr16.constrix-nv.com/api/v1/countries",
+            url: `${baseURL}/countries`,
             valueField: "id",
             labelField: "name",
             paginationEnabled: true,
@@ -88,7 +91,7 @@ export const CompaniesConfig = () => {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
           dynamicDropdown: {
-            url: "https://core-be-pr16.constrix-nv.com/api/v1/company_types",
+            url: `${baseURL}/company_types`,
             valueField: "id",
             labelField: "name",
             paginationEnabled: true,
@@ -106,15 +109,15 @@ export const CompaniesConfig = () => {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
           dynamicDropdown: {
-              url: "https://core-be-pr16.constrix-nv.com/api/v1/company_fields",
-              valueField: "id",
-              labelField: "name",
-              paginationEnabled: true,
-              itemsPerPage: 5,
-              searchParam: "name",
-              pageParam: "page",
-              limitParam: "per_page",
-              totalCountHeader: "x-total-count",
+            url: `${baseURL}/company_fields`,
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 5,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
           },
         },
       },

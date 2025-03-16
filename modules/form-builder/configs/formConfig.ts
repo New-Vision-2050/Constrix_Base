@@ -1,20 +1,21 @@
+import { baseURL } from '@/config/axios-config';
 import { FormConfig, SearchTypeConfig } from '../types/formTypes';
 
 // Define search configurations for form fields
 const countrySearchConfig: SearchTypeConfig = {
-  type: 'dropdown',
-  placeholder: 'Select your country',
+  type: "dropdown",
+  placeholder: "Select your country",
   dynamicDropdown: {
-    url: 'https://core-be-pr16.constrix-nv.com/api/v1/countries',
-    valueField: 'id',
-    labelField: 'name',
+    url: `${baseURL}/countries`,
+    valueField: "id",
+    labelField: "name",
     paginationEnabled: true,
     itemsPerPage: 10,
-    searchParam: 'name',
-    pageParam: 'page',
-    limitParam: 'per_page',
-    totalCountHeader: 'x-total-count',
-  }
+    searchParam: "name",
+    pageParam: "page",
+    limitParam: "per_page",
+    totalCountHeader: "x-total-count",
+  },
 };
 
 const citySearchConfig: SearchTypeConfig = {

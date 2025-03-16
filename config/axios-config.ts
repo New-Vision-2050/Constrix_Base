@@ -4,7 +4,7 @@ import axios from "axios";
 import { deleteCookie, getCookie } from "cookies-next";
 import { getErrorMessage, showErrorToast, dispatchErrorEvent, errorEvent } from "@/utils/errorHandler";
 
-const baseURL =
+export const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL +
   "/" +
   process.env.NEXT_PUBLIC_API_PATH +

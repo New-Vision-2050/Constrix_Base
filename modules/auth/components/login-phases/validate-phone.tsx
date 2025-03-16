@@ -136,6 +136,8 @@ const ValidatePhonePhase = ({
       <Button
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
         className="w-full"
       >
         {loginT("Login")}
@@ -146,7 +148,14 @@ const ValidatePhonePhase = ({
         identifier={identifier}
       />
 
-      <div className="flex items-center gap-2">
+      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+        <AnotherCheckingWay
+          loginOptionAlternatives={loginOptionAlternatives}
+          handleSetStep={handleSetStep}
+        />
+      )}
+
+{/*       <div className="flex items-center gap-2">
         <Button
           type="button"
           variant={"link"}
@@ -160,7 +169,7 @@ const ValidatePhonePhase = ({
             handleSetStep={handleSetStep}
           />
         )}
-      </div>
+      </div> */}
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}

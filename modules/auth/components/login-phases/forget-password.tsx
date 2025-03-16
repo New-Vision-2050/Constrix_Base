@@ -70,13 +70,18 @@ const ForgetPasswordPhase = ({
           </div>
         )}
       />
-      <Button onClick={handleSubmit(onSubmit)} className="w-full">
+      <Button
+        onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
+        className="w-full"
+      >
         {t("ForgotPassword.Confirm")}
       </Button>{" "}
       <OtpHub
         identifier={identifier}
         resendFor={"forget-password"}
-        token={token??""}
+        token={token ?? ""}
       />
     </>
   );

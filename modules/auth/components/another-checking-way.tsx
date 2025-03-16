@@ -119,30 +119,30 @@ const AnotherCheckingWay = memo(
     ];
 
     return (
-      <div className="flex justify-center">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="underline group flex items-center gap-1 text-sm sm:text-base">
-            {t("ChooseAnotherMethod")}
-            <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 transition group-data-[state=open]:rotate-180" />
-          </DropdownMenuTrigger>
-          {isPending && <LoadingSpinner />}
-          <DropdownMenuContent className="min-w-[200px]">
-            <DropdownMenuLabel className="text-center">{t("VerifyVia")}</DropdownMenuLabel>
-            {menuItems
-              .filter((item) => loginOptionAlternatives?.includes(item.optionKey))
-              .map((item) => (
-                <DropdownMenuItem
-                  key={item.id}
-                  className="gap-4 flex items-center justify-start"
-                  onClick={item.func}
-                >
-                  <span className="flex-shrink-0">{item.icon}</span>
-                  <span>{item.label}</span>
-                </DropdownMenuItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="underline group flex items-center gap-1 text-sm sm:text-base">
+          {t("ChooseAnotherMethod")}
+          <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 transition group-data-[state=open]:rotate-180" />
+        </DropdownMenuTrigger>
+        {isPending && <LoadingSpinner />}
+        <DropdownMenuContent className="min-w-[200px]">
+          <DropdownMenuLabel className="text-center">
+            {t("VerifyVia")}
+          </DropdownMenuLabel>
+          {menuItems
+            .filter((item) => loginOptionAlternatives?.includes(item.optionKey))
+            .map((item) => (
+              <DropdownMenuItem
+                key={item.id}
+                className="gap-4 flex items-center justify-start"
+                onClick={item.func}
+              >
+                <span className="flex-shrink-0">{item.icon}</span>
+                <span>{item.label}</span>
+              </DropdownMenuItem>
+            ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 );

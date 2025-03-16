@@ -45,11 +45,14 @@ const ChangeEmailPhase = ({
         {...register("confirmNewEmail")}
         error={errors?.confirmNewEmail?.message}
       />
-      <p className="opacity-50">
-        {t("ChangeEmail.NoCopy")}
-      </p>
+      <p className="opacity-50">{t("ChangeEmail.NoCopy")}</p>
       <div className="flex flex-col gap-2 items-center">
-        <Button onClick={handleSubmit(onSubmit)} className="w-full">
+        <Button
+          type="submit"
+          form="login-form"
+          onClick={handleSubmit(onSubmit)}
+          className="w-full"
+        >
           {t("ChangeEmail.Confirm")}
         </Button>
         <Button

@@ -35,7 +35,13 @@ const SecurityQuestionsPhase = ({
         label={t("SecurityQuestions.TeamQuestion")}
         error={errors?.team?.message}
       />
-      <Button size={"lg"} className="w-full" onClick={handleSubmit(onSubmit)}>
+      <Button
+        size={"lg"}
+        className="w-full"
+        type="submit"
+        form="login-form"
+        onClick={handleSubmit(onSubmit)}
+      >
         {t("SecurityQuestions.Next")}
       </Button>
     </>
