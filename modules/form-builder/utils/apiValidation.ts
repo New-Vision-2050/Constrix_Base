@@ -3,26 +3,28 @@ import { useFormStore } from '../hooks/useFormStore';
 
 /**
  * Triggers API validation for a field with the apiValidation rule type
- * 
+ *
  * @param fieldName The name of the field to validate
  * @param value The current value of the field
  * @param rule The validation rule containing API configuration
+ * @param store Optional store instance to use instead of getting it from getState
  * @returns void - The validation result will be set in the form state
  */
 export const triggerApiValidation = (
   fieldName: string,
   value: any,
-  rule: ValidationRule
+  rule: ValidationRule,
+  store?: ReturnType<typeof useFormStore.getState>
 ): void => {
   if (rule.type !== 'apiValidation' || !rule.apiConfig) {
     return;
   }
   
-  // Get the form store instance
-  const store = useFormStore.getState();
+  // Use the provided store or get it from the global state
+  const formStore = store || useFormStore.getState();
   
   // Trigger API validation
-  store.validateFieldWithApi(fieldName, value, rule);
+  formStore.validateFieldWithApi(fieldName, value, rule);
 };
 
 /**

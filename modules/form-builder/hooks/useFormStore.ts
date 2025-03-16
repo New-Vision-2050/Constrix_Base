@@ -212,7 +212,8 @@ export const validateField = (
   value: any,
   rules?: ValidationRule[],
   formValues: Record<string, any> = {},
-  fieldName?: string
+  fieldName?: string,
+  store?: ReturnType<typeof useFormStore.getState>
 ): string | null => {
   if (!rules) return null;
 
@@ -266,16 +267,16 @@ export const validateField = (
       case 'apiValidation':
         // For API validation, we trigger the validation but also check if there's an existing error
         if (fieldName && rule.apiConfig) {
-          // Get the form store instance
-          const store = useFormStore.getState();
+          // Use the provided store or get it from the global state
+          const formStore = store || useFormStore.getState();
 
           // Check if there's an existing error for this field
-          if (store.errors[fieldName]) {
-            return store.errors[fieldName];
+          if (formStore.errors[fieldName]) {
+            return formStore.errors[fieldName];
           }
 
           // Trigger API validation
-          store.validateFieldWithApi(fieldName, value, rule);
+          formStore.validateFieldWithApi(fieldName, value, rule);
 
           // Return null here as the validation is async and will update the form state later
           // We'll check the validatingFields state to show a loading indicator

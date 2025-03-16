@@ -78,7 +78,8 @@ const FormField: React.FC<FormFieldProps> = ({
     if (field.validation && hasApiValidation(field.validation)) {
       field.validation.forEach(rule => {
         if (rule.type === 'apiValidation') {
-          triggerApiValidation(field.name, newValue, rule);
+          // Pass the formStore instance to avoid getState() call in the validation function
+          triggerApiValidation(field.name, newValue, rule, formStore);
         }
       });
     }

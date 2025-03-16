@@ -127,11 +127,6 @@ export const createTableFetcher = () => {
       // Always process the response, even if the component is unmounted
       // This ensures the data is cached for when the user returns to this page
       setTotalItems(totalItemsCount);
-      console.log('TOTAL ITEMS COUNT:',totalItemsCount)
-        response.headers.forEach((value)=>{
-            console.log('TOTAL ITEMS COUNT:',value)
-        })
-
       if (totalItemsCount > 0) {
         const calculatedTotalPages = Math.ceil(totalItemsCount / itemsPerPage);
         setPagination(currentPage, calculatedTotalPages, itemsPerPage);

@@ -290,23 +290,24 @@ export const companiesFormConfig: FormConfig = {
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
            // Option to call default way to handle the step
-      const result =   await defaultStepSubmitHandler(step, values, companiesFormConfig)
+      const result =   await defaultStepSubmitHandler(step, values, companiesFormConfig);
+      if(result.success) {
+          // Simulate API call
+          return new Promise((resolve) => {
+              resolve({
+                  success: true,
+                  message: `Step ${step + 1} submitted successfully`,
+                  data: {
+                      // For step 0 (location), return a generated ID
+                      ...(step === 0 && {
+                          company_id: result.data.payload.id
+                      }),
 
-
-      // Simulate API call
-      return new Promise((resolve) => {
-          resolve({
-              success: true,
-              message: `Step ${step + 1} submitted successfully`,
-              data: {
-                  // For step 0 (location), return a generated ID
-                  ...(step === 0 && {
-                      company_id: result.data.payload.id
-                  }),
-
-              },
+                  },
+              });
           });
-      });
+      }
+      return result;
     },
     // Handle step change
     onStepChange: (prevStep, nextStep, values) => {
