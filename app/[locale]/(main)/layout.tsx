@@ -1,10 +1,5 @@
-import MainLayout from "@/components/shared/layout/main-layout";
-import React from "react";
+import UsersMainView from "@/modules/users/views/UsersMainView";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return <MainLayout>{children}</MainLayout>;
+export default function UsersPage() {
+    return <UsersMainView />;
 }
