@@ -60,6 +60,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
   // Phone validation function
   const validatePhone = (phone: string): boolean => {
+      return true; //TODO To Be enhanced
     // Basic phone validation - can be enhanced as needed
     const phoneRegex = /^\d{6,14}\s\+\d{1,4}$/;
     return phoneRegex.test(phone);
@@ -89,7 +90,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   // Combine country code and phone number when either changes
   const handleCountryCodeChange = (code: string) => {
     setCountryCode(code);
-    const combinedValue = `${phoneNumber} ${code}`.trim();
+    const combinedValue = `${code}${phoneNumber}`.trim();
 
     // Validate the combined value
     if (phoneNumber && !validatePhone(combinedValue)) {
@@ -105,7 +106,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPhoneNumber = e.target.value;
     setPhoneNumber(newPhoneNumber);
-    const combinedValue = `${newPhoneNumber} ${countryCode}`.trim();
+    const combinedValue = `${countryCode}${newPhoneNumber}`.trim();
 
     // Validate the combined value
     if (newPhoneNumber && !validatePhone(combinedValue)) {

@@ -9,6 +9,7 @@ import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
 import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import {companiesFormConfig} from "@/modules/form-builder/configs/companiesFormConfig";
+import {useTableReload} from "@/modules/table";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -27,6 +28,8 @@ const CompaniesPage = () => {
               config={companiesFormConfig}
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={(values) => {
+                  const { reloadTable } = useTableReload();
+                  reloadTable();
                 console.log("Form submitted successfully:", values);
               }}
             />

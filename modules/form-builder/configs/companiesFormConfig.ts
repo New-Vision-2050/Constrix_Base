@@ -2,6 +2,7 @@
 // Define the form configuration
 import {FormConfig} from "@/modules/form-builder";
 import {baseURL} from "@/config/axios-config";
+import {defaultStepSubmitHandler} from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 
 export const companiesFormConfig: FormConfig = {
   title: "اضافة شركة جديدة",
@@ -138,17 +139,27 @@ export const companiesFormConfig: FormConfig = {
       title: "إنشاء مستخدم",
       collapsible: false,
       fields: [
+          {
+              type: "text",
+              name: "company_id",
+              label: "الشركة",
+              placeholder: "اختر الشركة",
+              required: true,
+              disabled:true,
+              hidden:true,
+              validation: [
+                  {
+                      type: "required",
+                      message: "الشركة",
+                  },
+              ],
+          },
         {
           name: "first_name",
           label: "اسم المستخدم الاول",
           type: "text",
           placeholder: "Enter your name",
           required: true,
-          // Example of using a condition based on previous step data
-          condition: (values) => {
-            // This field will only be shown if the country is not empty
-            return !!values.country;
-          },
           validation: [
             {
               type: "required",
@@ -164,13 +175,8 @@ export const companiesFormConfig: FormConfig = {
           name: "last_name",
           label: "اسم المستخدم ألأحير",
           type: "text",
-          placeholder: "Enter your name",
+          placeholder: "سم المستخدم ألأحير",
           required: true,
-          // Example of using a condition based on previous step data
-          condition: (values) => {
-            // This field will only be shown if the country is not empty
-            return !!values.country;
-          },
           validation: [
             {
               type: "required",
@@ -282,35 +288,26 @@ export const companiesFormConfig: FormConfig = {
     },
 
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
-    // onStepSubmit: async (step, values) => {
-    //   // Option to call default way to handle the step
-    //   // const result =   await defaultStepSubmitHandler(step, values, sheetFormConfig)
-    //   console.log(`Submitting step ${step + 1}`);
-    //   console.log("Values:", values);
-    //
-    //   // Simulate API call
-    //   return new Promise((resolve) => {
-    //     setTimeout(() => {
-    //       // Return success with data that can be used in subsequent steps
-    //       resolve({
-    //         success: true,
-    //         message: `Step ${step + 1} submitted successfully`,
-    //         data: {
-    //           stepId: step,
-    //           timestamp: new Date().toISOString(),
-    //           // For step 0 (location), return a generated ID
-    //           ...(step === 0 && {
-    //             name: `LOC-${Math.floor(Math.random() * 10000)}`,
-    //           }),
-    //           // For step 1 (personal info), return a generated user ID
-    //           ...(step === 1 && {
-    //             userId: `USR-${Math.floor(Math.random() * 10000)}`,
-    //           }),
-    //         },
-    //       });
-    //     }, 1000);
-    //   });
-    // },
+    onStepSubmit: async (step, values) => {
+           // Option to call default way to handle the step
+      const result =   await defaultStepSubmitHandler(step, values, companiesFormConfig)
+
+
+      // Simulate API call
+      return new Promise((resolve) => {
+          resolve({
+              success: true,
+              message: `Step ${step + 1} submitted successfully`,
+              data: {
+                  // For step 0 (location), return a generated ID
+                  ...(step === 0 && {
+                      company_id: result.data.payload.id
+                  }),
+
+              },
+          });
+      });
+    },
     // Handle step change
     onStepChange: (prevStep, nextStep, values) => {
       console.log(`Moving from step ${prevStep + 1} to step ${nextStep + 1}`);

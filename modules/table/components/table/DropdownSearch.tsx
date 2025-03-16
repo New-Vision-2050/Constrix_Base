@@ -55,26 +55,6 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
       })
     : { options: [], loading: false, error: null, refresh: () => {} };
 
-  // Log component rendering and props for debugging
-  useEffect(() => {
-    console.log(`DropdownSearch - ${columnKey} render:`, {
-      value,
-      dependencies,
-      dynamicConfig,
-      options: options.length > 0 ? options : "empty static options",
-      dynamicOptions:
-        dynamicOptions.length > 0 ? dynamicOptions : "empty dynamic options",
-      paginationEnabled: dynamicConfig?.paginationEnabled || false,
-    });
-  }, [
-    value,
-    dependencies,
-    dynamicConfig,
-    dynamicOptions.length,
-    options,
-    columnKey,
-  ]);
-
   // Handle dependency changes to clear child values - this effect runs only when dependencies change
   useEffect(() => {
     if (
@@ -110,7 +90,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
       const isEmpty = isMulti
         ? Array.isArray(value) && value.length === 0
         : value === "";
-        
+
       if (!isEmpty) {
         onChangeRef.current(isMulti ? [] : "");
       }
@@ -146,7 +126,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         ? Array.isArray(value) && Array.isArray(newValue) &&
           JSON.stringify(value) === JSON.stringify(newValue)
         : newValue === value;
-        
+
       if (!isEqual) {
         console.log(`DropdownSearch - onChange for ${columnKey}:`, newValue);
         onChange(newValue);

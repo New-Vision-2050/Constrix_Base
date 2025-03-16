@@ -1,80 +1,107 @@
-'use client';
+"use client";
+import React from "react";
+import { SheetFormBuilder, useSheetForm, FormConfig } from "@/modules/form-builder";
+import { TableBuilder, useTableReload, TableConfig } from "@/modules/table";
+import { Button } from "@/components/ui/button";
 
-import React from 'react';
-import ApiValidationExample from '@/modules/form-builder/test/ApiValidationExample';
+// Example form configuration
+const formConfig: FormConfig = {
+  title: "Add New Item",
+  submitButtonText: "Submit",
+  resetOnSuccess: true,
+  sections: [
+    {
+      title: "Item Details",
+      fields: [
+        {
+          name: "name",
+          label: "Name",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "description",
+          label: "Description",
+          type: "textarea",
+        },
+      ],
+    },
+  ],
+  // This would be your actual API endpoint for form submission
+  onSubmit: async (values: Record<string, any>) => {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    // Return success response
+    return {
+      success: true,
+      message: "Item added successfully",
+    };
+  },
+};
 
-/**
- * Form Test Page
- *
- * This page demonstrates the form builder with API validation feature
- * and button visibility options
- */
+// Example table configuration
+const tableConfig: TableConfig = {
+  url: "/api/items", // Your actual API endpoint for fetching table data
+  columns: [
+    {
+      key: "id",
+      label: "ID", // Changed from header to label
+      width: "80px", // Changed from number to string with px
+    },
+    {
+      key: "name",
+      label: "Name", // Changed from header to label
+      searchable: true,
+    },
+    {
+      key: "description",
+      label: "Description", // Changed from header to label
+      searchable: true,
+    },
+    {
+      key: "createdAt",
+      label: "Created At", // Changed from header to label
+      render: (value: string) => new Date(value).toLocaleDateString(), // Changed from formatter to render
+    },
+  ],
+  enableSearch: true,
+  enablePagination: true,
+  enableSorting: true,
+};
+
 export default function FormTestPage() {
+  // Get the table reload function
+  const { reloadTable } = useTableReload();
+
+  // Initialize the form with the reload function in the onSuccess callback
+  const formHook = useSheetForm({
+    config: formConfig,
+    onSuccess: () => {
+      // Reload the table after successful form submission
+      reloadTable();
+    },
+  });
+
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Form Builder Test</h1>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <ApiValidationExample />
+    <div className="container mx-auto p-4 space-y-8">
+      <h1 className="text-2xl font-bold">Form and Table Integration Example</h1>
+      
+      <div className="flex justify-end">
+        <Button onClick={formHook.openSheet}>Add New Item</Button>
       </div>
       
-      <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Form Builder Features</h2>
-        
-        <div className="mb-6">
-          <h3 className="text-lg font-medium mb-2">Button Visibility Options</h3>
-          <p className="mb-4">
-            The form builder now supports options to control the visibility of various buttons:
-          </p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li><strong>showCancelButton</strong>: Control whether to show the cancel button</li>
-            <li><strong>showBackButton</strong>: Control whether to show the back button in step-based forms</li>
-            <li><strong>showReset</strong>: Control whether to show the reset/clear button</li>
-          </ul>
-          <p className="mt-2">
-            Use the toggle buttons at the top of the demo to see how these options affect the forms.
-          </p>
-        </div>
-        
-        <div className="mb-6">
-          <h3 className="text-lg font-medium mb-2">API Validation</h3>
-          <p className="mb-4">
-            This example also demonstrates the form builder&apos;s API validation feature with debounce.
-            The validation happens after the user stops typing, preventing unnecessary API calls.
-          </p>
-          <ol className="list-decimal pl-6 space-y-2">
-            <li>Type in the username or email field</li>
-            <li>The validation will trigger after the debounce period (500ms for username, 800ms for email)</li>
-            <li>A loading indicator will show while validation is in progress</li>
-            <li>If validation fails, an error message will be displayed</li>
-          </ol>
-        </div>
-
-        <div className="mb-6">
-          <h3 className="text-lg font-medium mb-2">Text Field Postfix</h3>
-          <p className="mb-4">
-            The form builder now supports adding a postfix to text and number fields. This is useful for displaying units, currency symbols, or other indicators.
-          </p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>Check out the <strong>Price</strong> field with a &quot;USD&quot; postfix</li>
-            <li>Check out the <strong>Weight</strong> field with a &quot;kg&quot; postfix</li>
-          </ul>
-          <p className="mt-2">
-            Postfixes are displayed directly after the input field, making it clear what unit or format the input should be in.
-          </p>
-          <p className="mt-2 text-blue-600">
-            <strong>New:</strong> Postfixes now work consistently in both LTR and RTL layouts! The postfix is always displayed in the correct position and orientation regardless of the application&apos;s language direction.
-          </p>
-          <p className="mt-2 text-blue-600">
-            <strong>Enhanced:</strong> Input fields now properly respect localization direction, ensuring that placeholder text is displayed correctly in both LTR and RTL languages.
-          </p>
-        </div>
-        
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
-          <p className="text-sm text-blue-800">
-            <strong>Note:</strong> This example uses mock API endpoints. In a real application,
-            you would connect to your actual API endpoints for validation.
-          </p>
-        </div>
+      {/* Form component */}
+      <SheetFormBuilder
+        config={formConfig}
+        trigger={<Button>Open Form</Button>}
+        onSuccess={() => reloadTable()}
+      />
+      
+      {/* Table component */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Items</h2>
+        <TableBuilder config={tableConfig} />
       </div>
     </div>
   );

@@ -43,11 +43,11 @@ export const useDropdownSearch = ({
   // Store the selected option(s) as backup when they change
   useEffect(() => {
     if (!selectedValue) return;
-    
+
     if (isMulti && Array.isArray(selectedValue)) {
       // For multi-select, handle array of values
       const newBackupOptions: DropdownOption[] = [];
-      
+
       selectedValue.forEach(value => {
         const selectedOption = options.find(option => option.value === value);
         if (selectedOption) {
@@ -56,7 +56,7 @@ export const useDropdownSearch = ({
           newBackupOptions.push({ value, label: value });
         }
       });
-      
+
       if (newBackupOptions.length > 0) {
         setBackupOptions(newBackupOptions);
       }
@@ -95,7 +95,7 @@ export const useDropdownSearch = ({
       const paramValue = Array.isArray(dependencyValue)
         ? dependencyValue.join(',')
         : dependencyValue;
-      
+
       params.append(
         dynamicConfig.filterParam,
         paramValue
@@ -151,10 +151,10 @@ export const useDropdownSearch = ({
     setError(null);
 
     try {
-      console.log(
-        `Fetching dropdown options for search: ${debouncedSearchTerm}`,
-        url
-      );
+      // console.log(
+      //   `Fetching dropdown options for search: ${debouncedSearchTerm}`,
+      //   url
+      // );
 /*       const response = await apiClient.get(url, { signal: controller.signal });
  */
       const response = await queryClient.fetchQuery({
@@ -202,13 +202,13 @@ export const useDropdownSearch = ({
 
       // Merge the backup options with the new options if they exist and there is a selected value
       let mergedOptions = validOptions;
-      
+
       if (selectedValue && backupOptions.length > 0) {
         // Add any backup options that aren't already in the results
         const optionsToAdd = backupOptions.filter(
           backupOpt => !mergedOptions.some(option => option.value === backupOpt.value)
         );
-        
+
         if (optionsToAdd.length > 0) {
           mergedOptions = [...optionsToAdd, ...mergedOptions];
         }
