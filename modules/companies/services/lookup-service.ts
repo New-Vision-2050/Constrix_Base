@@ -53,7 +53,7 @@ export const fetchCompanyUsers = async () => {
   let url = apiUrl + lookupsEndPoints.countries;
   // ! The following line is a temporary override for testing purposes.
   // Remove it once the backend URL is stable and ready for production.
-  const token =  const token =  getCookie("new-vision-token");;
+  const token = getCookie("new-vision-token");;
     url = `https://core-be-stage.constrix-nv.com/api/v1${lookupsEndPoints.companyUsers}`;
 
   const response = await axios.get<fetchCompanyUsersResponseT>(url, {
