@@ -68,7 +68,7 @@ export const CompaniesConfig = () => {
     ],
     allSearchedFields: [
       {
-        key: "country",
+        key: "country_id",
         searchType: {
           type: "dropdown",
           placeholder: t("Companies.CountryFilter"),
@@ -86,7 +86,7 @@ export const CompaniesConfig = () => {
         },
       },
       {
-        key: "companyType",
+        key: "company_type_id",
         searchType: {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
@@ -104,10 +104,10 @@ export const CompaniesConfig = () => {
         },
       },
       {
-        key: "companyField",
+        key: "company_field_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("Companies.TypeFilter"),
+          placeholder: t("Companies.CompanySection"),
           dynamicDropdown: {
             url: `${baseURL}/company_fields`,
             valueField: "id",
@@ -130,7 +130,7 @@ export const CompaniesConfig = () => {
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
   };
