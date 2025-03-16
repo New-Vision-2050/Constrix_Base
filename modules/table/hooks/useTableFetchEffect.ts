@@ -74,13 +74,21 @@ export const useTableFetchEffect = ({
     // Reset certain parts of the state when URL changes
     // Instead of accessing signal.url, we'll store the current URL in a custom property on the controller itself
     if (url !== (abortControllerRef.current as any)?.lastUrl) {
-      setData([]);
-      // Don't reset columns here if they're provided in config
-      if (!configColumns || configColumns.length === 0) {
-        setColumns([]);
+      // Check if we have cached data for this URL in the activeRequestsMap
+      // If not, reset the data
+      const cachedRequest = (window as any).activeRequestsMap?.get?.(url);
+      if (!cachedRequest) {
+        console.log('No cached data found for URL, resetting state');
+        setData([]);
+        // Don't reset columns here if they're provided in config
+        if (!configColumns || configColumns.length === 0) {
+          setColumns([]);
+        }
+        setError(null);
+        setIsFirstLoad(true);
+      } else {
+        console.log('Found cached request for URL, reusing data');
       }
-      setError(null);
-      setIsFirstLoad(true);
     }
     
     console.log(`Fetching data with params: ${currentParamsSignature}`);

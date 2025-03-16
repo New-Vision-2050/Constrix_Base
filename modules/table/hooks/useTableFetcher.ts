@@ -108,7 +108,12 @@ export const createTableFetcher = () => {
       
       clearTimeout(timeoutId);
       
-      if (!isMountedRef.current || requestCounter !== currentRequestId) {
+      if (!isMountedRef.current) {
+        // Component unmounted, but we'll still process the response
+        // to cache it for when the user returns to this page
+        console.log('Component unmounted but continuing to process response for caching');
+      } else if (requestCounter !== currentRequestId) {
+        // A newer request has been made, ignore this response
         return;
       }
       
@@ -119,57 +124,62 @@ export const createTableFetcher = () => {
       const totalCount = response.headers.get('x-total-count');
       const totalItemsCount = totalCount ? parseInt(totalCount, 10) : 0;
       
-      if (isMountedRef.current && requestCounter === currentRequestId) {
-        setTotalItems(totalItemsCount);
-        
-        if (totalItemsCount > 0) {
-          const calculatedTotalPages = Math.ceil(totalItemsCount / itemsPerPage);
-          setPagination(currentPage, calculatedTotalPages, itemsPerPage);
-        }
+      // Always process the response, even if the component is unmounted
+      // This ensures the data is cached for when the user returns to this page
+      setTotalItems(totalItemsCount);
+      
+      if (totalItemsCount > 0) {
+        const calculatedTotalPages = Math.ceil(totalItemsCount / itemsPerPage);
+        setPagination(currentPage, calculatedTotalPages, itemsPerPage);
       }
       
       const result = await response.json();
       let tableData = processApiResponse(result);
       
-      if (!isMountedRef.current || requestCounter !== currentRequestId) {
+      if (!isMountedRef.current) {
+        // Component unmounted, but we'll still process the response
+        // to cache it for when the user returns to this page
+        console.log('Component unmounted but continuing to process response for caching');
+      } else if (requestCounter !== currentRequestId) {
+        // A newer request has been made, ignore this response
         return;
       }
       
       if (!totalCount && tableData.length > 0) {
-        if (isMountedRef.current && requestCounter === currentRequestId) {
-          setTotalItems(tableData.length);
-          const calculatedTotalPages = Math.ceil(tableData.length / itemsPerPage);
-          setPagination(currentPage, calculatedTotalPages, itemsPerPage);
-        }
+        // Always process the response, even if the component is unmounted
+        setTotalItems(tableData.length);
+        const calculatedTotalPages = Math.ceil(tableData.length / itemsPerPage);
+        setPagination(currentPage, calculatedTotalPages, itemsPerPage);
       } else if (!totalCount && tableData.length === 0) {
-        if (isMountedRef.current && requestCounter === currentRequestId) {
-          setError('No data found or data format not supported');
-        }
+        // Always process the response, even if the component is unmounted
+        setError('No data found or data format not supported');
       }
       
       if (dataMapper) {
         tableData = dataMapper(tableData);
       }
       
-      if (isMountedRef.current && requestCounter === currentRequestId) {
-        if (configColumns && configColumns.length > 0) {
-          setColumns(configColumns);
-        } else if (tableData.length > 0) {
-          const sampleRow = tableData[0];
-          const extractedColumns = extractColumnsFromData(sampleRow);
-          setColumns(extractedColumns);
-        }
-        
-        setData(tableData);
-        setLoading(false);
+      // Always process the response, even if the component is unmounted
+      if (configColumns && configColumns.length > 0) {
+        setColumns(configColumns);
+      } else if (tableData.length > 0) {
+        const sampleRow = tableData[0];
+        const extractedColumns = extractColumnsFromData(sampleRow);
+        setColumns(extractedColumns);
       }
       
+      setData(tableData);
+      setLoading(false);
+      
     } catch (err: any) {
-      if (isMountedRef.current && requestCounter === currentRequestId && !(err instanceof Error && err.name === 'AbortError')) {
+      // Don't handle AbortError as an actual error
+      if (!(err instanceof Error && err.name === 'AbortError')) {
         console.error('Error fetching data:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
         setData([]);
         setLoading(false);
+      } else {
+        console.log('Request was aborted, likely due to component unmount or new request');
       }
     }
   }, []);
