@@ -1,8 +1,7 @@
-
 // Define the form configuration
-import {FormConfig} from "@/modules/form-builder";
-import {baseURL} from "@/config/axios-config";
-import {defaultStepSubmitHandler} from "@/modules/form-builder/utils/defaultStepSubmitHandler";
+import { FormConfig } from "@/modules/form-builder";
+import { baseURL } from "@/config/axios-config";
+import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 
 export const companiesFormConfig: FormConfig = {
   title: "اضافة شركة جديدة",
@@ -13,147 +12,142 @@ export const companiesFormConfig: FormConfig = {
   },
   sections: [
     {
-        title: "إنشاء شركة",
+      title: "إنشاء شركة",
       fields: [
-          {
-              type: "select",
-              name: "country_id",
-              label: "دولة الشركة",
-              placeholder: "اختر دولة الشركة",
-              required: true,
-              dynamicOptions: {
-                  url: `${baseURL}/countries`,
-                  valueField: "id",
-                  labelField: "name",
-                  searchParam: "name",
-                  paginationEnabled: true,
-                  pageParam: "page",
-                  limitParam: "per_page",
-                  itemsPerPage: 10,
-                  totalCountHeader: "X-Total-Count",
-
-              },
-              validation: [
-                  {
-                      type: "required",
-                      message: "ادخل دولة الشركة",
-                  },
-              ],
+        {
+          type: "select",
+          name: "country_id",
+          label: "دولة الشركة",
+          placeholder: "اختر دولة الشركة",
+          required: true,
+          dynamicOptions: {
+            url: `${baseURL}/countries`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
           },
+          validation: [
+            {
+              type: "required",
+              message: "ادخل دولة الشركة",
+            },
+          ],
+        },
         {
           name: "company_field_id",
           label: "النشاط",
           type: "select",
-            isMulti:true,
+          isMulti: true,
           placeholder: "اختر النشاط",
           required: true,
-            dynamicOptions: {
-                url: `${baseURL}/company_fields`,
-                valueField: "id",
-                labelField: "name",
-                searchParam: "name",
-                paginationEnabled: true,
-                pageParam: "page",
-                limitParam: "per_page",
-                itemsPerPage: 10,
-                totalCountHeader: "X-Total-Count",
-
-            },
+          dynamicOptions: {
+            url: `${baseURL}/company_fields`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
           validation: [
             {
               type: "required",
               message: "برجاء اختيار النشاط",
             },
           ],
-        }
-        ,
-          {
-              name: "name",
-              label: "الاسم التجاري",
-              type: "text",
-              placeholder: "برجاء إدخال الاسم التجاري",
-              validation: [
-
-                  {
-                      type: 'apiValidation',
-                      message: 'This username is already taken',
-                      apiConfig: {
-                          url: '/api/validate-username',
-                          method: 'POST',
-                          debounceMs: 500,
-                          paramName: 'username',
-                          successCondition: (response) => response.available === true,
-                      },
-                  },
-              ],
-          },
-          {
-              name: "user_name",
-              label: "الاسم المختصر",
-              type: "text",
-              placeholder: "برجاء إدخال الاسم المختصر",
-              postfix: 'constrix.com',
-              validation: [
-                  {
-                      type: 'apiValidation',
-                      message: 'This username is already taken',
-                      apiConfig: {
-                          url: '/api/validate-username',
-                          method: 'POST',
-                          debounceMs: 500,
-                          paramName: 'username',
-                          successCondition: (response) => response.available === true,
-                      },
-                  },
-              ],
-          },
-          {
-              type: "select",
-              name: "general_manager_id",
-              label: "مسؤول الدعم",
-              placeholder: "اختر مسؤول الدعم",
-              required: true,
-              dynamicOptions: {
-                  url: `${baseURL}/users`,
-                  valueField: "id",
-                  labelField: "name",
-                  searchParam: "name",
-                  paginationEnabled: true,
-                  pageParam: "page",
-                  limitParam: "per_page",
-                  itemsPerPage: 10,
-                  totalCountHeader: "X-Total-Count",
-
+        },
+        {
+          name: "name",
+          label: "الاسم التجاري",
+          type: "text",
+          placeholder: "برجاء إدخال الاسم التجاري",
+          validation: [
+            {
+              type: "apiValidation",
+              message: "This username is already taken",
+              apiConfig: {
+                url: "/api/validate-username",
+                method: "POST",
+                debounceMs: 500,
+                paramName: "username",
+                successCondition: (response) => response.available === true,
               },
-              validation: [
-                  {
-                      type: "required",
-                      message: "مسؤول الدعم",
-                  },
-              ],
+            },
+          ],
+        },
+        {
+          name: "user_name",
+          label: "الاسم المختصر",
+          type: "text",
+          placeholder: "برجاء إدخال الاسم المختصر",
+          postfix: "constrix.com",
+          containerClassName: "rtl:flex-row-reverse",
+          validation: [
+            {
+              type: "apiValidation",
+              message: "This username is already taken",
+              apiConfig: {
+                url: "/api/validate-username",
+                method: "POST",
+                debounceMs: 500,
+                paramName: "username",
+                successCondition: (response) => response.available === true,
+              },
+            },
+          ],
+        },
+        {
+          type: "select",
+          name: "general_manager_id",
+          label: "مسؤول الدعم",
+          placeholder: "اختر مسؤول الدعم",
+          required: true,
+          dynamicOptions: {
+            url: `${baseURL}/users`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
           },
-
+          validation: [
+            {
+              type: "required",
+              message: "مسؤول الدعم",
+            },
+          ],
+        },
       ],
     },
     {
       title: "إنشاء مستخدم",
       collapsible: false,
       fields: [
-          {
-              type: "text",
-              name: "company_id",
-              label: "الشركة",
-              placeholder: "اختر الشركة",
-              required: true,
-              disabled:true,
-              hidden:true,
-              validation: [
-                  {
-                      type: "required",
-                      message: "الشركة",
-                  },
-              ],
-          },
+        {
+          type: "text",
+          name: "company_id",
+          label: "الشركة",
+          placeholder: "اختر الشركة",
+          required: true,
+          disabled: true,
+          hidden: true,
+          validation: [
+            {
+              type: "required",
+              message: "الشركة",
+            },
+          ],
+        },
         {
           name: "first_name",
           label: "اسم المستخدم الاول",
@@ -171,7 +165,8 @@ export const companiesFormConfig: FormConfig = {
               message: "Name must be at least 2 characters",
             },
           ],
-        },{
+        },
+        {
           name: "last_name",
           label: "اسم المستخدم ألأحير",
           type: "text",
@@ -206,43 +201,42 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-          {
-              name: "phone",
-              label: "الهاتف",
-              type: "phone",
-              placeholder: "Enter your phone",
-              validation: [
-                  {
-                      type: "required",
-                      message: "برجاء إدخال رقم الهاتف",
-                  },
-              ],
+        {
+          name: "phone",
+          label: "الهاتف",
+          type: "phone",
+          placeholder: "Enter your phone",
+          validation: [
+            {
+              type: "required",
+              message: "برجاء إدخال رقم الهاتف",
+            },
+          ],
+        },
+        {
+          type: "select",
+          name: "job_title_id",
+          label: "المسمى الوظيفي",
+          placeholder: "اختر المسمى الوظيفي",
+          required: true,
+          dynamicOptions: {
+            url: `${baseURL}/job_titles`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
           },
-          {
-              type: "select",
-              name: "job_title_id",
-              label: "المسمى الوظيفي",
-              placeholder: "اختر المسمى الوظيفي",
-              required: true,
-              dynamicOptions: {
-                  url: `${baseURL}/job_titles`,
-                  valueField: "id",
-                  labelField: "name",
-                  searchParam: "name",
-                  paginationEnabled: true,
-                  pageParam: "page",
-                  limitParam: "per_page",
-                  itemsPerPage: 10,
-                  totalCountHeader: "X-Total-Count",
-
-              },
-              validation: [
-                  {
-                      type: "required",
-                      message: "المسمى الوظيفي",
-                  },
-              ],
-          },
+          validation: [
+            {
+              type: "required",
+              message: "المسمى الوظيفي",
+            },
+          ],
+        },
       ],
     },
   ],
@@ -252,13 +246,12 @@ export const companiesFormConfig: FormConfig = {
   resetButtonText: "Clear Form",
   showSubmitLoader: true,
   resetOnSuccess: true,
-  showCancelButton:false,
-  showBackButton:false,
-
+  showCancelButton: false,
+  showBackButton: false,
 
   // Enable wizard mode
   //   wizard: true,
-    accordion: true,
+  accordion: true,
   wizardOptions: {
     showStepIndicator: false,
     showStepTitles: false,
@@ -289,23 +282,26 @@ export const companiesFormConfig: FormConfig = {
 
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
-           // Option to call default way to handle the step
-      const result =   await defaultStepSubmitHandler(step, values, companiesFormConfig);
-      if(result.success) {
-          // Simulate API call
-          return new Promise((resolve) => {
-              resolve({
-                  success: true,
-                  message: `Step ${step + 1} submitted successfully`,
-                  data: {
-                      // For step 0 (location), return a generated ID
-                      ...(step === 0 && {
-                          company_id: result.data.payload.id
-                      }),
-
-                  },
-              });
+      // Option to call default way to handle the step
+      const result = await defaultStepSubmitHandler(
+        step,
+        values,
+        companiesFormConfig
+      );
+      if (result.success) {
+        // Simulate API call
+        return new Promise((resolve) => {
+          resolve({
+            success: true,
+            message: `Step ${step + 1} submitted successfully`,
+            data: {
+              // For step 0 (location), return a generated ID
+              ...(step === 0 && {
+                company_id: result.data.payload.id,
+              }),
+            },
           });
+        });
       }
       return result;
     },
