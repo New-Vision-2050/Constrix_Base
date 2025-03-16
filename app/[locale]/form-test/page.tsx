@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-import { SheetFormBuilder, useSheetFormWithTableReload, FormConfig } from "@/modules/form-builder";
+import { SheetFormBuilder, FormConfig } from "@/modules/form-builder";
 import { TableBuilder, TableConfig } from "@/modules/table";
 import { Button } from "@/components/ui/button";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 // Example form configuration
 const formConfig: FormConfig = {
@@ -71,29 +72,36 @@ const tableConfig: TableConfig = {
 };
 
 export default function FormTestPage() {
-  // Initialize the form with automatic table reload
-  const formHook = useSheetFormWithTableReload({
-    config: formConfig,
-    // The table will automatically reload after successful form submission
-    // No need to manually call reloadTable in onSuccess
-  });
+  // Create a function to handle form success and reload the table
+  const handleFormSuccess = (values: any) => {
+    // Import the store directly to avoid hooks in callbacks
+    const tableStore = useTableStore.getState();
+    
+    // Manually trigger the reload logic
+    tableStore.setLoading(true);
+    setTimeout(() => {
+      tableStore.setLoading(false);
+    }, 100);
+    
+    console.log("Form submitted successfully:", values);
+  };
 
   return (
     <div className="container mx-auto p-4 space-y-8">
       <h1 className="text-2xl font-bold">Form and Table Integration Example</h1>
       
       <div className="flex justify-end">
-        <Button onClick={formHook.openSheet}>Add New Item</Button>
+        <Button onClick={() => {
+          // Open the form using the SheetFormBuilder's trigger
+          document.getElementById('open-form-button')?.click();
+        }}>Add New Item</Button>
       </div>
       
       {/* Form component */}
       <SheetFormBuilder
         config={formConfig}
-        trigger={<Button>Open Form</Button>}
-        onSuccess={() => {
-          // The table will automatically reload because we're using useSheetFormWithTableReload
-          console.log("Form submitted successfully");
-        }}
+        trigger={<Button id="open-form-button">Open Form</Button>}
+        onSuccess={handleFormSuccess}
       />
       
       {/* Table component */}
