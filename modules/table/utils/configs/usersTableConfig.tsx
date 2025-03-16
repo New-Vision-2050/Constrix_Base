@@ -33,6 +33,7 @@ export const UsersConfig = () => {
         key: "name",
         label: "الاسم",
         sortable: true,
+        searchable: true,
         render: (_: unknown, row: UsersData) => (
           <div className="flex items-center gap-2">
             <AvatarGroup fullName={row.name} alt={row.name} /> {row.name}
