@@ -1,0 +1,36 @@
+"use client";
+import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { Button } from "@/components/ui/button";
+import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
+import ExportButton from "@/modules/table/components/ExportButton";
+import TableBuilder from "@/modules/table/components/TableBuilder";
+import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
+import { statisticsConfig } from "@/modules/users/components/statistics-config";
+import React from "react";
+
+const UsersPage = () => {
+  const config = UsersConfig();
+
+  return (
+    <div className="px-8 space-y-7">
+      <StatisticsRow config={statisticsConfig} />{" "}
+      <TableBuilder
+        config={config}
+        searchBarActions={
+          <div>
+            <ExportButton data={["omar"]} />
+            <SheetFormBuilder
+              config={sheetFormConfig}
+              trigger={<Button>Open Form</Button>}
+              onSuccess={(values) => {
+                console.log("Form submitted successfully:", values);
+              }}
+            />
+          </div>
+        }
+      />
+    </div>
+  );
+};
+
+export default UsersPage;

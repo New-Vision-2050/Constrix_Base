@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
@@ -53,7 +55,7 @@ const StatisticsRow = ({ config }: { config: Config }) => {
                 {isSuccess && (
                   <>
                     ({item.percentage > 0 && "+"}
-                    {item.percentage}%)
+                    {Math.round(item.percentage)}%)
                   </>
                 )}
               </span>

@@ -109,7 +109,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               )}
               onKeyDown={handleKeyDown}
             >
-              <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left">
+              <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-start">
                 {value ? selectedLabel : placeholder}
               </div>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -145,10 +145,10 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             <div className="flex items-center border-b px-3">
               <CommandInput
                 ref={inputRef}
-                placeholder="Search..."
+                placeholder="بحث..."
                 value={searchValue}
                 onValueChange={setSearchValue}
-                className="flex-1 py-3 outline-none"
+                className="flex-1 py-3 px-1 outline-none"
               />
             </div>
             <CommandList

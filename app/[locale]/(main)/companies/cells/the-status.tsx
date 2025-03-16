@@ -1,3 +1,4 @@
+"use client";
 import { Label } from "@/modules/table/components/ui/label";
 import { Switch } from "@/modules/table/components/ui/switch";
 import React, { useState } from "react";
@@ -12,7 +13,7 @@ const TheStatus = ({
 }) => {
   const t = useTranslations();
   const [isActive, setIsActive] = useState(!!theStatus);
-  
+
   return (
     <div className="flex items-center gap-2">
       <Label htmlFor={`${id}-switcher`} className="font-normal">

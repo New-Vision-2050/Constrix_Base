@@ -126,7 +126,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             case "text":
             default:
               return (
-                <div key={column.key} className="space-y-1">
+                <div key={column.key}>
                   <label
                     htmlFor={`search-${column.key}`}
                     className="text-sm font-medium text-gray-700 dark:text-gray-300"
