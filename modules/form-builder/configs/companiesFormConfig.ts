@@ -282,35 +282,35 @@ export const companiesFormConfig: FormConfig = {
     },
 
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
-    onStepSubmit: async (step, values) => {
-      // Option to call default way to handle the step
-      // const result =   await defaultStepSubmitHandler(step, values, sheetFormConfig)
-      console.log(`Submitting step ${step + 1}`);
-      console.log("Values:", values);
-
-      // Simulate API call
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Return success with data that can be used in subsequent steps
-          resolve({
-            success: true,
-            message: `Step ${step + 1} submitted successfully`,
-            data: {
-              stepId: step,
-              timestamp: new Date().toISOString(),
-              // For step 0 (location), return a generated ID
-              ...(step === 0 && {
-                name: `LOC-${Math.floor(Math.random() * 10000)}`,
-              }),
-              // For step 1 (personal info), return a generated user ID
-              ...(step === 1 && {
-                userId: `USR-${Math.floor(Math.random() * 10000)}`,
-              }),
-            },
-          });
-        }, 1000);
-      });
-    },
+    // onStepSubmit: async (step, values) => {
+    //   // Option to call default way to handle the step
+    //   // const result =   await defaultStepSubmitHandler(step, values, sheetFormConfig)
+    //   console.log(`Submitting step ${step + 1}`);
+    //   console.log("Values:", values);
+    //
+    //   // Simulate API call
+    //   return new Promise((resolve) => {
+    //     setTimeout(() => {
+    //       // Return success with data that can be used in subsequent steps
+    //       resolve({
+    //         success: true,
+    //         message: `Step ${step + 1} submitted successfully`,
+    //         data: {
+    //           stepId: step,
+    //           timestamp: new Date().toISOString(),
+    //           // For step 0 (location), return a generated ID
+    //           ...(step === 0 && {
+    //             name: `LOC-${Math.floor(Math.random() * 10000)}`,
+    //           }),
+    //           // For step 1 (personal info), return a generated user ID
+    //           ...(step === 1 && {
+    //             userId: `USR-${Math.floor(Math.random() * 10000)}`,
+    //           }),
+    //         },
+    //       });
+    //     }, 1000);
+    //   });
+    // },
     // Handle step change
     onStepChange: (prevStep, nextStep, values) => {
       console.log(`Moving from step ${prevStep + 1} to step ${nextStep + 1}`);
