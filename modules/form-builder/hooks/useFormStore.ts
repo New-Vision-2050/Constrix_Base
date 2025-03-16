@@ -264,11 +264,15 @@ export const validateField = (
         }
         break;
       case 'apiValidation':
-        // For API validation, we trigger the validation but don't return an error immediately
-        // The error will be set by the API validation function when it completes
+        // For API validation, we trigger the validation but also check if there's an existing error
         if (fieldName && rule.apiConfig) {
           // Get the form store instance
           const store = useFormStore.getState();
+
+          // Check if there's an existing error for this field
+          if (store.errors[fieldName]) {
+            return store.errors[fieldName];
+          }
 
           // Trigger API validation
           store.validateFieldWithApi(fieldName, value, rule);

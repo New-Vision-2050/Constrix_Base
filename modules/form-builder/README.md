@@ -109,12 +109,16 @@ Important notes about validation:
 When using API validation:
 1. The field will show a loading indicator while validation is in progress
 2. The validation happens after the user stops typing (debounce)
-3. A checkmark (✓) icon is displayed when validation succeeds
+3. A checkmark (✓) icon is displayed when API validation succeeds (only for fields with API validation)
 4. An X icon is displayed if validation fails
 5. Form submission is prevented while API validation is in progress
 6. Form submission is prevented if any API validation fails
+7. Step submission in wizard/accordion mode is also prevented if any API validation fails
+8. API validation errors persist until the field value is changed and revalidated successfully
 
 This ensures that users cannot submit forms with invalid data, and provides clear visual feedback about the validation status. The checkmark icon gives users confidence that their input is valid and ready for submission.
+
+The form system now checks for API validation errors during both regular form submission and step submission in wizard/accordion modes. This enhancement ensures that all API validations must be successful before allowing the form or step to be submitted, maintaining data integrity and preventing submission of invalid data.
 
 ## Form Modes
 

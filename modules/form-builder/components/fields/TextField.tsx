@@ -48,16 +48,16 @@ const TextField: React.FC<TextFieldProps> = ({
 
   // Determine if field has been validated successfully
   // A field is considered successfully validated if:
-  // 1. It has been touched (user interacted with it)
-  // 2. It has a value (not empty)
-  // 3. It has no errors
-  // 4. It's not currently being validated
-  // 5. If it has API validation, it must have been validated by the API
+  // 1. It has API validation rules
+  // 2. It has been touched (user interacted with it)
+  // 3. It has a value (not empty)
+  // 4. It has no errors
+  // 5. It's not currently being validated
+  // 6. It has been validated by the API
   const hasValue = value !== undefined && value !== null && value !== '';
-  const isValidated = touched && hasValue && !error && !isFieldValidating &&
-                     (!hasApiVal || (hasApiVal && hasBeenApiValidated));
+  const isValidated = hasApiVal && touched && hasValue && !error && !isFieldValidating && hasBeenApiValidated;
 
-  // Show icon if field is validating, has error, or has been successfully validated
+  // Show icon if field is validating, has error, or has been successfully validated with API
   const showIcon = isFieldValidating || showError || isValidated;
 
   return (

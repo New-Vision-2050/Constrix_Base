@@ -160,6 +160,9 @@ export function useSheetForm({
     const newErrors: Record<string, string> = {};
     let isValid = true;
 
+    // Get existing errors from API validation
+    const formStoreErrors = useFormStore.getState().errors;
+    
     // Iterate through all sections and fields
     config.sections.forEach((section) => {
       // Skip sections that don't meet their condition
@@ -176,6 +179,13 @@ export function useSheetForm({
         // Skip fields that are hidden or disabled
         if (field.hidden || field.disabled) {
           return;
+        }
+
+        // Check if there's an API validation error for this field
+        if (formStoreErrors[field.name]) {
+          newErrors[field.name] = formStoreErrors[field.name];
+          isValid = false;
+          return; // Skip other validations for this field
         }
 
         // Check required fields
@@ -373,6 +383,9 @@ export function useSheetForm({
     const newErrors: Record<string, string> = {};
     let isValid = true;
 
+    // Get existing errors from API validation
+    const formStoreErrors = useFormStore.getState().errors;
+
     // Get the current section
     const currentSection = config.sections[currentStep];
 
@@ -391,6 +404,13 @@ export function useSheetForm({
       // Skip fields that are hidden or disabled
       if (field.hidden || field.disabled) {
         return;
+      }
+
+      // Check if there's an API validation error for this field
+      if (formStoreErrors[field.name]) {
+        newErrors[field.name] = formStoreErrors[field.name];
+        isValid = false;
+        return; // Skip other validations for this field
       }
 
       // Check required fields
