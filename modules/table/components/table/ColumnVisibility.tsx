@@ -17,6 +17,12 @@ interface ColumnVisibilityProps {
   onToggleColumnVisibility: (columnKey: string) => void;
   onSetAllColumnsVisible: () => void;
   onSetMinimalColumnsVisible: () => void;
+  columnVisibility?: {
+    visible: boolean;
+    keys: string[];
+  };
+  onSetColumnVisibility?: (visible: boolean) => void;
+  onSetColumnVisibilityKeys?: (keys: string[]) => void;
 }
 
 const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
@@ -25,12 +31,26 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
   onToggleColumnVisibility,
   onSetAllColumnsVisible,
   onSetMinimalColumnsVisible,
+  columnVisibility,
+  onSetColumnVisibility,
+  onSetColumnVisibilityKeys,
 }) => {
   const t = useTranslations();
   const locale = useLocale();
   const isRtl = locale === "ar";
 
   if (columns.length === 0) return null;
+  
+  // Use columnVisibility state if provided, otherwise use visibleColumnKeys
+  const isVisible = columnVisibility?.visible ?? true;
+  const visibleKeys = columnVisibility?.keys?.length ? columnVisibility.keys : visibleColumnKeys;
+
+  // Handle toggling the overall column visibility
+  const handleToggleVisibility = () => {
+    if (onSetColumnVisibility) {
+      onSetColumnVisibility(!isVisible);
+    }
+  };
 
   return (
     <Popover>
@@ -39,8 +59,9 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
           type="button"
           variant="outline"
           size="icon"
-          className="flex-shrink-0 bg-sidebar"
+          className={`flex-shrink-0 ${isVisible ? 'bg-sidebar' : 'bg-muted'}`}
           title={t("Table.ToggleColumns") || "Toggle visible columns"}
+          onClick={onSetColumnVisibility ? handleToggleVisibility : undefined}
         >
           <VisibilityIcon />
         </Button>
@@ -77,8 +98,19 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
               <div key={column.key} className="flex items-center gap-x-2">
                 <Checkbox
                   id={`column-visibility-${column.key}`}
-                  checked={visibleColumnKeys.includes(column.key)}
-                  onCheckedChange={() => onToggleColumnVisibility(column.key)}
+                  checked={visibleKeys.includes(column.key)}
+                  onCheckedChange={() => {
+                    if (onSetColumnVisibilityKeys && columnVisibility) {
+                      // If using the new API, update the keys directly
+                      const newKeys = visibleKeys.includes(column.key)
+                        ? visibleKeys.filter(key => key !== column.key)
+                        : [...visibleKeys, column.key];
+                      onSetColumnVisibilityKeys(newKeys);
+                    } else {
+                      // Fall back to the old API
+                      onToggleColumnVisibility(column.key);
+                    }
+                  }}
                 />
                 <Label
                   htmlFor={`column-visibility-${column.key}`}
@@ -91,7 +123,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
           </div>
           <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground">
-              {visibleColumnKeys.length} من {columns.length} اعمدة مرئية
+              {visibleKeys.length} من {columns.length} اعمدة مرئية
             </p>
           </div>
         </div>

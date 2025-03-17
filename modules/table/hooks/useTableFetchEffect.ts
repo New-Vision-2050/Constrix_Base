@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ColumnConfig } from '@/modules/table/utils/tableConfig';
 import { SearchConfig, ColumnSearchState } from '@/modules/table/utils/tableTypes';
 import { useFetchTracking } from './useFetchTracking';
@@ -60,11 +60,23 @@ export const useTableFetchEffect = ({
       sortDirection,
       searchQuery,
       searchFields,
-      columnSearchState
+      columnSearchState // Include columnSearchState in the signature
     });
     
-    // Add logging to debug columnSearchState changes
-    console.log("Effect triggered with columnSearchState:", columnSearchState);
+    // Log the current column search state for debugging
+    console.log("Current column search state:", columnSearchState);
+    
+    // Add logging to debug parameters
+    console.log("Effect triggered with params:", {
+      url,
+      currentPage,
+      itemsPerPage,
+      sortColumn,
+      sortDirection,
+      searchQuery,
+      searchFields,
+      columnSearchState
+    });
     
     if (!shouldFetchData(url, currentParamsSignature)) {
       console.log("Skipping fetch due to duplicate parameters");
@@ -97,6 +109,8 @@ export const useTableFetchEffect = ({
     // Attach the URL to the controller itself, not to the signal
     (controller as any).lastUrl = url;
     
+    // Make sure to include columnSearchState in the fetch parameters
+    // even though it's not in the dependency array
     fetchData({
       url,
       currentPage,
@@ -105,7 +119,7 @@ export const useTableFetchEffect = ({
       sortDirection,
       searchQuery,
       searchFields,
-      columnSearchState,
+      columnSearchState, // Still include this for filtering
       searchConfig,
       isMountedRef,
       abortControllerRef,
@@ -114,5 +128,5 @@ export const useTableFetchEffect = ({
     
     // Cleanup when unmounting or when dependencies change
     return cleanup;
-  }, [url, currentPage, itemsPerPage, sortColumn, sortDirection, searchQuery, searchFields, JSON.stringify(columnSearchState)]);
+  }, [url, currentPage, itemsPerPage, sortColumn, sortDirection, searchQuery, searchFields, columnSearchState]);
 };

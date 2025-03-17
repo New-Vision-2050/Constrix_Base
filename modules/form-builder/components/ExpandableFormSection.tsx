@@ -60,9 +60,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   }, [forceDisabled, isOpen]);
 
   // Check if section has any errors
-  const hasErrors = section.fields.some(
-    (field) => errors[field.name] && touched[field.name]
-  );
+  const hasErrors = section.fields.some(field => errors[field.name] && touched[field.name]);
 
   // Check if section is completed (all required fields filled and no errors)
   const isCompleted = useMemo(() => {

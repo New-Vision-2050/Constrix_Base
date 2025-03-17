@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import { companiesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
 
@@ -19,6 +20,12 @@ const CompaniesPage = () => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
 
+  // Define a unique table ID for the companies table
+  const companiesTableId = "companies-table";
+  
+  // Use the reset hook to clear table state on route changes
+  useResetTableOnRouteChange(companiesTableId);
+
   // Create a function that will get the reloadTable function when needed
   // This avoids the infinite update loop
   const handleFormSuccess = (values: Record<string, unknown>) => {
@@ -26,9 +33,9 @@ const CompaniesPage = () => {
     const tableStore = useTableStore.getState();
 
     // Manually trigger the reload logic
-    tableStore.setLoading(true);
+    tableStore.setLoading(companiesTableId, true);
     setTimeout(() => {
-      tableStore.setLoading(false);
+      tableStore.setLoading(companiesTableId, false);
     }, 100);
 
     // Add type safety for the result structure
@@ -48,6 +55,7 @@ const CompaniesPage = () => {
 
       <TableBuilder
         config={config}
+        tableId={companiesTableId} // Pass the unique table ID
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder

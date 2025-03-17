@@ -3,12 +3,13 @@ import { useState, useCallback, useEffect } from "react";
 import { FormConfig } from "../types/formTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
-import { useFormStore } from "./useFormStore";
+import { useFormInstance, useFormStore } from "./useFormStore";
 
 interface UseSheetFormProps {
   config: FormConfig;
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
+  formId?: string;
 }
 
 interface UseSheetFormResult {
@@ -50,23 +51,42 @@ interface UseSheetFormResult {
   getStepResponseData: (step: number, key?: string) => any;
   // Error handling
   clearFiledError: (fieldName: string) => void;
+  // Form ID
+  formId: string;
 }
 
 export function useSheetForm({
   config,
   onSuccess,
   onCancel,
+  formId,
 }: UseSheetFormProps): UseSheetFormResult {
+  // Use formId from config if provided, otherwise use the prop or default
+  const actualFormId = config.formId || formId || 'sheet-form';
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
-
-  // Form state
-  const [values, setValues] = useState<Record<string, any>>(
-    config.initialValues || {}
-  );
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Get form instance from store
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    isValid,
+    
+    setValue,
+    setValues,
+    setError,
+    setErrors,
+    setTouched,
+    setAllTouched,
+    resetForm,
+    setSubmitting,
+    setIsValid,
+    hasValidatingFields,
+  } = useFormInstance(actualFormId, config.initialValues || {});
+  
+  // Local state for sheet-specific functionality
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -97,7 +117,7 @@ export function useSheetForm({
     if (config.initialValues) {
       setValues(config.initialValues);
     }
-  }, [config]);
+  }, [config, setValues]);
 
   // Open and close sheet
   const openSheet = useCallback(() => {
@@ -118,52 +138,16 @@ export function useSheetForm({
     if (isStepBased) {
       setCurrentStep(0);
     }
-  }, [config.resetOnSuccess, isStepBased]);
+  }, [config.resetOnSuccess, isStepBased, resetForm]);
 
-  // Form actions
-  const setValue = useCallback((field: string, value: any) => {
-    setValues((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  }, []);
-
-  const setFieldTouched = useCallback((field: string, isTouched: boolean) => {
-    setTouched((prev) => ({
-      ...prev,
-      [field]: isTouched,
-    }));
-  }, []);
-
-  const setAllTouched = useCallback(() => {
-    const allTouched: Record<string, boolean> = {};
-
-    // Mark all fields as touched
-    config.sections.forEach((section) => {
-      section.fields.forEach((field) => {
-        allTouched[field.name] = true;
-      });
-    });
-
-    setTouched(allTouched);
-  }, [config.sections]);
-
-  const resetForm = useCallback(() => {
-    setValues(config.initialValues || {});
-    setErrors({});
-    setTouched({});
-    setIsSubmitting(false);
-    setSubmitSuccess(false);
-    setSubmitError(null);
-  }, [config.initialValues]);
+  const clearFiledError = useCallback((fieldName: string) => {
+    setError(fieldName, null);
+  }, [setError]);
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
     const newErrors: Record<string, string> = {};
     let isValid = true;
-
-    // Get existing errors from API validation
-    const formStoreErrors = useFormStore.getState().errors;
 
     // Iterate through all sections and fields
     config.sections.forEach((section) => {
@@ -181,13 +165,6 @@ export function useSheetForm({
         // Skip fields that are hidden or disabled
         if (field.hidden || field.disabled) {
           return;
-        }
-
-        // Check if there's an API validation error for this field
-        if (formStoreErrors[field.name]) {
-          newErrors[field.name] = formStoreErrors[field.name];
-          isValid = false;
-          return; // Skip other validations for this field
         }
 
         // Check required fields
@@ -255,17 +232,10 @@ export function useSheetForm({
 
     // Update form state with errors
     setErrors(newErrors);
+    setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, values]);
-
-  const clearFiledError = (fieldName: string) => {
-    setErrors((prevErrors) => {
-      const updatedErrors = { ...prevErrors };
-      delete updatedErrors[fieldName];
-      return updatedErrors;
-    });
-  };
+  }, [config.sections, values, setErrors, setIsValid]);
 
   // Handle form submission
   const handleSubmit = useCallback(
@@ -274,7 +244,7 @@ export function useSheetForm({
       e.stopPropagation(); // Stop event propagation to prevent rerendering
 
       // Reset submission state
-      setIsSubmitting(true);
+      setSubmitting(true);
       setSubmitError(null);
       setSubmitSuccess(false);
 
@@ -285,14 +255,14 @@ export function useSheetForm({
       const isValid = validateAllFields();
 
       // Check if any fields are currently being validated via API
-      const hasValidatingFields = useFormStore.getState().hasValidatingFields();
+      const fieldsValidating = hasValidatingFields();
 
       // If form is not valid or fields are being validated, stop submission
-      if (!isValid || hasValidatingFields) {
-        if (hasValidatingFields) {
+      if (!isValid || fieldsValidating) {
+        if (fieldsValidating) {
           setSubmitError("Please wait for field validation to complete");
         }
-        setIsSubmitting(false);
+        setSubmitting(false);
         return;
       }
 
@@ -388,7 +358,7 @@ export function useSheetForm({
 
             // Mark fields with errors as touched
             Object.keys(formattedErrors).forEach((field) => {
-              setFieldTouched(field, true);
+              setTouched(field, true);
             });
 
             // Call onValidationError callback if provided
@@ -401,7 +371,7 @@ export function useSheetForm({
         console.log("Form submission error:", error);
         setSubmitError("An unexpected error occurred");
       } finally {
-        setIsSubmitting(false);
+        setSubmitting(false);
       }
     },
     [
@@ -412,12 +382,15 @@ export function useSheetForm({
       closeSheet,
       resetForm,
       onSuccess,
-      setFieldTouched,
+      setTouched,
       config.onSuccess,
       config.onError,
       config.onValidationError,
       isStepBased,
       stepResponses,
+      setSubmitting,
+      setErrors,
+      hasValidatingFields,
     ]
   );
 
@@ -427,9 +400,6 @@ export function useSheetForm({
 
     const newErrors: Record<string, string> = {};
     let isValid = true;
-
-    // Get existing errors from API validation
-    const formStoreErrors = useFormStore.getState().errors;
 
     // Get the current section
     const currentSection = config.sections[currentStep];
@@ -449,13 +419,6 @@ export function useSheetForm({
       // Skip fields that are hidden or disabled
       if (field.hidden || field.disabled) {
         return;
-      }
-
-      // Check if there's an API validation error for this field
-      if (formStoreErrors[field.name]) {
-        newErrors[field.name] = formStoreErrors[field.name];
-        isValid = false;
-        return; // Skip other validations for this field
       }
 
       // Check required fields
@@ -522,9 +485,10 @@ export function useSheetForm({
 
     // Update form state with errors
     setErrors(newErrors);
+    setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, currentStep, isStepBased, values]);
+  }, [config.sections, currentStep, isStepBased, values, setErrors, setIsValid]);
 
   // Wizard navigation functions
   const goToNextStep = useCallback(() => {
@@ -534,11 +498,16 @@ export function useSheetForm({
       !validateCurrentStep()
     ) {
       // Mark all fields in the current step as touched
-      const currentStepTouched: Record<string, boolean> = { ...touched };
+      const currentStepTouched: Record<string, boolean> = {};
       config.sections[currentStep].fields.forEach((field) => {
         currentStepTouched[field.name] = true;
       });
-      setTouched(currentStepTouched);
+      
+      // Update touched state for each field
+      Object.entries(currentStepTouched).forEach(([field, isTouched]) => {
+        setTouched(field, isTouched);
+      });
+      
       return;
     }
 
@@ -559,8 +528,8 @@ export function useSheetForm({
     totalSteps,
     validateCurrentStep,
     values,
-    touched,
     config.sections,
+    setTouched,
   ]);
 
   const goToPrevStep = useCallback(() => {
@@ -607,17 +576,21 @@ export function useSheetForm({
     // Validate the current step
     if (!validateCurrentStep()) {
       // Mark all fields in the current step as touched
-      const currentStepTouched: Record<string, boolean> = { ...touched };
+      const currentStepTouched: Record<string, boolean> = {};
       config.sections[currentStep].fields.forEach((field) => {
         currentStepTouched[field.name] = true;
       });
-      setTouched(currentStepTouched);
+      
+      // Update touched state for each field
+      Object.entries(currentStepTouched).forEach(([field, isTouched]) => {
+        setTouched(field, isTouched);
+      });
+      
       return false;
     }
 
     // Check if any fields are currently being validated via API
-    const hasValidatingFields = useFormStore.getState().hasValidatingFields();
-    if (hasValidatingFields) {
+    if (hasValidatingFields()) {
       setSubmitError("Please wait for field validation to complete");
       return false;
     }
@@ -658,7 +631,7 @@ export function useSheetForm({
 
         // Mark fields with errors as touched
         Object.keys(formattedErrors).forEach((field) => {
-          setFieldTouched(field, true);
+          setTouched(field, true);
         });
 
         // Call onValidationError callback if provided
@@ -681,9 +654,10 @@ export function useSheetForm({
     config,
     currentStep,
     values,
-    touched,
     validateCurrentStep,
-    setFieldTouched,
+    setTouched,
+    hasValidatingFields,
+    setErrors,
   ]);
 
   // Get data from a step response
@@ -727,7 +701,7 @@ export function useSheetForm({
     submitError,
     setValues,
     setValue,
-    setTouched: setFieldTouched,
+    setTouched,
     setAllTouched,
     resetForm,
     handleSubmit,
@@ -750,5 +724,7 @@ export function useSheetForm({
     stepResponses,
     getStepResponseData,
     clearFiledError,
+    // Form ID
+    formId: actualFormId,
   };
 }
