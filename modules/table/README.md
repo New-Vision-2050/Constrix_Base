@@ -167,20 +167,30 @@ const MyComponent = () => {
 
 ### useTableReload
 
-A hook for reloading table data after form submissions or other actions.
+A hook for reloading table data after form submissions or other actions. This hook uses the `_forceRefetch` mechanism to ensure the table data is refreshed even if the query parameters haven't changed.
 
 ```tsx
 import { useTableReload } from '@/modules/table';
 
 const MyComponent = () => {
-  const { reloadTable } = useTableReload();
+  const { reloadTable } = useTableReload('my-table-id');
   
   const handleFormSuccess = () => {
     // After a successful form submission, reload the table
+    // This will force a refetch even if the query parameters haven't changed
     reloadTable();
   };
 };
 ```
+
+The `reloadTable` function works by setting a unique timestamp in the `_forceRefetch` property of the table state, which triggers a new fetch operation regardless of whether other parameters have changed. This is particularly useful after operations like:
+
+- Form submissions that create or update data
+- Delete operations
+- Import/export operations
+- Any action that modifies the data on the server
+
+The hook automatically handles setting the loading state during the reload and clearing it after completion.
 
 ### useResetTableOnRouteChange
 
@@ -231,11 +241,22 @@ Tables display error messages when API requests fail and provide retry options.
 
 Loading indicators are displayed during data fetching.
 
-## Integration with Form Builder
+### Optimized Data Fetching
+
+The table uses several optimization techniques to prevent unnecessary API calls:
+
+- **Debounce mechanism**: Rapid state changes are batched together to trigger only one fetch
+- **Fetch tracking**: Prevents duplicate fetches with identical parameters
+- **Force refetch capability**: Allows explicit data refresh when needed (e.g., after form submissions)
+- **Concurrent fetch prevention**: Ensures only one fetch operation happens at a time
+
+## Integration with Other Components
+
+### Integration with Form Builder
 
 The Table Builder module can be integrated with the Form Builder module to automatically reload table data after form submissions.
 
-### Manual Integration
+#### Manual Integration
 
 ```tsx
 import { SheetFormBuilder } from '@/modules/form-builder';
@@ -257,7 +278,7 @@ function FormAndTablePage() {
 }
 ```
 
-### Automatic Integration
+#### Automatic Integration
 
 For a more seamless integration, you can use the `useFormWithTableReload` hook from the Form Builder module:
 
@@ -279,6 +300,41 @@ function FormAndTablePage() {
   );
 }
 ```
+
+### Integration with DeleteConfirmationDialog
+
+The Table Builder module can be integrated with the DeleteConfirmationDialog component to automatically reload table data after successful deletion operations.
+
+```tsx
+import { useTableInstance } from '@/modules/table/store/useTableStore';
+import DeleteConfirmationDialog from '@/components/shared/DeleteConfirmationDialog';
+import { useModal } from '@/hooks/use-modal';
+
+const DeleteButton = ({ id }) => {
+  const [isOpen, handleOpen, handleClose] = useModal();
+  
+  // Get the reloadTable method directly from the table instance
+  const { reloadTable } = useTableInstance("my-table-id");
+
+  return (
+    <>
+      <Button onClick={handleOpen}>Delete</Button>
+      
+      <DeleteConfirmationDialog
+        deleteUrl={`/api/items/${id}`}
+        onClose={handleClose}
+        open={isOpen}
+        onSuccess={() => {
+          // Reload the table after successful deletion
+          reloadTable();
+        }}
+      />
+    </>
+  );
+};
+```
+
+This integration ensures that the table data is refreshed immediately after a successful deletion operation, without requiring a manual page refresh. The `reloadTable` method uses the optimized fetch mechanism to ensure only one network request is made.
 
 ## Example Usage
 
