@@ -64,6 +64,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     searchQuery,
     searchFields,
     columnSearchState,
+    columnVisibility,
     currentPage,
     totalPages,
     totalItems,
@@ -77,6 +78,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     handleSetAllColumnsVisible,
     handleSetMinimalColumnsVisible,
     setColumns,
+    setColumnVisibility,
+    setColumnVisibilityKeys,
   } = useTableData(
     dataUrl,
     config?.columns,
@@ -153,16 +156,32 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             onToggleColumnVisibility={toggleColumnVisibility}
             onSetAllColumnsVisible={handleSetAllColumnsVisible}
             onSetMinimalColumnsVisible={handleSetMinimalColumnsVisible}
+            columnVisibility={columnVisibility}
+            onSetColumnVisibility={setColumnVisibility}
+            onSetColumnVisibilityKeys={setColumnVisibilityKeys}
             actions={searchBarActions} // Pass custom actions to SearchBar
           />
         )}
 
         <DataTable
           data={data}
-          // Ensure we have columns by not filtering if visibleColumnKeys is empty
-          columns={visibleColumnKeys.length > 0
-            ? (config?.columns || columns).filter((col: ColumnConfig) => visibleColumnKeys.includes(col.key))
-            : (config?.columns || columns)
+          // Use columnVisibility to control which columns are displayed
+          columns={
+            // Never return an empty array of columns
+            // If columnVisibility.visible is false, still show the columns but respect the keys
+            (columnVisibility?.keys?.length > 0 || visibleColumnKeys.length > 0)
+              ? (config?.columns || columns).filter((col: ColumnConfig) => {
+                  // If columnVisibility.visible is false, don't filter by keys
+                  if (columnVisibility?.visible === false) {
+                    return true;
+                  }
+                  
+                  const keysToUse = columnVisibility?.keys?.length > 0
+                    ? columnVisibility.keys
+                    : visibleColumnKeys;
+                  return keysToUse.includes(col.key);
+                })
+              : (config?.columns || columns)
           }
           searchQuery={searchQuery}
           sortState={sortState}

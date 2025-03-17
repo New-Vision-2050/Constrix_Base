@@ -26,6 +26,12 @@ interface SearchBarProps {
   onSetAllColumnsVisible: () => void; // Function to show all columns
   onSetMinimalColumnsVisible: () => void; // Function to show minimal columns
   actions?: React.ReactNode; // Prop for custom actions
+  columnVisibility?: {
+    visible: boolean;
+    keys: string[];
+  };
+  onSetColumnVisibility?: (visible: boolean) => void;
+  onSetColumnVisibilityKeys?: (keys: string[]) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -39,6 +45,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSetAllColumnsVisible,
   onSetMinimalColumnsVisible,
   actions,
+  columnVisibility,
+  onSetColumnVisibility,
+  onSetColumnVisibilityKeys,
 }) => {
   const t = useTranslations();
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
@@ -241,6 +250,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         onToggleColumnVisibility={onToggleColumnVisibility}
         onSetAllColumnsVisible={onSetAllColumnsVisible}
         onSetMinimalColumnsVisible={onSetMinimalColumnsVisible}
+        columnVisibility={columnVisibility}
+        onSetColumnVisibility={onSetColumnVisibility}
+        onSetColumnVisibilityKeys={onSetColumnVisibilityKeys}
       />
     </div>
   );

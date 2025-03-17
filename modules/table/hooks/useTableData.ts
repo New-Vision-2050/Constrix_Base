@@ -51,6 +51,7 @@ export const useTableData = (
     searchQuery,
     searchFields,
     columnSearchState,
+    columnVisibility,
 
     setData,
     setColumns,
@@ -65,6 +66,8 @@ export const useTableData = (
     resetTable,
     setVisibleColumns,
     toggleColumnVisibility,
+    setColumnVisibility,
+    setColumnVisibilityKeys,
   } = tableInstance;
 
   // Initialize table state
@@ -141,14 +144,30 @@ export const useTableData = (
 
   // Handler for setting all columns visible
   const handleSetAllColumnsVisible = () => {
-    setVisibleColumns(columns.map((col: ColumnConfig) => col.key));
+    const allColumnKeys = columns.map((col: ColumnConfig) => col.key);
+    // Update both the old and new APIs
+    setVisibleColumns(allColumnKeys);
+    
+    // Also update the columnVisibility state if it exists
+    if (setColumnVisibility && setColumnVisibilityKeys) {
+      setColumnVisibility(true);
+      setColumnVisibilityKeys(allColumnKeys);
+    }
   };
 
   // Handler for setting minimal columns visible (just the first few columns)
   const handleSetMinimalColumnsVisible = () => {
     // Show only the first 2-3 columns as minimal view
     const minimalColumns = columns.slice(0, Math.min(3, columns.length)).map((col: ColumnConfig) => col.key);
+    
+    // Update both the old and new APIs
     setVisibleColumns(minimalColumns);
+    
+    // Also update the columnVisibility state if it exists
+    if (setColumnVisibility && setColumnVisibilityKeys) {
+      setColumnVisibility(true);
+      setColumnVisibilityKeys(minimalColumns);
+    }
   };
 
   return {
@@ -167,6 +186,7 @@ export const useTableData = (
     searchQuery,
     searchFields,
     columnSearchState,
+    columnVisibility,
     tableId,
 
     // Actions
@@ -180,5 +200,7 @@ export const useTableData = (
     handleSetMinimalColumnsVisible,
     resetTable,
     setColumns, // Export setColumns so it can be used directly
+    setColumnVisibility,
+    setColumnVisibilityKeys,
   };
 };

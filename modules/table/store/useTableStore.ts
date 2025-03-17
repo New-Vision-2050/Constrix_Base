@@ -31,6 +31,12 @@ interface TableInstanceState {
   
   // Column-specific search state
   columnSearchState: ColumnSearchState;
+  
+  // Column visibility state
+  columnVisibility: {
+    visible: boolean;
+    keys: string[];
+  };
 }
 
 // Define the global store that holds multiple table instances
@@ -57,6 +63,10 @@ interface TableState {
   setSearch: (tableId: string, query: string, fields?: string[]) => void;
   setColumnSearch: (tableId: string, columnKey: string, value: string | string[]) => void;
   resetTable: (tableId: string) => void;
+  
+  // Column visibility actions
+  setColumnVisibility: (tableId: string, visible: boolean) => void;
+  setColumnVisibilityKeys: (tableId: string, keys: string[]) => void;
 }
 
 // Default state for a new table instance
@@ -76,6 +86,10 @@ const getDefaultTableState = (): TableInstanceState => ({
   searchQuery: '',
   searchFields: undefined,
   columnSearchState: {},
+  columnVisibility: {
+    visible: true,
+    keys: []
+  }
 });
 
 // Create the store with proper server snapshot caching
@@ -124,15 +138,23 @@ export const useTableStore = create<TableState>((set) => ({
     };
   }),
   
-  setVisibleColumns: (tableId: string, visibleColumnKeys: string[]) => set((state: TableState) => ({
-    tables: {
-      ...state.tables,
-      [tableId]: {
-        ...state.tables[tableId] || getDefaultTableState(),
-        visibleColumnKeys
+  setVisibleColumns: (tableId: string, visibleColumnKeys: string[]) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          visibleColumnKeys,
+          columnVisibility: {
+            ...tableState.columnVisibility,
+            keys: visibleColumnKeys
+          }
+        }
       }
-    }
-  })),
+    };
+  }),
   
   toggleColumnVisibility: (tableId: string, columnKey: string) => set((state: TableState) => {
     const tableState = state.tables[tableId] || getDefaultTableState();
@@ -142,12 +164,25 @@ export const useTableStore = create<TableState>((set) => ({
       ? visibleColumnKeys.filter((key: string) => key !== columnKey)
       : [...visibleColumnKeys, columnKey];
     
+    // Also update the columnVisibility keys
+    const currentKeys = tableState.columnVisibility.keys.length > 0
+      ? tableState.columnVisibility.keys
+      : visibleColumnKeys;
+    
+    const newKeys = currentKeys.includes(columnKey)
+      ? currentKeys.filter((key: string) => key !== columnKey)
+      : [...currentKeys, columnKey];
+    
     return {
       tables: {
         ...state.tables,
         [tableId]: {
           ...tableState,
-          visibleColumnKeys: newVisibleColumnKeys
+          visibleColumnKeys: newVisibleColumnKeys,
+          columnVisibility: {
+            ...tableState.columnVisibility,
+            keys: newKeys
+          }
         }
       }
     };
@@ -259,7 +294,42 @@ export const useTableStore = create<TableState>((set) => ({
       ...state.tables,
       [tableId]: getDefaultTableState()
     }
-  }))
+  })),
+  
+  // Column visibility actions
+  setColumnVisibility: (tableId: string, visible: boolean) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          columnVisibility: {
+            ...tableState.columnVisibility,
+            visible
+          }
+        }
+      }
+    };
+  }),
+  
+  setColumnVisibilityKeys: (tableId: string, keys: string[]) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          columnVisibility: {
+            ...tableState.columnVisibility,
+            keys
+          }
+        }
+      }
+    };
+  })
 }));
 
 // Helper functions to access the current table state
@@ -323,6 +393,12 @@ export const useTableInstance = (tableId: string) => {
     
   const resetTable = useCallback(() =>
     useTableStore.getState().resetTable(tableId), [tableId]);
+    
+  const setColumnVisibility = useCallback((visible: boolean) =>
+    useTableStore.getState().setColumnVisibility(tableId, visible), [tableId]);
+    
+  const setColumnVisibilityKeys = useCallback((keys: string[]) =>
+    useTableStore.getState().setColumnVisibilityKeys(tableId, keys), [tableId]);
   
   return {
     // State
@@ -341,7 +417,9 @@ export const useTableInstance = (tableId: string) => {
     setSort,
     setSearch,
     setColumnSearch,
-    resetTable
+    resetTable,
+    setColumnVisibility,
+    setColumnVisibilityKeys
   };
 };
 
