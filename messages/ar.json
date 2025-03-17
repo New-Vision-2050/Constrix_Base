@@ -94,7 +94,9 @@
     "FilterSearch": "فلتر البحث",
     "RowsPerPage": "الصفوف لكل صفحة :",
     "Search": "بحث",
-    "Actions": "إجراء"
+    "Actions": "إجراء",
+    "ToggleColumns": "تبديل الأعمدة المرئية",
+    "VisibleColumns": "الأعمدة المرئية"
   },
   "Companies": {
     "Companies": "الشركات",

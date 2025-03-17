@@ -111,10 +111,28 @@ export const useTableData = (
     totalItems,
   });
 
+  // Get visible columns state and actions
+  const visibleColumnKeys = useTableStore((state) => state.visibleColumnKeys);
+  const setVisibleColumns = useTableStore((state) => state.setVisibleColumns);
+  const toggleColumnVisibility = useTableStore((state) => state.toggleColumnVisibility);
+
+  // Handler for setting all columns visible
+  const handleSetAllColumnsVisible = () => {
+    setVisibleColumns(columns.map(col => col.key));
+  };
+
+  // Handler for setting minimal columns visible (just the first few columns)
+  const handleSetMinimalColumnsVisible = () => {
+    // Show only the first 2-3 columns as minimal view
+    const minimalColumns = columns.slice(0, Math.min(3, columns.length)).map(col => col.key);
+    setVisibleColumns(minimalColumns);
+  };
+
   return {
     // State
     data,
     columns,
+    visibleColumnKeys,
     loading,
     isFirstLoad,
     error,
@@ -133,6 +151,9 @@ export const useTableData = (
     handleColumnSearch,
     handlePageChange,
     handleItemsPerPageChange,
+    toggleColumnVisibility,
+    handleSetAllColumnsVisible,
+    handleSetMinimalColumnsVisible,
     resetTable,
     setColumns, // Export setColumns so it can be used directly
   };

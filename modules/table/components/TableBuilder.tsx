@@ -47,6 +47,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const {
     data,
     columns,
+    visibleColumnKeys,
     loading,
     error,
     isFirstLoad,
@@ -63,6 +64,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     handleColumnSearch,
     handlePageChange,
     handleItemsPerPageChange,
+    toggleColumnVisibility,
+    handleSetAllColumnsVisible,
+    handleSetMinimalColumnsVisible,
     setColumns,
   } = useTableData(
     dataUrl,
@@ -130,12 +134,17 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             onSearch={handleSearch}
             searchConfig={searchConfig}
             searchableColumns={searchableColumns}
+            columns={columns}
+            visibleColumnKeys={visibleColumnKeys}
+            onToggleColumnVisibility={toggleColumnVisibility}
+            onSetAllColumnsVisible={handleSetAllColumnsVisible}
+            onSetMinimalColumnsVisible={handleSetMinimalColumnsVisible}
             actions={searchBarActions} // Pass custom actions to SearchBar
           />
         )}
         <DataTable
           data={data}
-          columns={config?.columns || columns}
+          columns={(config?.columns || columns).filter(col => visibleColumnKeys.includes(col.key))}
           searchQuery={searchQuery}
           sortState={sortState}
           onSort={handleSort}
