@@ -69,6 +69,46 @@ export const hiddenObjectFormExample: FormConfig = {
       ]
     },
     {
+      title: 'Conditional Hidden Objects',
+      fields: [
+        {
+          type: 'select',
+          name: 'accountType',
+          label: 'Account Type',
+          required: true,
+          options: [
+            { value: 'personal', label: 'Personal' },
+            { value: 'business', label: 'Business' }
+          ]
+        },
+        // This hidden object will only be included when accountType is 'business'
+        {
+          type: 'hiddenObject',
+          name: 'businessDetails',
+          label: 'Business Details',
+          condition: (values) => values.accountType === 'business',
+          defaultValue: {
+            companyType: 'llc',
+            employeeCount: 0,
+            industry: 'technology',
+            taxExempt: false
+          }
+        },
+        // This hidden object will only be included when accountType is 'personal'
+        {
+          type: 'hiddenObject',
+          name: 'personalPreferences',
+          label: 'Personal Preferences',
+          condition: (values) => values.accountType === 'personal',
+          defaultValue: {
+            privacyLevel: 'high',
+            communicationFrequency: 'weekly',
+            interests: ['technology', 'sports']
+          }
+        }
+      ]
+    },
+    {
       title: 'Additional Information',
       fields: [
         {
@@ -89,6 +129,17 @@ export const hiddenObjectFormExample: FormConfig = {
     
     console.log('User metadata:', userMetadata);
     console.log('Previous orders:', previousOrders);
+    
+    // Conditional hidden objects will only be present if their condition is met
+    if (values.accountType === 'business') {
+      // businessDetails will be present, personalPreferences will not
+      console.log('Business details:', values.businessDetails);
+      console.log('Personal preferences exists:', values.personalPreferences !== undefined); // Will be false
+    } else if (values.accountType === 'personal') {
+      // personalPreferences will be present, businessDetails will not
+      console.log('Personal preferences:', values.personalPreferences);
+      console.log('Business details exists:', values.businessDetails !== undefined); // Will be false
+    }
     
     // You can manipulate or use this data before sending to the server
     // For example, you might want to include only certain fields from the metadata

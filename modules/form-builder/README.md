@@ -361,6 +361,22 @@ The form builder supports various field types:
 }
 ```
 
+```tsx
+// Example with condition - field will only be included in form submission if condition is true
+{
+  type: 'hiddenObject',
+  name: 'businessDetails',
+  label: 'Business Details',
+  condition: (values) => values.accountType === 'business',
+  defaultValue: {
+    companyType: 'llc',
+    employeeCount: 0,
+    industry: 'technology',
+    taxExempt: false
+  }
+}
+```
+
 ## Validation
 
 The form builder supports various validation rules:
