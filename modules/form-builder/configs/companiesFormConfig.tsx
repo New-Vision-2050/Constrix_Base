@@ -129,28 +129,6 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-        {
-          type: "checkbox",
-          name: "change_local_time",
-          label: "الشركة",
-          placeholder: "اختر الشركة",
-          render: (field, value, onChange) => {
-            return (
-              <div className="flex items-center gap-2 ">
-                <Checkbox
-                  checked={value}
-                  onCheckedChange={(b) => onChange(b)}
-                />
-                <div className="flex items-center gap-1">
-                  <p className="text-sm">لتأكيد تغيير المنطقة الزمنية،</p>
-                  <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
-                    اضغط هنا
-                  </Button>
-                </div>
-              </div>
-            );
-          },
-        },
       ],
     },
     {
@@ -260,6 +238,28 @@ export const companiesFormConfig: FormConfig = {
               message: "المسمى الوظيفي",
             },
           ],
+        },
+        {
+          type: "checkbox",
+          name: "change_local_time",
+          label: "الشركة",
+          placeholder: "اختر الشركة",
+          render: (field, value, onChange) => {
+            return (
+              <div className="flex items-center gap-2 ">
+                <Checkbox
+                  checked={value}
+                  onCheckedChange={(b) => onChange(b)}
+                />
+                <div className="flex items-center gap-1">
+                  <p className="text-sm">لتأكيد تغيير المنطقة الزمنية،</p>
+                  <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
+                    اضغط هنا
+                  </Button>
+                </div>
+              </div>
+            );
+          },
         },
       ],
     },
