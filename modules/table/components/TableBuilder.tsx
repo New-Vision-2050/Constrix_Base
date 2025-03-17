@@ -77,7 +77,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     handleSetAllColumnsVisible,
     handleSetMinimalColumnsVisible,
     setColumns,
-    resetTable,
   } = useTableData(
     dataUrl,
     config?.columns,
@@ -90,9 +89,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     tableId // Pass the tableId to isolate this table's state
   );
 
-  useEffect(() => {
-    resetTable();
-  }, []);
   // Initialize columns from config immediately if available
   // Use a ref to track if we've already set the columns
   const columnsInitializedRef = React.useRef(false);
