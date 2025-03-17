@@ -392,6 +392,54 @@ The form builder supports various validation rules:
 - `custom`: Custom validation function
 - `apiValidation`: Validate against an API endpoint with debounce
 
+### Custom Validation
+
+You can create custom validation rules for any field type, including hiddenObject fields:
+
+```tsx
+{
+  type: 'hiddenObject',
+  name: 'orderData',
+  label: 'Order Data',
+  defaultValue: {
+    items: [],
+    totalAmount: 0,
+    discount: 0
+  },
+  validation: [
+    {
+      type: 'custom',
+      message: 'Order must have at least one item',
+      validator: (value) => {
+        // Check if the value is defined and has items
+        if (!value || !value.items || !Array.isArray(value.items)) {
+          return false;
+        }
+        // Check if there's at least one item
+        return value.items.length > 0;
+      }
+    },
+    {
+      type: 'custom',
+      message: 'Discount cannot exceed 50% of total amount',
+      validator: (value, formValues) => {
+        if (!value || typeof value.totalAmount !== 'number' || typeof value.discount !== 'number') {
+          return true; // Skip validation if values are not numbers
+        }
+        // Check if discount is valid
+        return value.discount <= (value.totalAmount * 0.5);
+      }
+    }
+  ]
+}
+```
+
+The validator function receives two parameters:
+- `value`: The current value of the field being validated
+- `formValues`: (Optional) The current values of all fields in the form
+
+This allows you to create complex validation rules that can depend on the values of other fields.
+
 ### API Validation
 
 The form builder supports API validation with debounce, allowing you to validate field values against an API endpoint before form submission.

@@ -105,6 +105,42 @@ export const hiddenObjectFormExample: FormConfig = {
             communicationFrequency: 'weekly',
             interests: ['technology', 'sports']
           }
+        },
+        // Example of a hidden object with custom validation
+        {
+          type: 'hiddenObject',
+          name: 'cartData',
+          label: 'Shopping Cart Data',
+          defaultValue: {
+            items: [],
+            totalAmount: 0,
+            discount: 0
+          },
+          validation: [
+            {
+              type: 'custom',
+              message: 'Cart must have at least one item',
+              validator: (value) => {
+                // Check if the value is defined and has items
+                if (!value || !value.items || !Array.isArray(value.items)) {
+                  return false;
+                }
+                // Check if there's at least one item
+                return value.items.length > 0;
+              }
+            },
+            {
+              type: 'custom',
+              message: 'Discount cannot exceed 50% of total amount',
+              validator: (value, formValues) => {
+                if (!value || typeof value.totalAmount !== 'number' || typeof value.discount !== 'number') {
+                  return true; // Skip validation if values are not numbers
+                }
+                // Check if discount is valid
+                return value.discount <= (value.totalAmount * 0.5);
+              }
+            }
+          ]
         }
       ]
     },
@@ -139,6 +175,22 @@ export const hiddenObjectFormExample: FormConfig = {
       // personalPreferences will be present, businessDetails will not
       console.log('Personal preferences:', values.personalPreferences);
       console.log('Business details exists:', values.businessDetails !== undefined); // Will be false
+    }
+    
+    // Check the cartData validation - this would normally be handled by the form validation system
+    // but we're showing how to manually validate it here
+    const cartData = values.cartData;
+    if (cartData) {
+      console.log('Cart data:', cartData);
+      
+      // Manually validate the cart data
+      if (!cartData.items || cartData.items.length === 0) {
+        console.log('Validation error: Cart must have at least one item');
+      }
+      
+      if (cartData.discount > (cartData.totalAmount * 0.5)) {
+        console.log('Validation error: Discount cannot exceed 50% of total amount');
+      }
     }
     
     // You can manipulate or use this data before sending to the server
