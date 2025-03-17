@@ -12,6 +12,8 @@ import { companiesFormConfig } from "@/modules/form-builder/configs/companiesFor
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
+import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
+import { changeLocalTimeConfig } from "@/modules/form-builder/configs/changeLocalTimeConfig";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -32,8 +34,10 @@ const CompaniesPage = () => {
     }, 100);
 
     // Add type safety for the result structure
-    const result = values.result as { data?: { payload?: { id?: string } } } | undefined;
-    const companyId = result?.data?.payload?.id || '';
+    const result = values.result as
+      | { data?: { payload?: { id?: string } } }
+      | undefined;
+    const companyId = result?.data?.payload?.id || "";
     setCompanyNumber(companyId);
     handleOpen();
 
@@ -53,6 +57,11 @@ const CompaniesPage = () => {
               config={companiesFormConfig}
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
+            />{" "}
+            <DialogFormBuilder
+              config={changeLocalTimeConfig}
+              trigger={<Button>change</Button>}
+              onSuccess={() => console.log("success")}
             />
             <CompanySaveDialog
               open={isOpen}
