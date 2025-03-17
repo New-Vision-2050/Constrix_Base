@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Search, X, Filter } from "lucide-react";
-import { Button } from "@/modules/table/components/ui/button";
+import { Search, X } from "lucide-react";
 import { Input } from "@/modules/table/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/modules/table/components/ui/popover";
-import { Checkbox } from "@/modules/table/components/ui/checkbox";
-import { Label } from "@/modules/table/components/ui/label";
 import { SearchConfig } from "@/modules/table/utils/tableTypes";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
@@ -70,7 +62,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     selectedSearchColumns.length,
     searchConfig.allowFieldSelection,
   ]);
-  
+
   // Add an effect to trigger search when selectedSearchColumns changes
   useEffect(() => {
     // Skip the initial render
@@ -109,17 +101,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
       const newColumns = prev.includes(columnKey)
         ? prev.filter((key) => key !== columnKey)
         : [...prev, columnKey];
-      
+
       // Trigger a search with the updated columns
       setTimeout(() => {
         const fieldsToPass = searchConfig.allowFieldSelection
           ? newColumns
           : searchConfig.defaultFields;
-        
+
         console.log("Search columns changed, triggering search with fields:", fieldsToPass);
         onSearch(localSearchQuery, fieldsToPass);
       }, 0);
-      
+
       return newColumns;
     });
   };
@@ -128,7 +120,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     if (!searchConfig.allowFieldSelection) return;
     const allColumns = searchableColumns.map((col) => col.key);
     setSelectedSearchColumns(allColumns);
-    
+
     // Trigger a search with all columns
     setTimeout(() => {
       console.log("Selected all search columns, triggering search with fields:", allColumns);
@@ -139,7 +131,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const clearAllSearchColumns = () => {
     if (!searchConfig.allowFieldSelection) return;
     setSelectedSearchColumns([]);
-    
+
     // Trigger a search with no columns
     setTimeout(() => {
       console.log("Cleared all search columns, triggering search with no fields");
@@ -250,9 +242,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
         onToggleColumnVisibility={onToggleColumnVisibility}
         onSetAllColumnsVisible={onSetAllColumnsVisible}
         onSetMinimalColumnsVisible={onSetMinimalColumnsVisible}
-        columnVisibility={columnVisibility}
-        onSetColumnVisibility={onSetColumnVisibility}
-        onSetColumnVisibilityKeys={onSetColumnVisibilityKeys}
       />
     </div>
   );

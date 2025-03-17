@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import InfoIcon from "@/public/icons/info";
 import DateField from "@/modules/form-builder/components/fields/DateField";
 import { FieldConfig } from "@/modules/form-builder/types/formTypes";
-import LoaddingDots from "@/components/ui/loadding-dots";
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -84,7 +83,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         )}
         <DialogFooter className="!items-center !justify-center gap-3">
           <Button onClick={handleConfirm} className="w-32 h-10" loading={isLoading} disabled={!!!activationDate}>
-          تاكيد          
+          تاكيد
           </Button>
           <Button variant="outline" onClick={onClose} className="w-32 h-10" disabled={isLoading}>
             الغاء
