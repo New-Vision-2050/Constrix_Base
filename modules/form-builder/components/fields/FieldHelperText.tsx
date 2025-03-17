@@ -20,7 +20,7 @@ const FieldHelperText: React.FC<FieldHelperTextProps> = ({
 
   return (
     <div className={cn("mt-1 text-sm", className)}>
-      {error && touched ? (
+      {error  ? (
         <div className="text-destructive">
           {typeof error === 'string' ? <p>{error}</p> : error}
         </div>
