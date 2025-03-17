@@ -5,7 +5,7 @@ import { createTableFetcher } from "./useTableFetcher";
 import { useTableActions } from "./useTableActions";
 import { useTableInitialization } from "./useTableInitialization";
 import { useTableFetchEffect } from "./useTableFetchEffect";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export const useTableData = (
   url: string,
@@ -23,16 +23,25 @@ export const useTableData = (
   // Set the active table ID
   const setTableId = useTableStore((state) => state.setTableId);
   
+  // Use a ref to track if we've already set the table ID
+  const tableIdSetRef = useRef(false);
+  
   // Set the active table ID only once
   useEffect(() => {
-    setTableId(tableId);
+    if (!tableIdSetRef.current) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[TableData] Setting active table ID: ${tableId}`);
+      }
+      setTableId(tableId);
+      tableIdSetRef.current = true;
+    }
     
     // Return cleanup function
     return () => {
       // Don't reset the table on unmount to allow for data persistence
       // This is important for maintaining table state across route changes
     };
-  }, [tableId]); // Remove setTableId from dependencies to prevent unnecessary re-renders
+  }, []); // Empty dependency array to run only once on mount
   
   // Get state and actions from the table instance
   const tableInstance = useTableInstance(tableId);
@@ -87,6 +96,7 @@ export const useTableData = (
     setSearch: (query, fields) => setSearch(query, fields),
     setColumns: (columns) => setColumns(columns),
     setVisibleColumns: (columnKeys) => setVisibleColumns(columnKeys),
+    tableId, // Pass the tableId
   });
 
   // Get data fetcher

@@ -95,13 +95,24 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Initialize columns from config immediately if available
   // Use a ref to track if we've already set the columns
   const columnsInitializedRef = React.useRef(false);
+  
+  // Store the columns in a ref to avoid dependency issues
+  const configColumnsRef = React.useRef(config?.columns);
+  
+  // Store the tableId in a ref to avoid dependency issues
+  const tableIdRef = React.useRef(tableId);
 
   useEffect(() => {
+    // Only initialize once and only if we have columns
     if (!columnsInitializedRef.current && config?.columns && config.columns.length > 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[TableBuilder] Initializing columns for table ${tableIdRef.current}`);
+      }
       setColumns(config.columns);
       columnsInitializedRef.current = true;
+      configColumnsRef.current = config.columns;
     }
-  }, [config?.columns]); // Remove setColumns from dependencies
+  }, []); // Empty dependency array to run only once on mount
 
   const enableSorting = config?.enableSorting !== false;
   const enablePagination = config?.enablePagination !== false;

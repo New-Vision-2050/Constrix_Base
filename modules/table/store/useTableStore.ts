@@ -342,6 +342,10 @@ export const useTableStore = create<TableState>((set) => ({
     // Generate a unique timestamp to force a refetch
     const timestamp = Date.now();
     
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[TableStore] Reloading table ${tableId} with timestamp ${timestamp}`);
+    }
+    
     return {
       tables: {
         ...state.tables,
@@ -434,7 +438,7 @@ export const useTableInstance = (tableId: string) => {
     // After a short delay, set loading back to false
     setTimeout(() => {
       tableStore.setLoading(tableId, false);
-    }, 100);
+    }, 200); // Increased timeout to ensure fetch completes
   }, [tableId]);
   
   return {

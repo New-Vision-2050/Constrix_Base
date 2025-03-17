@@ -28,6 +28,7 @@ type FetchDataBaseProps = {
   isMountedRef: React.MutableRefObject<boolean>;
   abortControllerRef: React.MutableRefObject<AbortController | null>;
   configColumns?: ColumnConfig[];
+  _forceRefetch?: number; // Add _forceRefetch property
 };
 
 type FetchDataAdditionalProps = {
@@ -65,6 +66,7 @@ export const createTableFetcher = () => {
       isMountedRef,
       abortControllerRef,
       configColumns,
+      _forceRefetch, // Extract _forceRefetch property
       setLoading,
       setError,
       setTotalItems,
@@ -73,6 +75,11 @@ export const createTableFetcher = () => {
       setData,
       dataMapper,
     } = props;
+    
+    // Log force refetch if present
+    if (_forceRefetch && process.env.NODE_ENV === 'development') {
+      console.log(`[TableFetcher] Force refetch requested: ${_forceRefetch}`);
+    }
 
     if (!url) return;
 
