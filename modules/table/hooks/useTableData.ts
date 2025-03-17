@@ -16,8 +16,10 @@ export const useTableData = (
   defaultSearchQuery = "",
   dataMapper?: (data: any) => any[],
   searchConfig?: SearchConfig,
-  tableId: string = 'default' // Default table ID if not provided
+  config?: any // Accept config object to extract tableId
 ) => {
+  // Use tableId from config if provided, otherwise use default
+  const tableId = config?.tableId || 'default';
   // Set the active table ID
   const setTableId = useTableStore((state) => state.setTableId);
   

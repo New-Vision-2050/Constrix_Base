@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
-import { 
-  FormConfig, 
+import {
+  FormConfig,
   useFormData,
   useFormReload,
-  useFormWithTableReload
 } from "@/modules/form-builder";
 import { Button } from "@/components/ui/button";
 
@@ -74,10 +73,10 @@ const formConfig: FormConfig = {
   onSubmit: async (formData: Record<string, unknown>) => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     // Log the form data
     console.log("Form data received:", formData);
-    
+
     // Return success response
     return {
       success: true,
@@ -89,7 +88,7 @@ const formConfig: FormConfig = {
 export default function FormIsolatedExamplePage() {
   // Define unique form ID
   const formId = "isolated-form-example";
-  
+
   // Use the form data hook
   const form = useFormData({
     config: formConfig,
@@ -103,27 +102,27 @@ export default function FormIsolatedExamplePage() {
       alert(`Form submission error: ${error}`);
     }
   });
-  
+
   // Use the form reload hook
   const { reloadForm } = useFormReload();
-  
+
   return (
     <div className="container mx-auto p-4 space-y-8">
       <h1 className="text-2xl font-bold">Isolated Form Example</h1>
       <p className="text-gray-600">
         This example demonstrates the use of the isolated form module with the useFormData hook.
       </p>
-      
+
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">{formConfig.title}</h2>
-        
+
         <form onSubmit={(e) => form.handleSubmit(e)}>
           {form.getVisibleFields(form.values).map((field) => (
             <div key={field.name} className="mb-4">
               <label className="block text-sm font-medium mb-1">
                 {field.label} {field.required && <span className="text-red-500">*</span>}
               </label>
-              
+
               {field.type === 'textarea' ? (
                 <textarea
                   className="w-full p-2 border rounded"
@@ -136,14 +135,14 @@ export default function FormIsolatedExamplePage() {
                   className="w-full p-2 border rounded"
                   value={form.values[field.name] || ''}
                   onChange={(e) => {
-                    const value = field.type === 'number' 
+                    const value = field.type === 'number'
                       ? e.target.value === '' ? '' : Number(e.target.value)
                       : e.target.value;
                     form.handleFieldChange(field.name, value, field.validation);
                   }}
                 />
               )}
-              
+
               {form.errors[field.name] && (
                 <p className="text-red-500 text-sm mt-1">
                   {form.errors[field.name]}
@@ -151,17 +150,17 @@ export default function FormIsolatedExamplePage() {
               )}
             </div>
           ))}
-          
+
           <div className="flex justify-end space-x-2 mt-6">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => form.handleFormReset()}
             >
               Reset
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={form.isSubmitting}
             >
               {form.isSubmitting ? 'Submitting...' : formConfig.submitButtonText}
@@ -169,7 +168,7 @@ export default function FormIsolatedExamplePage() {
           </div>
         </form>
       </div>
-      
+
       <div className="bg-gray-100 p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Form State</h2>
         <div className="grid grid-cols-2 gap-4">
@@ -195,10 +194,10 @@ export default function FormIsolatedExamplePage() {
           </div>
         </div>
       </div>
-      
+
       <div className="flex justify-end">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => reloadForm(formId)}
         >
           Reload Form

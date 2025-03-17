@@ -24,6 +24,7 @@ export const CompaniesConfig = () => {
 
   return {
     url: `${baseURL}/companies`,
+    tableId: "companies-table", // Add tableId to the config
     columns: [
       {
         key: "name",

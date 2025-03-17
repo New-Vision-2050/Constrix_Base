@@ -7,6 +7,7 @@ import { useFormInitialization } from "./useFormInitialization";
 
 export interface UseFormDataProps {
   config: FormConfig;
+  formId?: string; // Optional formId parameter
   onSuccess?: (values: Record<string, any>) => void;
   onError?: (error: string) => void;
 }
@@ -17,11 +18,12 @@ export interface UseFormDataProps {
  */
 export const useFormData = ({
   config,
+  formId,
   onSuccess,
   onError,
 }: UseFormDataProps) => {
-  // Use formId from config if provided, otherwise use default
-  const actualFormId = config.formId || 'default-form';
+  // Use provided formId, or formId from config, or default
+  const actualFormId = formId || config.formId || 'default-form';
   // Set the active form ID
   const setFormId = useFormStore((state) => state.setFormId);
   

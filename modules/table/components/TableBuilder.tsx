@@ -17,7 +17,6 @@ interface TableBuilderProps {
   config?: TableConfig;
   onReset?: () => void;
   searchBarActions?: React.ReactNode; // New prop for custom actions in search bar
-  tableId?: string; // Unique ID for this table instance
 }
 
 const TableBuilder: React.FC<TableBuilderProps> = ({
@@ -25,8 +24,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   config,
   onReset,
   searchBarActions,
-  tableId = `table-${Math.random().toString(36).substring(2, 9)}`, // Generate a random ID if not provided
 }) => {
+  // Generate a random ID if not provided in config
+  const tableId = config?.tableId || `table-${Math.random().toString(36).substring(2, 9)}`;
   const { toast } = useToast();
 
   // Use the reset hook to clear table state on route changes
@@ -89,7 +89,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     config?.defaultSearchQuery || "",
     config?.dataMapper,
     searchConfig,
-    tableId // Pass the tableId to isolate this table's state
+    config // Pass the entire config object
   );
 
   // Initialize columns from config immediately if available

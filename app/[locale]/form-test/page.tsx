@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 
 // Example form configuration
 const formConfig: FormConfig = {
+  formId: "form-test-form", // Add formId to the config
   title: "Add New Item",
   submitButtonText: "Submit",
   resetOnSuccess: true,
@@ -51,6 +52,7 @@ const formConfig: FormConfig = {
 // Example table configuration
 const tableConfig: TableConfig = {
   url: "/api/items", // Your actual API endpoint for fetching table data
+  tableId: "form-test-table", // Add tableId to the config
   columns: [
     {
       key: "id",
@@ -95,7 +97,6 @@ export default function FormTestPage() {
   const formWithTableReload = useFormWithTableReload({
     config: formConfig,
     tableId: formTestTableId,
-    formId: formId,
     onSuccess: handleFormSuccess
   });
 
@@ -123,7 +124,6 @@ export default function FormTestPage() {
       {/* Form component */}
       <SheetFormBuilder
         config={formConfig}
-        formId={formId}
         trigger={<Button id="open-form-button">Open Form</Button>}
         onSuccess={handleFormSuccess}
       />
@@ -131,10 +131,7 @@ export default function FormTestPage() {
       {/* Table component */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Items</h2>
-        <TableBuilder
-          config={tableConfig}
-          tableId={formTestTableId} // Pass the unique table ID
-        />
+        <TableBuilder config={tableConfig} />
       </div>
       
       <div className="mt-8 p-4 bg-gray-100 rounded-lg">

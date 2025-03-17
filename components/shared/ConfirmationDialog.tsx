@@ -31,7 +31,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   showDatePicker,
 }) => {
   const [activationDate, setActivationDate] = useState("");
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -62,6 +61,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               ✕
             </button>
             <InfoIcon />
+            <h2 className="text-center !text-[#EAEAFFDE] !text-xl mt-4">{title}</h2>
           </DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
@@ -75,7 +75,6 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             value={activationDate}
             onChange={setActivationDate}
             onBlur={() => {}}
-            allowRangeSelection
           />
         )}
         <DialogFooter className="!items-center !justify-center gap-3">

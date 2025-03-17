@@ -1,6 +1,10 @@
 import { ValidationRule } from '../types/formTypes';
 import { useFormStore } from '../hooks/useFormStore';
 
+// Define types for the different kinds of stores we might receive
+type GlobalFormStore = ReturnType<typeof useFormStore.getState>;
+type FormInstance = { formId?: string };
+
 /**
  * Triggers API validation for a field with the apiValidation rule type
  *
@@ -14,7 +18,7 @@ export const triggerApiValidation = (
   fieldName: string,
   value: any,
   rule: ValidationRule,
-  store?: ReturnType<typeof useFormStore.getState>
+  store?: GlobalFormStore | FormInstance
 ): void => {
   if (rule.type !== 'apiValidation' || !rule.apiConfig) {
     return;
@@ -22,19 +26,23 @@ export const triggerApiValidation = (
   
   // Use the provided store or get it from the global state
   const formStore = store || useFormStore.getState();
+  const globalStore = useFormStore.getState();
   
-  // Trigger API validation with the correct formId
+  // Determine which formId to use
+  let formId: string;
+  
   if ('activeFormId' in formStore) {
     // If it's the global store
-    formStore.validateFieldWithApi(formStore.activeFormId, fieldName, value, rule);
-  } else if (formStore.formId) {
+    formId = formStore.activeFormId;
+    formStore.validateFieldWithApi(formId, fieldName, value, rule);
+  } else if ('formId' in formStore && typeof formStore.formId === 'string') {
     // If it's a form instance with formId property
-    const globalStore = useFormStore.getState();
-    globalStore.validateFieldWithApi(formStore.formId, fieldName, value, rule);
+    formId = formStore.formId;
+    globalStore.validateFieldWithApi(formId, fieldName, value, rule);
   } else {
     // Fallback to active form ID
-    const globalStore = useFormStore.getState();
-    globalStore.validateFieldWithApi(globalStore.activeFormId, fieldName, value, rule);
+    formId = globalStore.activeFormId;
+    globalStore.validateFieldWithApi(formId, fieldName, value, rule);
   }
 };
 

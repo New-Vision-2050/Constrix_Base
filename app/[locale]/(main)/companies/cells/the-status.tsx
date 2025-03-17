@@ -19,7 +19,6 @@ const TheStatus = ({
   const [isActive, setIsActive] = useState(!!theStatus);
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
-  const [activationDate, setActivationDate] = useState("");
   const { toast } = useToast();
 
   const handleConfirm = async (activationDate: string) => {
@@ -38,7 +37,7 @@ const TheStatus = ({
           description: "Failed to update status",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update status",
@@ -71,7 +70,7 @@ const TheStatus = ({
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <ConfirmationDialog
           open={showDialog}
-          onClose={() => setShowDialog(false)}
+          onClose={handleCancel}
           onConfirm={handleConfirm}
           title={t("Companies.Confirmation")}
           description={t("Companies.AreYouSure")}

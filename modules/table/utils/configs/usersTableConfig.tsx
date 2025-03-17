@@ -38,6 +38,7 @@ export const UsersConfig = () => {
 
   return {
     url: `${baseURL}/company-users`,
+    tableId: "users-table", // Add tableId to the config
     columns: [
       {
         key: "name",

@@ -532,8 +532,12 @@ export const validateField = (
           const formStore = store || useFormStore.getState();
 
           // Check if there's an existing error for this field
-          if (formStore.errors && formStore.errors[fieldName]) {
-            return formStore.errors[fieldName];
+          // We need to get the active form ID and then access its errors
+          const activeFormId = formStore.activeFormId;
+          const activeForm = formStore.forms[activeFormId];
+          
+          if (activeForm && activeForm.errors && activeForm.errors[fieldName]) {
+            return activeForm.errors[fieldName];
           }
 
           // Use the triggerApiValidation utility function which handles formId correctly

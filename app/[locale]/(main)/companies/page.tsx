@@ -20,11 +20,9 @@ const CompaniesPage = () => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
 
-  // Define a unique table ID for the companies table
-  const companiesTableId = "companies-table";
-  
   // Use the reset hook to clear table state on route changes
-  useResetTableOnRouteChange(companiesTableId);
+  // The tableId is now defined in the config
+  useResetTableOnRouteChange(config.tableId);
 
   // Create a function that will get the reloadTable function when needed
   // This avoids the infinite update loop
@@ -33,9 +31,9 @@ const CompaniesPage = () => {
     const tableStore = useTableStore.getState();
 
     // Manually trigger the reload logic
-    tableStore.setLoading(companiesTableId, true);
+    tableStore.setLoading(config.tableId, true);
     setTimeout(() => {
-      tableStore.setLoading(companiesTableId, false);
+      tableStore.setLoading(config.tableId, false);
     }, 100);
 
     // Add type safety for the result structure
@@ -55,7 +53,6 @@ const CompaniesPage = () => {
 
       <TableBuilder
         config={config}
-        tableId={companiesTableId} // Pass the unique table ID
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
