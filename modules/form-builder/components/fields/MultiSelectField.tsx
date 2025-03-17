@@ -9,7 +9,7 @@ import { apiClient } from "@/config/axios-config";
 interface MultiSelectFieldProps {
   field: FieldConfig;
   value: string[];
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string[]) => void;
   onBlur: () => void;
@@ -310,7 +310,9 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       />
 
       {error && touched && (
-        <p className="text-destructive text-sm mt-1">{error}</p>
+        <div className="text-destructive text-sm mt-1">
+          {typeof error === 'string' ? <p>{error}</p> : error}
+        </div>
       )}
 
       {field.helperText && !error && (

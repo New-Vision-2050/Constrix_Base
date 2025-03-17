@@ -7,7 +7,7 @@ import { DropdownOption } from '../../types/formTypes';
 interface SelectFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;

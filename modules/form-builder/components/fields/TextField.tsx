@@ -10,7 +10,7 @@ import { useLocale } from "next-intl";
 interface TextFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   type?: "text" | "email" | "password" | "number";
   onChange: (value: string) => void;

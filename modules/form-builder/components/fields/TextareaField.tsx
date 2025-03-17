@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 interface TextareaFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;

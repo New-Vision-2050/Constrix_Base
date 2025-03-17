@@ -11,7 +11,7 @@ const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debou
 interface FormInstanceState {
   // Form values and state
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
   isValid: boolean;
@@ -32,8 +32,8 @@ interface FormState {
   initForm: (formId: string, initialValues?: Record<string, any>) => void;
   setValue: (formId: string, field: string, value: any) => void;
   setValues: (formId: string, values: Record<string, any>) => void;
-  setError: (formId: string, field: string, error: string | null) => void;
-  setErrors: (formId: string, errors: Record<string, string>) => void;
+  setError: (formId: string, field: string, error: string | React.ReactNode | null) => void;
+  setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => void;
   setTouched: (formId: string, field: string, isTouched: boolean) => void;
   setAllTouched: (formId: string) => void;
   resetForm: (formId: string, values?: Record<string, any>) => void;
@@ -115,7 +115,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     };
   }),
 
-  setError: (formId: string, field: string, error: string | null) => set((state: FormState) => {
+  setError: (formId: string, field: string, error: string | React.ReactNode | null) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
     
     const newErrors = error
@@ -138,7 +138,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     };
   }),
 
-  setErrors: (formId: string, errors: Record<string, string>) => set((state: FormState) => {
+  setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
     const isValid = Object.values(errors).every((error) => !error);
     
@@ -390,11 +390,11 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     useFormStore.getState().setValues(formId, values);
   }, [formId]);
   
-  const setError = useCallback((field: string, error: string | null) => {
+  const setError = useCallback((field: string, error: string | React.ReactNode | null) => {
     useFormStore.getState().setError(formId, field, error);
   }, [formId]);
   
-  const setErrors = useCallback((errors: Record<string, string>) => {
+  const setErrors = useCallback((errors: Record<string, string | React.ReactNode>) => {
     useFormStore.getState().setErrors(formId, errors);
   }, [formId]);
   
@@ -462,7 +462,7 @@ export const validateField = (
   formValues: Record<string, any> = {},
   fieldName?: string,
   store?: ReturnType<typeof useFormStore.getState>
-): string | null => {
+): string | React.ReactNode | null => {
   if (!rules) return null;
 
   for (const rule of rules) {

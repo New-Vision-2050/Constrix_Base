@@ -3,7 +3,7 @@ import React from 'react';
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
   value?: any;
-  message: string;
+  message: string | React.ReactNode;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
   apiConfig?: {
     url: string;

@@ -17,7 +17,7 @@ import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
 interface FormFieldProps {
   field: FieldConfig;
   value: any;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
@@ -74,14 +74,25 @@ const FormField: React.FC<FormFieldProps> = ({
     // Clear any existing errors for this field when the value changes
     formInstance.setError(field.name, null);
 
-    // Check if field has API validation rules and trigger validation
-    if (field.validation && hasApiValidation(field.validation)) {
-      field.validation.forEach(rule => {
-        if (rule.type === 'apiValidation') {
-          // Pass the store instance to avoid getState() call in the validation function
-          triggerApiValidation(field.name, newValue, rule, useFormStore.getState());
-        }
-      });
+    // Validate the field with the new value
+    if (field.validation && field.validation.length > 0) {
+      // First handle non-API validations
+      const { validateField } = require('../hooks/useFormStore');
+      const error = validateField(newValue, field.validation, values, field.name);
+      
+      if (error) {
+        formInstance.setError(field.name, error);
+      }
+      
+      // Then handle API validations separately
+      if (hasApiValidation(field.validation)) {
+        field.validation.forEach(rule => {
+          if (rule.type === 'apiValidation') {
+            // Pass the store instance to avoid getState() call in the validation function
+            triggerApiValidation(field.name, newValue, rule, useFormStore.getState());
+          }
+        });
+      }
     }
   }, [field.name, field.onChange, field.validation, propOnChange, values, formInstance]);
 
@@ -95,7 +106,18 @@ const FormField: React.FC<FormFieldProps> = ({
     if (field.onBlur) {
       field.onBlur(fieldValue, values);
     }
-  }, [field.name, field.onBlur, propOnBlur, fieldValue, values]);
+
+    // Validate the field on blur
+    if (field.validation && field.validation.length > 0) {
+      // Handle non-API validations
+      const { validateField } = require('../hooks/useFormStore');
+      const error = validateField(fieldValue, field.validation, values, field.name);
+      
+      if (error) {
+        formInstance.setError(field.name, error);
+      }
+    }
+  }, [field.name, field.onBlur, propOnBlur, fieldValue, values, field.validation, formInstance]);
 
   // Use custom renderer if provided
   if (field.render) {

@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface FieldHelperTextProps {
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   helperText?: string;
   className?: string;
@@ -21,7 +21,9 @@ const FieldHelperText: React.FC<FieldHelperTextProps> = ({
   return (
     <div className={cn("mt-1 text-sm", className)}>
       {error && touched ? (
-        <p className="text-destructive">{error}</p>
+        <div className="text-destructive">
+          {typeof error === 'string' ? <p>{error}</p> : error}
+        </div>
       ) : helperText ? (
         <p className="text-muted-foreground">{helperText}</p>
       ) : null}

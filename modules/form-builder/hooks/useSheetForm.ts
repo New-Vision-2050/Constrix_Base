@@ -16,7 +16,7 @@ interface UseSheetFormResult {
   openSheet: () => void;
   closeSheet: () => void;
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
   submitSuccess: boolean;
@@ -144,7 +144,7 @@ export function useSheetForm({
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
 
     // Iterate through all sections and fields
@@ -176,53 +176,13 @@ export function useSheetForm({
 
         // Check validation rules
         if (field.validation && field.validation.length > 0) {
-          for (const rule of field.validation) {
-            const value = values[field.name];
-
-            switch (rule.type) {
-              case "required":
-                if (value === undefined || value === null || value === "") {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "minLength":
-                if (typeof value === "string" && value.length < rule.value) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "maxLength":
-                if (typeof value === "string" && value.length > rule.value) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "pattern":
-                if (
-                  typeof value === "string" &&
-                  !new RegExp(rule.value).test(value)
-                ) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "email":
-                if (
-                  typeof value === "string" &&
-                  !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-                ) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              // Add other validation types as needed
-            }
-
-            // Break the loop if we already found an error for this field
-            if (newErrors[field.name]) {
-              break;
-            }
+          // Use the validateField function from useFormStore to ensure consistent validation
+          const { validateField } = require('./useFormStore');
+          const error = validateField(values[field.name], field.validation, values, field.name);
+          
+          if (error) {
+            newErrors[field.name] = error;
+            isValid = false;
           }
         }
       });
@@ -342,7 +302,7 @@ export function useSheetForm({
 
           // Handle Laravel validation errors if enabled
           if (config.laravelValidation?.enabled && result.errors) {
-            const formattedErrors: Record<string, string> = {};
+            const formattedErrors: Record<string, string | React.ReactNode> = {};
 
             // Convert Laravel validation errors to form errors
             Object.entries(result.errors).forEach(([field, messages]) => {
@@ -361,7 +321,7 @@ export function useSheetForm({
 
             // Call onValidationError callback if provided
             if (config.onValidationError) {
-              config.onValidationError(formattedErrors);
+              config.onValidationError(formattedErrors as Record<string, string>);
             }
           }
         }
@@ -396,7 +356,7 @@ export function useSheetForm({
   const validateCurrentStep = useCallback(() => {
     if (!isStepBased) return true; // If not in step-based mode (wizard or accordion), return true
 
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
 
     // Get the current section
@@ -430,53 +390,13 @@ export function useSheetForm({
 
       // Check validation rules
       if (field.validation && field.validation.length > 0) {
-        for (const rule of field.validation) {
-          const value = values[field.name];
-
-          switch (rule.type) {
-            case "required":
-              if (value === undefined || value === null || value === "") {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "minLength":
-              if (typeof value === "string" && value.length < rule.value) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "maxLength":
-              if (typeof value === "string" && value.length > rule.value) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "pattern":
-              if (
-                typeof value === "string" &&
-                !new RegExp(rule.value).test(value)
-              ) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "email":
-              if (
-                typeof value === "string" &&
-                !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-              ) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            // Add other validation types as needed
-          }
-
-          // Break the loop if we already found an error for this field
-          if (newErrors[field.name]) {
-            break;
-          }
+        // Use the validateField function from useFormStore to ensure consistent validation
+        const { validateField } = require('./useFormStore');
+        const error = validateField(values[field.name], field.validation, values, field.name);
+        
+        if (error) {
+          newErrors[field.name] = error;
+          isValid = false;
         }
       }
     });
@@ -615,7 +535,7 @@ export function useSheetForm({
 
       // Handle validation errors if any
       if (!result.success && result.errors) {
-        const formattedErrors: Record<string, string> = {};
+        const formattedErrors: Record<string, string | React.ReactNode> = {};
 
         // Convert validation errors to form errors
         Object.entries(result.errors).forEach(([field, messages]) => {
@@ -634,7 +554,7 @@ export function useSheetForm({
 
         // Call onValidationError callback if provided
         if (config.onValidationError) {
-          config.onValidationError(formattedErrors);
+          config.onValidationError(formattedErrors as Record<string, string>);
         }
 
         return false;

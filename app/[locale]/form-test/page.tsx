@@ -24,11 +24,43 @@ const formConfig: FormConfig = {
           label: "Name",
           type: "text",
           required: true,
+          validation: [
+            {
+              type: "required",
+              message: "Name is required",
+            },
+            {
+              type: "minLength",
+              value: 3,
+              message: <div>Name must be at least <strong>3 characters</strong> long</div>,
+            },
+          ],
+        },
+        {
+          name: "email",
+          label: "Email",
+          type: "email",
+          validation: [
+            {
+              type: "email",
+              message: <div style={{ color: 'red' }}>Please enter a valid email address</div>,
+            },
+          ],
         },
         {
           name: "description",
           label: "Description",
           type: "textarea",
+          validation: [
+            {
+              type: "maxLength",
+              value: 100,
+              message: <div>
+                <p>Description is too long!</p>
+                <small>Maximum 100 characters allowed</small>
+              </div>,
+            },
+          ],
         },
       ],
     },
@@ -169,9 +201,11 @@ export default function FormTestPage() {
                   )}
                   
                   {formWithTableReload.errors[field.name] && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {formWithTableReload.errors[field.name]}
-                    </p>
+                    <div className="text-red-500 text-sm mt-1">
+                      {typeof formWithTableReload.errors[field.name] === 'string'
+                        ? <p>{formWithTableReload.errors[field.name]}</p>
+                        : formWithTableReload.errors[field.name]}
+                    </div>
                   )}
                 </div>
               ))}

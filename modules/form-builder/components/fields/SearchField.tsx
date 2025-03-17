@@ -6,7 +6,7 @@ import DropdownSearch from '@/modules/table/components/table/DropdownSearch';
 interface SearchFieldProps {
   field: FieldConfig;
   value: string | string[];
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string | string[]) => void;
   onBlur: () => void;
