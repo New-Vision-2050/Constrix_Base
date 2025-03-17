@@ -72,8 +72,8 @@ const TheStatus = ({
           open={showDialog}
           onClose={handleCancel}
           onConfirm={handleConfirm}
-          title={t("Companies.Confirmation")}
-          description={t("Companies.AreYouSure")}
+          // title={isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
+          description={!isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
           showDatePicker={!isActive}
         />
       </Dialog>
