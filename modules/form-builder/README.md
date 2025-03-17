@@ -531,6 +531,176 @@ const MyComponent = () => {
 };
 ```
 
+## Accessing and Controlling Forms from External Components
+
+The Form Builder module provides a way to access and control forms from any component in your application. This is useful for scenarios where you need to programmatically close a form or update its values from a different component.
+
+### Accessing a Form by ID
+
+Each form in the system has a unique ID that can be used to access it. You can specify this ID when creating the form, or the system will generate one for you.
+
+```tsx
+import { SheetFormBuilder } from '@/modules/form-builder';
+
+function MyComponent() {
+  return (
+    <SheetFormBuilder
+      config={formConfig}
+      formId="my-unique-form-id" // Specify a custom form ID
+    />
+  );
+}
+```
+
+### Closing a Form Programmatically
+
+To close a form from another component, you can use the `useFormStore` hook to access the form's state and methods:
+
+```tsx
+import { useFormStore } from '@/modules/form-builder';
+
+function ExternalComponent() {
+  // Access the form by its ID
+  const closeSheet = () => {
+    // Get the current state of the form store
+    const formStore = useFormStore.getState();
+    
+    // Get all forms in the store
+    const { forms } = formStore;
+    
+    // Check if the form exists
+    if (forms['my-unique-form-id']) {
+      // Import the useSheetForm hook dynamically to avoid circular dependencies
+      import('@/modules/form-builder').then(({ useSheetForm }) => {
+        // Create a temporary hook instance to access the closeSheet method
+        const { closeSheet } = useSheetForm({
+          config: {}, // Empty config is fine for just closing
+          formId: 'my-unique-form-id',
+        });
+        
+        // Close the sheet
+        closeSheet();
+      });
+    }
+  };
+
+  return (
+    <button onClick={closeSheet}>
+      Close Form
+    </button>
+  );
+}
+```
+
+### Updating Form Values
+
+You can update form values from any component using the `useFormStore` directly:
+
+```tsx
+import { useFormStore } from '@/modules/form-builder';
+
+function ExternalComponent() {
+  // Update a specific field in the form
+  const updateFormField = () => {
+    // Get the form store state
+    const formStore = useFormStore.getState();
+    
+    // Update a specific field
+    formStore.setValue('my-unique-form-id', 'fieldName', 'new value');
+    
+    // Or update multiple fields at once
+    formStore.setValues('my-unique-form-id', {
+      fieldName1: 'value1',
+      fieldName2: 'value2',
+    });
+  };
+
+  return (
+    <button onClick={updateFormField}>
+      Update Form Values
+    </button>
+  );
+}
+```
+
+### Creating a Form Controller Hook
+
+For more convenient access to form controls, you can create a custom hook:
+
+```tsx
+import { useCallback } from 'react';
+import { useFormStore } from '@/modules/form-builder';
+
+// Custom hook to control a form from any component
+export function useFormController(formId: string) {
+  // Get direct access to the form store
+  const store = useFormStore.getState();
+  
+  // Close the form
+  const closeForm = useCallback(() => {
+    // Make sure the form exists
+    if (store.forms[formId]) {
+      // Import dynamically to avoid circular dependencies
+      import('@/modules/form-builder').then(({ useSheetForm }) => {
+        const { closeSheet } = useSheetForm({
+          config: {},
+          formId,
+        });
+        closeSheet();
+      });
+    }
+  }, [formId]);
+  
+  // Update a single field
+  const updateField = useCallback((fieldName: string, value: any) => {
+    store.setValue(formId, fieldName, value);
+  }, [formId]);
+  
+  // Update multiple fields
+  const updateFields = useCallback((values: Record<string, any>) => {
+    store.setValues(formId, values);
+  }, [formId]);
+  
+  // Reset the form
+  const resetForm = useCallback((initialValues = {}) => {
+    store.resetForm(formId, initialValues);
+  }, [formId]);
+  
+  return {
+    closeForm,
+    updateField,
+    updateFields,
+    resetForm,
+    // Add more methods as needed
+  };
+}
+```
+
+Usage example:
+
+```tsx
+function SomeComponent() {
+  const { closeForm, updateField, updateFields } = useFormController('my-unique-form-id');
+  
+  const handleAction = () => {
+    // Update form values
+    updateFields({
+      name: 'John Doe',
+      email: 'john@example.com',
+    });
+    
+    // Close the form
+    closeForm();
+  };
+  
+  return (
+    <button onClick={handleAction}>
+      Update and Close Form
+    </button>
+  );
+}
+```
+
 ## Integration with Table Builder
 
 The Form Builder module can be integrated with the Table Builder module to automatically reload table data after form submissions.
