@@ -156,6 +156,7 @@ The form builder supports various field types:
 - `date`: Date picker
 - `search`: Search input with autocomplete
 - `phone`: Phone input with country code selection
+- `hiddenObject`: Hidden field that stores an object or array of objects without visual representation
 
 ### Example Field Configurations
 
@@ -311,6 +312,52 @@ The form builder supports various field types:
   name: 'phoneNumber',
   label: 'Phone Number',
   required: true,
+}
+```
+
+#### Hidden Object Field
+
+```tsx
+{
+  type: 'hiddenObject',
+  name: 'userMetadata',
+  label: 'User Metadata', // Label is not displayed but used for identification
+  defaultValue: {
+    registrationSource: 'web',
+    userType: 'customer',
+    preferences: {
+      notifications: true,
+      theme: 'light'
+    }
+  }
+}
+```
+
+```tsx
+// Example with array of objects
+{
+  type: 'hiddenObject',
+  name: 'previousOrders',
+  label: 'Previous Orders',
+  defaultValue: [
+    {
+      id: '1001',
+      date: '2023-01-15',
+      total: 125.50,
+      items: [
+        { productId: 'p1', quantity: 2 },
+        { productId: 'p2', quantity: 1 }
+      ]
+    },
+    {
+      id: '1002',
+      date: '2023-02-20',
+      total: 75.25,
+      items: [
+        { productId: 'p3', quantity: 1 }
+      ]
+    }
+  ]
 }
 ```
 
@@ -474,6 +521,26 @@ const formConfig: FormConfig = {
 | `onError` | `function` | Error callback |
 | `onCancel` | `function` | Cancel callback |
 | `onValidationError` | `function` | Validation error callback |
+
+### FieldConfig Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `type` | `string` | Field type (text, textarea, select, hiddenObject, etc.) |
+| `name` | `string` | Field name (used as the key in form values) |
+| `label` | `string` | Field label |
+| `defaultValue` | `any` | Default value for the field (especially useful for hiddenObject fields) |
+| `placeholder` | `string` | Placeholder text |
+| `helperText` | `string` | Helper text displayed below the field |
+| `required` | `boolean` | Whether the field is required |
+| `disabled` | `boolean` | Whether the field is disabled |
+| `hidden` | `boolean` | Whether the field is hidden |
+| `className` | `string` | Additional CSS classes for the field |
+| `containerClassName` | `string` | Additional CSS classes for the field container |
+| `width` | `string` | Width of the field (e.g., 'w-full', '200px') |
+| `options` | `DropdownOption[]` | Options for select, multiSelect, and radio fields |
+| `validation` | `ValidationRule[]` | Validation rules for the field |
+| `condition` | `function` | Function that determines whether the field should be displayed |
 
 ## Hooks
 

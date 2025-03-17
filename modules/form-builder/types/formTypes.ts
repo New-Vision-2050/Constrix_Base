@@ -46,7 +46,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject';
   name: string;
   label: string;
   placeholder?: string;
@@ -70,6 +70,7 @@ export interface FieldConfig {
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isMulti?: boolean; // Whether to enable multi-select functionality
   postfix?: string; // Text to display after the input field
+  defaultValue?: any; // Default value for the field
 }
 
 export interface FormSection {

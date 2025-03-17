@@ -9,6 +9,7 @@ import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
+import HiddenObjectField from './fields/HiddenObjectField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
@@ -212,11 +213,26 @@ const FormField: React.FC<FormFieldProps> = ({
                 onBlur={onBlur}
               />
             );
+            
+          case 'hiddenObject':
+            return (
+              <HiddenObjectField
+                field={field}
+                value={fieldValue}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            );
 
           default:
             return <div>Unsupported field type: {field.type}</div>;
     }
   };
+
+  // For hiddenObject type, just render the field without any wrapper
+  if (field.type === 'hiddenObject') {
+    return renderField();
+  }
 
   // For checkbox type, the label is already rendered with the checkbox
   if (field.type === 'checkbox') {
