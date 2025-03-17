@@ -83,8 +83,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           />
         )}
         <DialogFooter className="!items-center !justify-center gap-3">
-          <Button onClick={handleConfirm} className="w-32 h-10" disabled={isLoading}>
-            {isLoading ? <LoaddingDots /> : "تاكيد"}
+          <Button onClick={handleConfirm} className="w-32 h-10" loading={isLoading} disabled={!!!activationDate}>
+          تاكيد          
           </Button>
           <Button variant="outline" onClick={onClose} className="w-32 h-10" disabled={isLoading}>
             الغاء
