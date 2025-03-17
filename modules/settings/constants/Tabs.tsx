@@ -1,0 +1,45 @@
+import { SystemTab } from "../types/SystemTab";
+
+
+export const SystemSettingTabs: SystemTab[] = [
+  {
+    id: "CompanyData",
+    title: "بيانات الشركة",
+    content: "بيانات الشركة",
+  },
+  {
+    id: "SystemRoles",
+    title: "ادوار النظام",
+    content: "ادوار النظام",
+  },
+  {
+    id: "IdentifierSetting",
+    title: "اعدادات المعرف",
+    content: "اعدادات المعرف",
+  },
+  {
+    id: "LanguagesAndCountries",
+    title: "الدول واللغات",
+    content: "الدول واللغات",
+  },
+  {
+    id: "ChatSettings",
+    title: "اعدادات المراسلات",
+    content: "اعدادات المراسلات",
+  },
+  {
+    id: "StorageSettings",
+    title: "اعدادات التخزين",
+    content: "اعدادات التخزين",
+  },
+  {
+    id: "CompanyTypes",
+    title: "انواع الشركات",
+    content: "انواع الشركات",
+  },
+  {
+    id: "AppAndWebsiteSettings",
+    title: "اعدادات الموقع والتطبيقات",
+    content: "اعدادات الموقع والتطبيقات",
+  },
+];
