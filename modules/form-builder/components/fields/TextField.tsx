@@ -119,7 +119,7 @@ const TextField: React.FC<TextFieldProps> = ({
         />
         {hasPostfix && (
           <div
-            className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-s-0 border-input rounded-e-md relative z-10"
+            className="inline-flex items-center px-3 text-sm text-white bg-primary border border-s-0 border-input rounded-e-md relative z-10"
             dir="ltr" // Force LTR direction for the postfix
           >
             {field.postfix}

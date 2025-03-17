@@ -64,6 +64,7 @@ export const defaultSubmitHandler = async (
     return {
       success: true,
       message: response.data?.message || "Form submitted successfully",
+      data: response.data || {},
     };
   } catch (error: any) {
     console.log("Form submission error:", error);
