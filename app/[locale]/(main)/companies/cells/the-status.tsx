@@ -23,9 +23,9 @@ const TheStatus = ({
 
   const handleConfirm = async (activationDate: string) => {
     try {
-      const response = await apiClient.put(`/api/companies/${id}/status`, {
-        isActive: tempIsActive,
-        activationDate: activationDate,
+      const response = await apiClient.put(`/companies/${id}/activate`, {
+          is_active: Number(tempIsActive),
+          date_activate: activationDate,
       });
 
       if (response.status === 200) {
