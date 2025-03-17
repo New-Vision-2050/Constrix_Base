@@ -2,6 +2,7 @@
 import React, { memo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TableConfig } from "@/modules/table/utils/configs/tableConfig";
+import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { Button } from "@/modules/table/components/ui/button";
 import ErrorMessage from "./ErrorMessage";
 import { useToast } from "@/modules/table/hooks/use-toast";
@@ -9,12 +10,14 @@ import SearchBar from "./table/SearchBar";
 import ColumnSearch from "./table/ColumnSearch";
 import DataTable from "./table/DataTable";
 import { useTableData } from "@/modules/table/hooks/useTableData";
+import { useResetTableOnRouteChange } from "@/modules/table/hooks/useResetTableOnRouteChange";
 
 interface TableBuilderProps {
   url?: string;
   config?: TableConfig;
   onReset?: () => void;
   searchBarActions?: React.ReactNode; // New prop for custom actions in search bar
+  tableId?: string; // Unique ID for this table instance
 }
 
 const TableBuilder: React.FC<TableBuilderProps> = ({
@@ -22,8 +25,14 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   config,
   onReset,
   searchBarActions,
+  tableId = `table-${Math.random().toString(36).substring(2, 9)}`, // Generate a random ID if not provided
 }) => {
   const { toast } = useToast();
+  
+  // Use the reset hook to clear table state on route changes
+  // This prevents stale data when navigating between pages
+  useResetTableOnRouteChange(tableId);
+  
   // Use URL from config if direct URL not provided
   const dataUrl = url || (config ? config.url : "");
 
@@ -76,21 +85,26 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     config?.defaultSortDirection || null,
     config?.defaultSearchQuery || "",
     config?.dataMapper,
-    searchConfig
+    searchConfig,
+    tableId // Pass the tableId to isolate this table's state
   );
 
   // Initialize columns from config immediately if available
+  // Use a ref to track if we've already set the columns
+  const columnsInitializedRef = React.useRef(false);
+  
   useEffect(() => {
-    if (config?.columns && config.columns.length > 0) {
+    if (!columnsInitializedRef.current && config?.columns && config.columns.length > 0) {
       setColumns(config.columns);
+      columnsInitializedRef.current = true;
     }
-  }, [config?.columns, setColumns]);
+  }, [config?.columns]); // Remove setColumns from dependencies
 
   const enableSorting = config?.enableSorting !== false;
   const enablePagination = config?.enablePagination !== false;
   const enableSearch = config?.enableSearch !== false;
   const enableColumnSearch = config?.enableColumnSearch === true;
-  const searchableColumns = columns.filter((col) => col.searchable);
+  const searchableColumns = columns.filter((col: ColumnConfig) => col.searchable);
   const hasSearchableColumns = searchableColumns.length > 0;
   const allSearchedFields = config?.allSearchedFields;
   
@@ -142,9 +156,21 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             actions={searchBarActions} // Pass custom actions to SearchBar
           />
         )}
+        {/* Debug info */}
+        <div className="p-2 bg-gray-100 text-xs">
+          <div>Config Columns: {config?.columns?.length || 0}</div>
+          <div>Columns: {columns?.length || 0}</div>
+          <div>Visible Keys: {visibleColumnKeys?.length || 0}</div>
+          <div>Filtered Columns: {(config?.columns || columns).filter((col: ColumnConfig) => visibleColumnKeys.includes(col.key)).length}</div>
+        </div>
+        
         <DataTable
           data={data}
-          columns={(config?.columns || columns).filter(col => visibleColumnKeys.includes(col.key))}
+          // Ensure we have columns by not filtering if visibleColumnKeys is empty
+          columns={visibleColumnKeys.length > 0
+            ? (config?.columns || columns).filter((col: ColumnConfig) => visibleColumnKeys.includes(col.key))
+            : (config?.columns || columns)
+          }
           searchQuery={searchQuery}
           sortState={sortState}
           onSort={handleSort}

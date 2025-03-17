@@ -53,13 +53,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
       selectedSearchColumns.length === 0 &&
       searchConfig.allowFieldSelection
     ) {
-      setSelectedSearchColumns(searchableColumns.map((col) => col.key));
+      const allColumns = searchableColumns.map((col) => col.key);
+      setSelectedSearchColumns(allColumns);
     }
   }, [
     searchableColumns,
     selectedSearchColumns.length,
     searchConfig.allowFieldSelection,
   ]);
+  
+  // Add an effect to trigger search when selectedSearchColumns changes
+  useEffect(() => {
+    // Skip the initial render
+    if (selectedSearchColumns.length > 0) {
+      console.log("Selected search columns changed, triggering search with fields:", selectedSearchColumns);
+      onSearch(localSearchQuery, selectedSearchColumns);
+    }
+  }, [selectedSearchColumns]);
 
   // Create the debounced search function
   const debouncedSearch = useDebounce((query: string) => {
@@ -87,22 +97,45 @@ const SearchBar: React.FC<SearchBarProps> = ({
     if (!searchConfig.allowFieldSelection) return;
 
     setSelectedSearchColumns((prev) => {
-      if (prev.includes(columnKey)) {
-        return prev.filter((key) => key !== columnKey);
-      } else {
-        return [...prev, columnKey];
-      }
+      const newColumns = prev.includes(columnKey)
+        ? prev.filter((key) => key !== columnKey)
+        : [...prev, columnKey];
+      
+      // Trigger a search with the updated columns
+      setTimeout(() => {
+        const fieldsToPass = searchConfig.allowFieldSelection
+          ? newColumns
+          : searchConfig.defaultFields;
+        
+        console.log("Search columns changed, triggering search with fields:", fieldsToPass);
+        onSearch(localSearchQuery, fieldsToPass);
+      }, 0);
+      
+      return newColumns;
     });
   };
 
   const selectAllSearchColumns = () => {
     if (!searchConfig.allowFieldSelection) return;
-    setSelectedSearchColumns(searchableColumns.map((col) => col.key));
+    const allColumns = searchableColumns.map((col) => col.key);
+    setSelectedSearchColumns(allColumns);
+    
+    // Trigger a search with all columns
+    setTimeout(() => {
+      console.log("Selected all search columns, triggering search with fields:", allColumns);
+      onSearch(localSearchQuery, allColumns);
+    }, 0);
   };
 
   const clearAllSearchColumns = () => {
     if (!searchConfig.allowFieldSelection) return;
     setSelectedSearchColumns([]);
+    
+    // Trigger a search with no columns
+    setTimeout(() => {
+      console.log("Cleared all search columns, triggering search with no fields");
+      onSearch(localSearchQuery, []);
+    }, 0);
   };
 
   if (searchableColumns.length === 0) return null;

@@ -83,8 +83,22 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
       [columnKey]: value,
     }));
 
-    // Trigger debounced search
+    // Trigger debounced search for text inputs
     debouncedColumnSearch(columnKey, value);
+  };
+  
+  // Handle dropdown change - apply immediately without debounce
+  const handleDropdownChange = (columnKey: string, value: string | string[]) => {
+    // Update local state immediately for responsive UI
+    setLocalInputValues((prev) => ({
+      ...prev,
+      [columnKey]: value,
+    }));
+    
+    // Apply dropdown changes immediately without debounce
+    onColumnSearch(columnKey, value);
+    
+    console.log(`Dropdown change applied for ${columnKey}:`, value);
   };
 
   if (searchableColumns.length === 0) {
@@ -112,7 +126,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                   columnKey={column.key}
                   label={column.label}
                   value={stateValue}
-                  onChange={(newValue) => onColumnSearch(column.key, newValue)}
+                  onChange={(newValue) => handleDropdownChange(column.key, newValue)}
                   options={searchType.dropdownOptions}
                   dynamicConfig={searchType.dynamicDropdown}
                   dependencies={dependenciesMap[column.key]}

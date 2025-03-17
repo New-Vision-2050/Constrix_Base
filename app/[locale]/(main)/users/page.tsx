@@ -11,12 +11,16 @@ import {companyUserFormConfig} from "@/modules/form-builder/configs/companyUserF
 
 const UsersPage = () => {
   const config = UsersConfig();
+  
+  // Define a unique table ID for the users table
+  const usersTableId = "users-table";
 
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
       <TableBuilder
         config={config}
+        tableId={usersTableId} // Pass the unique table ID
         searchBarActions={
           <div>
             <ExportButton data={["omar"]} />

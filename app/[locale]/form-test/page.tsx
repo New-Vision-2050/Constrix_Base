@@ -75,15 +75,18 @@ const tableConfig: TableConfig = {
 };
 
 export default function FormTestPage() {
+  // Define unique table IDs
+  const formTestTableId = "form-test-table";
+  
   // Create a function to handle form success and reload the table
   const handleFormSuccess = (formData: Record<string, unknown>) => {
     // Import the store directly to avoid hooks in callbacks
     const tableStore = useTableStore.getState();
     
     // Manually trigger the reload logic
-    tableStore.setLoading(true);
+    tableStore.setLoading(formTestTableId, true);
     setTimeout(() => {
-      tableStore.setLoading(false);
+      tableStore.setLoading(formTestTableId, false);
     }, 100);
     
     console.log("Form submitted successfully:", formData);
@@ -110,7 +113,10 @@ export default function FormTestPage() {
       {/* Table component */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Items</h2>
-        <TableBuilder config={tableConfig} />
+        <TableBuilder
+          config={tableConfig}
+          tableId={formTestTableId} // Pass the unique table ID
+        />
       </div>
     </div>
   );

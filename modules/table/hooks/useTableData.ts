@@ -1,10 +1,11 @@
-import { useTableStore } from "@/modules/table/store//useTableStore";
+import { useTableInstance, useTableStore } from "@/modules/table/store/useTableStore";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { SearchConfig } from "@/modules/table/utils/tableTypes";
 import { createTableFetcher } from "./useTableFetcher";
 import { useTableActions } from "./useTableActions";
 import { useTableInitialization } from "./useTableInitialization";
 import { useTableFetchEffect } from "./useTableFetchEffect";
+import { useEffect } from "react";
 
 export const useTableData = (
   url: string,
@@ -14,12 +15,30 @@ export const useTableData = (
   defaultSortDirection: "asc" | "desc" | null = null,
   defaultSearchQuery = "",
   dataMapper?: (data: any) => any[],
-  searchConfig?: SearchConfig
+  searchConfig?: SearchConfig,
+  tableId: string = 'default' // Default table ID if not provided
 ) => {
-  // Get state and actions from the store
+  // Set the active table ID
+  const setTableId = useTableStore((state) => state.setTableId);
+  
+  // Set the active table ID only once
+  useEffect(() => {
+    setTableId(tableId);
+    
+    // Return cleanup function
+    return () => {
+      // Don't reset the table on unmount to allow for data persistence
+      // This is important for maintaining table state across route changes
+    };
+  }, [tableId]); // Remove setTableId from dependencies to prevent unnecessary re-renders
+  
+  // Get state and actions from the table instance
+  const tableInstance = useTableInstance(tableId);
+  
   const {
     data,
     columns,
+    visibleColumnKeys,
     loading,
     isFirstLoad,
     error,
@@ -44,7 +63,9 @@ export const useTableData = (
     setSearch,
     setColumnSearch,
     resetTable,
-  } = useTableStore();
+    setVisibleColumns,
+    toggleColumnVisibility,
+  } = tableInstance;
 
   // Initialize table state
   useTableInitialization({
@@ -54,14 +75,19 @@ export const useTableData = (
     defaultSortDirection,
     defaultSearchQuery,
     searchConfig,
-    setPagination,
-    setSort,
-    setSearch,
-    setColumns,
+    setPagination: (currentPage, totalPages, itemsPerPage) =>
+      setPagination(currentPage, totalPages, itemsPerPage),
+    setSort: (column, direction) => setSort(column, direction),
+    setSearch: (query, fields) => setSearch(query, fields),
+    setColumns: (columns) => setColumns(columns),
+    setVisibleColumns: (columnKeys) => setVisibleColumns(columnKeys),
   });
 
   // Get data fetcher
   const { fetchData } = createTableFetcher();
+
+  // We removed the manual reload effect for columnSearchState changes
+  // as it was causing an infinite loop
 
   // Setup data fetching with dependencies
   useTableFetchEffect({
@@ -77,18 +103,19 @@ export const useTableData = (
     fetchData: (params) =>
       fetchData({
         ...params,
-        setLoading,
-        setError,
-        setTotalItems,
-        setPagination,
-        setColumns,
-        setData,
+        setLoading: (loading) => setLoading(loading),
+        setError: (error) => setError(error),
+        setTotalItems: (totalItems) => setTotalItems(totalItems),
+        setPagination: (currentPage, totalPages, itemsPerPage) =>
+          setPagination(currentPage, totalPages, itemsPerPage),
+        setColumns: (columns) => setColumns(columns),
+        setData: (data) => setData(data),
         dataMapper,
       }),
-    setData,
-    setColumns,
-    setError,
-    setIsFirstLoad,
+    setData: (data) => setData(data),
+    setColumns: (columns) => setColumns(columns),
+    setError: (error) => setError(error),
+    setIsFirstLoad: (isFirstLoad) => setIsFirstLoad(isFirstLoad),
     configColumns,
   });
 
@@ -100,10 +127,11 @@ export const useTableData = (
     handlePageChange,
     handleItemsPerPageChange,
   } = useTableActions({
-    setSort,
-    setSearch,
-    setColumnSearch,
-    setPagination,
+    setSort: (column, direction) => setSort(column, direction),
+    setSearch: (query, fields) => setSearch(query, fields),
+    setColumnSearch: (columnKey, value) => setColumnSearch(columnKey, value),
+    setPagination: (currentPage, totalPages, itemsPerPage) =>
+      setPagination(currentPage, totalPages, itemsPerPage),
     totalPages,
     itemsPerPage,
     sortColumn,
@@ -111,20 +139,15 @@ export const useTableData = (
     totalItems,
   });
 
-  // Get visible columns state and actions
-  const visibleColumnKeys = useTableStore((state) => state.visibleColumnKeys);
-  const setVisibleColumns = useTableStore((state) => state.setVisibleColumns);
-  const toggleColumnVisibility = useTableStore((state) => state.toggleColumnVisibility);
-
   // Handler for setting all columns visible
   const handleSetAllColumnsVisible = () => {
-    setVisibleColumns(columns.map(col => col.key));
+    setVisibleColumns(columns.map((col: ColumnConfig) => col.key));
   };
 
   // Handler for setting minimal columns visible (just the first few columns)
   const handleSetMinimalColumnsVisible = () => {
     // Show only the first 2-3 columns as minimal view
-    const minimalColumns = columns.slice(0, Math.min(3, columns.length)).map(col => col.key);
+    const minimalColumns = columns.slice(0, Math.min(3, columns.length)).map((col: ColumnConfig) => col.key);
     setVisibleColumns(minimalColumns);
   };
 
@@ -144,6 +167,7 @@ export const useTableData = (
     searchQuery,
     searchFields,
     columnSearchState,
+    tableId,
 
     // Actions
     handleSort,
