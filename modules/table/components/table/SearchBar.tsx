@@ -12,12 +12,19 @@ import { Label } from "@/modules/table/components/ui/label";
 import { SearchConfig } from "@/modules/table/utils/tableTypes";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
+import ColumnVisibility from "./ColumnVisibility";
+import { ColumnConfig } from "@/modules/table/utils/configs/columnConfig";
 
 interface SearchBarProps {
   searchQuery: string;
   onSearch: (query: string, fields?: string[]) => void;
   searchConfig: SearchConfig;
   searchableColumns: { key: string; label: string }[];
+  columns: ColumnConfig[]; // All available columns
+  visibleColumnKeys: string[]; // Currently visible column keys
+  onToggleColumnVisibility: (columnKey: string) => void; // Function to toggle column visibility
+  onSetAllColumnsVisible: () => void; // Function to show all columns
+  onSetMinimalColumnsVisible: () => void; // Function to show minimal columns
   actions?: React.ReactNode; // Prop for custom actions
 }
 
@@ -26,6 +33,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   searchConfig,
   searchableColumns,
+  columns,
+  visibleColumnKeys,
+  onToggleColumnVisibility,
+  onSetAllColumnsVisible,
+  onSetMinimalColumnsVisible,
   actions,
 }) => {
   const t = useTranslations();
@@ -186,6 +198,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </PopoverContent>
           </Popover>
         )}
+        
+        {/* Column visibility toggle */}
+        <ColumnVisibility
+          columns={columns}
+          visibleColumnKeys={visibleColumnKeys}
+          onToggleColumnVisibility={onToggleColumnVisibility}
+          onSetAllColumnsVisible={onSetAllColumnsVisible}
+          onSetMinimalColumnsVisible={onSetMinimalColumnsVisible}
+        />
       </div>
 
       {/* Custom actions area */}
