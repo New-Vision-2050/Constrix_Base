@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar } from '@/modules/table/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/table/components/ui/popover';
@@ -25,9 +25,10 @@ const DateField: React.FC<DateFieldProps> = ({
   onBlur,
 }) => {
   const date = value ? new Date(value) : undefined;
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
           id={field.name}
@@ -52,6 +53,7 @@ const DateField: React.FC<DateFieldProps> = ({
           onSelect={(date) => {
             onChange(date ? date.toISOString() : '');
             onBlur();
+            setIsOpen(false);
           }}
           disabled={field.disabled}
           initialFocus

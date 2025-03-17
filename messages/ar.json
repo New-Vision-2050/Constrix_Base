@@ -112,7 +112,9 @@
     "Active": "نشط",
     "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
     "PackageSettings": "اعدادات الباقة والبرامج",
-    "Delete": "حذف (أرشفة)"
+    "Delete": "حذف (أرشفة)",
+    "Confirmation": "تأكيد",
+    "AreYouSure": "هل أنت متأكد؟"
   },
   "Sidebar": {
     "Companies": "الشركات",
