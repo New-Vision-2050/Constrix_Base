@@ -54,6 +54,7 @@ export const useTableData = (
     searchFields,
     columnSearchState,
     columnVisibility,
+    _forceRefetch, // Extract _forceRefetch property
 
     setData,
     setColumns,
@@ -122,6 +123,7 @@ export const useTableData = (
     setError: (error) => setError(error),
     setIsFirstLoad: (isFirstLoad) => setIsFirstLoad(isFirstLoad),
     configColumns,
+    _forceRefetch, // Pass _forceRefetch to useTableFetchEffect
   });
 
   // Get table action handlers

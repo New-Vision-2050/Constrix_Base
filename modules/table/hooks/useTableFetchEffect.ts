@@ -20,6 +20,7 @@ interface TableFetchEffectProps {
   setError: (error: string | null) => void;
   setIsFirstLoad: (isFirstLoad: boolean) => void;
   configColumns?: ColumnConfig[];
+  _forceRefetch?: number; // Add _forceRefetch property
 }
 
 export const useTableFetchEffect = ({
@@ -37,7 +38,8 @@ export const useTableFetchEffect = ({
   setColumns,
   setError,
   setIsFirstLoad,
-  configColumns
+  configColumns,
+  _forceRefetch
 }: TableFetchEffectProps) => {
   const {
     isMountedRef,
@@ -60,7 +62,8 @@ export const useTableFetchEffect = ({
       sortDirection,
       searchQuery,
       searchFields,
-      columnSearchState // Include columnSearchState in the signature
+      columnSearchState, // Include columnSearchState in the signature
+      _forceRefetch // Include _forceRefetch in the signature to force a refetch when it changes
     });
     
     // Log the current column search state for debugging
@@ -75,7 +78,8 @@ export const useTableFetchEffect = ({
       sortDirection,
       searchQuery,
       searchFields,
-      columnSearchState
+      columnSearchState,
+      _forceRefetch
     });
     
     if (!shouldFetchData(url, currentParamsSignature)) {
@@ -123,10 +127,11 @@ export const useTableFetchEffect = ({
       searchConfig,
       isMountedRef,
       abortControllerRef,
-      configColumns
+      configColumns,
+      _forceRefetch // Include _forceRefetch to force a refetch when it changes
     });
     
     // Cleanup when unmounting or when dependencies change
     return cleanup;
-  }, [url, currentPage, itemsPerPage, sortColumn, sortDirection, searchQuery, searchFields, columnSearchState]);
+  }, [url, currentPage, itemsPerPage, sortColumn, sortDirection, searchQuery, searchFields, columnSearchState, _forceRefetch]);
 };
