@@ -23,6 +23,7 @@ interface SheetFormBuilderProps {
   onCancel?: () => void;
   side?: "top" | "right" | "bottom" | "left";
   className?: string;
+  formId?: string;
 }
 
 const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
@@ -32,6 +33,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   onCancel,
   side,
   className,
+  formId,
 }) => {
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -71,6 +73,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     config,
     onSuccess,
     onCancel,
+    formId,
   });
 
   return (

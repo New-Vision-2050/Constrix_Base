@@ -1,3 +1,5 @@
+"use client";
+
 // Export components
 export { default as SheetFormBuilder } from './components/SheetFormBuilder';
 export { default as ExpandableFormSection } from './components/ExpandableFormSection';
@@ -8,8 +10,12 @@ export * from './components/fields';
 
 // Export hooks
 export { useSheetForm } from './hooks/useSheetForm';
-export { useSheetFormWithTableReload } from './hooks/useSheetFormWithTableReload';
-export { useFormStore, validateField } from './hooks/useFormStore';
+export { useFormStore, useFormInstance, validateField } from './hooks/useFormStore';
+export { useFormReload, useFormReloadWithDelay } from './hooks/useFormReload';
+export { useFormInitialization } from './hooks/useFormInitialization';
+export { useFormActions } from './hooks/useFormActions';
+export { useFormWithTableReload } from './hooks/useFormWithTableReload';
+export { useFormData } from './hooks/useFormData';
 
 // Export types
 export type { FormConfig, FormSection, FieldConfig, DropdownOption, DynamicDropdownConfig, SearchTypeConfig } from './types/formTypes';
