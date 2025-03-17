@@ -17,14 +17,15 @@ const FieldHelperText: React.FC<FieldHelperTextProps> = ({
   if (!error && !helperText) {
     return null;
   }
-
+console.log(helperText)
   return (
     <div className={cn("mt-1 text-sm", className)}>
       {error && touched ? (
         <p className="text-destructive">{error}</p>
       ) : helperText ? (
         <p className="text-muted-foreground">{helperText}</p>
-      ) : null}
+      ) : error ? (<p className="text-destructive">{error}</p>)
+        : null}
     </div>
   );
 };
