@@ -11,7 +11,7 @@ export function middleware(req: NextRequest) {
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
 
   if (!nvToken && !isLoginPage) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("ar/login", req.url));
   }
 
   return intlMiddleware(req);
