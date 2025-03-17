@@ -68,6 +68,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     handleSetAllColumnsVisible,
     handleSetMinimalColumnsVisible,
     setColumns,
+    resetTable,
   } = useTableData(
     dataUrl,
     config?.columns,
@@ -79,6 +80,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     searchConfig
   );
 
+  useEffect(() => {
+    resetTable();
+  }, []);
   // Initialize columns from config immediately if available
   useEffect(() => {
     if (config?.columns && config.columns.length > 0) {
@@ -93,7 +97,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const searchableColumns = columns.filter((col) => col.searchable);
   const hasSearchableColumns = searchableColumns.length > 0;
   const allSearchedFields = config?.allSearchedFields;
-  
 
   // Show error toast when an error occurs
   React.useEffect(() => {
@@ -144,7 +147,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         )}
         <DataTable
           data={data}
-          columns={(config?.columns || columns).filter(col => visibleColumnKeys.includes(col.key))}
+          columns={(config?.columns || columns).filter((col) =>
+            visibleColumnKeys.includes(col.key)
+          )}
           searchQuery={searchQuery}
           sortState={sortState}
           onSort={handleSort}
