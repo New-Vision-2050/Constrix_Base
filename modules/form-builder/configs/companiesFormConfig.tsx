@@ -2,6 +2,8 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
+import { Checkbox } from "@/modules/table/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
 export const companiesFormConfig: FormConfig = {
   title: "اضافة شركة جديدة",
@@ -237,6 +239,28 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
+        {
+          type: "checkbox",
+          name: "change_local_time",
+          label: "الشركة",
+          placeholder: "اختر الشركة",
+          render: (field, value, onChange) => {
+            return (
+              <div className="flex items-center gap-2 ">
+                <Checkbox
+                  checked={value}
+                  onCheckedChange={(b) => onChange(b)}
+                />
+                <div className="flex items-center gap-1">
+                  <p className="text-sm">لتأكيد تغيير المنطقة الزمنية،</p>
+                  <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
+                    اضغط هنا
+                  </Button>
+                </div>
+              </div>
+            );
+          },
+        },
       ],
     },
   ],
@@ -282,23 +306,27 @@ export const companiesFormConfig: FormConfig = {
 
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
-           // Option to call default way to handle the step
-      const result =   await defaultStepSubmitHandler(step, values, companiesFormConfig);
-      if(result.success) {
-          // Simulate API call
-          return new Promise((resolve) => {
-              resolve({
-                  success: true,
-                  message: `Step ${step + 1} submitted successfully`,
-                  data: {
-                      // For step 0 (location), return a generated ID
-                      ...(step === 0 && result.data?.payload?.id && {
-                          company_id: result.data.payload.id
-                      }),
-
-                  },
-              });
+      // Option to call default way to handle the step
+      const result = await defaultStepSubmitHandler(
+        step,
+        values,
+        companiesFormConfig
+      );
+      if (result.success) {
+        // Simulate API call
+        return new Promise((resolve) => {
+          resolve({
+            success: true,
+            message: `Step ${step + 1} submitted successfully`,
+            data: {
+              // For step 0 (location), return a generated ID
+              ...(step === 0 &&
+                result.data?.payload?.id && {
+                  company_id: result.data.payload.id,
+                }),
+            },
           });
+        });
       }
       return result;
     },

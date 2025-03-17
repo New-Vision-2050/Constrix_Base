@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, Check } from 'lucide-react';
-import { FormSection } from '../types/formTypes';
-import FormField from './FormField';
-import { cn } from '@/lib/utils';
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight, Check } from "lucide-react";
+import { FormSection } from "../types/formTypes";
+import FormField from "./FormField";
+import { cn } from "@/lib/utils";
 
 interface ExpandableFormSectionProps {
   section: FormSection;
@@ -122,6 +126,11 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
         )}
         <div className="p-4 bg-background">
           <div
+            style={{
+              gridTemplateColumns: section.columns
+                ? `repeat(${section.columns}, minmax(0, 1fr))`
+                : "1fr",
+            }}
             className={`grid gap-4 ${
               section.columns ? `grid-cols-${section.columns}` : "grid-cols-1"
             }`}
@@ -208,6 +217,11 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
       </CollapsibleTrigger>
       <CollapsibleContent className="p-4 bg-background">
         <div
+          style={{
+            gridTemplateColumns: section.columns
+              ? `repeat(${section.columns}, minmax(0, 1fr))`
+              : "1fr",
+          }}
           className={`grid gap-4 ${
             section.columns ? `grid-cols-${section.columns}` : "grid-cols-1"
           }`}

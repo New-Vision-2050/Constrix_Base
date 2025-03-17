@@ -39,8 +39,10 @@ const CompaniesPage = () => {
     }, 100);
 
     // Add type safety for the result structure
-    const result = values.result as { data?: { payload?: { id?: string } } } | undefined;
-    const companyId = result?.data?.payload?.id || '';
+    const result = values.result as
+      | { data?: { payload?: { id?: string } } }
+      | undefined;
+    const companyId = result?.data?.payload?.id || "";
     setCompanyNumber(companyId);
     handleOpen();
 
@@ -55,13 +57,13 @@ const CompaniesPage = () => {
         config={config}
         tableId={companiesTableId} // Pass the unique table ID
         searchBarActions={
-          <div>
-            <ExportButton data={["omar"]} />
+          <div className="flex items-center gap-3">
             <SheetFormBuilder
               config={companiesFormConfig}
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
-            />
+            />{" "}
+            <ExportButton data={["omar"]} />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}

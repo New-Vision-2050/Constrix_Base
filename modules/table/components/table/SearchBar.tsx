@@ -162,7 +162,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </button>
           )}
         </div>
-        {searchConfig.allowFieldSelection && (
+        {/*    {searchConfig.allowFieldSelection && (
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -230,20 +230,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
             </PopoverContent>
           </Popover>
-        )}
-        
-        {/* Column visibility toggle */}
-        <ColumnVisibility
-          columns={columns}
-          visibleColumnKeys={visibleColumnKeys}
-          onToggleColumnVisibility={onToggleColumnVisibility}
-          onSetAllColumnsVisible={onSetAllColumnsVisible}
-          onSetMinimalColumnsVisible={onSetMinimalColumnsVisible}
-        />
+        )} */}
       </div>
-
       {/* Custom actions area */}
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {actions && <>{actions}</>}
+      {/* Column visibility toggle */}
+      <ColumnVisibility
+        columns={columns}
+        visibleColumnKeys={visibleColumnKeys}
+        onToggleColumnVisibility={onToggleColumnVisibility}
+        onSetAllColumnsVisible={onSetAllColumnsVisible}
+        onSetMinimalColumnsVisible={onSetMinimalColumnsVisible}
+      />
     </div>
   );
 };
