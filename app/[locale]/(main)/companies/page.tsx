@@ -12,8 +12,6 @@ import { companiesFormConfig } from "@/modules/form-builder/configs/companiesFor
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
-import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
-import { changeLocalTimeConfig } from "@/modules/form-builder/configs/changeLocalTimeConfig";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -58,11 +56,6 @@ const CompaniesPage = () => {
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
-            <DialogFormBuilder
-              config={changeLocalTimeConfig}
-              trigger={<Button>change</Button>}
-              onSuccess={() => console.log("success")}
-            />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}
