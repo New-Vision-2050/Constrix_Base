@@ -59,8 +59,10 @@ export function useSheetForm({
   config,
   onSuccess,
   onCancel,
-  formId = 'sheet-form',
+  formId,
 }: UseSheetFormProps): UseSheetFormResult {
+  // Use formId from config if provided, otherwise use the prop or default
+  const actualFormId = config.formId || formId || 'sheet-form';
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
   
@@ -82,7 +84,7 @@ export function useSheetForm({
     setSubmitting,
     setIsValid,
     hasValidatingFields,
-  } = useFormInstance(formId, config.initialValues || {});
+  } = useFormInstance(actualFormId, config.initialValues || {});
   
   // Local state for sheet-specific functionality
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -723,6 +725,6 @@ export function useSheetForm({
     getStepResponseData,
     clearFiledError,
     // Form ID
-    formId,
+    formId: actualFormId,
   };
 }

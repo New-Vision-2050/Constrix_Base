@@ -44,7 +44,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   clearFiledError,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  
+
   // Force close if forceDisabled is true (not the active step)
   // Force open if not forceDisabled (is the active step)
   useEffect(() => {
@@ -57,12 +57,12 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
 
   // Check if section has any errors
   const hasErrors = section.fields.some(field => errors[field.name] && touched[field.name]);
-  
+
   // Check if section is completed (all required fields filled and no errors)
   const isCompleted = useMemo(() => {
     // If there are errors, the section is not completed
     if (hasErrors) return false;
-    
+
     // Check if all required fields have values
     const allRequiredFieldsFilled = section.fields.every((field) => {
       // Skip fields that don't meet their condition
@@ -92,8 +92,6 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   if (section.condition && !section.condition(values)) {
     return null;
   }
-
-  console.log({ errors });
 
   if (!collapsible || !section.title) {
     return (

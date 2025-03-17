@@ -116,6 +116,7 @@ export interface WizardOptions {
 }
 
 export interface FormConfig {
+  formId?: string; // Unique identifier for the form instance
   title?: string;
   description?: string;
   className?: string;

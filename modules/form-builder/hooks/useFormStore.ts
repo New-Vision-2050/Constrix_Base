@@ -251,7 +251,8 @@ export const useFormStore = create<FormState>((set, get) => ({
   }),
 
   validateFieldWithApi: (formId: string, field: string, value: any, rule: ValidationRule) => {
-    if (!rule.apiConfig) return;
+    // Check if rule and apiConfig exist
+    if (!rule || !rule.apiConfig) return;
 
     const {
       url,
@@ -512,17 +513,28 @@ export const validateField = (
         break;
       case "apiValidation":
         // For API validation, we trigger the validation but also check if there's an existing error
-        if (fieldName && rule.apiConfig) {
+        if (fieldName) {
+          // Make sure rule and apiConfig exist
+          if (!rule || !rule.apiConfig) {
+            return null;
+          }
+          
           // Use the provided store or get it from the global state
           const formStore = store || useFormStore.getState();
 
           // Check if there's an existing error for this field
-          if (formStore.errors[fieldName]) {
+          if (formStore.errors && formStore.errors[fieldName]) {
             return formStore.errors[fieldName];
           }
 
-          // Trigger API validation
-          formStore.validateFieldWithApi(fieldName, value, rule);
+          // Use the triggerApiValidation utility function which handles formId correctly
+          try {
+            // Import the utility function to avoid circular dependencies
+            const { triggerApiValidation } = require('../utils/apiValidation');
+            triggerApiValidation(fieldName, value, rule, formStore);
+          } catch (error) {
+            console.error("Error in API validation:", error);
+          }
 
           // Return null here as the validation is async and will update the form state later
           // We'll check the validatingFields state to show a loading indicator

@@ -18,25 +18,27 @@ export interface UseFormDataProps {
  */
 export const useFormData = ({
   config,
-  formId = 'default-form',
+  formId,
   onSuccess,
   onError,
 }: UseFormDataProps) => {
+  // Use formId from config if provided, otherwise use the prop or default
+  const actualFormId = config.formId || formId || 'default-form';
   // Set the active form ID
   const setFormId = useFormStore((state) => state.setFormId);
   
   // Set the active form ID only once
   useEffect(() => {
-    setFormId(formId);
+    setFormId(actualFormId);
     
     // Return cleanup function
     return () => {
       // Don't reset the form on unmount to allow for data persistence
     };
-  }, [formId, setFormId]);
+  }, [actualFormId, setFormId]);
   
   // Get state and actions from the form instance
-  const formInstance = useFormInstance(formId, config.initialValues || {});
+  const formInstance = useFormInstance(actualFormId, config.initialValues || {});
   
   const {
     values,
@@ -230,7 +232,7 @@ export const useFormData = ({
   
   return {
     // State
-    formId,
+    formId: actualFormId,
     values,
     errors,
     touched,
