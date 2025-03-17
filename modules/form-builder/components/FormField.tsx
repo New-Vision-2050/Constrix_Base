@@ -5,13 +5,12 @@ import TextField from './fields/TextField';
 import TextareaField from './fields/TextareaField';
 import CheckboxField from './fields/CheckboxField';
 import RadioField from './fields/RadioField';
-import SelectField from './fields/SelectField';
 import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
 import FieldHelperText from './fields/FieldHelperText';
-import { useFormStore } from '../hooks/useFormStore';
+import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
 
 interface FormFieldProps {
@@ -25,6 +24,7 @@ interface FormFieldProps {
   stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
+  formId?: string; // Add formId prop to identify which form instance to use
 }
 
 // This component subscribes to validating state
@@ -39,9 +39,11 @@ const FormField: React.FC<FormFieldProps> = ({
   stepResponses,
   getStepResponseData,
   currentStep,
+  formId = 'default', // Use a default form ID if not provided
 }) => {
-  // Get validating state from the store
-  const validatingFields = useFormStore((state) => state.validatingFields);
+  // Get the form instance
+  const formInstance = useFormInstance(formId);
+
   // Check if this field's value exists in any previous step's response
   let fieldValue = value;
   if (getStepResponseData && currentStep && currentStep > 0 && stepResponses) {
@@ -56,9 +58,6 @@ const FormField: React.FC<FormFieldProps> = ({
     }
   }
 
-  // Get the form store
-  const formStore = useFormStore();
-
   // Memoize callbacks to prevent recreating them on every render
   const onChange = useCallback((newValue: any) => {
     // Call the onChange prop if provided
@@ -72,18 +71,18 @@ const FormField: React.FC<FormFieldProps> = ({
     }
 
     // Clear any existing errors for this field when the value changes
-    formStore.setError(field.name, null);
+    formInstance.setError(field.name, null);
 
     // Check if field has API validation rules and trigger validation
     if (field.validation && hasApiValidation(field.validation)) {
       field.validation.forEach(rule => {
         if (rule.type === 'apiValidation') {
-          // Pass the formStore instance to avoid getState() call in the validation function
-          triggerApiValidation(field.name, newValue, rule, formStore);
+          // Pass the store instance to avoid getState() call in the validation function
+          triggerApiValidation(field.name, newValue, rule, useFormStore.getState());
         }
       });
     }
-  }, [field.name, field.onChange, field.validation, propOnChange, values, formStore]);
+  }, [field.name, field.onChange, field.validation, propOnChange, values, formInstance]);
 
   const onBlur = useCallback(() => {
     // Call the onBlur prop if provided
@@ -123,7 +122,8 @@ const FormField: React.FC<FormFieldProps> = ({
             type={field.type}
             onChange={onChange}
             onBlur={onBlur}
-            isValidating={validatingFields[field.name]}
+            isValidating={formInstance.validatingFields?.[field.name] || false}
+            formId={formId}
           />
         );
 
@@ -163,7 +163,7 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-   
+
 
       case 'date':
         return (
@@ -200,7 +200,7 @@ const FormField: React.FC<FormFieldProps> = ({
                 dependencyValues={values}
               />
             );
-            
+
           case 'phone':
             return (
               <PhoneField
@@ -212,7 +212,7 @@ const FormField: React.FC<FormFieldProps> = ({
                 onBlur={onBlur}
               />
             );
-    
+
           default:
             return <div>Unsupported field type: {field.type}</div>;
     }

@@ -15,6 +15,7 @@ interface TableInitializationProps {
   setSort: (column: string | null, direction: 'asc' | 'desc' | null) => void;
   setSearch: (query: string, fields?: string[]) => void;
   setColumns: (columns: ColumnConfig[]) => void;
+  setVisibleColumns?: (columnKeys: string[]) => void;
 }
 
 export const useTableInitialization = ({
@@ -27,7 +28,8 @@ export const useTableInitialization = ({
   setPagination,
   setSort,
   setSearch,
-  setColumns
+  setColumns,
+  setVisibleColumns
 }: TableInitializationProps) => {
   const isInitializedRef = useRef<boolean>(false);
   
@@ -53,6 +55,12 @@ export const useTableInitialization = ({
     // Set initial columns if provided
     if (configColumns && configColumns.length > 0) {
       setColumns(configColumns);
+      
+      // Also initialize visible columns if the function is provided
+      if (setVisibleColumns) {
+        const columnKeys = configColumns.map(col => col.key);
+        setVisibleColumns(columnKeys);
+      }
     }
   }, []);
   

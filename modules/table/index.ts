@@ -7,6 +7,7 @@ export { default as ConfigurableTable } from './components/ConfigurableTable';
 // Export hooks
 export { useTableData } from './hooks/useTableData';
 export { useTableReload } from './hooks/useTableReload';
+export { useResetTableOnRouteChange } from './hooks/useResetTableOnRouteChange';
 
 // Export types
 export type { TableConfig } from './utils/configs/tableConfig';

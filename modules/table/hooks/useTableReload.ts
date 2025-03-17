@@ -1,6 +1,6 @@
 "use client";
 import { useCallback } from 'react';
-import { useTableStore } from '@/modules/table/store/useTableStore';
+import { useTableStore, useTableInstance } from '@/modules/table/store/useTableStore';
 
 /**
  * Custom hook that provides a method to reload the table data
@@ -13,8 +13,9 @@ import { useTableStore } from '@/modules/table/store/useTableStore';
  * 3. This ensures the table displays the most up-to-date data after form submissions
  *    or other actions that modify data
  */
-export const useTableReload = () => {
-  const { setLoading } = useTableStore();
+export const useTableReload = (tableId: string = 'default') => {
+  // Get the table instance for the specified tableId
+  const { setLoading } = useTableInstance(tableId);
   
   /**
    * Reload the table data by triggering a refetch

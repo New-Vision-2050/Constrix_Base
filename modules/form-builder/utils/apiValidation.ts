@@ -23,8 +23,19 @@ export const triggerApiValidation = (
   // Use the provided store or get it from the global state
   const formStore = store || useFormStore.getState();
   
-  // Trigger API validation
-  formStore.validateFieldWithApi(fieldName, value, rule);
+  // Trigger API validation with the correct formId
+  if ('activeFormId' in formStore) {
+    // If it's the global store
+    formStore.validateFieldWithApi(formStore.activeFormId, fieldName, value, rule);
+  } else if (formStore.formId) {
+    // If it's a form instance with formId property
+    const globalStore = useFormStore.getState();
+    globalStore.validateFieldWithApi(formStore.formId, fieldName, value, rule);
+  } else {
+    // Fallback to active form ID
+    const globalStore = useFormStore.getState();
+    globalStore.validateFieldWithApi(globalStore.activeFormId, fieldName, value, rule);
+  }
 };
 
 /**
