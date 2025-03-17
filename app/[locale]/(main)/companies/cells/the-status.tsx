@@ -4,9 +4,7 @@ import { Switch } from "@/modules/table/components/ui/switch";
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Dialog } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
-import { Input } from "@/components/ui/input";
 import { apiClient } from "@/config/axios-config";
 import { useToast } from "@/modules/table/hooks/use-toast";
 
@@ -35,15 +33,12 @@ const TheStatus = ({
         setIsActive(tempIsActive);
         setShowDialog(false);
       } else {
-        // Handle error
-        console.error("Failed to update status");
         toast({
           title: "Error",
           description: "Failed to update status",
         });
       }
     } catch (error) {
-      console.error("API Error:", error);
       toast({
         title: "Error",
         description: "Failed to update status",
@@ -60,8 +55,6 @@ const TheStatus = ({
     setTempIsActive(checked); // Store the current state before the change
     setShowDialog(true);
   };
-
-  const deleteUrl = "/api/update-company-status"; // Replace with the actual update URL
 
   return (
     <>
