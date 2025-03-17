@@ -6,8 +6,9 @@ import { Button } from '@/modules/table/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import { FieldConfig } from '../../types/formTypes';
 import { cn } from '@/lib/utils';
+import { DayPickerSingleProps } from 'react-day-picker'; 
 
-interface DateFieldProps {
+interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
   value: string;
   error?: string;
@@ -23,6 +24,7 @@ const DateField: React.FC<DateFieldProps> = ({
   touched,
   onChange,
   onBlur,
+  ...props
 }) => {
   const date = value ? new Date(value) : undefined;
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +59,7 @@ const DateField: React.FC<DateFieldProps> = ({
           }}
           disabled={field.disabled}
           initialFocus
+          {...props}
         />
       </PopoverContent>
     </Popover>

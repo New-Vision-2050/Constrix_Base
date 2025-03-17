@@ -79,6 +79,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             value={activationDate}
             onChange={setActivationDate}
             onBlur={() => {}}
+            fromDate={new Date()}
           />
         )}
         <DialogFooter className="!items-center !justify-center gap-3">
