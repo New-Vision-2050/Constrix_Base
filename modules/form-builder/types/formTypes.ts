@@ -1,10 +1,18 @@
 import React from 'react';
 
 export interface ValidationRule {
-  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom';
+  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
   value?: any;
   message: string;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
+  apiConfig?: {
+    url: string;
+    method?: 'GET' | 'POST' | 'PUT';
+    debounceMs?: number;
+    paramName?: string;
+    headers?: Record<string, string>;
+    successCondition?: (response: any) => boolean;
+  };
 }
 
 export interface DropdownOption {
@@ -38,7 +46,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'email' | 'password' | 'number' | 'date' | 'search';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject';
   name: string;
   label: string;
   placeholder?: string;
@@ -49,6 +57,7 @@ export interface FieldConfig {
   hidden?: boolean;
   autoFocus?: boolean;
   className?: string;
+  containerClassName?: string; // Class name for the container element
   width?: string;
   gridArea?: string;
   options?: DropdownOption[]; // Using shared DropdownOption type
@@ -59,6 +68,9 @@ export interface FieldConfig {
   render?: (field: FieldConfig, value: any, onChange: (newValue: any) => void) => React.ReactNode;
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
+  isMulti?: boolean; // Whether to enable multi-select functionality
+  postfix?: string; // Text to display after the input field
+  defaultValue?: any; // Default value for the field
 }
 
 export interface FormSection {
@@ -105,20 +117,24 @@ export interface WizardOptions {
 }
 
 export interface FormConfig {
+  formId?: string; // Unique identifier for the form instance
   title?: string;
   description?: string;
   className?: string;
   sections: FormSection[];
   showReset?: boolean;
+  showCancelButton?: boolean; // Whether to show the cancel button
+  showBackButton?: boolean; // Whether to show the back button in step-based forms
   submitButtonText?: string;
   resetButtonText?: string;
   cancelButtonText?: string;
   showSubmitLoader?: boolean;
   initialValues?: Record<string, any>;
   resetOnSuccess?: boolean;
-  // Wizard mode configuration
+  // Form mode configuration
   wizard?: boolean; // Enable wizard mode (multi-step form)
-  wizardOptions?: WizardOptions; // Configuration options for wizard mode
+  accordion?: boolean; // Enable accordion mode (collapsible sections with step navigation)
+  wizardOptions?: WizardOptions; // Configuration options for wizard/accordion mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
   apiHeaders?: Record<string, string>; // Custom headers for the API request

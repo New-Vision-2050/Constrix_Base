@@ -94,12 +94,15 @@
     "FilterSearch": "فلتر البحث",
     "RowsPerPage": "الصفوف لكل صفحة :",
     "Search": "بحث",
-    "Actions": "إجراء"
+    "Actions": "إجراء",
+    "ToggleColumns": "تبديل الأعمدة المرئية",
+    "VisibleColumns": "الأعمدة المرئية"
   },
   "Companies": {
     "Companies": "الشركات",
     "Email": "البريد الاليكتروني",
     "CompanyType": "نوع الشركة",
+    "CompanySection": "نشاط الشركه",
     "Manager": "المسؤول",
     "DataStatus": "حالة البيانات",
     "Status": "الحالة",
@@ -109,7 +112,11 @@
     "Active": "نشط",
     "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
     "PackageSettings": "اعدادات الباقة والبرامج",
-    "Delete": "حذف (أرشفة)"
+    "Delete": "حذف (أرشفة)",
+    "Confirmation": "تأكيد",
+    "AreYouSure": "هل أنت متأكد؟",
+    "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
+    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
   },
   "Sidebar": {
     "Companies": "الشركات",

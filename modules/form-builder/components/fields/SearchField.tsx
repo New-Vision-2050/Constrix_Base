@@ -5,10 +5,10 @@ import DropdownSearch from '@/modules/table/components/table/DropdownSearch';
 
 interface SearchFieldProps {
   field: FieldConfig;
-  value: string;
+  value: string | string[];
   error?: string;
   touched?: boolean;
-  onChange: (value: string) => void;
+  onChange: (value: string | string[]) => void;
   onBlur: () => void;
   dependencyValues?: Record<string, any>;
 }
@@ -31,12 +31,13 @@ const SearchField: React.FC<SearchFieldProps> = ({
       <DropdownSearch
         columnKey={field.name}
         label={field.label}
-        value={value || ''}
+        value={value}
         onChange={onChange}
         options={field.options}
         dynamicConfig={field.dynamicOptions}
         dependencies={dependencyValues}
         placeholder={field.placeholder}
+        isMulti={field.isMulti}
       />
     </div>
   );

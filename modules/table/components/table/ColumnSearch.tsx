@@ -12,7 +12,7 @@ import { useTranslations } from "next-intl";
 interface ColumnSearchProps {
   columns: ColumnConfig[];
   columnSearchState: ColumnSearchState;
-  onColumnSearch: (columnKey: string, value: string) => void;
+  onColumnSearch: (columnKey: string, value: string | string[]) => void;
   allSearchedFields?: any[];
 }
 
@@ -38,7 +38,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
 
   // Create a debounced version of onColumnSearch
   const debouncedColumnSearch = useDebounce(
-    (columnKey: string, value: string) => {
+    (columnKey: string, value: string | string[]) => {
       onColumnSearch(columnKey, value);
     },
     500
@@ -46,7 +46,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
 
   // Create dependencies object for each dropdown
   const buildDependenciesMap = useCallback(() => {
-    const dependenciesMap: Record<string, Record<string, string>> = {};
+    const dependenciesMap: Record<string, Record<string, string | string[]>> = {};
 
     searchableColumns.forEach((column) => {
       if (
@@ -76,15 +76,29 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   }, [columnSearchState, dependenciesMap]);
 
   // Handle input change without immediately triggering the API call
-  const handleInputChange = (columnKey: string, value: string) => {
+  const handleInputChange = (columnKey: string, value: string | string[]) => {
     // Update local state immediately for responsive UI
     setLocalInputValues((prev) => ({
       ...prev,
       [columnKey]: value,
     }));
 
-    // Trigger debounced search
+    // Trigger debounced search for text inputs
     debouncedColumnSearch(columnKey, value);
+  };
+  
+  // Handle dropdown change - apply immediately without debounce
+  const handleDropdownChange = (columnKey: string, value: string | string[]) => {
+    // Update local state immediately for responsive UI
+    setLocalInputValues((prev) => ({
+      ...prev,
+      [columnKey]: value,
+    }));
+    
+    // Apply dropdown changes immediately without debounce
+    onColumnSearch(columnKey, value);
+    
+    console.log(`Dropdown change applied for ${columnKey}:`, value);
   };
 
   if (searchableColumns.length === 0) {
@@ -112,7 +126,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                   columnKey={column.key}
                   label={column.label}
                   value={stateValue}
-                  onChange={(newValue) => onColumnSearch(column.key, newValue)}
+                  onChange={(newValue) => handleDropdownChange(column.key, newValue)}
                   options={searchType.dropdownOptions}
                   dynamicConfig={searchType.dynamicDropdown}
                   dependencies={dependenciesMap[column.key]}
@@ -126,7 +140,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             case "text":
             default:
               return (
-                <div key={column.key} className="space-y-1">
+                <div key={column.key}>
                   <label
                     htmlFor={`search-${column.key}`}
                     className="text-sm font-medium text-gray-700 dark:text-gray-300"

@@ -24,6 +24,7 @@ export const CompaniesConfig = () => {
 
   return {
     url: `${baseURL}/companies`,
+    tableId: "companies-table", // Add tableId to the config
     columns: [
       {
         key: "name",
@@ -53,7 +54,7 @@ export const CompaniesConfig = () => {
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
-      {
+       {
         key: "is_active",
         label: t("Companies.Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
@@ -68,7 +69,7 @@ export const CompaniesConfig = () => {
     ],
     allSearchedFields: [
       {
-        key: "country",
+        key: "country_id",
         searchType: {
           type: "dropdown",
           placeholder: t("Companies.CountryFilter"),
@@ -86,7 +87,7 @@ export const CompaniesConfig = () => {
         },
       },
       {
-        key: "companyType",
+        key: "company_type_id",
         searchType: {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
@@ -104,10 +105,10 @@ export const CompaniesConfig = () => {
         },
       },
       {
-        key: "companyField",
+        key: "company_field_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("Companies.TypeFilter"),
+          placeholder: t("Companies.CompanySection"),
           dynamicDropdown: {
             url: `${baseURL}/company_fields`,
             valueField: "id",
@@ -130,7 +131,7 @@ export const CompaniesConfig = () => {
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
   };

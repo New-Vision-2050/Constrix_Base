@@ -94,12 +94,15 @@
     "FilterSearch": "Filter Search",
     "RowsPerPage": "Rows per page:",
     "Search": "Search",
-    "Actions": "Actions"
+    "Actions": "Actions",
+    "ToggleColumns": "Toggle visible columns",
+    "VisibleColumns": "Visible Columns"
   },
   "Companies": {
     "Companies": "Companies",
     "Email": "Email",
     "CompanyType": "Company Type",
+    "CompanySection": "Company Section",
     "Manager": "Manager",
     "DataStatus": "Data Status",
     "Status": "Status",

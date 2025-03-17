@@ -15,10 +15,12 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
   dynamicConfig,
   dependencies,
   placeholder = "Select option",
+  isMulti = false,
 }) => {
   const { localValue, handleSelect } = useDropdownState({
     initialValue: value,
     onChange,
+    isMulti,
   });
 
   const shouldBeDisabled =
@@ -37,25 +39,30 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
     label: opt.label,
   }));
 
-  // Find current value option
-  const selectedOption =
-    selectOptions.find((opt) => opt.value === localValue) || null;
+  // Find current value option(s)
+  const selectedOption = isMulti
+    ? selectOptions.filter((opt) =>
+        Array.isArray(localValue) && localValue.includes(opt.value)
+      )
+    : selectOptions.find((opt) => opt.value === localValue) || null;
 
   return (
     <div className="space-y-2">
-      {!!label && (
-        <Label
-          htmlFor={`select-${columnKey}`}
-          className="text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          {label}
-        </Label>
-      )}
       <Select
         id={`select-${columnKey}`}
         value={selectedOption}
-        onChange={(newValue: any) => handleSelect(newValue?.value || "")}
+        onChange={(newValue: any) => {
+          if (isMulti) {
+            // For multi-select, extract array of values
+            const values = newValue ? newValue.map((item: any) => item.value) : [];
+            handleSelect(values);
+          } else {
+            // For single select
+            handleSelect(newValue?.value || "");
+          }
+        }}
         options={selectOptions}
+        isMulti={isMulti}
         isDisabled={shouldBeDisabled}
         placeholder={placeholder}
         isClearable

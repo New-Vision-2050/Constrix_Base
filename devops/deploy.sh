@@ -52,4 +52,4 @@ cd "$DEPLOY_DIR/devops"
 #ENTRYPOINT ["devops/entrypoint.sh"]
 
 # Start the containers and remove any orphaned containers
-docker compose -p $DEPLOYMENT_ID up --force-recreate --remove-orphans -d
+docker compose -p $PROJECT_NAME up --force-recreate --remove-orphans -d

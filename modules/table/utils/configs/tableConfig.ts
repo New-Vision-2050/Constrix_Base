@@ -3,6 +3,7 @@ import { ColumnConfig } from './columnConfig';
 
 export interface TableConfig {
   url: string;
+  tableId?: string; // Unique identifier for the table instance
   columns?: ColumnConfig[];
   defaultItemsPerPage?: number;
   defaultSortColumn?: string;

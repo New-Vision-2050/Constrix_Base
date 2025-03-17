@@ -23,9 +23,11 @@ const SimpleSelectDropdown: React.FC<DropdownBaseProps> = ({
 }) => {
   const dependencyMessage = useDependencyMessage(isDisabled, dynamicConfig?.dependsOn);
   const isLoading = options.length === 0 && dynamicConfig !== undefined && !isDisabled;
-  const [localValue, setLocalValue] = useState(value);
+  // Ensure we're working with a string value
+  const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : (typeof value === 'string' ? value : '');
+  const [localValue, setLocalValue] = useState<string>(stringValue);
   const initialRenderRef = useRef(true);
-  const prevValueRef = useRef(value);
+  const prevValueRef = useRef<string>(stringValue);
   const isUpdatingRef = useRef(false);
   
   // Use debounce to prevent multiple rapid selections
@@ -40,11 +42,16 @@ const SimpleSelectDropdown: React.FC<DropdownBaseProps> = ({
 
   // Update local value when prop value changes, but only if it's different
   useEffect(() => {
-    console.log(`SimpleSelectDropdown - Value prop changed for ${columnKey}: ${value}`);
-    if (value !== prevValueRef.current && !isUpdatingRef.current) {
+    // Ensure we're working with a string value
+    const newStringValue = Array.isArray(value) && value.length > 0
+      ? value[0]
+      : (typeof value === 'string' ? value : '');
+    
+    console.log(`SimpleSelectDropdown - Value prop changed for ${columnKey}: ${newStringValue}`);
+    if (newStringValue !== prevValueRef.current && !isUpdatingRef.current) {
       isUpdatingRef.current = true;
-      setLocalValue(value);
-      prevValueRef.current = value;
+      setLocalValue(newStringValue);
+      prevValueRef.current = newStringValue;
       isUpdatingRef.current = false;
     }
   }, [value, columnKey]);

@@ -21,6 +21,7 @@ export interface DynamicDropdownConfig {
   queryParameters?: Record<string, string>; // Additional query parameters
   transformResponse?: (data: unknown) => DropdownOption[]; // Transform API response to dropdown options
   enableServerSearch?: boolean; // Whether to enable server-side search
+  isMulti?: boolean; // Whether to enable multi-select functionality
 }
 
 // Type for search/filter configuration
@@ -29,4 +30,5 @@ export interface SearchTypeConfig {
   placeholder?: string;
   dropdownOptions?: DropdownOption[]; // Static options
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
+  isMulti?: boolean; // Whether to enable multi-select functionality
 }

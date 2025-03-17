@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 type TableActionProps = {
   setSort: (column: string | null, direction: 'asc' | 'desc' | null) => void;
   setSearch: (query: string, fields?: string[]) => void;
-  setColumnSearch: (columnKey: string, value: string) => void;
+  setColumnSearch: (columnKey: string, value: string | string[]) => void;
   setPagination: (currentPage: number, totalPages: number, itemsPerPage: number) => void;
   totalPages: number;
   itemsPerPage: number;
@@ -43,8 +43,14 @@ export const useTableActions = ({
   }, [setSearch]);
   
   // Handle column-specific search
-  const handleColumnSearch = useCallback((columnKey: string, value: string) => {
+  const handleColumnSearch = useCallback((columnKey: string, value: string | string[]) => {
+    console.log(`handleColumnSearch called for ${columnKey} with value:`, value);
+    
+    // Apply the column search
     setColumnSearch(columnKey, value);
+    
+    // Log after setting the column search
+    console.log(`Column search state updated for ${columnKey}`);
   }, [setColumnSearch]);
   
   // Handle page change

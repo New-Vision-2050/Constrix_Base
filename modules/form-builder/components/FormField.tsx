@@ -5,10 +5,14 @@ import TextField from './fields/TextField';
 import TextareaField from './fields/TextareaField';
 import CheckboxField from './fields/CheckboxField';
 import RadioField from './fields/RadioField';
-import SelectField from './fields/SelectField';
+import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
+import PhoneField from './fields/PhoneField';
+import HiddenObjectField from './fields/HiddenObjectField';
 import FieldHelperText from './fields/FieldHelperText';
+import { useFormInstance, useFormStore } from '../hooks/useFormStore';
+import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
 
 interface FormFieldProps {
   field: FieldConfig;
@@ -21,9 +25,10 @@ interface FormFieldProps {
   stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
+  formId?: string; // Add formId prop to identify which form instance to use
 }
 
-// This component doesn't subscribe to any store values
+// This component subscribes to validating state
 const FormField: React.FC<FormFieldProps> = ({
   field,
   value,
@@ -35,7 +40,11 @@ const FormField: React.FC<FormFieldProps> = ({
   stepResponses,
   getStepResponseData,
   currentStep,
+  formId = 'default', // Use a default form ID if not provided
 }) => {
+  // Get the form instance
+  const formInstance = useFormInstance(formId);
+
   // Check if this field's value exists in any previous step's response
   let fieldValue = value;
   if (getStepResponseData && currentStep && currentStep > 0 && stepResponses) {
@@ -61,7 +70,20 @@ const FormField: React.FC<FormFieldProps> = ({
     if (field.onChange) {
       field.onChange(newValue, values);
     }
-  }, [field.name, field.onChange, propOnChange, values]);
+
+    // Clear any existing errors for this field when the value changes
+    formInstance.setError(field.name, null);
+
+    // Check if field has API validation rules and trigger validation
+    if (field.validation && hasApiValidation(field.validation)) {
+      field.validation.forEach(rule => {
+        if (rule.type === 'apiValidation') {
+          // Pass the store instance to avoid getState() call in the validation function
+          triggerApiValidation(field.name, newValue, rule, useFormStore.getState());
+        }
+      });
+    }
+  }, [field.name, field.onChange, field.validation, propOnChange, values, formInstance]);
 
   const onBlur = useCallback(() => {
     // Call the onBlur prop if provided
@@ -101,6 +123,8 @@ const FormField: React.FC<FormFieldProps> = ({
             type={field.type}
             onChange={onChange}
             onBlur={onBlur}
+            isValidating={formInstance.validatingFields?.[field.name] || false}
+            formId={formId}
           />
         );
 
@@ -140,7 +164,7 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-   
+
 
       case 'date':
         return (
@@ -153,24 +177,63 @@ const FormField: React.FC<FormFieldProps> = ({
             onBlur={onBlur}
           />
         );
-        
-      case 'select':
-        return (
-          <SearchField
-            field={field}
-            value={fieldValue}
-            error={error}
-            touched={touched}
-            onChange={onChange}
-            onBlur={onBlur}
-            dependencyValues={values}
-          />
-        );
+        case 'select':
+          return (
+            <SearchField
+              field={field}
+              value={fieldValue}
+              error={error}
+              touched={touched}
+              onChange={onChange}
+              onBlur={onBlur}
+              dependencyValues={values}
+            />
+          );
+          case 'multiSelect':
+            return (
+              <MultiSelectField
+                field={field}
+                value={Array.isArray(fieldValue) ? fieldValue : []}
+                error={error}
+                touched={touched}
+                onChange={onChange}
+                onBlur={onBlur}
+                dependencyValues={values}
+              />
+            );
 
-      default:
-        return <div>Unsupported field type: {field.type}</div>;
+          case 'phone':
+            return (
+              <PhoneField
+                field={field}
+                value={fieldValue || ''}
+                error={error}
+                touched={touched}
+                onChange={onChange}
+                onBlur={onBlur}
+              />
+            );
+            
+          case 'hiddenObject':
+            return (
+              <HiddenObjectField
+                field={field}
+                value={fieldValue}
+                onChange={onChange}
+                onBlur={onBlur}
+                values={values}
+              />
+            );
+
+          default:
+            return <div>Unsupported field type: {field.type}</div>;
     }
   };
+
+  // For hiddenObject type, just render the field without any wrapper
+  if (field.type === 'hiddenObject') {
+    return renderField();
+  }
 
   // For checkbox type, the label is already rendered with the checkbox
   if (field.type === 'checkbox') {

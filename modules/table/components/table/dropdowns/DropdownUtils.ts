@@ -17,13 +17,14 @@ export interface DynamicDropdownConfig {
 export interface DropdownBaseProps {
     columnKey: string;
     label: string;
-    value: string;
-    onChange: (value: string) => void;
+    value: string | string[];
+    onChange: (value: string | string[]) => void;
     options?: DropdownOption[];
     dynamicConfig?: DynamicDropdownConfig;
-    dependencies?: Record<string, string>;
+    dependencies?: Record<string, string | string[]>;
     placeholder?: string;
     isDisabled?: boolean;
+    isMulti?: boolean;
 }
 
 export const useDependencyMessage = (
@@ -40,7 +41,7 @@ export const getFetchUrl = (
     baseUrl: string,
     filterParam?: string,
     dependsOnKey?: string,
-    dependencies?: Record<string, string>
+    dependencies?: Record<string, string | string[]>
 ): string => {
     let url = baseUrl;
 
@@ -48,7 +49,11 @@ export const getFetchUrl = (
         const filterValue = dependencies[dependsOnKey];
         if (filterValue) {
             const separator = url.includes('?') ? '&' : '?';
-            url = `${url}${separator}${filterParam}=${encodeURIComponent(filterValue)}`;
+            // Handle both string and string[] values
+            const encodedValue = Array.isArray(filterValue)
+                ? filterValue.map(v => encodeURIComponent(v)).join(',')
+                : encodeURIComponent(filterValue);
+            url = `${url}${separator}${filterParam}=${encodedValue}`;
         }
     }
 

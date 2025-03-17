@@ -49,6 +49,7 @@ const subjectSearchConfig: SearchTypeConfig = {
 
 // Define the form configuration
 export const formConfig: FormConfig = {
+  formId: 'contact-form',
   title: 'Contact Us',
   description: 'Fill out the form below to get in touch with us.',
   apiUrl: "https://your-laravel-api.com/contact",

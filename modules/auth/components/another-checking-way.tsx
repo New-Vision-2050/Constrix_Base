@@ -40,6 +40,7 @@ const AnotherCheckingWay = memo(
         "login_option_alternatives",
         res.payload.login_way.step.login_option_alternatives
       );
+      setValue("by", res.payload.login_way.by);
       switch (nextStep) {
         case "password":
           handleSetStep(LOGIN_PHASES.PASSWORD);

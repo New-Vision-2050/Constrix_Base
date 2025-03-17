@@ -15,12 +15,16 @@ import UserIcon from "@/public/icons/user";
 import SidebarHeaderContent from "./sidebar-header-content";
 import SidebarFooterContent from "./sidebar-footer-content";
 import { useLocale, useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { ROUTER } from "@/router";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
-  
+  const path = usePathname();
+  const pageName = "/"+path.split('/').at(-1); 
+    
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
@@ -52,13 +56,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     projects: [
       {
         name: t("Sidebar.Companies"),
-        url: "#",
+        url: ROUTER.COMPANIES,
         icon: CompaniesIcon,
+        isActive : pageName === ROUTER.COMPANIES
       },
       {
         name: t("Sidebar.Users"),
-        url: "#",
-        icon: UserIcon,
+        url: ROUTER.USERS,
+        icon: UserIcon,        
+        isActive : pageName === ROUTER.USERS
       },
     ],
   };

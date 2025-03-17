@@ -1,6 +1,7 @@
 import { FormConfig } from '../types/formTypes';
 
 export const searchFormConfig: FormConfig = {
+  formId: 'search-form',
   title: 'Search Form Example',
   description: 'This form demonstrates the use of the search field type',
   sections: [
@@ -84,7 +85,7 @@ export const searchFormConfig: FormConfig = {
             searchParam: 'query',
             paginationEnabled: true,
             pageParam: 'page',
-            limitParam: 'limit',
+            limitParam: 'per_page',
             itemsPerPage: 10,
             totalCountHeader: 'X-Total-Count',
           },
@@ -125,7 +126,7 @@ export const searchFormConfig: FormConfig = {
   onSubmit: async (values) => {
     // Simulate API call
     console.log('Form values:', values);
-    
+
     // Simulate successful submission
     return new Promise((resolve) => {
       setTimeout(() => {
