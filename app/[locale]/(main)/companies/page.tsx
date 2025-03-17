@@ -11,14 +11,6 @@ import { statisticsConfig } from "@/modules/companies/components/statistics-conf
 import { companiesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useModal } from "@/hooks/use-modal";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { DialogHeader } from "@/modules/table/components/ui/dialog";
-import CircleCheckIcon from "@/public/icons/circle-check";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
 
 const CompaniesPage = () => {

@@ -10,10 +10,13 @@ import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
 import TrashIcon from "@/public/icons/trash";
 import { useTranslations } from "next-intl";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
+import { useModal } from "@/hooks/use-modal";
 
 const Execution = ({ id }: { id: string }) => {
+  const [isOpen, handleOpen, handleClose] = useModal();
   const t = useTranslations();
-  
+
   const menuItems = [
     {
       label: t("Companies.LoginAsManager"),
@@ -28,27 +31,35 @@ const Execution = ({ id }: { id: string }) => {
     {
       label: t("Companies.Delete"),
       icon: <TrashIcon className="w-4 h-4 me-2" />,
-      func: () => null,
+      func: handleOpen,
     },
   ];
-  
+
   return (
-    <DropdownMenu dir="rtl">
-      <DropdownMenuTrigger asChild>
-        <Button className="px-5 bg-[#8785A2] hover:bg-[#8785A2] rotate-svg-child">
-          {t("Companies.Actions")}
-          <ChevronDown />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {menuItems.map((item, index) => (
-          <DropdownMenuItem key={index}>
-            {item.icon}
-            {item.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu dir="rtl">
+        <DropdownMenuTrigger asChild>
+          <Button className="px-5 bg-[#8785A2] hover:bg-[#8785A2] rotate-svg-child">
+            {t("Companies.Actions")}
+            <ChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {menuItems.map((item, index) => (
+            <DropdownMenuItem key={index} onClick={item.func}>
+              {item.icon}
+              {item.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DeleteConfirmationDialog
+        deleteUrl={`/companies/${id}`}
+        onClose={handleClose}
+        open={isOpen}
+        onSuccess={() => console.log("success deleting")}
+      />
+    </>
   );
 };
 

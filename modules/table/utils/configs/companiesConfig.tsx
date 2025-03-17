@@ -53,13 +53,13 @@ export const CompaniesConfig = () => {
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
-      {
+/*       {
         key: "is_active",
         label: t("Companies.Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
           <TheStatus theStatus={value} id={row.id} />
         ),
-      },
+      }, */
       {
         key: "id",
         label: t("Companies.Actions"),
