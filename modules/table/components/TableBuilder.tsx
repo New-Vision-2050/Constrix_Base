@@ -28,11 +28,11 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   tableId = `table-${Math.random().toString(36).substring(2, 9)}`, // Generate a random ID if not provided
 }) => {
   const { toast } = useToast();
-  
+
   // Use the reset hook to clear table state on route changes
   // This prevents stale data when navigating between pages
   useResetTableOnRouteChange(tableId);
-  
+
   // Use URL from config if direct URL not provided
   const dataUrl = url || (config ? config.url : "");
 
@@ -92,7 +92,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Initialize columns from config immediately if available
   // Use a ref to track if we've already set the columns
   const columnsInitializedRef = React.useRef(false);
-  
+
   useEffect(() => {
     if (!columnsInitializedRef.current && config?.columns && config.columns.length > 0) {
       setColumns(config.columns);
@@ -107,7 +107,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const searchableColumns = columns.filter((col: ColumnConfig) => col.searchable);
   const hasSearchableColumns = searchableColumns.length > 0;
   const allSearchedFields = config?.allSearchedFields;
-  
+
 
   // Show error toast when an error occurs
   React.useEffect(() => {
@@ -156,14 +156,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             actions={searchBarActions} // Pass custom actions to SearchBar
           />
         )}
-        {/* Debug info */}
-        <div className="p-2 bg-gray-100 text-xs">
-          <div>Config Columns: {config?.columns?.length || 0}</div>
-          <div>Columns: {columns?.length || 0}</div>
-          <div>Visible Keys: {visibleColumnKeys?.length || 0}</div>
-          <div>Filtered Columns: {(config?.columns || columns).filter((col: ColumnConfig) => visibleColumnKeys.includes(col.key)).length}</div>
-        </div>
-        
+
         <DataTable
           data={data}
           // Ensure we have columns by not filtering if visibleColumnKeys is empty
