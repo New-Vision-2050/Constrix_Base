@@ -272,27 +272,57 @@ export const useTableInstance = (tableId: string) => {
     }
   }, [tableId]);
   
-  // Get the table state
-  const tableState = useTableStore((state) => state.tables[tableId] || getDefaultTableState());
+  // Create a stable reference for the default state
+  const defaultStateRef = useRef(getDefaultTableState());
   
-  // Get the actions for this table
-  const setData = (data: TableData[]) => useTableStore.getState().setData(tableId, data);
-  const setColumns = (columns: ColumnConfig[]) => useTableStore.getState().setColumns(tableId, columns);
-  const setVisibleColumns = (columnKeys: string[]) => useTableStore.getState().setVisibleColumns(tableId, columnKeys);
-  const toggleColumnVisibility = (columnKey: string) => useTableStore.getState().toggleColumnVisibility(tableId, columnKey);
-  const setLoading = (loading: boolean) => useTableStore.getState().setLoading(tableId, loading);
-  const setIsFirstLoad = (isFirstLoad: boolean) => useTableStore.getState().setIsFirstLoad(tableId, isFirstLoad);
-  const setError = (error: string | null) => useTableStore.getState().setError(tableId, error);
-  const setTotalItems = (totalItems: number) => useTableStore.getState().setTotalItems(tableId, totalItems);
-  const setPagination = (currentPage: number, totalPages: number, itemsPerPage: number) =>
-    useTableStore.getState().setPagination(tableId, currentPage, totalPages, itemsPerPage);
-  const setSort = (column: string | null, direction: SortDirection) =>
-    useTableStore.getState().setSort(tableId, column, direction);
-  const setSearch = (query: string, fields?: string[]) =>
-    useTableStore.getState().setSearch(tableId, query, fields);
-  const setColumnSearch = (columnKey: string, value: string | string[]) =>
-    useTableStore.getState().setColumnSearch(tableId, columnKey, value);
-  const resetTable = () => useTableStore.getState().resetTable(tableId);
+  // Use a memoized selector to prevent infinite loops
+  const selector = useCallback(
+    (state: TableState) => state.tables[tableId] || defaultStateRef.current,
+    [tableId]
+  );
+  
+  // Get the table state using the memoized selector
+  const tableState = useTableStore(selector);
+  
+  // Get the actions for this table with memoization to prevent unnecessary re-renders
+  const setData = useCallback((data: TableData[]) =>
+    useTableStore.getState().setData(tableId, data), [tableId]);
+    
+  const setColumns = useCallback((columns: ColumnConfig[]) =>
+    useTableStore.getState().setColumns(tableId, columns), [tableId]);
+    
+  const setVisibleColumns = useCallback((columnKeys: string[]) =>
+    useTableStore.getState().setVisibleColumns(tableId, columnKeys), [tableId]);
+    
+  const toggleColumnVisibility = useCallback((columnKey: string) =>
+    useTableStore.getState().toggleColumnVisibility(tableId, columnKey), [tableId]);
+    
+  const setLoading = useCallback((loading: boolean) =>
+    useTableStore.getState().setLoading(tableId, loading), [tableId]);
+    
+  const setIsFirstLoad = useCallback((isFirstLoad: boolean) =>
+    useTableStore.getState().setIsFirstLoad(tableId, isFirstLoad), [tableId]);
+    
+  const setError = useCallback((error: string | null) =>
+    useTableStore.getState().setError(tableId, error), [tableId]);
+    
+  const setTotalItems = useCallback((totalItems: number) =>
+    useTableStore.getState().setTotalItems(tableId, totalItems), [tableId]);
+    
+  const setPagination = useCallback((currentPage: number, totalPages: number, itemsPerPage: number) =>
+    useTableStore.getState().setPagination(tableId, currentPage, totalPages, itemsPerPage), [tableId]);
+    
+  const setSort = useCallback((column: string | null, direction: SortDirection) =>
+    useTableStore.getState().setSort(tableId, column, direction), [tableId]);
+    
+  const setSearch = useCallback((query: string, fields?: string[]) =>
+    useTableStore.getState().setSearch(tableId, query, fields), [tableId]);
+    
+  const setColumnSearch = useCallback((columnKey: string, value: string | string[]) =>
+    useTableStore.getState().setColumnSearch(tableId, columnKey, value), [tableId]);
+    
+  const resetTable = useCallback(() =>
+    useTableStore.getState().resetTable(tableId), [tableId]);
   
   return {
     // State

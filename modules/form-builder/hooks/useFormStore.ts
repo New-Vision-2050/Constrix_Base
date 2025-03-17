@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { ValidationRule } from "../types/formTypes";
 import axios from "axios";
 import { debounce } from "lodash";
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useRef } from "react";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -369,8 +369,17 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     }
   }, [formId, JSON.stringify(initialValues)]);
   
-  // Get the form state
-  const formState = useFormStore((state) => state.forms[formId] || getDefaultFormState(initialValues));
+  // Create a stable reference for the default state
+  const defaultStateRef = useRef(getDefaultFormState(initialValues));
+  
+  // Use a memoized selector to prevent infinite loops
+  const selector = useCallback(
+    (state: FormState) => state.forms[formId] || defaultStateRef.current,
+    [formId] // We don't need to include initialValues here since we're using a ref
+  );
+  
+  // Get the form state using the memoized selector
+  const formState = useFormStore(selector);
   
   // Get the actions for this form
   const setValue = useCallback((field: string, value: any) => {
