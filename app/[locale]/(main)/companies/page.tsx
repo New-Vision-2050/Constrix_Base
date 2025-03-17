@@ -31,7 +31,9 @@ const CompaniesPage = () => {
       tableStore.setLoading(false);
     }, 100);
 
-    const companyId = values?.result?.data?.payload?.id;
+    // Add type safety for the result structure
+    const result = values.result as { data?: { payload?: { id?: string } } } | undefined;
+    const companyId = result?.data?.payload?.id || '';
     setCompanyNumber(companyId);
     handleOpen();
 

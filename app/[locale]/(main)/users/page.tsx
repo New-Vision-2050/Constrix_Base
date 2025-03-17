@@ -1,7 +1,7 @@
 "use client";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { Button } from "@/components/ui/button";
-import { SheetFormBuilder, sheetFormConfig } from "@/modules/form-builder";
+import { SheetFormBuilder } from "@/modules/form-builder";
 import ExportButton from "@/modules/table/components/ExportButton";
 import TableBuilder from "@/modules/table/components/TableBuilder";
 import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
@@ -22,7 +22,7 @@ const UsersPage = () => {
             <ExportButton data={["omar"]} />
             <SheetFormBuilder
               config={companyUserFormConfig}
-              trigger={<Button>Open Form</Button>}
+              trigger={<Button>إنشاء مستخدم</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);
               }}

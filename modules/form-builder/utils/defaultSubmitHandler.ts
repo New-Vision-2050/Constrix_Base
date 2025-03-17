@@ -12,6 +12,7 @@ export const defaultSubmitHandler = async (
   success: boolean;
   message?: string;
   errors?: Record<string, string | string[]>;
+  data?: any;
 }> => {
   try {
     // Log the form submission
