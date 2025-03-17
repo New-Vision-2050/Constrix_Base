@@ -7,6 +7,7 @@ import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
+import { Toaster } from "@/modules/table/components/ui/toaster";
 
 const theSans = localFont({
   src: [
@@ -51,6 +52,7 @@ export default async function RootLayout({
           <main>
             <ReactQueryProvider>{children}</ReactQueryProvider>
           </main>
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>
