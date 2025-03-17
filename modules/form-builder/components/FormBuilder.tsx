@@ -147,6 +147,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             stepResponses={stepResponses}
             getStepResponseData={getStepResponseData}
             currentStep={currentStep}
+            clearFiledError={clearFiledError}
           />
         ) : isAccordion ? (
           config.sections.map((section, index) => (
@@ -184,6 +185,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               onChange={(field, value) => setValue(field, value)}
               onBlur={(field) => setTouched(field, true)}
               collapsible={section.collapsible}
+              clearFiledError={clearFiledError}
             />
           ))
         )}
