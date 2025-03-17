@@ -9,7 +9,6 @@ interface UseFormWithTableReloadProps {
   tableId: string;
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
-  formId?: string;
 }
 
 /**
@@ -21,14 +20,10 @@ export const useFormWithTableReload = ({
   tableId,
   onSuccess,
   onCancel,
-  formId,
 }: UseFormWithTableReloadProps) => {
-  // Use formId from config if provided, otherwise use the prop or default
-  const actualFormId = config.formId || formId || 'form-with-table-reload';
   // Get the form functionality
   const form = useSheetForm({
     config,
-    formId: actualFormId,
     onSuccess: (data) => {
       // Call the original onSuccess if provided
       if (onSuccess) {

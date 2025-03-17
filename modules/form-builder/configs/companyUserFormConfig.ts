@@ -2,6 +2,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 
 export const companyUserFormConfig: FormConfig = {
+    formId: "company-user-form",
     title: "إنشاء مستخدم",
     apiUrl: `${baseURL}/company-users`,
     laravelValidation: {

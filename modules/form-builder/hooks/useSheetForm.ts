@@ -9,7 +9,6 @@ interface UseSheetFormProps {
   config: FormConfig;
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
-  formId?: string;
 }
 
 interface UseSheetFormResult {
@@ -59,10 +58,9 @@ export function useSheetForm({
   config,
   onSuccess,
   onCancel,
-  formId,
 }: UseSheetFormProps): UseSheetFormResult {
-  // Use formId from config if provided, otherwise use the prop or default
-  const actualFormId = config.formId || formId || 'sheet-form';
+  // Use formId from config if provided, otherwise use default
+  const actualFormId = config.formId || 'sheet-form';
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
   

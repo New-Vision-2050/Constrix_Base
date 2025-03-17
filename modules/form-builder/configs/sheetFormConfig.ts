@@ -22,6 +22,7 @@ const countrySearchConfig: SearchTypeConfig = {
 
 // Define the form configuration
 export const sheetFormConfig: FormConfig = {
+  formId: "sheet-form",
   title: "Contact Us",
   description: "Fill out the form below to get in touch with us.",
   apiUrl: `${baseURL}/companies`,

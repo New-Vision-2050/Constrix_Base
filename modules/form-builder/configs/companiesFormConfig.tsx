@@ -6,6 +6,7 @@ import { Checkbox } from "@/modules/table/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
 export const companiesFormConfig: FormConfig = {
+  formId: "companies-form",
   title: "اضافة شركة جديدة",
   apiUrl: `${baseURL}/companies`,
   laravelValidation: {

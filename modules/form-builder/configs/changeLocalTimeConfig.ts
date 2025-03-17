@@ -3,6 +3,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 
 export const changeLocalTimeConfig: FormConfig = {
+  formId: "change-local-time-form",
   title: "تغيير المنطقة الزمنية",
   apiUrl: `${baseURL}/companies`,
   laravelValidation: {

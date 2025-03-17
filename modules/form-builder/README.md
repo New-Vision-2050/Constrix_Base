@@ -34,7 +34,6 @@ const MyForm = () => {
 - `onCancel`: Optional callback when form is cancelled
 - `side`: Optional side for the sheet ('top', 'right', 'bottom', 'left')
 - `className`: Optional additional CSS classes
-- `formId`: Optional unique identifier for this form instance
 
 ### FormBuilder
 
@@ -375,6 +374,30 @@ If no `successCondition` is provided, the system will automatically check for co
 3. `response.valid === true`
 4. `response.isValid === true`
 
+## Form ID Management
+
+The form builder now requires that form IDs be specified in the form configuration object rather than passed as a prop to components or hooks. This change centralizes form identification and makes it easier to manage forms across your application.
+
+### Best Practices for Form IDs
+
+1. **Always specify a formId in your form config**:
+   ```tsx
+   const formConfig = {
+     formId: "unique-form-id", // Always include this
+     title: "My Form",
+     // ...other properties
+   };
+   ```
+
+2. **Use descriptive, unique IDs**:
+   Choose IDs that describe the form's purpose, such as "user-registration-form" or "product-order-form".
+
+3. **Consistent ID format**:
+   Use a consistent format for your form IDs, such as kebab-case (e.g., "contact-form") or camelCase (e.g., "contactForm").
+
+4. **Reference the same ID across your application**:
+   When you need to access a form from another component, use the same ID that you specified in the form config.
+
 ## Form Configuration
 
 Forms are configured using a `FormConfig` object:
@@ -426,7 +449,7 @@ const formConfig: FormConfig = {
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `formId` | `string` | Unique identifier for the form instance |
+| `formId` | `string` | Unique identifier for the form instance (recommended to always specify this) |
 | `title` | `string` | Form title |
 | `description` | `string` | Form description |
 | `className` | `string` | Additional CSS classes |
@@ -537,16 +560,22 @@ The Form Builder module provides a way to access and control forms from any comp
 
 ### Accessing a Form by ID
 
-Each form in the system has a unique ID that can be used to access it. You can specify this ID when creating the form, or the system will generate one for you.
+Each form in the system has a unique ID that can be used to access it. You should specify this ID in the form configuration object.
 
 ```tsx
 import { SheetFormBuilder } from '@/modules/form-builder';
+
+// Define your form configuration with a formId
+const formConfig = {
+  formId: "my-unique-form-id", // Specify the form ID in the config
+  title: "My Form",
+  // ... other config properties
+};
 
 function MyComponent() {
   return (
     <SheetFormBuilder
       config={formConfig}
-      formId="my-unique-form-id" // Specify a custom form ID
     />
   );
 }
@@ -574,8 +603,9 @@ function ExternalComponent() {
       import('@/modules/form-builder').then(({ useSheetForm }) => {
         // Create a temporary hook instance to access the closeSheet method
         const { closeSheet } = useSheetForm({
-          config: {}, // Empty config is fine for just closing
-          formId: 'my-unique-form-id',
+          config: {
+            formId: 'my-unique-form-id', // Specify the form ID in the config
+          },
         });
         
         // Close the sheet
@@ -643,8 +673,9 @@ export function useFormController(formId: string) {
       // Import dynamically to avoid circular dependencies
       import('@/modules/form-builder').then(({ useSheetForm }) => {
         const { closeSheet } = useSheetForm({
-          config: {},
-          formId,
+          config: {
+            formId, // Specify the form ID in the config
+          },
         });
         closeSheet();
       });

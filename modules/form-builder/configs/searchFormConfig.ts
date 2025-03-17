@@ -1,6 +1,7 @@
 import { FormConfig } from '../types/formTypes';
 
 export const searchFormConfig: FormConfig = {
+  formId: 'search-form',
   title: 'Search Form Example',
   description: 'This form demonstrates the use of the search field type',
   sections: [
