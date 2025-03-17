@@ -1,5 +1,4 @@
 import React from "react";
-import { Eye, EyeOff } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -8,8 +7,9 @@ import {
 import { Button } from "@/modules/table/components/ui/button";
 import { Checkbox } from "@/modules/table/components/ui/checkbox";
 import { Label } from "@/modules/table/components/ui/label";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ColumnConfig } from "@/modules/table/utils/configs/columnConfig";
+import VisibilityIcon from "@/public/icons/visability";
 
 interface ColumnVisibilityProps {
   columns: ColumnConfig[];
@@ -27,7 +27,9 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
   onSetMinimalColumnsVisible,
 }) => {
   const t = useTranslations();
-  
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
   if (columns.length === 0) return null;
 
   return (
@@ -40,10 +42,10 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
           className="flex-shrink-0 bg-sidebar"
           title={t("Table.ToggleColumns") || "Toggle visible columns"}
         >
-          <Eye className="h-4 w-4" />
+          <VisibilityIcon />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-56">
+      <PopoverContent className="w-56" align={isRtl ? "end" : "start"}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-medium text-sm">
@@ -72,10 +74,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
           </div>
           <div className="space-y-2">
             {columns.map((column) => (
-              <div
-                key={column.key}
-                className="flex items-center space-x-2"
-              >
+              <div key={column.key} className="flex items-center gap-x-2">
                 <Checkbox
                   id={`column-visibility-${column.key}`}
                   checked={visibleColumnKeys.includes(column.key)}
@@ -92,7 +91,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
           </div>
           <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground">
-              {visibleColumnKeys.length} of {columns.length} columns visible
+              {visibleColumnKeys.length} من {columns.length} اعمدة مرئية
             </p>
           </div>
         </div>

@@ -49,13 +49,13 @@ const CompaniesPage = () => {
       <TableBuilder
         config={config}
         searchBarActions={
-          <div>
-            <ExportButton data={["omar"]} />
+          <div className="flex items-center gap-3">
             <SheetFormBuilder
               config={companiesFormConfig}
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
+            <ExportButton data={["omar"]} />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}
