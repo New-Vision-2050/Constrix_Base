@@ -116,9 +116,9 @@ export const UsersConfig = () => {
                       </span>
                     ) : (
                       <span
-                        key={index}
-                        className="w-5 h-5 flex items-center"
-                      ></span>
+    key={index}
+    className="w-5 h-5 flex items-center"
+    />
                     );
                   })}
                 </div>
@@ -141,7 +141,7 @@ export const UsersConfig = () => {
     ],
     allSearchedFields: [
       {
-        key: "country",
+        key: "company_id",
         searchType: {
           type: "dropdown",
           placeholder: "الشركة",
@@ -170,10 +170,10 @@ export const UsersConfig = () => {
         },
       },
       {
-        key: "email",
+        key: "ephone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال",
+          placeholder: "البريد الإليكتروني / الجوال"
         },
       },
     ],

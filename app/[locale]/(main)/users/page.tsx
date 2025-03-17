@@ -22,7 +22,7 @@ const UsersPage = () => {
             <ExportButton data={["omar"]} />
             <SheetFormBuilder
               config={companyUserFormConfig}
-              trigger={<Button>Open Form</Button>}
+              trigger={<Button>إنشاء مستخدم</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);
               }}

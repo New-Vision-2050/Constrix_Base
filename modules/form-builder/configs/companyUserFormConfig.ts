@@ -40,7 +40,7 @@ export const companyUserFormConfig: FormConfig = {
                     name: "first_name",
                     label: "اسم المستخدم الاول",
                     type: "text",
-                    placeholder: "Enter your name",
+                    placeholder: "اسم المستخدم الاول",
                     required: true,
                     validation: [
                         {
@@ -76,7 +76,7 @@ export const companyUserFormConfig: FormConfig = {
                     name: "email",
                     label: "البريد الإلكتروني",
                     type: "email",
-                    placeholder: "Enter your email",
+                    placeholder: "البريد الإلكتروني",
                     required: true,
                     validation: [
                         {
@@ -93,7 +93,7 @@ export const companyUserFormConfig: FormConfig = {
                     name: "phone",
                     label: "الهاتف",
                     type: "phone",
-                    placeholder: "Enter your phone",
+                    placeholder: "الهاتف",
                     validation: [
                         {
                             type: "required",
