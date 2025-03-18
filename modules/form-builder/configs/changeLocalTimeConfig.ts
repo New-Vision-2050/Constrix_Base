@@ -45,9 +45,9 @@ export const changeLocalTimeConfig: FormConfig = {
           placeholder: "اختر المنطقة الزمنية",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/countries`,
+            url: `${baseURL}/time_zones`,
             valueField: "id",
-            labelField: "name",
+            labelField: "time_zone",
             searchParam: "name",
             paginationEnabled: true,
             pageParam: "page",
@@ -58,7 +58,7 @@ export const changeLocalTimeConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "ادخل لبمنطقة الزمنية",
+              message: "ادخل المنطقة الزمنية",
             },
           ],
         },
@@ -69,10 +69,10 @@ export const changeLocalTimeConfig: FormConfig = {
           placeholder: "اختر العملة",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/countries`,
+            url: `${baseURL}/currencies`,
             valueField: "id",
-            labelField: "name",
-            searchParam: "name",
+            labelField: "short_name",
+            searchParam: "short_name",
             paginationEnabled: true,
             pageParam: "page",
             limitParam: "per_page",
@@ -89,11 +89,11 @@ export const changeLocalTimeConfig: FormConfig = {
         {
           type: "select",
           name: "language",
-          label: "العملة",
-          placeholder: "اختر العملة",
+          label: "اللغة",
+          placeholder: "اختر اللغة",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/countries`,
+            url: `${baseURL}/languages`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
@@ -106,15 +106,15 @@ export const changeLocalTimeConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "ادخل العملة",
+              message: "ادخل اللغة",
             },
           ],
         },
-     
+
       ],
     },
   ],
-  submitButtonText: "Send Message",
+  submitButtonText: "حفظ",
   cancelButtonText: "Cancel",
   showReset: false,
   resetButtonText: "Clear Form",
@@ -127,14 +127,8 @@ export const changeLocalTimeConfig: FormConfig = {
     console.log('Form submitted with values:', values);
     const formStore = useFormStore.getState();
     formStore.setValue('companies-form', 'local-time', values);
+        return { success: true };
 
-
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true });
-      }, 1500);
-    });
   },
 
   // Example onSuccess handler

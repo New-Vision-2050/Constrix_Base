@@ -189,12 +189,12 @@ export const companiesFormConfig: FormConfig = {
           name: "first_name",
           label: "اسم المستخدم الاول",
           type: "text",
-          placeholder: "Enter your name",
+          placeholder: "ادخل اسم المستخدم الاول",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "اسم المستخدم الاول مطلوب",
             },
             {
               type: "minLength",
@@ -207,12 +207,12 @@ export const companiesFormConfig: FormConfig = {
           name: "last_name",
           label: "اسم المستخدم ألأحير",
           type: "text",
-          placeholder: "سم المستخدم ألأحير",
+          placeholder: "اسم المستخدم ألأحير",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "الاسم مطلوب",
             },
             {
               type: "minLength",
@@ -225,12 +225,12 @@ export const companiesFormConfig: FormConfig = {
           name: "email",
           label: "البريد الإلكتروني",
           type: "email",
-          placeholder: "Enter your email",
+          placeholder: "ادخل البريد الإلكتروني",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Email is required",
+              message: "البريد الإلكتروني مطلوب",
             },
             {
               type: "email",

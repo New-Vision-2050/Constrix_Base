@@ -281,7 +281,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 {isSubmittingStep ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Submitting...
+                    جاري الحفظ
                   </span>
                 ) : (
                   config.wizardOptions?.submitButtonTextPerStep || "Submit Step"
@@ -314,7 +314,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 {isSubmitting && config.showSubmitLoader ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Submitting...
+                    جاري الحفظ
                   </span>
                 ) : (
                   config.wizardOptions?.finishButtonText ||
@@ -336,7 +336,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             {isSubmitting && config.showSubmitLoader ? (
               <span className="flex items-center">
                 <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                Submitting...
+                جاري الحفظ
               </span>
             ) : (
               config.submitButtonText || "Submit"

@@ -70,12 +70,12 @@ export const formConfig: FormConfig = {
           name: 'name',
           label: 'Full Names',
           type: 'text',
-          placeholder: 'Enter your name',
+          placeholder: 'ادخل اسمك',
           required: true,
           validation: [
             {
               type: 'required',
-              message: 'Name is required'
+              message: 'الاسم مطلوب'
             },
             {
               type: 'minLength',
@@ -93,7 +93,7 @@ export const formConfig: FormConfig = {
           validation: [
             {
               type: 'required',
-              message: 'Email is required'
+              message: 'البريد الالكترونى مطلوب'
             },
             {
               type: 'email',
