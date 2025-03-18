@@ -18,7 +18,6 @@ interface DropdownSearchProps {
   placeholder?: string;
   isMulti?: boolean;
 }
-
 const DropdownSearch: React.FC<DropdownSearchProps> = ({
   columnKey,
   label,
@@ -31,6 +30,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   isMulti = false,
 }) => {
   const { toast } = useToast();
+
   const [previousDependencyValues, setPreviousDependencyValues] = useState<
     Record<string, string | string[]>
   >({});

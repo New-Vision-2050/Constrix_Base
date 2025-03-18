@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { create } from 'zustand';
 import URLInput from '@/modules/table/components/URLInput';
@@ -82,31 +82,21 @@ const Index = () => {
   const EnhancedTableBuilder = useCallback(() => {
     if (!url) return null;
     
-    const handleDataUpdated = (newData: any[]) => {
-      handleDataUpdate(newData);
-    };
+    // Define a unique table ID for this table
+    const indexTableId = "index-table";
     
-    // We'll intercept the data from TableBuilder using an effect in a wrapper component
-    const TableBuilderWrapper = () => {
-      const { data } = useTableStore((state) => ({ data: state.data }));
-      
-      React.useEffect(() => {
-        if (data && data.length > 0) {
-          handleDataUpdated(data);
-        }
-      }, [data]);
-      
-      return (
-        <TableBuilder 
-          url={url} 
-          onReset={handleReset} 
-          searchBarActions={renderSearchBarActions()} 
-        />
-      );
-    };
-    
-    return <TableBuilderWrapper />;
-  }, [url, handleReset, handleDataUpdate]);
+    return (
+      <TableBuilder
+        url={url}
+        config={{
+          tableId: indexTableId,
+          url: url
+        }}
+        onReset={handleReset}
+        searchBarActions={renderSearchBarActions()}
+      />
+    );
+  }, [url, handleReset, renderSearchBarActions]);
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-background to-secondary/50">
@@ -140,107 +130,102 @@ const Index = () => {
         <URLInput onSubmit={handleSubmit} />
         
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="mb-4 mx-auto">
-            <TabsTrigger value="custom">Custom URL</TabsTrigger>
-            <TabsTrigger value="examples">Example Configurations</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="custom" className="w-full">
-            <AnimatePresence mode="wait">
-              {isLoading ? (
-                <motion.div
-                  key="loading"
-                  className="flex-1 flex flex-col items-center justify-center py-12"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LoadingSpinner text="Preparing your data visualization..." />
-                </motion.div>
-              ) : url ? (
-                <motion.div 
-                  key="table"
-                  className="w-full"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <EnhancedTableBuilder />
-                </motion.div>
-              ) : (
-                <motion.div 
-                  key="placeholder"
-                  className="flex-1 flex flex-col items-center justify-center py-12"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="glass-panel rounded-2xl p-8 max-w-lg w-full text-center">
-                    <div className="rounded-full bg-primary/10 h-16 w-16 flex items-center justify-center mx-auto mb-6">
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="24" 
-                        height="24" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        className="text-primary"
-                      >
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <path d="M3 9h18" />
-                        <path d="M9 21V9" />
-                      </svg>
-                    </div>
-                    <h2 className="text-2xl font-medium mb-3">Enter a URL to begin</h2>
-                    <p className="text-muted-foreground mb-6">
-                      Paste any JSON API URL or data endpoint to automatically generate an interactive table.
-                    </p>
-                    <div className="text-sm text-muted-foreground space-y-2">
-                      <p>Try these example URLs:</p>
-                      <ul className="space-y-1">
-                        <li><code className="bg-secondary p-1 rounded">https://jsonplaceholder.typicode.com/users</code></li>
-                        <li><code className="bg-secondary p-1 rounded">https://jsonplaceholder.typicode.com/posts</code></li>
-                        <li><code className="bg-secondary p-1 rounded">https://jsonplaceholder.typicode.com/todos</code></li>
-                      </ul>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </TabsContent>
-          
-          <TabsContent value="examples" className="w-full">
-            <motion.div 
-              className="w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ConfigurableTable 
-                configs={exampleConfigs} 
-                searchBarActions={renderSearchBarActions()}
-              />
-            </motion.div>
-          </TabsContent>
-        </Tabs>
-         <TableBuilder 
-                      config={usersConfig} 
-                      searchBarActions={renderSearchBarActions()} 
-                    />
+         <TabsList className="mb-4 mx-auto">
+           <TabsTrigger value="custom">Custom URL</TabsTrigger>
+           <TabsTrigger value="examples">Example Configurations</TabsTrigger>
+         </TabsList>
+         
+         <TabsContent value="custom" className="w-full">
+           <AnimatePresence mode="wait">
+             {isLoading ? (
+               <motion.div
+                 key="loading"
+                 className="flex-1 flex flex-col items-center justify-center py-12"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+                 transition={{ duration: 0.3 }}
+               >
+                 <LoadingSpinner text="Preparing your data visualization..." />
+               </motion.div>
+             ) : url ? (
+               <motion.div
+                 key="table"
+                 className="w-full"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+                 transition={{ duration: 0.3 }}
+               >
+                 <EnhancedTableBuilder />
+               </motion.div>
+             ) : (
+               <motion.div
+                 key="placeholder"
+                 className="flex-1 flex flex-col items-center justify-center py-12"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 exit={{ opacity: 0 }}
+                 transition={{ duration: 0.3 }}
+               >
+                 <div className="glass-panel rounded-2xl p-8 max-w-lg w-full text-center">
+                   <div className="rounded-full bg-primary/10 h-16 w-16 flex items-center justify-center mx-auto mb-6">
+                     <svg
+                       xmlns="http://www.w3.org/2000/svg"
+                       width="24"
+                       height="24"
+                       viewBox="0 0 24 24"
+                       fill="none"
+                       stroke="currentColor"
+                       strokeWidth="2"
+                       strokeLinecap="round"
+                       strokeLinejoin="round"
+                       className="text-primary"
+                     >
+                       <rect x="3" y="3" width="18" height="18" rx="2" />
+                       <path d="M3 9h18" />
+                       <path d="M9 21V9" />
+                     </svg>
+                   </div>
+                   <h2 className="text-2xl font-medium mb-3">Enter a URL to begin</h2>
+                   <p className="text-muted-foreground mb-6">
+                     Paste any JSON API URL or data endpoint to automatically generate an interactive table.
+                   </p>
+                   <div className="text-sm text-muted-foreground space-y-2">
+                     <p>Try these example URLs:</p>
+                     <ul className="space-y-1">
+                       <li><code className="bg-secondary p-1 rounded">https://jsonplaceholder.typicode.com/users</code></li>
+                       <li><code className="bg-secondary p-1 rounded">https://jsonplaceholder.typicode.com/posts</code></li>
+                       <li><code className="bg-secondary p-1 rounded">https://jsonplaceholder.typicode.com/todos</code></li>
+                     </ul>
+                   </div>
+                 </div>
+               </motion.div>
+             )}
+           </AnimatePresence>
+         </TabsContent>
+         
+         <TabsContent value="examples" className="w-full">
+           <motion.div
+             className="w-full"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             transition={{ duration: 0.3 }}
+           >
+             <ConfigurableTable
+               configs={exampleConfigs}
+               searchBarActions={renderSearchBarActions()}
+             />
+           </motion.div>
+         </TabsContent>
+       </Tabs>
       </main>
     </div>
   );
 };
 
-// Add this import at the top of your file
-import { useTableStore } from '@/modules/table/store//useTableStore';
-import { usersConfig } from '@/modules/table/utils/configs/usersConfig';
+// Import the table store
+import { useTableStore } from '@/modules/table/store/useTableStore';
 
 export default React.memo(Index);

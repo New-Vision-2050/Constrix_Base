@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 import { Input } from "@/modules/table/components/ui/input";
 import { FieldConfig } from "../../types/formTypes";
 import { cn } from "@/lib/utils";
-import { useFormStore } from "../../hooks/useFormStore";
+import { useFormInstance } from "../../hooks/useFormStore";
 import { XCircle, CheckCircle } from "lucide-react";
 import { hasApiValidation } from "../../utils/apiValidation";
 import { useLocale } from "next-intl";
@@ -10,12 +10,13 @@ import { useLocale } from "next-intl";
 interface TextFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   type?: "text" | "email" | "password" | "number";
   onChange: (value: string) => void;
   onBlur: () => void;
   isValidating?: boolean;
+  formId?: string;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -27,6 +28,7 @@ const TextField: React.FC<TextFieldProps> = ({
   onChange,
   onBlur,
   isValidating,
+  formId = 'default',
 }) => {
   // Track whether the field has been API validated
   const [hasBeenApiValidated, setHasBeenApiValidated] = useState(false);
@@ -35,23 +37,23 @@ const TextField: React.FC<TextFieldProps> = ({
   const locale = useLocale();
   const isRtl = locale === "ar";
 
-  // Get validating state and errors from the store
-  const formStore = useFormStore();
-  const validatingFields = formStore.validatingFields;
-  const storeErrors = formStore.errors;
+  // Get form instance from the store
+  const formInstance = useFormInstance(formId);
+  const validatingFields = formInstance.validatingFields || {};
+  const storeErrors = formInstance.errors || {};
   const isFieldValidating = isValidating || validatingFields[field.name];
 
   // Check for errors in both the form store and the local state
   const hasStoreError = !!storeErrors[field.name];
-  const hasLocalError = error && touched;
+  const hasLocalError = !!error && touched;
   const showError = hasLocalError || hasStoreError;
 
   // Clear store error when value is empty
   useEffect(() => {
     if (hasStoreError && (!value || value === "")) {
-      formStore.setError(field.name, null);
+      formInstance.setError(field.name, null);
     }
-  }, [field.name, value, hasStoreError, formStore]);
+  }, [field.name, value, hasStoreError, formInstance]);
 
   // Check if this field has API validation
   const hasApiVal = field.validation

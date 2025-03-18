@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar } from '@/modules/table/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/table/components/ui/popover';
@@ -6,11 +6,12 @@ import { Button } from '@/modules/table/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import { FieldConfig } from '../../types/formTypes';
 import { cn } from '@/lib/utils';
+import { DayPickerSingleProps } from 'react-day-picker'; 
 
-interface DateFieldProps {
+interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;
@@ -23,11 +24,13 @@ const DateField: React.FC<DateFieldProps> = ({
   touched,
   onChange,
   onBlur,
+  ...props
 }) => {
   const date = value ? new Date(value) : undefined;
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
           id={field.name}
@@ -35,7 +38,7 @@ const DateField: React.FC<DateFieldProps> = ({
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
-            error && touched ? 'border-destructive' : '',
+            !!error && touched ? 'border-destructive' : '',
             field.className,
             field.width ? field.width : 'w-full'
           )}
@@ -52,9 +55,11 @@ const DateField: React.FC<DateFieldProps> = ({
           onSelect={(date) => {
             onChange(date ? date.toISOString() : '');
             onBlur();
+            setIsOpen(false);
           }}
           disabled={field.disabled}
           initialFocus
+          {...props}
         />
       </PopoverContent>
     </Popover>

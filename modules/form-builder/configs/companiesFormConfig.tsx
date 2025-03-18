@@ -2,8 +2,10 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
+import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 
 export const companiesFormConfig: FormConfig = {
+  formId: "companies-form",
   title: "اضافة شركة جديدة",
   apiUrl: `${baseURL}/companies`,
   laravelValidation: {
@@ -126,7 +128,42 @@ export const companiesFormConfig: FormConfig = {
               message: "مسؤول الدعم",
             },
           ],
+        },  
+        {
+          type: "checkbox",
+          name: "change_local_time",
+          label: "الشركة",
+          placeholder: "اختر الشركة",
+          render: (field: any, value: boolean, onChange: (value: boolean) => void) => {
+            return <TimeZoneCheckbox field={field} value={value} onChange={onChange} />;
+          },
+          validation: [
+            {
+              type: 'custom',
+              message: 'Order must have at least one item',
+              validator: (value) => {
+
+                console.log('checkbox error: -----: ' , value)
+              
+                return false
+              }
+            },
+          ]
         },
+        {
+          type: 'hiddenObject',
+          name: 'local-time',
+          label: 'local-time',
+          condition(values) {
+            return !!values['change_local_time']
+          }, 
+          defaultValue: {
+            companyType: 'llc',
+            employeeCount: 0,
+            industry: 'technology',
+            taxExempt: false
+          }
+        }
       ],
     },
     {
@@ -237,6 +274,9 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
+
+      
+      
       ],
     },
   ],
@@ -282,23 +322,27 @@ export const companiesFormConfig: FormConfig = {
 
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
-           // Option to call default way to handle the step
-      const result =   await defaultStepSubmitHandler(step, values, companiesFormConfig);
-      if(result.success) {
-          // Simulate API call
-          return new Promise((resolve) => {
-              resolve({
-                  success: true,
-                  message: `Step ${step + 1} submitted successfully`,
-                  data: {
-                      // For step 0 (location), return a generated ID
-                      ...(step === 0 && result.data?.payload?.id && {
-                          company_id: result.data.payload.id
-                      }),
-
-                  },
-              });
+      // Option to call default way to handle the step
+      const result = await defaultStepSubmitHandler(
+        step,
+        values,
+        companiesFormConfig
+      );
+      if (result.success) {
+        // Simulate API call
+        return new Promise((resolve) => {
+          resolve({
+            success: true,
+            message: `Step ${step + 1} submitted successfully`,
+            data: {
+              // For step 0 (location), return a generated ID
+              ...(step === 0 &&
+                result.data?.payload?.id && {
+                  company_id: result.data.payload.id,
+                }),
+            },
           });
+        });
       }
       return result;
     },

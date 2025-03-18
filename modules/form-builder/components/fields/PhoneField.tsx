@@ -38,7 +38,7 @@ const countryCodes = [
 interface PhoneFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;
@@ -141,7 +141,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             placeholder={field.placeholder || "Enter phone number"}
             className={cn(
               "w-full",
-              error && touched ? "border-red-500" : ""
+              !!error && touched ? "border-red-500" : ""
             )}
             disabled={field.disabled}
             required={field.required}
@@ -197,7 +197,9 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
       {/* Show either the form validation error or our local validation error */}
       {((error && touched) || localError) && (
-        <p className="text-red-500 text-sm mt-1">{error || localError}</p>
+        <div className="text-red-500 text-sm mt-1">
+          {typeof error === 'string' ? error || localError : error}
+        </div>
       )}
 
       {/* Only show helper text if there's no error */}

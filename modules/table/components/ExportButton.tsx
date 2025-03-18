@@ -111,7 +111,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="bg-sidebar" size="sm">
+        <Button variant="outline" className="bg-sidebar h-10" size="sm">
           <Download className="mr-2 h-4 w-4" />
           {t("Table.Export")}
         </Button>

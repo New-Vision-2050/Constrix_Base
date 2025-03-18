@@ -1,5 +1,4 @@
-import { SearchTypeConfig } from "@/components/shared/dropdowns/sharedTypes";
-import { FormConfig } from "../types/formTypes";
+import { FormConfig, SearchTypeConfig } from "../types/formTypes";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { baseURL } from "@/config/axios-config";
 
@@ -22,6 +21,7 @@ const countrySearchConfig: SearchTypeConfig = {
 
 // Define the form configuration
 export const sheetFormConfig: FormConfig = {
+  formId: "sheet-form",
   title: "Contact Us",
   description: "Fill out the form below to get in touch with us.",
   apiUrl: `${baseURL}/companies`,

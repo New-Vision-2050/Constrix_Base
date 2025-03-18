@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight, Check } from 'lucide-react';
-import { FormSection } from '../types/formTypes';
-import FormField from './FormField';
-import { cn } from '@/lib/utils';
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight, Check } from "lucide-react";
+import { FormSection } from "../types/formTypes";
+import FormField from "./FormField";
+import { cn } from "@/lib/utils";
 
 interface ExpandableFormSectionProps {
   section: FormSection;
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   defaultOpen?: boolean;
   collapsible?: boolean;
@@ -44,7 +48,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   clearFiledError,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  
+
   // Force close if forceDisabled is true (not the active step)
   // Force open if not forceDisabled (is the active step)
   useEffect(() => {
@@ -57,12 +61,12 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
 
   // Check if section has any errors
   const hasErrors = section.fields.some(field => errors[field.name] && touched[field.name]);
-  
+
   // Check if section is completed (all required fields filled and no errors)
   const isCompleted = useMemo(() => {
     // If there are errors, the section is not completed
     if (hasErrors) return false;
-    
+
     // Check if all required fields have values
     const allRequiredFieldsFilled = section.fields.every((field) => {
       // Skip fields that don't meet their condition
@@ -93,8 +97,6 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
     return null;
   }
 
-  console.log({ errors });
-
   if (!collapsible || !section.title) {
     return (
       <div className="w-full border rounded-md mb-4 overflow-hidden border-border">
@@ -124,6 +126,11 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
         )}
         <div className="p-4 bg-background">
           <div
+            style={{
+              gridTemplateColumns: section.columns
+                ? `repeat(${section.columns}, minmax(0, 1fr))`
+                : "1fr",
+            }}
             className={`grid gap-4 ${
               section.columns ? `grid-cols-${section.columns}` : "grid-cols-1"
             }`}
@@ -210,6 +217,11 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
       </CollapsibleTrigger>
       <CollapsibleContent className="p-4 bg-background">
         <div
+          style={{
+            gridTemplateColumns: section.columns
+              ? `repeat(${section.columns}, minmax(0, 1fr))`
+              : "1fr",
+          }}
           className={`grid gap-4 ${
             section.columns ? `grid-cols-${section.columns}` : "grid-cols-1"
           }`}

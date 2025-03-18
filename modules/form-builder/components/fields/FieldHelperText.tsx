@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
+import { isString } from '@tsparticles/engine';
 
 interface FieldHelperTextProps {
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   helperText?: string;
   className?: string;
@@ -21,9 +22,19 @@ const FieldHelperText: React.FC<FieldHelperTextProps> = ({
   return (
     <div className={cn("mt-1 text-sm", className)}>
       {error && touched ? (
-        <p className="text-destructive">{error}</p>
+        typeof error === 'string' ? (
+          <p className="text-destructive">{error}</p>
+        ) : (
+          error
+        )
       ) : helperText ? (
         <p className="text-muted-foreground">{helperText}</p>
+      ) : error ? (
+        typeof error === 'string' ? (
+          <p className="text-destructive">{error}</p>
+        ) : (
+          error
+        )
       ) : null}
     </div>
   );

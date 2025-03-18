@@ -44,7 +44,13 @@ export const useTableActions = ({
   
   // Handle column-specific search
   const handleColumnSearch = useCallback((columnKey: string, value: string | string[]) => {
+    console.log(`handleColumnSearch called for ${columnKey} with value:`, value);
+    
+    // Apply the column search
     setColumnSearch(columnKey, value);
+    
+    // Log after setting the column search
+    console.log(`Column search state updated for ${columnKey}`);
   }, [setColumnSearch]);
   
   // Handle page change

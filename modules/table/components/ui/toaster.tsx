@@ -1,3 +1,4 @@
+'use client'
 import { useToast } from "@/modules/table/hooks/use-toast"
 import {
   Toast,

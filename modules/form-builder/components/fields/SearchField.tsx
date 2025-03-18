@@ -6,7 +6,7 @@ import DropdownSearch from '@/modules/table/components/table/DropdownSearch';
 interface SearchFieldProps {
   field: FieldConfig;
   value: string | string[];
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string | string[]) => void;
   onBlur: () => void;
@@ -25,7 +25,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
   return (
     <div className={cn(
       field.className,
-      error && touched ? 'border-destructive' : '',
+      !!error && touched ? 'border-destructive' : '',
       field.width ? field.width : 'w-full'
     )}>
       <DropdownSearch

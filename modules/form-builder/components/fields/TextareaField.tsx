@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 interface TextareaFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;
@@ -30,7 +30,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
       readOnly={field.readOnly}
       className={cn(
         field.className,
-        error && touched ? 'border-destructive' : '',
+        !!error && touched ? 'border-destructive' : '',
         field.width ? field.width : 'w-full'
       )}
       onChange={(e) => onChange(e.target.value)}

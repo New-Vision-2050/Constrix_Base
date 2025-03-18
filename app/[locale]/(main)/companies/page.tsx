@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import { companiesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
 
@@ -19,21 +20,29 @@ const CompaniesPage = () => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
 
+  // Use the reset hook to clear table state on route changes
+  // The tableId is now defined in the config
+  useResetTableOnRouteChange(config.tableId);
+
   // Create a function that will get the reloadTable function when needed
   // This avoids the infinite update loop
   const handleFormSuccess = (values: Record<string, unknown>) => {
     // Import the store directly to avoid hooks in callbacks
     const tableStore = useTableStore.getState();
-
-    // Manually trigger the reload logic
-    tableStore.setLoading(true);
+    
+    // Use the centralized reloadTable method from the TableStore
+    tableStore.reloadTable(config.tableId);
+    
+    // After a short delay, set loading back to false
     setTimeout(() => {
-      tableStore.setLoading(false);
+      tableStore.setLoading(config.tableId, false);
     }, 100);
 
     // Add type safety for the result structure
-    const result = values.result as { data?: { payload?: { id?: string } } } | undefined;
-    const companyId = result?.data?.payload?.id || '';
+    const result = values.result as
+      | { data?: { payload?: { id?: string } } }
+      | undefined;
+    const companyId = result?.data?.payload?.id || "";
     setCompanyNumber(companyId);
     handleOpen();
 
@@ -47,13 +56,13 @@ const CompaniesPage = () => {
       <TableBuilder
         config={config}
         searchBarActions={
-          <div>
-            <ExportButton data={["omar"]} />
+          <div className="flex items-center gap-3">
             <SheetFormBuilder
               config={companiesFormConfig}
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
-            />
+            />{" "}
+            <ExportButton data={["omar"]} />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}

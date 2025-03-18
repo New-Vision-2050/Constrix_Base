@@ -28,6 +28,7 @@ type FetchDataBaseProps = {
   isMountedRef: React.MutableRefObject<boolean>;
   abortControllerRef: React.MutableRefObject<AbortController | null>;
   configColumns?: ColumnConfig[];
+  _forceRefetch?: number; // Add _forceRefetch property
 };
 
 type FetchDataAdditionalProps = {
@@ -65,6 +66,7 @@ export const createTableFetcher = () => {
       isMountedRef,
       abortControllerRef,
       configColumns,
+      _forceRefetch, // Extract _forceRefetch property
       setLoading,
       setError,
       setTotalItems,
@@ -73,6 +75,11 @@ export const createTableFetcher = () => {
       setData,
       dataMapper,
     } = props;
+    
+    // Log force refetch if present
+    if (_forceRefetch && process.env.NODE_ENV === 'development') {
+      console.log(`[TableFetcher] Force refetch requested: ${_forceRefetch}`);
+    }
 
     if (!url) return;
 
@@ -134,10 +141,9 @@ export const createTableFetcher = () => {
       // Always process the response, even if the component is unmounted
       // This ensures the data is cached for when the user returns to this page
       setTotalItems(totalItemsCount);
-      if (totalItemsCount > 0) {
-        const calculatedTotalPages = Math.ceil(totalItemsCount / itemsPerPage);
-        setPagination(currentPage, calculatedTotalPages, itemsPerPage);
-      }
+      // Always update pagination, even when totalItemsCount is 0
+      const calculatedTotalPages = Math.max(1, Math.ceil(totalItemsCount / itemsPerPage));
+      setPagination(currentPage, calculatedTotalPages, itemsPerPage);
 
       const result = await response.json();
       let tableData = processApiResponse(result);
@@ -160,7 +166,9 @@ export const createTableFetcher = () => {
         setPagination(currentPage, calculatedTotalPages, itemsPerPage);
       } else if (!totalCount && tableData.length === 0) {
         // Always process the response, even if the component is unmounted
-        setError("No data found or data format not supported");
+        // Update pagination to show 0 items with 1 empty page instead of showing an error
+        setTotalItems(0);
+        setPagination(1, 1, itemsPerPage);
       }
 
       if (dataMapper) {

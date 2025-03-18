@@ -3,7 +3,7 @@ import React from 'react';
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
   value?: any;
-  message: string;
+  message: string | React.ReactNode;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
   apiConfig?: {
     url: string;
@@ -46,7 +46,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject';
   name: string;
   label: string;
   placeholder?: string;
@@ -70,6 +70,7 @@ export interface FieldConfig {
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isMulti?: boolean; // Whether to enable multi-select functionality
   postfix?: string; // Text to display after the input field
+  defaultValue?: any; // Default value for the field
 }
 
 export interface FormSection {
@@ -116,6 +117,7 @@ export interface WizardOptions {
 }
 
 export interface FormConfig {
+  formId?: string; // Unique identifier for the form instance
   title?: string;
   description?: string;
   className?: string;
@@ -145,7 +147,7 @@ export interface FormConfig {
   onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
   onError?: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => void;
   onCancel?: () => void;
-  onValidationError?: (errors: Record<string, string>) => void;
+  onValidationError?: (errors: Record<string, string | React.ReactNode>) => void;
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
 }

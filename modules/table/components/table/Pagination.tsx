@@ -33,12 +33,15 @@ const Pagination: React.FC<PaginationProps> = ({
   const renderPageButtons = () => {
     const pages = [];
     const MAX_VISIBLE_PAGES = 5;
-
+    
+    // Ensure totalPages is at least 1 to prevent pagination issues
+    const effectiveTotalPages = Math.max(1, totalPages);
+    
     let startPage = Math.max(
       1,
       currentPage - Math.floor(MAX_VISIBLE_PAGES / 2)
     );
-    let endPage = Math.min(totalPages, startPage + MAX_VISIBLE_PAGES - 1);
+    let endPage = Math.min(effectiveTotalPages, startPage + MAX_VISIBLE_PAGES - 1);
 
     if (endPage - startPage + 1 < MAX_VISIBLE_PAGES) {
       startPage = Math.max(1, endPage - MAX_VISIBLE_PAGES + 1);
@@ -98,9 +101,9 @@ const Pagination: React.FC<PaginationProps> = ({
     }
 
     // Last page
-    if (endPage < totalPages) {
+    if (endPage < effectiveTotalPages) {
       // Ellipsis if needed
-      if (endPage < totalPages - 1) {
+      if (endPage < effectiveTotalPages - 1) {
         pages.push(
           <span key="ellipsis2" className="px-1">
             ...
@@ -110,13 +113,13 @@ const Pagination: React.FC<PaginationProps> = ({
 
       pages.push(
         <Button
-          key={totalPages}
-          variant={currentPage === totalPages ? "default" : "outline"}
+          key={effectiveTotalPages}
+          variant={currentPage === effectiveTotalPages ? "default" : "outline"}
           size="sm"
-          onClick={() => onPageChange(totalPages)}
+          onClick={() => onPageChange(effectiveTotalPages)}
           className="h-8 w-8 px-0 "
         >
-          {totalPages}
+          {effectiveTotalPages}
         </Button>
       );
     }
@@ -127,8 +130,8 @@ const Pagination: React.FC<PaginationProps> = ({
         key="next"
         variant="outline"
         size="icon"
-        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
+        onClick={() => onPageChange(Math.min(effectiveTotalPages, currentPage + 1))}
+        disabled={currentPage === effectiveTotalPages}
         className="h-8 w-8"
       >
         <ChevronRight className="h-4 w-4 rtl:rotate-180" />
