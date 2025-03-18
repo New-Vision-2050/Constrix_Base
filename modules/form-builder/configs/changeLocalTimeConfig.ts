@@ -1,5 +1,5 @@
 // Define the form configuration
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 
 export const changeLocalTimeConfig: FormConfig = {
@@ -16,8 +16,8 @@ export const changeLocalTimeConfig: FormConfig = {
       fields: [
         {
           type: "select",
-          name: "country_id",
-          label: "دولة الشركة",
+          name: "country-id",
+          label: "الدولة",
           placeholder: "اختر دولة الشركة",
           required: true,
           dynamicOptions: {
@@ -39,14 +39,13 @@ export const changeLocalTimeConfig: FormConfig = {
           ],
         },
         {
-          name: "company_field_id",
-          label: "النشاط",
           type: "select",
-          isMulti: true,
-          placeholder: "اختر النشاط",
+          name: "time-zone",
+          label: "المنطقة الزمنية",
+          placeholder: "اختر المنطقة الزمنية",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/company_fields`,
+            url: `${baseURL}/countries`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
@@ -59,58 +58,18 @@ export const changeLocalTimeConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "برجاء اختيار النشاط",
-            },
-          ],
-        },
-        {
-          name: "name",
-          label: "الاسم التجاري",
-          type: "text",
-          placeholder: "برجاء إدخال الاسم التجاري",
-          validation: [
-            {
-              type: "apiValidation",
-              message: "This username is already taken",
-              apiConfig: {
-                url: "/api/validate-username",
-                method: "POST",
-                debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
-              },
-            },
-          ],
-        },
-        {
-          name: "user_name",
-          label: "الاسم المختصر",
-          type: "text",
-          placeholder: "برجاء إدخال الاسم المختصر",
-          postfix: "constrix.com",
-          containerClassName: "rtl:flex-row-reverse",
-          validation: [
-            {
-              type: "apiValidation",
-              message: "This username is already taken",
-              apiConfig: {
-                url: "/api/validate-username",
-                method: "POST",
-                debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
-              },
+              message: "ادخل لبمنطقة الزمنية",
             },
           ],
         },
         {
           type: "select",
-          name: "general_manager_id",
-          label: "مسؤول الدعم",
-          placeholder: "اختر مسؤول الدعم",
+          name: "currency",
+          label: "العملة",
+          placeholder: "اختر العملة",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/users`,
+            url: `${baseURL}/countries`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
@@ -123,10 +82,35 @@ export const changeLocalTimeConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "مسؤول الدعم",
+              message: "ادخل العملة",
             },
           ],
         },
+        {
+          type: "select",
+          name: "language",
+          label: "العملة",
+          placeholder: "اختر العملة",
+          required: true,
+          dynamicOptions: {
+            url: `${baseURL}/countries`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
+          validation: [
+            {
+              type: "required",
+              message: "ادخل العملة",
+            },
+          ],
+        },
+     
       ],
     },
   ],
@@ -138,6 +122,20 @@ export const changeLocalTimeConfig: FormConfig = {
   resetOnSuccess: true,
   showCancelButton: false,
   showBackButton: false,
+
+  onSubmit: async (values) => {
+    console.log('Form submitted with values:', values);
+    const formStore = useFormStore.getState();
+    formStore.setValue('companies-form', 'local-time', values);
+
+
+    // Simulate API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true });
+      }, 1500);
+    });
+  },
 
   // Example onSuccess handler
   onSuccess: (values, result) => {
