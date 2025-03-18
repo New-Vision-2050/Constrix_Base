@@ -3,7 +3,7 @@ import React from 'react';
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
   value?: any;
-  message: string;
+  message: string | React.ReactNode;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
   apiConfig?: {
     url: string;
@@ -147,7 +147,7 @@ export interface FormConfig {
   onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
   onError?: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => void;
   onCancel?: () => void;
-  onValidationError?: (errors: Record<string, string>) => void;
+  onValidationError?: (errors: Record<string, string | React.ReactNode>) => void;
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
 }

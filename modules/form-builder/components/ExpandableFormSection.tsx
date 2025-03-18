@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 interface ExpandableFormSectionProps {
   section: FormSection;
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   defaultOpen?: boolean;
   collapsible?: boolean;

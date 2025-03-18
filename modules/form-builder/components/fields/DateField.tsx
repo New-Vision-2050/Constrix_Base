@@ -11,7 +11,7 @@ import { DayPickerSingleProps } from 'react-day-picker';
 interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;
@@ -38,7 +38,7 @@ const DateField: React.FC<DateFieldProps> = ({
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
-            error && touched ? 'border-destructive' : '',
+            !!error && touched ? 'border-destructive' : '',
             field.className,
             field.width ? field.width : 'w-full'
           )}

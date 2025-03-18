@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { ValidationRule } from "../types/formTypes";
 import axios from "axios";
 import { debounce } from "lodash";
-import { useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useEffect, useMemo, useCallback, useRef } from "react";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -11,7 +11,7 @@ const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debou
 interface FormInstanceState {
   // Form values and state
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
   isValid: boolean;
@@ -23,17 +23,17 @@ interface FormInstanceState {
 interface FormState {
   // Map of form instances by formId
   forms: Record<string, FormInstanceState>;
-  
+
   // Current active form ID
   activeFormId: string;
-  
+
   // Form actions
   setFormId: (formId: string) => void;
   initForm: (formId: string, initialValues?: Record<string, any>) => void;
   setValue: (formId: string, field: string, value: any) => void;
   setValues: (formId: string, values: Record<string, any>) => void;
-  setError: (formId: string, field: string, error: string | null) => void;
-  setErrors: (formId: string, errors: Record<string, string>) => void;
+  setError: (formId: string, field: string, error: string | React.ReactNode | null) => void;
+  setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => void;
   setTouched: (formId: string, field: string, isTouched: boolean) => void;
   setAllTouched: (formId: string) => void;
   resetForm: (formId: string, values?: Record<string, any>) => void;
@@ -66,10 +66,10 @@ export const useFormStore = create<FormState>((set, get) => ({
   // Initial state
   forms: {},
   activeFormId: 'default',
-  
+
   // Set the active form ID
   setFormId: (formId: string) => set({ activeFormId: formId }),
-  
+
   // Initialize a new form instance if it doesn't exist
   initForm: (formId: string, initialValues = {}) => set((state: FormState) => ({
     forms: {
@@ -77,7 +77,7 @@ export const useFormStore = create<FormState>((set, get) => ({
       [formId]: state.forms[formId] || getDefaultFormState(initialValues)
     }
   })),
-  
+
   // Actions for specific form instances
   setValue: (formId: string, field: string, value: any) => {
     // Get the current state
@@ -103,7 +103,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   setValues: (formId: string, values: Record<string, any>) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     return {
       forms: {
         ...state.forms,
@@ -115,17 +115,17 @@ export const useFormStore = create<FormState>((set, get) => ({
     };
   }),
 
-  setError: (formId: string, field: string, error: string | null) => set((state: FormState) => {
+  setError: (formId: string, field: string, error: string | React.ReactNode | null) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     const newErrors = error
       ? { ...formState.errors, [field]: error }
       : Object.fromEntries(
           Object.entries(formState.errors).filter(([key]) => key !== field)
         );
-    
+
     const isValid = Object.values(newErrors).every((err) => !err);
-    
+
     return {
       forms: {
         ...state.forms,
@@ -138,10 +138,10 @@ export const useFormStore = create<FormState>((set, get) => ({
     };
   }),
 
-  setErrors: (formId: string, errors: Record<string, string>) => set((state: FormState) => {
+  setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
     const isValid = Object.values(errors).every((error) => !error);
-    
+
     return {
       forms: {
         ...state.forms,
@@ -156,7 +156,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   setTouched: (formId: string, field: string, isTouched: boolean) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     return {
       forms: {
         ...state.forms,
@@ -170,12 +170,12 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   setAllTouched: (formId: string) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     const allTouched = Object.keys(formState.values).reduce((acc, key) => {
       acc[key] = true;
       return acc;
     }, {} as Record<string, boolean>);
-    
+
     return {
       forms: {
         ...state.forms,
@@ -196,7 +196,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   setSubmitting: (formId: string, isSubmitting: boolean) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     return {
       forms: {
         ...state.forms,
@@ -210,7 +210,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   setIsValid: (formId: string, isValid: boolean) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     return {
       forms: {
         ...state.forms,
@@ -224,7 +224,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   incrementSubmitCount: (formId: string) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     return {
       forms: {
         ...state.forms,
@@ -238,7 +238,7 @@ export const useFormStore = create<FormState>((set, get) => ({
 
   setFieldValidating: (formId: string, field: string, isValidating: boolean) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
-    
+
     return {
       forms: {
         ...state.forms,
@@ -274,7 +274,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     if (!debouncedValidations.has(formId)) {
       debouncedValidations.set(formId, new Map());
     }
-    
+
     const formValidations = debouncedValidations.get(formId)!;
 
     // Create or get the debounced validation function for this field
@@ -368,76 +368,76 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
       useFormStore.getState().initForm(formId, initialValues);
     }
   }, [formId, JSON.stringify(initialValues)]);
-  
+
   // Create a stable reference for the default state
   const defaultStateRef = useRef(getDefaultFormState(initialValues));
-  
+
   // Use a memoized selector to prevent infinite loops
   const selector = useCallback(
     (state: FormState) => state.forms[formId] || defaultStateRef.current,
     [formId] // We don't need to include initialValues here since we're using a ref
   );
-  
+
   // Get the form state using the memoized selector
   const formState = useFormStore(selector);
-  
+
   // Get the actions for this form
   const setValue = useCallback((field: string, value: any) => {
     useFormStore.getState().setValue(formId, field, value);
   }, [formId]);
-  
+
   const setValues = useCallback((values: Record<string, any>) => {
     useFormStore.getState().setValues(formId, values);
   }, [formId]);
-  
-  const setError = useCallback((field: string, error: string | null) => {
+
+  const setError = useCallback((field: string, error: string | React.ReactNode | null) => {
     useFormStore.getState().setError(formId, field, error);
   }, [formId]);
-  
-  const setErrors = useCallback((errors: Record<string, string>) => {
+
+  const setErrors = useCallback((errors: Record<string, string | React.ReactNode>) => {
     useFormStore.getState().setErrors(formId, errors);
   }, [formId]);
-  
+
   const setTouched = useCallback((field: string, isTouched: boolean) => {
     useFormStore.getState().setTouched(formId, field, isTouched);
   }, [formId]);
-  
+
   const setAllTouched = useCallback(() => {
     useFormStore.getState().setAllTouched(formId);
   }, [formId]);
-  
+
   const resetForm = useCallback((values: Record<string, any> = {}) => {
     useFormStore.getState().resetForm(formId, values);
   }, [formId]);
-  
+
   const setSubmitting = useCallback((isSubmitting: boolean) => {
     useFormStore.getState().setSubmitting(formId, isSubmitting);
   }, [formId]);
-  
+
   const setIsValid = useCallback((isValid: boolean) => {
     useFormStore.getState().setIsValid(formId, isValid);
   }, [formId]);
-  
+
   const incrementSubmitCount = useCallback(() => {
     useFormStore.getState().incrementSubmitCount(formId);
   }, [formId]);
-  
+
   const setFieldValidating = useCallback((field: string, isValidating: boolean) => {
     useFormStore.getState().setFieldValidating(formId, field, isValidating);
   }, [formId]);
-  
+
   const validateFieldWithApi = useCallback((field: string, value: any, rule: ValidationRule) => {
     useFormStore.getState().validateFieldWithApi(formId, field, value, rule);
   }, [formId]);
-  
+
   const hasValidatingFields = useCallback(() => {
     return useFormStore.getState().hasValidatingFields(formId);
   }, [formId]);
-  
+
   return {
     // State
     ...formState,
-    
+
     // Actions
     setValue,
     setValues,
@@ -462,7 +462,7 @@ export const validateField = (
   formValues: Record<string, any> = {},
   fieldName?: string,
   store?: ReturnType<typeof useFormStore.getState>
-): string | null => {
+): string | React.ReactNode | null => {
   if (!rules) return null;
 
   for (const rule of rules) {
@@ -527,7 +527,7 @@ export const validateField = (
           if (!rule || !rule.apiConfig) {
             return null;
           }
-          
+
           // Use the provided store or get it from the global state
           const formStore = store || useFormStore.getState();
 
@@ -535,7 +535,7 @@ export const validateField = (
           // We need to get the active form ID and then access its errors
           const activeFormId = formStore.activeFormId;
           const activeForm = formStore.forms[activeFormId];
-          
+
           if (activeForm && activeForm.errors && activeForm.errors[fieldName]) {
             return activeForm.errors[fieldName];
           }

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { FormConfig } from "../types/formTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
@@ -16,7 +16,7 @@ interface UseSheetFormResult {
   openSheet: () => void;
   closeSheet: () => void;
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
   submitSuccess: boolean;
@@ -63,7 +63,7 @@ export function useSheetForm({
   const actualFormId = config.formId || 'sheet-form';
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Get form instance from store
   const {
     values,
@@ -71,7 +71,7 @@ export function useSheetForm({
     touched,
     isSubmitting,
     isValid,
-    
+
     setValue,
     setValues,
     setError,
@@ -83,7 +83,7 @@ export function useSheetForm({
     setIsValid,
     hasValidatingFields,
   } = useFormInstance(actualFormId, config.initialValues || {});
-  
+
   // Local state for sheet-specific functionality
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -144,7 +144,7 @@ export function useSheetForm({
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
 
     // Iterate through all sections and fields
@@ -342,7 +342,7 @@ export function useSheetForm({
 
           // Handle Laravel validation errors if enabled
           if (config.laravelValidation?.enabled && result.errors) {
-            const formattedErrors: Record<string, string> = {};
+            const formattedErrors: Record<string, string | React.ReactNode> = {};
 
             // Convert Laravel validation errors to form errors
             Object.entries(result.errors).forEach(([field, messages]) => {
@@ -396,7 +396,7 @@ export function useSheetForm({
   const validateCurrentStep = useCallback(() => {
     if (!isStepBased) return true; // If not in step-based mode (wizard or accordion), return true
 
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
 
     // Get the current section
@@ -500,12 +500,12 @@ export function useSheetForm({
       config.sections[currentStep].fields.forEach((field) => {
         currentStepTouched[field.name] = true;
       });
-      
+
       // Update touched state for each field
       Object.entries(currentStepTouched).forEach(([field, isTouched]) => {
         setTouched(field, isTouched);
       });
-      
+
       return;
     }
 
@@ -578,12 +578,12 @@ export function useSheetForm({
       config.sections[currentStep].fields.forEach((field) => {
         currentStepTouched[field.name] = true;
       });
-      
+
       // Update touched state for each field
       Object.entries(currentStepTouched).forEach(([field, isTouched]) => {
         setTouched(field, isTouched);
       });
-      
+
       return false;
     }
 
@@ -615,7 +615,7 @@ export function useSheetForm({
 
       // Handle validation errors if any
       if (!result.success && result.errors) {
-        const formattedErrors: Record<string, string> = {};
+        const formattedErrors: Record<string, string | React.ReactNode> = {};
 
         // Convert validation errors to form errors
         Object.entries(result.errors).forEach(([field, messages]) => {

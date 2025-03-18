@@ -9,7 +9,7 @@ import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 interface FormBuilderProps {
   config: FormConfig;
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
   submitSuccess: boolean;

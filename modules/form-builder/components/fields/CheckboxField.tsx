@@ -7,7 +7,7 @@ import { Label } from '@/modules/table/components/ui/label';
 interface CheckboxFieldProps {
   field: FieldConfig;
   value: boolean;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: boolean) => void;
   onBlur: () => void;
@@ -30,7 +30,7 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
         disabled={field.disabled}
         className={cn(
           field.className,
-          error && touched ? 'border-destructive' : ''
+          !!error && touched ? 'border-destructive' : ''
         )}
         onCheckedChange={(checked) => onChange(!!checked)}
         onBlur={onBlur}

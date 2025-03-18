@@ -17,7 +17,7 @@ import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
 interface FormFieldProps {
   field: FieldConfig;
   value: any;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;

@@ -1,12 +1,12 @@
 "use client";
-import { useCallback } from "react";
+import React,{ useCallback } from "react";
 import { ValidationRule } from "../types/formTypes";
 
 interface UseFormActionsProps {
   setValue: (field: string, value: any) => void;
   setValues: (values: Record<string, any>) => void;
-  setError: (field: string, error: string | null) => void;
-  setErrors: (errors: Record<string, string>) => void;
+  setError: (field: string, error: string | React.ReactNode | null) => void;
+  setErrors: (errors: Record<string, string | React.ReactNode>) => void;
   setTouched: (field: string, isTouched: boolean) => void;
   setAllTouched: () => void;
   resetForm: (values?: Record<string, any>) => void;
@@ -37,13 +37,13 @@ export const useFormActions = ({
     (field: string, value: any, validation?: ValidationRule[]) => {
       // Update the field value
       setValue(field, value);
-      
+
       // Mark the field as touched
       setTouched(field, true);
-      
+
       // Clear any existing error for this field
       setError(field, null);
-      
+
       // If validation rules are provided, apply them
       if (validation && validation.length > 0) {
         for (const rule of validation) {
@@ -116,13 +116,13 @@ export const useFormActions = ({
    * @returns Whether the form is valid for submission
    */
   const handleSubmitPrep = useCallback(
-    (errors: Record<string, string>) => {
+    (errors: Record<string, string | React.ReactNode>) => {
       // Mark all fields as touched
       setAllTouched();
-      
+
       // Check if there are any errors
       const hasErrors = Object.values(errors).some(error => !!error);
-      
+
       return !hasErrors;
     },
     [setAllTouched]
@@ -137,7 +137,7 @@ export const useFormActions = ({
     (newValues: Record<string, any>, validate = false) => {
       // Update the values
       setValues(newValues);
-      
+
       // If validation is requested, mark all fields as touched to trigger validation
       if (validate) {
         setAllTouched();
