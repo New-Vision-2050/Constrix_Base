@@ -10,6 +10,7 @@ import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
 import HiddenObjectField from './fields/HiddenObjectField';
+import DynamicRowsField from './fields/DynamicRowsField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
@@ -222,6 +223,18 @@ const FormField: React.FC<FormFieldProps> = ({
                 onChange={onChange}
                 onBlur={onBlur}
                 values={values}
+              />
+            );
+            
+          case 'dynamicRows':
+            return (
+              <DynamicRowsField
+                field={field}
+                value={Array.isArray(fieldValue) ? fieldValue : []}
+                error={error}
+                touched={touched}
+                onChange={onChange}
+                onBlur={onBlur}
               />
             );
 

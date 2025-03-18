@@ -143,7 +143,6 @@ const formConfig = {
 ## Field Types
 
 The form builder supports various field types:
-
 - `text`: Text input
 - `textarea`: Multi-line text input
 - `checkbox`: Checkbox input
@@ -157,6 +156,7 @@ The form builder supports various field types:
 - `search`: Search input with autocomplete
 - `phone`: Phone input with country code selection
 - `hiddenObject`: Hidden field that stores an object or array of objects without visual representation
+- `dynamicRows`: Dynamic field that allows users to add multiple rows with customizable fields (see [Dynamic Rows Field Documentation](./docs/dynamic-rows-field.md))
 
 ### Example Field Configurations
 
@@ -358,6 +358,69 @@ The form builder supports various field types:
       ]
     }
   ]
+}
+```
+
+#### Dynamic Rows Field
+
+```tsx
+{
+  type: 'dynamicRows',
+  name: 'education',
+  label: 'Education History',
+  required: true,
+  validation: [
+    {
+      type: 'required',
+      message: 'At least one education entry is required'
+    }
+  ],
+  dynamicRowsConfig: {
+    fields: [
+      {
+        name: 'institution',
+        label: 'Institution',
+        type: 'text',
+        placeholder: 'Enter institution name',
+        required: true
+      },
+      {
+        name: 'degree',
+        label: 'Degree',
+        type: 'select',
+        placeholder: 'Select degree',
+        options: [
+          { value: 'high_school', label: 'High School' },
+          { value: 'bachelor', label: 'Bachelor\'s Degree' },
+          { value: 'master', label: 'Master\'s Degree' },
+          { value: 'doctorate', label: 'Doctorate' }
+        ]
+      },
+      {
+        name: 'startDate',
+        label: 'Start Date',
+        type: 'date'
+      },
+      {
+        name: 'endDate',
+        label: 'End Date',
+        type: 'date'
+      },
+      {
+        name: 'current',
+        label: 'Currently Studying',
+        type: 'checkbox'
+      }
+    ],
+    addRowButtonText: 'Add Education',
+    deleteRowButtonText: 'Remove',
+    minRows: 1,
+    maxRows: 5,
+    sortable: true,
+    defaultRowValues: {
+      current: false
+    }
+  }
 }
 ```
 
@@ -590,7 +653,7 @@ const formConfig: FormConfig = {
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `type` | `string` | Field type (text, textarea, select, hiddenObject, etc.) |
+| `type` | `string` | Field type (text, textarea, select, hiddenObject, dynamicRows, etc.) |
 | `name` | `string` | Field name (used as the key in form values) |
 | `label` | `string` | Field label |
 | `defaultValue` | `any` | Default value for the field (especially useful for hiddenObject fields) |
@@ -605,6 +668,7 @@ const formConfig: FormConfig = {
 | `options` | `DropdownOption[]` | Options for select, multiSelect, and radio fields |
 | `validation` | `ValidationRule[]` | Validation rules for the field |
 | `condition` | `function` | Function that determines whether the field should be displayed |
+| `dynamicRowsConfig` | `DynamicRowsConfig` | Configuration for dynamic rows field type |
 
 ## Hooks
 

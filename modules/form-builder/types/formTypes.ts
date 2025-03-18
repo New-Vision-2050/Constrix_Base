@@ -45,8 +45,35 @@ export interface SearchTypeConfig {
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
 }
 
+// Dynamic row field configuration
+export interface DynamicRowFieldConfig {
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date';
+  name: string;
+  label: string;
+  placeholder?: string;
+  helperText?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  width?: string;
+  options?: DropdownOption[];
+  validation?: ValidationRule[];
+  defaultValue?: any;
+}
+
+// Dynamic rows configuration
+export interface DynamicRowsConfig {
+  fields: DynamicRowFieldConfig[];
+  addRowButtonText?: string;
+  deleteRowButtonText?: string;
+  minRows?: number;
+  maxRows?: number;
+  sortable?: boolean;
+  defaultRowValues?: Record<string, any>;
+}
+
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows';
   name: string;
   label: string;
   placeholder?: string;
@@ -71,6 +98,7 @@ export interface FieldConfig {
   isMulti?: boolean; // Whether to enable multi-select functionality
   postfix?: string; // Text to display after the input field
   defaultValue?: any; // Default value for the field
+  dynamicRowsConfig?: DynamicRowsConfig; // Configuration for dynamic rows field type
 }
 
 export interface FormSection {

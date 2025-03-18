@@ -27,6 +27,7 @@ export { searchFormConfig } from './configs/searchFormConfig';
 export { companiesFormConfig } from './configs/companiesFormConfig';
 export { companyUserFormConfig } from './configs/companyUserFormConfig';
 export { changeLocalTimeConfig } from './configs/changeLocalTimeConfig';
+export { dynamicRowsExampleConfig } from './configs/dynamicRowsExampleConfig';
 
 // Export utilities
 export { triggerApiValidation, hasApiValidation } from './utils/apiValidation';
