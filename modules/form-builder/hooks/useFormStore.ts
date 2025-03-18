@@ -3,6 +3,7 @@ import { ValidationRule } from "../types/formTypes";
 import axios from "axios";
 import { debounce } from "lodash";
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
+import {apiClient} from "@/config/axios-config";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -293,7 +294,7 @@ export const useFormStore = create<FormState>((set, get) => ({
             };
 
             // Make the API request
-            const response = await axios(config);
+            const response = await apiClient(config);
 
             // Check if validation passed
             let isValid = false;

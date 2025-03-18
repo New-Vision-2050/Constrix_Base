@@ -75,11 +75,11 @@ export const companiesFormConfig: FormConfig = {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
-                url: "/api/validate-username",
+                url: `${baseURL}/companies/validated`,
                 method: "POST",
                 debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
+                paramName: "name",
+                successCondition: (response) => response.payload.status === 1,
               },
             },
           ],
@@ -96,11 +96,11 @@ export const companiesFormConfig: FormConfig = {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
-                url: "/api/validate-username",
+                url: `${baseURL}/companies/validated`,
                 method: "POST",
                 debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
+                paramName: "user_name",
+                successCondition: (response) => response.status === 1,
               },
             },
           ],
@@ -128,7 +128,7 @@ export const companiesFormConfig: FormConfig = {
               message: "مسؤول الدعم",
             },
           ],
-        },  
+        },
         {
           type: "checkbox",
           name: "change_local_time",
@@ -144,7 +144,7 @@ export const companiesFormConfig: FormConfig = {
               validator: (value) => {
 
                 console.log('checkbox error: -----: ' , value)
-              
+
                 return false
               }
             },
@@ -156,7 +156,7 @@ export const companiesFormConfig: FormConfig = {
           label: 'local-time',
           condition(values) {
             return !!values['change_local_time']
-          }, 
+          },
           defaultValue: {
             companyType: 'llc',
             employeeCount: 0,
@@ -275,8 +275,8 @@ export const companiesFormConfig: FormConfig = {
           ],
         },
 
-      
-      
+
+
       ],
     },
   ],
