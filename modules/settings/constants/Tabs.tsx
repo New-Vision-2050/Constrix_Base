@@ -1,5 +1,5 @@
+import IdentifierSettingTab from "../components/tabs/IdentifierSetting";
 import { SystemTab } from "../types/SystemTab";
-
 
 export const SystemSettingTabs: SystemTab[] = [
   {
@@ -15,7 +15,11 @@ export const SystemSettingTabs: SystemTab[] = [
   {
     id: "IdentifierSetting",
     title: "اعدادات المعرف",
-    content: "اعدادات المعرف",
+    content: (
+      <>
+        <IdentifierSettingTab />
+      </>
+    ),
   },
   {
     id: "LanguagesAndCountries",

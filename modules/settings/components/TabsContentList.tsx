@@ -1,7 +1,6 @@
 import { TabsContent } from "@radix-ui/react-tabs";
 
 import { SystemTab } from "../types/SystemTab";
-import { SystemSettingTabs } from "../constants/Tabs";
 
 /**
  * TabsContentList Component
@@ -11,8 +10,12 @@ import { SystemSettingTabs } from "../constants/Tabs";
  *
  * @returns JSX.Element - The content for all tabs.
  */
-export default function TabsContentList() {
-  return <>{renderTabsContent()}</>;
+
+type PropsT = {
+  list: SystemTab[];
+};
+export default function TabsContentList({ list }: PropsT) {
+  return <>{renderTabsContent(list)}</>;
 }
 
 /**
@@ -23,10 +26,8 @@ export default function TabsContentList() {
  *
  * @returns JSX.Element[] - An array of tab content elements.
  */
-function renderTabsContent() {
-  return SystemSettingTabs.map((tab) => (
-    <SingleTabContent key={tab.id} tab={tab} />
-  ));
+function renderTabsContent(list: SystemTab[]) {
+  return list.map((tab) => <SingleTabContent key={tab.id} tab={tab} />);
 }
 
 /**

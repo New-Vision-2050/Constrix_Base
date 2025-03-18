@@ -1,11 +1,11 @@
 // shad-cn tab
 import { Tabs, TabsList } from "@/components/ui/tabs";
-import TabsTriggerList from "../components/TabsTriggerList";
-import TabsContentList from "../components/TabsContentList";
 import { useLocale } from "next-intl";
-import { SystemSettingTabs } from "../constants/Tabs";
+import TabsTriggerList from "../../TabsTriggerList";
+import TabsContentList from "../../TabsContentList";
+import { IdentifierSettingTabs } from "./constants/Tabs";
 
-export default function TabsManager() {
+export default function IdentifierSettingTab() {
   // declare and define component state and variables
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -18,9 +18,9 @@ export default function TabsManager() {
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >
       <TabsList className="bg-transparent overflow-y-hidden overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start">
-        <TabsTriggerList list={SystemSettingTabs} />
+        <TabsTriggerList list={IdentifierSettingTabs} />
       </TabsList>
-      <TabsContentList list={SystemSettingTabs} />
+      <TabsContentList list={IdentifierSettingTabs} />
     </Tabs>
   );
 }

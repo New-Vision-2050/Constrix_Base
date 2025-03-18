@@ -1,5 +1,4 @@
 import { TabsTrigger } from "@radix-ui/react-tabs";
-import { SystemSettingTabs } from "../constants/Tabs";
 import { SystemTab } from "../types/SystemTab";
 
 /**
@@ -10,8 +9,13 @@ import { SystemTab } from "../types/SystemTab";
  *
  * @returns JSX.Element - A list of tab triggers.
  */
-export default function TabsTriggerList() {
-  return <>{renderTabs()}</>;
+
+type PropsT = {
+  list: SystemTab[];
+};
+
+export default function TabsTriggerList({ list }: PropsT) {
+  return <>{renderTabs(list)}</>;
 }
 
 /**
@@ -22,10 +26,8 @@ export default function TabsTriggerList() {
  *
  * @returns JSX.Element[] - An array of tab trigger elements.
  */
-function renderTabs() {
-  return SystemSettingTabs.map((tab) => (
-    <SingleTabTrigger key={tab.id} tab={tab} />
-  ));
+function renderTabs(list: SystemTab[]) {
+  return list.map((tab) => <SingleTabTrigger key={tab.id} tab={tab} />);
 }
 
 /**
