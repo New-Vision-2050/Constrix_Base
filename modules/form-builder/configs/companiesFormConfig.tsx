@@ -100,7 +100,7 @@ export const companiesFormConfig: FormConfig = {
                 method: "POST",
                 debounceMs: 500,
                 paramName: "user_name",
-                successCondition: (response) => response.status === 1,
+                successCondition: (response) => response.payload.status === 1,
               },
             },
           ],
