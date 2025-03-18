@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
+import { isString } from '@tsparticles/engine';
 
 interface FieldHelperTextProps {
   error?: string;
@@ -17,14 +18,20 @@ const FieldHelperText: React.FC<FieldHelperTextProps> = ({
   if (!error && !helperText) {
     return null;
   }
-console.log(helperText)
+
+  if(!!error && typeof error !=='string') return error
+
   return (
     <div className={cn("mt-1 text-sm", className)}>
       {error && touched ? (
-        <p className="text-destructive">{error}</p>
+       <> 
+       {isString(error)? <p className="text-destructive">{error}</p> : {error}}
+       </>
       ) : helperText ? (
         <p className="text-muted-foreground">{helperText}</p>
-      ) : error ? (<p className="text-destructive">{error}</p>)
+      ) : error ?    <>
+       {isString(error)? <p className="text-destructive">{error}</p> : {error}}
+       </>
         : null}
     </div>
   );

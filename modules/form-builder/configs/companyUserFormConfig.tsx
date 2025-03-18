@@ -33,7 +33,7 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: "الشركة",
+                            message: <div>omar</div>,
                         },
                     ],
                 },
