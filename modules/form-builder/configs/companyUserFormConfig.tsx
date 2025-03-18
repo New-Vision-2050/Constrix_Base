@@ -33,7 +33,7 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: <div>omar</div>,
+                            message: 'اختر الشركة',
                         },
                     ],
                 },
@@ -46,7 +46,7 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: "Name is required",
+                            message: "ادخل اسم المستخدم الاول",
                         },
                         {
                             type: "minLength",
@@ -59,12 +59,12 @@ export const companyUserFormConfig: FormConfig = {
                     name: "last_name",
                     label: "اسم المستخدم ألأحير",
                     type: "text",
-                    placeholder: "سم المستخدم ألأحير",
+                    placeholder: "اسم المستخدم ألأحير",
                     required: true,
                     validation: [
                         {
                             type: "required",
-                            message: "Name is required",
+                            message: "ادخل اسم المستخدم ألأحير",
                         },
                         {
                             type: "minLength",
@@ -82,7 +82,7 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: "Email is required",
+                            message: "ادخل البريد الإلكتروني",
                         },
                         {
                             type: "email",
