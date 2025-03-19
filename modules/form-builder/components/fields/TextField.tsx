@@ -10,7 +10,7 @@ import { useLocale } from "next-intl";
 interface TextFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   type?: "text" | "email" | "password" | "number";
   onChange: (value: string) => void;
@@ -45,7 +45,7 @@ const TextField: React.FC<TextFieldProps> = ({
 
   // Check for errors in both the form store and the local state
   const hasStoreError = !!storeErrors[field.name];
-  const hasLocalError = error && touched;
+  const hasLocalError = !!error && touched;
   const showError = hasLocalError || hasStoreError;
 
   // Clear store error when value is empty

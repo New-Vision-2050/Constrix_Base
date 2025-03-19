@@ -12,10 +12,13 @@ import TrashIcon from "@/public/icons/trash";
 import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
+import { useTableInstance } from "@/modules/table/store/useTableStore";
 
 const Execution = ({ id }: { id: string }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const t = useTranslations();
+  // Get the reloadTable method directly from the table instance
+  const { reloadTable } = useTableInstance("companies-table");
 
   const menuItems = [
     {
@@ -57,7 +60,11 @@ const Execution = ({ id }: { id: string }) => {
         deleteUrl={`/companies/${id}`}
         onClose={handleClose}
         open={isOpen}
-        onSuccess={() => console.log("success deleting")}
+        onSuccess={() => {
+          console.log("success deleting");
+          // Reload the table after successful deletion using the centralized method
+          reloadTable();
+        }}
       />
     </>
   );

@@ -29,7 +29,7 @@ const ApiValidationExample: React.FC = () => {
             validation: [
               {
                 type: 'required',
-                message: 'Username is required',
+                message: 'Userالاسم مطلوب',
               },
               {
                 type: 'apiValidation',
@@ -54,7 +54,7 @@ const ApiValidationExample: React.FC = () => {
             validation: [
               {
                 type: 'required',
-                message: 'Email is required',
+                message: 'البريد الالكترونى مطلوب',
               },
               {
                 type: 'email',

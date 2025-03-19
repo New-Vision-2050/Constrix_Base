@@ -181,7 +181,7 @@ export default function FormTestPage() {
                   Cancel
                 </Button>
                 <Button type="submit" disabled={formWithTableReload.isSubmitting}>
-                  {formWithTableReload.isSubmitting ? 'Submitting...' : formConfig.submitButtonText}
+                  {formWithTableReload.isSubmitting ? 'جاري الحفظ' : formConfig.submitButtonText}
                 </Button>
               </div>
               

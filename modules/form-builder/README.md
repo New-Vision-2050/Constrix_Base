@@ -156,6 +156,8 @@ The form builder supports various field types:
 - `date`: Date picker
 - `search`: Search input with autocomplete
 - `phone`: Phone input with country code selection
+- `dynamicRows`: Dynamic rows field for managing arrays of objects with add/delete/sort capabilities
+- `hiddenObject`: Hidden field that stores an object or array of objects without visual representation
 
 ### Example Field Configurations
 
@@ -314,6 +316,128 @@ The form builder supports various field types:
 }
 ```
 
+#### Hidden Object Field
+
+```tsx
+{
+  type: 'hiddenObject',
+  name: 'userMetadata',
+  label: 'User Metadata', // Label is not displayed but used for identification
+  defaultValue: {
+    registrationSource: 'web',
+    userType: 'customer',
+    preferences: {
+      notifications: true,
+      theme: 'light'
+    }
+  }
+}
+```
+
+```tsx
+// Example with array of objects
+{
+  type: 'hiddenObject',
+  name: 'previousOrders',
+  label: 'Previous Orders',
+  defaultValue: [
+    {
+      id: '1001',
+      date: '2023-01-15',
+      total: 125.50,
+      items: [
+        { productId: 'p1', quantity: 2 },
+        { productId: 'p2', quantity: 1 }
+      ]
+    },
+    {
+      id: '1002',
+      date: '2023-02-20',
+      total: 75.25,
+      items: [
+        { productId: 'p3', quantity: 1 }
+      ]
+    }
+  ]
+}
+```
+
+#### Dynamic Rows Field
+
+```tsx
+{
+  type: 'dynamicRows',
+  name: 'contactPersons',
+  label: 'Contact Persons',
+  
+  // All options organized in dynamicRowOptions
+  dynamicRowOptions: {
+    // Fields for each row (rowTemplate will be auto-generated from these if not provided)
+    rowFields: [
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        required: true
+      },
+      {
+        name: 'email',
+        label: 'Email',
+        type: 'email',
+        required: true
+      }
+    ],
+    
+    // Column configuration
+    columns: 2,                // Fixed number of columns for all screen sizes
+    // Or use responsive options:
+    columnsSmall: 1,           // For small screens
+    columnsMedium: 2,          // For medium screens
+    columnsLarge: 3,           // For large screens
+    
+    // Styling options
+    rowBgColor: 'bg-slate-50/30',
+    rowHeaderBgColor: 'bg-primary/5',
+    
+    // Row limits
+    minRows: 1,
+    maxRows: 5
+  }
+}
+```
+
+The `dynamicRows` field type provides a powerful way to manage arrays of objects with add, delete, and sort capabilities:
+
+- **Row Management**: Users can add new rows, delete existing rows, and reorder rows using up/down buttons
+- **Customizable Fields**: Each row can contain multiple fields of any supported type
+- **Validation**: Built-in validation for required fields and custom validation rules
+- **Responsive Layout**: Configure different column counts for different screen sizes
+- **Styling Options**: Customize the appearance with background colors and other styling options
+- **Row Limits**: Set minimum and maximum number of rows
+
+This field type is ideal for collecting multiple entries of related data, such as:
+- Contact persons for a company
+- Order line items
+- Education or work experience entries
+- Family members or dependents
+- Multiple addresses
+
+```tsx
+// Example with condition - field will only be included in form submission if condition is true
+{
+  type: 'hiddenObject',
+  name: 'businessDetails',
+  label: 'Business Details',
+  condition: (values) => values.accountType === 'business',
+  defaultValue: {
+    companyType: 'llc',
+    employeeCount: 0,
+    industry: 'technology',
+    taxExempt: false
+  }
+}
+```
+
 ## Validation
 
 The form builder supports various validation rules:
@@ -328,6 +452,54 @@ The form builder supports various validation rules:
 - `url`: URL format validation
 - `custom`: Custom validation function
 - `apiValidation`: Validate against an API endpoint with debounce
+
+### Custom Validation
+
+You can create custom validation rules for any field type, including hiddenObject fields:
+
+```tsx
+{
+  type: 'hiddenObject',
+  name: 'orderData',
+  label: 'Order Data',
+  defaultValue: {
+    items: [],
+    totalAmount: 0,
+    discount: 0
+  },
+  validation: [
+    {
+      type: 'custom',
+      message: 'Order must have at least one item',
+      validator: (value) => {
+        // Check if the value is defined and has items
+        if (!value || !value.items || !Array.isArray(value.items)) {
+          return false;
+        }
+        // Check if there's at least one item
+        return value.items.length > 0;
+      }
+    },
+    {
+      type: 'custom',
+      message: 'Discount cannot exceed 50% of total amount',
+      validator: (value, formValues) => {
+        if (!value || typeof value.totalAmount !== 'number' || typeof value.discount !== 'number') {
+          return true; // Skip validation if values are not numbers
+        }
+        // Check if discount is valid
+        return value.discount <= (value.totalAmount * 0.5);
+      }
+    }
+  ]
+}
+```
+
+The validator function receives two parameters:
+- `value`: The current value of the field being validated
+- `formValues`: (Optional) The current values of all fields in the form
+
+This allows you to create complex validation rules that can depend on the values of other fields.
 
 ### API Validation
 
@@ -474,6 +646,26 @@ const formConfig: FormConfig = {
 | `onError` | `function` | Error callback |
 | `onCancel` | `function` | Cancel callback |
 | `onValidationError` | `function` | Validation error callback |
+
+### FieldConfig Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `type` | `string` | Field type (text, textarea, select, hiddenObject, etc.) |
+| `name` | `string` | Field name (used as the key in form values) |
+| `label` | `string` | Field label |
+| `defaultValue` | `any` | Default value for the field (especially useful for hiddenObject fields) |
+| `placeholder` | `string` | Placeholder text |
+| `helperText` | `string` | Helper text displayed below the field |
+| `required` | `boolean` | Whether the field is required |
+| `disabled` | `boolean` | Whether the field is disabled |
+| `hidden` | `boolean` | Whether the field is hidden |
+| `className` | `string` | Additional CSS classes for the field |
+| `containerClassName` | `string` | Additional CSS classes for the field container |
+| `width` | `string` | Width of the field (e.g., 'w-full', '200px') |
+| `options` | `DropdownOption[]` | Options for select, multiSelect, and radio fields |
+| `validation` | `ValidationRule[]` | Validation rules for the field |
+| `condition` | `function` | Function that determines whether the field should be displayed |
 
 ## Hooks
 
@@ -1107,6 +1299,214 @@ const OrderForm = () => {
     <SheetFormBuilder
       config={formConfig}
       onSuccess={(values) => console.log('Order placed:', values)}
+    />
+  );
+};
+```
+
+### Form with Dynamic Rows
+
+```tsx
+import { SheetFormBuilder } from '@/modules/form-builder';
+
+const EmployeeForm = () => {
+  const formConfig = {
+    formId: 'employee-form',
+    title: 'Employee Information',
+    sections: [
+      {
+        title: 'Basic Information',
+        fields: [
+          {
+            type: 'text',
+            name: 'fullName',
+            label: 'Full Name',
+            required: true,
+          },
+          {
+            type: 'email',
+            name: 'email',
+            label: 'Email Address',
+            required: true,
+          },
+          {
+            type: 'select',
+            name: 'department',
+            label: 'Department',
+            required: true,
+            options: [
+              { value: 'engineering', label: 'Engineering' },
+              { value: 'marketing', label: 'Marketing' },
+              { value: 'sales', label: 'Sales' },
+              { value: 'hr', label: 'Human Resources' },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'Work Experience',
+        fields: [
+          {
+            type: 'dynamicRows',
+            name: 'workExperience',
+            label: 'Work Experience',
+            
+            dynamicRowOptions: {
+              // rowTemplate is optional - will be auto-generated from rowFields
+              // You can provide it for more control over default values
+              // rowTemplate: {
+              //   company: '',
+              //   position: '',
+              //   startDate: '',
+              //   endDate: '',
+              //   currentlyWorking: false,
+              //   description: ''
+              // },
+              
+              // Fields for each row
+              rowFields: [
+                {
+                  name: 'company',
+                  label: 'Company',
+                  type: 'text',
+                  required: true
+                },
+                {
+                  name: 'position',
+                  label: 'Position',
+                  type: 'text',
+                  required: true
+                },
+                {
+                  name: 'startDate',
+                  label: 'Start Date',
+                  type: 'date',
+                  required: true
+                },
+                {
+                  name: 'endDate',
+                  label: 'End Date',
+                  type: 'date',
+                  condition: (values) => !values.currentlyWorking
+                },
+                {
+                  name: 'currentlyWorking',
+                  label: 'Currently Working Here',
+                  type: 'checkbox'
+                },
+                {
+                  name: 'description',
+                  label: 'Description',
+                  type: 'textarea'
+                }
+              ],
+              
+              // Layout configuration
+              columnsSmall: 1,
+              columnsMedium: 2,
+              columnsLarge: 3,
+              
+              // Row limits
+              minRows: 1,
+              maxRows: 10
+            }
+          }
+        ],
+      },
+      {
+        title: 'Education',
+        fields: [
+          {
+            type: 'dynamicRows',
+            name: 'education',
+            label: 'Education',
+            
+            dynamicRowOptions: {
+              // rowTemplate is auto-generated from rowFields
+              rowFields: [
+                {
+                  name: 'institution',
+                  label: 'Institution',
+                  type: 'text',
+                  required: true
+                },
+                {
+                  name: 'degree',
+                  label: 'Degree',
+                  type: 'select',
+                  required: true,
+                  options: [
+                    { value: 'highSchool', label: 'High School' },
+                    { value: 'associate', label: 'Associate Degree' },
+                    { value: 'bachelor', label: 'Bachelor\'s Degree' },
+                    { value: 'master', label: 'Master\'s Degree' },
+                    { value: 'doctorate', label: 'Doctorate' }
+                  ]
+                },
+                {
+                  name: 'fieldOfStudy',
+                  label: 'Field of Study',
+                  type: 'text'
+                },
+                {
+                  name: 'graduationYear',
+                  label: 'Graduation Year',
+                  type: 'number',
+                  required: true
+                }
+              ],
+              columns: 2,
+              minRows: 1,
+              maxRows: 5
+            }
+          }
+        ],
+      }
+    ],
+    submitButtonText: 'Save Employee Information',
+    onSubmit: async (values) => {
+      // Submit form data to API
+      console.log('Form values:', values);
+      
+      // Example of the data structure with dynamic rows:
+      // {
+      //   fullName: "John Doe",
+      //   email: "john@example.com",
+      //   department: "engineering",
+      //   workExperience: [
+      //     {
+      //       company: "ABC Corp",
+      //       position: "Developer",
+      //       startDate: "2020-01-15",
+      //       currentlyWorking: true
+      //     },
+      //     {
+      //       company: "XYZ Inc",
+      //       position: "Junior Developer",
+      //       startDate: "2018-06-01",
+      //       endDate: "2019-12-31",
+      //       currentlyWorking: false,
+      //       description: "Worked on various web projects"
+      //     }
+      //   ],
+      //   education: [
+      //     {
+      //       institution: "University of Example",
+      //       degree: "bachelor",
+      //       fieldOfStudy: "Computer Science",
+      //       graduationYear: 2018
+      //     }
+      //   ]
+      // }
+      
+      return { success: true };
+    },
+  };
+
+  return (
+    <SheetFormBuilder
+      config={formConfig}
+      onSuccess={(values) => console.log('Employee information saved:', values)}
     />
   );
 };

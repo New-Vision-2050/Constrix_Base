@@ -114,7 +114,9 @@
     "PackageSettings": "اعدادات الباقة والبرامج",
     "Delete": "حذف (أرشفة)",
     "Confirmation": "تأكيد",
-    "AreYouSure": "هل أنت متأكد؟"
+    "AreYouSure": "هل أنت متأكد؟",
+    "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
+    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
   },
   "Sidebar": {
     "Companies": "الشركات",

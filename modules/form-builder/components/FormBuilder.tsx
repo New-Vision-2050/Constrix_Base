@@ -9,7 +9,7 @@ import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 interface FormBuilderProps {
   config: FormConfig;
   values: Record<string, any>;
-  errors: Record<string, string>;
+  errors: Record<string, string | React.ReactNode>;
   touched: Record<string, boolean>;
   isSubmitting: boolean;
   submitSuccess: boolean;
@@ -147,6 +147,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             stepResponses={stepResponses}
             getStepResponseData={getStepResponseData}
             currentStep={currentStep}
+            clearFiledError={clearFiledError}
           />
         ) : isAccordion ? (
           config.sections.map((section, index) => (
@@ -184,6 +185,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               onChange={(field, value) => setValue(field, value)}
               onBlur={(field) => setTouched(field, true)}
               collapsible={section.collapsible}
+              clearFiledError={clearFiledError}
             />
           ))
         )}
@@ -279,7 +281,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 {isSubmittingStep ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Submitting...
+                    جاري الحفظ
                   </span>
                 ) : (
                   config.wizardOptions?.submitButtonTextPerStep || "Submit Step"
@@ -312,7 +314,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 {isSubmitting && config.showSubmitLoader ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Submitting...
+                    جاري الحفظ
                   </span>
                 ) : (
                   config.wizardOptions?.finishButtonText ||
@@ -334,7 +336,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             {isSubmitting && config.showSubmitLoader ? (
               <span className="flex items-center">
                 <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                Submitting...
+                جاري الحفظ
               </span>
             ) : (
               config.submitButtonText || "Submit"

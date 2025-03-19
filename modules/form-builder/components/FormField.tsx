@@ -9,6 +9,8 @@ import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
 import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
+import HiddenObjectField from './fields/HiddenObjectField';
+import DynamicRowsField from './fields/DynamicRowsField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
@@ -16,7 +18,7 @@ import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
 interface FormFieldProps {
   field: FieldConfig;
   value: any;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
@@ -212,11 +214,40 @@ const FormField: React.FC<FormFieldProps> = ({
                 onBlur={onBlur}
               />
             );
+            
+          case 'hiddenObject':
+            return (
+              <HiddenObjectField
+                field={field}
+                value={fieldValue}
+                onChange={onChange}
+                onBlur={onBlur}
+                values={values}
+              />
+            );
+            
+          case 'dynamicRows':
+            return (
+              <DynamicRowsField
+                field={field}
+                value={fieldValue || []}
+                error={error}
+                touched={touched}
+                onChange={onChange}
+                onBlur={onBlur}
+                formId={formId}
+              />
+            );
 
           default:
             return <div>Unsupported field type: {field.type}</div>;
     }
   };
+
+  // For hiddenObject type, just render the field without any wrapper
+  if (field.type === 'hiddenObject') {
+    return renderField();
+  }
 
   // For checkbox type, the label is already rendered with the checkbox
   if (field.type === 'checkbox') {

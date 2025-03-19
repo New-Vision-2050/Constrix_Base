@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface RadioFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string;
+  error?: string | React.ReactNode;
   touched?: boolean;
   onChange: (value: string) => void;
   onBlur: () => void;
@@ -42,7 +42,7 @@ const RadioField: React.FC<RadioFieldProps> = ({
             id={`${field.name}-${option.value}`}
             value={option.value}
             className={cn(
-              error && touched ? 'border-destructive' : ''
+              !!error && touched ? 'border-destructive' : ''
             )}
           />
           <Label

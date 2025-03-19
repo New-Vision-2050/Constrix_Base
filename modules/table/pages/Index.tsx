@@ -88,7 +88,10 @@ const Index = () => {
     return (
       <TableBuilder
         url={url}
-        tableId={indexTableId}
+        config={{
+          tableId: indexTableId,
+          url: url
+        }}
         onReset={handleReset}
         searchBarActions={renderSearchBarActions()}
       />

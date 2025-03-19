@@ -49,27 +49,67 @@ export const useFetchTracking = () => {
   }, []);
   
   const shouldFetchData = (url: string, paramsSignature: string) => {
-    // Generate a unique request ID
-    const requestId = `${url}|${paramsSignature}`;
+    // Try to parse the params signature to extract _forceRefetch
+    let params: any;
+    let forceRefetch = false;
+    
+    try {
+      params = JSON.parse(paramsSignature);
+      
+      // Check if this is a forced refetch
+      if (params._forceRefetch) {
+        // Extract _forceRefetch and create a signature without it
+        forceRefetch = true;
+        const { _forceRefetch, ...restParams } = params;
+        // Create a clean signature without the _forceRefetch property
+        params = restParams;
+      }
+    } catch (e) {
+      // If parsing fails, use the original signature
+      console.error('Failed to parse params signature:', e);
+    }
+    
+    // Generate a unique request ID (without _forceRefetch)
+    const cleanParamsSignature = params ? JSON.stringify(params) : paramsSignature;
+    const requestId = `${url}|${cleanParamsSignature}`;
     requestIdRef.current = requestId;
     
     // Always fetch if URL changes
     if (url !== prevUrlRef.current) {
-      console.log(`URL changed from ${prevUrlRef.current} to ${url}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[FetchTracking] URL changed from ${prevUrlRef.current} to ${url}`);
+      }
       prevUrlRef.current = url;
-      paramsSignatureRef.current = paramsSignature;
+      paramsSignatureRef.current = cleanParamsSignature;
       return true;
     }
     
-    // Skip if this exact request was just made
-    if (paramsSignature === paramsSignatureRef.current) {
-      console.log('Skipping duplicate API request with identical parameters');
+    // If this is a forced refetch, always fetch
+    if (forceRefetch) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[FetchTracking] Forced refetch requested');
+      }
+      
+      // Update the signature to include this force refetch
+      // This prevents multiple force refetches with the same parameters
+      paramsSignatureRef.current = cleanParamsSignature + `|force:${Date.now()}`;
+      
+      return true;
+    }
+    
+    // Skip if this exact request was just made (ignoring _forceRefetch)
+    if (cleanParamsSignature === paramsSignatureRef.current) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[FetchTracking] Skipping duplicate request');
+      }
       return false;
     }
     
     // Parameters changed, update signature and fetch
-    console.log('Parameters changed, fetching new data');
-    paramsSignatureRef.current = paramsSignature;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[FetchTracking] Parameters changed, fetching new data');
+    }
+    paramsSignatureRef.current = cleanParamsSignature;
     return true;
   };
   
@@ -78,6 +118,7 @@ export const useFetchTracking = () => {
     const url = prevUrlRef.current;
     
     // Check if we have an active request for this URL with different params
+    // We use paramsSignatureRef.current which already has _forceRefetch removed
     const existingRequest = activeRequestsMap.get(url);
     if (existingRequest && existingRequest.paramsSignature !== paramsSignatureRef.current) {
       // Abort the existing request since parameters changed
@@ -91,11 +132,11 @@ export const useFetchTracking = () => {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     
-    // Store in the global map
+    // Store in the global map with the clean signature (without _forceRefetch)
     activeRequestsMap.set(url, {
       controller,
       timestamp: Date.now(),
-      paramsSignature: paramsSignatureRef.current
+      paramsSignature: paramsSignatureRef.current // This already has _forceRefetch removed
     });
     
     return controller;

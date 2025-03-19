@@ -18,7 +18,7 @@ export const searchFormConfig: FormConfig = {
           validation: [
             {
               type: 'required',
-              message: 'Full name is required',
+              message: 'Full الاسم مطلوب',
             },
           ],
         },
@@ -31,7 +31,7 @@ export const searchFormConfig: FormConfig = {
           validation: [
             {
               type: 'required',
-              message: 'Email is required',
+              message: 'البريد الالكترونى مطلوب',
             },
             {
               type: 'email',

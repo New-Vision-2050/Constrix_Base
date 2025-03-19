@@ -2,8 +2,7 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
-import { Checkbox } from "@/modules/table/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 
 export const companiesFormConfig: FormConfig = {
   formId: "companies-form",
@@ -76,11 +75,11 @@ export const companiesFormConfig: FormConfig = {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
-                url: "/api/validate-username",
+                url: `${baseURL}/companies/validated`,
                 method: "POST",
                 debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
+                paramName: "name",
+                successCondition: (response) => response.payload.status === 1,
               },
             },
           ],
@@ -97,11 +96,11 @@ export const companiesFormConfig: FormConfig = {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
-                url: "/api/validate-username",
+                url: `${baseURL}/companies/validated`,
                 method: "POST",
                 debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
+                paramName: "user_name",
+                successCondition: (response) => response.payload.status === 1,
               },
             },
           ],
@@ -130,6 +129,41 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
+        {
+          type: "checkbox",
+          name: "change_local_time",
+          label: "الشركة",
+          placeholder: "اختر الشركة",
+          render: (field: any, value: boolean, onChange: (value: boolean) => void) => {
+            return <TimeZoneCheckbox field={field} value={value} onChange={onChange} />;
+          },
+          validation: [
+            {
+              type: 'custom',
+              message: 'Order must have at least one item',
+              validator: (value) => {
+
+                console.log('checkbox error: -----: ' , value)
+
+                return false
+              }
+            },
+          ]
+        },
+        {
+          type: 'hiddenObject',
+          name: 'local-time',
+          label: 'local-time',
+          condition(values) {
+            return !!values['change_local_time']
+          },
+          defaultValue: {
+            companyType: 'llc',
+            employeeCount: 0,
+            industry: 'technology',
+            taxExempt: false
+          }
+        },
       ],
     },
     {
@@ -155,12 +189,12 @@ export const companiesFormConfig: FormConfig = {
           name: "first_name",
           label: "اسم المستخدم الاول",
           type: "text",
-          placeholder: "Enter your name",
+          placeholder: "ادخل اسم المستخدم الاول",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "اسم المستخدم الاول مطلوب",
             },
             {
               type: "minLength",
@@ -173,12 +207,12 @@ export const companiesFormConfig: FormConfig = {
           name: "last_name",
           label: "اسم المستخدم ألأحير",
           type: "text",
-          placeholder: "سم المستخدم ألأحير",
+          placeholder: "اسم المستخدم ألأحير",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "الاسم مطلوب",
             },
             {
               type: "minLength",
@@ -191,12 +225,12 @@ export const companiesFormConfig: FormConfig = {
           name: "email",
           label: "البريد الإلكتروني",
           type: "email",
-          placeholder: "Enter your email",
+          placeholder: "ادخل البريد الإلكتروني",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Email is required",
+              message: "البريد الإلكتروني مطلوب",
             },
             {
               type: "email",
@@ -240,28 +274,9 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-        {
-          type: "checkbox",
-          name: "change_local_time",
-          label: "الشركة",
-          placeholder: "اختر الشركة",
-          render: (field, value, onChange) => {
-            return (
-              <div className="flex items-center gap-2 ">
-                <Checkbox
-                  checked={value}
-                  onCheckedChange={(b) => onChange(b)}
-                />
-                <div className="flex items-center gap-1">
-                  <p className="text-sm">لتأكيد تغيير المنطقة الزمنية،</p>
-                  <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
-                    اضغط هنا
-                  </Button>
-                </div>
-              </div>
-            );
-          },
-        },
+
+
+
       ],
     },
   ],

@@ -1,5 +1,4 @@
-import { SearchTypeConfig } from "@/components/shared/dropdowns/sharedTypes";
-import { FormConfig } from "../types/formTypes";
+import { FormConfig, SearchTypeConfig } from "../types/formTypes";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { baseURL } from "@/config/axios-config";
 
@@ -135,7 +134,7 @@ export const sheetFormConfig: FormConfig = {
           name: "name",
           label: "Full Name",
           type: "text",
-          placeholder: "Enter your name",
+          placeholder: "ادخل اسمك",
           required: true,
           // Example of using a condition based on previous step data
           condition: (values) => {
@@ -145,7 +144,7 @@ export const sheetFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "الاسم مطلوب",
             },
             {
               type: "minLength",
@@ -175,7 +174,7 @@ export const sheetFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "Email is required",
+              message: "البريد الالكترونى مطلوب",
             },
             {
               type: "email",

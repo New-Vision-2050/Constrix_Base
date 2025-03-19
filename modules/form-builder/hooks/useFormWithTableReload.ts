@@ -1,8 +1,7 @@
 "use client";
-import { useCallback } from "react";
 import { FormConfig } from "../types/formTypes";
 import { useSheetForm } from "./useSheetForm";
-import { useTableStore } from "@/modules/table/store/useTableStore";
+import { useTableInstance } from "@/modules/table/store/useTableStore";
 
 interface UseFormWithTableReloadProps {
   config: FormConfig;
@@ -21,6 +20,9 @@ export const useFormWithTableReload = ({
   onSuccess,
   onCancel,
 }: UseFormWithTableReloadProps) => {
+  // Get the reloadTable function from the table instance
+  const { reloadTable } = useTableInstance(tableId);
+
   // Get the form functionality
   const form = useSheetForm({
     config,
@@ -30,25 +32,11 @@ export const useFormWithTableReload = ({
         onSuccess(data);
       }
       
-      // Reload the table
+      // Reload the table using the centralized method from TableStore
       reloadTable();
     },
     onCancel,
   });
-
-  // Function to reload the table
-  const reloadTable = useCallback(() => {
-    // Get the table store
-    const tableStore = useTableStore.getState();
-    
-    // Set loading state
-    tableStore.setLoading(tableId, true);
-    
-    // Use a small timeout to ensure the loading state is applied
-    setTimeout(() => {
-      tableStore.setLoading(tableId, false);
-    }, 100);
-  }, [tableId]);
 
   return {
     ...form,

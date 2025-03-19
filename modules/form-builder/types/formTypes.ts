@@ -3,7 +3,7 @@ import React from 'react';
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
   value?: any;
-  message: string;
+  message: string | React.ReactNode;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
   apiConfig?: {
     url: string;
@@ -18,6 +18,23 @@ export interface ValidationRule {
 export interface DropdownOption {
   value: string;
   label: string;
+}
+
+export interface DynamicRowOptions {
+  rowTemplate?: Record<string, any>; // Optional template for new rows (will be auto-generated from rowFields if not provided)
+  rowFields?: FieldConfig[]; // Fields to display for each row
+  minRows?: number; // Minimum number of rows
+  maxRows?: number; // Maximum number of rows
+  rowBgColor?: string; // Optional custom background color for rows
+  rowHeaderBgColor?: string; // Optional custom background color for row headers
+  columns?: number; // Number of columns for all screen sizes
+  columnsSmall?: number; // Number of columns on small screens (default: 1)
+  columnsMedium?: number; // Number of columns on medium screens (default: 2)
+  columnsLarge?: number; // Number of columns on large screens (default: 3)
+  enableDrag?: boolean; // Enable drag-and-drop reordering of rows
+  dragHandlePosition?: 'left' | 'right'; // Position of the drag handle (default: 'left')
+  onDragStart?: (index: number) => void; // Callback when drag starts
+  onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
 }
 
 export interface DynamicDropdownConfig {
@@ -46,7 +63,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows';
   name: string;
   label: string;
   placeholder?: string;
@@ -70,6 +87,8 @@ export interface FieldConfig {
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isMulti?: boolean; // Whether to enable multi-select functionality
   postfix?: string; // Text to display after the input field
+  defaultValue?: any; // Default value for the field
+  dynamicRowOptions?: DynamicRowOptions; // Configuration for dynamic rows field
 }
 
 export interface FormSection {
@@ -91,22 +110,22 @@ export interface WizardOptions {
   prevButtonText?: string; // Text for the previous button
   finishButtonText?: string; // Text for the finish button on the last step
   onStepChange?: (prevStep: number, nextStep: number, values: Record<string, any>) => void; // Callback when step changes
-  
+
   // New options for step submission
   submitEachStep?: boolean; // Whether to submit each step individually
   submitButtonTextPerStep?: string; // Text for the submit button on each step
-  
+
   // API configuration for each step
   stepApiUrls?: Record<number, string>; // API URLs for each step (key is step index)
   stepApiHeaders?: Record<number, Record<string, string>>; // API headers for each step (key is step index)
-  
+
   onStepSubmit?: (step: number, values: Record<string, any>) => Promise<{
     success: boolean;
     message?: string;
     data?: Record<string, any>; // Data that can be used in subsequent steps
     errors?: Record<string, string | string[]>;
   }>;
-  
+
   // Store responses from each step
   stepResponses?: Record<number, {
     success: boolean;
@@ -146,7 +165,7 @@ export interface FormConfig {
   onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
   onError?: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => void;
   onCancel?: () => void;
-  onValidationError?: (errors: Record<string, string>) => void;
+  onValidationError?: (errors: Record<string, string | React.ReactNode>) => void;
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
 }

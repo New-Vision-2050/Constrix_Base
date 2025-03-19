@@ -24,7 +24,7 @@ const formConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "Name is required"
+              message: "الاسم مطلوب"
             },
             {
               type: "minLength",
@@ -41,7 +41,7 @@ const formConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "Email is required"
+              message: "البريد الالكترونى مطلوب"
             },
             {
               type: "email",
@@ -163,7 +163,7 @@ export default function FormIsolatedExamplePage() {
               type="submit"
               disabled={form.isSubmitting}
             >
-              {form.isSubmitting ? 'Submitting...' : formConfig.submitButtonText}
+              {form.isSubmitting ? 'جاري الحفظ' : formConfig.submitButtonText}
             </Button>
           </div>
         </form>

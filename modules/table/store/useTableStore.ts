@@ -37,6 +37,9 @@ interface TableInstanceState {
     visible: boolean;
     keys: string[];
   };
+  
+  // Internal state for reload functionality
+  _forceRefetch?: number; // Timestamp to force a refetch
 }
 
 // Define the global store that holds multiple table instances
@@ -63,6 +66,7 @@ interface TableState {
   setSearch: (tableId: string, query: string, fields?: string[]) => void;
   setColumnSearch: (tableId: string, columnKey: string, value: string | string[]) => void;
   resetTable: (tableId: string) => void;
+  reloadTable: (tableId: string) => void; // New method to reload table data
   
   // Column visibility actions
   setColumnVisibility: (tableId: string, visible: boolean) => void;
@@ -313,7 +317,6 @@ export const useTableStore = create<TableState>((set) => ({
       }
     };
   }),
-  
   setColumnVisibilityKeys: (tableId: string, keys: string[]) => set((state: TableState) => {
     const tableState = state.tables[tableId] || getDefaultTableState();
     
@@ -326,6 +329,31 @@ export const useTableStore = create<TableState>((set) => ({
             ...tableState.columnVisibility,
             keys
           }
+        }
+      }
+    };
+  }),
+  
+  // Reload table data by forcing a refetch
+  reloadTable: (tableId: string) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    if (!tableState) return state;
+    
+    // Generate a unique timestamp to force a refetch
+    const timestamp = Date.now();
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[TableStore] Reloading table ${tableId} with timestamp ${timestamp}`);
+    }
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          loading: true,
+          // Set the _forceRefetch property to the current timestamp
+          _forceRefetch: timestamp
         }
       }
     };
@@ -399,6 +427,19 @@ export const useTableInstance = (tableId: string) => {
     
   const setColumnVisibilityKeys = useCallback((keys: string[]) =>
     useTableStore.getState().setColumnVisibilityKeys(tableId, keys), [tableId]);
+    
+  const reloadTable = useCallback(() => {
+    // Get the table store
+    const tableStore = useTableStore.getState();
+    
+    // Call the reloadTable method
+    tableStore.reloadTable(tableId);
+    
+    // After a short delay, set loading back to false
+    setTimeout(() => {
+      tableStore.setLoading(tableId, false);
+    }, 200); // Increased timeout to ensure fetch completes
+  }, [tableId]);
   
   return {
     // State
@@ -419,7 +460,8 @@ export const useTableInstance = (tableId: string) => {
     setColumnSearch,
     resetTable,
     setColumnVisibility,
-    setColumnVisibilityKeys
+    setColumnVisibilityKeys,
+    reloadTable // Expose the reloadTable method
   };
 };
 

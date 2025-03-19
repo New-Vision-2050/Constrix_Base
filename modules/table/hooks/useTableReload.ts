@@ -1,37 +1,22 @@
 "use client";
-import { useCallback } from 'react';
-import { useTableStore, useTableInstance } from '@/modules/table/store/useTableStore';
+import { useTableInstance } from '@/modules/table/store/useTableStore';
 
 /**
  * Custom hook that provides a method to reload the table data
  * This can be used after form submissions or other actions that modify data
  *
  * How it works:
- * 1. The hook uses the table store's setLoading method to trigger a loading state
- * 2. When loading state changes, the useTableFetchEffect hook in useTableData will
- *    detect the change and refetch the data from the server
- * 3. This ensures the table displays the most up-to-date data after form submissions
- *    or other actions that modify data
+ * 1. The hook uses the reloadTable method from the table instance
+ * 2. This method is implemented in the TableStore and handles all the
+ *    complexity of forcing a refetch by manipulating the search query
+ * 3. This ensures the table displays the most up-to-date data after form submissions,
+ *    deletions, or other actions that modify data, even if already on page 1
  */
 export const useTableReload = (tableId: string = 'default') => {
   // Get the table instance for the specified tableId
-  const { setLoading } = useTableInstance(tableId);
+  // which now includes the reloadTable method
+  const { reloadTable } = useTableInstance(tableId);
   
-  /**
-   * Reload the table data by triggering a refetch
-   * This works by temporarily setting loading to true, which will cause
-   * the useTableFetchEffect to refetch the data
-   */
-  const reloadTable = useCallback(() => {
-    // Set loading to true to trigger a refetch
-    setLoading(true);
-    
-    // After a short delay, set loading back to false
-    // This ensures the loading state is visible to the user
-    setTimeout(() => {
-      setLoading(false);
-    }, 100);
-  }, [setLoading]);
-
+  // Simply return the reloadTable method from the table instance
   return { reloadTable };
 };

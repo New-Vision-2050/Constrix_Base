@@ -171,7 +171,7 @@ export const UsersConfig = () => {
         },
       },
       {
-        key: "ephone",
+        key: "email_or_phone",
         searchType: {
           type: "text",
           placeholder: "البريد الإليكتروني / الجوال"
