@@ -116,7 +116,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               )}
               onKeyDown={handleKeyDown}
             >
-              <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-start">
+              <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
                 {(value && (!isMulti || (Array.isArray(value) && value.length > 0)))
                   ? selectedLabel
                   : placeholder}
