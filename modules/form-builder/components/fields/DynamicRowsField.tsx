@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FieldConfig, DynamicRowOptions } from "../../types/formTypes";
 import { useFormInstance } from "../../hooks/useFormStore";
 import { cn } from "@/lib/utils";
-import { Trash2, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { Trash2, ArrowUp, ArrowDown, Plus, GripVertical } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
@@ -21,9 +21,10 @@ export interface DynamicRowsFieldRef {
  *
  * Features:
  * - Add/remove rows with validation
- * - Reorder rows with up/down buttons
+ * - Reorder rows with up/down buttons or drag-and-drop
  * - Customizable row templates
- * - Field-level validation
+ * - Comprehensive field-level validation with support for multiple validation rules
+ * - Form submission prevention when validation fails
  * - Configurable minimum and maximum rows
  * - Customizable styling with transparent backgrounds
  *
@@ -35,6 +36,8 @@ export interface DynamicRowsFieldRef {
  * - columnsSmall/columnsMedium/columnsLarge: Responsive column counts
  * - rowBgColor: Optional CSS class for row background
  * - rowHeaderBgColor: Optional CSS class for row header background
+ * - enableDrag: Enable drag-and-drop reordering of rows
+ * - dragHandlePosition: Position of the drag handle (default: 'left')
  */
 
 // DynamicRowOptions interface is now imported from formTypes.ts
@@ -132,6 +135,10 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
   // State for delete confirmation
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // State for drag and drop
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Ensure value is an array
   const rows = useMemo(() => {
@@ -248,6 +255,62 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
 
     onChange(newRows);
   }, [rows, onChange]);
+  
+  // Drag handlers
+  const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+    setDraggedIndex(index);
+    if (options.onDragStart) {
+      options.onDragStart(index);
+    }
+  }, [options]);
+  
+  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  }, []);
+  
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
+  
+  const handleDragLeave = useCallback(() => {
+    // Optional: Add visual feedback when dragging leaves an item
+  }, []);
+  
+  const handleDrop = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    const draggedIdx = Number(e.dataTransfer.getData('text/plain'));
+    
+    if (isNaN(draggedIdx) || draggedIdx === index) return;
+    
+    // Reorder the rows
+    const newRows = [...rows];
+    const draggedItem = newRows[draggedIdx];
+    
+    // Remove the dragged item
+    newRows.splice(draggedIdx, 1);
+    
+    // Insert at the new position
+    newRows.splice(index, 0, draggedItem);
+    
+    // Update state
+    onChange(newRows);
+    
+    // Reset drag state
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    
+    // Call the callback if provided
+    if (options.onDragEnd) {
+      options.onDragEnd(draggedIdx, index);
+    }
+  }, [rows, onChange, options]);
+  
+  const handleDragEnd = useCallback(() => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  }, []);
 
   // Update a specific field in a row
   const updateRowField = useCallback((rowIndex: number, fieldName: string, fieldValue: any) => {
@@ -315,29 +378,85 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
         row.touched = {};
       }
 
-      // Mark all fields as touched
+      // Mark all fields as touched during validation
+      // This ensures errors are displayed even if the user hasn't interacted with the field
       if (options.rowFields) {
         options.rowFields.forEach(rowField => {
           row.touched[rowField.name] = true;
-        });
-
-        // Validate each field in the row
-        options.rowFields.forEach(rowField => {
-          if (rowField.required && (!row[rowField.name] || row[rowField.name] === '')) {
+          
+          // Clear previous errors for this field
+          row.errors[rowField.name] = null;
+          
+          // Required field validation
+          if (rowField.required && (row[rowField.name] === undefined || row[rowField.name] === null || row[rowField.name] === '')) {
             row.errors[rowField.name] = `${rowField.label} is required`;
             isValid = false;
           }
-
-          // Add more validation rules as needed
+          
+          // Apply custom validation rules if defined
+          if (rowField.validation && Array.isArray(rowField.validation)) {
+            for (const rule of rowField.validation) {
+              // Skip if already has error or if it's a required rule (already handled)
+              if (row.errors[rowField.name] || rule.type === 'required') continue;
+              
+              let validationFailed = false;
+              
+              switch (rule.type) {
+                case 'minLength':
+                  if (typeof row[rowField.name] === 'string' && row[rowField.name].length < rule.value) {
+                    validationFailed = true;
+                  }
+                  break;
+                case 'maxLength':
+                  if (typeof row[rowField.name] === 'string' && row[rowField.name].length > rule.value) {
+                    validationFailed = true;
+                  }
+                  break;
+                case 'min':
+                  if (typeof row[rowField.name] === 'number' && row[rowField.name] < rule.value) {
+                    validationFailed = true;
+                  }
+                  break;
+                case 'max':
+                  if (typeof row[rowField.name] === 'number' && row[rowField.name] > rule.value) {
+                    validationFailed = true;
+                  }
+                  break;
+                case 'pattern':
+                  if (typeof row[rowField.name] === 'string' && !new RegExp(rule.value).test(row[rowField.name])) {
+                    validationFailed = true;
+                  }
+                  break;
+                case 'custom':
+                  if (rule.validator && !rule.validator(row[rowField.name], row)) {
+                    validationFailed = true;
+                  }
+                  break;
+              }
+              
+              if (validationFailed) {
+                row.errors[rowField.name] = rule.message;
+                isValid = false;
+              }
+            }
+          }
         });
       }
     });
 
     // Update rows with validation results
     onChange(newRows);
+    
+    // If validation failed, set the field error to indicate the dynamic rows have errors
+    if (!isValid && formInstance) {
+      formInstance.setError(field.name, `One or more ${field.label || 'rows'} have validation errors`);
+    } else if (formInstance) {
+      // Clear the error by setting it to null
+      formInstance.setError(field.name, null);
+    }
 
     return isValid;
-  }, [options.rowFields, rows, onChange]);
+  }, [options.rowFields, rows, onChange, field.name, field.label, formInstance]);
 
   // Generate grid column classes based on configuration
   const getGridColumnClasses = useCallback(() => {
@@ -377,13 +496,22 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
             return (
               <div
                 key={row.id || index}
+                draggable={!!options.enableDrag}
+                onDragStart={options.enableDrag ? (e) => handleDragStart(e, index) : undefined}
+                onDragOver={options.enableDrag ? (e) => handleDragOver(e, index) : undefined}
+                onDragEnter={options.enableDrag ? handleDragEnter : undefined}
+                onDragLeave={options.enableDrag ? handleDragLeave : undefined}
+                onDrop={options.enableDrag ? (e) => handleDrop(e, index) : undefined}
+                onDragEnd={options.enableDrag ? handleDragEnd : undefined}
                 className={cn(
                   "flex flex-col p-5 border rounded-lg transition-all duration-300 animate-in fade-in-50 slide-in-from-bottom-5",
                   hasErrors
                     ? "border-destructive/50 bg-destructive/5"
                     : options.rowBgColor
                       ? `border-border ${options.rowBgColor} hover:border-primary/30 hover:shadow-sm`
-                      : "border-border bg-transparent hover:border-primary/30 hover:shadow-sm"
+                      : "border-border bg-transparent hover:border-primary/30 hover:shadow-sm",
+                  draggedIndex === index && "opacity-50",
+                  dragOverIndex === index && "border-primary border-2"
                 )}
               >
                 {/* Row header with index and actions */}
@@ -392,6 +520,14 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                   options.rowHeaderBgColor
                 )}>
                   <div className="flex items-center">
+                    {options.enableDrag && (
+                      <div
+                        className="cursor-grab active:cursor-grabbing mr-2 text-muted-foreground hover:text-primary"
+                        title="Drag to reorder"
+                      >
+                        <GripVertical className="h-4 w-4" />
+                      </div>
+                    )}
                     <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-sm font-medium mr-2">
                       {index + 1}
                     </span>

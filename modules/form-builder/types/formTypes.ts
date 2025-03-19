@@ -31,6 +31,10 @@ export interface DynamicRowOptions {
   columnsSmall?: number; // Number of columns on small screens (default: 1)
   columnsMedium?: number; // Number of columns on medium screens (default: 2)
   columnsLarge?: number; // Number of columns on large screens (default: 3)
+  enableDrag?: boolean; // Enable drag-and-drop reordering of rows
+  dragHandlePosition?: 'left' | 'right'; // Position of the drag handle (default: 'left')
+  onDragStart?: (index: number) => void; // Callback when drag starts
+  onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
 }
 
 export interface DynamicDropdownConfig {
