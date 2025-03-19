@@ -36,7 +36,7 @@ interface DeleteConfirmationProps {
   isLoading?: boolean;
 }
 
-// Simple delete confirmation dialog
+// Enhanced delete confirmation dialog
 const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
   open,
   onClose,
@@ -45,36 +45,40 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader className="items-center justify-center mb-9">
-          <DialogTitle>
-            <button
-              className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-white"
-              onClick={onClose}
-            >
-              ✕
-            </button>
+      <DialogContent className="max-w-md border-destructive/20">
+        <DialogHeader className="items-center justify-center mb-6">
+          <div className="bg-destructive/10 p-3 rounded-full mb-4 flex items-center justify-center">
             <InfoIcon />
+          </div>
+          <DialogTitle className="text-xl font-semibold">
+            تأكيد الحذف
           </DialogTitle>
+          <button
+            className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-destructive transition-colors"
+            onClick={onClose}
+          >
+            ✕
+          </button>
         </DialogHeader>
-        <div className="text-center !text-[#EAEAFFDE] !text-2xl mb-9">
-          هل انت متاكد تريد الحذف؟
+        <div className="text-center text-muted-foreground mb-6 px-4">
+          هل انت متاكد تريد الحذف؟ لا يمكن التراجع عن هذا الإجراء.
         </div>
-        <DialogFooter className="!items-center !justify-center gap-3">
+        <DialogFooter className="!items-center !justify-center gap-3 pt-2">
           <Button
             onClick={onConfirm}
             loading={isLoading}
-            className="w-32 h-10"
+            variant="destructive"
+            className="w-32 h-10 transition-all duration-200"
           >
-            حذف
+            تأكيد الحذف
           </Button>
           <Button
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
-            className="w-32 h-10"
+            className="w-32 h-10 border-muted-foreground/30 hover:bg-muted/50"
           >
-            الغاء
+            إلغاء
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -269,96 +273,133 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
 
   return (
     <div className={cn("w-full", field.containerClassName)}>
-      <div className="space-y-4">
-        {rows.map((row, index) => (
-          <div
-            key={row.id || index}
-            className="flex items-start p-4 border border-border rounded-md bg-card"
-          >
-            <div className="flex flex-col items-center justify-center mr-2 space-y-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => moveRowUp(index)}
-                disabled={index === 0}
-                className="h-8 w-8"
-              >
-                <ArrowUp className="h-4 w-4 text-muted-foreground" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => moveRowDown(index)}
-                disabled={index === rows.length - 1}
-                className="h-8 w-8"
-              >
-                <ArrowDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
+      <div className="space-y-6">
+        {rows.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-lg bg-muted/30">
+            <div className="text-muted-foreground text-center mb-4">
+              <p className="text-sm">لا توجد بيانات حتى الآن</p>
+              <p className="text-xs mt-1">أضف {field.label || 'صف جديد'} للبدء</p>
             </div>
-
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {field.rowFields?.map((rowField) => {
-                const fieldKey = rowField.name;
-                return (
-                  <div key={fieldKey} className="flex flex-col">
-                    <FormField
-                      formId={formId}
-                      key={fieldKey}
-                      values={row}
-                      field={rowField}
-                      value={row[fieldKey] || ''}
-                      error={row.errors?.[fieldKey]}
-                      touched={row.touched?.[fieldKey]}
-                      onChange={(fieldName, fieldValue) => updateRowField(index, fieldName, fieldValue)}
-                      onBlur={() => {
-                        // Mark field as touched on blur
-                        const newRows = [...rows];
-                        if (!newRows[index].touched) {
-                          newRows[index].touched = {};
-                        }
-                        newRows[index].touched[fieldKey] = true;
-
-                        // Validate field on blur if required
-                        if (rowField.required && (!row[fieldKey] || row[fieldKey] === '')) {
-                          if (!newRows[index].errors) {
-                            newRows[index].errors = {};
-                          }
-                          newRows[index].errors[fieldKey] = `${rowField.label} is required`;
-                        }
-
-                        onChange(newRows);
-                      }}
-                    />
+          </div>
+        ) : (
+          rows.map((row, index) => {
+            // Determine if the row has any errors
+            const hasErrors = row.errors && Object.values(row.errors).some(error => !!error);
+            
+            return (
+              <div
+                key={row.id || index}
+                className={cn(
+                  "flex flex-col p-5 border rounded-lg transition-all duration-300 animate-in fade-in-50 slide-in-from-bottom-5",
+                  hasErrors
+                    ? "border-destructive/50 bg-destructive/5"
+                    : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                )}
+              >
+                {/* Row header with index and actions */}
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-border/50">
+                  <div className="flex items-center">
+                    <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-sm font-medium mr-2">
+                      {index + 1}
+                    </span>
+                    <h4 className="text-sm font-medium text-foreground">
+                      {field.label} {index + 1}
+                    </h4>
                   </div>
-                );
-              })}
-            </div>
+                  
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => moveRowUp(index)}
+                      disabled={index === 0}
+                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      title="Move up"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => moveRowDown(index)}
+                      disabled={index === rows.length - 1}
+                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      title="Move down"
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                    {canDeleteRow && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteRow(index)}
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        title="Delete row"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Row fields */}
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {field.rowFields?.map((rowField) => {
+                    const fieldKey = rowField.name;
+                    return (
+                      <div key={fieldKey} className="flex flex-col">
+                        <FormField
+                          formId={formId}
+                          key={fieldKey}
+                          values={row}
+                          field={rowField}
+                          value={row[fieldKey] || ''}
+                          error={row.errors?.[fieldKey]}
+                          touched={row.touched?.[fieldKey]}
+                          onChange={(fieldName, fieldValue) => updateRowField(index, fieldName, fieldValue)}
+                          onBlur={() => {
+                            // Mark field as touched on blur
+                            const newRows = [...rows];
+                            if (!newRows[index].touched) {
+                              newRows[index].touched = {};
+                            }
+                            newRows[index].touched[fieldKey] = true;
 
-                      {canDeleteRow && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteRow(index)}
-                          className="ml-2 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </Button>
-                      )}
-                    </div>
-               ))}
-             </div>
+                            // Validate field on blur if required
+                            if (rowField.required && (!row[fieldKey] || row[fieldKey] === '')) {
+                              if (!newRows[index].errors) {
+                                newRows[index].errors = {};
+                              }
+                              newRows[index].errors[fieldKey] = `${rowField.label} is required`;
+                            }
+
+                            onChange(newRows);
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
 
       {canAddRow && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="mt-4"
-          onClick={handleAddRow}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          إضافة صف جديد
-        </Button>
+        <div className="mt-6 flex justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="group relative overflow-hidden border-dashed border-primary/40 hover:border-primary transition-all duration-300 px-6"
+            onClick={handleAddRow}
+          >
+            <span className="absolute inset-0 bg-primary/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            <Plus className="h-4 w-4 mr-2 text-primary" />
+            <span>إضافة {field.label || 'صف جديد'}</span>
+          </Button>
+        </div>
       )}
 
       {/* Delete confirmation dialog */}
