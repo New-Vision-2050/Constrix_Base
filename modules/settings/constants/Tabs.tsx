@@ -1,3 +1,4 @@
+import ChatSettingsTab from "../components/tabs/ChatSettings";
 import IdentifierSettingTab from "../components/tabs/IdentifierSetting";
 import { SystemTab } from "../types/SystemTab";
 
@@ -29,7 +30,11 @@ export const SystemSettingTabs: SystemTab[] = [
   {
     id: "ChatSettings",
     title: "اعدادات المراسلات",
-    content: "اعدادات المراسلات",
+    content: (
+      <>
+        <ChatSettingsTab />
+      </>
+    ),
   },
   {
     id: "StorageSettings",

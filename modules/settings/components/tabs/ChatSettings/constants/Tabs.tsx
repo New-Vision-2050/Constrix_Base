@@ -1,10 +1,15 @@
 import { SystemTab } from "@/modules/settings/types/SystemTab";
+import ChatSettingEmailTab from "../tabs/email-setting-tab";
 
 export const ChatSettingsTabs: SystemTab[] = [
   {
     id: "ChatSettingsTab_email",
     title: "البريد الالكتروني",
-    content: <>البريد الالكتروني</>,
+    content: (
+      <>
+        <ChatSettingEmailTab />
+      </>
+    ),
   },
   {
     id: "ChatSettingsTab_sms",
