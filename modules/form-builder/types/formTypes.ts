@@ -20,6 +20,19 @@ export interface DropdownOption {
   label: string;
 }
 
+export interface DynamicRowOptions {
+  rowTemplate?: Record<string, any>; // Optional template for new rows (will be auto-generated from rowFields if not provided)
+  rowFields?: FieldConfig[]; // Fields to display for each row
+  minRows?: number; // Minimum number of rows
+  maxRows?: number; // Maximum number of rows
+  rowBgColor?: string; // Optional custom background color for rows
+  rowHeaderBgColor?: string; // Optional custom background color for row headers
+  columns?: number; // Number of columns for all screen sizes
+  columnsSmall?: number; // Number of columns on small screens (default: 1)
+  columnsMedium?: number; // Number of columns on medium screens (default: 2)
+  columnsLarge?: number; // Number of columns on large screens (default: 3)
+}
+
 export interface DynamicDropdownConfig {
   url: string;
   valueField: string;
@@ -71,12 +84,12 @@ export interface FieldConfig {
   isMulti?: boolean; // Whether to enable multi-select functionality
   postfix?: string; // Text to display after the input field
   defaultValue?: any; // Default value for the field
-  
-  // Dynamic Rows Field specific properties
-  rowTemplate?: Record<string, any>; // Template for new rows in dynamicRows
-  rowFields?: FieldConfig[]; // Fields to display for each row in dynamicRows
-  minRows?: number; // Minimum number of rows for dynamicRows
-  maxRows?: number; // Maximum number of rows for dynamicRows
+  dynamicRowOptions?: DynamicRowOptions; // Configuration for dynamic rows field
+  // The following properties are deprecated - use dynamicRowOptions instead
+  rowTemplate?: Record<string, any>; // Deprecated: Template for new rows in dynamicRows
+  rowFields?: FieldConfig[]; // Deprecated: Fields to display for each row in dynamicRows
+  minRows?: number; // Deprecated: Minimum number of rows for dynamicRows
+  maxRows?: number; // Deprecated: Maximum number of rows for dynamicRows
 }
 
 export interface FormSection {
@@ -98,22 +111,22 @@ export interface WizardOptions {
   prevButtonText?: string; // Text for the previous button
   finishButtonText?: string; // Text for the finish button on the last step
   onStepChange?: (prevStep: number, nextStep: number, values: Record<string, any>) => void; // Callback when step changes
-  
+
   // New options for step submission
   submitEachStep?: boolean; // Whether to submit each step individually
   submitButtonTextPerStep?: string; // Text for the submit button on each step
-  
+
   // API configuration for each step
   stepApiUrls?: Record<number, string>; // API URLs for each step (key is step index)
   stepApiHeaders?: Record<number, Record<string, string>>; // API headers for each step (key is step index)
-  
+
   onStepSubmit?: (step: number, values: Record<string, any>) => Promise<{
     success: boolean;
     message?: string;
     data?: Record<string, any>; // Data that can be used in subsequent steps
     errors?: Record<string, string | string[]>;
   }>;
-  
+
   // Store responses from each step
   stepResponses?: Record<number, {
     success: boolean;

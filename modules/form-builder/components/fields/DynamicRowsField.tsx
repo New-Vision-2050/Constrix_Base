@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { FieldConfig } from "../../types/formTypes";
+import { FieldConfig, DynamicRowOptions } from "../../types/formTypes";
 import { useFormInstance } from "../../hooks/useFormStore";
 import { cn } from "@/lib/utils";
 import { Trash2, ArrowUp, ArrowDown, Plus } from "lucide-react";
@@ -37,19 +37,7 @@ export interface DynamicRowsFieldRef {
  * - rowHeaderBgColor: Optional CSS class for row header background
  */
 
-// Dynamic row options interface
-interface DynamicRowOptions {
-  rowTemplate?: Record<string, any>; // Optional template for new rows (will be auto-generated from rowFields if not provided)
-  rowFields?: FieldConfig[]; // Fields to display for each row
-  minRows?: number; // Minimum number of rows
-  maxRows?: number; // Maximum number of rows
-  rowBgColor?: string; // Optional custom background color for rows
-  rowHeaderBgColor?: string; // Optional custom background color for row headers
-  columns?: number; // Number of columns for all screen sizes
-  columnsSmall?: number; // Number of columns on small screens (default: 1)
-  columnsMedium?: number; // Number of columns on medium screens (default: 2)
-  columnsLarge?: number; // Number of columns on large screens (default: 3)
-}
+// DynamicRowOptions interface is now imported from formTypes.ts
 
 interface DynamicRowsFieldProps {
   field: FieldConfig & {
