@@ -85,11 +85,6 @@ export interface FieldConfig {
   postfix?: string; // Text to display after the input field
   defaultValue?: any; // Default value for the field
   dynamicRowOptions?: DynamicRowOptions; // Configuration for dynamic rows field
-  // The following properties are deprecated - use dynamicRowOptions instead
-  rowTemplate?: Record<string, any>; // Deprecated: Template for new rows in dynamicRows
-  rowFields?: FieldConfig[]; // Deprecated: Fields to display for each row in dynamicRows
-  minRows?: number; // Deprecated: Minimum number of rows for dynamicRows
-  maxRows?: number; // Deprecated: Maximum number of rows for dynamicRows
 }
 
 export interface FormSection {
