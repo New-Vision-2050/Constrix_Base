@@ -14,12 +14,46 @@ export interface DynamicRowsFieldRef {
   validateAllRows: () => boolean;
 }
 
+/**
+ * DynamicRowsField Component
+ *
+ * A form field component that allows users to add, delete, and sort rows of JSON data.
+ *
+ * Features:
+ * - Add/remove rows with validation
+ * - Reorder rows with up/down buttons
+ * - Customizable row templates
+ * - Field-level validation
+ * - Configurable minimum and maximum rows
+ * - Customizable styling with transparent backgrounds
+ *
+ * Configuration options (via dynamicRowOptions):
+ * - rowFields: Fields to display for each row
+ * - rowTemplate: Optional template for new rows (will be auto-generated from rowFields if not provided)
+ * - minRows/maxRows: Limits on number of rows
+ * - columns: Number of columns for all screen sizes
+ * - columnsSmall/columnsMedium/columnsLarge: Responsive column counts
+ * - rowBgColor: Optional CSS class for row background
+ * - rowHeaderBgColor: Optional CSS class for row header background
+ */
+
+// Dynamic row options interface
+interface DynamicRowOptions {
+  rowTemplate?: Record<string, any>; // Optional template for new rows (will be auto-generated from rowFields if not provided)
+  rowFields?: FieldConfig[]; // Fields to display for each row
+  minRows?: number; // Minimum number of rows
+  maxRows?: number; // Maximum number of rows
+  rowBgColor?: string; // Optional custom background color for rows
+  rowHeaderBgColor?: string; // Optional custom background color for row headers
+  columns?: number; // Number of columns for all screen sizes
+  columnsSmall?: number; // Number of columns on small screens (default: 1)
+  columnsMedium?: number; // Number of columns on medium screens (default: 2)
+  columnsLarge?: number; // Number of columns on large screens (default: 3)
+}
+
 interface DynamicRowsFieldProps {
   field: FieldConfig & {
-    rowTemplate?: Record<string, any>; // Template for new rows
-    rowFields?: FieldConfig[]; // Fields to display for each row
-    minRows?: number; // Minimum number of rows
-    maxRows?: number; // Maximum number of rows
+    dynamicRowOptions?: DynamicRowOptions;
   };
   value: any[];
   error?: string | React.ReactNode;
@@ -101,6 +135,11 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
 
   // Get form instance from the store
   const formInstance = useFormInstance(formId);
+  
+  // Get dynamic row options with defaults
+  const options = useMemo(() => {
+    return field.dynamicRowOptions || {};
+  }, [field.dynamicRowOptions]);
 
   // State for delete confirmation
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
@@ -111,10 +150,56 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     return Array.isArray(value) ? value : [];
   }, [value]);
 
-  // Default row template
+  // Generate default row template from rowFields if not provided
   const defaultRowTemplate = useMemo(() => {
-    return field.rowTemplate || {};
-  }, [field.rowTemplate]);
+    if (options.rowTemplate) {
+      return options.rowTemplate;
+    }
+    
+    // If no template is provided, create one from rowFields
+    if (options.rowFields) {
+      const template: Record<string, any> = {};
+      options.rowFields.forEach(field => {
+        // Set default values based on field type
+        switch (field.type) {
+          case 'text':
+          case 'email':
+          case 'password':
+          case 'textarea':
+          case 'search':
+          case 'phone':
+            template[field.name] = '';
+            break;
+          case 'number':
+            template[field.name] = 0;
+            break;
+          case 'checkbox':
+            template[field.name] = false;
+            break;
+          case 'date':
+            template[field.name] = '';
+            break;
+          case 'select':
+          case 'radio':
+            // If options are available, use the first option's value as default
+            if (field.options && field.options.length > 0) {
+              template[field.name] = field.options[0].value;
+            } else {
+              template[field.name] = '';
+            }
+            break;
+          case 'multiSelect':
+            template[field.name] = [];
+            break;
+          default:
+            template[field.name] = '';
+        }
+      });
+      return template;
+    }
+    
+    return {};
+  }, [options.rowTemplate, options.rowFields]);
 
   // Add a new row
   const handleAddRow = useCallback(() => {
@@ -215,17 +300,17 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
 
   // Check if we can add more rows
   const canAddRow = useMemo(() => {
-    return !field.maxRows || rows.length < field.maxRows;
-  }, [field.maxRows, rows.length]);
+    return !options.maxRows || rows.length < options.maxRows;
+  }, [options.maxRows, rows.length]);
 
   // Check if we can delete rows
   const canDeleteRow = useMemo(() => {
-    return !field.minRows || rows.length > field.minRows;
-  }, [field.minRows, rows.length]);
+    return !options.minRows || rows.length > options.minRows;
+  }, [options.minRows, rows.length]);
 
   // Validate all rows
   const validateAllRows = useCallback(() => {
-    if (!field.rowFields) return true;
+    if (!options.rowFields) return true;
 
     let isValid = true;
     const newRows = [...rows];
@@ -243,13 +328,13 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
       }
 
       // Mark all fields as touched
-      if (field.rowFields) {
-        field.rowFields.forEach(rowField => {
+      if (options.rowFields) {
+        options.rowFields.forEach(rowField => {
           row.touched[rowField.name] = true;
         });
 
         // Validate each field in the row
-        field.rowFields.forEach(rowField => {
+        options.rowFields.forEach(rowField => {
           if (rowField.required && (!row[rowField.name] || row[rowField.name] === '')) {
             row.errors[rowField.name] = `${rowField.label} is required`;
             isValid = false;
@@ -264,7 +349,22 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     onChange(newRows);
 
     return isValid;
-  }, [field.rowFields, rows, onChange]);
+  }, [options.rowFields, rows, onChange]);
+
+  // Generate grid column classes based on configuration
+  const getGridColumnClasses = useCallback(() => {
+    // If a single columns value is provided, use it for all screen sizes
+    if (options.columns) {
+      return `grid-cols-${options.columns}`;
+    }
+    
+    // Otherwise, use responsive column values or defaults
+    const smallCols = options.columnsSmall ? `grid-cols-${options.columnsSmall}` : "grid-cols-1";
+    const mediumCols = options.columnsMedium ? `md:grid-cols-${options.columnsMedium}` : "md:grid-cols-2";
+    const largeCols = options.columnsLarge ? `lg:grid-cols-${options.columnsLarge}` : "lg:grid-cols-3";
+    
+    return `${smallCols} ${mediumCols} ${largeCols}`;
+  }, [options.columns, options.columnsSmall, options.columnsMedium, options.columnsLarge]);
 
   // Expose validateAllRows to parent component through ref
   React.useImperativeHandle(ref, () => ({
@@ -275,7 +375,7 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     <div className={cn("w-full", field.containerClassName)}>
       <div className="space-y-6">
         {rows.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-lg bg-muted/30">
+          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-lg bg-transparent">
             <div className="text-muted-foreground text-center mb-4">
               <p className="text-sm">لا توجد بيانات حتى الآن</p>
               <p className="text-xs mt-1">أضف {field.label || 'صف جديد'} للبدء</p>
@@ -293,11 +393,16 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                   "flex flex-col p-5 border rounded-lg transition-all duration-300 animate-in fade-in-50 slide-in-from-bottom-5",
                   hasErrors
                     ? "border-destructive/50 bg-destructive/5"
-                    : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                    : options.rowBgColor
+                      ? `border-border ${options.rowBgColor} hover:border-primary/30 hover:shadow-sm`
+                      : "border-border bg-transparent hover:border-primary/30 hover:shadow-sm"
                 )}
               >
                 {/* Row header with index and actions */}
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-border/50">
+                <div className={cn(
+                  "flex items-center justify-between mb-4 pb-2 border-b border-border/50",
+                  options.rowHeaderBgColor
+                )}>
                   <div className="flex items-center">
                     <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-sm font-medium mr-2">
                       {index + 1}
@@ -343,8 +448,8 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                 </div>
                 
                 {/* Row fields */}
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {field.rowFields?.map((rowField) => {
+                <div className={cn("flex-1 grid gap-5", getGridColumnClasses())}>
+                  {options.rowFields?.map((rowField) => {
                     const fieldKey = rowField.name;
                     return (
                       <div key={fieldKey} className="flex flex-col">
