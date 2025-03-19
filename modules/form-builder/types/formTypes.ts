@@ -45,20 +45,9 @@ export interface SearchTypeConfig {
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
 }
 
-// Dynamic row field configuration
-export interface DynamicRowFieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date';
-  name: string;
-  label: string;
-  placeholder?: string;
-  helperText?: string;
-  required?: boolean;
-  disabled?: boolean;
-  readOnly?: boolean;
-  width?: string;
-  options?: DropdownOption[];
-  validation?: ValidationRule[];
-  defaultValue?: any;
+// Dynamic row field configuration - extends FieldConfig to support all field types and options
+export interface DynamicRowFieldConfig extends Omit<FieldConfig, 'type' | 'dynamicRowsConfig'> {
+  type: Exclude<FieldConfig['type'], 'dynamicRows'>;
 }
 
 // Dynamic rows configuration
@@ -70,6 +59,7 @@ export interface DynamicRowsConfig {
   maxRows?: number;
   sortable?: boolean;
   defaultRowValues?: Record<string, any>;
+  columnsPerRow?: number; // Number of columns per row (default: 1)
 }
 
 export interface FieldConfig {

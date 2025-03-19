@@ -163,7 +163,73 @@ export const companiesFormConfig: FormConfig = {
             industry: 'technology',
             taxExempt: false
           }
-        }
+        },
+          {
+              name: 'advancedFields',
+              label: 'Advanced Fields',
+              type: 'dynamicRows',
+              required: true,
+              validation: [
+                  {
+                      type: "required",
+                      message: "مسؤول الدعم",
+                  },
+              ],
+              dynamicRowsConfig: {
+                  columnsPerRow:1,
+                  fields: [
+                      // Dynamic dropdown with pagination and search
+                      {
+                          name: 'country',
+                          label: 'Country',
+                          type: 'select',
+                          placeholder: 'Select country',
+                          required: true,
+                          searchType: {
+                              type: 'dropdown',
+                              dynamicDropdown: {
+                                  url: `${baseURL}/countries`,
+                                  valueField: 'id',
+                                  labelField: 'name',
+                                  paginationEnabled: true,
+                                  itemsPerPage: 10,
+                                  searchParam: 'name',
+                                  pageParam: 'page',
+                                  limitParam: 'per_page',
+                                  totalCountHeader: 'x-total-count',
+                                  enableServerSearch: true
+                              }
+                          }
+                      },
+                      // Dependent dropdown example
+                      {
+                          name: 'city',
+                          label: 'City',
+                          type: 'select',
+                          placeholder: 'Select city',
+                          searchType: {
+                              type: 'dropdown',
+                              dynamicDropdown: {
+                                  url: `${baseURL}/countries`,
+                                  valueField: "id",
+                                  labelField: "name",
+                                  searchParam: "name",
+                                  paginationEnabled: true,
+                                  pageParam: "page",
+                                  limitParam: "per_page",
+                                  itemsPerPage: 10,
+                                  totalCountHeader: "X-Total-Count",
+                                  dependsOn: "country", // Add dependency on country field
+                                  filterParam: "country_id", // Parameter name to filter by
+                              },
+                          }
+                      },
+                  ],
+                  addRowButtonText: 'Add Advanced Row',
+                  deleteRowButtonText: 'Remove',
+                  sortable: true
+              }
+          }
       ],
     },
     {

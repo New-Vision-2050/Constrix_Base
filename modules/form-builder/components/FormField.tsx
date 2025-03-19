@@ -279,5 +279,27 @@ const FormField: React.FC<FormFieldProps> = ({
   );
 };
 
-// Use memo to prevent unnecessary rerenders
-export default memo(FormField);
+// Custom comparison function for memo
+const arePropsEqual = (prevProps: FormFieldProps, nextProps: FormFieldProps) => {
+  // For dynamicRows fields, use a more restrictive comparison to prevent unnecessary rerenders
+  if (prevProps.field.type === 'dynamicRows' && nextProps.field.type === 'dynamicRows') {
+    return (
+      prevProps.field === nextProps.field &&
+      prevProps.error === nextProps.error &&
+      prevProps.touched === nextProps.touched &&
+      // For value, we do a shallow comparison of arrays
+      (
+        (!Array.isArray(prevProps.value) && !Array.isArray(nextProps.value)) ||
+        (Array.isArray(prevProps.value) && Array.isArray(nextProps.value) &&
+         prevProps.value.length === nextProps.value.length)
+      )
+      // We intentionally don't compare onChange and onBlur as they're function references
+    );
+  }
+  
+  // For other field types, use default comparison (shallow equality)
+  return false; // Let React do the default comparison
+};
+
+// Use memo with custom comparison function to prevent unnecessary rerenders
+export default memo(FormField, arePropsEqual);

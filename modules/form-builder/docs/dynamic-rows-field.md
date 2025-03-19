@@ -1,16 +1,30 @@
 # Dynamic Rows Field
 
-The Dynamic Rows field type allows users to add multiple rows with customizable fields. Each row can support various field types and can be sorted using drag-and-drop.
+The Dynamic Rows field type allows users to add multiple rows with customizable fields. Each row can support most form builder field types and can be sorted using drag-and-drop.
 
 ## Features
 
 - Add multiple rows with customizable fields
-- Support for various field types (text, number, select, checkbox, date, etc.)
+- Support for common field types:
+  - Text, textarea, number, email, password
+  - Select with static options
+  - Checkbox, radio
+  - Date
 - Drag-and-drop sorting
 - Row management (add, edit, delete)
 - Configurable minimum and maximum number of rows
 - Custom button text for adding and deleting rows
 - Default values for new rows
+
+## Limitations
+
+Due to technical constraints, some complex field types may not work as expected in dynamic rows:
+- Dynamic dropdowns with pagination and server-side search
+- Dependent dropdowns
+- Custom field renderers
+- Fields with complex state management
+
+For these cases, consider using simpler field types or implementing custom solutions.
 
 ## Usage
 
@@ -105,19 +119,28 @@ The `dynamicRowsConfig` object accepts the following options:
 
 ### DynamicRowFieldConfig
 
-Each field in a dynamic row accepts the following options:
+Each field in a dynamic row supports all the same properties as a regular FieldConfig (except for the 'dynamicRows' type to prevent nesting). This means you can use all the same configuration options you would use for any other form field, including:
 
 | Option | Type | Description |
 |--------|------|-------------|
 | name | string | The name of the field |
 | label | string | The label for the field |
-| type | string | The field type (text, textarea, checkbox, radio, select, multiSelect, email, password, number, date) |
+| type | string | Any field type supported by the form builder (except 'dynamicRows') |
 | placeholder | string | Placeholder text for the field |
+| helperText | string | Helper text displayed below the field |
 | required | boolean | Whether the field is required |
-| options | DropdownOption[] | Options for select, multiSelect, and radio fields |
-| validation | ValidationRule[] | Validation rules for the field |
-| defaultValue | any | Default value for the field |
+| disabled | boolean | Whether the field is disabled |
+| readOnly | boolean | Whether the field is read-only |
+| className | string | Additional CSS classes for the field |
 | width | string | Width of the field (e.g., "100%", "200px") |
+| options | DropdownOption[] | Options for select, multiSelect, and radio fields |
+| dynamicOptions | DynamicDropdownConfig | Configuration for dynamic dropdown options |
+| searchType | SearchTypeConfig | Configuration for search fields |
+| validation | ValidationRule[] | Validation rules for the field |
+| condition | function | Function that determines whether the field should be displayed |
+| onChange | function | Function called when the field value changes |
+| onBlur | function | Function called when the field loses focus |
+| defaultValue | any | Default value for the field |
 
 ## Data Structure
 

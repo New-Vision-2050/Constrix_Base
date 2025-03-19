@@ -1,10 +1,11 @@
 import { FormConfig } from '../types/formTypes';
+import { baseURL } from '@/config/axios-config';
 
 // Example form configuration with dynamic rows field
 export const dynamicRowsExampleConfig: FormConfig = {
   formId: 'dynamic-rows-example',
   title: 'Dynamic Rows Example',
-  description: 'This form demonstrates the dynamic rows field type',
+  description: 'This form demonstrates the dynamic rows field type with support for all field types',
   sections: [
     {
       title: 'Basic Information',
@@ -224,6 +225,147 @@ export const dynamicRowsExampleConfig: FormConfig = {
             deleteRowButtonText: 'Remove',
             sortable: true
           }
+        }
+      ]
+    },
+    {
+      title: 'Simple Field Types Example',
+      description: 'This section demonstrates the recommended field types for dynamic rows',
+      fields: [
+        {
+          name: 'simpleFields',
+          label: 'Simple Fields',
+          type: 'dynamicRows',
+          dynamicRowsConfig: {
+            fields: [
+              // Text field
+              {
+                name: 'textField',
+                label: 'Text Field',
+                type: 'text',
+                placeholder: 'Enter text',
+                required: true,
+                helperText: 'This is a simple text field'
+              },
+              // Number field
+              {
+                name: 'numberField',
+                label: 'Number Field',
+                type: 'number',
+                placeholder: 'Enter a number',
+                helperText: 'This is a number field'
+              },
+              // Select field with static options
+              {
+                name: 'category',
+                label: 'Category',
+                type: 'select',
+                placeholder: 'Select a category',
+                options: [
+                  { value: 'category1', label: 'Category 1' },
+                  { value: 'category2', label: 'Category 2' },
+                  { value: 'category3', label: 'Category 3' }
+                ]
+              },
+              // Checkbox field
+              {
+                name: 'isActive',
+                label: 'Active',
+                type: 'checkbox',
+                helperText: 'Check if active'
+              },
+              // Date field
+              {
+                name: 'eventDate',
+                label: 'Event Date',
+                type: 'date',
+                placeholder: 'Select a date'
+              },
+              // Textarea field
+              {
+                name: 'notes',
+                label: 'Notes',
+                type: 'textarea',
+                placeholder: 'Enter notes',
+                helperText: 'Additional information'
+              }
+            ],
+            addRowButtonText: 'Add Simple Row',
+            deleteRowButtonText: 'Remove',
+            sortable: true
+          }
+        }
+      ]
+    },
+    {
+      title: 'Advanced Field Types (Outside Dynamic Rows)',
+      description: 'This section demonstrates advanced field types that should be used outside of dynamic rows',
+      fields: [
+        // Dynamic dropdown with pagination and search
+        {
+          name: 'country',
+          label: 'Country',
+          type: 'select',
+          placeholder: 'Select country',
+          required: true,
+          searchType: {
+            type: 'dropdown',
+            dynamicDropdown: {
+              url: `${baseURL}/countries`,
+              valueField: 'id',
+              labelField: 'name',
+              paginationEnabled: true,
+              itemsPerPage: 10,
+              searchParam: 'name',
+              pageParam: 'page',
+              limitParam: 'per_page',
+              totalCountHeader: 'x-total-count',
+              enableServerSearch: true
+            }
+          }
+        },
+        // Dependent dropdown example
+        {
+          name: 'city',
+          label: 'City',
+          type: 'select',
+          placeholder: 'Select city',
+          searchType: {
+            type: 'dropdown',
+            dynamicDropdown: {
+              url: `${baseURL}/cities`,
+              valueField: 'id',
+              labelField: 'name',
+              dependsOn: 'country', // This field depends on the country field
+              filterParam: 'country_id', // Parameter name for filtering
+              searchParam: 'name',
+              enableServerSearch: true
+            }
+          }
+        },
+        // Phone field with country code
+        {
+          name: 'phoneNumber',
+          label: 'Phone Number',
+          type: 'phone',
+          placeholder: 'Enter phone number',
+          required: true
+        },
+        // Multi-select field
+        {
+          name: 'languages',
+          label: 'Languages',
+          type: 'multiSelect',
+          placeholder: 'Select languages',
+          isMulti: true,
+          options: [
+            { value: 'en', label: 'English' },
+            { value: 'fr', label: 'French' },
+            { value: 'es', label: 'Spanish' },
+            { value: 'de', label: 'German' },
+            { value: 'zh', label: 'Chinese' },
+            { value: 'ar', label: 'Arabic' }
+          ]
         }
       ]
     }
