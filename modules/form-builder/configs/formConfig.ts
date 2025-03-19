@@ -230,6 +230,53 @@ export const formConfig: FormConfig = {
           ]
         }
       ]
+    },
+    {
+      title: 'Contact Persons',
+      description: 'Add multiple contact persons for your organization',
+      fields: [
+        {
+          name: 'contactPersons',
+          label: 'Contact Persons',
+          type: 'dynamicRows',
+          rowTemplate: {
+            name: '',
+            email: '',
+            phone: '',
+            position: ''
+          },
+          rowFields: [
+            {
+              name: 'name',
+              label: 'Name',
+              type: 'text',
+              placeholder: 'Enter name',
+              required: true
+            },
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              placeholder: 'Enter email',
+              required: true
+            },
+            {
+              name: 'phone',
+              label: 'Phone',
+              type: 'text',
+              placeholder: 'Enter phone number'
+            },
+            {
+              name: 'position',
+              label: 'Position',
+              type: 'text',
+              placeholder: 'Enter position'
+            }
+          ],
+          minRows: 1,
+          maxRows: 5
+        }
+      ]
     }
   ],
   submitButtonText: 'Send Message',

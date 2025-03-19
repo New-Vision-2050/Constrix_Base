@@ -163,7 +163,53 @@ export const companiesFormConfig: FormConfig = {
             industry: 'technology',
             taxExempt: false
           }
-        }
+        },
+          {
+              name: 'contactPersons',
+              label: 'Contact Persons',
+              type: 'dynamicRows',
+              rowTemplate: {
+                  name: '',
+                  email: '',
+                  phone: '',
+                  position: ''
+              },
+              rowFields: [
+                  {
+                      name: 'name',
+                      label: 'Name',
+                      type: 'text',
+                      placeholder: 'Enter name',
+                      required: true
+                  },
+                  {
+                      type: "select",
+                      name: "currency",
+                      label: "العملة",
+                      placeholder: "اختر العملة",
+                      required: true,
+                      dynamicOptions: {
+                          url: `${baseURL}/currencies`,
+                          valueField: "id",
+                          labelField: "short_name",
+                          searchParam: "short_name",
+                          paginationEnabled: true,
+                          pageParam: "page",
+                          limitParam: "per_page",
+                          itemsPerPage: 10,
+                          totalCountHeader: "X-Total-Count",
+                      },
+                      validation: [
+                          {
+                              type: "required",
+                              message: "ادخل العملة",
+                          },
+                      ],
+                  },
+              ],
+              minRows: 1,
+              maxRows: 5
+          }
       ],
     },
     {

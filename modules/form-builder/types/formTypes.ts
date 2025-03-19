@@ -46,7 +46,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows';
   name: string;
   label: string;
   placeholder?: string;
@@ -71,6 +71,12 @@ export interface FieldConfig {
   isMulti?: boolean; // Whether to enable multi-select functionality
   postfix?: string; // Text to display after the input field
   defaultValue?: any; // Default value for the field
+  
+  // Dynamic Rows Field specific properties
+  rowTemplate?: Record<string, any>; // Template for new rows in dynamicRows
+  rowFields?: FieldConfig[]; // Fields to display for each row in dynamicRows
+  minRows?: number; // Minimum number of rows for dynamicRows
+  maxRows?: number; // Maximum number of rows for dynamicRows
 }
 
 export interface FormSection {
