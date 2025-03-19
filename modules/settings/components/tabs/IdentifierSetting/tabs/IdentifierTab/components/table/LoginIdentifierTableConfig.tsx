@@ -1,24 +1,22 @@
 import { baseURL } from "@/config/axios-config";
-import LoginWayStatus from "./LoginWayStatus";
-import { LoginWay } from "@/modules/settings/types/LoginWay";
-import LoginWaysExecutionBtn from "./ExecutionBtn";
+import LoginIdentifierStatus from "./LoginIdentifierStatus";
+import { LoginIdentifier } from "@/modules/settings/types/LoginIdentifier";
+import LoginIdentifierExecutionBtn from "./ExecutionBtn";
 
-// Create a component that uses the translations
-export const LoginWaysConfig = () => {
+export const LoginIdentifierTableConfig = () => {
   return {
-    url: `${baseURL}/settings/login-way`,
-    tableId: "login-ways-table",
+    url: `${baseURL}/settings/identifier`,
+    tableId: "login-identifier-table",
     columns: [
       {
         key: "name",
-        label: "اسم الاعداد",
+        label: "اسم المعرف",
         sortable: true,
         searchable: true,
       },
       {
         key: "users_count",
         label: "عدد المستخدين",
-        sortable: true,
       },
       {
         key: "companies",
@@ -27,20 +25,19 @@ export const LoginWaysConfig = () => {
       {
         key: "providers",
         label: "مزودين الخدمة",
-        sortable: true,
       },
       {
         key: "status",
         label: "الحالة",
-        render: (_: unknown, row: LoginWay) => (
-          <LoginWayStatus loginWay={row} />
+        render: (_: unknown, row: LoginIdentifier) => (
+          <LoginIdentifierStatus identifier={row} />
         ),
       },
       {
         key: "id",
         label: "الأجراء",
-        render: (_: unknown, row: LoginWay) => (
-          <LoginWaysExecutionBtn id={row.id} />
+        render: (_: unknown, row: LoginIdentifier) => (
+          <LoginIdentifierExecutionBtn id={row.id} />
         ),
       },
     ],

@@ -1,5 +1,6 @@
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import LoginWaysTab from "../tabs/SettingTab-LoginWays";
+import LoginIdentifierTab from "../tabs/IdentifierTab";
 
 export const IdentifierSettingTabs: SystemTab[] = [
   {
@@ -14,6 +15,10 @@ export const IdentifierSettingTabs: SystemTab[] = [
   {
     id: "IdentifierSettingTab_Identifier",
     title: "المعرف",
-    content: "المعرف",
+    content: (
+      <>
+        <LoginIdentifierTab />
+      </>
+    ),
   },
 ];

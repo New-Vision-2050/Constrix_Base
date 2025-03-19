@@ -17,7 +17,7 @@ export default function IdentifierSettingTab() {
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >
-      <TabsList className="bg-transparent overflow-y-hidden overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start">
+      <TabsList className="bg-transparent min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start">
         <TabsTriggerList list={IdentifierSettingTabs} />
       </TabsList>
       <TabsContentList list={IdentifierSettingTabs} />
