@@ -43,11 +43,35 @@ export interface DropdownBaseProps {
 
 export const useDependencyMessage = (
     isDisabled: boolean,
-    dependsOnField?: string
+    dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>
 ): string | null => {
-    if (isDisabled && dependsOnField) {
-        return `Please select a ${dependsOnField} first`;
+    if (!isDisabled || !dependsOn) return null;
+    
+    // Case 1: String format (backward compatibility)
+    if (typeof dependsOn === 'string') {
+        return `Please select a ${dependsOn} first`;
     }
+    
+    // Case 2: Array of dependency configs
+    if (Array.isArray(dependsOn) && dependsOn.length > 0) {
+        if (dependsOn.length === 1) {
+            return `Please select a ${dependsOn[0].field} first`;
+        } else {
+            const fields = dependsOn.map(dep => dep.field).join(', ');
+            return `Please select the required fields: ${fields}`;
+        }
+    }
+    
+    // Case 3: Object with field names as keys
+    if (typeof dependsOn === 'object') {
+        const fields = Object.keys(dependsOn);
+        if (fields.length === 1) {
+            return `Please select a ${fields[0]} first`;
+        } else if (fields.length > 1) {
+            return `Please select the required fields: ${fields.join(', ')}`;
+        }
+    }
+    
     return null;
 };
 
@@ -137,10 +161,45 @@ export const extractDropdownOptions = (
         return path.split('.').reduce((acc, part) => acc && acc[part], obj);
     };
 
-    const extractedOptions = data.map(item => ({
-        value: String(getValue(item, valueField)),
-        label: String(getValue(item, labelField)),
-    }));
+    const extractedOptions = data.map(item => {
+        // Handle primitive values (string, number)
+        if (typeof item === 'string' || typeof item === 'number') {
+            // For primitive values, use the value as both value and label
+            return {
+                value: String(item),
+                label: String(item),
+            };
+        }
+        
+        // Handle array format [value, label]
+        if (Array.isArray(item)) {
+            // If item is an array, use indices as valueField and labelField
+            // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label
+            const valueIndex = parseInt(valueField, 10);
+            const labelIndex = parseInt(labelField, 10);
+            
+            if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
+                valueIndex >= 0 && labelIndex >= 0 &&
+                valueIndex < item.length && labelIndex < item.length) {
+                return {
+                    value: String(item[valueIndex]),
+                    label: String(item[labelIndex]),
+                };
+            }
+            
+            // Fallback to first element as value and second as label if indices are invalid
+            return {
+                value: String(item[0] || ''),
+                label: String(item[1] || item[0] || ''),
+            };
+        }
+        
+        // Handle object format
+        return {
+            value: String(getValue(item, valueField)),
+            label: String(getValue(item, labelField)),
+        };
+    });
 
     const validOptions = extractedOptions.filter(
         opt => opt.value && opt.value.trim() !== ''

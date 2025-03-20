@@ -242,6 +242,39 @@ export const useDropdownSearch = ({
 
       // Extract values and labels from the response
       const extractedOptions = data.map((item) => {
+        // Handle primitive values (string, number)
+        if (typeof item === 'string' || typeof item === 'number') {
+          // For primitive values, use the value as both value and label
+          return {
+            value: String(item),
+            label: String(item),
+          };
+        }
+
+        // Handle array format [value, label]
+        if (Array.isArray(item)) {
+          // If item is an array, use indices as valueField and labelField
+          // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label
+          const valueIndex = parseInt(dynamicConfig.valueField, 10);
+          const labelIndex = parseInt(dynamicConfig.labelField, 10);
+
+          if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
+              valueIndex >= 0 && labelIndex >= 0 &&
+              valueIndex < item.length && labelIndex < item.length) {
+            return {
+              value: String(item[valueIndex]),
+              label: String(item[labelIndex]),
+            };
+          }
+
+          // Fallback to first element as value and second as label if indices are invalid
+          return {
+            value: String(item[0] || ''),
+            label: String(item[1] || item[0] || ''),
+          };
+        }
+
+        // Handle object format
         const getValue = (obj: any, path: string) => {
           return path.split(".").reduce((acc, part) => acc && acc[part], obj);
         };
