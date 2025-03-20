@@ -23,10 +23,31 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
     isMulti,
   });
 
-  const shouldBeDisabled =
-    isDisabled ||
-    ((dynamicConfig?.dependsOn &&
-      (!dependencies || !dependencies[dynamicConfig.dependsOn])) as boolean);
+  const shouldBeDisabled = (() => {
+    if (isDisabled) return true;
+    if (!dynamicConfig?.dependsOn || !dependencies) return false;
+
+    // Case 1: String format (backward compatibility)
+    if (typeof dynamicConfig.dependsOn === 'string') {
+      return !dependencies[dynamicConfig.dependsOn];
+    }
+
+    // Case 2: Array of dependency configs
+    if (Array.isArray(dynamicConfig.dependsOn)) {
+      return dynamicConfig.dependsOn.some(
+        depConfig => !dependencies[depConfig.field] || dependencies[depConfig.field] === ""
+      );
+    }
+
+    // Case 3: Object with field names as keys
+    if (typeof dynamicConfig.dependsOn === 'object') {
+      return Object.keys(dynamicConfig.dependsOn).some(
+        field => !dependencies[field]
+      );
+    }
+
+    return false;
+  })();
 
   const dependencyMessage = useDependencyMessage(
     shouldBeDisabled,

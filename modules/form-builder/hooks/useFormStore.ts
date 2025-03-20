@@ -31,6 +31,7 @@ interface FormState {
   // Form actions
   setFormId: (formId: string) => void;
   initForm: (formId: string, initialValues?: Record<string, any>) => void;
+  getValue: (formId: string, field: string) => any;
   setValue: (formId: string, field: string, value: any) => void;
   setValues: (formId: string, values: Record<string, any>) => void;
   setError: (formId: string, field: string, error: string | React.ReactNode | null) => void;
@@ -101,6 +102,14 @@ export const useFormStore = create<FormState>((set, get) => ({
       }
     }));
   },
+
+    // Actions for specific form instances
+    getValue: (formId: string, field: string) => {
+        // Get the current state
+        const state = get();
+        const formState = state.forms[formId] || getDefaultFormState();
+        return formState.values[field]
+    },
 
   setValues: (formId: string, values: Record<string, any>) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();

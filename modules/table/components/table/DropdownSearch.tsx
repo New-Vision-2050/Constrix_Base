@@ -65,24 +65,68 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
       return;
     }
 
-    const dependencyKey = dynamicConfig.dependsOn;
-    const currentValue = dependencies[dependencyKey] || "";
-    const previousValue = previousDependencyValues[dependencyKey] || "";
-
     // Skip initial render to avoid unnecessary clearing on component initialization
     if (Object.keys(previousDependencyValues).length === 0) {
       setPreviousDependencyValues(dependencies || {});
       return;
     }
 
-    // Clear value if dependency changed
-    if (currentValue !== previousValue) {
-      console.log(`Dependency changed for ${columnKey}:`, {
-        field: dependencyKey,
-        from: previousValue,
-        to: currentValue,
-      });
+    // Function to check if a dependency has changed
+    const hasDependencyChanged = () => {
+      // Case 1: String format (backward compatibility)
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        const dependencyKey = dynamicConfig.dependsOn;
+        const currentValue = dependencies[dependencyKey] || "";
+        const previousValue = previousDependencyValues[dependencyKey] || "";
+        
+        if (currentValue !== previousValue) {
+          console.log(`Dependency changed for ${columnKey}:`, {
+            field: dependencyKey,
+            from: previousValue,
+            to: currentValue,
+          });
+          return true;
+        }
+      }
+      // Case 2: Array of dependency configs
+      else if (Array.isArray(dynamicConfig.dependsOn)) {
+        for (const depConfig of dynamicConfig.dependsOn) {
+          const field = depConfig.field;
+          const currentValue = dependencies[field] || "";
+          const previousValue = previousDependencyValues[field] || "";
+          
+          if (currentValue !== previousValue) {
+            console.log(`Dependency changed for ${columnKey}:`, {
+              field,
+              from: previousValue,
+              to: currentValue,
+            });
+            return true;
+          }
+        }
+      }
+      // Case 3: Object with field names as keys
+      else if (typeof dynamicConfig.dependsOn === 'object') {
+        for (const field of Object.keys(dynamicConfig.dependsOn)) {
+          const currentValue = dependencies[field] || "";
+          const previousValue = previousDependencyValues[field] || "";
+          
+          if (currentValue !== previousValue) {
+            console.log(`Dependency changed for ${columnKey}:`, {
+              field,
+              from: previousValue,
+              to: currentValue,
+            });
+            return true;
+          }
+        }
+      }
+      
+      return false;
+    };
 
+    // If any dependency has changed, clear the value
+    if (hasDependencyChanged()) {
       // Set flag to prevent re-triggering the effect
       processingDependencyChange.current = true;
 
@@ -95,11 +139,8 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         onChangeRef.current(isMulti ? [] : "");
       }
 
-      // Update the stored previous value
-      setPreviousDependencyValues((prev) => ({
-        ...prev,
-        [dependencyKey]: currentValue,
-      }));
+      // Update the stored previous values
+      setPreviousDependencyValues(dependencies || {});
 
       // Reset the flag
       setTimeout(() => {
@@ -136,12 +177,30 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   );
 
   // Determine if the dropdown should be disabled
-  const isDisabled = !!(
-    dynamicConfig?.dependsOn &&
-    (!dependencies ||
-      !dependencies[dynamicConfig.dependsOn] ||
-      dependencies[dynamicConfig.dependsOn] === "")
-  );
+  const isDisabled = (() => {
+    if (!dynamicConfig?.dependsOn || !dependencies) return false;
+
+    // Case 1: String format (backward compatibility)
+    if (typeof dynamicConfig.dependsOn === 'string') {
+      return !dependencies[dynamicConfig.dependsOn] || dependencies[dynamicConfig.dependsOn] === "";
+    }
+    
+    // Case 2: Array of dependency configs
+    if (Array.isArray(dynamicConfig.dependsOn)) {
+      return dynamicConfig.dependsOn.some(
+        depConfig => !dependencies[depConfig.field] || dependencies[depConfig.field] === ""
+      );
+    }
+    
+    // Case 3: Object with field names as keys
+    if (typeof dynamicConfig.dependsOn === 'object') {
+      return Object.keys(dynamicConfig.dependsOn).some(
+        field => !dependencies[field] || dependencies[field] === ""
+      );
+    }
+    
+    return false;
+  })();
 
   // Convert value to appropriate type based on isMulti
   const processedValue = isMulti
