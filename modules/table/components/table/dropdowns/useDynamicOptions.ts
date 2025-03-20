@@ -122,24 +122,86 @@ export const useDynamicOptions = ({
     let shouldRefetch = refreshCounter > 0;
 
     if (dynamicConfig?.dependsOn && dependencies) {
-      const dependencyKey = dynamicConfig.dependsOn;
-      const currentValue = dependencies[dependencyKey] || "";
-      const previousValue =
-        previousDependenciesRef.current[dependencyKey] || "";
-
-      // Update the previous dependencies ref
-      previousDependenciesRef.current = {
-        ...previousDependenciesRef.current,
-        [dependencyKey]: currentValue,
+      // Function to check if dependencies have changed
+      const checkDependencyChanges = () => {
+        let hasChanged = false;
+        let shouldClearOptions = false;
+        
+        // Case 1: String format (backward compatibility)
+        if (typeof dynamicConfig.dependsOn === 'string') {
+          const dependencyKey = dynamicConfig.dependsOn;
+          const currentValue = dependencies[dependencyKey] || "";
+          const previousValue = previousDependenciesRef.current[dependencyKey] || "";
+          
+          // Update the previous dependencies ref
+          previousDependenciesRef.current = {
+            ...previousDependenciesRef.current,
+            [dependencyKey]: currentValue,
+          };
+          
+          // If dependency changed, we should refetch and clear options
+          if (currentValue !== previousValue) {
+            hasChanged = true;
+            shouldClearOptions = !currentValue; // Clear if value is empty
+          }
+        }
+        // Case 2: Array of dependency configs
+        else if (Array.isArray(dynamicConfig.dependsOn)) {
+          for (const depConfig of dynamicConfig.dependsOn) {
+            const field = depConfig.field;
+            const currentValue = dependencies[field] || "";
+            const previousValue = previousDependenciesRef.current[field] || "";
+            
+            // Update the previous dependencies ref
+            previousDependenciesRef.current = {
+              ...previousDependenciesRef.current,
+              [field]: currentValue,
+            };
+            
+            // If any dependency changed, we should refetch
+            if (currentValue !== previousValue) {
+              hasChanged = true;
+              if (!currentValue) {
+                shouldClearOptions = true;
+                break;
+              }
+            }
+          }
+        }
+        // Case 3: Object with field names as keys
+        else if (typeof dynamicConfig.dependsOn === 'object') {
+          for (const field of Object.keys(dynamicConfig.dependsOn)) {
+            const currentValue = dependencies[field] || "";
+            const previousValue = previousDependenciesRef.current[field] || "";
+            
+            // Update the previous dependencies ref
+            previousDependenciesRef.current = {
+              ...previousDependenciesRef.current,
+              [field]: currentValue,
+            };
+            
+            // If any dependency changed, we should refetch
+            if (currentValue !== previousValue) {
+              hasChanged = true;
+              if (!currentValue) {
+                shouldClearOptions = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        return { hasChanged, shouldClearOptions };
       };
-
-      // If dependency changed, we should refetch and clear options
-      if (currentValue !== previousValue) {
+      
+      const { hasChanged, shouldClearOptions } = checkDependencyChanges();
+      
+      if (hasChanged) {
         shouldRefetch = true;
         // Clear options immediately when dependency changes
         setOptions([]);
-
-        if (!currentValue) {
+        
+        if (shouldClearOptions) {
           setLoading(false);
           processingFetchRef.current = false;
           return;
@@ -150,8 +212,7 @@ export const useDynamicOptions = ({
     // Skip fetch if URL hasn't changed and no other reason to refetch
     const url = getFetchUrl(
       dynamicConfig.url,
-      dynamicConfig.filterParam,
-      dynamicConfig.dependsOn,
+      dynamicConfig,
       dependencies
     );
 

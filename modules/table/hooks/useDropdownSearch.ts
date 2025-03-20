@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  DropdownOption,
-  DynamicDropdownConfig,
-} from "@/modules/table/utils/tableTypes";
-import { useDebounce } from "./useDebounce";
+
 import { processApiResponse } from "@/modules/table/utils/dataUtils";
 import { apiClient } from "@/config/axios-config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {DropdownOption, DynamicDropdownConfig} from "@/modules/form-builder";
 
 interface UseDropdownSearchProps {
   searchTerm: string;
@@ -83,23 +80,65 @@ export const useDropdownSearch = ({
       params.append(dynamicConfig.searchParam, debouncedSearchTerm);
     }
 
-    // Add dependency filter parameter if configured
-    if (
-      dynamicConfig.dependsOn &&
-      dynamicConfig.filterParam &&
-      dependencies &&
-      dependencies[dynamicConfig.dependsOn]
-    ) {
-      const dependencyValue = dependencies[dynamicConfig.dependsOn];
-      // Handle both string and string[] values
-      const paramValue = Array.isArray(dependencyValue)
-        ? dependencyValue.join(',')
-        : dependencyValue;
+    // Handle dependency parameters
+    if (dynamicConfig.dependsOn && dependencies) {
+      // Case 1: String format (backward compatibility)
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        if (dynamicConfig.filterParam && dependencies[dynamicConfig.dependsOn]) {
+          const dependencyValue = dependencies[dynamicConfig.dependsOn];
+          // Handle both string and string[] values
+          const paramValue = Array.isArray(dependencyValue)
+            ? dependencyValue.join(',')
+            : dependencyValue;
 
-      params.append(
-        dynamicConfig.filterParam,
-        paramValue
-      );
+          params.append(
+            dynamicConfig.filterParam,
+            paramValue
+          );
+        }
+      }
+      // Case 2: Array of dependency configs
+      else if (Array.isArray(dynamicConfig.dependsOn)) {
+        for (const depConfig of dynamicConfig.dependsOn) {
+          if (dependencies[depConfig.field]) {
+            const dependencyValue = dependencies[depConfig.field];
+            const paramValue = Array.isArray(dependencyValue)
+              ? dependencyValue.join(',')
+              : dependencyValue;
+
+            if (depConfig.method === 'replace') {
+              // Replace placeholders in URL
+              const placeholder = `{${depConfig.field}}`;
+              url = url.replace(placeholder, encodeURIComponent(paramValue));
+            } else if (depConfig.method === 'query') {
+              // Add as query parameter
+              const paramName = depConfig.paramName || depConfig.field;
+              params.append(paramName, paramValue);
+            }
+          }
+        }
+      }
+      // Case 3: Object with field names as keys
+      else if (typeof dynamicConfig.dependsOn === 'object') {
+        for (const [field, config] of Object.entries(dynamicConfig.dependsOn)) {
+          if (dependencies[field]) {
+            const dependencyValue = dependencies[field];
+            const paramValue = Array.isArray(dependencyValue)
+              ? dependencyValue.join(',')
+              : dependencyValue;
+
+            if (config.method === 'replace') {
+              // Replace placeholders in URL
+              const placeholder = `{${field}}`;
+              url = url.replace(placeholder, encodeURIComponent(paramValue));
+            } else if (config.method === 'query') {
+              // Add as query parameter
+              const paramName = config.paramName || field;
+              params.append(paramName, paramValue);
+            }
+          }
+        }
+      }
     }
 
     // Add pagination parameters if enabled
@@ -126,13 +165,35 @@ export const useDropdownSearch = ({
     // Skip if we don't have dynamic config
     if (!dynamicConfig) return;
 
-    // Skip if we have a dependsOn value but don't have the dependency
-    if (
-      dynamicConfig.dependsOn &&
-      (!dependencies || !dependencies[dynamicConfig.dependsOn])
-    ) {
-      setOptions([]);
-      return;
+    // Skip if we have a dependsOn value but don't have the required dependencies
+    if (dynamicConfig.dependsOn) {
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        // Case 1: String format (backward compatibility)
+        if (!dependencies || !dependencies[dynamicConfig.dependsOn]) {
+          setOptions([]);
+          return;
+        }
+      } else if (Array.isArray(dynamicConfig.dependsOn)) {
+        // Case 2: Array of dependency configs
+        // Check if any required dependency is missing
+        const missingDependency = dynamicConfig.dependsOn.some(
+          depConfig => !dependencies || !dependencies[depConfig.field]
+        );
+        if (missingDependency) {
+          setOptions([]);
+          return;
+        }
+      } else if (typeof dynamicConfig.dependsOn === 'object') {
+        // Case 3: Object with field names as keys
+        // Check if any required dependency is missing
+        const missingDependency = Object.keys(dynamicConfig.dependsOn).some(
+          field => !dependencies || !dependencies[field]
+        );
+        if (missingDependency) {
+          setOptions([]);
+          return;
+        }
+      }
     }
 
     const url = buildSearchUrl();
