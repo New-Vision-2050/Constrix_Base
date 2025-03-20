@@ -21,59 +21,76 @@ export const loginWayFormConfig: FormConfig = {
           placeholder: "برجاء إدخال اسم الاعداد",
         },
         {
-          type: "select",
-          name: "login_option_id",
-          label: "Login Option",
-          placeholder: "Select Login Option",
-          dynamicOptions: {
-            url: `${baseURL}/settings/login-way/login-options`,
-            valueField: "login_option",
-            labelField: "login_option",
-            searchParam: "login_option",
+          name: "contactPersons",
+          label: "Contact Persons",
+          type: "dynamicRows",
+          dynamicRowOptions: {
+            enableDrag: true,
+            rowFields: [
+              {
+                type: "select",
+                name: "login_option",
+                label: "Login Option",
+                placeholder: "Select Login Option",
+                dynamicOptions: {
+                  url: `${baseURL}/settings/login-way/login-options`,
+                  valueField: "",
+                  labelField: "",
+                  searchParam: "login_option",
+                  transformResponse: (data: string[]) =>
+                    data.map((option) => ({ value: option, label: option })),
+                },
+                validation: [
+                  {
+                    type: "required",
+                    message: "Login Option is required",
+                  },
+                ],
+              },
+              {
+                type: "select",
+                name: "drivers",
+                label: "Login Driver",
+                placeholder: "Select Login Driver",
+                dynamicOptions: {
+                  url: `${baseURL}/settings/driver/get-drivers-by-login-option`,
+                  valueField: "id",
+                  labelField: "name",
+                  dependsOn: "login_option",
+                  filterParam: "login-option",
+                },
+                validation: [
+                  {
+                    type: "required",
+                    message: "Login Driver is required",
+                  },
+                ],
+              },
+              {
+                type: "select",
+                name: "login_option_alternatives",
+                label: "Login Way Alternative",
+                placeholder: "Select Login Way Alternative",
+                dynamicOptions: {
+                  url: `${baseURL}/settings/driver/get-alternatives-drivers-by-login-option/:login-option/:driver`,
+                  dependsOn: "drivers",
+                  filterParam: "drivers",
+                  valueField: "login_alternative",
+                  labelField: "login_alternative",
+                  searchParam: "login_alternative",
+                },
+                validation: [
+                  {
+                    type: "required",
+                    message: "Login Way Alternative is required",
+                  },
+                ],
+              },
+            ],
+            minRows: 1,
+            maxRows: 5,
+            columns: 1,
           },
-          validation: [
-            {
-              type: "required",
-              message: "Login Option is required",
-            },
-          ],
-        },
-        {
-          type: "select",
-          name: "login_driver_id",
-          label: "Login Driver",
-          placeholder: "Select Login Driver",
-          dynamicOptions: {
-            url: `${baseURL}/settings/drivers`,
-            valueField: "id",
-            labelField: "name",
-            dependsOn: "login_option_id",
-            filterParam: "login_option_id",
-          },
-          validation: [
-            {
-              type: "required",
-              message: "Login Driver is required",
-            },
-          ],
-        },
-        {
-          type: "select",
-          name: "login_alternative_id",
-          label: "Login Way Alternative",
-          placeholder: "Select Login Way Alternative",
-          dynamicOptions: {
-            url: `${baseURL}/settings/alternatives`,
-            valueField: "login_alternative",
-            labelField: "login_alternative",
-            searchParam: "login_alternative",
-          },
-          validation: [
-            {
-              type: "required",
-              message: "Login Way Alternative is required",
-            },
-          ],
         },
       ],
     },
