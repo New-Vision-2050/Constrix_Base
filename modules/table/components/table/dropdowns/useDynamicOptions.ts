@@ -69,8 +69,31 @@ export const useDynamicOptions = ({
         // Check if component is still mounted
         if (!isMountedRef.current) return [];
 
-        const data = response.data;
-        if (!Array.isArray(data)) throw new Error("Expected array response");
+        const responseData = response.data;
+        let data;
+
+        // Handle response format
+        if (responseData && typeof responseData === 'object') {
+          if (responseData.payload && Array.isArray(responseData.payload)) {
+            // Handle responses with payload property
+            data = responseData.payload;
+          } else if (Array.isArray(responseData)) {
+            // Handle direct array response
+            data = responseData;
+          } else {
+            // Try to find an array in the response
+            const arrayCandidate = Object.values(responseData).find(val => Array.isArray(val));
+            if (arrayCandidate && Array.isArray(arrayCandidate)) {
+              data = arrayCandidate;
+            } else {
+              data = [responseData];
+            }
+          }
+        } else if (Array.isArray(responseData)) {
+          data = responseData;
+        } else {
+          throw new Error("Unexpected response format");
+        }
 
         // Update the URL ref
         urlRef.current = url;
@@ -126,19 +149,19 @@ export const useDynamicOptions = ({
       const checkDependencyChanges = () => {
         let hasChanged = false;
         let shouldClearOptions = false;
-        
+
         // Case 1: String format (backward compatibility)
         if (typeof dynamicConfig.dependsOn === 'string') {
           const dependencyKey = dynamicConfig.dependsOn;
           const currentValue = dependencies[dependencyKey] || "";
           const previousValue = previousDependenciesRef.current[dependencyKey] || "";
-          
+
           // Update the previous dependencies ref
           previousDependenciesRef.current = {
             ...previousDependenciesRef.current,
             [dependencyKey]: currentValue,
           };
-          
+
           // If dependency changed, we should refetch and clear options
           if (currentValue !== previousValue) {
             hasChanged = true;
@@ -151,13 +174,13 @@ export const useDynamicOptions = ({
             const field = depConfig.field;
             const currentValue = dependencies[field] || "";
             const previousValue = previousDependenciesRef.current[field] || "";
-            
+
             // Update the previous dependencies ref
             previousDependenciesRef.current = {
               ...previousDependenciesRef.current,
               [field]: currentValue,
             };
-            
+
             // If any dependency changed, we should refetch
             if (currentValue !== previousValue) {
               hasChanged = true;
@@ -173,13 +196,13 @@ export const useDynamicOptions = ({
           for (const field of Object.keys(dynamicConfig.dependsOn)) {
             const currentValue = dependencies[field] || "";
             const previousValue = previousDependenciesRef.current[field] || "";
-            
+
             // Update the previous dependencies ref
             previousDependenciesRef.current = {
               ...previousDependenciesRef.current,
               [field]: currentValue,
             };
-            
+
             // If any dependency changed, we should refetch
             if (currentValue !== previousValue) {
               hasChanged = true;
@@ -190,17 +213,17 @@ export const useDynamicOptions = ({
             }
           }
         }
-        
+
         return { hasChanged, shouldClearOptions };
       };
-      
+
       const { hasChanged, shouldClearOptions } = checkDependencyChanges();
-      
+
       if (hasChanged) {
         shouldRefetch = true;
         // Clear options immediately when dependency changes
         setOptions([]);
-        
+
         if (shouldClearOptions) {
           setLoading(false);
           processingFetchRef.current = false;
