@@ -37,12 +37,22 @@ export interface DynamicRowOptions {
   onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
 }
 
+export interface DependencyConfig {
+  field: string; // The field/column key this dropdown depends on
+  method: 'replace' | 'query'; // Method to add value to URL: replace = replace in URL path, query = add as query parameter
+  paramName?: string; // The parameter name to use when method is 'query' (defaults to field name)
+}
+
 export interface DynamicDropdownConfig {
   url: string;
   valueField: string;
   labelField: string;
-  dependsOn?: string; // The field/column key this dropdown depends on
-  filterParam?: string; // The parameter name to filter by in API calls
+  dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>; // The field/column key this dropdown depends on
+  // dependsOn can be:
+  // 1. A string (for backward compatibility)
+  // 2. An array of DependencyConfig objects
+  // 3. An object with field names as keys and configuration as values
+  filterParam?: string; // The parameter name to filter by in API calls (used when dependsOn is a string, for backward compatibility)
   searchParam?: string; // Parameter name for search query
   paginationEnabled?: boolean; // Whether to use pagination
   pageParam?: string; // Parameter name for page number
