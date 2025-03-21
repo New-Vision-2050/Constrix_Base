@@ -4,9 +4,12 @@ import { LoginWaysConfig } from "./components/table/config";
 import ExportButton from "@/modules/table/components/ExportButton";
 import { loginWayFormConfig } from "./components/form/config";
 import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
+import { Button } from "@/components/ui/button";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 export default function LoginWaysTab() {
   const config = LoginWaysConfig();
+  const tableStore = useTableStore.getState();
 
   return (
     <div className="space-y-7">
@@ -16,8 +19,10 @@ export default function LoginWaysTab() {
           <div className="flex items-center gap-3">
             <DialogFormBuilder
               config={loginWayFormConfig}
-              trigger={<button>Open Form</button>}
-              onSuccess={(values) => console.log("Form submitted:", values)}
+              trigger={<Button>Add Login Way</Button>}
+              onSuccess={(values) => {
+                tableStore.reloadTable(config.tableId);
+              }}
             />{" "}
             <ExportButton data={[]} />
           </div>
