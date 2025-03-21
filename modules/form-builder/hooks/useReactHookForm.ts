@@ -8,6 +8,7 @@ import { FormConfig, FormSection, FieldConfig } from "../types/formTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
 import { hasApiValidation, triggerApiValidation } from "../utils/apiValidation";
+import { apiClient } from "@/config/axios-config";
 
 // Helper function to create a Zod schema from form config
 const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
@@ -30,7 +31,9 @@ const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
           fieldSchema = z.string().optional();
           break;
         case "email":
-          fieldSchema = z.string().email().optional();
+          // For email fields, find if there's a validation rule with type "email" to get the message
+          const emailValidationRule = field.validation?.find(rule => rule.type === "email");
+          fieldSchema = z.string().email(emailValidationRule?.message as string || "Invalid email").optional();
           break;
         case "number":
           fieldSchema = z.number().optional();
@@ -63,34 +66,40 @@ const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
       // Apply validation rules
       if (field.validation) {
         field.validation.forEach((rule) => {
+          // Use the message directly from the validation rule
+          const errorMessage = rule.message as string;
+          
           switch (rule.type) {
             case "required":
-              fieldSchema = z.string().min(1, rule.message as string);
+              fieldSchema = z.string().min(1, errorMessage);
               break;
             case "minLength":
               if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "password") {
-                fieldSchema = (fieldSchema as z.ZodString).min(rule.value, rule.message as string);
+                fieldSchema = (fieldSchema as z.ZodString).min(rule.value, errorMessage);
               }
               break;
             case "maxLength":
               if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "password") {
-                fieldSchema = (fieldSchema as z.ZodString).max(rule.value, rule.message as string);
+                fieldSchema = (fieldSchema as z.ZodString).max(rule.value, errorMessage);
               }
               break;
             case "pattern":
               if (field.type === "text" || field.type === "textarea" || field.type === "email" || field.type === "password") {
-                fieldSchema = (fieldSchema as z.ZodString).regex(new RegExp(rule.value), rule.message as string);
+                fieldSchema = (fieldSchema as z.ZodString).regex(new RegExp(rule.value), errorMessage);
               }
               break;
             case "min":
               if (field.type === "number") {
-                fieldSchema = (fieldSchema as z.ZodNumber).min(rule.value, rule.message as string);
+                fieldSchema = (fieldSchema as z.ZodNumber).min(rule.value, errorMessage);
               }
               break;
             case "max":
               if (field.type === "number") {
-                fieldSchema = (fieldSchema as z.ZodNumber).max(rule.value, rule.message as string);
+                fieldSchema = (fieldSchema as z.ZodNumber).max(rule.value, errorMessage);
               }
+              break;
+            case "email":
+              fieldSchema = z.string().email(errorMessage);
               break;
             // API validation will be handled separately
           }
@@ -616,16 +625,22 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
               (fetchOptions.headers as Record<string, string>)['Content-Type'] = 'application/json';
             }
             
-            // For GET requests, add query parameters to the URL
-            const fetchUrl = method === "GET"
-              ? `${url}${url.includes('?') ? '&' : '?'}${paramName}=${encodeURIComponent(String(value))}`
-              : url;
-            
-            fetch(fetchUrl, fetchOptions)
-              .then(response => response.json())
-              .then(data => {
+            // Prepare request config for apiClient
+            const config = {
+              method,
+              url,
+              headers: headers as Record<string, string>,
+              ...(method === "GET"
+                ? { params: { [paramName]: value } }
+                : { data: { [paramName]: value } }),
+            };
+
+            // Use apiClient instead of fetch
+            apiClient(config)
+              .then(response => {
                 // Check if validation passed
                 let isValid = false;
+                const data = response.data;
                 
                 if (successCondition) {
                   // Use the provided success condition
