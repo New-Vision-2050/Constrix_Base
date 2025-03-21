@@ -1,6 +1,7 @@
 // Define the form configuration
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
+import {defaultSubmitHandler} from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const loginWayFormConfig: FormConfig = {
   formId: "login-way-form",
@@ -111,7 +112,7 @@ export const loginWayFormConfig: FormConfig = {
       login_options: formData?.login_options?.map((ele) => {
         let login_option_alternatives = [],
           drivers = [];
-        
+
           if (
           ele?.login_option_alternatives &&
           Array.isArray(ele?.login_option_alternatives)
@@ -133,19 +134,7 @@ export const loginWayFormConfig: FormConfig = {
 
     // Log the form data
     console.log("Form data received bodybody:", body);
-
-    const response = await apiClient.post(
-      `${baseURL}/settings/login-way`,
-      body
-    );
-
-    console.log("Form data received responseresponse", response);
-
-    // Return success response
-    return {
-      success: true,
-      message: "Form submitted successfully",
-    };
+    return await defaultSubmitHandler(body,loginWayFormConfig)
   },
 
   // Example onSuccess handler
