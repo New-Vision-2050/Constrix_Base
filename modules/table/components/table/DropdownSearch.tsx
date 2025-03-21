@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, memo, useRef } from "react";
 import { DropdownOption } from "@/modules/table/utils/tableTypes";
 import { useDynamicOptions } from "./dropdowns/useDynamicOptions";
 import ComboBoxDropdown from "./dropdowns/ComboBoxDropdown";
-import { DynamicDropdownConfig } from "./dropdowns/DropdownUtils";
+import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import PaginatedDropdown from "./dropdowns/PaginatedDropdown";
 
@@ -78,7 +78,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         const dependencyKey = dynamicConfig.dependsOn;
         const currentValue = dependencies[dependencyKey] || "";
         const previousValue = previousDependencyValues[dependencyKey] || "";
-        
+
         if (currentValue !== previousValue) {
           console.log(`Dependency changed for ${columnKey}:`, {
             field: dependencyKey,
@@ -94,7 +94,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
           const field = depConfig.field;
           const currentValue = dependencies[field] || "";
           const previousValue = previousDependencyValues[field] || "";
-          
+
           if (currentValue !== previousValue) {
             console.log(`Dependency changed for ${columnKey}:`, {
               field,
@@ -110,7 +110,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         for (const field of Object.keys(dynamicConfig.dependsOn)) {
           const currentValue = dependencies[field] || "";
           const previousValue = previousDependencyValues[field] || "";
-          
+
           if (currentValue !== previousValue) {
             console.log(`Dependency changed for ${columnKey}:`, {
               field,
@@ -121,7 +121,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
           }
         }
       }
-      
+
       return false;
     };
 
@@ -182,23 +182,23 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
 
     // Case 1: String format (backward compatibility)
     if (typeof dynamicConfig.dependsOn === 'string') {
-      return !dependencies[dynamicConfig.dependsOn] || dependencies[dynamicConfig.dependsOn] === "";
+      return !dependencies[dynamicConfig.dependsOn];
     }
-    
+
     // Case 2: Array of dependency configs
     if (Array.isArray(dynamicConfig.dependsOn)) {
       return dynamicConfig.dependsOn.some(
-        depConfig => !dependencies[depConfig.field] || dependencies[depConfig.field] === ""
+        depConfig => !dependencies[depConfig.field]
       );
     }
-    
+
     // Case 3: Object with field names as keys
     if (typeof dynamicConfig.dependsOn === 'object') {
       return Object.keys(dynamicConfig.dependsOn).some(
-        field => !dependencies[field] || dependencies[field] === ""
+        field => !dependencies[field]
       );
     }
-    
+
     return false;
   })();
 
