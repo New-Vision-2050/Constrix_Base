@@ -239,7 +239,7 @@ export const useDynamicOptions = ({
       dependencies
     );
 
-    if (url === urlRef.current && !shouldRefetch) {
+    if ( url == null || url === urlRef.current && !shouldRefetch) {
       setLoading(false);
       processingFetchRef.current = false;
       return;

@@ -46,12 +46,12 @@ export const useDependencyMessage = (
     dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>
 ): string | null => {
     if (!isDisabled || !dependsOn) return null;
-    
+
     // Case 1: String format (backward compatibility)
     if (typeof dependsOn === 'string') {
         return `Please select a ${dependsOn} first`;
     }
-    
+
     // Case 2: Array of dependency configs
     if (Array.isArray(dependsOn) && dependsOn.length > 0) {
         if (dependsOn.length === 1) {
@@ -61,7 +61,7 @@ export const useDependencyMessage = (
             return `Please select the required fields: ${fields}`;
         }
     }
-    
+
     // Case 3: Object with field names as keys
     if (typeof dependsOn === 'object') {
         const fields = Object.keys(dependsOn);
@@ -71,7 +71,7 @@ export const useDependencyMessage = (
             return `Please select the required fields: ${fields.join(', ')}`;
         }
     }
-    
+
     return null;
 };
 
@@ -79,13 +79,14 @@ export const getFetchUrl = (
     baseUrl: string,
     dynamicConfig: DynamicDropdownConfig,
     dependencies?: Record<string, string | string[]>
-): string => {
+): string|null => {
     let url = baseUrl;
     const params = new URLSearchParams();
-
+    let dependenciesCount = 0;
     if (dynamicConfig.dependsOn && dependencies) {
         // Case 1: String format (backward compatibility)
         if (typeof dynamicConfig.dependsOn === 'string') {
+            dependenciesCount++;
             if (dynamicConfig.filterParam && dependencies[dynamicConfig.dependsOn]) {
                 const dependencyValue = dependencies[dynamicConfig.dependsOn];
                 // Handle both string and string[] values
@@ -102,6 +103,7 @@ export const getFetchUrl = (
         // Case 2: Array of dependency configs
         else if (Array.isArray(dynamicConfig.dependsOn)) {
             for (const depConfig of dynamicConfig.dependsOn) {
+                dependenciesCount++;
                 if (dependencies[depConfig.field]) {
                     const dependencyValue = dependencies[depConfig.field];
                     const paramValue = Array.isArray(dependencyValue)
@@ -123,6 +125,7 @@ export const getFetchUrl = (
         // Case 3: Object with field names as keys
         else if (typeof dynamicConfig.dependsOn === 'object') {
             for (const [field, config] of Object.entries(dynamicConfig.dependsOn)) {
+                dependenciesCount++;
                 if (dependencies[field]) {
                     const dependencyValue = dependencies[field];
                     const paramValue = Array.isArray(dependencyValue)
@@ -143,6 +146,9 @@ export const getFetchUrl = (
         }
     }
 
+    if (dynamicConfig.dependsOn && (params.size !== dependenciesCount || dependenciesCount == 0)) {
+        return null;
+    }
     // Append params to URL
     const queryString = params.toString();
     if (queryString) {
@@ -170,14 +176,14 @@ export const extractDropdownOptions = (
                 label: String(item),
             };
         }
-        
+
         // Handle array format [value, label]
         if (Array.isArray(item)) {
             // If item is an array, use indices as valueField and labelField
             // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label
             const valueIndex = parseInt(valueField, 10);
             const labelIndex = parseInt(labelField, 10);
-            
+
             if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
                 valueIndex >= 0 && labelIndex >= 0 &&
                 valueIndex < item.length && labelIndex < item.length) {
@@ -186,14 +192,14 @@ export const extractDropdownOptions = (
                     label: String(item[labelIndex]),
                 };
             }
-            
+
             // Fallback to first element as value and second as label if indices are invalid
             return {
                 value: String(item[0] || ''),
                 label: String(item[1] || item[0] || ''),
             };
         }
-        
+
         // Handle object format
         return {
             value: String(getValue(item, valueField)),
