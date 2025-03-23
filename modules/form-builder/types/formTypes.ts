@@ -166,6 +166,13 @@ export interface FormConfig {
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
   apiHeaders?: Record<string, string>; // Custom headers for the API request
+  // Edit mode configuration
+  isEditMode?: boolean; // Whether the form is in edit mode
+  editValues?: Record<string, any>; // Values to use for editing (direct values)
+  editApiUrl?: string; // URL to fetch data for editing (can include :id placeholder)
+  editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
+  editDataPath?: string; // Path to the data in the API response (e.g., 'data' or 'data.user')
+  editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
   // Laravel validation response support
   laravelValidation?: {
     enabled: boolean;

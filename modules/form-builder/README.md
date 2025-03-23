@@ -12,6 +12,7 @@ This module provides a flexible and powerful form building system for React appl
 - **Accessibility**: Built with accessibility in mind
 - **Internationalization**: Support for RTL languages and translations
 - **React Hook Form Integration**: Optional integration with React Hook Form
+- **Edit Mode Support**: Load and edit existing data from direct values or API endpoints
 
 ## Usage
 
@@ -85,6 +86,14 @@ interface FormConfig {
   apiUrl?: string;                // URL to submit the form data to
   apiHeaders?: Record<string, string>; // Custom headers for the API request
   
+  // Edit mode configuration
+  isEditMode?: boolean;           // Whether the form is in edit mode
+  editValues?: Record<string, any>; // Values to use for editing (direct values)
+  editApiUrl?: string;            // URL to fetch data for editing (can include :id placeholder)
+  editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
+  editDataPath?: string;          // Path to the data in the API response (e.g., 'data' or 'data.user')
+  editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
+  
   // Event handlers
   onSubmit?: (values: Record<string, any>) => Promise<{ success: boolean; message?: string; errors?: Record<string, string | string[]> }>;
   onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
@@ -114,7 +123,77 @@ The React Hook Form integration provides several benefits:
 ### Hooks
 
 - `useReactHookForm`: Custom hook for integrating React Hook Form with the form builder
+- `useFormEdit`: Custom hook for handling form edit mode functionality
+- `useFormData`: Main hook for using forms with the isolated pattern
 
-## Example
+## Edit Mode
 
-See the example page at `/react-hook-form-example` for a complete demonstration of the React Hook Form integration.
+The form builder supports edit mode, allowing you to load and edit existing data. There are two ways to use edit mode:
+
+### 1. Direct Values
+
+You can provide the values directly in the form configuration:
+
+```tsx
+import { SheetFormBuilder, FormConfig } from "@/modules/form-builder";
+
+const editFormConfig: FormConfig = {
+  // Basic form configuration...
+  isEditMode: true,
+  editValues: {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    // Other field values...
+  },
+};
+
+export default function EditForm() {
+  return (
+    <SheetFormBuilder
+      config={editFormConfig}
+      onSuccess={(values) => console.log("Form updated:", values)}
+    />
+  );
+}
+```
+
+### 2. API-based Values
+
+You can fetch the values from an API endpoint:
+
+```tsx
+import { SheetFormBuilder, FormConfig } from "@/modules/form-builder";
+
+const apiEditFormConfig: FormConfig = {
+  // Basic form configuration...
+  editApiUrl: "/api/users/:id", // :id will be replaced with the recordId
+  editDataPath: "data", // Path to the data in the API response
+  editDataTransformer: (data) => {
+    // Optional: transform the API response data
+    return {
+      ...data,
+      // Any transformations needed...
+    };
+  },
+};
+
+export default function EditForm() {
+  const recordId = "123"; // This could come from a route parameter, state, etc.
+  
+  return (
+    <SheetFormBuilder
+      config={apiEditFormConfig}
+      recordId={recordId}
+      onSuccess={(values) => console.log("Form updated:", values)}
+    />
+  );
+}
+```
+
+The form builder will automatically handle loading states and error messages when fetching data from an API.
+
+## Examples
+
+- See the example page at `/react-hook-form-example` for a complete demonstration of the React Hook Form integration.
+- See the example page at `/edit-mode-test` for a demonstration of the edit mode functionality.
+- See the example page at `/form-edit-example` for another example of edit mode with both direct values and API-based values.

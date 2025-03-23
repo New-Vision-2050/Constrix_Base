@@ -35,6 +35,10 @@ interface FormBuilderProps {
   stepResponses: Record<number, any>;
   getStepResponseData: (step: number) => any;
   clearFiledError: (field: string) => void;
+  // Edit mode props (optional)
+  isEditMode?: boolean;
+  isLoadingEditData?: boolean;
+  editError?: string | null;
 }
 
 const FormBuilder: React.FC<FormBuilderProps> = ({
@@ -65,6 +69,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   stepResponses,
   getStepResponseData,
   clearFiledError,
+  // Edit mode props
+  isEditMode,
+  isLoadingEditData,
+  editError,
 }) => {
   return (
     <form
@@ -124,13 +132,30 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
         </div>
       )}
 
+      {/* Loading state for edit mode */}
+      {isLoadingEditData && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="animate-spin h-8 w-8 text-primary" />
+          <span className="ml-2 text-lg">Loading data...</span>
+        </div>
+      )}
+
+      {/* Error state for edit mode */}
+      {editError && (
+        <div className="text-destructive border border-destructive/20 p-4 rounded mb-4">
+          <h3 className="font-medium text-lg mb-1">Error Loading Data</h3>
+          <p>{editError}</p>
+        </div>
+      )}
+
       <div
-        className="max-h-[calc(80vh-120px)] overflow-y-auto pr-2
+        className={`max-h-[calc(80vh-120px)] overflow-y-auto pr-2
           [&::-webkit-scrollbar]:w-2
           [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-gray-300
           [&::-webkit-scrollbar-thumb]:rounded-full
-          hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
+          hover:[&::-webkit-scrollbar-thumb]:bg-gray-400
+          ${isLoadingEditData ? 'hidden' : ''}`}
       >
         {/* Render form sections based on mode */}
         {isWizard ? (

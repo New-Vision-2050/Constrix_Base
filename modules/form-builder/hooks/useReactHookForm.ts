@@ -115,6 +115,7 @@ const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
 
 interface UseReactHookFormProps {
   config: FormConfig;
+  recordId?: string | number | null; // Optional record ID for editing
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
 }
@@ -130,6 +131,11 @@ interface UseReactHookFormResult<TFieldValues extends FieldValues = FieldValues>
   isSubmitting: boolean;
   submitSuccess: boolean;
   submitError: string | null;
+  
+  // Edit mode state
+  isEditMode: boolean;
+  isLoadingEditData: boolean;
+  editError: string | null;
   
   // Form methods
   form: UseFormReturn<TFieldValues>;
@@ -163,10 +169,14 @@ interface UseReactHookFormResult<TFieldValues extends FieldValues = FieldValues>
   
   // Form ID
   formId: string;
+  
+  // Edit mode actions
+  loadEditData: (id?: string | number) => Promise<void>;
 }
 
 export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>({
   config,
+  recordId,
   onSuccess,
   onCancel,
 }: UseReactHookFormProps): UseReactHookFormResult<TFieldValues> {
@@ -176,21 +186,26 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
   
+  // Edit mode state
+  const [isLoadingEditData, setIsLoadingEditData] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const isEditMode = !!recordId || !!config.isEditMode;
+  
   // Create Zod schema from form config
   const schema = createZodSchema(config);
   
   // Initialize React Hook Form
   const form = useForm<TFieldValues>({
     resolver: zodResolver(schema),
-    defaultValues: (config.initialValues || {}) as unknown as TFieldValues,
+    defaultValues: (config.initialValues || {}) as any,
     mode: 'onBlur',
   });
   
-  const { 
-    handleSubmit: rhfHandleSubmit, 
-    reset, 
-    formState, 
-    getValues, 
+  const {
+    handleSubmit: rhfHandleSubmit,
+    reset,
+    formState,
+    getValues,
     setValue: rhfSetValue,
     trigger,
     clearErrors: rhfClearErrors,
@@ -224,12 +239,84 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     >
   >({});
   
+  // Function to load data for editing
+  const loadEditData = useCallback(async (id?: string | number) => {
+    // Use provided id or fallback to recordId from props
+    const targetId = id || recordId;
+    
+    // If no ID is provided, we can't load data
+    if (!targetId) {
+      setEditError("No record ID provided for editing");
+      return;
+    }
+
+    // If editValues are directly provided in the config, use those
+    if (config.editValues) {
+      reset(config.editValues as unknown as TFieldValues);
+      return;
+    }
+
+    // If no editApiUrl is provided, we can't load data
+    if (!config.editApiUrl) {
+      setEditError("No API URL configured for editing");
+      return;
+    }
+
+    try {
+      setIsLoadingEditData(true);
+      setEditError(null);
+
+      // Replace :id placeholder in URL if present
+      const url = config.editApiUrl.replace(":id", String(targetId));
+      
+      // Make the API request
+      const response = await apiClient.get(url, {
+        headers: config.editApiHeaders,
+      });
+
+      // Extract data from response
+      let data = response.data;
+      
+      // If a data path is specified, extract the data from that path
+      if (config.editDataPath) {
+        const paths = config.editDataPath.split('.');
+        for (const path of paths) {
+          data = data[path];
+          if (data === undefined) {
+            throw new Error(`Data path '${config.editDataPath}' not found in response`);
+          }
+        }
+      }
+
+      // If a data transformer is provided, transform the data
+      if (config.editDataTransformer) {
+        data = config.editDataTransformer(data);
+      }
+
+      // Reset the form with the loaded data
+      reset(data as unknown as TFieldValues);
+    } catch (error: any) {
+      console.error("Error loading data for editing:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
+      setEditError(errorMessage);
+    } finally {
+      setIsLoadingEditData(false);
+    }
+  }, [config, recordId, reset]);
+
   // Reset form when config changes
   useEffect(() => {
     if (config.initialValues) {
       reset(config.initialValues as TFieldValues);
     }
   }, [config, reset]);
+  
+  // Load edit data when in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      loadEditData();
+    }
+  }, [isEditMode, loadEditData]);
   
   // Open and close sheet
   const openSheet = useCallback(() => {
@@ -686,6 +773,11 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     submitSuccess,
     submitError,
     
+    // Edit mode state
+    isEditMode,
+    isLoadingEditData,
+    editError,
+    
     // Form methods
     form,
     setValue,
@@ -718,5 +810,8 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     
     // Form ID
     formId: actualFormId,
+    
+    // Edit mode actions
+    loadEditData,
   };
 }
