@@ -44,10 +44,6 @@ const ForgetPasswordPhase = ({
           setValue("token", res.payload.token);
           handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
         },
-        onError(error) {
-          const description = error.response?.data?.message?.description;
-          openDialog(description);
-        },
       }
     );
   };

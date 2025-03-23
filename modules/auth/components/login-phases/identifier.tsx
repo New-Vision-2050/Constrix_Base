@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginWays } from "../../store/mutations";
 import { useEffect, useState } from "react";
-import { useLoginWays } from "../../store/mutations";
 import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
