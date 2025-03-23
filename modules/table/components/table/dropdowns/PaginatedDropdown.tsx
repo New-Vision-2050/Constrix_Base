@@ -111,7 +111,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               aria-label={label}
               disabled={isDisabled}
               className={cn(
-                "w-full justify-between bg-sidebar",
+                "w-full justify-between bg-sidebar whitespace-normal",
                 (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground"
               )}
               onKeyDown={handleKeyDown}

@@ -12,9 +12,11 @@ import TrashIcon from "@/public/icons/trash";
 import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
+import { useTableInstance } from "@/modules/table/store/useTableStore";
 
 const LoginWaysExecutionBtn = ({ id }: { id: string }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
+  const { reloadTable } = useTableInstance("login-ways-table");
   const t = useTranslations();
 
   const menuItems = [
@@ -29,7 +31,7 @@ const LoginWaysExecutionBtn = ({ id }: { id: string }) => {
       func: () => null,
     },
     {
-      label: "Action 3",
+      label: "Delete",
       icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: handleOpen,
     },
@@ -54,10 +56,13 @@ const LoginWaysExecutionBtn = ({ id }: { id: string }) => {
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteConfirmationDialog
-        deleteUrl={`/companies/${id}`}
+        deleteUrl={`/settings/login-way/${id}`}
         onClose={handleClose}
         open={isOpen}
-        onSuccess={() => console.log("success deleting")}
+        onSuccess={() => {
+          // Reload the table after successful deletion using the centralized method
+          reloadTable();
+        }}
       />
     </>
   );

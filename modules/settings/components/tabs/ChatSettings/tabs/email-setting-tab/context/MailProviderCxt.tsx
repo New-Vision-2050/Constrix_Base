@@ -1,18 +1,26 @@
-'use client'
+"use client";
 //hooks
-import { MailProvider } from "@/modules/settings/types/MailProvider";
 import { createContext, useCallback, useContext, useState } from "react";
+import useDriversData from "../../../hooks/useDriversData";
+import { Driver } from "@/modules/settings/types/Driver";
+import { DriverTypes } from "../../../constants/DriversTypes";
 
 // TODO::declare and define context type
 type MailProviderCxtType = {
-  activeMailProvider: MailProvider | undefined;
-  handleChangeActiveProvider: (provider: MailProvider) => void;
+  activeMailProvider: Driver | undefined;
+  handleChangeActiveProvider: (provider: Driver) => void;
+  // drivers data
+  drivers: Driver[];
+  loadingDrivers: boolean;
 };
 
 // TODO::create MailProviderCxt
 export const MailProviderCxt = createContext<MailProviderCxtType>({
   activeMailProvider: undefined,
   handleChangeActiveProvider: () => {},
+  // drivers data
+  drivers: [],
+  loadingDrivers: false,
 });
 
 // custom hook to fasalitate reach MailProviderCxt
@@ -36,17 +44,25 @@ export const useMailProviderCxt = () => {
 // TODO::declare context provider
 function MailProviderCxtProvider({ children }: React.PropsWithChildren) {
   // * declare and define state and variables
-  const [activeMailProvider, setActiveMailProvider] = useState<MailProvider>();
+  const [activeMailProvider, setActiveMailProvider] = useState<Driver>();
+  const { data: drivers, isLoading: loadingDrivers } = useDriversData({
+    driverType: DriverTypes.Mail,
+  });
 
   // * declare and define component methods
-  const handleChangeActiveProvider = useCallback((provider: MailProvider) => {
+  const handleChangeActiveProvider = useCallback((provider: Driver) => {
     setActiveMailProvider(provider);
   }, []);
 
   // * return component ui
   return (
     <MailProviderCxt.Provider
-      value={{ activeMailProvider, handleChangeActiveProvider }}
+      value={{
+        activeMailProvider,
+        handleChangeActiveProvider,
+        drivers: drivers ?? [],
+        loadingDrivers,
+      }}
     >
       {children}
     </MailProviderCxt.Provider>

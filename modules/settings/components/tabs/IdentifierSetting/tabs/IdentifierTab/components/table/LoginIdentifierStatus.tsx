@@ -22,7 +22,7 @@ export default function LoginIdentifierStatus({ identifier }: PropsT) {
     }
   };
 
-  console.log("identifieridentifier", identifier);
+  
   return (
     <Switch
       checked={identifier.status == 1}
