@@ -59,7 +59,6 @@ export default async function RootLayout({
           <main>
             <ReactQueryProvider>
               {children}
-              <ErrorDialog />
             </ReactQueryProvider>
           </main>
           <Toaster />
