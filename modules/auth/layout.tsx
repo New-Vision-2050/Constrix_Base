@@ -12,7 +12,7 @@ export default function AuthLayout({
 }>) {
   const t = useTranslations();
   return (
-    <main className="min-h-screen flex flex-col bg-[#18003A] relative overflow-hidden">
+    <main className="min-h-screen flex flex-col bg-[#18003A] relative overflow-hidden !dark text-foreground">
       {/* Language switcher */}
       {/* <div className="fixed top-4 end-4 z-50">
         <RenderLocaleSwitch />
