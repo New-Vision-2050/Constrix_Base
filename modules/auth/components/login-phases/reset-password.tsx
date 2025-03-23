@@ -37,11 +37,7 @@ const ResetPasswordPhase = ({
         onSuccess: () => {
           reset();
           handleSetStep(LOGIN_PHASES.IDENTIFIER);
-        },
-        onError(error) {
-          const description = error.response?.data?.message?.description;
-          openDialog(description);
-        },
+        }
       }
     );
   };
