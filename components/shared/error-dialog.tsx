@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
@@ -10,17 +8,19 @@ import {
 } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
 import { Button } from "../ui/button";
-
 import { useTranslations } from "next-intl";
 
-const ErrorDialog = () => {
-  const { isOpen, desc, closeDialog } = useErrorDialogStore();
+interface IErrorDialog {
+  isOpen: boolean;
+  handleClose: () => void;
+  desc: string;
+}
 
 const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
   const t = useTranslations();
   
   return (
-    <Dialog open={isOpen} onOpenChange={closeDialog}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-80 w-full rounded-2xl p-10 flex flex-col">
         <DialogHeader>
           <DialogTitle className="mx-auto">
@@ -37,7 +37,7 @@ const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
           <Button
             type="button"
             color="primary"
-            onClick={closeDialog}
+            onClick={handleClose}
             className="w-full"
           >
             {t("Errors.Back")}
