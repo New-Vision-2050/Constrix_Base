@@ -16,6 +16,7 @@ export { useFormInitialization } from './hooks/useFormInitialization';
 export { useFormActions } from './hooks/useFormActions';
 export { useFormWithTableReload } from './hooks/useFormWithTableReload';
 export { useFormData } from './hooks/useFormData';
+export { useFormEdit } from './hooks/useFormEdit';
 
 // Export types
 export type { FormConfig, FormSection, FieldConfig, DropdownOption, DynamicDropdownConfig, SearchTypeConfig } from './types/formTypes';

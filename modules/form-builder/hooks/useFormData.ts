@@ -1,13 +1,15 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormConfig, ValidationRule } from "../types/formTypes";
 import { useFormInstance, useFormStore } from "./useFormStore";
 import { useFormActions } from "./useFormActions";
 import { useFormInitialization } from "./useFormInitialization";
+import { useFormEdit } from "./useFormEdit";
 
 export interface UseFormDataProps {
   config: FormConfig;
   formId?: string; // Optional formId parameter
+  recordId?: string | number | null; // Optional record ID for editing
   onSuccess?: (values: Record<string, any>) => void;
   onError?: (error: string) => void;
 }
@@ -19,6 +21,7 @@ export interface UseFormDataProps {
 export const useFormData = ({
   config,
   formId,
+  recordId,
   onSuccess,
   onError,
 }: UseFormDataProps) => {
@@ -83,6 +86,15 @@ export const useFormData = ({
     setAllTouched,
     resetForm,
     validateFieldWithApi,
+  });
+  
+  // Initialize edit mode if needed
+  const { isLoading: isLoadingEditData, error: editError, loadData } = useFormEdit({
+    config,
+    recordId,
+    setValues,
+    setSubmitting,
+    onError,
   });
   
   // Handle form submission
@@ -239,6 +251,11 @@ export const useFormData = ({
     isSubmitting,
     isValid,
     
+    // Edit mode state
+    isEditMode: !!recordId || !!config.isEditMode,
+    isLoadingEditData,
+    editError,
+    
     // Field helpers
     getVisibleFields,
     isFieldRequired,
@@ -259,5 +276,8 @@ export const useFormData = ({
     handleBulkUpdate,
     validateField,
     hasValidatingFields,
+    
+    // Edit mode actions
+    loadData,
   };
 };
