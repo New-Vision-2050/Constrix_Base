@@ -18,8 +18,8 @@ export const loginRepository = {
     const response = await loginSteps(identifier, password, token);
     return response.data;
   },
-  forgetPassword: async (identifier: string) => {
-    const response = await forgetPassword(identifier);
+  forgetPassword: async (identifier: string, token: string) => {
+    const response = await forgetPassword(identifier, token);
     return response.data;
   },
   resetPassword: async (
@@ -36,8 +36,8 @@ export const loginRepository = {
     );
     return response.data;
   },
-  resendOtp: async (identifier: string) => {
-    const response = await resendOtp(identifier);
+  resendOtp: async (identifier: string, token: string) => {
+    const response = await resendOtp(identifier, token);
     return response.data;
   },
   loginAlternative: async (

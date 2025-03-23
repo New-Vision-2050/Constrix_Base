@@ -5,14 +5,22 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useLoginWays } from "../../store/mutations";
-import { useErrorDialogStore } from "@/store/use-error-dialog-store";
+import { useEffect, useState } from "react";
+import { useLoginWays } from "../../store/mutations";
+import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { useTranslations } from "next-intl";
 
 const IdentifierPhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-  const openDialog = useErrorDialogStore((state) => state.openDialog);
+
+  const t = useTranslations();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
   const { mutate, isPending } = useLoginWays();
   const {
     register,
@@ -20,6 +28,23 @@ const IdentifierPhase = ({
     handleSubmit,
     setValue,
   } = useFormContext<IdentifierType>();
+
+  // Listen for auth errors from the interceptor
+  useEffect(() => {
+    const handleAuthError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        setErrorMessage(customEvent.detail.messageKey);
+        handleOpen();
+      }
+    };
+
+    errorEvent.addEventListener('auth-error', handleAuthError);
+
+    return () => {
+      errorEvent.removeEventListener('auth-error', handleAuthError);
+    };
+  }, [handleOpen, t]);
 
   const onSubmit = (data: IdentifierType) => {
     mutate(
@@ -55,30 +80,36 @@ const IdentifierPhase = ({
           }
         },
         onError(error) {
-          const description = error.response?.data?.message?.description;
-          openDialog(description);
-        },
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
+          handleOpen();
+
+       },
       }
     );
   };
 
   return (
     <>
-      <h1 className="text-2xl text-center">تسجيل الدخول</h1>
-      <Input
-        {...register("identifier")}
-        label="رقم الجوال / البريد الالكتروني / رقم المعرف (يحدد من الاعدادات)"
-        error={errors?.identifier?.message}
-      />
+      <h1 className="text-xl sm:text-2xl text-center mb-4">{t("Login.SignIn")}</h1>
+      <div className="space-y-4">
+        <Input
+          {...register("identifier")}
+          label={t("Login.Identifier")}
+          error={errors?.identifier?.message}
+        />
 
-      <Button
-        size={"lg"}
-        className="w-full"
-        loading={isPending}
-        onClick={handleSubmit(onSubmit)}
-      >
-        التالي
-      </Button>
+        <Button
+          size={"lg"}
+          className="w-full mt-4"
+          loading={isPending}
+          onClick={handleSubmit(onSubmit)}
+          type="submit"
+          form="login-form"
+        >
+          {t("Login.Next")}
+        </Button>
+      </div>
 
     </>
   );

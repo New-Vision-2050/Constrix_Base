@@ -18,15 +18,22 @@ import { useAuthStore } from "../../store/use-auth";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next";
 import { ROUTER } from "@/router";
-import { useErrorDialogStore } from "@/store/use-error-dialog-store";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useModal } from "@/hooks/use-modal";
+import ErrorDialog from "@/components/shared/error-dialog";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidatePhonePhase = ({
   handleSetStep,
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-  const openDialog = useErrorDialogStore((state) => state.openDialog);
+  const t = useTranslations("Login.PhoneVerification");
+  const loginT = useTranslations("Login");
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const { mutate, isPending } = useLoginSteps();
 
@@ -38,6 +45,7 @@ const ValidatePhonePhase = ({
     setValue,
   } = useFormContext<IdentifierType & ValidatePhoneType>();
   const identifier = getValues("identifier");
+  const token = getValues("token");
   const by = getValues("by");
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
@@ -79,9 +87,12 @@ const ValidatePhonePhase = ({
               return;
           }
         },
-        onError(error) {
-          const description = error.response?.data?.message?.description;
-          openDialog(description);
+        onError: (error) => {
+          const messageKey = getErrorMessage(error);
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.InvalidIdentifier")
+          );
+          handleOpen();
         },
       }
     );
@@ -90,9 +101,9 @@ const ValidatePhonePhase = ({
   return (
     <>
       <div className="space-y-4">
-        <h1 className="text-2xl text-start">التحقق من رقم الجوال</h1>
+        <h1 className="text-2xl text-start">{t("Title")}</h1>
         <p>
-          <span className="opacity-50">ادخل رمز التحقق المرسل الى </span>
+          <span className="opacity-50">{t("EnterVerificationCode")} </span>
           <span dir="ltr">{by}</span>
         </p>
       </div>
@@ -125,19 +136,32 @@ const ValidatePhonePhase = ({
       <Button
         loading={isPending}
         onClick={handleSubmit(onSubmit)}
+        type="submit"
+        form="login-form"
         className="w-full"
       >
-        دخول
+        {loginT("Login")}
       </Button>
-      <OtpHub resendFor="resend-otp" identifier={identifier} />
+      <OtpHub
+        resendFor="resend-otp"
+        token={token ?? ""}
+        identifier={identifier}
+      />
 
-      <div className="flex items-center gap-2">
+      {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
+        <AnotherCheckingWay
+          loginOptionAlternatives={loginOptionAlternatives}
+          handleSetStep={handleSetStep}
+        />
+      )}
+
+{/*       <div className="flex items-center gap-2">
         <Button
           type="button"
           variant={"link"}
           className="text-primary p-0 h-auto underline"
         >
-          تغيير رقم الجوال{" "}
+          {t("ChangePhoneNumber")}
         </Button>
         {!!loginOptionAlternatives && loginOptionAlternatives.length > 0 && (
           <AnotherCheckingWay
@@ -145,7 +169,12 @@ const ValidatePhonePhase = ({
             handleSetStep={handleSetStep}
           />
         )}
-      </div>
+      </div> */}
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
     </>
   );
 };

@@ -1,5 +1,130 @@
 {
   "Login": {
-    "Control_panel": "لوحة التحكم"
+    "Control_panel": "لوحة التحكم",
+    "SignIn": "تسجيل الدخول",
+    "EnterPassword": "ادخل كلمة المرور",
+    "Next": "التالي",
+    "Login": "دخول",
+    "ForgotPassword": "هل نسيت كلمة المرور؟",
+    "Identifier": "رقم الجوال / البريد الالكتروني / رقم المعرف",
+    "Password": "كلمة المرور",
+    "Copyright": "جميع الحقوق البرمجية محفوظة لشركة نيو فيجن التقنية.",
+    "Verification": {
+      "Mobile": "رقم الجوال",
+      "Password": "كلمة المرور",
+      "Email": "البريد الإليكتروني",
+      "Social": "اجتماعي",
+      "Barcode": "الباركود",
+      "LocalNetwork": "الشبكة المحلية",
+      "ChooseAnotherMethod": "او اختر طريقة تحقق اخرى",
+      "VerifyVia": "التحقق عن طريق"
+    },
+    "PhoneVerification": {
+      "Title": "التحقق من رقم الجوال",
+      "EnterVerificationCode": "ادخل رمز التحقق المرسل الى",
+      "ChangePhoneNumber": "تغيير رقم الجوال",
+      "invalid token": "رمز التحقق غير صالح",
+      "ResendCode": "لم يصلك رمز التحقق؟",
+      "Resend": "إعادة الإرسال"
+    },
+    "EmailVerification": {
+      "Title": "التحقق من البريد الالكتروني",
+      "EnterVerificationCode": "ادخل رمز التحقق المرسل على",
+      "ChangeEmailAddress": "تغيير البريد الالكتروني",
+      "invalid token": "رمز التحقق غير صالح"
+    }
+  },
+  "ForgotPassword": {
+    "Title": "نسيت كلمة المرور",
+    "EnterTemporaryPassword": "ادخل كلمة المرور المؤقتة المرسلة على البريد الالكتروني",
+    "Confirm": "تأكيد",
+    "BackToLogin": "الرجوع للدخول"
+  },
+  "ResetPassword": {
+    "Title": "اعادة تعيين كلمة المرور",
+    "NewPassword": "كلمة المرور الجديدة",
+    "ConfirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "PasswordRequirements": "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل، حرف كبير واحد على الأقل، استخدام رمز خاص واحد على الأقل.",
+    "Confirm": "تأكيد"
+  },
+  "ChangeEmail": {
+    "Title": "تغيير البريد الالكتروني",
+    "NewEmail": "البريد الالكتروني الجديد",
+    "ConfirmNewEmail": "تأكيد البريد الالكتروني الجديد",
+    "NoCopy": "لا يمكن نسخ البريد الالكتروني يجب اعادة كتابتها يدويا",
+    "Confirm": "تأكيد",
+    "BackToLogin": "الرجوع للدخول"
+  },
+  "SecurityQuestions": {
+    "Title": "اسئلة الامان",
+    "PetQuestion": "ما هو اسم حيوانك الأليف المفضل؟",
+    "TeamQuestion": "ما اسم فريقك الرياضي المفضل؟",
+    "Next": "التالي"
+  },
+  "Errors": {
+    "Authentication": {
+      "Title": "خطأ في المصادقة",
+      "SessionExpired": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+      "InvalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة",
+      "InvalidIdentifier": "المعرف غير صحيح أو غير موجود",
+      "UserNotFound": "المستخدم غير موجود",
+      "GenericError": "حدث خطأ"
+    },
+    "Back": "رجوع"
+  },
+  "Validation": {
+    "Required": "هذا الحقل مطلوب",
+    "MinLength": "يجب أن يكون طول النص {min} أحرف على الأقل",
+    "InvalidEmail": "البريد الإلكتروني غير صالح",
+    "InvalidPhone": "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx",
+    "Password": {
+      "MinLength": "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل",
+      "UpperCase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+      "SpecialChar": "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل",
+      "Required": "يجب إدخال كلمة المرور"
+    },
+    "PasswordMatch": "يجب أن تتطابق كلمة المرور الجديدة مع تأكيد كلمة المرور",
+    "EmailMatch": "يجب أن تتطابق البريد الاليكتروني الجديد مع تأكيد البريد الاليكتروني",
+    "OTP": "يجب إدخال كلمة المرور المؤقتة"
+  },
+  "Table": {
+    "Export": "تصدير",
+    "ExportAsCSV": "تصدير كـ CSV",
+    "ExportAsJSON": "تصدير كـ JSON",
+    "FilterSearch": "فلتر البحث",
+    "RowsPerPage": "الصفوف لكل صفحة :",
+    "Search": "بحث",
+    "Actions": "إجراء",
+    "ToggleColumns": "تبديل الأعمدة المرئية",
+    "VisibleColumns": "الأعمدة المرئية"
+  },
+  "Companies": {
+    "Companies": "الشركات",
+    "Email": "البريد الاليكتروني",
+    "CompanyType": "نوع الشركة",
+    "CompanySection": "نشاط الشركه",
+    "Manager": "المسؤول",
+    "DataStatus": "حالة البيانات",
+    "Status": "الحالة",
+    "Actions": "الاجراء",
+    "CountryFilter": "دولة الشركة",
+    "TypeFilter": "نوع الشركة",
+    "Active": "نشط",
+    "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
+    "PackageSettings": "اعدادات الباقة والبرامج",
+    "Delete": "حذف (أرشفة)",
+    "Confirmation": "تأكيد",
+    "AreYouSure": "هل أنت متأكد؟",
+    "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
+    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
+  },
+  "Sidebar": {
+    "Companies": "الشركات",
+    "Users": "المستخدمين",
+    "Welcome": "مرحبا، محمد سعد!",
+    "CompanyName" : "نيو فيجن"
+  },
+  "Header": {
+    "MainSystemManagement": "ادارة النظام الرئيسي"
   }
 }

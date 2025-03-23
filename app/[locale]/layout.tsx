@@ -7,7 +7,8 @@ import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
-import ErrorDialog from "@/components/shared/error-dialog";
+import { Toaster } from "@/modules/table/components/ui/toaster";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 const theSans = localFont({
   src: [
@@ -46,8 +47,14 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className="dark">
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
       <body className={theSans.variable}>
+      <ThemeProvider            
+       attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+>
         <NextIntlClientProvider messages={messages}>
           <main>
             <ReactQueryProvider>
@@ -55,7 +62,9 @@ export default async function RootLayout({
               <ErrorDialog />
             </ReactQueryProvider>
           </main>
+          <Toaster />
         </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

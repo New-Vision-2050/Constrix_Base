@@ -10,11 +10,15 @@ import {
 } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
 import { Button } from "../ui/button";
-import { useErrorDialogStore } from "@/store/use-error-dialog-store";
+
+import { useTranslations } from "next-intl";
 
 const ErrorDialog = () => {
   const { isOpen, desc, closeDialog } = useErrorDialogStore();
 
+const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
+  const t = useTranslations();
+  
   return (
     <Dialog open={isOpen} onOpenChange={closeDialog}>
       <DialogContent className="max-w-80 w-full rounded-2xl p-10 flex flex-col">
@@ -36,7 +40,7 @@ const ErrorDialog = () => {
             onClick={closeDialog}
             className="w-full"
           >
-            رجوع
+            {t("Errors.Back")}
           </Button>
         </DialogFooter>
       </DialogContent>

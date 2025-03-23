@@ -17,8 +17,8 @@ export const loginSteps = async (
 ) =>
   await apiClient.post(endPoints.loginSteps, { identifier, password, token });
 
-export const forgetPassword = async (identifier: string) =>
-  await apiClient.post(endPoints.forgetPassword, { identifier });
+export const forgetPassword = async (identifier: string, token: string) =>
+  await apiClient.post(endPoints.forgetPassword, { identifier, token });
 
 export const resetPassword = async (
   identifier: string,
@@ -33,8 +33,8 @@ export const resetPassword = async (
     token,
   });
 
-export const resendOtp = async (identifier: string) =>
-  await apiClient.post(endPoints.resendOtp, { identifier });
+export const resendOtp = async (identifier: string, token: string) =>
+  await apiClient.post(endPoints.resendOtp, { identifier, token });
 
 export const loginAlternative = async (
   identifier: string,
