@@ -111,6 +111,12 @@ const IdentifierPhase = ({
         </Button>
       </div>
 
+      <ErrorDialog
+        isOpen={isOpen}
+        handleClose={handleClose}
+        desc={errorMessage}
+      />
+
     </>
   );
 };
