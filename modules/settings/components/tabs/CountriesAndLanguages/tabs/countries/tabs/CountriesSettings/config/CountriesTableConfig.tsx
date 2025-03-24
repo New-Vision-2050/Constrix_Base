@@ -1,6 +1,6 @@
 import { baseURL } from "@/config/axios-config";
 import { Country } from "@/modules/settings/types/Country";
-import TableStatus from "../components/TableStatus";
+import CountriesSettingsActionsBtn from "../components/ActionsBtn";
 
 export const CountriesTableConfig = () => {
   return {
@@ -8,23 +8,20 @@ export const CountriesTableConfig = () => {
     tableId: "countries-table",
     columns: [
       {
+        key: "language",
+        label: "اللغة",
+      },
+      {
         key: "name",
-        label: "اسم الدولة",
+        label: "الدولة",
         sortable: true,
         searchable: true,
       },
       {
-        key: "sms_driver",
-        label: "مزود الخدمة",
-      },
-      {
-        key: "status",
-        label: "الحالة",
+        key: "actions",
+        label: "الأجراء",
         render: (_: unknown, row: Country) => (
-          <TableStatus
-            url={`change-country-status`}
-            country={row}
-          />
+          <CountriesSettingsActionsBtn id={row.id} />
         ),
       },
     ],
