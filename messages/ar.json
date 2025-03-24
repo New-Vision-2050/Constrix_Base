@@ -100,6 +100,7 @@
   },
   "Companies": {
     "Companies": "الشركات",
+    "Edit":"تعديل",
     "Email": "البريد الاليكتروني",
     "CompanyType": "نوع الشركة",
     "CompanySection": "نشاط الشركه",
@@ -121,7 +122,7 @@
   "Sidebar": {
     "Companies": "الشركات",
     "Users": "المستخدمين",
-    "settings":"اعدادات النظام",
+    "Settings":"اعدادات النظام",
     "Welcome": "مرحبا، محمد سعد!",
     "CompanyName" : "نيو فيجن"
   },

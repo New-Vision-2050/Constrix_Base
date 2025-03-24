@@ -68,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         isActive: pageName === ROUTER.USERS,
       },
       {
-        name: t("Sidebar.settings"),
+        name: t("Sidebar.Settings"),
         url: ROUTER.SETTINGS,
         icon: SettingsIcon,
         isActive: pageName === ROUTER.SETTINGS,
