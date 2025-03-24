@@ -89,7 +89,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : hookIsOpen;
 
   // Handle open state changes
-  const handleOpenChange = (open: boolean) => {
+  const handleOpenChange = (open: boolean) => {    
     if (onOpenChange) {
       onOpenChange(open);
     } else {
@@ -106,12 +106,8 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
       open={isOpen}
       onOpenChange={handleOpenChange}
     >
-      {trigger ? (
+      {trigger && (
         <SheetTrigger asChild>{trigger}</SheetTrigger>
-      ) : (
-        <SheetTrigger asChild>
-          <Button variant="outline">Open Form</Button>
-        </SheetTrigger>
       )}
       <SheetContent
         side={sheetSide}
