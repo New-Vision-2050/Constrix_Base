@@ -5,10 +5,10 @@ import FormContent from "./FormContent";
 
 export default function MailProviderFormContent() {
   const { activeMailProvider } = useMailProviderCxt();
-  const fields = generateFields(
-    Object.keys(activeMailProvider?.config ?? {}) ?? []
-  );
-  console.log("breakpoint101 fields", fields);
+  // const fields = generateFields(
+  //   Object.keys(activeMailProvider?.config ?? {}) ?? []
+  // );
+  // console.log("breakpoint101 fields", fields);
 
   return (
     <>
