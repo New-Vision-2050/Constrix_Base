@@ -16,6 +16,30 @@ export const MailProviderConfig = (id: string) => {
         title: "",
         fields: [
           {
+            name: "MAIL_DRIVER",
+            label: "Mail DRIVER",
+            type: "text",
+            placeholder: "Mail DRIVER",
+          },
+          {
+            name: "MAIL_ENCRYPTION",
+            label: "Mail ENCRYPTION",
+            type: "text",
+            placeholder: "Mail ENCRYPTION",
+          },
+          {
+            name: "MAIL_FROM_ADDRESS",
+            label: "Mail From Address",
+            type: "text",
+            placeholder: "Mail From Address",
+          },
+          {
+            name: "MAIL_FROM_NAME",
+            label: "Mail From Name",
+            type: "text",
+            placeholder: "Mail From Name",
+          },
+          {
             name: "MAIL_MAILER",
             label: "Mail Mailer",
             type: "text",
