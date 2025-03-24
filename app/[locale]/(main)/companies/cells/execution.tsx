@@ -13,9 +13,13 @@ import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
 import { useTableInstance } from "@/modules/table/store/useTableStore";
+import { companiesFormConfig, SheetFormBuilder } from "@/modules/form-builder";
+import { Fragment } from "react";
 
 const Execution = ({ id }: { id: string }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
+  const [isOpenEdit, handleOpenEdit, handleCloseEdit] = useModal();
+
   const t = useTranslations();
   // Get the reloadTable method directly from the table instance
   const { reloadTable } = useTableInstance("companies-table");
@@ -36,8 +40,13 @@ const Execution = ({ id }: { id: string }) => {
       icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: handleOpen,
     },
+    {
+      label: "eddd",
+      icon: <TrashIcon className="w-4 h-4 me-2" />,
+      func: handleOpenEdit,
+    },
   ];
-
+  console.log({ isOpenEdit });
   return (
     <>
       <DropdownMenu dir="rtl">
@@ -65,6 +74,11 @@ const Execution = ({ id }: { id: string }) => {
           // Reload the table after successful deletion using the centralized method
           reloadTable();
         }}
+      />
+      <SheetFormBuilder
+        config={companiesFormConfig}
+        isOpen={isOpenEdit}
+        onOpenChange={handleCloseEdit}
       />
     </>
   );
