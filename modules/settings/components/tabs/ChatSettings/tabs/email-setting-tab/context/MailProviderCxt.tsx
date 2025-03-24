@@ -1,6 +1,12 @@
 "use client";
 //hooks
-import { createContext, useCallback, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import useDriversData from "../../../hooks/useDriversData";
 import { Driver } from "@/modules/settings/types/Driver";
 import { DriverTypes } from "../../../constants/DriversTypes";
@@ -48,6 +54,13 @@ function MailProviderCxtProvider({ children }: React.PropsWithChildren) {
   const { data: drivers, isLoading: loadingDrivers } = useDriversData({
     driverType: DriverTypes.Mail,
   });
+
+  // handle side effects
+  useEffect(() => {
+    if (drivers) {
+      setActiveMailProvider(drivers?.[0]);
+    }
+  }, [drivers]);
 
   // * declare and define component methods
   const handleChangeActiveProvider = useCallback((provider: Driver) => {

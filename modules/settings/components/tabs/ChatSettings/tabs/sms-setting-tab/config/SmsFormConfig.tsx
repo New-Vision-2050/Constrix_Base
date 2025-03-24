@@ -16,19 +16,19 @@ export const SMSProviderConfig = (id: string) => {
         title: "",
         fields: [
           {
-            name: "SMS_KEY",
-            label: "SMS KEY",
+            name: "SMS_MORA_KEY",
+            label: "SMS MORA KEY",
             type: "text",
             placeholder: "SMS KEY",
           },
           {
-            name: "SMS_SENDER",
-            label: "SMS SENDER",
+            name: "SMS_MORA_SENDER",
+            label: "SMS MORA SENDER",
             type: "text",
-            placeholder: "SMS SENDER",
+            placeholder: "SMS MORA SENDER",
           },
           {
-            name: "SMS_USERNAME",
+            name: "SMS_MORA_USER",
             label: "SMS USER",
             type: "text",
             placeholder: "SMS USER",
@@ -57,7 +57,12 @@ export const SMSProviderConfig = (id: string) => {
         },
       };
       console.log("body-body", id, body);
-      await apiClient.put(`${baseURL}/settings/driver/${id}`, body);
+      const response = await apiClient.put(`${baseURL}/settings/driver/${id}`, body);
+      return {
+        success: true,
+        message: response.data?.message || "Form submitted successfully",
+        data: response.data || {},
+      };
     },
 
     // Example onError handler

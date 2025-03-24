@@ -1,6 +1,12 @@
 "use client";
 //hooks
-import { createContext, useCallback, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import useDriversData from "../../../hooks/useDriversData";
 import { DriverTypes } from "../../../constants/DriversTypes";
 import { Driver } from "@/modules/settings/types/Driver";
@@ -48,6 +54,13 @@ function SmsProviderCxtProvider({ children }: React.PropsWithChildren) {
   const { data: drivers, isLoading: loadingDrivers } = useDriversData({
     driverType: DriverTypes.SMS,
   });
+
+  // handle side effects
+  useEffect(() => {
+    if (drivers) {
+      setActiveSmsProvider(drivers?.[0]);
+    }
+  }, [drivers]);
 
   // * declare and define component methods
   const handleChangeActiveProvider = useCallback((provider: Driver) => {

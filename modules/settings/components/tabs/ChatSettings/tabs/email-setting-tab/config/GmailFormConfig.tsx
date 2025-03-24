@@ -11,6 +11,8 @@ export const MailProviderConfig = (id: string) => {
       enabled: true,
       errorsPath: "errors",
     },
+    isEditMode: true,
+    editApiUrl: `${baseURL}/settings/driver/${id}`,
     sections: [
       {
         title: "",
@@ -92,7 +94,16 @@ export const MailProviderConfig = (id: string) => {
           ...formData,
         },
       };
-      await apiClient.put(`${baseURL}/settings/driver/${id}`, body);
+      const response = await apiClient.put(
+        `${baseURL}/settings/driver/${id}`,
+        body
+      );
+
+      return {
+        success: true,
+        message: response.data?.message || "Form submitted successfully",
+        data: response.data || {},
+      };
     },
     // Example onError handler
     onError: (values, error) => {

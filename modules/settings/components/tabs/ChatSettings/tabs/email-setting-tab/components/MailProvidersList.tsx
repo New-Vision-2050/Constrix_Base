@@ -8,16 +8,15 @@ import Loader from "@/components/shared/loader/Loader";
  * Renders a list of mail provider buttons.
  */
 export default function MailProvidersList() {
-  const { drivers, loadingDrivers } = useMailProviderCxt();
+  const { drivers, loadingDrivers,activeMailProvider } = useMailProviderCxt();
 
   // handle loading state
   if (loadingDrivers) return <Loader />;
 
-  
   return (
     <div className="p-4 bg-[#140F35] rounded-md shadow-lg">
       {drivers?.map((provider) => (
-        <MailProviderButton key={provider.id} provider={provider} />
+        <MailProviderButton key={provider.id} isActive={activeMailProvider?.id == provider.id} provider={provider} />
       ))}
     </div>
   );
@@ -26,7 +25,13 @@ export default function MailProvidersList() {
 /**
  * Renders a single mail provider button with its title and icon.
  */
-function MailProviderButton({ provider }: { provider: Driver }) {
+function MailProviderButton({
+  provider,
+  isActive,
+}: {
+  provider: Driver;
+  isActive: boolean;
+}) {
   const { handleChangeActiveProvider } = useMailProviderCxt();
 
   return (
@@ -34,17 +39,11 @@ function MailProviderButton({ provider }: { provider: Driver }) {
       onClick={() => {
         handleChangeActiveProvider(provider);
       }}
-      className="text-lg w-full my-2 bg-transparent font-bold flex items-center justify-between"
+      className={`text-lg w-full my-2 bg-transparent font-bold flex items-center justify-between ${
+        isActive ? "bg-primary/90" : ""
+      }`}
     >
       <p>{provider.name}</p>
-      {/* {provider.iconSrc && (
-        <img
-          src={provider.iconSrc}
-          width={20}
-          height={20}
-          alt={provider.title}
-        />
-      )} */}
     </Button>
   );
 }
