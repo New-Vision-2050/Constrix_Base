@@ -41,7 +41,7 @@ const Execution = ({ id }: { id: string }) => {
       func: handleOpen,
     },
     {
-      label: "eddd",
+      label: "Edit",
       icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: handleOpenEdit,
     },
@@ -76,7 +76,8 @@ const Execution = ({ id }: { id: string }) => {
         }}
       />
       <SheetFormBuilder
-        config={companiesFormConfig}
+        recordId={id}
+        config={{...companiesFormConfig, isEditMode:true,editApiUrl:'/api/companies/:id'}}
         isOpen={isOpenEdit}
         onOpenChange={handleCloseEdit}
       />

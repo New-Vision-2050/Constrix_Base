@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import {ChevronDown, EditIcon} from "lucide-react";
 import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
 import TrashIcon from "@/public/icons/trash";
@@ -13,11 +13,16 @@ import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
 import { useTableInstance } from "@/modules/table/store/useTableStore";
+import {companiesFormConfig, SheetFormBuilder} from "@/modules/form-builder";
+import {
+    loginWayFormEditConfig
+} from "@/modules/settings/components/tabs/IdentifierSetting/tabs/SettingTab-LoginWays/components/form/editConfig";
 
 const LoginWaysExecutionBtn = ({ id }: { id: string }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const { reloadTable } = useTableInstance("login-ways-table");
   const t = useTranslations();
+  const [isOpenEdit, handleOpenEdit, handleCloseEdit] = useModal();
 
   const menuItems = [
     {
@@ -25,11 +30,11 @@ const LoginWaysExecutionBtn = ({ id }: { id: string }) => {
       icon: <EnterIcon className="w-4 h-4 me-2" />,
       func: () => console.log(id),
     },
-    {
-      label: "Action 2",
-      icon: <GearIcon className="w-4 h-4 me-2" />,
-      func: () => null,
-    },
+      {
+          label: "Edit",
+          icon: <EditIcon className="w-4 h-4 me-2" />,
+          func: handleOpenEdit,
+      },
     {
       label: "Delete",
       icon: <TrashIcon className="w-4 h-4 me-2" />,
@@ -64,6 +69,12 @@ const LoginWaysExecutionBtn = ({ id }: { id: string }) => {
           reloadTable();
         }}
       />
+        <SheetFormBuilder
+            recordId={id}
+            config={loginWayFormEditConfig}
+            isOpen={isOpenEdit}
+            onOpenChange={handleCloseEdit}
+        />
     </>
   );
 };
