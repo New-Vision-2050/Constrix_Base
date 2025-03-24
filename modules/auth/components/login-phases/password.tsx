@@ -35,6 +35,7 @@ const PasswordPhase = ({
     formState: { errors },
     handleSubmit,
     getValues,
+    setValue
   } = useFormContext<LoginType>();
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
@@ -65,7 +66,9 @@ const PasswordPhase = ({
         token: data.token ?? "",
       },
       {
-        onSuccess: (data) => {
+        onSuccess: (data, variable) => {
+          setValue("token", data.payload.token);
+          const nextStep = data.payload.login_way.step?.login_option;
           if (!data.payload.login_way.step) {
             useAuthStore.getState().setUser(data.payload.user);
             setCookie("new-vision-token", data.payload.token, {
@@ -75,9 +78,19 @@ const PasswordPhase = ({
             router.push(ROUTER.COMPANIES);
             return;
           }
+          switch (nextStep) {
+            case "otp":
+              if (variable.identifier.includes("@")) {
+                handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
+              } else {
+                handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
+              }
+              break;
+            default:
+              return;
+          }
         },
         onError(error) {
-
           const messageKey = getErrorMessage(error);
           setErrorMessage((messageKey) || t("Errors.Authentication.InvalidCredentials"));
           handleOpen();
