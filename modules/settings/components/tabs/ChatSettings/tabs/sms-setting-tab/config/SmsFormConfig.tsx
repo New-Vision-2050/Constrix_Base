@@ -1,6 +1,6 @@
 // Define the form configuration
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 
 export const SMSProviderConfig = (id: string) => {
   const SmsFormConfig: FormConfig = {
@@ -56,7 +56,8 @@ export const SMSProviderConfig = (id: string) => {
           ...formData,
         },
       };
-      console.log("Form submitted ::", id, body);
+      console.log("body-body", id, body);
+      await apiClient.put(`${baseURL}/settings/driver/${id}`, body);
     },
 
     // Example onError handler

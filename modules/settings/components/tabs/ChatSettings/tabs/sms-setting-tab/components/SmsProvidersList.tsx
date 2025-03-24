@@ -1,16 +1,21 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { SmsProvider } from "@/modules/settings/types/SmsProvider";
 import { useSmsProviderCxt } from "../context/SmsProviderCxt";
-import { SmsProviders } from "../../../constants/SmsProviders";
+import Loader from "@/components/shared/loader/Loader";
+import { Driver } from "@/modules/settings/types/Driver";
 
 /**
  * Renders a list of Sms provider buttons.
  */
 export default function SmsProvidersList() {
+  const { drivers, loadingDrivers } = useSmsProviderCxt();
+
+  // handle loading state
+  if (loadingDrivers) return <Loader />;
+
   return (
     <div className="p-4 bg-[#140F35] rounded-md shadow-lg">
-      {SmsProviders?.map((provider) => (
+      {drivers?.map((provider) => (
         <SmsProviderButton key={provider.id} provider={provider} />
       ))}
     </div>
@@ -20,7 +25,7 @@ export default function SmsProvidersList() {
 /**
  * Renders a single Sms provider button with its title and icon.
  */
-function SmsProviderButton({ provider }: { provider: SmsProvider }) {
+function SmsProviderButton({ provider }: { provider: Driver }) {
   const { handleChangeActiveProvider } = useSmsProviderCxt();
   return (
     <Button
@@ -29,7 +34,7 @@ function SmsProviderButton({ provider }: { provider: SmsProvider }) {
       }}
       className="text-lg w-full my-2 bg-transparent font-bold flex items-center justify-between"
     >
-      {provider.title}
+      {provider.name}
     </Button>
   );
 }
