@@ -6,7 +6,7 @@ import FormContent from "./FormContent";
 export default function MailProviderFormContent() {
   const { activeMailProvider } = useMailProviderCxt();
   const fields = generateFields(
-    Object(activeMailProvider?.config ?? {}).keys() ?? []
+    Object.keys(activeMailProvider?.config ?? {}) ?? []
   );
   console.log("breakpoint101 fields", fields);
 
