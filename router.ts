@@ -1,5 +1,6 @@
 export const ROUTER = {
   LOGIN: "/login",
   COMPANIES: "/companies",
-  USERS:"/users"
+  USERS:"/users",
+  SETTINGS:"/settings"
 };

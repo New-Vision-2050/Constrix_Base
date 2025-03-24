@@ -1,18 +1,19 @@
 import ChatSettingsTab from "../components/tabs/ChatSettings";
+import CountriesTab from "../components/tabs/countries";
 import IdentifierSettingTab from "../components/tabs/IdentifierSetting";
 import { SystemTab } from "../types/SystemTab";
 
 export const SystemSettingTabs: SystemTab[] = [
-  {
-    id: "CompanyData",
-    title: "بيانات الشركة",
-    content: "بيانات الشركة",
-  },
-  {
-    id: "SystemRoles",
-    title: "ادوار النظام",
-    content: "ادوار النظام",
-  },
+  // {
+  //   id: "CompanyData",
+  //   title: "بيانات الشركة",
+  //   content: "بيانات الشركة",
+  // },
+  // {
+  //   id: "SystemRoles",
+  //   title: "ادوار النظام",
+  //   content: "ادوار النظام",
+  // },
   {
     id: "IdentifierSetting",
     title: "اعدادات المعرف",
@@ -25,30 +26,34 @@ export const SystemSettingTabs: SystemTab[] = [
   {
     id: "LanguagesAndCountries",
     title: "الدول واللغات",
-    content: "الدول واللغات",
-  },
-  {
-    id: "ChatSettings",
-    title: "اعدادات المراسلات",
     content: (
       <>
-        <ChatSettingsTab />
+        <CountriesTab />
       </>
     ),
   },
-  {
-    id: "StorageSettings",
-    title: "اعدادات التخزين",
-    content: "اعدادات التخزين",
-  },
-  {
-    id: "CompanyTypes",
-    title: "انواع الشركات",
-    content: "انواع الشركات",
-  },
-  {
-    id: "AppAndWebsiteSettings",
-    title: "اعدادات الموقع والتطبيقات",
-    content: "اعدادات الموقع والتطبيقات",
-  },
+  // {
+  //   id: "ChatSettings",
+  //   title: "اعدادات المراسلات",
+  //   content: (
+  //     <>
+  //       <ChatSettingsTab />
+  //     </>
+  //   ),
+  // },
+  // {
+  //   id: "StorageSettings",
+  //   title: "اعدادات التخزين",
+  //   content: "اعدادات التخزين",
+  // },
+  // {
+  //   id: "CompanyTypes",
+  //   title: "انواع الشركات",
+  //   content: "انواع الشركات",
+  // },
+  // {
+  //   id: "AppAndWebsiteSettings",
+  //   title: "اعدادات الموقع والتطبيقات",
+  //   content: "اعدادات الموقع والتطبيقات",
+  // },
 ];

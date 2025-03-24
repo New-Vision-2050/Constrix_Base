@@ -19,7 +19,7 @@ export default function LoginWaysTab() {
           <div className="flex items-center gap-3">
             <DialogFormBuilder
               config={loginWayFormConfig}
-              trigger={<Button>Add Login Way</Button>}
+              trigger={<Button>أضافة طريقة دخول جديدة</Button>}
               onSuccess={(values) => {
                 tableStore.reloadTable(config.tableId);
               }}

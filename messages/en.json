@@ -117,8 +117,9 @@
   "Sidebar": {
     "Companies": "Companies",
     "Users": "Users",
+    "settings": "System Settings",
     "Welcome": "Hello, Mohammed Saad!",
-    "CompanyName" : "New Vision"
+    "CompanyName": "New Vision"
   },
   "Header": {
     "MainSystemManagement": "Main System Management"

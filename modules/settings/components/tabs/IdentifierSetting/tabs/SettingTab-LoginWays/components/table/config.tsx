@@ -1,7 +1,7 @@
 import { baseURL } from "@/config/axios-config";
-import LoginWayStatus from "./LoginWayStatus";
 import { LoginWay } from "@/modules/settings/types/LoginWay";
 import LoginWaysExecutionBtn from "./ExecutionBtn";
+import TableStatus from "./TableStatus";
 
 // Create a component that uses the translations
 export const LoginWaysConfig = () => {
@@ -32,8 +32,11 @@ export const LoginWaysConfig = () => {
       {
         key: "status",
         label: "الحالة",
-        render: (_: unknown, row: LoginWay) => (
-          <LoginWayStatus loginWay={row} />
+        render: (value: "active" | "inActive", row: LoginWay) => (
+          <TableStatus
+            loginWay={row}
+            url={`/settings/login-way/make-default/${row.id}`}
+          />
         ),
       },
       {

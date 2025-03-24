@@ -1,7 +1,7 @@
 import { baseURL } from "@/config/axios-config";
-import LoginIdentifierStatus from "./LoginIdentifierStatus";
 import { LoginIdentifier } from "@/modules/settings/types/LoginIdentifier";
 import LoginIdentifierExecutionBtn from "./ExecutionBtn";
+import TableStatus from "./TableStatus";
 
 export const LoginIdentifierTableConfig = () => {
   return {
@@ -30,7 +30,10 @@ export const LoginIdentifierTableConfig = () => {
         key: "status",
         label: "الحالة",
         render: (_: unknown, row: LoginIdentifier) => (
-          <LoginIdentifierStatus identifier={row} />
+          <TableStatus
+            url={`settings/identifier/make-default/${row.id}`}
+            identifier={row}
+          />
         ),
       },
       {

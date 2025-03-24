@@ -17,18 +17,19 @@ import SidebarFooterContent from "./sidebar-footer-content";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { ROUTER } from "@/router";
+import SettingsIcon from "@/public/icons/settings";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
   const path = usePathname();
-  const pageName = "/"+path.split('/').at(-1); 
-    
+  const pageName = "/" + path.split("/").at(-1);
+
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
-  
+
   // This is sample data with translated names
   const data = {
     user: {
@@ -58,17 +59,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: t("Sidebar.Companies"),
         url: ROUTER.COMPANIES,
         icon: CompaniesIcon,
-        isActive : pageName === ROUTER.COMPANIES
+        isActive: pageName === ROUTER.COMPANIES,
       },
       {
         name: t("Sidebar.Users"),
         url: ROUTER.USERS,
-        icon: UserIcon,        
-        isActive : pageName === ROUTER.USERS
+        icon: UserIcon,
+        isActive: pageName === ROUTER.USERS,
+      },
+      {
+        name: t("Sidebar.settings"),
+        url: ROUTER.SETTINGS,
+        icon: SettingsIcon,
+        isActive: pageName === ROUTER.SETTINGS,
       },
     ],
   };
-  
+
   return (
     <Sidebar collapsible="icon" side={sidebarSide} {...props}>
       <SidebarHeader className=" pt-10">

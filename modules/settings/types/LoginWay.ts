@@ -7,5 +7,6 @@ export type LoginStep = {
 export type LoginWay = {
   id: string;
   name: string;
+  default: number;
   steps: LoginStep[];
 };
