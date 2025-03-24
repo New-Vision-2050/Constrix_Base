@@ -4,25 +4,25 @@ import { MailProvider } from "@/modules/settings/types/MailProvider";
 import gmail from "@/assets/icons/gmail.png";
 import yahoo from "@/assets/icons/yahhoo.png";
 import outlook from "@/assets/icons/outlook.png";
-import { MailFormConfig } from "../tabs/email-setting-tab/config/GmailFormConfig";
+import { MailProviderConfig } from "../tabs/email-setting-tab/config/GmailFormConfig";
 
 export const MailProviders: MailProvider[] = [
   {
     id: "gmail-provider",
     title: "Gmail",
     iconSrc: gmail.src,
-    formConfig: MailFormConfig,
+    formConfig: MailProviderConfig("gmail-provider"),
   },
   {
     id: "yahoo-provider",
     title: "Yahoo",
     iconSrc: yahoo.src,
-    formConfig: MailFormConfig,
+    formConfig: MailProviderConfig("yahoo-provider"),
   },
   {
     id: "hotmail-provider",
     title: "Hotmail",
     iconSrc: outlook.src,
-    formConfig: MailFormConfig,
+    formConfig: MailProviderConfig("hotmail-provider"),
   },
 ];

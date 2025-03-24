@@ -2,51 +2,68 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 
-export const SmsFormConfig: FormConfig = {
-  formId: "sms-provider-form",
-  title: "",
-  apiUrl: `${baseURL}/settings/login-way`,
-  laravelValidation: {
-    enabled: true,
-    errorsPath: "errors",
-  },
-  sections: [
-    {
-      title: "",
-      fields: [
-        {
-          name: "sms_code",
-          label: "رمز الدخول",
-          type: "text",
-          placeholder: "ادخل رمز الدخول",
-        },
-        {
-          name: "sms_re_code",
-          label: "تاكيد رمز الدخول",
-          type: "text",
-          placeholder: "اعادة ادخال رمز الدخول",
-        },
-      ],
+export const SMSProviderConfig = (id: string) => {
+  const SmsFormConfig: FormConfig = {
+    formId: "sms-provider-form",
+    title: "",
+    apiUrl: `${baseURL}/settings/driver/${id}`,
+    laravelValidation: {
+      enabled: true,
+      errorsPath: "errors",
     },
-  ],
-  submitButtonText: "Submit",
-  cancelButtonText: "Cancel",
-  showReset: false,
-  resetButtonText: "Clear Form",
-  showSubmitLoader: true,
-  resetOnSuccess: true,
-  showCancelButton: false,
-  showBackButton: false,
+    sections: [
+      {
+        title: "",
+        fields: [
+          {
+            name: "SMS_MORA_KEY",
+            label: "SMS MORA KEY",
+            type: "text",
+            placeholder: "SMS MORA KEY",
+          },
+          {
+            name: "SMS_MORA_SENDER",
+            label: "SMS MORA SENDER",
+            type: "text",
+            placeholder: "SMS MORA SENDER",
+          },
+          {
+            name: "SMS_MORA_USER",
+            label: "SMS MORA USER",
+            type: "text",
+            placeholder: "SMS MORA USER",
+          },
+        ],
+      },
+    ],
+    submitButtonText: "Submit",
+    cancelButtonText: "Cancel",
+    showReset: false,
+    resetButtonText: "Clear Form",
+    showSubmitLoader: true,
+    resetOnSuccess: true,
+    showCancelButton: false,
+    showBackButton: false,
 
-  // Example onSuccess handler
-  onSuccess: (values, result) => {
-    console.log("Form submitted successfully with values:", values);
-    console.log("Result from API:", result);
-  },
+    // Example onSuccess handler
+    onSuccess: (values, result) => {
+      console.log("Form submitted successfully with values:", values);
+      console.log("Result from API:", result);
+    },
+    onSubmit: async (formData: Record<string, unknown>) => {
+      const body = {
+        config: {
+          ...formData,
+        },
+      };
+      console.log("Form submitted ::", id, body);
+    },
 
-  // Example onError handler
-  onError: (values, error) => {
-    console.log("Form submission failed with values:", values);
-    console.log("Error details:", error);
-  },
+    // Example onError handler
+    onError: (values, error) => {
+      console.log("Form submission failed with values:", values);
+      console.log("Error details:", error);
+    },
+  };
+  return SmsFormConfig;
 };

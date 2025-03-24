@@ -44,7 +44,7 @@ export default function FormContent(props: PropsT) {
 
   return (
     <div className="w-full">
-      <FormBuilder
+      {/* <FormBuilder
         config={config}
         values={values}
         errors={errors}
@@ -72,7 +72,7 @@ export default function FormContent(props: PropsT) {
         stepResponses={stepResponses}
         getStepResponseData={getStepResponseData}
         clearFiledError={clearFiledError}
-      />
+      /> */}
     </div>
   );
 }

@@ -10,13 +10,7 @@ export const SocialFormConfig: FormConfig = {
     enabled: true,
     errorsPath: "errors",
   },
-  sections: [
-    {
-      title: "",
-      fields: [],
-    },
-  ],
-  submitButtonText: "Submit",
+  sections: [],
   cancelButtonText: "Cancel",
   showReset: false,
   resetButtonText: "Clear Form",

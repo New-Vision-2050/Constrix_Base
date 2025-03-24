@@ -32,15 +32,15 @@ export const SystemSettingTabs: SystemTab[] = [
       </>
     ),
   },
-  // {
-  //   id: "ChatSettings",
-  //   title: "اعدادات المراسلات",
-  //   content: (
-  //     <>
-  //       <ChatSettingsTab />
-  //     </>
-  //   ),
-  // },
+  {
+    id: "ChatSettings",
+    title: "اعدادات المراسلات",
+    content: (
+      <>
+        <ChatSettingsTab />
+      </>
+    ),
+  },
   // {
   //   id: "StorageSettings",
   //   title: "اعدادات التخزين",
