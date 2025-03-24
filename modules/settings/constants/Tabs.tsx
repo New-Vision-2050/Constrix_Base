@@ -1,5 +1,5 @@
 import ChatSettingsTab from "../components/tabs/ChatSettings";
-import CountriesTab from "../components/tabs/countries";
+import CountriesAndLanguagesSettingsTab from "../components/tabs/CountriesAndLanguages/tabs";
 import IdentifierSettingTab from "../components/tabs/IdentifierSetting";
 import { SystemTab } from "../types/SystemTab";
 
@@ -28,7 +28,7 @@ export const SystemSettingTabs: SystemTab[] = [
     title: "الدول واللغات",
     content: (
       <>
-        <CountriesTab />
+        <CountriesAndLanguagesSettingsTab />
       </>
     ),
   },

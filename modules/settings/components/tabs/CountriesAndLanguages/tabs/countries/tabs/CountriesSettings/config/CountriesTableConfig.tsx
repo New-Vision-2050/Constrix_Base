@@ -1,6 +1,6 @@
 import { baseURL } from "@/config/axios-config";
 import { Country } from "@/modules/settings/types/Country";
-import TableStatus from "./TableStatus";
+import TableStatus from "../components/TableStatus";
 
 export const CountriesTableConfig = () => {
   return {

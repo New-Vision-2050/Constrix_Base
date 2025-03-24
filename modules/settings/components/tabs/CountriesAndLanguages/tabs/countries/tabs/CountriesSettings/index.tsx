@@ -1,9 +1,9 @@
-'use client'
+"use client";
 import { TableBuilder } from "@/modules/table";
-import { CountriesTableConfig } from "./CountriesTableConfig";
 import ExportButton from "@/modules/table/components/ExportButton";
+import { CountriesTableConfig } from "./config/CountriesTableConfig";
 
-export default function CountriesTab() {
+export default function CountriesTabCountriesSettingTab() {
   const config = CountriesTableConfig();
   return (
     <div className="space-y-7">
@@ -11,11 +11,6 @@ export default function CountriesTab() {
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
-            {/* <DialogFormBuilder
-          config={loginWayFormConfig}
-          trigger={<button>Open Form</button>}
-          onSuccess={(values) => console.log("Form submitted:", values)}
-        />{" "} */}
             <ExportButton data={[]} />
           </div>
         }
