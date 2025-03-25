@@ -73,8 +73,20 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows' | 'image';
   name: string;
+  // Image field specific properties
+  imageConfig?: {
+    allowedFileTypes?: string[]; // e.g., ['image/jpeg', 'image/png']
+    maxFileSize?: number; // in bytes
+    maxWidth?: number; // in pixels
+    maxHeight?: number; // in pixels
+    aspectRatio?: number; // width/height
+    previewWidth?: number; // in pixels
+    previewHeight?: number; // in pixels
+    uploadUrl?: string; // URL to upload the image to
+    uploadHeaders?: Record<string, string>; // Custom headers for the upload request
+  };
   label: string;
   placeholder?: string;
   helperText?: string;

@@ -123,5 +123,23 @@
   },
   "Header": {
     "MainSystemManagement": "Main System Management"
+  },
+  "FormBuilder": {
+    "Fields": {
+      "Image": {
+        "UploadImage": "Upload Image",
+        "ChangeImage": "Change Image",
+        "RemoveImage": "Remove Image",
+        "ClickToUpload": "Click to upload an image",
+        "Uploading": "Uploading...",
+        "AllowedTypes": "Allowed types",
+        "MaxSize": "Max size",
+        "FileTypeNotAllowed": "File type not allowed. Allowed types",
+        "FileSizeExceeds": "File size exceeds maximum allowed size",
+        "UploadFailed": "Upload failed",
+        "UploadSuccessful": "Upload successful",
+        "ImageRequired": "Image is required"
+      }
+    }
   }
 }

@@ -59,6 +59,14 @@ const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
         case "dynamicRows":
           fieldSchema = z.array(z.record(z.any())).optional();
           break;
+        case "image":
+          // For image fields, we accept either a File object or a string URL
+          fieldSchema = z.union([
+            z.instanceof(File),
+            z.string(),
+            z.null()
+          ]).optional();
+          break;
         default:
           fieldSchema = z.any().optional();
       }

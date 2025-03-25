@@ -12,6 +12,7 @@ import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
 import HiddenObjectField from './fields/HiddenObjectField';
 import DynamicRowsField from './fields/DynamicRowsField';
+import ImageField from './fields/ImageField';
 import FieldHelperText from './fields/FieldHelperText';
 
 interface ReactHookFormFieldProps {
@@ -28,6 +29,7 @@ interface ReactHookFormFieldProps {
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
   clearFiledError: (fieldName: string) => void;
+  formId?: string;
 }
 
 const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
@@ -44,6 +46,7 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
   getStepResponseData,
   currentStep,
   clearFiledError,
+  formId = 'default',
 }) => {
   // Check if this field's value exists in any previous step's response
   let fieldValue = value;
@@ -247,21 +250,34 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
                   // disabled={fieldProps.disabled} - Removed as it's not in the component props
                 />
               );
-              
-            case 'dynamicRows':
-              return (
-                <DynamicRowsField
-                  field={field}
-                  value={fieldProps.value || []}
-                  error={error}
-                  touched={touched}
-                  onChange={fieldProps.onChange}
-                  onBlur={fieldProps.onBlur}
-                  // disabled={fieldProps.disabled} - Removed as it's not in the component props
-                />
-              );
-
-            default:
+              case 'dynamicRows':
+                return (
+                  <DynamicRowsField
+                    field={field}
+                    value={fieldProps.value || []}
+                    error={error}
+                    touched={touched}
+                    onChange={fieldProps.onChange}
+                    onBlur={fieldProps.onBlur}
+                    // disabled={fieldProps.disabled} - Removed as it's not in the component props
+                  />
+                );
+                
+              case 'image':
+                return (
+                  <ImageField
+                    field={field}
+                    value={fieldProps.value}
+                    error={error}
+                    touched={touched}
+                    onChange={fieldProps.onChange}
+                    onBlur={fieldProps.onBlur}
+                    formId={formId}
+                  />
+                );
+  
+              default:
+                return <div>Unsupported field type: {field.type}</div>;
               return <div>Unsupported field type: {field.type}</div>;
           }
         }}

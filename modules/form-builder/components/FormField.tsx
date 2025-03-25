@@ -11,6 +11,7 @@ import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
 import HiddenObjectField from './fields/HiddenObjectField';
 import DynamicRowsField from './fields/DynamicRowsField';
+import ImageField from './fields/ImageField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
@@ -225,21 +226,34 @@ const FormField: React.FC<FormFieldProps> = ({
                 values={values}
               />
             );
-            
-          case 'dynamicRows':
-            return (
-              <DynamicRowsField
-                field={field}
-                value={fieldValue || []}
-                error={error}
-                touched={touched}
-                onChange={onChange}
-                onBlur={onBlur}
-                formId={formId}
-              />
-            );
-
-          default:
+            case 'dynamicRows':
+              return (
+                <DynamicRowsField
+                  field={field}
+                  value={fieldValue || []}
+                  error={error}
+                  touched={touched}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  formId={formId}
+                />
+              );
+              
+            case 'image':
+              return (
+                <ImageField
+                  field={field}
+                  value={fieldValue}
+                  error={error}
+                  touched={touched}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  formId={formId}
+                />
+              );
+  
+            default:
+              return <div>Unsupported field type: {field.type}</div>;
             return <div>Unsupported field type: {field.type}</div>;
     }
   };

@@ -128,5 +128,23 @@
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي"
+  },
+  "FormBuilder": {
+    "Fields": {
+      "Image": {
+        "UploadImage": "رفع صورة",
+        "ChangeImage": "تغيير الصورة",
+        "RemoveImage": "إزالة الصورة",
+        "ClickToUpload": "انقر لرفع صورة",
+        "Uploading": "جاري الرفع...",
+        "AllowedTypes": "الأنواع المسموح بها",
+        "MaxSize": "الحجم الأقصى",
+        "FileTypeNotAllowed": "نوع الملف غير مسموح به. الأنواع المسموح بها",
+        "FileSizeExceeds": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
+        "UploadFailed": "فشل الرفع",
+        "UploadSuccessful": "تم الرفع بنجاح",
+        "ImageRequired": "الصورة مطلوبة"
+      }
+    }
   }
 }
