@@ -1,6 +1,7 @@
 import ChatSettingsTab from "../components/tabs/ChatSettings";
 import CountriesAndLanguagesSettingsTab from "../components/tabs/CountriesAndLanguages/tabs";
 import IdentifierSettingTab from "../components/tabs/IdentifierSetting";
+import SystemRoles from "../components/tabs/system-roles";
 import { SystemTab } from "../types/SystemTab";
 
 export const SystemSettingTabs: SystemTab[] = [
@@ -9,11 +10,11 @@ export const SystemSettingTabs: SystemTab[] = [
   //   title: "بيانات الشركة",
   //   content: "بيانات الشركة",
   // },
-  // {
-  //   id: "SystemRoles",
-  //   title: "ادوار النظام",
-  //   content: "ادوار النظام",
-  // },
+  {
+    id: "SystemRoles",
+    title: "ادوار النظام",
+    content: <SystemRoles />,
+  },
   {
     id: "IdentifierSetting",
     title: "اعدادات المعرف",
