@@ -55,6 +55,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     submitSuccess,
     submitError,
     setValue,
+    setValues,
     setTouched,
     handleSubmit,
     handleCancel,
@@ -74,10 +75,8 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     stepResponses,
     getStepResponseData,
     clearFiledError,
-    isEditMode,
     isLoadingEditData,
     editError,
-    loadEditData,
   } = useSheetForm({
     config,
     recordId,
@@ -89,16 +88,16 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : hookIsOpen;
 
   // Handle open state changes
-  const handleOpenChange = (open: boolean) => {    
+  const handleOpenChange = (open: boolean) => {
     if (onOpenChange) {
       onOpenChange(open);
-    } else {
+    }
       if (open) {
         openSheet();
       } else {
         closeSheet();
       }
-    }
+
   };
 
   return (
@@ -142,6 +141,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           handleCancel={handleCancel}
           resetForm={resetForm}
           setValue={setValue}
+          setValues={setValues}
           setTouched={setTouched}
           isWizard={isWizard}
           isAccordion={isAccordion}
@@ -158,10 +158,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           stepResponses={stepResponses}
           getStepResponseData={getStepResponseData}
           clearFiledError={clearFiledError}
-          // Edit mode props
-          isEditMode={isEditMode}
           isLoadingEditData={isLoadingEditData}
           editError={editError}
+          recordId={recordId}
         />
 
         <SheetFooter />

@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import ExpandableFormSection from "./ExpandableFormSection";
 import { Button } from "@/components/ui/button";
 import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
+import { apiClient } from "@/config/axios-config";
+import {useFormStore} from "@/modules/form-builder";
 
 interface FormBuilderProps {
   config: FormConfig;
@@ -18,6 +20,7 @@ interface FormBuilderProps {
   handleCancel: () => void;
   resetForm: () => void;
   setValue: (field: string, value: any) => void;
+  setValues?: (values: Record<string, any>) => void;
   setTouched: (field: string, touched: boolean) => void;
   // Wizard/step related props
   isWizard: boolean;
@@ -35,10 +38,9 @@ interface FormBuilderProps {
   stepResponses: Record<number, any>;
   getStepResponseData: (step: number) => any;
   clearFiledError: (field: string) => void;
-  // Edit mode props (optional)
-  isEditMode?: boolean;
   isLoadingEditData?: boolean;
   editError?: string | null;
+  recordId?: string | number;
 }
 
 const FormBuilder: React.FC<FormBuilderProps> = ({
@@ -53,6 +55,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   handleCancel,
   resetForm,
   setValue,
+  setValues,
   setTouched,
   isWizard,
   isAccordion,
@@ -69,11 +72,97 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   stepResponses,
   getStepResponseData,
   clearFiledError,
-  // Edit mode props
-  isEditMode,
-  isLoadingEditData,
-  editError,
+  isLoadingEditData: initialIsLoadingEditData,
+  editError: initialEditError,
+  recordId,
 }) => {
+  // Local state for edit mode
+
+  const [isEditMode] = useState( config.isEditMode || false);
+  const [isLoadingEditData, setIsLoadingEditData] = useState(initialIsLoadingEditData || false);
+  const [editError, setEditError] = useState<string | null>(initialEditError || null);
+
+  // Function to load data for editing
+  const loadEditData = useCallback(async (id?: string | number) => {
+    // Use provided id or fallback to recordId from props
+    const targetId = id || recordId;
+
+    // If no ID is provided, we can't load data
+    if (!targetId) {
+      setEditError("No record ID provided for editing");
+      return;
+    }
+
+    // If editValues are directly provided in the config, use those
+    if (config.editValues) {
+      if (setValues) {
+        setValues(config.editValues);
+      }
+      else
+      {
+          useFormStore.getState().setValues(config.formId || '',config.editValues);
+      }
+      return;
+    }
+
+    // If no editApiUrl is provided, we can't load data
+    if (!config.editApiUrl) {
+      setEditError("No API URL configured for editing");
+      return;
+    }
+
+    try {
+      setIsLoadingEditData(true);
+      setEditError(null);
+
+      // Replace :id placeholder in URL if present
+      const url = config.editApiUrl.replace(":id", String(targetId));
+
+      // Make the API request
+      const response = await apiClient.get(url, {headers: config.editApiHeaders});
+
+      // Extract data from response
+      let data = response.data;
+
+      // If a data path is specified, extract the data from that path
+      if (config.editDataPath) {
+        const paths = config.editDataPath.split('.');
+        for (const path of paths) {
+          data = data[path];
+          if (data === undefined) {
+            throw new Error(`Data path '${config.editDataPath}' not found in response`);
+          }
+        }
+      }
+      else{
+          data = data.payload;
+      }
+
+      // If a data transformer is provided, transform the data
+      if (config.editDataTransformer) {
+        data = config.editDataTransformer(data);
+      }
+
+      // Set the form values
+      if (setValues) {
+        setValues(data);
+      } else {
+         useFormStore.getState().setValues(config.formId || '',data);
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
+      setEditError(errorMessage);
+    } finally {
+      setIsLoadingEditData(false);
+    }
+  }, [config, recordId, setValue, setValues]);
+
+  // Load edit data when in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      loadEditData();
+    }
+  }, [isEditMode]);
   return (
     <form
       onSubmit={handleSubmit}

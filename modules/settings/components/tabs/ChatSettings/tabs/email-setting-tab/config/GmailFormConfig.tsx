@@ -11,8 +11,6 @@ export const MailProviderConfig = (id: string) => {
       enabled: true,
       errorsPath: "errors",
     },
-    isEditMode: true,
-    editApiUrl: `${baseURL}/settings/driver/${id}`,
     sections: [
       {
         title: "",

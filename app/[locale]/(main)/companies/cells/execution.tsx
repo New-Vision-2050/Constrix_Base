@@ -13,10 +13,9 @@ import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
 import { useTableInstance } from "@/modules/table/store/useTableStore";
-import { companiesFormConfig, SheetFormBuilder } from "@/modules/form-builder";
-import { Fragment } from "react";
+import {FormConfig, SheetFormBuilder} from "@/modules/form-builder";
 
-const Execution = ({ id }: { id: string }) => {
+const Execution = ({ id ,formConfig}: { id: string,formConfig: FormConfig }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const [isOpenEdit, handleOpenEdit, handleCloseEdit] = useModal();
 
@@ -35,18 +34,18 @@ const Execution = ({ id }: { id: string }) => {
       icon: <GearIcon className="w-4 h-4 me-2" />,
       func: () => null,
     },
+      {
+          label: t("Companies.Edit"),
+          icon: <TrashIcon className="w-4 h-4 me-2" />,
+          func: handleOpenEdit,
+      },
     {
       label: t("Companies.Delete"),
       icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: handleOpen,
-    },
-    {
-      label: "Edit",
-      icon: <TrashIcon className="w-4 h-4 me-2" />,
-      func: handleOpenEdit,
-    },
+    }
   ];
-  console.log({ isOpenEdit });
+
   return (
     <>
       <DropdownMenu dir="rtl">
@@ -66,18 +65,16 @@ const Execution = ({ id }: { id: string }) => {
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteConfirmationDialog
-        deleteUrl={`/companies/${id}`}
+        deleteUrl={`${formConfig.apiUrl}/${id}`}
         onClose={handleClose}
         open={isOpen}
         onSuccess={() => {
-          console.log("success deleting");
-          // Reload the table after successful deletion using the centralized method
           reloadTable();
         }}
       />
       <SheetFormBuilder
         recordId={id}
-        config={{...companiesFormConfig, isEditMode:true,editApiUrl:'/api/companies/:id'}}
+        config={formConfig?.isEditMode ? formConfig : {...formConfig, isEditMode:true,editApiUrl:formConfig.apiUrl+'/:id'}}
         isOpen={isOpenEdit}
         onOpenChange={handleCloseEdit}
       />

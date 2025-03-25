@@ -136,7 +136,7 @@ export const loginWayFormEditConfig: FormConfig = {
 
     // Log the form data
     console.log("Form data received bodybody:", body);
-    return await defaultSubmitHandler(body,loginWayFormConfig)
+    return await defaultSubmitHandler(body,loginWayFormEditConfig)
   },
 
   // Example onSuccess handler

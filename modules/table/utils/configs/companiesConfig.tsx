@@ -4,6 +4,7 @@ import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
+import {companiesFormConfig} from "@/modules/form-builder";
 
 // Define types for the company data
 interface CompanyData {
@@ -64,7 +65,7 @@ export const CompaniesConfig = () => {
       {
         key: "id",
         label: t("Companies.Actions"),
-        render: (_: unknown, row: CompanyData) => <Execution id={row.id} />,
+        render: (_: unknown, row: CompanyData) => <Execution id={row.id} formConfig={companiesFormConfig} />,
       },
     ],
     allSearchedFields: [

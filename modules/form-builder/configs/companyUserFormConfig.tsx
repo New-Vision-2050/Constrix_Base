@@ -137,6 +137,16 @@ export const companyUserFormConfig: FormConfig = {
     resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
+    editDataTransformer:(data)=>{
+        return {
+            'company_id' : data.company[0].id,
+            'first_name' : data.name,
+            'last_name' : data.name,
+            'email' : data.email,
+            'phone' : data.phone,
+            'job_title_id' : data.job_title_id
+        };
+    },
 
     // Example onSuccess handler
     onSuccess: (values, result) => {

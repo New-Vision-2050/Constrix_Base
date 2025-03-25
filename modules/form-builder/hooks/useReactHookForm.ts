@@ -68,7 +68,7 @@ const createZodSchema = (config: FormConfig): z.ZodTypeAny => {
         field.validation.forEach((rule) => {
           // Use the message directly from the validation rule
           const errorMessage = rule.message as string;
-          
+
           switch (rule.type) {
             case "required":
               fieldSchema = z.string().min(1, errorMessage);
@@ -131,12 +131,11 @@ interface UseReactHookFormResult<TFieldValues extends FieldValues = FieldValues>
   isSubmitting: boolean;
   submitSuccess: boolean;
   submitError: string | null;
-  
+
   // Edit mode state
-  isEditMode: boolean;
   isLoadingEditData: boolean;
   editError: string | null;
-  
+
   // Form methods
   form: UseFormReturn<TFieldValues>;
   setValue: (field: string, value: any) => void;
@@ -145,7 +144,7 @@ interface UseReactHookFormResult<TFieldValues extends FieldValues = FieldValues>
   resetForm: () => void;
   handleSubmit: (e: React.FormEvent) => void;
   handleCancel: () => void;
-  
+
   // Wizard/Accordion related properties and methods
   isWizard: boolean;
   isAccordion: boolean;
@@ -157,21 +156,20 @@ interface UseReactHookFormResult<TFieldValues extends FieldValues = FieldValues>
   goToStep: (step: number) => void;
   isFirstStep: boolean;
   isLastStep: boolean;
-  
+
   // Step submission related properties and methods
   submitCurrentStep: () => Promise<boolean>;
   isSubmittingStep: boolean;
   stepResponses: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
   getStepResponseData: (step: number, key?: string) => any;
-  
+
   // Error handling
   clearFiledError: (fieldName: string) => void;
-  
+
   // Form ID
   formId: string;
-  
-  // Edit mode actions
-  loadEditData: (id?: string | number) => Promise<void>;
+
+  // Edit mode actions are now handled by ReactHookFormBuilder
 }
 
 export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>({
@@ -182,25 +180,24 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
 }: UseReactHookFormProps): UseReactHookFormResult<TFieldValues> {
   // Use formId from config if provided, otherwise use default
   const actualFormId = config.formId || 'sheet-form';
-  
+
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Edit mode state
   const [isLoadingEditData, setIsLoadingEditData] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const isEditMode = !!recordId || !!config.isEditMode;
-  
+
   // Create Zod schema from form config
   const schema = createZodSchema(config);
-  
+
   // Initialize React Hook Form
   const form = useForm<TFieldValues>({
     resolver: zodResolver(schema),
     defaultValues: (config.initialValues || {}) as any,
     mode: 'onBlur',
   });
-  
+
   const {
     handleSubmit: rhfHandleSubmit,
     reset,
@@ -211,12 +208,12 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     clearErrors: rhfClearErrors,
     setError: rhfSetError
   } = form;
-  
+
   // Local state for sheet-specific functionality
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [touched, setTouchedFields] = useState<Record<string, boolean>>({});
-  
+
   // Wizard/Accordion state
   const isWizard = config.wizard || false;
   const isAccordion = config.accordion || false;
@@ -225,7 +222,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
   const [currentStep, setCurrentStep] = useState(0);
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === totalSteps - 1;
-  
+
   // Step submission state
   const [isSubmittingStep, setIsSubmittingStep] = useState(false);
   const [stepResponses, setStepResponses] = useState<
@@ -238,71 +235,8 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       }
     >
   >({});
-  
-  // Function to load data for editing
-  const loadEditData = useCallback(async (id?: string | number) => {
-    // Use provided id or fallback to recordId from props
-    const targetId = id || recordId;
-    
-    // If no ID is provided, we can't load data
-    if (!targetId) {
-      setEditError("No record ID provided for editing");
-      return;
-    }
 
-    // If editValues are directly provided in the config, use those
-    if (config.editValues) {
-      reset(config.editValues as unknown as TFieldValues);
-      return;
-    }
-
-    // If no editApiUrl is provided, we can't load data
-    if (!config.editApiUrl) {
-      setEditError("No API URL configured for editing");
-      return;
-    }
-
-    try {
-      setIsLoadingEditData(true);
-      setEditError(null);
-
-      // Replace :id placeholder in URL if present
-      const url = config.editApiUrl.replace(":id", String(targetId));
-      
-      // Make the API request
-      const response = await apiClient.get(url, {
-        headers: config.editApiHeaders,
-      });
-
-      // Extract data from response
-      let data = response.data;
-      
-      // If a data path is specified, extract the data from that path
-      if (config.editDataPath) {
-        const paths = config.editDataPath.split('.');
-        for (const path of paths) {
-          data = data[path];
-          if (data === undefined) {
-            throw new Error(`Data path '${config.editDataPath}' not found in response`);
-          }
-        }
-      }
-
-      // If a data transformer is provided, transform the data
-      if (config.editDataTransformer) {
-        data = config.editDataTransformer(data);
-      }
-
-      // Reset the form with the loaded data
-      reset(data as unknown as TFieldValues);
-    } catch (error: any) {
-      console.error("Error loading data for editing:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
-      setEditError(errorMessage);
-    } finally {
-      setIsLoadingEditData(false);
-    }
-  }, [config, recordId, reset]);
+  // Edit mode data loading is now handled by ReactHookFormBuilder
 
   // Reset form when config changes
   useEffect(() => {
@@ -310,14 +244,9 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       reset(config.initialValues as TFieldValues);
     }
   }, [config, reset]);
-  
-  // Load edit data when in edit mode
-  useEffect(() => {
-    if (isEditMode) {
-      loadEditData();
-    }
-  }, [isEditMode, loadEditData]);
-  
+
+  // Edit mode data loading is now handled by ReactHookFormBuilder
+
   // Open and close sheet
   const openSheet = useCallback(() => {
     setIsOpen(true);
@@ -326,7 +255,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       setCurrentStep(0);
     }
   }, [isStepBased]);
-  
+
   const closeSheet = useCallback(() => {
     setIsOpen(false);
     // Reset form state when sheet is closed
@@ -338,11 +267,11 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       setCurrentStep(0);
     }
   }, [config.resetOnSuccess, isStepBased, reset]);
-  
+
   const clearFiledError = useCallback((fieldName: string) => {
     rhfClearErrors(fieldName as any);
   }, [rhfClearErrors]);
-  
+
   // Set a field as touched
   const setTouched = useCallback((field: string, isTouched: boolean) => {
     setTouchedFields(prev => ({
@@ -350,48 +279,48 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       [field]: isTouched
     }));
   }, []);
-  
+
   // Set all fields as touched
   const setAllTouched = useCallback(() => {
     const allFields: Record<string, boolean> = {};
-    
+
     config.sections.forEach(section => {
       section.fields.forEach(field => {
         allFields[field.name] = true;
       });
     });
-    
+
     setTouchedFields(allFields);
   }, [config.sections]);
-  
+
   // Validate current step fields
   const validateCurrentStep = useCallback(async () => {
     if (!isStepBased) return true;
-    
+
     const currentSection = config.sections[currentStep];
     const fieldNames = currentSection.fields
       .filter(field => !field.hidden && (!field.condition || field.condition(getValues() as Record<string, any>)))
       .map(field => field.name);
-    
+
     return await trigger(fieldNames as any[]);
   }, [config.sections, currentStep, isStepBased, trigger, getValues]);
-  
+
   // Handle form submission
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Mark all fields as touched
     setAllTouched();
-    
+
     rhfHandleSubmit(async (data) => {
       setSubmitError(null);
       setSubmitSuccess(false);
-      
+
       try {
         // For step-based forms, include step response data in the form values
         let finalValues = { ...data };
-        
+
         if (isStepBased) {
           // Include data from step responses in the final values
           Object.entries(stepResponses).forEach(([stepIndex, response]) => {
@@ -402,7 +331,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
                   (finalValues as any)[key] = value;
                 }
               });
-              
+
               // Also include IDs directly if they exist
               if (response.data.companyId) {
                 (finalValues as any).companyId = response.data.companyId;
@@ -413,19 +342,19 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
             }
           });
         }
-        
+
         // Call the onSubmit handler from config or use default handler
         const submitHandler = config.onSubmit || ((values) => defaultSubmitHandler(values, config));
         const result = await submitHandler(finalValues as Record<string, any>);
-        
+
         if (result.success) {
           setSubmitSuccess(true);
-          
+
           // Call onSuccess callback from props if provided
           if (onSuccess) {
             onSuccess({ values: finalValues, result });
           }
-          
+
           // Call onSuccess callback from config if provided
           if (config.onSuccess) {
             config.onSuccess(finalValues as Record<string, any>, {
@@ -433,12 +362,12 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
               message: result.message,
             });
           }
-          
+
           // Close the sheet after successful submission
           setTimeout(() => {
             closeSheet();
           }, 1000);
-          
+
           // Reset form if configured to do so
           if (config.resetOnSuccess) {
             reset();
@@ -446,7 +375,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
         } else {
           // Handle API error message
           setSubmitError(result.message || "Form submission failed");
-          
+
           // Call onError callback from config if provided
           if (config.onError) {
             config.onError(finalValues as Record<string, any>, {
@@ -454,7 +383,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
               errors: result.errors,
             });
           }
-          
+
           // Handle Laravel validation errors if enabled
           if (config.laravelValidation?.enabled && result.errors) {
             // Convert Laravel validation errors to form errors
@@ -462,7 +391,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
               const message = Array.isArray(messages) ? messages[0] : messages;
               rhfSetError(field as any, { type: 'server', message: message as string });
             });
-            
+
             // Call onValidationError callback if provided
             if (config.onValidationError) {
               config.onValidationError(result.errors);
@@ -485,7 +414,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     stepResponses,
     rhfSetError
   ]);
-  
+
   // Wizard navigation functions
   const goToNextStep = useCallback(async () => {
     // If validation is required before proceeding
@@ -504,10 +433,10 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
         return;
       }
     }
-    
+
     // Move to the next step
     const nextStep = Math.min(currentStep + 1, totalSteps - 1);
-    
+
     // Call onStepChange callback if provided
     if (config.wizardOptions?.onStepChange) {
       config.wizardOptions.onStepChange(
@@ -516,7 +445,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
         getValues() as Record<string, any>
       );
     }
-    
+
     setCurrentStep(nextStep);
   }, [
     config.wizardOptions,
@@ -526,11 +455,11 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     validateCurrentStep,
     getValues
   ]);
-  
+
   const goToPrevStep = useCallback(() => {
     // Move to the previous step
     const prevStep = Math.max(currentStep - 1, 0);
-    
+
     // Call onStepChange callback if provided
     if (config.wizardOptions?.onStepChange) {
       config.wizardOptions.onStepChange(
@@ -539,15 +468,15 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
         getValues() as Record<string, any>
       );
     }
-    
+
     setCurrentStep(prevStep);
   }, [config.wizardOptions, currentStep, getValues]);
-  
+
   const goToStep = useCallback(
     (step: number) => {
       // Ensure step is within bounds
       const targetStep = Math.max(0, Math.min(step, totalSteps - 1));
-      
+
       // Call onStepChange callback if provided
       if (config.wizardOptions?.onStepChange) {
         config.wizardOptions.onStepChange(
@@ -556,12 +485,12 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
           getValues() as Record<string, any>
         );
       }
-      
+
       setCurrentStep(targetStep);
     },
     [config.wizardOptions, currentStep, totalSteps, getValues]
   );
-  
+
   // Submit current step
   const submitCurrentStep = useCallback(async () => {
     // Validate current step
@@ -578,20 +507,20 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       }));
       return false;
     }
-    
+
     setIsSubmittingStep(true);
-    
+
     try {
       // Get current values
       const values = getValues() as Record<string, any>;
-      
+
       // Use custom step submission handler if provided, otherwise use default
       const stepSubmitHandler =
         config.wizardOptions?.onStepSubmit ||
         ((step, values) => defaultStepSubmitHandler(step, values, config));
-      
+
       const result = await stepSubmitHandler(currentStep, values);
-      
+
       // Store step response
       setStepResponses((prev) => ({
         ...prev,
@@ -601,7 +530,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
           data: result.data,
         },
       }));
-      
+
       // Handle validation errors if any
       if (!result.success && result.errors) {
         // Set form errors
@@ -609,7 +538,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
           const errorMessage = Array.isArray(message) ? message[0] : message;
           rhfSetError(field as any, { type: 'server', message: errorMessage as string });
         });
-        
+
         // Mark fields with errors as touched
         const fieldsWithErrors: Record<string, boolean> = {};
         Object.keys(result.errors).forEach((field) => {
@@ -620,7 +549,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
           ...fieldsWithErrors
         }));
       }
-      
+
       return result.success;
     } catch (error) {
       console.log("Step submission error:", error);
@@ -635,22 +564,22 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     getValues,
     rhfSetError
   ]);
-  
+
   // Get step response data
   const getStepResponseData = useCallback(
     (step: number, key?: string) => {
       const response = stepResponses[step];
       if (!response || !response.data) return undefined;
-      
+
       if (key) {
         return response.data[key];
       }
-      
+
       return response.data;
     },
     [stepResponses]
   );
-  
+
   // Handle cancel
   const handleCancel = useCallback(() => {
     if (onCancel) {
@@ -658,7 +587,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     }
     closeSheet();
   }, [onCancel, closeSheet]);
-  
+
   // Reset form
   const resetForm = useCallback(() => {
     reset();
@@ -666,7 +595,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     setSubmitSuccess(false);
     setSubmitError(null);
   }, [reset]);
-  
+
   // Set value wrapper
   const setValue = useCallback((field: string, value: any) => {
     rhfSetValue(field as any, value, {
@@ -674,15 +603,15 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       shouldDirty: true,
       shouldTouch: true,
     });
-    
+
     // Clear any existing errors for this field when the value changes
     rhfClearErrors(field as any);
-    
+
     // Check if field has API validation rules and trigger validation
     const fieldConfig = config.sections
       .flatMap(section => section.fields)
       .find(f => f.name === field);
-    
+
     if (fieldConfig?.validation && hasApiValidation(fieldConfig.validation)) {
       fieldConfig.validation.forEach(rule => {
         if (rule.type === 'apiValidation' && rule.apiConfig) {
@@ -690,19 +619,19 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
           setTimeout(() => {
             // Make API request
             if (!rule.apiConfig) return;
-            
+
             const url = rule.apiConfig.url;
             const method = rule.apiConfig.method || "GET";
             const paramName = rule.apiConfig.paramName || "value";
             const headers = rule.apiConfig.headers || {};
             const successCondition = rule.apiConfig.successCondition;
-            
+
             // Prepare fetch options
             const fetchOptions: RequestInit = {
               method,
               headers: headers as HeadersInit,
             };
-            
+
             // For POST/PUT requests, add the body
             if (method !== "GET") {
               fetchOptions.body = JSON.stringify({ [paramName]: value });
@@ -711,7 +640,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
               }
               (fetchOptions.headers as Record<string, string>)['Content-Type'] = 'application/json';
             }
-            
+
             // Prepare request config for apiClient
             const config = {
               method,
@@ -728,7 +657,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
                 // Check if validation passed
                 let isValid = false;
                 const data = response.data;
-                
+
                 if (successCondition) {
                   // Use the provided success condition
                   isValid = successCondition(data);
@@ -745,7 +674,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
                   // Check if the API returns an 'isValid' property
                   isValid = data.isValid === true;
                 }
-                
+
                 // Set error if validation failed
                 if (!isValid) {
                   rhfSetError(field as any, { type: 'apiValidation', message: rule.message as string });
@@ -760,7 +689,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
       });
     }
   }, [rhfSetValue, rhfClearErrors, rhfSetError, config.sections]);
-  
+
   return {
     // Form state
     isOpen,
@@ -772,12 +701,11 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     isSubmitting: formState.isSubmitting,
     submitSuccess,
     submitError,
-    
+
     // Edit mode state
-    isEditMode,
     isLoadingEditData,
     editError,
-    
+
     // Form methods
     form,
     setValue,
@@ -786,7 +714,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     resetForm,
     handleSubmit,
     handleCancel,
-    
+
     // Wizard/Accordion related properties and methods
     isWizard,
     isAccordion,
@@ -798,20 +726,19 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
     goToStep,
     isFirstStep,
     isLastStep,
-    
+
     // Step submission related properties and methods
     submitCurrentStep,
     isSubmittingStep,
     stepResponses,
     getStepResponseData,
-    
+
     // Error handling
     clearFiledError,
-    
+
     // Form ID
     formId: actualFormId,
-    
-    // Edit mode actions
-    loadEditData,
+
+    // Edit mode actions are now handled by ReactHookFormBuilder
   };
 }

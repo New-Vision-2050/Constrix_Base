@@ -30,10 +30,8 @@ interface UseSheetFormResult {
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   handleCancel: () => void;
   // Edit mode related properties and methods
-  isEditMode: boolean;
   isLoadingEditData: boolean;
   editError: string | null;
-  loadEditData: (id?: string | number) => Promise<void>;
   // Wizard/Accordion related properties and methods
   isWizard: boolean;
   isAccordion: boolean;
@@ -72,11 +70,10 @@ export function useSheetForm({
   const actualFormId = config.formId || 'sheet-form';
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Edit mode state
   const [isLoadingEditData, setIsLoadingEditData] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const isEditMode = !!recordId || !!config.isEditMode;
 
   // Get form instance from store
   const {
@@ -84,8 +81,6 @@ export function useSheetForm({
     errors,
     touched,
     isSubmitting,
-    isValid,
-
     setValue,
     setValues,
     setError,
@@ -124,70 +119,7 @@ export function useSheetForm({
     >
   >({});
 
-  // Function to load data for editing
-  const loadEditData = useCallback(async (id?: string | number) => {
-    // Use provided id or fallback to recordId from props
-    const targetId = id || recordId;
-    
-    // If no ID is provided, we can't load data
-    if (!targetId) {
-      setEditError("No record ID provided for editing");
-      return;
-    }
-
-    // If editValues are directly provided in the config, use those
-    if (config.editValues) {
-      setValues(config.editValues);
-      return;
-    }
-
-    // If no editApiUrl is provided, we can't load data
-    if (!config.editApiUrl) {
-      setEditError("No API URL configured for editing");
-      return;
-    }
-
-    try {
-      setIsLoadingEditData(true);
-      setEditError(null);
-
-      // Replace :id placeholder in URL if present
-      const url = config.editApiUrl.replace(":id", String(targetId));
-      
-      // Make the API request
-      const response = await apiClient.get(url, {
-        headers: config.editApiHeaders,
-      });
-
-      // Extract data from response
-      let data = response.data;
-      
-      // If a data path is specified, extract the data from that path
-      if (config.editDataPath) {
-        const paths = config.editDataPath.split('.');
-        for (const path of paths) {
-          data = data[path];
-          if (data === undefined) {
-            throw new Error(`Data path '${config.editDataPath}' not found in response`);
-          }
-        }
-      }
-
-      // If a data transformer is provided, transform the data
-      if (config.editDataTransformer) {
-        data = config.editDataTransformer(data);
-      }
-
-      // Set the form values
-      setValues(data);
-    } catch (error: any) {
-      console.error("Error loading data for editing:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
-      setEditError(errorMessage);
-    } finally {
-      setIsLoadingEditData(false);
-    }
-  }, [config, recordId, setValues]);
+  // Edit mode state is now managed by FormBuilder
 
   // Reset form when config changes
   useEffect(() => {
@@ -195,13 +127,8 @@ export function useSheetForm({
       setValues(config.initialValues);
     }
   }, [config, setValues]);
-  
-  // Load edit data when in edit mode
-  useEffect(() => {
-    if (isEditMode) {
-      loadEditData();
-    }
-  }, [isEditMode, loadEditData]);
+
+  // Edit mode data loading is now handled by FormBuilder
 
   // Open and close sheet
   const openSheet = useCallback(() => {
@@ -791,10 +718,8 @@ export function useSheetForm({
     handleSubmit,
     handleCancel,
     // Edit mode related properties and methods
-    isEditMode,
     isLoadingEditData,
     editError,
-    loadEditData,
     // Wizard/Accordion related properties and methods
     isWizard,
     isAccordion,

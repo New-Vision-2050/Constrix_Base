@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocale } from "next-intl";
 import {
   Sheet,
@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FormConfig } from "../types/formTypes";
 import { useReactHookForm } from "../hooks/useReactHookForm";
+import { useFormInstance } from "../hooks/useFormStore";
 import ReactHookFormBuilder from "./ReactHookFormBuilder";
 
 interface ReactHookSheetFormBuilderProps {
@@ -23,6 +24,7 @@ interface ReactHookSheetFormBuilderProps {
   onCancel?: () => void;
   side?: "top" | "right" | "bottom" | "left";
   className?: string;
+  recordId?: string | number; // Optional record ID for editing
 }
 
 const ReactHookSheetFormBuilder: React.FC<ReactHookSheetFormBuilderProps> = ({
@@ -32,10 +34,20 @@ const ReactHookSheetFormBuilder: React.FC<ReactHookSheetFormBuilderProps> = ({
   onCancel,
   side,
   className,
+  recordId,
 }) => {
   const locale = useLocale();
   const isRtl = locale === "ar";
   const sheetSide = side || (isRtl ? "left" : "right");
+
+  // Get form instance from store for edit mode
+  const actualFormId = config.formId || 'sheet-form';
+  const { isEditMode, setEditMode } = useFormInstance(actualFormId);
+  
+  // Set edit mode based on config
+  useEffect(() => {
+    setEditMode(!!config.isEditMode);
+  }, [config.isEditMode, setEditMode]);
 
   const {
     isOpen,
@@ -136,6 +148,9 @@ const ReactHookSheetFormBuilder: React.FC<ReactHookSheetFormBuilderProps> = ({
           stepResponses={stepResponses}
           getStepResponseData={getStepResponseData}
           clearFiledError={clearFiledError}
+          // Edit mode props
+          isEditMode={isEditMode}
+          recordId={recordId}
         />
 
         <SheetFooter />

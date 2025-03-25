@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { UseFormReturn, FieldValues } from "react-hook-form";
 import ReactHookExpandableFormSection from "./ReactHookExpandableFormSection";
 import { Button } from "@/components/ui/button";
 import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
+import { apiClient } from "@/config/axios-config";
+import {useFormStore} from "@/modules/form-builder";
 
 interface ReactHookFormBuilderProps {
   config: FormConfig;
@@ -37,6 +39,7 @@ interface ReactHookFormBuilderProps {
   stepResponses: Record<number, any>;
   getStepResponseData: (step: number) => any;
   clearFiledError: (field: string) => void;
+  recordId?: string | number;
 }
 
 const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
@@ -68,15 +71,113 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
   stepResponses,
   getStepResponseData,
   clearFiledError,
+  isLoadingEditData: initialIsLoadingEditData,
+  editError: initialEditError,
+  recordId,
 }) => {
+  const [isEditMode] = useState( config.isEditMode || false);
+  const [isLoadingEditData, setIsLoadingEditData] = useState(initialIsLoadingEditData || false);
+  const [editError, setEditError] = useState<string | null>(initialEditError || null);
+
+  // Function to load data for editing
+  const loadEditData = useCallback(async (id?: string | number) => {
+    // Use provided id or fallback to recordId from props
+    const targetId = id || recordId;
+
+    // If no ID is provided, we can't load data
+    if (!targetId) {
+      setEditError("No record ID provided for editing");
+      return;
+    }
+
+    // If editValues are directly provided in the config, use those
+    if (config.editValues) {
+      form.reset(config.editValues);
+      return;
+    }
+    else
+    {
+        useFormStore.getState().setValues(config.formId || '',config.editValues || []);
+    }
+
+    // If no editApiUrl is provided, we can't load data
+    if (!config.editApiUrl) {
+      setEditError("No API URL configured for editing");
+      return;
+    }
+
+    try {
+      setIsLoadingEditData(true);
+      setEditError(null);
+
+      // Replace :id placeholder in URL if present
+      const url = config.editApiUrl.replace(":id", String(targetId));
+
+      // Make the API request
+      const response = await apiClient.get(url, {
+        headers: config.editApiHeaders,
+      });
+
+      // Extract data from response
+      let data = response.data;
+
+      // If a data path is specified, extract the data from that path
+      if (config.editDataPath) {
+        const paths = config.editDataPath.split('.');
+        for (const path of paths) {
+          data = data[path];
+          if (data === undefined) {
+            throw new Error(`Data path '${config.editDataPath}' not found in response`);
+          }
+        }
+      }
+
+      // If a data transformer is provided, transform the data
+      if (config.editDataTransformer) {
+        data = config.editDataTransformer(data);
+      }
+
+      // Reset the form with the loaded data
+      form.reset(data);
+    } catch (error: any) {
+      console.error("Error loading data for editing:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
+      setEditError(errorMessage);
+    } finally {
+      setIsLoadingEditData(false);
+    }
+  }, [config, recordId, form]);
+
+  // Load edit data when in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      loadEditData();
+    }
+  }, [isEditMode]);
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-6 py-6"
       onClick={(e) => e.stopPropagation()}
     >
+      {/* Loading state for edit mode */}
+      {isLoadingEditData && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="animate-spin h-8 w-8 text-primary" />
+          <span className="ml-2 text-lg">Loading data...</span>
+        </div>
+      )}
+
+      {/* Error state for edit mode */}
+      {editError && (
+        <div className="text-destructive border border-destructive/20 p-4 rounded mb-4">
+          <h3 className="font-medium text-lg mb-1">Error Loading Data</h3>
+          <p>{editError}</p>
+        </div>
+      )}
+
       {/* Step indicator for wizard/accordion mode */}
-      {isStepBased && config.wizardOptions?.showStepIndicator && (
+      {isStepBased && config.wizardOptions?.showStepIndicator && !isLoadingEditData && (
         <div className="mb-6">
           <div className="flex items-center justify-between">
             {config.sections.map((section, index) => (
@@ -128,12 +229,13 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
       )}
 
       <div
-        className="max-h-[calc(80vh-120px)] overflow-y-auto pr-2
+        className={`max-h-[calc(80vh-120px)] overflow-y-auto pr-2
           [&::-webkit-scrollbar]:w-2
           [&::-webkit-scrollbar-track]:bg-transparent
           [&::-webkit-scrollbar-thumb]:bg-gray-300
           [&::-webkit-scrollbar-thumb]:rounded-full
-          hover:[&::-webkit-scrollbar-thumb]:bg-gray-400"
+          hover:[&::-webkit-scrollbar-thumb]:bg-gray-400
+          ${isLoadingEditData ? 'hidden' : ''}`}
       >
         {/* Render form sections based on mode */}
         {isWizard ? (
