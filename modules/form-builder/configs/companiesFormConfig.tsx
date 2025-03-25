@@ -352,6 +352,12 @@ export const companiesFormConfig: FormConfig = {
       console.log("Current values:", values);
     },
   },
+    editDataTransformer:(data)=>{
+      if(!Array.isArray( data.company_field_id)) {
+          data.company_field_id = data?.company_field_id?.split(",")
+      }
+      return data;
+    },
 
   // Example onSuccess handler
   onSuccess: (values, result) => {

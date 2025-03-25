@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/modules/table/components/ui/popover";
-import { DynamicDropdownConfig } from "@/modules/table/utils/tableTypes";
+import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
 
 interface PaginatedDropdownProps {
@@ -64,7 +64,20 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     } else {
       // For single select
       const singleValue = value as string;
-      return options.find((option) => option.value === singleValue)?.label || singleValue;
+      const option = options.find((option) => option.value === singleValue);
+      
+      // If we have a proper label, use it
+      if (option) {
+        return option.label;
+      }
+      
+      // If we're still loading and have a value, show loading indicator
+      if (loading && singleValue) {
+        return `${singleValue} (loading...)`;
+      }
+      
+      // Fallback to the value itself
+      return singleValue;
     }
   };
   

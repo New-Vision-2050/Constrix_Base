@@ -33,9 +33,179 @@ export const useDropdownSearch = ({
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
+  const initialFetchDoneRef = useRef(false);
 
   // Create a debounced search term
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+
+  // Fetch label for initial value if needed
+  useEffect(() => {
+    const fetchInitialLabel = async () => {
+      if (!dynamicConfig || !selectedValue || initialFetchDoneRef.current ) return;
+
+      // Skip if we already have the label in options
+      if (isMulti && Array.isArray(selectedValue)) {
+        const allLabelsFound = selectedValue.every(value =>
+          options.some(option => option.value === value && option.label !== value)
+        );
+        if (allLabelsFound) return;
+      } else if (!isMulti && typeof selectedValue === 'string') {
+        const labelFound = options.some(option =>
+          option.value === selectedValue && option.label !== selectedValue
+        );
+        if (labelFound) return;
+      }
+
+      try {
+        setLoading(true);
+
+        // Prepare values to fetch
+        const valuesToFetch = isMulti && Array.isArray(selectedValue)
+          ? selectedValue
+          : [selectedValue as string];
+
+        // Only fetch for values that don't already have proper labels
+        const valuesToFetchFiltered = valuesToFetch.filter(value =>
+          !options.some(option => option.value === value && option.label !== value)
+        );
+
+        if (valuesToFetchFiltered.length === 0) return;
+
+        // Build URL with ID parameter
+        let url = dynamicConfig.url;
+        const params = new URLSearchParams();
+
+        // Add ID parameter
+        params.append('id', valuesToFetchFiltered.join(','));
+
+        // Append params to URL
+        const queryString = params.toString();
+        if (queryString) {
+          url = `${url}${url.includes("?") ? "&" : "?"}${queryString}`;
+        }
+
+        const response = await queryClient.fetchQuery({
+          queryKey: ["initialLabel", url],
+          queryFn: async () => {
+            const response = await apiClient.get(url);
+            return response;
+          },
+          staleTime: 1000 * 60 * 5,
+        });
+
+        if (!isMountedRef.current) return;
+
+        if (response.status !== 200) {
+          throw new Error(`Failed to fetch initial label: ${response.status}`);
+        }
+
+        const data = processApiResponse(await response.data);
+        if (!isMountedRef.current) return;
+
+        // Extract options from response
+        let fetchedOptions: DropdownOption[] = [];
+
+        if (Array.isArray(data)) {
+          // Handle array response
+          fetchedOptions = data.map((item) => {
+            if (typeof item === 'string' || typeof item === 'number') {
+              return {
+                value: String(item),
+                label: String(item),
+              };
+            }
+
+            if (Array.isArray(item)) {
+              const valueIndex = parseInt(dynamicConfig.valueField, 10);
+              const labelIndex = parseInt(dynamicConfig.labelField, 10);
+
+              if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
+                  valueIndex >= 0 && labelIndex >= 0 &&
+                  valueIndex < item.length && labelIndex < item.length) {
+                return {
+                  value: String(item[valueIndex]),
+                  label: String(item[labelIndex]),
+                };
+              }
+
+              return {
+                value: String(item[0] || ''),
+                label: String(item[1] || item[0] || ''),
+              };
+            }
+
+            // Handle object format
+            const getValue = (obj: any, path: string) => {
+              return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+            };
+
+            return {
+              value: String(getValue(item, dynamicConfig.valueField)),
+              label: String(getValue(item, dynamicConfig.labelField)),
+            };
+          });
+        } else if (data && typeof data === 'object') {
+          // Handle single object response
+          const getValue = (obj: any, path: string) => {
+            return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+          };
+
+          fetchedOptions = [{
+            value: String(getValue(data, dynamicConfig.valueField)),
+            label: String(getValue(data, dynamicConfig.labelField)),
+          }];
+        }
+
+        // Filter valid options
+        const validOptions = fetchedOptions
+          .filter((opt) => opt.value && opt.value.trim() !== "");
+
+        if (validOptions.length > 0) {
+          // Merge with existing options, avoiding duplicates
+          setOptions(prevOptions => {
+            const newOptions = [...prevOptions];
+
+            validOptions.forEach(newOpt => {
+              const existingIndex = newOptions.findIndex(opt => opt.value === newOpt.value);
+              if (existingIndex >= 0) {
+                newOptions[existingIndex] = newOpt;
+              } else {
+                newOptions.push(newOpt);
+              }
+            });
+
+            return newOptions;
+          });
+
+          // Update backup options
+          setBackupOptions(prevBackup => {
+            const newBackup = [...prevBackup];
+
+            validOptions.forEach(newOpt => {
+              const existingIndex = newBackup.findIndex(opt => opt.value === newOpt.value);
+              if (existingIndex >= 0) {
+                newBackup[existingIndex] = newOpt;
+              } else {
+                newBackup.push(newOpt);
+              }
+            });
+
+            return newBackup;
+          });
+        }
+
+        initialFetchDoneRef.current = true;
+      } catch (err) {
+        console.error("Error fetching initial label:", err);
+      } finally {
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchInitialLabel();
+  }, [dynamicConfig, selectedValue, options, isMulti, queryClient]);
 
   // Store the selected option(s) as backup when they change
   useEffect(() => {
