@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { baseURL } from "@/config/axios-config";
 import { FormConfig, SheetFormBuilder } from "@/modules/form-builder";
 import { useEffect, useState } from "react";
 
@@ -78,6 +79,7 @@ export function SetRoleForm() {
     title: "Advanced Role & Permissions",
     description:
       "Create or edit a role with specific permissions and select all functionality",
+    apiUrl: `${baseURL}/role_and_permissions/roles`,
     sections: [
       {
         title: "Role Information",
@@ -208,17 +210,17 @@ export function SetRoleForm() {
         ],
       },
     ],
-    submitButtonText: "Save Role",
-    resetButtonText: "Reset",
-    showReset: true,
-    initialValues: formValues,
-    onSubmit: async (values) => {
-      console.log("Submit_Form_Values::", values);
-      return {
-        success: true,
-        message: "Role saved successfully",
-      };
+    wizard: true,
+    wizardOptions: {
+      showStepIndicator: false,
+      showStepTitles: false,
+      validateStepBeforeNext: true,
+      allowStepNavigation: false,
+      nextButtonText: "Continue",
+      prevButtonText: "Back",
+      finishButtonText: "حفظ",
     },
+    submitButtonText: "Save Role",
   };
 
   return (
@@ -274,7 +276,7 @@ export function SetRoleForm() {
           }),
         })),
       }}
-      trigger={<Button>Create New Role</Button>}
+      trigger={<Button>Add Role</Button>}
       onSuccess={(values: Record<string, any>) => {
         console.log("Role saved successfully:", values);
         alert("Role saved successfully!");
