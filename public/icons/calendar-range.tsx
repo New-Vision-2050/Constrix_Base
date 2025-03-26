@@ -1,4 +1,8 @@
-export default function CalendarRangeIcon() {
+type PropsT = {
+  additionalClass?: string;
+};
+
+export default function CalendarRangeIcon({ additionalClass }: PropsT) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -10,7 +14,9 @@ export default function CalendarRangeIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="lucide lucide-calendar-range-icon lucide-calendar-range"
+      className={`lucide lucide-calendar-range-icon lucide-calendar-range ${
+        additionalClass ?? ""
+      }`}
     >
       <rect width="18" height="18" x="3" y="4" rx="2" />
       <path d="M16 2v4" />
