@@ -1,22 +1,19 @@
 "use client";
+
 import Chart from "react-apexcharts";
-import "./working-time-chart.css";
 
-
-
-export default function WorkingTimeCardChart() {
-  // declare and define component state and variables
+export default function FinancialReportChart() {
   const totalHours = "231h";
 
-  // declare chart options
+  // declare and define chart options
   const options = {
     chart: { sparkline: { enabled: true }, background: "transparent" },
-    colors: ["#1E40AF", "#3B82F6"],
+    colors: ["#F42588", "#F7F7F9"],
     stroke: { width: 0 },
     legend: { show: false },
     tooltip: { theme: "dark" },
     dataLabels: { enabled: false },
-    labels: ["36%", "56%"],
+    labels: ["74%", "26%"],
     plotOptions: {
       pie: {
         customScale: 0.9,
@@ -42,17 +39,15 @@ export default function WorkingTimeCardChart() {
       },
     },
   };
-  
 
   return (
-    <div className="w-36 h-36 flex items-center justify-center  rounded-full">
-      {/* Placeholder for the chart */}
+    <div>
       <Chart
         type="donut"
         height={140}
         width={140}
         options={options}
-        series={[35, 65]}
+        series={[74, 26]}
       />
     </div>
   );
