@@ -3,7 +3,7 @@ import StatisticsCardsSection from "../components/statistics-cards";
 
 export default function UserDashboardModule() {
   return (
-    <div className="flex flex-col gap-12 container p-12">
+    <div className="flex flex-col gap-12  p-12">
       {/* header */}
       <UserProfileHeader />
       {/* Statistics cards */}
