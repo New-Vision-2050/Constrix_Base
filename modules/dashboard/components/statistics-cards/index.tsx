@@ -1,6 +1,7 @@
 import ContractStatusCard from "./components/contract-status-card";
 import EmptyStatisticsCard from "./components/empty-card";
 import FinancialReportCard from "./components/financial-report-card";
+import TasksStatisticCard from "./components/tasks-statistic-card";
 import WorkingTimeCard from "./components/working-time-card";
 
 export default function StatisticsCardsSection() {
@@ -9,6 +10,7 @@ export default function StatisticsCardsSection() {
       <ContractStatusCard />
       <WorkingTimeCard />
       <FinancialReportCard />
+      <TasksStatisticCard />
 
       {/* 
       <EmptyStatisticsCard
