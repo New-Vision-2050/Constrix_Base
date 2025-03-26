@@ -22,8 +22,9 @@ export default function StatisticsCardsSection() {
       <EmptyStatisticsCard
         title="التقرير المالي"
         description="لا يوجد بيانات"
-      /> */}
+      />
       <EmptyStatisticsCard title="المهام" description="لا يوجد بيانات" />
+       */}
     </div>
   );
 }

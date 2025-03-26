@@ -7,8 +7,8 @@ export default function TasksStatisticCard() {
   const isRtl = locale === "ar";
   
   return (
-    <div className="relative w-full bg-sidebar shadow-md rounded-lg p-4 flex justify-between">
-      <div className="flex flex-col justify-between gap-5 w-2/3">
+    <div className="relative min-h-[177px] min-w-[250px] bg-sidebar shadow-md rounded-lg p-4 flex justify-between">
+      <div className="flex flex-col justify-between gap-5 w-full">
         <div className="flex flex-col items-start gap-2">
           <h3 className="text-lg font-bold">المهام</h3>
           <span
