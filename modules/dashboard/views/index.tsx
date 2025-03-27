@@ -4,6 +4,7 @@ import UserProfilePersonalData from "../components/personal-data";
 import UserProfileProfessionalData from "../components/professional-data";
 import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
+import UpcomingMeetings from "../components/upcoming-meetings";
 import UserActivitiesDataList from "../components/user-activities-data-list";
 import UserProfileGridLayout from "../components/UserProfileGridLayout";
 
@@ -19,6 +20,12 @@ export default function UserDashboardModule() {
         left={
           <div className="flex flex-col gap-3">
             <UserProfileActivityTimeline />
+            <div className="flex flex-col md:flex-row gap-2 justify-between">
+              <div className="flex-grow p-8 w-full md:w-1/2">
+                <UpcomingMeetings />
+              </div>
+              <div className="flex-grow p-8 w-full md:w-1/2">right 50 %</div>
+            </div>
           </div>
         }
         right={
