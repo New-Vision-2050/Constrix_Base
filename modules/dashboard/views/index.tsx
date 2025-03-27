@@ -6,6 +6,7 @@ import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
 import UpcomingMeetings from "../components/upcoming-meetings";
 import UserActivitiesDataList from "../components/user-activities-data-list";
+import UserProjectsData from "../components/user-projects";
 import UserTeams from "../components/user-teams";
 import UserProfileGridLayout from "../components/UserProfileGridLayout";
 
@@ -29,6 +30,7 @@ export default function UserDashboardModule() {
                 <UserTeams />
               </div>
             </div>
+            <UserProjectsData />
           </div>
         }
         right={
