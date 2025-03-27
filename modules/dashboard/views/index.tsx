@@ -1,3 +1,4 @@
+import UserProfileActivityTimeline from "../components/activity-timeline";
 import UserProfileBankingData from "../components/Banking-data";
 import UserProfilePersonalData from "../components/personal-data";
 import UserProfileProfessionalData from "../components/professional-data";
@@ -15,7 +16,11 @@ export default function UserDashboardModule() {
       <StatisticsCardsSection />
       {/* grid */}
       <UserProfileGridLayout
-        left={<>left section</>}
+        left={
+          <div className="flex flex-col gap-3">
+            <UserProfileActivityTimeline />
+          </div>
+        }
         right={
           <div className="flex flex-col gap-3">
             <UserProfilePersonalData />
