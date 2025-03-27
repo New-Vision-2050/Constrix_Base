@@ -1,6 +1,9 @@
+import UserProfileBankingData from "../components/Banking-data";
+import UserProfilePersonalData from "../components/personal-data";
+import UserProfileProfessionalData from "../components/professional-data";
 import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
-import UserInformationCardLayout from "../components/UserInformationCardLayout";
+import UserActivitiesDataList from "../components/user-activities-data-list";
 import UserProfileGridLayout from "../components/UserProfileGridLayout";
 
 export default function UserDashboardModule() {
@@ -14,11 +17,12 @@ export default function UserDashboardModule() {
       <UserProfileGridLayout
         left={<>left section</>}
         right={
-          <>
-            <UserInformationCardLayout title="البيانات الشخصية">
-              User Data List
-            </UserInformationCardLayout>
-          </>
+          <div className="flex flex-col gap-3">
+            <UserProfilePersonalData />
+            <UserProfileProfessionalData />
+            <UserProfileBankingData />
+            <UserActivitiesDataList />
+          </div>
         }
       />
     </div>
