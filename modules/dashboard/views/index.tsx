@@ -6,6 +6,7 @@ import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
 import UpcomingMeetings from "../components/upcoming-meetings";
 import UserActivitiesDataList from "../components/user-activities-data-list";
+import UserTeams from "../components/user-teams";
 import UserProfileGridLayout from "../components/UserProfileGridLayout";
 
 export default function UserDashboardModule() {
@@ -24,7 +25,9 @@ export default function UserDashboardModule() {
               <div className="flex-grow p-8 w-full md:w-1/2">
                 <UpcomingMeetings />
               </div>
-              <div className="flex-grow p-8 w-full md:w-1/2">right 50 %</div>
+              <div className="flex-grow p-8 w-full md:w-1/2">
+                <UserTeams />
+              </div>
             </div>
           </div>
         }
