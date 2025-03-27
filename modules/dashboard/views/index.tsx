@@ -1,5 +1,7 @@
 import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
+import UserInformationCardLayout from "../components/UserInformationCardLayout";
+import UserProfileGridLayout from "../components/UserProfileGridLayout";
 
 export default function UserDashboardModule() {
   return (
@@ -8,6 +10,17 @@ export default function UserDashboardModule() {
       <UserProfileHeader />
       {/* Statistics cards */}
       <StatisticsCardsSection />
+      {/* grid */}
+      <UserProfileGridLayout
+        left={<>left section</>}
+        right={
+          <>
+            <UserInformationCardLayout title="البيانات الشخصية">
+              User Data List
+            </UserInformationCardLayout>
+          </>
+        }
+      />
     </div>
   );
 }
