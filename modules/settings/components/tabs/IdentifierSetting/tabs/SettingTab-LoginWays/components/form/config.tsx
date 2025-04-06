@@ -34,6 +34,7 @@ export const loginWayFormConfig: FormConfig = {
                 label: "Login Option",
                 placeholder: "Select Login Option",
                 dynamicOptions: {
+                    paginationEnabled:true,
                   url: `${baseURL}/settings/login-way/login-options`,
                   valueField: "login_option",
                   labelField: "login_option",
@@ -55,6 +56,7 @@ export const loginWayFormConfig: FormConfig = {
                 label: "Login Driver",
                 placeholder: "Select Login Driver",
                 dynamicOptions: {
+                    paginationEnabled:true,
                   url: `${baseURL}/settings/driver/get-drivers-by-login-option`,
                   valueField: "value",
                   labelField: "name",
@@ -74,6 +76,7 @@ export const loginWayFormConfig: FormConfig = {
                 label: "Login Way Alternative",
                 placeholder: "Select Login Way Alternative",
                 dynamicOptions: {
+                    paginationEnabled:true,
                   url: `${baseURL}/settings/driver/get-alternatives-drivers-by-login-option`,
                   dependsOn: "drivers",
                   filterParam: "login_option_driver",
@@ -105,6 +108,13 @@ export const loginWayFormConfig: FormConfig = {
   resetOnSuccess: true,
   showCancelButton: false,
   showBackButton: false,
+    editDataTransformer:(data)=>{
+            return {
+               id:data.id,
+               name:data.name,
+                login_options:data.steps
+            }
+        },
 
   onSubmit: async (formData: Record<string, unknown>) => {
     const body = {
