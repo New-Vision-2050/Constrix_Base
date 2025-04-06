@@ -45,6 +45,7 @@ export default function UserTeams() {
         <RegularList<ListItemType, "item">
           items={items}
           sourceName="item"
+          keyPrefix="user-teams"
           ItemComponent={SingleListItem}
         />
         <div className="flex items-center justify-center p-2 w-full h-6">

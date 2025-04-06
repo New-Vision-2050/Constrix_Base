@@ -30,7 +30,7 @@ export default function UserDashboardModule() {
                 <UserTeams />
               </div>
             </div>
-            <UserProjectsData />
+            <UserProjectsData /> 
           </div>
         }
         right={

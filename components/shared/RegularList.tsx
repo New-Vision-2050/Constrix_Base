@@ -10,6 +10,7 @@ interface RegularListProps<T, K extends string> {
   items: T[];
   /** The dynamic prop name for passing items to the child component */
   sourceName: K;
+  keyPrefix?: string;
   /** The component responsible for rendering each item */
   ItemComponent: React.ComponentType<{ [key in K]: T }>;
 }
@@ -26,6 +27,7 @@ interface RegularListProps<T, K extends string> {
  */
 export default function RegularList<T, K extends string>({
   items,
+  keyPrefix,
   sourceName,
   ItemComponent,
 }: RegularListProps<T, K>) {
@@ -35,7 +37,12 @@ export default function RegularList<T, K extends string>({
         // Ensure the dynamic prop name matches the expected component props
         const itemProps = { [sourceName]: item } as { [key in K]: T };
 
-        return <ItemComponent key={idx} {...itemProps} />;
+        return (
+          <ItemComponent
+            key={`${idx}_${sourceName}_${keyPrefix}`}
+            {...itemProps}
+          />
+        );
       })}
     </>
   );

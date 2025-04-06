@@ -15,20 +15,21 @@ const items: ActivityListItem[] = [
 export default function UserActivitiesDataList() {
   return (
     <UserInformationCardLayout title="الانشطة">
-      <RegularList<ActivityListItem, "item">
-        sourceName="item"
+      <RegularList<ActivityListItem, "activityItem">
+        sourceName="activityItem"
         items={items}
+        keyPrefix="user-activities-data-list"
         ItemComponent={SigleItem}
       />
     </UserInformationCardLayout>
   );
 }
 
-const SigleItem = ({ item }: { item: ActivityListItem }) => {
+const SigleItem = ({ activityItem }: { activityItem: ActivityListItem }) => {
   return (
     <div className="flex gap-4">
-      {item.icon}
-      <p className="font-md my-1">{item.text}</p>
+      {activityItem.icon}
+      <p className="font-md my-1">{activityItem.text}</p>
     </div>
   );
 };

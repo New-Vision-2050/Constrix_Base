@@ -6,15 +6,16 @@ const items: string[] = [];
 export default function UserProfileBankingData() {
   return (
     <UserInformationCardLayout title="البيانات المهنية">
-      <RegularList<string, "item">
-        sourceName="item"
+      <RegularList<string, "ProfessionalItemData">
+        sourceName="ProfessionalItemData"
         items={items}
+        keyPrefix="user-profile-banking-data"
         ItemComponent={SigleItem}
       />
     </UserInformationCardLayout>
   );
 }
 
-const SigleItem = ({ item }: { item: string }) => {
-  return <p className="font-md my-1">{item}</p>;
+const SigleItem = ({ ProfessionalItemData }: { ProfessionalItemData: string }) => {
+  return <p className="font-md my-1">{ProfessionalItemData}</p>;
 };

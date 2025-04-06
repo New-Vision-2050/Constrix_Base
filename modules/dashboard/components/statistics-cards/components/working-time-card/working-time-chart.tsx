@@ -1,8 +1,8 @@
 "use client";
-import Chart from "react-apexcharts";
+import dynamic from "next/dynamic";
 import "./working-time-chart.css";
 
-
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function WorkingTimeCardChart() {
   // declare and define component state and variables
@@ -42,7 +42,6 @@ export default function WorkingTimeCardChart() {
       },
     },
   };
-  
 
   return (
     <div className="w-36 h-36 flex items-center justify-center  rounded-full">

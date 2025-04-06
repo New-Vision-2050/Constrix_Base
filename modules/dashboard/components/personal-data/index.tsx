@@ -15,15 +15,16 @@ const items: string[] = [
 export default function UserProfilePersonalData() {
   return (
     <UserInformationCardLayout title="بيانات الشخصية">
-      <RegularList<string, "item">
-        sourceName="item"
+      <RegularList<string, "personalItemData">
+        sourceName="personalItemData"
         items={items}
+        keyPrefix="user-profile-personal-data"
         ItemComponent={SigleItem}
       />
     </UserInformationCardLayout>
   );
 }
 
-const SigleItem = ({ item }: { item: string }) => {
-  return <p className="font-md my-1">{item}</p>;
+const SigleItem = ({ personalItemData }: { personalItemData: string }) => {
+  return <p className="font-md my-1">{personalItemData}</p>;
 };
