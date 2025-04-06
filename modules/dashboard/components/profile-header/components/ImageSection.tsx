@@ -1,5 +1,6 @@
-'use client'
+"use client";
 import VisuallyHiddenInput from "@/components/shared/VisuallyHiddenInput";
+import { useUserProfileCxt } from "@/modules/dashboard/context/user-profile-cxt";
 
 type PropsT = {
   imgSrc?: string; // Optional image source URL for the profile picture
@@ -12,6 +13,14 @@ type PropsT = {
  * otherwise, it shows a placeholder with an upload hidden input.
  */
 export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
+  const { user, isLoading } = useUserProfileCxt();
+
+  // handle loading state
+  if (isLoading)
+    return (
+      <div className="w-44 h-44 bg-gray-200 animate-pulse rounded-lg"></div>
+    );
+
   return (
     <div className="bg-gray-50 border rounded-xl p-4 flex items-center justify-center">
       {imgSrc ? (
