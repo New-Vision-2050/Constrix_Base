@@ -1,4 +1,4 @@
-import { useUserDashboardCxt } from "@/modules/dashboard/context/user-dashboard-cxt";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import BackpackIcon from "@/public/icons/backpack";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 import MapPinIcon from "@/public/icons/map-pin";
@@ -11,7 +11,7 @@ import MapPinIcon from "@/public/icons/map-pin";
  *
  */
 export default function UserProfileHeaderUserInformationSection() {
-  const { user, isLoading } = useUserDashboardCxt();
+  const { user, isLoading } = useUserProfileCxt();
 
   // handle loading state
   if (isLoading)

@@ -1,7 +1,7 @@
 "use client";
 import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
-import { UserProfileCxtProvider } from "../context/user-profile-cxt";
+import { UserDashboardCxtProvider } from "../context/user-dashboard-cxt";
 import UserProfileGridLayout from "../components/UserProfileGridLayout";
 import UserProfileActivityTimeline from "../components/activity-timeline";
 import UpcomingMeetings from "../components/upcoming-meetings";
@@ -14,7 +14,7 @@ import UserActivitiesDataList from "../components/user-activities-data-list";
 
 export default function UserDashboardModule() {
   return (
-    <UserProfileCxtProvider>
+    <UserDashboardCxtProvider>
       <div className="flex flex-col gap-12  p-12">
         {/* header */}
         <UserProfileHeader />
@@ -46,6 +46,6 @@ export default function UserDashboardModule() {
           }
         />
       </div>
-    </UserProfileCxtProvider>
+    </UserDashboardCxtProvider>
   );
 }

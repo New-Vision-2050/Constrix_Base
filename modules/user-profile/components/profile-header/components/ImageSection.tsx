@@ -1,5 +1,5 @@
 "use client";
-import { useUserDashboardCxt } from "@/modules/dashboard/context/user-dashboard-cxt";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import UploadImageDialog from "./UploadImageDialog";
 import { useState } from "react";
 
@@ -14,7 +14,7 @@ type PropsT = {
  * otherwise, it shows a placeholder with an upload hidden input.
  */
 export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
-  const { isLoading } = useUserDashboardCxt();
+  const { isLoading } = useUserProfileCxt();
   const [openDialog, setOpenDialog] = useState(false);
 
   // handle loading state

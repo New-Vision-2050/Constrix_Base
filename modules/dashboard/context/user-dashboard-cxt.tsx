@@ -9,27 +9,27 @@ import useUserProfileData from "../hooks/useUserProfileData";
 import { UserProfileData } from "../types/user-profile-response";
 
 // declare context types
-type UserProfileCxtType = {
+type UserDashboardCxtType = {
   isLoading: boolean;
   user: UserProfileData | undefined;
 };
 
-export const UserProfileCxt = createContext<UserProfileCxtType>(
-  {} as UserProfileCxtType
+export const UserDashboardCxt = createContext<UserDashboardCxtType>(
+  {} as UserDashboardCxtType
 );
 
 // ** create a custom hook to use the context
-export const useUserProfileCxt = () => {
-  const context = useContext(UserProfileCxt);
+export const useUserDashboardCxt = () => {
+  const context = useContext(UserDashboardCxt);
   if (!context) {
     throw new Error(
-      "useUserProfileCxt must be used within a UserProfileCxtProvider"
+      "useUserDashboardCxt must be used within a UserDashboardCxtProvider"
     );
   }
   return context;
 };
 
-export const UserProfileCxtProvider = ({
+export const UserDashboardCxtProvider = ({
   children,
 }: {
   children: ReactNode;
@@ -43,7 +43,7 @@ export const UserProfileCxtProvider = ({
 
   // ** return component ui
   return (
-    <UserProfileCxt.Provider
+    <UserDashboardCxt.Provider
       value={{
         // user data
         user,
@@ -51,6 +51,6 @@ export const UserProfileCxtProvider = ({
       }}
     >
       {children}
-    </UserProfileCxt.Provider>
+    </UserDashboardCxt.Provider>
   );
 };

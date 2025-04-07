@@ -1,11 +1,11 @@
 import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
-import { useUserProfileCxt } from "../../context/user-profile-cxt";
+import { useUserDashboardCxt } from "../../context/user-dashboard-cxt";
 import LoadingMenuData from "../LoadingMenuData";
 import { useEffect, useState } from "react";
 
 export default function UserProfilePersonalData() {
-  const { user, isLoading } = useUserProfileCxt();
+  const { user, isLoading } = useUserDashboardCxt();
   const [items, setItems] = useState<string[]>([]);
 
   // handle side effects
