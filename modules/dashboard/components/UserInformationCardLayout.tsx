@@ -1,6 +1,5 @@
 import InfoIcon from "@/public/icons/InfoIcon";
 import SettingsIcon from "@/public/icons/settings";
-import { useUserProfileCxt } from "../context/user-profile-cxt";
 import { Button } from "@/components/ui/button";
 
 type PropsT = {
@@ -8,7 +7,7 @@ type PropsT = {
   children: React.ReactNode;
 };
 export default function UserInformationCardLayout({ title, children }: PropsT) {
-  const { handleChangeEditMode } = useUserProfileCxt();
+  const handleRedirectToUserProfile = () => {};
   
   return (
     <div className="w-full flex gap-4 flex-col p-4 bg-sidebar rounded-lg shadow-md">
@@ -17,7 +16,7 @@ export default function UserInformationCardLayout({ title, children }: PropsT) {
           <InfoIcon additionClass="text-orange-400" />
           <p className="font-bold text-lg">{title}</p>
         </div>
-        <Button variant="ghost" onClick={handleChangeEditMode}>
+        <Button variant="ghost" onClick={handleRedirectToUserProfile}>
           <SettingsIcon additionalClass="cursor-pointer" />
         </Button>
       </div>

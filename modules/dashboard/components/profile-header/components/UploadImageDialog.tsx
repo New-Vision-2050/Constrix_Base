@@ -13,13 +13,14 @@ import validateProfileImage from "@/modules/dashboard/api/validate-image";
 import { CircleCheckIcon } from "lucide-react";
 import { ProfileImageMsg } from "@/modules/dashboard/types/valdation-message-user-image";
 import RegularList from "@/components/shared/RegularList";
+import uploadProfileImage from "@/modules/dashboard/api/upload-profile-image";
 
 type PropsT = {
   open: boolean;
   setOpen: React.Dispatch<SetStateAction<boolean>>;
 };
 
-const initallyValidateMgs: ProfileImageMsg[] = [
+const initialValidateMgs: ProfileImageMsg[] = [
   { sentence: "حجم الصورة لا يتعدى 5 ميجابايت.", status: -1, sub_title: "" },
   {
     sentence: "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
@@ -30,8 +31,9 @@ const initallyValidateMgs: ProfileImageMsg[] = [
 ];
 
 export default function UploadImageDialog({ open, setOpen }: PropsT) {
+  const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [feedbackMessages, setFeedbackMessages] = useState(initallyValidateMgs);
+  const [feedbackMessages, setFeedbackMessages] = useState(initialValidateMgs);
   const [uploadedFile, setUploadedFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -48,13 +50,23 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
   // handle clear image
   const handleClearImage = () => {
     setPreviewUrl(null);
-    setFeedbackMessages(initallyValidateMgs);
+    setValid(false);
+    setFeedbackMessages(initialValidateMgs);
   };
+
   // handle upload and validate Image
   const handleValidateImage = async () => {
     try {
       setLoading(true);
       const response = await validateProfileImage(uploadedFile as File);
+      let _valid = true;
+      for (let i = 0; i < response.length; i++) {
+        if (response[i].status !== 1) {
+          _valid = false;
+          break;
+        }
+      }
+      setValid(_valid);
       setFeedbackMessages(response);
       setLoading(false);
     } catch (err) {
@@ -65,7 +77,16 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
 
   // handle save image
   const handleSaveImage = async () => {
-    console.log("start save image");
+    try {
+      setLoading(true);
+      const response = await uploadProfileImage(uploadedFile as File);
+      console.log("response_response", response);
+
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      console.log("error in handleValidateImage :", err);
+    }
   };
 
   return (
@@ -126,11 +147,11 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
         {/* Dialog Actions Buttons */}
         <div className="w-full flex justify-center items-center">
           <Button
-            onClick={handleValidateImage}
-            title={"validate Image"}
+            onClick={!valid ? handleValidateImage : handleSaveImage}
+            title={!valid ? "validate Image" : "Save Image"}
             disabled={!Boolean(uploadedFile) || loading}
           >
-            التحقق من الصورة
+            {!valid ? "التحقق من الصورة" : "حفظ"}
           </Button>
         </div>
       </DialogContent>

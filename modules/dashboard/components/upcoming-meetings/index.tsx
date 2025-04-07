@@ -1,8 +1,6 @@
 import RegularList from "@/components/shared/RegularList";
-import UserProfileTableDataMainLayout from "../../UserProfileTableDataMainLayout";
-import SingleListItem, {
-  ListItemType,
-} from "../upcoming-meetings/SingleListItem";
+import UserProfileTableDataMainLayout from "../UserProfileTableDataMainLayout";
+import SingleListItem, { ListItemType } from "./SingleListItem";
 
 // dummy data
 const avatarSrc =
@@ -10,42 +8,42 @@ const avatarSrc =
 const items: ListItemType[] = [
   {
     avatarSrc,
-    title: "مشروع العليا جديد",
+    title: "أجتماع مع مدير الشركة",
     subtitle: "05/08/2024  |   08:30م",
-    chipLabel: "مهندس",
+    chipLabel: "عاجل",
     chipColor: "primary",
   },
   {
     avatarSrc,
     title: "مشروع العليا",
     subtitle: "05/08/2024  |   08:30م",
-    chipLabel: "مهندس",
+    chipLabel: "قريبا",
     chipColor: "secondary",
   },
   {
     avatarSrc,
-    title: "مشروع العليا جديد",
+    title: "أجتماع مع مدير الشركة",
     subtitle: "05/08/2024  |   08:30م",
-    chipLabel: "مهندس",
+    chipLabel: "عاجل",
     chipColor: "primary",
   },
   {
     avatarSrc,
     title: "مشروع العليا",
     subtitle: "05/08/2024  |   08:30م",
-    chipLabel: "مهندس",
+    chipLabel: "قريبا",
     chipColor: "secondary",
   },
 ];
 
-export default function UserTeams() {
+export default function UpcomingMeetings() {
   return (
-    <UserProfileTableDataMainLayout title="الفريق">
+    <UserProfileTableDataMainLayout title="الاجتماعات القادمة">
       <div className="flex gap-4 flex-col">
         <RegularList<ListItemType, "item">
           items={items}
           sourceName="item"
-          keyPrefix="user-teams"
+          keyPrefix="upcoming-meetings"
           ItemComponent={SingleListItem}
         />
         <div className="flex items-center justify-center p-2 w-full h-6">

@@ -1,6 +1,6 @@
 'use client'
 import { TableBuilder } from "@/modules/table";
-import UserProfileTableDataMainLayout from "../../UserProfileTableDataMainLayout";
+import UserProfileTableDataMainLayout from "../UserProfileTableDataMainLayout";
 import { UserProjectsTableConfig } from "./table-config";
 import ExportButton from "@/modules/table/components/ExportButton";
 

@@ -1,5 +1,5 @@
 import RegularList from "@/components/shared/RegularList";
-import UserInformationCardLayout from "../../UserInformationCardLayout";
+import UserInformationCardLayout from "../UserInformationCardLayout";
 import SettingsIcon from "@/public/icons/settings";
 
 type ActivityListItem = {
