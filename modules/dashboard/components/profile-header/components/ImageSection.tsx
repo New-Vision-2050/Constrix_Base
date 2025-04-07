@@ -1,6 +1,7 @@
 "use client";
-import VisuallyHiddenInput from "@/components/shared/VisuallyHiddenInput";
 import { useUserProfileCxt } from "@/modules/dashboard/context/user-profile-cxt";
+import UploadImageDialog from "./UploadImageDialog";
+import { useState } from "react";
 
 type PropsT = {
   imgSrc?: string; // Optional image source URL for the profile picture
@@ -13,7 +14,8 @@ type PropsT = {
  * otherwise, it shows a placeholder with an upload hidden input.
  */
 export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
-  const { user, isLoading } = useUserProfileCxt();
+  const { isLoading } = useUserProfileCxt();
+  const [openDialog, setOpenDialog] = useState(false);
 
   // handle loading state
   if (isLoading)
@@ -30,20 +32,17 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
           className="w-32 h-32 rounded"
         />
       ) : (
-        <label className="w-32 h-32 flex flex-col items-center justify-center text-black cursor-pointer">
+        <label
+          onClick={() => setOpenDialog(true)}
+          className="w-32 h-32 flex flex-col items-center justify-center text-black cursor-pointer"
+        >
           <i className="ri-camera-2-line text-2xl" />
           <p className="text-center text-sm mt-2">
             يلزم اضافة صورة خلفية بيضاء 6*4
           </p>
-          <VisuallyHiddenInput
-            type="file"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              console.log("uploaded file", file);
-            }}
-          />
         </label>
       )}
+      <UploadImageDialog open={openDialog} setOpen={setOpenDialog} />
     </div>
   );
 }

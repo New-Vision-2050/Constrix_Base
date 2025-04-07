@@ -16,7 +16,7 @@ export default function UserProfileHeader() {
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
       {/* image or upload image field */}
-      <UserProfileHeaderImageSection imgSrc={imageSrc} />
+      <UserProfileHeaderImageSection />
       {/* user information */}
       <UserProfileHeaderUserInformationSection />
     </div>
