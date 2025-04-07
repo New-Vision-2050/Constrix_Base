@@ -15,6 +15,7 @@ import ImageField from './fields/ImageField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
+import { cn } from '@/lib/utils';
 
 interface FormFieldProps {
   field: FieldConfig;
@@ -28,6 +29,18 @@ interface FormFieldProps {
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
   formId?: string; // Add formId prop to identify which form instance to use
+  label: string;
+  name: string;
+  type?: 'text' | 'select' | 'textarea' | 'number';
+  placeholder?: string;
+  required?: boolean;
+  icon?: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  dir?: 'rtl' | 'ltr';
+  description?: string;
+  children: React.ReactNode;
 }
 
 // This component subscribes to validating state
@@ -43,6 +56,18 @@ const FormField: React.FC<FormFieldProps> = ({
   getStepResponseData,
   currentStep,
   formId = 'default', // Use a default form ID if not provided
+  label,
+  name,
+  type = 'text',
+  placeholder,
+  required,
+  icon,
+  className,
+  disabled,
+  readOnly,
+  dir = 'rtl',
+  description,
+  children,
 }) => {
   // Get the form instance
   const formInstance = useFormInstance(formId);
@@ -166,8 +191,6 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-
-
       case 'date':
         return (
           <DateField
@@ -254,7 +277,6 @@ const FormField: React.FC<FormFieldProps> = ({
   
             default:
               return <div>Unsupported field type: {field.type}</div>;
-            return <div>Unsupported field type: {field.type}</div>;
     }
   };
 
@@ -279,17 +301,38 @@ const FormField: React.FC<FormFieldProps> = ({
 
   // For all other field types
   return (
-    <div className="mb-4">
-      <Label htmlFor={field.name} className="block mb-2">
-        {field.label}
-        {field.required && <span className="text-destructive ml-1">*</span>}
-      </Label>
-      {renderField()}
-      <FieldHelperText
-        error={error}
-        touched={touched}
-        helperText={field.helperText}
-      />
+    <div 
+      className={cn('form-field', error && 'has-error', className)}
+      dir={dir}
+    >
+      <div className="field-header">
+        <label htmlFor={name} className="field-label">
+          {label}
+          {required && <span className="required-indicator">*</span>}
+        </label>
+        {description && (
+          <p className="field-description">{description}</p>
+        )}
+      </div>
+      
+      <div className="field-content">
+        {React.Children.map(children, child => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, {
+              id: name,
+              'aria-describedby': error ? `${name}-error` : undefined,
+              ...child.props,
+            });
+          }
+          return child;
+        })}
+      </div>
+      
+      {error && (
+        <div id={`${name}-error`} className="field-error">
+          {error}
+        </div>
+      )}
     </div>
   );
 };
