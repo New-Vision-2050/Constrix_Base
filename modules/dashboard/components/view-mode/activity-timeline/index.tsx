@@ -1,4 +1,4 @@
-import UserProfileTableDataMainLayout from "../UserProfileTableDataMainLayout";
+import UserProfileTableDataMainLayout from "../../UserProfileTableDataMainLayout";
 import pdfImg from "@/assets/icons/PDF.png";
 import TimeLineItem from "./time-line-item";
 

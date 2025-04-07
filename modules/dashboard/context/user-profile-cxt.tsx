@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import useUserProfileData from "../hooks/useUserProfileData";
 import { UserProfileData } from "../types/user-profile-response";
 
@@ -12,6 +12,11 @@ import { UserProfileData } from "../types/user-profile-response";
 type UserProfileCxtType = {
   isLoading: boolean;
   user: UserProfileData | undefined;
+
+  // control user profile mode view or edit
+  // isEditMode?true ''
+  isEditMode: boolean;
+  handleChangeEditMode: () => void
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -36,12 +41,12 @@ export const UserProfileCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const { data: user, isLoading } = useUserProfileData();
-
-  console.log("user", user);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // ** handle side effects
 
   // ** declare and define component helper methods
+  const handleChangeEditMode = () => setIsEditMode((prev) => !prev);
 
   // ** return component ui
   return (
@@ -50,6 +55,9 @@ export const UserProfileCxtProvider = ({
         // user data
         user,
         isLoading,
+        // edit mode
+        isEditMode,
+        handleChangeEditMode
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import RegularList from "@/components/shared/RegularList";
-import UserInformationCardLayout from "../UserInformationCardLayout";
-import { useUserProfileCxt } from "../../context/user-profile-cxt";
-import LoadingMenuData from "../LoadingMenuData";
+import UserInformationCardLayout from "../../UserInformationCardLayout";
+import { useUserProfileCxt } from "../../../context/user-profile-cxt";
+import LoadingMenuData from "../../LoadingMenuData";
 import { useEffect, useState } from "react";
 
 export default function UserProfilePersonalData() {

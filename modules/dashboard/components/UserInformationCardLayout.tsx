@@ -1,11 +1,15 @@
 import InfoIcon from "@/public/icons/InfoIcon";
 import SettingsIcon from "@/public/icons/settings";
+import { useUserProfileCxt } from "../context/user-profile-cxt";
+import { Button } from "@/components/ui/button";
 
 type PropsT = {
   title: string;
   children: React.ReactNode;
 };
 export default function UserInformationCardLayout({ title, children }: PropsT) {
+  const { handleChangeEditMode } = useUserProfileCxt();
+  
   return (
     <div className="w-full flex gap-4 flex-col p-4 bg-sidebar rounded-lg shadow-md">
       <div className="flex items-center justify-between">
@@ -13,7 +17,9 @@ export default function UserInformationCardLayout({ title, children }: PropsT) {
           <InfoIcon additionClass="text-orange-400" />
           <p className="font-bold text-lg">{title}</p>
         </div>
-        <SettingsIcon />
+        <Button variant="ghost" onClick={handleChangeEditMode}>
+          <SettingsIcon additionalClass="cursor-pointer" />
+        </Button>
       </div>
       <div className="flex-grow">{children}</div>
     </div>
