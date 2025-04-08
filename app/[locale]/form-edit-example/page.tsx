@@ -159,7 +159,7 @@ export default function FormEditExample() {
     isEditMode: isApiEditMode,
     isLoadingEditData,
     editError,
-    loadData,
+    // Removed unused loadData variable
     values: apiEditValues,
   } = useFormData({
     config: apiEditFormConfig,
@@ -174,12 +174,12 @@ export default function FormEditExample() {
   });
 
   // Success handlers for the forms
-  const handleDirectEditSuccess = (values: Record<string, any>) => {
+  const handleDirectEditSuccess = (values: Record<string, unknown>) => {
     console.log("Direct edit form submitted:", values);
     setShowDirectEditForm(false);
   };
 
-  const handleApiEditSuccess = (values: Record<string, any>) => {
+  const handleApiEditSuccess = (values: Record<string, unknown>) => {
     console.log("API edit form submitted:", values);
     setShowApiEditForm(false);
     setRecordId(null);

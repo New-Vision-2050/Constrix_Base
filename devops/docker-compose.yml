@@ -6,6 +6,7 @@ services:
       args:
         - DEPLOYMENT_ID=${DEPLOYMENT_ID}
         - NODE_ENV=${NODE_ENV}
+        - CACHEBUST=${CACHEBUST}
     container_name: nextjs-${DEPLOYMENT_ID}
     restart: always
     environment:
@@ -14,9 +15,11 @@ services:
       - NEXTAUTH_SECRET=8ea28feed665d06fd12c8a1a35b90577293531b59c3e8b8316213c89b5e5d62c
       - NEXT_PUBLIC_API_PATH=api
       - NEXT_PUBLIC_API_VERSION=v1
+      - NEXT_PUBLIC_CACHE_BUST=${CACHEBUST}
+      - DEPLOYMENT_ID=${DEPLOYMENT_ID}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.rule=Host(`core-${DEPLOYMENT_ID}.constrix-nv.com`)"
+      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.rule=HostRegexp(`(?i)^core-${DEPLOYMENT_ID}(-[a-z0-9-]+)?\\.constrix-nv\\.com$`)"
       - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.entrypoints=https"
       - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.tls.certresolver=letsencrypt"
       - "traefik.http.services.nextjs-${DEPLOYMENT_ID}.loadbalancer.server.port=3000"

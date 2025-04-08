@@ -4,6 +4,7 @@
 export { default as SheetFormBuilder } from './components/SheetFormBuilder';
 export { default as ExpandableFormSection } from './components/ExpandableFormSection';
 export { default as FormField } from './components/FormField';
+export { default as ReactHookSheetFormBuilder } from './components/ReactHookSheetFormBuilder';
 
 // Export field components
 export * from './components/fields';

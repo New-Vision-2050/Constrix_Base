@@ -1,17 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-// Define user type
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  bio: string;
-  role: string;
-}
+import { NextResponse } from 'next/server';
 
 // Mock user data
-const users: Record<string, User> = {
+const users = {
   '123': {
     id: '123',
     name: 'John Doe',
@@ -30,13 +20,7 @@ const users: Record<string, User> = {
   },
 };
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
+export function GET(request, { params }) {
   const id = params.id;
 
   // Check if user exists

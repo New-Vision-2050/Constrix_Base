@@ -7,6 +7,7 @@ import {
 } from "./DropdownUtils";
 import { useApiClient } from "@/utils/apiClient";
 import axios, { AxiosError } from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface UseDynamicOptionsProps {
   dynamicConfig?: DynamicDropdownConfig;
@@ -35,6 +36,7 @@ export const useDynamicOptions = ({
   const urlRef = useRef<string>("");
   const processingFetchRef = useRef(false);
   const apiClient = useApiClient();
+  const queryClient = useQueryClient();
 
   // Function to manually trigger a refresh of options
   const refresh = useCallback(() => {
@@ -232,7 +234,7 @@ export const useDynamicOptions = ({
       }
     }
 
-    // Skip fetch if URL hasn't changed and no other reason to refetch
+
     const url = getFetchUrl(
       dynamicConfig.url,
       dynamicConfig,

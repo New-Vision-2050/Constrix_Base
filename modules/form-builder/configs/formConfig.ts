@@ -239,20 +239,21 @@ export const formConfig: FormConfig = {
           name: 'contactPersons',
           label: 'Contact Persons',
           type: 'dynamicRows',
-          rowTemplate: {
-            name: '',
-            email: '',
-            phone: '',
-            position: ''
-          },
-          rowFields: [
-            {
-              name: 'name',
-              label: 'Name',
-              type: 'text',
-              placeholder: 'Enter name',
-              required: true
+          dynamicRowOptions: {
+            rowTemplate: {
+              name: '',
+              email: '',
+              phone: '',
+              position: ''
             },
+            rowFields: [
+              {
+                name: 'name',
+                label: 'Name',
+                type: 'text',
+                placeholder: 'Enter name',
+                required: true
+              },
             {
               name: 'email',
               label: 'Email',
@@ -273,8 +274,9 @@ export const formConfig: FormConfig = {
               placeholder: 'Enter position'
             }
           ],
-          minRows: 1,
-          maxRows: 5
+            minRows: 1,
+            maxRows: 5
+          }
         }
       ]
     }

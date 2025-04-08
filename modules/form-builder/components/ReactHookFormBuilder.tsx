@@ -39,7 +39,11 @@ interface ReactHookFormBuilderProps {
   stepResponses: Record<number, any>;
   getStepResponseData: (step: number) => any;
   clearFiledError: (field: string) => void;
+  // Edit mode related props
+  isLoadingEditData?: boolean;
+  editError?: string | null;
   recordId?: string | number;
+  isEditMode?: boolean;
 }
 
 const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({

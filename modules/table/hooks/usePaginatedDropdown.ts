@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  DropdownOption,
-  DynamicDropdownConfig,
-} from "@/modules/table/utils/tableTypes";
+import { DropdownOption } from "@/modules/table/utils/tableTypes";
+import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { extractDropdownOptions } from "@/modules/table/components/table/dropdowns/DropdownUtils";
 import { useFetchTracking, buildPaginatedUrl } from "./useFetchTracking";
 import { useDebounce } from "./useDebounce";
@@ -138,20 +136,32 @@ export const usePaginatedDropdown = ({
     }
 
     // Skip if dependency is required but not provided
-    if (
-      dynamicConfig.dependsOn &&
-      (!dependencies || !dependencies[dynamicConfig.dependsOn])
-    ) {
-      setOptions([]);
-      setLoading(false);
-      return cleanup;
+    if (dynamicConfig.dependsOn) {
+      // Handle different types of dependsOn
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        // String dependency
+        if (!dependencies || !dependencies[dynamicConfig.dependsOn]) {
+          setOptions([]);
+          setLoading(false);
+          return cleanup;
+        }
+      } else {
+        // For other types of dependsOn, we'll skip this check for now
+        // This would need more complex handling based on the actual usage
+      }
     }
 
     // Build additional params from dependencies
     const additionalParams: Record<string, string> = {};
     if (dynamicConfig.dependsOn && dependencies && dynamicConfig.filterParam) {
-      additionalParams[dynamicConfig.filterParam] =
-        dependencies[dynamicConfig.dependsOn];
+      // Handle different types of dependsOn
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        additionalParams[dynamicConfig.filterParam] =
+          dependencies[dynamicConfig.dependsOn];
+      } else {
+        // For other types of dependsOn, we'll skip this for now
+        // This would need more complex handling based on the actual usage
+      }
     }
 
     // Build URL with pagination and search parameters

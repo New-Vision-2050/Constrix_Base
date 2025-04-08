@@ -18,6 +18,7 @@ interface FormInstanceState {
   isValid: boolean;
   submitCount: number;
   validatingFields: Record<string, boolean>;
+  isEditMode?: boolean; // Add isEditMode property
 }
 
 // Define the global store that holds multiple form instances
@@ -50,6 +51,7 @@ interface FormState {
     rule: ValidationRule
   ) => void;
   hasValidatingFields: (formId: string) => boolean;
+  setEditMode: (formId: string, isEditMode: boolean) => void; // Add setEditMode action
 }
 
 // Default state for a new form instance
@@ -61,6 +63,7 @@ const getDefaultFormState = (initialValues: Record<string, any> = {}): FormInsta
   isValid: true,
   submitCount: 0,
   validatingFields: {},
+  isEditMode: false, // Default isEditMode to false
 });
 
 // Create the store with proper server snapshot caching
@@ -367,6 +370,21 @@ export const useFormStore = create<FormState>((set, get) => ({
       (isValidating) => isValidating
     );
   },
+
+  // Set edit mode for a form
+  setEditMode: (formId: string, isEditMode: boolean) => set((state: FormState) => {
+    const formState = state.forms[formId] || getDefaultFormState();
+
+    return {
+      forms: {
+        ...state.forms,
+        [formId]: {
+          ...formState,
+          isEditMode,
+        }
+      }
+    };
+  }),
 }));
 
 // Helper function to access the current form state
@@ -444,6 +462,10 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     return useFormStore.getState().hasValidatingFields(formId);
   }, [formId]);
 
+  const setEditMode = useCallback((isEditMode: boolean) => {
+    useFormStore.getState().setEditMode(formId, isEditMode);
+  }, [formId]);
+
   return {
     // State
     ...formState,
@@ -461,7 +483,8 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     incrementSubmitCount,
     setFieldValidating,
     validateFieldWithApi,
-    hasValidatingFields
+    hasValidatingFields,
+    setEditMode
   };
 };
 
