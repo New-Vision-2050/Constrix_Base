@@ -1,16 +1,14 @@
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
 import FormFieldSet from "../../../components/FormFieldSet";
-import { PersonalDataFormConfig } from "./config/personal-data-form";
 import { ConnectionDataFormConfig } from "./config/connection-data-form";
 import { IdentityDataFormConfig } from "./config/Identity-data-form";
 import { PassportDataFormConfig } from "./config/Passport-form-config";
+import PersonalDataSectionPersonalForm from "./components/personal-user-data";
 
 export default function PersonalDataSection() {
   return (
     <>
-      <FormFieldSet title="البيانات الشخصية">
-        <FormContent config={PersonalDataFormConfig()} />
-      </FormFieldSet>
+      <PersonalDataSectionPersonalForm />
 
       <FormFieldSet title="بيانات الاتصال">
         <FormContent config={ConnectionDataFormConfig()} />

@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { apiClient } from "@/config/axios-config";
 import {
   temporaryDomain,
   temporaryToken,
@@ -16,7 +16,6 @@ export const PersonalDataFormConfig = () => {
     },
     sections: [
       {
-        title: "البيانات الشخصية",
         fields: [
           {
             name: "name",
