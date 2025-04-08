@@ -1,9 +1,9 @@
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
-import FormFieldSet from "../../components/FormFieldSet";
-import { PersonalDataFormConfig } from "../config/personal-data-form";
-import { ConnectionDataFormConfig } from "../config/connection-data-form";
-import { IdentityDataFormConfig } from "../config/Identity-data-form";
-import { PassportDataFormConfig } from "../config/Passport-form-config";
+import FormFieldSet from "../../../components/FormFieldSet";
+import { PersonalDataFormConfig } from "./config/personal-data-form";
+import { ConnectionDataFormConfig } from "./config/connection-data-form";
+import { IdentityDataFormConfig } from "./config/Identity-data-form";
+import { PassportDataFormConfig } from "./config/Passport-form-config";
 
 export default function PersonalDataSection() {
   return (
