@@ -6,7 +6,7 @@ import UserProfileGridLayout from "../components/UserProfileGridLayout";
 import UserProfileActivityTimeline from "../components/activity-timeline";
 import UpcomingMeetings from "../components/upcoming-meetings";
 import UserTeams from "../components/user-teams";
-import UserProjectsData from "../components/user-projects";
+// import UserProjectsData from "../components/user-projects";
 import UserProfilePersonalData from "../components/personal-data";
 import UserProfileProfessionalData from "../components/professional-data";
 import UserProfileBankingData from "../components/Banking-data";
@@ -33,7 +33,7 @@ export default function UserDashboardModule() {
                   <UserTeams />
                 </div>
               </div>
-              <UserProjectsData />
+              {/* <UserProjectsData /> */}
             </div>
           }
           right={
