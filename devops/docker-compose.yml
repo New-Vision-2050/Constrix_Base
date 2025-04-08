@@ -16,7 +16,7 @@ services:
       - NEXT_PUBLIC_API_VERSION=v1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.rule=rule: Host(`core-stage.constrix-nv.com`) || HostRegexp(`{prefix:core-stage-[a-z0-9-]+}.constrix-nv.com`)"
+      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.rule=rule: Host(`core-${DEPLOYMENT_ID}.constrix-nv.com`) || HostRegexp(`{prefix:core-${DEPLOYMENT_ID}-[a-z0-9-]+}.constrix-nv.com`)"
       - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.entrypoints=https"
       - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.tls.certresolver=letsencrypt"
       - "traefik.http.services.nextjs-${DEPLOYMENT_ID}.loadbalancer.server.port=3000"
