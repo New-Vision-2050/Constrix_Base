@@ -21,9 +21,17 @@ apiClient.interceptors.request.use(
     if (nvToken) {
       config.headers.Authorization = `Bearer ${nvToken}`;
     }
-      const lang = getCookie("NEXT_LOCALE");
-      config.headers.Lang = lang || 'ar';
-      config.headers['Accept-Language'] = lang || 'ar';
+    
+    // Add language headers
+    const lang = getCookie("NEXT_LOCALE");
+    config.headers.Lang = lang || 'ar';
+    config.headers['Accept-Language'] = lang || 'ar';
+    
+    // Add current domain to headers
+    if (typeof window !== 'undefined') {
+      config.headers['X-Domain'] = window.location.hostname;
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
