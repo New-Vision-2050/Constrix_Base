@@ -2,6 +2,10 @@ import { baseURL } from "@/config/axios-config";
 import { LoginWay } from "@/modules/settings/types/LoginWay";
 import LoginWaysExecutionBtn from "./ExecutionBtn";
 import TableStatus from "./TableStatus";
+import Execution from "@/app/[locale]/(main)/companies/cells/execution";
+import {
+    loginWayFormConfig
+} from "@/modules/settings/components/tabs/IdentifierSetting/tabs/SettingTab-LoginWays/components/form/config";
 
 // Create a component that uses the translations
 export const LoginWaysConfig = () => {
@@ -43,7 +47,7 @@ export const LoginWaysConfig = () => {
         key: "id",
         label: "الأجراء",
         render: (_: unknown, row: LoginWay) => (
-          <LoginWaysExecutionBtn id={row.id} />
+          <Execution id={row.id}  formConfig={loginWayFormConfig}/>
         ),
       },
     ],

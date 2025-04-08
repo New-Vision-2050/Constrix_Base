@@ -138,9 +138,33 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       field.dynamicOptions;
 
     // Skip if we have a dependency but no value for it
-    if (dependsOn && (!dependencyValues || !dependencyValues[dependsOn])) {
-      setOptions([]);
-      return;
+    if (dependsOn) {
+      // Handle different types of dependsOn
+      if (typeof dependsOn === 'string') {
+        // String dependency
+        if (!dependencyValues || !dependencyValues[dependsOn]) {
+          setOptions([]);
+          return;
+        }
+      } else if (Array.isArray(dependsOn)) {
+        // Array of dependencies - if any dependency is missing, skip
+        const missingDependency = dependsOn.some(
+          (dep) => !dependencyValues || !dependencyValues[dep.field]
+        );
+        if (missingDependency) {
+          setOptions([]);
+          return;
+        }
+      } else {
+        // Object with field keys - if any dependency is missing, skip
+        const missingDependency = Object.keys(dependsOn).some(
+          (field) => !dependencyValues || !dependencyValues[field]
+        );
+        if (missingDependency) {
+          setOptions([]);
+          return;
+        }
+      }
     }
 
     try {
@@ -156,8 +180,26 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       }
 
       // Add dependency filter if configured
-      if (dependsOn && filterParam && dependencyValues[dependsOn]) {
-        params.append(filterParam, dependencyValues[dependsOn]);
+      if (dependsOn && filterParam) {
+        if (typeof dependsOn === 'string' && dependencyValues[dependsOn]) {
+          params.append(filterParam, dependencyValues[dependsOn]);
+        } else if (Array.isArray(dependsOn)) {
+          // Handle array of dependencies
+          dependsOn.forEach(dep => {
+            if (dependencyValues[dep.field]) {
+              const paramName = dep.paramName || dep.field;
+              params.append(paramName, dependencyValues[dep.field]);
+            }
+          });
+        } else {
+          // Handle object with field keys
+          Object.entries(dependsOn).forEach(([field, config]) => {
+            if (dependencyValues[field]) {
+              const paramName = config.paramName || field;
+              params.append(paramName, dependencyValues[field]);
+            }
+          });
+        }
       }
 
       // Add pagination parameters if enabled

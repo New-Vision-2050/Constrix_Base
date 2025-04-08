@@ -32,7 +32,7 @@ export function SetRoleForm() {
   });
 
   // Permission groups
-  const permissionGroups = {
+  const permissionGroups: Record<string, string[]> = {
     users: [
       "permissions.users.view",
       "permissions.users.create",
@@ -239,9 +239,12 @@ export function SetRoleForm() {
                 onChange: (value: boolean, values: Record<string, any>) => {
                   // Update all permissions in the group
                   const newValues = { ...values };
-                  permissionGroups[group].forEach((perm) => {
-                    newValues[perm] = value;
-                  });
+                  // Ensure group is a valid key in permissionGroups
+                  if (group in permissionGroups) {
+                    permissionGroups[group].forEach((perm) => {
+                      newValues[perm] = value;
+                    });
+                  }
 
                   // Update form values
                   setFormValues(newValues);
