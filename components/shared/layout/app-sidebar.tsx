@@ -111,7 +111,7 @@ export function AppSidebar({
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        <NavCompanies projects={data.projects} isCentral={isCentral} />
+        <NavCompanies projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarFooterContent />

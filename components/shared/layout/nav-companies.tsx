@@ -11,9 +11,7 @@ import Link from "next/link";
 
 export function NavCompanies({
   projects,
-  isCentral,
 }: {
-  isCentral: boolean;
   projects: {
     name: string;
     url: string;
