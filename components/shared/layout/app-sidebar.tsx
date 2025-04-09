@@ -67,6 +67,13 @@ export function AppSidebar({
     ],
     projects: [
       {
+        name: t("Sidebar.Dashboard"),
+        url: ROUTER.DASHBOARD,
+        icon: CompaniesIcon,
+        isActive: pageName === ROUTER.DASHBOARD,
+        central: true,
+      },
+      {
         name: t("Sidebar.Companies"),
         url: ROUTER.COMPANIES,
         icon: CompaniesIcon,

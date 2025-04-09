@@ -69,7 +69,7 @@ const ValidateEmailPhase = ({
               maxAge: 7 * 24 * 60 * 60,
               path: "/",
             });
-            router.push(ROUTER.DASHBOARD);
+            router.push(ROUTER.COMPANIES);
             return;
           }
           switch (nextStep) {

@@ -100,7 +100,7 @@
   },
   "Companies": {
     "Companies": "الشركات",
-    "Edit":"تعديل",
+    "Edit": "تعديل",
     "Email": "البريد الاليكتروني",
     "CompanyType": "نوع الشركة",
     "CompanySection": "نشاط الشركه",
@@ -120,11 +120,12 @@
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
   },
   "Sidebar": {
+    "Dashboard": "الملف الشخصي",
     "Companies": "الشركات",
     "Users": "المستخدمين",
-    "Settings":"اعدادات النظام",
+    "Settings": "اعدادات النظام",
     "Welcome": "مرحبا",
-    "CompanyName" : "نيو فيجن"
+    "CompanyName": "نيو فيجن"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي"
