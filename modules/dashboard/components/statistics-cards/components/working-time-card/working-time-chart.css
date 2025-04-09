@@ -1,0 +1,3 @@
+.apexcharts-donut {
+  background: transparent !important; /* ✅ Removes unwanted white circle */
+}
