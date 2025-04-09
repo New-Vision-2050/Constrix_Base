@@ -40,6 +40,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log('in interceptor.... ')
     const status = error.response?.status;
     const errorMessageKey = getErrorMessage(error);
 

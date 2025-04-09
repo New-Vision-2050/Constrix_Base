@@ -19,7 +19,18 @@ import { usePathname } from "next/navigation";
 import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  isCentral: boolean;
+  name?: string;
+  mainLogo?: string;
+}
+
+export function AppSidebar({
+  isCentral,
+  name,
+  mainLogo,
+  ...props
+}: AppSidebarProps) {
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
@@ -60,18 +71,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: ROUTER.COMPANIES,
         icon: CompaniesIcon,
         isActive: pageName === ROUTER.COMPANIES,
+        central: false,
       },
       {
         name: t("Sidebar.Users"),
         url: ROUTER.USERS,
         icon: UserIcon,
         isActive: pageName === ROUTER.USERS,
+        central: false,
       },
       {
         name: t("Sidebar.Settings"),
         url: ROUTER.SETTINGS,
         icon: SettingsIcon,
         isActive: pageName === ROUTER.SETTINGS,
+        central: true,
       },
     ],
   };
@@ -80,10 +94,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" side={sidebarSide} {...props}>
       <SidebarHeader className=" pt-10">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
-        <SidebarHeaderContent />
+        <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        <NavCompanies projects={data.projects} />
+        <NavCompanies projects={data.projects} isCentral={isCentral} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarFooterContent />

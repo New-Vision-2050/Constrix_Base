@@ -13,7 +13,7 @@ export default function ChatSettingsTab() {
   // return component ui.
   return (
     <Tabs
-      defaultValue="account"
+      defaultValue="ChatSettingsTab_email"
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >

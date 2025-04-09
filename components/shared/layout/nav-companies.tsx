@@ -11,20 +11,31 @@ import Link from "next/link";
 
 export function NavCompanies({
   projects,
+  isCentral,
 }: {
+  isCentral: boolean;
   projects: {
     name: string;
     url: string;
-    icon: React.ElementType; // Most permissive type for components
+    icon: React.ComponentType<{ additionalClass?: string }>;
     isActive: boolean;
+    central: boolean;
   }[];
 }) {
+  const allProject = isCentral
+    ? projects
+    : projects.filter((project) => !!project.central);
+
   return (
     <SidebarGroup>
       <SidebarMenu>
-        {projects.map((item) => (
+        {allProject.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild tooltip={item.name} className={cn(item.isActive && 'bg-primary hover:bg-primary')}>
+            <SidebarMenuButton
+              asChild
+              tooltip={item.name}
+              className={cn(item.isActive && "bg-primary hover:bg-primary")}
+            >
               <Link href={item.url} className="pr-5 flex gap-5">
                 <item.icon />
                 <span>{item.name}</span>
