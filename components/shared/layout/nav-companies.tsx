@@ -17,7 +17,7 @@ export function NavCompanies({
   projects: {
     name: string;
     url: string;
-    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    icon: React.ComponentType<{ additionalClass?: string }>;
     isActive: boolean;
     central: boolean;
   }[];
