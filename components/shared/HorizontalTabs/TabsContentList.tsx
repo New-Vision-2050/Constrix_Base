@@ -1,6 +1,6 @@
+import { SystemTab } from "@/modules/settings/types/SystemTab";
 import { TabsContent } from "@radix-ui/react-tabs";
 
-import { SystemTab } from "../types/SystemTab";
 
 /**
  * TabsContentList Component
