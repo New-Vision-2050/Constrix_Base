@@ -42,6 +42,42 @@ export function AppSidebar({
   const sidebarSide = isRtl ? "right" : "left";
 
   // This is sample data with translated names
+
+  const projects = isCentral
+    ? [
+        {
+          name: t("Sidebar.Companies"),
+          url: ROUTER.COMPANIES,
+          icon: CompaniesIcon,
+          isActive: pageName === ROUTER.COMPANIES,
+        },
+        {
+          name: t("Sidebar.Users"),
+          url: ROUTER.USERS,
+          icon: UserIcon,
+          isActive: pageName === ROUTER.USERS,
+        },
+        {
+          name: t("Sidebar.Settings"),
+          url: ROUTER.SETTINGS,
+          icon: SettingsIcon,
+          isActive: pageName === ROUTER.SETTINGS,
+        },
+      ]
+    : [
+        {
+          name: t("Sidebar.Dashboard"),
+          url: ROUTER.DASHBOARD,
+          icon: CompaniesIcon,
+          isActive: pageName === ROUTER.DASHBOARD,
+        },
+        {
+          name: t("Sidebar.Settings"),
+          url: ROUTER.SETTINGS,
+          icon: SettingsIcon,
+          isActive: pageName === ROUTER.SETTINGS,
+        },
+      ];
   const data = {
     user: {
       name: "shadcn",
@@ -65,36 +101,7 @@ export function AppSidebar({
         plan: "Free",
       },
     ],
-    projects: [
-      {
-        name: t("Sidebar.Dashboard"),
-        url: ROUTER.DASHBOARD,
-        icon: CompaniesIcon,
-        isActive: pageName === ROUTER.DASHBOARD,
-        central: true,
-      },
-      {
-        name: t("Sidebar.Companies"),
-        url: ROUTER.COMPANIES,
-        icon: CompaniesIcon,
-        isActive: pageName === ROUTER.COMPANIES,
-        central: false,
-      },
-      {
-        name: t("Sidebar.Users"),
-        url: ROUTER.USERS,
-        icon: UserIcon,
-        isActive: pageName === ROUTER.USERS,
-        central: false,
-      },
-      {
-        name: t("Sidebar.Settings"),
-        url: ROUTER.SETTINGS,
-        icon: SettingsIcon,
-        isActive: pageName === ROUTER.SETTINGS,
-        central: true,
-      },
-    ],
+    projects,
   };
 
   return (

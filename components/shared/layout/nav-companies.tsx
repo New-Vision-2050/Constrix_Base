@@ -19,17 +19,12 @@ export function NavCompanies({
     url: string;
     icon: React.ComponentType<{ additionalClass?: string }>;
     isActive: boolean;
-    central: boolean;
   }[];
 }) {
-  const allProject = isCentral
-    ? projects
-    : projects.filter((project) => !!project.central);
-
   return (
     <SidebarGroup>
       <SidebarMenu>
-        {allProject.map((item) => (
+        {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton
               asChild
