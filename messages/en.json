@@ -115,6 +115,7 @@
     "Delete": "Delete (Archive)"
   },
   "Sidebar": {
+    "Dashboard": "Profile",
     "Companies": "Companies",
     "Users": "Users",
     "settings": "System Settings",
