@@ -68,7 +68,7 @@ const ValidatePhonePhase = ({
               maxAge: 7 * 24 * 60 * 60,
               path: "/",
             });
-            router.push(ROUTER.COMPANIES);
+            router.push(ROUTER.DASHBOARD);
             return;
           }
           const nextStep = data.payload.login_way.step?.login_option;
