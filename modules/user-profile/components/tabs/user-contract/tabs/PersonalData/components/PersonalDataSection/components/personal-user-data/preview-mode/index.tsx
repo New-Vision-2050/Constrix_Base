@@ -25,9 +25,25 @@ export default function UserProfilePersonalDataReview() {
       </div>
 
       {/* Second row */}
-      <div className="p-2">Item 4</div>
-      <div className="p-2">Item 5</div>
-      <div className="p-2">Item 6</div>
+      <div className="p-2">
+        <PreviewTextField valid={true} label="الجنس" value="ذكر" isSelect />
+      </div>
+      <div className="p-2">
+        <PreviewTextField
+          valid={true}
+          label="تاريخ الميلاد"
+          value="05-02-1991"
+          isDate
+        />
+      </div>
+      <div className="p-2">
+        <PreviewTextField
+          valid={false}
+          label="تاريخ الميلاد (هجري)"
+          value="05-02-1991"
+          isDate
+        />
+      </div>
 
       {/* Third row - full width */}
       <div className="p-2 col-span-3">

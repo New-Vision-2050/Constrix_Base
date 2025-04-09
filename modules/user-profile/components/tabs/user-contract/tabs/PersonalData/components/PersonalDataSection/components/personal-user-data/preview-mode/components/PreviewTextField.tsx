@@ -3,19 +3,30 @@ import { Input } from "@/modules/table/components/ui/input";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { useLocale } from "next-intl";
 import { Asterisk, CircleCheckIcon } from "lucide-react";
+import ChevronDownIcon from "@/public/icons/chevron-down-icon";
+import CalendarRangeIcon from "@/public/icons/calendar-range";
 
 type PropsT = {
   value: string;
   valid: boolean;
-  select?: boolean;
+  isDate?: boolean;
+  isSelect?: boolean;
   label?: string;
   required?: boolean;
 };
 
-const PreviewTextField = ({ label, value, valid, required }: PropsT) => {
+const PreviewTextField = ({
+  label,
+  value,
+  isDate,
+  isSelect,
+  valid,
+  required,
+}: PropsT) => {
   const locale = useLocale();
   const spanDir = locale !== "ar" ? "right-[15px]" : "left-[15px]";
-  const labelDir = locale === "ar" ? "right-[15px]" : "left-[15px]";
+  const isRTL = locale === "ar";
+  const labelDir = isRTL ? "right-[15px]" : "left-[15px]";
 
   return (
     <div className="relative">
@@ -31,6 +42,27 @@ const PreviewTextField = ({ label, value, valid, required }: PropsT) => {
           {required === true && <Asterisk size={"12px"} color="red" />}
         </span>
       )}
+      {/* date */}
+      {isDate && (
+        <span
+          className={`absolute top-[8px] ${
+            isRTL ? "left-[50px]" : "right-[50px]"
+          }`}
+        >
+          <CalendarRangeIcon />
+        </span>
+      )}
+      {/* select icon */}
+      {isSelect && (
+        <span
+          className={`absolute top-[8px] ${
+            isRTL ? "left-[50px]" : "right-[50px]"
+          }`}
+        >
+          <ChevronDownIcon />
+        </span>
+      )}
+      {/* validation icon */}
       <span className={`absolute top-[8px] ${spanDir}`}>
         {valid ? (
           <CircleCheckIcon color="green" />
