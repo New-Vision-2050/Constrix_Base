@@ -1,10 +1,10 @@
 import { useState } from "react";
-import UserProfilePersonalDataEditForm from "./edit-mode";
-import FormFieldSet from "../../../../../components/FormFieldSet";
-import FieldSetSecondTitle from "../FieldSetSecondTitle";
-import UserProfilePersonalDataReview from "./preview-mode";
+import FormFieldSet from "../../../../../../components/FormFieldSet";
+import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
+import UserProfileConnectionDataEditForm from "./edit-mode";
+import UserProfileConnectionDataReview from "./preview-mode";
 
-export default function PersonalDataSectionPersonalForm() {
+export default function ConnectionDataSectionPersonalForm() {
   // declare and define component state and vars
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -14,15 +14,15 @@ export default function PersonalDataSectionPersonalForm() {
 
   return (
     <FormFieldSet
-      title="البيانات الشخصية"
+      title="البيانات الاتصال"
       secondTitle={
         <FieldSetSecondTitle mode={mode} handleEditClick={handleEditClick} />
       }
     >
       {mode === "Preview" ? (
-        <UserProfilePersonalDataReview />
+        <UserProfileConnectionDataReview />
       ) : (
-        <UserProfilePersonalDataEditForm />
+        <UserProfileConnectionDataEditForm />
       )}
     </FormFieldSet>
   );

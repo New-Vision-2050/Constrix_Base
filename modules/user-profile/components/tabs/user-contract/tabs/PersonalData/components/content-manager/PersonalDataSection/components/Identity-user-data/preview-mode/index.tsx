@@ -1,4 +1,4 @@
-import PreviewTextField from "../../PreviewTextField";
+import PreviewTextField from "../../../../../../../components/PreviewTextField";
 
 export default function UserProfileIdentityDataReview() {
   return (

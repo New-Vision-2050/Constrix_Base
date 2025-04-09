@@ -1,10 +1,10 @@
 import { useState } from "react";
-import FormFieldSet from "../../../../../components/FormFieldSet";
-import FieldSetSecondTitle from "../FieldSetSecondTitle";
-import UserProfilePassportDataReview from "./preview-mode";
-import UserProfilePassportDataEditForm from "./edit-mode";
+import FormFieldSet from "../../../../../../components/FormFieldSet";
+import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
+import UserProfileConnectionDataEditForm from "./edit-mode";
+import UserProfileIdentityDataReview from "./preview-mode";
 
-export default function PassportDataSectionPersonalForm() {
+export default function IdentityDataSectionPersonalForm() {
   // declare and define component state and vars
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -20,9 +20,9 @@ export default function PassportDataSectionPersonalForm() {
       }
     >
       {mode === "Preview" ? (
-        <UserProfilePassportDataReview />
+        <UserProfileIdentityDataReview />
       ) : (
-        <UserProfilePassportDataEditForm />
+        <UserProfileConnectionDataEditForm />
       )}
     </FormFieldSet>
   );

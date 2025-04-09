@@ -1,6 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import PreviewTextField from "../../PreviewTextField";
+import PreviewTextField from "../../../../../../../components/PreviewTextField";
 
 export default function UserProfilePersonalDataReview() {
   return (
