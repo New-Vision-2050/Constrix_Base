@@ -13,7 +13,7 @@ export default function TabsManager() {
   // return component ui.
   return (
     <Tabs
-      defaultValue="account"
+      defaultValue="SystemRoles"
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >

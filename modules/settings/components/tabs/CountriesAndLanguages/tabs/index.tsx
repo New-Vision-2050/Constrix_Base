@@ -13,7 +13,7 @@ export default function CountriesAndLanguagesSettingsTab() {
   // return component ui.
   return (
     <Tabs
-      defaultValue="account"
+      defaultValue="countries_and_languages_tabs_countries"
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >

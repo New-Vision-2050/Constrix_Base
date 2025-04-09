@@ -13,7 +13,7 @@ export default function IdentifierSettingTab() {
   // return component ui.
   return (
     <Tabs
-      defaultValue="account"
+      defaultValue="IdentifierSettingTab_Settings"
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >
