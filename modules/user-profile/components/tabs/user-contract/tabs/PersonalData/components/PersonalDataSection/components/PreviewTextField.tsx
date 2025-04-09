@@ -5,10 +5,12 @@ import { useLocale } from "next-intl";
 import { Asterisk, CircleCheckIcon } from "lucide-react";
 import ChevronDownIcon from "@/public/icons/chevron-down-icon";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
+import pdfImg from "@/assets/icons/PDF.png";
 
 type PropsT = {
   value: string;
   valid: boolean;
+  isPdf?: boolean;
   isDate?: boolean;
   isSelect?: boolean;
   label?: string;
@@ -18,6 +20,7 @@ type PropsT = {
 const PreviewTextField = ({
   label,
   value,
+  isPdf,
   isDate,
   isSelect,
   valid,
@@ -30,7 +33,10 @@ const PreviewTextField = ({
 
   return (
     <div className="relative">
-      <div className="flex w-full">
+      <div className="flex w-full items-center gap-1">
+        {isPdf && (
+          <img src={pdfImg.src} width={"25px"} height={"25px"} alt="pdf file" />
+        )}
         <Input disabled type="text" value={value} />
       </div>
       {/* label */}

@@ -14,7 +14,7 @@ export default function FormFieldSet(props: PropsT) {
   
   return (
     <div className="relative">
-      <fieldset className="border border-gray-300 rounded-2xl p-6 shadow-sm">
+      <fieldset className="border border-gray-500 rounded-2xl p-6 shadow-sm">
         <legend className="text-lg font-semibold px-2">{title}</legend>
         {children}
       </fieldset>

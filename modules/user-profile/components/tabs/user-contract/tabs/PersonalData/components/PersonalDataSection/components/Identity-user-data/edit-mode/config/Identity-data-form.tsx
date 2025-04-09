@@ -1,14 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { apiClient } from "@/config/axios-config";
 import {
   temporaryDomain,
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const ConnectionDataFormConfig = () => {
-  const ConnectionFormConfig: FormConfig = {
-    formId: "Connection-data-form",
-    title: "البيانات الاتصال",
+export const IdentityDataFormConfig = () => {
+  const IdentityFormConfig: FormConfig = {
+    formId: "Identity-data-form",
+    title: "بيانات الهوية",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,20 +16,32 @@ export const ConnectionDataFormConfig = () => {
     },
     sections: [
       {
-        title: "البيانات الاتصال",
+        title: "بيانات الهوية",
         fields: [
           {
-            name: "phone",
-            label: "رقم الجوال",
+            name: "IdentityNumber",
+            label: "رقم رقم الهوية",
             type: "text",
-            placeholder: "رقم الجوال",
+            placeholder: "رقم رقم الهوية",
           },
           {
-            name: "email",
-            label: "البريد الالكتروني",
+            label: "رقم الاقامة",
             type: "text",
-            placeholder: "البريد الالكتروني",
-          }
+            name: "IqamNumber",
+            placeholder: "رقم الاقامة",
+          },
+          {
+            label: "رقم الدخول",
+            type: "date",
+            name: "endDate",
+            placeholder: "رقم الدخول",
+          },
+          {
+            label: "رقم جواز السفر",
+            type: "text",
+            name: "passportNumber",
+            placeholder: "رقم جواز السفر",
+          },
         ],
       },
     ],
@@ -75,5 +87,5 @@ export const ConnectionDataFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return ConnectionFormConfig;
+  return IdentityFormConfig;
 };

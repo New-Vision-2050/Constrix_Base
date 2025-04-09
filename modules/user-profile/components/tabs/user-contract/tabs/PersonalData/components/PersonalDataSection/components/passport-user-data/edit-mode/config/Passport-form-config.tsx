@@ -1,14 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { apiClient } from "@/config/axios-config";
 import {
   temporaryDomain,
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const IdentityDataFormConfig = () => {
-  const IdentityFormConfig: FormConfig = {
-    formId: "Identity-data-form",
-    title: "بيانات الهوية",
+export const PassportDataFormConfig = () => {
+  const PassportFormConfig: FormConfig = {
+    formId: "Passport-data-form",
+    title: "بيانات جواز السفر",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,31 +16,31 @@ export const IdentityDataFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات الهوية",
+        title: "بيانات جواز السفر",
         fields: [
           {
-            name: "IdentityNumber",
-            label: "رقم رقم الهوية",
+            name: "passportNumber",
+            label: "رقم جواز السغر",
             type: "text",
-            placeholder: "رقم رقم الهوية",
+            placeholder: "رقم جواز السغر",
           },
           {
-            label: "رقم الاقامة",
-            type: "text",
-            name: "IqamNumber",
-            placeholder: "رقم الاقامة",
+            label: "تاريخ الأستلام",
+            type: "date",
+            name: "dateOfReceipt",
+            placeholder: "تاريخ الأستلام",
           },
           {
-            label: "رقم الدخول",
+            label: "تاريخ الأنتهاء",
             type: "date",
             name: "endDate",
-            placeholder: "رقم الدخول",
+            placeholder: "تاريخ الأنتهاء",
           },
           {
-            label: "رقم جواز السفر",
-            type: "text",
-            name: "passportNumber",
-            placeholder: "رقم جواز السفر",
+            label: "ارفاق الهوية",
+            type: "image",
+            name: "passport",
+            placeholder: "ارفاق الهوية",
           },
         ],
       },
@@ -87,5 +87,5 @@ export const IdentityDataFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return IdentityFormConfig;
+  return PassportFormConfig;
 };

@@ -1,14 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { apiClient } from "@/config/axios-config";
 import {
   temporaryDomain,
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const PassportDataFormConfig = () => {
-  const PassportFormConfig: FormConfig = {
-    formId: "Passport-data-form",
-    title: "بيانات جواز السفر",
+export const ConnectionDataFormConfig = () => {
+  const ConnectionFormConfig: FormConfig = {
+    formId: "Connection-data-form",
+    title: "البيانات الاتصال",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,31 +16,18 @@ export const PassportDataFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات جواز السفر",
         fields: [
           {
-            name: "passportNumber",
-            label: "رقم جواز السغر",
+            name: "phone",
+            label: "رقم الجوال",
             type: "text",
-            placeholder: "رقم جواز السغر",
+            placeholder: "رقم الجوال",
           },
           {
-            label: "تاريخ الأستلام",
-            type: "date",
-            name: "dateOfReceipt",
-            placeholder: "تاريخ الأستلام",
-          },
-          {
-            label: "تاريخ الأنتهاء",
-            type: "date",
-            name: "endDate",
-            placeholder: "تاريخ الأنتهاء",
-          },
-          {
-            label: "ارفاق الهوية",
-            type: "image",
-            name: "passport",
-            placeholder: "ارفاق الهوية",
+            name: "email",
+            label: "البريد الالكتروني",
+            type: "text",
+            placeholder: "البريد الالكتروني",
           },
         ],
       },
@@ -87,5 +74,5 @@ export const PassportDataFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return PassportFormConfig;
+  return ConnectionFormConfig;
 };

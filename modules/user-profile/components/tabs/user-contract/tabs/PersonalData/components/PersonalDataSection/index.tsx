@@ -1,26 +1,18 @@
-import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
-import FormFieldSet from "../../../components/FormFieldSet";
-import { ConnectionDataFormConfig } from "./config/connection-data-form";
-import { IdentityDataFormConfig } from "./config/Identity-data-form";
-import { PassportDataFormConfig } from "./config/Passport-form-config";
 import PersonalDataSectionPersonalForm from "./components/personal-user-data";
+import ConnectionDataSectionPersonalForm from "./components/connection-user-data";
+import IdentityDataSectionPersonalForm from "./components/Identity-user-data";
+import PassportDataSectionPersonalForm from "./components/passport-user-data";
 
 export default function PersonalDataSection() {
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <PersonalDataSectionPersonalForm />
 
-      <FormFieldSet title="بيانات الاتصال">
-        <FormContent config={ConnectionDataFormConfig()} />
-      </FormFieldSet>
+      <ConnectionDataSectionPersonalForm />
 
-      <FormFieldSet title="بيانات الهوية">
-        <FormContent config={IdentityDataFormConfig()} />
-      </FormFieldSet>
+      <IdentityDataSectionPersonalForm />
 
-      <FormFieldSet title="بيانات جواز السفر">
-        <FormContent config={PassportDataFormConfig()} />
-      </FormFieldSet>
-    </>
+      <PassportDataSectionPersonalForm />
+    </div>
   );
 }
