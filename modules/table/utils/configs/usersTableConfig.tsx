@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
-import {companyUserFormConfig} from "@/modules/form-builder";
+import { companyUserFormConfig, formConfig } from "@/modules/form-builder";
 
 // Define types for the company data
 interface CompanyData {
@@ -93,10 +93,7 @@ export const UsersConfig = () => {
           return (
             <div className="line-clamp-3 ">
               {companies.map((company) => (
-                <div
-                  key={company.id}
-                  className="flex items-center gap-x-1"
-                >
+                <div key={company.id} className="flex items-center gap-x-1">
                   {Array.from({ length: 3 }).map((_, index) => {
                     // Find role matching index + 1
                     const role =
@@ -117,10 +114,7 @@ export const UsersConfig = () => {
                         )}
                       </span>
                     ) : (
-                      <span
-    key={index}
-    className="w-5 h-5 flex items-center"
-    />
+                      <span key={index} className="w-5 h-5 flex items-center" />
                     );
                   })}
                 </div>
@@ -134,11 +128,6 @@ export const UsersConfig = () => {
         label: t("Companies.DataStatus"),
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
-      },
-      {
-        key: "id",
-        label: t("Companies.Actions"),
-        render: (_: unknown, row: UsersData) => <Execution id={row.id} formConfig={companyUserFormConfig}/>,
       },
     ],
     allSearchedFields: [
@@ -175,7 +164,7 @@ export const UsersConfig = () => {
         key: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال"
+          placeholder: "البريد الإليكتروني / الجوال",
         },
       },
     ],
@@ -190,5 +179,6 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    formConfig: companyUserFormConfig,
   };
 };

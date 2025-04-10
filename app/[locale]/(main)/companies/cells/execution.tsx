@@ -40,7 +40,7 @@ export type ActionState = {
 
 const Execution = ({
   id,
-  executions,
+  executions = [],
   formConfig,
   buttonLabel = "Actions",
   tableName = "",
