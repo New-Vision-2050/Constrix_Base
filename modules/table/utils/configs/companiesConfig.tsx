@@ -4,7 +4,10 @@ import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
-import {companiesFormConfig} from "@/modules/form-builder";
+import { companiesFormConfig } from "@/modules/form-builder";
+import EnterIcon from "@/public/icons/enter";
+import GearIcon from "@/public/icons/gear";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 
 // Define types for the company data
 interface CompanyData {
@@ -55,17 +58,12 @@ export const CompaniesConfig = () => {
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
-       {
+      {
         key: "is_active",
         label: t("Companies.Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
           <TheStatus theStatus={value} id={row.id} />
         ),
-      },
-      {
-        key: "id",
-        label: t("Companies.Actions"),
-        render: (_: unknown, row: CompanyData) => <Execution id={row.id} formConfig={companiesFormConfig} />,
       },
     ],
     allSearchedFields: [
@@ -135,5 +133,24 @@ export const CompaniesConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    formConfig: companiesFormConfig,
+    executions: [
+      {
+        label: t("Companies.LoginAsManager"),
+        icon: <EnterIcon className="w-4 h-4" />,
+        action: () => console.log("Login as manager clicked"),
+        position: "after",
+      },
+      {
+        label: t("Companies.PackageSettings"),
+        icon: <GearIcon className="w-4 h-4" />,
+        action: "packageSettings",
+        dialogComponent: DeleteConfirmationDialog,
+        dialogProps: {
+          title: "Package Settings",
+          shouldReloadTable: true,
+        },
+      },
+    ],
   };
 };
