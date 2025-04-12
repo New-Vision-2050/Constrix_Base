@@ -5,10 +5,10 @@ import {
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const IqamaDataFormConfig = () => {
-  const iqamaDataFormConfig: FormConfig = {
-    formId: "iqama-data-form",
-    title: "بيانات الاقامة",
+export const WorkLicenseFormConfig = () => {
+  const workLicenseFormConfig: FormConfig = {
+    formId: "ConnectionInformation-data-form",
+    title: "بيانات رخصة العمل",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,31 +16,30 @@ export const IqamaDataFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات الاقامة",
         fields: [
           {
-            name: "iqamaNumber",
-            label: "رقم الاقامة",
+            name: "licenseNumber",
+            label: "رقم رخصة العمل",
             type: "text",
-            placeholder: "رقم الاقامة",
+            placeholder: "رقم رخصة العمل",
           },
           {
-            name: "exportDate",
-            label: "تاريخ الاصدار",
-            type: "date",
-            placeholder: "تاريخ الاصدار",
+            name: "start_date",
+            label: "تاريخ الدخول",
+            type: "text",
+            placeholder: "تاريخ الدخول",
           },
           {
-            name: "endDate",
+            name: "end_date",
             label: "تاريخ الانتهاء",
-            type: "date",
+            type: "text",
             placeholder: "تاريخ الانتهاء",
           },
           {
             name: "attachment",
-            label: "ارفاق رقم الاقامة",
+            label: "ارفاق رخصة العمل",
             type: "image",
-            placeholder: "ارفاق رقم الاقامة",
+            placeholder: "ارفاق رخصة العمل",
           },
         ],
       },
@@ -87,5 +86,5 @@ export const IqamaDataFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return iqamaDataFormConfig;
+  return workLicenseFormConfig;
 };

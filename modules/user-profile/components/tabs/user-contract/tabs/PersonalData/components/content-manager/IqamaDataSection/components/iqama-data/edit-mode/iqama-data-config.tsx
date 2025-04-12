@@ -5,10 +5,10 @@ import {
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const BorderNumberFormConfig = () => {
-  const borderNumberFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
-    title: "بيانات رقم الحدود - الدخول",
+export const IqamaDataFormConfig = () => {
+  const iqamaDataFormConfig: FormConfig = {
+    formId: "iqama-data-form",
+    title: "بيانات الاقامة",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,31 +16,30 @@ export const BorderNumberFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات رقم الحدود - الدخول",
         fields: [
           {
-            name: "borderNumber",
-            label: "رقم الحدود",
+            name: "iqamaNumber",
+            label: "رقم الاقامة",
             type: "text",
-            placeholder: "رقم الحدود",
+            placeholder: "رقم الاقامة",
           },
           {
-            name: "start_data",
-            label: "تاريخ الدخول",
+            name: "exportDate",
+            label: "تاريخ الاصدار",
             type: "date",
-            placeholder: "تاريخ الدخول",
+            placeholder: "تاريخ الاصدار",
           },
           {
-            name: "end_date",
+            name: "endDate",
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
           },
           {
             name: "attachment",
-            label: "ارفاق رقم الحدود",
-            type: "text",
-            placeholder: "ارفاق رقم الحدود",
+            label: "ارفاق رقم الاقامة",
+            type: "image",
+            placeholder: "ارفاق رقم الاقامة",
           },
         ],
       },
@@ -87,5 +86,5 @@ export const BorderNumberFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return borderNumberFormConfig;
+  return iqamaDataFormConfig;
 };

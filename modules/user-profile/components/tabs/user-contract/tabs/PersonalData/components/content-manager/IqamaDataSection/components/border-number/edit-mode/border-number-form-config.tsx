@@ -5,10 +5,10 @@ import {
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const WorkLicenseFormConfig = () => {
-  const workLicenseFormConfig: FormConfig = {
+export const BorderNumberFormConfig = () => {
+  const borderNumberFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "بيانات رخصة العمل",
+    title: "بيانات رقم الحدود - الدخول",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,31 +16,30 @@ export const WorkLicenseFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات رخصة العمل",
         fields: [
           {
-            name: "licenseNumber",
-            label: "رقم رخصة العمل",
+            name: "borderNumber",
+            label: "رقم الحدود",
             type: "text",
-            placeholder: "رقم رخصة العمل",
+            placeholder: "رقم الحدود",
           },
           {
-            name: "start_date",
+            name: "start_data",
             label: "تاريخ الدخول",
-            type: "text",
+            type: "date",
             placeholder: "تاريخ الدخول",
           },
           {
             name: "end_date",
             label: "تاريخ الانتهاء",
-            type: "text",
+            type: "date",
             placeholder: "تاريخ الانتهاء",
           },
           {
             name: "attachment",
-            label: "ارفاق رخصة العمل",
-            type: "image",
-            placeholder: "ارفاق رخصة العمل",
+            label: "ارفاق رقم الحدود",
+            type: "text",
+            placeholder: "ارفاق رقم الحدود",
           },
         ],
       },
@@ -87,5 +86,5 @@ export const WorkLicenseFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return workLicenseFormConfig;
+  return borderNumberFormConfig;
 };
