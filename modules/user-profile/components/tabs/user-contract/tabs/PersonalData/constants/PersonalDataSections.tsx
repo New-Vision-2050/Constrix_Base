@@ -1,11 +1,11 @@
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
 import UserIcon from "@/public/icons/user";
 import PersonalDataSection from "../components/content-manager/PersonalDataSection";
-import BankingDataSection from "../components/content-manager/BankingDataSection";
 import LandmarkIcon from "@/public/icons/landmark";
 import PhoneIcon from "@/public/icons/phone-icon";
 import BackpackIcon from "@/public/icons/backpack";
 import IqamaDataSection from "../components/content-manager/IqamaDataSection";
+import BankingDataSection from "../components/content-manager/BankingDataSection";
 
 export const PersonalDataSections: UserProfileNestedTab[] = [
   {

@@ -16,7 +16,6 @@ export const BankingDataFormConfig = () => {
     },
     sections: [
       {
-        title: "البيانات البنكية",
         fields: [
           {
             name: "",

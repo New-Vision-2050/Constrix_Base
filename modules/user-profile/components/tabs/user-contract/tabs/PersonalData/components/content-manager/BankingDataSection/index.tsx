@@ -1,6 +1,5 @@
-import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
-import { BankingDataFormConfig } from "./config/BankingFormConfig";
 import { Button } from "@/components/ui/button";
+import BankSection from "./bank-data";
 
 export default function BankingDataSection() {
   return (
@@ -9,7 +8,8 @@ export default function BankingDataSection() {
         <h4 className="text-lg font-bold">البيانات البنكية</h4>
         <Button>اضافة حساب بنكي</Button>
       </div>
-      <FormContent config={BankingDataFormConfig()} />
+      <BankSection title="حساب بنكي 1" />
+      <BankSection title="حساب بنكي 2" />
     </div>
   );
 }
