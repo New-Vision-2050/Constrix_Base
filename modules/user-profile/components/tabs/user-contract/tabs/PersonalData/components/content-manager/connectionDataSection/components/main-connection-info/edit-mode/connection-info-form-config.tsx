@@ -16,7 +16,6 @@ export const ConnectionInformationFormConfig = () => {
     },
     sections: [
       {
-        title: "البيانات الاتصال",
         fields: [
           {
             name: "phone",

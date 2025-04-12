@@ -16,7 +16,6 @@ export const AddressFormConfig = () => {
     },
     sections: [
       {
-        title: "العنوان",
         fields: [
           {
             name: "address",

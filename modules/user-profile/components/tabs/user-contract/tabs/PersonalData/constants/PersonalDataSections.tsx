@@ -6,6 +6,7 @@ import PhoneIcon from "@/public/icons/phone-icon";
 import BackpackIcon from "@/public/icons/backpack";
 import IqamaDataSection from "../components/content-manager/IqamaDataSection";
 import BankingDataSection from "../components/content-manager/BankingDataSection";
+import ConnectionDataSection from "../components/content-manager/connectionDataSection";
 
 export const PersonalDataSections: UserProfileNestedTab[] = [
   {
@@ -24,7 +25,7 @@ export const PersonalDataSections: UserProfileNestedTab[] = [
     id: "contract-tab-connect-data-section",
     title: "معلومات الاتصال",
     icon: <PhoneIcon />,
-    content: <>معلومات الاتصال</>,
+    content: <ConnectionDataSection />,
   },
   {
     id: "contract-tab-iqama-data-section",

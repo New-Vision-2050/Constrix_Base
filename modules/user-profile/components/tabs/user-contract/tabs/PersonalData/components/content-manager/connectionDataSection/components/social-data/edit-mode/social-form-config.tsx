@@ -5,10 +5,10 @@ import {
   temporaryToken,
 } from "@/modules/dashboard/constants/dummy-domain";
 
-export const MaritalStatusRelativesFormConfig = () => {
-  const maritalStatusRelativesFormConfig: FormConfig = {
+export const SocialMediaSitesFormConfig = () => {
+  const socialMediaSitesFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "الحالة الاجتماعية / الاقارب",
+    title: "حسابات التواصل الاجتماعي",
     apiUrl: `${temporaryDomain}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -16,31 +16,42 @@ export const MaritalStatusRelativesFormConfig = () => {
     },
     sections: [
       {
-        title: "الحالة الاجتماعية / الاقارب",
         fields: [
           {
-            name: "maritalStatus",
-            label: "الحالة الاجتماعية",
+            name: "whatsapp",
+            label: "واتساب ",
             type: "text",
-            placeholder: "الحالة الاجتماعية",
+            placeholder: "واتساب ",
           },
           {
-            name: "personName",
-            label: "اسم شخص في حالة الطواري",
+            name: "facebook",
+            label: "فيسبوك ",
             type: "text",
-            placeholder: "اسم شخص في حالة الطواري",
+            placeholder: "فيسبوك ",
           },
           {
-            name: "postalAddress2",
-            label: "علاقة الشخص بحاله الطواري",
+            name: "telegram",
+            label: "تيليجرام ",
             type: "text",
-            placeholder: "علاقة الشخص بحاله الطواري",
+            placeholder: "تيليجرام ",
           },
           {
-            name: "phone",
-            label: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
+            name: "instagram",
+            label: "انستقرام  ",
             type: "text",
-            placeholder: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
+            placeholder: "انستقرام  ",
+          },
+          {
+            name: "snapchat",
+            label: "سناب شات  ",
+            type: "text",
+            placeholder: "سناب شات  ",
+          },
+          {
+            name: "linkedin",
+            label: "لينك اند  ",
+            type: "text",
+            placeholder: "لينك اند  ",
           },
         ],
       },
@@ -87,5 +98,5 @@ export const MaritalStatusRelativesFormConfig = () => {
       console.log("Error details:", error);
     },
   };
-  return maritalStatusRelativesFormConfig;
+  return socialMediaSitesFormConfig;
 };
