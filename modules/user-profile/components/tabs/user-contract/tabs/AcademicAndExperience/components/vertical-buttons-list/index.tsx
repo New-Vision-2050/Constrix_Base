@@ -1,7 +1,7 @@
 import RegularList from "@/components/shared/RegularList";
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
 import InfoIcon from "@/public/icons/InfoIcon";
-import { usePersonalDataTabCxt } from "../../context/PersonalDataCxt";
+import { useAcademicAndExperienceCxt } from "../../context/AcademicAndExperienceCxt";
 
 type PropsT = {
   items: UserProfileNestedTab[];
@@ -20,7 +20,8 @@ export default function VerticalBtnsList({ items }: PropsT) {
 }
 
 const VerticalButton = ({ btn }: { btn: UserProfileNestedTab }) => {
-  const { activeSection, handleChangeActiveSection } = usePersonalDataTabCxt();
+  const { activeSection, handleChangeActiveSection } =
+    useAcademicAndExperienceCxt();
   const isActive = activeSection?.id === btn.id;
 
   const handleClick = () => handleChangeActiveSection(btn);
