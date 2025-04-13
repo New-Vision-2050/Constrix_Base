@@ -6,11 +6,17 @@ import type { ReactNode } from "react";
 
 // import packages
 import { createContext, useContext, useState } from "react";
+import useUserPersonalData from "../hooks/useUserPersonalData";
+import { PersonalUserDataSectionT } from "../api/get-personal-data";
 
 // declare context types
 type PersonalDataTabCxtType = {
   activeSection: UserProfileNestedTab | undefined;
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;
+
+  // user -personal data
+  userPersonalData: PersonalUserDataSectionT | undefined;
+  handleRefreshPersonalData: () => void;
 };
 
 export const PersonalDataTabCxt = createContext<PersonalDataTabCxtType>(
@@ -34,18 +40,30 @@ export const PersonalDataTabCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
+  const { data: userPersonalData, refetch: refreshPersonalData } =
+    useUserPersonalData();
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
 
   // ** handle side effects
 
   // ** declare and define component helper methods
+  const handleRefreshPersonalData = () => {
+    refreshPersonalData();
+  };
+
   const handleChangeActiveSection = (section: UserProfileNestedTab) =>
     setActiveSection(section);
 
   // ** return component ui
   return (
     <PersonalDataTabCxt.Provider
-      value={{ activeSection, handleChangeActiveSection }}
+      value={{
+        activeSection,
+        handleChangeActiveSection,
+        // user -personal data
+        userPersonalData,
+        handleRefreshPersonalData,
+      }}
     >
       {children}
     </PersonalDataTabCxt.Provider>

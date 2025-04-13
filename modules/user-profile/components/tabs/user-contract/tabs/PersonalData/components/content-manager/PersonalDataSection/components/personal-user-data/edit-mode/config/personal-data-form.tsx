@@ -1,7 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 
 export const PersonalDataFormConfig = () => {
+  const { userPersonalData } = usePersonalDataTabCxt();
   const PersonalFormConfig: FormConfig = {
     formId: "personal-data-form",
     title: "البيانات الشخصية",
@@ -67,20 +69,23 @@ export const PersonalDataFormConfig = () => {
         ],
       },
     ],
+    initialValues: {
+      name: userPersonalData?.name,
+      nickname: userPersonalData?.nickname,
+      gender: userPersonalData?.gender,
+      is_default: userPersonalData?.is_default == 1,
+      birthdate_gregorian: userPersonalData?.birthdate_gregorian,
+      birthdate_hijri: userPersonalData?.birthdate_hijri,
+      nationality: userPersonalData?.nationality,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
-    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
@@ -92,12 +97,6 @@ export const PersonalDataFormConfig = () => {
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return PersonalFormConfig;
