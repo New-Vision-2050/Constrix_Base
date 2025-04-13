@@ -20,7 +20,5 @@ type ResponseT = {
 export default async function GetPersonalUserData() {
   const res = await apiClient.get<ResponseT>(`company-users/show-data-info`);
 
-  console.log("res_res_res", res);
-
   return res.data.payload;
 }

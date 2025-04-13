@@ -1,6 +1,8 @@
 import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserProfileConnectionDataReview() {
+  const { userConnectionData } = usePersonalDataTabCxt();
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
@@ -8,14 +10,14 @@ export default function UserProfileConnectionDataReview() {
         <PreviewTextField
           valid={true}
           label="رقم الجوال"
-          value="+966 055456200"
+          value={userConnectionData?.phone ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
           valid={true}
           label="البريد الالكتروني"
-          value="Mohamed@gmail.com"
+          value={userConnectionData?.email ?? ""}
         />
       </div>
     </div>
