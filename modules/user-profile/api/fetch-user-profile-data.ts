@@ -1,5 +1,4 @@
-import axios from "axios";
-import { temporaryDomain, temporaryToken } from "@/modules/dashboard/constants/dummy-domain";
+import { apiClient } from "@/config/axios-config";
 import { UserProfileData } from "@/modules/dashboard/types/user-profile-response";
 
 type ResponseT = {
@@ -9,17 +8,7 @@ type ResponseT = {
 };
 
 export default async function fetchUserProfileData() {
-  // ! this Temporary token is used for testing purposes only until this work in back merged with stage
-  // ! replace this token with the actual token
-  const url = `${temporaryDomain}/company-users/profile`;
-
-  // ! use axiosInstance instead of axios
-  const res = await axios.get<ResponseT>(url, {
-    headers: {
-      Authorization: `Bearer ${temporaryToken}`,
-      "X-Tenant": "560005d6-04b8-53b3-9889-d312648288e3",
-    },
-  });
+  const res = await apiClient.get<ResponseT>(`/company-users/profile`);
 
   return res.data.payload;
 }

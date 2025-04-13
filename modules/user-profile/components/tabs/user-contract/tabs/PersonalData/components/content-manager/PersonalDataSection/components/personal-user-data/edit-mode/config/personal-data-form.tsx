@@ -1,15 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
-import {
-  temporaryDomain,
-  temporaryToken,
-} from "@/modules/dashboard/constants/dummy-domain";
+import { apiClient, baseURL } from "@/config/axios-config";
 
 export const PersonalDataFormConfig = () => {
   const PersonalFormConfig: FormConfig = {
     formId: "personal-data-form",
     title: "البيانات الشخصية",
-    apiUrl: `${temporaryDomain}/company-users/data-info`,
+    apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -91,14 +87,8 @@ export const PersonalDataFormConfig = () => {
       };
       console.log("body-body", body);
       const response = await apiClient.put(
-        `${temporaryDomain}/company-users/data-info`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${temporaryToken}`,
-            "X-Tenant": "560005d6-04b8-53b3-9889-d312648288e3",
-          },
-        }
+        `${baseURL}/company-users/data-info`,
+        body
       );
       return {
         success: true,

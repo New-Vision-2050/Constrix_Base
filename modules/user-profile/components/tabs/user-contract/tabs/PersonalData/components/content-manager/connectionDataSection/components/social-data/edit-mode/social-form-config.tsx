@@ -1,15 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
-import {
-  temporaryDomain,
-  temporaryToken,
-} from "@/modules/dashboard/constants/dummy-domain";
+import { apiClient, baseURL } from "@/config/axios-config";
 
 export const SocialMediaSitesFormConfig = () => {
   const socialMediaSitesFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
     title: "حسابات التواصل الاجتماعي",
-    apiUrl: `${temporaryDomain}/company-users/contact-info`,
+    apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -76,14 +72,8 @@ export const SocialMediaSitesFormConfig = () => {
       };
       console.log("body-body", body);
       const response = await apiClient.put(
-        `${temporaryDomain}/company-users/contact-info`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${temporaryToken}`,
-            "X-Tenant": "560005d6-04b8-53b3-9889-d312648288e3",
-          },
-        }
+        `${baseURL}/company-users/contact-info`,
+        body
       );
       return {
         success: true,

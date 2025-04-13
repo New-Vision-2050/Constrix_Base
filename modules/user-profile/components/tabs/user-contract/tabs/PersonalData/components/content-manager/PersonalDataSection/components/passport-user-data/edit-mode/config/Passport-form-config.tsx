@@ -1,15 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
-import {
-  temporaryDomain,
-  temporaryToken,
-} from "@/modules/dashboard/constants/dummy-domain";
+import { apiClient, baseURL } from "@/config/axios-config";
 
 export const PassportDataFormConfig = () => {
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
     title: "بيانات جواز السفر",
-    apiUrl: `${temporaryDomain}/company-users/contact-info`,
+    apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -64,16 +60,7 @@ export const PassportDataFormConfig = () => {
         ...formData,
       };
       console.log("body-body", body);
-      const response = await apiClient.put(
-        `${temporaryDomain}/company-users/contact-info`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${temporaryToken}`,
-            "X-Tenant": "560005d6-04b8-53b3-9889-d312648288e3",
-          },
-        }
-      );
+      const response = await apiClient.put(`/company-users/contact-info`, body);
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
