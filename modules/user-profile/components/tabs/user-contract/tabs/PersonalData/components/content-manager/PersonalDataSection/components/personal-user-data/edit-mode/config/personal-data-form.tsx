@@ -15,19 +15,19 @@ export const PersonalDataFormConfig = () => {
         fields: [
           {
             name: "name",
-            label: "Name",
+            label: "الاسم ثلاثي",
             type: "text",
             placeholder: "Name",
           },
           {
             name: "nickname",
-            label: "nick name",
+            label: "اسم الشهرة",
             type: "text",
             placeholder: "nick name",
           },
           {
             name: "gender",
-            label: "Gender",
+            label: "الجنس",
             type: "select",
             placeholder: "Gender",
             options: [
@@ -37,25 +37,25 @@ export const PersonalDataFormConfig = () => {
           },
           {
             name: "is_default",
-            label: "Is Default?",
+            label: "افتراضي ؟",
             type: "checkbox",
             placeholder: "Is Default?",
           },
           {
             name: "birthdate_gregorian",
-            label: "Birthdate Gregorian",
+            label: "تاريخ الميلاد",
             type: "date",
             placeholder: "Birthdate Gregorian",
           },
           {
             name: "birthdate_hijri",
-            label: "Birthdate Hijri",
+            label: "تاريخ الهجري",
             type: "date",
             placeholder: "Birthdate Hijri",
           },
           {
             name: "nationality",
-            label: "Nationality",
+            label: "الجنسية",
             type: "select",
             placeholder: "Nationality",
             dynamicOptions: {
@@ -84,12 +84,9 @@ export const PersonalDataFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
+        is_default: formData?.formData ? 1 : 0,
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(
-        `${baseURL}/company-users/data-info`,
-        body
-      );
+      const response = await apiClient.put(`/company-users/data-info`, body);
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
