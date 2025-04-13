@@ -39,7 +39,7 @@ const CompanyFileTaps = () => {
   return (
     <Tabs defaultValue={"structure"} className="w-full">
       <TabsList
-        className="w-full bg-transparent py-0 px-10 justify-between h-max border-b mb-4"
+        className="w-full bg-transparent py-0 px-10 justify-between h-max border-b rounded-none mb-4"
         dir={isRtl ? "rtl" : "ltr"}
       >
         {tabs.map((tab) => (

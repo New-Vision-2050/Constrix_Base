@@ -1,6 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Lock, MapPin } from "lucide-react";
 import { useLocale } from "next-intl";
+import GeneralStructure from "./general-structure";
+import EmployeeStructure from "./employee-structure";
+import SerialStructure from "./serial-structure";
 
 const AdminStructureTaps = () => {
   const locale = useLocale();
@@ -11,24 +14,26 @@ const AdminStructureTaps = () => {
       label: "الهيكل العام",
       icon: <User size={18} />,
       value: "general-structure",
+      component: <GeneralStructure />,
     },
     {
       label: "الهيكل التسلسلي",
       icon: <MapPin size={18} />,
-      value: "hierarchy-structure",
+      value: "serial-structure",
+      component: <SerialStructure />,
     },
     {
       label: "هيكل الموظفين",
       icon: <Lock size={18} />,
       value: "employees-structure",
-      component: <AdminStructureTaps />,
+      component: <EmployeeStructure />,
     },
   ];
 
   return (
     <Tabs defaultValue={"general-structure"} className="w-full">
       <TabsList
-        className="w-full bg-transparent py-0 px-10 justify-start gap-20 h-max border-b mb-4"
+        className="w-full bg-transparent py-0 px-10 justify-start gap-20 h-max border-b rounded-none mb-4"
         dir={isRtl ? "rtl" : "ltr"}
       >
         {tabs.map((tab) => (
@@ -42,6 +47,15 @@ const AdminStructureTaps = () => {
           </TabsTrigger>
         ))}
       </TabsList>
+      {tabs.map((tab) => (
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          dir={isRtl ? "rtl" : "ltr"}
+        >
+          {tab.component}
+        </TabsContent>
+      ))}
     </Tabs>
   );
 };
