@@ -21,11 +21,36 @@ const SimpleSelectDropdown: React.FC<DropdownBaseProps> = ({
   dynamicConfig,
   placeholder = "Select option"
 }) => {
+  // Determine if the dropdown should be disabled
+  const shouldBeDisabled = (() => {
+    if (isDisabled) return true;
+    if (!dynamicConfig?.dependsOn || !options) return false;
+
+    // Case 1: String format (backward compatibility)
+    if (typeof dynamicConfig.dependsOn === 'string') {
+      return false; // We don't have access to dependencies here, so we rely on the isDisabled prop
+    }
+    
+    // Case 2: Array of dependency configs
+    if (Array.isArray(dynamicConfig.dependsOn)) {
+      return false; // We don't have access to dependencies here, so we rely on the isDisabled prop
+    }
+    
+    // Case 3: Object with field names as keys
+    if (typeof dynamicConfig.dependsOn === 'object') {
+      return false; // We don't have access to dependencies here, so we rely on the isDisabled prop
+    }
+    
+    return false;
+  })();
+
   const dependencyMessage = useDependencyMessage(isDisabled, dynamicConfig?.dependsOn);
   const isLoading = options.length === 0 && dynamicConfig !== undefined && !isDisabled;
-  const [localValue, setLocalValue] = useState(value);
+  // Ensure we're working with a string value
+  const stringValue = Array.isArray(value) && value.length > 0 ? value[0] : (typeof value === 'string' ? value : '');
+  const [localValue, setLocalValue] = useState<string>(stringValue);
   const initialRenderRef = useRef(true);
-  const prevValueRef = useRef(value);
+  const prevValueRef = useRef<string>(stringValue);
   const isUpdatingRef = useRef(false);
   
   // Use debounce to prevent multiple rapid selections
@@ -40,11 +65,16 @@ const SimpleSelectDropdown: React.FC<DropdownBaseProps> = ({
 
   // Update local value when prop value changes, but only if it's different
   useEffect(() => {
-    console.log(`SimpleSelectDropdown - Value prop changed for ${columnKey}: ${value}`);
-    if (value !== prevValueRef.current && !isUpdatingRef.current) {
+    // Ensure we're working with a string value
+    const newStringValue = Array.isArray(value) && value.length > 0
+      ? value[0]
+      : (typeof value === 'string' ? value : '');
+    
+    console.log(`SimpleSelectDropdown - Value prop changed for ${columnKey}: ${newStringValue}`);
+    if (newStringValue !== prevValueRef.current && !isUpdatingRef.current) {
       isUpdatingRef.current = true;
-      setLocalValue(value);
-      prevValueRef.current = value;
+      setLocalValue(newStringValue);
+      prevValueRef.current = newStringValue;
       isUpdatingRef.current = false;
     }
   }, [value, columnKey]);

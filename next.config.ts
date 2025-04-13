@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
-
 const nextConfig: NextConfig = {
   /* config options here */
   async redirects() {
@@ -12,6 +11,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Add cache busting for static assets
+  generateBuildId: async () => {
+    // Use environment variable if available, otherwise use timestamp
+    return process.env.NEXT_PUBLIC_CACHE_BUST || `build-${Date.now()}`;
+  },
+  // Disable static optimization to ensure fresh builds
+  experimental: {
+    // This ensures that the server always re-renders pages
+    optimizeCss: false
+  }
 };
 const withNextIntl = createNextIntlPlugin();
 

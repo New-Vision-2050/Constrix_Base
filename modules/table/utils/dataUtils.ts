@@ -63,6 +63,9 @@ export const processApiResponse = (result: any): TableData[] => {
     tableData = result;
   } else if (result.data && Array.isArray(result.data)) {
     tableData = result.data;
+  } else if (result.payload && Array.isArray(result.payload)) {
+    // Handle responses with payload property
+    tableData = result.payload;
   } else if (typeof result === 'object') {
     const arrayCandidate = Object.values(result).find(val => Array.isArray(val));
     if (arrayCandidate && Array.isArray(arrayCandidate)) {

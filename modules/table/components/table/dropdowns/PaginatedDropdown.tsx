@@ -15,18 +15,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/modules/table/components/ui/popover";
-import { DynamicDropdownConfig } from "@/modules/table/utils/tableTypes";
+import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
 
 interface PaginatedDropdownProps {
   columnKey: string;
   label: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string | string[];
+  onChange: (value: string | string[]) => void;
   placeholder?: string;
   isDisabled?: boolean;
   dynamicConfig?: DynamicDropdownConfig;
-  dependencies?: Record<string, string>;
+  dependencies?: Record<string, string | string[]>;
+  isMulti?: boolean;
 }
 
 const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
@@ -38,6 +39,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   isDisabled = false,
   dynamicConfig,
   dependencies,
+  isMulti = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -51,9 +53,35 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     selectedValue: value,
   });
 
-  // Find the label for the current value
-  const selectedLabel =
-    options.find((option) => option.value === value)?.label || value;
+  // Find the label(s) for the current value(s)
+  const getSelectedLabels = () => {
+    if (isMulti && Array.isArray(value)) {
+      // For multi-select, return comma-separated labels
+      return value.map(val => {
+        const option = options.find(opt => opt.value === val);
+        return option ? option.label : val;
+      }).join(', ');
+    } else {
+      // For single select
+      const singleValue = value as string;
+      const option = options.find((option) => option.value === singleValue);
+      
+      // If we have a proper label, use it
+      if (option) {
+        return option.label;
+      }
+      
+      // If we're still loading and have a value, show loading indicator
+      if (loading && singleValue) {
+        return `${singleValue} (loading...)`;
+      }
+      
+      // Fallback to the value itself
+      return singleValue;
+    }
+  };
+  
+  const selectedLabel = getSelectedLabels();
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -86,14 +114,6 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
   return (
     <div>
-      {!!label && (
-        <label
-          htmlFor={columnKey}
-          className={cn("block text-sm font-medium text-gray-700 mb-2")}
-        >
-          {label}
-        </label>
-      )}{" "}
       <Popover open={open} onOpenChange={setOpen}>
         <div className="flex gap-2">
           <PopoverTrigger asChild>
@@ -104,18 +124,20 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               aria-label={label}
               disabled={isDisabled}
               className={cn(
-                "w-full justify-between bg-sidebar",
-                !value && "text-muted-foreground"
+                "w-full justify-between bg-sidebar whitespace-normal",
+                (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground"
               )}
               onKeyDown={handleKeyDown}
             >
-              <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-left">
-                {value ? selectedLabel : placeholder}
+              <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
+                {(value && (!isMulti || (Array.isArray(value) && value.length > 0)))
+                  ? selectedLabel
+                  : placeholder}
               </div>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          {value && (
+          {(value && !isMulti) || (isMulti && Array.isArray(value) && value.length > 0) ? (
             <Button
               variant="ghost"
               size="icon"
@@ -123,13 +145,13 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                onChange("");
+                onChange(isMulti ? [] : "");
                 setSearchValue("");
               }}
             >
               <X className="h-4 w-4 opacity-50 hover:opacity-80" />
             </Button>
-          )}
+          ) : null}
         </div>
         <PopoverContent
           className="w-[250px] p-0"
@@ -145,10 +167,10 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             <div className="flex items-center border-b px-3">
               <CommandInput
                 ref={inputRef}
-                placeholder="Search..."
+                placeholder="بحث..."
                 value={searchValue}
                 onValueChange={setSearchValue}
-                className="flex-1 py-3 outline-none"
+                className="flex-1 py-3 px-1 outline-none"
               />
             </div>
             <CommandList
@@ -177,15 +199,32 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
-                      onChange(option.value);
-                      setOpen(false);
+                      if (isMulti) {
+                        // For multi-select, toggle the selected value
+                        const currentValues = Array.isArray(value) ? value : [];
+                        const newValues = currentValues.includes(option.value)
+                          ? currentValues.filter(v => v !== option.value)
+                          : [...currentValues, option.value];
+                        onChange(newValues);
+                        // Don't close the dropdown for multi-select
+                      } else {
+                        // For single select
+                        onChange(option.value);
+                        setOpen(false);
+                      }
                     }}
                     className="cursor-pointer"
                   >
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
-                        value === option.value ? "opacity-100" : "opacity-0"
+                        isMulti
+                          ? Array.isArray(value) && value.includes(option.value)
+                            ? "opacity-100"
+                            : "opacity-0"
+                          : value === option.value
+                          ? "opacity-100"
+                          : "opacity-0"
                       )}
                     />
                     {option.label}

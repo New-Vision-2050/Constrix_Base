@@ -1,5 +1,4 @@
-import { SearchTypeConfig } from "@/components/shared/dropdowns/sharedTypes";
-import { FormConfig } from "../types/formTypes";
+import { FormConfig, SearchTypeConfig } from "../types/formTypes";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { baseURL } from "@/config/axios-config";
 
@@ -22,6 +21,7 @@ const countrySearchConfig: SearchTypeConfig = {
 
 // Define the form configuration
 export const sheetFormConfig: FormConfig = {
+  formId: "sheet-form",
   title: "Contact Us",
   description: "Fill out the form below to get in touch with us.",
   apiUrl: `${baseURL}/companies`,
@@ -43,6 +43,7 @@ export const sheetFormConfig: FormConfig = {
           type: "select",
           placeholder: "Select your country",
           required: true,
+         // isMulti:true,
           searchType: countrySearchConfig,
           options: [
             { value: "1", label: "United States" },
@@ -63,12 +64,25 @@ export const sheetFormConfig: FormConfig = {
             },
           ],
         },
+          {
+              name: "phone",
+              label: "Phone",
+              type: "phone",
+              placeholder: "Enter your phone",
+              validation: [
+                  {
+                      type: "required",
+                      message: "Please enter phone",
+                  },
+              ],
+          },
         {
           type: "select",
           name: "city",
           label: "City",
           placeholder: "Select a city",
           required: true,
+            isMulti:true,
           dynamicOptions: {
             url: `${baseURL}/countries`,
             valueField: "id",
@@ -78,9 +92,10 @@ export const sheetFormConfig: FormConfig = {
             searchParam: "name",
             paginationEnabled: true,
             pageParam: "page",
-            limitParam: "limit",
+            limitParam: "per_page",
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
+
           },
           validation: [
             {
@@ -95,11 +110,18 @@ export const sheetFormConfig: FormConfig = {
           type: "text",
           placeholder: "Enter your postal code",
           validation: [
-            {
-              type: "pattern",
-              value: "^[0-9a-zA-Z\\s\\-]+$",
-              message: "Please enter a valid postal code",
-            },
+
+              {
+                  type: 'apiValidation',
+                  message: 'This username is already taken',
+                  apiConfig: {
+                      url: '/api/validate-username',
+                      method: 'POST',
+                      debounceMs: 500,
+                      paramName: 'username',
+                      successCondition: (response) => response.available === true,
+                  },
+              },
           ],
         },
       ],
@@ -112,7 +134,7 @@ export const sheetFormConfig: FormConfig = {
           name: "name",
           label: "Full Name",
           type: "text",
-          placeholder: "Enter your name",
+          placeholder: "ادخل اسمك",
           required: true,
           // Example of using a condition based on previous step data
           condition: (values) => {
@@ -122,7 +144,7 @@ export const sheetFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "الاسم مطلوب",
             },
             {
               type: "minLength",
@@ -152,7 +174,7 @@ export const sheetFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "Email is required",
+              message: "البريد الالكترونى مطلوب",
             },
             {
               type: "email",
@@ -166,11 +188,10 @@ export const sheetFormConfig: FormConfig = {
           type: "text",
           placeholder: "Enter your phone number",
           validation: [
-            {
-              type: "pattern",
-              value: "^[0-9\\-\\+\\s\\(\\)]+$",
-              message: "Please enter a valid phone number",
-            },
+              {
+                  type: "required",
+                  message: "Phone is required",
+              },
           ],
         },
       ],
@@ -178,18 +199,22 @@ export const sheetFormConfig: FormConfig = {
   ],
   submitButtonText: "Send Message",
   cancelButtonText: "Cancel",
-  showReset: true,
+  showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,
   resetOnSuccess: true,
+  showCancelButton:false,
+  showBackButton:false,
+
 
   // Enable wizard mode
-  wizard: true,
+  //   wizard: true,
+    accordion: true,
   wizardOptions: {
-    showStepIndicator: true,
-    showStepTitles: true,
+    showStepIndicator: false,
+    showStepTitles: false,
     validateStepBeforeNext: true,
-    allowStepNavigation: true,
+    allowStepNavigation: false,
     nextButtonText: "Continue",
     prevButtonText: "Back",
     finishButtonText: "Submit Form",

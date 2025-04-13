@@ -1,51 +1,63 @@
-import ArrowStaticIcon from "@/public/icons/arrow-static";
-import ChartStaticIcon from "@/public/icons/chart-static";
-import CheckStatic from "@/public/icons/check-static";
-import PersonStaticIcon from "@/public/icons/person-static";
+"use client";
 
-const statistics = [
-  {
-    title: "إجمالي الشركات",
-    value: 1459,
-    change: 18,
-    icon: <PersonStaticIcon />,
-  },
-  { title: "الشركات الفعالة", value: 127, change: -14, icon: <CheckStatic /> },
-  {
-    title: "شركات غير مكتملة البيانات",
-    value: 2,
-    change: 18,
-    icon: <ChartStaticIcon />,
-  },
-  {
-    title: "شركات قاربت على الانتهاء",
-    value: 127,
-    change: -14,
-    icon: <ArrowStaticIcon />,
-  },
-];
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { apiClient } from "@/config/axios-config";
+import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
-const StatisticsRow = () => {
+interface Config {
+  url: string;
+  icons: React.ReactNode[];
+}
+
+const StatisticsRow = ({ config }: { config: Config }) => {
+  const { data, isLoading, isSuccess } = useQuery({
+    queryKey: ["widgets"],
+    queryFn: async () => {
+      const response = await apiClient.get(config.url);
+      return response.data;
+    },
+  });
+
+  const payload = data?.payload || [{}, {}, {}, {}];
+
   return (
-    <div className="w-full grid grid-cols-4 gap-6">
-      {statistics.map((stat, index) => (
+    <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
+      {payload.map((item: any, index: number) => (
         <div
           key={index}
           className="bg-sidebar gap-4 items-start w-full text-white py-6 px-5 rounded-lg flex shadow-md"
         >
-          <div>{stat.icon}</div>
+          <div>{config.icons[index]}</div>
           <div className="flex flex-col">
-            <h3 className="text-xs text-[#EAEAFFDE]">{stat.title}</h3>
-            <div className="flex gap-3 items-center mt-1">
-              <p className="text-2xl leading-none font-bold">{stat.value}</p>
+            <h3
+              className={cn(
+                "text-xs text-[#EAEAFFDE]",
+                isLoading && "h-4 w-32 bg-popover rounded-md animate-pulse"
+              )}
+            >
+              {item?.title}
+            </h3>
+            <div
+              className={cn(
+                "flex gap-3 items-center mt-1",
+                isLoading && "h-6 mt-1 w-24 bg-popover rounded-md animate-pulse"
+              )}
+            >
+              <p className="text-2xl leading-none font-bold">{item.total}</p>
               <span
                 dir="ltr"
                 className={`text-lg font-semibold ${
-                  stat.change >= 0 ? "text-green-500" : "text-red-500"
+                  isSuccess &&
+                  (item.percentage >= 0 ? "text-green-500" : "text-red-500")
                 }`}
               >
-                ({stat.change > 0 && "+"}
-                {stat.change}%)
+                {isSuccess && (
+                  <>
+                    ({item.percentage > 0 && "+"}
+                    {Math.round(item.percentage)}%)
+                  </>
+                )}
               </span>
             </div>{" "}
           </div>

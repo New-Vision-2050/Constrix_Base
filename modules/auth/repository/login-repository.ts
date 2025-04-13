@@ -5,6 +5,7 @@ import {
   loginWays,
   resendOtp,
   resetPassword,
+  validateResetPasswordOtp,
 } from "../service/login-services";
 import { LoginOption } from "../types/login-responses";
 
@@ -25,13 +26,13 @@ export const loginRepository = {
     identifier: string,
     password: string,
     password_confirmation: string,
-    otp: string
+    token: string
   ) => {
     const response = await resetPassword(
       identifier,
       password,
       password_confirmation,
-      otp
+      token
     );
     return response.data;
   },
@@ -45,6 +46,10 @@ export const loginRepository = {
     token: string
   ) => {
     const response = await loginAlternative(identifier, login_option, token);
+    return response.data;
+  },
+  validateResetPasswordOtp: async (identifier: string, otp: string) => {
+    const response = await validateResetPasswordOtp(identifier, otp);
     return response.data;
   },
 };

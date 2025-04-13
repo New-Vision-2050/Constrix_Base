@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { Search, X, Filter } from "lucide-react";
-import { Button } from "@/modules/table/components/ui/button";
+import { Search, X } from "lucide-react";
 import { Input } from "@/modules/table/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/modules/table/components/ui/popover";
-import { Checkbox } from "@/modules/table/components/ui/checkbox";
-import { Label } from "@/modules/table/components/ui/label";
 import { SearchConfig } from "@/modules/table/utils/tableTypes";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
+import ColumnVisibility from "./ColumnVisibility";
+import { ColumnConfig } from "@/modules/table/utils/configs/columnConfig";
 
 interface SearchBarProps {
   searchQuery: string;
   onSearch: (query: string, fields?: string[]) => void;
   searchConfig: SearchConfig;
   searchableColumns: { key: string; label: string }[];
+  columns: ColumnConfig[]; // All available columns
+  visibleColumnKeys: string[]; // Currently visible column keys
+  onToggleColumnVisibility: (columnKey: string) => void; // Function to toggle column visibility
+  onSetAllColumnsVisible: () => void; // Function to show all columns
+  onSetMinimalColumnsVisible: () => void; // Function to show minimal columns
   actions?: React.ReactNode; // Prop for custom actions
+  columnVisibility?: {
+    visible: boolean;
+    keys: string[];
+  };
+  onSetColumnVisibility?: (visible: boolean) => void;
+  onSetColumnVisibilityKeys?: (keys: string[]) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -26,7 +31,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   searchConfig,
   searchableColumns,
+  columns,
+  visibleColumnKeys,
+  onToggleColumnVisibility,
+  onSetAllColumnsVisible,
+  onSetMinimalColumnsVisible,
   actions,
+  columnVisibility,
+  onSetColumnVisibility,
+  onSetColumnVisibilityKeys,
 }) => {
   const t = useTranslations();
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
@@ -41,13 +54,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
       selectedSearchColumns.length === 0 &&
       searchConfig.allowFieldSelection
     ) {
-      setSelectedSearchColumns(searchableColumns.map((col) => col.key));
+      const allColumns = searchableColumns.map((col) => col.key);
+      setSelectedSearchColumns(allColumns);
     }
   }, [
     searchableColumns,
     selectedSearchColumns.length,
     searchConfig.allowFieldSelection,
   ]);
+
+  // Add an effect to trigger search when selectedSearchColumns changes
+  useEffect(() => {
+    // Skip the initial render
+    if (selectedSearchColumns.length > 0) {
+      console.log("Selected search columns changed, triggering search with fields:", selectedSearchColumns);
+      onSearch(localSearchQuery, selectedSearchColumns);
+    }
+  }, [selectedSearchColumns]);
 
   // Create the debounced search function
   const debouncedSearch = useDebounce((query: string) => {
@@ -75,22 +98,45 @@ const SearchBar: React.FC<SearchBarProps> = ({
     if (!searchConfig.allowFieldSelection) return;
 
     setSelectedSearchColumns((prev) => {
-      if (prev.includes(columnKey)) {
-        return prev.filter((key) => key !== columnKey);
-      } else {
-        return [...prev, columnKey];
-      }
+      const newColumns = prev.includes(columnKey)
+        ? prev.filter((key) => key !== columnKey)
+        : [...prev, columnKey];
+
+      // Trigger a search with the updated columns
+      setTimeout(() => {
+        const fieldsToPass = searchConfig.allowFieldSelection
+          ? newColumns
+          : searchConfig.defaultFields;
+
+        console.log("Search columns changed, triggering search with fields:", fieldsToPass);
+        onSearch(localSearchQuery, fieldsToPass);
+      }, 0);
+
+      return newColumns;
     });
   };
 
   const selectAllSearchColumns = () => {
     if (!searchConfig.allowFieldSelection) return;
-    setSelectedSearchColumns(searchableColumns.map((col) => col.key));
+    const allColumns = searchableColumns.map((col) => col.key);
+    setSelectedSearchColumns(allColumns);
+
+    // Trigger a search with all columns
+    setTimeout(() => {
+      console.log("Selected all search columns, triggering search with fields:", allColumns);
+      onSearch(localSearchQuery, allColumns);
+    }, 0);
   };
 
   const clearAllSearchColumns = () => {
     if (!searchConfig.allowFieldSelection) return;
     setSelectedSearchColumns([]);
+
+    // Trigger a search with no columns
+    setTimeout(() => {
+      console.log("Cleared all search columns, triggering search with no fields");
+      onSearch(localSearchQuery, []);
+    }, 0);
   };
 
   if (searchableColumns.length === 0) return null;
@@ -117,7 +163,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             </button>
           )}
         </div>
-        {searchConfig.allowFieldSelection && (
+        {/*    {searchConfig.allowFieldSelection && (
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -185,11 +231,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
             </PopoverContent>
           </Popover>
-        )}
+        )} */}
       </div>
-
       {/* Custom actions area */}
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      {actions && <>{actions}</>}
+      {/* Column visibility toggle */}
+      <ColumnVisibility
+        columns={columns}
+        visibleColumnKeys={visibleColumnKeys}
+        onToggleColumnVisibility={onToggleColumnVisibility}
+        onSetAllColumnsVisible={onSetAllColumnsVisible}
+        onSetMinimalColumnsVisible={onSetMinimalColumnsVisible}
+      />
     </div>
   );
 };

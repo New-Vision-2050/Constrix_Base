@@ -1,55 +1,159 @@
 import {DropdownOption} from "@/modules/table/utils/tableTypes";
+import {useFormStore} from "@/modules/form-builder";
+
+export interface DependencyConfig {
+    field: string; // The field/column key this dropdown depends on
+    method: 'replace' | 'query'; // Method to add value to URL: replace = replace in URL path, query = add as query parameter
+    paramName?: string; // The parameter name to use when method is 'query' (defaults to field name)
+}
 
 export interface DynamicDropdownConfig {
     url: string;
     valueField: string;
     labelField: string;
-    dependsOn?: string;
-    filterParam?: string;
-    searchParam?: string;
-    paginationEnabled?: boolean;
-    pageParam?: string;
-    limitParam?: string;
-    itemsPerPage?: number;
-    totalCountHeader?: string;
+    dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>; // The field/column key this dropdown depends on
+    // dependsOn can be:
+    // 1. A string (for backward compatibility)
+    // 2. An array of DependencyConfig objects
+    // 3. An object with field names as keys and configuration as values
+    filterParam?: string; // The parameter name to filter by in API calls (used when dependsOn is a string, for backward compatibility)
+    searchParam?: string; // Parameter name for search query
+    paginationEnabled?: boolean; // Whether to use pagination
+    pageParam?: string; // Parameter name for page number
+    limitParam?: string; // Parameter name for items per page
+    itemsPerPage?: number; // Number of items to fetch per page
+    totalCountHeader?: string; // Header containing total count information
+    headers?: Record<string, string>; // Custom headers for the API request
+    queryParameters?: Record<string, string>; // Additional query parameters
+    transformResponse?: (data: any) => DropdownOption[]; // Transform API response to dropdown options
+    enableServerSearch?: boolean; // Whether to enable server-side search
 }
 
 export interface DropdownBaseProps {
     columnKey: string;
     label: string;
-    value: string;
-    onChange: (value: string) => void;
+    value: string | string[];
+    onChange: (value: string | string[]) => void;
     options?: DropdownOption[];
     dynamicConfig?: DynamicDropdownConfig;
-    dependencies?: Record<string, string>;
+    dependencies?: Record<string, string | string[]>;
     placeholder?: string;
     isDisabled?: boolean;
+    isMulti?: boolean;
 }
 
 export const useDependencyMessage = (
     isDisabled: boolean,
-    dependsOnField?: string
+    dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>
 ): string | null => {
-    if (isDisabled && dependsOnField) {
-        return `Please select a ${dependsOnField} first`;
+    if (!isDisabled || !dependsOn) return null;
+
+    // Case 1: String format (backward compatibility)
+    if (typeof dependsOn === 'string') {
+        return `Please select a ${dependsOn} first`;
     }
+
+    // Case 2: Array of dependency configs
+    if (Array.isArray(dependsOn) && dependsOn.length > 0) {
+        if (dependsOn.length === 1) {
+            return `Please select a ${dependsOn[0].field} first`;
+        } else {
+            const fields = dependsOn.map(dep => dep.field).join(', ');
+            return `Please select the required fields: ${fields}`;
+        }
+    }
+
+    // Case 3: Object with field names as keys
+    if (typeof dependsOn === 'object') {
+        const fields = Object.keys(dependsOn);
+        if (fields.length === 1) {
+            return `Please select a ${fields[0]} first`;
+        } else if (fields.length > 1) {
+            return `Please select the required fields: ${fields.join(', ')}`;
+        }
+    }
+
     return null;
 };
 
 export const getFetchUrl = (
     baseUrl: string,
-    filterParam?: string,
-    dependsOnKey?: string,
-    dependencies?: Record<string, string>
-): string => {
+    dynamicConfig: DynamicDropdownConfig,
+    dependencies?: Record<string, string | string[]>
+): string|null => {
     let url = baseUrl;
+    const params = new URLSearchParams();
+    let dependenciesCount = 0;
+    if (dynamicConfig.dependsOn && dependencies) {
+        // Case 1: String format (backward compatibility)
+        if (typeof dynamicConfig.dependsOn === 'string') {
+            dependenciesCount++;
+            if (dynamicConfig.filterParam && dependencies[dynamicConfig.dependsOn]) {
+                const dependencyValue = dependencies[dynamicConfig.dependsOn];
+                // Handle both string and string[] values
+                const paramValue = Array.isArray(dependencyValue)
+                    ? dependencyValue.join(',')
+                    : dependencyValue;
 
-    if (filterParam && dependencies && dependsOnKey) {
-        const filterValue = dependencies[dependsOnKey];
-        if (filterValue) {
-            const separator = url.includes('?') ? '&' : '?';
-            url = `${url}${separator}${filterParam}=${encodeURIComponent(filterValue)}`;
+                params.append(
+                    dynamicConfig.filterParam,
+                    paramValue
+                );
+            }
         }
+        // Case 2: Array of dependency configs
+        else if (Array.isArray(dynamicConfig.dependsOn)) {
+            for (const depConfig of dynamicConfig.dependsOn) {
+                dependenciesCount++;
+                if (dependencies[depConfig.field]) {
+                    const dependencyValue = dependencies[depConfig.field];
+                    const paramValue = Array.isArray(dependencyValue)
+                        ? dependencyValue.join(',')
+                        : dependencyValue;
+
+                    if (depConfig.method === 'replace') {
+                        // Replace placeholders in URL
+                        const placeholder = `{${depConfig.field}}`;
+                        url = url.replace(placeholder, encodeURIComponent(paramValue));
+                    } else if (depConfig.method === 'query') {
+                        // Add as query parameter
+                        const paramName = depConfig.paramName || depConfig.field;
+                        params.append(paramName, paramValue);
+                    }
+                }
+            }
+        }
+        // Case 3: Object with field names as keys
+        else if (typeof dynamicConfig.dependsOn === 'object') {
+            for (const [field, config] of Object.entries(dynamicConfig.dependsOn)) {
+                dependenciesCount++;
+                if (dependencies[field]) {
+                    const dependencyValue = dependencies[field];
+                    const paramValue = Array.isArray(dependencyValue)
+                        ? dependencyValue.join(',')
+                        : dependencyValue;
+
+                    if (config.method === 'replace') {
+                        // Replace placeholders in URL
+                        const placeholder = `{${field}}`;
+                        url = url.replace(placeholder, encodeURIComponent(paramValue));
+                    } else if (config.method === 'query') {
+                        // Add as query parameter
+                        const paramName = config.paramName || field;
+                        params.append(paramName, paramValue);
+                    }
+                }
+            }
+        }
+    }
+
+    if (dynamicConfig.dependsOn && (params.size !== dependenciesCount || dependenciesCount == 0)) {
+        return null;
+    }
+    // Append params to URL
+    const queryString = params.toString();
+    if (queryString) {
+        url = `${url}${url.includes("?") ? "&" : "?"}${queryString}`;
     }
 
     return url;
@@ -64,10 +168,45 @@ export const extractDropdownOptions = (
         return path.split('.').reduce((acc, part) => acc && acc[part], obj);
     };
 
-    const extractedOptions = data.map(item => ({
-        value: String(getValue(item, valueField)),
-        label: String(getValue(item, labelField)),
-    }));
+    const extractedOptions = data.map(item => {
+        // Handle primitive values (string, number)
+        if (typeof item === 'string' || typeof item === 'number') {
+            // For primitive values, use the value as both value and label
+            return {
+                value: String(item),
+                label: String(item),
+            };
+        }
+
+        // Handle array format [value, label]
+        if (Array.isArray(item)) {
+            // If item is an array, use indices as valueField and labelField
+            // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label
+            const valueIndex = parseInt(valueField, 10);
+            const labelIndex = parseInt(labelField, 10);
+
+            if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
+                valueIndex >= 0 && labelIndex >= 0 &&
+                valueIndex < item.length && labelIndex < item.length) {
+                return {
+                    value: String(item[valueIndex]),
+                    label: String(item[labelIndex]),
+                };
+            }
+
+            // Fallback to first element as value and second as label if indices are invalid
+            return {
+                value: String(item[0] || ''),
+                label: String(item[1] || item[0] || ''),
+            };
+        }
+
+        // Handle object format
+        return {
+            value: String(getValue(item, valueField)),
+            label: String(getValue(item, labelField)),
+        };
+    });
 
     const validOptions = extractedOptions.filter(
         opt => opt.value && opt.value.trim() !== ''

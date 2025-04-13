@@ -6,6 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export function NavCompanies({
@@ -14,7 +15,8 @@ export function NavCompanies({
   projects: {
     name: string;
     url: string;
-    icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    icon: React.ComponentType<{ additionalClass?: string }>;
+    isActive: boolean;
   }[];
 }) {
   return (
@@ -22,7 +24,11 @@ export function NavCompanies({
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild tooltip={item.name}>
+            <SidebarMenuButton
+              asChild
+              tooltip={item.name}
+              className={cn(item.isActive && "bg-primary hover:bg-primary")}
+            >
               <Link href={item.url} className="pr-5 flex gap-5">
                 <item.icon />
                 <span>{item.name}</span>

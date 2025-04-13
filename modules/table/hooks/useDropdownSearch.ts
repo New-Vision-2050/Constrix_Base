@@ -1,18 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  DropdownOption,
-  DynamicDropdownConfig,
-} from "@/modules/table/utils/tableTypes";
-import { useDebounce } from "./useDebounce";
+
 import { processApiResponse } from "@/modules/table/utils/dataUtils";
 import { apiClient } from "@/config/axios-config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {DropdownOption, DynamicDropdownConfig} from "@/modules/form-builder";
 
 interface UseDropdownSearchProps {
   searchTerm: string;
   dynamicConfig?: DynamicDropdownConfig;
-  dependencies?: Record<string, string>;
-  selectedValue?: string;
+  dependencies?: Record<string, string | string[]>;
+  selectedValue?: string | string[];
+  isMulti?: boolean;
 }
 
 interface UseDropdownSearchResult {
@@ -26,31 +24,219 @@ export const useDropdownSearch = ({
   dynamicConfig,
   dependencies,
   selectedValue,
+  isMulti = false,
 }: UseDropdownSearchProps): UseDropdownSearchResult => {
   const queryClient = useQueryClient();
   const [options, setOptions] = useState<DropdownOption[]>([]);
-  const [backupOption, setBackupOption] = useState<DropdownOption | null>(null);
+  const [backupOptions, setBackupOptions] = useState<DropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
+  const initialFetchDoneRef = useRef(false);
 
   // Create a debounced search term
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
 
-  // Store the selected option as a backup when it changes
+  // Fetch label for initial value if needed
   useEffect(() => {
-    if (selectedValue) {
-      const selectedOption = options.find(
-        (option) => option.value === selectedValue
-      );
+    const fetchInitialLabel = async () => {
+      if (!dynamicConfig || !selectedValue || initialFetchDoneRef.current ) return;
+
+      // Skip if we already have the label in options
+      if (isMulti && Array.isArray(selectedValue)) {
+        const allLabelsFound = selectedValue.every(value =>
+          options.some(option => option.value === value && option.label !== value)
+        );
+        if (allLabelsFound) return;
+      } else if (!isMulti && typeof selectedValue === 'string') {
+        const labelFound = options.some(option =>
+          option.value === selectedValue && option.label !== selectedValue
+        );
+        if (labelFound) return;
+      }
+
+      try {
+        setLoading(true);
+
+        // Prepare values to fetch
+        const valuesToFetch = isMulti && Array.isArray(selectedValue)
+          ? selectedValue
+          : [selectedValue as string];
+
+        // Only fetch for values that don't already have proper labels
+        const valuesToFetchFiltered = valuesToFetch.filter(value =>
+          !options.some(option => option.value === value && option.label !== value)
+        );
+
+        if (valuesToFetchFiltered.length === 0) return;
+
+        // Build URL with ID parameter
+        let url = dynamicConfig.url;
+        const params = new URLSearchParams();
+
+        // Add ID parameter
+        params.append('id', valuesToFetchFiltered.join(','));
+
+        // Append params to URL
+        const queryString = params.toString();
+        if (queryString) {
+          url = `${url}${url.includes("?") ? "&" : "?"}${queryString}`;
+        }
+
+        const response = await queryClient.fetchQuery({
+          queryKey: ["initialLabel", url],
+          queryFn: async () => {
+            const response = await apiClient.get(url);
+            return response;
+          },
+          staleTime: 1000 * 60 * 5,
+        });
+
+        if (!isMountedRef.current) return;
+
+        if (response.status !== 200) {
+          throw new Error(`Failed to fetch initial label: ${response.status}`);
+        }
+
+        const data = processApiResponse(await response.data);
+        if (!isMountedRef.current) return;
+
+        // Extract options from response
+        let fetchedOptions: DropdownOption[] = [];
+
+        if (Array.isArray(data)) {
+          // Handle array response
+          fetchedOptions = data.map((item) => {
+            if (typeof item === 'string' || typeof item === 'number') {
+              return {
+                value: String(item),
+                label: String(item),
+              };
+            }
+
+            if (Array.isArray(item)) {
+              const valueIndex = parseInt(dynamicConfig.valueField, 10);
+              const labelIndex = parseInt(dynamicConfig.labelField, 10);
+
+              if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
+                  valueIndex >= 0 && labelIndex >= 0 &&
+                  valueIndex < item.length && labelIndex < item.length) {
+                return {
+                  value: String(item[valueIndex]),
+                  label: String(item[labelIndex]),
+                };
+              }
+
+              return {
+                value: String(item[0] || ''),
+                label: String(item[1] || item[0] || ''),
+              };
+            }
+
+            // Handle object format
+            const getValue = (obj: any, path: string) => {
+              return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+            };
+
+            return {
+              value: String(getValue(item, dynamicConfig.valueField)),
+              label: String(getValue(item, dynamicConfig.labelField)),
+            };
+          });
+        } else if (data && typeof data === 'object') {
+          // Handle single object response
+          const getValue = (obj: any, path: string) => {
+            return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+          };
+
+          fetchedOptions = [{
+            value: String(getValue(data, dynamicConfig.valueField)),
+            label: String(getValue(data, dynamicConfig.labelField)),
+          }];
+        }
+
+        // Filter valid options
+        const validOptions = fetchedOptions
+          .filter((opt) => opt.value && opt.value.trim() !== "");
+
+        if (validOptions.length > 0) {
+          // Merge with existing options, avoiding duplicates
+          setOptions(prevOptions => {
+            const newOptions = [...prevOptions];
+
+            validOptions.forEach(newOpt => {
+              const existingIndex = newOptions.findIndex(opt => opt.value === newOpt.value);
+              if (existingIndex >= 0) {
+                newOptions[existingIndex] = newOpt;
+              } else {
+                newOptions.push(newOpt);
+              }
+            });
+
+            return newOptions;
+          });
+
+          // Update backup options
+          setBackupOptions(prevBackup => {
+            const newBackup = [...prevBackup];
+
+            validOptions.forEach(newOpt => {
+              const existingIndex = newBackup.findIndex(opt => opt.value === newOpt.value);
+              if (existingIndex >= 0) {
+                newBackup[existingIndex] = newOpt;
+              } else {
+                newBackup.push(newOpt);
+              }
+            });
+
+            return newBackup;
+          });
+        }
+
+        initialFetchDoneRef.current = true;
+      } catch (err) {
+        console.error("Error fetching initial label:", err);
+      } finally {
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchInitialLabel();
+  }, [dynamicConfig, selectedValue, options, isMulti, queryClient]);
+
+  // Store the selected option(s) as backup when they change
+  useEffect(() => {
+    if (!selectedValue) return;
+
+    if (isMulti && Array.isArray(selectedValue)) {
+      // For multi-select, handle array of values
+      const newBackupOptions: DropdownOption[] = [];
+
+      selectedValue.forEach(value => {
+        const selectedOption = options.find(option => option.value === value);
+        if (selectedOption) {
+          newBackupOptions.push(selectedOption);
+        } else if (value) {
+          newBackupOptions.push({ value, label: value });
+        }
+      });
+
+      if (newBackupOptions.length > 0) {
+        setBackupOptions(newBackupOptions);
+      }
+    } else if (!isMulti && typeof selectedValue === 'string') {
+      // For single select, handle string value
+      const selectedOption = options.find(option => option.value === selectedValue);
       if (selectedOption) {
-        setBackupOption(selectedOption);
+        setBackupOptions([selectedOption]);
       } else if (selectedValue) {
-        setBackupOption({ value: selectedValue, label: selectedValue });
+        setBackupOptions([{ value: selectedValue, label: selectedValue }]);
       }
     }
-  }, [selectedValue]);
+  }, [selectedValue, options, isMulti]);
 
   // Build the URL for the request
   const buildSearchUrl = useCallback(() => {
@@ -64,17 +250,65 @@ export const useDropdownSearch = ({
       params.append(dynamicConfig.searchParam, debouncedSearchTerm);
     }
 
-    // Add dependency filter parameter if configured
-    if (
-      dynamicConfig.dependsOn &&
-      dynamicConfig.filterParam &&
-      dependencies &&
-      dependencies[dynamicConfig.dependsOn]
-    ) {
-      params.append(
-        dynamicConfig.filterParam,
-        dependencies[dynamicConfig.dependsOn]
-      );
+    // Handle dependency parameters
+    if (dynamicConfig.dependsOn && dependencies) {
+      // Case 1: String format (backward compatibility)
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        if (dynamicConfig.filterParam && dependencies[dynamicConfig.dependsOn]) {
+          const dependencyValue = dependencies[dynamicConfig.dependsOn];
+          // Handle both string and string[] values
+          const paramValue = Array.isArray(dependencyValue)
+            ? dependencyValue.join(',')
+            : dependencyValue;
+
+          params.append(
+            dynamicConfig.filterParam,
+            paramValue
+          );
+        }
+      }
+      // Case 2: Array of dependency configs
+      else if (Array.isArray(dynamicConfig.dependsOn)) {
+        for (const depConfig of dynamicConfig.dependsOn) {
+          if (dependencies[depConfig.field]) {
+            const dependencyValue = dependencies[depConfig.field];
+            const paramValue = Array.isArray(dependencyValue)
+              ? dependencyValue.join(',')
+              : dependencyValue;
+
+            if (depConfig.method === 'replace') {
+              // Replace placeholders in URL
+              const placeholder = `{${depConfig.field}}`;
+              url = url.replace(placeholder, encodeURIComponent(paramValue));
+            } else if (depConfig.method === 'query') {
+              // Add as query parameter
+              const paramName = depConfig.paramName || depConfig.field;
+              params.append(paramName, paramValue);
+            }
+          }
+        }
+      }
+      // Case 3: Object with field names as keys
+      else if (typeof dynamicConfig.dependsOn === 'object') {
+        for (const [field, config] of Object.entries(dynamicConfig.dependsOn)) {
+          if (dependencies[field]) {
+            const dependencyValue = dependencies[field];
+            const paramValue = Array.isArray(dependencyValue)
+              ? dependencyValue.join(',')
+              : dependencyValue;
+
+            if (config.method === 'replace') {
+              // Replace placeholders in URL
+              const placeholder = `{${field}}`;
+              url = url.replace(placeholder, encodeURIComponent(paramValue));
+            } else if (config.method === 'query') {
+              // Add as query parameter
+              const paramName = config.paramName || field;
+              params.append(paramName, paramValue);
+            }
+          }
+        }
+      }
     }
 
     // Add pagination parameters if enabled
@@ -101,13 +335,35 @@ export const useDropdownSearch = ({
     // Skip if we don't have dynamic config
     if (!dynamicConfig) return;
 
-    // Skip if we have a dependsOn value but don't have the dependency
-    if (
-      dynamicConfig.dependsOn &&
-      (!dependencies || !dependencies[dynamicConfig.dependsOn])
-    ) {
-      setOptions([]);
-      return;
+    // Skip if we have a dependsOn value but don't have the required dependencies
+    if (dynamicConfig.dependsOn) {
+      if (typeof dynamicConfig.dependsOn === 'string') {
+        // Case 1: String format (backward compatibility)
+        if (!dependencies || !dependencies[dynamicConfig.dependsOn]) {
+          setOptions([]);
+          return;
+        }
+      } else if (Array.isArray(dynamicConfig.dependsOn)) {
+        // Case 2: Array of dependency configs
+        // Check if any required dependency is missing
+        const missingDependency = dynamicConfig.dependsOn.some(
+          depConfig => !dependencies || !dependencies[depConfig.field]
+        );
+        if (missingDependency) {
+          setOptions([]);
+          return;
+        }
+      } else if (typeof dynamicConfig.dependsOn === 'object') {
+        // Case 3: Object with field names as keys
+        // Check if any required dependency is missing
+        const missingDependency = Object.keys(dynamicConfig.dependsOn).some(
+          field => !dependencies || !dependencies[field]
+        );
+        if (missingDependency) {
+          setOptions([]);
+          return;
+        }
+      }
     }
 
     const url = buildSearchUrl();
@@ -126,10 +382,10 @@ export const useDropdownSearch = ({
     setError(null);
 
     try {
-      console.log(
-        `Fetching dropdown options for search: ${debouncedSearchTerm}`,
-        url
-      );
+      // console.log(
+      //   `Fetching dropdown options for search: ${debouncedSearchTerm}`,
+      //   url
+      // );
 /*       const response = await apiClient.get(url, { signal: controller.signal });
  */
       const response = await queryClient.fetchQuery({
@@ -156,6 +412,39 @@ export const useDropdownSearch = ({
 
       // Extract values and labels from the response
       const extractedOptions = data.map((item) => {
+        // Handle primitive values (string, number)
+        if (typeof item === 'string' || typeof item === 'number') {
+          // For primitive values, use the value as both value and label
+          return {
+            value: String(item),
+            label: String(item),
+          };
+        }
+
+        // Handle array format [value, label]
+        if (Array.isArray(item)) {
+          // If item is an array, use indices as valueField and labelField
+          // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label
+          const valueIndex = parseInt(dynamicConfig.valueField, 10);
+          const labelIndex = parseInt(dynamicConfig.labelField, 10);
+
+          if (!isNaN(valueIndex) && !isNaN(labelIndex) &&
+              valueIndex >= 0 && labelIndex >= 0 &&
+              valueIndex < item.length && labelIndex < item.length) {
+            return {
+              value: String(item[valueIndex]),
+              label: String(item[labelIndex]),
+            };
+          }
+
+          // Fallback to first element as value and second as label if indices are invalid
+          return {
+            value: String(item[0] || ''),
+            label: String(item[1] || item[0] || ''),
+          };
+        }
+
+        // Handle object format
         const getValue = (obj: any, path: string) => {
           return path.split(".").reduce((acc, part) => acc && acc[part], obj);
         };
@@ -175,14 +464,18 @@ export const useDropdownSearch = ({
           return acc;
         }, []);
 
-      // Merge the backup option with the new options if it exists and there is a selected value
+      // Merge the backup options with the new options if they exist and there is a selected value
       let mergedOptions = validOptions;
-      if (
-        selectedValue &&
-        backupOption &&
-        !mergedOptions.find((option) => option.value === backupOption.value)
-      ) {
-        mergedOptions = [backupOption, ...mergedOptions];
+
+      if (selectedValue && backupOptions.length > 0) {
+        // Add any backup options that aren't already in the results
+        const optionsToAdd = backupOptions.filter(
+          backupOpt => !mergedOptions.some(option => option.value === backupOpt.value)
+        );
+
+        if (optionsToAdd.length > 0) {
+          mergedOptions = [...optionsToAdd, ...mergedOptions];
+        }
       }
 
       setOptions(mergedOptions);

@@ -4,6 +4,7 @@ import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
+import {companiesFormConfig} from "@/modules/form-builder";
 
 // Define types for the company data
 interface CompanyData {
@@ -24,6 +25,7 @@ export const CompaniesConfig = () => {
 
   return {
     url: `${baseURL}/companies`,
+    tableId: "companies-table", // Add tableId to the config
     columns: [
       {
         key: "name",
@@ -53,7 +55,7 @@ export const CompaniesConfig = () => {
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
-      {
+       {
         key: "is_active",
         label: t("Companies.Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
@@ -63,12 +65,12 @@ export const CompaniesConfig = () => {
       {
         key: "id",
         label: t("Companies.Actions"),
-        render: (_: unknown, row: CompanyData) => <Execution id={row.id} />,
+        render: (_: unknown, row: CompanyData) => <Execution id={row.id} formConfig={companiesFormConfig} />,
       },
     ],
     allSearchedFields: [
       {
-        key: "country",
+        key: "country_id",
         searchType: {
           type: "dropdown",
           placeholder: t("Companies.CountryFilter"),
@@ -86,7 +88,7 @@ export const CompaniesConfig = () => {
         },
       },
       {
-        key: "companyType",
+        key: "company_type_id",
         searchType: {
           type: "dropdown",
           placeholder: t("Companies.TypeFilter"),
@@ -104,10 +106,10 @@ export const CompaniesConfig = () => {
         },
       },
       {
-        key: "companyField",
+        key: "company_field_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("Companies.TypeFilter"),
+          placeholder: t("Companies.CompanySection"),
           dynamicDropdown: {
             url: `${baseURL}/company_fields`,
             valueField: "id",
@@ -130,7 +132,7 @@ export const CompaniesConfig = () => {
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
   };

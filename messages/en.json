@@ -94,12 +94,15 @@
     "FilterSearch": "Filter Search",
     "RowsPerPage": "Rows per page:",
     "Search": "Search",
-    "Actions": "Actions"
+    "Actions": "Actions",
+    "ToggleColumns": "Toggle visible columns",
+    "VisibleColumns": "Visible Columns"
   },
   "Companies": {
     "Companies": "Companies",
     "Email": "Email",
     "CompanyType": "Company Type",
+    "CompanySection": "Company Section",
     "Manager": "Manager",
     "DataStatus": "Data Status",
     "Status": "Status",
@@ -112,12 +115,32 @@
     "Delete": "Delete (Archive)"
   },
   "Sidebar": {
+    "Dashboard": "Profile",
     "Companies": "Companies",
     "Users": "Users",
-    "Welcome": "Hello, Mohammed Saad!",
-    "CompanyName" : "New Vision"
+    "settings": "System Settings",
+    "Welcome": "Hello",
+    "CompanyName": "New Vision"
   },
   "Header": {
     "MainSystemManagement": "Main System Management"
+  },
+  "FormBuilder": {
+    "Fields": {
+      "Image": {
+        "UploadImage": "Upload Image",
+        "ChangeImage": "Change Image",
+        "RemoveImage": "Remove Image",
+        "ClickToUpload": "Click to upload an image",
+        "Uploading": "Uploading...",
+        "AllowedTypes": "Allowed types",
+        "MaxSize": "Max size",
+        "FileTypeNotAllowed": "File type not allowed. Allowed types",
+        "FileSizeExceeds": "File size exceeds maximum allowed size",
+        "UploadFailed": "Upload failed",
+        "UploadSuccessful": "Upload successful",
+        "ImageRequired": "Image is required"
+      }
+    }
   }
 }
