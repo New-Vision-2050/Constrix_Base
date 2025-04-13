@@ -1,11 +1,10 @@
 import { serialize } from "object-to-formdata";
-import { ProfileImageMsg } from "../types/valdation-message-user-image";
 import { apiClient } from "@/config/axios-config";
 
 type ResponseT = {
   code: string;
   message: string;
-  payload: ProfileImageMsg[];
+  payload: { image_url: string };
 };
 
 export default async function uploadProfileImage(image: File) {

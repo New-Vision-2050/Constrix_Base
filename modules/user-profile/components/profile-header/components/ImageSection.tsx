@@ -29,7 +29,8 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
         <img
           src={imgSrc}
           alt="Profile Background"
-          className="w-32 h-32 rounded"
+          className="w-32 h-32 rounded cursor-pointer"
+          onClick={() => setOpenDialog(true)}
         />
       ) : (
         <label

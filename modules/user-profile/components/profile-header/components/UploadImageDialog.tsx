@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import CloudUploadIcon from "@/public/icons/cloud-upload";
 import InfoIcon from "@/public/icons/InfoIcon";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import VisuallyHiddenInput from "@/components/shared/VisuallyHiddenInput";
 import validateProfileImage from "@/modules/dashboard/api/validate-image";
@@ -14,6 +14,7 @@ import { CircleCheckIcon } from "lucide-react";
 import { ProfileImageMsg } from "@/modules/dashboard/types/valdation-message-user-image";
 import RegularList from "@/components/shared/RegularList";
 import uploadProfileImage from "@/modules/dashboard/api/upload-profile-image";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 type PropsT = {
   open: boolean;
@@ -36,6 +37,14 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
   const [feedbackMessages, setFeedbackMessages] = useState(initialValidateMgs);
   const [uploadedFile, setUploadedFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { handleUpdateImage } = useUserProfileCxt();
+
+  // handle side effects
+  useEffect(() => {
+    setValid(false);
+    setPreviewUrl("");
+    setFeedbackMessages(initialValidateMgs);
+  }, [open]);
 
   // handle file input change
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,12 +60,16 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
   const handleClearImage = () => {
     setPreviewUrl(null);
     setValid(false);
+    setUploadedFile(undefined);
     setFeedbackMessages(initialValidateMgs);
   };
 
   // handle upload and validate Image
   const handleValidateImage = async () => {
     try {
+      if (!uploadedFile) {
+        return;
+      }
       setLoading(true);
       const response = await validateProfileImage(uploadedFile as File);
       let _valid = true;
@@ -80,9 +93,9 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
     try {
       setLoading(true);
       const response = await uploadProfileImage(uploadedFile as File);
-      console.log("response_response", response);
-
+      handleUpdateImage(response?.image_url);
       setLoading(false);
+      setOpen(false);
     } catch (err) {
       setLoading(false);
       console.log("error in handleValidateImage :", err);
@@ -148,10 +161,22 @@ export default function UploadImageDialog({ open, setOpen }: PropsT) {
         <div className="w-full flex justify-center items-center">
           <Button
             onClick={!valid ? handleValidateImage : handleSaveImage}
-            title={!valid ? "validate Image" : "Save Image"}
+            title={
+              !valid
+                ? !uploadedFile
+                  ? "upload image firstly"
+                  : "validate Image"
+                : "Save Image"
+            }
             disabled={!Boolean(uploadedFile) || loading}
           >
-            {!valid ? "التحقق من الصورة" : "حفظ"}
+            {!valid
+              ? loading
+                ? "جاري التنفيذ..."
+                : "التحقق من الصورة"
+              : loading
+              ? "جاري التنفيذ..."
+              : "حفظ"}
           </Button>
         </div>
       </DialogContent>

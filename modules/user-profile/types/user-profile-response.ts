@@ -17,6 +17,7 @@ export interface UserProfileData {
     pendingTasks?: number;
   };
   // Add any other fields that might be needed
+  image_url: string;
 }
 
 // Define the API response type

@@ -28,7 +28,7 @@ export const ConnectionDataFormConfig = () => {
         ],
       },
     ],
-    submitButtonText: "Submit",
+    submitButtonText: "تحقق",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
