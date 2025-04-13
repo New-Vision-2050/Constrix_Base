@@ -2,13 +2,14 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import LandmarkIcon from "@/public/icons/landmark";
 import BackpackIcon from "@/public/icons/backpack";
 import GraduationCapIcon from "@/public/icons/graduation-cap";
+import UserQualificationData from "../components/content-manager/components/qualification";
 
 export const AcademicAndExperienceSidebarItems: UserProfileNestedTab[] = [
   {
     id: "contract-tab-academic-experience-qualification",
     title: "المؤهل",
     icon: <GraduationCapIcon />,
-    content: <>المؤهل</>,
+    content: <UserQualificationData />,
   },
   {
     id: "contract-tab-academic-experience-brief",
