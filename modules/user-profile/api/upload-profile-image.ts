@@ -1,6 +1,6 @@
-import axios from "axios";
 import { serialize } from "object-to-formdata";
 import { ProfileImageMsg } from "@/modules/dashboard/types/valdation-message-user-image";
+import { apiClient } from "@/config/axios-config";
 
 type ResponseT = {
   code: string;
@@ -9,7 +9,7 @@ type ResponseT = {
 };
 
 export default async function uploadProfileImage(image: File) {
-  const res = await axios.post<ResponseT>(
+  const res = await apiClient.post<ResponseT>(
     `/company-users/upload-photo`,
     serialize({ image })
   );
