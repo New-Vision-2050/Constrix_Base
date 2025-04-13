@@ -84,7 +84,7 @@ export const PersonalDataFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
-        is_default: formData?.formData ? 1 : 0,
+        is_default: formData?.is_default ? 1 : 0,
       };
       const response = await apiClient.put(`/company-users/data-info`, body);
       return {
