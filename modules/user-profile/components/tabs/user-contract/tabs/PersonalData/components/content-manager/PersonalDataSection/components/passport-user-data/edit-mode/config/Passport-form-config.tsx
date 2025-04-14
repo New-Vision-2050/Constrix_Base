@@ -1,10 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
+import { serialize } from "object-to-formdata";
 
 export const PassportDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
-  console.log('userIdentityData',userIdentityData)
 
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
@@ -19,7 +19,7 @@ export const PassportDataFormConfig = () => {
         title: "بيانات جواز السفر",
         fields: [
           {
-            name: "passportNumber",
+            name: "passport",
             label: "رقم جواز السغر",
             type: "text",
             placeholder: "رقم جواز السغر",
@@ -27,25 +27,30 @@ export const PassportDataFormConfig = () => {
           {
             label: "تاريخ الأستلام",
             type: "date",
-            name: "dateOfReceipt",
+            name: "passport_start_date",
             placeholder: "تاريخ الأستلام",
           },
           {
             label: "تاريخ الأنتهاء",
             type: "date",
-            name: "endDate",
+            name: "passport_end_date",
             placeholder: "تاريخ الأنتهاء",
           },
           {
             label: "ارفاق الهوية",
             type: "image",
-            name: "passport",
+            isMulti: true,
+            name: "file_passport",
             placeholder: "ارفاق الهوية",
           },
         ],
       },
     ],
-    initialValues: {},
+    initialValues: {
+      passport: userIdentityData?.passport,
+      passport_start_date: userIdentityData?.passport_start_date,
+      passport_end_date: userIdentityData?.passport_end_date,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -55,11 +60,26 @@ export const PassportDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const formatDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
+        const day = `${date.getDate()}`.padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+      };
+      const startDate = new Date(formData?.passport_start_date as string);
+      const endDate = new Date(formData?.passport_end_date as string);
+
       const body = {
         ...formData,
+        passport_start_date: formatDate(startDate),
+        passport_end_date: formatDate(endDate),
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(`/company-users/contact-info`, body);
+
+      const response = await apiClient.post(
+        `/company-users/identity-data`,
+        serialize(body)
+      );
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

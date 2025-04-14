@@ -40,7 +40,7 @@ export default function UserProfilePassportDataReview() {
           valid={true}
           label="ارفاق الهوية"
           value={
-            userIdentityData?.file_passport ?? "passport_attached_file.pdf"
+            userIdentityData?.file_passport ? "passport_attached_file.pdf" : ""
           }
           isPdf
         />

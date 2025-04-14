@@ -6,13 +6,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export default function PersonalDataSection() {
   const { user } = useUserProfileCxt();
-  const identity = true || user?.country?.id === user?.company?.[0]?.country_id;
-  console.log(
-    "identity",
-    identity,
-    user?.country?.id,
-    user?.company?.[0]?.country_id
-  );
+  const identity = user?.country?.id === user?.company?.country_id;
 
   return (
     <div className="flex flex-col gap-6">

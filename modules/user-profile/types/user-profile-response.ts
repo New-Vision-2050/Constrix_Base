@@ -22,7 +22,7 @@ export interface UserProfileData {
   // Add any other fields that might be needed
   image_url: string;
   country?: Country;
-  company?:UserCompany[]
+  company?:UserCompany
 }
 
 // Define the API response type

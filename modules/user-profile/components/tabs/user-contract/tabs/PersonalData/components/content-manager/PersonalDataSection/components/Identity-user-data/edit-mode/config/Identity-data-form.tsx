@@ -18,21 +18,6 @@ export const IdentityDataFormConfig = () => {
     },
     sections: [
       {
-        //  border_number,
-        //  entry_number,
-        //  file_border_number,
-        //  file_entry_number,
-        //  ,
-        //  file_passport,
-        //  passport,
-        //  passport_start_date,
-        //  ,
-        //  border_number_start_date,
-        //  entry_number_start_date,
-        //  passport_end_date,
-        //  ,
-        //  border_number_end_date,
-        //  entry_number_end_date,
         title: "بيانات الهوية",
         fields: [
           {
@@ -66,7 +51,6 @@ export const IdentityDataFormConfig = () => {
       identity: userIdentityData?.identity,
       identity_start_date: userIdentityData?.identity_start_date,
       identity_end_date: userIdentityData?.identity_end_date,
-      file_identity: userIdentityData?.file_identity,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
