@@ -1,29 +1,29 @@
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import RelativesList from "./RelativesList";
 import FormFieldSet from "../../../../../../components/FormFieldSet";
-import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
-import MaritalStatusRelativesSectionPreviewMode from "./preview-mode";
-import MaritalStatusRelativesSectionEditMode from "./edit-mode";
+import CreateRelativeDialog from "./CreateRelativeDialog";
+import { useState } from "react";
 
 export default function MaritalStatusRelativesSection() {
-  // declare and define component state and vars
-  const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
-
-  // declare and define component methods
-  const handleEditClick = () =>
-    setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
+  const [open, setOpen] = useState(false);
 
   return (
     <FormFieldSet
-      title="الحالة الاجتماعية"
+      title="الحالة الاجتماعية / الاقارب"
       secondTitle={
-        <FieldSetSecondTitle mode={mode} handleEditClick={handleEditClick} />
+        <Button
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          أضافة قريب
+        </Button>
       }
     >
-      {mode === "Preview" ? (
-        <MaritalStatusRelativesSectionPreviewMode />
-      ) : (
-        <MaritalStatusRelativesSectionEditMode />
-      )}
+      <div className="flex flex-col gap-5">
+        <RelativesList />
+      </div>
+      <CreateRelativeDialog open={open} setOpen={setOpen} />
     </FormFieldSet>
   );
 }

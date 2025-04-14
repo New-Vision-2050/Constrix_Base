@@ -1,38 +1,45 @@
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import { Relative } from "@/modules/user-profile/types/relative";
+import PreviewTextField from "../../../../../../../../components/PreviewTextField";
 
-export default function MaritalStatusRelativesSectionPreviewMode() {
+type PropsT = {
+  relative: Relative;
+};
+
+export default function MaritalStatusRelativesSectionPreviewMode({
+  relative,
+}: PropsT) {
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row one columns*/}
       <div className="p-2 col-span-2">
         <PreviewTextField
-          valid={true}
           label="الحالة الاجتماعية"
-          value=""
+          value={relative?.marital_status}
+          valid={Boolean(relative?.marital_status)}
           isSelect
         />
       </div>
       {/* two row 2 columns*/}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="اسم شخص في حالة الطواري"
-          value=""
+          value={relative?.name}
+          valid={Boolean(relative?.name)}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="علاقة الشخص بحاله الطواري"
-          value=""
+          value={relative?.relationship}
+          valid={Boolean(relative?.relationship)}
         />
       </div>
       {/* third row one columns*/}
       <div className="p-2 col-span-2">
         <PreviewTextField
-          valid={true}
           label=" رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ"
-          value=""
+          value={relative?.phone}
+          valid={Boolean(relative?.phone)}
         />
       </div>
     </div>

@@ -1,11 +1,24 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { Relative } from "@/modules/user-profile/types/relative";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 
-export const MaritalStatusRelativesFormConfig = () => {
+type PropsT = {
+  relative?: Relative;
+  onSuccess?: () => void;
+};
+
+export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
+  const { relative, onSuccess } = props;
+  const { user } = useUserProfileCxt();
+  const { handleRefetchUserRelativesData } = useConnectionDataCxt();
+  const formMode = !relative ? "Create" : "Edit";
+
   const maritalStatusRelativesFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
+    formId: `ConnectionInformation-relatives-data-form-${relative?.id ?? ""}`,
     title: "الحالة الاجتماعية / الاقارب",
-    apiUrl: `${baseURL}/company-users/contact-info`,
+    apiUrl: `${baseURL}/user_relatives`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -14,19 +27,24 @@ export const MaritalStatusRelativesFormConfig = () => {
       {
         fields: [
           {
-            name: "maritalStatus",
+            name: "marital_status",
             label: "الحالة الاجتماعية",
-            type: "text",
+            type: "select",
+            options: [
+              { label: "متزوج", value: "married" },
+              { label: "غير متزوج", value: "single" },
+              { label: "متزوج ويعول", value: "married-with-children" },
+            ],
             placeholder: "الحالة الاجتماعية",
           },
           {
-            name: "personName",
+            name: "name",
             label: "اسم شخص في حالة الطواري",
             type: "text",
             placeholder: "اسم شخص في حالة الطواري",
           },
           {
-            name: "postalAddress2",
+            name: "relationship",
             label: "علاقة الشخص بحاله الطواري",
             type: "text",
             placeholder: "علاقة الشخص بحاله الطواري",
@@ -40,37 +58,44 @@ export const MaritalStatusRelativesFormConfig = () => {
         ],
       },
     ],
-    submitButtonText: "Submit",
+    initialValues: {
+      marital_status: relative?.marital_status,
+      name: relative?.name,
+      phone: relative?.phone,
+      relationship: relative?.relationship,
+    },
+    submitButtonText: "اضافة حقل اخر",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: formMode === "Create" ? true : false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
+    onSuccess: () => {
+      onSuccess?.();
+      handleRefetchUserRelativesData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
+      const url =
+        formMode === "Create"
+          ? "/user_relatives"
+          : `/user_relatives/${relative?.id}`;
+          
       const body = {
         ...formData,
+        user_id: user?.user_id,
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(`/company-users/contact-info`, body);
+
+      const response = await (formMode === "Edit"
+        ? apiClient.put
+        : apiClient.post)(url, body);
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return maritalStatusRelativesFormConfig;
