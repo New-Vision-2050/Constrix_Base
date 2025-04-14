@@ -5,6 +5,7 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 
 export default function UserProfilePersonalDataReview() {
   const { userPersonalData } = usePersonalDataTabCxt();
+  console.log("userPersonalData", userPersonalData);
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* First row */}
@@ -73,7 +74,7 @@ export default function UserProfilePersonalDataReview() {
         <PreviewTextField
           valid={true}
           label="الجنسية"
-          value={userPersonalData?.nationalityRelation ?? ""}
+          value={userPersonalData?.country ?? ""}
         />
       </div>
     </div>

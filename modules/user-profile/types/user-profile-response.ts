@@ -1,3 +1,6 @@
+import { UserCompany } from "@/modules/dashboard/types/user-company";
+import { Country } from "@/modules/settings/types/Country";
+
 // Define the user profile data type
 export interface UserProfileData {
   id: string;
@@ -18,6 +21,8 @@ export interface UserProfileData {
   };
   // Add any other fields that might be needed
   image_url: string;
+  country?: Country;
+  company?:UserCompany[]
 }
 
 // Define the API response type

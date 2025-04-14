@@ -1,6 +1,9 @@
 import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserProfilePassportDataReview() {
+  const { userIdentityData } = usePersonalDataTabCxt();
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
@@ -8,7 +11,7 @@ export default function UserProfilePassportDataReview() {
         <PreviewTextField
           valid={true}
           label="رقم جواز السفر"
-          value="A27678211"
+          value={userIdentityData?.passport ?? ""}
           required
         />
       </div>
@@ -16,7 +19,7 @@ export default function UserProfilePassportDataReview() {
         <PreviewTextField
           valid={true}
           label="تاريخ الانشاء"
-          value="05/08/2021"
+          value={userIdentityData?.passport_start_date ?? ""}
           required
           isDate
         />
@@ -27,7 +30,7 @@ export default function UserProfilePassportDataReview() {
         <PreviewTextField
           valid={true}
           label="تاريخ الانتهاء"
-          value="05/08/2024"
+          value={userIdentityData?.passport_end_date ?? ""}
           isDate
           required
         />
@@ -36,7 +39,9 @@ export default function UserProfilePassportDataReview() {
         <PreviewTextField
           valid={true}
           label="ارفاق الهوية"
-          value="الجواز-2024"
+          value={
+            userIdentityData?.file_passport ?? "passport_attached_file.pdf"
+          }
           isPdf
         />
       </div>

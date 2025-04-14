@@ -8,6 +8,8 @@ export type PersonalUserDataSectionT = {
   birthdate_gregorian: string;
   birthdate_hijri: string;
   nationality: string;
+  country: string;
+  country_id: number;
   nationalityRelation: string;
 };
 

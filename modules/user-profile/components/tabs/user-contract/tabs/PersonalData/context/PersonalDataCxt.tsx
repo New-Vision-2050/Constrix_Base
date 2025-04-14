@@ -10,6 +10,8 @@ import useUserPersonalData from "../hooks/useUserPersonalData";
 import { PersonalUserDataSectionT } from "../api/get-personal-data";
 import { UserConnectionInformationT } from "../api/get-user-connection-data";
 import useUserConnectionData from "../hooks/useUserConnectionData";
+import useUserIdentityData from "../hooks/useUserIdentityData";
+import { UserIdentityInformationT } from "../api/get-identity-data";
 
 // declare context types
 type PersonalDataTabCxtType = {
@@ -23,6 +25,10 @@ type PersonalDataTabCxtType = {
   // user - connection data
   userConnectionData: UserConnectionInformationT | undefined;
   handleRefreshConnectionData: () => void;
+
+  // user - identity data
+  userIdentityData: UserIdentityInformationT | undefined;
+  handleRefreshIdentityData: () => void;
 };
 
 export const PersonalDataTabCxt = createContext<PersonalDataTabCxtType>(
@@ -50,11 +56,17 @@ export const PersonalDataTabCxtProvider = ({
     useUserPersonalData();
   const { data: userConnectionData, refetch: refreshConnectionData } =
     useUserConnectionData();
+  const { data: userIdentityData, refetch: refetchIdentityData } =
+    useUserIdentityData();
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
 
   // ** handle side effects
 
   // ** declare and define component helper methods
+  const handleRefreshIdentityData = () => {
+    refetchIdentityData();
+  };
+
   const handleRefreshPersonalData = () => {
     refreshPersonalData();
   };
@@ -78,6 +90,9 @@ export const PersonalDataTabCxtProvider = ({
         // user - connection data
         userConnectionData,
         handleRefreshConnectionData,
+        // user - identity data
+        userIdentityData,
+        handleRefreshIdentityData,
       }}
     >
       {children}

@@ -1,6 +1,9 @@
 import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserProfileIdentityDataReview() {
+  const { userIdentityData } = usePersonalDataTabCxt();
+  
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
@@ -8,7 +11,7 @@ export default function UserProfileIdentityDataReview() {
         <PreviewTextField
           valid={true}
           label="رقم الهوية"
-          value="2145632456"
+          value={userIdentityData?.identity ?? ""}
           required
         />
       </div>
@@ -16,7 +19,7 @@ export default function UserProfileIdentityDataReview() {
         <PreviewTextField
           valid={true}
           label="تاريخ الدخول"
-          value="055456200"
+          value={userIdentityData?.identity_start_date ?? ""}
           required
           isDate
         />
@@ -27,7 +30,7 @@ export default function UserProfileIdentityDataReview() {
         <PreviewTextField
           valid={true}
           label="تاريخ الانتهاء"
-          value="05/08/2024"
+          value={userIdentityData?.identity_end_date ?? ""}
           isDate
           required
         />
@@ -36,7 +39,7 @@ export default function UserProfileIdentityDataReview() {
         <PreviewTextField
           valid={true}
           label="ارفاق الهوية"
-          value="الهوية-2024"
+          value={"identity_2024.pdf"}
           isPdf
         />
       </div>

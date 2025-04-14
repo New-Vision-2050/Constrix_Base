@@ -1,7 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 
 export const PassportDataFormConfig = () => {
+  const { userIdentityData } = usePersonalDataTabCxt();
+  console.log('userIdentityData',userIdentityData)
+
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
     title: "بيانات جواز السفر",
@@ -41,20 +45,15 @@ export const PassportDataFormConfig = () => {
         ],
       },
     ],
+    initialValues: {},
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
-    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
@@ -66,12 +65,6 @@ export const PassportDataFormConfig = () => {
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return PassportFormConfig;

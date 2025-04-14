@@ -56,7 +56,7 @@ export const PersonalDataFormConfig = () => {
             placeholder: "Birthdate Hijri",
           },
           {
-            name: "nationality",
+            name: "country_id",
             label: "الجنسية",
             type: "select",
             placeholder: "Nationality",
@@ -76,7 +76,7 @@ export const PersonalDataFormConfig = () => {
       is_default: userPersonalData?.is_default == 1,
       birthdate_gregorian: userPersonalData?.birthdate_gregorian,
       birthdate_hijri: userPersonalData?.birthdate_hijri,
-      nationality: userPersonalData?.nationality,
+      country_id: userPersonalData?.country_id?.toString(),
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
