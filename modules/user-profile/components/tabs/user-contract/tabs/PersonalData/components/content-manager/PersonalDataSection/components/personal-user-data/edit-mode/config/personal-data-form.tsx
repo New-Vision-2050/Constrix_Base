@@ -20,12 +20,24 @@ export const PersonalDataFormConfig = () => {
             label: "الاسم ثلاثي",
             type: "text",
             placeholder: "Name",
+            validation: [
+              {
+                type: "required",
+                message: "الاسم مطلوب",
+              },
+            ],
           },
           {
             name: "nickname",
             label: "اسم الشهرة",
             type: "text",
             placeholder: "nick name",
+            validation: [
+              {
+                type: "required",
+                message: "الاسم الشهرة مطلوب",
+              },
+            ],
           },
           {
             name: "gender",
@@ -35,6 +47,12 @@ export const PersonalDataFormConfig = () => {
             options: [
               { label: "Male", value: "male" },
               { label: "Female", value: "female" },
+            ],
+            validation: [
+              {
+                type: "required",
+                message: "الجنس مطلوب",
+              },
             ],
           },
           {
@@ -48,12 +66,24 @@ export const PersonalDataFormConfig = () => {
             label: "تاريخ الميلاد",
             type: "date",
             placeholder: "Birthdate Gregorian",
+            validation: [
+              {
+                type: "required",
+                message: "التاريخ الميلادي مطلوب",
+              },
+            ],
           },
           {
             name: "birthdate_hijri",
             label: "تاريخ الهجري",
             type: "date",
             placeholder: "Birthdate Hijri",
+            validation: [
+              {
+                type: "required",
+                message: "التاريخ الهجري مطلوب",
+              },
+            ],
           },
           {
             name: "country_id",
@@ -65,6 +95,12 @@ export const PersonalDataFormConfig = () => {
               valueField: "id",
               labelField: "name",
             },
+            validation: [
+              {
+                type: "required",
+                message: "الجنسية مطلوب",
+              },
+            ],
           },
         ],
       },

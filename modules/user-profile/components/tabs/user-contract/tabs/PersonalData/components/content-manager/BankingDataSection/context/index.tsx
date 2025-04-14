@@ -6,9 +6,13 @@ import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 import useUserBankingData from "../../../../hooks/useUserBankingData";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { BankAccount } from "@/modules/user-profile/types/bank-account";
 
 // declare context types
-type UserBankingDataCxtType = {};
+type UserBankingDataCxtType = {
+  bankAccounts: BankAccount[] | undefined;
+  handleRefreshBankingData: () => void;
+};
 
 export const UserBankingDataCxt = createContext<UserBankingDataCxtType>(
   {} as UserBankingDataCxtType
@@ -32,15 +36,21 @@ export const UserBankingDataCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const { user } = useUserProfileCxt();
-  const { data } = useUserBankingData(user?.user_id ?? "");
+  const { data: bankAccounts, refetch: refreshBankingData } =
+    useUserBankingData(user?.user_id ?? "");
 
   // ** handle side effects
 
   // ** declare and define component helper methods
+  const handleRefreshBankingData = () => {
+    refreshBankingData();
+  };
 
   // ** return component ui
   return (
-    <UserBankingDataCxt.Provider value={{}}>
+    <UserBankingDataCxt.Provider
+      value={{ bankAccounts, handleRefreshBankingData }}
+    >
       {children}
     </UserBankingDataCxt.Provider>
   );

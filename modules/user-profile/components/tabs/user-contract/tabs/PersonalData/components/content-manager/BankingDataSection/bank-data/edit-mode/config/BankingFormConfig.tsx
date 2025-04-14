@@ -1,11 +1,24 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { BankAccount } from "@/modules/user-profile/types/bank-account";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useUserBankingDataCxt } from "../../../context";
 
-export const BankingDataFormConfig = () => {
+type PropsT = {
+  bank?: BankAccount;
+  onSuccess?: () => void;
+};
+export const BankingDataFormConfig = (props: PropsT) => {
+  // declare and define helper state and variables
+  const { bank, onSuccess } = props ?? {};
+  const { user } = useUserProfileCxt();
+  const formType = bank ? "Edit" : "Create";
+  const { handleRefreshBankingData } = useUserBankingDataCxt();
+
+  // form config
   const BankingFormConfig: FormConfig = {
-    formId: "Banking-data-form",
-    title: "البيانات البنكية",
-    apiUrl: `${baseURL}/company-users/contact-info`,
+    formId: `Banking-data-form-${formType}-${bank?.id ?? ""}`,
+    apiUrl: `${baseURL}/bank_accounts`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -14,112 +27,168 @@ export const BankingDataFormConfig = () => {
       {
         fields: [
           {
-            name: "",
-            label: "حساب بنكي",
-            type: "dynamicRows",
-            dynamicRowOptions: {
-              enableDrag: true,
-              rowFields: [
-                {
-                  type: "select",
-                  name: "login_option",
-                  label: "Login Option",
-                  placeholder: "Select Login Option",
-                  dynamicOptions: {
-                    url: `${baseURL}/settings/login-way/login-options`,
-                    valueField: "login_option",
-                    labelField: "login_option",
-                    searchParam: "login_option",
-                    transformResponse: (data: string[]) =>
-                      data.map((option) => ({ value: option, label: option })),
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "Login Option is required",
-                    },
-                  ],
-                },
-                {
-                  type: "select",
-                  // isMulti: true,
-                  name: "drivers",
-                  label: "Login Driver",
-                  placeholder: "Select Login Driver",
-                  dynamicOptions: {
-                    url: `${baseURL}/settings/driver/get-drivers-by-login-option`,
-                    valueField: "value",
-                    labelField: "name",
-                    dependsOn: "login_option",
-                    filterParam: "login_option",
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "Login Driver is required",
-                    },
-                  ],
-                },
-                {
-                  type: "select",
-                  name: "login_option_alternatives",
-                  label: "Login Way Alternative",
-                  placeholder: "Select Login Way Alternative",
-                  dynamicOptions: {
-                    url: `${baseURL}/settings/driver/get-alternatives-drivers-by-login-option`,
-                    dependsOn: "drivers",
-                    filterParam: "login_option_driver",
-                    valueField: "key",
-                    labelField: "key",
-                    searchParam: "key",
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "Login Way Alternative is required",
-                    },
-                  ],
-                },
-              ],
-              minRows: 1,
-              maxRows: 5,
-              columns: 1,
+            type: "select",
+            name: "country_id",
+            label: "الدولة",
+            placeholder: "اختر الدولة",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل الدولة",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "bank_id",
+            label: "البنك",
+            placeholder: "اختر البنك",
+            dynamicOptions: {
+              url: `${baseURL}/banks`,
+              valueField: "id",
+              labelField: "name",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "البنك مطلوب",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "type",
+            label: "نوع الحساب",
+            placeholder: "اختر نوع الحساب",
+            options: [
+              { label: "default", value: "default" },
+              { label: "custody", value: "custody" },
+              { label: "salaries", value: "salaries" },
+            ],
+            validation: [
+              {
+                type: "required",
+                message: "نوع الحساب مطلوب",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "currency_id",
+            label: "عملة الحساب",
+            placeholder: "اختر عملة الحساب",
+            dynamicOptions: {
+              url: `${baseURL}/currencies`,
+              valueField: "id",
+              labelField: "name",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "عملة الحساب مطلوب",
+              },
+            ],
+          },
+          {
+            type: "text",
+            name: "iban",
+            label: "رمز ال iban",
+            placeholder: "اختر رمز ال iban",
+            validation: [
+              {
+                type: "required",
+                message: "رمز ال iban مطلوب",
+              },
+            ],
+          },
+          {
+            type: "text",
+            name: "user_name",
+            label: "أسم المستخدم",
+            placeholder: "اختر أسم المستخدم",
+            validation: [
+              {
+                type: "required",
+                message: "أسم المستخدم مطلوب",
+              },
+            ],
+          },
+          {
+            type: "text",
+            name: "account_number",
+            label: "رقم الحساب",
+            placeholder: "اختر رقم الحساب",
+            validation: [
+              {
+                type: "required",
+                message: "رقم الحساب مطلوب",
+              },
+            ],
+          },
+          {
+            type: "text",
+            name: "swift_bic",
+            label: "كود ال swift",
+            placeholder: "اختر كود ال swift",
+            validation: [
+              {
+                type: "required",
+                message: "كود ال swift مطلوب",
+              },
+            ],
           },
         ],
       },
     ],
+    initialValues: {
+      account_number: bank?.account_number,
+      bank_id: bank?.bank_id,
+      country_id: bank?.country_id,
+      currency_id: bank?.currency_id,
+      iban: bank?.iban,
+      swift_bic: bank?.swift_bic,
+      type: bank?.type,
+      user_name: bank?.user_name,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: formType === "Create" ? true : false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
+    onSuccess: () => {
+      handleRefreshBankingData();
+      onSuccess?.();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
+        user_id: user?.user_id,
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(`/company-users/contact-info`, body);
+      const url = `/bank_accounts${formType === "Edit" ? `/${bank?.id}` : ""}`;
+      const response = await (formType == "Create"
+        ? apiClient.post
+        : apiClient.put)(url, body);
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return BankingFormConfig;

@@ -5,23 +5,22 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 
 export default function UserProfilePersonalDataReview() {
   const { userPersonalData } = usePersonalDataTabCxt();
-  console.log("userPersonalData", userPersonalData);
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
           required={true}
-          valid={true}
           label="الاسم ثلاثي"
           value={userPersonalData?.name ?? ""}
+          valid={Boolean(userPersonalData?.name)}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={false}
           label="الاسم الشهرة"
           value={userPersonalData?.nickname ?? ""}
+          valid={Boolean(userPersonalData?.nickname)}
         />
       </div>
       <div className="p-2">
@@ -34,15 +33,14 @@ export default function UserProfilePersonalDataReview() {
       {/* Second row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="الجنس"
           value={userPersonalData?.gender ?? ""}
+          valid={Boolean(userPersonalData?.gender)}
           isSelect
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="تاريخ الميلاد"
           value={
             userPersonalData?.birthdate_gregorian
@@ -51,12 +49,12 @@ export default function UserProfilePersonalDataReview() {
                 ).toLocaleDateString()
               : ""
           }
+          valid={Boolean(userPersonalData?.birthdate_gregorian)}
           isDate
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={false}
           label="تاريخ الميلاد (هجري)"
           value={
             userPersonalData?.birthdate_hijri
@@ -65,6 +63,7 @@ export default function UserProfilePersonalDataReview() {
                 ).toLocaleDateString()
               : ""
           }
+          valid={Boolean(userPersonalData?.birthdate_hijri)}
           isDate
         />
       </div>
@@ -72,9 +71,9 @@ export default function UserProfilePersonalDataReview() {
       {/* Third row - full width */}
       <div className="p-2 col-span-3">
         <PreviewTextField
-          valid={true}
           label="الجنسية"
           value={userPersonalData?.country ?? ""}
+          valid={Boolean(userPersonalData?.country)}
         />
       </div>
     </div>

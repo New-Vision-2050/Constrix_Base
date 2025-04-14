@@ -6,8 +6,6 @@ import { serialize } from "object-to-formdata";
 export const IdentityDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
 
-  console.log("userIdentityData", userIdentityData);
-
   const IdentityFormConfig: FormConfig = {
     formId: "Identity-data-form",
     title: "بيانات الهوية",
@@ -22,21 +20,39 @@ export const IdentityDataFormConfig = () => {
         fields: [
           {
             name: "identity",
-            label: "رقم رقم الهوية",
+            label: "رقم الهوية",
             type: "text",
-            placeholder: "رقم رقم الهوية",
+            placeholder: "رقم الهوية",
+            validation: [
+              {
+                type: "required",
+                message: "رقم الهوية مطلوب",
+              },
+            ],
           },
           {
             label: "تاريخ الدخول",
             type: "date",
             name: "identity_start_date",
             placeholder: "تاريخ الدخول",
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الدخول مطلوب",
+              },
+            ],
           },
           {
             label: "تاريخ الانتهاء",
             type: "date",
             name: "identity_end_date",
             placeholder: "تاريخ الانتهاء",
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الأنتهاء مطلوب",
+              },
+            ],
           },
           {
             label: "ارفاق الهوية",

@@ -23,18 +23,36 @@ export const PassportDataFormConfig = () => {
             label: "رقم جواز السغر",
             type: "text",
             placeholder: "رقم جواز السغر",
+            validation: [
+              {
+                type: "required",
+                message: "رقم الجواز مطلوب",
+              },
+            ],
           },
           {
             label: "تاريخ الأستلام",
             type: "date",
             name: "passport_start_date",
             placeholder: "تاريخ الأستلام",
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الأستلام مطلوب",
+              },
+            ],
           },
           {
             label: "تاريخ الأنتهاء",
             type: "date",
             name: "passport_end_date",
             placeholder: "تاريخ الأنتهاء",
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الأنتهاء مطلوب",
+              },
+            ],
           },
           {
             label: "ارفاق الهوية",

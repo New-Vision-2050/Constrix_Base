@@ -3,9 +3,10 @@ import FormFieldSet from "../../../../../components/FormFieldSet";
 import FieldSetSecondTitle from "../../../../../components/FieldSetSecondTitle";
 import UserProfileBankingDataReview from "./review-mode";
 import BankingDataSectionEditMode from "./edit-mode";
+import { BankAccount } from "@/modules/user-profile/types/bank-account";
 
-type PropsT = { title: string };
-export default function BankSection({ title }: PropsT) {
+type PropsT = { bank: BankAccount };
+export default function BankSection({ bank }: PropsT) {
   // declare and define component state and vars
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -15,15 +16,15 @@ export default function BankSection({ title }: PropsT) {
 
   return (
     <FormFieldSet
-      title={title}
+      title={bank?.bank_name ?? "Bank Account"}
       secondTitle={
         <FieldSetSecondTitle mode={mode} handleEditClick={handleEditClick} />
       }
     >
       {mode === "Preview" ? (
-        <UserProfileBankingDataReview />
+        <UserProfileBankingDataReview bank={bank} />
       ) : (
-        <BankingDataSectionEditMode />
+        <BankingDataSectionEditMode bank={bank} />
       )}
     </FormFieldSet>
   );
