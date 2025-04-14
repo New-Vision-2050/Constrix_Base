@@ -1,11 +1,16 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export const AddressFormConfig = () => {
+  const { user } = useUserProfileCxt();
+  const { userContactData } = useConnectionDataCxt();
+
   const addressFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
+    formId: "ConnectionInformation-address-data-form",
     title: "العنوان",
-    apiUrl: `${baseURL}/company-users/contact-info`,
+    apiUrl: `${baseURL}/contactinfos/address/${user?.user_id}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -20,7 +25,7 @@ export const AddressFormConfig = () => {
             placeholder: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
           },
           {
-            name: "postalAddress",
+            name: "postal_code",
             label: "العنوان البريدي",
             type: "text",
             placeholder: "العنوان البريدي",
@@ -28,37 +33,32 @@ export const AddressFormConfig = () => {
         ],
       },
     ],
+    initialValues: {
+      postal_code: userContactData?.postal_code,
+      address: userContactData?.address,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
-    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(`/company-users/contact-info`, body);
+
+      const response = await apiClient.put(
+        `/contactinfos/address/${user?.user_id}`,
+        body
+      );
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return addressFormConfig;
