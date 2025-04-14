@@ -73,7 +73,7 @@ export interface SearchTypeConfig {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows' | 'image';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows' | 'image' | 'file';
   name: string;
   // Image field specific properties
   imageConfig?: {
@@ -86,6 +86,17 @@ export interface FieldConfig {
     previewHeight?: number; // in pixels
     uploadUrl?: string; // URL to upload the image to
     uploadHeaders?: Record<string, string>; // Custom headers for the upload request
+  };
+  
+  // File field specific properties
+  fileConfig?: {
+    allowedFileTypes?: string[]; // e.g., ['application/pdf', 'text/plain']
+    maxFileSize?: number; // in bytes
+    previewWidth?: number; // in pixels
+    previewHeight?: number; // in pixels
+    uploadUrl?: string; // URL to upload the file to
+    uploadHeaders?: Record<string, string>; // Custom headers for the upload request
+    showThumbnails?: boolean; // Whether to show thumbnails for files
   };
   label: string;
   placeholder?: string;
