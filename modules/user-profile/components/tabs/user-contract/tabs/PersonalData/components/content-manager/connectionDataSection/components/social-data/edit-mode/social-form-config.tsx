@@ -1,11 +1,16 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export const SocialMediaSitesFormConfig = () => {
+  const { user } = useUserProfileCxt();
+  const { userSocialData } = useConnectionDataCxt();
+
   const socialMediaSitesFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
     title: "حسابات التواصل الاجتماعي",
-    apiUrl: `${baseURL}/company-users/contact-info`,
+    apiUrl: `${baseURL}/socials/${user?.user_id}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -52,40 +57,34 @@ export const SocialMediaSitesFormConfig = () => {
         ],
       },
     ],
+    initialValues: {
+      facebook: userSocialData?.facebook,
+      instagram: userSocialData?.instagram,
+      linkedin: userSocialData?.linkedin,
+      snapchat: userSocialData?.snapchat,
+      telegram: userSocialData?.telegram,
+      whatsapp: userSocialData?.whatsapp,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
-    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(
-        `${baseURL}/company-users/contact-info`,
-        body
-      );
+      
+      const response = await apiClient.put(`/socials/${user?.user_id}`, body);
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return socialMediaSitesFormConfig;

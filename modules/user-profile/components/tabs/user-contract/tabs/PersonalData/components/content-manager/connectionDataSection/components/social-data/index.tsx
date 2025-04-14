@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormFieldSet from "../../../../../../components/FormFieldSet";
 import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
 import SocialDataSectionPreviewMode from "./preview-mode";
 import SocialDataSectionEditMode from "./edit-mode";
+import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 
 export default function SocialDataSection() {
   // declare and define component state and vars
+  const { handleRefetchUserSocialData } = useConnectionDataCxt();
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
+
+  // handle side effects
+  useEffect(() => {
+    if (mode === "Preview") handleRefetchUserSocialData();
+  }, [mode]);
 
   // declare and define component methods
   const handleEditClick = () =>
