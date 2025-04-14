@@ -50,6 +50,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
       const body = {
         identifier: identifier,
         otp: otp,
+        type,
       };
       await apiClient.post(`/company-users/validate-otp`, body);
       handleClose();
