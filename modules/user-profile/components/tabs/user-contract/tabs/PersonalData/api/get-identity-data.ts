@@ -21,6 +21,10 @@ export type UserIdentityInformationT = {
   identity_end_date: string;
   border_number_end_date: string;
   entry_number_end_date: string;
+  work_permit: string;
+  work_permit_start_date: string;
+  work_permit_end_date: string;
+  file_work_permit: fileType;
 };
 
 type ResponseT = {

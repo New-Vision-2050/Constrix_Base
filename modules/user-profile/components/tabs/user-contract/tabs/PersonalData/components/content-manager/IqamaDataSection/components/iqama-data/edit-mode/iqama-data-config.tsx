@@ -1,9 +1,13 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { serialize } from "object-to-formdata";
 
 export const IqamaDataFormConfig = () => {
+  const { userIdentityData } = usePersonalDataTabCxt();
+
   const iqamaDataFormConfig: FormConfig = {
-    formId: "iqama-data-form",
+    formId: "iqama-entry-data-form",
     title: "بيانات الاقامة",
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
@@ -14,25 +18,25 @@ export const IqamaDataFormConfig = () => {
       {
         fields: [
           {
-            name: "iqamaNumber",
+            name: "entry_number",
             label: "رقم الاقامة",
             type: "text",
             placeholder: "رقم الاقامة",
           },
           {
-            name: "exportDate",
+            name: "entry_number_start_date",
             label: "تاريخ الاصدار",
             type: "date",
             placeholder: "تاريخ الاصدار",
           },
           {
-            name: "endDate",
+            name: "entry_number_end_date",
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
           },
           {
-            name: "attachment",
+            name: "file_entry_number",
             label: "ارفاق رقم الاقامة",
             type: "image",
             placeholder: "ارفاق رقم الاقامة",
@@ -40,37 +44,45 @@ export const IqamaDataFormConfig = () => {
         ],
       },
     ],
+    initialValues: {
+      entry_number: userIdentityData?.entry_number,
+      entry_number_start_date: userIdentityData?.entry_number_start_date,
+      entry_number_end_date: userIdentityData?.entry_number_end_date,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
-    },
     onSubmit: async (formData: Record<string, unknown>) => {
+      const formatDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
+        const day = `${date.getDate()}`.padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+      };
+      const startDate = new Date(formData?.entry_number_start_date as string);
+      const endDate = new Date(formData?.entry_number_end_date as string);
+
       const body = {
         ...formData,
+        entry_number_start_date: formatDate(startDate),
+        entry_number_end_date: formatDate(endDate),
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(`/company-users/contact-info`, body);
+
+      const response = await apiClient.post(
+        `/company-users/identity-data`,
+        serialize(body)
+      );
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return iqamaDataFormConfig;
