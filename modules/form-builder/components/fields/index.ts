@@ -9,3 +9,6 @@ export { default as HiddenObjectField } from './HiddenObjectField';
 export { default as FieldHelperText } from './FieldHelperText';
 export { default as DynamicRowsField } from './DynamicRowsField';
 export { default as ImageField } from './ImageField';
+export { default as MultiImageField } from './MultiImageField';
+export { default as FileField } from './FileField';
+export { default as MultiFileField } from './MultiFileField';

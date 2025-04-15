@@ -12,6 +12,9 @@ import PhoneField from './fields/PhoneField';
 import HiddenObjectField from './fields/HiddenObjectField';
 import DynamicRowsField from './fields/DynamicRowsField';
 import ImageField from './fields/ImageField';
+import MultiImageField from './fields/MultiImageField';
+import FileField from './fields/FileField';
+import MultiFileField from './fields/MultiFileField';
 import FieldHelperText from './fields/FieldHelperText';
 import { useFormInstance, useFormStore } from '../hooks/useFormStore';
 import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
@@ -240,8 +243,43 @@ const FormField: React.FC<FormFieldProps> = ({
               );
               
             case 'image':
-              return (
+              // Use MultiImageField if isMulti is true, otherwise use regular ImageField
+              return field.isMulti ? (
+                <MultiImageField
+                  field={field}
+                  value={Array.isArray(fieldValue) ? fieldValue : (fieldValue ? [fieldValue] : [])}
+                  error={error}
+                  touched={touched}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  formId={formId}
+                />
+              ) : (
                 <ImageField
+                  field={field}
+                  value={fieldValue}
+                  error={error}
+                  touched={touched}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  formId={formId}
+                />
+              );
+              
+            case 'file':
+              // Use MultiFileField if isMulti is true, otherwise use regular FileField
+              return field.isMulti ? (
+                <MultiFileField
+                  field={field}
+                  value={Array.isArray(fieldValue) ? fieldValue : (fieldValue ? [fieldValue] : [])}
+                  error={error}
+                  touched={touched}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  formId={formId}
+                />
+              ) : (
+                <FileField
                   field={field}
                   value={fieldValue}
                   error={error}
@@ -254,7 +292,6 @@ const FormField: React.FC<FormFieldProps> = ({
   
             default:
               return <div>Unsupported field type: {field.type}</div>;
-            return <div>Unsupported field type: {field.type}</div>;
     }
   };
 
