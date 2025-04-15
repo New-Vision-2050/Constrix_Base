@@ -6,8 +6,14 @@ import Header from "./header";
 
 export default function MainLayout({
   children,
+  isCentral,
+  mainLogo,
+  name,
 }: Readonly<{
   children: React.ReactNode;
+  isCentral: boolean;
+  mainLogo?: string;
+  name?: string;
 }>) {
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -22,12 +28,12 @@ export default function MainLayout({
         particleDensity={100}
         className="h-full w-full absolute -z-20"
         particleColor="#FFFFFF"
-      />{" "}
+      />
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar name={name} mainLogo={mainLogo} isCentral={isCentral} />
         <SidebarInset className="bg-transparent">
           <Header />
-          {children}{" "}
+          {children}
         </SidebarInset>
       </SidebarProvider>
     </main>

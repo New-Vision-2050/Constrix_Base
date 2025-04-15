@@ -15,6 +15,7 @@ export type LoginWaysSuccessResponse = {
       type: "sms" | "mail";
     };
     token: string;
+    can_set_pass: 0 | 1;
   };
 };
 

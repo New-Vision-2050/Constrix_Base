@@ -115,13 +115,14 @@
     "Delete": "Delete (Archive)"
   },
   "Sidebar": {
+    "Dashboard": "Profile",
     "Companies": "Companies",
     "Users": "Users",
     "Settings": "Settings",
     "SystemSettings": "System Settings",
     "DashboardSettings": "Dashboard Setting",
     "UserProfileSettings": "User Profile Settings",
-    "Welcome": "Hello, Mohammed Saad!",
+    "Welcome": "Hello",
     "CompanyName": "New Vision"
   },
   "Header": {
@@ -131,17 +132,39 @@
     "Fields": {
       "Image": {
         "UploadImage": "Upload Image",
+        "UploadImages": "Upload Images",
         "ChangeImage": "Change Image",
         "RemoveImage": "Remove Image",
         "ClickToUpload": "Click to upload an image",
+        "ClickToUploadMultiple": "Click to upload images",
+        "AddMoreImages": "Add More Images",
         "Uploading": "Uploading...",
         "AllowedTypes": "Allowed types",
         "MaxSize": "Max size",
         "FileTypeNotAllowed": "File type not allowed. Allowed types",
         "FileSizeExceeds": "File size exceeds maximum allowed size",
         "UploadFailed": "Upload failed",
+        "UploadsFailed": "uploads failed",
         "UploadSuccessful": "Upload successful",
         "ImageRequired": "Image is required"
+      },
+      "File": {
+        "UploadFile": "Upload File",
+        "UploadFiles": "Upload Files",
+        "ChangeFile": "Change File",
+        "RemoveFile": "Remove File",
+        "ClickToUpload": "Click to upload a file",
+        "ClickToUploadMultiple": "Click to upload files",
+        "AddMoreFiles": "Add More Files",
+        "Uploading": "Uploading...",
+        "AllowedTypes": "Allowed types",
+        "MaxSize": "Max size",
+        "FileTypeNotAllowed": "File type not allowed. Allowed types",
+        "FileSizeExceeds": "File size exceeds maximum allowed size",
+        "UploadFailed": "Upload failed",
+        "UploadsFailed": "uploads failed",
+        "UploadSuccessful": "Upload successful",
+        "FileRequired": "File is required"
       }
     }
   }

@@ -13,6 +13,9 @@ import PhoneField from './fields/PhoneField';
 import HiddenObjectField from './fields/HiddenObjectField';
 import DynamicRowsField from './fields/DynamicRowsField';
 import ImageField from './fields/ImageField';
+import MultiImageField from './fields/MultiImageField';
+import FileField from './fields/FileField';
+import MultiFileField from './fields/MultiFileField';
 import FieldHelperText from './fields/FieldHelperText';
 
 interface ReactHookFormFieldProps {
@@ -264,8 +267,43 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
                 );
                 
               case 'image':
-                return (
+                // Use MultiImageField if isMulti is true, otherwise use regular ImageField
+                return field.isMulti ? (
+                  <MultiImageField
+                    field={field}
+                    value={Array.isArray(fieldProps.value) ? fieldProps.value : (fieldProps.value ? [fieldProps.value] : [])}
+                    error={error}
+                    touched={touched}
+                    onChange={fieldProps.onChange}
+                    onBlur={fieldProps.onBlur}
+                    formId={formId}
+                  />
+                ) : (
                   <ImageField
+                    field={field}
+                    value={fieldProps.value}
+                    error={error}
+                    touched={touched}
+                    onChange={fieldProps.onChange}
+                    onBlur={fieldProps.onBlur}
+                    formId={formId}
+                  />
+                );
+                
+              case 'file':
+                // Use MultiFileField if isMulti is true, otherwise use regular FileField
+                return field.isMulti ? (
+                  <MultiFileField
+                    field={field}
+                    value={Array.isArray(fieldProps.value) ? fieldProps.value : (fieldProps.value ? [fieldProps.value] : [])}
+                    error={error}
+                    touched={touched}
+                    onChange={fieldProps.onChange}
+                    onBlur={fieldProps.onBlur}
+                    formId={formId}
+                  />
+                ) : (
+                  <FileField
                     field={field}
                     value={fieldProps.value}
                     error={error}
@@ -278,7 +316,6 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
   
               default:
                 return <div>Unsupported field type: {field.type}</div>;
-              return <div>Unsupported field type: {field.type}</div>;
           }
         }}
       />

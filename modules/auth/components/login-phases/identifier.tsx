@@ -4,8 +4,8 @@ import { IdentifierType } from "../../validator/login-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
-import { useEffect, useState } from "react";
 import { useLoginWays } from "../../store/mutations";
+import { useEffect, useState } from "react";
 import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
@@ -16,6 +16,7 @@ const IdentifierPhase = ({
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
+
   const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -56,7 +57,12 @@ const IdentifierPhase = ({
           );
           setValue("by", data.payload.login_way.by);
           setValue("type", data.payload.login_way.type);
+
           const nextStep = data.payload.login_way.step?.login_option;
+          if (!!data.payload.can_set_pass) {
+            handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
+            return;
+          }
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);
@@ -76,7 +82,8 @@ const IdentifierPhase = ({
           const messageKey = getErrorMessage(error);
           setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
           handleOpen();
-        },
+
+       },
       }
     );
   };
@@ -108,6 +115,7 @@ const IdentifierPhase = ({
         handleClose={handleClose}
         desc={errorMessage}
       />
+
     </>
   );
 };

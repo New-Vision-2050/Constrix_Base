@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import OtpHub from "../resend-otp/otp-hub";
+import { useValidateResetPasswordOtp } from "../../store/mutations";
 import { useTranslations } from "next-intl";
 
 const ForgetPasswordPhase = ({
@@ -27,12 +28,24 @@ const ForgetPasswordPhase = ({
     handleSubmit,
     control,
     getValues,
+    setValue,
   } = useFormContext<IdentifierType & ForgetPasswordType>();
+  const { mutate, isPending } = useValidateResetPasswordOtp();
   const identifier = getValues("identifier");
   const token = getValues("token");
 
   const onSubmit = () => {
-    handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
+    const otp = getValues("forgetPasswordOtp");
+
+    mutate(
+      { identifier, otp },
+      {
+        onSuccess: (res) => {
+          setValue("token", res.payload.token);
+          handleSetStep(LOGIN_PHASES.RESET_PASSWORD);
+        },
+      }
+    );
   };
 
   return (
@@ -72,6 +85,7 @@ const ForgetPasswordPhase = ({
       />
       <Button
         onClick={handleSubmit(onSubmit)}
+        loading={isPending}
         type="submit"
         form="login-form"
         className="w-full"

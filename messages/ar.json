@@ -120,13 +120,14 @@
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
   },
   "Sidebar": {
+    "Dashboard": "الملف الشخصي",
     "Companies": "الشركات",
     "Users": "المستخدمين",
     "Settings": "اعدادات",
     "SystemSettings": "اعدادات البرامج",
     "DashboardSettings": "اعدادات ملف الشركة",
     "UserProfileSettings": "اعدادات الملف الشخصي",
-    "Welcome": "مرحبا، محمد سعد!",
+    "Welcome": "مرحبا",
     "CompanyName": "نيو فيجن"
   },
   "Header": {
@@ -136,17 +137,39 @@
     "Fields": {
       "Image": {
         "UploadImage": "رفع صورة",
+        "UploadImages": "رفع صور",
         "ChangeImage": "تغيير الصورة",
         "RemoveImage": "إزالة الصورة",
         "ClickToUpload": "انقر لرفع صورة",
+        "ClickToUploadMultiple": "انقر لرفع صور",
+        "AddMoreImages": "إضافة المزيد من الصور",
         "Uploading": "جاري الرفع...",
         "AllowedTypes": "الأنواع المسموح بها",
         "MaxSize": "الحجم الأقصى",
         "FileTypeNotAllowed": "نوع الملف غير مسموح به. الأنواع المسموح بها",
         "FileSizeExceeds": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
         "UploadFailed": "فشل الرفع",
+        "UploadsFailed": "فشل رفع الملفات",
         "UploadSuccessful": "تم الرفع بنجاح",
         "ImageRequired": "الصورة مطلوبة"
+      },
+      "File": {
+        "UploadFile": "رفع ملف",
+        "UploadFiles": "رفع ملفات",
+        "ChangeFile": "تغيير الملف",
+        "RemoveFile": "إزالة الملف",
+        "ClickToUpload": "انقر لرفع ملف",
+        "ClickToUploadMultiple": "انقر لرفع ملفات",
+        "AddMoreFiles": "إضافة المزيد من الملفات",
+        "Uploading": "جاري الرفع...",
+        "AllowedTypes": "الأنواع المسموح بها",
+        "MaxSize": "الحجم الأقصى",
+        "FileTypeNotAllowed": "نوع الملف غير مسموح به. الأنواع المسموح بها",
+        "FileSizeExceeds": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
+        "UploadFailed": "فشل الرفع",
+        "UploadsFailed": "فشل رفع الملفات",
+        "UploadSuccessful": "تم الرفع بنجاح",
+        "FileRequired": "الملف مطلوب"
       }
     }
   }
