@@ -37,7 +37,7 @@ const PreviewTextField = ({
         {isPdf && (
           <img src={pdfImg.src} width={"25px"} height={"25px"} alt="pdf file" />
         )}
-        <Input disabled type="text" value={value} />
+        <Input disabled type="text" value={value ?? ""} />
       </div>
       {/* label */}
       {label && (

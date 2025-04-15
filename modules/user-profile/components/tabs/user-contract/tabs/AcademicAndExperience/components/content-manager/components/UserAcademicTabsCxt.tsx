@@ -16,6 +16,8 @@ import useUserCoursesData from "../../../hooks/useUserCoursesData";
 import { Course } from "@/modules/user-profile/types/Course";
 import useUserCertificationsData from "../../../hooks/useUserCertifications";
 import { Certification } from "@/modules/user-profile/types/Certification";
+import useUserCVData from "../../../hooks/useUserCVData";
+import { UserCVFilesT } from "../../../api/get-user-cv";
 
 // declare context types
 type UserAcademicTabsCxtType = {
@@ -34,6 +36,9 @@ type UserAcademicTabsCxtType = {
   // user certifications
   userCertifications: Certification[] | undefined;
   handleRefetchUserCertifications: () => void;
+  // user cv
+  userCV: UserCVFilesT | undefined;
+  handleRefetchUserCV: () => void;
 };
 
 export const UserAcademicTabsCxt = createContext<UserAcademicTabsCxtType>(
@@ -80,10 +85,18 @@ export const UserAcademicTabsCxtProvider = ({
   const { data: userCertifications, refetch: refetchUserCertifications } =
     useUserCertificationsData(user?.user_id ?? "");
 
-  console.log("userCertifications", userCertifications);
+  // user cv
+  const { data: userCV, refetch: refetchUserCV } = useUserCVData(
+    user?.user_id ?? ""
+  );
+
   // ** handle side effects
 
   // ** declare and define component helper methods
+  const handleRefetchUserCV = () => {
+    refetchUserCV();
+  };
+
   const handleRefetchUserCertifications = () => {
     refetchUserCertifications();
   };
@@ -123,6 +136,9 @@ export const UserAcademicTabsCxtProvider = ({
         // user certifications
         userCertifications,
         handleRefetchUserCertifications,
+        // user cv
+        userCV,
+        handleRefetchUserCV,
       }}
     >
       {children}
