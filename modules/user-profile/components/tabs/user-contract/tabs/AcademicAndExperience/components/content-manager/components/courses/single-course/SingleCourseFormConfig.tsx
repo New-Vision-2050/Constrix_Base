@@ -1,10 +1,22 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient } from "@/config/axios-config";
-import { serialize } from "object-to-formdata";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
+import { Course } from "@/modules/user-profile/types/Course";
 
-export const SingleCourseFormConfig = () => {
+type PropsT = {
+  course?: Course;
+  onSuccess?: () => void;
+};
+
+export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
+  // ** declare and define component state and variables
+  const { user } = useUserProfileCxt();
+  const formType = course ? "Edit" : "Create";
+  const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
+
   const singleCourseFormConfig: FormConfig = {
-    formId: "user-courses-data-form",
+    formId: `user-courses-data-form-${course?.id ?? ""}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -37,7 +49,7 @@ export const SingleCourseFormConfig = () => {
             ],
           },
           {
-            name: "course_name",
+            name: "name",
             label: "اسم الدورة التدريبية ",
             type: "text",
             placeholder: "اسم الدورة التدريبية ",
@@ -49,7 +61,7 @@ export const SingleCourseFormConfig = () => {
             ],
           },
           {
-            name: "confirm_authority",
+            name: "institute",
             label: "جهة الاعتماد",
             type: "text",
             placeholder: "جهة الاعتماد",
@@ -61,7 +73,7 @@ export const SingleCourseFormConfig = () => {
             ],
           },
           {
-            name: "certifications",
+            name: "certificate",
             label: "الشهادات الممنوحة",
             type: "text",
             placeholder: "الشهادات الممنوحة",
@@ -73,7 +85,7 @@ export const SingleCourseFormConfig = () => {
             ],
           },
           {
-            name: "certification_date_start",
+            name: "date_obtain",
             label: "تاريخ الحصول على الشهادة",
             type: "date",
             placeholder: "تاريخ الحصول على الشهادة",
@@ -85,7 +97,7 @@ export const SingleCourseFormConfig = () => {
             ],
           },
           {
-            name: "certification_date_end",
+            name: "date_end",
             label: "تاريخ انتهاء الشهادة",
             type: "date",
             placeholder: "تاريخ انتهاء الشهادة",
@@ -99,7 +111,15 @@ export const SingleCourseFormConfig = () => {
         ],
       },
     ],
-    initialValues: {},
+    initialValues: {
+      company_name: course?.company_name,
+      authority: course?.authority,
+      name: course?.name,
+      institute: course?.institute,
+      certificate: course?.certificate,
+      date_obtain: course?.date_obtain,
+      date_end: course?.date_end,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -108,6 +128,10 @@ export const SingleCourseFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      onSuccess?.();
+      handleRefetchUserCourses();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       // format date yyyy-mm-dd
       const formatDate = (date: Date): string => {
@@ -117,19 +141,22 @@ export const SingleCourseFormConfig = () => {
 
         return `${year}-${month}-${day}`;
       };
-      const startDate = new Date(formData?.identity_start_date as string);
-      const endDate = new Date(formData?.identity_end_date as string);
+      const dateObtain = new Date(formData?.date_obtain as string);
+      const endDate = new Date(formData?.date_end as string);
 
       const body = {
         ...formData,
-        identity_start_date: formatDate(startDate),
-        identity_end_date: formatDate(endDate),
+        user_id: user?.user_id,
+        date_obtain: formatDate(dateObtain),
+        date_end: formatDate(endDate),
       };
+      const url =
+        formType === "Create"
+          ? `/user_educational_courses`
+          : `/user_educational_courses/${course?.id}`;
+      const _apiClient = formType === "Create" ? apiClient.post : apiClient.put;
 
-      const response = await apiClient.post(
-        `/company-users/identity-data`,
-        serialize(body)
-      );
+      const response = await _apiClient(url, body);
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

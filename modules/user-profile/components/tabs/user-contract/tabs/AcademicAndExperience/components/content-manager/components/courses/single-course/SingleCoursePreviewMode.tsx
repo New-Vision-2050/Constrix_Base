@@ -1,45 +1,55 @@
+import { Course } from "@/modules/user-profile/types/Course";
 import PreviewTextField from "../../../../../../components/PreviewTextField";
 
-export default function SingleCoursePreviewMode() {
+type PropsT = { course: Course };
+export default function SingleCoursePreviewMode({ course }: PropsT) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
-        <PreviewTextField label="اسم الشركة" value="اسم الشركة" valid={false} />
+        <PreviewTextField
+          label="اسم الشركة"
+          value={course?.company_name}
+          valid={Boolean(course?.company_name)}
+        />
       </div>
 
       <div className="p-2">
-        <PreviewTextField label="الجهة" value="الجهة" valid={false} />
+        <PreviewTextField
+          label="الجهة"
+          value={course?.authority}
+          valid={Boolean(course?.authority)}
+        />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="اسم الدورة التدريبية "
-          value="اسم الدورة التدريبية "
-          valid={false}
+          value={course?.name}
+          valid={Boolean(course?.name)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="جهة الاعتماد"
-          value="جهة الاعتماد"
-          valid={false}
+          value={course?.institute}
+          valid={Boolean(course?.institute)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="الشهادات الممنوحة"
-          value="الشهادات الممنوحة"
-          valid={false}
+          value={course?.certificate}
+          valid={Boolean(course?.certificate)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الحصول على الشهادة"
-          value="تاريخ الحصول على الشهادة"
-          valid={false}
+          value={course?.date_obtain}
+          valid={Boolean(course?.date_obtain)}
           isDate
         />
       </div>
@@ -47,8 +57,8 @@ export default function SingleCoursePreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ انتهاء الشهادة"
-          value="تاريخ انتهاء الشهادة"
-          valid={false}
+          value={course?.date_end}
+          valid={Boolean(course?.date_end)}
           isDate
         />
       </div>

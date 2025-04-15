@@ -12,6 +12,8 @@ import useUserBriefData from "../../../hooks/useUserBriefData";
 import { BriefInfoT } from "../../../api/get-user-brief";
 import useUserExperiences from "../../../hooks/useUserExperiences";
 import { Experience } from "@/modules/user-profile/types/experience";
+import useUserCoursesData from "../../../hooks/useUserCoursesData";
+import { Course } from "@/modules/user-profile/types/Course";
 
 // declare context types
 type UserAcademicTabsCxtType = {
@@ -24,6 +26,9 @@ type UserAcademicTabsCxtType = {
   // user experiences
   userExperiences: Experience[] | undefined;
   handleRefetchUserExperiences: () => void;
+  // user courses
+  userCourses: Course[] | undefined;
+  handleRefetchUserCourses: () => void
 };
 
 export const UserAcademicTabsCxt = createContext<UserAcademicTabsCxtType>(
@@ -61,12 +66,21 @@ export const UserAcademicTabsCxtProvider = ({
   const { data: userExperiences, refetch: refetchUserExperiences } =
     useUserExperiences(user?.user_id ?? "");
 
+  // user courses
+  const { data: userCourses, refetch: refetchUserCourses } = useUserCoursesData(
+    user?.user_id ?? ""
+  );
+
   console.log("userExperiences", userExperiences);
   // ** handle side effects
 
   // ** declare and define component helper methods
   const handleRefetchUserExperiences = () => {
     refetchUserExperiences();
+  };
+
+  const handleRefetchUserCourses = () => {
+    refetchUserCourses();
   };
 
   const handleRefreshUserQualifications = () => {
@@ -90,6 +104,9 @@ export const UserAcademicTabsCxtProvider = ({
         // user experiences
         userExperiences,
         handleRefetchUserExperiences,
+        // user courses
+        userCourses,
+        handleRefetchUserCourses
       }}
     >
       {children}

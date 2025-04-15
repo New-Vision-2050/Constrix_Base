@@ -194,6 +194,7 @@ export const QualificationFormConfig = ({
         user_id: user?.user_id,
         graduation_date: formatDate(graduationDate),
       };
+      
       const url =
         formType === "Edit"
           ? `/qualifications/${qualification?.id}`
