@@ -1,13 +1,14 @@
 import TabsGroup from "@/components/shared/TabsGroup";
 import { Tab } from "@/types/Tab";
 import { DollarSign, Lock, MapPin, Send, User, Users } from "lucide-react";
+import OfficialData from "../official-data";
 
 export const CompanyProfile: Tab[] = [
   {
     label: "البيانات الرسمية",
     icon: <User size={18} />,
     value: "official-data",
-    component: <div>omar</div>,
+    component: <OfficialData />,
   },
   {
     label: "الفروع",
