@@ -1,13 +1,15 @@
+import { Certification } from "@/modules/user-profile/types/Certification";
 import PreviewTextField from "../../../../../../components/PreviewTextField";
 
-export default function UserCertificationPreview() {
+type PropsT = { certification: Certification };
+export default function UserCertificationPreview({ certification }: PropsT) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
           label="اسم الجهة"
-          value="الهيئة السعودية للمهندسين"
-          valid={true}
+          value={certification?.professional_bodie_name ?? ""}
+          valid={Boolean(certification?.professional_bodie_name)}
           isSelect
         />
       </div>
@@ -15,32 +17,32 @@ export default function UserCertificationPreview() {
       <div className="p-2">
         <PreviewTextField
           label="اسم الاعتماد"
-          value="اسم الاعتماد"
-          valid={false}
+          value={certification?.accreditation_name ?? ""}
+          valid={Boolean(certification?.accreditation_name)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="رقم الاعتماد"
-          value="رقم الاعتماد"
-          valid={true}
+          value={certification?.accreditation_number ?? ""}
+          valid={Boolean(certification?.accreditation_number)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="درجة الاعتماد"
-          value="درجة الاعتماد"
-          valid={false}
+          value={certification?.accreditation_degree ?? ""}
+          valid={Boolean(certification?.accreditation_degree)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الحصول على الشهادة"
-          value="تاريخ الحصول على الشهادة"
-          valid={false}
+          value={certification?.date_obtain ?? ""}
+          valid={Boolean(certification?.date_obtain)}
           isDate
         />
       </div>
@@ -48,8 +50,8 @@ export default function UserCertificationPreview() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ انتهاء الشهادة"
-          value="تاريخ انتهاء الشهادة"
-          valid={false}
+          value={certification?.date_end ?? ""}
+          valid={Boolean(certification?.date_end)}
           isDate
         />
       </div>

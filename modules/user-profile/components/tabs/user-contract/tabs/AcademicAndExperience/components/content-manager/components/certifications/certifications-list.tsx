@@ -1,11 +1,18 @@
+import RegularList from "@/components/shared/RegularList";
 import UserCertification from "./single-certification";
+import { Certification } from "@/modules/user-profile/types/Certification";
+import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 
 export default function UserCertificationsList() {
+  const { userCertifications } = useUserAcademicTabsCxt();
+
   return (
     <>
-      <UserCertification title="شهادة 1" />
-      <UserCertification title="شهادة 2" />
-      <UserCertification title="شهادة 3" />
+      <RegularList<Certification, "certification">
+        sourceName="certification"
+        items={userCertifications ?? []}
+        ItemComponent={UserCertification}
+      />
     </>
   );
 }

@@ -1,10 +1,26 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
-import { serialize } from "object-to-formdata";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
+import { Certification } from "@/modules/user-profile/types/Certification";
 
-export const UserCertificationFormConfig = () => {
+type PropsT = {
+  onSuccess?: () => void;
+  certification?: Certification;
+};
+
+export const UserCertificationFormConfig = ({
+  onSuccess,
+  certification,
+}: PropsT) => {
+  // declare and define component state and variables
+  const { user } = useUserProfileCxt();
+  const formType = certification ? "Edit" : "Create";
+  const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
+
+  // form config
   const userCertificationFormConfig: FormConfig = {
-    formId: "user-certification-data-form",
+    formId: `user-certification-data-form-${certification?.id}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -13,19 +29,31 @@ export const UserCertificationFormConfig = () => {
       {
         fields: [
           {
-            name: "authority_name",
-            label: "اسم الجهة",
-            type: "text",
-            placeholder: "اسم الجهة",
+            type: "select",
+            name: "professional_bodie_id",
+            label: "الجهة",
+            placeholder: "اختر الجهة",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/professional_bodies`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
-                message: "اسم الجهة مطلوب",
+                message: "ادخل الجهة",
               },
             ],
           },
           {
-            name: "conformation_name",
+            name: "accreditation_name",
             label: "اسم الاعتماد",
             type: "text",
             placeholder: "اسم الاعتماد",
@@ -37,7 +65,7 @@ export const UserCertificationFormConfig = () => {
             ],
           },
           {
-            name: "confirmation_number",
+            name: "accreditation_number",
             label: "رقم الاعتماد",
             type: "text",
             placeholder: "رقم الاعتماد ",
@@ -49,7 +77,7 @@ export const UserCertificationFormConfig = () => {
             ],
           },
           {
-            name: "conformation_degree",
+            name: "accreditation_degree",
             label: "درجة الاعتماد",
             type: "text",
             placeholder: "درجة الاعتماد",
@@ -61,7 +89,7 @@ export const UserCertificationFormConfig = () => {
             ],
           },
           {
-            name: "certification_date_start",
+            name: "date_obtain",
             label: "تاريخ الحصول على الشهادة",
             type: "date",
             placeholder: "تاريخ الحصول على الشهادة",
@@ -73,7 +101,7 @@ export const UserCertificationFormConfig = () => {
             ],
           },
           {
-            name: "certification_date_end",
+            name: "date_end",
             label: "تاريخ انتهاء الشهادة",
             type: "date",
             placeholder: "تاريخ انتهاء الشهادة",
@@ -87,7 +115,14 @@ export const UserCertificationFormConfig = () => {
         ],
       },
     ],
-    initialValues: {},
+    initialValues: {
+      professional_bodie_id: certification?.professional_bodie_id,
+      accreditation_name: certification?.accreditation_name,
+      accreditation_number: certification?.accreditation_number,
+      accreditation_degree: certification?.accreditation_degree,
+      date_obtain: certification?.date_obtain,
+      date_end: certification?.date_end,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -96,6 +131,10 @@ export const UserCertificationFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      onSuccess?.();
+      handleRefetchUserCertifications();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       // format date yyyy-mm-dd
       const formatDate = (date: Date): string => {
@@ -105,19 +144,24 @@ export const UserCertificationFormConfig = () => {
 
         return `${year}-${month}-${day}`;
       };
-      const startDate = new Date(formData?.identity_start_date as string);
-      const endDate = new Date(formData?.identity_end_date as string);
+      //professional_bodie_id,accreditation_name,accreditation_number,accreditation_degree,,
+      const dateObtain = new Date(formData?.date_obtain as string);
+      const endDate = new Date(formData?.date_end as string);
 
       const body = {
         ...formData,
-        identity_start_date: formatDate(startDate),
-        identity_end_date: formatDate(endDate),
+        user_id: user?.user_id,
+        date_obtain: formatDate(dateObtain),
+        date_end: formatDate(endDate),
       };
+      const url =
+        formType === "Edit"
+          ? `professional_certificates/${certification?.id}`
+          : `professional_certificates`;
+      const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
 
-      const response = await apiClient.post(
-        `/company-users/identity-data`,
-        serialize(body)
-      );
+      const response = await _apiClient(url, body);
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

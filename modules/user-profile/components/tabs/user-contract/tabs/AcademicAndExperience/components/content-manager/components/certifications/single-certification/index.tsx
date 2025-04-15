@@ -3,10 +3,11 @@ import FormFieldSet from "../../../../../../components/FormFieldSet";
 import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
 import UserCertificationPreview from "./UserCertificationPreview";
 import UserCertificationEdit from "./UserCertificationEdit";
+import { Certification } from "@/modules/user-profile/types/Certification";
 
-type PropsT = { title: string };
+type PropsT = { certification: Certification };
 
-export default function UserCertification({ title }: PropsT) {
+export default function UserCertification({ certification }: PropsT) {
   // declare and define component state and vars
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -16,15 +17,15 @@ export default function UserCertification({ title }: PropsT) {
 
   return (
     <FormFieldSet
-      title={title}
+      title={certification?.accreditation_name ?? ""}
       secondTitle={
         <FieldSetSecondTitle mode={mode} handleEditClick={handleEditClick} />
       }
     >
       {mode === "Preview" ? (
-        <UserCertificationPreview />
+        <UserCertificationPreview certification={certification}/>
       ) : (
-        <UserCertificationEdit />
+        <UserCertificationEdit certification={certification}/>
       )}
     </FormFieldSet>
   );
