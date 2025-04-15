@@ -3,9 +3,10 @@ import FormFieldSet from "../../../../../components/FormFieldSet";
 import FieldSetSecondTitle from "../../../../../components/FieldSetSecondTitle";
 import SingleQualificationDataPreview from "./preview-mode";
 import SingleQualificationDataEditMode from "./edit-mode";
+import { Qualification } from "@/modules/user-profile/types/qualification";
 
-type PropsT = { title: string };
-export default function SingleQualificationData({ title }: PropsT) {
+type PropsT = { qualification: Qualification };
+export default function SingleQualificationData({ qualification }: PropsT) {
   // declare and define component state and vars
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -15,15 +16,15 @@ export default function SingleQualificationData({ title }: PropsT) {
 
   return (
     <FormFieldSet
-      title={title}
+      title={""}
       secondTitle={
         <FieldSetSecondTitle mode={mode} handleEditClick={handleEditClick} />
       }
     >
       {mode === "Preview" ? (
-        <SingleQualificationDataPreview />
+        <SingleQualificationDataPreview qualification={qualification} />
       ) : (
-        <SingleQualificationDataEditMode />
+        <SingleQualificationDataEditMode qualification={qualification} />
       )}
     </FormFieldSet>
   );

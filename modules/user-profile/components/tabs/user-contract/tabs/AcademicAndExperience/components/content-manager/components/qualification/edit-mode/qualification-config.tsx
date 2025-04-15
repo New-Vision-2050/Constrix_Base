@@ -1,10 +1,26 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { Qualification } from "@/modules/user-profile/types/qualification";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { serialize } from "object-to-formdata";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 
-export const QualificationFormConfig = () => {
+type PropsT = {
+  qualification?: Qualification;
+  onSuccess?: () => void;
+};
+export const QualificationFormConfig = ({
+  qualification,
+  onSuccess,
+}: PropsT) => {
+  const { user } = useUserProfileCxt();
+  // declare and define helper state and variables
+  const formType = qualification ? "Edit" : "Create";
+  const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
+
+  // form config
   const qualificationFormConfig: FormConfig = {
-    formId: "qualification-data-form",
-    apiUrl: `${baseURL}/company-users/contact-info`,
+    formId: `qualification-data-form-${qualification?.id ?? ""}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -13,184 +29,185 @@ export const QualificationFormConfig = () => {
       {
         fields: [
           {
-            name: "",
-            label: "مؤهل",
-            type: "dynamicRows",
-            dynamicRowOptions: {
-              enableDrag: true,
-              rowFields: [
-                {
-                  type: "select",
-                  name: "country_id",
-                  label: "دولة التخرج",
-                  placeholder: "اختر دولة الشركة",
-                  required: true,
-                  dynamicOptions: {
-                    url: `${baseURL}/countries`,
-                    valueField: "id",
-                    labelField: "name",
-                    searchParam: "name",
-                    paginationEnabled: true,
-                    pageParam: "page",
-                    limitParam: "per_page",
-                    itemsPerPage: 10,
-                    totalCountHeader: "X-Total-Count",
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "ادخل دولة الشركة",
-                    },
-                  ],
-                },
-                {
-                  type: "select",
-                  name: "university_id",
-                  label: "الجامعة",
-                  placeholder: "اختر الجامعة",
-                  required: true,
-                  dynamicOptions: {
-                    url: `${baseURL}/universities`,
-                    valueField: "id",
-                    labelField: "name",
-                    searchParam: "name",
-                    paginationEnabled: true,
-                    pageParam: "page",
-                    limitParam: "per_page",
-                    itemsPerPage: 10,
-                    totalCountHeader: "X-Total-Count",
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "ادخل الجامعة",
-                    },
-                  ],
-                },
-                {
-                  type: "select",
-                  name: "qualification_id",
-                  label: "المؤهل",
-                  placeholder: "اختر المؤهل",
-                  required: true,
-                  dynamicOptions: {
-                    url: `${baseURL}/qualifications`,
-                    valueField: "id",
-                    labelField: "name",
-                    searchParam: "name",
-                    paginationEnabled: true,
-                    pageParam: "page",
-                    limitParam: "per_page",
-                    itemsPerPage: 10,
-                    totalCountHeader: "X-Total-Count",
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "ادخل المؤهل",
-                    },
-                  ],
-                },
-                {
-                  type: "select",
-                  name: "classification_id",
-                  label: "التخصص الأكاديمي",
-                  placeholder: "اختر التخصص الأكاديمي",
-                  required: true,
-                  dynamicOptions: {
-                    url: `${baseURL}/classifications`,
-                    valueField: "id",
-                    labelField: "name",
-                    searchParam: "name",
-                    paginationEnabled: true,
-                    pageParam: "page",
-                    limitParam: "per_page",
-                    itemsPerPage: 10,
-                    totalCountHeader: "X-Total-Count",
-                  },
-                  validation: [
-                    {
-                      type: "required",
-                      message: "ادخل التخصص الأكاديمي",
-                    },
-                  ],
-                },
-                {
-                  type: "date",
-                  name: "graduation_date",
-                  label: "تاريخ الحصول على الشهادة",
-                  placeholder: "تاريخ الحصول على الشهادة",
-                  validation: [
-                    {
-                      type: "required",
-                      message: "graduation date is required",
-                    },
-                  ],
-                },
-                {
-                  type: "text",
-                  name: "graduation_grade",
-                  label: "المعدلات الدراسية",
-                  placeholder: "المعدلات الدراسية",
-                  validation: [
-                    {
-                      type: "required",
-                      message: "graduation grade is required",
-                    },
-                  ],
-                },
-                {
-                  type: "image",
-                  name: "graduation_file",
-                  label: "ارفاق شهادة",
-                  placeholder: "ارفاق شهادة",
-                  validation: [
-                    {
-                      type: "required",
-                      message: "graduation file is required",
-                    },
-                  ],
-                },
-              ],
-              minRows: 1,
-              maxRows: 5,
-              columns: 1,
+            type: "select",
+            name: "country_id",
+            label: "دولة التخرج",
+            placeholder: "اختر دولة الشركة",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل دولة الشركة",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "university_id",
+            label: "الجامعة",
+            placeholder: "اختر الجامعة",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/universities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل الجامعة",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "academic_qualification_id",
+            label: "المؤهل",
+            placeholder: "اختر المؤهل",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/academic_qualifications`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل المؤهل",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "academic_specialization_id",
+            label: "التخصص الأكاديمي",
+            placeholder: "اختر التخصص الأكاديمي",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/academic_specializations`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل التخصص الأكاديمي",
+              },
+            ],
+          },
+          {
+            type: "date",
+            name: "graduation_date",
+            label: "تاريخ الحصول على الشهادة",
+            placeholder: "تاريخ الحصول على الشهادة",
+            validation: [
+              {
+                type: "required",
+                message: "graduation date is required",
+              },
+            ],
+          },
+          {
+            type: "text",
+            name: "study_rate",
+            label: "المعدلات الدراسية",
+            placeholder: "المعدلات الدراسية",
+            validation: [
+              {
+                type: "required",
+                message: "graduation grade is required",
+              },
+            ],
+          },
+          {
+            type: "image",
+            name: "graduation_file",
+            label: "ارفاق شهادة",
+            placeholder: "ارفاق شهادة",
           },
         ],
       },
     ],
+    initialValues: {
+      country_id: qualification?.country_id,
+      university_id: qualification?.university_id,
+      academic_specialization_id: qualification?.academic_specialization_id,
+      academic_qualification_id: qualification?.academic_qualification_id,
+      graduation_date: qualification?.graduation_date,
+      study_rate: qualification?.study_rate,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: formType === "Create" ? true : false,
     showCancelButton: false,
     showBackButton: false,
 
     // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
+    onSuccess: () => {
+      onSuccess?.();
+      handleRefreshUserQualifications();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
+      const formatDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
+        const day = `${date.getDate()}`.padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+      };
+      const graduationDate = new Date(formData?.graduation_date as string);
+
       const body = {
         ...formData,
+        user_id: user?.user_id,
+        graduation_date: formatDate(graduationDate),
       };
-      const response = await apiClient.put(`/company-users/contact-info`, body);
-      
+      const url =
+        formType === "Edit"
+          ? `/qualifications/${qualification?.id}`
+          : "/qualifications";
+
+      const response = await (formType === "Create"
+        ? apiClient.post
+        : apiClient.put)(url, serialize(body));
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return qualificationFormConfig;
