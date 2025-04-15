@@ -112,13 +112,19 @@
     "Active": "Active",
     "LoginAsManager": "Login as Company Manager (Edit)",
     "PackageSettings": "Package and Program Settings",
-    "Delete": "Delete (Archive)"
+    "Delete": "Delete (Archive)",
+    "Edit": "Edit",
+    "Confirmation": "Confirmation",
+    "AreYouSure": "Are you sure?",
+    "AreYouSureReactivate": "Are you sure you want to reactivate the company?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate the company?"
   },
   "Sidebar": {
     "Dashboard": "Profile",
     "Companies": "Companies",
     "Users": "Users",
     "settings": "System Settings",
+    "Settings": "System Settings",
     "Welcome": "Hello",
     "CompanyName": "New Vision"
   },
@@ -143,7 +149,8 @@
         "UploadFailed": "Upload failed",
         "UploadsFailed": "uploads failed",
         "UploadSuccessful": "Upload successful",
-        "ImageRequired": "Image is required"
+        "ImageRequired": "Image is required",
+        "OverallProgress": "Overall Progress"
       },
       "File": {
         "UploadFile": "Upload File",
@@ -161,7 +168,8 @@
         "UploadFailed": "Upload failed",
         "UploadsFailed": "uploads failed",
         "UploadSuccessful": "Upload successful",
-        "FileRequired": "File is required"
+        "FileRequired": "File is required",
+        "OverallProgress": "Overall Progress"
       }
     }
   }

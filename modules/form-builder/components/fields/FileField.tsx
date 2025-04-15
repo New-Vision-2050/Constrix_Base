@@ -5,6 +5,7 @@ import { useFormInstance } from "../../hooks/useFormStore";
 import { XCircle, Upload, File as FileIcon, X, FileText, FileType, Image, Archive, Code, FileIcon as FilePdf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
+import { apiClient } from "@/config/axios-config"; // Import apiClient
 
 interface FileFieldProps {
   field: FieldConfig;
@@ -16,10 +17,16 @@ interface FileFieldProps {
   formId?: string;
 }
 
+// Potential Future Enhancements:
+// - Direct-to-cloud storage uploads (e.g., S3 presigned URLs) for large files.
+// - More robust progress indication, especially for large uploads.
+// - Chunked uploading for very large files to improve reliability.
+// - Consider using a dedicated upload library for advanced features.
+
 // Helper function to get file icon based on file type
 const getFileIcon = (fileType: string | undefined, size: number = 24) => {
   if (!fileType) return <FileIcon size={size} />;
-  
+
   if (fileType.startsWith('image/')) {
     return <Image size={size} />;
   } else if (fileType === 'application/pdf') {
@@ -31,14 +38,14 @@ const getFileIcon = (fileType: string | undefined, size: number = 24) => {
   } else if (fileType.includes('javascript') || fileType.includes('json') || fileType.includes('html') || fileType.includes('css')) {
     return <Code size={size} />;
   }
-  
+
   return <FileIcon size={size} />;
 };
 
 // Helper function to get file name from URL or File object
 const getFileName = (value: File | string | null): string => {
   if (!value) return '';
-  
+
   if (typeof value === 'string') {
     // Extract filename from URL
     const parts = value.split('/');
@@ -51,13 +58,31 @@ const getFileName = (value: File | string | null): string => {
 // Helper function to get file size in human-readable format
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
+
+// Helper function to get file type from extension (used for URL strings)
+const getFileTypeFromExtension = (fileName: string): string | undefined => {
+    const fileExtension = fileName.split('.').pop()?.toLowerCase();
+    if (!fileExtension) return undefined;
+    switch (fileExtension) {
+      case 'pdf': return 'application/pdf';
+      case 'jpg': case 'jpeg': return 'image/jpeg';
+      case 'png': return 'image/png';
+      case 'gif': return 'image/gif';
+      case 'txt': return 'text/plain';
+      case 'doc': case 'docx': return 'application/msword';
+      case 'xls': case 'xlsx': return 'application/vnd.ms-excel';
+      case 'zip': case 'rar': return 'application/zip';
+      default: return 'application/octet-stream';
+    }
+};
+
 
 const FileField: React.FC<FileFieldProps> = ({
   field,
@@ -70,7 +95,7 @@ const FileField: React.FC<FileFieldProps> = ({
 }) => {
   // Reference to the file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // State for file info
   const [fileInfo, setFileInfo] = useState<{
     name: string;
@@ -78,76 +103,38 @@ const FileField: React.FC<FileFieldProps> = ({
     type?: string;
     icon: React.ReactNode;
   } | null>(null);
-  
+
   // State for upload status
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  
+
   // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
-  
+
   // Get translations
   const t = useTranslations('FormBuilder.Fields.File');
-  
+
   // Get form instance from the store
   const formInstance = useFormInstance(formId);
   const storeErrors = formInstance.errors || {};
-  
+
   // Check for errors in both the form store and the local state
   const hasStoreError = !!storeErrors[field.name];
   const hasLocalError = !!error && touched;
   const showError = hasLocalError || hasStoreError;
-  
+
   // Update file info when value changes
   useEffect(() => {
     if (!value) {
       setFileInfo(null);
       return;
     }
-    
+
     if (typeof value === 'string') {
       // If value is a URL string, extract file name and use generic icon
       const fileName = getFileName(value);
-      const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      let fileType;
-      
-      // Try to determine file type from extension
-      if (fileExtension) {
-        switch (fileExtension) {
-          case 'pdf':
-            fileType = 'application/pdf';
-            break;
-          case 'jpg':
-          case 'jpeg':
-            fileType = 'image/jpeg';
-            break;
-          case 'png':
-            fileType = 'image/png';
-            break;
-          case 'gif':
-            fileType = 'image/gif';
-            break;
-          case 'txt':
-            fileType = 'text/plain';
-            break;
-          case 'doc':
-          case 'docx':
-            fileType = 'application/msword';
-            break;
-          case 'xls':
-          case 'xlsx':
-            fileType = 'application/vnd.ms-excel';
-            break;
-          case 'zip':
-          case 'rar':
-            fileType = 'application/zip';
-            break;
-          default:
-            fileType = 'application/octet-stream';
-        }
-      }
-      
+      const fileType = getFileTypeFromExtension(fileName);
       setFileInfo({
         name: fileName,
         type: fileType,
@@ -163,122 +150,105 @@ const FileField: React.FC<FileFieldProps> = ({
       });
     }
   }, [value]);
-  
-  // Handle file selection
+
+  // Define uploadFile first
+  const uploadFile = useCallback(async (file: File) => {
+    if (!field.fileConfig?.uploadUrl) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const formData = new FormData();
+    formData.append('file', file); // Use 'file' as the key, adjust if backend expects different
+
+    try {
+      const response = await apiClient.post(field.fileConfig.uploadUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          // Add any specific headers from config, though apiClient might handle auth
+          ...(field.fileConfig.uploadHeaders || {}),
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(progress);
+          } else {
+            // Handle indeterminate progress if needed
+            setUploadProgress(0); // Or some other indicator
+          }
+        },
+      });
+
+      // Assuming the response.data contains the URL or relevant info
+      const fileUrl = response.data?.url || response.data?.data?.url || response.data?.fileUrl;
+
+      if (fileUrl && typeof fileUrl === 'string') {
+        onChange(fileUrl);
+        formInstance.setError(field.name, null); // Clear previous errors on success
+      } else {
+        console.error("Upload succeeded but no valid URL found in response:", response.data);
+        formInstance.setError(field.name, `${t('UploadSuccessful')} but ${t('InvalidResponse')}`);
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      // Attempt to get error message from Axios response
+      const errorMessage = error.response?.data?.message || error.message || t('UploadFailed');
+      formInstance.setError(field.name, errorMessage);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0); // Reset progress
+    }
+  }, [field, onChange, formInstance, t]); // End of uploadFile useCallback
+
+  // Handle file selection (now defined after uploadFile)
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     // Validate file type if allowedFileTypes is specified
     if (field.fileConfig?.allowedFileTypes &&
         !field.fileConfig.allowedFileTypes.includes(file.type)) {
       formInstance.setError(field.name, `${t('FileTypeNotAllowed')}: ${field.fileConfig.allowedFileTypes.join(', ')}`);
       return;
     }
-    
+
     // Validate file size if maxFileSize is specified
     if (field.fileConfig?.maxFileSize && file.size > field.fileConfig.maxFileSize) {
       const maxSizeMB = Math.round(field.fileConfig.maxFileSize / (1024 * 1024) * 10) / 10;
       formInstance.setError(field.name, `${t('FileSizeExceeds')} (${maxSizeMB} MB)`);
       return;
     }
-    
+
+    // Clear previous errors if validation passes
+    formInstance.setError(field.name, null);
+
     // If uploadUrl is provided, upload the file
     if (field.fileConfig?.uploadUrl) {
-      uploadFile(file);
+      uploadFile(file); // Call uploadFile defined above
     } else {
       // Otherwise, just update the value
       onChange(file);
     }
-    
+
     // Reset the file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [field, onChange, formInstance, t]);
-  
-  // Handle file upload
-  const uploadFile = useCallback(async (file: File) => {
-    if (!field.fileConfig?.uploadUrl) return;
-    
-    setIsUploading(true);
-    setUploadProgress(0);
-    
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const xhr = new XMLHttpRequest();
-      
-      // Track upload progress
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(progress);
-        }
-      });
-      
-      // Handle response
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            // Assuming the response contains a URL to the uploaded file
-            const fileUrl = response.url || response.data?.url || response.fileUrl;
-            if (fileUrl) {
-              onChange(fileUrl);
-            } else {
-              formInstance.setError(field.name, `${t('UploadSuccessful')} ${t('UploadFailed')}`);
-            }
-          } catch (error) {
-            formInstance.setError(field.name, t('UploadFailed'));
-          }
-        } else {
-          formInstance.setError(field.name, `${t('UploadFailed')} (${xhr.status})`);
-        }
-        setIsUploading(false);
-      };
-      
-      // Handle errors
-      xhr.onerror = () => {
-        formInstance.setError(field.name, t('UploadFailed'));
-        setIsUploading(false);
-      };
-      
-      // Open and send the request
-      if (field.fileConfig?.uploadUrl) {
-        xhr.open('POST', field.fileConfig.uploadUrl);
-        
-        // Add custom headers if provided
-        if (field.fileConfig.uploadHeaders) {
-          Object.entries(field.fileConfig.uploadHeaders).forEach(([key, value]) => {
-            xhr.setRequestHeader(key, value);
-          });
-        }
-      } else {
-        throw new Error('Upload URL is not defined');
-      }
-      
-      xhr.send(formData);
-    } catch (error) {
-      formInstance.setError(field.name, t('UploadFailed'));
-      setIsUploading(false);
-    }
-  }, [field, onChange, formInstance, t]);
-  
+  }, [field, onChange, formInstance, t, uploadFile]); // Added uploadFile dependency
+
   // Handle removing the file
   const handleRemoveFile = useCallback(() => {
     onChange(null);
     formInstance.setError(field.name, null);
   }, [onChange, formInstance, field.name]);
-  
+
   // Handle clicking the upload button
   const handleUploadClick = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   }, []);
-  
+
   return (
     <div className="relative">
       <div
@@ -297,11 +267,11 @@ const FileField: React.FC<FileFieldProps> = ({
           onChange={handleFileChange}
           onBlur={onBlur}
         />
-        
+
         {/* File preview */}
         {fileInfo ? (
           <div className="relative mb-4">
-            <div 
+            <div
               className={cn(
                 "relative border rounded-md p-4",
                 showError ? "border-destructive" : "border-input"
@@ -332,7 +302,7 @@ const FileField: React.FC<FileFieldProps> = ({
             </div>
           </div>
         ) : (
-          <div 
+          <div
             className={cn(
               "flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 mb-4 cursor-pointer hover:bg-muted/50 transition-colors",
               showError ? "border-destructive" : "border-input"
@@ -359,13 +329,13 @@ const FileField: React.FC<FileFieldProps> = ({
             )}
           </div>
         )}
-        
+
         {/* Upload progress */}
         {isUploading && (
           <div className="w-full mb-4">
             <div className="w-full bg-muted rounded-full h-2.5 mb-1">
-              <div 
-                className="bg-primary h-2.5 rounded-full transition-all duration-300" 
+              <div
+                className="bg-primary h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${uploadProgress}%` }}
               ></div>
             </div>
@@ -374,7 +344,7 @@ const FileField: React.FC<FileFieldProps> = ({
             </p>
           </div>
         )}
-        
+
         {/* Error message */}
         {showError && (
           <div className="text-destructive text-sm mt-1">

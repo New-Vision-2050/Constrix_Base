@@ -5,6 +5,7 @@ import { useFormInstance } from "../../hooks/useFormStore";
 import { XCircle, Upload, Image as ImageIcon, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
+import { apiClient } from "@/config/axios-config"; // Import apiClient
 
 interface MultiImageFieldProps {
   field: FieldConfig;
@@ -14,6 +15,20 @@ interface MultiImageFieldProps {
   onChange: (value: Array<File | string> | null) => void;
   onBlur: () => void;
   formId?: string;
+}
+
+// Potential Future Enhancements:
+// - Direct-to-cloud storage uploads (e.g., S3 presigned URLs), potentially uploading in parallel.
+// - More robust progress indication for individual images and overall batch progress.
+// - Client-side image manipulation (resizing, cropping) before uploading.
+// - Consider using a dedicated upload library (e.g., Uppy) for advanced features like resumable uploads, drag-and-drop improvements, etc.
+
+interface ImageInfo {
+  id: string;
+  url: string;
+  progress?: number;
+  isUploading?: boolean;
+  file?: File | string; // Store original file/url reference
 }
 
 const MultiImageField: React.FC<MultiImageFieldProps> = ({
@@ -27,258 +42,299 @@ const MultiImageField: React.FC<MultiImageFieldProps> = ({
 }) => {
   // Reference to the file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // State for image previews
-  const [previews, setPreviews] = useState<string[]>([]);
-  
-  // State for upload status
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  
+
+  // State for image previews and upload status/progress
+  const [imageInfos, setImageInfos] = useState<ImageInfo[]>([]);
+  const [overallUploadProgress, setOverallUploadProgress] = useState<number | null>(null); // State for overall progress
+
   // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
-  
+
   // Get translations
   const t = useTranslations('FormBuilder.Fields.Image');
-  
+
   // Get form instance from the store
   const formInstance = useFormInstance(formId);
   const storeErrors = formInstance.errors || {};
-  
+
   // Check for errors in both the form store and the local state
   const hasStoreError = !!storeErrors[field.name];
   const hasLocalError = !!error && touched;
   const showError = hasLocalError || hasStoreError;
-  
+
   // Normalize value to array
   const normalizedValue = Array.isArray(value) ? value : (value ? [value] : []);
-  
-  // Generate previews when value changes
+
+  // Generate image info (including previews) when value changes
   useEffect(() => {
-    if (!normalizedValue || normalizedValue.length === 0) {
-      setPreviews([]);
-      return;
-    }
-    
-    // Create an array to store the preview URLs
-    const newPreviews: string[] = [];
-    
-    // Create object URLs for File objects
-    const objectUrls: string[] = [];
-    
-    normalizedValue.forEach((item) => {
+    const objectUrlsToRevoke: string[] = [];
+
+    const newImageInfos = normalizedValue.map((item, index) => {
+      // Check if this item already exists in imageInfos (to preserve upload state)
+      const existingInfo = imageInfos.find(info => {
+        if (typeof item === 'string' && typeof info.file === 'string') return item === info.file;
+        if (item instanceof File && info.file instanceof File) return item.name === info.file.name && item.size === info.file.size;
+        return false;
+      });
+
+      if (existingInfo) return existingInfo; // Preserve existing info
+
+      let previewUrl = '';
       if (typeof item === 'string') {
-        // If item is a URL string, use it directly as preview
-        newPreviews.push(item);
+        previewUrl = item;
       } else if (item instanceof File) {
-        // If item is a File object, create a preview URL
-        const objectUrl = URL.createObjectURL(item);
-        newPreviews.push(objectUrl);
-        objectUrls.push(objectUrl);
+        previewUrl = URL.createObjectURL(item);
+        objectUrlsToRevoke.push(previewUrl);
       }
+
+      return {
+        id: `image-${Date.now()}-${index}`,
+        url: previewUrl,
+        file: item,
+        isUploading: false,
+        progress: undefined
+      };
     });
-    
-    setPreviews(newPreviews);
-    
-    // Clean up the URLs when component unmounts or value changes
+
+    setImageInfos(newImageInfos);
+
+    // Clean up previously created object URLs
     return () => {
-      objectUrls.forEach(url => URL.revokeObjectURL(url));
+      objectUrlsToRevoke.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [normalizedValue]);
-  
-  // Handle file selection
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [normalizedValue]); // Only depend on normalizedValue
+
+  // Define uploadFiles first
+  const uploadFiles = useCallback(async (files: File[]) => {
+    if (!field.imageConfig?.uploadUrl) return;
+
+    setOverallUploadProgress(0); // Initialize overall progress
+
+    // Create temporary image info objects for the uploading files
+    const uploadingImageInfos = files.map((file, index) => {
+      const previewUrl = URL.createObjectURL(file); // Create preview immediately
+      return {
+        id: `uploading-${Date.now()}-${index}`,
+        url: previewUrl,
+        file: file,
+        isUploading: true,
+        progress: 0
+      };
+    });
+
+    // Add the uploading images to the state
+    setImageInfos(prev => [...prev, ...uploadingImageInfos]);
+
+    // Upload each file and track overall progress
+    const individualProgress: { [key: string]: number } = {};
+    uploadingImageInfos.forEach(f => individualProgress[f.id] = 0);
+
+    const uploadPromises = files.map((file, fileIndex) => {
+      return new Promise<string>(async (resolve, reject) => { // Make inner function async
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await apiClient.post(field.imageConfig!.uploadUrl!, formData, { // Added non-null assertions
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              ...(field.imageConfig!.uploadHeaders || {}),
+            },
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                // Update individual and overall progress
+                individualProgress[uploadingImageInfos[fileIndex].id] = progress;
+                const totalProgressSum = Object.values(individualProgress).reduce((sum, p) => sum + p, 0);
+                const calculatedOverallProgress = Math.round(totalProgressSum / files.length);
+                setOverallUploadProgress(calculatedOverallProgress);
+                // Update UI state for the specific image
+                setImageInfos(prev => prev.map(imgInfo =>
+                  imgInfo.id === uploadingImageInfos[fileIndex].id
+                    ? { ...imgInfo, progress: progress }
+                    : imgInfo
+                ));
+              }
+            },
+          });
+
+          // Process successful response
+          const imageUrl = response.data?.url || response.data?.data?.url || response.data?.imageUrl;
+          if (imageUrl && typeof imageUrl === 'string') {
+            resolve(imageUrl);
+          } else {
+            console.error("Upload succeeded but no valid URL found in response:", response.data);
+            reject(new Error(`${t('UploadSuccessful')} but ${t('InvalidResponse')}`));
+          }
+        } catch (error: any) {
+          console.error(`Upload error for ${file.name}:`, error);
+          const errorMessage = error.response?.data?.message || error.message || t('UploadFailed');
+          reject(new Error(errorMessage)); // Reject promise with error message
+        }
+      });
+    });
+
+    // Wait for all uploads to complete
+    try {
+      const results = await Promise.allSettled(uploadPromises);
+
+      // Process results
+      const uploadedUrls: string[] = [];
+      const failedUploads: string[] = [];
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          uploadedUrls.push(result.value);
+        } else {
+          console.error(`Upload failed for ${files[index].name}:`, result.reason);
+          failedUploads.push(files[index].name);
+          // Optionally update the specific imageInfo state to show an error indicator
+          setImageInfos(prev => prev.map(f =>
+            f.id === uploadingImageInfos[index].id
+              ? { ...f, isUploading: false, progress: undefined /*, error: 'Failed' */ }
+              : f
+          ));
+        }
+      });
+
+      // Update image info state after all uploads are settled (remove progress)
+      setImageInfos(prev => {
+        const finalImageInfos = prev.map(imgInfo => {
+          const uploadingInfoIndex = uploadingImageInfos.findIndex(uf => uf.id === imgInfo.id);
+          if (uploadingInfoIndex !== -1) {
+            // This image was part of the upload batch
+            const result = results[uploadingInfoIndex];
+            if (result.status === 'fulfilled') {
+              // Successfully uploaded: update URL, clear upload state
+              // Revoke the temporary blob URL before updating
+              URL.revokeObjectURL(imgInfo.url);
+              return { ...imgInfo, url: result.value, file: result.value, isUploading: false, progress: undefined };
+            } else {
+              // Failed upload: clear upload state, keep temporary blob URL for preview
+              return { ...imgInfo, isUploading: false, progress: undefined /*, error: 'Upload Failed' */ };
+            }
+          }
+          return imgInfo; // Keep images not part of this batch
+        });
+
+        // Optionally filter out images that failed to upload
+        // return finalImageInfos.filter(imgInfo => !(imgInfo.error === 'Upload Failed'));
+        return finalImageInfos;
+      });
+
+      // If at least one image was uploaded successfully
+      if (uploadedUrls.length > 0) {
+        // Combine existing URLs/Files with new URLs
+        const existingValues = normalizedValue.filter(item => typeof item === 'string' || !(item instanceof File)); // Keep existing URLs/non-files
+        onChange([...existingValues, ...uploadedUrls]);
+      }
+
+      // If some uploads failed
+      if (failedUploads.length > 0) {
+        formInstance.setError(field.name, `${t('UploadsFailed')}: ${failedUploads.join(', ')}`);
+      }
+    } catch (error) {
+      console.error('Upload processing error:', error);
+      formInstance.setError(field.name, t('UploadFailed'));
+      // Ensure uploading state is cleared even if processing fails
+      setImageInfos(prev => prev.map(f => uploadingImageInfos.some(uf => uf.id === f.id) ? { ...f, isUploading: false, progress: undefined } : f));
+    } finally {
+      setOverallUploadProgress(null); // Reset overall progress
+    }
+  }, [field, onChange, formInstance, value, t, normalizedValue]); // Added t and normalizedValue
+
+  // Handle file selection (now defined after uploadFiles)
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    
+
     // Validate each file
     const validFiles: File[] = [];
     const invalidFiles: { file: File, reason: string }[] = [];
-    
+
     files.forEach(file => {
       // Validate file type if allowedFileTypes is specified
       if (field.imageConfig?.allowedFileTypes &&
           !field.imageConfig.allowedFileTypes.includes(file.type)) {
-        invalidFiles.push({ 
-          file, 
-          reason: `${t('FileTypeNotAllowed')}: ${field.imageConfig.allowedFileTypes.join(', ')}` 
+        invalidFiles.push({
+          file,
+          reason: `${t('FileTypeNotAllowed')}: ${field.imageConfig.allowedFileTypes.join(', ')}`
         });
         return;
       }
-      
+
       // Validate file size if maxFileSize is specified
       if (field.imageConfig?.maxFileSize && file.size > field.imageConfig.maxFileSize) {
         const maxSizeMB = Math.round(field.imageConfig.maxFileSize / (1024 * 1024) * 10) / 10;
-        invalidFiles.push({ 
-          file, 
-          reason: `${t('FileSizeExceeds')} (${maxSizeMB} MB)` 
+        invalidFiles.push({
+          file,
+          reason: `${t('FileSizeExceeds')} (${maxSizeMB} MB)`
         });
         return;
       }
-      
+
       validFiles.push(file);
     });
-    
+
     // If there are invalid files, show errors
     if (invalidFiles.length > 0) {
-      const errorMessages = invalidFiles.map(item => 
+      const errorMessages = invalidFiles.map(item =>
         `${item.file.name}: ${item.reason}`
       );
       formInstance.setError(field.name, errorMessages.join('\n'));
-      
+
       // If all files are invalid, return
       if (validFiles.length === 0) return;
+    } else {
+       // Clear previous errors if all selected files are valid
+       formInstance.setError(field.name, null);
     }
-    
+
     // If uploadUrl is provided, upload the files
     if (field.imageConfig?.uploadUrl) {
-      uploadFiles(validFiles);
+      uploadFiles(validFiles); // Call uploadFiles defined above
     } else {
       // Otherwise, just update the value
       // Combine existing files (if any) with new files
       const existingFiles = Array.isArray(value) ? value : (value ? [value] : []);
       onChange([...existingFiles, ...validFiles]);
     }
-    
+
     // Reset the file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [field, onChange, formInstance, value]);
-  
-  // Handle multiple image uploads
-  const uploadFiles = useCallback(async (files: File[]) => {
-    if (!field.imageConfig?.uploadUrl) return;
-    
-    setIsUploading(true);
-    setUploadProgress(0);
-    
-    try {
-      // Create an array to store uploaded URLs
-      const uploadedUrls: string[] = [];
-      let completedUploads = 0;
-      
-      // Process each file
-      const uploadPromises = files.map(file => {
-        return new Promise<string>((resolve, reject) => {
-          const formData = new FormData();
-          formData.append('file', file);
-          
-          const xhr = new XMLHttpRequest();
-          
-          // Track upload progress
-          xhr.upload.addEventListener('progress', (event) => {
-            if (event.lengthComputable) {
-              // Calculate overall progress based on this file's progress
-              const fileProgress = Math.round((event.loaded / event.total) * 100);
-              const overallProgress = Math.round(
-                ((completedUploads * 100) + fileProgress) / files.length
-              );
-              setUploadProgress(overallProgress);
-            }
-          });
-          
-          // Handle response
-          xhr.onload = () => {
-            completedUploads++;
-            
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const response = JSON.parse(xhr.responseText);
-                // Assuming the response contains a URL to the uploaded image
-                const imageUrl = response.url || response.data?.url || response.imageUrl;
-                if (imageUrl) {
-                  resolve(imageUrl);
-                } else {
-                  reject(new Error(`${t('UploadSuccessful')} ${t('UploadFailed')}`));
-                }
-              } catch (error) {
-                reject(new Error(t('UploadFailed')));
-              }
-            } else {
-              reject(new Error(`${t('UploadFailed')} (${xhr.status})`));
-            }
-          };
-          
-          // Handle errors
-          xhr.onerror = () => {
-            completedUploads++;
-            reject(new Error(t('UploadFailed')));
-          };
-          
-          // Open and send the request
-          if (field.imageConfig?.uploadUrl) {
-            xhr.open('POST', field.imageConfig.uploadUrl);
-            
-            // Add custom headers if provided
-            if (field.imageConfig.uploadHeaders) {
-              Object.entries(field.imageConfig.uploadHeaders).forEach(([key, value]) => {
-                xhr.setRequestHeader(key, value);
-              });
-            }
-          } else {
-            reject(new Error('Upload URL is not defined'));
-            return;
-          }
-          
-          xhr.send(formData);
-        });
-      });
-      
-      // Wait for all uploads to complete
-      const results = await Promise.allSettled(uploadPromises);
-      
-      // Process results
-      results.forEach(result => {
-        if (result.status === 'fulfilled') {
-          uploadedUrls.push(result.value);
-        } else {
-          console.error('Upload failed:', result.reason);
-          formInstance.setError(field.name, result.reason.message);
-        }
-      });
-      
-      // If at least one file was uploaded successfully
-      if (uploadedUrls.length > 0) {
-        // Combine existing URLs (if any) with new URLs
-        const existingUrls = Array.isArray(value) ? value : (value ? [value] : []);
-        onChange([...existingUrls, ...uploadedUrls]);
-      }
-      
-      // If some uploads failed
-      if (uploadedUrls.length < files.length) {
-        formInstance.setError(field.name, `${files.length - uploadedUrls.length} ${t('UploadsFailed')}`);
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      formInstance.setError(field.name, t('UploadFailed'));
-    } finally {
-      setIsUploading(false);
-    }
-  }, [field, onChange, formInstance, value]);
-  
+  }, [field, onChange, formInstance, value, t, uploadFiles]); // Added uploadFiles dependency
+
   // Handle removing an image
   const handleRemoveImage = useCallback((index: number) => {
-    if (!Array.isArray(value)) return;
-    
-    const newValue = [...value];
-    newValue.splice(index, 1);
-    
-    // If the array is now empty, set to null or empty array based on your preference
+    const imageInfoToRemove = imageInfos[index];
+    if (!imageInfoToRemove) return;
+
+    // Filter the main value array
+    const newValue = normalizedValue.filter((item, i) => i !== index);
+
+    // Revoke object URL if it was a File preview
+    if (imageInfoToRemove.file instanceof File) {
+      URL.revokeObjectURL(imageInfoToRemove.url);
+    }
+
+    // Update state
     onChange(newValue.length === 0 ? [] : newValue);
-    
+
     // Clear any errors
     formInstance.setError(field.name, null);
-  }, [onChange, formInstance, field.name, value]);
-  
+  }, [onChange, formInstance, field.name, normalizedValue, imageInfos]); // Added imageInfos
+
   // Handle clicking the upload button
   const handleUploadClick = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
-  }, []);
-  
+  }, []); // End of handleUploadClick useCallback
+
   return (
     <div className="relative">
       <div
@@ -298,43 +354,54 @@ const MultiImageField: React.FC<MultiImageFieldProps> = ({
           onBlur={onBlur}
           multiple={true} // Always allow multiple files
         />
-        
+
         {/* Image previews */}
-        {previews.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-            {previews.map((preview, index) => (
-              <div key={index} className="relative">
+        {imageInfos.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-4">
+            {imageInfos.map((imgInfo, index) => (
+              <div key={imgInfo.id} className="relative aspect-square">
                 <div
                   className={cn(
-                    "relative border rounded-md overflow-hidden w-full",
-                    showError ? "border-destructive" : "border-input"
+                    "relative border rounded-md overflow-hidden w-full h-full group",
+                    showError && !imgInfo.isUploading ? "border-destructive" : "border-input" // Show border only if not uploading
                   )}
-                  style={{
-                    aspectRatio: field.imageConfig?.aspectRatio || 1,
-                    maxWidth: "100%"
-                  }}
                 >
                   <img
-                    src={preview}
+                    src={imgInfo.url}
                     alt={`Preview ${index + 1}`}
                     className="object-cover w-full h-full"
                   />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(index)}
-                    className="absolute top-2 right-2 bg-black bg-opacity-50 rounded-full p-1 text-white hover:bg-opacity-70 transition-colors"
-                    aria-label={t('RemoveImage')}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  {/* Remove Button */}
+                  {!imgInfo.isUploading && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(index)}
+                      className="absolute top-1 right-1 bg-black bg-opacity-40 rounded-full p-0.5 text-white opacity-0 group-hover:opacity-100 hover:bg-opacity-60 transition-opacity"
+                      aria-label={t('RemoveImage')}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                  {/* Upload Progress Overlay */}
+                  {imgInfo.isUploading && imgInfo.progress !== undefined && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center flex-col text-white p-1">
+                      <div className="w-full bg-gray-600 rounded-full h-1.5 mb-1">
+                        <div
+                          className="bg-white h-1.5 rounded-full"
+                          style={{ width: `${imgInfo.progress}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs">{imgInfo.progress}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
-            
+
           </div>
         ) : null}
-        
-        {/* Upload area */}
+
+        {/* Upload area / Add More Button */}
         <div
           className={cn(
             "flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 mb-4 cursor-pointer hover:bg-muted/50 transition-colors",
@@ -343,13 +410,19 @@ const MultiImageField: React.FC<MultiImageFieldProps> = ({
           onClick={handleUploadClick}
           style={{
             width: "100%",
-            minHeight: "150px",
-            aspectRatio: field.imageConfig?.aspectRatio || 16/9
+            minHeight: "100px", // Reduced height
           }}
         >
-          {previews.length > 0 ? (
+          {overallUploadProgress !== null ? (
             <>
-              <Plus className="h-12 w-12 text-muted-foreground mb-2" />
+              <div className="animate-spin h-8 w-8 border-2 border-current border-t-transparent rounded-full text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">
+                {t('Uploading')} {overallUploadProgress}%
+              </p>
+            </>
+          ) : imageInfos.length > 0 ? (
+            <>
+              <Plus className="h-10 w-10 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">
                 {t('AddMoreImages')}
               </p>
@@ -358,11 +431,11 @@ const MultiImageField: React.FC<MultiImageFieldProps> = ({
             <>
               <ImageIcon className="h-12 w-12 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">
-                {isUploading ? `${t('Uploading')} ${uploadProgress}%` : t('ClickToUploadMultiple')}
+                {t('ClickToUploadMultiple')}
               </p>
             </>
           )}
-          
+
           {field.imageConfig?.allowedFileTypes && (
             <p className="text-xs text-muted-foreground mt-1">
               {t('AllowedTypes')}: {field.imageConfig.allowedFileTypes.map(type => type.replace('image/', '')).join(', ')}
@@ -374,22 +447,22 @@ const MultiImageField: React.FC<MultiImageFieldProps> = ({
             </p>
           )}
         </div>
-        
-        {/* Upload progress */}
-        {isUploading && (
-          <div className="w-full mb-4">
-            <div className="w-full bg-muted rounded-full h-2.5 mb-1">
+
+        {/* Overall Upload progress (moved below upload area) */}
+        {overallUploadProgress !== null && overallUploadProgress >= 0 && (
+          <div className="w-full mb-4 px-1">
+            <p className="text-xs text-muted-foreground text-center mb-1">
+              {t('OverallProgress')}: {overallUploadProgress}%
+            </p>
+            <div className="w-full bg-muted rounded-full h-2">
               <div
-                className="bg-primary h-2.5 rounded-full transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
+                className="bg-primary h-2 rounded-full transition-all duration-150"
+                style={{ width: `${overallUploadProgress}%` }}
               ></div>
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              {t('Uploading')}: {uploadProgress}%
-            </p>
           </div>
         )}
-        
+
         {/* Error message */}
         {showError && (
           <div className="text-destructive text-sm mt-1 whitespace-pre-line">

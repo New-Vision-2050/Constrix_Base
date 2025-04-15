@@ -392,12 +392,20 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
             });
           }
 
-          // Handle Laravel validation errors if enabled
-          if (config.laravelValidation?.enabled && result.errors) {
-            // Convert Laravel validation errors to form errors
+          // Handle field-specific errors returned from the server
+          if (result.errors) {
             Object.entries(result.errors).forEach(([field, messages]) => {
+              // Take the first message if it's an array (common in Laravel)
               const message = Array.isArray(messages) ? messages[0] : messages;
-              rhfSetError(field as any, { type: 'server', message: message as string });
+              // Ensure the message is a string before setting the error
+              if (typeof message === 'string') {
+                 rhfSetError(field as any, { type: 'server', message: message });
+              } else {
+                 // Handle non-string messages if necessary, e.g., log a warning
+                 console.warn(`Received non-string error message for field ${field}:`, message);
+                 // Optionally set a generic error message
+                 // rhfSetError(field as any, { type: 'server', message: 'Invalid input' });
+              }
             });
 
             // Call onValidationError callback if provided

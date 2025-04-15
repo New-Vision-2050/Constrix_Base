@@ -115,7 +115,16 @@ const TextField: React.FC<TextFieldProps> = ({
             showIcon ? (isRtl ? "pl-8" : "pl-8") : "", // Add padding based on text direction
             hasPostfix ? "" : field.width ? field.width : "w-full"
           )}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            onChange(newValue); // Update the value in the store
+
+            // Check for and trigger API validation if applicable
+            const apiRule = field.validation?.find(rule => rule.type === 'apiValidation');
+            if (apiRule) {
+              formInstance.validateFieldWithApi(field.name, newValue, apiRule);
+            }
+          }}
           onBlur={onBlur}
           dir={isRtl ? "rtl" : "ltr"} // Set direction based on locale
         />

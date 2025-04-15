@@ -37,6 +37,14 @@ The Form Builder module is a powerful and flexible system for creating forms in 
 - **Edit Mode**: Load and edit existing data from direct values or API endpoints
 - **Image Upload**: Support for image upload fields with preview and validation
 
+### Accessibility (A11y)
+
+The module aims for accessibility compliance:
+- **Semantic HTML**: Uses appropriate HTML elements.
+- **ARIA Attributes**: Includes necessary ARIA attributes for screen readers (ensure custom components like `SearchField` also implement this).
+- **Keyboard Navigation**: Standard form elements are keyboard navigable. Custom components should ensure proper focus management and keyboard interaction patterns.
+- **Labels**: All fields have associated labels.
+
 ## Form Builder Components
 
 The module provides several components for different use cases:
@@ -278,6 +286,35 @@ Example field with validation:
 }
 ```
 
+### Handling Server-Side Errors
+
+While client-side validation catches many issues, server-side validation is crucial. The `onSubmit` function should return an `errors` object if the backend validation fails.
+
+```typescript
+// Example onSubmit handling backend errors
+onSubmit: async (values) => {
+  try {
+    const response = await fetch('/api/submit-form', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      // Assuming backend returns errors in a specific format, e.g., { errors: { fieldName: 'Error message' } }
+      return { success: false, message: errorData.message || 'Submission failed', errors: errorData.errors };
+    }
+
+    return { success: true, message: 'Form submitted successfully' };
+  } catch (error) {
+    return { success: false, message: 'An unexpected error occurred' };
+  }
+}
+```
+
+The form builder components (especially the React Hook Form variants) will automatically attempt to map these errors back to the corresponding fields if the keys in the `errors` object match the field names. You can also use the `onError` callback in the `FormConfig` for custom error handling logic.
+
 ## Advanced Features
 
 ### Multi-step Forms (Wizard)
@@ -445,6 +482,41 @@ const apiEditFormConfig: FormConfig = {
 />
 ```
 
+### Custom Field Rendering
+
+For highly specialized input needs, you can provide a custom rendering function for a field using the `render` property in `FieldConfig`.
+
+```typescript
+{
+  type: "custom", // Use a unique type or an existing one if extending
+  name: "specialInput",
+  label: "Special Input",
+  render: (field, value, onChange, error, form) => {
+    // field: The FieldConfig object for this field
+    // value: The current value of the field
+    // onChange: Function to call when the custom input's value changes
+    // error: Any validation error associated with this field
+    // form: The form instance (e.g., UseFormReturn from React Hook Form)
+
+    return (
+      <div>
+        <label htmlFor={field.name}>{field.label}</label>
+        <input
+          id={field.name}
+          type="text" // Or your custom input type
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          // Add necessary ARIA attributes, styling, etc.
+        />
+        {error && <p className="text-destructive">{error.message}</p>}
+      </div>
+    );
+  }
+}
+```
+
+**Note:** When using custom rendering, ensure you handle accessibility (labels, ARIA attributes, keyboard navigation) and integrate correctly with the form's state management (using the provided `onChange`, `value`, and potentially `form` instance).
+
 ## Field Types Reference
 
 ### Text Field
@@ -535,6 +607,8 @@ const apiEditFormConfig: FormConfig = {
 }
 ```
 
+**Potential Enhancements:** Consider future improvements like direct-to-cloud storage uploads (e.g., S3 presigned URLs), granular progress indicators, and client-side image manipulation (resizing/cropping).
+
 ### File Upload Field
 
 ```typescript
@@ -564,6 +638,8 @@ const apiEditFormConfig: FormConfig = {
   },
 }
 ```
+
+**Potential Enhancements:** Similar to image uploads, consider direct-to-cloud uploads and enhanced progress tracking for large files.
 
 ### Dynamic Rows Field
 
@@ -613,8 +689,16 @@ The form builder includes several examples to help you get started:
 4. **Use Conditional Fields**: Show only relevant fields based on user input to simplify the form.
 5. **Test Edit Mode Thoroughly**: When using edit mode, test both loading and saving functionality.
 6. **Handle Errors Gracefully**: Implement proper error handling for both client and server-side validation.
-7. **Consider Mobile Users**: Ensure your forms are responsive and work well on mobile devices.
+7. **Consider Mobile Users**: Ensure your forms are responsive and work well on mobile devices. Use `className` props on sections and fields for fine-grained layout control, potentially leveraging Tailwind CSS utility classes. For highly complex layouts, consider using the `gridArea` property on fields within a CSS Grid container defined on the section or form.
 8. **Choose the Right Implementation**: Select between the default form implementation and React Hook Form based on your project's needs.
+9. **Implement Testing**: Add unit tests for custom hooks and utility functions, and integration tests for key form configurations (e.g., wizard mode, edit mode, conditional logic) to ensure robustness.
+
+
+## Customization and Theming
+
+- **Styling**: Use the `className` prop available on `FormConfig`, `FormSection`, and `FieldConfig` to apply custom styles, often using Tailwind CSS utility classes.
+- **Component Overrides**: While not directly supported via configuration, you could fork specific field components (e.g., `TextField.tsx`) for deep customization if needed.
+- **CSS Variables**: Consider defining CSS variables for common theme elements (colors, spacing) if consistent theming across multiple forms is required.
 
 ## React Hook Form Integration Details
 
@@ -627,6 +711,13 @@ The Form Builder module provides a complete integration with React Hook Form, of
 3. **TypeScript Support**: Better type safety and autocompletion
 4. **Form State**: Access to form state like dirty, touched, etc.
 5. **Error Handling**: Improved error handling and validation
+
+### State Management Approach
+
+The React Hook Form integration primarily relies on `react-hook-form` for managing field values, validation state, and submission status. The `useReactHookForm` hook orchestrates this. Additionally:
+- **Props:** Configuration (`FormConfig`), initial data (`editValues`, `recordId`), and callbacks (`onSuccess`, `onError`, `onCancel`) are passed via props.
+- **Internal State:** Component-level state (e.g., within `ReactHookFormBuilder` for loading edit data) might be used for UI-specific concerns.
+- **`useFormStore` (Optional):** If used (check `useReactHookForm` implementation details), this likely serves for cross-form communication or persisting state beyond a single form instance, potentially for complex multi-part flows. Clarify its specific role by examining its usage within the hooks.
 
 ### How React Hook Form Integration Works
 
