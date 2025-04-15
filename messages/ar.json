@@ -100,7 +100,7 @@
   },
   "Companies": {
     "Companies": "الشركات",
-    "Edit":"تعديل",
+    "Edit": "تعديل",
     "Email": "البريد الاليكتروني",
     "CompanyType": "نوع الشركة",
     "CompanySection": "نشاط الشركه",
@@ -122,9 +122,12 @@
   "Sidebar": {
     "Companies": "الشركات",
     "Users": "المستخدمين",
-    "Settings":"اعدادات النظام",
+    "Settings": "اعدادات",
+    "SystemSettings": "اعدادات البرامج",
+    "DashboardSettings": "اعدادات ملف الشركة",
+    "UserProfileSettings": "اعدادات الملف الشخصي",
     "Welcome": "مرحبا، محمد سعد!",
-    "CompanyName" : "نيو فيجن"
+    "CompanyName": "نيو فيجن"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي"

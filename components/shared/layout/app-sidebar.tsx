@@ -30,6 +30,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
 
+  // grouped routes in sidebar
+  const settingsRoutes = [
+    ROUTER.SETTINGS,
+    ROUTER.DASHBOARD,
+    ROUTER.USER_PROFILE,
+  ];
+
   // This is sample data with translated names
   const data = {
     user: {
@@ -69,9 +76,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         name: t("Sidebar.Settings"),
-        url: ROUTER.SETTINGS,
         icon: SettingsIcon,
-        isActive: pageName === ROUTER.SETTINGS,
+        isActive: settingsRoutes.indexOf(pageName) !== -1,
+        submenu: [
+          {
+            name: t("Sidebar.UserProfileSettings"),
+            url: ROUTER.USER_PROFILE,
+            isActive: pageName === ROUTER.USER_PROFILE,
+          },
+          {
+            name: t("Sidebar.DashboardSettings"),
+            url: ROUTER.DASHBOARD,
+            isActive: pageName === ROUTER.DASHBOARD,
+          },
+          {
+            name: t("Sidebar.SystemSettings"),
+            url: ROUTER.SETTINGS,
+            isActive: pageName === ROUTER.SETTINGS,
+          },
+        ],
       },
     ],
   };
