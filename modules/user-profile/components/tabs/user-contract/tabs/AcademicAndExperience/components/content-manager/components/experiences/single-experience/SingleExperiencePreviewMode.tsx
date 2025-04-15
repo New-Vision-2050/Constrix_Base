@@ -1,34 +1,41 @@
+import { Experience } from "@/modules/user-profile/types/experience";
 import PreviewTextField from "../../../../../../components/PreviewTextField";
 
-export default function SingleExperiencePreviewMode() {
+type PropsT = { experience: Experience };
+
+export default function SingleExperiencePreviewMode({ experience }: PropsT) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
           label="المسمى الوظيفي"
-          value="المسمى الوظيفي"
-          valid={true}
+          value={experience?.job_name ?? ""}
+          valid={Boolean(experience?.job_name)}
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="حدد فترة التدريب"
-          value="حدد فترة التدريب"
-          valid={true}
+          value={experience?.training_from + " - " + experience?.training_to}
+          valid={Boolean(experience?.training_from) && Boolean(experience?.training_to)}
           isDate
         />
       </div>
 
       <div className="p-2">
-        <PreviewTextField label="اسم الشركة" value="اسم الشركة" valid={true} />
+        <PreviewTextField
+          label="اسم الشركة"
+          value={experience?.company_name ?? ""}
+          valid={Boolean(experience?.company_name)}
+        />
       </div>
 
       <div className="p-2">
         <PreviewTextField
           label="نبذه عن المشاريع والاعمال"
-          value="نبذه عن المشاريع والاعمال"
-          valid={false}
+          value={experience?.about ?? ""}
+          valid={Boolean(experience?.about)}
         />
       </div>
     </div>

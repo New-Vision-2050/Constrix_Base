@@ -1,11 +1,26 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient } from "@/config/axios-config";
-import { serialize } from "object-to-formdata";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { Experience } from "@/modules/user-profile/types/experience";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 
-export const SingleExperienceFormConfig = () => {
+type PropsT = {
+  experience?: Experience;
+  onSuccess?: () => void;
+};
 
+export const SingleExperienceFormConfig = ({
+  experience,
+  onSuccess,
+}: PropsT) => {
+  // declare and define component state and variables
+  const { user } = useUserProfileCxt();
+  const formType = experience ? "Edit" : "Create";
+  const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
+
+  //  form config
   const singleExperienceFormConfig: FormConfig = {
-    formId: "user-experiences-data-form",
+    formId: `user-experiences-data-form-${experience?.id ?? ""}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -14,7 +29,7 @@ export const SingleExperienceFormConfig = () => {
       {
         fields: [
           {
-            name: "job_title",
+            name: "job_name",
             label: "المسمى الوظيفي",
             type: "text",
             placeholder: "المسمى الوظيفي",
@@ -28,7 +43,7 @@ export const SingleExperienceFormConfig = () => {
           {
             label: "تاريخ البداية",
             type: "date",
-            name: "start_date",
+            name: "training_from",
             placeholder: "تاريخ البداية",
             validation: [
               {
@@ -40,14 +55,8 @@ export const SingleExperienceFormConfig = () => {
           {
             label: "تاريخ الانتهاء",
             type: "date",
-            name: "end_date",
+            name: "training_to",
             placeholder: "تاريخ الانتهاء",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الأنتهاء مطلوب",
-              },
-            ],
           },
           {
             name: "company_name",
@@ -62,21 +71,21 @@ export const SingleExperienceFormConfig = () => {
             ],
           },
           {
-            name: "summary",
+            name: "about",
             label: "نبذه عن المشاريع والاعمال",
             type: "text",
             placeholder: "نبذه عن المشاريع والاعمال",
-            validation: [
-              {
-                type: "required",
-                message: "نبذه عن المشاريع والاعمال مطلوب",
-              },
-            ],
           },
         ],
       },
     ],
-    initialValues: {},
+    initialValues: {
+      job_name: experience?.job_name,
+      training_from: experience?.training_from,
+      training_to: experience?.training_to,
+      company_name: experience?.company_name,
+      about: experience?.about,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -85,6 +94,10 @@ export const SingleExperienceFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      onSuccess?.();
+      handleRefetchUserExperiences();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       // format date yyyy-mm-dd
       const formatDate = (date: Date): string => {
@@ -94,19 +107,25 @@ export const SingleExperienceFormConfig = () => {
 
         return `${year}-${month}-${day}`;
       };
-      const startDate = new Date(formData?.identity_start_date as string);
-      const endDate = new Date(formData?.identity_end_date as string);
+      const trainingTo = new Date(formData?.training_to as string);
+      const trainingFrom = new Date(formData?.training_from as string);
 
       const body = {
         ...formData,
-        identity_start_date: formatDate(startDate),
-        identity_end_date: formatDate(endDate),
+        user_id: user?.user_id ?? "",
+        training_from: formatDate(trainingFrom),
+        training_to: formatDate(trainingTo),
       };
 
-      const response = await apiClient.post(
-        `/company-users/identity-data`,
-        serialize(body)
-      );
+      const url =
+        formType === "Edit"
+          ? `/user_experiences/${experience?.id}`
+          : `/user_experiences`;
+
+      const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
+
+      const response = await _apiClient(url, body);
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

@@ -3,10 +3,11 @@ import FormFieldSet from "../../../../../../components/FormFieldSet";
 import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
 import SingleExperienceEditMode from "./SingleExperienceEditMode";
 import SingleExperiencePreviewMode from "./SingleExperiencePreviewMode";
+import { Experience } from "@/modules/user-profile/types/experience";
 
-type PropsT = { title: string };
+type PropsT = { experience: Experience };
 
-export default function SingleExperience({ title }: PropsT) {
+export default function SingleExperience({ experience }: PropsT) {
   // declare and define component state and vars
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -16,15 +17,15 @@ export default function SingleExperience({ title }: PropsT) {
 
   return (
     <FormFieldSet
-      title={title}
+      title={experience?.job_name ?? ""}
       secondTitle={
         <FieldSetSecondTitle mode={mode} handleEditClick={handleEditClick} />
       }
     >
       {mode === "Preview" ? (
-        <SingleExperiencePreviewMode />
+        <SingleExperiencePreviewMode experience={experience} />
       ) : (
-        <SingleExperienceEditMode />
+        <SingleExperienceEditMode experience={experience} />
       )}
     </FormFieldSet>
   );

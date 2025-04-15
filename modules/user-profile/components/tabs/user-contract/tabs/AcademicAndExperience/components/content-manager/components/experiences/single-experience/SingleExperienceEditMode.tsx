@@ -1,10 +1,13 @@
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
 import { SingleExperienceFormConfig } from "./SingleExperienceFormConfig";
+import { Experience } from "@/modules/user-profile/types/experience";
 
-export default function SingleExperienceEditMode() {
+type PropsT = { experience: Experience };
+
+export default function SingleExperienceEditMode({ experience }: PropsT) {
   return (
     <div className="flex flex-col gap-6">
-      <FormContent config={SingleExperienceFormConfig()} />
+      <FormContent config={SingleExperienceFormConfig({ experience })} />
     </div>
   );
 }

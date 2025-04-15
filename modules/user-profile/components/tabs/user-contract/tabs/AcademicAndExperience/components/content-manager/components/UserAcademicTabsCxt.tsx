@@ -11,6 +11,7 @@ import { Qualification } from "@/modules/user-profile/types/qualification";
 import useUserBriefData from "../../../hooks/useUserBriefData";
 import { BriefInfoT } from "../../../api/get-user-brief";
 import useUserExperiences from "../../../hooks/useUserExperiences";
+import { Experience } from "@/modules/user-profile/types/experience";
 
 // declare context types
 type UserAcademicTabsCxtType = {
@@ -21,6 +22,7 @@ type UserAcademicTabsCxtType = {
   userBrief: BriefInfoT | undefined;
   handleRefetchUserBrief: () => void;
   // user experiences
+  userExperiences: Experience[] | undefined;
   handleRefetchUserExperiences: () => void;
 };
 
@@ -86,6 +88,7 @@ export const UserAcademicTabsCxtProvider = ({
         userBrief,
         handleRefetchUserBrief,
         // user experiences
+        userExperiences,
         handleRefetchUserExperiences,
       }}
     >

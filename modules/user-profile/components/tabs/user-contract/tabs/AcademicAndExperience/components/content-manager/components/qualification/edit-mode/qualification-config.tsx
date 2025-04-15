@@ -199,9 +199,10 @@ export const QualificationFormConfig = ({
           ? `/qualifications/${qualification?.id}`
           : "/qualifications";
 
-      const response = await (formType === "Create"
-        ? apiClient.post
-        : apiClient.put)(url, serialize(body));
+      const _body = formType === "Edit" ? body : serialize(body);
+      const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
+
+      const response = await _apiClient(url, _body);
 
       return {
         success: true,

@@ -1,9 +1,10 @@
 import { apiClient } from "@/config/axios-config";
+import { Experience } from "@/modules/user-profile/types/experience";
 
 type ResponseT = {
   code: string;
   message: string;
-  payload: {};
+  payload: Experience[];
 };
 
 export default async function GetUserExperienceData(userId: string) {
