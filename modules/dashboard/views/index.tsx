@@ -6,11 +6,7 @@ import UserProfileGridLayout from "../components/UserProfileGridLayout";
 import UserProfileActivityTimeline from "../components/activity-timeline";
 import UpcomingMeetings from "../components/upcoming-meetings";
 import UserTeams from "../components/user-teams";
-// import UserProjectsData from "../components/user-projects";
-import UserProfilePersonalData from "../components/personal-data";
-import UserProfileProfessionalData from "../components/professional-data";
-import UserProfileBankingData from "../components/Banking-data";
-import UserActivitiesDataList from "../components/user-activities-data-list";
+import DashboardRightSide from "../components/DashboardRightSide";
 
 export default function UserDashboardModule() {
   return (
@@ -36,14 +32,7 @@ export default function UserDashboardModule() {
               {/* <UserProjectsData /> */}
             </div>
           }
-          right={
-            <div className="flex flex-col gap-3">
-              <UserProfilePersonalData />
-              <UserProfileProfessionalData />
-              <UserProfileBankingData />
-              <UserActivitiesDataList />
-            </div>
-          }
+          right={<DashboardRightSide />}
         />
       </div>
     </UserDashboardCxtProvider>

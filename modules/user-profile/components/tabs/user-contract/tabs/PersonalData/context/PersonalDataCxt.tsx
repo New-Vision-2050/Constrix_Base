@@ -12,6 +12,7 @@ import { UserConnectionInformationT } from "../api/get-user-connection-data";
 import useUserConnectionData from "../hooks/useUserConnectionData";
 import useUserIdentityData from "../hooks/useUserIdentityData";
 import { UserIdentityInformationT } from "../api/get-identity-data";
+import { PersonalDataSections } from "../constants/PersonalDataSections";
 
 // declare context types
 type PersonalDataTabCxtType = {
@@ -58,7 +59,7 @@ export const PersonalDataTabCxtProvider = ({
     useUserConnectionData();
   const { data: userIdentityData, refetch: refetchIdentityData } =
     useUserIdentityData();
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(PersonalDataSections[0]);
 
   // ** handle side effects
 
