@@ -1,6 +1,7 @@
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
 import GraduationCapIcon from "@/public/icons/graduation-cap";
 import ContractualDataTab from "../components/contractual-data";
+import JobInformation from "../components/job-information";
 
 export const FunctionalContractualList: UserProfileNestedTab[] = [
   {
@@ -13,7 +14,7 @@ export const FunctionalContractualList: UserProfileNestedTab[] = [
     id: "functional-tab-contractual-job-data",
     title: "البيانات الوظيفية",
     icon: <GraduationCapIcon />,
-    content: <>البيانات الوظيفية</>,
+    content: <JobInformation />,
   },
 ];
 

@@ -2,6 +2,7 @@ import { SystemTab } from "@/modules/settings/types/SystemTab";
 import PersonalDataTab from "../tabs/PersonalData/PersonalData";
 import AcademicAndExperience from "../tabs/AcademicAndExperience";
 import FunctionalAndContractualData from "../tabs/FunctionalAndContractualData";
+import FinancialBenefits from "../tabs/FinancialData";
 
 export const UserContractTabsList: SystemTab[] = [
   {
@@ -21,8 +22,8 @@ export const UserContractTabsList: SystemTab[] = [
   },
   {
     id: "user-contract-tab-financial",
-    title: "البيانات المالية",
-    content: <>البيانات المالية</>,
+    title: "الامتيازات المالية",
+    content: <FinancialBenefits />,
   },
   {
     id: "user-contract-tab-contract-management",
