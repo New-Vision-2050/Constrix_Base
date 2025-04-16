@@ -18,6 +18,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
+import InboxIcon from "@/public/icons/inbox-icon";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isCentral: boolean;
@@ -42,11 +43,36 @@ export function AppSidebar({
   const sidebarSide = isRtl ? "right" : "left";
 
   // grouped routes in sidebar
-  const settingsRoutes = [
+  const settingsRoutesNames = [
     ROUTER.SETTINGS,
     ROUTER.DASHBOARD,
     ROUTER.USER_PROFILE,
   ];
+  const settingsRoutes = {
+    name: t("Sidebar.Settings"),
+    icon: SettingsIcon,
+    isActive: settingsRoutesNames.indexOf(pageName) !== -1,
+    submenu: [
+      {
+        name: t("Sidebar.UserProfileSettings"),
+        url: ROUTER.USER_PROFILE,
+        icon: UserIcon,
+        isActive: pageName === ROUTER.USER_PROFILE,
+      },
+      {
+        name: t("Sidebar.DashboardSettings"),
+        url: ROUTER.DASHBOARD,
+        icon: InboxIcon,
+        isActive: pageName === ROUTER.DASHBOARD,
+      },
+      {
+        name: t("Sidebar.SystemSettings"),
+        url: ROUTER.SETTINGS,
+        icon: InboxIcon,
+        isActive: pageName === ROUTER.SETTINGS,
+      },
+    ],
+  };
 
   // This is sample data with translated names
 
@@ -64,43 +90,9 @@ export function AppSidebar({
           icon: UserIcon,
           isActive: pageName === ROUTER.USERS,
         },
-        {
-          name: t("Sidebar.Settings"),
-          icon: SettingsIcon,
-          isActive: settingsRoutes.indexOf(pageName) !== -1,
-          submenu: [
-            {
-              name: t("Sidebar.UserProfileSettings"),
-              url: ROUTER.USER_PROFILE,
-              isActive: pageName === ROUTER.USER_PROFILE,
-            },
-            {
-              name: t("Sidebar.DashboardSettings"),
-              url: ROUTER.DASHBOARD,
-              isActive: pageName === ROUTER.DASHBOARD,
-            },
-            {
-              name: t("Sidebar.SystemSettings"),
-              url: ROUTER.SETTINGS,
-              isActive: pageName === ROUTER.SETTINGS,
-            },
-          ],
-        },
+        settingsRoutes,
       ]
-    : [
-        {
-          name: t("Sidebar.Dashboard"),
-          url: ROUTER.DASHBOARD,
-          icon: CompaniesIcon,
-          isActive: pageName === ROUTER.DASHBOARD,
-        },
-        {
-          name: t("Sidebar.Settings"),
-          url: ROUTER.SETTINGS,
-          icon: SettingsIcon,
-          isActive: pageName === ROUTER.SETTINGS,
-        },
-      ];
+    : [settingsRoutes];
 
   const data = {
     user: {

@@ -1,3 +1,5 @@
+"use client";
+
 import { useUserDashboardCxt } from "../context/user-dashboard-cxt";
 import UserProfileBankingData from "./Banking-data";
 import UserProfilePersonalData from "./personal-data";

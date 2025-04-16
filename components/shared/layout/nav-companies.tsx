@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // declare the type for the project item
@@ -25,6 +26,7 @@ type ProjectItem = {
 };
 
 export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
+  const router = useRouter();
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
 
   const toggleSubmenu = (name: string) => {
@@ -32,6 +34,10 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
       ...prev,
       [name]: !prev[name],
     }));
+  };
+
+  const handleSubMenuItemClick = (url: string) => {
+    router.push(url);
   };
 
   return (
@@ -55,15 +61,28 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
             {item.submenu && openSubmenus[item.name] && (
               <div className="ml-8 px-2 mt-1 space-y-1">
                 {item.submenu.map((sub) => (
-                  <Link
+                  <SidebarMenuButton
+                    asChild
                     key={sub.name}
-                    href={sub.url}
-                    className={`block text-md px-2 py-1 hover:bg-muted rounded transition ${
-                      sub.isActive ? "text-primary" : ""
-                    }`}
+                    tooltip={sub.name}
+                    className={cn(sub.isActive && "text-primary")}
+                    onClick={() => handleSubMenuItemClick(sub.url)}
                   >
-                    {sub.name}
-                  </Link>
+                    <div className="pr-5 flex gap-5 items-center cursor-pointer">
+                      {sub.icon ? <sub.icon /> : "i"}
+                      <span>{sub.name}</span>
+                    </div>
+                  </SidebarMenuButton>
+
+                  // <Link
+                  //   key={sub.name}
+                  //   href={sub.url}
+                  //   className={`block text-md px-2 py-1 hover:bg-muted rounded transition ${
+                  //     sub.isActive ? "text-primary" : ""
+                  //   }`}
+                  // >
+                  //   {sub.name}
+                  // </Link>
                 ))}
               </div>
             )}

@@ -1,3 +1,4 @@
+'use client';
 import UserProfileBankingData from "@/modules/dashboard/components/Banking-data";
 import UserProfilePersonalData from "@/modules/dashboard/components/personal-data";
 import UserProfileProfessionalData from "@/modules/dashboard/components/professional-data";
