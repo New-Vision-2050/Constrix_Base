@@ -42,6 +42,7 @@ export interface FieldConfig {
   render?: (field: FieldConfig, value: any, onChange: (newValue: any) => void) => React.ReactNode;
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
+  validateOn?: 'change' | 'blur' | 'submit'; // When to trigger validation (default: 'blur')
 }
 
 export interface FormSection {

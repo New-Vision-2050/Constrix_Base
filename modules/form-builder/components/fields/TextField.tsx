@@ -1,93 +1,117 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useCallback } from "react";
 import { Input } from "@/modules/table/components/ui/input";
 import { FieldConfig } from "../../types/formTypes";
 import { cn } from "@/lib/utils";
-import { useFormInstance } from "../../hooks/useFormStore";
+import { useFormInstance, validateField, useFormStore } from "../../hooks/useFormStore";
 import { XCircle, CheckCircle } from "lucide-react";
-import { hasApiValidation } from "../../utils/apiValidation";
-import { useLocale } from "next-intl";
+import { hasApiValidation, triggerApiValidation } from "../../utils/apiValidation";
+import { useLocale, useTranslations } from "next-intl"; // Added useTranslations import
 
 interface TextFieldProps {
   field: FieldConfig;
   value: string;
-  error?: string | React.ReactNode;
-  touched?: boolean;
+  error?: string | React.ReactNode; // Error from external validation (e.g., RHF)
+  touched?: boolean; // Touched state from external validation
   type?: "text" | "email" | "password" | "number";
   onChange: (value: string) => void;
-  onBlur: () => void;
-  isValidating?: boolean;
+  onBlur: () => void; // Original onBlur prop (likely just sets touched)
+  isValidating?: boolean; // Prop for external validation state (e.g., RHF)
   formId?: string;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
   field,
   value,
-  error,
-  touched,
+  error, // External error
+  touched, // External touched state
   type = "text",
   onChange,
-  onBlur,
-  isValidating,
+  onBlur, // Original onBlur prop
+  isValidating, // External validating prop
   formId = 'default',
 }) => {
-  // Track whether the field has been API validated
   const [hasBeenApiValidated, setHasBeenApiValidated] = useState(false);
-
-  // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const t = useTranslations('FormBuilder.Fields.Image'); // Assuming translations are needed
 
-  // Get form instance from the store
-  const formInstance = useFormInstance(formId);
-  const validatingFields = formInstance.validatingFields || {};
-  const storeErrors = formInstance.errors || {};
-  const isFieldValidating = isValidating || validatingFields[field.name];
+  const {
+    setError: setStoreError,
+    values: formValues,
+    errors: storeErrors,
+    validatingFields,
+    validateFieldWithApi: triggerApiValidationAction
+  } = useFormInstance(formId);
 
-  // Check for errors in both the form store and the local state
-  const hasStoreError = !!storeErrors[field.name];
-  const hasLocalError = !!error && touched;
-  const showError = hasLocalError || hasStoreError;
+  const isFieldValidating = isValidating || validatingFields?.[field.name];
+  const combinedError = error || storeErrors?.[field.name];
+  const showError = !!combinedError && touched;
 
-  // Clear store error when value is empty
+  const hasApiValRule = field.validation ? hasApiValidation(field.validation) : false;
+
+  // Determine validation mode: Use explicit config, or default based on API validation presence
+  const validateMode = field.validateOn || (hasApiValRule ? 'change' : 'blur');
+
+  // Reset API validation status if value changes
   useEffect(() => {
-    if (hasStoreError && (!value || value === "")) {
-      formInstance.setError(field.name, null);
-    }
-  }, [field.name, value, hasStoreError, formInstance]);
+    setHasBeenApiValidated(false);
+  }, [value]);
 
-  // Check if this field has API validation
-  const hasApiVal = field.validation
-    ? hasApiValidation(field.validation)
-    : false;
-
-  // Track when API validation completes
+  // Track API validation completion
   useEffect(() => {
-    if (hasApiVal && !isFieldValidating && value) {
-      setHasBeenApiValidated(true);
+    if (hasApiValRule && !isFieldValidating && value && !combinedError) {
+       setHasBeenApiValidated(true);
     }
-  }, [hasApiVal, isFieldValidating, value]);
+  }, [hasApiValRule, isFieldValidating, value, combinedError]);
 
-  // Determine if field has been validated successfully
-  // A field is considered successfully validated if:
-  // 1. It has API validation rules
-  // 2. It has a value (not empty)
-  // 3. It has no errors (both in local state and store)
-  // 4. It's not currently being validated
-  // 5. It has been validated by the API
+
   const hasValue = value !== undefined && value !== null && value !== "";
-  const hasNoErrors = !hasLocalError && !hasStoreError;
-  const isValidated =
-    hasApiVal &&
-    hasValue &&
-    hasNoErrors &&
-    !isFieldValidating &&
-    hasBeenApiValidated;
-
-  // Show icon if field is validating, has error, or has been successfully validated with API
-  const showIcon = isFieldValidating || showError || isValidated;
-
-  // Determine if we need to show a postfix
+  const isValidated = hasValue && !showError && !isFieldValidating && (!hasApiValRule || hasBeenApiValidated);
+  const showIcon = isFieldValidating || showError || (isValidated && hasApiValRule);
   const hasPostfix = !!field.postfix;
+
+  // Centralized validation function
+  const runValidation = useCallback((currentValue: string) => {
+    const syncError = validateField(currentValue, field.validation, formValues, field.name, useFormStore.getState(), formId);
+    setStoreError(field.name, syncError);
+
+    if (!syncError) {
+      const apiRule = field.validation?.find(rule => rule.type === 'apiValidation');
+      if (apiRule) {
+        triggerApiValidationAction(field.name, currentValue, apiRule);
+        setHasBeenApiValidated(false); // Reset status until API call completes
+      } else {
+        setHasBeenApiValidated(true); // Mark as validated if only sync rules pass
+      }
+    } else {
+      setHasBeenApiValidated(false); // Reset if sync validation fails
+    }
+  }, [field, formValues, formId, setStoreError, triggerApiValidationAction]);
+
+  // Handle change event
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue); // Update the value in the parent/store
+
+    if (validateMode === 'change') {
+      runValidation(newValue);
+    } else {
+      // Clear errors immediately if field becomes empty when validating on blur/submit
+      if (storeErrors?.[field.name] && newValue === "") {
+         setStoreError(field.name, null);
+      }
+      // Reset API validated status on change if not validating on change
+      setHasBeenApiValidated(false);
+    }
+  }, [onChange, validateMode, runValidation, field.name, storeErrors, setStoreError]);
+
+  // Handle blur event
+  const handleBlur = useCallback(() => {
+    onBlur(); // Call original onBlur (sets touched)
+    if (validateMode === 'blur') {
+      runValidation(value); // Validate current value on blur
+    }
+  }, [onBlur, validateMode, runValidation, value]);
 
   return (
     <div className="relative">
@@ -110,28 +134,19 @@ const TextField: React.FC<TextFieldProps> = ({
           className={cn(
             field.className,
             showError ? "border-destructive" : "",
-            isValidated ? "border-green-500" : "",
-            hasPostfix ? "rtl:rounded-s-none ltr:rounded-e-none" : "", // Use logical properties (end) instead of directional (right)
-            showIcon ? (isRtl ? "pl-8" : "pl-8") : "", // Add padding based on text direction
+            isValidated && !showError ? "border-green-500" : "",
+            hasPostfix ? "rtl:rounded-s-none ltr:rounded-e-none" : "",
+            showIcon ? (isRtl ? "pl-8" : "pr-8") : "",
             hasPostfix ? "" : field.width ? field.width : "w-full"
           )}
-          onChange={(e) => {
-            const newValue = e.target.value;
-            onChange(newValue); // Update the value in the store
-
-            // Check for and trigger API validation if applicable
-            const apiRule = field.validation?.find(rule => rule.type === 'apiValidation');
-            if (apiRule) {
-              formInstance.validateFieldWithApi(field.name, newValue, apiRule);
-            }
-          }}
-          onBlur={onBlur}
-          dir={isRtl ? "rtl" : "ltr"} // Set direction based on locale
+          onChange={handleChange}
+          onBlur={handleBlur}
+          dir={isRtl ? "rtl" : "ltr"}
         />
         {hasPostfix && (
           <div
             className="inline-flex items-center px-3 text-sm text-white bg-primary border border-s-0 border-input rounded-e-md relative z-10"
-            dir="ltr" // Force LTR direction for the postfix
+            dir="ltr"
           >
             {field.postfix}
           </div>
@@ -141,7 +156,8 @@ const TextField: React.FC<TextFieldProps> = ({
         <div
           className={cn(
             "absolute top-1/2 transform -translate-y-1/2 z-20",
-            isRtl ? "left-2.5" : "left-2.5"
+            isRtl ? (hasPostfix ? 'left-[calc(theme(spacing.3)_+_1rem)]' : 'left-2.5')
+                  : (hasPostfix ? 'right-[calc(theme(spacing.3)_+_1rem)]' : 'right-2.5')
           )}
         >
           {isFieldValidating ? (
