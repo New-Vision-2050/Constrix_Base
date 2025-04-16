@@ -1,4 +1,4 @@
-import VerticalBtnsList from "../PersonalData/components/vertical-buttons-list";
+import VerticalBtnsList from "@/components/shared/VerticalList";
 import { FunctionalContractualList } from "./constants/FunctionalContractualList";
 
 export default function FunctionalAndContractualData() {

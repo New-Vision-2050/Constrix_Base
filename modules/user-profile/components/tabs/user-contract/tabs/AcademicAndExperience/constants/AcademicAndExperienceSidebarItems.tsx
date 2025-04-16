@@ -47,3 +47,16 @@ export const AcademicAndExperienceSidebarItems: UserProfileNestedTab[] = [
     content: <UserCV />,
   },
 ];
+
+type PropsT = {
+  handleChangeActiveSection: (section: UserProfileNestedTab) => void;
+};
+
+export const GetAcademicAndExperienceSidebarItems = (props: PropsT) => {
+  const { handleChangeActiveSection } = props;
+
+  return AcademicAndExperienceSidebarItems?.map((btn) => ({
+    ...btn,
+    onClick: () => handleChangeActiveSection(btn),
+  })) as UserProfileNestedTab[];
+};
