@@ -7,6 +7,7 @@ import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useState } from "react";
+import { ActivationUserDialog } from "./ActivationUserDialog";
 
 const activationTypes = [
   { type: "permanente_active", label: "تفعيل دائم" },
@@ -19,6 +20,7 @@ export default function ActivateUser() {
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [openValidDialog, setOpenValidDialog] = useState(false);
   const [activationType, setActivationType] = useState<string>();
 
   // declare and define helper methods
@@ -47,11 +49,12 @@ export default function ActivateUser() {
           ...body,
           active_date_to: formatDateYYYYMMDD(selectedDate as Date),
         };
-
+      
       // start send request
       setLoading(true);
       await apiClient.post(url, body);
 
+      setOpenValidDialog(true);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -96,6 +99,11 @@ export default function ActivateUser() {
           تحديث
         </Button>
       </div>
+      <ActivationUserDialog
+        email={user?.email ?? ""}
+        open={openValidDialog}
+        setOpen={setOpenValidDialog}
+      />
     </div>
   );
 }
