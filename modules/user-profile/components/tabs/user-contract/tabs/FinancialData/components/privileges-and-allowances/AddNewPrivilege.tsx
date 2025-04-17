@@ -6,9 +6,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { PrivilegesActionsList } from "../../constants/privileges-actions-list";
+import { useFinancialDataCxt } from "../../context/financialDataCxt";
 
 export function AddNewPrivilege() {
+  const { privileges } = useFinancialDataCxt();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -16,9 +17,12 @@ export function AddNewPrivilege() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-auto">
         <DropdownMenuGroup>
-          {PrivilegesActionsList?.map((item) => (
-            <DropdownMenuItem className="justify-end"  key={item.type}>{item.title}</DropdownMenuItem>
-          ))}
+          {privileges &&
+            privileges?.map((item) => (
+              <DropdownMenuItem className="justify-end" key={item.id}>
+                {item.name}
+              </DropdownMenuItem>
+            ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,4 +1,5 @@
 import { AddNewPrivilege } from "./AddNewPrivilege";
+import PrivilegesFormsList from "./PrivilegesFormsList";
 
 export default function PrivilegesAndAllowances() {
   return (
@@ -7,6 +8,7 @@ export default function PrivilegesAndAllowances() {
         <p className="text-2xl font-bold">الامتيازات و البدلات</p>
         <AddNewPrivilege />
       </div>
+      <PrivilegesFormsList />
     </div>
   );
 }

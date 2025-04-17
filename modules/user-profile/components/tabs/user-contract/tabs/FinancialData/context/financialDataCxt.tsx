@@ -10,6 +10,8 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { financialDataSections } from "../constants/financial-data-sections";
 import useUserSalaryData from "../hooks/useUserSalaryData";
 import { Salary } from "@/modules/user-profile/types/Salary";
+import usePrivilegesData from "../hooks/usePrivilegesData";
+import { Privilege } from "@/modules/user-profile/types/privilege";
 
 // declare context types
 type FinancialDataCxtType = {
@@ -18,6 +20,9 @@ type FinancialDataCxtType = {
   // user salary
   userSalary: Salary | undefined;
   handleRefreshSalaryData: () => void;
+  // privileges data
+  privileges: Privilege[] | undefined;
+  handleRefreshPrivileges: () => void;
 };
 
 export const FinancialDataCxt = createContext<FinancialDataCxtType>(
@@ -51,7 +56,14 @@ export const FinancialDataCxtProvider = ({
     user?.user_id ?? ""
   );
 
+  // privileges data
+  const { data: privileges, refetch: refreshPrivileges } = usePrivilegesData();
+
   // ** declare and define component helper methods
+  const handleRefreshPrivileges = () => {
+    refreshPrivileges();
+  };
+
   const handleChangeActiveSection = (section: UserProfileNestedTab) =>
     setActiveSection(section);
 
@@ -68,6 +80,9 @@ export const FinancialDataCxtProvider = ({
         // user salary
         userSalary,
         handleRefreshSalaryData,
+        // privileges data
+        privileges,
+        handleRefreshPrivileges,
       }}
     >
       {children}

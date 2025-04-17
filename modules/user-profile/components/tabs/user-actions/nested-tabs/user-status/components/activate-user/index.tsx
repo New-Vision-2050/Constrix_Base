@@ -8,6 +8,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useState } from "react";
 import { ActivationUserDialog } from "./ActivationUserDialog";
+import { useUserActionsCxt } from "../../../../context";
 
 const activationTypes = [
   { type: "permanente_active", label: "تفعيل دائم" },
@@ -19,10 +20,12 @@ export default function ActivateUser() {
   const { user } = useUserProfileCxt();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const { userStatusData, userStatusLoading } = useUserActionsCxt();
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [openValidDialog, setOpenValidDialog] = useState(false);
   const [activationType, setActivationType] = useState<string>();
 
+  console.log("selectedDate", selectedDate, activationType, userStatusData);
   // declare and define helper methods
   const handleClick = (type: string) => setActivationType(type);
 
@@ -49,7 +52,7 @@ export default function ActivateUser() {
           ...body,
           active_date_to: formatDateYYYYMMDD(selectedDate as Date),
         };
-      
+
       // start send request
       setLoading(true);
       await apiClient.post(url, body);
@@ -62,9 +65,10 @@ export default function ActivateUser() {
     }
   };
 
+  if (userStatusLoading) return <>Loading...</>;
   return (
     <div className="flex flex-col gap-6">
-      <RadioGroup className="justify-end" defaultValue="comfortable">
+      <RadioGroup className="justify-end">
         {activationTypes?.map((item) => (
           <div
             key={item.type}
