@@ -4,6 +4,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
+import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 
 type PropsT = {
   offer?: JobOffer;
@@ -80,14 +81,6 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
       handleRefetchJobOffer();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      // format date yyyy-mm-dd
-      const formatDate = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
-        const day = `${date.getDate()}`.padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-      };
       const dateSend = new Date(formData?.date_send as string);
       const dateAccept = new Date(formData?.date_accept as string);
 
@@ -96,8 +89,8 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
       const body = {
         ...formData,
         user_id: user?.user_id,
-        date_send: formatDate(dateSend),
-        date_accept: formatDate(dateAccept),
+        date_send: formatDateYYYYMMDD(dateSend),
+        date_accept: formatDateYYYYMMDD(dateAccept),
       };
 
       const response = await apiClient.post(`/job_offers`, serialize(body));

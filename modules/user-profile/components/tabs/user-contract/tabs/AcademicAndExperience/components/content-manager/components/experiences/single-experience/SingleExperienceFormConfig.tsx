@@ -3,6 +3,7 @@ import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { Experience } from "@/modules/user-profile/types/experience";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
+import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 
 type PropsT = {
   experience?: Experience;
@@ -99,22 +100,14 @@ export const SingleExperienceFormConfig = ({
       handleRefetchUserExperiences();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      // format date yyyy-mm-dd
-      const formatDate = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
-        const day = `${date.getDate()}`.padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-      };
       const trainingTo = new Date(formData?.training_to as string);
       const trainingFrom = new Date(formData?.training_from as string);
 
       const body = {
         ...formData,
         user_id: user?.user_id ?? "",
-        training_from: formatDate(trainingFrom),
-        training_to: formatDate(trainingTo),
+        training_from: formatDateYYYYMMDD(trainingFrom),
+        training_to: formatDateYYYYMMDD(trainingTo),
       };
 
       const url =

@@ -3,6 +3,7 @@ import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Course } from "@/modules/user-profile/types/Course";
+import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 
 type PropsT = {
   course?: Course;
@@ -133,22 +134,14 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       handleRefetchUserCourses();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      // format date yyyy-mm-dd
-      const formatDate = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
-        const day = `${date.getDate()}`.padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-      };
       const dateObtain = new Date(formData?.date_obtain as string);
       const endDate = new Date(formData?.date_end as string);
 
       const body = {
         ...formData,
         user_id: user?.user_id,
-        date_obtain: formatDate(dateObtain),
-        date_end: formatDate(endDate),
+        date_obtain: formatDateYYYYMMDD(dateObtain),
+        date_end: formatDateYYYYMMDD(endDate),
       };
       const url =
         formType === "Create"

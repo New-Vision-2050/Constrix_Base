@@ -2,6 +2,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
+import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 
 export const IdentityDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
@@ -77,21 +78,13 @@ export const IdentityDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
-      // format date yyyy-mm-dd
-      const formatDate = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
-        const day = `${date.getDate()}`.padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-      };
       const startDate = new Date(formData?.identity_start_date as string);
       const endDate = new Date(formData?.identity_end_date as string);
 
       const body = {
         ...formData,
-        identity_start_date: formatDate(startDate),
-        identity_end_date: formatDate(endDate),
+        identity_start_date: formatDateYYYYMMDD(startDate),
+        identity_end_date: formatDateYYYYMMDD(endDate),
       };
 
       const response = await apiClient.post(

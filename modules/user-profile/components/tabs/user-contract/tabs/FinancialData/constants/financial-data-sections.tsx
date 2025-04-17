@@ -1,6 +1,7 @@
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
 import GraduationCapIcon from "@/public/icons/graduation-cap";
 import Salaries from "../components/salaries";
+import PrivilegesAndAllowances from "../components/privileges-and-allowances";
 
 export const financialDataSections: UserProfileNestedTab[] = [
   {
@@ -13,7 +14,7 @@ export const financialDataSections: UserProfileNestedTab[] = [
     id: "financial-data-alternatives",
     title: "الامتيازات و البدلات",
     icon: <GraduationCapIcon />,
-    content: <>الامتيازات و البدلات</>,
+    content: <PrivilegesAndAllowances />,
   },
 ];
 

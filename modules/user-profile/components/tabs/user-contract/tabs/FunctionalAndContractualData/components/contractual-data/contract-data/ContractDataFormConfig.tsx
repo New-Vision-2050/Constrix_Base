@@ -4,6 +4,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFunctionalContractualCxt } from "../../../context";
 import { Contract } from "@/modules/user-profile/types/Contract";
+import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 
 type PropsT = {
   contract?: Contract;
@@ -209,22 +210,14 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       handleRefetchContractData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      // format date yyyy-mm-dd
-      const formatDate = (date: Date): string => {
-        const year = date.getFullYear();
-        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
-        const day = `${date.getDate()}`.padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-      };
       const startDate = new Date(formData?.start_date as string);
       const commencementDate = new Date(formData?.commencement_date as string);
 
       const body = {
         ...formData,
         user_id: user?.user_id,
-        start_date: formatDate(startDate),
-        commencement_date: formatDate(commencementDate),
+        start_date: formatDateYYYYMMDD(startDate),
+        commencement_date: formatDateYYYYMMDD(commencementDate),
       };
 
       const response = await apiClient.post(
