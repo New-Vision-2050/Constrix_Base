@@ -4,9 +4,9 @@ import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 
-export const companiesFormConfig: FormConfig = {
-  formId: "companies-form",
-  title: "اضافة شركة جديدة",
+export const customerRelationFormConfig: FormConfig = {
+  formId: "CustomerRelation-form",
+  title: "اضافة عميل",
   apiUrl: `${baseURL}/companies`,
   laravelValidation: {
     enabled: true,
@@ -14,14 +14,13 @@ export const companiesFormConfig: FormConfig = {
   },
   sections: [
     {
-      title: "إنشاء شركة",
+      title: " اضافة عميل",
       fields: [
         {
           type: "select",
           name: "country_id",
-          label: " الشركة",
-          placeholder: "اختر دولة الشركة",
-          required: true,
+          label: "نوع العميل",
+          placeholder: "اختر نوع العميل",
           dynamicOptions: {
             url: `${baseURL}/countries`,
             valueField: "id",
@@ -42,22 +41,9 @@ export const companiesFormConfig: FormConfig = {
         },
         {
           name: "company_field_id",
-          label: "النشاط",
-          type: "select",
+          label: "اسم العميل",
+          type: "text",
           isMulti: true,
-          placeholder: "اختر النشاط",
-          required: true,
-          dynamicOptions: {
-            url: `${baseURL}/company_fields`,
-            valueField: "id",
-            labelField: "name",
-            searchParam: "name",
-            paginationEnabled: true,
-            pageParam: "page",
-            limitParam: "per_page",
-            itemsPerPage: 10,
-            totalCountHeader: "X-Total-Count",
-          },
           validation: [
             {
               type: "required",
@@ -66,53 +52,12 @@ export const companiesFormConfig: FormConfig = {
           ],
         },
         {
-          name: "name",
-          label: "الاسم التجاري",
-          type: "text",
-          placeholder: "برجاء إدخال الاسم التجاري",
-          validation: [
-            {
-              type: "apiValidation",
-              message: "This username is already taken",
-              apiConfig: {
-                url: `${baseURL}/companies/validated`,
-                method: "POST",
-                debounceMs: 500,
-                paramName: "name",
-                successCondition: (response) => response.payload.status === 1,
-              },
-            },
-          ],
-        },
-        {
-          name: "user_name",
-          label: "الاسم المختصر",
-          type: "text",
-          placeholder: "برجاء إدخال الاسم المختصر",
-          postfix: "constrix.com",
-          containerClassName: "rtl:flex-row-reverse",
-          validation: [
-            {
-              type: "apiValidation",
-              message: "This username is already taken",
-              apiConfig: {
-                url: `${baseURL}/companies/validated`,
-                method: "POST",
-                debounceMs: 500,
-                paramName: "user_name",
-                successCondition: (response) => response.payload.status === 1,
-              },
-            },
-          ],
-        },
-        {
           type: "select",
-          name: "general_manager_id",
-          label: "مسؤول الدعم",
-          placeholder: "اختر مسؤول الدعم",
-          required: true,
+          name: "country_id",
+          label: "الجنسية",
+          placeholder: "اختر الجنسية",
           dynamicOptions: {
-            url: `${baseURL}/users`,
+            url: `${baseURL}/countries`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
@@ -125,148 +70,52 @@ export const companiesFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "مسؤول الدعم",
+              message: "ادخل دولة الشركة",
             },
           ],
         },
         {
-          type: "checkbox",
-          name: "change_local_time",
-          label: "الشركة",
-          placeholder: "اختر الشركة",
-          render: (
-            field: any,
-            value: boolean,
-            onChange: (value: boolean) => void
-          ) => {
-            return (
-              <TimeZoneCheckbox
-                field={field}
-                value={value}
-                onChange={onChange}
-              />
-            );
-          },
-          validation: [
-            {
-              type: "custom",
-              message: "Order must have at least one item",
-              validator: (value) => {
-                console.log("checkbox error: -----: ", value);
-
-                return false;
-              },
-            },
-          ],
-        },
-        {
-          type: "hiddenObject",
-          name: "local-time",
-          label: "local-time",
-          condition(values) {
-            return !!values["change_local_time"];
-          },
-          defaultValue: {
-            companyType: "llc",
-            employeeCount: 0,
-            industry: "technology",
-            taxExempt: false,
-          },
-        },
-      ],
-    },
-    {
-      title: "إنشاء مستخدم",
-      collapsible: false,
-      fields: [
-        {
+          name: "company_field_id",
+          label: "رقم الهوية",
           type: "text",
-          name: "company_id",
-          label: "الشركة",
-          placeholder: "اختر الشركة",
-          required: true,
-          disabled: true,
-          hidden: true,
+          isMulti: true,
           validation: [
             {
               type: "required",
-              message: "الشركة",
+              message: "برجاء اختيار النشاط",
             },
           ],
         },
         {
-          name: "first_name",
-          label: "اسم المستخدم الاول",
+          name: "company_field_id",
+          label: "البريد الالكتروني",
           type: "text",
-          placeholder: "ادخل اسم المستخدم الاول",
+          isMulti: true,
           required: true,
           validation: [
             {
               type: "required",
-              message: "اسم المستخدم الاول مطلوب",
-            },
-            {
-              type: "minLength",
-              value: 2,
-              message: "Name must be at least 2 characters",
+              message: "برجاء اختيار النشاط",
             },
           ],
         },
         {
-          name: "last_name",
-          label: "اسم المستخدم ألأحير",
-          type: "text",
-          placeholder: "اسم المستخدم ألأحير",
-          required: true,
-          validation: [
-            {
-              type: "required",
-              message: "الاسم مطلوب",
-            },
-            {
-              type: "minLength",
-              value: 2,
-              message: "Name must be at least 2 characters",
-            },
-          ],
-        },
-        {
-          name: "email",
-          label: "البريد الإلكتروني",
-          type: "email",
-          placeholder: "ادخل البريد الإلكتروني",
-          required: true,
-          validation: [
-            {
-              type: "required",
-              message: "البريد الإلكتروني مطلوب",
-            },
-            {
-              type: "email",
-              message: "Please enter a valid email address",
-            },
-          ],
-        },
-        {
-          name: "phone",
-          label: "الهاتف",
           type: "phone",
-          placeholder: "Enter your phone",
+          name: "phone",
+          label: "رقم الجوال ",
           validation: [
             {
               type: "required",
-              message: "برجاء إدخال رقم الهاتف",
+              message: "ادخل دولة الشركة",
             },
           ],
         },
         {
           type: "select",
-          name: "job_title_id",
-          label: "المسمى الوظيفي",
-          placeholder: "اختر المسمى الوظيفي",
-          required: true,
+          name: "country_id",
+          label: "الفرع",
           dynamicOptions: {
-            url: `${baseURL}/job_titles`,
+            url: `${baseURL}/countries`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
@@ -279,7 +128,40 @@ export const companiesFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "المسمى الوظيفي",
+              message: "ادخل دولة الشركة",
+            },
+          ],
+        },
+        {
+          type: "select",
+          name: "country_id",
+          label: "الوسيط",
+          dynamicOptions: {
+            url: `${baseURL}/countries`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
+          validation: [
+            {
+              type: "required",
+              message: "ادخل دولة الشركة",
+            },
+          ],
+        },
+        {
+          type: "text",
+          name: "country_id",
+          label: "المراسلات",
+          validation: [
+            {
+              type: "required",
+              message: "ادخل دولة الشركة",
             },
           ],
         },

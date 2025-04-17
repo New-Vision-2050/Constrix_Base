@@ -119,6 +119,23 @@
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
   },
+  "CustomerRelation": {
+    "ClientName": "اسم العميل",
+    "IDNumber": "رقم الهوية",
+    "Email": "البريد الالكتروني",
+    "PhoneNumber": "رقم الجوال",
+    "Branch": "الفرع",
+    "ClientImportance": "اهمية العميل",
+    "Broker": "الوسيط",
+    "ProjectCount": "عدد المشاريع",
+    "ClientStatus": "حالة العميل",
+    "ClientType": "نوع العميل",
+    "Settings": "الاعدادات",
+    "Delete": "حذف",
+    "Edit": "تعديل",
+    "View": "عرض",
+    "Actions": "الإجراءات"
+  },
   "Sidebar": {
     "Dashboard": "الملف الشخصي",
     "Companies": "الشركات",
@@ -128,7 +145,9 @@
     "DashboardSettings": "اعدادات ملف الشركة",
     "UserProfileSettings": "اعدادات الملف الشخصي",
     "Welcome": "مرحبا",
-    "CompanyName": "نيو فيجن"
+    "CompanyName": "نيو فيجن",
+    "Clients": "العملاء",
+    "Brokers": "الوسطاء"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي"

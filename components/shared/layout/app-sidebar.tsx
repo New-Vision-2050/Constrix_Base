@@ -74,6 +74,30 @@ export function AppSidebar({
       },
     ],
   };
+  const clientRelationRoutesNames = [
+    ROUTER.CUSTOMER_RELATION,
+    // ROUTER.DASHBOARD,
+    // ROUTER.USER_PROFILE,
+  ];
+  const clientRelationRoutes = {
+    name: t("Sidebar.Clients"),
+    icon: SettingsIcon,
+    isActive: clientRelationRoutesNames.indexOf(pageName) !== -1,
+    submenu: [
+      {
+        name: t("Sidebar.Clients"),
+        url: ROUTER.CUSTOMER_RELATION,
+        icon: UserIcon,
+        isActive: pageName === ROUTER.CUSTOMER_RELATION,
+      },
+      {
+        name: t("Sidebar.Brokers"),
+        url: ROUTER.BROKER,
+        icon: InboxIcon,
+        isActive: pageName === ROUTER.BROKER,
+      },
+    ],
+  };
 
   // This is sample data with translated names
 
@@ -92,8 +116,9 @@ export function AppSidebar({
           isActive: pageName === ROUTER.USERS,
         },
         settingsRoutes,
+        clientRelationRoutes,
       ]
-    : [settingsRoutes];
+    : [settingsRoutes, clientRelationRoutes];
 
   const data = {
     user: {

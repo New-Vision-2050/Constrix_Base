@@ -114,6 +114,23 @@
     "PackageSettings": "Package and Program Settings",
     "Delete": "Delete (Archive)"
   },
+  "CustomerRelation": {
+    "ClientName": "Client Name",
+    "IDNumber": "ID Number",
+    "Email": "Email",
+    "PhoneNumber": "Phone Number",
+    "Branch": "Branch",
+    "ClientImportance": "Client Importance",
+    "Broker": "Broker",
+    "ProjectCount": "Project Count",
+    "ClientStatus": "Client Status",
+    "Settings": "Settings",
+    "Delete": "Delete",
+    "Edit": "Edit",
+    "View": "View",
+    "Actions": "Actions",
+    "ClientType": "Client Type"
+  },
   "Sidebar": {
     "Dashboard": "Profile",
     "Companies": "Companies",
@@ -123,7 +140,9 @@
     "DashboardSettings": "Dashboard Setting",
     "UserProfileSettings": "User Profile Settings",
     "Welcome": "Hello",
-    "CompanyName": "New Vision"
+    "CompanyName": "New Vision",
+    "Clients": "Clients",
+    "Brokers": "Brokers"
   },
   "Header": {
     "MainSystemManagement": "Main System Management"
