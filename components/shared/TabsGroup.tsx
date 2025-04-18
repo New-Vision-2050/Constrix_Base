@@ -27,7 +27,8 @@ const TabsGroup = ({
         className={cn(
           "w-full  px-10 justify-between h-max mb-4",
           variant === "primary" && "bg-sidebar py-2 text-foreground",
-          variant === "secondary" && "bg-transparent py-0 border-b rounded-none",
+          variant === "secondary" &&
+            "bg-transparent py-0 border-b rounded-none",
           tabsListClassNames
         )}
         dir={isRtl ? "rtl" : "ltr"}
@@ -43,7 +44,7 @@ const TabsGroup = ({
             )}
             value={tab.value}
           >
-            {tab.icon}
+            {tab.icon && tab.icon}
             {tab.label}
           </TabsTrigger>
         ))}

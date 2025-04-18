@@ -1,6 +1,6 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import useCompanyStore from "../../store/useCompanyOfficialData";
+import useCompanyStore from "../../../store/useCompanyOfficialData";
 
 export const CompanyOfficialData = () => {
   const { company } = useCompanyStore();

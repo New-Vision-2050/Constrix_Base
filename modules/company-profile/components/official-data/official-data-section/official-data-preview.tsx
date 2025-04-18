@@ -1,5 +1,5 @@
 import React from "react";
-import useCompanyStore from "../../store/useCompanyOfficialData";
+import useCompanyStore from "../../../store/useCompanyOfficialData";
 import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
 
 const OfficialDataPreview = () => {

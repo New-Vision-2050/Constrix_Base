@@ -60,7 +60,7 @@ const PreviewTextField = ({
             isRTL ? "left-[50px]" : "right-[50px]"
           }`}
         >
-          <CalendarRangeIcon />
+          <CalendarRangeIcon additionalClass="w-4"/>
         </span>
       )}
       {/* select icon */}
