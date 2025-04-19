@@ -6,7 +6,7 @@ export const CompanyOfficialData = () => {
   const { company } = useCompanyStore();
   const PersonalFormConfig: FormConfig = {
     formId: "company-official-data-form",
-    apiUrl: `${baseURL}/write-the-url`,
+    apiUrl: `${baseURL}/companies/company-profile/official-data`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -23,7 +23,7 @@ export const CompanyOfficialData = () => {
             disabled: true,
           },
           {
-            name: "branch",
+            name: "branch_name",
             label: "اسم الفرع",
             type: "text",
             placeholder: "اسم الفرع",
@@ -104,7 +104,7 @@ export const CompanyOfficialData = () => {
     ],
     initialValues: {
       name: company?.name ?? "",
-      branch: company?.main_branch?.name ?? "",
+      branch_name: company?.main_branch?.name ?? "",
       name_en: company?.name_en ?? "",
       company_type: company?.company_type ?? "",
       country: company?.country_id ?? "",
@@ -121,13 +121,6 @@ export const CompanyOfficialData = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-    onSubmit: async (formData: Record<string, unknown>) => {
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
-    },
   };
   return PersonalFormConfig;
 };

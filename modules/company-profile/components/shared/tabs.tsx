@@ -2,6 +2,7 @@ import TabsGroup from "@/components/shared/TabsGroup";
 import { Tab } from "@/types/Tab";
 import { DollarSign, Lock, MapPin, Send, User, Users } from "lucide-react";
 import OfficialData from "../official-data";
+import Branches from "../branches";
 
 export const CompanyProfile: Tab[] = [
   {
@@ -14,6 +15,7 @@ export const CompanyProfile: Tab[] = [
     label: "الفروع",
     icon: <MapPin size={18} />,
     value: "branches",
+    component: <Branches />,
   },
 ];
 
