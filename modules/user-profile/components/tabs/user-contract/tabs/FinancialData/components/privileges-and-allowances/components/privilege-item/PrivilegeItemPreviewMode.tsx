@@ -1,13 +1,18 @@
+import { UserPrivilege } from "@/modules/user-profile/types/privilege";
 import PreviewTextField from "../../../../../components/PreviewTextField";
 
-export default function PrivilegeItemPreviewMode() {
+type PropsT = {
+  privilegeData: UserPrivilege;
+};
+
+export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
-          label="نوع السكن"
-          value={"salary?.basic"}
-          valid={Boolean("salary?.basic")}
+          label="نوع البدل"
+          value={privilegeData?.type_privilege?.name}
+          valid={Boolean(privilegeData?.type_privilege?.name)}
           required
         />
       </div>
@@ -15,8 +20,8 @@ export default function PrivilegeItemPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="نوع البدل"
-          value={"salary?.basic"}
-          valid={Boolean("salary?.basic")}
+          value={privilegeData?.type_allowance?.name}
+          valid={Boolean(privilegeData?.type_allowance?.name)}
           required
         />
       </div>
@@ -24,8 +29,8 @@ export default function PrivilegeItemPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="معدل حساب النسبة من اصل الراتب"
-          value={"salary?.basic"}
-          valid={Boolean("salary?.basic")}
+          value={privilegeData?.charge_amount}
+          valid={Boolean(privilegeData?.charge_amount)}
           required
         />
       </div>
@@ -33,8 +38,8 @@ export default function PrivilegeItemPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="وصف حساب النسبة"
-          value={"salary?.basic"}
-          valid={Boolean("salary?.basic")}
+          value={privilegeData?.description}
+          valid={Boolean(privilegeData?.description)}
           required
         />
       </div>

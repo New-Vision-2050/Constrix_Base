@@ -11,7 +11,11 @@ import { financialDataSections } from "../constants/financial-data-sections";
 import useUserSalaryData from "../hooks/useUserSalaryData";
 import { Salary } from "@/modules/user-profile/types/Salary";
 import usePrivilegesData from "../hooks/usePrivilegesData";
-import { Privilege } from "@/modules/user-profile/types/privilege";
+import {
+  Privilege,
+  UserPrivilege,
+} from "@/modules/user-profile/types/privilege";
+import usePrivileges from "../hooks/usePrivileges";
 
 // declare context types
 type FinancialDataCxtType = {
@@ -23,6 +27,9 @@ type FinancialDataCxtType = {
   // privileges data
   privileges: Privilege[] | undefined;
   handleRefreshPrivileges: () => void;
+  // added privileges
+  addedPrivilegesList: UserPrivilege[] | undefined;
+  handleRefreshPrivilegesList: () => void
 };
 
 export const FinancialDataCxt = createContext<FinancialDataCxtType>(
@@ -59,7 +66,15 @@ export const FinancialDataCxtProvider = ({
   // privileges data
   const { data: privileges, refetch: refreshPrivileges } = usePrivilegesData();
 
+  // privileges list
+  const { data: addedPrivilegesList, refetch: refreshPrivilegesList } =
+    usePrivileges(user?.user_id ?? "");
+
   // ** declare and define component helper methods
+  const handleRefreshPrivilegesList = () => {
+    refreshPrivilegesList();
+  };
+
   const handleRefreshPrivileges = () => {
     refreshPrivileges();
   };
@@ -83,6 +98,9 @@ export const FinancialDataCxtProvider = ({
         // privileges data
         privileges,
         handleRefreshPrivileges,
+        // added privileges
+        addedPrivilegesList,
+        handleRefreshPrivilegesList
       }}
     >
       {children}
