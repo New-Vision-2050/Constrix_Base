@@ -1,11 +1,15 @@
 "use client";
 import EyeIcon from "@/public/icons/eye-icon";
 import EyeOffIcon from "@/public/icons/eye-off-icon";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 
-export default function EnterPassword() {
+type PropsT = {
+  password: string;
+  setPassword: React.Dispatch<SetStateAction<string>>;
+};
+export default function EnterPassword(props: PropsT) {
   // declare and define component state and variables
-  const [password, setPassword] = useState("");
+  const { password, setPassword } = props;
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 

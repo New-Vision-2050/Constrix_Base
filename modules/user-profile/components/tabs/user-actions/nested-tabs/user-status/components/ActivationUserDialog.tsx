@@ -11,11 +11,11 @@ import SuccessStatusIcon from "@/public/icons/success-status";
 
 type PropsT = {
   open: boolean;
-  email: string;
+  description: React.ReactNode;
   setOpen: React.Dispatch<SetStateAction<boolean>>;
 };
 
-export function ActivationUserDialog({ open, email, setOpen }: PropsT) {
+export function ActivationUserDialog({ open, setOpen, description }: PropsT) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="flex flex-col gap-5">
@@ -24,9 +24,7 @@ export function ActivationUserDialog({ open, email, setOpen }: PropsT) {
             <SuccessStatusIcon />
           </DialogTitle>
           <DialogDescription className="text-lg text-center">
-            تم ارسال كلمة مرور تلقائية على البريد الالكتروني
-            <br />
-            {email}
+            {description}
           </DialogDescription>
         </DialogHeader>
 

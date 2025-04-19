@@ -7,7 +7,7 @@ import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useState } from "react";
-import { ActivationUserDialog } from "./ActivationUserDialog";
+import { ActivationUserDialog } from "../ActivationUserDialog";
 import { useUserActionsCxt } from "../../../../context";
 
 const activationTypes = [
@@ -104,7 +104,13 @@ export default function ActivateUser() {
         </Button>
       </div>
       <ActivationUserDialog
-        email={user?.email ?? ""}
+        description={
+          <>
+            تم ارسال كلمة مرور تلقائية على البريد الالكتروني
+            <br />
+            {user?.email}
+          </>
+        }
         open={openValidDialog}
         setOpen={setOpenValidDialog}
       />

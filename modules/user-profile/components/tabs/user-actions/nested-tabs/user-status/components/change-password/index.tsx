@@ -6,10 +6,11 @@ import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useState } from "react";
 import EnterPassword from "./EnterPassword";
+import { ActivationUserDialog } from "../ActivationUserDialog";
 
 const changePasswordsWays = [
-  { type: "automatic_password", label: "انشاء كلمة مرور تلقائيا" },
-  { type: "custom_password", label: "انشاء كلمة مرور جديدة" },
+  { type: "automatic", label: "انشاء كلمة مرور تلقائيا" },
+  { type: "manual", label: "انشاء كلمة مرور جديدة" },
 ];
 
 export default function ChangeUserPassword() {
@@ -17,8 +18,9 @@ export default function ChangeUserPassword() {
   const { user } = useUserProfileCxt();
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const [password, setPassword] = useState<string>();
+  const [password, setPassword] = useState<string>("");
   const [changeType, setChangeType] = useState<string>();
+  const [openValidDialog, setOpenValidDialog] = useState(false);
 
   // declare and define helper methods
   const handleClick = (type: string) => setChangeType(type);
@@ -29,27 +31,29 @@ export default function ChangeUserPassword() {
         setError("برجاء أختيار طريقة تفعيل الباسورد");
         return;
       }
-      if (changeType === "custom_password" && !password) {
+      if (changeType === "manual" && !password) {
         setError("برجاء أدخال كلمة المرور");
         return;
       }
       setError(undefined);
 
       // helper vars
-      const url = `/user_statuses/activation/${user?.user_id}`;
+      const url = `/user_statuses/password/${user?.user_id}`;
       let body: Record<string, string> = {
-        active_type: changeType,
+        type: changeType,
       };
 
-      if (changeType === "temporary_active")
+      if (changeType === "manual")
         body = {
           ...body,
+          password: password ?? "",
         };
 
       // start send request
       setLoading(true);
       await apiClient.post(url, body);
 
+      setOpenValidDialog(true);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -75,7 +79,9 @@ export default function ChangeUserPassword() {
         ))}
       </RadioGroup>
 
-      {changeType === "custom_password" && <EnterPassword />}
+      {changeType === "manual" && (
+        <EnterPassword password={password} setPassword={setPassword} />
+      )}
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <div className="flex items-center justify-end">
@@ -86,6 +92,12 @@ export default function ChangeUserPassword() {
           تحديث
         </Button>
       </div>
+
+      <ActivationUserDialog
+        description={<>تم تغير كلمة المرور بنجاح</>}
+        open={openValidDialog}
+        setOpen={setOpenValidDialog}
+      />
     </div>
   );
 }
