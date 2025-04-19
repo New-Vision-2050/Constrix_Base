@@ -194,16 +194,16 @@ export const QualificationFormConfig = ({
         user_id: user?.user_id,
         graduation_date: formatDate(graduationDate),
       };
-      
+
       const url =
         formType === "Edit"
           ? `/qualifications/${qualification?.id}`
           : "/qualifications";
 
-      const _body = formType === "Edit" ? body : serialize(body);
-      const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
+      // const _body = formType === "Edit" ? body : serialize(body);
+      // const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
 
-      const response = await _apiClient(url, _body);
+      const response = await apiClient.post(url, serialize(body));
 
       return {
         success: true,

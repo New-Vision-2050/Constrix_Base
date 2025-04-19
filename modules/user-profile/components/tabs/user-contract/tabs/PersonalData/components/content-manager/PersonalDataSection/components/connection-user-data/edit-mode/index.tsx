@@ -37,6 +37,7 @@ export default function UserProfileConnectionDataEditForm() {
       };
       await apiClient.post(`/company-users/send-otp`, body);
 
+
       if (type === "email") toggleMailOtpDialog();
       else togglePhoneOtpDialog();
       setLoading(false);

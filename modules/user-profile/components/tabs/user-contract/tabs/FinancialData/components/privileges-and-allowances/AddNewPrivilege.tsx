@@ -1,3 +1,4 @@
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,14 +8,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddPrivilegeDialog from "./AddPrivilegeDialog";
 
 export function AddNewPrivilege() {
-  const { privileges } = useFinancialDataCxt();
+  const { privileges, addedPrivilegesList } = useFinancialDataCxt();
+  const [addedPrivilegesTypes, setAddedPrivilegesTypes] = useState<string[]>();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [privilegeId, setPrivilegeId] = useState("");
+
+  // handle side effects
+  useEffect(() => {
+    if (addedPrivilegesList) {
+      setAddedPrivilegesTypes(
+        addedPrivilegesList?.map((item) => item?.privilege?.type)
+      );
+    }
+  }, [addedPrivilegesList]);
 
   const handleClick = (id: string) => {
     setPrivilegeId(id);
@@ -30,15 +41,17 @@ export function AddNewPrivilege() {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-auto">
           <DropdownMenuGroup>
-            {privileges?.map((item) => (
-              <DropdownMenuItem
-                className="justify-end"
-                key={item.id}
-                onClick={() => handleClick(item.id)}
-              >
-                {item.name}
-              </DropdownMenuItem>
-            ))}
+            {privileges
+              ?.filter((ele) => addedPrivilegesTypes?.indexOf(ele.type) === -1)
+              ?.map((item) => (
+                <DropdownMenuItem
+                  className="justify-end"
+                  key={item.id}
+                  onClick={() => handleClick(item.id)}
+                >
+                  {item.name}
+                </DropdownMenuItem>
+              ))}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

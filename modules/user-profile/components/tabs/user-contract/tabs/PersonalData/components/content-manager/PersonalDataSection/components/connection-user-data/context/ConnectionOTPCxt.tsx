@@ -15,9 +15,9 @@ type ConnectionOTPCxtType = {
   togglePhoneOtpDialog: () => void;
 };
 
-export const ConnectionOTPCxt = createContext<ConnectionOTPCxtType>(
-  {} as ConnectionOTPCxtType
-);
+export const ConnectionOTPCxt = createContext<ConnectionOTPCxtType>({
+  toggleMailOtpDialog: () => {},
+} as ConnectionOTPCxtType);
 
 // ** create a custom hook to use the context
 export const useConnectionOTPCxt = () => {
@@ -42,7 +42,9 @@ export const ConnectionOTPCxtProvider = ({
   // ** handle side effects
 
   // ** declare and define component helper methods
-  const toggleMailOtpDialog = () => setOpenMailOtp((prev) => !prev);
+  const toggleMailOtpDialog = () => {
+    setOpenMailOtp((prev) => !prev);
+  };
   const togglePhoneOtpDialog = () => setOpenPhoneOtp((prev) => !prev);
 
   // ** return component ui
