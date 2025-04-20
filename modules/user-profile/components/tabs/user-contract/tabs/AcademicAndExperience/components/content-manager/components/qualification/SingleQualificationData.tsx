@@ -14,6 +14,12 @@ export default function SingleQualificationData({ qualification }: PropsT) {
       editMode={
         <SingleQualificationDataEditMode qualification={qualification} />
       }
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

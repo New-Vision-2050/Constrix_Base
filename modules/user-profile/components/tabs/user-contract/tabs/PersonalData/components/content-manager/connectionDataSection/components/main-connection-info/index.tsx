@@ -15,6 +15,12 @@ export default function MainUserConnectionInfoSection() {
       onChangeMode={() => {
         handleRefetchUserContactData();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

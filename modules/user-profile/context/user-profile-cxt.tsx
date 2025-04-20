@@ -13,6 +13,8 @@ import useProfileDataStatus from "../hooks/useProfileDataStatus";
 import { ProfileDataStatus } from "../types/profile-data-status";
 import useProfileWidgetData from "../hooks/useProfileWidgetData";
 import { ProfileWidgetData } from "../types/profile-widgets";
+import useUserPersonalData from "../components/tabs/user-contract/tabs/PersonalData/hooks/useUserPersonalData";
+import { PersonalUserDataSectionT } from "../components/tabs/user-contract/tabs/PersonalData/api/get-personal-data";
 
 // declare context types
 type UserProfileCxtType = {
@@ -26,6 +28,10 @@ type UserProfileCxtType = {
 
   // widgets data
   widgetData: ProfileWidgetData | undefined;
+
+  // personal data
+  userPersonalData: PersonalUserDataSectionT | undefined;
+  handleRefetchUserPersonalData: () => void;
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -52,8 +58,11 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   const { data: _user, isLoading } = useUserProfileData();
   const { data: userDataStatus, refetch: refetchDataStatus } =
     useProfileDataStatus((userId || _user?.user_id) ?? "");
-  const { data: widgetData } = useProfileWidgetData((userId || _user?.user_id) ?? "");
-
+  const { data: userPersonalData, refetch: refreshUserPersonalData } =
+    useUserPersonalData();
+  const { data: widgetData } = useProfileWidgetData(
+    (userId || _user?.user_id) ?? ""
+  );
 
   // ** handle side effects
   useEffect(() => {
@@ -61,6 +70,10 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   }, [_user]);
 
   // ** declare and define component helper methods
+  const handleRefetchUserPersonalData = () => {
+    refreshUserPersonalData();
+  };
+
   const handleRefetchDataStatus = () => {
     refetchDataStatus();
   };
@@ -84,6 +97,10 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
 
         // widgetData
         widgetData,
+
+        // personal data
+        userPersonalData,
+        handleRefetchUserPersonalData,
       }}
     >
       {children}

@@ -15,6 +15,12 @@ export default function IdentityDataSectionPersonalForm() {
       onChangeMode={() => {
         handleRefreshIdentityData();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

@@ -15,6 +15,12 @@ export default function UserIqamaData() {
       onChangeMode={() => {
         handleRefreshIdentityData();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

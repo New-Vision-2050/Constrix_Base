@@ -15,6 +15,12 @@ export default function UserAddressSection() {
       onChangeMode={() => {
         handleRefetchUserContactData();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

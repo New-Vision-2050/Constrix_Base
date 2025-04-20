@@ -12,6 +12,12 @@ export default function ContractDataForm() {
       title={"عقد العمل"}
       reviewMode={<ContractDataFormPreviewMode contract={userContractData} />}
       editMode={<ContractDataFormEditMode contract={userContractData} />}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

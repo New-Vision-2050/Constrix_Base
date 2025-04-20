@@ -6,12 +6,17 @@ import TabTemplate from "@/modules/user-profile/components/TabTemplate";
 type PropsT = { course: Course };
 
 export default function SingleCourse({ course }: PropsT) {
-
   return (
     <TabTemplate
       title={course?.name ?? ""}
       reviewMode={<SingleCoursePreviewMode course={course} />}
       editMode={<SingleCourseEditMode course={course} />}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }
