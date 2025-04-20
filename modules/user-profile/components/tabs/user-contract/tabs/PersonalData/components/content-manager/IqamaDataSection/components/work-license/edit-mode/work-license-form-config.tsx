@@ -42,6 +42,7 @@ export const WorkLicenseFormConfig = () => {
             placeholder: "ارفاق رخصة العمل",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

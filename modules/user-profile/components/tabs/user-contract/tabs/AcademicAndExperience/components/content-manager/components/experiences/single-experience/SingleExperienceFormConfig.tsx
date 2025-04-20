@@ -78,6 +78,7 @@ export const SingleExperienceFormConfig = ({
             placeholder: "نبذه عن المشاريع والاعمال",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

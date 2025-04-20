@@ -30,6 +30,7 @@ interface UsersData {
   complete_data: 0 | 1; // 0 = pending, 1 = success
   is_active: "active" | "inActive";
   companies: CompanyData[];
+  user_id:string;
   [key: string]: any; // For any other properties
 }
 
@@ -138,7 +139,7 @@ export const UsersConfig = () => {
       {
         key: "id",
         label: t("Companies.Actions"),
-        render: (_: unknown, row: UsersData) => <Execution id={row.id} formConfig={companyUserFormConfig}/>,
+        render: (_: unknown, row: UsersData) => <Execution id={row.user_id} formConfig={companyUserFormConfig}/>,
       },
     ],
     allSearchedFields: [

@@ -15,6 +15,12 @@ export default function ProfileBriefSummary() {
       onChangeMode={() => {
         handleRefetchUserBrief();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

@@ -110,6 +110,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

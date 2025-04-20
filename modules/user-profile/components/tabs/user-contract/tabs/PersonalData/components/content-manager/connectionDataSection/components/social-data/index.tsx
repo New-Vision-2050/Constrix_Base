@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import FormFieldSet from "../../../../../../components/FormFieldSet";
-import FieldSetSecondTitle from "../../../../../../components/FieldSetSecondTitle";
 import SocialDataSectionPreviewMode from "./preview-mode";
 import SocialDataSectionEditMode from "./edit-mode";
 import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
@@ -17,6 +14,12 @@ export default function SocialDataSection() {
       editMode={<SocialDataSectionEditMode />}
       onChangeMode={() => {
         handleRefetchUserSocialData();
+      }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
       }}
     />
   );

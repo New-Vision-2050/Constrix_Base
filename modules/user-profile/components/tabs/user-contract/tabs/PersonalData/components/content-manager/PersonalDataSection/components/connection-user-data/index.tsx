@@ -12,6 +12,12 @@ export default function ConnectionDataSectionPersonalForm() {
         title={"البيانات الاتصال"}
         reviewMode={<UserProfileConnectionDataReview />}
         editMode={<UserProfileConnectionDataEditForm />}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {} },
+            { title: "أنشاء طلب", onClick: () => {} },
+          ],
+        }}
       />
     </ConnectionOTPCxtProvider>
   );

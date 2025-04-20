@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/button";
-import SingleQualificationData from "./SingleQualificationData";
-import CreateQualificationDialog from "./CreateQualificationDialog";
 import { useState } from "react";
-import RegularList from "@/components/shared/RegularList";
-import { Qualification } from "@/modules/user-profile/types/qualification";
+import { Button } from "@/components/ui/button";
+import QualificationsList from "./qualificationsList";
+import CreateQualificationDialog from "./CreateQualificationDialog";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 
 export default function UserQualificationData() {
@@ -23,11 +21,7 @@ export default function UserQualificationData() {
         </Button>
       </div>
       <CreateQualificationDialog open={open} setOpen={setOpen} />
-      <RegularList<Qualification, "qualification">
-        sourceName="qualification"
-        ItemComponent={SingleQualificationData}
-        items={userQualifications ?? []}
-      />
+      <QualificationsList items={userQualifications} />
     </div>
   );
 }

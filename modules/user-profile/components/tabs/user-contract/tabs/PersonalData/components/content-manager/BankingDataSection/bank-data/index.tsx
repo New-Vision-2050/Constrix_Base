@@ -10,6 +10,13 @@ export default function BankSection({ bank }: PropsT) {
       title={bank?.bank_name ?? "Bank Account"}
       reviewMode={<UserProfileBankingDataReview bank={bank} />}
       editMode={<BankingDataSectionEditMode bank={bank} />}
+      settingsBtn={{
+        items: [
+          { title: "افتراضي", onClick: () => {} },
+          { title: "رواتب", onClick: () => {} },
+          { title: "عهد", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

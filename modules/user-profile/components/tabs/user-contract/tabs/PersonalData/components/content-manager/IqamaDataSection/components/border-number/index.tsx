@@ -15,6 +15,12 @@ export default function UserIqamaBorderNumber() {
       onChangeMode={() => {
         handleRefreshIdentityData();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

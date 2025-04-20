@@ -111,6 +111,7 @@
     "TypeFilter": "Company Type",
     "Active": "Active",
     "LoginAsManager": "Login as Company Manager (Edit)",
+    "completeProfileData": "complete profile data",
     "PackageSettings": "Package and Program Settings",
     "Delete": "Delete (Archive)"
   },
@@ -118,6 +119,7 @@
     "Dashboard": "Profile",
     "Companies": "Companies",
     "Users": "Users",
+    "UsersList": "Users List",
     "Settings": "Settings",
     "SystemSettings": "System Settings",
     "DashboardSettings": "Dashboard Setting",

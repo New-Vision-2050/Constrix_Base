@@ -1,12 +1,14 @@
-import ContractStatusCard from "./components/contract-status-card";
-import FinancialReportCard from "./components/financial-report-card";
-import TasksStatisticCard from "./components/tasks-statistic-card";
-import WorkingTimeCard from "./components/working-time-card";
+import ContractStatusCard from "@/modules/dashboard/components/statistics-cards/components/contract-status-card";
+import FinancialReportCard from "@/modules/dashboard/components/statistics-cards/components/financial-report-card";
+import TasksStatisticCard from "@/modules/dashboard/components/statistics-cards/components/tasks-statistic-card";
+import WorkingTimeCard from "@/modules/dashboard/components/statistics-cards/components/working-time-card";
+import { useUserProfileCxt } from "../../context/user-profile-cxt";
 
 export default function StatisticsCardsSection() {
+  const { widgetData } = useUserProfileCxt();
   return (
     <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4">
-      <ContractStatusCard />
+      <ContractStatusCard contractData={widgetData?.contract} />
       <WorkingTimeCard />
       <FinancialReportCard />
       <TasksStatisticCard />

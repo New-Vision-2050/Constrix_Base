@@ -1,4 +1,8 @@
 "use client";
+import {
+  DropdownItemT,
+  IconBtnDropdown,
+} from "@/components/shared/IconBtnDropdown";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +24,10 @@ type PropsT = {
   mode: "Edit" | "Preview";
   handleEditClick: () => void;
   dropdownItems?: DropdownItem[];
+  settingsBtn?: {
+    icon?: JSX.Element;
+    items: DropdownItemT[];
+  };
 };
 
 export default function FieldSetSecondTitle(props: PropsT) {
@@ -28,12 +36,18 @@ export default function FieldSetSecondTitle(props: PropsT) {
   const {
     mode,
     handleEditClick,
-    dropdownItems = [{ label: "Dummy", onClick: () => null }],
+    dropdownItems,
+    settingsBtn
   } = props;
 
   return (
     <div className="flex items-center justify-center gap-1">
-      <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
+      {!!settingsBtn ?     
+        <IconBtnDropdown
+        icon={settingsBtn?.icon ?? <SettingsIcon />}
+        items={settingsBtn?.items ?? []}
+      /> :      
+        <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost">
             <SettingsIcon />
@@ -46,8 +60,8 @@ export default function FieldSetSecondTitle(props: PropsT) {
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
-      </DropdownMenu>
-      <Button variant={"ghost"} onClick={handleEditClick}>
+      </DropdownMenu> }
+        <Button variant={"ghost"} onClick={handleEditClick}>
         {mode === "Preview" ? (
           <PencilLineIcon additionalClass="text-pink-600" />
         ) : (

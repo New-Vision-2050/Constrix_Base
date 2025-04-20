@@ -55,6 +55,7 @@ export const SocialMediaSitesFormConfig = () => {
             placeholder: "لينك اند  ",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

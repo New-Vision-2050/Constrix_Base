@@ -9,8 +9,14 @@ export default function UserCertification({ certification }: PropsT) {
   return (
     <TabTemplate
       title={certification?.accreditation_name ?? ""}
-      reviewMode={<UserCertificationPreview certification={certification}/>}
-      editMode={<UserCertificationEdit certification={certification}/>}
+      reviewMode={<UserCertificationPreview certification={certification} />}
+      editMode={<UserCertificationEdit certification={certification} />}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

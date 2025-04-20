@@ -17,6 +17,12 @@ export default function Salaries() {
         title={"الراتب الاساسي"}
         reviewMode={<SalaryPreviewMode salary={userSalary as Salary} />}
         editMode={<SalaryEditMode />}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {} },
+            { title: "أنشاء طلب", onClick: () => {} },
+          ],
+        }}
       />
     </div>
   );

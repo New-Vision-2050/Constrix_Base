@@ -15,6 +15,12 @@ export default function PersonalDataSectionPersonalForm() {
       onChangeMode={() => {
         handleRefreshPersonalData();
       }}
+      settingsBtn={{
+        items: [
+          { title: "طلباتي", onClick: () => {} },
+          { title: "أنشاء طلب", onClick: () => {} },
+        ],
+      }}
     />
   );
 }

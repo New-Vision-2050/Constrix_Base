@@ -2,6 +2,7 @@ import RegularList from "@/components/shared/RegularList";
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { useVerticalListCxt, VerticalListCxtProvider } from "./VerticalListCxt";
+import { CircleCheckIcon } from "lucide-react";
 type PropsT = {
   items: UserProfileNestedTab[];
 };
@@ -42,7 +43,11 @@ const VerticalButton = ({ btn }: { btn: UserProfileNestedTab }) => {
           {btn.icon}
           <p className="text-md font-semibold">{btn.title}</p>
         </div>
-        <InfoIcon additionClass="text-orange-500" />
+        {btn?.valid ? (
+          <CircleCheckIcon color="green" />
+        ) : (
+          <InfoIcon additionClass="text-orange-500" />
+        )}
       </div>
     </>
   );

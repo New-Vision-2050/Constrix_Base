@@ -94,9 +94,16 @@ export function AppSidebar({
         },
         {
           name: t("Sidebar.Users"),
-          url: ROUTER.USERS,
           icon: UserIcon,
           isActive: pageName === ROUTER.USERS,
+          submenu: [
+            {
+              name: t("Sidebar.UsersList"),
+              url: ROUTER.USERS,
+              icon: UserIcon,
+              isActive: pageName === ROUTER.USERS,
+            },
+          ],
         },
         settingsRoutes,
       ]
