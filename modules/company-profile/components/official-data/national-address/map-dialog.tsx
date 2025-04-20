@@ -9,6 +9,7 @@ import type { Libraries } from "@react-google-maps/api";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { Button } from "@/components/ui/button";
+import { ServerSuccessResponse } from "@/types/ServerResponse";
 
 // Zod schema for location validation
 const locationSchema = z.object({
@@ -39,11 +40,30 @@ interface LocationData {
 
 // Props interface for the component
 interface LocationSelectorProps {
-  onSave: (locationData: LocationData) => void;
+  onSave: (obj: any) => void;
   initialLocation?: {
     latitude: number;
     longitude: number;
   };
+}
+
+interface payloadSuccess {
+  country: {
+    id: string;
+    name: string;
+    status: number;
+  };
+  state: {
+    id: string;
+    name: string;
+  };
+  city: {
+    id: string;
+    name: string;
+  };
+  neighborhood: string;
+  postal_code: string;
+  route: string;
 }
 
 // The container style for the Google Map
@@ -55,8 +75,8 @@ const containerStyle = {
 
 // Default center for the map (can be set to a default location)
 const defaultCenter = {
-  lat: 25.276987,
-  lng: 55.296249,
+  lat: 24.68096433866003,
+  lng: 46.64794921875,
 };
 
 // Libraries to load with Google Maps
@@ -66,19 +86,14 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   onSave,
   initialLocation,
 }) => {
-  const {
-    mutateAsync,
-    data: resData,
-    isPending,
-  } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (data: LocationFormValues) => {
-      const response = await apiClient.post(
-        "companies/company-profile/national-address",
-        {
-          lat: data.latitude,
-          long: data.longitude,
-        }
-      );
+      const response = await apiClient.post<
+        ServerSuccessResponse<payloadSuccess>
+      >("companies/company-profile/national-address", {
+        lat: data.latitude,
+        long: data.longitude,
+      });
       return response.data;
     },
   });
@@ -104,6 +119,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     handleSubmit,
     setValue,
     formState: { errors },
+    setError,
   } = useForm<LocationFormValues>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
@@ -152,11 +168,32 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       longitude: parseFloat(data.longitude),
     };
 
-    const ss = await mutateAsync(data);
-
-    console.log({ ss, resData });
-
-    onSave(locationData);
+    const ss = mutate(data, {
+      onError: (err: any) => {
+        const errMessage =
+          err?.response?.data?.message?.description ?? "خطآ في اختيار الموقع";
+        setError("longitude", {
+          message: errMessage,
+        });
+        console.log("error from mutation: ", errMessage);
+      },
+      onSuccess: (succ) => {
+        const country_id = succ?.payload?.country?.id;
+        const state_id = succ?.payload?.state?.id;
+        const city_id = succ?.payload?.city?.id;
+        const neighborhood_name = succ?.payload?.neighborhood;
+        const postal_code = succ?.payload?.postal_code;
+        const street_name = succ?.payload?.route;
+        onSave({
+          country_id,
+          state_id,
+          city_id,
+          neighborhood_name,
+          postal_code,
+          street_name,
+        });
+      },
+    });
   };
 
   const onLoad = (mapInstance: google.maps.Map): void => {
@@ -219,7 +256,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={markerPosition}
-            zoom={10}
+            zoom={5}
             onClick={handleMapClick}
             onLoad={onLoad}
             onUnmount={onUnmount}

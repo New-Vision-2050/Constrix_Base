@@ -15,6 +15,16 @@ const PickupMap = ({ formId }: { formId: string }) => {
   const { setValue } = useFormStore();
   //   setValue(formId , 'street_name' , 'aaaaaaaaa')
 
+  const handleSaveMap = (obj: any) => {
+    setValue(formId, "city_id", obj.city_id);
+    setValue(formId, "state_id", obj.state_id);
+    setValue(formId, "postal_code", obj.postal_code);
+    setValue(formId, "street_name", obj.street_name);
+    setValue(formId, "neighborhood_name", obj.neighborhood_name);
+
+    handleClose();
+  };
+
   return (
     <>
       <div
@@ -36,7 +46,7 @@ const PickupMap = ({ formId }: { formId: string }) => {
               تعديل احداثيات موقع العنوان الوطني
             </DialogTitle>
           </DialogHeader>
-          <LocationSelector onSave={(e) => console.log(e)} />
+          <LocationSelector onSave={handleSaveMap} />
         </DialogContent>
       </Dialog>
     </>
