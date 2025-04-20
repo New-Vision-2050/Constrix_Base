@@ -16,7 +16,6 @@ export const PassportDataFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات جواز السفر",
         fields: [
           {
             name: "passport",
@@ -62,6 +61,7 @@ export const PassportDataFormConfig = () => {
             placeholder: "ارفاق الهوية",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

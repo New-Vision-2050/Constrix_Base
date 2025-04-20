@@ -42,6 +42,7 @@ export const IqamaDataFormConfig = () => {
             placeholder: "ارفاق رقم الاقامة",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

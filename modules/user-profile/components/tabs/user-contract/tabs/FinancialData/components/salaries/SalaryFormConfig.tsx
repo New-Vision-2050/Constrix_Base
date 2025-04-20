@@ -66,6 +66,7 @@ export const SalaryFormConfig = () => {
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

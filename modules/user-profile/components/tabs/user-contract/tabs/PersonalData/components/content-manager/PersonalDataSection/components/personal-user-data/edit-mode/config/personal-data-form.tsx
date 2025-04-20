@@ -1,11 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const PersonalDataFormConfig = () => {
   const { userPersonalData } = usePersonalDataTabCxt();
+  const { handleRefetchUserPersonalData } = useUserProfileCxt();
+  
   const PersonalFormConfig: FormConfig = {
-    formId: "personal-data-form",
+    formId: `personal-data-form`,
     title: "البيانات الشخصية",
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
@@ -103,6 +106,7 @@ export const PersonalDataFormConfig = () => {
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {
@@ -122,6 +126,9 @@ export const PersonalDataFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchUserPersonalData();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
