@@ -48,6 +48,7 @@ export function AppSidebar({
     ROUTER.SETTINGS,
     ROUTER.DASHBOARD,
     ROUTER.USER_PROFILE,
+    ROUTER.COMPANY_PROFILE,
   ];
   const settingsRoutes = {
     name: t("Sidebar.Settings"),
@@ -72,13 +73,6 @@ export function AppSidebar({
         icon: InboxIcon,
         isActive: pageName === ROUTER.SETTINGS,
       },
-    ],
-  };
-  const companyProfile = {
-    name: "ملف الشركة",
-    icon: CompaniesIcon,
-    isActive: [ROUTER.COMPANY_PROFILE].indexOf(pageName) !== -1,
-    submenu: [
       {
         name: "اعداد ملف الشركة",
         url: ROUTER.COMPANY_PROFILE,
@@ -105,9 +99,8 @@ export function AppSidebar({
           isActive: pageName === ROUTER.USERS,
         },
         settingsRoutes,
-        companyProfile,
       ]
-    : [settingsRoutes, companyProfile];
+    : [settingsRoutes];
 
   const data = {
     user: {
