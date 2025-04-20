@@ -118,6 +118,7 @@
   "Sidebar": {
     "Dashboard": "Profile",
     "Companies": "Companies",
+    "CompaniesList": "Companies List",
     "Users": "Users",
     "UsersList": "Users List",
     "Settings": "Settings",
