@@ -1,13 +1,18 @@
+import { Qualification } from "@/modules/user-profile/types/qualification";
 import PreviewTextField from "../../../../../../components/PreviewTextField";
 
-export default function SingleQualificationDataPreview() {
+type PropsT = { qualification: Qualification };
+
+export default function SingleQualificationDataPreview({
+  qualification,
+}: PropsT) {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
           valid={true}
           label="دولة التخرج"
-          value="المملكة العربية السعودية"
+          value={qualification?.country_name}
           isSelect
         />
       </div>
@@ -16,7 +21,7 @@ export default function SingleQualificationDataPreview() {
         <PreviewTextField
           valid={true}
           label="الجامعة"
-          value="جامعة الملك فهد"
+          value={qualification?.university_name}
           isSelect
         />
       </div>
@@ -25,7 +30,7 @@ export default function SingleQualificationDataPreview() {
         <PreviewTextField
           valid={true}
           label="المؤهل"
-          value="بكالوريوس"
+          value={qualification?.academic_qualification_name}
           isSelect
         />
       </div>
@@ -34,7 +39,7 @@ export default function SingleQualificationDataPreview() {
         <PreviewTextField
           valid={true}
           label="التخصص الأكاديمي"
-          value="هندسة معماري"
+          value={qualification?.academic_specialization_name}
           isSelect
         />
       </div>
@@ -43,17 +48,27 @@ export default function SingleQualificationDataPreview() {
         <PreviewTextField
           valid={true}
           label="تاريخ الحصول على الشهادة"
-          value="25-07-2013"
+          value={qualification?.graduation_date}
           isDate
         />
       </div>
 
       <div className="p-2">
-        <PreviewTextField valid={true} label="المعدلات الدراسية " value="83%" isSelect />
+        <PreviewTextField
+          valid={true}
+          label="المعدلات الدراسية "
+          value={qualification?.study_rate?.toString()}
+          isSelect
+        />
       </div>
 
       <div className="p-2">
-        <PreviewTextField valid={true} label="ارفاق شهادة" value="ملف_2024" isPdf />
+        <PreviewTextField
+          valid={true}
+          label="ارفاق شهادة"
+          value="ملف_2024"
+          isPdf
+        />
       </div>
     </div>
   );

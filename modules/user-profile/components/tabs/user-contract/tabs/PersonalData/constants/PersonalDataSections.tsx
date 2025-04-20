@@ -34,3 +34,16 @@ export const PersonalDataSections: UserProfileNestedTab[] = [
     content: <IqamaDataSection />,
   },
 ];
+
+type PropsT = {
+  handleChangeActiveSection: (section: UserProfileNestedTab) => void;
+};
+
+export const GetPersonalDataSections = (props: PropsT) => {
+  const { handleChangeActiveSection } = props;
+
+  return PersonalDataSections?.map((btn) => ({
+    ...btn,
+    onClick: () => handleChangeActiveSection(btn),
+  })) as UserProfileNestedTab[];
+};

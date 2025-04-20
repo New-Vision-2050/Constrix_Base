@@ -21,6 +21,7 @@ const mockUserData: UserProfileData = {
     completedTasks: 45,
     pendingTasks: 5,
   },
+  image_url: "/avatars/john-doe.jpg", // Added the required image_url property
 };
 
 /**

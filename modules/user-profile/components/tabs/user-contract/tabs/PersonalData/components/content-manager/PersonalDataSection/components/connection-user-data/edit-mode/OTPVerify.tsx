@@ -12,6 +12,7 @@ import OtpInput from "./OtpInput";
 import { useConnectionOTPCxt } from "../context/ConnectionOTPCxt";
 import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 type PropsT = {
   open: boolean;
@@ -22,6 +23,7 @@ type PropsT = {
 export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
+  const { handleRefreshConnectionData } = usePersonalDataTabCxt();
   const type = openMailOtp ? "email" : "phone";
   const [loading, setLoading] = useState(false);
   const handleClose =
@@ -56,6 +58,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
       handleClose();
       toast.success("تم التغير بنجاح");
       setLoading(false);
+      handleRefreshConnectionData();
     } catch (error) {
       setLoading(false);
       console.log("error", error);

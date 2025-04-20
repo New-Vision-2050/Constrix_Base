@@ -1,36 +1,43 @@
 import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaBorderNumberPreviewMode() {
+  const { userIdentityData } = usePersonalDataTabCxt();
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
       <div className="p-2">
-        <PreviewTextField valid={true} label="رقم الحدود" value="2145632456" />
+        <PreviewTextField
+          label="رقم الحدود"
+          value={userIdentityData?.border_number ?? ""}
+          valid={Boolean(userIdentityData?.border_number)}
+        />
       </div>
 
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="تاريخ الدخول"
-          value="05/08/2021"
+          value={userIdentityData?.border_number_start_date ?? ""}
+          valid={Boolean(userIdentityData?.border_number_start_date)}
           isDate
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="تاريخ الانتهاء"
-          value="05/08/2021"
+          value={userIdentityData?.border_number_end_date ?? ""}
+          valid={Boolean(userIdentityData?.border_number_end_date)}
           isDate
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
-          valid={true}
           label="ارفاق رقم الحدود"
-          value="رقم الحدود"
+          value={userIdentityData?.file_border_number ? "رقم الحدود" : ""}
+          valid={Boolean(userIdentityData?.file_border_number)}
           isPdf
         />
       </div>

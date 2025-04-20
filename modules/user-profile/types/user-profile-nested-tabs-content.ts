@@ -5,4 +5,5 @@ export type UserProfileNestedTab = {
   title: string;
   icon: ReactNode;
   content: ReactNode;
+  onClick?: () => void;
 };

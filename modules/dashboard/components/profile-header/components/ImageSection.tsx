@@ -1,7 +1,5 @@
 "use client";
 import { useUserDashboardCxt } from "@/modules/dashboard/context/user-dashboard-cxt";
-import UploadImageDialog from "./UploadImageDialog";
-import { useState } from "react";
 
 type PropsT = {
   imgSrc?: string; // Optional image source URL for the profile picture
@@ -15,7 +13,6 @@ type PropsT = {
  */
 export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
   const { isLoading } = useUserDashboardCxt();
-  const [openDialog, setOpenDialog] = useState(false);
 
   // handle loading state
   if (isLoading)
@@ -32,17 +29,13 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
           className="w-32 h-32 rounded"
         />
       ) : (
-        <label
-          onClick={() => setOpenDialog(true)}
-          className="w-32 h-32 flex flex-col items-center justify-center text-black cursor-pointer"
-        >
+        <label className="w-32 h-32 flex flex-col items-center justify-center text-black cursor-pointer">
           <i className="ri-camera-2-line text-2xl" />
           <p className="text-center text-sm mt-2">
             يلزم اضافة صورة خلفية بيضاء 6*4
           </p>
         </label>
       )}
-      <UploadImageDialog open={openDialog} setOpen={setOpenDialog} />
     </div>
   );
 }

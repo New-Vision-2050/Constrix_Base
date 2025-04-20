@@ -1,9 +1,13 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { serialize } from "object-to-formdata";
 
 export const WorkLicenseFormConfig = () => {
+  const { userIdentityData } = usePersonalDataTabCxt();
+
   const workLicenseFormConfig: FormConfig = {
-    formId: "ConnectionInformation-data-form",
+    formId: "ConnectionInformation-license-data-form",
     title: "بيانات رخصة العمل",
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
@@ -14,25 +18,25 @@ export const WorkLicenseFormConfig = () => {
       {
         fields: [
           {
-            name: "licenseNumber",
+            name: "work_permit",
             label: "رقم رخصة العمل",
             type: "text",
             placeholder: "رقم رخصة العمل",
           },
           {
-            name: "start_date",
+            name: "work_permit_start_date",
             label: "تاريخ الدخول",
-            type: "text",
+            type: "date",
             placeholder: "تاريخ الدخول",
           },
           {
-            name: "end_date",
+            name: "work_permit_end_date",
             label: "تاريخ الانتهاء",
-            type: "text",
+            type: "date",
             placeholder: "تاريخ الانتهاء",
           },
           {
-            name: "attachment",
+            name: "file_work_permit",
             label: "ارفاق رخصة العمل",
             type: "image",
             placeholder: "ارفاق رخصة العمل",
@@ -40,37 +44,45 @@ export const WorkLicenseFormConfig = () => {
         ],
       },
     ],
+    initialValues: {
+      work_permit: userIdentityData?.work_permit,
+      work_permit_start_date: userIdentityData?.work_permit_start_date,
+      work_permit_end_date: userIdentityData?.work_permit_end_date,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-
-    // Example onSuccess handler
-    onSuccess: (values, result) => {
-      console.log("Form submitted successfully with values:", values);
-      console.log("Result from API:", result);
-    },
     onSubmit: async (formData: Record<string, unknown>) => {
+      const formatDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0"); // Months are 0-based
+        const day = `${date.getDate()}`.padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+      };
+      const startDate = new Date(formData?.work_permit_start_date as string);
+      const endDate = new Date(formData?.work_permit_end_date as string);
+
       const body = {
         ...formData,
+        work_permit_start_date: formatDate(startDate),
+        work_permit_end_date: formatDate(endDate),
       };
-      console.log("body-body", body);
-      const response = await apiClient.put(`/company-users/contact-info`, body);
+
+      const response = await apiClient.post(
+        `/company-users/identity-data`,
+        serialize(body)
+      );
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",
         data: response.data || {},
       };
-    },
-
-    // Example onError handler
-    onError: (values, error) => {
-      console.log("Form submission failed with values:", values);
-      console.log("Error details:", error);
     },
   };
   return workLicenseFormConfig;

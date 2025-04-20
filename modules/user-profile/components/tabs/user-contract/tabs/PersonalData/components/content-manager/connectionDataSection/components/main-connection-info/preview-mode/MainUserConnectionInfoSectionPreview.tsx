@@ -3,7 +3,9 @@ import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export default function MainUserConnectionInfoSectionPreview() {
   const { userContactData } = useConnectionDataCxt();
-  
+
+  console.log("userContactData101", userContactData);
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}

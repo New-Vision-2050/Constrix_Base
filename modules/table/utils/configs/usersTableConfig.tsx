@@ -29,7 +29,7 @@ interface UsersData {
   general_manager_name: string;
   complete_data: 0 | 1; // 0 = pending, 1 = success
   is_active: "active" | "inActive";
-  company: CompanyData[];
+  companies: CompanyData[];
   [key: string]: any; // For any other properties
 }
 
@@ -72,7 +72,7 @@ export const UsersConfig = () => {
         sortable: true,
       },
       {
-        key: "company",
+        key: "companies",
         label: "الشركة",
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
@@ -89,7 +89,7 @@ export const UsersConfig = () => {
         key: "user-type",
         label: "نوع المستخدم",
         render: (_: unknown, row: UsersData) => {
-          const companies = row.company || [];
+          const companies = row.companies || [];
           return (
             <div className="line-clamp-3 ">
               {companies.map((company) => (
