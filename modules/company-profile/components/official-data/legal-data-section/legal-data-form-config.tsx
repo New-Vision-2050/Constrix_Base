@@ -1,7 +1,13 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { CompanyLegalData } from "@/modules/company-profile/types/company";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const LegalDataFormConfig = () => {
+export const LegalDataFormConfig = (
+  companyLegalData: CompanyLegalData[],
+  id?: string
+) => {
+  const queryClient = useQueryClient();
   const LegalDataFormConfig: FormConfig = {
     formId: "company-official-data-form",
     apiUrl: `${baseURL}/write-the-url`,
@@ -11,77 +17,87 @@ export const LegalDataFormConfig = () => {
     },
     sections: [
       {
-        columns: 4,
         fields: [
           {
-            name: "registration_type",
-            label: "نوع التسجل",
-            type: "text",
-            placeholder: "نوع التسجل",
-            disabled: true,
-            gridArea: 4,
-          },
-          {
-            name: "registration_number",
-            label: "ادخل رقم السجل التجاري / رقم الـ 700",
-            type: "text",
-            placeholder: "رقم السجل التجاري",
-            disabled: true,
-            gridArea: 2,
-          },
-          {
-            name: "registration_start_date",
-            label: "تاريخ الإصدار",
-            type: "date",
-            placeholder: "تاريخ الإصدار",
-          },
-          {
-            name: "registration_end_date",
-            label: "تاريخ الانتهاء",
-            type: "date",
-            placeholder: "تاريخ الانتهاء",
-          },
-          {
-            name: "registration_type_two",
-            label: "نوع التسجل",
-            type: "text",
-            placeholder: "نوع التسجل",
-            disabled: true,
-            gridArea: 4,
-          },
-          {
-            name: "registration_number_two",
-            label: "ادخل رقم الترخيص",
-            type: "text",
-            placeholder: "ادخل رقم الترخيص",
-            disabled: true,
-            gridArea: 2,
-          },
-          {
-            name: "registration_start_date_two",
-            label: "تاريخ الإصدار",
-            type: "date",
-            placeholder: "تاريخ الإصدار",
-          },
-          {
-            name: "registration_end_date_two",
-            label: "تاريخ الانتهاء",
-            type: "date",
-            placeholder: "تاريخ الانتهاء",
+            type: "dynamicRows",
+            name: "data",
+            label: "",
+            dynamicRowOptions: {
+              rowFields: [
+                {
+                  name: "registration_type",
+                  label: "نوع التسجل",
+                  type: "text",
+                  placeholder: "نوع التسجل",
+                  disabled: true,
+                  gridArea: 4,
+                },
+                {
+                  name: "registration_number",
+                  label: "ادخل رقم السجل التجاري / رقم الـ 700",
+                  type: "text",
+                  placeholder: "رقم السجل التجاري",
+                  disabled: true,
+                  gridArea: 2,
+                },
+                {
+                  name: "start_date",
+                  label: "تاريخ الإصدار",
+                  type: "date",
+                  placeholder: "تاريخ الإصدار",
+                  validation: [
+                    {
+                      type: "required",
+                      message: "تاريخ الإصدار مطلوب",
+                    },
+                  ],
+                },
+                {
+                  name: "end_date",
+                  label: "تاريخ الانتهاء",
+                  type: "date",
+                  placeholder: "تاريخ الانتهاء",
+                  validation: [
+                    {
+                      type: "required",
+                      message: "تاريخ الانتهاء مطلوب",
+                    },
+                  ],
+                },
+                {
+                  type: "file",
+                  name: "file",
+                  label: "اضافة مرفق",
+                  validation: [
+                    {
+                      type: "required",
+                      message: "اضافة مرفق مطلوب",
+                    },
+                  ],
+
+                  isMulti: false,
+                  fileConfig: {
+                    maxFileSize: 5 * 1024 * 1024, // 10MB
+                    showThumbnails: true,
+                    allowedFileTypes: [
+                      "application/pdf", // pdf
+                      "application/msword", // doc
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
+                      "image/jpeg", // jpeg & jpg
+                      "image/png", // png
+                    ],
+                  },
+                },
+              ],
+              maxRows: 10,
+              columns: 1,
+            },
           },
         ],
       },
     ],
     initialValues: {
-      registration_type: "سجل تجاري",
-      registration_number: "70025865836",
-      registration_start_date:  "2024/2/19",
-      registration_end_date:  "2024/2/19",
-      registration_type_two: "ترخيص",
-      registration_number_two: "70025865836",
-      registration_start_date_two:  "2024/2/19",
-      registration_end_date_two:  "2024/2/19",
-
+      data: companyLegalData,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -91,7 +107,25 @@ export const LegalDataFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-    onSubmit: async (formData: Record<string, unknown>) => {
+    onSubmit: async (formData) => {
+      const obj = formData.data.map((obj: any) => ({
+        start_date: obj.start_date,
+        end_date: obj.end_date,
+        id: obj.id,
+        ...(typeof obj.file !== "string" && { file: obj.file }),
+      }));
+
+      const response = await apiClient.postForm(
+        "companies/company-profile/legal-data/update",
+        { data: obj }
+      );
+
+      if (response.status === 200) {
+        queryClient.refetchQueries({
+          queryKey: ["main-company-data", id],
+        });
+      }
+
       return {
         success: true,
         message: "dummy return",

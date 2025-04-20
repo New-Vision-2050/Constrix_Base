@@ -1,8 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import useCompanyStore from "../../../store/useCompanyOfficialData";
+import { officialData } from "@/modules/company-profile/types/company";
 
-export const ReqOfficialDataEdit = () => {
+export const ReqOfficialDataEdit = (officialData: officialData) => {
   const { company } = useCompanyStore();
   const PersonalFormConfig: FormConfig = {
     formId: "ReqOfficialDataEdit",
@@ -38,10 +39,21 @@ export const ReqOfficialDataEdit = () => {
             ],
           },
           {
-            name: "company_type",
-            label: "كيان الشركة",
             type: "select",
-            options: [{ label: "هندسي", value: "هندسي" }],
+            name: "company_type_id",
+            label: "كيان الشركة",
+            placeholder: "كيان الشركة",
+            dynamicOptions: {
+              url: `${baseURL}/company_types`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
@@ -50,10 +62,21 @@ export const ReqOfficialDataEdit = () => {
             ],
           },
           {
-            name: "company_field",
-            label: "مجال الشركة",
             type: "select",
-            options: [{ label: "استشارات هندسية", value: "استشارات هندسية" }],
+            name: "company_field_id",
+            label: "مجال الشركة",
+            placeholder: "مجال الشركة",
+            dynamicOptions: {
+              url: `${baseURL}/company_fields`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
@@ -90,18 +113,18 @@ export const ReqOfficialDataEdit = () => {
             label: "ملاحظات",
             type: "text",
             placeholder: "ملاحظات",
+            validation: [
+              {
+                type: "required",
+                message: "الملاحظات مطلوبة",
+              },
+            ],
+
           },
           {
             type: "file",
             name: "mainDocument",
-            label: "Main Document",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "Main document is required",
-              },
-            ],
+            label: "اضافة المرفقات",
             isMulti: true,
             fileConfig: {
               allowedFileTypes: [
@@ -122,14 +145,14 @@ export const ReqOfficialDataEdit = () => {
       },
     ],
     initialValues: {
-      name: company?.name ?? "",
-      branch: company?.main_branch?.name ?? "",
-      name_en: company?.name_en ?? "",
-      company_type: "هندسي",
-      country_id: "السعودية",
-      company_field: "استشارات هندسية",
-      phone: company?.phone ?? "",
-      email: company?.email ?? "",
+      name: officialData?.name ?? "",
+      branch: officialData?.branch ?? "",
+      name_en: officialData?.name_en ?? "",
+      company_type_id: officialData?.company_type_id ?? "",
+      country_id: officialData?.country_id ?? "",
+      company_field_id: officialData?.company_field_id ?? "",
+      phone: officialData?.phone ?? "",
+      email: officialData?.email ?? "",
       bucket: "متميز",
     },
     submitButtonText: "ارسال طلب التعديل",
@@ -141,10 +164,17 @@ export const ReqOfficialDataEdit = () => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const response = await apiClient.put(
+        "companies/company-profile/official-data/request",
+        formData
+      );
+
+      console.log({ response });
+
       return {
         success: true,
         message: "dummy return",
-        data: {},
+        data: response.data,
       };
     },
   };

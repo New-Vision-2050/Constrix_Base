@@ -1,11 +1,13 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const LegalDataAddReqFormEditConfig = () => {
+export const LegalDataAddReqFormEditConfig = (id?: string) => {
+  const queryClient = useQueryClient()
   const LegalDataAddReqFormEditConfig: FormConfig = {
     formId: "company-official-data-form",
     title: "اضافة بيان قانوني",
-    apiUrl: `${baseURL}/write-the-url`,
+    apiUrl: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -14,19 +16,30 @@ export const LegalDataAddReqFormEditConfig = () => {
       {
         fields: [
           {
-            name: "registration_type",
-            label: "نوع التسجل",
             type: "select",
-            options: [{ label: "سجل تجاري", value: "سجل تجاري" }],
+            name: "registration_type_id",
+            label: "نوع التسجل",
+            placeholder: "نوع التسجل",
+            dynamicOptions: {
+              url: `${baseURL}/company_registration_types`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
-                message: "ادخل نوع التسجيل",
+                message: "ادخل نوع التسجل",
               },
             ],
           },
           {
-            name: "registration_number",
+            name: "regestration_number",
             label: "ادخل رقم الترخيص",
             type: "text",
             placeholder: "ادخل رقم الترخيص",
@@ -38,7 +51,7 @@ export const LegalDataAddReqFormEditConfig = () => {
             ],
           },
           {
-            name: "registration_start_date",
+            name: "start_date",
             label: "تاريخ الإصدار",
             type: "date",
             placeholder: "تاريخ الإصدار",
@@ -50,7 +63,7 @@ export const LegalDataAddReqFormEditConfig = () => {
             ],
           },
           {
-            name: "registration_end_date",
+            name: "end_date",
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
@@ -63,53 +76,54 @@ export const LegalDataAddReqFormEditConfig = () => {
           },
           {
             type: "file",
-            name: "mainDocument",
+            name: "file",
             label: "اضافة مرفق",
-            required: true,
             validation: [
               {
                 type: "required",
-                message: "Main document is required",
+                message: "اضافة مرفق مطلوب",
               },
             ],
-            isMulti: true,
+            isMulti: false,
             fileConfig: {
-              allowedFileTypes: [
-                "application/pdf",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-              ],
               maxFileSize: 5 * 1024 * 1024, // 10MB
               showThumbnails: true,
-              // If you have an upload endpoint, you can specify it here
-              // uploadUrl: "/api/upload-file",
-              // uploadHeaders: {
-              //   Authorization: "Bearer your-token",
-              // },
             },
           },
         ],
       },
     ],
-    initialValues: {
-      registration_type: "سجل تجاري",
-      registration_number: "70025865836",
-      registration_type_two: "ترخيص",
-      registration_number_two: "70025865836",
-    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: false,
+    resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const obj = {
+        registration_type_id: formData.registration_type_id,
+        regestration_number: formData.regestration_number,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        file: formData.file,
+      };
+
+      const response = await apiClient.postForm(
+        "companies/company-profile/legal-data/create-legal-data",
+        obj
+      );
+
+      if (response.status === 200) {
+        queryClient.refetchQueries({
+          queryKey: ["main-company-data", id],
+        });
+      }
       return {
         success: true,
         message: "dummy return",
-        data: {},
+        data: response.data,
       };
     },
   };

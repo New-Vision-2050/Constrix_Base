@@ -1,12 +1,16 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
-import useCompanyStore from "../../../store/useCompanyOfficialData";
+import { apiClient } from "@/config/axios-config";
+import { officialData } from "@/modules/company-profile/types/company";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const CompanyOfficialData = () => {
-  const { company } = useCompanyStore();
+export const CompanyOfficialData = (
+  officialData: officialData,
+  id?: string
+) => {
+  const queryClient = useQueryClient();
   const PersonalFormConfig: FormConfig = {
     formId: "company-official-data-form",
-    apiUrl: `${baseURL}/companies/company-profile/official-data`,
+    // apiUrl: `${baseURL}/companies/company-profile/official-data`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -103,14 +107,14 @@ export const CompanyOfficialData = () => {
       },
     ],
     initialValues: {
-      name: company?.name ?? "",
-      branch_name: company?.main_branch?.name ?? "",
-      name_en: company?.name_en ?? "",
-      company_type: company?.company_type ?? "",
-      country: company?.country_id ?? "",
-      company_field: company?.company_field ?? "",
-      phone: company?.phone ?? "",
-      email: company?.email ?? "",
+      name: officialData?.name ?? "",
+      branch_name: officialData?.branch ?? "",
+      name_en: officialData?.name_en ?? "",
+      company_type: officialData?.company_type ?? "",
+      country: officialData?.country_name ?? "",
+      company_field: officialData?.company_field ?? "",
+      phone: officialData?.phone ?? "",
+      email: officialData?.email ?? "",
       bucket: "متميز",
     },
     submitButtonText: "Submit",
@@ -121,6 +125,28 @@ export const CompanyOfficialData = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    apiHeaders: {
+      method: "PUT",
+    },
+
+    onSubmit: async (formData: Record<string, unknown>) => {
+      const response = await apiClient.put(
+        "companies/company-profile/official-data",
+        formData
+      );
+
+      if (response.status === 200) {
+        queryClient.refetchQueries({
+          queryKey: ["main-company-data", id],
+        });
+      }
+
+      return {
+        success: true,
+        message: "dummy return",
+        data: response.data,
+      };
+    },
   };
   return PersonalFormConfig;
 };

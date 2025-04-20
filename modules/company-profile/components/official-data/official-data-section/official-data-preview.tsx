@@ -1,55 +1,68 @@
 import React from "react";
-import useCompanyStore from "../../../store/useCompanyOfficialData";
 import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
+import { officialData } from "@/modules/company-profile/types/company";
 
-const OfficialDataPreview = () => {
-  const { company } = useCompanyStore();
+const OfficialDataPreview = ({
+  officialData,
+}: {
+  officialData: officialData;
+}) => {
+  const {
+    branch,
+    name,
+    name_en,
+    company_type,
+    country_name,
+    company_field,
+    phone,
+    email,
+  } = officialData;
 
   const previewData = [
     {
       valid: true,
       label: "اسم الشركة",
-      value: company?.name ?? "",
+      value: name ?? "",
       needRequest: true,
     },
     {
       valid: false,
       label: "اسم الفرع",
-      value: company?.main_branch?.name ?? "",
+      value: branch ?? "",
     },
     {
       valid: true,
       label: "اسم الشركة بالانجليزي",
-      value: company?.name_en ?? "يجب كتابة الاسم باللغة الانجليزية",
+      value: name_en ?? "",
       containerClassName: "col-span-2",
     },
     {
       valid: true,
       label: "كيان الشركة",
-      value: company?.company_type ?? "",
+      value: company_type ?? "",
       needRequest: true,
     },
     {
       valid: true,
       label: "دولة المركز الرئيسي",
-      value: "المملكة العربية السعودية", 
+      value: country_name ?? "",
       needRequest: true,
     },
     {
       valid: true,
       label: "مجال الشركة",
-      value: company?.company_field ?? "",
+      value: company_field ?? "",
       needRequest: true,
     },
     {
       valid: true,
       label: "رقم الجوال",
-      value: company?.phone ?? "",
+      value: phone ?? "",
     },
     {
       valid: true,
       label: "البريد الالكتروني",
-      value: company?.email ?? "",
+      value: email ?? "",
     },
     {
       valid: true,

@@ -1,7 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { CompanyLegalData } from "@/modules/company-profile/types/company";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const LegalDataReqFormEditConfig = () => {
+export const LegalDataReqFormEditConfig = (
+  companyLegalData: CompanyLegalData[],
+  id?: string
+) => {
+  const queryClient = useQueryClient();
+
   const LegalDataReqFormEditConfig: FormConfig = {
     formId: "company-official-data-form",
     title: "طلب تعديل البيان القانوني",
@@ -14,50 +21,51 @@ export const LegalDataReqFormEditConfig = () => {
       {
         fields: [
           {
-            name: "registration_type",
-            label: "نوع التسجل",
-            type: "select",
-            options: [{ label: "سجل تجاري", value: "سجل تجاري" }],
-            validation: [
-              {
-                type: "required",
-                message: "ادخل مجال الشركة",
-              },
-            ],
-          },
-          {
-            name: "registration_number",
-            label: "ادخل رقم الترخيص",
-            type: "text",
-            placeholder: "ادخل رقم الترخيص",
-          },
-          {
-            name: "registration_type_two",
-            label: "نوع التسجل",
-            type: "select",
-            options: [{ label: "ترخيص", value: "ترخيص" }],
-            validation: [
-              {
-                type: "required",
-                message: "ادخل مجال الشركة",
-              },
-            ],
-          },
-
-          {
-            name: "registration_number_two",
-            label: "ادخل رقم الترخيص",
-            type: "text",
-            placeholder: "ادخل رقم الترخيص",
+            type: "dynamicRows",
+            name: "data",
+            label: "",
+            dynamicRowOptions: {
+              rowFields: [
+                {
+                  type: "select",
+                  name: "registration_type_id",
+                  label: "نوع التسجل",
+                  placeholder: "نوع التسجل",
+                  dynamicOptions: {
+                    url: `${baseURL}/company_registration_types`,
+                    valueField: "id",
+                    labelField: "name",
+                    searchParam: "name",
+                    paginationEnabled: true,
+                    pageParam: "page",
+                    limitParam: "per_page",
+                    itemsPerPage: 10,
+                    totalCountHeader: "X-Total-Count",
+                  },
+                  validation: [
+                    {
+                      type: "required",
+                      message: "ادخل نوع التسجل",
+                    },
+                  ],
+                },
+                {
+                  name: "registration_number",
+                  label: "ادخل رقم الترخيص",
+                  type: "text",
+                  placeholder: "ادخل رقم الترخيص",
+                },
+              ],
+              minRows: 1,
+              maxRows: 10,
+              columns: 1,
+            },
           },
         ],
       },
     ],
     initialValues: {
-      registration_type: "سجل تجاري",
-      registration_number: "70025865836",
-      registration_type_two: "ترخيص",
-      registration_number_two: "70025865836",
+      data: companyLegalData,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -67,7 +75,15 @@ export const LegalDataReqFormEditConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
-    onSubmit: async (formData: Record<string, unknown>) => {
+    onSubmit: async (formData) => {
+      const obj = formData?.data.map((obj: any) => ({
+        id: obj.id,
+        registration_type_id: obj.registration_type_id,
+        registration_number: obj.registration_number,
+      }));
+      await apiClient.post("companies/company-profile/legal-data/request", {
+        data: obj,
+      });
       return {
         success: true,
         message: "dummy return",

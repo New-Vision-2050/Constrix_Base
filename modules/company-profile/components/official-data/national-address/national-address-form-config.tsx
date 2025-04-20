@@ -1,9 +1,16 @@
 import { FormConfig } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { CompanyAddress } from "@/modules/company-profile/types/company";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const NationalAddressFormConfig = () => {
+export const NationalAddressFormConfig = (
+  companyAddress: CompanyAddress,
+  id?: string
+) => {
+  const queryClient = useQueryClient();
+
   const NationalAddressFormConfig: FormConfig = {
-    formId: "company-official-data-form",
+    formId: "NationalAddressFormConfig",
     title: "اضافة بيان قانوني",
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
@@ -15,74 +22,135 @@ export const NationalAddressFormConfig = () => {
         columns: 2,
         fields: [
           {
-            name: "name",
+            name: "country_name",
             label: "الدولة",
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: "الدولة",
             disabled: true,
           },
           {
-            name: "area",
+            type: "select",
+            name: "state_id",
             label: "المنطقة",
-            type: "text",
             placeholder: "المنطقة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "country_id",
+              filterParam: "country_id",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل المنطقة",
+              },
+            ],
           },
           {
-            name: "city",
+            type: "select",
+            name: "city_id",
             label: "المدينة",
-            type: "text",
             placeholder: "المدينة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "state_id",
+              filterParam: "state_id",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل المدينة",
+              },
+            ],
           },
           {
-            name: "state",
+            name: "neighborhood_name",
             label: "الحي",
             type: "text",
             placeholder: "الحي",
+            validation: [
+              {
+                type: "required",
+                message: "الحي مطلوب",
+              },
+            ],
           },
           {
-            name: "build",
+            name: "building_number",
             label: "رقم المبنى",
             type: "text",
             placeholder: "رقم المبنى",
+            validation: [
+              {
+                type: "required",
+                message: "رقم المبنى مطلوب",
+              },
+            ],
           },
           {
-            name: "phone",
+            name: "additional_phone",
             label: "الرقم الاضافي",
             type: "text",
             placeholder: "الرقم الاضافي",
+            validation: [
+              {
+                type: "required",
+                message: "الرقم الاضافي مطلوب",
+              },
+            ],
           },
           {
-            name: "zip",
+            name: "postal_code",
             label: "الرمز البريدي",
             type: "text",
             placeholder: "الرمز البريدي",
+            validation: [
+              {
+                type: "required",
+                message: "الرمز البريدي مطلوب",
+              },
+            ],
           },
           {
-            name: "street",
+            name: "street_name",
             label: "الشارع",
             type: "text",
             placeholder: "الشارع",
-          },
-          {
-            name: "map",
-            label: "",
-            type: "text",
-            placeholder: "تعديل الموقع من الخريطة",
-            disabled: true,
-            gridArea: 2,
+            validation: [
+              {
+                type: "required",
+                message: "الشارع مطلوب",
+              },
+            ],
           },
         ],
       },
     ],
     initialValues: {
-      name: "المملكة العربية السعودية",
-      area: "الشمالية",
-      city: "الرياض",
-      state: "المحمدية",
-      build: "256",
-      phone: "966548552355",
-      zip: "052",
-      street: "شارع الصفا - مبنى 257",
+      country_id: companyAddress?.country_id ?? "",
+      country_name: companyAddress?.country_name ?? "",
+      neighborhood_name: companyAddress.neighborhood_name ?? "",
+      city_id: companyAddress.city_id ?? "",
+      state_id: companyAddress.state_id ?? "",
+      building_number: companyAddress.building_number ?? "",
+      additional_phone: companyAddress.additional_phone ?? "",
+      postal_code: companyAddress.postal_code ?? "",
+      street_name: companyAddress.street_name ?? "",
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -93,6 +161,28 @@ export const NationalAddressFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const obj = {
+        country_id: formData.country_id,
+        state_id: formData.state_id,
+        city_id: formData.city_id,
+        neighborhood_name: formData.neighborhood_name,
+        street_name: formData.street_name,
+        building_number: formData.building_number,
+        additional_phone: formData.additional_phone,
+        postal_code: formData.postal_code,
+      };
+
+      const response = await apiClient.put(
+        `companies/company-profile/national-address/${companyAddress.id}`,
+        obj
+      );
+
+      if (response.status === 200) {
+        queryClient.refetchQueries({
+          queryKey: ["main-company-data", id],
+        });
+      }
+
       return {
         success: true,
         message: "dummy return",

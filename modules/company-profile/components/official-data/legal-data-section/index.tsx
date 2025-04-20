@@ -17,8 +17,14 @@ import LegalDataForm from "./legal-data-form";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { LegalDataReqFormEditConfig } from "./legal-data-req-form-edit-config";
 import { LegalDataAddReqFormEditConfig } from "./legal-data-add-req-form-config";
+import { CompanyLegalData } from "@/modules/company-profile/types/company";
 
-const LegalDataSection = () => {
+const LegalDataSection = ({
+  companyLegalData = [],
+}: {
+  companyLegalData: CompanyLegalData[];
+}) => {
+
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -60,8 +66,8 @@ const LegalDataSection = () => {
       >
         {mode === "Preview" ? (
           <>
-            {true ? (
-              <LegalDataPreview />
+            {companyLegalData.length > 0 ? (
+              <LegalDataPreview companyLegalData={companyLegalData} />
             ) : (
               <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
                 <InfoIcon additionClass="text-orange-500 " />
@@ -70,7 +76,7 @@ const LegalDataSection = () => {
             )}
           </>
         ) : (
-          <LegalDataForm />
+          <LegalDataForm  companyLegalData={companyLegalData}/>
         )}
       </FormFieldSet>
 
@@ -89,7 +95,7 @@ const LegalDataSection = () => {
         </SheetContent>
 
         <SheetFormBuilder
-          config={LegalDataReqFormEditConfig()}
+          config={LegalDataReqFormEditConfig(companyLegalData)}
           isOpen={isOpenReqForm}
           onOpenChange={handleCloseReqForm}
         />

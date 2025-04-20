@@ -1,13 +1,18 @@
 import FormFieldSet from "@/modules/user-profile/components/tabs/user-contract/tabs/components/FormFieldSet";
 import React from "react";
+import { GeneralManager } from "../../types/company";
 
-const SupportData = () => {
+const SupportData = ({
+  generalManager,
+}: {
+  generalManager: GeneralManager;
+}) => {
   const data = [
     {
-      name: "محمد خالد حسن",
-      phone: "+966 562145222",
-      email: "hassan@gmail.com",
-      nationality: "مصري",
+      name: generalManager.name,
+      phone: generalManager.phone,
+      email: generalManager.email,
+      nationality: generalManager.nationality,
     },
   ];
 

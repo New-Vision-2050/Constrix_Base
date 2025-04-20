@@ -1,13 +1,14 @@
 import { apiClient, baseURL } from "@/config/axios-config";
+import { CompanyDocument } from "@/modules/company-profile/types/company";
 import { FormConfig } from "@/modules/form-builder";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const AddDocFormConfig = (id?: string) => {
+export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
   const queryClient = useQueryClient();
 
-  const AddDocFormConfig: FormConfig = {
-    formId: "AddDocFormConfig",
-    title: "اضافة مستند رسمي",
+  const updateDocsFormConfig: FormConfig = {
+    formId: `updateDocsFormConfig${doc.id}`,
+    title: "تحديث مستند رسمي",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -31,12 +32,12 @@ export const AddDocFormConfig = (id?: string) => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل نوع المستند",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "ادخل نوع المستند",
+            //   },
+            // ],
           },
           {
             name: "description",
@@ -117,7 +118,10 @@ export const AddDocFormConfig = (id?: string) => {
         ],
       },
     ],
-    submitButtonText: "إضافة",
+    initialValues: {
+      ...doc,
+    },
+    submitButtonText: "تحديث",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
@@ -126,16 +130,32 @@ export const AddDocFormConfig = (id?: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
+      const pastFiles = doc.files;
+      const serverFiles: number[] = formData.files
+        .filter((file: any) => !(file instanceof File))
+        .map((file: any) => file.id);
+      const files_deleted = pastFiles
+        .filter((file) => !serverFiles.includes(file.id))
+        .map((file: any) => file.id);
+      const files = formData.files.filter((file: any) => file instanceof File);
+
+      const obj = {
+        files,
+        files_deleted,
+        start_date: new Date(formData.start_date).toISOString().split("T")[0],
+        end_date: new Date(formData.end_date).toISOString().split("T")[0],
+        notification_date: new Date(formData.notification_date)
+          .toISOString()
+          .split("T")[0],
+        name: formData.name,
+        description: formData.description,
+        document_number: formData.document_number,
+        document_type_id: formData.document_type_id,
+      };
+
       const response = await apiClient.postForm(
-        "companies/company-profile/official-document",
-        {
-          ...formData,
-          start_date: new Date(formData.start_date).toISOString().split("T")[0],
-          end_date: new Date(formData.end_date).toISOString().split("T")[0],
-          notification_date: new Date(formData.notification_date)
-            .toISOString()
-            .split("T")[0],
-        }
+        `companies/company-profile/official-document/update/${doc.id}`,
+        obj
       );
 
       if (response.status === 200) {
@@ -151,5 +171,5 @@ export const AddDocFormConfig = (id?: string) => {
       };
     },
   };
-  return AddDocFormConfig;
+  return updateDocsFormConfig;
 };

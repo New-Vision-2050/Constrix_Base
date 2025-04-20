@@ -1,51 +1,56 @@
+import { CompanyAddress } from "@/modules/company-profile/types/company";
 import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
 import { CircleCheckIcon, MapPin } from "lucide-react";
 import React from "react";
 
-const NationalAddressDataPreview = () => {
+const NationalAddressDataPreview = ({
+  companyAddress,
+}: {
+  companyAddress: CompanyAddress;
+}) => {
   const previewData = [
     {
       valid: true,
       label: "الدولة",
-      value: "المملكة العربية السعودية",
+      value: companyAddress.country_name ?? "",
       needRequest: true,
     },
     {
       valid: true,
       label: "المنطقة",
-      value: "الشمالية",
+      value: companyAddress.state_name ?? "",
     },
     {
       valid: true,
       label: "المدينة",
-      value: "الرياض",
+      value: companyAddress.city_name ?? "",
     },
     {
       valid: true,
       label: "الحي",
-      value: "c",
+      value: companyAddress.neighborhood_name ?? "",
     },
 
     {
       valid: true,
       label: "رقم المبنى",
-      value: "256",
+      value: companyAddress.building_number ?? "",
     },
     {
       valid: true,
       label: "الرقم الاضافي",
-      value: "+966548552355",
+      value: companyAddress.additional_phone ?? "",
     },
 
     {
       valid: true,
       label: "الرمز البريدي",
-      value: "052",
+      value: companyAddress.postal_code ?? "",
     },
     {
       valid: true,
       label: "الشارع",
-      value: "شارع الصفا - مبنى 257",
+      value: companyAddress.street_name ?? "",
     },
   ];
 

@@ -17,8 +17,25 @@ import {
 import { useLocale } from "next-intl";
 import MyRequests from "./my-requests";
 import { Button } from "@/components/ui/button";
+import { officialData } from "@/modules/company-profile/types/company";
 
-const OfficialDataSection = () => {
+const OfficialDataSection = ({
+  officialData,
+}: {
+  officialData: officialData;
+}) => {
+  const {
+    branch,
+    name,
+    name_en,
+    company_type,
+    country_name,
+    country_id,
+    company_field,
+    company_field_id,
+    phone,
+    email,
+  } = officialData;
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -52,10 +69,10 @@ const OfficialDataSection = () => {
           />
         }
       >
-        {mode === "Preview" ? <OfficialDataPreview /> : <OfficialDataForm />}
+        {mode === "Preview" ? <OfficialDataPreview officialData={officialData} /> : <OfficialDataForm officialData={officialData}  />}
       </FormFieldSet>
       <SheetFormBuilder
-        config={ReqOfficialDataEdit()}
+        config={ReqOfficialDataEdit(officialData)}
         isOpen={isOpenReqForm}
         onOpenChange={handleCloseReqForm}
       />

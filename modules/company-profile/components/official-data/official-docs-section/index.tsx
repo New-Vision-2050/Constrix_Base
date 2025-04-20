@@ -1,6 +1,5 @@
 "use client";
 
-import FieldSetSecondTitle from "@/modules/user-profile/components/tabs/user-contract/tabs/components/FieldSetSecondTitle";
 import FormFieldSet from "@/modules/user-profile/components/tabs/user-contract/tabs/components/FormFieldSet";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { useState } from "react";
@@ -8,8 +7,25 @@ import DocsTable from "./docs-table";
 import { useModal } from "@/hooks/use-modal";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { AddDocFormConfig } from "./add-doc-form-config";
+import { CompanyDocument } from "@/modules/company-profile/types/company";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import SettingsIcon from "@/public/icons/settings";
+import { useLocale } from "next-intl";
 
-const OfficialDocsSection = () => {
+const OfficialDocsSection = ({
+  companyOfficialDocuments,
+}: {
+  companyOfficialDocuments: CompanyDocument[];
+}) => {
+  const locale = useLocale();
+  const isRTL = locale === "ar";
+
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
   const [isOpenAddDoc, handleOpenAddDoc, handleCloseAddDoc] = useModal();
 
@@ -29,17 +45,26 @@ const OfficialDocsSection = () => {
         title="المستندات الرسمية"
         valid={false}
         secondTitle={
-          <FieldSetSecondTitle
-            mode={mode}
-            handleEditClick={handleEditClick}
-            dropdownItems={dropdownItems}
-          />
+          <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">
+                <SettingsIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {dropdownItems.map((item, index) => (
+                <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         }
       >
         {mode === "Preview" ? (
           <>
-            {true ? (
-              <DocsTable />
+            {!!companyOfficialDocuments ? (
+              <DocsTable companyOfficialDocuments={companyOfficialDocuments} />
             ) : (
               <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
                 <InfoIcon additionClass="text-orange-500 " />
@@ -58,8 +83,6 @@ const OfficialDocsSection = () => {
         isOpen={isOpenAddDoc}
         onOpenChange={handleCloseAddDoc}
       />
-
-     
     </>
   );
 };

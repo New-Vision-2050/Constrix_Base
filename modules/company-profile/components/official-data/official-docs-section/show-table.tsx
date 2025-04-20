@@ -4,6 +4,7 @@ interface UserActivity {
   user: string;
   action: string;
   date: string;
+  id: string;
 }
 
 interface UserActivityLogProps {
@@ -30,7 +31,9 @@ const UserActivityLog = ({
             <tr key={index} className="border-b border-gray-700">
               <td className="p-4 text-start">{activity.user}</td>
               <td className="p-4 text-start">{activity.action}</td>
-              <td className="p-4 text-start">{activity.date}</td>
+              <td className="p-4 text-start">
+                {new Date(activity.date).toLocaleDateString("en-GB")}{" "}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -39,30 +42,4 @@ const UserActivityLog = ({
   );
 };
 
-const UserActivityLogExample = () => {
-  const activitiesData = [
-    {
-      user: "محمد خالد حسن",
-      action: "قام بتحديث التاريخ",
-      date: "20/10/2024 08:00م",
-    },
-    {
-      user: "عمرو احمد",
-      action: "قام بحذف المرفق",
-      date: "20/10/2024 08:00م",
-    },
-    {
-      user: "خالد احمد",
-      action: "حاول الحذف",
-      date: "20/10/2024 08:00م",
-    },
-  ];
-
-  return (
-    <div className="p-4">
-      <UserActivityLog activities={activitiesData} />
-    </div>
-  );
-};
-
-export default UserActivityLogExample;
+export default UserActivityLog;

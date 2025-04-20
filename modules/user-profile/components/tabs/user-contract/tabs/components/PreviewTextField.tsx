@@ -36,7 +36,7 @@ const PreviewTextField = ({
   const labelDir = isRTL ? "right-[15px]" : "left-[15px]";
 
   return (
-    <div className={cn("relative", needRequest && "bg-background")}>
+    <div className={cn("relative grow", needRequest && "bg-background")}>
       <div className="flex w-full items-center gap-1">
         {isPdf && (
           <img src={pdfImg.src} width={"25px"} height={"25px"} alt="pdf file" />
@@ -60,7 +60,7 @@ const PreviewTextField = ({
             isRTL ? "left-[50px]" : "right-[50px]"
           }`}
         >
-          <CalendarRangeIcon additionalClass="w-4"/>
+          <CalendarRangeIcon additionalClass="w-4" />
         </span>
       )}
       {/* select icon */}
@@ -75,7 +75,7 @@ const PreviewTextField = ({
       )}
       {/* validation icon */}
       <span className={`absolute top-[8px] ${spanDir}`}>
-        {valid ? (
+        {!!value ? (
           <CircleCheckIcon color="green" />
         ) : (
           <InfoIcon additionClass="text-orange-500" />

@@ -7,9 +7,16 @@ import { Button } from "@/components/ui/button";
 import PencilLineIcon from "@/public/icons/pencil-line";
 import EyeIcon from "@/public/icons/eye-icon";
 import NationalAddressForm from "./national-address-form";
+import { CompanyAddress } from "@/modules/company-profile/types/company";
 
-const NationalAddress = () => {
+const NationalAddress = ({
+  companyAddress,
+}: {
+  companyAddress: CompanyAddress;
+}) => {
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
+
+  console.log({companyAddress})
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
@@ -30,8 +37,8 @@ const NationalAddress = () => {
     >
       {mode === "Preview" ? (
         <>
-          {true ? (
-            <NationalAddressDataPreview />
+          {!!companyAddress ? (
+            <NationalAddressDataPreview companyAddress={companyAddress} />
           ) : (
             <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
               <InfoIcon additionClass="text-orange-500 " />
@@ -40,7 +47,7 @@ const NationalAddress = () => {
           )}
         </>
       ) : (
-        <NationalAddressForm />
+        <NationalAddressForm  companyAddress={companyAddress}/>
       )}
     </FormFieldSet>
   );
