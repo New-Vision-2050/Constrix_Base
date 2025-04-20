@@ -1,4 +1,4 @@
-import { Switch } from "@/components/ui/switch";
+import "./index.css";
 import { Label } from "@/components/ui/label";
 import PreviewTextField from "../../../../../../../components/PreviewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
@@ -25,7 +25,14 @@ export default function UserProfilePersonalDataReview() {
       </div>
       <div className="p-2">
         <div className="flex items-center gap-2">
-          <Switch checked={userPersonalData?.is_default == 1} id="is-default" />
+          <label className="switch">
+            <input
+              disabled
+              checked={userPersonalData?.is_default == 1}
+              type="checkbox"
+            />
+            <span className="slider"></span>
+          </label>
           <Label htmlFor="is-default">افتراضي</Label>
         </div>
       </div>

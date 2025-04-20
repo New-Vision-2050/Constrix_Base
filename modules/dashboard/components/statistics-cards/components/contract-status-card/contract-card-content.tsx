@@ -33,8 +33,6 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
     }
   }, [contractData]);
 
-  console.log(`Rate Passed: ${passedPercentage}%`);
-
   // declare and define
   return (
     <div className="flex flex-col gap-4 mt-4">
