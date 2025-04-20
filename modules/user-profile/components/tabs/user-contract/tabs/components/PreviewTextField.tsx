@@ -6,6 +6,8 @@ import { Asterisk, CircleCheckIcon } from "lucide-react";
 import ChevronDownIcon from "@/public/icons/chevron-down-icon";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 import pdfImg from "@/assets/icons/PDF.png";
+import PinIcon from "@/public/icons/pin";
+import { cn } from "@/lib/utils";
 
 type PropsT = {
   value: string;
@@ -15,6 +17,7 @@ type PropsT = {
   isSelect?: boolean;
   label?: string;
   required?: boolean;
+  needRequest?: boolean;
 };
 
 const PreviewTextField = ({
@@ -25,6 +28,7 @@ const PreviewTextField = ({
   isSelect,
   valid,
   required,
+  needRequest,
 }: PropsT) => {
   const locale = useLocale();
   const spanDir = locale !== "ar" ? "right-[15px]" : "left-[15px]";
@@ -32,7 +36,7 @@ const PreviewTextField = ({
   const labelDir = isRTL ? "right-[15px]" : "left-[15px]";
 
   return (
-    <div className="relative">
+    <div className={cn("relative grow", needRequest && "bg-background")}>
       <div className="flex w-full items-center gap-1">
         {isPdf && (
           <img src={pdfImg.src} width={"25px"} height={"25px"} alt="pdf file" />
@@ -44,6 +48,7 @@ const PreviewTextField = ({
         <span
           className={`absolute top-[-14px] text-[12px] ${labelDir} flex items-center text-gray-600`}
         >
+          {needRequest && <PinIcon className="me-1" />}
           <span>{label}</span>
           {required === true && <Asterisk size={"12px"} color="red" />}
         </span>
@@ -55,7 +60,7 @@ const PreviewTextField = ({
             isRTL ? "left-[50px]" : "right-[50px]"
           }`}
         >
-          <CalendarRangeIcon />
+          <CalendarRangeIcon additionalClass="w-4" />
         </span>
       )}
       {/* select icon */}
@@ -70,7 +75,7 @@ const PreviewTextField = ({
       )}
       {/* validation icon */}
       <span className={`absolute top-[8px] ${spanDir}`}>
-        {valid ? (
+        {!!value ? (
           <CircleCheckIcon color="green" />
         ) : (
           <InfoIcon additionClass="text-orange-500" />

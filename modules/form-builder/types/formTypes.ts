@@ -109,7 +109,7 @@ export interface FieldConfig {
   className?: string;
   containerClassName?: string; // Class name for the container element
   width?: string;
-  gridArea?: string;
+  gridArea?: number;
   options?: DropdownOption[]; // Using shared DropdownOption type
   validation?: ValidationRule[];
   condition?: (values: Record<string, any>) => boolean;

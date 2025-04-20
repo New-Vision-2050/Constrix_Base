@@ -1,23 +1,23 @@
-import React, { useCallback, memo } from 'react';
-import { FieldConfig } from '../types/formTypes';
-import { Label } from '@/modules/table/components/ui/label';
-import TextField from './fields/TextField';
-import TextareaField from './fields/TextareaField';
-import CheckboxField from './fields/CheckboxField';
-import RadioField from './fields/RadioField';
-import MultiSelectField from './fields/MultiSelectField';
-import DateField from './fields/DateField';
-import SearchField from './fields/SearchField';
-import PhoneField from './fields/PhoneField';
-import HiddenObjectField from './fields/HiddenObjectField';
-import DynamicRowsField from './fields/DynamicRowsField';
-import ImageField from './fields/ImageField';
-import MultiImageField from './fields/MultiImageField';
-import FileField from './fields/FileField';
-import MultiFileField from './fields/MultiFileField';
-import FieldHelperText from './fields/FieldHelperText';
-import { useFormInstance, useFormStore } from '../hooks/useFormStore';
-import { hasApiValidation, triggerApiValidation } from '../utils/apiValidation';
+import React, { useCallback, memo } from "react";
+import { FieldConfig } from "../types/formTypes";
+import { Label } from "@/modules/table/components/ui/label";
+import TextField from "./fields/TextField";
+import TextareaField from "./fields/TextareaField";
+import CheckboxField from "./fields/CheckboxField";
+import RadioField from "./fields/RadioField";
+import MultiSelectField from "./fields/MultiSelectField";
+import DateField from "./fields/DateField";
+import SearchField from "./fields/SearchField";
+import PhoneField from "./fields/PhoneField";
+import HiddenObjectField from "./fields/HiddenObjectField";
+import DynamicRowsField from "./fields/DynamicRowsField";
+import ImageField from "./fields/ImageField";
+import MultiImageField from "./fields/MultiImageField";
+import FileField from "./fields/FileField";
+import MultiFileField from "./fields/MultiFileField";
+import FieldHelperText from "./fields/FieldHelperText";
+import { useFormInstance, useFormStore } from "../hooks/useFormStore";
+import { hasApiValidation, triggerApiValidation } from "../utils/apiValidation";
 
 interface FormFieldProps {
   field: FieldConfig;
@@ -27,7 +27,10 @@ interface FormFieldProps {
   onChange?: (field: string, value: any) => void;
   onBlur?: (field: string) => void;
   values?: Record<string, any>;
-  stepResponses?: Record<number, { success: boolean; message?: string; data?: Record<string, any> }>;
+  stepResponses?: Record<
+    number,
+    { success: boolean; message?: string; data?: Record<string, any> }
+  >;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
   formId?: string; // Add formId prop to identify which form instance to use
@@ -45,7 +48,7 @@ const FormField: React.FC<FormFieldProps> = ({
   stepResponses,
   getStepResponseData,
   currentStep,
-  formId = 'default', // Use a default form ID if not provided
+  formId = "default", // Use a default form ID if not provided
 }) => {
   // Get the form instance
   const formInstance = useFormInstance(formId);
@@ -56,7 +59,11 @@ const FormField: React.FC<FormFieldProps> = ({
     // Check all previous steps for this field's value
     for (let step = 0; step < currentStep; step++) {
       const stepResponse = stepResponses[step];
-      if (stepResponse && stepResponse.data && stepResponse.data[field.name] !== undefined) {
+      if (
+        stepResponse &&
+        stepResponse.data &&
+        stepResponse.data[field.name] !== undefined
+      ) {
         // Use the value from the previous step's response
         fieldValue = stepResponse.data[field.name];
         break; // Use the most recent value if it appears in multiple steps
@@ -65,30 +72,45 @@ const FormField: React.FC<FormFieldProps> = ({
   }
 
   // Memoize callbacks to prevent recreating them on every render
-  const onChange = useCallback((newValue: any) => {
-    // Call the onChange prop if provided
-    if (propOnChange) {
-      propOnChange(field.name, newValue);
-    }
+  const onChange = useCallback(
+    (newValue: any) => {
+      // Call the onChange prop if provided
+      if (propOnChange) {
+        propOnChange(field.name, newValue);
+      }
 
-    // Run field-specific onChange handler if provided
-    if (field.onChange) {
-      field.onChange(newValue, values);
-    }
+      // Run field-specific onChange handler if provided
+      if (field.onChange) {
+        field.onChange(newValue, values);
+      }
 
-    // Clear any existing errors for this field when the value changes
-    formInstance.setError(field.name, null);
+      // Clear any existing errors for this field when the value changes
+      formInstance.setError(field.name, null);
 
-    // Check if field has API validation rules and trigger validation
-    if (field.validation && hasApiValidation(field.validation)) {
-      field.validation.forEach(rule => {
-        if (rule.type === 'apiValidation') {
-          // Pass the store instance to avoid getState() call in the validation function
-          triggerApiValidation(field.name, newValue, rule, useFormStore.getState());
-        }
-      });
-    }
-  }, [field.name, field.onChange, field.validation, propOnChange, values, formInstance]);
+      // Check if field has API validation rules and trigger validation
+      if (field.validation && hasApiValidation(field.validation)) {
+        field.validation.forEach((rule) => {
+          if (rule.type === "apiValidation") {
+            // Pass the store instance to avoid getState() call in the validation function
+            triggerApiValidation(
+              field.name,
+              newValue,
+              rule,
+              useFormStore.getState()
+            );
+          }
+        });
+      }
+    },
+    [
+      field.name,
+      field.onChange,
+      field.validation,
+      propOnChange,
+      values,
+      formInstance,
+    ]
+  );
 
   const onBlur = useCallback(() => {
     // Call the onBlur prop if provided
@@ -115,10 +137,10 @@ const FormField: React.FC<FormFieldProps> = ({
   // Render different field types
   const renderField = () => {
     switch (field.type) {
-      case 'text':
-      case 'email':
-      case 'password':
-      case 'number':
+      case "text":
+      case "email":
+      case "password":
+      case "number":
         return (
           <TextField
             field={field}
@@ -133,7 +155,7 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-      case 'textarea':
+      case "textarea":
         return (
           <TextareaField
             field={field}
@@ -145,7 +167,7 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-      case 'checkbox':
+      case "checkbox":
         return (
           <CheckboxField
             field={field}
@@ -157,7 +179,7 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-      case 'radio':
+      case "radio":
         return (
           <RadioField
             field={field}
@@ -169,9 +191,7 @@ const FormField: React.FC<FormFieldProps> = ({
           />
         );
 
-
-
-      case 'date':
+      case "date":
         return (
           <DateField
             field={field}
@@ -182,128 +202,145 @@ const FormField: React.FC<FormFieldProps> = ({
             onBlur={onBlur}
           />
         );
-        case 'select':
-          return (
-            <SearchField
-              field={field}
-              value={fieldValue}
-              error={error}
-              touched={touched}
-              onChange={onChange}
-              onBlur={onBlur}
-              dependencyValues={values}
-            />
-          );
-          case 'multiSelect':
-            return (
-              <MultiSelectField
-                field={field}
-                value={Array.isArray(fieldValue) ? fieldValue : []}
-                error={error}
-                touched={touched}
-                onChange={onChange}
-                onBlur={onBlur}
-                dependencyValues={values}
-              />
-            );
+      case "select":
+        return (
+          <SearchField
+            field={field}
+            value={fieldValue}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            dependencyValues={values}
+          />
+        );
+      case "multiSelect":
+        return (
+          <MultiSelectField
+            field={field}
+            value={Array.isArray(fieldValue) ? fieldValue : []}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            dependencyValues={values}
+          />
+        );
 
-          case 'phone':
-            return (
-              <PhoneField
-                field={field}
-                value={fieldValue || ''}
-                error={error}
-                touched={touched}
-                onChange={onChange}
-                onBlur={onBlur}
-              />
-            );
-            
-          case 'hiddenObject':
-            return (
-              <HiddenObjectField
-                field={field}
-                value={fieldValue}
-                onChange={onChange}
-                onBlur={onBlur}
-                values={values}
-              />
-            );
-            case 'dynamicRows':
-              return (
-                <DynamicRowsField
-                  field={field}
-                  value={fieldValue || []}
-                  error={error}
-                  touched={touched}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  formId={formId}
-                />
-              );
-              
-            case 'image':
-              // Use MultiImageField if isMulti is true, otherwise use regular ImageField
-              return field.isMulti ? (
-                <MultiImageField
-                  field={field}
-                  value={Array.isArray(fieldValue) ? fieldValue : (fieldValue ? [fieldValue] : [])}
-                  error={error}
-                  touched={touched}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  formId={formId}
-                />
-              ) : (
-                <ImageField
-                  field={field}
-                  value={fieldValue}
-                  error={error}
-                  touched={touched}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  formId={formId}
-                />
-              );
-              
-            case 'file':
-              // Use MultiFileField if isMulti is true, otherwise use regular FileField
-              return field.isMulti ? (
-                <MultiFileField
-                  field={field}
-                  value={Array.isArray(fieldValue) ? fieldValue : (fieldValue ? [fieldValue] : [])}
-                  error={error}
-                  touched={touched}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  formId={formId}
-                />
-              ) : (
-                <FileField
-                  field={field}
-                  value={fieldValue}
-                  error={error}
-                  touched={touched}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  formId={formId}
-                />
-              );
-  
-            default:
-              return <div>Unsupported field type: {field.type}</div>;
+      case "phone":
+        return (
+          <PhoneField
+            field={field}
+            value={fieldValue || ""}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+          />
+        );
+
+      case "hiddenObject":
+        return (
+          <HiddenObjectField
+            field={field}
+            value={fieldValue}
+            onChange={onChange}
+            onBlur={onBlur}
+            values={values}
+          />
+        );
+      case "dynamicRows":
+        return (
+          <DynamicRowsField
+            field={field}
+            value={fieldValue || []}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            formId={formId}
+          />
+        );
+
+      case "image":
+        // Use MultiImageField if isMulti is true, otherwise use regular ImageField
+        return field.isMulti ? (
+          <MultiImageField
+            field={field}
+            value={
+              Array.isArray(fieldValue)
+                ? fieldValue
+                : fieldValue
+                ? [fieldValue]
+                : []
+            }
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            formId={formId}
+          />
+        ) : (
+          <ImageField
+            field={field}
+            value={fieldValue}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            formId={formId}
+          />
+        );
+
+      case "file":
+        // Use MultiFileField if isMulti is true, otherwise use regular FileField
+        return field.isMulti ? (
+          <MultiFileField
+            field={field}
+            value={
+              Array.isArray(fieldValue)
+                ? fieldValue
+                : fieldValue
+                ? [fieldValue]
+                : []
+            }
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            formId={formId}
+          />
+        ) : (
+          <FileField
+            field={field}
+            value={fieldValue}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            formId={formId}
+          />
+        );
+
+      default:
+        return <div>Unsupported field type: {field.type}</div>;
     }
   };
 
   // For hiddenObject type, just render the field without any wrapper
-  if (field.type === 'hiddenObject') {
+  if (field.type === "hiddenObject") {
     return renderField();
   }
 
   // For checkbox type, the label is already rendered with the checkbox
-  if (field.type === 'checkbox') {
+  if (field.type === "checkbox") {
     return (
-      <div className="mb-4">
+      <div
+        style={{
+          ...(field?.gridArea && { gridColumn: `span ${field.gridArea}` }),
+        }}
+        className="mb-4"
+      >
         {renderField()}
         <FieldHelperText
           error={error}
@@ -316,7 +353,12 @@ const FormField: React.FC<FormFieldProps> = ({
 
   // For all other field types
   return (
-    <div className="mb-4">
+    <div
+      style={{
+        ...(field?.gridArea && { gridColumn: `span ${field.gridArea}` }),
+      }}
+      className="mb-4"
+    >
       <Label htmlFor={field.name} className="block mb-2">
         {field.label}
         {field.required && <span className="text-destructive ml-1">*</span>}
