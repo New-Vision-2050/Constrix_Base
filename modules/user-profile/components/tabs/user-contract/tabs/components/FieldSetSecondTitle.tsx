@@ -33,35 +33,33 @@ type PropsT = {
 export default function FieldSetSecondTitle(props: PropsT) {
   const locale = useLocale();
   const isRTL = locale === "ar";
-  const {
-    mode,
-    handleEditClick,
-    dropdownItems,
-    settingsBtn
-  } = props;
+  const { mode, handleEditClick, dropdownItems, settingsBtn } = props;
 
   return (
     <div className="flex items-center justify-center gap-1">
-      {!!settingsBtn ?     
+      {!!settingsBtn && (
         <IconBtnDropdown
-        icon={settingsBtn?.icon ?? <SettingsIcon />}
-        items={settingsBtn?.items ?? []}
-      /> :      
+          icon={settingsBtn?.icon ?? <SettingsIcon />}
+          items={settingsBtn?.items ?? []}
+        />
+      )}
+      {!!dropdownItems && (
         <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost">
-            <SettingsIcon />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          {dropdownItems.map((item, index) => (
-            <DropdownMenuItem key={index} onClick={() => item.onClick()}>
-              {item.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu> }
-        <Button variant={"ghost"} onClick={handleEditClick}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <SettingsIcon />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {dropdownItems.map((item, index) => (
+              <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                {item.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+      <Button variant={"ghost"} onClick={handleEditClick}>
         {mode === "Preview" ? (
           <PencilLineIcon additionalClass="text-pink-600" />
         ) : (
