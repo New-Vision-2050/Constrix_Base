@@ -1,11 +1,14 @@
 import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
-import { useUserDashboardCxt } from "../../context/user-dashboard-cxt";
 import LoadingMenuData from "../LoadingMenuData";
 import { useEffect, useState } from "react";
+import { UserProfileData } from "../../types/user-profile-response";
 
-export default function UserProfilePersonalData() {
-  const { user, isLoading } = useUserDashboardCxt();
+type PropsT = {
+  user: UserProfileData | undefined;
+  isLoading: boolean;
+};
+export default function UserProfilePersonalData({user, isLoading}:PropsT) {
   const [items, setItems] = useState<string[]>([]);
 
   // handle side effects
@@ -13,7 +16,7 @@ export default function UserProfilePersonalData() {
     if (user) {
       const userItems = [
         `الاسم: ${user.name}`,
-        `حالة الموظف: ${'--'}`,
+        `حالة الموظف: ${"--"}`,
         `المهنة: ${user.job_title}`,
         `الدور الوظيفي: ${user.Job_role}`,
         `التواصل: ${user.phone}`,

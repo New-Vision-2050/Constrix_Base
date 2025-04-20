@@ -22,4 +22,5 @@ export type UserProfileData = {
   other_phone: string;
   address: string;
   address_attendance: string;
+  image_url: string;
 };

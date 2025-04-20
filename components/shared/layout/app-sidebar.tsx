@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
-import { NavCompanies } from "@/components/shared/layout/nav-companies";
+// import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +18,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
+import InboxIcon from "@/public/icons/inbox-icon";
+import { SidebarProgramsList } from "./sidebar-programs";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isCentral: boolean;
@@ -41,6 +43,38 @@ export function AppSidebar({
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
 
+  // grouped routes in sidebar
+  const settingsRoutesNames = [
+    ROUTER.SETTINGS,
+    ROUTER.DASHBOARD,
+    ROUTER.USER_PROFILE,
+  ];
+  const settingsRoutes = {
+    name: t("Sidebar.Settings"),
+    icon: SettingsIcon,
+    isActive: settingsRoutesNames.indexOf(pageName) !== -1,
+    submenu: [
+      {
+        name: t("Sidebar.UserProfileSettings"),
+        url: ROUTER.USER_PROFILE,
+        icon: UserIcon,
+        isActive: pageName === ROUTER.USER_PROFILE,
+      },
+      {
+        name: t("Sidebar.DashboardSettings"),
+        url: ROUTER.DASHBOARD,
+        icon: InboxIcon,
+        isActive: pageName === ROUTER.DASHBOARD,
+      },
+      {
+        name: t("Sidebar.SystemSettings"),
+        url: ROUTER.SETTINGS,
+        icon: InboxIcon,
+        isActive: pageName === ROUTER.SETTINGS,
+      },
+    ],
+  };
+
   // This is sample data with translated names
 
   const projects = isCentral
@@ -57,27 +91,10 @@ export function AppSidebar({
           icon: UserIcon,
           isActive: pageName === ROUTER.USERS,
         },
-        {
-          name: t("Sidebar.Settings"),
-          url: ROUTER.SETTINGS,
-          icon: SettingsIcon,
-          isActive: pageName === ROUTER.SETTINGS,
-        },
+        settingsRoutes,
       ]
-    : [
-        {
-          name: t("Sidebar.Dashboard"),
-          url: ROUTER.DASHBOARD,
-          icon: CompaniesIcon,
-          isActive: pageName === ROUTER.DASHBOARD,
-        },
-        {
-          name: t("Sidebar.Settings"),
-          url: ROUTER.SETTINGS,
-          icon: SettingsIcon,
-          isActive: pageName === ROUTER.SETTINGS,
-        },
-      ];
+    : [settingsRoutes];
+
   const data = {
     user: {
       name: "shadcn",
@@ -111,7 +128,8 @@ export function AppSidebar({
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        <NavCompanies projects={data.projects} />
+        <SidebarProgramsList projects={data.projects} />
+        {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <SidebarFooterContent />

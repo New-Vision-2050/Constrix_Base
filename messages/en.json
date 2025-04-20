@@ -118,7 +118,10 @@
     "Dashboard": "Profile",
     "Companies": "Companies",
     "Users": "Users",
-    "settings": "System Settings",
+    "Settings": "Settings",
+    "SystemSettings": "System Settings",
+    "DashboardSettings": "Dashboard Setting",
+    "UserProfileSettings": "User Profile Settings",
     "Welcome": "Hello",
     "CompanyName": "New Vision"
   },

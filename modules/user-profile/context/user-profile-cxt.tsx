@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import useUserProfileData from "../hooks/useUserProfileData";
 import { UserProfileData } from "../types/user-profile-response";
 
@@ -12,6 +12,7 @@ import { UserProfileData } from "../types/user-profile-response";
 type UserProfileCxtType = {
   isLoading: boolean;
   user: UserProfileData | undefined;
+  handleUpdateImage: (imgUrl: string) => void;
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -35,13 +36,18 @@ export const UserProfileCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { data: user, isLoading } = useUserProfileData();
-
-  console.log("useUserProfileData_user", user);
+  const { data: _user, isLoading } = useUserProfileData();
+  const [user, setUser] = useState<UserProfileData>();
 
   // ** handle side effects
+  useEffect(() => {
+    if (_user) setUser(_user);
+  }, [_user]);
 
   // ** declare and define component helper methods
+  const handleUpdateImage = (imgUrl: string) => {
+    if (user) setUser({ ...user, image_url: imgUrl });
+  };
 
   // ** return component ui
   return (
@@ -50,6 +56,7 @@ export const UserProfileCxtProvider = ({
         // user data
         user,
         isLoading,
+        handleUpdateImage,
       }}
     >
       {children}
