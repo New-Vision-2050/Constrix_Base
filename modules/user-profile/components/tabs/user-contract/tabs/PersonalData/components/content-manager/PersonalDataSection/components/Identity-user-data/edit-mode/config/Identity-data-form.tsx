@@ -58,10 +58,12 @@ export const IdentityDataFormConfig = () => {
           {
             label: "ارفاق الهوية",
             type: "image",
+            isMulti: true,
             name: "file_identity",
             placeholder: "رقم جواز السفر",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {
@@ -91,6 +93,7 @@ export const IdentityDataFormConfig = () => {
         `/company-users/identity-data`,
         serialize(body)
       );
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

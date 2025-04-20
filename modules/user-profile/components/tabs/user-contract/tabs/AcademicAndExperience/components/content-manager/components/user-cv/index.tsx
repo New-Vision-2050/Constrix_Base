@@ -5,6 +5,7 @@ import PdfViewer from "./PdfViewer";
 import UploadCvDialog from "./UploadCvDialog";
 import { useState } from "react";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
+import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 
 export default function UserCV() {
   const [open, setOpen] = useState(false);
@@ -23,7 +24,14 @@ export default function UserCV() {
           </Button>
         }
       >
-        {userCV?.files && <PdfViewer src={userCV?.files ?? ""} />}
+        {userCV?.files ? (
+          <PdfViewer src={userCV?.files ?? ""} />
+        ) : (
+          <NoDataFounded
+            title="لا يوجد بيانات"
+            subTitle="لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية"
+          />
+        )}
       </FormFieldSet>
       <UploadCvDialog open={open} setOpen={setOpen} />
     </div>

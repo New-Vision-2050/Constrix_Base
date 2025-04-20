@@ -150,6 +150,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

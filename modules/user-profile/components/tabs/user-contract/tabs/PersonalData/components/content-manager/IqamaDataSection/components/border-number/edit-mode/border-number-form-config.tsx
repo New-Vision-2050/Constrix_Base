@@ -41,6 +41,7 @@ export const BorderNumberFormConfig = () => {
             placeholder: "ارفاق رقم الحدود",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

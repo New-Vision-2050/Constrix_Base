@@ -126,6 +126,7 @@ export const PrivilegeItemFormConfig = ({
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

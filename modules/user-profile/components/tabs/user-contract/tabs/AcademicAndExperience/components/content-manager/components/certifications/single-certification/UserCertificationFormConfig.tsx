@@ -114,6 +114,7 @@ export const UserCertificationFormConfig = ({
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

@@ -155,6 +155,7 @@ export const QualificationFormConfig = ({
             placeholder: "ارفاق شهادة",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

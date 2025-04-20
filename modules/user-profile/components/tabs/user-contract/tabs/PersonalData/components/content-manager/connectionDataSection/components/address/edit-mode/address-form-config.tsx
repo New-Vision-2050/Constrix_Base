@@ -31,6 +31,7 @@ export const AddressFormConfig = () => {
             placeholder: "العنوان البريدي",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

@@ -5,7 +5,7 @@ import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalData
 export const PersonalDataFormConfig = () => {
   const { userPersonalData } = usePersonalDataTabCxt();
   const PersonalFormConfig: FormConfig = {
-    formId: "personal-data-form",
+    formId: `personal-data-form`,
     title: "البيانات الشخصية",
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
@@ -103,6 +103,7 @@ export const PersonalDataFormConfig = () => {
             ],
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

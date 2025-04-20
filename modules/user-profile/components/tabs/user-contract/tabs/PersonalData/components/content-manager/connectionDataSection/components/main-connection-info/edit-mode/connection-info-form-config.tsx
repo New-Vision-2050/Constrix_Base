@@ -53,6 +53,7 @@ export const ConnectionInformationFormConfig = () => {
             placeholder: "رقم الهاتف الأرضي",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {
