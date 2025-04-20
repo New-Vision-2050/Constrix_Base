@@ -51,14 +51,6 @@ echo "Cleaning previous build artifacts..."
 rm -rf .next
 rm -rf node_modules/.cache
 
-# Install dependencies and build
-echo "Installing dependencies..."
-yarn install
-
-echo "Building with cache bust: $CACHEBUST..."
-# Add CACHEBUST to the build command to ensure it's used in the build process
-NEXT_PUBLIC_CACHE_BUST=$CACHEBUST yarn build
-
 cd "$DEPLOY_DIR/devops"
 
 #RUN chmod +x entrypoint.sh

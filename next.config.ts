@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
   images: {
      domains: ['constrix.fra1.digitaloceanspaces.com'],
   },
+   output: 'standalone',
 };
 const withNextIntl = createNextIntlPlugin();
 

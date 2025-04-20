@@ -1,8 +1,8 @@
 # Use an official Node runtime as a parent image
-FROM node:22-alpine
-
+FROM node:22-alpine AS builder
 RUN apk add --no-cache yarn
-
+COPY . .
+RUN yarn install && yarn build
 WORKDIR /app
 
 # Declare build arguments
@@ -16,22 +16,13 @@ ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
 # when the CACHEBUST value changes
 RUN echo "Cache bust: ${CACHEBUST}"
 
-# Copy built artifacts
-COPY ./.next ./.next
-COPY ./public ./public
-COPY ./package.json ./package.json
-COPY ./yarn.lock ./yarn.lock
-COPY ./.env ./.env
-
+# Copy only the necessary files from the build
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/static ./.next/static
 # Clean up any previous deployment artifacts
 RUN rm -rf ../${DEPLOYMENT_ID}
 
-# Install only production dependencies
-RUN yarn install --only=production
-
-# Add another cache busting step to ensure the final image is fresh
-RUN echo "Final cache bust: ${CACHEBUST}"
-
+ENV PORT 3000
 EXPOSE 3000
-
-CMD ["yarn", "start"]
+CMD ["node", "server.js"]
