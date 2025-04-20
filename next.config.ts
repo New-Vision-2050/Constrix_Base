@@ -21,9 +21,9 @@ const nextConfig: NextConfig = {
     // This ensures that the server always re-renders pages
     optimizeCss: false
   },
-    images: {
-        domains: ['82.112.241.33','s3.constrix-nv.com'],
-    },
+  images: {
+     domains: ['s3.constrix-nv.com','82.112.241.33'],
+  },
 };
 const withNextIntl = createNextIntlPlugin();
 
