@@ -1,11 +1,12 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
+import { serialize } from "object-to-formdata";
 
 export const LegalDataAddReqFormEditConfig = (id?: string) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const LegalDataAddReqFormEditConfig: FormConfig = {
-    formId: "company-official-data-form",
+    formId: `company-official-data-form-${id}`,
     title: "اضافة بيان قانوني",
     apiUrl: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
     laravelValidation: {
@@ -102,6 +103,8 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const obj = {
         registration_type_id: formData.registration_type_id,
         regestration_number: formData.regestration_number,
@@ -110,9 +113,12 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
         file: formData.file,
       };
 
-      const response = await apiClient.postForm(
+      const newFormData = serialize(obj);
+
+      const response = await apiClient.post(
         "companies/company-profile/legal-data/create-legal-data",
-        obj
+        newFormData,
+        config
       );
 
       if (response.status === 200) {

@@ -52,6 +52,9 @@ export interface CompanyAddress {
   id: string;
   company_id: string;
   country_id: string;
+  country_iso2: string;
+  country_lat: string;
+  country_long: string;
   city_id: string | null;
   state_id: string | null;
   neighborhood_name: string | null;

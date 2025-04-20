@@ -1,16 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
-import { useQueryClient } from "@tanstack/react-query";
 
 export const LegalDataReqFormEditConfig = (
   companyLegalData: CompanyLegalData[],
   id?: string
 ) => {
-  const queryClient = useQueryClient();
-
+  console.log("id in LegalDataReqFormEditConfig : ", id);
   const LegalDataReqFormEditConfig: FormConfig = {
-    formId: "company-official-data-form",
+    formId: `LegalDataReqFormEditConfig-${id}`,
     title: "طلب تعديل البيان القانوني",
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
@@ -76,14 +74,21 @@ export const LegalDataReqFormEditConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const obj = formData?.data.map((obj: any) => ({
         id: obj.id,
         registration_type_id: obj.registration_type_id,
         registration_number: obj.registration_number,
       }));
-      await apiClient.post("companies/company-profile/legal-data/request", {
-        data: obj,
-      });
+
+      await apiClient.post(
+        "companies/company-profile/legal-data/request",
+        {
+          data: obj,
+        },
+        config
+      );
       return {
         success: true,
         message: "dummy return",

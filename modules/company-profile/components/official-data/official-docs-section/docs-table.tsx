@@ -29,7 +29,7 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
 
   return (
     <>
-      <tr key={doc.id}>
+      <tr>
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2">
             <FolderIcon />
@@ -54,7 +54,7 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
             <SheetFormBuilder
-              config={updateDocsFormConfig(doc)}
+              config={updateDocsFormConfig(doc, id)}
               trigger={
                 <button className="py-1 px-3 bg-[#72E128]/20 text-[#72E128] rounded-full">
                   تحديث
@@ -70,7 +70,9 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
 
       {/* Delete dialog specific to this row */}
       <DeleteConfirmationDialog
-        deleteUrl={`${baseURL}/companies/company-profile/official-document/${doc.id}`}
+        deleteUrl={`${baseURL}/companies/company-profile/official-document/${
+          doc.id
+        }${id && `?branch_id=${id}`}`}
         onClose={handleCloseDelete}
         open={isOpenDelete}
         onSuccess={() => {
@@ -96,8 +98,10 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
 // Main table component
 const DocsTable = ({
   companyOfficialDocuments,
+  id,
 }: {
   companyOfficialDocuments: CompanyDocument[];
+  id?: string;
 }) => {
   return (
     <table className="w-full border-collapse">
@@ -116,7 +120,7 @@ const DocsTable = ({
       </thead>
       <tbody>
         {companyOfficialDocuments.map((doc) => (
-          <DocTableRow key={doc.id} doc={doc} />
+          <DocTableRow key={doc.id} doc={doc} id={id} />
         ))}
       </tbody>
     </table>

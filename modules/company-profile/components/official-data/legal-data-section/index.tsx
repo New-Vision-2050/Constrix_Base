@@ -21,10 +21,12 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 
 const LegalDataSection = ({
   companyLegalData = [],
+  id,
 }: {
   companyLegalData: CompanyLegalData[];
+  id?: string;
 }) => {
-
+  console.log("id in legal data section: ", id);
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -76,7 +78,7 @@ const LegalDataSection = ({
             )}
           </>
         ) : (
-          <LegalDataForm  companyLegalData={companyLegalData}/>
+          <LegalDataForm companyLegalData={companyLegalData} id={id} />
         )}
       </FormFieldSet>
 
@@ -95,13 +97,13 @@ const LegalDataSection = ({
         </SheetContent>
 
         <SheetFormBuilder
-          config={LegalDataReqFormEditConfig(companyLegalData)}
+          config={LegalDataReqFormEditConfig(companyLegalData, id)}
           isOpen={isOpenReqForm}
           onOpenChange={handleCloseReqForm}
         />
 
         <SheetFormBuilder
-          config={LegalDataAddReqFormEditConfig()}
+          config={LegalDataAddReqFormEditConfig(id)}
           isOpen={isOpenMyForm}
           onOpenChange={handleCloseMyForm}
         />

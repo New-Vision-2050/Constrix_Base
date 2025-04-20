@@ -144,7 +144,13 @@ export const NationalAddressFormConfig = (
             label: "تعديل الموقع من الخريطة",
             name: "map",
             type: "text",
-            render: () => <PickupMap formId={formId} />,
+            render: () => (
+              <PickupMap
+                formId={formId}
+                lat={companyAddress.country_lat}
+                long={companyAddress.country_long}
+              />
+            ),
           },
         ],
       },
@@ -169,6 +175,8 @@ export const NationalAddressFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const obj = {
         country_id: formData.country_id,
         state_id: formData.state_id,
@@ -182,7 +190,8 @@ export const NationalAddressFormConfig = (
 
       const response = await apiClient.put(
         `companies/company-profile/national-address/${companyAddress.id}`,
-        obj
+        obj,
+        config
       );
 
       if (response.status === 200) {

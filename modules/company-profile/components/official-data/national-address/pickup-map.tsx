@@ -10,7 +10,15 @@ import { MapPin } from "lucide-react";
 import React from "react";
 import LocationSelector from "./map-dialog";
 
-const PickupMap = ({ formId }: { formId: string }) => {
+const PickupMap = ({
+  formId,
+  lat,
+  long,
+}: {
+  formId: string;
+  lat: string;
+  long: string;
+}) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue } = useFormStore();
   //   setValue(formId , 'street_name' , 'aaaaaaaaa')
@@ -46,7 +54,13 @@ const PickupMap = ({ formId }: { formId: string }) => {
               تعديل احداثيات موقع العنوان الوطني
             </DialogTitle>
           </DialogHeader>
-          <LocationSelector onSave={handleSaveMap} />
+          <LocationSelector
+            onSave={handleSaveMap}
+            initialLocation={{
+              latitude: parseFloat(lat),
+              longitude: parseFloat(long),
+            }}
+          />
         </DialogContent>
       </Dialog>
     </>

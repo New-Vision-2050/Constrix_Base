@@ -7,7 +7,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
   const queryClient = useQueryClient();
 
   const updateDocsFormConfig: FormConfig = {
-    formId: `updateDocsFormConfig${doc.id}`,
+    formId: `updateDocsFormConfig-${doc.id}-${id}`,
     title: "تحديث مستند رسمي",
     laravelValidation: {
       enabled: true,
@@ -130,6 +130,8 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const pastFiles = doc.files;
       const serverFiles: number[] = formData.files
         .filter((file: any) => !(file instanceof File))
@@ -155,7 +157,8 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
 
       const response = await apiClient.postForm(
         `companies/company-profile/official-document/update/${doc.id}`,
-        obj
+        obj,
+        config
       );
 
       if (response.status === 200) {

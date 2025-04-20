@@ -67,14 +67,15 @@ const OfficialData = ({ id }: { id?: string }) => {
             id={id}
           />
 
-          <LegalDataSection companyLegalData={company_legal_data} />
+          <LegalDataSection companyLegalData={company_legal_data} id={id} />
 
           <SupportData generalManager={general_manager} />
 
-          <NationalAddress companyAddress={company_address} />
+          <NationalAddress companyAddress={company_address} id={id}  />
 
           <OfficialDocsSection
             companyOfficialDocuments={company_official_documents}
+            id={id}
           />
         </>
       )}

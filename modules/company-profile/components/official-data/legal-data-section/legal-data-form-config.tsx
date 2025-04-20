@@ -9,7 +9,7 @@ export const LegalDataFormConfig = (
 ) => {
   const queryClient = useQueryClient();
   const LegalDataFormConfig: FormConfig = {
-    formId: "company-official-data-form",
+    formId: `company-official-data-form-${id}`,
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -108,6 +108,8 @@ export const LegalDataFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const obj = formData.data.map((obj: any) => ({
         start_date: obj.start_date,
         end_date: obj.end_date,
@@ -117,7 +119,8 @@ export const LegalDataFormConfig = (
 
       const response = await apiClient.postForm(
         "companies/company-profile/legal-data/update",
-        { data: obj }
+        { data: obj },
+        config
       );
 
       if (response.status === 200) {

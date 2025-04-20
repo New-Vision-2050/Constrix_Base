@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import { Toaster } from "@/modules/table/components/ui/toaster";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { cookies } from "next/headers";
+import { cn } from "@/lib/utils";
 
 const theSans = localFont({
   src: [
@@ -69,7 +70,7 @@ export default async function RootLayout({
       dir={locale === "ar" ? "rtl" : "ltr"}
       suppressHydrationWarning
     >
-      <body className={theSans.variable}>
+      <body className={cn(theSans.variable, "!pointer-events-auto")}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

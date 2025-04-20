@@ -6,7 +6,7 @@ export const AddDocFormConfig = (id?: string) => {
   const queryClient = useQueryClient();
 
   const AddDocFormConfig: FormConfig = {
-    formId: "AddDocFormConfig",
+    formId: `AddDocFormConfig-${id}`,
     title: "اضافة مستند رسمي",
     laravelValidation: {
       enabled: true,
@@ -43,12 +43,24 @@ export const AddDocFormConfig = (id?: string) => {
             label: "الوصف",
             type: "text",
             placeholder: "ادخل الوصف",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل الوصف",
+              },
+            ],
           },
           {
             name: "document_number",
             label: "رقم المستند",
             type: "text",
             placeholder: "ادخل رقم المستند",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل رقم المستند",
+              },
+            ],
           },
           {
             name: "start_date",
@@ -126,6 +138,8 @@ export const AddDocFormConfig = (id?: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const response = await apiClient.postForm(
         "companies/company-profile/official-document",
         {
@@ -135,7 +149,8 @@ export const AddDocFormConfig = (id?: string) => {
           notification_date: new Date(formData.notification_date)
             .toISOString()
             .split("T")[0],
-        }
+        },
+        config
       );
 
       if (response.status === 200) {

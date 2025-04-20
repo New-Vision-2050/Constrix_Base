@@ -11,12 +11,14 @@ import { CompanyAddress } from "@/modules/company-profile/types/company";
 
 const NationalAddress = ({
   companyAddress,
+  id,
 }: {
   companyAddress: CompanyAddress;
+  id?: string;
 }) => {
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
-  console.log({companyAddress})
+  console.log({ companyAddress });
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
@@ -47,7 +49,7 @@ const NationalAddress = ({
           )}
         </>
       ) : (
-        <NationalAddressForm  companyAddress={companyAddress}/>
+        <NationalAddressForm companyAddress={companyAddress} id={id} />
       )}
     </FormFieldSet>
   );

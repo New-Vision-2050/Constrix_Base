@@ -3,8 +3,14 @@ import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/em
 import { LegalDataFormConfig } from "./legal-data-form-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 
-const LegalDataForm = ({companyLegalData}:{companyLegalData:CompanyLegalData[]}) => {
-  const config = LegalDataFormConfig(companyLegalData);
+const LegalDataForm = ({
+  companyLegalData,
+  id,
+}: {
+  companyLegalData: CompanyLegalData[];
+  id?: string;
+}) => {
+  const config = LegalDataFormConfig(companyLegalData, id);
   return <FormContent config={config} />;
 };
 
