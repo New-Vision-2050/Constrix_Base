@@ -10,7 +10,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
     try {
       await navigator.clipboard.writeText(text);
       alert("تم النسخ!");
-    } catch (err) {
+    } catch {
       alert("Failed to copy!");
       console.error("فشل النسخ");
     }
