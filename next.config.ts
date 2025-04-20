@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
     optimizeCss: false
   },
     images: {
-        domains: ['82.112.241.33'],
+        domains: ['82.112.241.33','s3.constrix-nv.com'],
     },
 };
 const withNextIntl = createNextIntlPlugin();
