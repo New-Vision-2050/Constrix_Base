@@ -13,9 +13,18 @@ import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
 import { useTableInstance } from "@/modules/table/store/useTableStore";
-import {FormConfig, SheetFormBuilder} from "@/modules/form-builder";
+import { FormConfig, SheetFormBuilder } from "@/modules/form-builder";
+import PencilLineIcon from "@/public/icons/pencil-line";
+import { useRouter } from "next/navigation";
 
-const Execution = ({ id ,formConfig}: { id: string,formConfig: FormConfig }) => {
+const Execution = ({
+  id,
+  formConfig,
+}: {
+  id: string;
+  formConfig: FormConfig;
+}) => {
+  const router = useRouter();
   const [isOpen, handleOpen, handleClose] = useModal();
   const [isOpenEdit, handleOpenEdit, handleCloseEdit] = useModal();
 
@@ -30,20 +39,27 @@ const Execution = ({ id ,formConfig}: { id: string,formConfig: FormConfig }) => 
       func: () => console.log(id),
     },
     {
+      label: t("Companies.completeProfileData"),
+      icon: <PencilLineIcon additionalClass="w-4 h-4 me-2 text-primary" />,
+      func: () => {
+        router.push(`/user-profile?id=${id}`);
+      },
+    },
+    {
       label: t("Companies.PackageSettings"),
       icon: <GearIcon className="w-4 h-4 me-2" />,
       func: () => null,
     },
-      {
-          label: t("Companies.Edit"),
-          icon: <TrashIcon className="w-4 h-4 me-2" />,
-          func: handleOpenEdit,
-      },
+    {
+      label: t("Companies.Edit"),
+      icon: <TrashIcon className="w-4 h-4 me-2" />,
+      func: handleOpenEdit,
+    },
     {
       label: t("Companies.Delete"),
       icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: handleOpen,
-    }
+    },
   ];
 
   return (
@@ -74,7 +90,15 @@ const Execution = ({ id ,formConfig}: { id: string,formConfig: FormConfig }) => 
       />
       <SheetFormBuilder
         recordId={id}
-        config={formConfig?.isEditMode ? formConfig : {...formConfig, isEditMode:true,editApiUrl:formConfig.apiUrl+'/:id'}}
+        config={
+          formConfig?.isEditMode
+            ? formConfig
+            : {
+                ...formConfig,
+                isEditMode: true,
+                editApiUrl: formConfig.apiUrl + "/:id",
+              }
+        }
         isOpen={isOpenEdit}
         onOpenChange={handleCloseEdit}
       />

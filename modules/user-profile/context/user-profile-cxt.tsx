@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 // types
 import type { ReactNode } from "react";
 
@@ -41,19 +43,17 @@ export const useUserProfileCxt = () => {
   return context;
 };
 
-export const UserProfileCxtProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+type PropsT = { children: ReactNode };
+export const UserProfileCxtProvider = ({ children }: PropsT) => {
   // ** declare and define component state and variables
+  const searchParams = useSearchParams();
+  const userId = searchParams.get("id");
   const [user, setUser] = useState<UserProfileData>();
   const { data: _user, isLoading } = useUserProfileData();
   const { data: userDataStatus, refetch: refetchDataStatus } =
-    useProfileDataStatus(_user?.user_id ?? "");
-  const { data: widgetData } = useProfileWidgetData(_user?.user_id ?? "");
+    useProfileDataStatus((userId || _user?.user_id) ?? "");
+  const { data: widgetData } = useProfileWidgetData((userId || _user?.user_id) ?? "");
 
-  console.log("userDataStatus", userDataStatus);
 
   // ** handle side effects
   useEffect(() => {

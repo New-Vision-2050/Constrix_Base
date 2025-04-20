@@ -5,6 +5,7 @@ import UserProfileHeader from "../components/profile-header";
 import StatisticsCardsSection from "../components/statistics-cards";
 import { UserProfileCxtProvider } from "../context/user-profile-cxt";
 
+
 export default function UserProfileModule() {
   return (
     <UserProfileCxtProvider>
