@@ -1,7 +1,41 @@
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 import ContractStatusProgressBar from "./Card-Progress-Bar";
+import { ProfileWidgetContract } from "@/modules/user-profile/types/profile-widgets";
+import { useEffect, useState } from "react";
 
-export default function ContractStatusCardContent() {
+type PropsT = {
+  contractData?: ProfileWidgetContract;
+};
+
+export default function ContractStatusCardContent({ contractData }: PropsT) {
+  // declare and define helper state and variables
+  const [passedPercentage, setPassedPercentage] = useState<number>();
+
+  // handle side effects
+  useEffect(() => {
+    if (contractData) {
+      const today = new Date();
+      const startDate = new Date(contractData?.start_date ?? "");
+      const endDate = new Date(contractData?.end_date ?? "");
+
+      const now =
+        today < startDate ? startDate : today > endDate ? endDate : today;
+
+      const totalDuration = endDate.getTime() - startDate.getTime();
+      const passedDuration = now.getTime() - startDate.getTime();
+
+      const _passedPercentage = Math.min(
+        100,
+        Math.max(0, (passedDuration / totalDuration) * 100)
+      );
+
+      setPassedPercentage(_passedPercentage);
+    }
+  }, [contractData]);
+
+  console.log(`Rate Passed: ${passedPercentage}%`);
+
+  // declare and define
   return (
     <div className="flex flex-col gap-4 mt-4">
       <div className="flex items-center justify-between">
@@ -13,8 +47,10 @@ export default function ContractStatusCardContent() {
             </div>
             <span className="text-sm">بداية العقد</span>
           </div>
-          <span className="text-lg font-semibold ">23.5%</span>
-          <span className="text-sm ">20/02/2020</span>
+          <span className="text-lg font-semibold ">
+            {passedPercentage && `${passedPercentage?.toFixed(1)} %`}
+          </span>
+          <span className="text-sm ">{contractData?.start_date}</span>
         </div>
 
         {/* Divider */}
@@ -30,12 +66,15 @@ export default function ContractStatusCardContent() {
               <CalendarRangeIcon additionalClass="text-yellow-500 w-[15px]" />
             </div>
           </div>
-          <span className="text-lg font-semibold">23.5%</span>
-          <span className="text-sm">20/02/2020</span>
+          <span className="text-lg font-semibold">
+            {passedPercentage &&
+              `${(100 - (passedPercentage ?? 0))?.toFixed(1)} %`}
+          </span>
+          <span className="text-sm">{contractData?.end_date}</span>
         </div>
       </div>
       {/* Progress Bar */}
-      <ContractStatusProgressBar />
+      <ContractStatusProgressBar value={passedPercentage ?? 1} />
     </div>
   );
 }

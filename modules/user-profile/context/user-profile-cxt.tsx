@@ -9,6 +9,8 @@ import useUserProfileData from "../hooks/useUserProfileData";
 import { UserProfileData } from "../types/user-profile-response";
 import useProfileDataStatus from "../hooks/useProfileDataStatus";
 import { ProfileDataStatus } from "../types/profile-data-status";
+import useProfileWidgetData from "../hooks/useProfileWidgetData";
+import { ProfileWidgetData } from "../types/profile-widgets";
 
 // declare context types
 type UserProfileCxtType = {
@@ -19,6 +21,9 @@ type UserProfileCxtType = {
   // data status
   userDataStatus: ProfileDataStatus | undefined;
   handleRefetchDataStatus: () => void;
+
+  // widgets data
+  widgetData: ProfileWidgetData | undefined;
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -46,6 +51,7 @@ export const UserProfileCxtProvider = ({
   const { data: _user, isLoading } = useUserProfileData();
   const { data: userDataStatus, refetch: refetchDataStatus } =
     useProfileDataStatus(_user?.user_id ?? "");
+  const { data: widgetData } = useProfileWidgetData(_user?.user_id ?? "");
 
   console.log("userDataStatus", userDataStatus);
 
@@ -75,6 +81,9 @@ export const UserProfileCxtProvider = ({
         // user data status
         userDataStatus,
         handleRefetchDataStatus,
+
+        // widgetData
+        widgetData,
       }}
     >
       {children}

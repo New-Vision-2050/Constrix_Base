@@ -1,8 +1,19 @@
-export default function ContractStatusHeader() {
+import { ProfileWidgetContract } from "@/modules/user-profile/types/profile-widgets";
+
+type PropsT = {
+  contractData?: ProfileWidgetContract;
+};
+
+export default function ContractStatusHeader({ contractData }: PropsT) {
+  // declare and define helper variables
+  const salary = +(contractData?.user_salary??"0");
+  const formattedSalary = (salary / 1000).toFixed(1) + "k ريال";
+
+  // return component ui
   return (
     <div className="flex flex-col">
       <span className=" text-sm font-medium">حالة العقد</span>
-      <span className="text-xl font-bold">42.5k ريال</span>
+      <span className="text-xl font-bold">{formattedSalary}</span>
     </div>
   );
 }
