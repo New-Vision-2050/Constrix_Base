@@ -46,9 +46,15 @@ type PropsT = {
 
 export const GetPersonalDataSections = (props: PropsT) => {
   const { handleChangeActiveSection } = props;
-  const { userDataStatus } = useUserProfileCxt();
+  const { user, userDataStatus } = useUserProfileCxt();
 
-  return PersonalDataSections?.map((btn) => ({
+  const identity = user?.country?.id === user?.company?.country_id;
+
+  return PersonalDataSections?.filter((ele) => {
+    if (ele.id !== "contract-tab-iqama-data-section") return true;
+
+    return !identity;
+  })?.map((btn) => ({
     ...btn,
     valid: btn?.type
       ? userDataStatus?.[btn?.type as keyof typeof userDataStatus]
