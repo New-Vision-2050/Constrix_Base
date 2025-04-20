@@ -101,7 +101,15 @@ export function AppSidebar({
         plan: "Free",
       },
     ],
-    projects,
+    projects: [
+      ...projects,
+      {
+        name: "ملف الشركة",
+        url: ROUTER.COMPANY_PROFILE,
+        icon: CompaniesIcon,
+        isActive: pageName === ROUTER.COMPANY_PROFILE,
+      },
+    ],
   };
 
   return (
