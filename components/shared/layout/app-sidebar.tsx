@@ -74,6 +74,19 @@ export function AppSidebar({
       },
     ],
   };
+  const companyProfile = {
+    name: "ملف الشركة",
+    icon: CompaniesIcon,
+    isActive: [ROUTER.COMPANY_PROFILE].indexOf(pageName) !== -1,
+    submenu: [
+      {
+        name: "اعداد ملف الشركة",
+        url: ROUTER.COMPANY_PROFILE,
+        icon: CompaniesIcon,
+        isActive: pageName === ROUTER.COMPANY_PROFILE,
+      },
+    ],
+  };
 
   // This is sample data with translated names
 
@@ -92,8 +105,9 @@ export function AppSidebar({
           isActive: pageName === ROUTER.USERS,
         },
         settingsRoutes,
+        companyProfile,
       ]
-    : [settingsRoutes];
+    : [settingsRoutes, companyProfile];
 
   const data = {
     user: {
@@ -118,15 +132,7 @@ export function AppSidebar({
         plan: "Free",
       },
     ],
-    projects: [
-      ...projects,
-      {
-        name: "ملف الشركة",
-        url: ROUTER.COMPANY_PROFILE,
-        icon: CompaniesIcon,
-        isActive: pageName === ROUTER.COMPANY_PROFILE,
-      },
-    ],
+    projects: [...projects],
   };
 
   return (
