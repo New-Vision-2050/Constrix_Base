@@ -22,7 +22,6 @@ COPY ./public ./public
 COPY ./package.json ./package.json
 COPY ./yarn.lock ./yarn.lock
 COPY ./.env ./.env
-COPY ./next.config.js ./next.config.js
 
 # Clean up any previous deployment artifacts
 RUN rm -rf ../${DEPLOYMENT_ID}
