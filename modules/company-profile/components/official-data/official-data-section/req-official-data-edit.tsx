@@ -3,10 +3,12 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import useCompanyStore from "../../../store/useCompanyOfficialData";
 import { officialData } from "@/modules/company-profile/types/company";
 
-export const ReqOfficialDataEdit = (officialData: officialData) => {
-  const { company } = useCompanyStore();
+export const ReqOfficialDataEdit = (
+  officialData: officialData,
+  id?: string
+) => {
   const PersonalFormConfig: FormConfig = {
-    formId: "ReqOfficialDataEdit",
+    formId: `ReqOfficialDataEdit-${id}`,
     title: "طلب تعديل البيانات الرسمية",
     laravelValidation: {
       enabled: true,
@@ -119,7 +121,6 @@ export const ReqOfficialDataEdit = (officialData: officialData) => {
                 message: "الملاحظات مطلوبة",
               },
             ],
-
           },
           {
             type: "file",
@@ -164,9 +165,11 @@ export const ReqOfficialDataEdit = (officialData: officialData) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
       const response = await apiClient.put(
         "companies/company-profile/official-data/request",
-        formData
+        formData,
+        config
       );
 
       console.log({ response });

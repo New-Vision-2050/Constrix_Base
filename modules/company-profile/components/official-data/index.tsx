@@ -10,13 +10,16 @@ import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 
-const OfficialData = ({ id }: { id?: number }) => {
+const OfficialData = ({ id }: { id?: string }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["main-company-data", id],
     queryFn: async () => {
+      const config = id ? { params: { branch_id: id } } : undefined;
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
-        "/companies/current-auth-company"
+        "/companies/current-auth-company",
+        config
       );
+
       return response.data;
     },
   });
@@ -61,6 +64,7 @@ const OfficialData = ({ id }: { id?: number }) => {
               email,
               company_type_id,
             }}
+            id={id}
           />
 
           <LegalDataSection companyLegalData={company_legal_data} />

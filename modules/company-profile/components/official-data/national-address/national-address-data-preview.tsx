@@ -68,7 +68,7 @@ const NationalAddressDataPreview = ({
       >
         <div className="flex w-full items-center gap-2">
           <MapPin className="text-primary w-4" />
-          <button className="underline">اظهار الموقع من الخريطة</button>
+          <p className="underline">اظهار الموقع من الخريطة</p>
         </div>
         <CircleCheckIcon color="green" />
       </div>

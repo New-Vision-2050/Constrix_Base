@@ -1,35 +1,44 @@
+"use client";
 import { Check, MapPin, CircleCheck } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BranchesInfo from "./branches-info";
 import OfficialData from "../official-data";
+import { useQueryClient } from "@tanstack/react-query";
+import { ServerSuccessResponse } from "@/types/ServerResponse";
+import { CompanyData } from "../../types/company";
+import { useMemo } from "react";
 
 const Branches = () => {
   const locale = useLocale();
   const isRtl = locale === "ar";
 
-  const tabs = [
-    {
-      label: "معلومات الفروع",
-      value: "general",
-      component: <BranchesInfo />,
-    },
-    {
-      label: "فرع الرياض",
-      value: "reyad",
-      component: <OfficialData />,
-    },
-    {
-      label: "فرع جدة",
-      value: "jaddah",
-      component: <OfficialData />,
-    },
-    {
-      label: "فرع مكة",
-      value: "mecca",
-      component: <OfficialData />,
-    },
-  ];
+  const queryClient = useQueryClient();
+  const cachedData = queryClient.getQueryData<
+    ServerSuccessResponse<CompanyData>
+  >(["main-company-data", null]);
+
+  const branches = cachedData?.payload?.branches ?? [];
+
+  const tabs = useMemo(() => {
+    const dynamicBranchTabs =
+      branches.length > 0
+        ? branches.map((branch) => ({
+            label: branch.name,
+            value: branch.id,
+            component: <OfficialData id={branch.id} />,
+          }))
+        : [];
+    return [
+      {
+        label: "معلومات الفروع",
+        value: "general",
+        component: <BranchesInfo branches={branches} />,
+      },
+      ...dynamicBranchTabs,
+    ];
+  }, [branches]);
+
   return (
     <div>
       <Tabs

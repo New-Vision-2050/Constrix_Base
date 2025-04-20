@@ -9,7 +9,7 @@ export const CompanyOfficialData = (
 ) => {
   const queryClient = useQueryClient();
   const PersonalFormConfig: FormConfig = {
-    formId: "company-official-data-form",
+    formId: `company-official-data-form-${id}`,
     // apiUrl: `${baseURL}/companies/company-profile/official-data`,
     laravelValidation: {
       enabled: true,
@@ -130,9 +130,12 @@ export const CompanyOfficialData = (
     },
 
     onSubmit: async (formData: Record<string, unknown>) => {
+      const config = id ? { params: { branch_id: id } } : undefined;
+
       const response = await apiClient.put(
         "companies/company-profile/official-data",
-        formData
+        formData,
+        config
       );
 
       if (response.status === 200) {

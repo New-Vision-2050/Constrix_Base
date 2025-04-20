@@ -2,15 +2,17 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyAddress } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
+import PickupMap from "./pickup-map";
 
 export const NationalAddressFormConfig = (
   companyAddress: CompanyAddress,
   id?: string
 ) => {
+  const formId = `NationalAddressFormConfig-${id}`;
   const queryClient = useQueryClient();
 
   const NationalAddressFormConfig: FormConfig = {
-    formId: "NationalAddressFormConfig",
+    formId,
     title: "اضافة بيان قانوني",
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
@@ -137,6 +139,12 @@ export const NationalAddressFormConfig = (
                 message: "الشارع مطلوب",
               },
             ],
+          },
+          {
+            label: "تعديل الموقع من الخريطة",
+            name: "map",
+            type: "text",
+            render: () => <PickupMap formId={formId} />,
           },
         ],
       },

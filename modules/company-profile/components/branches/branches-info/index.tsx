@@ -4,8 +4,9 @@ import React from "react";
 import BranchInfo from "../branch-card";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { addNewBranchFormConfig } from "./add-new-branch-form-config";
+import { Branch } from "@/modules/company-profile/types/company";
 
-const BranchesInfo = () => {
+const BranchesInfo = ({ branches }: { branches: Branch[] }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -15,7 +16,7 @@ const BranchesInfo = () => {
           trigger={<Button>اضافة فرع</Button>}
         />{" "}
       </div>
-      <BranchInfo />
+      <BranchInfo branches={branches} />
     </div>
   );
 };

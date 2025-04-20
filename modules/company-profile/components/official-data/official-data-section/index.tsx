@@ -21,21 +21,11 @@ import { officialData } from "@/modules/company-profile/types/company";
 
 const OfficialDataSection = ({
   officialData,
+  id,
 }: {
   officialData: officialData;
+  id?: string;
 }) => {
-  const {
-    branch,
-    name,
-    name_en,
-    company_type,
-    country_name,
-    country_id,
-    company_field,
-    company_field_id,
-    phone,
-    email,
-  } = officialData;
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -69,10 +59,14 @@ const OfficialDataSection = ({
           />
         }
       >
-        {mode === "Preview" ? <OfficialDataPreview officialData={officialData} /> : <OfficialDataForm officialData={officialData}  />}
+        {mode === "Preview" ? (
+          <OfficialDataPreview officialData={officialData} />
+        ) : (
+          <OfficialDataForm officialData={officialData} id={id}/>
+        )}
       </FormFieldSet>
       <SheetFormBuilder
-        config={ReqOfficialDataEdit(officialData)}
+        config={ReqOfficialDataEdit(officialData , id)}
         isOpen={isOpenReqForm}
         onOpenChange={handleCloseReqForm}
       />

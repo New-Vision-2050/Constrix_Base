@@ -12,6 +12,7 @@ import {
 import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import ChangeBranchDialog from "./change-branch-dialog";
+import { Branch } from "@/modules/company-profile/types/company";
 
 interface BranchInfoProps {
   branchName: string;
@@ -102,47 +103,22 @@ const BranchCard = ({
   );
 };
 
-const BranchInfo = () => {
-  const branchesData: BranchInfoProps[] = [
-    {
-      branchName: "فرع الدمام",
-      country: "المملكة العربية السعودية",
-      manager: "محمد خالد",
-      employeesCount: 54,
-      departmentsCount: 5,
-      email: "staffuser@vd-2030.com",
-      phoneNumber: "0585624785",
-      isMainBranch: true,
-    },
-    {
-      branchName: "فرع الرياض",
-      country: "المملكة العربية السعودية",
-      manager: "أحمد سعيد",
-      employeesCount: 78,
-      departmentsCount: 8,
-      email: "riyadh@vd-2030.com",
-      phoneNumber: "0512345678",
-      isMainBranch: false,
-    },
-    {
-      branchName: "فرع جدة",
-      country: "المملكة العربية السعودية",
-      manager: "خالد عبدالله",
-      employeesCount: 42,
-      departmentsCount: 4,
-      email: "jeddah@vd-2030.com",
-      phoneNumber: "0598765432",
-      isMainBranch: false,
-    },
-  ];
-
+const BranchInfo = ({ branches }: { branches: Branch[] }) => {
+  console.log({branches})
   return (
     <div className=" bg-sidebar grid grid-cols-2 ">
-      {branchesData.map((branch, index) => (
+      {branches.map((branch) => (
         <BranchCard
-          key={index}
-          {...branch}
-          isMultipleBranch={branchesData.length > 1}
+          key={branch.id}
+          branchName={branch.name}
+          country={branch.country_name}
+          manager="—" // Replace with actual manager field if available
+          employeesCount="—" // Replace with actual value if available
+          departmentsCount="—" // Replace with actual value if available
+          email={branch.email ?? "—"}
+          phoneNumber={branch.phone ?? "—"}
+          isMainBranch={branch.parent_id === null}
+          isMultipleBranch={branches.length > 1}
         />
       ))}
     </div>
