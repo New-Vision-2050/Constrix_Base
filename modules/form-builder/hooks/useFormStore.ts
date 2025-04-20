@@ -1,9 +1,10 @@
 import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 import { ValidationRule } from "../types/formTypes";
 import axios from "axios";
 import { debounce } from "lodash";
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
-import {apiClient} from "@/config/axios-config";
+import { apiClient } from "@/config/axios-config";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -67,7 +68,8 @@ const getDefaultFormState = (initialValues: Record<string, any> = {}): FormInsta
 });
 
 // Create the store with proper server snapshot caching
-export const useFormStore = create<FormState>((set, get) => ({
+export const useFormStore = create<FormState>()(
+  immer((set, get) => ({
   // Initial state
   forms: {},
   activeFormId: 'default',
@@ -94,16 +96,16 @@ export const useFormStore = create<FormState>((set, get) => ({
       return;
     }
 
-    // Update the value
-    set((state: FormState) => ({
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          values: { ...formState.values, [field]: value },
-        }
+    // Update the value using Immer
+    set((draft) => {
+      // Ensure the form exists
+      if (!draft.forms[formId]) {
+        draft.forms[formId] = getDefaultFormState();
       }
-    }));
+      
+      // Directly "mutate" the draft state
+      draft.forms[formId].values[field] = value;
+    });
   },
 
     // Actions for specific form instances
@@ -114,153 +116,113 @@ export const useFormStore = create<FormState>((set, get) => ({
         return formState.values[field]
     },
 
-  setValues: (formId: string, values: Record<string, any>) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          values: { ...formState.values, ...values },
-        }
-      }
-    };
-  }),
-
-  setError: (formId: string, field: string, error: string | React.ReactNode | null) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    const newErrors = error
-      ? { ...formState.errors, [field]: error }
-      : Object.fromEntries(
-          Object.entries(formState.errors).filter(([key]) => key !== field)
-        );
-
-    const isValid = Object.values(newErrors).every((err) => !err);
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          errors: newErrors,
-          isValid,
-        }
-      }
-    };
-  }),
-
-  setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-    const isValid = Object.values(errors).every((error) => !error);
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          errors,
-          isValid,
-        }
-      }
-    };
-  }),
-
-  setTouched: (formId: string, field: string, isTouched: boolean) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          touched: { ...formState.touched, [field]: isTouched },
-        }
-      }
-    };
-  }),
-
-  setAllTouched: (formId: string) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    const allTouched = Object.keys(formState.values).reduce((acc, key) => {
-      acc[key] = true;
-      return acc;
-    }, {} as Record<string, boolean>);
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          touched: allTouched,
-        }
-      }
-    };
-  }),
-
-  resetForm: (formId: string, values = {}) => set((state: FormState) => ({
-    forms: {
-      ...state.forms,
-      [formId]: getDefaultFormState(values)
+  setValues: (formId: string, values: Record<string, any>) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
     }
-  })),
-
-  setSubmitting: (formId: string, isSubmitting: boolean) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          isSubmitting,
-        }
-      }
-    };
+    
+    // Merge the new values with existing values
+    Object.assign(draft.forms[formId].values, values);
   }),
 
-  setIsValid: (formId: string, isValid: boolean) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
+  setError: (formId: string, field: string, error: string | React.ReactNode | null) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
 
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          isValid,
-        }
-      }
-    };
+    if (error) {
+      // Set the error
+      draft.forms[formId].errors[field] = error;
+    } else {
+      // Remove the error
+      delete draft.forms[formId].errors[field];
+    }
+
+    // Update isValid based on whether there are any errors
+    draft.forms[formId].isValid = Object.values(draft.forms[formId].errors).every((err) => !err);
   }),
 
-  incrementSubmitCount: (formId: string) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          submitCount: formState.submitCount + 1,
-        }
-      }
-    };
+  setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Set all errors at once
+    draft.forms[formId].errors = errors;
+    
+    // Update isValid based on whether there are any errors
+    draft.forms[formId].isValid = Object.values(errors).every((error) => !error);
   }),
 
-  setFieldValidating: (formId: string, field: string, isValidating: boolean) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
+  setTouched: (formId: string, field: string, isTouched: boolean) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Set the touched state for the field
+    draft.forms[formId].touched[field] = isTouched;
+  }),
 
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          validatingFields: { ...formState.validatingFields, [field]: isValidating },
-        }
-      }
-    };
+  setAllTouched: (formId: string) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Mark all fields as touched
+    const form = draft.forms[formId];
+    Object.keys(form.values).forEach(key => {
+      form.touched[key] = true;
+    });
+  }),
+
+  resetForm: (formId: string, values = {}) => set((draft) => {
+    // Reset the form to its default state with the provided values
+    draft.forms[formId] = getDefaultFormState(values);
+  }),
+
+  setSubmitting: (formId: string, isSubmitting: boolean) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Set the submitting state
+    draft.forms[formId].isSubmitting = isSubmitting;
+  }),
+
+  setIsValid: (formId: string, isValid: boolean) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Set the valid state
+    draft.forms[formId].isValid = isValid;
+  }),
+
+  incrementSubmitCount: (formId: string) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Increment the submit count
+    draft.forms[formId].submitCount += 1;
+  }),
+
+  setFieldValidating: (formId: string, field: string, isValidating: boolean) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Set the validating state for the field
+    draft.forms[formId].validatingFields[field] = isValidating;
   }),
 
   validateFieldWithApi: (formId: string, field: string, value: any, rule: ValidationRule) => {
@@ -372,20 +334,17 @@ export const useFormStore = create<FormState>((set, get) => ({
   },
 
   // Set edit mode for a form
-  setEditMode: (formId: string, isEditMode: boolean) => set((state: FormState) => {
-    const formState = state.forms[formId] || getDefaultFormState();
-
-    return {
-      forms: {
-        ...state.forms,
-        [formId]: {
-          ...formState,
-          isEditMode,
-        }
-      }
-    };
+  setEditMode: (formId: string, isEditMode: boolean) => set((draft) => {
+    // Ensure the form exists
+    if (!draft.forms[formId]) {
+      draft.forms[formId] = getDefaultFormState();
+    }
+    
+    // Set the edit mode
+    draft.forms[formId].isEditMode = isEditMode;
   }),
-}));
+}))
+);
 
 // Helper function to access the current form state
 export const useFormInstance = (formId: string = 'default', initialValues: Record<string, any> = {}) => {
