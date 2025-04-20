@@ -1,0 +1,23 @@
+import SalaryPreviewMode from "./SalaryPreviewMode";
+import SalaryEditMode from "./SalaryEditMode";
+import { Salary } from "@/modules/user-profile/types/Salary";
+import { useFinancialDataCxt } from "../../context/financialDataCxt";
+import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+
+export default function Salaries() {
+  // declare and define helper state and variables
+  const { userSalary } = useFinancialDataCxt();
+
+  // return component ui
+  return (
+    <div className="flex flex-col gap-6">
+      <p className="text-2xl font-bold">الراتب</p>
+
+      <TabTemplate
+        title={"الراتب الاساسي"}
+        reviewMode={<SalaryPreviewMode salary={userSalary as Salary} />}
+        editMode={<SalaryEditMode />}
+      />
+    </div>
+  );
+}

@@ -8,5 +8,6 @@ type UserRole = {
 export type UserCompany = {
   id: string;
   name: string;
+  country_id?: string;
   roles: UserRole[];
 };

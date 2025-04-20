@@ -1,3 +1,6 @@
+import { UserCompany } from "@/modules/dashboard/types/user-company";
+import { Country } from "@/modules/settings/types/Country";
+
 // Define the user profile data type
 export interface UserProfileData {
   id: string;
@@ -17,6 +20,11 @@ export interface UserProfileData {
     pendingTasks?: number;
   };
   // Add any other fields that might be needed
+  image_url: string;
+  country?: Country;
+  company?: UserCompany;
+  global_id?: string;
+  user_id?: string;
 }
 
 // Define the API response type

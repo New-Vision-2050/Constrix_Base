@@ -1,8 +1,6 @@
+import { useUserDashboardCxt } from "../../context/user-dashboard-cxt";
 import UserProfileHeaderImageSection from "./components/ImageSection";
 import UserProfileHeaderUserInformationSection from "./components/UserInformationSection";
-
-const imageSrc =
-  "https://ui-avatars.com/api/?name=Sallam+Rady&background=random";
 
 /**
  * UserProfileHeader Component
@@ -13,10 +11,11 @@ const imageSrc =
  *   2. **User Information Section**: Displays user details such as name, role, location, etc.
  */
 export default function UserProfileHeader() {
+  const { user } = useUserDashboardCxt();
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
       {/* image or upload image field */}
-      <UserProfileHeaderImageSection />
+      <UserProfileHeaderImageSection  imgSrc={user?.image_url ?? ""} />
       {/* user information */}
       <UserProfileHeaderUserInformationSection />
     </div>

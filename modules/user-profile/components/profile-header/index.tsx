@@ -1,3 +1,4 @@
+import { useUserProfileCxt } from "../../context/user-profile-cxt";
 import UserProfileHeaderImageSection from "./components/ImageSection";
 import UserProfileHeaderUserInformationSection from "./components/UserInformationSection";
 /**
@@ -9,10 +10,12 @@ import UserProfileHeaderUserInformationSection from "./components/UserInformatio
  *   2. **User Information Section**: Displays user details such as name, role, location, etc.
  */
 export default function UserProfileHeader() {
+  const { user } = useUserProfileCxt();
+
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
       {/* image or upload image field */}
-      <UserProfileHeaderImageSection />
+      <UserProfileHeaderImageSection imgSrc={user?.image_url ?? ""} />
       {/* user information */}
       <UserProfileHeaderUserInformationSection />
     </div>
