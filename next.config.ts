@@ -20,7 +20,10 @@ const nextConfig: NextConfig = {
   experimental: {
     // This ensures that the server always re-renders pages
     optimizeCss: false
-  }
+  },
+    images: {
+        domains: ['82.112.241.33'],
+    },
 };
 const withNextIntl = createNextIntlPlugin();
 
