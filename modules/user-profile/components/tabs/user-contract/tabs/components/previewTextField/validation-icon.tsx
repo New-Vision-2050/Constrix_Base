@@ -12,7 +12,7 @@ export default function PreviewTextFieldValidationIcon({
 }: PropsT) {
   return (
     <span className={`absolute top-[8px] ${spanDir}`}>
-      {valid ? (
+      {!!valid ? (
         <CircleCheckIcon color="green" />
       ) : (
         <InfoIcon additionClass="text-orange-500" />

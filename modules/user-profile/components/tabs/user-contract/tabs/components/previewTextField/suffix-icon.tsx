@@ -51,7 +51,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
       case "select":
         return <ChevronDownIcon />;
       case "date":
-        return <CalendarRangeIcon />;
+        return <CalendarRangeIcon additionalClass="w-4"/>;
       case "image":
       case "pdf":
         return <ArrowDownToLineIcon />;

@@ -2,6 +2,8 @@ import React from "react";
 import { Input } from "@/modules/table/components/ui/input";
 import { useLocale } from "next-intl";
 
+import { cn } from "@/lib/utils";
+
 // modular components handling specific UI logic
 import PreviewTextFieldPrefixIcon from "./prefix-icon";
 import PreviewTextFieldLabel from "./label";
@@ -19,9 +21,17 @@ type PropsT = {
   label?: string;
   required?: boolean;
   fileUrl?: string;
+  needRequest?: boolean;
 };
 
-const PreviewTextField = ({ label, type, value, valid, required }: PropsT) => {
+const PreviewTextField = ({
+  label,
+  type,
+  value,
+  valid,
+  required,
+  needRequest,
+}: PropsT) => {
   // get current locale for RTL/LTR
   const locale = useLocale();
   const isRTL = locale === "ar";
@@ -31,7 +41,7 @@ const PreviewTextField = ({ label, type, value, valid, required }: PropsT) => {
   const labelDir = isRTL ? "right-[15px]" : "left-[15px]";
 
   return (
-    <div className="relative">
+    <div className={cn("relative grow", needRequest && "bg-background")}>
       {/* input field with prefix icon */}
       <div className="flex w-full items-center gap-1">
         <PreviewTextFieldPrefixIcon type={type} />
@@ -43,6 +53,7 @@ const PreviewTextField = ({ label, type, value, valid, required }: PropsT) => {
         labelDir={labelDir}
         label={label}
         required={required}
+        needRequest={needRequest}
       />
 
       {/* suffix icon */}
