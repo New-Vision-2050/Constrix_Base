@@ -131,6 +131,9 @@
     "Actions": "Actions",
     "ClientType": "Client Type"
   },
+  "Broker": {
+    "BrokerName": "Broker Name"
+  },
   "Sidebar": {
     "Dashboard": "Profile",
     "Companies": "Companies",

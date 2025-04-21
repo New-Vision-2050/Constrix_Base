@@ -57,16 +57,16 @@ const TheStatus = ({
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <Label htmlFor={`${id}-switcher`} className="font-normal">
+      {/* <div className="flex items-center gap-2"> */}
+      {/* <Label htmlFor={`${id}-switcher`} className="font-normal">
           {t("Companies.Active")}
-        </Label>
-        <Switch
-          id={`${id}-switcher`}
-          checked={isActive}
-          onCheckedChange={handleChange}
-        />
-      </div>
+        </Label> */}
+      <Switch
+        id={`${id}-switcher`}
+        checked={isActive}
+        onCheckedChange={handleChange}
+      />
+      {/* </div> */}
       {/* <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <ConfirmationDialog
           open={showDialog}

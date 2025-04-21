@@ -1,6 +1,8 @@
+import Company from "@/app/[locale]/(main)/companies/cells/company";
 import DataStatus from "@/app/[locale]/(main)/companies/cells/data-status";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
+import { companiesFormConfig } from "@/modules/form-builder";
 import { customerRelationFormConfig } from "@/modules/form-builder/configs/customerRelationFormConfig";
 import Execution from "@/modules/customer-relations/components/execution";
 import TheStatus from "@/modules/customer-relations/components/the-status";
@@ -21,12 +23,12 @@ interface CompanyData {
 }
 
 // Create a component that uses the translations
-export const CustomerRelationConfig = () => {
-  const t = useTranslations("CustomerRelation");
+export const BrokersConfig = () => {
+  const t = useTranslations("");
 
   return {
     url: `${baseURL}/companies`,
-    tableId: "customer-relation-table", // Add tableId to the config
+    tableId: "broker-table", // Add tableId to the config
     columns: [
       {
         key: "id",
@@ -36,53 +38,37 @@ export const CustomerRelationConfig = () => {
       },
       {
         key: "name",
-        label: t("ClientName"),
+        label: t("Broker.BrokerName"),
         // sortable: true,
         render: (_: unknown, row: CompanyData) => <ClientName row={row} />,
       },
       {
         key: "complete_data",
-        label: t("IDNumber"),
+        label: t("CustomerRelation.Branch"),
         // sortable: true,
       },
       {
         key: "email",
-        label: t("Email"),
+        label: t("CustomerRelation.Email"),
         // sortable: true,
         searchable: true,
       },
       {
         key: "complete_data",
-        label: t("PhoneNumber"),
+        label: t("CustomerRelation.PhoneNumber"),
         // sortable: true,
-      },
-      {
-        key: "complete_data",
-        label: t("Branch"),
-        // sortable: true,
-        // render: (value: 0 | 1) => <DataStatus dataStatus={value} />
       },
 
       {
         key: "complete_data",
-        label: t("Broker"),
-        // render: (_: unknown, row: CompanyData) => <Execution id={row.id} formConfig={companiesFormConfig} />,
-      },
-      {
-        key: "complete_data",
-        label: t("ProjectCount"),
-        // render: (_: unknown, row: CompanyData) => <Execution id={row.id} formConfig={companiesFormConfig} />,
-      },
-      {
-        key: "complete_data",
-        label: t("ClientStatus"),
+        label: t("CustomerRelation.ClientStatus"),
         render: (value: "active" | "inActive", row: CompanyData) => (
           <TheStatus theStatus={value} id={row.id} />
         ),
       },
       {
         key: "id",
-        label: t("Settings"),
+        label: t("CustomerRelation.Settings"),
         render: (_: unknown, row: CompanyData) => (
           <Execution id={row.id} formConfig={customerRelationFormConfig} />
         ),
@@ -90,12 +76,12 @@ export const CustomerRelationConfig = () => {
     ],
     allSearchedFields: [
       {
-        key: "country_id",
+        key: "company_type_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("ClientStatus"),
+          placeholder: t("CustomerRelation.Branch"),
           dynamicDropdown: {
-            url: `${baseURL}/countries`,
+            url: `${baseURL}/company_types`,
             valueField: "id",
             labelField: "name",
             paginationEnabled: true,
@@ -108,12 +94,12 @@ export const CustomerRelationConfig = () => {
         },
       },
       {
-        key: "company_type_id",
+        key: "company_field_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("Branch"),
+          placeholder: t("CustomerRelation.ClientStatus"),
           dynamicDropdown: {
-            url: `${baseURL}/company_types`,
+            url: `${baseURL}/company_fields`,
             valueField: "id",
             labelField: "name",
             paginationEnabled: true,

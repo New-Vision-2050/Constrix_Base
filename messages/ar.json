@@ -136,6 +136,9 @@
     "View": "عرض",
     "Actions": "الإجراءات"
   },
+  "Broker": {
+    "BrokerName": "اسم الوسيط"
+  },
   "Sidebar": {
     "Dashboard": "الملف الشخصي",
     "Companies": "الشركات",

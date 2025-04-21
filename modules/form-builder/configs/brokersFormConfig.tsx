@@ -4,9 +4,9 @@ import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import Link from "next/link";
 
-export const customerRelationFormConfig: FormConfig = {
+export const BrokersFormConfig: FormConfig = {
   formId: "CustomerRelation-form",
-  title: "اضافة عميل",
+  title: "اضافة وسيط",
   apiUrl: `${baseURL}/companies`,
   laravelValidation: {
     enabled: true,
@@ -14,37 +14,13 @@ export const customerRelationFormConfig: FormConfig = {
   },
   sections: [
     {
-      title: " اضافة عميل",
+      title: " اضافة وسيط",
       fields: [
         {
-          type: "select",
-          name: "country_id",
-          label: "نوع العميل",
-          placeholder: "اختر نوع العميل",
-          dynamicOptions: {
-            url: `${baseURL}/countries`,
-            valueField: "id",
-            labelField: "name",
-            searchParam: "name",
-            paginationEnabled: true,
-            pageParam: "page",
-            limitParam: "per_page",
-            itemsPerPage: 10,
-            totalCountHeader: "X-Total-Count",
-          },
-          validation: [
-            {
-              type: "required",
-              message: "ادخل دولة الشركة",
-            },
-          ],
-        },
-        {
           name: "company_field_id",
-          label: "اسم العميل",
+          label: "اسم الوسيط",
           type: "text",
           isMulti: true,
-          required: true,
           validation: [
             {
               type: "required",
@@ -110,7 +86,11 @@ export const customerRelationFormConfig: FormConfig = {
               <>
                 <p className="text-sm mb-2">
                   تم تسجيل البريد الإلكتروني مسبقًا ،
-                  <Link href="#" className="text-[#F42588] mr-2 ">
+                  <Link
+                    href="#"
+                    // style={{ color: "", marginRight: "5px", te }}
+                    className="text-[#F42588] mr-2 "
+                  >
                     اضغط هنا لاسترجاع بياناتك.
                   </Link>
                 </p>
@@ -129,20 +109,23 @@ export const customerRelationFormConfig: FormConfig = {
             },
           ],
         },
+
         {
-          type: "phone",
           name: "phone",
-          label: "رقم الجوال ",
+          label: "الهاتف",
+          type: "phone",
+          placeholder: "الهاتف",
           validation: [
             {
               type: "required",
-              message: "ادخل دولة الشركة",
+              message: "برجاء إدخال رقم الهاتف",
             },
           ],
         },
         {
-          type: "multiSelect",
+          type: "select",
           name: "country_id",
+          isMulti: true,
           label: "الفرع",
           dynamicOptions: {
             url: `${baseURL}/countries`,
@@ -162,28 +145,7 @@ export const customerRelationFormConfig: FormConfig = {
             },
           ],
         },
-        {
-          type: "select",
-          name: "country_id",
-          label: "الوسيط",
-          dynamicOptions: {
-            url: `${baseURL}/countries`,
-            valueField: "id",
-            labelField: "name",
-            searchParam: "name",
-            paginationEnabled: true,
-            pageParam: "page",
-            limitParam: "per_page",
-            itemsPerPage: 10,
-            totalCountHeader: "X-Total-Count",
-          },
-          validation: [
-            {
-              type: "required",
-              message: "ادخل دولة الشركة",
-            },
-          ],
-        },
+
         {
           type: "text",
           name: "country_id",
@@ -244,7 +206,7 @@ export const customerRelationFormConfig: FormConfig = {
       const result = await defaultStepSubmitHandler(
         step,
         values,
-        customerRelationFormConfig
+        BrokersFormConfig
       );
       if (result.success) {
         // Simulate API call
