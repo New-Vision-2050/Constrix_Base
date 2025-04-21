@@ -9,12 +9,14 @@ export const userStatusDataSections: UserProfileNestedTab[] = [
     title: "تفعيل المستخدم",
     icon: <GraduationCapIcon />,
     content: <ActivateUser />,
+    ignoreValidation: true,
   },
   {
     id: "user-status-password",
     title: "كلمة المرور",
     icon: <GraduationCapIcon />,
     content: <ChangeUserPassword />,
+    ignoreValidation: true,
   },
 ];
 

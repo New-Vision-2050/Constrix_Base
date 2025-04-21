@@ -3,6 +3,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { Relative } from "@/modules/user-profile/types/relative";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
+import { MaritalStatusList } from "../../marital-status-enum";
 
 type PropsT = {
   relative?: Relative;
@@ -30,11 +31,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             name: "marital_status",
             label: "الحالة الاجتماعية",
             type: "select",
-            options: [
-              { label: "متزوج", value: "married" },
-              { label: "غير متزوج", value: "single" },
-              { label: "متزوج ويعول", value: "married-with-children" },
-            ],
+            options: MaritalStatusList,
             placeholder: "الحالة الاجتماعية",
           },
           {

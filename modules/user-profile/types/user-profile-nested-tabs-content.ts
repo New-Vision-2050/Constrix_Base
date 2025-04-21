@@ -8,4 +8,5 @@ export type UserProfileNestedTab = {
   valid?: boolean;
   type?: string;
   onClick?: () => void;
+  ignoreValidation?: boolean;
 };

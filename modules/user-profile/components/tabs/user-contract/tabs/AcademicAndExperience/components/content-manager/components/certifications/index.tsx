@@ -9,7 +9,7 @@ export default function UserCertifications() {
       <div className="flex items-center justify-between">
         <p className="text-lg font-bold text-gray-700">الشهادات المهنية</p>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-primary text-white px-4 py-2 rounded"
           onClick={() => setOpen(true)}
         >
           اضافة حقل اخر
