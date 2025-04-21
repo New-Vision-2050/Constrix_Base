@@ -4,6 +4,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFinancialDataCxt } from "../../../../context/financialDataCxt";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
+import { AllowancesTypes } from "../../AllowancesEnum";
 
 type PropsT = {
   privilegeData?: UserPrivilege;
@@ -82,10 +83,9 @@ export const PrivilegeItemFormConfig = ({
             label: "معدل حساب النسبة من اصل الراتب",
             type: "text",
             condition: (values) => {
-              console.log("charge_amount values ::", values);
               if (
-                values.type_allowance_id ===
-                "1bd98488-68a0-49a9-8fa1-1928b9ebb3b7"
+                values.type_allowance_id === AllowancesTypes?.Saving ||
+                values.type_allowance_id == null
               )
                 return false;
               return true;
