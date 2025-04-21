@@ -13,6 +13,9 @@ import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import ChangeBranchDialog from "./change-branch-dialog";
 import { Branch } from "@/modules/company-profile/types/company";
+import { SheetFormBuilder } from "@/modules/form-builder";
+import { addNewBranchFormConfig } from "../branches-info/add-new-branch-form-config";
+import { useModal } from "@/hooks/use-modal";
 
 interface BranchInfoProps {
   branchName: string;
@@ -25,6 +28,7 @@ interface BranchInfoProps {
   isMultipleBranch?: boolean;
   isMainBranch?: boolean;
   className?: string;
+  branches: Branch[];
 }
 
 const BranchCard = ({
@@ -38,7 +42,9 @@ const BranchCard = ({
   isMainBranch = false,
   className = "",
   isMultipleBranch,
+  branches,
 }: BranchInfoProps) => {
+  const [isOpen, handleOpen, handleClose] = useModal();
   const local = useLocale();
   const isRTL = local === "ar";
   const detailRows = [
@@ -75,14 +81,16 @@ const BranchCard = ({
               <MoreVertical size={24} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="text-start block">
+              <DropdownMenuItem
+                onClick={handleOpen}
+                className="text-start block"
+              >
                 تعديل
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
-
       <Card className="border bg-transparent rounded-lg overflow-hidden">
         <div className="flex flex-col">
           {detailRows.map((row, index) => (
@@ -97,14 +105,17 @@ const BranchCard = ({
           ))}
         </div>
       </Card>
-
+      {/* <SheetFormBuilder
+        config={{ ...addNewBranchFormConfig(branches), isEditMode: true }}
+        isOpen={isOpen}
+        onOpenChange={handleClose}
+      />{" "} */}
       {isMultipleBranch && isMainBranch && <ChangeBranchDialog />}
     </div>
   );
 };
 
 const BranchInfo = ({ branches }: { branches: Branch[] }) => {
-  console.log({branches})
   return (
     <div className=" bg-sidebar grid grid-cols-2 ">
       {branches.map((branch) => (
@@ -119,6 +130,7 @@ const BranchInfo = ({ branches }: { branches: Branch[] }) => {
           phoneNumber={branch.phone ?? "—"}
           isMainBranch={branch.parent_id === null}
           isMultipleBranch={branches.length > 1}
+          branches={branches}
         />
       ))}
     </div>
