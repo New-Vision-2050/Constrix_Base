@@ -99,7 +99,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
 
   if (!collapsible || !section.title) {
     return (
-      <div className="w-full border rounded-md mb-4 overflow-hidden border-border">
+      <div className="w-full border rounded-md mb-4 border-border">
         {section.title && (
           <div className="p-4 bg-muted/50">
             <div className="flex items-center">

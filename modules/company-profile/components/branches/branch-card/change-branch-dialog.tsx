@@ -26,7 +26,7 @@ const ChangeBranchDialog = () => {
               لا يمكن تغيير الفرع الا عند اختيار فرع رئيسي اخر{" "}
             </DialogTitle>
           </DialogHeader>
-          <FormContent config={changeBranchForm()} />
+          <FormContent config={changeBranchForm()}/>
         </DialogContent>
       </Dialog>
     </>
