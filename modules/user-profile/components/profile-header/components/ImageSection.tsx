@@ -17,8 +17,8 @@ type PropsT = {
  * otherwise, it shows a placeholder with an upload hidden input.
  */
 export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
-  const { isLoading } = useUserProfileCxt();
   const [openDialog, setOpenDialog] = useState(false);
+  const { isLoading, handleUpdateImage } = useUserProfileCxt();
 
   // handle loading state
   if (isLoading)
@@ -52,6 +52,9 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
         setOpen={setOpenDialog}
         validateImageFn={validateProfileImage}
         uploadImageFn={uploadProfileImage}
+        onSuccess={(url: string) => {
+          handleUpdateImage(url);
+        }}
       />
     </div>
   );

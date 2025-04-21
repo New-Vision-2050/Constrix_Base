@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 
 import { ProfileImageMsg } from "@/modules/dashboard/types/valdation-message-user-image";
 
-import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-
 import UploadProfileImageDialogHeader from "./UploadProfileImageDialogHeader";
 import ShowFeedbackMessages from "./ShowFeedbackMessages";
 import PreviewImage from "./PreviewImage";
@@ -15,6 +13,7 @@ import PlaceholderImage from "./PlaceholderImage";
 type PropsT = {
   title?: string;
   open: boolean;
+  onSuccess?: (url: string) => void;
   setOpen: React.Dispatch<SetStateAction<boolean>>;
   validateImageFn(image: File): Promise<ProfileImageMsg[]>; // external image validation logic
   uploadImageFn(image: File): Promise<{ image_url: string }>; // external upload logic
@@ -35,6 +34,7 @@ export default function UploadProfileImageDialog({
   title,
   open,
   setOpen,
+  onSuccess,
   validateImageFn,
   uploadImageFn,
 }: PropsT) {
@@ -45,7 +45,6 @@ export default function UploadProfileImageDialog({
   const [uploadedFile, setUploadedFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   // access user profile updater
-  const { handleUpdateImage } = useUserProfileCxt();
 
   // reset dialog state when opened
   useEffect(() => {
@@ -97,7 +96,7 @@ export default function UploadProfileImageDialog({
     try {
       setLoading(true);
       const response = await uploadImageFn(uploadedFile as File);
-      handleUpdateImage(response.image_url);
+      onSuccess?.(response?.image_url);
       setOpen(false);
     } catch (err) {
       console.error("Upload error:", err);

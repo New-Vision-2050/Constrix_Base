@@ -20,9 +20,9 @@ export default function PreviewImage(props: PropsT) {
         variant={"outline"}
         disabled={loading}
         onClick={handleClearImage}
-        className="border-pink-600"
+        className="border-pink-600 w-32"
       >
-        أرفاق
+        Clear
       </Button>
     </div>
   );
