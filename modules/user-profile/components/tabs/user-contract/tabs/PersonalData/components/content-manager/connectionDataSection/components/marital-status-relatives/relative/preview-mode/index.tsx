@@ -1,5 +1,5 @@
 import { Relative } from "@/modules/user-profile/types/relative";
-import PreviewTextField from "../../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../../components/previewTextField";
 
 type PropsT = {
   relative: Relative;
@@ -16,7 +16,7 @@ export default function MaritalStatusRelativesSectionPreviewMode({
           label="الحالة الاجتماعية"
           value={relative?.marital_status}
           valid={Boolean(relative?.marital_status)}
-          isSelect
+          type="select"
         />
       </div>
       {/* two row 2 columns*/}

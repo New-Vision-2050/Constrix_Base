@@ -81,6 +81,15 @@ export const PrivilegeItemFormConfig = ({
             name: "charge_amount",
             label: "معدل حساب النسبة من اصل الراتب",
             type: "text",
+            condition: (values) => {
+              console.log("charge_amount values ::", values);
+              if (
+                values.type_allowance_id ===
+                "1bd98488-68a0-49a9-8fa1-1928b9ebb3b7"
+              )
+                return false;
+              return true;
+            },
             placeholder: "معدل حساب النسبة من اصل الراتب",
             validation: [
               {
@@ -158,9 +167,8 @@ export const PrivilegeItemFormConfig = ({
       const url = isEdit
         ? `/user_privileges/${privilegeData?.id}`
         : `/user_privileges`;
-        
-      const _apiClient = isEdit ? apiClient.put : apiClient.post;
 
+      const _apiClient = isEdit ? apiClient.put : apiClient.post;
 
       const response = await _apiClient(url, serialize(body));
 

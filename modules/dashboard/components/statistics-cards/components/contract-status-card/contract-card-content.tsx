@@ -46,7 +46,10 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
             <span className="text-sm">بداية العقد</span>
           </div>
           <span className="text-lg font-semibold ">
-            {passedPercentage && `${passedPercentage?.toFixed(1)} %`}
+            {passedPercentage &&
+              `${(isNaN(passedPercentage) ? 0 : passedPercentage)?.toFixed(
+                1
+              )} %`}
           </span>
           <span className="text-sm ">{contractData?.start_date}</span>
         </div>
@@ -66,7 +69,10 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
           </div>
           <span className="text-lg font-semibold">
             {passedPercentage &&
-              `${(100 - (passedPercentage ?? 0))?.toFixed(1)} %`}
+              `${(isNaN(100 - (passedPercentage ?? 0))
+                ? 0
+                : 100 - (passedPercentage ?? 0)
+              )?.toFixed(1)} %`}
           </span>
           <span className="text-sm">{contractData?.end_date}</span>
         </div>

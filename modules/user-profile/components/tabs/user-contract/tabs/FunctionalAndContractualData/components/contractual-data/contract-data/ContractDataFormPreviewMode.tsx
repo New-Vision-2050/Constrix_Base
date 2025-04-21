@@ -1,5 +1,5 @@
 import { Contract } from "@/modules/user-profile/types/Contract";
-import PreviewTextField from "../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../components/previewTextField";
 
 type PropsT = {
   contract?: Contract | undefined;

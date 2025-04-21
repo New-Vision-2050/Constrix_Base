@@ -1,5 +1,5 @@
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
-import PreviewTextField from "../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../components/previewTextField";
 
 type PropsT = {
   offer: JobOffer | undefined;
@@ -21,7 +21,7 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
           label="تاريخ الارسال"
           value={offer?.date_send ?? ""}
           valid={Boolean(offer?.date_send)}
-          isDate
+          type="date"
           required
         />
       </div>

@@ -1,5 +1,5 @@
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
-import PreviewTextField from "../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../components/previewTextField";
 
 type PropsT = { bank: BankAccount };
 export default function UserProfileBankingDataReview({ bank }: PropsT) {
@@ -11,7 +11,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           label="دولة البنك"
           value={bank?.country_name ?? ""}
           valid={Boolean(bank?.country_name)}
-          isSelect
+          type="select"
         />
       </div>
       <div className="p-2">

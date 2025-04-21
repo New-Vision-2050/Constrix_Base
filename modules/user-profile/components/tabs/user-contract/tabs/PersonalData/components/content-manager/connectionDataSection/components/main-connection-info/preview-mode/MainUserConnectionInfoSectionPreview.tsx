@@ -1,4 +1,4 @@
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../components/previewTextField";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export default function MainUserConnectionInfoSectionPreview() {
