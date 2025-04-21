@@ -33,7 +33,7 @@ export interface FieldConfig {
   autoFocus?: boolean;
   className?: string;
   width?: string;
-  gridArea?: string;
+  gridArea?: number;
   options?: DropdownOption[]; // Using shared DropdownOption type
   validation?: ValidationRule[];
   condition?: (values: Record<string, any>) => boolean;

@@ -1,37 +1,29 @@
-# Use an official Node runtime as a parent image
-FROM node:22-alpine
+# Stage 1: Build
+FROM node:22-alpine AS builder
 
+WORKDIR /app
 RUN apk add --no-cache yarn
+
+COPY . .
+RUN yarn install && yarn build
+
+# Optional: build args
+ARG DEPLOYMENT_ID
+ARG CACHEBUST=1
+ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
+RUN echo "Cache bust: ${CACHEBUST}"
+
+# Stage 2: Run
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Declare build arguments
-ARG DEPLOYMENT_ID
-ARG CACHEBUST=1
+# Copy built app from builder stage
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
-# Set environment variable
-ENV DEPLOYMENT_ID=${DEPLOYMENT_ID}
-
-# Add cache busting argument - this will force Docker to rebuild from this point
-# when the CACHEBUST value changes
-RUN echo "Cache bust: ${CACHEBUST}"
-
-# Copy built artifacts
-COPY ./.next ./.next
-COPY ./public ./public
-COPY ./package.json ./package.json
-COPY ./yarn.lock ./yarn.lock
-COPY ./.env ./.env
-
-# Clean up any previous deployment artifacts
-RUN rm -rf ../${DEPLOYMENT_ID}
-
-# Install only production dependencies
-RUN yarn install --only=production
-
-# Add another cache busting step to ensure the final image is fresh
-RUN echo "Final cache bust: ${CACHEBUST}"
-
+ENV PORT=3000
 EXPOSE 3000
 
-CMD ["yarn", "start"]
+CMD ["node", "server.js"]

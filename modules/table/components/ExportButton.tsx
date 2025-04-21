@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/modules/table/components/ui/button";
 import { Download } from "lucide-react";

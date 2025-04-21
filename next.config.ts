@@ -22,8 +22,9 @@ const nextConfig: NextConfig = {
     optimizeCss: false
   },
   images: {
-     domains: ['s3.constrix-nv.com','82.112.241.33'],
+     domains: ['constrix.fra1.digitaloceanspaces.com'],
   },
+   output: 'standalone',
 };
 const withNextIntl = createNextIntlPlugin();
 

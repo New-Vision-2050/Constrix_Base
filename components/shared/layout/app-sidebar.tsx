@@ -48,6 +48,7 @@ export function AppSidebar({
     ROUTER.SETTINGS,
     ROUTER.DASHBOARD,
     ROUTER.USER_PROFILE,
+    ROUTER.COMPANY_PROFILE,
   ];
   const settingsRoutes = {
     name: t("Sidebar.Settings"),
@@ -71,6 +72,12 @@ export function AppSidebar({
         url: ROUTER.SETTINGS,
         icon: InboxIcon,
         isActive: pageName === ROUTER.SETTINGS,
+      },
+      {
+        name: "اعداد ملف الشركة",
+        url: ROUTER.COMPANY_PROFILE,
+        icon: CompaniesIcon,
+        isActive: pageName === ROUTER.COMPANY_PROFILE,
       },
     ],
   };
@@ -133,7 +140,7 @@ export function AppSidebar({
         plan: "Free",
       },
     ],
-    projects,
+    projects: [...projects],
   };
 
   return (

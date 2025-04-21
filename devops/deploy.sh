@@ -38,6 +38,7 @@ NEXT_PUBLIC_API_VERSION=v1
 NODE_ENV=$NODE_ENV
 NEXT_PUBLIC_CACHE_BUST=$CACHEBUST
 DEPLOYMENT_ID=$DEPLOYMENT_ID
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyD5izq7FZI-nHdrt6mx5UeKRkUSjvagS5g
 EOF
 
 cat .env
@@ -49,14 +50,6 @@ chmod 600 .env
 echo "Cleaning previous build artifacts..."
 rm -rf .next
 rm -rf node_modules/.cache
-
-# Install dependencies and build
-echo "Installing dependencies..."
-yarn install
-
-echo "Building with cache bust: $CACHEBUST..."
-# Add CACHEBUST to the build command to ensure it's used in the build process
-NEXT_PUBLIC_CACHE_BUST=$CACHEBUST yarn build
 
 cd "$DEPLOY_DIR/devops"
 

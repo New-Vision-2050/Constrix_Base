@@ -4,5 +4,6 @@ export const ROUTER = {
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",
+  COMPANY_PROFILE: "/company-profile",
   USER_PROFILE: "/user-profile",
 };
