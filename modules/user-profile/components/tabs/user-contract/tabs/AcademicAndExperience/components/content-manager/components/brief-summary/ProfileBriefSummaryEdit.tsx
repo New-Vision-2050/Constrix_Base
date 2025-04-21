@@ -7,10 +7,10 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export default function ProfileBriefSummaryEdit() {
   // ** declare and define component state and vars
-  const { user } = useUserProfileCxt();
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const { userBrief } = useUserAcademicTabsCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   const handleUpdateUserBrief = async () => {
     try {
@@ -20,6 +20,7 @@ export default function ProfileBriefSummaryEdit() {
         about_me: summary,
       });
       setLoading(false);
+      handleRefetchDataStatus();
     } catch (err) {
       setLoading(false);
       console.log("Error updating user brief:", err);

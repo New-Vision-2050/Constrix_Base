@@ -3,9 +3,11 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const IdentityDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
+  const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const IdentityFormConfig: FormConfig = {
     formId: "Identity-data-form",
@@ -79,6 +81,9 @@ export const IdentityDataFormConfig = () => {
     resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchDataStatus();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const startDate = new Date(formData?.identity_start_date as string);
       const endDate = new Date(formData?.identity_end_date as string);

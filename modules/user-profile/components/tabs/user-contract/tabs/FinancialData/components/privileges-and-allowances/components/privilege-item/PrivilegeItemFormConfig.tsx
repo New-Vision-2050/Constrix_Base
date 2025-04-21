@@ -17,7 +17,7 @@ export const PrivilegeItemFormConfig = ({
 }: PropsT) => {
   // declare and define helper variables
   const isEdit = privilegeData ? true : false;
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefreshPrivilegesList } = useFinancialDataCxt();
 
   const privilegeItemFormConfig: FormConfig = {
@@ -155,6 +155,7 @@ export const PrivilegeItemFormConfig = ({
     showBackButton: false,
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefreshPrivilegesList();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

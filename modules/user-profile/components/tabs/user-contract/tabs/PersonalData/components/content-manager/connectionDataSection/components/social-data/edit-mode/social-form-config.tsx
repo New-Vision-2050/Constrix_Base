@@ -4,7 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export const SocialMediaSitesFormConfig = () => {
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSocialData } = useConnectionDataCxt();
 
   const socialMediaSitesFormConfig: FormConfig = {
@@ -74,11 +74,14 @@ export const SocialMediaSitesFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchDataStatus();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
       };
-      
+
       const response = await apiClient.put(`/socials/${user?.user_id}`, body);
 
       return {

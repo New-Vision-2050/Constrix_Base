@@ -25,7 +25,7 @@ type PropsT = {
 export default function UploadCvDialog(props: PropsT) {
   // declare and define component state and variables
   const { open, setOpen } = props;
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCV } = useUserAcademicTabsCxt();
   const [loading, setLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File>();
@@ -56,6 +56,7 @@ export default function UploadCvDialog(props: PropsT) {
       );
       setOpen(false);
       handleRefetchUserCV();
+      handleRefetchDataStatus();
       setLoading(false);
     } catch (error) {
       console.error("Error uploading file:", error);

@@ -5,8 +5,9 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export const PersonalDataFormConfig = () => {
   const { userPersonalData } = usePersonalDataTabCxt();
-  const { handleRefetchUserPersonalData } = useUserProfileCxt();
-  
+  const { handleRefetchUserPersonalData, handleRefetchDataStatus } =
+    useUserProfileCxt();
+
   const PersonalFormConfig: FormConfig = {
     formId: `personal-data-form`,
     title: "البيانات الشخصية",
@@ -128,6 +129,7 @@ export const PersonalDataFormConfig = () => {
     showBackButton: false,
     onSuccess: () => {
       handleRefetchUserPersonalData();
+      handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {

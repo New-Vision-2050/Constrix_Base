@@ -13,10 +13,10 @@ export const QualificationFormConfig = ({
   qualification,
   onSuccess,
 }: PropsT) => {
-  const { user } = useUserProfileCxt();
   // declare and define helper state and variables
   const formType = qualification ? "Edit" : "Create";
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   // form config
   const qualificationFormConfig: FormConfig = {
@@ -178,6 +178,7 @@ export const QualificationFormConfig = ({
     // Example onSuccess handler
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefreshUserQualifications();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
