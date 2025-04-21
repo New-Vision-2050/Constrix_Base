@@ -59,6 +59,7 @@ interface UseSheetFormResult {
 }
 
 import { apiClient } from "@/config/axios-config";
+import { useToast } from "@/modules/table/hooks/use-toast";
 
 export function useSheetForm({
   config,
@@ -66,8 +67,10 @@ export function useSheetForm({
   onSuccess,
   onCancel,
 }: UseSheetFormProps): UseSheetFormResult {
+  const { toast } = useToast();
+
   // Use formId from config if provided, otherwise use default
-  const actualFormId = config.formId || 'sheet-form';
+  const actualFormId = config.formId || "sheet-form";
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
 
@@ -151,9 +154,12 @@ export function useSheetForm({
     }
   }, [config.resetOnSuccess, isStepBased, resetForm]);
 
-  const clearFiledError = useCallback((fieldName: string) => {
-    setError(fieldName, null);
-  }, [setError]);
+  const clearFiledError = useCallback(
+    (fieldName: string) => {
+      setError(fieldName, null);
+    },
+    [setError]
+  );
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
@@ -332,6 +338,11 @@ export function useSheetForm({
             });
           }
 
+          toast({
+            title: "Success",
+            description: "Form Submitted Successfully",
+          });
+
           // Close the sheet after successful submission
           setTimeout(() => {
             closeSheet();
@@ -355,7 +366,8 @@ export function useSheetForm({
 
           // Handle Laravel validation errors if enabled
           if (config.laravelValidation?.enabled && result.errors) {
-            const formattedErrors: Record<string, string | React.ReactNode> = {};
+            const formattedErrors: Record<string, string | React.ReactNode> =
+              {};
 
             // Convert Laravel validation errors to form errors
             Object.entries(result.errors).forEach(([field, messages]) => {
@@ -499,7 +511,14 @@ export function useSheetForm({
     setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, currentStep, isStepBased, values, setErrors, setIsValid]);
+  }, [
+    config.sections,
+    currentStep,
+    isStepBased,
+    values,
+    setErrors,
+    setIsValid,
+  ]);
 
   // Wizard navigation functions
   const goToNextStep = useCallback(() => {
