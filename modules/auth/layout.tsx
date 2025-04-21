@@ -4,6 +4,7 @@ import NewVisionWhite from "@/public/icons/new-vision-white";
 import { SparklesCore } from "./components/sparkles-core";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 
 export default function AuthLayout({
   children,
@@ -51,7 +52,13 @@ export default function AuthLayout({
                 className="w-full h-full object-contain"
               />
             ) : (
-              <NewVision />
+              <Image
+                src={LogoPlaceholder}
+                alt={"logo placeholder"}
+                width={112}
+                height={47}
+                className="w-full h-full object-contain"
+              />
             )}
           </div>
         </div>
