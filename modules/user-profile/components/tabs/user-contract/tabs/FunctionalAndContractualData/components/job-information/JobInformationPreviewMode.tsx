@@ -1,4 +1,4 @@
-import PreviewTextField from "../../../components/PreviewTextField";
+import PreviewTextField from "../../../components/previewTextField";
 
 export default function JobInformationPreviewMode() {
   return (

@@ -1,4 +1,4 @@
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaBorderNumberPreviewMode() {
@@ -20,7 +20,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
           label="تاريخ الدخول"
           value={userIdentityData?.border_number_start_date ?? ""}
           valid={Boolean(userIdentityData?.border_number_start_date)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -29,7 +29,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
           label="تاريخ الانتهاء"
           value={userIdentityData?.border_number_end_date ?? ""}
           valid={Boolean(userIdentityData?.border_number_end_date)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -38,7 +38,8 @@ export default function UserIqamaBorderNumberPreviewMode() {
           label="ارفاق رقم الحدود"
           value={userIdentityData?.file_border_number ? "رقم الحدود" : ""}
           valid={Boolean(userIdentityData?.file_border_number)}
-          isPdf
+          type="pdf"
+          fileUrl={userIdentityData?.file_border_number?.url}
         />
       </div>
     </div>

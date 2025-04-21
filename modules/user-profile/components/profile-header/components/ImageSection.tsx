@@ -1,7 +1,10 @@
 "use client";
-import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import UploadImageDialog from "./UploadImageDialog";
+
 import { useState } from "react";
+import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
+import uploadProfileImage from "@/modules/dashboard/api/upload-profile-image";
+import validateProfileImage from "@/modules/dashboard/api/validate-image";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 type PropsT = {
   imgSrc?: string; // Optional image source URL for the profile picture
@@ -14,8 +17,8 @@ type PropsT = {
  * otherwise, it shows a placeholder with an upload hidden input.
  */
 export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
-  const { isLoading } = useUserProfileCxt();
   const [openDialog, setOpenDialog] = useState(false);
+  const { isLoading, handleUpdateImage } = useUserProfileCxt();
 
   // handle loading state
   if (isLoading)
@@ -43,7 +46,16 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
           </p>
         </label>
       )}
-      <UploadImageDialog open={openDialog} setOpen={setOpenDialog} />
+      <UploadProfileImageDialog
+        title="أضافة صورة"
+        open={openDialog}
+        setOpen={setOpenDialog}
+        validateImageFn={validateProfileImage}
+        uploadImageFn={uploadProfileImage}
+        onSuccess={(url: string) => {
+          handleUpdateImage(url);
+        }}
+      />
     </div>
   );
 }

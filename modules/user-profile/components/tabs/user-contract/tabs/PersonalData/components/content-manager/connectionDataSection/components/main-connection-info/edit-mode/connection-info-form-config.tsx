@@ -5,7 +5,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { countryPhoneCodes } from "../../../../../../constants/ContriesPhoneCodeList";
 
 export const ConnectionInformationFormConfig = () => {
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userContactData } = useConnectionDataCxt();
 
   const _ConnectionInformationFormConfig: FormConfig = {
@@ -70,6 +70,9 @@ export const ConnectionInformationFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchDataStatus();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,

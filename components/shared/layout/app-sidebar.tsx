@@ -91,6 +91,14 @@ export function AppSidebar({
           url: ROUTER.COMPANIES,
           icon: CompaniesIcon,
           isActive: pageName === ROUTER.COMPANIES,
+          submenu: [
+            {
+              name: t("Sidebar.CompaniesList"),
+              url: ROUTER.COMPANIES,
+              icon: CompaniesIcon,
+              isActive: pageName === ROUTER.COMPANIES,
+            },
+          ],
         },
         {
           name: t("Sidebar.Users"),

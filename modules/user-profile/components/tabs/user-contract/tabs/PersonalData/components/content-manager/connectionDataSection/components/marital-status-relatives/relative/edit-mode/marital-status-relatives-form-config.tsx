@@ -11,7 +11,7 @@ type PropsT = {
 
 export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { relative, onSuccess } = props;
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
   const formMode = !relative ? "Create" : "Edit";
 
@@ -75,6 +75,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
     showBackButton: false,
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefetchUserRelativesData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
@@ -82,7 +83,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
         formMode === "Create"
           ? "/user_relatives"
           : `/user_relatives/${relative?.id}`;
-          
+
       const body = {
         ...formData,
         user_id: user?.user_id,

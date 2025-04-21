@@ -37,7 +37,7 @@ type UserProfileCxtType = {
 export const UserProfileCxt = createContext<UserProfileCxtType>(
   {} as UserProfileCxtType
 );
-
+ 
 // ** create a custom hook to use the context
 export const useUserProfileCxt = () => {
   const context = useContext(UserProfileCxt);

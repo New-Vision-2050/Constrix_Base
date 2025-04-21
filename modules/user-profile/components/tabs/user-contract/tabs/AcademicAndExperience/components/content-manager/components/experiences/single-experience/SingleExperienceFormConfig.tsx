@@ -15,8 +15,8 @@ export const SingleExperienceFormConfig = ({
   onSuccess,
 }: PropsT) => {
   // declare and define component state and variables
-  const { user } = useUserProfileCxt();
   const formType = experience ? "Edit" : "Create";
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
 
   //  form config
@@ -98,6 +98,7 @@ export const SingleExperienceFormConfig = ({
     showBackButton: false,
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefetchUserExperiences();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

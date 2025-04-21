@@ -123,6 +123,7 @@
   "Sidebar": {
     "Dashboard": "الملف الشخصي",
     "Companies": "الشركات",
+    "CompaniesList": "عرض الشركات",
     "Users": "المستخدمين",
     "UsersList": "عرض المستخدميين",
     "Settings": "اعدادات",

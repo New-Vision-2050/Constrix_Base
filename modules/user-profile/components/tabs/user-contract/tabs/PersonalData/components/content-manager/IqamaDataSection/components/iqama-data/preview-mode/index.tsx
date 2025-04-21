@@ -1,4 +1,4 @@
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaDataPreviewMode() {
@@ -20,7 +20,7 @@ export default function UserIqamaDataPreviewMode() {
           label="تاريخ الاصدار"
           value={userIdentityData?.entry_number_start_date ?? ""}
           valid={Boolean(userIdentityData?.entry_number_start_date)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -29,7 +29,7 @@ export default function UserIqamaDataPreviewMode() {
           label="تاريخ الانتهاء"
           value={userIdentityData?.entry_number_end_date ?? ""}
           valid={Boolean(userIdentityData?.entry_number_end_date)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -40,7 +40,8 @@ export default function UserIqamaDataPreviewMode() {
             Boolean(userIdentityData?.file_entry_number) ? "رقم الاقامة" : ""
           }
           valid={Boolean(userIdentityData?.file_entry_number)}
-          isPdf
+          type="pdf"
+          fileUrl={userIdentityData?.file_entry_number?.url}
         />
       </div>
     </div>

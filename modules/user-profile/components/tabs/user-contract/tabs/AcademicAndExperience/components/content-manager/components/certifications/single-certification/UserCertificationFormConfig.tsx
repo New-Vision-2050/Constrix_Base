@@ -15,8 +15,8 @@ export const UserCertificationFormConfig = ({
   certification,
 }: PropsT) => {
   // declare and define component state and variables
-  const { user } = useUserProfileCxt();
   const formType = certification ? "Edit" : "Create";
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
 
   // form config
@@ -135,6 +135,7 @@ export const UserCertificationFormConfig = ({
     showBackButton: false,
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefetchUserCertifications();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

@@ -5,7 +5,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 
 export const SalaryFormConfig = () => {
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
 
   const salaryFormConfig: FormConfig = {
@@ -84,6 +84,7 @@ export const SalaryFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchDataStatus();
       handleRefreshSalaryData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
