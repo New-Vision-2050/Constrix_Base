@@ -107,9 +107,9 @@ const ExportButton: React.FC<ExportButtonProps> = ({
         <DropdownMenuItem onClick={() => handleExport('csv')}>
           {t('Table.ExportAsCSV')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport('json')}>
-          {t('Table.ExportAsJSON')}
-        </DropdownMenuItem>
+        {/*<DropdownMenuItem onClick={() => handleExport('json')}>*/}
+        {/*  {t('Table.ExportAsJSON')}*/}
+        {/*</DropdownMenuItem>*/}
       </DropdownMenuContent>
     </DropdownMenu>
   );
