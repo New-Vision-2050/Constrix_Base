@@ -55,7 +55,7 @@ export const companiesFormConfig: FormConfig = {
             paginationEnabled: true,
             pageParam: "page",
             limitParam: "per_page",
-            itemsPerPage: 10,
+            itemsPerPage: 20,
             totalCountHeader: "X-Total-Count",
           },
           validation: [
