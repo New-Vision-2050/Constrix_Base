@@ -60,18 +60,14 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               >
                 ✕
               </button>
-
-              {title && (
-                <h2 className="text-center !text-[#EAEAFFDE] !text-xl mt-4">
-                  {title}
-                </h2>
-              )}
-            </div>
+              {(title &&
+                  <h2 className="text-center !text-xl mt-4">{title}</h2>)}
+              </div>
           </DialogTitle>
           <InfoIcon />
         </DialogHeader>
         <DialogDescription asChild>
-          <h3 className="text-center !text-[#EAEAFFDE] !text-2xl mb-3">
+          <h3 className="text-center !text-2xl mb-3">
             {description}
           </h3>
         </DialogDescription>
