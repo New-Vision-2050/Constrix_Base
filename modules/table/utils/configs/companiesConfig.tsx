@@ -38,12 +38,26 @@ export const CompaniesConfig = () => {
         label: t("Companies.Email"),
         sortable: true,
       },
-      {
-        key: "company_type",
-        label: t("Companies.CompanyType"),
-        sortable: true,
-        searchable: true,
-      },
+        {
+            key: "company_type",
+            label: t("Companies.CompanyType"),
+            sortable: true,
+            searchable: true,
+        },
+        {
+            key: "company_field",
+            label: "النشاط",
+            render: (value: any[] | null) => (
+                <div className="line-clamp-3">
+                    {value &&
+                        value.map((field) => (
+                            <p key={field.id} className="line-clamp-1 h-5">
+                                {field.name}
+                            </p>
+                        ))}
+                </div>
+            )
+        },
       {
         key: "general_manager.name",
         label: t("Companies.Manager"),
