@@ -1,5 +1,5 @@
 import { CompanyAddress } from "@/modules/company-profile/types/company";
-import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
+import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 import { CircleCheckIcon, MapPin } from "lucide-react";
 import React from "react";
 

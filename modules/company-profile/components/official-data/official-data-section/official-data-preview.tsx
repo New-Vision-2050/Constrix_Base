@@ -1,6 +1,6 @@
 import React from "react";
-import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
 import { officialData } from "@/modules/company-profile/types/company";
+import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 
 const OfficialDataPreview = ({
   officialData,

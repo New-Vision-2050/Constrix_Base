@@ -32,15 +32,9 @@ const locationSchema = z.object({
 // Create types from the schema
 type LocationFormValues = z.infer<typeof locationSchema>;
 
-// Interface for the saved location data
-interface LocationData {
-  latitude: number;
-  longitude: number;
-}
-
 // Props interface for the component
 interface LocationSelectorProps {
-  onSave: (obj: any) => void;
+  onSave: (obj: Record<string, string | undefined>) => void;
   initialLocation?: {
     latitude: number;
     longitude: number;
@@ -135,7 +129,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   }, [markerPosition, setValue]);
 
   // Handle map click to update marker position
-  const handleMapClick = (e: any) => {
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
       const newPosition = {
         lat: e.latLng.lat(),
@@ -168,7 +162,8 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       longitude: String(parseFloat(data.longitude)),
     };
 
-    const ss = mutate(data, {
+    mutate(data, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
         const errMessage =
           err?.response?.data?.message?.description ?? "خطآ في اختيار الموقع";

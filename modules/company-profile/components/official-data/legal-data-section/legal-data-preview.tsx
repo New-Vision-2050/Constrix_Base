@@ -1,6 +1,6 @@
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
-import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
-import { File, FilePlus, Folder } from "lucide-react";
+import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
+import { FilePlus } from "lucide-react";
 
 const LegalDataPreview = ({
   companyLegalData,

@@ -1,6 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
-import useCompanyStore from "../../../store/useCompanyOfficialData";
 import { officialData } from "@/modules/company-profile/types/company";
 
 export const ReqOfficialDataEdit = (
