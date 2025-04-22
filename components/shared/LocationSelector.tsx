@@ -186,7 +186,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           neighborhood_name,
           postal_code,
           street_name,
-          ...locationData,
+        ...locationData,
         });
       },
     });
