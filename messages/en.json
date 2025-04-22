@@ -137,7 +137,8 @@
     "CompanyName": "New Vision"
   },
   "Header": {
-    "MainSystemManagement": "Main System Management"
+    "MainSystemManagement": "Main System Management",
+    "Logout": "Logout"
   },
   "FormBuilder": {
     "Fields": {
