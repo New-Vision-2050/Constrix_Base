@@ -4,7 +4,7 @@ import ActivateUser from "./components/activate-user";
 import ChangeUserPassword from "./components/change-password";
 import { useTranslations } from "next-intl";
 
-const userStatusDataSectionsBase: Omit<UserProfileNestedTab, 'title'>[] = [
+export const userStatusDataSections: Omit<UserProfileNestedTab, 'title'>[] = [
   {
     id: "user-status-activation",
     icon: <GraduationCapIcon />,
@@ -27,7 +27,7 @@ export const GetUserStatusDataSections = (props: PropsT) => {
   const { handleChangeActiveSection } = props;
   const t = useTranslations("UserStatusDataSections");
 
-  return userStatusDataSectionsBase.map((btn) => {
+  return userStatusDataSections.map((btn) => {
     let titleKey: string | null = null; // Use string type instead
     if (btn.id === "user-status-activation") {
       titleKey = "ActivateUser";

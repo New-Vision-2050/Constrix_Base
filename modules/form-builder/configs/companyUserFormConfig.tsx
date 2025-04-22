@@ -1,8 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
-const t = useTranslations("CompanyUserForm");
-export const companyUserFormConfig: FormConfig = {
+
+export const getCompanyUserFormConfig = (): FormConfig => {
+  const t = useTranslations("CompanyUserForm");
+  
+  return {
     formId: "company-user-form",
     title: t("CreateUser"),
     apiUrl: `${baseURL}/company-users`,
@@ -175,4 +178,5 @@ export const companyUserFormConfig: FormConfig = {
     },
 
     // No onSubmit handler needed - will use the default handler
+  };
 };

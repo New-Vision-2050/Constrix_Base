@@ -27,7 +27,7 @@ export { formConfig } from './configs/formConfig';
 export { sheetFormConfig } from './configs/sheetFormConfig';
 export { searchFormConfig } from './configs/searchFormConfig';
 export { companiesFormConfig } from './configs/companiesFormConfig';
-export { companyUserFormConfig } from './configs/companyUserFormConfig';
+export { getCompanyUserFormConfig } from './configs/companyUserFormConfig';
 export { changeLocalTimeConfig } from './configs/changeLocalTimeConfig';
 
 // Export utilities

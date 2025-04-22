@@ -5,7 +5,7 @@ import JobInformation from "../components/job-information";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useTranslations } from "next-intl";
 
-const FunctionalContractualListBase: Omit<UserProfileNestedTab, 'title' | 'valid' | 'onClick'>[] = [
+export const FunctionalContractualList: Omit<UserProfileNestedTab, 'title' | 'valid' | 'onClick'>[] = [
   {
     id: "functional-tab-contractual-contract-data",
     icon: <GraduationCapIcon />,
@@ -35,7 +35,7 @@ export const GetFunctionalContractualList = (props: PropsT) => {
     "functional-tab-contractual-job-data": tJob("JobData"),
   };
 
-  return FunctionalContractualListBase.map((btn) => {
+  return FunctionalContractualList.map((btn) => {
     const title = titleMap[btn.id] || ''; // Provide a default empty string
 
     return {

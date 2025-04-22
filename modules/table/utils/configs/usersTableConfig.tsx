@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
-import {companyUserFormConfig} from "@/modules/form-builder";
+import {getCompanyUserFormConfig} from "@/modules/form-builder/configs/companyUserFormConfig";
 
 // Define types for the company data
 interface CompanyData {
@@ -139,7 +139,7 @@ export const UsersConfig = () => {
       {
         key: "id",
         label: t("Companies.Actions"),
-        render: (_: unknown, row: UsersData) => <Execution id={row.user_id} formConfig={companyUserFormConfig}/>,
+        render: (_: unknown, row: UsersData) => <Execution id={row.user_id} formConfig={getCompanyUserFormConfig()}/>,
       },
     ],
     allSearchedFields: [

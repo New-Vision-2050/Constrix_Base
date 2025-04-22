@@ -70,6 +70,7 @@ export const companiesFormConfig: FormConfig = {
           label: "الاسم التجاري",
           type: "text",
           placeholder: "برجاء إدخال الاسم التجاري",
+          required:true,
           validation: [
             {
               type: "required",
@@ -95,6 +96,7 @@ export const companiesFormConfig: FormConfig = {
           placeholder: "برجاء إدخال الاسم المختصر",
           postfix: "constrix.com",
           containerClassName: "rtl:flex-row-reverse",
+          required:true,
           validation: [
             {
               type: "required",
