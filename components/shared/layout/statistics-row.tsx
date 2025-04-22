@@ -26,13 +26,13 @@ const StatisticsRow = ({ config }: { config: Config }) => {
       {payload.map((item: any, index: number) => (
         <div
           key={index}
-          className="bg-sidebar gap-4 items-start w-full text-white py-6 px-5 rounded-lg flex shadow-md"
+          className="bg-sidebar gap-4 items-start w-full py-6 px-5 rounded-lg flex shadow-md"
         >
           <div>{config.icons[index]}</div>
           <div className="flex flex-col">
             <h3
               className={cn(
-                "text-xs text-[#EAEAFFDE]",
+                "text-xs",
                 isLoading && "h-4 w-32 bg-popover rounded-md animate-pulse"
               )}
             >

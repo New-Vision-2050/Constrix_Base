@@ -14,6 +14,6 @@ const LightIcon = () => {
       ></path>
     </svg>
   );
-}
+};
 
-export default LightIcon
+export default LightIcon;

@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import LightIcon from "@/public/icons/light";
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -10,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "next-intl";
+import { MoonIcon } from "lucide-react";
 
 const ToggleTheme = () => {
   const { setTheme } = useTheme();
@@ -20,7 +20,7 @@ const ToggleTheme = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size={"icon"} variant={"ghost"}>
-          <LightIcon />
+          <MoonIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={isRtl ? "start" : "end"}>

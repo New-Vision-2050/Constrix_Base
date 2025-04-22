@@ -6,9 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import LangIcon from "@/public/icons/lang";
-import { usePathname } from 'next/navigation';
-import { SA, US } from 'country-flag-icons/react/3x2'
+import { usePathname } from "next/navigation";
+import { SA, US } from "country-flag-icons/react/3x2";
+import { LanguagesIcon } from "lucide-react";
 
 const ToggleLang = () => {
   const pathname = usePathname();
@@ -19,21 +19,27 @@ const ToggleLang = () => {
 
     // Construct the new path with the new locale
     const newPathname = `/${newLocale}${basePath}`;
-      window.location.href = newPathname;
+    window.location.href = newPathname;
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <LangIcon />
+        <LanguagesIcon />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleLocaleChange('en')}>
-          <US style={{ width: '20px', marginRight: '5px' }} title="United States" />
+        <DropdownMenuItem onClick={() => handleLocaleChange("en")}>
+          <US
+            style={{ width: "20px", marginRight: "5px" }}
+            title="United States"
+          />
           English
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleLocaleChange('ar')}>
-          <SA style={{ width: '20px', marginRight: '5px' }} title="Saudi Arabia" />
+        <DropdownMenuItem onClick={() => handleLocaleChange("ar")}>
+          <SA
+            style={{ width: "20px", marginRight: "5px" }}
+            title="Saudi Arabia"
+          />
           Arabic
         </DropdownMenuItem>
       </DropdownMenuContent>

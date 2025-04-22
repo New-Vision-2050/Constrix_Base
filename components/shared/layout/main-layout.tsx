@@ -17,7 +17,6 @@ export default function MainLayout({
 }>) {
   const locale = useLocale();
   const isRtl = locale === "ar";
-
   return (
     <main className="relative" dir={isRtl ? "rtl" : "ltr"}>
       <SparklesCore

@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 259 22% 86%;
 
     --foreground: 0 0% 3.9%;
 
@@ -20,7 +20,7 @@
 
     --popover-foreground: 0 0% 3.9%;
 
-    --primary: 329 89% 55%;
+    --primary: 331 90% 55%;
 
     --primary-foreground: 0 0% 98%;
 
@@ -58,7 +58,7 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 259 22% 86%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
 

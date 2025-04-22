@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import NotificationIcon from "@/public/icons/notification";
+import { BellIcon } from "lucide-react";
 
 const Notification = () => {
   return (
     <Button size={"icon"} variant={"ghost"}>
-      <NotificationIcon />
+      <BellIcon />
     </Button>
   );
 };
