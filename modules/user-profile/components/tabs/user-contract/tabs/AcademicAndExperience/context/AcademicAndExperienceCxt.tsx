@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 // import packages
 import { createContext, useContext, useState } from "react";
 import { AcademicAndExperienceSidebarItems } from "../constants/AcademicAndExperienceSidebarItems";
+import { useTranslations } from "next-intl";
 
 // declare context types
 type AcademicAndExperienceCxtType = {
@@ -36,8 +37,11 @@ export const AcademicAndExperienceCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
+  const t = useTranslations(
+    "UserProfile.tabs.verticalLists.academicAndExperienceList"
+  );
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    AcademicAndExperienceSidebarItems[0]
+    AcademicAndExperienceSidebarItems(t)[0]
   );
 
   // ** handle side effects

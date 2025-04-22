@@ -13,6 +13,7 @@ import useUserConnectionData from "../hooks/useUserConnectionData";
 import useUserIdentityData from "../hooks/useUserIdentityData";
 import { UserIdentityInformationT } from "../api/get-identity-data";
 import { PersonalDataSections } from "../constants/PersonalDataSections";
+import { useTranslations } from "next-intl";
 
 // declare context types
 type PersonalDataTabCxtType = {
@@ -53,13 +54,16 @@ export const PersonalDataTabCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
+  const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
   const { data: userPersonalData, refetch: refreshPersonalData } =
     useUserPersonalData();
   const { data: userConnectionData, refetch: refreshConnectionData } =
     useUserConnectionData();
   const { data: userIdentityData, refetch: refetchIdentityData } =
     useUserIdentityData();
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(PersonalDataSections[0]);
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
+    PersonalDataSections(t)[0]
+  );
 
   // ** handle side effects
 
