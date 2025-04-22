@@ -25,6 +25,7 @@ const OfficialDocsSection = ({
   companyOfficialDocuments: CompanyDocument[];
   id?: string;
 }) => {
+  console.log({ companyOfficialDocuments });
   const locale = useLocale();
   const isRTL = locale === "ar";
 
@@ -65,8 +66,12 @@ const OfficialDocsSection = ({
       >
         {mode === "Preview" ? (
           <>
-            {!!companyOfficialDocuments ? (
-              <DocsTable companyOfficialDocuments={companyOfficialDocuments} id={id} />
+            {!!companyOfficialDocuments &&
+            companyOfficialDocuments.length > 0 ? (
+              <DocsTable
+                companyOfficialDocuments={companyOfficialDocuments}
+                id={id}
+              />
             ) : (
               <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
                 <InfoIcon additionClass="text-orange-500 " />

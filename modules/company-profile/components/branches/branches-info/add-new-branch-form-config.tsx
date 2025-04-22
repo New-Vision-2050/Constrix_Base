@@ -1,12 +1,20 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import useCompanyStore from "../../../store/useCompanyOfficialData";
+import { Branch } from "@/modules/company-profile/types/company";
+import PickupMap from "../../official-data/national-address/pickup-map";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const addNewBranchFormConfig = () => {
-  const { company } = useCompanyStore();
+export const addNewBranchFormConfig = (branches: Branch[]) => {
+  const queryClient = useQueryClient();
+  const formId = "add-new-branch-form";
   const addNewBranchFormConfig: FormConfig = {
-    formId: "company-official-data-form",
-    apiUrl: `${baseURL}/write-ur-url`,
+    formId,
+    apiUrl: `${baseURL}/management_hierarchies/create-branch`,
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data"],
+      });
+    },
     title: "اضافة فرع جديد",
     laravelValidation: {
       enabled: true,
@@ -39,10 +47,10 @@ export const addNewBranchFormConfig = () => {
             ],
           },
           {
-            name: "branch_name",
+            name: "name",
             label: "اسم الفرع",
-            type: "select",
-            options: [{ label: "فرع الرياض", value: "فرع الرياض" }],
+            placeholder: "اسم الفرع",
+            type: "text",
             validation: [
               {
                 type: "required",
@@ -51,14 +59,52 @@ export const addNewBranchFormConfig = () => {
             ],
           },
           {
-            name: "government",
-            label: "المحافظة",
             type: "select",
-            options: [{ label: "الشمالية", value: "الشمالية" }],
+            name: "state_id",
+            label: "المحافظة",
+            placeholder: "المحافظة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "country_id",
+              filterParam: "country_id",
+            },
             validation: [
               {
                 type: "required",
-                message: "ادخل المحافظة",
+                message: "ادخل المنطقة",
+              },
+            ],
+          },
+          {
+            type: "select",
+            name: "city_id",
+            label: "المدينة",
+            placeholder: "المدينة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "state_id",
+              filterParam: "state_id",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل المدينة",
               },
             ],
           },
@@ -66,7 +112,10 @@ export const addNewBranchFormConfig = () => {
             name: "branch_type",
             label: "نوع الفرع",
             type: "select",
-            options: [{ label: "رئيسي", value: "رئيسي" }],
+            options: [
+              { label: "رئيسي", value: "رئيسي" },
+              { label: "فرعي", value: "فرعي" },
+            ],
             validation: [
               {
                 type: "required",
@@ -75,14 +124,35 @@ export const addNewBranchFormConfig = () => {
             ],
           },
           {
-            name: "branch_manager",
-            label: "مدير الفرع",
+            name: "parent_id",
+            label: "الفرع الرئيسي",
             type: "select",
-            options: [{ label: "سعد مشعل", value: "سعد مشعل" }],
+            options: branches.map((branch) => ({
+              value: branch.id,
+              label: branch.name,
+            })),
+            condition: (values) => values.branch_type === "فرعي",
+          },
+          {
+            type: "select",
+            name: "manager_id",
+            label: "مدير الفرع",
+            placeholder: "اختر مدير الفرع",
+            dynamicOptions: {
+              url: `${baseURL}/users`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
-                message: "ادخل مدير الفرع",
+                message: "مدير الفرع",
               },
             ],
           },
@@ -101,6 +171,7 @@ export const addNewBranchFormConfig = () => {
             name: "email",
             label: "البريد الالكتروني",
             type: "email",
+            placeholder: "البريد الالكتروني",
             validation: [
               {
                 type: "required",
@@ -109,6 +180,57 @@ export const addNewBranchFormConfig = () => {
               {
                 type: "email",
                 message: "البريد الالكتروني غير صحيح",
+              },
+            ],
+          },
+          {
+            label: "تعديل الموقع من الخريطة",
+            name: "map",
+            type: "text",
+            render: () => (
+              <PickupMap
+                formId={formId}
+                keysToUpdate={[
+                  "country_id",
+                  "state_id",
+                  "city_id",
+                  "latitude",
+                  "longitude",
+                ]}
+              />
+            ),
+          },
+          {
+            label: "",
+            name: "",
+            type: "text",
+            render: () => (
+              <p className="text-xs">
+                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+              </p>
+            ),
+          },
+          {
+            name: "latitude",
+            label: "latitude",
+            placeholder: "latitude",
+            type: "hiddenObject",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل دائرة العرض",
+              },
+            ],
+          },
+          {
+            name: "longitude",
+            label: "longitude",
+            placeholder: "longitude",
+            type: "hiddenObject",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل خط الطول",
               },
             ],
           },

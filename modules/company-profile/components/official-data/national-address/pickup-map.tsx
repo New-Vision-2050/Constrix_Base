@@ -8,27 +8,40 @@ import { useModal } from "@/hooks/use-modal";
 import { useFormStore } from "@/modules/form-builder";
 import { MapPin } from "lucide-react";
 import React from "react";
-import LocationSelector from "./map-dialog";
+import LocationSelector from "../../../../../components/shared/LocationSelector";
+import { cn } from "@/lib/utils";
+
+const defaultKeys = [
+  "city_id",
+  "state_id",
+  "postal_code",
+  "street_name",
+  "neighborhood_name",
+];
 
 const PickupMap = ({
   formId,
   lat,
   long,
+  containerClassName,
+  keysToUpdate,
 }: {
   formId: string;
-  lat: string;
-  long: string;
+  lat?: string;
+  long?: string;
+  containerClassName?: string;
+  keysToUpdate?: string[];
 }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue } = useFormStore();
-  //   setValue(formId , 'street_name' , 'aaaaaaaaa')
 
   const handleSaveMap = (obj: any) => {
-    setValue(formId, "city_id", obj.city_id);
-    setValue(formId, "state_id", obj.state_id);
-    setValue(formId, "postal_code", obj.postal_code);
-    setValue(formId, "street_name", obj.street_name);
-    setValue(formId, "neighborhood_name", obj.neighborhood_name);
+    const keys = keysToUpdate ?? defaultKeys;
+    keys.forEach((key) => {
+      if (obj[key] !== undefined) {
+        setValue(formId, key, obj[key]);
+      }
+    });
 
     handleClose();
   };
@@ -36,9 +49,10 @@ const PickupMap = ({
   return (
     <>
       <div
-        className={
-          "relative border col-span-2 h-10 rounded-md flex items-center justify-between px-3"
-        }
+        className={cn(
+          "relative border h-10 rounded-md flex items-center justify-between px-3",
+          containerClassName
+        )}
       >
         <div className="flex w-full items-center gap-2">
           <MapPin className="text-primary w-4" />
@@ -56,10 +70,14 @@ const PickupMap = ({
           </DialogHeader>
           <LocationSelector
             onSave={handleSaveMap}
-            initialLocation={{
-              latitude: parseFloat(lat),
-              longitude: parseFloat(long),
-            }}
+            {...(!!lat && !!long
+              ? {
+                  initialLocation: {
+                    latitude: parseFloat(lat),
+                    longitude: parseFloat(long),
+                  },
+                }
+              : {})}
           />
         </DialogContent>
       </Dialog>

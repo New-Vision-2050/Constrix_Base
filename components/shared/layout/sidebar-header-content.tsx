@@ -1,11 +1,11 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import NewVision from "@/public/icons/new-vision";
 import React from "react";
 import { AvatarGroup } from "../avatar-group";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
+import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 
 const SidebarHeaderContent = ({
   name,
@@ -30,12 +30,15 @@ const SidebarHeaderContent = ({
             className="transition-[width] ease-linear duration-200"
           />
         ) : (
-          <NewVision
-            width={open ? 60 : 30}
+          <Image
+            src={LogoPlaceholder}
+            alt={"logo placeholder"}
+            width={open ? 80 : 40}
             height={47}
             className="transition-[width] ease-linear duration-200"
           />
         )}
+
         <p
           className={cn(
             "transition truncate font-bold",

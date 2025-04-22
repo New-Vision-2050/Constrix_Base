@@ -163,9 +163,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   // Handle form submission
   const onSubmit = async (data: LocationFormValues): Promise<void> => {
-    const locationData: LocationData = {
-      latitude: parseFloat(data.latitude),
-      longitude: parseFloat(data.longitude),
+    const locationData = {
+      latitude: String(parseFloat(data.latitude)),
+      longitude: String(parseFloat(data.longitude)),
     };
 
     const ss = mutate(data, {
@@ -191,6 +191,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           neighborhood_name,
           postal_code,
           street_name,
+          ...locationData,
         });
       },
     });

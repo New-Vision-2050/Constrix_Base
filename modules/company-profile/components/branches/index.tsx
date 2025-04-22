@@ -4,23 +4,30 @@ import { useLocale } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BranchesInfo from "./branches-info";
 import OfficialData from "../official-data";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
-import { useMemo } from "react";
+import { apiClient } from "@/config/axios-config";
 
 const Branches = () => {
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const { data: cachedData, isLoading } = useQuery({
+    queryKey: ["main-company-data", undefined],
+    queryFn: async () => {
+      const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
+        "/companies/current-auth-company"
+      );
 
-  const queryClient = useQueryClient();
-  const cachedData = queryClient.getQueryData<
-    ServerSuccessResponse<CompanyData>
-  >(["main-company-data", null]);
+      return response.data;
+    },
+  });
+
+  console.log({ cachedData });
 
   const branches = cachedData?.payload?.branches ?? [];
 
-  const tabs = useMemo(() => {
+  const tabs = () => {
     const dynamicBranchTabs =
       branches.length > 0
         ? branches.map((branch) => ({
@@ -37,7 +44,7 @@ const Branches = () => {
       },
       ...dynamicBranchTabs,
     ];
-  }, [branches]);
+  };
 
   return (
     <div>
@@ -50,7 +57,7 @@ const Branches = () => {
           className="flex flex-col bg-sidebar p-2 w-32 h-full gap-4 rounded-lg justify-start"
           dir={isRtl ? "rtl" : "ltr"}
         >
-          {tabs.map((tab) => (
+          {tabs().map((tab) => (
             <TabsTrigger
               key={tab.value}
               className="flex items-start justify-between w-full px-2 py-4 rounded-md data-[state=active]:bg-sidebar gap-2 whitespace-normal"
@@ -68,7 +75,7 @@ const Branches = () => {
           ))}
         </TabsList>
         <div className="flex-1">
-          {tabs.map((tab) => (
+          {tabs().map((tab) => (
             <TabsContent
               key={tab.value}
               value={tab.value}
