@@ -62,7 +62,6 @@ const CompaniesPage = () => {
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
-            <ExportButton data={["omar"]} />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}

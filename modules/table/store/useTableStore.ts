@@ -38,6 +38,10 @@ interface TableInstanceState {
     keys: string[];
   };
   
+  // Row selection state
+  selectedRows: Record<string | number, boolean>;
+  selectionEnabled: boolean;
+  
   // Internal state for reload functionality
   _forceRefetch?: number; // Timestamp to force a refetch
 }
@@ -71,6 +75,12 @@ interface TableState {
   // Column visibility actions
   setColumnVisibility: (tableId: string, visible: boolean) => void;
   setColumnVisibilityKeys: (tableId: string, keys: string[]) => void;
+  
+  // Row selection actions
+  setSelectionEnabled: (tableId: string, enabled: boolean) => void;
+  selectRow: (tableId: string, rowId: string | number, selected: boolean) => void;
+  selectAllRows: (tableId: string, selected: boolean) => void;
+  clearSelectedRows: (tableId: string) => void;
 }
 
 // Default state for a new table instance
@@ -93,7 +103,9 @@ const getDefaultTableState = (): TableInstanceState => ({
   columnVisibility: {
     visible: true,
     keys: []
-  }
+  },
+  selectedRows: {},
+  selectionEnabled: true // Set to true by default
 });
 
 // Create the store with proper server snapshot caching
@@ -357,6 +369,78 @@ export const useTableStore = create<TableState>((set) => ({
         }
       }
     };
+  }),
+  
+  // Row selection actions
+  setSelectionEnabled: (tableId: string, enabled: boolean) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          selectionEnabled: enabled,
+          // Clear selected rows when disabling selection
+          selectedRows: enabled ? tableState.selectedRows : {}
+        }
+      }
+    };
+  }),
+  
+  selectRow: (tableId: string, rowId: string | number, selected: boolean) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          selectedRows: {
+            ...tableState.selectedRows,
+            [rowId]: selected
+          }
+        }
+      }
+    };
+  }),
+  
+  selectAllRows: (tableId: string, selected: boolean) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    const selectedRows: Record<string | number, boolean> = {};
+    
+    // If selected is true, select all rows, otherwise clear selection
+    if (selected) {
+      tableState.data.forEach((row, index) => {
+        // Use row.id if available, otherwise use index
+        const rowId = row.id !== undefined ? row.id : index;
+        selectedRows[rowId] = true;
+      });
+    }
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          selectedRows
+        }
+      }
+    };
+  }),
+  
+  clearSelectedRows: (tableId: string) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          selectedRows: {}
+        }
+      }
+    };
   })
 }));
 
@@ -441,6 +525,19 @@ export const useTableInstance = (tableId: string) => {
     }, 200); // Increased timeout to ensure fetch completes
   }, [tableId]);
   
+  // Row selection actions
+  const setSelectionEnabled = useCallback((enabled: boolean) =>
+    useTableStore.getState().setSelectionEnabled(tableId, enabled), [tableId]);
+    
+  const selectRow = useCallback((rowId: string | number, selected: boolean) =>
+    useTableStore.getState().selectRow(tableId, rowId, selected), [tableId]);
+    
+  const selectAllRows = useCallback((selected: boolean) =>
+    useTableStore.getState().selectAllRows(tableId, selected), [tableId]);
+    
+  const clearSelectedRows = useCallback(() =>
+    useTableStore.getState().clearSelectedRows(tableId), [tableId]);
+  
   return {
     // State
     ...tableState,
@@ -461,7 +558,13 @@ export const useTableInstance = (tableId: string) => {
     resetTable,
     setColumnVisibility,
     setColumnVisibilityKeys,
-    reloadTable // Expose the reloadTable method
+    reloadTable, // Expose the reloadTable method
+    
+    // Row selection actions
+    setSelectionEnabled,
+    selectRow,
+    selectAllRows,
+    clearSelectedRows
   };
 };
 
