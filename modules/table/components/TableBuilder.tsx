@@ -9,6 +9,7 @@ import { useToast } from "@/modules/table/hooks/use-toast";
 import SearchBar from "./table/SearchBar";
 import ColumnSearch from "./table/ColumnSearch";
 import DataTable from "./table/DataTable";
+import ExportButton from "./table/ExportButton";
 import { useTableData } from "@/modules/table/hooks/useTableData";
 import { useResetTableOnRouteChange } from "@/modules/table/hooks/useResetTableOnRouteChange";
 
@@ -17,6 +18,7 @@ interface TableBuilderProps {
   config?: TableConfig;
   onReset?: () => void;
   searchBarActions?: React.ReactNode; // New prop for custom actions in search bar
+  tableId?: string; // Optional table ID override
 }
 
 const TableBuilder: React.FC<TableBuilderProps> = ({
@@ -24,9 +26,10 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   config,
   onReset,
   searchBarActions,
+  tableId: propTableId,
 }) => {
-  // Generate a random ID if not provided in config
-  const tableId = config?.tableId || `table-${Math.random().toString(36).substring(2, 9)}`;
+  // Generate a random ID if not provided in config or props
+  const tableId = propTableId || config?.tableId || `table-${Math.random().toString(36).substring(2, 9)}`;
   const { toast } = useToast();
 
   // Use the reset hook to clear table state on route changes
@@ -69,6 +72,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     totalPages,
     totalItems,
     itemsPerPage,
+    selectedRows,
+    selectionEnabled,
     handleSort,
     handleSearch,
     handleColumnSearch,
@@ -80,6 +85,10 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     setColumns,
     setColumnVisibility,
     setColumnVisibilityKeys,
+    setSelectionEnabled,
+    selectRow,
+    selectAllRows,
+    clearSelectedRows,
   } = useTableData(
     dataUrl,
     config?.columns,
@@ -95,10 +104,10 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Initialize columns from config immediately if available
   // Use a ref to track if we've already set the columns
   const columnsInitializedRef = React.useRef(false);
-  
+
   // Store the columns in a ref to avoid dependency issues
   const configColumnsRef = React.useRef(config?.columns);
-  
+
   // Store the tableId in a ref to avoid dependency issues
   const tableIdRef = React.useRef(tableId);
 
@@ -118,6 +127,14 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const enablePagination = config?.enablePagination !== false;
   const enableSearch = config?.enableSearch !== false;
   const enableColumnSearch = config?.enableColumnSearch === true;
+  // Only disable row selection if explicitly set to false
+  const enableRowSelection = config?.enableRowSelection !== false;
+
+  // Initialize row selection based on config or default
+  React.useEffect(() => {
+    // Set selection enabled state based on config
+    setSelectionEnabled(enableRowSelection);
+  }, [enableRowSelection, setSelectionEnabled]);
   const searchableColumns = columns.filter((col: ColumnConfig) => col.searchable);
   const hasSearchableColumns = searchableColumns.length > 0;
   const allSearchedFields = config?.allSearchedFields;
@@ -170,7 +187,18 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             columnVisibility={columnVisibility}
             onSetColumnVisibility={setColumnVisibility}
             onSetColumnVisibilityKeys={setColumnVisibilityKeys}
-            actions={searchBarActions} // Pass custom actions to SearchBar
+            actions={
+              <div className="flex items-center gap-2">
+                {/* Add the ExportButton component */}
+                <ExportButton
+                  url={dataUrl}
+                  selectedRows={selectedRows}
+                  disabled={loading || !selectionEnabled}
+                />
+                {/* Include any custom actions passed from the parent */}
+                {searchBarActions}
+              </div>
+            }
           />
         )}
 
@@ -186,7 +214,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                   if (columnVisibility?.visible === false) {
                     return true;
                   }
-                  
+
                   const keysToUse = columnVisibility?.keys?.length > 0
                     ? columnVisibility.keys
                     : visibleColumnKeys;
@@ -206,6 +234,12 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
           onPageChange={handlePageChange}
           onItemsPerPageChange={handleItemsPerPageChange}
           loading={loading}
+
+          // Row selection props
+          selectionEnabled={selectionEnabled}
+          selectedRows={selectedRows}
+          onSelectRow={selectRow}
+          onSelectAllRows={selectAllRows}
         />
 
         {onReset && (

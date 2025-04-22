@@ -23,6 +23,12 @@ interface DataTableProps {
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (items: number) => void;
   loading?: boolean;
+  
+  // Row selection props
+  selectionEnabled?: boolean;
+  selectedRows?: Record<string | number, boolean>;
+  onSelectRow?: (rowId: string | number, selected: boolean) => void;
+  onSelectAllRows?: (selected: boolean) => void;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -39,7 +45,13 @@ const DataTable: React.FC<DataTableProps> = ({
   itemsPerPage,
   onPageChange,
   onItemsPerPageChange,
-  loading = false
+  loading = false,
+  
+  // Row selection props
+  selectionEnabled = false,
+  selectedRows = {},
+  onSelectRow,
+  onSelectAllRows
 }) => {
   const hasColumns = columns && columns.length > 0;
 
@@ -59,12 +71,21 @@ const DataTable: React.FC<DataTableProps> = ({
               sortState={sortState}
               onSort={onSort}
               enableSorting={enableSorting}
+              selectionEnabled={selectionEnabled}
+              allRowsSelected={
+                data.length > 0 &&
+                data.every((row, index) => {
+                  const rowId = row.id !== undefined ? row.id : index;
+                  return selectedRows[rowId];
+                })
+              }
+              onSelectAllRows={onSelectAllRows}
             />
             <AnimatePresence mode="wait">
               {loading ? (
                 <tbody>
                   <tr>
-                    <td colSpan={columns.length} className="py-8">
+                    <td colSpan={selectionEnabled ? columns.length + 1 : columns.length} className="py-8">
                       <LoadingSpinner text="Loading data..." size="small" />
                     </td>
                   </tr>
@@ -74,6 +95,10 @@ const DataTable: React.FC<DataTableProps> = ({
                   data={data}
                   columns={columns}
                   searchQuery={searchQuery}
+                  selectionEnabled={selectionEnabled}
+                  selectedRows={selectedRows}
+                  onSelectRow={onSelectRow}
+                  onSelectAllRows={onSelectAllRows}
                 />
               )}
             </AnimatePresence>

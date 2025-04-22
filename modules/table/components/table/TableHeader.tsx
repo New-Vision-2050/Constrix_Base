@@ -3,19 +3,26 @@ import React from 'react';
 import { ChevronUp, ChevronDown, ArrowUpDown } from 'lucide-react';
 import { ColumnConfig } from '@/modules/table/utils/configs/columnConfig';
 import { SortState } from '@/modules/table/utils/tableTypes';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface TableHeaderProps {
   columns: ColumnConfig[];
   sortState: SortState;
   onSort: (column: string) => void;
   enableSorting: boolean;
+  selectionEnabled?: boolean;
+  allRowsSelected?: boolean;
+  onSelectAllRows?: (selected: boolean) => void;
 }
 
 const TableHeader: React.FC<TableHeaderProps> = ({
   columns,
   sortState,
   onSort,
-  enableSorting
+  enableSorting,
+  selectionEnabled = false,
+  allRowsSelected = false,
+  onSelectAllRows
 }) => {
   const getSortIcon = (column: string) => {
     // Use logical properties (ms-1 for RTL support instead of ml-1)
@@ -33,6 +40,15 @@ const TableHeader: React.FC<TableHeaderProps> = ({
   return (
     <thead>
       <tr className="border-b border-border bg-background">
+        {selectionEnabled && (
+          <th className="p-2 md:p-3 w-10 text-center">
+            <Checkbox
+              checked={allRowsSelected}
+              onCheckedChange={(checked) => onSelectAllRows && onSelectAllRows(!!checked)}
+              aria-label="Select all rows"
+            />
+          </th>
+        )}
         {columns.map((column) => {
           const isMobileHidden = column.hideOnMobile ? 'hidden sm:table-cell' : '';
           // Use logical properties for RTL/LTR support
