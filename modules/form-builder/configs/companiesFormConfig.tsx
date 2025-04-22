@@ -77,7 +77,7 @@ export const companiesFormConfig: FormConfig = {
             },
             {
               type: "apiValidation",
-              message: "This username is already taken",
+              message: "الاسم يجب ان يكون باللغة العربية ولا يتخلله رموز",
               apiConfig: {
                 url: `${baseURL}/companies/validated`,
                 method: "POST",
@@ -198,7 +198,7 @@ export const companiesFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "الشركة",
+              message: "اختر الشركة",
             },
           ],
         },
