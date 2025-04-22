@@ -28,11 +28,9 @@ const ProfileDrop = () => {
   ];
   return (
     <div className="flex justify-center items-center">
-      <AvatarGroup
-        fullName="Sallam Rady"
-        alt="Sallam Rady"
-        src="https://github.com/shad\cn.png"
-      />
+      {user?.name && (
+        <AvatarGroup fullName={user?.name} alt={user?.name} src={user?.name} />
+      )}
       <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
           <Button className="px-5 bg-[transparent] hover:bg-[transparent] rotate-svg-child">
