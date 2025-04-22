@@ -1,11 +1,11 @@
-type PropsT = { additionClass?: string };
+type PropsT = { additionClass?: string; width?: string; height?: string };
 
-export default function InfoIcon({ additionClass }: PropsT) {
+export default function InfoIcon({ additionClass, width, height }: PropsT) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
+      width={width ?? "24"}
+      height={height ?? "24"}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

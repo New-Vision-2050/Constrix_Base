@@ -9,24 +9,24 @@ interface TimeZoneCheckboxProps {
   onChange: (value: boolean) => void;
 }
 
-export const TimeZoneCheckbox: React.FC<TimeZoneCheckboxProps> = ({ field, value, onChange }) => {
+export const TimeZoneCheckbox: React.FC<TimeZoneCheckboxProps> = ({
+  field,
+  value,
+  onChange,
+}) => {
   return (
     <div className="flex items-center gap-2">
-      <Checkbox
-        checked={value}
-        onCheckedChange={(b: boolean) => onChange(b)}
-      />
+      <Checkbox checked={value} onCheckedChange={(b: boolean) => onChange(b)} />
       <div className="flex items-center gap-1">
         <p className="text-sm">لتأكيد تغيير المنطقة الزمنية،</p>
-    
         <DialogFormBuilder
-              config={changeLocalTimeConfig}
-              trigger={    
-              <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
-                اضغط هنا
-              </Button>
-              }
-            />{" "}
+          config={changeLocalTimeConfig}
+          trigger={
+            <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
+              اضغط هنا
+            </Button>
+          }
+        />{" "}
       </div>
     </div>
   );

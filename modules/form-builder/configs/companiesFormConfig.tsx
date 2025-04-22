@@ -1,8 +1,9 @@
 // Define the form configuration
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
+import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/InvalidMessage";
 
 export const companiesFormConfig: FormConfig = {
   formId: "companies-form",
@@ -32,6 +33,12 @@ export const companiesFormConfig: FormConfig = {
             limitParam: "per_page",
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
+          },
+          onChange: (newVal, values) => {
+            console.log("neeeewValue", newVal, values);
+            // useFormStore.getState().setValues("change-local-time-form", {
+            //   "country-id": newVal,
+            // });
           },
           validation: [
             {
@@ -134,35 +141,44 @@ export const companiesFormConfig: FormConfig = {
           name: "change_local_time",
           label: "الشركة",
           placeholder: "اختر الشركة",
-          render: (field: any, value: boolean, onChange: (value: boolean) => void) => {
-            return <TimeZoneCheckbox field={field} value={value} onChange={onChange} />;
+          render: (
+            field: any,
+            value: boolean,
+            onChange: (value: boolean) => void
+          ) => {
+            return (
+              <TimeZoneCheckbox
+                field={field}
+                value={value}
+                onChange={onChange}
+              />
+            );
           },
           validation: [
             {
-              type: 'custom',
-              message: 'Order must have at least one item',
+              type: "custom",
+              message: "Order must have at least one item",
               validator: (value) => {
+                console.log("checkbox error: -----: ", value);
 
-                console.log('checkbox error: -----: ' , value)
-
-                return false
-              }
+                return false;
+              },
             },
-          ]
+          ],
         },
         {
-          type: 'hiddenObject',
-          name: 'local-time',
-          label: 'local-time',
+          type: "hiddenObject",
+          name: "local-time",
+          label: "local-time",
           condition(values) {
-            return !!values['change_local_time']
+            return !!values["change_local_time"];
           },
           defaultValue: {
-            companyType: 'llc',
+            companyType: "llc",
             employeeCount: 0,
-            industry: 'technology',
-            taxExempt: false
-          }
+            industry: "technology",
+            taxExempt: false,
+          },
         },
       ],
     },
@@ -170,6 +186,12 @@ export const companiesFormConfig: FormConfig = {
       title: "إنشاء مستخدم",
       collapsible: false,
       fields: [
+        {
+          type: "hiddenObject",
+          name: "exist_user_id",
+          label: "exist_user_id",
+          defaultValue: "",
+        },
         {
           type: "text",
           name: "company_id",
@@ -236,6 +258,26 @@ export const companiesFormConfig: FormConfig = {
               type: "email",
               message: "Please enter a valid email address",
             },
+            {
+              type: "apiValidation",
+              message: (
+                <>
+                  <InvalidMessage />
+                </>
+              ),
+              apiConfig: {
+                url: `${baseURL}/company-users/check-email`,
+                method: "POST",
+                debounceMs: 500,
+                paramName: "email",
+                successCondition: (response) => {
+                  useFormStore.getState().setValues("companies-form", {
+                    exist_user_id: response.payload?.[0]?.id,
+                  });
+                  return response.payload?.[0]?.status === 1;
+                },
+              },
+            },
           ],
         },
         {
@@ -253,6 +295,8 @@ export const companiesFormConfig: FormConfig = {
         {
           type: "select",
           name: "job_title_id",
+          disabled: true,
+          defaultValue: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
           label: "المسمى الوظيفي",
           placeholder: "اختر المسمى الوظيفي",
           required: true,
@@ -274,12 +318,12 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-
-
-
       ],
     },
   ],
+  initialValues:{
+    job_title_id:"8326ca2c-a0ea-443d-a073-4b16f21a3302"
+  },
   submitButtonText: "Send Message",
   cancelButtonText: "Cancel",
   showReset: false,
@@ -303,13 +347,11 @@ export const companiesFormConfig: FormConfig = {
     // Enable submitting each step individually
     submitEachStep: true,
     submitButtonTextPerStep: "التالي",
-
     // API URLs for each step
     stepApiUrls: {
       0: `${baseURL}/companies`,
       1: `${baseURL}/company-users`,
     },
-
     // API headers for each step
     stepApiHeaders: {
       0: {
@@ -319,7 +361,6 @@ export const companiesFormConfig: FormConfig = {
         "X-User-API-Key": "user-api-key",
       },
     },
-
     // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
     onStepSubmit: async (step, values) => {
       // Option to call default way to handle the step
@@ -328,18 +369,28 @@ export const companiesFormConfig: FormConfig = {
         values,
         companiesFormConfig
       );
+      console.log("result before success", result);
+      useFormStore.getState().setValues("companies-form", {
+        company_id: result?.data?.payload.id,
+      });
       if (result.success) {
         // Simulate API call
         return new Promise((resolve) => {
           resolve({
             success: true,
             message: `Step ${step + 1} submitted successfully`,
-            data: {
-              // For step 0 (location), return a generated ID
-              ...(step === 0 &&
-                result.data?.payload?.id && {
-                  company_id: result.data.payload.id,
-                }),
+            data: () => {
+              console.log("result after success", result);
+              useFormStore.getState().setValues("companies-form", {
+                company_id: result?.data?.payload.id,
+              });
+              return {
+                // For step 0 (location), return a generated ID
+                ...(step === 0 &&
+                  result.data?.payload?.id && {
+                    company_id: result.data.payload.id,
+                  }),
+              };
             },
           });
         });
@@ -352,37 +403,10 @@ export const companiesFormConfig: FormConfig = {
       console.log("Current values:", values);
     },
   },
-    editDataTransformer:(data)=>{
-      if(!Array.isArray( data.company_field_id)) {
-          data.company_field_id = data?.company_field_id?.split(",")
-      }
-      return data;
-    },
-
-  // Example onSuccess handler
-  onSuccess: (values, result) => {
-    console.log("Form submitted successfully with values:", values);
-    console.log("Result from API:", result);
-
-    // You can perform additional actions here, such as:
-    // - Show a custom notification
-    // - Navigate to another page
-    // - Update application state
-    // - Trigger analytics events
-    // - etc.
+  editDataTransformer: (data) => {
+    if (!Array.isArray(data.company_field_id)) {
+      data.company_field_id = data?.company_field_id?.split(",");
+    }
+    return data;
   },
-
-  // Example onError handler
-  onError: (values, error) => {
-    console.log("Form submission failed with values:", values);
-    console.log("Error details:", error);
-
-    // You can perform additional actions here, such as:
-    // - Show a custom error notification
-    // - Log the error to an analytics service
-    // - Attempt to recover from the error
-    // - etc.
-  },
-
-  // No onSubmit handler needed - will use the default handler
 };
