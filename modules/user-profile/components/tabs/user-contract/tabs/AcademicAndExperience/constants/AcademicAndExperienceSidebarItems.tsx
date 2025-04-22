@@ -9,48 +9,51 @@ import UserCourses from "../components/content-manager/components/courses";
 import UserCertifications from "../components/content-manager/components/certifications";
 import UserCV from "../components/content-manager/components/user-cv";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 
-export const AcademicAndExperienceSidebarItems: UserProfileNestedTab[] = [
+export const AcademicAndExperienceSidebarItems = (
+  t: (key: string) => string
+): UserProfileNestedTab[] => [
   {
     id: "contract-tab-academic-experience-qualification",
-    title: "المؤهل",
-    type:"qualification",
+    title: t("qualification"),
+    type: "qualification",
     icon: <GraduationCapIcon />,
     content: <UserQualificationData />,
   },
   {
     id: "contract-tab-academic-experience-brief",
-    title: "نبذه مختصرة",
-    type:"user_about",
+    title: t("summary"),
+    type: "user_about",
     icon: <BackpackIcon />,
     content: <ProfileBriefSummary />,
   },
   {
     id: "contract-tab-academic-experience-old-experience",
-    title: "الخبرات السابقة",
+    title: t("experiences"),
     icon: <BackpackIcon />,
-    type:"experience",
+    type: "experience",
     content: <UserExperiences />,
   },
   {
     id: "contract-tab-academic-experience-courses",
     icon: <LandmarkIcon />,
-    type:"educational_course",
-    title: "الكورسات التعليمية",
+    type: "educational_course",
+    title: t("courses"),
     content: <UserCourses />,
   },
   {
     id: "contract-tab-academic-experience-certificates",
     icon: <GraduationCapIcon />,
     title: "الشهادات المهنية",
-    type:"professional_certificate",
+    type: t("certifications"),
     content: <UserCertifications />,
   },
   {
     id: "contract-tab-academic-experience-cv",
     icon: <BackpackIcon />,
-    type:"biography",
-    title: "السيرة الذاتية",
+    type: "biography",
+    title: t("cv"),
     content: <UserCV />,
   },
 ];
@@ -60,10 +63,14 @@ type PropsT = {
 };
 
 export const GetAcademicAndExperienceSidebarItems = (props: PropsT) => {
+  // declare and define component state and vars
   const { handleChangeActiveSection } = props;
   const { userDataStatus } = useUserProfileCxt();
+  const t = useTranslations(
+    "UserProfile.tabs.verticalLists.academicAndExperienceList"
+  );
 
-  return AcademicAndExperienceSidebarItems?.map((btn) => ({
+  return AcademicAndExperienceSidebarItems(t)?.map((btn) => ({
     ...btn,
     valid: btn?.type
       ? userDataStatus?.[btn?.type as keyof typeof userDataStatus]

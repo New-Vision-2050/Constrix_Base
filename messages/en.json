@@ -208,6 +208,35 @@
           "rule3": "Make sure the background is white."
         }
       }
+    },
+    "tabs": {
+      "profile": "Profile",
+      "contract": "Employment Contract",
+      "attendance": "Attendance Policy",
+      "usersActions": "User Actions",
+      "contractTabs": {
+        "personalTab": "Personal Data",
+        "academicAndExperience": "Academic and Experience Data",
+        "employmentAndContractalData": "Employment and Contractual Data",
+        "financialPrivileges": "Financial Benefits",
+        "contractManagement": "Contract Management"
+      },
+      "verticalLists": {
+        "personalList": {
+          "personalData": "Personal Data",
+          "bankingData": "Banking Information",
+          "connectionData": "Contact Information",
+          "iqamaData": "Residence Information"
+        },
+        "academicAndExperienceList": {
+          "qualification": "Qualification",
+          "summary": "Brief Overview",
+          "experiences": "Previous Experience",
+          "courses": "Educational Courses",
+          "certifications": "Professional Certifications",
+          "cv": "CV"
+        }
+      }
     }
   }
 }

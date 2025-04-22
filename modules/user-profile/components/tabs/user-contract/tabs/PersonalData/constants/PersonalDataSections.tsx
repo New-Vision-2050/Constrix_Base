@@ -8,25 +8,28 @@ import IqamaDataSection from "../components/content-manager/IqamaDataSection";
 import BankingDataSection from "../components/content-manager/BankingDataSection";
 import ConnectionDataSection from "../components/content-manager/connectionDataSection";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 
-export const PersonalDataSections: UserProfileNestedTab[] = [
+export const PersonalDataSections = (
+  t: (key: string) => string
+): UserProfileNestedTab[] => [
   {
     id: "contract-tab-personal-data-section",
-    title: "البيانات الشخصية",
+    title: t("personalData"),
     icon: <UserIcon />,
     type: "info_company_user",
     content: <PersonalDataSection />,
   },
   {
     id: "contract-tab-banking-data-section",
-    title: "المعلومات البنكية",
+    title: t("bankingData"),
     type: "bank_account",
     icon: <LandmarkIcon />,
     content: <BankingDataSection />,
   },
   {
     id: "contract-tab-connect-data-section",
-    title: "معلومات الاتصال",
+    title: t("connectionData"),
     type: "contact_info",
     icon: <PhoneIcon />,
     content: <ConnectionDataSection />,
@@ -35,7 +38,7 @@ export const PersonalDataSections: UserProfileNestedTab[] = [
     id: "contract-tab-iqama-data-section",
     icon: <BackpackIcon />,
     type: "identity_info",
-    title: "معلومات الاقامة",
+    title: t("iqamaData"),
     content: <IqamaDataSection />,
   },
 ];
@@ -45,12 +48,14 @@ type PropsT = {
 };
 
 export const GetPersonalDataSections = (props: PropsT) => {
+  // declare and define component state and vars
   const { handleChangeActiveSection } = props;
   const { user, userDataStatus } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
 
   const identity = user?.country?.id === user?.company?.country_id;
 
-  return PersonalDataSections?.filter((ele) => {
+  return PersonalDataSections(t)?.filter((ele) => {
     if (ele.id !== "contract-tab-iqama-data-section") return true;
 
     return !identity;
