@@ -367,7 +367,7 @@ export const companiesFormConfig: FormConfig = {
     },
   },
   editDataTransformer: (data) => {
-      data.company_field_id = data.company_field?.map(item => item.id);
+      data.company_field_id = data.company_field.map((item: { id: number | string }) => item.id);
     return data;
   },
 
