@@ -53,19 +53,22 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <DialogContent className="max-w-md">
         <DialogHeader className="items-center justify-center mb-4">
           <DialogTitle asChild>
-              <div>
-            <button
-              className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-white"
-              onClick={onClose}
-            >
-              ✕
-            </button>
+            <div>
+              <button
+                className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-white"
+                onClick={onClose}
+              >
+                ✕
+              </button>
 
-              {(title &&
-                  <h2 className="text-center !text-[#EAEAFFDE] !text-xl mt-4">{title}</h2>)}
-              </div>
+              {title && (
+                <h2 className="text-center !text-[#EAEAFFDE] !text-xl mt-4">
+                  {title}
+                </h2>
+              )}
+            </div>
           </DialogTitle>
-            <InfoIcon />
+          <InfoIcon />
         </DialogHeader>
         <DialogDescription asChild>
           <h3 className="text-center !text-[#EAEAFFDE] !text-2xl mb-3">
@@ -82,10 +85,20 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           />
         )}
         <DialogFooter className="!items-center !justify-center gap-3">
-          <Button onClick={handleConfirm} className="w-32 h-10" loading={isLoading} disabled={!!!activationDate}>
-          تاكيد
+          <Button
+            onClick={handleConfirm}
+            className="w-32 h-10"
+            loading={isLoading}
+            {...(showDatePicker ? { disabled: !!!activationDate } : {})}
+          >
+            تاكيد
           </Button>
-          <Button variant="outline" onClick={onClose} className="w-32 h-10" disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-32 h-10"
+            disabled={isLoading}
+          >
             الغاء
           </Button>
         </DialogFooter>

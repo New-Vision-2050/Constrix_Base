@@ -72,6 +72,10 @@ export const companiesFormConfig: FormConfig = {
           placeholder: "برجاء إدخال الاسم التجاري",
           validation: [
             {
+              type: "required",
+              message: "الاسم التجاري مطلوب",
+            },
+            {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
@@ -92,6 +96,10 @@ export const companiesFormConfig: FormConfig = {
           postfix: "constrix.com",
           containerClassName: "rtl:flex-row-reverse",
           validation: [
+            {
+              type: "required",
+              message: "الاسم المختصر مطلوب",
+            },
             {
               type: "apiValidation",
               message: "This username is already taken",
@@ -134,35 +142,44 @@ export const companiesFormConfig: FormConfig = {
           name: "change_local_time",
           label: "الشركة",
           placeholder: "اختر الشركة",
-          render: (field: any, value: boolean, onChange: (value: boolean) => void) => {
-            return <TimeZoneCheckbox field={field} value={value} onChange={onChange} />;
+          render: (
+            field: any,
+            value: boolean,
+            onChange: (value: boolean) => void
+          ) => {
+            return (
+              <TimeZoneCheckbox
+                field={field}
+                value={value}
+                onChange={onChange}
+              />
+            );
           },
           validation: [
             {
-              type: 'custom',
-              message: 'Order must have at least one item',
+              type: "custom",
+              message: "Order must have at least one item",
               validator: (value) => {
+                console.log("checkbox error: -----: ", value);
 
-                console.log('checkbox error: -----: ' , value)
-
-                return false
-              }
+                return false;
+              },
             },
-          ]
+          ],
         },
         {
-          type: 'hiddenObject',
-          name: 'local-time',
-          label: 'local-time',
+          type: "hiddenObject",
+          name: "local-time",
+          label: "local-time",
           condition(values) {
-            return !!values['change_local_time']
+            return !!values["change_local_time"];
           },
           defaultValue: {
-            companyType: 'llc',
+            companyType: "llc",
             employeeCount: 0,
-            industry: 'technology',
-            taxExempt: false
-          }
+            industry: "technology",
+            taxExempt: false,
+          },
         },
       ],
     },
@@ -274,9 +291,6 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-
-
-
       ],
     },
   ],
@@ -352,12 +366,12 @@ export const companiesFormConfig: FormConfig = {
       console.log("Current values:", values);
     },
   },
-    editDataTransformer:(data)=>{
-      if(!Array.isArray( data.company_field_id)) {
-          data.company_field_id = data?.company_field_id?.split(",")
-      }
-      return data;
-    },
+  editDataTransformer: (data) => {
+    if (!Array.isArray(data.company_field_id)) {
+      data.company_field_id = data?.company_field_id?.split(",");
+    }
+    return data;
+  },
 
   // Example onSuccess handler
   onSuccess: (values, result) => {
