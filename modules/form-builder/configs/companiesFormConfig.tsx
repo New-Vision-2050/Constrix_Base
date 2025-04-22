@@ -127,7 +127,7 @@ export const companiesFormConfig: FormConfig = {
           placeholder: "اختر مسؤول الدعم",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/users`,
+            url: `${baseURL}/users/admin-users`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
