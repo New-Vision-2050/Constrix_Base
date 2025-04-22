@@ -131,7 +131,7 @@ const TextField: React.FC<TextFieldProps> = ({
       {showIcon && (
         <div
           className={cn(
-            "absolute top-1/2 transform -translate-y-1/2 z-20",
+            "absolute transform top-3 z-20",
             isRtl ? "left-2.5" : "left-2.5"
           )}
         >

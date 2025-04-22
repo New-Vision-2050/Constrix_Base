@@ -3,6 +3,7 @@ import ToggleLang from "./toggle-lang";
 import ToggleTheme from "./toggle-them";
 import Notification from "./notification";
 import { useTranslations } from "next-intl";
+import ProfileDrop from "./profile-drop";
 
 const Header = () => {
   const t = useTranslations();
@@ -14,6 +15,7 @@ const Header = () => {
           <ToggleLang />
           <ToggleTheme />
           <Notification />
+          <ProfileDrop />
         </div>
       </div>
     </header>

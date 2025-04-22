@@ -61,7 +61,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
-          <h3 className="text-center !text-[#EAEAFFDE] !text-2xl mb-9">
+          <h3 className="text-center !text-2xl mb-9">
             هل انت متاكد تريد الحذف؟
           </h3>
         </DialogDescription>

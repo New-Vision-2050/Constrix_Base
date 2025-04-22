@@ -313,12 +313,12 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             {submitError}
           </div>
         )}
-        {submitSuccess && (
+        {/* {submitSuccess && (
           <div className="text-green-600 border border-green-200 p-2 rounded">
             <span className="font-medium">Success: </span>Form submitted
             successfully!
           </div>
-        )}
+        )} */}
       </div>
 
       <div

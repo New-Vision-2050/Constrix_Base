@@ -36,6 +36,7 @@ export const changeBranchForm = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    className: "overflow-visible",
   };
   return changeBranchForm;
 };
