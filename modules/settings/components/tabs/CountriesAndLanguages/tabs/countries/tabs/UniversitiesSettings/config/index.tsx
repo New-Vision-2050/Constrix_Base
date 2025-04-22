@@ -1,21 +1,23 @@
 import { baseURL } from "@/config/axios-config";
 import CountriesSettingsActionsBtn from "../components/ActionsBtn";
 import { University } from "@/modules/settings/types/University";
+import { useTranslations } from "next-intl";
 
 export const UniversitiesTableConfig = () => {
+  const t = useTranslations();
   return {
     url: `${baseURL}/universities`,
     tableId: "universities-table",
     columns: [
       {
         key: "name",
-        label: "أسم الجامعة",
+        label: t("UniversitiesTable.UniversityName"),
         sortable: true,
         searchable: true,
       },
       {
         key: "actions",
-        label: "الأجراء",
+        label: t("UniversitiesTable.Actions"),
         render: (_: unknown, row: University) => (
           <CountriesSettingsActionsBtn id={row.id} />
         ),

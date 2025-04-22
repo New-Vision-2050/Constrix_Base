@@ -8,6 +8,7 @@ import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { apiClient } from "@/config/axios-config";
 import {useFormStore} from "@/modules/form-builder";
+import { useTranslations } from "next-intl";
 
 interface ReactHookFormBuilderProps {
   config: FormConfig;
@@ -79,6 +80,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
   editError: initialEditError,
   recordId,
 }) => {
+  const t = useTranslations("FormTest");
   const [isEditMode] = useState( config.isEditMode || false);
   const [isLoadingEditData, setIsLoadingEditData] = useState(initialIsLoadingEditData || false);
   const [editError, setEditError] = useState<string | null>(initialEditError || null);
@@ -393,7 +395,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                 {isSubmittingStep ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    جاري الحفظ
+                    {t("Saving")}
                   </span>
                 ) : (
                   config.wizardOptions?.submitButtonTextPerStep || "Submit Step"
@@ -426,7 +428,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                 {isSubmitting && config.showSubmitLoader ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    جاري الحفظ
+                    {t("Saving")}
                   </span>
                 ) : (
                   config.wizardOptions?.finishButtonText ||
@@ -448,7 +450,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
             {isSubmitting && config.showSubmitLoader ? (
               <span className="flex items-center">
                 <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                جاري الحفظ
+                {t("Saving")}
               </span>
             ) : (
               config.submitButtonText || "Submit"

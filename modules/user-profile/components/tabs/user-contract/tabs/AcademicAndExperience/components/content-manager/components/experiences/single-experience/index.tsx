@@ -4,10 +4,12 @@ import { Experience } from "@/modules/user-profile/types/experience";
 import TabTemplate from "@/modules/user-profile/components/TabTemplate";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { apiClient } from "@/config/axios-config";
+import { useTranslations } from "next-intl";
 
 type PropsT = { experience: Experience };
 
 export default function SingleExperience({ experience }: PropsT) {
+  const tCompanies = useTranslations("Companies");
   // declare and define component state and vars
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
 
@@ -32,7 +34,7 @@ export default function SingleExperience({ experience }: PropsT) {
       settingsBtn={{
         items: [
           {
-            title: "حذف",
+            title: tCompanies("Delete"),
             onClick: () => {
               handleDelete();
             },

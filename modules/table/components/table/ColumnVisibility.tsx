@@ -91,7 +91,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
           </div>
           <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground">
-              {visibleColumnKeys.length} من {columns.length} اعمدة مرئية
+              {t("Table.VisibleColumnsCount", { visibleCount: visibleColumnKeys.length, totalCount: columns.length })}
             </p>
           </div>
         </div>

@@ -3,25 +3,27 @@ import { LoginWay } from "@/modules/settings/types/LoginWay";
 import LoginWaysExecutionBtn from "./ExecutionBtn";
 import TableStatus from "./TableStatus";
 import Execution from "@/app/[locale]/(main)/companies/cells/execution";
+import { useTranslations } from "next-intl";
 import {
     loginWayFormConfig
 } from "@/modules/settings/components/tabs/IdentifierSetting/tabs/SettingTab-LoginWays/components/form/config";
 
 // Create a component that uses the translations
 export const LoginWaysConfig = () => {
+  const t = useTranslations("LoginWaysTable");
   return {
     url: `${baseURL}/settings/login-way`,
     tableId: "login-ways-table",
     columns: [
       {
         key: "name",
-        label: "اسم الاعداد",
+        label: t("SettingName"),
         sortable: true,
         searchable: true,
       },
       {
         key: "users_count",
-        label: "عدد المستخدين",
+        label: t("UsersCount"),
         sortable: true,
       },
       {
@@ -30,12 +32,12 @@ export const LoginWaysConfig = () => {
       },
       {
         key: "providers",
-        label: "مزودين الخدمة",
+        label: t("ServiceProviders"),
         sortable: true,
       },
       {
         key: "status",
-        label: "الحالة",
+        label: t("Status"),
         render: (value: "active" | "inActive", row: LoginWay) => (
           <TableStatus
             loginWay={row}
@@ -45,7 +47,7 @@ export const LoginWaysConfig = () => {
       },
       {
         key: "id",
-        label: "الأجراء",
+        label: t("Actions"),
         render: (_: unknown, row: LoginWay) => (
           <Execution id={row.id}  formConfig={loginWayFormConfig}/>
         ),

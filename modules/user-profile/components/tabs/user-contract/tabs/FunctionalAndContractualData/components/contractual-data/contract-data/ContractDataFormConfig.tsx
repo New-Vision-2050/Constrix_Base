@@ -5,15 +5,17 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFunctionalContractualCxt } from "../../../context";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   contract?: Contract;
 };
 
+
 export const ContractDataFormConfig = ({ contract }: PropsT) => {
+  const t = useTranslations("ContractData");
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchContractData } = useFunctionalContractualCxt();
-
   const contractDataFormConfig: FormConfig = {
     formId: `user-contract-data-form-${contract?.id}`,
     sections: [
@@ -21,129 +23,129 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         fields: [
           {
             name: "contract_number",
-            label: "رقم العقد",
+            label: t("ContractNumber"),
             type: "text",
-            placeholder: "رقم العقد",
+            placeholder: t("ContractNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم العقد مطلوب",
+                message: t("ContractNumberRequired"),
               },
             ],
           },
           {
             name: "start_date",
-            label: "تاريخ المباشرة",
+            label: t("CommencementDate"), // Assuming label should be CommencementDate
             type: "date",
-            placeholder: "تاريخ المباشرة",
+            placeholder: t("CommencementDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ المباشرة مطلوب",
+                message: t("CommencementDateRequired"),
               },
             ],
           },
           {
             name: "commencement_date",
-            label: "تاريخ البدء",
+            label: t("StartDate"),
             type: "date",
-            placeholder: "تاريخ البدء",
+            placeholder: t("StartDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ البدء مطلوب",
+                message: t("StartDateRequired"),
               },
             ],
           },
           {
             name: "contract_duration",
-            label: "مدة العقد",
+            label: t("ContractDuration"),
             type: "text",
-            placeholder: "مدة العقد",
+            placeholder: t("ContractDuration"),
             validation: [
               {
                 type: "required",
-                message: "مدة العقد مطلوب",
+                message: t("ContractDurationRequired"),
               },
             ],
           },
           {
             name: "notice_period",
-            label: "فترة الاشعار",
+            label: t("NoticePeriod"),
             type: "text",
-            placeholder: "فترة الاشعار",
+            placeholder: t("NoticePeriod"),
             validation: [
               {
                 type: "required",
-                message: "فترة الاشعار مطلوب",
+                message: t("NoticePeriodRequired"),
               },
             ],
           },
           {
             name: "probation_period",
-            label: "فترة التجربة",
+            label: t("ProbationPeriod"),
             type: "text",
-            placeholder: "فترة التجربة",
+            placeholder: t("ProbationPeriod"),
             validation: [
               {
                 type: "required",
-                message: "فترة التجربة مطلوب",
+                message: t("ProbationPeriodRequired"),
               },
             ],
           },
           {
             name: "nature_work",
-            label: "طبيعة العمل",
+            label: t("NatureOfWork"),
             type: "text",
-            placeholder: "طبيعة العمل",
+            placeholder: t("NatureOfWork"),
             validation: [
               {
                 type: "required",
-                message: "طبيعة العمل مطلوب",
+                message: t("NatureOfWorkRequired"),
               },
             ],
           },
           {
             name: "type_working_hours",
-            label: "نوع ساعات العمل",
+            label: t("WorkingHoursType"),
             type: "text",
-            placeholder: "نوع ساعات العمل",
+            placeholder: t("WorkingHoursType"),
             validation: [
               {
                 type: "required",
-                message: "نوع ساعات العمل مطلوب",
+                message: t("WorkingHoursTypeRequired"),
               },
             ],
           },
           {
             name: "working_hours",
-            label: "ساعات العمل الاسبوعية",
+            label: t("WeeklyWorkingHours"),
             type: "text",
-            placeholder: "ساعات العمل الاسبوعية",
+            placeholder: t("WeeklyWorkingHours"),
             validation: [
               {
                 type: "required",
-                message: "ساعات العمل الاسبوعية مطلوب",
+                message: t("WeeklyWorkingHoursRequired"),
               },
             ],
           },
           {
             name: "annual_leave",
-            label: "ايام الاجازات السنوية",
+            label: t("AnnualLeaveDays"),
             type: "text",
-            placeholder: "ايام الاجازات السنوية",
+            placeholder: t("AnnualLeaveDays"),
             validation: [
               {
                 type: "required",
-                message: "ايام الاجازات السنوية مطلوب",
+                message: t("AnnualLeaveDaysRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "country_id",
-            label: "مكان العمل",
-            placeholder: "اختر مكان العمل",
+            label: t("WorkLocation"),
+            placeholder: t("SelectWorkLocation"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -159,27 +161,27 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: "ادخل مكان العمل",
+                message: t("EnterWorkLocation"),
               },
             ],
           },
           {
             name: "right_terminate",
-            label: "حق الانهاء خلال فترة التجربة",
+            label: t("RightToTerminateDuringProbation"),
             type: "text",
-            placeholder: "حق الانهاء خلال فترة التجربة",
+            placeholder: t("RightToTerminateDuringProbation"),
             validation: [
               {
                 type: "required",
-                message: "حق الانهاء خلال فترة التجربة مطلوب",
+                message: t("RightToTerminateDuringProbationRequired"),
               },
             ],
           },
           {
             name: "file",
-            label: "ارفاق العقد",
+            label: t("AttachContract"),
             type: "image",
-            placeholder: "ارفاق العقد",
+            placeholder: t("AttachContract"),
           },
         ],
       },

@@ -99,7 +99,8 @@
     "Search": "Search",
     "Actions": "Actions",
     "ToggleColumns": "Toggle visible columns",
-    "VisibleColumns": "Visible Columns"
+    "VisibleColumns": "Visible Columns",
+    "VisibleColumnsCount": "{visibleCount} of {totalCount} columns visible"
   },
   "Companies": {
     "Companies": "Companies",
@@ -121,7 +122,8 @@
     "Confirmation": "Confirmation",
     "AreYouSure": "Are you sure?",
     "AreYouSureReactivate": "Do you want to confirm activating the company?",
-    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?"
+    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?",
+    "CompanySavedWithNumber": "Company saved with number"
   },
   "Sidebar": {
     "Dashboard": "Profile",
@@ -238,5 +240,242 @@
         }
       }
     }
+  },
+  "UserProjectsTable": {
+    "Project": "Project",
+    "Number of Tasks": "Number of Tasks",
+    "Completion Rate": "Completion Rate",
+    "Hours": "Hours"
+  },
+  "UsersTable": {
+    "Name": "Name",
+    "PhoneNumber": "Phone Number",
+    "Nationality": "Nationality",
+    "Company": "Company",
+    "UserType": "User Type",
+    "Active": "Active",
+    "Inactive": "Inactive",
+    "EmailOrPhone": "Email / Phone"
+  },
+  "LanguagesTable": {
+    "Language": "Language",
+    "TextFromRightToLeft": "Text from right to left",
+    "Yes": "Yes",
+    "No": "No",
+    "Default": "Default",
+    "Actions": "Actions"
+  },
+  "UniversitiesTable": {
+    "UniversityName": "University Name",
+    "Actions": "Actions"
+  },
+  "CountriesTable": {
+    "Language": "Language",
+    "Country": "Country",
+    "Actions": "Actions"
+  },
+  "LoginIdentifierTable": {
+    "IdentifierName": "Identifier Name",
+    "UsersCount": "Users Count",
+    "UsedCompanies": "Used Companies",
+    "ServiceProviders": "Service Providers",
+    "Status": "Status",
+    "Actions": "Actions"
+  },
+  "LoginWaysTable": {
+    "SettingName": "Setting Name",
+    "UsersCount": "Users Count",
+    "UsedCompanies": "Used Companies",
+    "ServiceProviders": "Service Providers",
+    "Status": "Status",
+    "Actions": "Actions"
+  },
+  "FormTest": {
+    "Saving": "Saving..."
+  },
+  "CompanyUserForm": {
+    "CreateUser": "Create User",
+    "Company": "Company",
+    "SelectCompany": "Select Company",
+    "EnterFirstName": "Enter First Name",
+    "FirstName": "First Name",
+    "LastName": "Last Name",
+    "EnterLastName": "Enter Last Name",
+    "Email": "Email",
+    "EnterEmail": "Enter Email",
+    "Phone": "Phone",
+    "PleaseEnterPhoneNumber": "Please enter phone number",
+    "JobTitle": "Job Title",
+    "SelectJobTitle": "Select Job Title",
+    "Save": "Save"
+  },
+  "TimeZoneCheckbox": {
+    "ConfirmChange": "To confirm changing the time zone,",
+    "ClickHere": "Click here"
+  },
+  "CompaniesForm": {
+    "AddNewCompany": "Add New Company",
+    "CreateCompany": "Create Company",
+    "CompanyCountry": "Company Country",
+    "SelectCompanyCountry": "Select Company Country",
+    "EnterCompanyCountry": "Enter Company Country",
+    "Activity": "Activity",
+    "SelectActivity": "Select Activity",
+    "PleaseSelectActivity": "Please select activity",
+    "TradeName": "Trade Name",
+    "PleaseEnterTradeName": "Please enter trade name",
+    "ShortName": "Short Name",
+    "PleaseEnterShortName": "Please enter short name",
+    "SupportManager": "Support Manager",
+    "SelectSupportManager": "Select Support Manager",
+    "NameRequired": "Name is required",
+    "EmailRequired": "Email is required"
+  },
+  "DynamicRowsField": {
+    "ConfirmDeletion": "Confirm Deletion",
+    "ConfirmDeletionMessage": "Are you sure you want to delete? This action cannot be undone.",
+    "Cancel": "Cancel",
+    "NoDataYet": "No data yet",
+    "AddRowToStart": "Add {label} to start",
+    "AddNewRow": "Add {label}",
+    "NewRowDefaultLabel": "new row"
+  },
+  "EditModeTabs": {
+    "Profile": "Profile",
+    "WorkContract": "Work Contract",
+    "AttendancePolicy": "Attendance Policy",
+    "UserActions": "User Actions"
+  },
+  "UserActionsTabs": {
+    "UserStatus": "User Status",
+    "SMSMessages": "SMS Messages",
+    "SocialPlatforms": "Social Platforms"
+  },
+  "UserContractTabs": {
+    "PersonalData": "Personal Data",
+    "AcademicExperience": "Academic Data and Experience",
+    "FunctionalContractualData": "Functional and Contractual Data",
+    "FinancialBenefits": "Financial Benefits",
+    "ContractManagement": "Contract Management",
+    "ContractualData": "Contractual Data"
+  },
+  "UserStatusDataSections": {
+    "ActivateUser": "Activate User",
+    "Password": "Password"
+  },
+  "AcademicExperience": {
+    "AddNewCertification": "Add New Certification",
+    "Qualification": "Qualification",
+    "BriefSummary": "Brief Summary",
+    "PreviousExperiences": "Previous Experiences",
+    "EducationalCourses": "Educational Courses",
+    "ProfessionalCertificates": "Professional Certificates",
+    "CV": "CV",
+    "NoDataFound": "No data found",
+    "NoQualificationsData": "No data related to the user's qualifications found. Add a qualification.",
+    "GraduationCountry": "Graduation Country",
+    "University": "University",
+    "SelectUniversity": "Select University",
+    "EnterUniversity": "Enter University",
+    "SelectQualification": "Select Qualification",
+    "EnterQualification": "Enter Qualification",
+    "AcademicSpecialization": "Academic Specialization",
+    "SelectAcademicSpecialization": "Select Academic Specialization",
+    "EnterAcademicSpecialization": "Enter Academic Specialization",
+    "CertificateAcquisitionDate": "Certificate Acquisition Date",
+    "StudyGrades": "Study Grades",
+    "AttachCertificate": "Attach Certificate",
+    "AddNewQualification": "Add New Qualification",
+    "AddNewExperience": "Add New Experience",
+    "AuthorityName": "Authority Name",
+    "AccreditationName": "Accreditation Name",
+    "AccreditationNumber": "Accreditation Number",
+    "AccreditationDegree": "Accreditation Degree",
+    "CertificateExpiryDate": "Certificate Expiry Date",
+    "NoExperiencesData": "No data related to the user's previous experiences found. Add a previous experience.",
+    "CompanyName": "Company Name",
+    "Authority": "Authority",
+    "CourseName": "Course Name",
+    "AccreditationInstitute": "Accreditation Institute",
+    "CertificatesGranted": "Certificates Granted",
+    "EnterAuthority": "Enter Authority",
+    "AccreditationNameRequired": "Accreditation name is required",
+    "AccreditationNumberRequired": "Accreditation number is required",
+    "AccreditationDegreeRequired": "Accreditation degree is required",
+    "CertificateAcquisitionDateRequired": "Certificate acquisition date is required",
+    "CertificateExpiryDateRequired": "Certificate expiry date is required",
+    "AddNewCourse": "Add New Course",
+    "SpecifyTrainingPeriod": "Specify Training Period",
+    "BriefAboutProjects": "Brief about projects and work",
+    "JobTitleRequired": "Job title is required",
+    "StartDateRequired": "Start date is required",
+    "CompanyNameRequired": "Company name is required",
+    "AuthorityRequired": "Authority is required",
+    "CourseNameRequired": "Course name is required",
+    "AccreditationInstituteRequired": "Accreditation institute is required",
+    "CertificatesGrantedRequired": "Certificates granted is required",
+    "NoCoursesData": "No data related to the user's courses found. Add a course.",
+    "AuthorityRequired": "Authority is required",
+    "CourseNameRequired": "Course name is required",
+    "AccreditationInstituteRequired": "Accreditation institute is required",
+    "CertificatesGrantedRequired": "Certificates granted is required",
+    "NoCVData": "No CV found, please attach the CV.",
+    "AboutMe": "About Me",
+    "JobTitleRequired": "Job title is required",
+    "StartDateRequired": "Start date is required",
+    "CompanyNameRequired": "Company name is required",
+    "WriteBriefAboutYourself": "Write a brief about yourself"
+  },
+  "JobInformation": {
+    "JobData": "Job Data",
+    "EmploymentData": "Employment Data",
+    "Branch": "Branch",
+    "Department": "Department",
+    "Section": "Section",
+    "JobType": "Job Type",
+    "JobNumber": "Job Number"
+  },
+  "GeneralActions": {
+    "MyRequests": "My Requests",
+    "CreateRequest": "Create Request",
+    "File": "File"
+  },
+  "ContractData": {
+    "ContractNumber": "Contract Number",
+    "CommencementDate": "Commencement Date",
+    "StartDate": "Start Date",
+    "ContractDuration": "Contract Duration",
+    "NoticePeriod": "Notice Period",
+    "ProbationPeriod": "Probation Period",
+    "NatureOfWork": "Nature of Work",
+    "WorkingHoursType": "Working Hours Type",
+    "WeeklyWorkingHours": "Weekly Working Hours",
+    "AnnualLeaveDays": "Annual Leave Days",
+    "WorkLocation": "Work Location",
+    "RightToTerminateDuringProbation": "Right to Terminate During Probation",
+    "AttachContract": "Attach Contract",
+    "ContractNumberRequired": "Contract number is required",
+    "CommencementDateRequired": "Commencement date is required",
+    "StartDateRequired": "Start date is required",
+    "ContractDurationRequired": "Contract duration is required",
+    "NoticePeriodRequired": "Notice period is required",
+    "ProbationPeriodRequired": "Probation period is required",
+    "NatureOfWorkRequired": "Nature of work is required",
+    "WorkingHoursTypeRequired": "Working hours type is required",
+    "WeeklyWorkingHoursRequired": "Weekly working hours is required",
+    "AnnualLeaveDaysRequired": "Annual leave days is required",
+    "SelectWorkLocation": "Select Work Location",
+    "EnterWorkLocation": "Enter Work Location",
+    "RightToTerminateDuringProbationRequired": "Right to terminate during probation is required"
+  },
+  "JobOffer": {
+    "OfferNumber": "Offer Number",
+    "SendDate": "Send Date",
+    "ApprovalDate": "Approval Date",
+    "AttachOffer": "Attach Offer",
+    "JobOffer": "Job Offer",
+    "OfferNumberRequired": "Offer number is required",
+    "SendDateRequired": "Send date is required",
+    "ApprovalDateRequired": "Approval date is required"
   }
 }

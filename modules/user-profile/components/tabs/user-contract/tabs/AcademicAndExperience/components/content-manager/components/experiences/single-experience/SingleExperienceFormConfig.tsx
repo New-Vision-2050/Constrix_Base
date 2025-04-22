@@ -4,6 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { Experience } from "@/modules/user-profile/types/experience";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   experience?: Experience;
@@ -14,6 +15,8 @@ export const SingleExperienceFormConfig = ({
   experience,
   onSuccess,
 }: PropsT) => {
+  const t = useTranslations("AcademicExperience");
+  const tCompanyUser = useTranslations("CompanyUserForm"); // For JobTitle
   // declare and define component state and variables
   const formType = experience ? "Edit" : "Create";
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -31,51 +34,51 @@ export const SingleExperienceFormConfig = ({
         fields: [
           {
             name: "job_name",
-            label: "المسمى الوظيفي",
+            label: tCompanyUser("JobTitle"),
             type: "text",
-            placeholder: "المسمى الوظيفي",
+            placeholder: tCompanyUser("JobTitle"),
             validation: [
               {
                 type: "required",
-                message: "المسمى الوظيفي مطلوب",
+                message: t("JobTitleRequired"),
               },
             ],
           },
           {
-            label: "تاريخ البداية",
+            label: t("StartDateRequired"), // Assuming StartDateRequired implies the label too
             type: "date",
             name: "training_from",
-            placeholder: "تاريخ البداية",
+            placeholder: t("StartDateRequired"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ البداية مطلوب",
+                message: t("StartDateRequired"),
               },
             ],
           },
           {
-            label: "تاريخ الانتهاء",
+            label: t("CertificateExpiryDate"), // Reusing CertificateExpiryDate label
             type: "date",
             name: "training_to",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("CertificateExpiryDate"),
           },
           {
             name: "company_name",
-            label: "اسم الشركة",
+            label: t("CompanyName"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("CompanyName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("CompanyNameRequired"),
               },
             ],
           },
           {
             name: "about",
-            label: "نبذه عن المشاريع والاعمال",
+            label: t("BriefAboutProjects"),
             type: "text",
-            placeholder: "نبذه عن المشاريع والاعمال",
+            placeholder: t("BriefAboutProjects"),
           },
         ],
         columns: 2,

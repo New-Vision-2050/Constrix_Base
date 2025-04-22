@@ -17,6 +17,7 @@ import {
 } from "@/modules/table/components/ui/popover";
 import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
+import { useTranslations } from "next-intl";
 
 interface PaginatedDropdownProps {
   columnKey: string;
@@ -41,6 +42,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   dependencies,
   isMulti = false,
 }) => {
+  const t = useTranslations("Table");
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
@@ -167,7 +169,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             <div className="flex items-center border-b px-3">
               <CommandInput
                 ref={inputRef}
-                placeholder="بحث..."
+                placeholder={t("Search")}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex-1 py-3 px-1 outline-none"

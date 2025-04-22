@@ -1,35 +1,37 @@
 import { baseURL } from "@/config/axios-config";
 import { Language } from "@/modules/settings/types/Language";
 import LanguagesSettingsActionsBtn from "../components/ActionsBtn";
+import { useTranslations } from "next-intl";
 
 export const LanguagesSettingTableConfig = () => {
+  const t = useTranslations("LanguagesTable");
   return {
     url: `${baseURL}/languages`,
     tableId: "languages-table",
     columns: [
       {
         key: "name",
-        label: "اللغة",
+        label: t("Language"),
         sortable: true,
         searchable: true,
       },
       {
         key: "is_rtl",
-        label: "نص من اليمين الى اليسار",
+        label: t("TextFromRightToLeft"),
         render: (_: unknown, row: Language) => (
           <p>{row.is_rtl == 1 ? "نعم" : "لا"}</p>
         ),
       },
       {
         key: "status",
-        label: "افتراضي",
+        label: t("Default"),
         render: (_: unknown, row: Language) => (
           <p>{row.status == 1 ? "نعم" : "لا"}</p>
         ),
       },
       {
         key: "actions",
-        label: "الأجراء",
+        label:  t("Actions"),
         render: (_: unknown, row: Language) => (
           <LanguagesSettingsActionsBtn id={row.id} />
         ),

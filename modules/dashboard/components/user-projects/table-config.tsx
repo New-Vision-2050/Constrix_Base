@@ -1,27 +1,29 @@
 import { baseURL } from "@/config/axios-config";
+import { useTranslations } from "next-intl";
 
 export const UserProjectsTableConfig = () => {
+  const t = useTranslations();
   return {
     url: `${baseURL}/user-projects`,
     tableId: "user-projects-table",
     columns: [
       {
         key: "name",
-        label: "المشروع",
+        label: t("UserProjectsTable.Project"),
         sortable: true,
         searchable: true,
       },
       {
         key: "name",
-        label: "عدد المهام",
+        label: t("UserProjectsTable.Number of Tasks"),
       },
       {
         key: "name",
-        label: "نسبة الانجاز",
+        label: t("UserProjectsTable.Completion Rate"),
       },
       {
         key: "name",
-        label: "الساعات",
+        label: t("UserProjectsTable.Hours"),
       },
     ],
     allSearchedFields: [],

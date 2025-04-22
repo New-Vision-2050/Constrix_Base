@@ -4,7 +4,7 @@ import { FieldConfig, DynamicRowOptions } from "../../types/formTypes";
 import { useFormInstance } from "../../hooks/useFormStore";
 import { cn } from "@/lib/utils";
 import { Trash2, ArrowUp, ArrowDown, Plus, GripVertical } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
 import FormField from "../../components/FormField";
@@ -68,6 +68,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
   onConfirm,
   isLoading = false,
 }) => {
+  const t = useTranslations("DynamicRowsField");
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md border-destructive/20">
@@ -76,7 +77,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
             <InfoIcon />
           </div>
           <DialogTitle className="text-xl font-semibold">
-            تأكيد الحذف
+            {t("ConfirmDeletion")}
           </DialogTitle>
           <button
             className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-destructive transition-colors"
@@ -86,7 +87,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
           </button>
         </DialogHeader>
         <div className="text-center text-muted-foreground mb-6 px-4">
-          هل انت متاكد تريد الحذف؟ لا يمكن التراجع عن هذا الإجراء.
+          {t("ConfirmDeletionMessage")}
         </div>
         <DialogFooter className="!items-center !justify-center gap-3 pt-2">
           <Button
@@ -95,7 +96,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
             variant="destructive"
             className="w-32 h-10 transition-all duration-200"
           >
-            تأكيد الحذف
+            {t("ConfirmDeletion")}
           </Button>
           <Button
             variant="outline"
@@ -103,7 +104,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
             disabled={isLoading}
             className="w-32 h-10 border-muted-foreground/30 hover:bg-muted/50"
           >
-            إلغاء
+            {t("Cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -123,6 +124,7 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
   // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const t = useTranslations("DynamicRowsField");
 
   // Get form instance from the store
   const formInstance = useFormInstance(formId);
@@ -484,8 +486,8 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
         {rows.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-lg bg-transparent">
             <div className="text-muted-foreground text-center mb-4">
-              <p className="text-sm">لا توجد بيانات حتى الآن</p>
-              <p className="text-xs mt-1">أضف {field.label || 'صف جديد'} للبدء</p>
+              <p className="text-sm">{t("NoDataYet")}</p>
+              <p className="text-xs mt-1">{t("AddRowToStart", { label: field.label || t("NewRowDefaultLabel") })}</p>
             </div>
           </div>
         ) : (
@@ -626,7 +628,7 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
           >
             <span className="absolute inset-0 bg-primary/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             <Plus className="h-4 w-4 mr-2 text-primary" />
-            <span>إضافة {field.label || 'صف جديد'}</span>
+            <span>{t("AddNewRow", { label: field.label || t("NewRowDefaultLabel") })}</span>
           </Button>
         </div>
       )}

@@ -5,15 +5,17 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   offer?: JobOffer;
 };
 
+
 export const JobOfferFormConfig = ({ offer }: PropsT) => {
+  const t = useTranslations("JobOffer");
   const { user } = useUserProfileCxt();
   const { handleRefetchJobOffer } = useFunctionalContractualCxt();
-
   const jobOfferFormConfig: FormConfig = {
     formId: `job-offer-data-form-${offer?.id}`,
     sections: [
@@ -21,42 +23,42 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
         fields: [
           {
             name: "job_offer_number",
-            label: "رقم العرض",
+            label: t("OfferNumber"),
             type: "text",
-            placeholder: "رقم العرض",
+            placeholder: t("OfferNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم العرض مطلوب",
+                message: t("OfferNumberRequired"),
               },
             ],
           },
           {
-            label: "تاريخ الارسال",
+            label: t("SendDate"),
             type: "date",
             name: "date_send",
-            placeholder: "تاريخ الارسال",
+            placeholder: t("SendDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الارسال مطلوب",
+                message: t("SendDateRequired"),
               },
             ],
           },
           {
-            label: "تاريخ الموافقة",
+            label: t("ApprovalDate"),
             type: "date",
             name: "date_accept",
-            placeholder: "تاريخ الموافقة",
+            placeholder: t("ApprovalDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الموافقة مطلوب",
+                message: t("ApprovalDateRequired"),
               },
             ],
           },
           {
-            label: "ارفاق العرض",
+            label: t("AttachOffer"),
             type: "image",
             name: "file",
             placeholder: "job_offer.pdf",

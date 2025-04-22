@@ -1,9 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-
+import { useTranslations } from "next-intl";
+const t = useTranslations("CompanyUserForm");
 export const companyUserFormConfig: FormConfig = {
     formId: "company-user-form",
-    title: "إنشاء مستخدم",
+    title: t("CreateUser"),
     apiUrl: `${baseURL}/company-users`,
     laravelValidation: {
         enabled: true,
@@ -16,8 +17,8 @@ export const companyUserFormConfig: FormConfig = {
                 {
                     type: "select",
                     name: "company_id",
-                    label: "الشركة",
-                    placeholder: "اختر الشركة",
+                    label: t("Company"),
+                    placeholder: t("SelectCompany"),
                     required: true,
                     dynamicOptions: {
                         url: `${baseURL}/companies`,
@@ -33,20 +34,20 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: 'اختر الشركة',
+                            message: t("SelectCompany"),
                         },
                     ],
                 },
                 {
                     name: "first_name",
-                    label: "اسم المستخدم الاول",
+                    label: t("FirstName"),
                     type: "text",
-                    placeholder: "اسم المستخدم الاول",
+                    placeholder: t("FirstName"),
                     required: true,
                     validation: [
                         {
                             type: "required",
-                            message: "ادخل اسم المستخدم الاول",
+                            message: t("EnterFirstName"),
                         },
                         {
                             type: "minLength",
@@ -57,14 +58,14 @@ export const companyUserFormConfig: FormConfig = {
                 },
                 {
                     name: "last_name",
-                    label: "اسم المستخدم ألأحير",
+                    label: t("LastName"),
                     type: "text",
-                    placeholder: "اسم المستخدم ألأحير",
+                    placeholder: t("LastName"),
                     required: true,
                     validation: [
                         {
                             type: "required",
-                            message: "ادخل اسم المستخدم ألأحير",
+                            message: t("EnterLastName"),
                         },
                         {
                             type: "minLength",
@@ -75,14 +76,14 @@ export const companyUserFormConfig: FormConfig = {
                 },
                 {
                     name: "email",
-                    label: "البريد الإلكتروني",
+                    label: t("Email"),
                     type: "email",
-                    placeholder: "البريد الإلكتروني",
+                    placeholder: t("Email"),
                     required: true,
                     validation: [
                         {
                             type: "required",
-                            message: "ادخل البريد الإلكتروني",
+                            message: t("EnterEmail"),
                         },
                         {
                             type: "email",
@@ -92,21 +93,21 @@ export const companyUserFormConfig: FormConfig = {
                 },
                 {
                     name: "phone",
-                    label: "الهاتف",
+                    label: t("Phone"),
                     type: "phone",
-                    placeholder: "الهاتف",
+                    placeholder: t("Phone"),
                     validation: [
                         {
                             type: "required",
-                            message: "برجاء إدخال رقم الهاتف",
+                            message: t("PleaseEnterPhoneNumber"),
                         },
                     ],
                 },
                 {
                     type: "select",
                     name: "job_title_id",
-                    label: "المسمى الوظيفي",
-                    placeholder: "اختر المسمى الوظيفي",
+                    label: t("JobTitle"),
+                    placeholder: t("SelectJobTitle"),
                     required: true,
                     dynamicOptions: {
                         url: `${baseURL}/job_titles`,
@@ -122,14 +123,14 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: "المسمى الوظيفي",
+                            message: t("JobTitle"),
                         },
                     ],
                 },
             ],
         },
     ],
-    submitButtonText: "حفظ",
+    submitButtonText: t("Save"),
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",

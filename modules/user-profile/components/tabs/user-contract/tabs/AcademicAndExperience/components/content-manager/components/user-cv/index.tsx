@@ -6,18 +6,21 @@ import UploadCvDialog from "./UploadCvDialog";
 import { useState } from "react";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
+import { useTranslations } from "next-intl";
 
 export default function UserCV() {
   const [open, setOpen] = useState(false);
   const { userCV } = useUserAcademicTabsCxt();
+  const t = useTranslations("AcademicExperience");
+  const tContract = useTranslations("UserContractTabs");
 
   return (
     <div className="flex flex-col gap-6">
       <p className="text-lg font-bold text-gray-700">
-        البيانات الوظيفية والتعاقدية
+        {tContract("FunctionalContractualData")} {/* Assuming this title is correct */}
       </p>
       <FormFieldSet
-        title={"السيرة الذاتية"}
+        title={t("CV")}
         secondTitle={
           <Button variant={"ghost"} onClick={() => setOpen(true)}>
             <PencilLineIcon additionalClass="text-pink-600" />
@@ -28,8 +31,8 @@ export default function UserCV() {
           <PdfViewer src={userCV?.files ?? ""} />
         ) : (
           <NoDataFounded
-            title="لا يوجد بيانات"
-            subTitle="لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية"
+            title={t("NoDataFound")}
+            subTitle={t("NoCVData")}
           />
         )}
       </FormFieldSet>

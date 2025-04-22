@@ -4,6 +4,7 @@ import { Qualification } from "@/modules/user-profile/types/qualification";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { serialize } from "object-to-formdata";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   qualification?: Qualification;
@@ -13,6 +14,8 @@ export const QualificationFormConfig = ({
   qualification,
   onSuccess,
 }: PropsT) => {
+  const t = useTranslations("AcademicExperience");
+  const tCompanies = useTranslations("CompaniesForm"); // For reusing company-related translations
   // declare and define helper state and variables
   const formType = qualification ? "Edit" : "Create";
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
@@ -31,8 +34,8 @@ export const QualificationFormConfig = ({
           {
             type: "select",
             name: "country_id",
-            label: "دولة التخرج",
-            placeholder: "اختر دولة الشركة",
+            label: t("GraduationCountry"),
+            placeholder: tCompanies("SelectCompanyCountry"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -48,15 +51,15 @@ export const QualificationFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل دولة الشركة",
+                message: tCompanies("EnterCompanyCountry"),
               },
             ],
           },
           {
             type: "select",
             name: "university_id",
-            label: "الجامعة",
-            placeholder: "اختر الجامعة",
+            label: t("University"),
+            placeholder: t("SelectUniversity"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/universities`,
@@ -72,15 +75,15 @@ export const QualificationFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل الجامعة",
+                message: t("EnterUniversity"),
               },
             ],
           },
           {
             type: "select",
             name: "academic_qualification_id",
-            label: "المؤهل",
-            placeholder: "اختر المؤهل",
+            label: t("Qualification"),
+            placeholder: t("SelectQualification"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/academic_qualifications`,
@@ -96,15 +99,15 @@ export const QualificationFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل المؤهل",
+                message: t("EnterQualification"),
               },
             ],
           },
           {
             type: "select",
             name: "academic_specialization_id",
-            label: "التخصص الأكاديمي",
-            placeholder: "اختر التخصص الأكاديمي",
+            label: t("AcademicSpecialization"),
+            placeholder: t("SelectAcademicSpecialization"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/academic_specializations`,
@@ -120,15 +123,15 @@ export const QualificationFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل التخصص الأكاديمي",
+                message: t("EnterAcademicSpecialization"),
               },
             ],
           },
           {
             type: "date",
             name: "graduation_date",
-            label: "تاريخ الحصول على الشهادة",
-            placeholder: "تاريخ الحصول على الشهادة",
+            label: t("CertificateAcquisitionDate"),
+            placeholder: t("CertificateAcquisitionDate"),
             validation: [
               {
                 type: "required",
@@ -139,8 +142,8 @@ export const QualificationFormConfig = ({
           {
             type: "text",
             name: "study_rate",
-            label: "المعدلات الدراسية",
-            placeholder: "المعدلات الدراسية",
+            label: t("StudyGrades"),
+            placeholder: t("StudyGrades"),
             validation: [
               {
                 type: "required",
@@ -151,8 +154,8 @@ export const QualificationFormConfig = ({
           {
             type: "image",
             name: "graduation_file",
-            label: "ارفاق شهادة",
-            placeholder: "ارفاق شهادة",
+            label: t("AttachCertificate"),
+            placeholder: t("AttachCertificate"),
           },
         ],
         columns: 2,

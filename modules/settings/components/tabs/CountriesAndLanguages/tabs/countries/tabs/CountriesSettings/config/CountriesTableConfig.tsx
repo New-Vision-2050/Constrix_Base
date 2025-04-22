@@ -1,25 +1,27 @@
 import { baseURL } from "@/config/axios-config";
 import { Country } from "@/modules/settings/types/Country";
 import CountriesSettingsActionsBtn from "../components/ActionsBtn";
+import { useTranslations } from "next-intl";
 
 export const CountriesTableConfig = () => {
+  const t = useTranslations();
   return {
     url: `${baseURL}/countries`,
     tableId: "countries-table",
     columns: [
       {
         key: "language",
-        label: "اللغة",
+        label: t("CountriesTable.Language"),
       },
       {
         key: "name",
-        label: "الدولة",
+        label: t("CountriesTable.Country"),
         sortable: true,
         searchable: true,
       },
       {
         key: "actions",
-        label: "الأجراء",
+        label: t("CountriesTable.Actions"),
         render: (_: unknown, row: Country) => (
           <CountriesSettingsActionsBtn id={row.id} />
         ),

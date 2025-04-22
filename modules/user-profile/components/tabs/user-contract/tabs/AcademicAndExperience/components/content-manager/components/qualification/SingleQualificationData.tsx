@@ -4,9 +4,12 @@ import { Qualification } from "@/modules/user-profile/types/qualification";
 import TabTemplate from "@/modules/user-profile/components/TabTemplate";
 import { apiClient } from "@/config/axios-config";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
+import { useTranslations } from "next-intl";
 
 type PropsT = { qualification: Qualification };
 export default function SingleQualificationData({ qualification }: PropsT) {
+  const t = useTranslations("GeneralActions");
+  const tCompanies = useTranslations("Companies");
   // declare and define component state and vars
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
 
@@ -34,10 +37,10 @@ export default function SingleQualificationData({ qualification }: PropsT) {
       }
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} },
-          { title: "أنشاء طلب", onClick: () => {} },
+          { title: t("MyRequests"), onClick: () => {} },
+          { title: t("CreateRequest"), onClick: () => {} },
           {
-            title: "حذف",
+            title: tCompanies("Delete"),
             onClick: () => {
               handleDelete();
             },

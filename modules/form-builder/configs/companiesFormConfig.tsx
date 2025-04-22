@@ -140,8 +140,8 @@ export const companiesFormConfig: FormConfig = {
         {
           type: "checkbox",
           name: "change_local_time",
-          label: "الشركة",
-          placeholder: "اختر الشركة",
+          label: "الشركة", // Reverted - Needs translation in consuming component
+          placeholder: "اختر الشركة", // Reverted - Needs translation in consuming component
           render: (
             field: any,
             value: boolean,
@@ -190,28 +190,28 @@ export const companiesFormConfig: FormConfig = {
         {
           type: "text",
           name: "company_id",
-          label: "الشركة",
-          placeholder: "اختر الشركة",
+          label: "الشركة", // Reverted
+          placeholder: "اختر الشركة", // Reverted
           required: true,
           disabled: true,
           hidden: true,
           validation: [
             {
               type: "required",
-              message: "الشركة",
+              message: "الشركة", // Reverted
             },
           ],
         },
         {
           name: "first_name",
-          label: "اسم المستخدم الاول",
+          label: "اسم المستخدم الاول", // Reverted
           type: "text",
-          placeholder: "ادخل اسم المستخدم الاول",
+          placeholder: "ادخل اسم المستخدم الاول", // Reverted
           required: true,
           validation: [
             {
               type: "required",
-              message: "اسم المستخدم الاول مطلوب",
+              message: "اسم المستخدم الاول مطلوب", // Reverted
             },
             {
               type: "minLength",
@@ -222,14 +222,14 @@ export const companiesFormConfig: FormConfig = {
         },
         {
           name: "last_name",
-          label: "اسم المستخدم ألأحير",
+          label: "اسم المستخدم ألأحير", // Reverted
           type: "text",
-          placeholder: "اسم المستخدم ألأحير",
+          placeholder: "اسم المستخدم ألأحير", // Reverted
           required: true,
           validation: [
             {
               type: "required",
-              message: "الاسم مطلوب",
+              message: "الاسم مطلوب", // Reverted
             },
             {
               type: "minLength",
@@ -240,14 +240,14 @@ export const companiesFormConfig: FormConfig = {
         },
         {
           name: "email",
-          label: "البريد الإلكتروني",
+          label: "البريد الإلكتروني", // Reverted
           type: "email",
-          placeholder: "ادخل البريد الإلكتروني",
+          placeholder: "ادخل البريد الإلكتروني", // Reverted
           required: true,
           validation: [
             {
               type: "required",
-              message: "البريد الإلكتروني مطلوب",
+              message: "البريد الإلكتروني مطلوب", // Reverted
             },
             {
               type: "email",
@@ -257,21 +257,21 @@ export const companiesFormConfig: FormConfig = {
         },
         {
           name: "phone",
-          label: "الهاتف",
+          label: "الهاتف", // Reverted
           type: "phone",
           placeholder: "Enter your phone",
           validation: [
             {
               type: "required",
-              message: "برجاء إدخال رقم الهاتف",
+              message: "برجاء إدخال رقم الهاتف", // Reverted
             },
           ],
         },
         {
           type: "select",
           name: "job_title_id",
-          label: "المسمى الوظيفي",
-          placeholder: "اختر المسمى الوظيفي",
+          label: "المسمى الوظيفي", // Reverted
+          placeholder: "اختر المسمى الوظيفي", // Reverted
           required: true,
           dynamicOptions: {
             url: `${baseURL}/job_titles`,
@@ -287,7 +287,7 @@ export const companiesFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "المسمى الوظيفي",
+              message: "المسمى الوظيفي", // Reverted
             },
           ],
         },
@@ -313,10 +313,10 @@ export const companiesFormConfig: FormConfig = {
     allowStepNavigation: false,
     nextButtonText: "Continue",
     prevButtonText: "Back",
-    finishButtonText: "حفظ",
+    finishButtonText: "حفظ", // Reverted
     // Enable submitting each step individually
     submitEachStep: true,
-    submitButtonTextPerStep: "التالي",
+    submitButtonTextPerStep: "التالي", // Reverted
 
     // API URLs for each step
     stepApiUrls: {

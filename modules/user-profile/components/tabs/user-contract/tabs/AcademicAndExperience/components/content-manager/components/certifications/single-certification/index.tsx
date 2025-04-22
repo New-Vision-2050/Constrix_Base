@@ -4,10 +4,13 @@ import { Certification } from "@/modules/user-profile/types/Certification";
 import TabTemplate from "@/modules/user-profile/components/TabTemplate";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { apiClient } from "@/config/axios-config";
+import { useTranslations } from "next-intl";
 
 type PropsT = { certification: Certification };
 
 export default function UserCertification({ certification }: PropsT) {
+  const t = useTranslations("GeneralActions");
+  const tCompanies = useTranslations("Companies");
   // declare and define component state and vars
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
 
@@ -31,10 +34,10 @@ export default function UserCertification({ certification }: PropsT) {
       editMode={<UserCertificationEdit certification={certification} />}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} },
-          { title: "أنشاء طلب", onClick: () => {} },
+          { title: t("MyRequests"), onClick: () => {} },
+          { title: t("CreateRequest"), onClick: () => {} },
           {
-            title: "حذف",
+            title: tCompanies("Delete"),
             onClick: () => {
               handleDelete();
             },

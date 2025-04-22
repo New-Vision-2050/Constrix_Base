@@ -4,6 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Course } from "@/modules/user-profile/types/Course";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   course?: Course;
@@ -11,6 +12,7 @@ type PropsT = {
 };
 
 export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
+  const t = useTranslations("AcademicExperience");
   // ** declare and define component state and variables
   const formType = course ? "Edit" : "Create";
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -27,85 +29,85 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
         fields: [
           {
             name: "company_name",
-            label: "اسم الشركة",
+            label: t("CompanyName"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("CompanyName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("CompanyNameRequired"),
               },
             ],
           },
           {
             name: "authority",
-            label: "الجهة",
+            label: t("Authority"),
             type: "text",
-            placeholder: "الجهة",
+            placeholder: t("Authority"),
             validation: [
               {
                 type: "required",
-                message: "الجهة مطلوب",
+                message: t("AuthorityRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "اسم الدورة التدريبية ",
+            label: t("CourseName"),
             type: "text",
-            placeholder: "اسم الدورة التدريبية ",
+            placeholder: t("CourseName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الدورة التدريبية  مطلوب",
+                message: t("CourseNameRequired"),
               },
             ],
           },
           {
             name: "institute",
-            label: "جهة الاعتماد",
+            label: t("AccreditationInstitute"),
             type: "text",
-            placeholder: "جهة الاعتماد",
+            placeholder: t("AccreditationInstitute"),
             validation: [
               {
                 type: "required",
-                message: "جهة الاعتماد مطلوب",
+                message: t("AccreditationInstituteRequired"),
               },
             ],
           },
           {
             name: "certificate",
-            label: "الشهادات الممنوحة",
+            label: t("CertificatesGranted"),
             type: "text",
-            placeholder: "الشهادات الممنوحة",
+            placeholder: t("CertificatesGranted"),
             validation: [
               {
                 type: "required",
-                message: "الشهادات الممنوحة مطلوب",
+                message: t("CertificatesGrantedRequired"),
               },
             ],
           },
           {
             name: "date_obtain",
-            label: "تاريخ الحصول على الشهادة",
+            label: t("CertificateAcquisitionDate"),
             type: "date",
-            placeholder: "تاريخ الحصول على الشهادة",
+            placeholder: t("CertificateAcquisitionDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الحصول على الشهادة مطلوب",
+                message: t("CertificateAcquisitionDateRequired"),
               },
             ],
           },
           {
             name: "date_end",
-            label: "تاريخ انتهاء الشهادة",
+            label: t("CertificateExpiryDate"),
             type: "date",
-            placeholder: "تاريخ انتهاء الشهادة",
+            placeholder: t("CertificateExpiryDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
+                message: t("CertificateExpiryDateRequired"),
               },
             ],
           },

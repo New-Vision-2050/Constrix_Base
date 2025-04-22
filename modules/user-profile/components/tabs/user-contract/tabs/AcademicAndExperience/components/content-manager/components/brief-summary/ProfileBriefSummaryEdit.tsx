@@ -4,12 +4,15 @@ import { useState } from "react";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useTranslations } from "next-intl";
 
 export default function ProfileBriefSummaryEdit() {
   // ** declare and define component state and vars
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const { userBrief } = useUserAcademicTabsCxt();
+  const t = useTranslations("AcademicExperience");
+  const tCompanyUser = useTranslations("CompanyUserForm");
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   const handleUpdateUserBrief = async () => {
@@ -29,11 +32,11 @@ export default function ProfileBriefSummaryEdit() {
 
   return (
     <div className="flex p-4 flex-col gap-4">
-      <p className="text-sm text-gray-500">نبذة عني</p>
+      <p className="text-sm text-gray-500">{t("AboutMe")}</p>
       <Textarea
         name={"profile-summary"}
         defaultValue={userBrief?.about_me ?? ""}
-        placeholder={"اكتب نبذة عنك"}
+        placeholder={t("WriteBriefAboutYourself")}
         rows={4}
         disabled={loading}
         maxLength={500}
@@ -46,7 +49,7 @@ export default function ProfileBriefSummaryEdit() {
         disabled={loading}
         onClick={handleUpdateUserBrief}
       >
-        حفظ
+        {tCompanyUser("Save")}
       </Button>
     </div>
   );

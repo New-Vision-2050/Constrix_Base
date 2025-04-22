@@ -2,15 +2,17 @@ import { baseURL } from "@/config/axios-config";
 import { LoginIdentifier } from "@/modules/settings/types/LoginIdentifier";
 import LoginIdentifierExecutionBtn from "./ExecutionBtn";
 import TableStatus from "./TableStatus";
+import { useTranslations } from "next-intl";
 
 export const LoginIdentifierTableConfig = () => {
+  const t = useTranslations();
   return {
     url: `${baseURL}/settings/identifier`,
     tableId: "login-identifier-table",
     columns: [
       {
         key: "name",
-        label: "اسم المعرف",
+        label: t("LoginIdentifierTable.IdentifierName"),
         sortable: true,
         searchable: true,
       },
@@ -28,7 +30,7 @@ export const LoginIdentifierTableConfig = () => {
       },
       {
         key: "status",
-        label: "الحالة",
+        label:  t("LoginIdentifierTable.Status"),
         render: (_: unknown, row: LoginIdentifier) => (
           <TableStatus
             url={`settings/identifier/make-default/${row.id}`}
@@ -38,7 +40,7 @@ export const LoginIdentifierTableConfig = () => {
       },
       {
         key: "id",
-        label: "الأجراء",
+        label: t("LoginIdentifierTable.Actions"),
         render: (_: unknown, row: LoginIdentifier) => (
           <LoginIdentifierExecutionBtn id={row.id} />
         ),

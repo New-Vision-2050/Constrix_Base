@@ -99,7 +99,8 @@
     "Search": "بحث",
     "Actions": "إجراء",
     "ToggleColumns": "تبديل الأعمدة المرئية",
-    "VisibleColumns": "الأعمدة المرئية"
+    "VisibleColumns": "الأعمدة المرئية",
+    "VisibleColumnsCount": "{visibleCount} من {totalCount} اعمدة مرئية"
   },
   "Companies": {
     "Companies": "الشركات",
@@ -121,7 +122,8 @@
     "Confirmation": "تأكيد",
     "AreYouSure": "هل أنت متأكد؟",
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
-    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
+    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
+    "CompanySavedWithNumber": "تم حفظ الشركة برقم"
   },
   "Sidebar": {
     "Dashboard": "الملف الشخصي",
@@ -238,5 +240,250 @@
         }
       }
     }
+  },
+  "UserProjectsTable": {
+    "Project": "المشروع",
+    "Number of Tasks": "عدد المهام",
+    "Completion Rate": "نسبة الانجاز",
+    "Hours": "الساعات"
+  },
+  "UsersTable": {
+    "Name": "الاسم",
+    "PhoneNumber": "رقم الجوال",
+    "Nationality": "الجنسية",
+    "Company": "الشركة",
+    "UserType": "نوع المستخدم",
+    "Active": "نشط",
+    "Inactive": "غير نشط",
+    "EmailOrPhone": "البريد الإليكتروني / الجوال"
+  },
+  "LanguagesTable": {
+    "Language": "اللغة",
+    "TextFromRightToLeft": "نص من اليمين الى اليسار",
+    "Yes": "نعم",
+    "No": "لا",
+    "Default": "افتراضي",
+    "Actions": "الأجراء"
+  },
+  "UniversitiesTable": {
+    "UniversityName": "أسم الجامعة",
+    "Actions": "الأجراء"
+  },
+  "UniversitiesTable": {
+    "UniversityName": "أسم الجامعة",
+    "Actions": "الأجراء"
+  },
+  "CountriesTable": {
+    "Language": "اللغة",
+    "Country": "الدولة",
+    "Actions": "الأجراء"
+  },
+  "LoginIdentifierTable": {
+    "IdentifierName": "اسم المعرف",
+    "UsersCount": "عدد المستخدين",
+    "UsedCompanies": "الشركات المستخدمة",
+    "ServiceProviders": "مزودين الخدمة",
+    "Status": "الحالة",
+    "Actions": "الأجراء"
+  },
+  "LoginWaysTable": {
+    "SettingName": "اسم الاعداد",
+    "UsersCount": "عدد المستخدين",
+    "UsedCompanies": "الشركات المستخدمة",
+    "ServiceProviders": "مزودين الخدمة",
+    "Status": "الحالة",
+    "Actions": "الأجراء"
+  },
+  "FormTest": {
+    "Saving": "جاري الحفظ"
+  },
+  "CompanyUserForm": {
+    "CreateUser": "إنشاء مستخدم",
+    "Company": "الشركة",
+    "SelectCompany": "اختر الشركة",
+    "EnterFirstName": "ادخل اسم المستخدم الاول",
+    "FirstName": "اسم المستخدم الاول",
+    "LastName": "اسم المستخدم ألأحير",
+    "EnterLastName": "ادخل اسم المستخدم ألأحير",
+    "Email": "البريد الإلكتروني",
+    "EnterEmail": "ادخل البريد الإلكتروني",
+    "Phone": "الهاتف",
+    "PleaseEnterPhoneNumber": "برجاء إدخال رقم الهاتف",
+    "JobTitle": "المسمى الوظيفي",
+    "SelectJobTitle": "اختر المسمى الوظيفي",
+    "Save": "حفظ"
+  },
+  "TimeZoneCheckbox": {
+    "ConfirmChange": "لتأكيد تغيير المنطقة الزمنية،",
+    "ClickHere": "اضغط هنا"
+  },
+  "CompaniesForm": {
+    "AddNewCompany": "اضافة شركة جديدة",
+    "CreateCompany": "إنشاء شركة",
+    "CompanyCountry": "دولة الشركة",
+    "SelectCompanyCountry": "اختر دولة الشركة",
+    "EnterCompanyCountry": "ادخل دولة الشركة",
+    "Activity": "النشاط",
+    "SelectActivity": "اختر النشاط",
+    "PleaseSelectActivity": "برجاء اختيار النشاط",
+    "TradeName": "الاسم التجاري",
+    "PleaseEnterTradeName": "برجاء إدخال الاسم التجاري",
+    "ShortName": "الاسم المختصر",
+    "PleaseEnterShortName": "برجاء إدخال الاسم المختصر",
+    "SupportManager": "مسؤول الدعم",
+    "SelectSupportManager": "اختر مسؤول الدعم",
+    "NameRequired": "الاسم مطلوب",
+    "EmailRequired": "البريد الإلكتروني مطلوب"
+  },
+  "DynamicRowsField": {
+    "ConfirmDeletion": "تأكيد الحذف",
+    "ConfirmDeletionMessage": "هل انت متاكد تريد الحذف؟ لا يمكن التراجع عن هذا الإجراء.",
+    "Cancel": "إلغاء",
+    "NoDataYet": "لا توجد بيانات حتى الآن",
+    "AddRowToStart": "أضف {label} للبدء",
+    "AddNewRow": "إضافة {label}",
+    "NewRowDefaultLabel": "صف جديد"
+  },
+  "EditModeTabs": {
+    "Profile": "الملف الشخصي",
+    "WorkContract": "عقد العمل",
+    "AttendancePolicy": "سياسة الحضور",
+    "UserActions": "اجراءات المستخدم"
+  },
+  "UserActionsTabs": {
+    "UserStatus": "حالة المستخدم",
+    "SMSMessages": "الرسائل النصية",
+    "SocialPlatforms": "منصات التواصل"
+  },
+  "UserContractTabs": {
+    "PersonalData": "البيانات الشخصية",
+    "AcademicExperience": "البيانات الاكاديمية والخبرة",
+    "FunctionalContractualData": "البيانات الوظيفية والتعاقدية",
+    "FinancialBenefits": "الامتيازات المالية",
+    "ContractManagement": "ادارة العقد",
+    "ContractualData": "البيانات التعاقدية"
+  },
+  "UserStatusDataSections": {
+    "ActivateUser": "تفعيل المستخدم",
+    "Password": "كلمة المرور"
+  },
+  "AcademicExperience": {
+    "AddNewCertification": "اضافة شهادة جديدة",
+    "Qualification": "المؤهل",
+    "BriefSummary": "نبذه مختصرة",
+    "PreviousExperiences": "الخبرات السابقة",
+    "EducationalCourses": "الكورسات التعليمية",
+    "ProfessionalCertificates": "الشهادات المهنية",
+    "CV": "السيرة الذاتية",
+    "NoDataFound": "لا يوجد بيانات",
+    "NoQualificationsData": "لا يوجد بيانات تخص المؤهلات للمستخدم قم باضافة مؤهل",
+    "GraduationCountry": "دولة التخرج",
+    "University": "الجامعة",
+    "SelectUniversity": "اختر الجامعة",
+    "EnterUniversity": "ادخل الجامعة",
+    "SelectQualification": "اختر المؤهل",
+    "EnterQualification": "ادخل المؤهل",
+    "AcademicSpecialization": "التخصص الأكاديمي",
+    "SelectAcademicSpecialization": "اختر التخصص الأكاديمي",
+    "EnterAcademicSpecialization": "ادخل التخصص الأكاديمي",
+    "CertificateAcquisitionDate": "تاريخ الحصول على الشهادة",
+    "StudyGrades": "المعدلات الدراسية",
+    "AttachCertificate": "ارفاق شهادة",
+    "AddNewQualification": "اضافة مؤهل جديد",
+    "AddNewExperience": "اضافة خبرة جديدة",
+    "AuthorityName": "اسم الجهة",
+    "AccreditationName": "اسم الاعتماد",
+    "AccreditationNumber": "رقم الاعتماد",
+    "AccreditationDegree": "درجة الاعتماد",
+    "CertificateExpiryDate": "تاريخ انتهاء الشهادة",
+    "NoExperiencesData": "لا يوجد بيانات تخص الخبرات السابقة للمستخدم قم باضافة خبرة مسبقة",
+    "CompanyName": "اسم الشركة",
+    "Authority": "الجهة",
+    "CourseName": "اسم الدورة التدريبية ",
+    "AccreditationInstitute": "جهة الاعتماد",
+    "CertificatesGranted": "الشهادات الممنوحة",
+    "EnterAuthority": "ادخل الجهة",
+    "AccreditationNameRequired": "اسم الاعتماد مطلوب",
+    "AccreditationNumberRequired": "رقم الاعتماد مطلوب",
+    "AccreditationDegreeRequired": "درجة الاعتماد مطلوب",
+    "CertificateAcquisitionDateRequired": "تاريخ الحصول على الشهادة مطلوب",
+    "CertificateExpiryDateRequired": "تاريخ انتهاء الشهادة مطلوب",
+    "AddNewCourse": "اضافة كورس جديد",
+    "SpecifyTrainingPeriod": "حدد فترة التدريب",
+    "BriefAboutProjects": "نبذه عن المشاريع والاعمال",
+    "JobTitleRequired": "المسمى الوظيفي مطلوب",
+    "StartDateRequired": "تاريخ البداية مطلوب",
+    "CompanyNameRequired": "اسم الشركة مطلوب",
+    "AuthorityRequired": "الجهة مطلوب",
+    "CourseNameRequired": "اسم الدورة التدريبية مطلوب",
+    "AccreditationInstituteRequired": "جهة الاعتماد مطلوب",
+    "CertificatesGrantedRequired": "الشهادات الممنوحة مطلوب",
+    "NoCoursesData": "لا يوجد بيانات تخص الكورسات للمستخدم قم باضافة كورس / دورة",
+    "AuthorityRequired": "الجهة مطلوب",
+    "CourseNameRequired": "اسم الدورة التدريبية مطلوب",
+    "AccreditationInstituteRequired": "جهة الاعتماد مطلوب",
+    "NoCVData": "لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية",
+    "AboutMe": "نبذه عني",
+    "JobTitleRequired": "المسمى الوظيفي مطلوب",
+    "StartDateRequired": "تاريخ البداية مطلوب",
+    "CompanyNameRequired": "اسم الشركة مطلوب",
+    "WriteBriefAboutYourself": "اكتب نبذة عنك"
+  },
+  "JobInformation": {
+    "JobData": "البيانات الوظيفية",
+    "EmploymentData": "بيانات التوظيف",
+    "Branch": "الفرع",
+    "Department": "الادارة",
+    "Section": "القسم",
+    "JobType": "نوع الوظيفة",
+    "JobNumber": "الرقم الوظيفي"
+  },
+  "GeneralActions": {
+    "MyRequests": "طلباتي",
+    "CreateRequest": "أنشاء طلب",
+    "File": "ملف"
+  },
+  "ContractData": {
+    "ContractNumber": "رقم العقد",
+    "CommencementDate": "تاريخ المباشرة",
+    "StartDate": "تاريخ البدء",
+    "ContractDuration": "مدة العقد",
+    "NoticePeriod": "فترة الاشعار",
+    "ProbationPeriod": "فترة التجربة",
+    "NatureOfWork": "طبيعة العمل",
+    "WorkingHoursType": "نوع ساعات العمل",
+    "WeeklyWorkingHours": "ساعات العمل الاسبوعية",
+    "AnnualLeaveDays": "ايام الاجازات السنوية",
+    "WorkLocation": "مكان العمل",
+    "RightToTerminateDuringProbation": "حق الانهاء خلال فترة التجربة",
+    "AttachContract": "ارفاق العقد",
+    "ContractNumberRequired": "رقم العقد مطلوب",
+    "CommencementDateRequired": "تاريخ المباشرة مطلوب",
+    "StartDateRequired": "تاريخ البدء مطلوب",
+    "ContractDurationRequired": "مدة العقد مطلوب",
+    "NoticePeriodRequired": "فترة الاشعار مطلوب",
+    "ProbationPeriodRequired": "فترة التجربة مطلوب",
+    "NatureOfWorkRequired": "طبيعة العمل مطلوب",
+    "WorkingHoursTypeRequired": "نوع ساعات العمل مطلوب",
+    "WeeklyWorkingHoursRequired": "ساعات العمل الاسبوعية مطلوب",
+    "AnnualLeaveDaysRequired": "ايام الاجازات السنوية مطلوب",
+    "SelectWorkLocation": "اختر مكان العمل",
+    "EnterWorkLocation": "ادخل مكان العمل",
+    "RightToTerminateDuringProbationRequired": "حق الانهاء خلال فترة التجربة مطلوب"
+  },
+  "JobOffer": {
+    "OfferNumber": "رقم العرض",
+    "SendDate": "تاريخ الارسال",
+    "ApprovalDate": "تاريخ الموافقة",
+    "AttachOffer": "ارفاق العرض",
+    "JobOffer": "العرض الوظيفي",
+    "OfferNumberRequired": "رقم العرض مطلوب",
+    "SendDateRequired": "تاريخ الارسال مطلوب",
+    "ApprovalDateRequired": "تاريخ الموافقة مطلوب"
+  },
+  "FinancialData": {
+    "Salary": "الراتب",
+    "BasicSalary": "الراتب الاساسي",
+    "NoAllowancesData": "لا يوجد بدلات للمستخدم قم باضافة بدل جديد"
   }
 }

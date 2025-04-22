@@ -4,6 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Certification } from "@/modules/user-profile/types/Certification";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   onSuccess?: () => void;
@@ -14,6 +15,7 @@ export const UserCertificationFormConfig = ({
   onSuccess,
   certification,
 }: PropsT) => {
+  const t = useTranslations("AcademicExperience");
   // declare and define component state and variables
   const formType = certification ? "Edit" : "Create";
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -32,8 +34,8 @@ export const UserCertificationFormConfig = ({
           {
             type: "select",
             name: "professional_bodie_id",
-            label: "الجهة",
-            placeholder: "اختر الجهة",
+            label: t("Authority"),
+            placeholder: t("EnterAuthority"), // Assuming placeholder should be "Enter Authority"
             required: true,
             dynamicOptions: {
               url: `${baseURL}/professional_bodies`,
@@ -49,67 +51,67 @@ export const UserCertificationFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل الجهة",
+                message: t("EnterAuthority"),
               },
             ],
           },
           {
             name: "accreditation_name",
-            label: "اسم الاعتماد",
+            label: t("AccreditationName"),
             type: "text",
-            placeholder: "اسم الاعتماد",
+            placeholder: t("AccreditationName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الاعتماد مطلوب",
+                message: t("AccreditationNameRequired"),
               },
             ],
           },
           {
             name: "accreditation_number",
-            label: "رقم الاعتماد",
+            label: t("AccreditationNumber"),
             type: "text",
-            placeholder: "رقم الاعتماد ",
+            placeholder: t("AccreditationNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم الاعتماد  مطلوب",
+                message: t("AccreditationNumberRequired"),
               },
             ],
           },
           {
             name: "accreditation_degree",
-            label: "درجة الاعتماد",
+            label: t("AccreditationDegree"),
             type: "text",
-            placeholder: "درجة الاعتماد",
+            placeholder: t("AccreditationDegree"),
             validation: [
               {
                 type: "required",
-                message: "درجة الاعتماد مطلوب",
+                message: t("AccreditationDegreeRequired"),
               },
             ],
           },
           {
             name: "date_obtain",
-            label: "تاريخ الحصول على الشهادة",
+            label: t("CertificateAcquisitionDate"),
             type: "date",
-            placeholder: "تاريخ الحصول على الشهادة",
+            placeholder: t("CertificateAcquisitionDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الحصول على الشهادة مطلوب",
+                message: t("CertificateAcquisitionDateRequired"),
               },
             ],
           },
           {
             name: "date_end",
-            label: "تاريخ انتهاء الشهادة",
+            label: t("CertificateExpiryDate"),
             type: "date",
-            placeholder: "تاريخ انتهاء الشهادة",
+            placeholder: t("CertificateExpiryDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
+                message: t("CertificateExpiryDateRequired"),
               },
             ],
           },

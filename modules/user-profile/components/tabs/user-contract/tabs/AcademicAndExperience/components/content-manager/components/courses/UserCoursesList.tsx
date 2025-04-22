@@ -3,16 +3,18 @@ import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import SingleCourse from "./single-course";
 import { Course } from "@/modules/user-profile/types/Course";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
+import { useTranslations } from "next-intl";
 
 export default function UserCoursesList() {
   const { userCourses } = useUserAcademicTabsCxt();
+  const t = useTranslations("AcademicExperience");
 
   // handle there is no data found
   if (userCourses && userCourses.length === 0)
     return (
       <NoDataFounded
-        title="لا يوجد بيانات"
-        subTitle="لا يوجد بيانات تخص الكورسات للمستخدم قم باضافة كورس / دورة"
+        title={t("NoDataFound")}
+        subTitle={t("NoCoursesData")}
       />
     );
 

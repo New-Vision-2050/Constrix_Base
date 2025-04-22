@@ -44,7 +44,7 @@ export const UsersConfig = () => {
     columns: [
       {
         key: "name",
-        label: "الاسم",
+        label: t("UsersTable.Name"),
         sortable: true,
         searchable: true,
         render: (_: unknown, row: UsersData) => (
@@ -60,7 +60,7 @@ export const UsersConfig = () => {
       },
       {
         key: "phone",
-        label: "رقم الجوال",
+        label:  t("UsersTable.PhoneNumber"),
         render: (value: string) => (
           <p style={{ direction: "ltr" }} className="text-start">
             {value}
@@ -69,12 +69,12 @@ export const UsersConfig = () => {
       },
       {
         key: "country.name",
-        label: "الجنسية",
+        label: t("UsersTable.Nationality"),
         sortable: true,
       },
       {
         key: "companies",
-        label: "الشركة",
+        label: t("UsersTable.Company"),
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
             {value &&
@@ -88,7 +88,7 @@ export const UsersConfig = () => {
       },
       {
         key: "user-type",
-        label: "نوع المستخدم",
+        label: t("UsersTable.UserType"),
         render: (_: unknown, row: UsersData) => {
           const companies = row.companies || [];
           return (
@@ -147,7 +147,7 @@ export const UsersConfig = () => {
         key: "company_id",
         searchType: {
           type: "dropdown",
-          placeholder: "الشركة",
+          placeholder: t("UsersTable.Company"),
           dynamicDropdown: {
             url: `${baseURL}/companies`,
             valueField: "id",
@@ -165,10 +165,10 @@ export const UsersConfig = () => {
         key: "companyType",
         searchType: {
           type: "dropdown",
-          placeholder: "حالة المستخدم",
+          placeholder: t("UsersTable.UserType"),
           dropdownOptions: [
-            { value: "active", label: "نشط" },
-            { value: "inactive", label: "غير نشط" },
+            { value: "active", label: t("UsersTable.Active") },
+            { value: "inactive", label:  t("UsersTable.Inactive") },
           ],
         },
       },
@@ -176,7 +176,7 @@ export const UsersConfig = () => {
         key: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال"
+          placeholder: t("UsersTable.EmailOrPhone")
         },
       },
     ],

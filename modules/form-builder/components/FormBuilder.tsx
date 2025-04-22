@@ -7,6 +7,7 @@ import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { apiClient } from "@/config/axios-config";
 import {useFormStore} from "@/modules/form-builder";
+import { useTranslations } from "next-intl";
 
 interface FormBuilderProps {
   config: FormConfig;
@@ -76,6 +77,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   editError: initialEditError,
   recordId,
 }) => {
+  const t = useTranslations("FormTest");
   // Local state for edit mode
 
   const [isEditMode] = useState( config.isEditMode || false);
@@ -395,7 +397,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 {isSubmittingStep ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    جاري الحفظ
+                    {t("Saving")}
                   </span>
                 ) : (
                   config.wizardOptions?.submitButtonTextPerStep || "Submit Step"
@@ -428,7 +430,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 {isSubmitting && config.showSubmitLoader ? (
                   <span className="flex items-center">
                     <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    جاري الحفظ
+                    {t("Saving")}
                   </span>
                 ) : (
                   config.wizardOptions?.finishButtonText ||
@@ -450,7 +452,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             {isSubmitting && config.showSubmitLoader ? (
               <span className="flex items-center">
                 <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                جاري الحفظ
+                {t("Saving")}
               </span>
             ) : (
               config.submitButtonText || "Submit"
