@@ -134,7 +134,8 @@
     "CompanyName": "نيو فيجن"
   },
   "Header": {
-    "MainSystemManagement": "ادارة النظام الرئيسي"
+    "MainSystemManagement": "ادارة النظام الرئيسي",
+    "Logout": "تسجيل الخروج"
   },
   "FormBuilder": {
     "Fields": {
