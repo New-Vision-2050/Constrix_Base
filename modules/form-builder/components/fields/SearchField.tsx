@@ -23,22 +23,31 @@ const SearchField: React.FC<SearchFieldProps> = ({
   dependencyValues = {},
 }) => {
   return (
-    <div className={cn(
-      field.className,
-      !!error && touched ? 'border-destructive' : '',
-      field.width ? field.width : 'w-full'
-    )}>
-      <DropdownSearch
-        columnKey={field.name}
-        label={field.label}
-        value={value}
-        onChange={onChange}
-        options={field.options}
-        dynamicConfig={field.dynamicOptions}
-        dependencies={dependencyValues}
-        placeholder={field.placeholder}
-        isMulti={field.isMulti}
-      />
+    <div className="relative">
+      <div className={cn(
+        field.className,
+        !!error && touched ? 'border-destructive' : '',
+        field.width ? field.width : 'w-full'
+      )}>
+        <DropdownSearch
+          columnKey={field.name}
+          label={field.label}
+          value={value}
+          onChange={onChange}
+          options={field.options}
+          dynamicConfig={field.dynamicOptions}
+          dependencies={dependencyValues}
+          placeholder={field.placeholder}
+          isMulti={field.isMulti}
+        />
+      </div>
+      
+      {/* Error message */}
+      {!!error && touched && (
+        <div className="text-destructive text-sm mt-1">
+          {error}
+        </div>
+      )}
     </div>
   );
 };

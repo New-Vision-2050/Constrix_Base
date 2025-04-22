@@ -4,30 +4,32 @@ import AcademicAndExperience from "../tabs/AcademicAndExperience";
 import FunctionalAndContractualData from "../tabs/FunctionalAndContractualData";
 import FinancialBenefits from "../tabs/FinancialData";
 
-export const UserContractTabsList: SystemTab[] = [
+export const GetUserContractTabsList = (
+  t: (key: string) => string
+): SystemTab[] => [
   {
     id: "user-contract-tab-personal-data",
-    title: "البيانات الشخصية",
+    title: t("personalTab"),
     content: <PersonalDataTab />,
   },
   {
     id: "user-contract-tab-academic-experience",
-    title: "البيانات الاكاديمية والخبرة",
+    title: t("academicAndExperience"),
     content: <AcademicAndExperience />,
   },
   {
     id: "user-contract-tab-job-contract",
-    title: "البيانات الوظيفية والتعاقدية",
+    title: t("employmentAndContractalData"),
     content: <FunctionalAndContractualData />,
   },
   {
     id: "user-contract-tab-financial",
-    title: "الامتيازات المالية",
+    title: t("financialPrivileges"),
     content: <FinancialBenefits />,
   },
   {
     id: "user-contract-tab-contract-management",
-    title: "ادارة العقد",
+    title: t("contractManagement"),
     content: <>ادارة العقد</>,
   },
 ];

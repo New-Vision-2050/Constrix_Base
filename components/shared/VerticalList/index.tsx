@@ -43,10 +43,14 @@ const VerticalButton = ({ btn }: { btn: UserProfileNestedTab }) => {
           {btn.icon}
           <p className="text-md font-semibold">{btn.title}</p>
         </div>
-        {btn?.valid ? (
-          <CircleCheckIcon color="green" />
-        ) : (
-          <InfoIcon additionClass="text-orange-500" />
+        {btn.ignoreValidation !== true && (
+          <>
+            {btn?.valid ? (
+              <CircleCheckIcon color="green" />
+            ) : (
+              <InfoIcon additionClass="text-orange-500" />
+            )}
+          </>
         )}
       </div>
     </>

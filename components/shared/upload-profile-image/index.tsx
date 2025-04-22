@@ -8,6 +8,7 @@ import UploadProfileImageDialogHeader from "./UploadProfileImageDialogHeader";
 import ShowFeedbackMessages from "./ShowFeedbackMessages";
 import PreviewImage from "./PreviewImage";
 import PlaceholderImage from "./PlaceholderImage";
+import { useTranslations } from "next-intl";
 
 // Props type
 type PropsT = {
@@ -20,14 +21,10 @@ type PropsT = {
 };
 
 // initial validation messages to display before upload
-const initialValidateMgs: ProfileImageMsg[] = [
-  { sentence: "حجم الصورة لا يتعدى 5 ميجابايت.", status: -1, sub_title: "" },
-  {
-    sentence: "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
-    status: -1,
-    sub_title: "",
-  },
-  { sentence: "تأكد من أن الخلفية بيضاء.", status: -1, sub_title: "" },
+export const getInitialValidateMsgs = (t: (key: string) => string) => [
+  { sentence: t("rules.rule1"), status: -1, sub_title: "" },
+  { sentence: t("rules.rule2"), status: -1, sub_title: "" },
+  { sentence: t("rules.rule3"), status: -1, sub_title: "" },
 ];
 
 export default function UploadProfileImageDialog({
@@ -41,7 +38,10 @@ export default function UploadProfileImageDialog({
   // declare and define component state and vars
   const [valid, setValid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [feedbackMessages, setFeedbackMessages] = useState(initialValidateMgs);
+  const t = useTranslations("UserProfile.header.uploadPhoto");
+  const [feedbackMessages, setFeedbackMessages] = useState(
+    getInitialValidateMsgs(t)
+  );
   const [uploadedFile, setUploadedFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   // access user profile updater
@@ -50,8 +50,8 @@ export default function UploadProfileImageDialog({
   useEffect(() => {
     setValid(false);
     setPreviewUrl("");
-    setFeedbackMessages(initialValidateMgs);
-  }, [open]);
+    setFeedbackMessages(getInitialValidateMsgs(t));
+  }, [open, t]);
 
   // handle file input changes and preview image
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +68,7 @@ export default function UploadProfileImageDialog({
     setPreviewUrl(null);
     setValid(false);
     setUploadedFile(undefined);
-    setFeedbackMessages(initialValidateMgs);
+    setFeedbackMessages(getInitialValidateMsgs(t));
   };
 
   // run validation function passed via props
@@ -137,19 +137,19 @@ export default function UploadProfileImageDialog({
             title={
               !valid
                 ? !uploadedFile
-                  ? "upload image firstly"
-                  : "validate Image"
-                : "Save Image"
+                  ? t("actions.title.upload")
+                  : t("actions.title.validate")
+                : t("actions.title.save")
             }
             disabled={!Boolean(uploadedFile) || loading}
           >
             {!valid
               ? loading
-                ? "جاري التنفيذ..."
-                : "التحقق من الصورة"
+                ? t("actions.loadingLabel")
+                : t("actions.checkLabel")
               : loading
-              ? "جاري التنفيذ..."
-              : "حفظ"}
+              ? t("actions.loadingLabel")
+              : t("actions.saveLabel")}
           </Button>
         </div>
       </DialogContent>

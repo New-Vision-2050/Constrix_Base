@@ -21,14 +21,6 @@ cd $DEPLOY_DIR
 
 PROJECT_NAME=nextjs-$DEPLOYMENT_ID
 
- if docker ps -a --filter "name=$PROJECT_NAME" | grep -w "$PROJECT_NAME"; then
-            echo "Existing deployment found for $PROJECT_NAME. Removing..."
-            docker rm -f $PROJECT_NAME
-            yes|docker image prune
-            echo "Existing deployment removed."
-            else
-            echo "No existing deployment found for $PROJECT_NAME."
-            fi
 
 # Create .env file
 cat <<EOF > .env

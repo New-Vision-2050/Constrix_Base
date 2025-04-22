@@ -21,21 +21,30 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
   onBlur,
 }) => {
   return (
-    <Textarea
-      id={field.name}
-      name={field.name}
-      value={value || ''}
-      placeholder={field.placeholder}
-      disabled={field.disabled}
-      readOnly={field.readOnly}
-      className={cn(
-        field.className,
-        !!error && touched ? 'border-destructive' : '',
-        field.width ? field.width : 'w-full'
+    <div className="relative">
+      <Textarea
+        id={field.name}
+        name={field.name}
+        value={value || ''}
+        placeholder={field.placeholder}
+        disabled={field.disabled}
+        readOnly={field.readOnly}
+        className={cn(
+          field.className,
+          !!error && touched ? 'border-destructive' : '',
+          field.width ? field.width : 'w-full'
+        )}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+      />
+      
+      {/* Error message */}
+      {!!error && touched && (
+        <div className="text-destructive text-sm mt-1">
+          {error}
+        </div>
       )}
-      onChange={(e) => onChange(e.target.value)}
-      onBlur={onBlur}
-    />
+    </div>
   );
 };
 

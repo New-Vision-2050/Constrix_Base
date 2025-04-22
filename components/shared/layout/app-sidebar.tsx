@@ -144,7 +144,7 @@ export function AppSidebar({
   };
 
   return (
-    <Sidebar collapsible="icon" side={sidebarSide} {...props}>
+    <Sidebar collapsible="icon" side={sidebarSide} {...props} className="text-white">
       <SidebarHeader className=" pt-10">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />

@@ -11,7 +11,7 @@ export default function UserProfilePassportDataReview() {
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.passport)}
           label="رقم جواز السفر"
           value={userIdentityData?.passport ?? ""}
           required
@@ -19,7 +19,7 @@ export default function UserProfilePassportDataReview() {
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.passport_start_date)}
           label="تاريخ الانشاء"
           value={userIdentityData?.passport_start_date ?? ""}
           required
@@ -30,7 +30,7 @@ export default function UserProfilePassportDataReview() {
       {/* second row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.passport_end_date)}
           label="تاريخ الانتهاء"
           value={userIdentityData?.passport_end_date ?? ""}
           type="date"

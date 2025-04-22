@@ -55,8 +55,8 @@ const SidebarHeaderContent = ({
         )}
       >
         <AvatarGroup
-          fullName="Mohamed Saad"
-          alt="Mohamed Saad"
+          fullName={user?.name ?? ""}
+          alt={user?.name ?? ""}
           src="https://github.com/shad\cn.png"
         />
         <p

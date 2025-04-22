@@ -1,5 +1,5 @@
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
-import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
+import FieldPreview from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 import { FilePlus } from "lucide-react";
 
 const LegalDataPreview = ({
@@ -38,7 +38,7 @@ const LegalDataPreview = ({
         value: new Date(obj.end_date).toLocaleDateString("en-GB"),
         render: () => (
           <div className="flex items-stretch gap-3">
-            <PreviewTextField
+            <FieldPreview
               valid={true}
               label="تاريخ الانتهاء"
               value={new Date(obj.end_date).toLocaleDateString("en-GB")}
@@ -63,7 +63,7 @@ const LegalDataPreview = ({
             {preview?.render ? (
               preview.render()
             ) : (
-              <PreviewTextField {...preview} />
+              <FieldPreview {...preview} />
             )}
           </div>
         ))

@@ -27,7 +27,7 @@ export const PersonalDataFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "الاسم مطلوب",
+                message: "الاسم مطلوب"
               },
             ],
           },
