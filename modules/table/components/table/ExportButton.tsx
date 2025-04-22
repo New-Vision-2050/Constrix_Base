@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/modules/table/hooks/use-toast';
 import { useApiClient } from '@/utils/apiClient';
+import { AxiosError } from 'axios';
 
 interface ExportButtonProps {
   url: string;
@@ -77,9 +78,10 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       });
     } catch (error) {
       console.error('Export error:', error);
+      const axiosError = error as AxiosError<{ message: string }>;
       toast({
         title: t('Table.ExportFailed'),
-        description: error?.response?.data?.message || (error instanceof Error ? error.message : String(error)),
+        description: axiosError.response?.data?.message || (error instanceof Error ? error.message : String(error)),
         variant: 'destructive',
       });
     } finally {
