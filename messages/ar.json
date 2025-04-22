@@ -91,6 +91,9 @@
     "Export": "تصدير",
     "ExportAsCSV": "تصدير كـ CSV",
     "ExportAsJSON": "تصدير كـ JSON",
+    "ExportSuccess": "تم التصدير بنجاح",
+    "ExportFailed": "فشل التصدير",
+    "ItemsExported": "عناصر تم تصديرها",
     "FilterSearch": "فلتر البحث",
     "RowsPerPage": "الصفوف لكل صفحة :",
     "Search": "بحث",
@@ -100,6 +103,7 @@
   },
   "Companies": {
     "Companies": "الشركات",
+    "Edit": "تعديل",
     "Email": "البريد الاليكتروني",
     "CompanyType": "نوع الشركة",
     "CompanySection": "نشاط الشركه",
@@ -111,6 +115,7 @@
     "TypeFilter": "نوع الشركة",
     "Active": "نشط",
     "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
+    "completeProfileData": "أستكمال بيانات",
     "PackageSettings": "اعدادات الباقة والبرامج",
     "Delete": "حذف (أرشفة)",
     "Confirmation": "تأكيد",
@@ -119,12 +124,90 @@
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
   },
   "Sidebar": {
+    "Dashboard": "الملف الشخصي",
     "Companies": "الشركات",
+    "CompaniesList": "عرض الشركات",
     "Users": "المستخدمين",
-    "Welcome": "مرحبا، محمد سعد!",
-    "CompanyName" : "نيو فيجن"
+    "UsersList": "عرض المستخدميين",
+    "Settings": "اعدادات",
+    "SystemSettings": "اعدادات البرامج",
+    "DashboardSettings": "ملف الشركة",
+    "UserProfileSettings": "الملف الشخصي",
+    "Welcome": "مرحبا",
+    "CompanyName": "نيو فيجن"
   },
   "Header": {
-    "MainSystemManagement": "ادارة النظام الرئيسي"
+    "MainSystemManagement": "ادارة النظام الرئيسي",
+    "Logout": "تسجيل الخروج"
+  },
+  "FormBuilder": {
+    "Fields": {
+      "Image": {
+        "UploadImage": "رفع صورة",
+        "UploadImages": "رفع صور",
+        "ChangeImage": "تغيير الصورة",
+        "RemoveImage": "إزالة الصورة",
+        "ClickToUpload": "انقر لرفع صورة",
+        "ClickToUploadMultiple": "انقر لرفع صور",
+        "AddMoreImages": "إضافة المزيد من الصور",
+        "Uploading": "جاري الرفع...",
+        "AllowedTypes": "الأنواع المسموح بها",
+        "MaxSize": "الحجم الأقصى",
+        "FileTypeNotAllowed": "نوع الملف غير مسموح به. الأنواع المسموح بها",
+        "FileSizeExceeds": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
+        "UploadFailed": "فشل الرفع",
+        "UploadsFailed": "فشل رفع الملفات",
+        "UploadSuccessful": "تم الرفع بنجاح",
+        "ImageRequired": "الصورة مطلوبة"
+      },
+      "File": {
+        "UploadFile": "رفع ملف",
+        "UploadFiles": "رفع ملفات",
+        "ChangeFile": "تغيير الملف",
+        "RemoveFile": "إزالة الملف",
+        "ClickToUpload": "انقر لرفع ملف",
+        "ClickToUploadMultiple": "انقر لرفع ملفات",
+        "AddMoreFiles": "إضافة المزيد من الملفات",
+        "Uploading": "جاري الرفع...",
+        "AllowedTypes": "الأنواع المسموح بها",
+        "MaxSize": "الحجم الأقصى",
+        "FileTypeNotAllowed": "نوع الملف غير مسموح به. الأنواع المسموح بها",
+        "FileSizeExceeds": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
+        "UploadFailed": "فشل الرفع",
+        "UploadsFailed": "فشل رفع الملفات",
+        "UploadSuccessful": "تم الرفع بنجاح",
+        "FileRequired": "الملف مطلوب"
+      }
+    }
+  },
+  "UserProfile": {
+    "header": {
+      "placeholder": {
+        "userName": "اسم المستخدم",
+        "jobTitle": "الوظيفة",
+        "address": "العنوان",
+        "appointmentDate": "تاريخ التعيين",
+        "image": "يلزم اضافة صورة خلفية بيضاء 6*4"
+      },
+      "uploadPhoto": {
+        "title": "أضافة صورة",
+        "actions": {
+          "checkLabel": "التحقق من الصورة",
+          "loadingLabel": "جاري التنفيذ...",
+          "saveLabel": "حفظ",
+          "attachmentLabel":"ارفاق",
+          "title": {
+            "upload": "قم برفع الصورة أولأ",
+            "validate": "تحقق من الصورة",
+            "save": "رفع الصورة"
+          }
+        },
+        "rules": {
+          "rule1": "حجم الصورة لا يتعدى 5 ميجابايت.",
+          "rule2": "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
+          "rule3": "تأكد من أن الخلفية بيضاء."
+        }
+      }
+    }
   }
 }

@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/modules/table/components/ui/popover";
-import { DynamicDropdownConfig } from "@/modules/table/utils/tableTypes";
+import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
 
 interface PaginatedDropdownProps {
@@ -64,7 +64,20 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     } else {
       // For single select
       const singleValue = value as string;
-      return options.find((option) => option.value === singleValue)?.label || singleValue;
+      const option = options.find((option) => option.value === singleValue);
+      
+      // If we have a proper label, use it
+      if (option) {
+        return option.label;
+      }
+      
+      // If we're still loading and have a value, show loading indicator
+      if (loading && singleValue) {
+        return `${singleValue} (loading...)`;
+      }
+      
+      // Fallback to the value itself
+      return singleValue;
     }
   };
   
@@ -111,12 +124,12 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               aria-label={label}
               disabled={isDisabled}
               className={cn(
-                "w-full justify-between bg-sidebar",
+                "w-full justify-between bg-sidebar whitespace-normal",
                 (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground"
               )}
               onKeyDown={handleKeyDown}
             >
-              <div className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-start">
+              <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
                 {(value && (!isMulti || (Array.isArray(value) && value.length > 0)))
                   ? selectedLabel
                   : placeholder}

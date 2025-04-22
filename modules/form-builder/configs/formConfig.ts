@@ -70,12 +70,12 @@ export const formConfig: FormConfig = {
           name: 'name',
           label: 'Full Names',
           type: 'text',
-          placeholder: 'Enter your name',
+          placeholder: 'ادخل اسمك',
           required: true,
           validation: [
             {
               type: 'required',
-              message: 'Name is required'
+              message: 'الاسم مطلوب'
             },
             {
               type: 'minLength',
@@ -93,7 +93,7 @@ export const formConfig: FormConfig = {
           validation: [
             {
               type: 'required',
-              message: 'Email is required'
+              message: 'البريد الالكترونى مطلوب'
             },
             {
               type: 'email',
@@ -228,6 +228,55 @@ export const formConfig: FormConfig = {
             { value: 'ad', label: 'Advertisement' },
             { value: 'other', label: 'Other' }
           ]
+        }
+      ]
+    },
+    {
+      title: 'Contact Persons',
+      description: 'Add multiple contact persons for your organization',
+      fields: [
+        {
+          name: 'contactPersons',
+          label: 'Contact Persons',
+          type: 'dynamicRows',
+          dynamicRowOptions: {
+            rowTemplate: {
+              name: '',
+              email: '',
+              phone: '',
+              position: ''
+            },
+            rowFields: [
+              {
+                name: 'name',
+                label: 'Name',
+                type: 'text',
+                placeholder: 'Enter name',
+                required: true
+              },
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              placeholder: 'Enter email',
+              required: true
+            },
+            {
+              name: 'phone',
+              label: 'Phone',
+              type: 'text',
+              placeholder: 'Enter phone number'
+            },
+            {
+              name: 'position',
+              label: 'Position',
+              type: 'text',
+              placeholder: 'Enter position'
+            }
+          ],
+            minRows: 1,
+            maxRows: 5
+          }
         }
       ]
     }

@@ -1,4 +1,4 @@
-type ServerResponse<T extends "success" | "error"> = {
+type ServerResponse<T extends "success" | "error", P = null> = {
   status: T;
   message: {
     type: T;
@@ -6,7 +6,8 @@ type ServerResponse<T extends "success" | "error"> = {
     name: string | null;
     description: string;
   };
+  payload?: P;
 };
 
-export type ServerErrorResponse = ServerResponse<"error">;
-export type ServerSuccessResponse = ServerResponse<"success">;
+export type ServerErrorResponse<P = null> = ServerResponse<"error", P>;
+export type ServerSuccessResponse<P = null> = ServerResponse<"success", P>;

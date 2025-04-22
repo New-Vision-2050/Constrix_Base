@@ -3,6 +3,7 @@ import { ValidationRule } from "../types/formTypes";
 import axios from "axios";
 import { debounce } from "lodash";
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
+import {apiClient} from "@/config/axios-config";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -17,6 +18,7 @@ interface FormInstanceState {
   isValid: boolean;
   submitCount: number;
   validatingFields: Record<string, boolean>;
+  isEditMode?: boolean; // Add isEditMode property
 }
 
 // Define the global store that holds multiple form instances
@@ -30,6 +32,7 @@ interface FormState {
   // Form actions
   setFormId: (formId: string) => void;
   initForm: (formId: string, initialValues?: Record<string, any>) => void;
+  getValue: (formId: string, field: string) => any;
   setValue: (formId: string, field: string, value: any) => void;
   setValues: (formId: string, values: Record<string, any>) => void;
   setError: (formId: string, field: string, error: string | React.ReactNode | null) => void;
@@ -48,6 +51,7 @@ interface FormState {
     rule: ValidationRule
   ) => void;
   hasValidatingFields: (formId: string) => boolean;
+  setEditMode: (formId: string, isEditMode: boolean) => void; // Add setEditMode action
 }
 
 // Default state for a new form instance
@@ -59,6 +63,7 @@ const getDefaultFormState = (initialValues: Record<string, any> = {}): FormInsta
   isValid: true,
   submitCount: 0,
   validatingFields: {},
+  isEditMode: false, // Default isEditMode to false
 });
 
 // Create the store with proper server snapshot caching
@@ -100,6 +105,14 @@ export const useFormStore = create<FormState>((set, get) => ({
       }
     }));
   },
+
+    // Actions for specific form instances
+    getValue: (formId: string, field: string) => {
+        // Get the current state
+        const state = get();
+        const formState = state.forms[formId] || getDefaultFormState();
+        return formState.values[field]
+    },
 
   setValues: (formId: string, values: Record<string, any>) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
@@ -293,7 +306,7 @@ export const useFormStore = create<FormState>((set, get) => ({
             };
 
             // Make the API request
-            const response = await axios(config);
+            const response = await apiClient(config);
 
             // Check if validation passed
             let isValid = false;
@@ -357,6 +370,21 @@ export const useFormStore = create<FormState>((set, get) => ({
       (isValidating) => isValidating
     );
   },
+
+  // Set edit mode for a form
+  setEditMode: (formId: string, isEditMode: boolean) => set((state: FormState) => {
+    const formState = state.forms[formId] || getDefaultFormState();
+
+    return {
+      forms: {
+        ...state.forms,
+        [formId]: {
+          ...formState,
+          isEditMode,
+        }
+      }
+    };
+  }),
 }));
 
 // Helper function to access the current form state
@@ -434,6 +462,10 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     return useFormStore.getState().hasValidatingFields(formId);
   }, [formId]);
 
+  const setEditMode = useCallback((isEditMode: boolean) => {
+    useFormStore.getState().setEditMode(formId, isEditMode);
+  }, [formId]);
+
   return {
     // State
     ...formState,
@@ -451,7 +483,8 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     incrementSubmitCount,
     setFieldValidating,
     validateFieldWithApi,
-    hasValidatingFields
+    hasValidatingFields,
+    setEditMode
   };
 };
 

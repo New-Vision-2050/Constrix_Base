@@ -7,6 +7,7 @@ import {
 } from "./DropdownUtils";
 import { useApiClient } from "@/utils/apiClient";
 import axios, { AxiosError } from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface UseDynamicOptionsProps {
   dynamicConfig?: DynamicDropdownConfig;
@@ -35,6 +36,7 @@ export const useDynamicOptions = ({
   const urlRef = useRef<string>("");
   const processingFetchRef = useRef(false);
   const apiClient = useApiClient();
+  const queryClient = useQueryClient();
 
   // Function to manually trigger a refresh of options
   const refresh = useCallback(() => {
@@ -69,8 +71,31 @@ export const useDynamicOptions = ({
         // Check if component is still mounted
         if (!isMountedRef.current) return [];
 
-        const data = response.data;
-        if (!Array.isArray(data)) throw new Error("Expected array response");
+        const responseData = response.data;
+        let data;
+
+        // Handle response format
+        if (responseData && typeof responseData === 'object') {
+          if (responseData.payload && Array.isArray(responseData.payload)) {
+            // Handle responses with payload property
+            data = responseData.payload;
+          } else if (Array.isArray(responseData)) {
+            // Handle direct array response
+            data = responseData;
+          } else {
+            // Try to find an array in the response
+            const arrayCandidate = Object.values(responseData).find(val => Array.isArray(val));
+            if (arrayCandidate && Array.isArray(arrayCandidate)) {
+              data = arrayCandidate;
+            } else {
+              data = [responseData];
+            }
+          }
+        } else if (Array.isArray(responseData)) {
+          data = responseData;
+        } else {
+          throw new Error("Unexpected response format");
+        }
 
         // Update the URL ref
         urlRef.current = url;
@@ -122,24 +147,86 @@ export const useDynamicOptions = ({
     let shouldRefetch = refreshCounter > 0;
 
     if (dynamicConfig?.dependsOn && dependencies) {
-      const dependencyKey = dynamicConfig.dependsOn;
-      const currentValue = dependencies[dependencyKey] || "";
-      const previousValue =
-        previousDependenciesRef.current[dependencyKey] || "";
+      // Function to check if dependencies have changed
+      const checkDependencyChanges = () => {
+        let hasChanged = false;
+        let shouldClearOptions = false;
 
-      // Update the previous dependencies ref
-      previousDependenciesRef.current = {
-        ...previousDependenciesRef.current,
-        [dependencyKey]: currentValue,
+        // Case 1: String format (backward compatibility)
+        if (typeof dynamicConfig.dependsOn === 'string') {
+          const dependencyKey = dynamicConfig.dependsOn;
+          const currentValue = dependencies[dependencyKey] || "";
+          const previousValue = previousDependenciesRef.current[dependencyKey] || "";
+
+          // Update the previous dependencies ref
+          previousDependenciesRef.current = {
+            ...previousDependenciesRef.current,
+            [dependencyKey]: currentValue,
+          };
+
+          // If dependency changed, we should refetch and clear options
+          if (currentValue !== previousValue) {
+            hasChanged = true;
+            shouldClearOptions = !currentValue; // Clear if value is empty
+          }
+        }
+        // Case 2: Array of dependency configs
+        else if (Array.isArray(dynamicConfig.dependsOn)) {
+          for (const depConfig of dynamicConfig.dependsOn) {
+            const field = depConfig.field;
+            const currentValue = dependencies[field] || "";
+            const previousValue = previousDependenciesRef.current[field] || "";
+
+            // Update the previous dependencies ref
+            previousDependenciesRef.current = {
+              ...previousDependenciesRef.current,
+              [field]: currentValue,
+            };
+
+            // If any dependency changed, we should refetch
+            if (currentValue !== previousValue) {
+              hasChanged = true;
+              if (!currentValue) {
+                shouldClearOptions = true;
+                break;
+              }
+            }
+          }
+        }
+        // Case 3: Object with field names as keys
+        else if (typeof dynamicConfig.dependsOn === 'object') {
+          for (const field of Object.keys(dynamicConfig.dependsOn)) {
+            const currentValue = dependencies[field] || "";
+            const previousValue = previousDependenciesRef.current[field] || "";
+
+            // Update the previous dependencies ref
+            previousDependenciesRef.current = {
+              ...previousDependenciesRef.current,
+              [field]: currentValue,
+            };
+
+            // If any dependency changed, we should refetch
+            if (currentValue !== previousValue) {
+              hasChanged = true;
+              if (!currentValue) {
+                shouldClearOptions = true;
+                break;
+              }
+            }
+          }
+        }
+
+        return { hasChanged, shouldClearOptions };
       };
 
-      // If dependency changed, we should refetch and clear options
-      if (currentValue !== previousValue) {
+      const { hasChanged, shouldClearOptions } = checkDependencyChanges();
+
+      if (hasChanged) {
         shouldRefetch = true;
         // Clear options immediately when dependency changes
         setOptions([]);
 
-        if (!currentValue) {
+        if (shouldClearOptions) {
           setLoading(false);
           processingFetchRef.current = false;
           return;
@@ -147,15 +234,14 @@ export const useDynamicOptions = ({
       }
     }
 
-    // Skip fetch if URL hasn't changed and no other reason to refetch
+
     const url = getFetchUrl(
       dynamicConfig.url,
-      dynamicConfig.filterParam,
-      dynamicConfig.dependsOn,
+      dynamicConfig,
       dependencies
     );
 
-    if (url === urlRef.current && !shouldRefetch) {
+    if ( url == null || url === urlRef.current && !shouldRefetch) {
       setLoading(false);
       processingFetchRef.current = false;
       return;

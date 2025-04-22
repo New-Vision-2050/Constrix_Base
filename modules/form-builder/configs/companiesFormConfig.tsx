@@ -72,14 +72,18 @@ export const companiesFormConfig: FormConfig = {
           placeholder: "برجاء إدخال الاسم التجاري",
           validation: [
             {
+              type: "required",
+              message: "الاسم التجاري مطلوب",
+            },
+            {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
-                url: "/api/validate-username",
+                url: `${baseURL}/companies/validated`,
                 method: "POST",
                 debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
+                paramName: "name",
+                successCondition: (response) => response.payload.status === 1,
               },
             },
           ],
@@ -93,14 +97,18 @@ export const companiesFormConfig: FormConfig = {
           containerClassName: "rtl:flex-row-reverse",
           validation: [
             {
+              type: "required",
+              message: "الاسم المختصر مطلوب",
+            },
+            {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
-                url: "/api/validate-username",
+                url: `${baseURL}/companies/validated`,
                 method: "POST",
                 debounceMs: 500,
-                paramName: "username",
-                successCondition: (response) => response.available === true,
+                paramName: "user_name",
+                successCondition: (response) => response.payload.status === 1,
               },
             },
           ],
@@ -128,42 +136,51 @@ export const companiesFormConfig: FormConfig = {
               message: "مسؤول الدعم",
             },
           ],
-        },  
+        },
         {
           type: "checkbox",
           name: "change_local_time",
           label: "الشركة",
           placeholder: "اختر الشركة",
-          render: (field: any, value: boolean, onChange: (value: boolean) => void) => {
-            return <TimeZoneCheckbox field={field} value={value} onChange={onChange} />;
+          render: (
+            field: any,
+            value: boolean,
+            onChange: (value: boolean) => void
+          ) => {
+            return (
+              <TimeZoneCheckbox
+                field={field}
+                value={value}
+                onChange={onChange}
+              />
+            );
           },
           validation: [
             {
-              type: 'custom',
-              message: 'Order must have at least one item',
+              type: "custom",
+              message: "Order must have at least one item",
               validator: (value) => {
+                console.log("checkbox error: -----: ", value);
 
-                console.log('checkbox error: -----: ' , value)
-              
-                return false
-              }
+                return false;
+              },
             },
-          ]
+          ],
         },
         {
-          type: 'hiddenObject',
-          name: 'local-time',
-          label: 'local-time',
+          type: "hiddenObject",
+          name: "local-time",
+          label: "local-time",
           condition(values) {
-            return !!values['change_local_time']
-          }, 
+            return !!values["change_local_time"];
+          },
           defaultValue: {
-            companyType: 'llc',
+            companyType: "llc",
             employeeCount: 0,
-            industry: 'technology',
-            taxExempt: false
-          }
-        }
+            industry: "technology",
+            taxExempt: false,
+          },
+        },
       ],
     },
     {
@@ -189,12 +206,12 @@ export const companiesFormConfig: FormConfig = {
           name: "first_name",
           label: "اسم المستخدم الاول",
           type: "text",
-          placeholder: "Enter your name",
+          placeholder: "ادخل اسم المستخدم الاول",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "اسم المستخدم الاول مطلوب",
             },
             {
               type: "minLength",
@@ -207,12 +224,12 @@ export const companiesFormConfig: FormConfig = {
           name: "last_name",
           label: "اسم المستخدم ألأحير",
           type: "text",
-          placeholder: "سم المستخدم ألأحير",
+          placeholder: "اسم المستخدم ألأحير",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Name is required",
+              message: "الاسم مطلوب",
             },
             {
               type: "minLength",
@@ -225,12 +242,12 @@ export const companiesFormConfig: FormConfig = {
           name: "email",
           label: "البريد الإلكتروني",
           type: "email",
-          placeholder: "Enter your email",
+          placeholder: "ادخل البريد الإلكتروني",
           required: true,
           validation: [
             {
               type: "required",
-              message: "Email is required",
+              message: "البريد الإلكتروني مطلوب",
             },
             {
               type: "email",
@@ -274,9 +291,6 @@ export const companiesFormConfig: FormConfig = {
             },
           ],
         },
-
-      
-      
       ],
     },
   ],
@@ -351,6 +365,12 @@ export const companiesFormConfig: FormConfig = {
       console.log(`Moving from step ${prevStep + 1} to step ${nextStep + 1}`);
       console.log("Current values:", values);
     },
+  },
+  editDataTransformer: (data) => {
+    if (!Array.isArray(data.company_field_id)) {
+      data.company_field_id = data?.company_field_id?.split(",");
+    }
+    return data;
   },
 
   // Example onSuccess handler

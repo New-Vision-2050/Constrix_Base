@@ -131,7 +131,7 @@ const TextField: React.FC<TextFieldProps> = ({
       {showIcon && (
         <div
           className={cn(
-            "absolute top-1/2 transform -translate-y-1/2 z-20",
+            "absolute transform top-3 z-20",
             isRtl ? "left-2.5" : "left-2.5"
           )}
         >
@@ -142,6 +142,13 @@ const TextField: React.FC<TextFieldProps> = ({
           ) : isValidated ? (
             <CheckCircle className="h-4 w-4 text-green-500" />
           ) : null}
+        </div>
+      )}
+      
+      {/* Error message */}
+      {showError && (
+        <div className="text-destructive text-sm mt-1">
+          {error || storeErrors[field.name]}
         </div>
       )}
     </div>

@@ -1,0 +1,53 @@
+import PreviewTextField from "../../../../../../../components/previewTextField";
+import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+
+export default function UserProfilePassportDataReview() {
+  const { userIdentityData } = usePersonalDataTabCxt();
+
+  console.log("userIdentityData", userIdentityData);
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {/* First row */}
+      <div className="p-2">
+        <PreviewTextField
+          valid={true}
+          label="رقم جواز السفر"
+          value={userIdentityData?.passport ?? ""}
+          required
+        />
+      </div>
+      <div className="p-2">
+        <PreviewTextField
+          valid={true}
+          label="تاريخ الانشاء"
+          value={userIdentityData?.passport_start_date ?? ""}
+          required
+          type="date"
+        />
+      </div>
+
+      {/* second row */}
+      <div className="p-2">
+        <PreviewTextField
+          valid={true}
+          label="تاريخ الانتهاء"
+          value={userIdentityData?.passport_end_date ?? ""}
+          type="date"
+          required
+        />
+      </div>
+      <div className="p-2">
+        <PreviewTextField
+          valid={Boolean(userIdentityData?.file_passport?.url)}
+          label="ارفاق الهوية"
+          value={
+            userIdentityData?.file_passport ? "passport_attached_file.pdf" : ""
+          }
+          type="pdf"
+          fileUrl={userIdentityData?.file_passport?.url}
+        />
+      </div>
+    </div>
+  );
+}

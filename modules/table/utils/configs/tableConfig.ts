@@ -12,6 +12,7 @@ export interface TableConfig {
   enableSorting?: boolean;
   enablePagination?: boolean;
   enableSearch?: boolean;
+  enableRowSelection?: boolean; // Row selection is enabled by default, set to false to disable
   dataMapper?: (data: any) => any[];
   // Search configuration options
   searchFields?: string[];

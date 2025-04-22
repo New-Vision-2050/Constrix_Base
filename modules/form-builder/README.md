@@ -1,1243 +1,697 @@
-# Form Builder
+# Form Builder Module
 
-A flexible and powerful form builder for React applications with advanced validation, wizard forms, and API integration.
+The Form Builder module is a powerful and flexible system for creating forms in React applications. It provides a declarative approach to form creation, with support for various field types, validation, and advanced features like multi-step forms and edit mode.
 
-## Overview
+## Table of Contents
 
-The Form Builder module provides a comprehensive solution for creating and managing forms in React applications. It supports various field types, validation rules, multi-step forms, and API integration, all with a clean and modern UI.
+1. [Key Features](#key-features)
+2. [Form Builder Components](#form-builder-components)
+3. [Basic Usage](#basic-usage)
+   - [Standard Form](#standard-form)
+   - [Sheet Form](#sheet-form)
+   - [React Hook Form Integration](#react-hook-form-integration)
+4. [Form Configuration](#form-configuration)
+   - [Form Config Structure](#form-config-structure)
+   - [Field Types](#field-types)
+   - [Validation](#validation)
+5. [Advanced Features](#advanced-features)
+   - [Multi-step Forms (Wizard)](#multi-step-forms-wizard)
+   - [Accordion Forms](#accordion-forms)
+   - [Dynamic Fields](#dynamic-fields)
+   - [Conditional Fields](#conditional-fields)
+   - [API Integration](#api-integration)
+   - [Edit Mode](#edit-mode)
+6. [Field Types Reference](#field-types-reference)
+7. [Examples](#examples)
 
-## Main Components
+## Key Features
 
-### SheetFormBuilder
+- **Declarative Configuration**: Define forms using a simple configuration object
+- **Multiple Form Modes**: Standard, Wizard (multi-step), and Accordion modes
+- **Comprehensive Validation**: Client-side and server-side validation support
+- **Dynamic Fields**: Conditional fields, dynamic dropdowns, and more
+- **Responsive Layout**: Configurable grid layouts for form sections
+- **Accessibility**: Built with accessibility in mind
+- **Internationalization**: Support for RTL languages and translations
+- **React Hook Form Integration**: Optional integration with React Hook Form for enhanced performance
+- **Edit Mode**: Load and edit existing data from direct values or API endpoints
+- **Image Upload**: Support for image upload fields with preview and validation
 
-The primary component for rendering forms in a slide-out sheet.
+## Form Builder Components
+
+The module provides several components for different use cases:
+
+### Standard Form Components
+
+- `FormBuilder`: Basic form component
+- `ReactHookFormBuilder`: Form component using React Hook Form
+
+### Sheet Form Components (Dialog/Modal)
+
+- `SheetFormBuilder`: Sheet-based form component
+- `ReactHookSheetFormBuilder`: Sheet-based form component using React Hook Form
+
+## Basic Usage
+
+### Standard Form
 
 ```tsx
-import { SheetFormBuilder } from '@/modules/form-builder';
+import { FormBuilder, FormConfig } from "@/modules/form-builder";
 
-const MyForm = () => {
-  return (
-    <SheetFormBuilder
-      config={formConfig}
-      trigger={<button>Open Form</button>}
-      onSuccess={(values) => console.log('Form submitted:', values)}
-    />
-  );
+const formConfig: FormConfig = {
+  title: "Contact Form",
+  sections: [
+    {
+      title: "Personal Information",
+      fields: [
+        {
+          type: "text",
+          name: "name",
+          label: "Full Name",
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "Name is required",
+            },
+          ],
+        },
+        {
+          type: "email",
+          name: "email",
+          label: "Email Address",
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "Email is required",
+            },
+            {
+              type: "email",
+              message: "Please enter a valid email",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  onSubmit: async (values) => {
+    console.log("Form values:", values);
+    return { success: true, message: "Form submitted successfully" };
+  },
 };
-```
 
-#### Props
-
-- `config`: Form configuration object
-- `trigger`: Optional custom trigger element
-- `onSuccess`: Optional callback when form is successfully submitted
-- `onCancel`: Optional callback when form is cancelled
-- `side`: Optional side for the sheet ('top', 'right', 'bottom', 'left')
-- `className`: Optional additional CSS classes
-
-### FormBuilder
-
-The core component used by SheetFormBuilder to render the form.
-
-```tsx
-import { FormBuilder } from '@/modules/form-builder';
-
-const MyCustomForm = () => {
-  // Use hooks to manage form state
-  const {
-    values,
-    errors,
-    touched,
-    handleSubmit,
-    // ...other form state and handlers
-  } = useFormStore(formConfig);
-
+export default function MyForm() {
   return (
     <FormBuilder
       config={formConfig}
-      values={values}
-      errors={errors}
-      touched={touched}
-      handleSubmit={handleSubmit}
-      // ...other props
+      onSuccess={(values) => console.log("Success:", values)}
     />
   );
-};
+}
 ```
 
-### DialogFormBuilder
+### Sheet Form
 
-Similar to SheetFormBuilder but renders the form in a dialog/modal.
+Sheet forms open in a dialog/modal when triggered:
 
 ```tsx
-import { DialogFormBuilder } from '@/modules/form-builder';
+import { SheetFormBuilder, FormConfig } from "@/modules/form-builder";
+import { Button } from "@/components/ui/button";
 
-const MyDialogForm = () => {
+const formConfig: FormConfig = {
+  // Form configuration...
+};
+
+export default function MySheetForm() {
   return (
-    <DialogFormBuilder
+    <SheetFormBuilder
       config={formConfig}
-      trigger={<button>Open Form</button>}
-      onSuccess={(values) => console.log('Form submitted:', values)}
+      trigger={<Button>Open Form</Button>}
+      onSuccess={(values) => console.log("Form submitted:", values)}
     />
   );
-};
+}
 ```
 
-## Form Modes
+### React Hook Form Integration
 
-The form builder supports different modes for displaying and navigating through forms:
-
-### Regular Mode (Default)
-
-All sections are displayed at once, and sections can be individually collapsible.
+For better performance and enhanced validation, use the React Hook Form integration:
 
 ```tsx
-const formConfig = {
-  title: 'Regular Form',
-  sections: [
-    // Form sections
-  ],
+import { ReactHookFormBuilder, FormConfig } from "@/modules/form-builder";
+
+const formConfig: FormConfig = {
+  // Form configuration...
 };
+
+export default function MyReactHookForm() {
+  return (
+    <ReactHookFormBuilder
+      config={formConfig}
+      onSuccess={(values) => console.log("Form submitted:", values)}
+    />
+  );
+}
 ```
 
-### Wizard Mode
+The React Hook Form integration provides a complete alternative to the default form state management system while maintaining the same API and features. It leverages the popular react-hook-form library with Zod validation for improved performance and type safety.
 
-A step-by-step form where only one section is visible at a time, with navigation buttons to move between steps.
+## Form Configuration
 
-```tsx
-const formConfig = {
-  title: 'Wizard Form',
-  sections: [
-    // Form sections (each section becomes a step)
+### Form Config Structure
+
+The form configuration object defines the structure and behavior of the form:
+
+```typescript
+interface FormConfig {
+  formId?: string;                // Unique identifier for the form instance
+  title?: string;                 // Form title
+  description?: string;           // Form description
+  className?: string;             // Custom CSS class
+  sections: FormSection[];        // Form sections
+  showReset?: boolean;            // Whether to show the reset button
+  showCancelButton?: boolean;     // Whether to show the cancel button
+  showBackButton?: boolean;       // Whether to show the back button in step-based forms
+  submitButtonText?: string;      // Text for the submit button
+  resetButtonText?: string;       // Text for the reset button
+  cancelButtonText?: string;      // Text for the cancel button
+  showSubmitLoader?: boolean;     // Whether to show a loader when submitting
+  initialValues?: Record<string, any>; // Initial form values
+  resetOnSuccess?: boolean;       // Whether to reset the form after successful submission
+  
+  // Form mode configuration
+  wizard?: boolean;               // Enable wizard mode (multi-step form)
+  accordion?: boolean;            // Enable accordion mode (collapsible sections with step navigation)
+  wizardOptions?: WizardOptions;  // Configuration options for wizard/accordion mode
+  
+  // Backend API configuration
+  apiUrl?: string;                // URL to submit the form data to
+  apiHeaders?: Record<string, string>; // Custom headers for the API request
+  
+  // Edit mode configuration
+  isEditMode?: boolean;           // Whether the form is in edit mode
+  editValues?: Record<string, any>; // Values to use for editing (direct values)
+  editApiUrl?: string;            // URL to fetch data for editing (can include :id placeholder)
+  editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
+  editDataPath?: string;          // Path to the data in the API response (e.g., 'data' or 'data.user')
+  editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
+  
+  // Event handlers
+  onSubmit?: (values: Record<string, any>) => Promise<{ success: boolean; message?: string; errors?: Record<string, string | string[]> }>;
+  onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
+  onError?: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => void;
+  onCancel?: () => void;
+  onValidationError?: (errors: Record<string, string | React.ReactNode>) => void;
+}
+```
+
+### Field Types
+
+The form builder supports various field types:
+
+- `text`: Standard text input
+- `textarea`: Multi-line text input
+- `email`: Email input with validation
+- `password`: Password input
+- `number`: Numeric input
+- `checkbox`: Checkbox input
+- `radio`: Radio button group
+- `select`: Dropdown select
+- `multiSelect`: Multi-select dropdown
+- `date`: Date picker
+- `phone`: Phone number input
+- `search`: Search input with autocomplete
+- `image`: Image upload field
+- `dynamicRows`: Dynamic rows for repeating sections
+- `hiddenObject`: Hidden field for storing complex data
+
+### Validation
+
+Each field can have validation rules:
+
+```typescript
+interface ValidationRule {
+  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
+  value?: any;
+  message: string | React.ReactNode;
+  validator?: (value: any, formValues?: Record<string, any>) => boolean;
+  apiConfig?: {
+    url: string;
+    method?: 'GET' | 'POST' | 'PUT';
+    debounceMs?: number;
+    paramName?: string;
+    headers?: Record<string, string>;
+    successCondition?: (response: any) => boolean;
+  };
+}
+```
+
+Example field with validation:
+
+```typescript
+{
+  type: "email",
+  name: "email",
+  label: "Email Address",
+  required: true,
+  validation: [
+    {
+      type: "required",
+      message: "Email is required",
+    },
+    {
+      type: "email",
+      message: "Please enter a valid email",
+    },
+    {
+      type: "apiValidation",
+      message: "This email is already in use",
+      apiConfig: {
+        url: "/api/validate-email",
+        method: "POST",
+        debounceMs: 500,
+        paramName: "email",
+      },
+    },
   ],
+}
+```
+
+## Advanced Features
+
+### Multi-step Forms (Wizard)
+
+Create multi-step forms with the wizard mode:
+
+```typescript
+const wizardFormConfig: FormConfig = {
   wizard: true,
   wizardOptions: {
     showStepIndicator: true,
     showStepTitles: true,
     validateStepBeforeNext: true,
-    allowStepNavigation: true,
-    nextButtonText: 'Next',
-    prevButtonText: 'Previous',
-    finishButtonText: 'Submit',
+    nextButtonText: "Next",
+    prevButtonText: "Back",
+    finishButtonText: "Submit",
   },
-};
-```
-
-### Accordion Mode
-
-All sections are displayed as collapsible accordions, but only one section is expanded at a time.
-
-```tsx
-const formConfig = {
-  title: 'Accordion Form',
   sections: [
-    // Form sections
-  ],
-  accordion: true,
-  wizardOptions: {
-    // Same options as wizard mode
-  },
-};
-```
-
-## Field Types
-
-The form builder supports various field types:
-
-- `text`: Text input
-- `textarea`: Multi-line text input
-- `checkbox`: Checkbox input
-- `radio`: Radio button group
-- `select`: Dropdown select
-- `multiSelect`: Multi-select dropdown
-- `email`: Email input
-- `password`: Password input
-- `number`: Number input
-- `date`: Date picker
-- `search`: Search input with autocomplete
-- `phone`: Phone input with country code selection
-- `hiddenObject`: Hidden field that stores an object or array of objects without visual representation
-
-### Example Field Configurations
-
-#### Text Field
-
-```tsx
-{
-  type: 'text',
-  name: 'fullName',
-  label: 'Full Name',
-  placeholder: 'Enter your full name',
-  required: true,
-  validation: [
+    // Each section becomes a step
     {
-      type: 'required',
-      message: 'Full name is required',
-    },
-    {
-      type: 'minLength',
-      value: 3,
-      message: 'Name must be at least 3 characters',
-    },
-  ],
-}
-```
-
-#### Text Field with Postfix
-
-```tsx
-{
-  type: 'number',
-  name: 'weight',
-  label: 'Weight',
-  postfix: 'kg',
-  required: true,
-}
-```
-
-#### Select Field
-
-```tsx
-{
-  type: 'select',
-  name: 'country',
-  label: 'Country',
-  required: true,
-  options: [
-    { value: 'us', label: 'United States' },
-    { value: 'ca', label: 'Canada' },
-    { value: 'uk', label: 'United Kingdom' },
-  ],
-}
-```
-
-#### Dynamic Select Field
-
-```tsx
-{
-  type: 'select',
-  name: 'city',
-  label: 'City',
-  required: true,
-  dynamicOptions: {
-    url: '/api/cities',
-    valueField: 'id',
-    labelField: 'name',
-    dependsOn: 'country', // This field depends on the 'country' field
-    filterParam: 'countryId', // Parameter name for filtering
-  },
-}
-```
-
-#### Multi-Select Field
-
-```tsx
-{
-  type: 'multiSelect',
-  name: 'skills',
-  label: 'Skills',
-  isMulti: true,
-  options: [
-    { value: 'react', label: 'React' },
-    { value: 'vue', label: 'Vue' },
-    { value: 'angular', label: 'Angular' },
-  ],
-}
-```
-
-#### Checkbox Field
-
-```tsx
-{
-  type: 'checkbox',
-  name: 'termsAccepted',
-  label: 'I accept the terms and conditions',
-  required: true,
-}
-```
-
-#### Radio Field
-
-```tsx
-{
-  type: 'radio',
-  name: 'gender',
-  label: 'Gender',
-  required: true,
-  options: [
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'other', label: 'Other' },
-  ],
-}
-```
-
-#### Date Field
-
-```tsx
-{
-  type: 'date',
-  name: 'birthDate',
-  label: 'Date of Birth',
-  required: true,
-}
-```
-
-#### Search Field
-
-```tsx
-{
-  type: 'search',
-  name: 'product',
-  label: 'Product',
-  required: true,
-  searchType: {
-    type: 'dropdown',
-    dynamicDropdown: {
-      url: '/api/products/search',
-      valueField: 'id',
-      labelField: 'name',
-      searchParam: 'q',
-      enableServerSearch: true,
-    },
-  },
-}
-```
-
-#### Phone Field
-
-```tsx
-{
-  type: 'phone',
-  name: 'phoneNumber',
-  label: 'Phone Number',
-  required: true,
-}
-```
-
-#### Hidden Object Field
-
-```tsx
-{
-  type: 'hiddenObject',
-  name: 'userMetadata',
-  label: 'User Metadata', // Label is not displayed but used for identification
-  defaultValue: {
-    registrationSource: 'web',
-    userType: 'customer',
-    preferences: {
-      notifications: true,
-      theme: 'light'
-    }
-  }
-}
-```
-
-```tsx
-// Example with array of objects
-{
-  type: 'hiddenObject',
-  name: 'previousOrders',
-  label: 'Previous Orders',
-  defaultValue: [
-    {
-      id: '1001',
-      date: '2023-01-15',
-      total: 125.50,
-      items: [
-        { productId: 'p1', quantity: 2 },
-        { productId: 'p2', quantity: 1 }
-      ]
-    },
-    {
-      id: '1002',
-      date: '2023-02-20',
-      total: 75.25,
-      items: [
-        { productId: 'p3', quantity: 1 }
-      ]
-    }
-  ]
-}
-```
-
-```tsx
-// Example with condition - field will only be included in form submission if condition is true
-{
-  type: 'hiddenObject',
-  name: 'businessDetails',
-  label: 'Business Details',
-  condition: (values) => values.accountType === 'business',
-  defaultValue: {
-    companyType: 'llc',
-    employeeCount: 0,
-    industry: 'technology',
-    taxExempt: false
-  }
-}
-```
-
-## Validation
-
-The form builder supports various validation rules:
-
-- `required`: Field is required
-- `minLength`: Minimum length for text fields
-- `maxLength`: Maximum length for text fields
-- `min`: Minimum value for number fields
-- `max`: Maximum value for number fields
-- `pattern`: Regular expression pattern
-- `email`: Email format validation
-- `url`: URL format validation
-- `custom`: Custom validation function
-- `apiValidation`: Validate against an API endpoint with debounce
-
-### Custom Validation
-
-You can create custom validation rules for any field type, including hiddenObject fields:
-
-```tsx
-{
-  type: 'hiddenObject',
-  name: 'orderData',
-  label: 'Order Data',
-  defaultValue: {
-    items: [],
-    totalAmount: 0,
-    discount: 0
-  },
-  validation: [
-    {
-      type: 'custom',
-      message: 'Order must have at least one item',
-      validator: (value) => {
-        // Check if the value is defined and has items
-        if (!value || !value.items || !Array.isArray(value.items)) {
-          return false;
-        }
-        // Check if there's at least one item
-        return value.items.length > 0;
-      }
-    },
-    {
-      type: 'custom',
-      message: 'Discount cannot exceed 50% of total amount',
-      validator: (value, formValues) => {
-        if (!value || typeof value.totalAmount !== 'number' || typeof value.discount !== 'number') {
-          return true; // Skip validation if values are not numbers
-        }
-        // Check if discount is valid
-        return value.discount <= (value.totalAmount * 0.5);
-      }
-    }
-  ]
-}
-```
-
-The validator function receives two parameters:
-- `value`: The current value of the field being validated
-- `formValues`: (Optional) The current values of all fields in the form
-
-This allows you to create complex validation rules that can depend on the values of other fields.
-
-### API Validation
-
-The form builder supports API validation with debounce, allowing you to validate field values against an API endpoint before form submission.
-
-```tsx
-{
-  type: 'text',
-  name: 'username',
-  label: 'Username',
-  required: true,
-  validation: [
-    {
-      type: 'required',
-      message: 'Username is required',
-    },
-    {
-      type: 'apiValidation',
-      message: 'Username is already taken',
-      apiConfig: {
-        url: '/api/validate-username',
-        method: 'POST',
-        debounceMs: 500, // Wait 500ms after typing stops before validating
-        paramName: 'username',
-        successCondition: (response) => response.available === true,
-      },
-    },
-  ],
-}
-```
-
-#### API Validation Configuration
-
-- `url`: The API endpoint to validate against
-- `method`: HTTP method (GET, POST, PUT)
-- `debounceMs`: Debounce time in milliseconds (default: 500)
-- `paramName`: The parameter name to send the value as
-- `headers`: Optional headers to include in the request
-- `successCondition`: Function to determine if validation passed based on the API response
-
-If no `successCondition` is provided, the system will automatically check for common response patterns:
-1. `response.available === true`
-2. `response.success === true`
-3. `response.valid === true`
-4. `response.isValid === true`
-
-## Form ID Management
-
-The form builder now requires that form IDs be specified in the form configuration object rather than passed as a prop to components or hooks. This change centralizes form identification and makes it easier to manage forms across your application.
-
-### Best Practices for Form IDs
-
-1. **Always specify a formId in your form config**:
-   ```tsx
-   const formConfig = {
-     formId: "unique-form-id", // Always include this
-     title: "My Form",
-     // ...other properties
-   };
-   ```
-
-2. **Use descriptive, unique IDs**:
-   Choose IDs that describe the form's purpose, such as "user-registration-form" or "product-order-form".
-
-3. **Consistent ID format**:
-   Use a consistent format for your form IDs, such as kebab-case (e.g., "contact-form") or camelCase (e.g., "contactForm").
-
-4. **Reference the same ID across your application**:
-   When you need to access a form from another component, use the same ID that you specified in the form config.
-
-## Form Configuration
-
-Forms are configured using a `FormConfig` object:
-
-```tsx
-import { FormConfig } from '@/modules/form-builder';
-
-const formConfig: FormConfig = {
-  title: 'Contact Form',
-  description: 'Please fill out the form below',
-  sections: [
-    {
-      title: 'Personal Information',
-      description: 'Your personal details',
+      title: "Step 1: Personal Information",
       fields: [
-        // Field configurations
+        // Step 1 fields...
       ],
     },
-    // More sections
+    {
+      title: "Step 2: Contact Information",
+      fields: [
+        // Step 2 fields...
+      ],
+    },
+    {
+      title: "Step 3: Review",
+      fields: [
+        // Step 3 fields...
+      ],
+    },
   ],
-  submitButtonText: 'Submit',
-  resetButtonText: 'Reset',
-  cancelButtonText: 'Cancel',
-  showReset: true,
-  showCancelButton: true,
-  showBackButton: true,
-  showSubmitLoader: true,
-  initialValues: {
-    // Initial form values
-  },
-  resetOnSuccess: true,
-  onSubmit: async (values) => {
-    // Handle form submission
-    return { success: true };
-  },
-  onSuccess: (values, result) => {
-    // Handle successful submission
-  },
-  onError: (values, error) => {
-    // Handle submission error
-  },
-  onCancel: () => {
-    // Handle form cancellation
-  },
+  // Other configuration...
 };
 ```
 
-### FormConfig Properties
+### Accordion Forms
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `formId` | `string` | Unique identifier for the form instance (recommended to always specify this) |
-| `title` | `string` | Form title |
-| `description` | `string` | Form description |
-| `className` | `string` | Additional CSS classes |
-| `sections` | `FormSection[]` | Array of form sections |
-| `showReset` | `boolean` | Whether to show the reset button |
-| `showCancelButton` | `boolean` | Whether to show the cancel button |
-| `showBackButton` | `boolean` | Whether to show the back button in step-based forms |
-| `submitButtonText` | `string` | Text for the submit button |
-| `resetButtonText` | `string` | Text for the reset button |
-| `cancelButtonText` | `string` | Text for the cancel button |
-| `showSubmitLoader` | `boolean` | Whether to show a loader during submission |
-| `initialValues` | `Record<string, any>` | Initial form values |
-| `resetOnSuccess` | `boolean` | Whether to reset the form after successful submission |
-| `wizard` | `boolean` | Enable wizard mode |
-| `accordion` | `boolean` | Enable accordion mode |
-| `wizardOptions` | `WizardOptions` | Configuration for wizard/accordion mode |
-| `apiUrl` | `string` | URL to submit the form data to |
-| `apiHeaders` | `Record<string, string>` | Custom headers for the API request |
-| `laravelValidation` | `object` | Laravel validation response support |
-| `onSubmit` | `function` | Form submission handler |
-| `onSuccess` | `function` | Success callback |
-| `onError` | `function` | Error callback |
-| `onCancel` | `function` | Cancel callback |
-| `onValidationError` | `function` | Validation error callback |
+Create accordion-style forms with collapsible sections:
 
-### FieldConfig Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `type` | `string` | Field type (text, textarea, select, hiddenObject, etc.) |
-| `name` | `string` | Field name (used as the key in form values) |
-| `label` | `string` | Field label |
-| `defaultValue` | `any` | Default value for the field (especially useful for hiddenObject fields) |
-| `placeholder` | `string` | Placeholder text |
-| `helperText` | `string` | Helper text displayed below the field |
-| `required` | `boolean` | Whether the field is required |
-| `disabled` | `boolean` | Whether the field is disabled |
-| `hidden` | `boolean` | Whether the field is hidden |
-| `className` | `string` | Additional CSS classes for the field |
-| `containerClassName` | `string` | Additional CSS classes for the field container |
-| `width` | `string` | Width of the field (e.g., 'w-full', '200px') |
-| `options` | `DropdownOption[]` | Options for select, multiSelect, and radio fields |
-| `validation` | `ValidationRule[]` | Validation rules for the field |
-| `condition` | `function` | Function that determines whether the field should be displayed |
-
-## Hooks
-
-### useSheetForm
-
-The primary hook for managing form state in a sheet.
-
-```tsx
-import { useSheetForm } from '@/modules/form-builder';
-
-const MyComponent = () => {
-  const {
-    isOpen,
-    openSheet,
-    closeSheet,
-    values,
-    errors,
-    touched,
-    isSubmitting,
-    submitSuccess,
-    submitError,
-    setValue,
-    setTouched,
-    handleSubmit,
-    handleCancel,
-    resetForm,
-    // ...other form state and handlers
-  } = useSheetForm({
-    config: formConfig,
-    onSuccess: (values) => console.log('Form submitted:', values),
-    onCancel: () => console.log('Form cancelled'),
-  });
-  
-  // Use these values and functions to build a custom form UI
+```typescript
+const accordionFormConfig: FormConfig = {
+  accordion: true,
+  wizardOptions: {
+    showStepIndicator: true,
+    showStepTitles: true,
+  },
+  sections: [
+    // Each section becomes an accordion panel
+    {
+      title: "Personal Information",
+      collapsible: true,
+      fields: [
+        // Fields...
+      ],
+    },
+    {
+      title: "Contact Information",
+      collapsible: true,
+      fields: [
+        // Fields...
+      ],
+    },
+  ],
+  // Other configuration...
 };
 ```
 
-### useFormStore
+### Dynamic Fields
 
-The core hook that manages form state and actions.
+Create fields that depend on other field values:
 
-```tsx
-import { useFormStore } from '@/modules/form-builder';
+```typescript
+{
+  type: "select",
+  name: "country",
+  label: "Country",
+  options: [
+    { value: "us", label: "United States" },
+    { value: "ca", label: "Canada" },
+    // More countries...
+  ],
+},
+{
+  type: "select",
+  name: "state",
+  label: "State/Province",
+  condition: (values) => values.country === "us" || values.country === "ca",
+  dynamicOptions: {
+    url: "/api/states",
+    valueField: "code",
+    labelField: "name",
+    dependsOn: "country",
+  },
+}
+```
 
-const MyComponent = () => {
-  const {
-    values,
-    errors,
-    touched,
-    isSubmitting,
-    submitSuccess,
-    submitError,
-    setValue,
-    setTouched,
-    handleSubmit,
-    resetForm,
-    // ...other form state and handlers
-  } = useFormStore(formConfig);
-  
-  // Use these values and functions to build a custom form UI
+### Conditional Fields
+
+Show or hide fields based on other field values:
+
+```typescript
+{
+  type: "checkbox",
+  name: "hasDiscount",
+  label: "Apply Discount",
+},
+{
+  type: "number",
+  name: "discountAmount",
+  label: "Discount Amount",
+  condition: (values) => values.hasDiscount === true,
+}
+```
+
+### API Integration
+
+Submit form data to an API endpoint:
+
+```typescript
+const apiFormConfig: FormConfig = {
+  // Form fields...
+  apiUrl: "/api/submit-form",
+  apiHeaders: {
+    "Authorization": "Bearer your-token",
+  },
+  // Other configuration...
 };
 ```
 
-### useFormWithTableReload
+### Edit Mode
 
-A hook that combines form functionality with table reloading.
+Load and edit existing data:
 
-```tsx
-import { useFormWithTableReload } from '@/modules/form-builder';
-
-const MyComponent = () => {
-  const formHook = useFormWithTableReload({
-    config: formConfig,
-    // The table will automatically reload after successful form submission
-  });
-  
-  // Use formHook to access form state and handlers
-};
-```
-
-## Accessing and Controlling Forms from External Components
-
-The Form Builder module provides a way to access and control forms from any component in your application. This is useful for scenarios where you need to programmatically close a form or update its values from a different component.
-
-### Accessing a Form by ID
-
-Each form in the system has a unique ID that can be used to access it. You should specify this ID in the form configuration object.
-
-```tsx
-import { SheetFormBuilder } from '@/modules/form-builder';
-
-// Define your form configuration with a formId
-const formConfig = {
-  formId: "my-unique-form-id", // Specify the form ID in the config
-  title: "My Form",
-  // ... other config properties
+```typescript
+// Direct values
+const editFormConfig: FormConfig = {
+  isEditMode: true,
+  editValues: {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    // Other field values...
+  },
+  // Form fields...
 };
 
-function MyComponent() {
-  return (
-    <SheetFormBuilder
-      config={formConfig}
-    />
-  );
+// API-based values
+const apiEditFormConfig: FormConfig = {
+  editApiUrl: "/api/users/:id", // :id will be replaced with the recordId
+  editDataPath: "data", // Path to the data in the API response
+  // Form fields...
+};
+
+// Usage with recordId
+<SheetFormBuilder
+  config={apiEditFormConfig}
+  recordId="123" // This could come from a route parameter, state, etc.
+  onSuccess={(values) => console.log("Form updated:", values)}
+/>
+```
+
+## Field Types Reference
+
+### Text Field
+
+```typescript
+{
+  type: "text",
+  name: "firstName",
+  label: "First Name",
+  placeholder: "Enter your first name",
+  required: true,
 }
 ```
 
-### Closing a Form Programmatically
+### Email Field
 
-To close a form from another component, you can use the `useFormStore` hook to access the form's state and methods:
-
-```tsx
-import { useFormStore } from '@/modules/form-builder';
-
-function ExternalComponent() {
-  // Access the form by its ID
-  const closeSheet = () => {
-    // Get the current state of the form store
-    const formStore = useFormStore.getState();
-    
-    // Get all forms in the store
-    const { forms } = formStore;
-    
-    // Check if the form exists
-    if (forms['my-unique-form-id']) {
-      // Import the useSheetForm hook dynamically to avoid circular dependencies
-      import('@/modules/form-builder').then(({ useSheetForm }) => {
-        // Create a temporary hook instance to access the closeSheet method
-        const { closeSheet } = useSheetForm({
-          config: {
-            formId: 'my-unique-form-id', // Specify the form ID in the config
-          },
-        });
-        
-        // Close the sheet
-        closeSheet();
-      });
-    }
-  };
-
-  return (
-    <button onClick={closeSheet}>
-      Close Form
-    </button>
-  );
+```typescript
+{
+  type: "email",
+  name: "email",
+  label: "Email Address",
+  placeholder: "Enter your email",
+  required: true,
 }
 ```
 
-### Updating Form Values
+### Select Field
 
-You can update form values from any component using the `useFormStore` directly:
-
-```tsx
-import { useFormStore } from '@/modules/form-builder';
-
-function ExternalComponent() {
-  // Update a specific field in the form
-  const updateFormField = () => {
-    // Get the form store state
-    const formStore = useFormStore.getState();
-    
-    // Update a specific field
-    formStore.setValue('my-unique-form-id', 'fieldName', 'new value');
-    
-    // Or update multiple fields at once
-    formStore.setValues('my-unique-form-id', {
-      fieldName1: 'value1',
-      fieldName2: 'value2',
-    });
-  };
-
-  return (
-    <button onClick={updateFormField}>
-      Update Form Values
-    </button>
-  );
+```typescript
+{
+  type: "select",
+  name: "country",
+  label: "Country",
+  options: [
+    { value: "us", label: "United States" },
+    { value: "ca", label: "Canada" },
+    // More options...
+  ],
 }
 ```
 
-### Creating a Form Controller Hook
+### Dynamic Select Field
 
-For more convenient access to form controls, you can create a custom hook:
-
-```tsx
-import { useCallback } from 'react';
-import { useFormStore } from '@/modules/form-builder';
-
-// Custom hook to control a form from any component
-export function useFormController(formId: string) {
-  // Get direct access to the form store
-  const store = useFormStore.getState();
-  
-  // Close the form
-  const closeForm = useCallback(() => {
-    // Make sure the form exists
-    if (store.forms[formId]) {
-      // Import dynamically to avoid circular dependencies
-      import('@/modules/form-builder').then(({ useSheetForm }) => {
-        const { closeSheet } = useSheetForm({
-          config: {
-            formId, // Specify the form ID in the config
-          },
-        });
-        closeSheet();
-      });
-    }
-  }, [formId]);
-  
-  // Update a single field
-  const updateField = useCallback((fieldName: string, value: any) => {
-    store.setValue(formId, fieldName, value);
-  }, [formId]);
-  
-  // Update multiple fields
-  const updateFields = useCallback((values: Record<string, any>) => {
-    store.setValues(formId, values);
-  }, [formId]);
-  
-  // Reset the form
-  const resetForm = useCallback((initialValues = {}) => {
-    store.resetForm(formId, initialValues);
-  }, [formId]);
-  
-  return {
-    closeForm,
-    updateField,
-    updateFields,
-    resetForm,
-    // Add more methods as needed
-  };
+```typescript
+{
+  type: "select",
+  name: "city",
+  label: "City",
+  dynamicOptions: {
+    url: "/api/cities",
+    valueField: "id",
+    labelField: "name",
+    dependsOn: "country", // This field depends on the country field
+  },
 }
 ```
 
-Usage example:
+### Image Upload Field
 
-```tsx
-function SomeComponent() {
-  const { closeForm, updateField, updateFields } = useFormController('my-unique-form-id');
-  
-  const handleAction = () => {
-    // Update form values
-    updateFields({
-      name: 'John Doe',
-      email: 'john@example.com',
-    });
-    
-    // Close the form
-    closeForm();
-  };
-  
-  return (
-    <button onClick={handleAction}>
-      Update and Close Form
-    </button>
-  );
+```typescript
+// Single image upload
+{
+  type: "image",
+  name: "profileImage",
+  label: "Profile Image",
+  imageConfig: {
+    allowedFileTypes: ["image/jpeg", "image/png"],
+    maxFileSize: 5 * 1024 * 1024, // 5MB
+    previewWidth: 200,
+    previewHeight: 200,
+    uploadUrl: "/api/upload-image", // Optional
+  },
+}
+
+// Multiple image upload
+{
+  type: "image",
+  name: "galleryImages",
+  label: "Gallery Images",
+  isMulti: true, // Enable multiple image upload
+  imageConfig: {
+    allowedFileTypes: ["image/jpeg", "image/png"],
+    maxFileSize: 2 * 1024 * 1024, // 2MB per image
+    previewWidth: 150,
+    previewHeight: 150,
+    uploadUrl: "/api/upload-images", // Optional
+  },
 }
 ```
 
-## Integration with Table Builder
+### File Upload Field
 
-The Form Builder module can be integrated with the Table Builder module to automatically reload table data after form submissions.
+```typescript
+// Single file upload
+{
+  type: "file",
+  name: "document",
+  label: "Document",
+  fileConfig: {
+    allowedFileTypes: ["application/pdf", "application/msword"],
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+    showThumbnails: true,
+    uploadUrl: "/api/upload-file", // Optional
+  },
+}
 
-### Manual Integration
-
-```tsx
-import { SheetFormBuilder } from '@/modules/form-builder';
-import { TableBuilder, useTableReload } from '@/modules/table';
-
-function FormAndTablePage() {
-  const { reloadTable } = useTableReload();
-
-  return (
-    <div>
-      <SheetFormBuilder
-        config={formConfig}
-        onSuccess={() => reloadTable()}
-      />
-      
-      <TableBuilder config={tableConfig} />
-    </div>
-  );
+// Multiple file upload
+{
+  type: "file",
+  name: "attachments",
+  label: "Attachments",
+  isMulti: true, // Enable multiple file upload
+  fileConfig: {
+    allowedFileTypes: ["application/pdf", "image/jpeg", "image/png"],
+    maxFileSize: 5 * 1024 * 1024, // 5MB per file
+    showThumbnails: true,
+  },
 }
 ```
 
-### Automatic Integration
+### Dynamic Rows Field
 
-For a more seamless integration, you can use the `useFormWithTableReload` hook:
-
-```tsx
-import { SheetFormBuilder, useFormWithTableReload } from '@/modules/form-builder';
-import { TableBuilder } from '@/modules/table';
-
-function FormAndTablePage() {
-  const formHook = useFormWithTableReload({
-    config: formConfig,
-    // The table will automatically reload after successful form submission
-  });
-
-  return (
-    <div>
-      <SheetFormBuilder config={formConfig} />
-      <TableBuilder config={tableConfig} />
-    </div>
-  );
-}
-```
-
-## Example Usage
-
-### Basic Form
-
-```tsx
-import { SheetFormBuilder } from '@/modules/form-builder';
-
-const ContactForm = () => {
-  const formConfig = {
-    title: 'Contact Form',
-    sections: [
+```typescript
+{
+  type: "dynamicRows",
+  name: "contacts",
+  label: "Contacts",
+  dynamicRowOptions: {
+    rowFields: [
       {
-        title: 'Personal Information',
-        fields: [
-          {
-            type: 'text',
-            name: 'name',
-            label: 'Full Name',
-            required: true,
-          },
-          {
-            type: 'email',
-            name: 'email',
-            label: 'Email Address',
-            required: true,
-          },
-          {
-            type: 'textarea',
-            name: 'message',
-            label: 'Message',
-            required: true,
-          },
-        ],
+        type: "text",
+        name: "name",
+        label: "Name",
+      },
+      {
+        type: "email",
+        name: "email",
+        label: "Email",
       },
     ],
-    submitButtonText: 'Send Message',
-    onSubmit: async (values) => {
-      // Submit form data to API
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-      
-      const data = await response.json();
-      return { success: data.success, message: data.message };
-    },
-  };
-
-  return (
-    <SheetFormBuilder
-      config={formConfig}
-      onSuccess={(values) => console.log('Form submitted:', values)}
-    />
-  );
-};
+    minRows: 1,
+    maxRows: 5,
+  },
+}
 ```
 
-### Wizard Form
+## Examples
 
-```tsx
-import { SheetFormBuilder } from '@/modules/form-builder';
+The form builder includes several examples to help you get started:
 
-const RegistrationForm = () => {
-  const formConfig = {
-    title: 'Registration Form',
-    sections: [
-      {
-        title: 'Account Information',
-        fields: [
-          {
-            type: 'text',
-            name: 'username',
-            label: 'Username',
-            required: true,
-            validation: [
-              {
-                type: 'apiValidation',
-                message: 'Username is already taken',
-                apiConfig: {
-                  url: '/api/validate-username',
-                  method: 'POST',
-                  paramName: 'username',
-                },
-              },
-            ],
-          },
-          {
-            type: 'email',
-            name: 'email',
-            label: 'Email',
-            required: true,
-            validation: [
-              {
-                type: 'apiValidation',
-                message: 'Email is already registered',
-                apiConfig: {
-                  url: '/api/validate-email',
-                  method: 'POST',
-                  paramName: 'email',
-                },
-              },
-            ],
-          },
-          {
-            type: 'password',
-            name: 'password',
-            label: 'Password',
-            required: true,
-          },
-        ],
-      },
-      {
-        title: 'Personal Information',
-        fields: [
-          {
-            type: 'text',
-            name: 'firstName',
-            label: 'First Name',
-            required: true,
-          },
-          {
-            type: 'text',
-            name: 'lastName',
-            label: 'Last Name',
-            required: true,
-          },
-          {
-            type: 'date',
-            name: 'birthDate',
-            label: 'Date of Birth',
-            required: true,
-          },
-        ],
-      },
-      {
-        title: 'Preferences',
-        fields: [
-          {
-            type: 'select',
-            name: 'theme',
-            label: 'Theme',
-            options: [
-              { value: 'light', label: 'Light' },
-              { value: 'dark', label: 'Dark' },
-              { value: 'system', label: 'System' },
-            ],
-          },
-          {
-            type: 'checkbox',
-            name: 'newsletter',
-            label: 'Subscribe to newsletter',
-          },
-          {
-            type: 'checkbox',
-            name: 'termsAccepted',
-            label: 'I accept the terms and conditions',
-            required: true,
-          },
-        ],
-      },
-    ],
-    wizard: true,
-    wizardOptions: {
-      showStepIndicator: true,
-      showStepTitles: true,
-      validateStepBeforeNext: true,
-      nextButtonText: 'Continue',
-      prevButtonText: 'Back',
-      finishButtonText: 'Complete Registration',
-    },
-    submitButtonText: 'Register',
-    onSubmit: async (values) => {
-      // Submit form data to API
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-      
-      const data = await response.json();
-      return { success: data.success, message: data.message };
-    },
-  };
+- **Basic Form**: `/react-hook-form-example` - A basic form with React Hook Form integration
+- **Edit Mode**: `/edit-mode-test` - Demonstrates edit mode functionality
+- **Image Upload**: `/image-upload-example` - Shows how to use image upload fields
+- **Multi-Image Upload**: `/multi-image-upload-example` - Demonstrates multiple image upload functionality
+- **File Upload**: `/file-upload-example` - Shows how to use file upload fields with type-based thumbnails
+- **Direct Upload with Progress**: `/direct-upload-example` - Shows real-time upload with progress tracking
+- **Role Permissions**: `/role-permissions-example` - Complex form with nested data structure
+- **Multi-step Form**: `/form-wizard-example` - Example of a multi-step form
+- **Advanced React Hook Form**: `/advanced-react-hook-form-example` - Comprehensive example of React Hook Form integration with advanced features
 
-  return (
-    <SheetFormBuilder
-      config={formConfig}
-      onSuccess={(values) => console.log('Registration complete:', values)}
-    />
-  );
-};
-```
+## Best Practices
 
-### Form with Conditional Fields
+1. **Organize Fields into Logical Sections**: Group related fields together in sections for better organization.
+2. **Use Validation Rules**: Always add appropriate validation rules to ensure data quality.
+3. **Provide Clear Labels and Helper Text**: Make your forms user-friendly with clear labels and helpful instructions.
+4. **Use Conditional Fields**: Show only relevant fields based on user input to simplify the form.
+5. **Test Edit Mode Thoroughly**: When using edit mode, test both loading and saving functionality.
+6. **Handle Errors Gracefully**: Implement proper error handling for both client and server-side validation.
+7. **Consider Mobile Users**: Ensure your forms are responsive and work well on mobile devices.
+8. **Choose the Right Implementation**: Select between the default form implementation and React Hook Form based on your project's needs.
 
-```tsx
-import { SheetFormBuilder } from '@/modules/form-builder';
+## React Hook Form Integration Details
 
-const OrderForm = () => {
-  const formConfig = {
-    title: 'Order Form',
-    sections: [
-      {
-        title: 'Order Details',
-        fields: [
-          {
-            type: 'select',
-            name: 'productType',
-            label: 'Product Type',
-            required: true,
-            options: [
-              { value: 'physical', label: 'Physical Product' },
-              { value: 'digital', label: 'Digital Product' },
-              { value: 'subscription', label: 'Subscription' },
-            ],
-          },
-          {
-            type: 'text',
-            name: 'productName',
-            label: 'Product Name',
-            required: true,
-          },
-          {
-            type: 'number',
-            name: 'quantity',
-            label: 'Quantity',
-            required: true,
-            condition: (values) => values.productType === 'physical',
-          },
-          {
-            type: 'select',
-            name: 'subscriptionPeriod',
-            label: 'Subscription Period',
-            required: true,
-            condition: (values) => values.productType === 'subscription',
-            options: [
-              { value: 'monthly', label: 'Monthly' },
-              { value: 'quarterly', label: 'Quarterly' },
-              { value: 'yearly', label: 'Yearly' },
-            ],
-          },
-          {
-            type: 'text',
-            name: 'downloadInstructions',
-            label: 'Download Instructions',
-            condition: (values) => values.productType === 'digital',
-          },
-        ],
-      },
-      {
-        title: 'Shipping Information',
-        condition: (values) => values.productType === 'physical',
-        fields: [
-          {
-            type: 'text',
-            name: 'address',
-            label: 'Shipping Address',
-            required: true,
-          },
-          {
-            type: 'text',
-            name: 'city',
-            label: 'City',
-            required: true,
-          },
-          {
-            type: 'text',
-            name: 'postalCode',
-            label: 'Postal Code',
-            required: true,
-          },
-          {
-            type: 'select',
-            name: 'country',
-            label: 'Country',
-            required: true,
-            options: [
-              { value: 'us', label: 'United States' },
-              { value: 'ca', label: 'Canada' },
-              { value: 'uk', label: 'United Kingdom' },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'Payment Information',
-        fields: [
-          {
-            type: 'select',
-            name: 'paymentMethod',
-            label: 'Payment Method',
-            required: true,
-            options: [
-              { value: 'creditCard', label: 'Credit Card' },
-              { value: 'paypal', label: 'PayPal' },
-              { value: 'bankTransfer', label: 'Bank Transfer' },
-            ],
-          },
-        ],
-      },
-    ],
-    submitButtonText: 'Place Order',
-    onSubmit: async (values) => {
-      // Submit form data to API
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-      
-      const data = await response.json();
-      return { success: data.success, message: data.message };
-    },
-  };
+The Form Builder module provides a complete integration with React Hook Form, offering an alternative to the default form state management system. This integration provides several benefits:
 
-  return (
-    <SheetFormBuilder
-      config={formConfig}
-      onSuccess={(values) => console.log('Order placed:', values)}
-    />
-  );
-};
+### Key Benefits
+
+1. **Performance**: React Hook Form is optimized for performance with minimal re-renders
+2. **Validation**: Integration with Zod for schema validation
+3. **TypeScript Support**: Better type safety and autocompletion
+4. **Form State**: Access to form state like dirty, touched, etc.
+5. **Error Handling**: Improved error handling and validation
+
+### How React Hook Form Integration Works
+
+The React Hook Form integration uses the same form configuration structure as the default form implementation, ensuring a consistent developer experience. Here's how it works:
+
+1. **Schema Generation**: The form configuration is automatically converted to a Zod validation schema
+2. **Form Initialization**: React Hook Form is initialized with the schema and default values
+3. **Field Registration**: Each field is registered with React Hook Form using the Controller component
+4. **Validation**: Validation is handled by Zod based on the field validation rules
+5. **Form Submission**: Form submission follows the same pattern as the default implementation
+
+### Key Components and Hooks
+
+The React Hook Form integration provides these key components and hooks:
+
+#### Components
+
+- `ReactHookSheetFormBuilder`: Sheet-based form builder using React Hook Form
+- `ReactHookFormBuilder`: Standard form builder using React Hook Form
+- `ReactHookExpandableFormSection`: Expandable form section component
+- `ReactHookFormField`: Form field component that wraps React Hook Form's Controller
+
+#### Hooks
+
+- `useReactHookForm`: The core hook that powers the React Hook Form integration
+  - Handles form initialization, validation, submission, and state management
+  - Provides methods for field manipulation and form navigation
+  - Supports all form modes (standard, wizard, accordion)
+  - Handles API validation and server-side errors
+- `useFormEdit`: Custom hook for handling form edit mode functionality
+- `useFormData`: Main hook for using forms with the isolated pattern
+
+### Feature Parity with Default Form Implementation
+
+The React Hook Form integration maintains feature parity with the default form implementation:
+
+| Feature | Default Form | React Hook Form |
+|---------|-------------|-----------------|
+| Form Modes | Standard, Wizard, Accordion | Standard, Wizard, Accordion |
+| Field Types | All supported | All supported |
+| Validation | Custom validation | Zod schema validation |
+| API Validation | Supported | Supported |
+| Edit Mode | Supported | Supported |
+| Conditional Fields | Supported | Supported |
+| Dynamic Fields | Supported | Supported |
+| Multi-step Forms | Supported | Supported |
+| Server-side Validation | Supported | Supported |
+
+### When to Use React Hook Form Integration
+
+Consider using the React Hook Form integration when:
+
+1. **Performance is critical**: For forms with many fields or complex validation
+2. **TypeScript integration is important**: For better type safety and autocompletion
+3. **You need advanced validation**: For complex validation rules or dependencies
+4. **You're familiar with React Hook Form**: For developers already comfortable with the library
+
+### Technical Implementation
+
+The React Hook Form integration works by:
+
+1. Converting the form configuration to a Zod schema in the `createZodSchema` function
+2. Initializing React Hook Form with this schema using `useForm` from react-hook-form
+3. Using the `Controller` component to connect each field to React Hook Form
+4. Handling form submission with React Hook Form's `handleSubmit` function
+5. Managing form state and navigation with custom hooks and components
+
+This approach ensures that all features of the default implementation are available in the React Hook Form implementation, while leveraging the performance and validation benefits of React Hook Form.

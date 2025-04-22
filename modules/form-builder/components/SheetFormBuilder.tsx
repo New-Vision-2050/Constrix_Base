@@ -23,6 +23,9 @@ interface SheetFormBuilderProps {
   onCancel?: () => void;
   side?: "top" | "right" | "bottom" | "left";
   className?: string;
+  recordId?: string | number; // Optional record ID for editing
+  isOpen?: boolean; // Control the open state externally
+  onOpenChange?: (open: boolean) => void; // Callback when open state changes
 }
 
 const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
@@ -32,13 +35,17 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   onCancel,
   side,
   className,
+  recordId,
+  isOpen: controlledIsOpen,
+  onOpenChange,
 }) => {
   const locale = useLocale();
   const isRtl = locale === "ar";
   const sheetSide = side || (isRtl ? "left" : "right");
 
+  // Use the hook with recordId for edit mode
   const {
-    isOpen,
+    isOpen: hookIsOpen,
     openSheet,
     closeSheet,
     values,
@@ -48,6 +55,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     submitSuccess,
     submitError,
     setValue,
+    setValues,
     setTouched,
     handleSubmit,
     handleCancel,
@@ -67,23 +75,38 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     stepResponses,
     getStepResponseData,
     clearFiledError,
+    isLoadingEditData,
+    editError,
   } = useSheetForm({
     config,
+    recordId,
     onSuccess,
     onCancel,
   });
 
+  // Determine if the sheet is open (controlled or uncontrolled)
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : hookIsOpen;
+
+  // Handle open state changes
+  const handleOpenChange = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    }
+      if (open) {
+        openSheet();
+      } else {
+        closeSheet();
+      }
+
+  };
+
   return (
     <Sheet
       open={isOpen}
-      onOpenChange={(open) => (open ? openSheet() : closeSheet())}
+      onOpenChange={handleOpenChange}
     >
-      {trigger ? (
+      {trigger && (
         <SheetTrigger asChild>{trigger}</SheetTrigger>
-      ) : (
-        <SheetTrigger asChild>
-          <Button variant="outline">Open Form</Button>
-        </SheetTrigger>
       )}
       <SheetContent
         side={sheetSide}
@@ -118,6 +141,7 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           handleCancel={handleCancel}
           resetForm={resetForm}
           setValue={setValue}
+          setValues={setValues}
           setTouched={setTouched}
           isWizard={isWizard}
           isAccordion={isAccordion}
@@ -134,6 +158,9 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           stepResponses={stepResponses}
           getStepResponseData={getStepResponseData}
           clearFiledError={clearFiledError}
+          isLoadingEditData={isLoadingEditData}
+          editError={editError}
+          recordId={recordId}
         />
 
         <SheetFooter />

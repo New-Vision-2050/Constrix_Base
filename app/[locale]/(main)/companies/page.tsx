@@ -1,6 +1,5 @@
 "use client";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
-import ExportButton from "@/modules/table/components/ExportButton";
 import TableBuilder from "@/modules/table/components/TableBuilder";
 import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
 
@@ -29,10 +28,10 @@ const CompaniesPage = () => {
   const handleFormSuccess = (values: Record<string, unknown>) => {
     // Import the store directly to avoid hooks in callbacks
     const tableStore = useTableStore.getState();
-    
+
     // Use the centralized reloadTable method from the TableStore
     tableStore.reloadTable(config.tableId);
-    
+
     // After a short delay, set loading back to false
     setTimeout(() => {
       tableStore.setLoading(config.tableId, false);
@@ -62,7 +61,6 @@ const CompaniesPage = () => {
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
-            <ExportButton data={["omar"]} />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}

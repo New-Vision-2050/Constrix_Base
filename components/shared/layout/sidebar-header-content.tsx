@@ -4,26 +4,45 @@ import NewVision from "@/public/icons/new-vision";
 import React from "react";
 import { AvatarGroup } from "../avatar-group";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useAuthStore } from "@/modules/auth/store/use-auth";
 
-const SidebarHeaderContent = () => {
+const SidebarHeaderContent = ({
+  name,
+  mainLogo,
+}: {
+  name?: string;
+  mainLogo?: string;
+}) => {
+  const user = useAuthStore((state) => state.user);
   const { open } = useSidebar();
   const t = useTranslations();
 
   return (
     <>
       <div className="flex items-center justify-center flex-col gap-1">
-        <NewVision
-          width={open ? 60 : 30}
-          height={47}
-          className="transition-[width] ease-linear duration-200"
-        />
+        {mainLogo ? (
+          <Image
+            src={mainLogo}
+            alt={name || "Company Logo"}
+            width={open ? 60 : 30}
+            height={47}
+            className="transition-[width] ease-linear duration-200"
+          />
+        ) : (
+          <NewVision
+            width={open ? 60 : 30}
+            height={47}
+            className="transition-[width] ease-linear duration-200"
+          />
+        )}
         <p
           className={cn(
             "transition truncate font-bold",
             open ? "opacity-100" : "opacity-0"
           )}
         >
-            {t("Sidebar.CompanyName")}
+          {name || t("Sidebar.CompanyName")}
         </p>
       </div>
       <div
@@ -33,8 +52,8 @@ const SidebarHeaderContent = () => {
         )}
       >
         <AvatarGroup
-          fullName="Mohamed Saad"
-          alt="Mohamed Saad"
+          fullName={user?.name ?? ""}
+          alt={user?.name ?? ""}
           src="https://github.com/shad\cn.png"
         />
         <p
@@ -43,7 +62,7 @@ const SidebarHeaderContent = () => {
             open ? "opacity-100" : "opacity-0"
           )}
         >
-          {t("Sidebar.Welcome")}
+          {t("Sidebar.Welcome")} {user?.name}
         </p>
       </div>
     </>

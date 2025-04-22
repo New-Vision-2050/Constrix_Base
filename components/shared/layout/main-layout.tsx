@@ -9,8 +9,14 @@ import { useTheme } from "next-themes";
 
 export default function MainLayout({
   children,
+  isCentral,
+  mainLogo,
+  name,
 }: Readonly<{
   children: React.ReactNode;
+  isCentral: boolean;
+  mainLogo?: string;
+  name?: string;
 }>) {
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -30,10 +36,10 @@ export default function MainLayout({
         particleColor={isLight ? "#18003A" : "#ffffff"}
       />{" "}
       <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="bg-transparent pb-5">
+        <AppSidebar name={name} mainLogo={mainLogo} isCentral={isCentral} />
+        <SidebarInset className="bg-transparent">
           <Header />
-          {children}{" "}
+          {children}
         </SidebarInset>
       </SidebarProvider>
     </main>

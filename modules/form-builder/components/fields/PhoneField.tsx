@@ -62,7 +62,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   const validatePhone = (phone: string): boolean => {
       return true; //TODO To Be enhanced
     // Basic phone validation - can be enhanced as needed
-    const phoneRegex = /^\d{6,14}\s\+\d{1,4}$/;
+    // Format: "+XX XXXXXXXX" where XX is country code and XXXXXXXX is phone number
+    const phoneRegex = /^\+\d{1,4}\s\d{6,14}$/;
     return phoneRegex.test(phone);
   };
 
@@ -74,15 +75,22 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   // Initialize from value
   useEffect(() => {
     if (value) {
-      // Try to extract country code from the value (now at the end)
-      const match = value.match(/^(.*?)(\+\d+)$/);
+      // Try to extract country code and phone number from the value
+      // Format could be: "+XX XXXXXXXX" or "+XX-XXXXXXXX"
+      const match = value.match(/^(\+\d+)[\s-](.*)$/);
       if (match) {
-        const [, number, code] = match;
+        const [, code, number] = match;
         setCountryCode(code);
         setPhoneNumber(number.trim());
       } else {
-        // If no country code is found, just set the phone number
-        setPhoneNumber(value);
+        // If no match found, check if it's just a country code
+        if (value.startsWith('+')) {
+          setCountryCode(value);
+          setPhoneNumber('');
+        } else {
+          // If no country code is found, just set the phone number
+          setPhoneNumber(value);
+        }
       }
     }
   }, []);
@@ -90,7 +98,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   // Combine country code and phone number when either changes
   const handleCountryCodeChange = (code: string) => {
     setCountryCode(code);
-    const combinedValue = `${code}${phoneNumber}`.trim();
+    const combinedValue = `${code} ${phoneNumber}`.trim();
 
     // Validate the combined value
     if (phoneNumber && !validatePhone(combinedValue)) {
@@ -106,7 +114,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPhoneNumber = e.target.value;
     setPhoneNumber(newPhoneNumber);
-    const combinedValue = `${countryCode}${newPhoneNumber}`.trim();
+    const combinedValue = `${countryCode} ${newPhoneNumber}`.trim();
 
     // Validate the combined value
     if (newPhoneNumber && !validatePhone(combinedValue)) {

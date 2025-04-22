@@ -21,6 +21,29 @@ const SimpleSelectDropdown: React.FC<DropdownBaseProps> = ({
   dynamicConfig,
   placeholder = "Select option"
 }) => {
+  // Determine if the dropdown should be disabled
+  const shouldBeDisabled = (() => {
+    if (isDisabled) return true;
+    if (!dynamicConfig?.dependsOn || !options) return false;
+
+    // Case 1: String format (backward compatibility)
+    if (typeof dynamicConfig.dependsOn === 'string') {
+      return false; // We don't have access to dependencies here, so we rely on the isDisabled prop
+    }
+    
+    // Case 2: Array of dependency configs
+    if (Array.isArray(dynamicConfig.dependsOn)) {
+      return false; // We don't have access to dependencies here, so we rely on the isDisabled prop
+    }
+    
+    // Case 3: Object with field names as keys
+    if (typeof dynamicConfig.dependsOn === 'object') {
+      return false; // We don't have access to dependencies here, so we rely on the isDisabled prop
+    }
+    
+    return false;
+  })();
+
   const dependencyMessage = useDependencyMessage(isDisabled, dynamicConfig?.dependsOn);
   const isLoading = options.length === 0 && dynamicConfig !== undefined && !isDisabled;
   // Ensure we're working with a string value

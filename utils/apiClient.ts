@@ -16,6 +16,8 @@ export const useApiClient = () => {
     headers: {
       ...apiClient.defaults.headers,
       "Accept-Language": locale,
+      // Add domain header if in browser environment
+      ...(typeof window !== 'undefined' ? { "X-Domain": window.location.hostname } : {}),
     },
   });
   
@@ -46,12 +48,16 @@ export const createApiRequestOptions = (
 ): RequestInit => {
   const token = getCookie("new-vision-token");
   
+  // Get domain if in browser environment
+  const domain = typeof window !== 'undefined' ? window.location.hostname : '';
+  
   return {
     signal: controller?.signal,
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       "Accept-Language": locale,
+      "X-Domain": domain,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     method: "GET",

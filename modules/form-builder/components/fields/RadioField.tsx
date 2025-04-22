@@ -25,35 +25,44 @@ const RadioField: React.FC<RadioFieldProps> = ({
   const options = useMemo(() => field.options || [], [field.options]);
 
   return (
-    <RadioGroup
-      value={value || ''}
-      onValueChange={onChange}
-      onBlur={onBlur}
-      className={cn(
-        "space-y-2",
-        field.className,
-        field.width ? field.width : 'w-full'
-      )}
-      disabled={field.disabled}
-    >
-      {options.map((option) => (
-        <div key={option.value} className="flex items-center space-x-2">
-          <RadioGroupItem
-            id={`${field.name}-${option.value}`}
-            value={option.value}
-            className={cn(
-              !!error && touched ? 'border-destructive' : ''
-            )}
-          />
-          <Label
-            htmlFor={`${field.name}-${option.value}`}
-            className="text-sm font-normal"
-          >
-            {option.label}
-          </Label>
+    <div className="flex flex-col">
+      <RadioGroup
+        value={value || ''}
+        onValueChange={onChange}
+        onBlur={onBlur}
+        className={cn(
+          "space-y-2",
+          field.className,
+          field.width ? field.width : 'w-full'
+        )}
+        disabled={field.disabled}
+      >
+        {options.map((option) => (
+          <div key={option.value} className="flex items-center space-x-2">
+            <RadioGroupItem
+              id={`${field.name}-${option.value}`}
+              value={option.value}
+              className={cn(
+                !!error && touched ? 'border-destructive' : ''
+              )}
+            />
+            <Label
+              htmlFor={`${field.name}-${option.value}`}
+              className="text-sm font-normal"
+            >
+              {option.label}
+            </Label>
+          </div>
+        ))}
+      </RadioGroup>
+      
+      {/* Error message */}
+      {!!error && touched && (
+        <div className="text-destructive text-sm mt-1">
+          {typeof error === 'string' ? error : error}
         </div>
-      ))}
-    </RadioGroup>
+      )}
+    </div>
   );
 };
 

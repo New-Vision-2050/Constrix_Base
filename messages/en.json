@@ -91,6 +91,9 @@
     "Export": "Export",
     "ExportAsCSV": "Export as CSV",
     "ExportAsJSON": "Export as JSON",
+    "ExportSuccess": "Export successful",
+    "ExportFailed": "Export failed",
+    "ItemsExported": "items exported",
     "FilterSearch": "Filter Search",
     "RowsPerPage": "Rows per page:",
     "Search": "Search",
@@ -100,6 +103,7 @@
   },
   "Companies": {
     "Companies": "Companies",
+    "Edit": "Edit",
     "Email": "Email",
     "CompanyType": "Company Type",
     "CompanySection": "Company Section",
@@ -111,16 +115,99 @@
     "TypeFilter": "Company Type",
     "Active": "Active",
     "LoginAsManager": "Login as Company Manager (Edit)",
+    "completeProfileData": "complete profile data",
     "PackageSettings": "Package and Program Settings",
-    "Delete": "Delete (Archive)"
+    "Delete": "Delete (Archive)",
+    "Confirmation": "Confirmation",
+    "AreYouSure": "Are you sure?",
+    "AreYouSureReactivate": "Do you want to confirm activating the company?",
+    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?"
   },
   "Sidebar": {
+    "Dashboard": "Profile",
     "Companies": "Companies",
+    "CompaniesList": "Companies List",
     "Users": "Users",
-    "Welcome": "Hello, Mohammed Saad!",
-    "CompanyName" : "New Vision"
+    "UsersList": "Users List",
+    "Settings": "Settings",
+    "SystemSettings": "System Settings",
+    "DashboardSettings": "Dashboard",
+    "UserProfileSettings": "User Profile",
+    "Welcome": "Hello",
+    "CompanyName": "New Vision"
   },
   "Header": {
-    "MainSystemManagement": "Main System Management"
+    "MainSystemManagement": "Main System Management",
+    "Logout": "Logout"
+  },
+  "FormBuilder": {
+    "Fields": {
+      "Image": {
+        "UploadImage": "Upload Image",
+        "UploadImages": "Upload Images",
+        "ChangeImage": "Change Image",
+        "RemoveImage": "Remove Image",
+        "ClickToUpload": "Click to upload an image",
+        "ClickToUploadMultiple": "Click to upload images",
+        "AddMoreImages": "Add More Images",
+        "Uploading": "Uploading...",
+        "AllowedTypes": "Allowed types",
+        "MaxSize": "Max size",
+        "FileTypeNotAllowed": "File type not allowed. Allowed types",
+        "FileSizeExceeds": "File size exceeds maximum allowed size",
+        "UploadFailed": "Upload failed",
+        "UploadsFailed": "uploads failed",
+        "UploadSuccessful": "Upload successful",
+        "ImageRequired": "Image is required"
+      },
+      "File": {
+        "UploadFile": "Upload File",
+        "UploadFiles": "Upload Files",
+        "ChangeFile": "Change File",
+        "RemoveFile": "Remove File",
+        "ClickToUpload": "Click to upload a file",
+        "ClickToUploadMultiple": "Click to upload files",
+        "AddMoreFiles": "Add More Files",
+        "Uploading": "Uploading...",
+        "AllowedTypes": "Allowed types",
+        "MaxSize": "Max size",
+        "FileTypeNotAllowed": "File type not allowed. Allowed types",
+        "FileSizeExceeds": "File size exceeds maximum allowed size",
+        "UploadFailed": "Upload failed",
+        "UploadsFailed": "uploads failed",
+        "UploadSuccessful": "Upload successful",
+        "FileRequired": "File is required"
+      }
+    }
+  },
+  "UserProfile": {
+    "header": {
+      "placeholder": {
+        "userName": "user name",
+        "jobTitle": "job title",
+        "address": "address",
+        "appointmentDate": "Appointment Date",
+        "image": "A 6*4 white background image is required."
+      },
+      "uploadPhoto": {
+        "title": "Upload Image",
+        "actions": {
+          "checkLabel": "Check Image",
+          "loadingLabel": "Loading...",
+          "saveLabel": "Save",
+          "attachmentLabel": "Attach",
+          "title": {
+            "upload": "upload image firstly",
+            "validate": "validate Image",
+            "save": "Save Image"
+          }
+        },
+        "rules": {
+          "rule1": "Image size must not exceed 5 MB.",
+          "rule2": "Choose an appropriate image size (e.g., 1920x1080 pixels).",
+          "rule3": "Make sure the background is white."
+        }
+      }
+    }
   }
 }

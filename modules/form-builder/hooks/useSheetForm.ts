@@ -7,6 +7,7 @@ import { useFormInstance, useFormStore } from "./useFormStore";
 
 interface UseSheetFormProps {
   config: FormConfig;
+  recordId?: string | number | null; // Optional record ID for editing
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
 }
@@ -28,6 +29,9 @@ interface UseSheetFormResult {
   resetForm: () => void;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
   handleCancel: () => void;
+  // Edit mode related properties and methods
+  isLoadingEditData: boolean;
+  editError: string | null;
   // Wizard/Accordion related properties and methods
   isWizard: boolean;
   isAccordion: boolean;
@@ -54,8 +58,11 @@ interface UseSheetFormResult {
   formId: string;
 }
 
+import { apiClient } from "@/config/axios-config";
+
 export function useSheetForm({
   config,
+  recordId,
   onSuccess,
   onCancel,
 }: UseSheetFormProps): UseSheetFormResult {
@@ -64,14 +71,16 @@ export function useSheetForm({
   // Sheet state
   const [isOpen, setIsOpen] = useState(false);
 
+  // Edit mode state
+  const [isLoadingEditData, setIsLoadingEditData] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
   // Get form instance from store
   const {
     values,
     errors,
     touched,
     isSubmitting,
-    isValid,
-
     setValue,
     setValues,
     setError,
@@ -110,12 +119,16 @@ export function useSheetForm({
     >
   >({});
 
+  // Edit mode state is now managed by FormBuilder
+
   // Reset form when config changes
   useEffect(() => {
     if (config.initialValues) {
       setValues(config.initialValues);
     }
   }, [config, setValues]);
+
+  // Edit mode data loading is now handled by FormBuilder
 
   // Open and close sheet
   const openSheet = useCallback(() => {
@@ -704,6 +717,9 @@ export function useSheetForm({
     resetForm,
     handleSubmit,
     handleCancel,
+    // Edit mode related properties and methods
+    isLoadingEditData,
+    editError,
     // Wizard/Accordion related properties and methods
     isWizard,
     isAccordion,
