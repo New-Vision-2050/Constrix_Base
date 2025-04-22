@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
-import uploadProfileImage from "@/modules/dashboard/api/upload-profile-image";
-import validateProfileImage from "@/modules/dashboard/api/validate-image";
-import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { SetStateAction } from "react";
 
 type PropsT = {
+  loading: boolean;
   imgSrc?: string; // Optional image source URL for the profile picture
+  uploadImageChildren?: React.ReactNode;
+  setOpenUploadImgDialog?: React.Dispatch<SetStateAction<boolean>>;
 };
 
 /**
@@ -16,12 +15,14 @@ type PropsT = {
  * This component displays a user's profile image if provided;
  * otherwise, it shows a placeholder with an upload hidden input.
  */
-export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
-  const [openDialog, setOpenDialog] = useState(false);
-  const { isLoading, handleUpdateImage } = useUserProfileCxt();
-
+export default function UserProfileHeaderImageSection({
+  loading,
+  imgSrc,
+  uploadImageChildren,
+  setOpenUploadImgDialog,
+}: PropsT) {
   // handle loading state
-  if (isLoading)
+  if (loading)
     return (
       <div className="w-44 h-44 bg-gray-200 animate-pulse rounded-lg"></div>
     );
@@ -33,11 +34,11 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
           src={imgSrc}
           alt="Profile Background"
           className="w-32 h-32 rounded cursor-pointer"
-          onClick={() => setOpenDialog(true)}
+          onClick={() => setOpenUploadImgDialog?.(true)}
         />
       ) : (
         <label
-          onClick={() => setOpenDialog(true)}
+          onClick={() => setOpenUploadImgDialog?.(true)}
           className="w-32 h-32 flex flex-col items-center justify-center text-black cursor-pointer"
         >
           <i className="ri-camera-2-line text-2xl" />
@@ -46,16 +47,7 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
           </p>
         </label>
       )}
-      <UploadProfileImageDialog
-        title="أضافة صورة"
-        open={openDialog}
-        setOpen={setOpenDialog}
-        validateImageFn={validateProfileImage}
-        uploadImageFn={uploadProfileImage}
-        onSuccess={(url: string) => {
-          handleUpdateImage(url);
-        }}
-      />
+      {Boolean(uploadImageChildren) && <>{uploadImageChildren}</>}
     </div>
   );
 }

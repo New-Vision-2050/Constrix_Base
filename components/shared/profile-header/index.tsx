@@ -1,3 +1,4 @@
+import { SetStateAction } from "react";
 import UserProfileHeaderImageSection from "./components/ImageSection";
 import UserProfileHeaderUserInformationSection from "./components/UserInformationSection";
 
@@ -8,7 +9,10 @@ type PropsT = {
   address?: string;
   job_title?: string;
   date_appointment?: string;
+  children?: React.ReactNode;
+  setOpenUploadImgDialog?: React.Dispatch<SetStateAction<boolean>>;
 };
+
 
 /**
  * UserProfileHeader Component
@@ -19,18 +23,32 @@ type PropsT = {
  *   2. **User Information Section**: Displays user details such as name, role, location, etc.
  */
 export default function UserProfileHeader(props: PropsT) {
-  const { imgSrc, loading, name, job_title, address, date_appointment } = props;
-  
+  const {
+    imgSrc,
+    loading,
+    name,
+    job_title,
+    address,
+    date_appointment,
+    children,
+    setOpenUploadImgDialog,
+  } = props;
+
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
       {/* image or upload image field */}
-      <UserProfileHeaderImageSection imgSrc={imgSrc ?? ""} />
+      <UserProfileHeaderImageSection
+        loading={loading}
+        imgSrc={imgSrc ?? ""}
+        uploadImageChildren={children}
+        setOpenUploadImgDialog={setOpenUploadImgDialog}
+      />
       {/* user information */}
       <UserProfileHeaderUserInformationSection
-        loading={loading}
         name={name}
-        job_title={job_title}
+        loading={loading}
         address={address}
+        job_title={job_title}
         date_appointment={date_appointment}
       />
     </div>
