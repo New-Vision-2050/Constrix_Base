@@ -34,7 +34,7 @@ export const CompaniesConfig = () => {
         render: (_: unknown, row: CompanyData) => <Company row={row} />,
       },
       {
-        key: "email",
+        key: "general_manager.email",
         label: t("Companies.Email"),
         sortable: true,
       },
@@ -45,7 +45,7 @@ export const CompaniesConfig = () => {
         searchable: true,
       },
       {
-        key: "general_manager_name",
+        key: "general_manager.name",
         label: t("Companies.Manager"),
         sortable: true,
       },
