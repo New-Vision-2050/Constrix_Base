@@ -1,6 +1,6 @@
 import "./index.css";
 import { Label } from "@/components/ui/label";
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserProfilePersonalDataReview() {
@@ -43,7 +43,7 @@ export default function UserProfilePersonalDataReview() {
           label="الجنس"
           value={userPersonalData?.gender ?? ""}
           valid={Boolean(userPersonalData?.gender)}
-          isSelect
+          type="select"
         />
       </div>
       <div className="p-2">
@@ -57,7 +57,7 @@ export default function UserProfilePersonalDataReview() {
               : ""
           }
           valid={Boolean(userPersonalData?.birthdate_gregorian)}
-          isDate
+          type="date"
         />
       </div>
       <div className="p-2">
@@ -71,7 +71,7 @@ export default function UserProfilePersonalDataReview() {
               : ""
           }
           valid={Boolean(userPersonalData?.birthdate_hijri)}
-          isDate
+          type="date"
         />
       </div>
 

@@ -4,7 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export const AddressFormConfig = () => {
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userContactData } = useConnectionDataCxt();
 
   const addressFormConfig: FormConfig = {
@@ -46,6 +46,9 @@ export const AddressFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchDataStatus();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,

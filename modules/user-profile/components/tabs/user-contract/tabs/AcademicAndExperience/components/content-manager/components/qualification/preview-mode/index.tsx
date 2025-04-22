@@ -1,5 +1,5 @@
 import { Qualification } from "@/modules/user-profile/types/qualification";
-import PreviewTextField from "../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../components/previewTextField";
 
 type PropsT = { qualification: Qualification };
 
@@ -13,7 +13,7 @@ export default function SingleQualificationDataPreview({
           valid={true}
           label="دولة التخرج"
           value={qualification?.country_name}
-          isSelect
+          type="select"
         />
       </div>
 
@@ -22,7 +22,7 @@ export default function SingleQualificationDataPreview({
           valid={true}
           label="الجامعة"
           value={qualification?.university_name}
-          isSelect
+          type="select"
         />
       </div>
 
@@ -31,7 +31,7 @@ export default function SingleQualificationDataPreview({
           valid={true}
           label="المؤهل"
           value={qualification?.academic_qualification_name}
-          isSelect
+          type="select"
         />
       </div>
 
@@ -40,7 +40,7 @@ export default function SingleQualificationDataPreview({
           valid={true}
           label="التخصص الأكاديمي"
           value={qualification?.academic_specialization_name}
-          isSelect
+          type="select"
         />
       </div>
 
@@ -49,7 +49,7 @@ export default function SingleQualificationDataPreview({
           valid={true}
           label="تاريخ الحصول على الشهادة"
           value={qualification?.graduation_date}
-          isDate
+          type="date"
         />
       </div>
 
@@ -58,16 +58,17 @@ export default function SingleQualificationDataPreview({
           valid={true}
           label="المعدلات الدراسية "
           value={qualification?.study_rate?.toString()}
-          isSelect
+          type="select"
         />
       </div>
 
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(qualification?.files?.[0]?.url)}
           label="ارفاق شهادة"
-          value="ملف_2024"
-          isPdf
+          value="ملف"
+          type="pdf"
+          fileUrl={qualification?.files?.[0]?.url??''}
         />
       </div>
     </div>

@@ -4,7 +4,7 @@ export type Qualification = {
   academic_specialization_id: string;
   company_id: string;
   country_id: string;
-  files: [];
+  files: { id: string; url: string }[];
   global_id: string;
   graduation_date: string;
   study_rate: number;

@@ -1,5 +1,5 @@
 import { Experience } from "@/modules/user-profile/types/experience";
-import PreviewTextField from "../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../components/previewTextField";
 
 type PropsT = { experience: Experience };
 
@@ -19,7 +19,7 @@ export default function SingleExperiencePreviewMode({ experience }: PropsT) {
           label="حدد فترة التدريب"
           value={experience?.training_from + " - " + experience?.training_to}
           valid={Boolean(experience?.training_from) && Boolean(experience?.training_to)}
-          isDate
+          type="date"
         />
       </div>
 

@@ -1,8 +1,10 @@
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserProfilePassportDataReview() {
   const { userIdentityData } = usePersonalDataTabCxt();
+
+  console.log("userIdentityData", userIdentityData);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -21,7 +23,7 @@ export default function UserProfilePassportDataReview() {
           label="تاريخ الانشاء"
           value={userIdentityData?.passport_start_date ?? ""}
           required
-          isDate
+          type="date"
         />
       </div>
 
@@ -31,18 +33,19 @@ export default function UserProfilePassportDataReview() {
           valid={true}
           label="تاريخ الانتهاء"
           value={userIdentityData?.passport_end_date ?? ""}
-          isDate
+          type="date"
           required
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.file_passport?.url)}
           label="ارفاق الهوية"
           value={
             userIdentityData?.file_passport ? "passport_attached_file.pdf" : ""
           }
-          isPdf
+          type="pdf"
+          fileUrl={userIdentityData?.file_passport?.url}
         />
       </div>
     </div>

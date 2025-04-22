@@ -2,9 +2,12 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const BorderNumberFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
+  const { handleRefetchDataStatus } = useUserProfileCxt();
+
   const borderNumberFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
     title: "بيانات رقم الحدود - الدخول",
@@ -57,6 +60,9 @@ export const BorderNumberFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchDataStatus();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const formatDate = (date: Date): string => {
         const year = date.getFullYear();

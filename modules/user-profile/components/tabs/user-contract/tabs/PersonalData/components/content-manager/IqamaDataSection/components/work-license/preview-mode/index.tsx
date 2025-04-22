@@ -1,4 +1,4 @@
-import PreviewTextField from "../../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaWorkLicenseDataPreviewMode() {
@@ -20,7 +20,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
           label="تاريخ الدخول"
           value={userIdentityData?.work_permit_start_date??''}
           valid={Boolean(userIdentityData?.work_permit_start_date)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -29,7 +29,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
           label="تاريخ الانتهاء"
           value={userIdentityData?.work_permit_end_date??''}
           valid={Boolean(userIdentityData?.work_permit_end_date)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -38,7 +38,8 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
           label="ارفاق رخصة العمل"
           value={userIdentityData?.file_work_permit?'رخصة العمل pdf':''}
           valid={Boolean(userIdentityData?.file_work_permit)}
-          isPdf
+          type="pdf"
+          fileUrl={userIdentityData?.file_work_permit?.url}
         />
       </div>
     </div>

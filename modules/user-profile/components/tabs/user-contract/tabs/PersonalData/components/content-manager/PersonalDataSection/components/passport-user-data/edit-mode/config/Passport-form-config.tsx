@@ -2,9 +2,11 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const PassportDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
+  const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
@@ -77,6 +79,9 @@ export const PassportDataFormConfig = () => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSuccess: () => {
+      handleRefetchDataStatus();
+    },
     onSubmit: async (formData: Record<string, unknown>) => {
       const formatDate = (date: Date): string => {
         const year = date.getFullYear();
