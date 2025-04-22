@@ -175,5 +175,35 @@
         "FileRequired": "الملف مطلوب"
       }
     }
+  },
+  "UserProfile": {
+    "header": {
+      "placeholder": {
+        "userName": "اسم المستخدم",
+        "jobTitle": "الوظيفة",
+        "address": "العنوان",
+        "appointmentDate": "تاريخ التعيين",
+        "image": "يلزم اضافة صورة خلفية بيضاء 6*4"
+      },
+      "uploadPhoto": {
+        "title": "أضافة صورة",
+        "actions": {
+          "checkLabel": "التحقق من الصورة",
+          "loadingLabel": "جاري التنفيذ...",
+          "saveLabel": "حفظ",
+          "attachmentLabel":"ارفاق",
+          "title": {
+            "upload": "قم برفع الصورة أولأ",
+            "validate": "تحقق من الصورة",
+            "save": "رفع الصورة"
+          }
+        },
+        "rules": {
+          "rule1": "حجم الصورة لا يتعدى 5 ميجابايت.",
+          "rule2": "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
+          "rule3": "تأكد من أن الخلفية بيضاء."
+        }
+      }
+    }
   }
 }
