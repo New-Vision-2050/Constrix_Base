@@ -364,11 +364,11 @@ const FormField: React.FC<FormFieldProps> = ({
         {field.required && <span className="text-destructive ml-1">*</span>}
       </Label>
       {renderField()}
-      <FieldHelperText
-        error={error}
-        touched={touched}
-        helperText={field.helperText}
-      />
+      {/*<FieldHelperText*/}
+      {/*  error={error}*/}
+      {/*  touched={touched}*/}
+      {/*  helperText={field.helperText}*/}
+      {/*/>*/}
     </div>
   );
 };
