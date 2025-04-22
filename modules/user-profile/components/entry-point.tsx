@@ -6,8 +6,11 @@ import UploadProfileImageDialog from "@/components/shared/upload-profile-image";
 import { useState } from "react";
 import uploadProfileImage from "@/modules/dashboard/api/upload-profile-image";
 import validateProfileImage from "@/modules/dashboard/api/validate-image";
+import { useTranslations } from "next-intl";
 
 export default function UserProfileEntryPoint() {
+  // declare and define component state
+  const t = useTranslations("UserProfile.header.uploadPhoto");
   const [openDialog, setOpenDialog] = useState(false);
   const { user, isLoading, userPersonalData, handleUpdateImage } =
     useUserProfileCxt();
@@ -29,7 +32,7 @@ export default function UserProfileEntryPoint() {
         setOpenUploadImgDialog={setOpenDialog}
       >
         <UploadProfileImageDialog
-          title="أضافة صورة"
+          title={t("title")}
           open={openDialog}
           setOpen={setOpenDialog}
           validateImageFn={validateProfileImage}

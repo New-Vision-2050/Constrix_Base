@@ -1,5 +1,5 @@
 import { CompanyAddress } from "@/modules/company-profile/types/company";
-import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
+import FieldPreview from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 import { CircleCheckIcon, MapPin } from "lucide-react";
 import React from "react";
 
@@ -58,7 +58,7 @@ const NationalAddressDataPreview = ({
     <div className="grid grid-cols-2 gap-x-3 gap-y-5">
       {previewData.map((preview) => (
         <div key={preview.label}>
-          <PreviewTextField {...preview} />
+          <FieldPreview {...preview} />
         </div>
       ))}
       <div

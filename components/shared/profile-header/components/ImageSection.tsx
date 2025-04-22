@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { SetStateAction } from "react";
 
 type PropsT = {
@@ -21,6 +22,9 @@ export default function UserProfileHeaderImageSection({
   uploadImageChildren,
   setOpenUploadImgDialog,
 }: PropsT) {
+  // declare and define vars and state
+  const t = useTranslations("UserProfile.header.placeholder");
+  
   // handle loading state
   if (loading)
     return (
@@ -43,7 +47,7 @@ export default function UserProfileHeaderImageSection({
         >
           <i className="ri-camera-2-line text-2xl" />
           <p className="text-center text-sm mt-2">
-            يلزم اضافة صورة خلفية بيضاء 6*4
+            {t("image")}
           </p>
         </label>
       )}

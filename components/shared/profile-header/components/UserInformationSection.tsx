@@ -1,6 +1,7 @@
 import BackpackIcon from "@/public/icons/backpack";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 import MapPinIcon from "@/public/icons/map-pin";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   loading: boolean;
@@ -16,6 +17,8 @@ type PropsT = {
  *
  */
 export default function UserProfileHeaderUserInformationSection(props: PropsT) {
+  // declare and define vars and state
+  const t = useTranslations("UserProfile.header.placeholder");
   const { loading, name, job_title, address, date_appointment } = props;
 
   // handle loading state
@@ -31,21 +34,31 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
         {job_title && (
           <div className="flex items-center gap-2">
             <BackpackIcon />
-            <span className="font-medium">{job_title ?? "job title"}</span>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold">{t("jobTitle")}</span>
+              <span className="font-medium">{job_title ?? t("jobTitle")}</span>
+            </div>
           </div>
         )}
         {address && (
           <div className="flex items-center gap-2">
             <MapPinIcon />
-            <span className="font-medium">{address ?? "user address"}</span>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold">{t("address")}</span>
+              <span className="font-medium">{job_title ?? t("address")}</span>
+            </div>
           </div>
         )}
         {date_appointment && (
           <div className="flex items-center gap-2">
             <CalendarRangeIcon />
             <div className="flex flex-col">
-              <span className="font-small">تاريخ التعيين</span>
-              <span className="font-medium">{date_appointment}</span>
+              <span className="text-sm font-semibold">
+                {t("appointmentDate")}
+              </span>
+              <span className="font-medium">
+                {date_appointment ?? t("appointmentDate")}
+              </span>
             </div>
           </div>
         )}
