@@ -1,5 +1,6 @@
-import { FormConfig } from "@/modules/form-builder";
+import {FormConfig, useFormStore} from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
+import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/InvalidMessage";
 
 export const companyUserFormConfig: FormConfig = {
     formId: "company-user-form",
@@ -38,15 +39,21 @@ export const companyUserFormConfig: FormConfig = {
                     ],
                 },
                 {
+                    type: "hiddenObject",
+                    name: "exist_user_id",
+                    label: "exist_user_id",
+                    defaultValue: "",
+                },
+                {
                     name: "first_name",
                     label: "اسم المستخدم الاول",
                     type: "text",
-                    placeholder: "اسم المستخدم الاول",
+                    placeholder: "ادخل اسم المستخدم الاول",
                     required: true,
                     validation: [
                         {
                             type: "required",
-                            message: "ادخل اسم المستخدم الاول",
+                            message: "اسم المستخدم الاول مطلوب",
                         },
                         {
                             type: "minLength",
@@ -64,7 +71,7 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "required",
-                            message: "ادخل اسم المستخدم ألأحير",
+                            message: "الاسم مطلوب",
                         },
                         {
                             type: "minLength",
@@ -77,16 +84,36 @@ export const companyUserFormConfig: FormConfig = {
                     name: "email",
                     label: "البريد الإلكتروني",
                     type: "email",
-                    placeholder: "البريد الإلكتروني",
+                    placeholder: "ادخل البريد الإلكتروني",
                     required: true,
                     validation: [
                         {
                             type: "required",
-                            message: "ادخل البريد الإلكتروني",
+                            message: "البريد الإلكتروني مطلوب",
                         },
                         {
                             type: "email",
                             message: "Please enter a valid email address",
+                        },
+                        {
+                            type: "apiValidation",
+                            message: (
+                                <>
+                                    <InvalidMessage />
+                                </>
+                            ),
+                            apiConfig: {
+                                url: `${baseURL}/company-users/check-email`,
+                                method: "POST",
+                                debounceMs: 500,
+                                paramName: "email",
+                                successCondition: (response) => {
+                                    useFormStore.getState().setValues("companies-form", {
+                                        exist_user_id: response.payload?.[0]?.id,
+                                    });
+                                    return response.payload?.[0]?.status === 1;
+                                },
+                            },
                         },
                     ],
                 },
@@ -94,7 +121,7 @@ export const companyUserFormConfig: FormConfig = {
                     name: "phone",
                     label: "الهاتف",
                     type: "phone",
-                    placeholder: "الهاتف",
+                    placeholder: "Enter your phone",
                     validation: [
                         {
                             type: "required",
@@ -105,6 +132,8 @@ export const companyUserFormConfig: FormConfig = {
                 {
                     type: "select",
                     name: "job_title_id",
+                    disabled: true,
+                    defaultValue: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
                     label: "المسمى الوظيفي",
                     placeholder: "اختر المسمى الوظيفي",
                     required: true,
@@ -130,7 +159,7 @@ export const companyUserFormConfig: FormConfig = {
         },
     ],
     submitButtonText: "حفظ",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

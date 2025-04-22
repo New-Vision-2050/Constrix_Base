@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useLocale } from "next-intl";
+import { useFormStore, type FormState } from "../hooks/useFormStore";
 import {
   Sheet,
   SheetContent,
@@ -43,11 +44,13 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
   const isRtl = locale === "ar";
   const sheetSide = side || (isRtl ? "left" : "right");
 
+  // Get form store actions
+  const formId = config.formId || "sheet-form";
+  const isOpen = useFormStore((state) => state.isSheetOpen[formId] || false);
+  const { openSheet: openSheetStore, closeSheet: closeSheetStore } = useFormStore.getState();
+
   // Use the hook with recordId for edit mode
   const {
-    isOpen: hookIsOpen,
-    openSheet,
-    closeSheet,
     values,
     errors,
     touched,
@@ -84,20 +87,16 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     onCancel,
   });
 
-  // Determine if the sheet is open (controlled or uncontrolled)
-  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : hookIsOpen;
-
   // Handle open state changes
   const handleOpenChange = (open: boolean) => {
     if (onOpenChange) {
       onOpenChange(open);
     }
-      if (open) {
-        openSheet();
-      } else {
-        closeSheet();
-      }
-
+    if (open) {
+      openSheetStore(formId);
+    } else {
+      closeSheetStore(formId);
+    }
   };
 
   return (

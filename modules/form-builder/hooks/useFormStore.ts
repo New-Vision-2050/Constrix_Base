@@ -22,15 +22,20 @@ interface FormInstanceState {
 }
 
 // Define the global store that holds multiple form instances
-interface FormState {
+export interface FormState {
   // Map of form instances by formId
   forms: Record<string, FormInstanceState>;
 
   // Current active form ID
   activeFormId: string;
 
+  // Sheet state
+  isSheetOpen: Record<string, boolean>;
+
   // Form actions
   setFormId: (formId: string) => void;
+  closeSheet: (formId: string) => void;
+  openSheet: (formId: string) => void;
   initForm: (formId: string, initialValues?: Record<string, any>) => void;
   getValue: (formId: string, field: string) => any;
   setValue: (formId: string, field: string, value: any) => void;
@@ -71,6 +76,38 @@ export const useFormStore = create<FormState>((set, get) => ({
   // Initial state
   forms: {},
   activeFormId: 'default',
+  isSheetOpen: {},
+
+  // Sheet actions
+  closeSheet: (formId: string) => set((state) => {
+    // Reset form if it exists
+    const form = state.forms[formId];
+    if (form) {
+      return {
+        forms: {
+          ...state.forms,
+          [formId]: getDefaultFormState()
+        },
+        isSheetOpen: {
+          ...state.isSheetOpen,
+          [formId]: false
+        }
+      };
+    }
+    return {
+      isSheetOpen: {
+        ...state.isSheetOpen,
+        [formId]: false
+      }
+    };
+  }),
+
+  openSheet: (formId: string) => set((state) => ({
+    isSheetOpen: {
+      ...state.isSheetOpen,
+      [formId]: true
+    }
+  })),
 
   // Set the active form ID
   setFormId: (formId: string) => set({ activeFormId: formId }),

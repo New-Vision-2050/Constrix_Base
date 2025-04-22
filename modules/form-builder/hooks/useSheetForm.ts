@@ -71,8 +71,12 @@ export function useSheetForm({
 
   // Use formId from config if provided, otherwise use default
   const actualFormId = config.formId || "sheet-form";
-  // Sheet state
-  const [isOpen, setIsOpen] = useState(false);
+  
+  // Get form store actions
+  const { closeSheet: closeSheetStore, openSheet: openSheetStore } = useFormStore();
+  
+  // Get sheet state from store
+  const isOpen = useFormStore((state) => state.isSheetOpen[actualFormId] || false);
 
   // Edit mode state
   const [isLoadingEditData, setIsLoadingEditData] = useState(false);
@@ -135,24 +139,20 @@ export function useSheetForm({
 
   // Open and close sheet
   const openSheet = useCallback(() => {
-    setIsOpen(true);
+    openSheetStore(actualFormId);
     // Reset to first step when opening the sheet in step-based mode
     if (isStepBased) {
       setCurrentStep(0);
     }
-  }, [isStepBased]);
+  }, [openSheetStore, actualFormId, isStepBased]);
 
   const closeSheet = useCallback(() => {
-    setIsOpen(false);
-    // Reset form state when sheet is closed
-    if (config.resetOnSuccess) {
-      resetForm();
-    }
+    closeSheetStore(actualFormId); // This will also reset the form
     // Always reset to first step when closing the sheet in step-based mode
     if (isStepBased) {
       setCurrentStep(0);
     }
-  }, [config.resetOnSuccess, isStepBased, resetForm]);
+  }, [closeSheetStore, actualFormId, isStepBased]);
 
   const clearFiledError = useCallback(
     (fieldName: string) => {
