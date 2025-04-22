@@ -51,7 +51,7 @@ export default function UploadProfileImageDialog({
     setValid(false);
     setPreviewUrl("");
     setFeedbackMessages(getInitialValidateMsgs(t));
-  }, [open]);
+  }, [open, t]);
 
   // handle file input changes and preview image
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
