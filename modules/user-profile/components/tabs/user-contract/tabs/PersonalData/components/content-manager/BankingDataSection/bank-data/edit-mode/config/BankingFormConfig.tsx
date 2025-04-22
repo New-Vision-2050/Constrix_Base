@@ -11,9 +11,9 @@ type PropsT = {
 export const BankingDataFormConfig = (props: PropsT) => {
   // declare and define helper state and variables
   const { bank, onSuccess } = props ?? {};
-  const { user } = useUserProfileCxt();
   const formType = bank ? "Edit" : "Create";
   const { handleRefreshBankingData } = useUserBankingDataCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   // form config
   const BankingFormConfig: FormConfig = {
@@ -173,6 +173,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
     showBackButton: false,
     onSuccess: () => {
       handleRefreshBankingData();
+      handleRefetchDataStatus();
       onSuccess?.();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

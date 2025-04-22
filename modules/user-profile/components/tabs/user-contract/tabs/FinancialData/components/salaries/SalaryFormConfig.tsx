@@ -1,11 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 
 export const SalaryFormConfig = () => {
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
 
   const salaryFormConfig: FormConfig = {
@@ -42,14 +42,26 @@ export const SalaryFormConfig = () => {
             ],
           },
           {
+            type: "select",
             name: "type",
             label: "دورة القبض",
-            type: "text",
-            placeholder: "دورة القبض",
+            placeholder: "اختر دورة القبض",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/periods`,
+              valueField: "name",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
-                message: "دورة القبض مطلوب",
+                message: "ادخل دورة القبض",
               },
             ],
           },
@@ -84,6 +96,7 @@ export const SalaryFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchDataStatus();
       handleRefreshSalaryData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

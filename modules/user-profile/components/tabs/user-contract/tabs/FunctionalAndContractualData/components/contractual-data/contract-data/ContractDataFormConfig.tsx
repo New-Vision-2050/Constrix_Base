@@ -11,7 +11,7 @@ type PropsT = {
 };
 
 export const ContractDataFormConfig = ({ contract }: PropsT) => {
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchContractData } = useFunctionalContractualCxt();
 
   const contractDataFormConfig: FormConfig = {
@@ -207,6 +207,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchDataStatus();
       handleRefetchContractData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

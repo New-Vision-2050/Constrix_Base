@@ -12,8 +12,8 @@ type PropsT = {
 
 export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
   // ** declare and define component state and variables
-  const { user } = useUserProfileCxt();
   const formType = course ? "Edit" : "Create";
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
 
   const singleCourseFormConfig: FormConfig = {
@@ -132,6 +132,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
     showBackButton: false,
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefetchUserCourses();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

@@ -1,5 +1,5 @@
 import { Salary } from "@/modules/user-profile/types/Salary";
-import PreviewTextField from "../../../components/PreviewTextField";
+import PreviewTextField from "../../../components/previewTextField";
 
 export default function SalaryPreviewMode({ salary }: { salary: Salary }) {
   return (

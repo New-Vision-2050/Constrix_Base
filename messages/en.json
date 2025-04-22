@@ -91,6 +91,9 @@
     "Export": "Export",
     "ExportAsCSV": "Export as CSV",
     "ExportAsJSON": "Export as JSON",
+    "ExportSuccess": "Export successful",
+    "ExportFailed": "Export failed",
+    "ItemsExported": "items exported",
     "FilterSearch": "Filter Search",
     "RowsPerPage": "Rows per page:",
     "Search": "Search",
@@ -100,6 +103,7 @@
   },
   "Companies": {
     "Companies": "Companies",
+    "Edit": "Edit",
     "Email": "Email",
     "CompanyType": "Company Type",
     "CompanySection": "Company Section",
@@ -113,7 +117,11 @@
     "LoginAsManager": "Login as Company Manager (Edit)",
     "completeProfileData": "complete profile data",
     "PackageSettings": "Package and Program Settings",
-    "Delete": "Delete (Archive)"
+    "Delete": "Delete (Archive)",
+    "Confirmation": "Confirmation",
+    "AreYouSure": "Are you sure?",
+    "AreYouSureReactivate": "Do you want to confirm activating the company?",
+    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?"
   },
   "Sidebar": {
     "Dashboard": "Profile",
@@ -123,8 +131,8 @@
     "UsersList": "Users List",
     "Settings": "Settings",
     "SystemSettings": "System Settings",
-    "DashboardSettings": "Dashboard Setting",
-    "UserProfileSettings": "User Profile Settings",
+    "DashboardSettings": "Dashboard",
+    "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
     "CompanyName": "New Vision"
   },
@@ -169,6 +177,36 @@
         "UploadsFailed": "uploads failed",
         "UploadSuccessful": "Upload successful",
         "FileRequired": "File is required"
+      }
+    }
+  },
+  "UserProfile": {
+    "header": {
+      "placeholder": {
+        "userName": "user name",
+        "jobTitle": "job title",
+        "address": "address",
+        "appointmentDate": "Appointment Date",
+        "image": "A 6*4 white background image is required."
+      },
+      "uploadPhoto": {
+        "title": "Upload Image",
+        "actions": {
+          "checkLabel": "Check Image",
+          "loadingLabel": "Loading...",
+          "saveLabel": "Save",
+          "attachmentLabel": "Attach",
+          "title": {
+            "upload": "upload image firstly",
+            "validate": "validate Image",
+            "save": "Save Image"
+          }
+        },
+        "rules": {
+          "rule1": "Image size must not exceed 5 MB.",
+          "rule2": "Choose an appropriate image size (e.g., 1920x1080 pixels).",
+          "rule3": "Make sure the background is white."
+        }
       }
     }
   }

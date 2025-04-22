@@ -202,6 +202,8 @@ export const useTableData = (
     columnSearchState,
     columnVisibility,
     tableId,
+    selectedRows: tableInstance.selectedRows,
+    selectionEnabled: tableInstance.selectionEnabled,
 
     // Actions
     handleSort,
@@ -216,5 +218,11 @@ export const useTableData = (
     setColumns, // Export setColumns so it can be used directly
     setColumnVisibility,
     setColumnVisibilityKeys,
+    
+    // Row selection actions
+    setSelectionEnabled: tableInstance.setSelectionEnabled,
+    selectRow: tableInstance.selectRow,
+    selectAllRows: tableInstance.selectAllRows,
+    clearSelectedRows: tableInstance.clearSelectedRows,
   };
 };

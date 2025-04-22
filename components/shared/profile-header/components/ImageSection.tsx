@@ -1,10 +1,14 @@
 "use client";
-import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import UploadImageDialog from "./UploadImageDialog";
-import { useState } from "react";
+
+import { useTranslations } from "next-intl";
+import { SetStateAction } from "react";
+import Image from "next/image";
 
 type PropsT = {
+  loading: boolean;
   imgSrc?: string; // Optional image source URL for the profile picture
+  uploadImageChildren?: React.ReactNode;
+  setOpenUploadImgDialog?: React.Dispatch<SetStateAction<boolean>>;
 };
 
 /**
@@ -13,12 +17,17 @@ type PropsT = {
  * This component displays a user's profile image if provided;
  * otherwise, it shows a placeholder with an upload hidden input.
  */
-export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
-  const { isLoading } = useUserProfileCxt();
-  const [openDialog, setOpenDialog] = useState(false);
-
+export default function UserProfileHeaderImageSection({
+  loading,
+  imgSrc,
+  uploadImageChildren,
+  setOpenUploadImgDialog,
+}: PropsT) {
+  // declare and define vars and state
+  const t = useTranslations("UserProfile.header.placeholder");
+  
   // handle loading state
-  if (isLoading)
+  if (loading)
     return (
       <div className="w-44 h-44 bg-gray-200 animate-pulse rounded-lg"></div>
     );
@@ -26,24 +35,26 @@ export default function UserProfileHeaderImageSection({ imgSrc }: PropsT) {
   return (
     <div className="bg-gray-50 border rounded-xl p-4 flex items-center justify-center">
       {imgSrc ? (
-        <img
+        <Image
           src={imgSrc}
           alt="Profile Background"
-          className="w-32 h-32 rounded cursor-pointer"
-          onClick={() => setOpenDialog(true)}
+          width={128}
+          height={128}
+          className="rounded cursor-pointer object-cover"
+          onClick={() => setOpenUploadImgDialog?.(true)}
         />
       ) : (
         <label
-          onClick={() => setOpenDialog(true)}
+          onClick={() => setOpenUploadImgDialog?.(true)}
           className="w-32 h-32 flex flex-col items-center justify-center text-black cursor-pointer"
         >
           <i className="ri-camera-2-line text-2xl" />
           <p className="text-center text-sm mt-2">
-            يلزم اضافة صورة خلفية بيضاء 6*4
+            {t("image")}
           </p>
         </label>
       )}
-      <UploadImageDialog open={openDialog} setOpen={setOpenDialog} />
+      {Boolean(uploadImageChildren) && <>{uploadImageChildren}</>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from "react";
-import PreviewTextField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/PreviewTextField";
 import { officialData } from "@/modules/company-profile/types/company";
+import PreviewField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 
 const OfficialDataPreview = ({
   officialData,
@@ -79,7 +79,7 @@ const OfficialDataPreview = ({
           key={preview.label}
           className={preview?.containerClassName && preview?.containerClassName}
         >
-          <PreviewTextField {...preview} />
+          <PreviewField {...preview} />
         </div>
       ))}
     </div>

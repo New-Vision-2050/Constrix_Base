@@ -1,6 +1,5 @@
 "use client";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
-import ExportButton from "@/modules/table/components/ExportButton";
 import TableBuilder from "@/modules/table/components/TableBuilder";
 import { CompaniesConfig } from "@/modules/table/utils/configs/companiesConfig";
 
@@ -62,7 +61,6 @@ const CompaniesPage = () => {
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
-            <ExportButton data={["omar"]} />
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}

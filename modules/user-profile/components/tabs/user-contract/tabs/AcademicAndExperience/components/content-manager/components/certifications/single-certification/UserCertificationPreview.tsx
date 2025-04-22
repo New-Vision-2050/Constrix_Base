@@ -1,5 +1,5 @@
 import { Certification } from "@/modules/user-profile/types/Certification";
-import PreviewTextField from "../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../components/previewTextField";
 
 type PropsT = { certification: Certification };
 export default function UserCertificationPreview({ certification }: PropsT) {
@@ -10,7 +10,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
           label="اسم الجهة"
           value={certification?.professional_bodie_name ?? ""}
           valid={Boolean(certification?.professional_bodie_name)}
-          isSelect
+          type="select"
         />
       </div>
 
@@ -43,7 +43,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
           label="تاريخ الحصول على الشهادة"
           value={certification?.date_obtain ?? ""}
           valid={Boolean(certification?.date_obtain)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -52,7 +52,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
           label="تاريخ انتهاء الشهادة"
           value={certification?.date_end ?? ""}
           valid={Boolean(certification?.date_end)}
-          isDate
+          type="date"
         />
       </div>
     </div>

@@ -12,7 +12,7 @@ export default function UserExperiences() {
           onClick={() => {
             setOpen(true);
           }}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-pink-500 text-white px-4 py-2 rounded"
         >
           إضافة خبرة
         </button>

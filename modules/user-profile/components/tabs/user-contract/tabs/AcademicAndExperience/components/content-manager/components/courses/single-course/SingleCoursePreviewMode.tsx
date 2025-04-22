@@ -1,5 +1,5 @@
 import { Course } from "@/modules/user-profile/types/Course";
-import PreviewTextField from "../../../../../../components/PreviewTextField";
+import PreviewTextField from "../../../../../../components/previewTextField";
 
 type PropsT = { course: Course };
 export default function SingleCoursePreviewMode({ course }: PropsT) {
@@ -50,7 +50,7 @@ export default function SingleCoursePreviewMode({ course }: PropsT) {
           label="تاريخ الحصول على الشهادة"
           value={course?.date_obtain}
           valid={Boolean(course?.date_obtain)}
-          isDate
+          type="date"
         />
       </div>
 
@@ -59,7 +59,7 @@ export default function SingleCoursePreviewMode({ course }: PropsT) {
           label="تاريخ انتهاء الشهادة"
           value={course?.date_end}
           valid={Boolean(course?.date_end)}
-          isDate
+          type="date"
         />
       </div>
     </div>

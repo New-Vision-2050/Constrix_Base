@@ -4,6 +4,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFinancialDataCxt } from "../../../../context/financialDataCxt";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
+import { AllowancesTypes } from "../../AllowancesEnum";
 
 type PropsT = {
   privilegeData?: UserPrivilege;
@@ -17,7 +18,7 @@ export const PrivilegeItemFormConfig = ({
 }: PropsT) => {
   // declare and define helper variables
   const isEdit = privilegeData ? true : false;
-  const { user } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefreshPrivilegesList } = useFinancialDataCxt();
 
   const privilegeItemFormConfig: FormConfig = {
@@ -81,6 +82,14 @@ export const PrivilegeItemFormConfig = ({
             name: "charge_amount",
             label: "معدل حساب النسبة من اصل الراتب",
             type: "text",
+            condition: (values) => {
+              if (
+                values.type_allowance_id === AllowancesTypes?.Saving ||
+                values.type_allowance_id == null
+              )
+                return false;
+              return true;
+            },
             placeholder: "معدل حساب النسبة من اصل الراتب",
             validation: [
               {
@@ -146,6 +155,7 @@ export const PrivilegeItemFormConfig = ({
     showBackButton: false,
     onSuccess: () => {
       onSuccess?.();
+      handleRefetchDataStatus();
       handleRefreshPrivilegesList();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
@@ -158,9 +168,8 @@ export const PrivilegeItemFormConfig = ({
       const url = isEdit
         ? `/user_privileges/${privilegeData?.id}`
         : `/user_privileges`;
-        
-      const _apiClient = isEdit ? apiClient.put : apiClient.post;
 
+      const _apiClient = isEdit ? apiClient.put : apiClient.post;
 
       const response = await _apiClient(url, serialize(body));
 
