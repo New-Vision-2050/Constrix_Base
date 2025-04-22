@@ -4,6 +4,20 @@ import React from 'react';
 import { TableBuilder, useTableInstance } from '@/modules/table';
 import { Button } from '@/components/ui/button';
 
+// Define types for our user data
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+// Define type for API response
+interface ApiResponse {
+  data?: User[];
+  error?: string;
+}
+
 export default function TableRowSelectionExample() {
   // Define the table configuration with row selection enabled
   const tableConfig = {
@@ -17,7 +31,7 @@ export default function TableRowSelectionExample() {
       { key: 'role', label: 'Role', sortable: true, searchable: true },
     ],
     // Mock data for demonstration purposes
-    dataMapper: (response: any) => {
+    dataMapper: (response: ApiResponse | null | undefined) => {
       // If the API isn't available, return mock data
       if (!response || response.error) {
         return [

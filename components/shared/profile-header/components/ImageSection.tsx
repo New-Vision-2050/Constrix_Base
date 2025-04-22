@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { SetStateAction } from "react";
+import Image from "next/image";
 
 type PropsT = {
   loading: boolean;
@@ -34,10 +35,12 @@ export default function UserProfileHeaderImageSection({
   return (
     <div className="bg-gray-50 border rounded-xl p-4 flex items-center justify-center">
       {imgSrc ? (
-        <img
+        <Image
           src={imgSrc}
           alt="Profile Background"
-          className="w-32 h-32 rounded cursor-pointer"
+          width={128}
+          height={128}
+          className="rounded cursor-pointer object-cover"
           onClick={() => setOpenUploadImgDialog?.(true)}
         />
       ) : (

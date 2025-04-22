@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 type PropsT = {
   loading: boolean;
@@ -11,11 +12,15 @@ export default function PreviewImage(props: PropsT) {
 
   return (
     <div className="w-80 h-60 bg-sidebar flex gap-4 flex-col items-center justify-around">
-      <img
-        src={previewUrl}
-        alt="Preview"
-        className="w-44 max-h-[150px] h-auto rounded-xl"
-      />
+      <div className="relative w-44 h-[150px] flex items-center justify-center">
+        <Image
+          src={previewUrl}
+          alt="Preview"
+          width={176}
+          height={150}
+          className="max-h-[150px] rounded-xl object-contain"
+        />
+      </div>
       <Button
         variant={"outline"}
         disabled={loading}
