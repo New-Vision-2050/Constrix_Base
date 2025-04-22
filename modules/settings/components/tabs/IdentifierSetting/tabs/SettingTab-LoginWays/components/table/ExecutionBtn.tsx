@@ -7,13 +7,12 @@ import {
 import { Button } from "@/components/ui/button";
 import {ChevronDown, EditIcon} from "lucide-react";
 import EnterIcon from "@/public/icons/enter";
-import GearIcon from "@/public/icons/gear";
 import TrashIcon from "@/public/icons/trash";
 import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
 import { useTableInstance } from "@/modules/table/store/useTableStore";
-import {companiesFormConfig, SheetFormBuilder} from "@/modules/form-builder";
+import { SheetFormBuilder} from "@/modules/form-builder";
 import {
     loginWayFormEditConfig
 } from "@/modules/settings/components/tabs/IdentifierSetting/tabs/SettingTab-LoginWays/components/form/editConfig";
