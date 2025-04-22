@@ -32,15 +32,18 @@ const locationSchema = z.object({
 // Create types from the schema
 type LocationFormValues = z.infer<typeof locationSchema>;
 
-// Interface for the saved location data
-interface LocationData {
-  latitude: number;
-  longitude: number;
-}
-
 // Props interface for the component
 interface LocationSelectorProps {
-  onSave: (obj: any) => void;
+  onSave: (obj: {
+    country_id: string | undefined;
+    state_id: string | undefined;
+    city_id: string | undefined;
+    neighborhood_name: string | undefined;
+    postal_code: string | undefined;
+    street_name: string | undefined;
+    latitude: string;
+    longitude: string;
+  }) => void;
   initialLocation?: {
     latitude: number;
     longitude: number;
@@ -135,7 +138,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   }, [markerPosition, setValue]);
 
   // Handle map click to update marker position
-  const handleMapClick = (e: any) => {
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng) {
       const newPosition = {
         lat: e.latLng.lat(),
@@ -168,10 +171,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       longitude: String(parseFloat(data.longitude)),
     };
 
-    const ss = mutate(data, {
-      onError: (err: any) => {
-        const errMessage =
-          err?.response?.data?.message?.description ?? "خطآ في اختيار الموقع";
+    mutate(data, {
+      onError: () => {
+        const errMessage = "خطآ في اختيار الموقع";
         setError("longitude", {
           message: errMessage,
         });
@@ -185,12 +187,12 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         const postal_code = succ?.payload?.postal_code;
         const street_name = succ?.payload?.route;
         onSave({
-          country_id,
-          state_id,
-          city_id,
-          neighborhood_name,
-          postal_code,
-          street_name,
+          country_id: country_id || '',
+          state_id: state_id || '',
+          city_id: city_id || '',
+          neighborhood_name: neighborhood_name || '',
+          postal_code: postal_code || '',
+          street_name: street_name || '',
           ...locationData,
         });
       },
