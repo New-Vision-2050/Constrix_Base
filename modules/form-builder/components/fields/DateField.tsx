@@ -30,39 +30,48 @@ const DateField: React.FC<DateFieldProps> = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={field.name}
-          variant="outline"
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground",
-            !!error && touched ? 'border-destructive' : '',
-            field.className,
-            field.width ? field.width : 'w-full'
-          )}
-          disabled={field.disabled}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, 'PPP') : field.placeholder || 'Select a date'}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={(date) => {
-            onChange(date ? date.toISOString() : '');
-            onBlur();
-            setIsOpen(false);
-          }}
-          disabled={field.disabled}
-          initialFocus
-          {...props}
-        />
-      </PopoverContent>
-    </Popover>
+    <div className="relative">
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            id={field.name}
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !date && "text-muted-foreground",
+              !!error && touched ? 'border-destructive' : '',
+              field.className,
+              field.width ? field.width : 'w-full'
+            )}
+            disabled={field.disabled}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, 'PPP') : field.placeholder || 'Select a date'}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(date) => {
+              onChange(date ? date.toISOString() : '');
+              onBlur();
+              setIsOpen(false);
+            }}
+            disabled={field.disabled}
+            initialFocus
+            {...props}
+          />
+        </PopoverContent>
+      </Popover>
+      
+      {/* Error message */}
+      {!!error && touched && (
+        <div className="text-destructive text-sm mt-1">
+          {error}
+        </div>
+      )}
+    </div>
   );
 };
 

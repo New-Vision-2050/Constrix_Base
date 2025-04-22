@@ -144,6 +144,13 @@ const TextField: React.FC<TextFieldProps> = ({
           ) : null}
         </div>
       )}
+      
+      {/* Error message */}
+      {showError && (
+        <div className="text-destructive text-sm mt-1">
+          {error || storeErrors[field.name]}
+        </div>
+      )}
     </div>
   );
 };

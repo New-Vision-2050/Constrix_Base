@@ -119,6 +119,7 @@ const tableConfig: TableConfig = {
 | `allowSearchFieldSelection` | `boolean` | Whether to allow selecting search fields |
 | `columnSearchConfig` | `ColumnSearchConfig` | Configuration for column search |
 | `allSearchedFields` | `any[]` | Additional search fields for advanced filtering |
+| `enableRowSelection` | `boolean` | Row selection is enabled by default, set to false to disable |
 
 ### Column Configuration
 
@@ -229,6 +230,71 @@ Individual column search allows for more precise filtering of data.
 
 Users can toggle the visibility of columns using the column visibility dropdown.
 
+### Row Selection and Export
+
+Tables support row selection by default. This allows users to select individual rows or all rows at once using checkboxes. Selected rows are highlighted for better visibility. Row selection can be disabled by setting the `enableRowSelection` option to `false`.
+
+When rows are selected, an Export button appears in the search bar, allowing users to export the selected data in CSV or JSON format. The export functionality makes an API call to `{tableUrl}/export` with the selected row IDs and the chosen format.
+
+The row selection state is managed automatically and can be accessed through the table instance. This is particularly useful for implementing bulk actions like delete, export, or other operations on selected rows.
+
+```tsx
+import { TableBuilder, useTableInstance } from '@/modules/table';
+
+function TableWithBulkActions() {
+  const tableConfig = {
+    url: '/api/users',
+    tableId: 'users-table',
+    // Row selection is enabled by default
+    columns: [
+      // column definitions
+    ]
+  };
+  
+  // Get the table instance to access selection state and actions
+  const { selectedRows, clearSelectedRows } = useTableInstance('users-table');
+  
+  const handleBulkDelete = () => {
+    // Get the IDs of selected rows
+    const selectedIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    
+    // Perform bulk delete operation
+    deleteUsers(selectedIds).then(() => {
+      // Clear selection after successful operation
+      clearSelectedRows();
+    });
+  };
+  
+  return (
+    <div>
+      {Object.keys(selectedRows).some(id => selectedRows[id]) && (
+        <div className="mb-4">
+          <button onClick={handleBulkDelete}>Delete Selected</button>
+          <button onClick={clearSelectedRows}>Clear Selection</button>
+        </div>
+      )}
+      
+      <TableBuilder config={tableConfig} />
+    </div>
+  );
+}
+```
+
+### Export Functionality
+
+The table includes built-in export functionality that allows users to export selected rows in CSV or JSON format. When rows are selected, an Export button appears in the search bar. Clicking this button sends a POST request to `{tableUrl}/export` with the selected row IDs and the chosen format.
+
+The API endpoint should handle the export request and return the appropriate file. The expected request format is:
+
+```json
+{
+  "ids": ["1", "2", "3"],
+  "format": "csv" | "json"
+}
+```
+
+The response should include the appropriate Content-Type header and Content-Disposition header for the file download.
+
 ### Data Transformation
 
 The `dataMapper` function allows you to transform API response data before it's displayed in the table.
@@ -330,6 +396,58 @@ const DeleteButton = ({ id }) => {
         }}
       />
     </>
+  );
+};
+
+### Table with Row Selection
+
+```tsx
+import { TableBuilder } from '@/modules/table';
+
+const SelectableTable = () => {
+  const tableConfig = {
+    url: '/api/products',
+    columns: [
+      { key: 'id', label: 'ID', sortable: true },
+      { key: 'name', label: 'Product Name', sortable: true, searchable: true },
+      { key: 'price', label: 'Price', sortable: true },
+      { key: 'category', label: 'Category', sortable: true, searchable: true },
+      {
+        key: 'actions',
+        label: 'Actions',
+        render: (_, row) => (
+          <div className="flex space-x-2">
+            <button onClick={() => handleEdit(row.id)}>Edit</button>
+            <button onClick={() => handleDelete(row.id)}>Delete</button>
+          </div>
+        ),
+      },
+    ],
+    // Row selection is enabled by default
+  };
+
+  // Example of using the selected rows
+  const handleBulkAction = () => {
+    // Get the table instance to access selected rows
+    const { selectedRows } = useTableInstance('products-table');
+    
+    // Get the IDs of selected rows
+    const selectedIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    
+    // Perform bulk action with selected IDs
+    console.log('Selected IDs:', selectedIds);
+  };
+
+  return (
+    <div>
+      <div className="mb-4">
+        <button onClick={handleBulkAction}>Bulk Action</button>
+      </div>
+      <TableBuilder
+        config={tableConfig}
+        tableId="products-table" // Provide a stable ID to access the instance later
+      />
+    </div>
   );
 };
 ```

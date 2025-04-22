@@ -91,6 +91,9 @@
     "Export": "Export",
     "ExportAsCSV": "Export as CSV",
     "ExportAsJSON": "Export as JSON",
+    "ExportSuccess": "Export successful",
+    "ExportFailed": "Export failed",
+    "ItemsExported": "items exported",
     "FilterSearch": "Filter Search",
     "RowsPerPage": "Rows per page:",
     "Search": "Search",
@@ -100,6 +103,7 @@
   },
   "Companies": {
     "Companies": "Companies",
+    "Edit": "Edit",
     "Email": "Email",
     "CompanyType": "Company Type",
     "CompanySection": "Company Section",
@@ -113,7 +117,11 @@
     "LoginAsManager": "Login as Company Manager (Edit)",
     "completeProfileData": "complete profile data",
     "PackageSettings": "Package and Program Settings",
-    "Delete": "Delete (Archive)"
+    "Delete": "Delete (Archive)",
+    "Confirmation": "Confirmation",
+    "AreYouSure": "Are you sure?",
+    "AreYouSureReactivate": "Do you want to confirm activating the company?",
+    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?"
   },
   "Sidebar": {
     "Dashboard": "Profile",
