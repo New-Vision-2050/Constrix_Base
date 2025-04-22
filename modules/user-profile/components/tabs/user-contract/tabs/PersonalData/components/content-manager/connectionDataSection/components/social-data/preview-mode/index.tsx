@@ -8,42 +8,42 @@ export default function SocialDataSectionPreviewMode() {
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userSocialData?.whatsapp)}
           label="واتساب "
           value={userSocialData?.whatsapp ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userSocialData?.facebook)}
           label="فيسبوك"
           value={userSocialData?.facebook ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userSocialData?.telegram)}
           label="تيليجرام"
           value={userSocialData?.telegram ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userSocialData?.instagram)}
           label="انستقرام"
           value={userSocialData?.instagram ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userSocialData?.snapchat)}
           label="سناب شات"
           value={userSocialData?.snapchat ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userSocialData?.linkedin)}
           label="لينك اند"
           value={userSocialData?.linkedin ?? ""}
         />

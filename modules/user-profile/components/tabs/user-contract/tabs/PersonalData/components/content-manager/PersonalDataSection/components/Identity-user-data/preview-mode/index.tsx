@@ -9,7 +9,7 @@ export default function UserProfileIdentityDataReview() {
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.identity)}
           label="رقم الهوية"
           value={userIdentityData?.identity ?? ""}
           required
@@ -17,7 +17,7 @@ export default function UserProfileIdentityDataReview() {
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.identity_start_date)}
           label="تاريخ الدخول"
           value={userIdentityData?.identity_start_date ?? ""}
           required
@@ -28,7 +28,7 @@ export default function UserProfileIdentityDataReview() {
       {/* second row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userIdentityData?.identity_end_date)}
           label="تاريخ الانتهاء"
           value={userIdentityData?.identity_end_date ?? ""}
           type="date"

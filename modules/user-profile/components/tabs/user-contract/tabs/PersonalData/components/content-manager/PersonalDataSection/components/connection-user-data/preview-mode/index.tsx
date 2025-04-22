@@ -8,14 +8,14 @@ export default function UserProfileConnectionDataReview() {
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userConnectionData?.phone)}
           label="رقم الجوال"
           value={userConnectionData?.phone ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={true}
+          valid={Boolean(userConnectionData?.email)}
           label="البريد الالكتروني"
           value={userConnectionData?.email ?? ""}
         />
