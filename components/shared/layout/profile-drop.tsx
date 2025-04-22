@@ -39,7 +39,7 @@ const ProfileDrop = () => {
       )}
       <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
-          <Button className="px-5 bg-[transparent] hover:bg-[transparent] rotate-svg-child">
+          <Button className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none">
             {user?.name}
             <ChevronDown />
           </Button>
