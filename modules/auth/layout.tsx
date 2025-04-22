@@ -12,7 +12,6 @@ export default function AuthLayout({
   children: React.ReactNode;
   mainLogo?: string;
 }>) {
-  console.log({ mainLogo });
   const t = useTranslations();
   return (
     <main className="min-h-screen flex flex-col bg-[#18003A] relative overflow-hidden !dark text-foreground">
