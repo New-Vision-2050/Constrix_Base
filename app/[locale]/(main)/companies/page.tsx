@@ -7,10 +7,7 @@ import React, { useState } from "react";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { Button } from "@/components/ui/button";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
-import {
-  companiesFormConfig,
-  GetCompaniesFormConfig,
-} from "@/modules/form-builder/configs/companiesFormConfig";
+import { companiesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
@@ -60,7 +57,7 @@ const CompaniesPage = () => {
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
-              config={GetCompaniesFormConfig()}
+              config={companiesFormConfig}
               trigger={<Button>انشاء شركة</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
