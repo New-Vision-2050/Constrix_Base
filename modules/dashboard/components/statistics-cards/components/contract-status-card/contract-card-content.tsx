@@ -33,6 +33,14 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
     }
   }, [contractData]);
 
+  const showPercentage = !isNaN(passedPercentage as number);
+  const startPercentage = showPercentage ? passedPercentage?.toFixed(1) : "-";
+  const endPercentage = showPercentage
+    ? (100 - (passedPercentage ?? 0))?.toFixed(1)
+    : "-";
+
+  console.log("showPercentage", showPercentage);
+
   // declare and define
   return (
     <div className="flex flex-col gap-4 mt-4">
@@ -46,10 +54,7 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
             <span className="text-sm">بداية العقد</span>
           </div>
           <span className="text-lg font-semibold ">
-            {passedPercentage &&
-              `${(isNaN(passedPercentage) ? 0 : passedPercentage)?.toFixed(
-                1
-              )} %`}
+            {`${startPercentage} %`}
           </span>
           <span className="text-sm ">{contractData?.start_date}</span>
         </div>
@@ -68,11 +73,7 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
             </div>
           </div>
           <span className="text-lg font-semibold">
-            {passedPercentage &&
-              `${(isNaN(100 - (passedPercentage ?? 0))
-                ? 0
-                : 100 - (passedPercentage ?? 0)
-              )?.toFixed(1)} %`}
+            {`${endPercentage} %`}
           </span>
           <span className="text-sm">{contractData?.end_date}</span>
         </div>

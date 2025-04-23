@@ -14,6 +14,7 @@ import { useState } from "react";
 
 export function InvalidMessage() {
   // declare and define component state and variables
+  const email = useFormStore?.getState().getValue("companies-form", "email");
   const [loading, setLoading] = useState(false);
   const [isOpen, handleOpen, handleClose] = useModal();
   const { closeSheet } = useSheetForm({
@@ -66,9 +67,7 @@ export function InvalidMessage() {
             <div className="flex flex-col">
               <p className="font-bold text-lg">
                 تأكيد استرجاع البيانات المرتبطة بالبريد الإلكتروني (
-                <span className="text-primary">
-                  {"mohamedkhaled@gmail.com"}
-                </span>
+                <span className="text-primary">{email}</span>
                 )؟
               </p>
             </div>
