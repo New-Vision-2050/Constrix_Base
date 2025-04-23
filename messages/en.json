@@ -138,7 +138,10 @@
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
-    "Logout": "Logout"
+    "Logout": "Logout",
+    "profile": "My account",
+    "changeMail": "Change email",
+    "changePassword": "Change password"
   },
   "FormBuilder": {
     "Fields": {

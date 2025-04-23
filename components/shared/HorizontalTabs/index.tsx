@@ -6,9 +6,10 @@ import TabsTriggerList from "./TabsTriggerList";
 import TabsContentList from "./TabsContentList";
 
 type PropsT = {
+  defaultValue?: string;
   list: SystemTab[];
 };
-export default function HorizontalTabs({ list }: PropsT) {
+export default function HorizontalTabs({ list, defaultValue }: PropsT) {
   // declare and define component state and variables.
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -16,7 +17,7 @@ export default function HorizontalTabs({ list }: PropsT) {
   // return component ui.
   return (
     <Tabs
-      defaultValue={list?.[0]?.id ?? "_"}
+      defaultValue={defaultValue ?? list?.[0]?.id ?? "_"}
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full`}
     >

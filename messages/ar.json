@@ -138,7 +138,10 @@
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
-    "Logout": "تسجيل الخروج"
+    "Logout": "تسجيل الخروج",
+    "profile": "حسابي",
+    "changeMail": "تغيير البريد الالكتروني",
+    "changePassword": "تغيير كلمة المرور"
   },
   "FormBuilder": {
     "Fields": {

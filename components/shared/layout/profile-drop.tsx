@@ -13,12 +13,40 @@ import { deleteCookie } from "cookies-next"; // Ensure you have this package ins
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
+import { useRouter } from "next/navigation";
+import UserIcon from "@/public/icons/user";
 
 const ProfileDrop = () => {
   const t = useTranslations("Header");
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
 
   const menuItems = [
+    {
+      label: t("profile"),
+      icon: <UserIcon />,
+      func: () => {
+        router?.push(`/user-profile`);
+      },
+    },
+    {
+      label: t("changeMail"),
+      icon: <UserIcon />,
+      func: () => {
+        router?.push(
+          `/user-profile?tab1=edit-mode-tabs-contract&tab2=user-contract-tab-personal-data`
+        );
+      },
+    },
+    {
+      label: t("changePassword"),
+      icon: <UserIcon />,
+      func: () => {
+        router?.push(
+          `/user-profile?tab1=edit-mode-tabs-logs&tab2=user-actions-tabs-user-status&verticalSection=user-status-password`
+        );
+      },
+    },
     {
       label: t("Logout"),
       icon: <LogoutIcon />,

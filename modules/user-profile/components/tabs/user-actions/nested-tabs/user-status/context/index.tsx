@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 // import packages
 import { createContext, useContext, useState } from "react";
 import { userStatusDataSections } from "../UserStatusDataSections";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 // declare context types
 type UserStatusCxtType = {
@@ -35,10 +36,23 @@ export const UserStatusCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    userStatusDataSections[0]
-  );
+  const { verticalSection } = useUserProfileCxt();
+  const defaultSection =
+    verticalSection === null
+      ? userStatusDataSections[0]
+      : userStatusDataSections?.filter(
+          (ele) => ele.id === verticalSection
+        )?.[0];
 
+  const [activeSection, setActiveSection] =
+    useState<UserProfileNestedTab>(defaultSection);
+
+  console.log(
+    "verticalSection",
+    verticalSection,
+    defaultSection,
+    activeSection
+  );
   // ** declare and define component helper methods
   const handleChangeActiveSection = (section: UserProfileNestedTab) =>
     setActiveSection(section);
