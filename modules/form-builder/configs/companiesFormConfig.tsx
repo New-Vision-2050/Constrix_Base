@@ -405,7 +405,7 @@ export function GetCompaniesFormConfig(): FormConfig {
     },
     editDataTransformer: (data) => {
         if (data.company_field) {
-            data.company_field_id = (data?.company_field || []).map(item => item.id);
+            data.company_field_id = (data?.company_field || []).map((item: { id: string|Number }) => item.id);
         }
       return data;
     },
