@@ -47,6 +47,7 @@ export interface DynamicDropdownConfig {
   url: string;
   valueField: string;
   labelField: string;
+  setFirstAsDefault?: boolean; // Whether to automatically select the first option when no value is selected
   dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>; // The field/column key this dropdown depends on
   // dependsOn can be:
   // 1. A string (for backward compatibility)
