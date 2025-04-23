@@ -4,7 +4,7 @@ import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
-import {companiesFormConfig} from "@/modules/form-builder";
+import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 
 // Define types for the company data
 interface CompanyData {
@@ -37,20 +37,20 @@ export const CompaniesConfig = () => {
         label: t("Companies.Email"),
         sortable: true,
       },
-        {
-            key: "company_field",
-            label: "النشاط",
-            render: (value: any[] | null) => (
-                <div className="line-clamp-3">
-                    {value &&
-                        value.map((field) => (
-                            <p key={field.id} className="line-clamp-1 h-5">
-                                {field.name}
-                            </p>
-                        ))}
-                </div>
-            )
-        },
+      {
+        key: "company_field",
+        label: "النشاط",
+        render: (value: any[] | null) => (
+          <div className="line-clamp-3">
+            {value &&
+              value.map((field) => (
+                <p key={field.id} className="line-clamp-1 h-5">
+                  {field.name}
+                </p>
+              ))}
+          </div>
+        ),
+      },
       {
         key: "general_manager.name",
         label: t("Companies.Manager"),
@@ -62,7 +62,7 @@ export const CompaniesConfig = () => {
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
-       {
+      {
         key: "is_active",
         label: t("Companies.Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
@@ -72,7 +72,9 @@ export const CompaniesConfig = () => {
       {
         key: "id",
         label: t("Companies.Actions"),
-        render: (_: unknown, row: CompanyData) => <Execution id={row.id} formConfig={companiesFormConfig} />,
+        render: (_: unknown, row: CompanyData) => (
+          <Execution id={row.id} formConfig={GetCompaniesFormConfig()} />
+        ),
       },
     ],
     allSearchedFields: [

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"; // Adjust import path as needed
 import { Checkbox } from "@/modules/table/components/ui/checkbox";
 import { changeLocalTimeConfig } from "../configs/changeLocalTimeConfig";
 import DialogFormBuilder from "./DialogFormBuilder";
+import { useFormStore } from "../hooks/useFormStore";
 
 interface TimeZoneCheckboxProps {
   field: any; // You might want to specify a more specific type based on your form library
@@ -16,7 +17,22 @@ export const TimeZoneCheckbox: React.FC<TimeZoneCheckboxProps> = ({
 }) => {
   return (
     <div className="flex items-center gap-2">
-      <Checkbox checked={value} onCheckedChange={(b: boolean) => onChange(b)} />
+      <Checkbox
+        checked={value}
+        onCheckedChange={(b: boolean) => {
+          if (b) {
+            const countryId = useFormStore
+              ?.getState()
+              .getValue("change-local-time-form", "country-id");
+
+            if (countryId)
+              useFormStore.getState().setValues("companies-form", {
+                country_id: countryId,
+              });
+          }
+          onChange(b);
+        }}
+      />
       <div className="flex items-center gap-1">
         <p className="text-sm">لتأكيد تغيير المنطقة الزمنية،</p>
         <DialogFormBuilder
