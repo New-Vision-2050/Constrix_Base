@@ -47,7 +47,7 @@ const SingleTabTrigger = ({ tab }: { tab: SystemTab }) => {
       value={tab.id}
       className="px-4 py-2 text-gray-600 rounded-none 
                  data-[state=active]:border-b-2 data-[state=active]:border-primary 
-                 data-[state=active]:text-white"
+                 data-[state=active]:text-foreground"
     >
       {tab.title}
     </TabsTrigger>

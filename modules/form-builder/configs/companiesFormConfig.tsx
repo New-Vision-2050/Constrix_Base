@@ -79,6 +79,10 @@ export const companiesFormConfig: FormConfig = {
           placeholder: "برجاء إدخال الاسم التجاري",
           validation: [
             {
+              type: "required",
+              message: "الاسم التجاري مطلوب",
+            },
+            {
               type: "apiValidation",
               message: "This username is already taken",
               apiConfig: {
@@ -99,6 +103,10 @@ export const companiesFormConfig: FormConfig = {
           postfix: "constrix.com",
           containerClassName: "rtl:flex-row-reverse",
           validation: [
+            {
+              type: "required",
+              message: "الاسم المختصر مطلوب",
+            },
             {
               type: "apiValidation",
               message: "This username is already taken",

@@ -158,7 +158,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className="space-y-4 w-full bg-sidebar rounded-lg "
+        className="space-y-4 w-full bg-sidebar rounded-lg shadow-md"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}

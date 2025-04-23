@@ -66,7 +66,7 @@ const Execution = ({
     <>
       <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
-          <Button className="px-5 bg-[#8785A2] hover:bg-[#8785A2] rotate-svg-child">
+          <Button className="px-5 bg-[#EAE8FF] hover:bg-[#EAE8FF]  dark:bg-[#8785A2] dark:hover:bg-[#8785A2] text-foreground rotate-svg-child">
             {t("Companies.Actions")}
             <ChevronDown />
           </Button>

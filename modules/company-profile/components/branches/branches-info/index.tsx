@@ -12,7 +12,7 @@ const BranchesInfo = ({ branches }: { branches: Branch[] }) => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl">الفروع</h3>
         <SheetFormBuilder
-          config={addNewBranchFormConfig()}
+          config={addNewBranchFormConfig(branches)}
           trigger={<Button>اضافة فرع</Button>}
         />{" "}
       </div>

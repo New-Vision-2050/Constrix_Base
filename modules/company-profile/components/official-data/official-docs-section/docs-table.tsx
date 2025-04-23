@@ -72,7 +72,7 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
       <DeleteConfirmationDialog
         deleteUrl={`${baseURL}/companies/company-profile/official-document/${
           doc.id
-        }${id && `?branch_id=${id}`}`}
+        }${!!id ? `?branch_id=${id}` : ""}`}
         onClose={handleCloseDelete}
         open={isOpenDelete}
         onSuccess={() => {

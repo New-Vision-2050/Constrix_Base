@@ -149,6 +149,8 @@ export const NationalAddressFormConfig = (
                 formId={formId}
                 lat={companyAddress.country_lat}
                 long={companyAddress.country_long}
+                containerClassName='col-span-2'
+                
               />
             ),
           },
