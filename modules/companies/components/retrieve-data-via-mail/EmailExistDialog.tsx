@@ -54,7 +54,7 @@ export function InvalidMessage() {
         </span>
       </p>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] md:min-w-[25rem] gap-8 min-h-[22rem]">
           <DialogTitle className="flex justify-center items-center">
             <InfoIcon
               additionClass="text-primary text-lg"

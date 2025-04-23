@@ -109,8 +109,7 @@ export const changeLocalTimeConfig: FormConfig = {
               message: "ادخل اللغة",
             },
           ],
-        },
-
+        }
       ],
     },
   ],
