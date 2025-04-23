@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest) {
 
   const res = intlMiddleware(req);
 
-  if (!existingCompanyCookie && host) {
+  if ((!existingCompanyCookie && host) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
         headers: {
