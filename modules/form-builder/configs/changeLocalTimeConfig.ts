@@ -50,6 +50,7 @@ export const changeLocalTimeConfig: FormConfig = {
             labelField: "time_zone",
             searchParam: "name",
             paginationEnabled: true,
+            setFirstAsDefault: true,
             pageParam: "page",
             limitParam: "per_page",
             itemsPerPage: 10,
@@ -73,6 +74,7 @@ export const changeLocalTimeConfig: FormConfig = {
           dynamicOptions: {
             url: `${baseURL}/currencies`,
             valueField: "id",
+            setFirstAsDefault: true,
             labelField: "short_name",
             searchParam: "short_name",
             paginationEnabled: true,
@@ -105,6 +107,7 @@ export const changeLocalTimeConfig: FormConfig = {
             pageParam: "page",
             limitParam: "per_page",
             itemsPerPage: 10,
+            setFirstAsDefault: true,
             totalCountHeader: "X-Total-Count",
             dependsOn: "country-id",
             filterParam: "country_id",
