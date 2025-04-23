@@ -148,7 +148,7 @@ export function AppSidebar({
       collapsible="icon"
       side={sidebarSide}
       {...props}
-      className="text-white bg-sidebar"
+      className=" bg-sidebar"
     >
       <SidebarHeader className=" pt-10 ">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
