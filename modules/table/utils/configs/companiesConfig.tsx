@@ -12,7 +12,6 @@ interface CompanyData {
   name: string;
   user_name: string;
   email: string;
-  company_type: string;
   general_manager_name: string;
   complete_data: 0 | 1; // 0 = pending, 1 = success
   is_active: "active" | "inActive";
@@ -38,12 +37,6 @@ export const CompaniesConfig = () => {
         label: t("Companies.Email"),
         sortable: true,
       },
-        {
-            key: "company_type",
-            label: t("Companies.CompanyType"),
-            sortable: true,
-            searchable: true,
-        },
         {
             key: "company_field",
             label: "النشاط",
@@ -90,24 +83,6 @@ export const CompaniesConfig = () => {
           placeholder: t("Companies.CountryFilter"),
           dynamicDropdown: {
             url: `${baseURL}/countries`,
-            valueField: "id",
-            labelField: "name",
-            paginationEnabled: true,
-            itemsPerPage: 10,
-            searchParam: "name",
-            pageParam: "page",
-            limitParam: "per_page",
-            totalCountHeader: "x-total-count",
-          },
-        },
-      },
-      {
-        key: "company_type_id",
-        searchType: {
-          type: "dropdown",
-          placeholder: t("Companies.TypeFilter"),
-          dynamicDropdown: {
-            url: `${baseURL}/company_types`,
             valueField: "id",
             labelField: "name",
             paginationEnabled: true,

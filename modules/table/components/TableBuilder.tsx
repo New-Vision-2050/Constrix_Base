@@ -135,7 +135,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     // Set selection enabled state based on config
     setSelectionEnabled(enableRowSelection);
   }, [enableRowSelection, setSelectionEnabled]);
-  const searchableColumns = columns.filter((col: ColumnConfig) => col.searchable);
+  const searchableColumns = columns;
   const hasSearchableColumns = searchableColumns.length > 0;
   const allSearchedFields = config?.allSearchedFields;
 
