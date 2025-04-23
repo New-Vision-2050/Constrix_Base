@@ -77,10 +77,11 @@ export function GetCompaniesFormConfig(): FormConfig {
             label: "الاسم التجاري",
             type: "text",
             placeholder: "برجاء إدخال الاسم التجاري",
+            required:true,
             validation: [
               {
                 type: "apiValidation",
-                message: "This username is already taken",
+                message: "برجاء إدخال الاسم التجاري",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -98,18 +99,22 @@ export function GetCompaniesFormConfig(): FormConfig {
             placeholder: "برجاء إدخال الاسم المختصر",
             postfix: "constrix.com",
             containerClassName: "rtl:flex-row-reverse",
+              required:true,
             validation: [
               {
                 type: "apiValidation",
-                message: "This username is already taken",
+                message: "برجاء إدخال الاسم المختصر",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
                   debounceMs: 500,
                   paramName: "user_name",
                   successCondition: (response) => response.payload.status === 1,
-                },
-              },
+                }},
+                {
+                    type: "required",
+                    message: "اختر مسؤول الدعم",
+                }
             ],
           },
           {
@@ -132,7 +137,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             validation: [
               {
                 type: "required",
-                message: "مسؤول الدعم",
+                message: "اختر مسؤول الدعم",
               },
             ],
           },
