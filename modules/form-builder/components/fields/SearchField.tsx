@@ -39,9 +39,10 @@ const SearchField: React.FC<SearchFieldProps> = ({
           dependencies={dependencyValues}
           placeholder={field.placeholder}
           isMulti={field.isMulti}
+          isDisabled={field.disabled}
         />
       </div>
-      
+
       {/* Error message */}
       {!!error && touched && (
         <div className="text-destructive text-sm mt-1">
