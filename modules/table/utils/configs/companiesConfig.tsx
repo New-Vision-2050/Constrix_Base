@@ -33,7 +33,7 @@ export const CompaniesConfig = () => {
         render: (_: unknown, row: CompanyData) => <Company row={row} />,
       },
       {
-        key: "general_manager.email",
+        key: "email",
         label: t("Companies.Email"),
         sortable: true,
       },
