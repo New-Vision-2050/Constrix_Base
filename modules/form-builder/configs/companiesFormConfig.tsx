@@ -4,10 +4,6 @@ import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
-import useTimeZone from "@/modules/companies/hooks/useTimeZone";
-import { useEffect, useState } from "react";
-import useLanguagesData from "@/modules/companies/hooks/useLanguagesData";
-import useCurrenciesData from "@/modules/companies/hooks/useCurrencies";
 
 export const companiesFormConfig: FormConfig = {
   formId: "companies-form",
@@ -416,34 +412,7 @@ export const companiesFormConfig: FormConfig = {
 };
 
 export function GetCompaniesFormConfig() {
-  // declare and define component states and vars
-  const [countryId, setCountryId] = useState<string>();
-  const { data: timezones } = useTimeZone(countryId);
-  const { data: languages } = useLanguagesData(countryId);
-  const { data: currencies } = useCurrenciesData(countryId);
 
-  useEffect(() => {
-    if (timezones) {
-      useFormStore.getState().setValues("change-local-time-form", {
-        "time-zone": timezones?.[0]?.zoneName,
-      });
-    }
-    // currency
-    if (languages) {
-      useFormStore.getState().setValues("change-local-time-form", {
-        language: languages?.[0]?.id,
-      });
-    }
-
-    // currency
-    if (currencies) {
-      useFormStore.getState().setValues("change-local-time-form", {
-        currency: currencies?.[0]?.id,
-      });
-    }
-  }, [timezones, languages, currencies]);
-
-  console.log("CountryIID::", countryId, timezones);
   return {
     formId: "companies-form",
     title: "اضافة شركة جديدة",
@@ -474,7 +443,7 @@ export function GetCompaniesFormConfig() {
               totalCountHeader: "X-Total-Count",
             },
             onChange: (newVal, values) => {
-              setCountryId(newVal as string);
+              // setCountryId(newVal as string);
               useFormStore.getState().setValues("change-local-time-form", {
                 "country-id": newVal,
               });

@@ -54,6 +54,8 @@ export const changeLocalTimeConfig: FormConfig = {
             limitParam: "per_page",
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
+            dependsOn: "country-id",
+            filterParam: "country_id",
           },
           validation: [
             {
@@ -78,6 +80,8 @@ export const changeLocalTimeConfig: FormConfig = {
             limitParam: "per_page",
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
+            dependsOn: "country-id",
+            filterParam: "country_id",
           },
           validation: [
             {
@@ -102,6 +106,8 @@ export const changeLocalTimeConfig: FormConfig = {
             limitParam: "per_page",
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
+            dependsOn: "country-id",
+            filterParam: "country_id",
           },
           validation: [
             {
@@ -109,25 +115,25 @@ export const changeLocalTimeConfig: FormConfig = {
               message: "ادخل اللغة",
             },
           ],
-        }
+        },
       ],
     },
   ],
+  isEditMode: true,
   submitButtonText: "حفظ",
   cancelButtonText: "Cancel",
   showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,
-  resetOnSuccess: true,
+  resetOnSuccess: false,
   showCancelButton: false,
   showBackButton: false,
 
   onSubmit: async (values) => {
-    console.log('Form submitted with values:', values);
+    console.log("Form submitted with values:", values);
     const formStore = useFormStore.getState();
-    formStore.setValue('companies-form', 'local-time', values);
-        return { success: true };
-
+    formStore.setValue("companies-form", "local-time", values);
+    return { success: true };
   },
 
   // Example onSuccess handler

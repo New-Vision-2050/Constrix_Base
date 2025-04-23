@@ -9,8 +9,8 @@ type ResponseT = {
 
 export default async function fetchCurrencies(countryId?: string) {
   const url = Boolean(countryId)
-    ? `/countries/currencies?country_id=${countryId}`
-    : `/countries/currencies`;
+    ? `/currencies?country_id=${countryId}`
+    : `/currencies`;
 
   const res = await apiClient.get<ResponseT>(url);
 
