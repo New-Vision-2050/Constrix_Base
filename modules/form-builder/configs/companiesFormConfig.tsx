@@ -62,7 +62,7 @@ export const companiesFormConfig: FormConfig = {
             paginationEnabled: true,
             pageParam: "page",
             limitParam: "per_page",
-            itemsPerPage: 10,
+            itemsPerPage: 20,
             totalCountHeader: "X-Total-Count",
           },
           validation: [
@@ -84,7 +84,7 @@ export const companiesFormConfig: FormConfig = {
             },
             {
               type: "apiValidation",
-              message: "This username is already taken",
+              message: "الاسم يجب ان يكون باللغة العربية ولا يتخلله رموز",
               apiConfig: {
                 url: `${baseURL}/companies/validated`,
                 method: "POST",
@@ -127,7 +127,7 @@ export const companiesFormConfig: FormConfig = {
           placeholder: "اختر مسؤول الدعم",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/users`,
+            url: `${baseURL}/users/admin-users`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
@@ -211,7 +211,7 @@ export const companiesFormConfig: FormConfig = {
           validation: [
             {
               type: "required",
-              message: "الشركة",
+              message: "اختر الشركة",
             },
           ],
         },

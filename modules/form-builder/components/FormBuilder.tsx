@@ -89,7 +89,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
 
     // If no ID is provided, we can't load data
     if (!targetId) {
-      setEditError("No record ID provided for editing");
+      //setEditError("No record ID provided for editing");
       return;
     }
 
