@@ -13,7 +13,7 @@ export default function QualificationsList({ items }: PropsT) {
     return (
       <NoDataFounded
         title="لا يوجد بيانات"
-        subTitle="لا يوجد بيانات تخص الأقارب للمستخدم قم باضافة قريب"
+        subTitle="لا يوجد بيانات تخص مؤهلات المستخدم قم باضافة مؤهل"
       />
     );
 

@@ -34,7 +34,6 @@ type UserProfileCxtType = {
   userPersonalData: PersonalUserDataSectionT | undefined;
   handleRefetchUserPersonalData: () => void;
 
-  //
   tab1: string | null;
   tab2: string | null;
   verticalSection: string | null;

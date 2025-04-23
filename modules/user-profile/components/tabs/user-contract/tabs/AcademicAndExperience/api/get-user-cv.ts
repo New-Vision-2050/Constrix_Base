@@ -1,8 +1,9 @@
 import { apiClient } from "@/config/axios-config";
+import { MediaFile } from "@/types/media-file";
 
 export type UserCVFilesT = {
   id: string;
-  files: string;
+  files:MediaFile;
 };
 
 type ResponseT = {
