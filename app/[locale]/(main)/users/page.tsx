@@ -2,7 +2,6 @@
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { Button } from "@/components/ui/button";
 import { SheetFormBuilder } from "@/modules/form-builder";
-import ExportButton from "@/modules/table/components/ExportButton";
 import TableBuilder from "@/modules/table/components/TableBuilder";
 import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
 import { statisticsConfig } from "@/modules/users/components/statistics-config";

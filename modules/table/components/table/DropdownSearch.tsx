@@ -17,7 +17,7 @@ interface DropdownSearchProps {
   dependencies?: Record<string, string | string[]>;
   placeholder?: string;
   isMulti?: boolean;
-  isDisabled:boolean|undefined
+  isDisabled?: boolean;
 }
 const DropdownSearch: React.FC<DropdownSearchProps> = ({
   columnKey,
