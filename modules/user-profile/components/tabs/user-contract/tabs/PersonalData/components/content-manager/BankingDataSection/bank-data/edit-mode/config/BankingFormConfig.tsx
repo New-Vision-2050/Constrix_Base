@@ -13,7 +13,8 @@ export const BankingDataFormConfig = (props: PropsT) => {
   const { bank, onSuccess } = props ?? {};
   const formType = bank ? "Edit" : "Create";
   const { handleRefreshBankingData } = useUserBankingDataCxt();
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus, handleRefetchProfileData } =
+    useUserProfileCxt();
 
   // form config
   const BankingFormConfig: FormConfig = {
@@ -172,6 +173,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchProfileData();
       handleRefreshBankingData();
       handleRefetchDataStatus();
       onSuccess?.();

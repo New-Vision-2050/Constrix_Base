@@ -1,5 +1,6 @@
 import { UserCompany } from "@/modules/dashboard/types/user-company";
 import { Country } from "@/modules/settings/types/Country";
+import { BankAccount } from "./bank-account";
 
 // Define the user profile data type
 export interface UserProfileData {
@@ -25,6 +26,7 @@ export interface UserProfileData {
   company?: UserCompany;
   global_id?: string;
   user_id?: string;
+  bank_account?: BankAccount;
 }
 
 // Define the API response type

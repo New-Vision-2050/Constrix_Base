@@ -20,6 +20,7 @@ import useUserProfileData from "../hooks/useUserProfileData";
 type UserProfileCxtType = {
   isLoading: boolean;
   user: UserProfileData | undefined;
+  handleRefetchProfileData: () => void;
   handleUpdateImage: (imgUrl: string) => void;
 
   // data status
@@ -36,7 +37,7 @@ type UserProfileCxtType = {
   //
   tab1: string | null;
   tab2: string | null;
-  verticalSection: string | null
+  verticalSection: string | null;
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -63,9 +64,11 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   const tab2 = searchParams.get("tab2");
   const verticalSection = searchParams.get("verticalSection");
   const [user, setUser] = useState<UserProfileData>();
-  const { data: _user, isLoading } = useUserProfileData(
-    userId !== null ? userId : undefined
-  );
+  const {
+    data: _user,
+    isLoading,
+    refetch: refetchProfileData,
+  } = useUserProfileData(userId !== null ? userId : undefined);
   const { data: userDataStatus, refetch: refetchDataStatus } =
     useProfileDataStatus((userId || _user?.user_id) ?? "");
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
@@ -80,6 +83,10 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   }, [_user]);
 
   // ** declare and define component helper methods
+  const handleRefetchProfileData = () => {
+    refetchProfileData();
+  };
+
   const handleRefetchUserPersonalData = () => {
     refreshUserPersonalData();
   };
@@ -100,6 +107,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
         user,
         isLoading,
         handleUpdateImage,
+        handleRefetchProfileData,
 
         // user data status
         userDataStatus,
@@ -115,7 +123,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
         // external routes
         tab1,
         tab2,
-        verticalSection
+        verticalSection,
       }}
     >
       {children}

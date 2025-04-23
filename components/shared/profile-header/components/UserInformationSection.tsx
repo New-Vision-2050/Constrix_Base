@@ -36,7 +36,7 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
             <BackpackIcon />
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{t("jobTitle")}</span>
-              <span className="font-medium">{job_title ?? t("jobTitle")}</span>
+              <span className="font-medium dark:text-white">{job_title ?? t("jobTitle")}</span>
             </div>
           </div>
         )}
@@ -45,7 +45,7 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
             <MapPinIcon />
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{t("address")}</span>
-              <span className="font-medium">{job_title ?? t("address")}</span>
+              <span className="font-medium dark:text-white">{job_title ?? t("address")}</span>
             </div>
           </div>
         )}
@@ -56,7 +56,7 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
               <span className="text-sm font-semibold">
                 {t("appointmentDate")}
               </span>
-              <span className="font-medium">
+              <span className="font-medium dark:text-white">
                 {date_appointment ?? t("appointmentDate")}
               </span>
             </div>

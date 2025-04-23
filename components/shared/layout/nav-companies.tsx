@@ -33,8 +33,6 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
     router.push(url);
   };
 
-  console.log("projects", projects);
-
   return (
     <SidebarGroup>
       <SidebarMenu>
