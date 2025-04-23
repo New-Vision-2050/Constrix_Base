@@ -8,11 +8,13 @@ type AvatarGroupProps = {
 
 const getInitials = (name: string | null | undefined) => {
   if (!name) return "";
-  const words = name.trim().split(" ");
-  const firstLetter = words[0]?.[0] || "";
-  const lastLetter = words.length > 1 ? words[words.length - 1]?.[0] : "";
-  return (firstLetter +" "+ lastLetter).toUpperCase();
+    const parts = name.toUpperCase().trim().split(/\s+/);
+    if(parts.length > 1) {
+        return parts[0][0] + '\u200C' + parts[parts.length-1][0];
+    }
+    return parts[0][0];
 };
+
 
 export const AvatarGroup = ({
   fullName,
