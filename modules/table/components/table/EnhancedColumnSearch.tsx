@@ -87,6 +87,7 @@ const EnhancedColumnSearch: React.FC<EnhancedColumnSearchProps> = ({
                 dynamicConfig={searchType.dynamicDropdown}
                 dependencies={dependencies}
                 placeholder={searchType.placeholder || `Search ${column.label}...`}
+                isDisabled={false}
               />
             );
           

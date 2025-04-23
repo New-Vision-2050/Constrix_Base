@@ -65,6 +65,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Add an effect to trigger search when selectedSearchColumns changes
   useEffect(() => {
+
     // Skip the initial render
     if (selectedSearchColumns.length > 0) {
       console.log("Selected search columns changed, triggering search with fields:", selectedSearchColumns);

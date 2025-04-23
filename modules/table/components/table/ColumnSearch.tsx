@@ -134,6 +134,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                     searchType.placeholder ||
                     `Filter by ${column.label.toLowerCase()}`
                   }
+                  isDisabled={false}
                 />
               );
 
