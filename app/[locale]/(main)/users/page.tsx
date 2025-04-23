@@ -11,7 +11,7 @@ import { companyUserFormConfig } from "@/modules/form-builder/configs/companyUse
 
 const UsersPage = () => {
   const config = UsersConfig();
-  
+
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
@@ -26,7 +26,6 @@ const UsersPage = () => {
                 console.log("Form submitted successfully:", values);
               }}
             />{" "}
-            <ExportButton data={["omar"]} />
           </div>
         }
       />
