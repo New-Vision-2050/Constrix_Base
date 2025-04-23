@@ -3,11 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { apiClient } from "@/config/axios-config";
 import { useModal } from "@/hooks/use-modal";
-import {
-  companiesFormConfig,
-  useFormStore,
-  useSheetForm,
-} from "@/modules/form-builder";
+import { useFormStore, useSheetForm } from "@/modules/form-builder";
+import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useState } from "react";
@@ -18,7 +15,7 @@ export function InvalidMessage() {
   const [loading, setLoading] = useState(false);
   const [isOpen, handleOpen, handleClose] = useModal();
   const { closeSheet } = useSheetForm({
-    config: companiesFormConfig,
+    config: GetCompaniesFormConfig(),
   });
 
   const handleConfirmUserData = async () => {
