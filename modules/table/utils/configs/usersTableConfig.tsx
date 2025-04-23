@@ -99,10 +99,10 @@ export const UsersConfig = () => {
                   className="flex items-center gap-x-1"
                 >
                   {Array.from({ length: 3 }).map((_, index) => {
+                      console.log(company.roles)
                     // Find role matching index + 1
                     const role =
-                      company.roles.find((r) => r.role === index + 1) || null;
-
+                      company.roles.find((r) => Number(r.role) === index + 1) || null;
                     return role ? (
                       <span
                         key={index}

@@ -96,7 +96,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
           variant="outline"
           size="sm"
           className="flex items-center gap-1"
-          disabled={disabled || loading || !hasSelectedRows}
+          disabled={disabled || loading }
         >
           <Download className="h-4 w-4 mr-1" />
           {t('Table.Export')}

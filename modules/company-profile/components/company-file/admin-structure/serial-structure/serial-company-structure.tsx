@@ -15,7 +15,6 @@ const SerialCompanyStructure = () => {
             <Plus />
             إضافة حقل آخر
           </Button>
-          <ExportButton data={["omar"]} />
         </div>
       </div>
     </div>
