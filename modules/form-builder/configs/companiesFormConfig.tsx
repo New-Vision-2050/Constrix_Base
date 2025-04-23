@@ -404,9 +404,9 @@ export function GetCompaniesFormConfig(): FormConfig {
       },
     },
     editDataTransformer: (data) => {
-      if (!Array.isArray(data.company_field_id)) {
-        data.company_field_id = data?.company_field_id?.split(",");
-      }
+        if (data.company_field) {
+            data.company_field_id = (data?.company_field || []).map(item => item.id);
+        }
       return data;
     },
   };
