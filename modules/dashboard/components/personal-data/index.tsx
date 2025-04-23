@@ -2,13 +2,13 @@ import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
 import LoadingMenuData from "../LoadingMenuData";
 import { useEffect, useState } from "react";
-import { UserProfileData } from "../../types/user-profile-response";
+import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 
 type PropsT = {
   user: UserProfileData | undefined;
   isLoading: boolean;
 };
-export default function UserProfilePersonalData({user, isLoading}:PropsT) {
+export default function UserProfilePersonalData({ user, isLoading }: PropsT) {
   const [items, setItems] = useState<string[]>([]);
 
   // handle side effects
@@ -18,7 +18,7 @@ export default function UserProfilePersonalData({user, isLoading}:PropsT) {
         `الاسم: ${user.name}`,
         `حالة الموظف: ${"--"}`,
         `المهنة: ${user.job_title}`,
-        `الدور الوظيفي: ${user.Job_role}`,
+        `الدور الوظيفي: ${user.job_title}`,
         `التواصل: ${user.phone}`,
         `الرقم الاضافي: ${user.other_phone}`,
         `البريد الالكتروني: ${user.email}`,

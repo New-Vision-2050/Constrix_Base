@@ -1,26 +1,26 @@
 import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
-import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
+import { BankAccount } from "@/modules/user-profile/types/bank-account";
 
-
-const getBankingDataItems = (user?: UserProfileData): string[] => {
-  if (!user || !user?.bank_account) return [];
+const getBankingDataItems = (bank?: BankAccount): string[] => {
+  if (!bank) return [];
   return [
-    `اسم البنك: ${user?.bank_account?.bank_name ?? "-"}`,
-    `الحساب البنكي: ${user?.bank_account?.iban ?? "-"}`,
-    `عملة الحساب:  ${user?.bank_account?.currency_name ?? "-"}`,
+    `اسم البنك: ${bank?.bank_name ?? "-"}`,
+    `الحساب البنكي: ${bank?.iban ?? "-"}`,
+    `عملة الحساب:  ${bank?.currency_name ?? "-"}`,
   ];
 };
 
-
-export default function UserProfileBankingData() {
-  const { user } = useUserProfileCxt();
+export default function UserProfileBankingData({
+  bank,
+}: {
+  bank?: BankAccount;
+}) {
   return (
     <UserInformationCardLayout title="البيانات البنكية">
       <RegularList<string, "ProfessionalItemData">
         sourceName="ProfessionalItemData"
-        items={getBankingDataItems(user)}
+        items={getBankingDataItems(bank)}
         keyPrefix="user-profile-banking-data"
         ItemComponent={SigleItem}
       />

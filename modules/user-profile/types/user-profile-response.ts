@@ -27,6 +27,18 @@ export interface UserProfileData {
   global_id?: string;
   user_id?: string;
   bank_account?: BankAccount;
+  Job_role?: string;
+  address_attendance?: string;
+  border_number?: string;
+  branch?: string;
+  // companies:Company
+  data_status?: string;
+  identity?: string;
+  job_title_id?: string;
+  other_phone?: string;
+  passport?: string;
+  phone?: string;
+  residence?: string;
 }
 
 // Define the API response type
