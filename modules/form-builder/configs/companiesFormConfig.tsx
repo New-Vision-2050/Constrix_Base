@@ -35,10 +35,9 @@ export const companiesFormConfig: FormConfig = {
             totalCountHeader: "X-Total-Count",
           },
           onChange: (newVal, values) => {
-            console.log("neeeewValue", newVal, values);
-            // useFormStore.getState().setValues("change-local-time-form", {
-            //   "country-id": newVal,
-            // });
+            useFormStore.getState().setValues("change-local-time-form", {
+              "country-id": newVal,
+            });
           },
           validation: [
             {
@@ -412,8 +411,8 @@ export const companiesFormConfig: FormConfig = {
     },
   },
   editDataTransformer: (data) => {
-    if (!Array.isArray(data.company_field_id)) {
-      data.company_field_id = data?.company_field_id?.split(",");
+    if (data.company_field) {
+      data.company_field_id = (data?.company_field || []).map(item => item.id);
     }
     return data;
   },
