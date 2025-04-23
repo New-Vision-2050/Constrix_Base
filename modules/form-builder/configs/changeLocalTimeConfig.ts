@@ -58,7 +58,7 @@ export const changeLocalTimeConfig: FormConfig = {
           dynamicOptions: {
             url: `${baseURL}/time_zones`,
             valueField: "id",
-            labelField: "time_zone",
+            labelField: "zone_name",
             searchParam: "name",
             paginationEnabled: true,
             setFirstAsDefault: true,
