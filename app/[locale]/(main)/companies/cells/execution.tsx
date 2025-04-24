@@ -26,7 +26,7 @@ export interface DialogProps {
 export type MenuItem = {
   label: string;
   icon?: ReactNode;
-  action: string | ((row) => void);
+  action: string | ((row: { id: string; [key: string]: unknown }) => void);
   color?: string;
   // Optional component property for custom dialogs
   dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
@@ -58,7 +58,7 @@ const Execution = ({
   showEdit = true,
   showDelete = true,
 }: {
-  row: any;
+  row: { id: string; [key: string]: unknown };
   executions?: MenuItem[];
   formConfig?: FormConfig;
   buttonLabel?: string;
@@ -127,7 +127,7 @@ const Execution = ({
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
 
-  const handleMenuItemClick = (action: string | ((row) => void)) => {
+  const handleMenuItemClick = (action: string | ((row: { id: string; [key: string]: unknown }) => void)) => {
     if (typeof action === "function") {
       action(row);
     } else {
