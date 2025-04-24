@@ -154,9 +154,6 @@ export const companyUserFormConfig: FormConfig = {
             ],
         },
     ],
-    initialValues: {
-        job_title_id: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
-    },
     submitButtonText: "حفظ",
     cancelButtonText: "Cancel",
     showReset: false,
