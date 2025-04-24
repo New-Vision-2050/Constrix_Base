@@ -52,7 +52,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
-    selectedValue: value,
+    selectedValue: value
   });
 
   // Set first option as default when options change and no value is selected
@@ -62,13 +62,10 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       dataFetched &&
       options.length > 0 &&
       (!value || (isMulti && Array.isArray(value) && value.length === 0))
-    ) { onChange("")
-        setTimeout(function(){
+    ) {
             onChange(isMulti ? [options[0].value] : options[0].value);
-        },1000)
-
     }
-  }, [options, value, setFirstAsDefault, isMulti, onChange]);
+  }, [options, value, setFirstAsDefault, isMulti, onChange,dataFetched]);
 
   // Find the label(s) for the current value(s)
   const getSelectedLabels = () => {

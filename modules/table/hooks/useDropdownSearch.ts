@@ -381,6 +381,7 @@ export const useDropdownSearch = ({
     abortControllerRef.current = controller;
 
     setLoading(true);
+    setDataFetched(false)
     setError(null);
 
     try {

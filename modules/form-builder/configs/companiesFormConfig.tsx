@@ -36,7 +36,7 @@ export function GetCompaniesFormConfig(): FormConfig {
               totalCountHeader: "X-Total-Count",
             },
             onChange: (newVal, values) => {
-              useFormStore.getState().setValues("change-local-time-form", {
+              useFormStore.getState().setValue("companies-form",'local-time', {
                 "country-id": newVal,
               });
             },

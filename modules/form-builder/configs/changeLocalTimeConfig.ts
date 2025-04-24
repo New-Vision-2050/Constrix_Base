@@ -37,17 +37,6 @@ export const changeLocalTimeConfig: FormConfig = {
               message: "ادخل دولة الشركة",
             },
           ],
-          onChange(newValue) {
-            const changeCountry = useFormStore
-              ?.getState()
-              .getValue("companies-form", "change_local_time");
-
-            if (changeCountry) {
-              useFormStore.getState().setValues("companies-form", {
-                country_id: newValue,
-              });
-            }
-          },
         },
         {
           type: "select",
@@ -133,13 +122,13 @@ export const changeLocalTimeConfig: FormConfig = {
       ],
     },
   ],
-  isEditMode: true,
+  isEditMode: false,
   submitButtonText: "حفظ",
   cancelButtonText: "Cancel",
   showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,
-  resetOnSuccess: false,
+  resetOnSuccess: true,
   showCancelButton: false,
   showBackButton: false,
 
