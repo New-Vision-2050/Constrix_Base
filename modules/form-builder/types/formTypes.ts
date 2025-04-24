@@ -120,6 +120,7 @@ export interface FieldConfig {
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isMulti?: boolean; // Whether to enable multi-select functionality
+  isHijri?: boolean; // Whether to enable Hijri calendar works only with type=date
   postfix?: string; // Text to display after the input field
   defaultValue?: any; // Default value for the field
   dynamicRowOptions?: DynamicRowOptions; // Configuration for dynamic rows field

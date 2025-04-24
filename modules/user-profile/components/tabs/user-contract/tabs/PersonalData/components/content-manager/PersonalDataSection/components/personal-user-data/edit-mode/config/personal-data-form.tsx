@@ -84,6 +84,7 @@ export const PersonalDataFormConfig = () => {
             name: "birthdate_hijri",
             label: "تاريخ الهجري",
             type: "date",
+            isHijri: true,
             placeholder: "Birthdate Hijri",
             validation: [
               {
