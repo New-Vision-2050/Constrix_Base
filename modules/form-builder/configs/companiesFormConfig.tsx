@@ -103,7 +103,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             validation: [
               {
                 type: "apiValidation",
-                message: "الاسم المختصر يجب ان يكون بالغه الانجليزية ولا يتخلله رموز",
+                message: "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -238,9 +238,9 @@ export function GetCompaniesFormConfig(): FormConfig {
           },
           {
             name: "last_name",
-            label: "اسم المستخدم ألأحير",
+            label: "اسم المستخدم الأخير",
             type: "text",
-            placeholder: "اسم المستخدم ألأحير",
+            placeholder: "اسم المستخدم الأخير",
             required: true,
             validation: [
               {
@@ -307,7 +307,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             type: "select",
             name: "job_title_id",
             disabled: true,
-            defaultValue: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
+            defaultValue: "fda48196-2c8c-4cfa-8455-bcd1713266a7",
             label: "المسمى الوظيفي",
             placeholder: "اختر المسمى الوظيفي",
             required: true,
