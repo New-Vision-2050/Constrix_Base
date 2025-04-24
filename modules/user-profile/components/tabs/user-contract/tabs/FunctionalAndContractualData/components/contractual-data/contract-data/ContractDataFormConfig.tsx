@@ -182,6 +182,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             placeholder: "ارفاق العقد",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {

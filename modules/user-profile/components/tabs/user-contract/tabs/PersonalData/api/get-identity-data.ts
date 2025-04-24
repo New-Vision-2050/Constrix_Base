@@ -1,16 +1,13 @@
 import { apiClient } from "@/config/axios-config";
+import { MediaFile } from "@/types/media-file";
 
-type fileType = {
-  id: number;
-  url: string;
-};
 export type UserIdentityInformationT = {
   border_number: string;
   entry_number: string;
-  file_border_number: fileType;
-  file_entry_number: fileType;
-  file_identity: fileType;
-  file_passport: fileType;
+  file_border_number: MediaFile[];
+  file_entry_number: MediaFile[];
+  file_identity: MediaFile[];
+  file_passport: MediaFile[];
   identity: string;
   passport: string;
   passport_start_date: string;
@@ -24,7 +21,7 @@ export type UserIdentityInformationT = {
   work_permit: string;
   work_permit_start_date: string;
   work_permit_end_date: string;
-  file_work_permit: fileType;
+  file_work_permit: MediaFile[];
 };
 
 type ResponseT = {

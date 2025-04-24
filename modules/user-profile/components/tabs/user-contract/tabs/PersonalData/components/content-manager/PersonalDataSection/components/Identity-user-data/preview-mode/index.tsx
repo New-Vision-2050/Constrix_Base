@@ -37,11 +37,15 @@ export default function UserProfileIdentityDataReview() {
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={Boolean(userIdentityData?.file_entry_number?.url)}
+          valid={Boolean(userIdentityData?.file_identity?.[0]?.url)}
           label="ارفاق الهوية"
-          value={"identity_2024.pdf"}
-          type="pdf"
-          fileUrl={userIdentityData?.file_entry_number?.url}
+          value={userIdentityData?.file_identity?.[0]?.name ?? ""}
+          type={
+            userIdentityData?.file_identity?.[0]?.type == "image"
+              ? "image"
+              : "pdf"
+          }
+          fileUrl={userIdentityData?.file_identity?.[0]?.url}
         />
       </div>
     </div>

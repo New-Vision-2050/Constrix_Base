@@ -1,3 +1,5 @@
+import { MediaFile } from "@/types/media-file";
+
 export type Contract = {
   annual_leave: number;
   commencement_date: string;
@@ -9,6 +11,7 @@ export type Contract = {
   file_url: string;
   global_id: string;
   id: string;
+  files: MediaFile;
   nature_work: string;
   notice_period: number;
   probation_period: number;
