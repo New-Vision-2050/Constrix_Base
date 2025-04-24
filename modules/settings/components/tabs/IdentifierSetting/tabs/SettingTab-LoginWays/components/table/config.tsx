@@ -47,7 +47,7 @@ export const LoginWaysConfig = () => {
         key: "id",
         label: "الأجراء",
         render: (_: unknown, row: LoginWay) => (
-          <Execution id={row.id}  formConfig={loginWayFormConfig}/>
+          <Execution row={row}  formConfig={loginWayFormConfig}/>
         ),
       },
     ],
