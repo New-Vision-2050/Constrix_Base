@@ -100,7 +100,6 @@ export const UsersConfig = () => {
               {companies.map((company) => (
                 <div key={company.id} className="flex items-center gap-x-1">
                   {Array.from({ length: 3 }).map((_, index) => {
-                    console.log(company.roles);
                     // Find role matching index + 1
                     const role =
                       company.roles.find((r) => Number(r.role) === index + 1) ||
@@ -194,7 +193,7 @@ export const UsersConfig = () => {
       },
     ],
     executionConfig: {
-      canEdit: true,
+      canEdit: false,
       canDelete: true,
     },
   };

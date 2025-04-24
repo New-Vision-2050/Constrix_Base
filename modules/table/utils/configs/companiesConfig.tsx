@@ -138,7 +138,7 @@ export const CompaniesConfig = () => {
       },
     ],
     executionConfig: {
-      canEdit: true,
+      canEdit: false,
       canDelete: true,
     },
   };

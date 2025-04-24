@@ -190,11 +190,13 @@ export interface FormConfig {
   wizardOptions?: WizardOptions; // Configuration options for wizard/accordion mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
+  apiMethod?: 'POST' | 'PUT' | 'PATCH' | 'DELETE'; // HTTP method for form submission in create mode (default: POST)
   apiHeaders?: Record<string, string>; // Custom headers for the API request
   // Edit mode configuration
   isEditMode?: boolean; // Whether the form is in edit mode
   editValues?: Record<string, any>; // Values to use for editing (direct values)
   editApiUrl?: string; // URL to fetch data for editing (can include :id placeholder)
+  editApiMethod?: 'POST' | 'PUT' | 'PATCH'; // HTTP method for form submission in edit mode (default: PUT)
   editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
   editDataPath?: string; // Path to the data in the API response (e.g., 'data' or 'data.user')
   editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
