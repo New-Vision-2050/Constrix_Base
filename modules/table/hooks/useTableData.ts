@@ -89,6 +89,7 @@ export const useTableData = (
   useTableInitialization({
     formConfig: config?.formConfig,
     executions: config?.executions,
+    executionsConfig: config?.executionConfig,
     configColumns,
     defaultItemsPerPage,
     defaultSortColumn,

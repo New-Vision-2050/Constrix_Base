@@ -8,6 +8,10 @@ import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 interface TableInitializationProps {
   formConfig?: any;
   executions?: [];
+  executionsConfig?: {
+    canEdit?: boolean;
+    canDelete?: boolean;
+  };
   configColumns?: ColumnConfig[];
   defaultItemsPerPage: number;
   defaultSortColumn: string | null;
@@ -29,6 +33,7 @@ interface TableInitializationProps {
 export const useTableInitialization = ({
   formConfig,
   executions = [],
+  executionsConfig,
   configColumns,
   defaultItemsPerPage,
   defaultSortColumn,
@@ -86,6 +91,8 @@ export const useTableInitialization = ({
               formConfig={formConfig}
               executions={executions}
               buttonLabel={t("Companies.Actions")}
+              showEdit={Boolean(executionsConfig?.canEdit)}
+              showDelete={Boolean(executionsConfig?.canDelete)}
             />
           ),
         });

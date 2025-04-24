@@ -139,5 +139,9 @@ export const CompaniesConfig = () => {
         },
       },
     ],
+    executionConfig: {
+      canEdit: true,
+      canDelete: true,
+    },
   };
 };
