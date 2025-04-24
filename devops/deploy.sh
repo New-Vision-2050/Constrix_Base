@@ -10,7 +10,14 @@ echo "Cache bust value: $CACHEBUST"
 # Export CACHEBUST as an environment variable so Docker Compose can use it
 export CACHEBUST
 
+CURRENT_DIR=$(pwd)
+if [ "$ISLOCAL" = true ]; then
+echo "Deploy On Local Env"
+DEPLOY_DIR=$CURRENT_DIR/deployments/$DEPLOYMENT_ID
+else
+  echo "Deploying to DEVELOPMENT..."
 DEPLOY_DIR=/home/deployer/nextjs/deployments/$DEPLOYMENT_ID
+fi
 
 echo "Deployment ID: $DEPLOYMENT_ID"
 echo "Deployment Directory: $DEPLOY_DIR"
@@ -27,7 +34,7 @@ cat <<EOF > .env
 NEXT_PUBLIC_API_BASE_URL=$BE_URL
 NEXT_PUBLIC_API_PATH=api
 NEXT_PUBLIC_API_VERSION=v1
-NODE_ENV=$NODE_ENV
+NODE_ENV=$DEPLOYMENT_ID
 NEXT_PUBLIC_CACHE_BUST=$CACHEBUST
 DEPLOYMENT_ID=$DEPLOYMENT_ID
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyD5izq7FZI-nHdrt6mx5UeKRkUSjvagS5g
@@ -43,7 +50,23 @@ echo "Cleaning previous build artifacts..."
 rm -rf .next
 rm -rf node_modules/.cache
 
-cd "$DEPLOY_DIR/devops"
+
+if [ "$ISLOCAL" = true ]; then
+echo "Deploy On Local Env"
+
+echo "You are in: $CURRENT_DIR"
+cd "$CURRENT_DIR/dev"
+else
+if [ "$DEPLOYMENT_ID" = "master" ]; then
+  echo "Deploying to PRODUCTION..."
+  cd "$DEPLOY_DIR/devops/prod"
+else
+  echo "Deploying to DEVELOPMENT..."
+  cd "$DEPLOY_DIR/devops/dev"
+fi
+
+fi
+
 
 #RUN chmod +x entrypoint.sh
 #
