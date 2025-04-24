@@ -55,11 +55,12 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     } catch (error) {
+       res.cookies.delete("company-data");
       console.log(" Company fetch error:", error);
     }
   }
 
-  if (!!existingCompanyCookie) {
+  if (!!existingCompanyCookie && !isLoginPage) {
     const company = existingCompanyCookie
       ? JSON.parse(existingCompanyCookie)
       : null;
