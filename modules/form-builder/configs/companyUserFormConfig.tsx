@@ -97,7 +97,7 @@ export const companyUserFormConfig: FormConfig = {
                         },
                         {
                             type: "apiValidation",
-                            message:  <InvalidMessage formId="company-user-form" /> ,
+                            message: <InvalidMessage formId="company-user-form" />,
                             apiConfig: {
                                 url: `${baseURL}/company-users/check-email`,
                                 method: "POST",
@@ -107,6 +107,10 @@ export const companyUserFormConfig: FormConfig = {
                                     useFormStore.getState().setValues("company-user-form", {
                                         exist_user_id: response.payload?.[0]?.id,
                                     });
+                                    useFormStore.getState().setValues("company-user-form", {
+                                        error_sentence: response.payload?.[0]?.sentence,
+                                    });
+
                                     return response.payload?.[0]?.status === 1;
                                 },
                             },
