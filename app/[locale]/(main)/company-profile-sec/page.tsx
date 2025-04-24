@@ -33,10 +33,7 @@ const tabs = [
 const CompanyProfilePage = () => {
   return (
     <div className="px-8 space-y-7">
-      <CompanyHeader
-        companyName="ابعاد الرؤية للاستشارات الهندسية"
-        joinDate="04/05/2024"
-      />
+      <CompanyHeader />
       <div className="flex gap-6 rounded-lg p-4">
         <PlanCard
           currentUsers={6}

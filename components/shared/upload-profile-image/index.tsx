@@ -9,6 +9,7 @@ import ShowFeedbackMessages from "./ShowFeedbackMessages";
 import PreviewImage from "./PreviewImage";
 import PlaceholderImage from "./PlaceholderImage";
 import { useTranslations } from "next-intl";
+import { ValidCompanyProfileImage } from "@/modules/company-profile/types/valdation-message-company-image";
 
 // Props type
 type PropsT = {
@@ -16,7 +17,7 @@ type PropsT = {
   open: boolean;
   onSuccess?: (url: string) => void;
   setOpen: React.Dispatch<SetStateAction<boolean>>;
-  validateImageFn(image: File): Promise<ProfileImageMsg[]>; // external image validation logic
+  validateImageFn(image: File): Promise<ProfileImageMsg[] | ValidCompanyProfileImage[]>; // external image validation logic
   uploadImageFn(image: File): Promise<{ image_url: string }>; // external upload logic
 };
 

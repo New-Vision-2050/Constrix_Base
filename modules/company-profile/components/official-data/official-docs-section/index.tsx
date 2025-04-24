@@ -25,7 +25,6 @@ const OfficialDocsSection = ({
   companyOfficialDocuments: CompanyDocument[];
   id?: string;
 }) => {
-  console.log({ companyOfficialDocuments });
   const locale = useLocale();
   const isRTL = locale === "ar";
 

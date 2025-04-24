@@ -9,19 +9,40 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ChangeLogo from "../change-logo";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const CompanyLogo = () => {
+const CompanyLogo = ({
+  logo,
+  isPending,
+}: {
+  logo: string | undefined;
+  isPending: boolean;
+}) => {
   const [isOpen, handleOpen, handleClose] = useModal();
 
   return (
     <>
       <div
         onClick={handleOpen}
-        className="min-w-[180px] bg-foreground text-background rounded-md p-4 text-center flex flex-col items-center justify-center cursor-pointer"
+        className="w-[180px] shrink-0 h-[100px] bg-foreground text-background rounded-md text-center flex flex-col items-center justify-center cursor-pointer overflow-hidden"
       >
-        <Camera className="w-6 h-6 text-background mb-2" />
-        <span className="text-sm leading-tight">لا يلزم تحميل</span>
-        <span className="text-sm leading-tight">لوجو الشركة</span>
+        {isPending ? (
+          <Skeleton className="h-full w-full bg-background/10" />
+        ) : (
+          <>
+            {logo ? (
+              <Image src={logo} alt="company-logo" width={180} height={90} />
+            ) : (
+              <>
+                <Camera className="w-6 h-6 text-background mb-2" />
+                <span className="text-sm leading-tight">لا يلزم تحميل</span>
+                <span className="text-sm leading-tight">لوجو الشركة</span>
+              </>
+            )}
+          </>
+        )}
       </div>
 
       <Dialog
