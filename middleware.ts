@@ -43,6 +43,10 @@ export async function middleware(req: NextRequest) {
           maxAge: 60 * 60 * 24,
         });
       }
+      else
+      {
+          res.cookies.delete("company-data");
+      }
 
       if (
         !!company?.payload.is_central_company &&
