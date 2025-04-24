@@ -6,37 +6,46 @@ import { useModal } from "@/hooks/use-modal";
 import { useFormStore } from "@/modules/form-builder";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { memo } from "react";
+import { memo, useState } from "react";
 
 // Props interface for the InvalidMessage component
 interface InvalidMessageProps {
   email?: string;
-  company_id?: string|Number;
-  exist_user_id?: string|Number;
+  error_sentence?: string;
+  company_id?: string | number;
+  exist_user_id?: string | number;
 }
 
 // Memoized version that accepts email as a prop
-export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({ email,company_id, exist_user_id }: InvalidMessageProps) {
-    const [isOpen, handleOpen, handleClose] = useModal();
+export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
+  email,
+  error_sentence,
+  company_id,
+  exist_user_id,
+}: InvalidMessageProps) {
+  // declare and define component state and variables
+  const [loading, setLoading] = useState(false);
+  const [isOpen, handleOpen, handleClose] = useModal();
 
   const handleConfirmUserData = async () => {
-
+    setLoading(true);
     const url = `/company-users/${exist_user_id}/assign-role`;
     await apiClient
       .post(url, {
-        company_id:company_id,
+        company_id: company_id,
       })
       .then(() => {
         location.reload();
       })
       .finally(() => {
+        setLoading(false);
       });
   };
 
   return (
     <>
       <p className="text-white">
-        تم تسجيل البريد الإلكتروني مسبقًا،
+        تم تسجيل البريد الإلكتروني مسبقًا
         <br />
         <span onClick={handleOpen} className="text-primary cursor-pointer">
           اضغط هنا لاسترجاع بياناتك
@@ -54,8 +63,8 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({ em
           <div className="text-center flex flex-col items-center justify-center gap-4">
             <div className="flex flex-col">
               <p className="font-bold text-lg">
-                تأكيد استرجاع البيانات المرتبطة بالبريد الإلكتروني (
-                <span className="text-primary">{email}</span>
+                {error_sentence}
+                <br />(<span className="text-primary">{email}</span>
                 )؟
               </p>
             </div>
@@ -65,8 +74,9 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({ em
               onClick={handleConfirmUserData}
               className="w-full"
               type="submit"
+              disabled={loading}
             >
-              تأكيد
+              {loading ? "جاري التنفيذ.." : "تأكيد"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -76,7 +86,18 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({ em
 });
 
 // Original InvalidMessage component that uses the memoized version with email from the form store
-export function InvalidMessage({ formId = 'company-user-form' }: { formId?: string }) {
-    const formValues = useFormStore(state => state.forms[formId]?.values);
-    return <MemoizedInvalidMessage email={formValues?.email} exist_user_id={formValues?.exist_user_id} company_id={formValues?.company_id} />;
+export function InvalidMessage({
+  formId = "company-user-form",
+}: {
+  formId?: string;
+}) {
+  const formValues = useFormStore((state) => state.forms[formId]?.values);
+  return (
+    <MemoizedInvalidMessage
+      email={formValues?.email}
+      error_sentence={formValues?.error_sentence}
+      exist_user_id={formValues?.exist_user_id}
+      company_id={formValues?.company_id}
+    />
+  );
 }
