@@ -119,7 +119,7 @@ export const CompaniesConfig = () => {
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
-    defaultItemsPerPage: 5,
+    defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
