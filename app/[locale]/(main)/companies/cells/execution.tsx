@@ -12,6 +12,16 @@ import { FormConfig, SheetFormBuilder } from "@/modules/form-builder";
 import { useState, ReactNode, useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+// Define types for dialog props
+export interface DialogProps {
+  open?: boolean;
+  onClose?: () => void;
+  onSuccess?: () => void;
+  title?: string;
+  shouldReloadTable?: boolean;
+  [key: string]: unknown;
+}
+
 // Define types for menu items
 export type MenuItem = {
   label: string;
@@ -19,8 +29,8 @@ export type MenuItem = {
   action: string | (() => void);
   color?: string;
   // Optional component property for custom dialogs
-  dialogComponent?: ReactNode | ((props: any) => ReactNode);
-  dialogProps?: Record<string, any>;
+  dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
+  dialogProps?: DialogProps;
   position?: "before" | "after";
 };
 
@@ -35,7 +45,7 @@ export type ActionState = {
     open: boolean;
     config: FormConfig | null;
   };
-  [key: string]: any;
+  [key: string]: { open: boolean; url?: string; config?: FormConfig | null } | undefined;
 };
 
 const Execution = ({
@@ -49,7 +59,7 @@ const Execution = ({
   showDelete = true,
 }: {
   id: string;
-  executions: MenuItem[];
+  executions?: MenuItem[];
   formConfig?: FormConfig;
   buttonLabel?: string;
   tableName?: string;

@@ -6,12 +6,18 @@ import { XCircle, Upload, Image as ImageIcon, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 
+// Define a type for objects with a url property
+interface FileWithUrl {
+  url: string;
+  [key: string]: any;
+}
+
 interface MultiImageFieldProps {
   field: FieldConfig;
-  value: Array<File | string> | null;
+  value: Array<File | string | FileWithUrl> | null;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: Array<File | string> | null) => void;
+  onChange: (value: Array<File | string | FileWithUrl> | null) => void;
   onBlur: () => void;
   formId?: string;
 }
@@ -73,7 +79,7 @@ const MultiImageField: React.FC<MultiImageFieldProps> = ({
         newPreviews.push(item);
       }
       else if(item.hasOwnProperty('url')){
-              newPreviews.push(item.url);
+              newPreviews.push((item as FileWithUrl).url);
       }
 
       else if (item instanceof File) {
