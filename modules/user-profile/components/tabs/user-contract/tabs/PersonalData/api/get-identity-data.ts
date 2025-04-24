@@ -30,9 +30,9 @@ type ResponseT = {
   payload: UserIdentityInformationT;
 };
 
-export default async function GetUserIdentityData() {
+export default async function GetUserIdentityData(userId?: string) {
   const res = await apiClient.get<ResponseT>(
-    `/company-users/show-identity-data`
+    `/company-users/show-identity-data${userId ? "?id=" + userId : ""}`
   );
   return res.data.payload;
 }

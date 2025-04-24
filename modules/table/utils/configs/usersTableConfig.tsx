@@ -63,22 +63,22 @@ export const UsersConfig = () => {
         label: t("Companies.Email"),
         sortable: true,
       },
-        {
-            key: "phone",
-            label: "رقم الجوال",
-            render: (_: unknown, row: UsersData) => {
-                const companies = row.companies || [];
-                return (
-                    <div className="line-clamp-3">
-                        {companies.map((company) => (
-                            <p key={company.id} className="line-clamp-1 h-5">
-                                {company?.phone || ''}
-                            </p>
-                        ))}
-                    </div>
-                );
-            }
+      {
+        key: "phone",
+        label: "رقم الجوال",
+        render: (_: unknown, row: UsersData) => {
+          const companies = row.companies || [];
+          return (
+            <div className="line-clamp-3">
+              {companies.map((company) => (
+                <p key={company.id} className="line-clamp-1 h-5">
+                  {company?.phone || ""}
+                </p>
+              ))}
+            </div>
+          );
         },
+      },
       {
         key: "country.name",
         label: "الجنسية",
@@ -197,7 +197,7 @@ export const UsersConfig = () => {
       {
         label: "اكمال الملف الشخصي",
         icon: <GearIcon className="w-4 h-4" />,
-        action: () => router.push(ROUTER.USER_PROFILE),
+        action: (row) => router.push(`${ROUTER.USER_PROFILE}?id=${row.user_id}`),
       },
     ],
     executionConfig: {
