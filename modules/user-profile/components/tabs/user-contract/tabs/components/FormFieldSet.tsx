@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { useLocale } from "next-intl";
 
@@ -10,7 +11,7 @@ type PropsT = {
 
 export default function FormFieldSet(props: PropsT) {
   const locale = useLocale();
-  const { title, secondTitle, children, valid = true } = props;
+  const { title, secondTitle, children, valid } = props;
   const isRtl = locale === "ar";
   const dirClass = isRtl ? "left-6" : "right-6";
 
@@ -18,7 +19,15 @@ export default function FormFieldSet(props: PropsT) {
     <div className="relative">
       <fieldset className="border border-gray-500 rounded-2xl p-6 shadow-sm">
         <legend className="text-lg font-semibold px-2 flex items-center gap-2">
-          {title} {!valid && <InfoIcon additionClass="text-orange-500 w-4" />}
+          {title}{" "}
+          {typeof valid === "boolean" && (
+            <InfoIcon
+              additionClass={cn(
+                " w-4",
+                valid ? "text-green-500" : "text-orange-500"
+              )}
+            />
+          )}
         </legend>
         {children}
       </fieldset>
