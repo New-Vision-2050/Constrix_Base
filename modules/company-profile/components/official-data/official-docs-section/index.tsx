@@ -46,7 +46,9 @@ const OfficialDocsSection = ({
     <>
       <FormFieldSet
         title="المستندات الرسمية"
-        valid={false}
+        valid={
+          !!companyOfficialDocuments && companyOfficialDocuments.length > 0
+        }
         secondTitle={
           <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
             <DropdownMenuTrigger asChild>
