@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
-import {companyUserFormConfig} from "@/modules/form-builder";
+import { companyUserFormConfig } from "@/modules/form-builder";
 
 // Define types for the company data
 interface CompanyData {
@@ -30,7 +30,7 @@ interface UsersData {
   complete_data: 0 | 1; // 0 = pending, 1 = success
   is_active: "active" | "inActive";
   companies: CompanyData[];
-  user_id:string;
+  user_id: string;
   [key: string]: any; // For any other properties
 }
 
@@ -94,15 +94,13 @@ export const UsersConfig = () => {
           return (
             <div className="line-clamp-3 ">
               {companies.map((company) => (
-                <div
-                  key={company.id}
-                  className="flex items-center gap-x-1"
-                >
+                <div key={company.id} className="flex items-center gap-x-1">
                   {Array.from({ length: 3 }).map((_, index) => {
-                      console.log(company.roles)
+                    console.log(company.roles);
                     // Find role matching index + 1
                     const role =
-                      company.roles.find((r) => Number(r.role) === index + 1) || null;
+                      company.roles.find((r) => Number(r.role) === index + 1) ||
+                      null;
                     return role ? (
                       <span
                         key={index}
@@ -118,10 +116,7 @@ export const UsersConfig = () => {
                         )}
                       </span>
                     ) : (
-                      <span
-    key={index}
-    className="w-5 h-5 flex items-center"
-    />
+                      <span key={index} className="w-5 h-5 flex items-center" />
                     );
                   })}
                 </div>
@@ -139,7 +134,13 @@ export const UsersConfig = () => {
       {
         key: "id",
         label: t("Companies.Actions"),
-        render: (_: unknown, row: UsersData) => <Execution id={row.user_id} formConfig={companyUserFormConfig}/>,
+        render: (_: unknown, row: UsersData) => (
+          <Execution
+            id={row.id}
+            user_id={row.user_id}
+            formConfig={companyUserFormConfig}
+          />
+        ),
       },
     ],
     allSearchedFields: [
@@ -161,22 +162,22 @@ export const UsersConfig = () => {
           },
         },
       },
-      {
-        key: "companyType",
-        searchType: {
-          type: "dropdown",
-          placeholder: "حالة المستخدم",
-          dropdownOptions: [
-            { value: "active", label: "نشط" },
-            { value: "inactive", label: "غير نشط" },
-          ],
-        },
-      },
+      // {
+      //   key: "companyType",
+      //   searchType: {
+      //     type: "dropdown",
+      //     placeholder: "حالة المستخدم",
+      //     dropdownOptions: [
+      //       { value: "active", label: "نشط" },
+      //       { value: "inactive", label: "غير نشط" },
+      //     ],
+      //   },
+      // },
       {
         key: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال"
+          placeholder: "البريد الإليكتروني / الجوال",
         },
       },
     ],
