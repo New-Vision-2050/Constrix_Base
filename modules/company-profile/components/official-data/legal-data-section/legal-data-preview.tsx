@@ -14,27 +14,27 @@ const LegalDataPreview = ({
   const previewData = companyLegalData.map((obj) => {
     return [
       {
-        valid: true,
+        valid: Boolean(obj.registration_type),
         label: "نوع التسجل",
         value: obj.registration_type,
         needRequest: true,
         containerClassName: "col-span-4",
       },
       {
-        valid: true,
+        valid: Boolean(obj.registration_number),
         label: "ادخل رقم السجل التجاري / رقم الـ 700",
         needRequest: true,
         value: obj.registration_number,
         containerClassName: "col-span-2",
       },
       {
-        valid: true,
+        valid: Boolean(obj.start_date),
         label: "تاريخ الإصدار",
         type: "date" as PreviewTextFieldType,
         value: new Date(obj.start_date).toLocaleDateString("en-GB"),
       },
       {
-        valid: true,
+        valid: Boolean(obj.end_date),
         label: "تاريخ الانتهاء",
         value: new Date(obj.end_date).toLocaleDateString("en-GB"),
         render: () => (
