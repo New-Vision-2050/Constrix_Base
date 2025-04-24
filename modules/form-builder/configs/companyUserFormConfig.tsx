@@ -15,6 +15,12 @@ export const companyUserFormConfig: FormConfig = {
             collapsible: false,
             fields: [
                 {
+                    type: "hiddenObject",
+                    name: "exist_user_id",
+                    label: "exist_user_id",
+                    defaultValue: "",
+                },
+                {
                     type: "select",
                     name: "company_id",
                     label: "الشركة",
@@ -91,18 +97,14 @@ export const companyUserFormConfig: FormConfig = {
                         },
                         {
                             type: "apiValidation",
-                            message: (
-                                <>
-                                    <InvalidMessage />
-                                </>
-                            ),
+                            message:  <InvalidMessage formId="company-user-form" /> ,
                             apiConfig: {
                                 url: `${baseURL}/company-users/check-email`,
                                 method: "POST",
                                 debounceMs: 500,
                                 paramName: "email",
                                 successCondition: (response) => {
-                                    useFormStore.getState().setValues("companies-form", {
+                                    useFormStore.getState().setValues("company-user-form", {
                                         exist_user_id: response.payload?.[0]?.id,
                                     });
                                     return response.payload?.[0]?.status === 1;

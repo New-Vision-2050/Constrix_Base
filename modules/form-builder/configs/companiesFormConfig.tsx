@@ -265,11 +265,7 @@ export function GetCompaniesFormConfig(): FormConfig {
               },
               {
                 type: "apiValidation",
-                message: (
-                  <>
-                    <InvalidMessage />
-                  </>
-                ),
+                  message:  <InvalidMessage formId="companies-form" /> ,
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,
                   method: "POST",
