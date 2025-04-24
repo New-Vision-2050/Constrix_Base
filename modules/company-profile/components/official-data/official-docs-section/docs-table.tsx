@@ -107,7 +107,7 @@ const DocsTable = ({
     <table className="w-full border-collapse">
       <thead>
         <tr>
-          <td className="text-start p-3 border-b">الاسم</td>
+          <td className="text-start p-3 border-b">نوع المستند</td>
           <td className="text-start p-3 border-b">الوصف</td>
           <td className="text-start p-3 border-b">رقم المستند</td>
           <td className="text-start p-3 border-b">تاريخ الاصدار</td>

@@ -6,10 +6,7 @@ import { CompanyTabs } from "@/modules/company-profile/components/shared/tabs";
 const CompanyProfileSec = () => {
   return (
     <div className="px-8 space-y-7">
-      <CompanyHeader
-        companyName="ابعاد الرؤية للاستشارات الهندسية"
-        joinDate="04/05/2024"
-      />
+      <CompanyHeader />
       <EmployeeCard />
       <TabsGroup tabs={CompanyTabs} defaultValue="company" variant="primary" />
     </div>

@@ -34,16 +34,7 @@ type LocationFormValues = z.infer<typeof locationSchema>;
 
 // Props interface for the component
 interface LocationSelectorProps {
-  onSave: (obj: {
-    country_id: string | undefined;
-    state_id: string | undefined;
-    city_id: string | undefined;
-    neighborhood_name: string | undefined;
-    postal_code: string | undefined;
-    street_name: string | undefined;
-    latitude: string;
-    longitude: string;
-  }) => void;
+  onSave: (obj: Record<string, string | undefined>) => void;
   initialLocation?: {
     latitude: number;
     longitude: number;
@@ -172,8 +163,10 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     };
 
     mutate(data, {
-      onError: () => {
-        const errMessage = "خطآ في اختيار الموقع";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError: (err: any) => {
+        const errMessage =
+          err?.response?.data?.message?.description ?? "خطآ في اختيار الموقع";
         setError("longitude", {
           message: errMessage,
         });
@@ -187,13 +180,13 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         const postal_code = succ?.payload?.postal_code;
         const street_name = succ?.payload?.route;
         onSave({
-          country_id: country_id || '',
-          state_id: state_id || '',
-          city_id: city_id || '',
-          neighborhood_name: neighborhood_name || '',
-          postal_code: postal_code || '',
-          street_name: street_name || '',
-          ...locationData,
+          country_id,
+          state_id,
+          city_id,
+          neighborhood_name,
+          postal_code,
+          street_name,
+        ...locationData,
         });
       },
     });
