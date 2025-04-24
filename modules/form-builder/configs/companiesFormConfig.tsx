@@ -36,7 +36,7 @@ export function GetCompaniesFormConfig(): FormConfig {
               totalCountHeader: "X-Total-Count",
             },
             onChange: (newVal, values) => {
-              useFormStore.getState().setValues("change-local-time-form", {
+              useFormStore.getState().setValue("companies-form", "local-time", {
                 "country-id": newVal,
               });
             },
@@ -77,10 +77,11 @@ export function GetCompaniesFormConfig(): FormConfig {
             label: "الاسم التجاري",
             type: "text",
             placeholder: "برجاء إدخال الاسم التجاري",
+            required: true,
             validation: [
               {
                 type: "apiValidation",
-                message: "This username is already taken",
+                message: "الاسم التجاري يجب ان يكون بالغه العربية",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -98,10 +99,12 @@ export function GetCompaniesFormConfig(): FormConfig {
             placeholder: "برجاء إدخال الاسم المختصر",
             postfix: "constrix.com",
             containerClassName: "rtl:flex-row-reverse",
+            required: true,
             validation: [
               {
                 type: "apiValidation",
-                message: "This username is already taken",
+                message:
+                  "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -109,6 +112,10 @@ export function GetCompaniesFormConfig(): FormConfig {
                   paramName: "user_name",
                   successCondition: (response) => response.payload.status === 1,
                 },
+              },
+              {
+                type: "required",
+                message: "اختر مسؤول الدعم",
               },
             ],
           },
@@ -132,7 +139,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             validation: [
               {
                 type: "required",
-                message: "مسؤول الدعم",
+                message: "اختر مسؤول الدعم",
               },
             ],
           },
@@ -193,6 +200,12 @@ export function GetCompaniesFormConfig(): FormConfig {
             defaultValue: "",
           },
           {
+            type: "hiddenObject",
+            name: "error_sentence",
+            label: "error_sentence",
+            defaultValue: "",
+          },
+          {
             type: "text",
             name: "company_id",
             label: "الشركة",
@@ -227,9 +240,9 @@ export function GetCompaniesFormConfig(): FormConfig {
           },
           {
             name: "last_name",
-            label: "اسم المستخدم ألأحير",
+            label: "اسم المستخدم الأخير",
             type: "text",
-            placeholder: "اسم المستخدم ألأحير",
+            placeholder: "اسم المستخدم الأخير",
             required: true,
             validation: [
               {
@@ -260,11 +273,7 @@ export function GetCompaniesFormConfig(): FormConfig {
               },
               {
                 type: "apiValidation",
-                message: (
-                  <>
-                    <InvalidMessage />
-                  </>
-                ),
+                message: <InvalidMessage formId="companies-form" />,
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,
                   method: "POST",
@@ -274,6 +283,10 @@ export function GetCompaniesFormConfig(): FormConfig {
                     useFormStore.getState().setValues("companies-form", {
                       exist_user_id: response.payload?.[0]?.id,
                     });
+                    useFormStore.getState().setValues("companies-form", {
+                      error_sentence: response.payload?.[0]?.sentence,
+                    });
+
                     return response.payload?.[0]?.status === 1;
                   },
                 },
@@ -296,16 +309,16 @@ export function GetCompaniesFormConfig(): FormConfig {
             type: "select",
             name: "job_title_id",
             disabled: true,
-            defaultValue: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
             label: "المسمى الوظيفي",
             placeholder: "اختر المسمى الوظيفي",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_titles`,
+              url: `${baseURL}/job_titles?type=general_manager`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
+              setFirstAsDefault: true,
               pageParam: "page",
               limitParam: "per_page",
               itemsPerPage: 10,
@@ -321,9 +334,6 @@ export function GetCompaniesFormConfig(): FormConfig {
         ],
       },
     ],
-    initialValues: {
-      job_title_id: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
-    },
     submitButtonText: "Send Message",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -404,9 +414,11 @@ export function GetCompaniesFormConfig(): FormConfig {
       },
     },
     editDataTransformer: (data) => {
-        if (data.company_field) {
-            data.company_field_id = (data?.company_field || []).map((item: { id: string|Number }) => item.id);
-        }
+      if (data.company_field) {
+        data.company_field_id = (data?.company_field || []).map(
+          (item: { id: string | Number }) => item.id
+        );
+      }
       return data;
     },
   };

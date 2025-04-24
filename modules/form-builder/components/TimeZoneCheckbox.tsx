@@ -21,14 +21,17 @@ export const TimeZoneCheckbox: React.FC<TimeZoneCheckboxProps> = ({
         checked={value}
         onCheckedChange={(b: boolean) => {
           if (b) {
-            const countryId = useFormStore
+            const country = useFormStore
               ?.getState()
-              .getValue("change-local-time-form", "country-id");
+              .getValue("companies-form", "local-time");
 
-            if (countryId)
-              useFormStore.getState().setValues("companies-form", {
-                country_id: countryId,
-              });
+            if (country) {
+              const countryId = country["country-id"];
+              if (countryId)
+                useFormStore.getState().setValues("companies-form", {
+                  country_id: countryId,
+                });
+            }
           }
           onChange(b);
         }}
@@ -38,7 +41,21 @@ export const TimeZoneCheckbox: React.FC<TimeZoneCheckboxProps> = ({
         <DialogFormBuilder
           config={changeLocalTimeConfig}
           trigger={
-            <Button className="p-0 h-fit text-primary bg-transparent hover:bg-transparent">
+            <Button
+              className="p-0 h-fit text-primary bg-transparent hover:bg-transparent"
+              onClick={() => {
+                const localTime = useFormStore
+                  ?.getState()
+                  .getValue("companies-form", "local-time");
+                useFormStore
+                  .getState()
+                  .setValues("change-local-time-form", localTime);
+                //reset change_local_time
+                useFormStore
+                  .getState()
+                  .setValues("companies-form", { change_local_time: false });
+              }}
+            >
               اضغط هنا
             </Button>
           }

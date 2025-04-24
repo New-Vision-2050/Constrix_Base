@@ -1,5 +1,7 @@
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
-import FieldPreview from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
+import FieldPreview, {
+  PreviewTextFieldType,
+} from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 import { FilePlus } from "lucide-react";
 
 const LegalDataPreview = ({
@@ -12,35 +14,35 @@ const LegalDataPreview = ({
   const previewData = companyLegalData.map((obj) => {
     return [
       {
-        valid: true,
+        valid: Boolean(obj.registration_type),
         label: "نوع التسجل",
         value: obj.registration_type,
         needRequest: true,
         containerClassName: "col-span-4",
       },
       {
-        valid: true,
+        valid: Boolean(obj.registration_number),
         label: "ادخل رقم السجل التجاري / رقم الـ 700",
         needRequest: true,
         value: obj.registration_number,
         containerClassName: "col-span-2",
       },
       {
-        valid: true,
+        valid: Boolean(obj.start_date),
         label: "تاريخ الإصدار",
-        isDate: true,
+        type: "date" as PreviewTextFieldType,
         value: new Date(obj.start_date).toLocaleDateString("en-GB"),
       },
       {
-        valid: true,
+        valid: Boolean(obj.end_date),
         label: "تاريخ الانتهاء",
-        isDate: true,
         value: new Date(obj.end_date).toLocaleDateString("en-GB"),
         render: () => (
           <div className="flex items-stretch gap-3">
             <FieldPreview
               valid={true}
               label="تاريخ الانتهاء"
+              type="date"
               value={new Date(obj.end_date).toLocaleDateString("en-GB")}
             />
             <div className="border border-dashed  flex items-center justify-center w-9 rounded-md">
@@ -60,11 +62,7 @@ const LegalDataPreview = ({
             key={`${arrayIndex}-${itemIndex}-${preview.label}`}
             className={preview?.containerClassName}
           >
-            {preview?.render ? (
-              preview.render()
-            ) : (
-              <FieldPreview {...preview} />
-            )}
+            {preview?.render ? preview.render() : <FieldPreview {...preview} />}
           </div>
         ))
       )}

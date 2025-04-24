@@ -1,10 +1,14 @@
 import Company from "@/app/[locale]/(main)/companies/cells/company";
 import DataStatus from "@/app/[locale]/(main)/companies/cells/data-status";
-import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
+import EnterIcon from "@/public/icons/enter";
+import GearIcon from "@/public/icons/gear";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
+import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
 
 // Define types for the company data
 interface CompanyData {
@@ -21,6 +25,7 @@ interface CompanyData {
 // Create a component that uses the translations
 export const CompaniesConfig = () => {
   const t = useTranslations();
+  const router = useRouter();
 
   return {
     url: `${baseURL}/companies`,
@@ -33,7 +38,7 @@ export const CompaniesConfig = () => {
         render: (_: unknown, row: CompanyData) => <Company row={row} />,
       },
       {
-        key: "general_manager.email",
+        key: "email",
         label: t("Companies.Email"),
         sortable: true,
       },
@@ -67,13 +72,6 @@ export const CompaniesConfig = () => {
         label: t("Companies.Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
           <TheStatus theStatus={value} id={row.id} />
-        ),
-      },
-      {
-        key: "id",
-        label: t("Companies.Actions"),
-        render: (_: unknown, row: CompanyData) => (
-          <Execution id={row.id} formConfig={GetCompaniesFormConfig()} />
         ),
       },
     ],
@@ -119,12 +117,29 @@ export const CompaniesConfig = () => {
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
-    defaultItemsPerPage: 5,
+    defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    formConfig: GetCompaniesFormConfig(),
+    executions: [
+      {
+        label: t("Companies.LoginAsManager"),
+        icon: <EnterIcon className="w-4 h-4" />,
+        action: () => console.log("Login as manager clicked"),
+      },
+      {
+        label: "اكمال ملف الشركة",
+        icon: <GearIcon className="w-4 h-4" />,
+        action: () => router.push(ROUTER.COMPANY_PROFILE),
+      },
+    ],
+    executionConfig: {
+      canEdit: false,
+      canDelete: true,
+    },
   };
 };

@@ -241,5 +241,64 @@
         }
       }
     }
+  },
+  "companyProfile": {
+    "header": {
+      "placeholder": {
+        "userName": "اسم المستخدم",
+        "jobTitle": "الوظيفة",
+        "address": "العنوان",
+        "appointmentDate": "تاريخ التعيين",
+        "image": "يلزم اضافة صورة خلفية بيضاء 6*4"
+      },
+      "uploadPhoto": {
+        "title": "أضافة صورة",
+        "actions": {
+          "checkLabel": "التحقق من الصورة",
+          "loadingLabel": "جاري التنفيذ...",
+          "saveLabel": "حفظ",
+          "attachmentLabel": "ارفاق",
+          "title": {
+            "upload": "قم برفع الصورة أولأ",
+            "validate": "تحقق من الصورة",
+            "save": "رفع الصورة"
+          }
+        },
+        "rules": {
+          "rule1": "حجم الصورة لا يتعدى 5 ميجابايت.",
+          "rule2": "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
+          "rule3": "تأكد من أن الخلفية بيضاء."
+        }
+      }
+    },
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "contract": "عقد العمل",
+      "attendance": "سياسة الحضور",
+      "usersActions": "اجراءات المستخدم",
+      "contractTabs": {
+        "personalTab": "البيانات الشخصية",
+        "academicAndExperience": "البيانات الاكاديمية والخبرة",
+        "employmentAndContractalData": "البيانات الوظيفية والتعاقدية",
+        "financialPrivileges": "الامتيازات المالية",
+        "contractManagement": "ادارة العقد"
+      },
+      "verticalLists": {
+        "personalList": {
+          "personalData": "البيانات الشخصية",
+          "bankingData": "المعلومات البنكية",
+          "connectionData": "معلومات الاتصال",
+          "iqamaData": "معلومات الاقامة"
+        },
+        "academicAndExperienceList": {
+          "qualification": "المؤهل",
+          "summary": "نبذه مختصرة",
+          "experiences": "الخبرات السابقة",
+          "courses": "الكورسات التعليمية",
+          "certifications": "الشهادات المهنية",
+          "cv": "السيرة الذاتية"
+        }
+      }
+    }
   }
 }

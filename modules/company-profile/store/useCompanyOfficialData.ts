@@ -64,7 +64,8 @@ const useCompanyStore = create<CompanyStore>((set) => ({
       state_name: null,
       city_name: null
     },
-    branches: []
+    branches: [],
+    created_at: null
   },
   setCompany: (company) => set({ company }),
 }));

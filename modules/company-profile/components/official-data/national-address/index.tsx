@@ -18,15 +18,16 @@ const NationalAddress = ({
 }) => {
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
-  console.log({ companyAddress });
-
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
 
   return (
     <FormFieldSet
       title="العنوان الوطني"
-      valid={true}
+      valid={
+        !!companyAddress &&
+        Object.values(companyAddress).every((value) => !!value)
+      }
       secondTitle={
         <Button variant={"ghost"} onClick={handleEditClick}>
           {mode === "Preview" ? (

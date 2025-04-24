@@ -1,6 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import useCompanyStore from "../../../store/useCompanyOfficialData";
 
 export const ReqLegalDataEdit = () => {
   const ReqLegalDataEdit: FormConfig = {
