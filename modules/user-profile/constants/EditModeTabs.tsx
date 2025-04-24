@@ -1,7 +1,7 @@
-import { SystemTab } from "@/modules/settings/types/SystemTab";
-import UserContractTab from "../components/tabs/user-contract";
-import UserProfileTab from "../components/tabs/user-profile";
-import UserActionsTabs from "../components/tabs/user-actions";
+import { SystemTab } from '@/modules/settings/types/SystemTab'
+import UserContractTab from '../components/tabs/user-contract'
+import UserProfileTab from '../components/tabs/user-profile'
+import UserActionsTabs from '../components/tabs/user-actions'
 
 export const getEditModeTabsList = (
   t: (key: string) => string

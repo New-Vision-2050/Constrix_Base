@@ -25,7 +25,6 @@ const OfficialDocsSection = ({
   companyOfficialDocuments: CompanyDocument[];
   id?: string;
 }) => {
-  console.log({ companyOfficialDocuments });
   const locale = useLocale();
   const isRTL = locale === "ar";
 
@@ -46,7 +45,9 @@ const OfficialDocsSection = ({
     <>
       <FormFieldSet
         title="المستندات الرسمية"
-        valid={false}
+        valid={
+          !!companyOfficialDocuments && companyOfficialDocuments.length > 0
+        }
         secondTitle={
           <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
             <DropdownMenuTrigger asChild>

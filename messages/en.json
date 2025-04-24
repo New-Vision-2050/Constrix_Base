@@ -241,5 +241,64 @@
         }
       }
     }
+  },
+  "companyProfile": {
+    "header": {
+      "placeholder": {
+        "userName": "user name",
+        "jobTitle": "job title",
+        "address": "address",
+        "appointmentDate": "Appointment Date",
+        "image": "A 6*4 white background image is required."
+      },
+      "uploadPhoto": {
+        "title": "Upload Image",
+        "actions": {
+          "checkLabel": "Check Image",
+          "loadingLabel": "Loading...",
+          "saveLabel": "Save",
+          "attachmentLabel": "Attach",
+          "title": {
+            "upload": "upload image firstly",
+            "validate": "validate Image",
+            "save": "Save Image"
+          }
+        },
+        "rules": {
+          "rule1": "Image size must not exceed 5 MB.",
+          "rule2": "Choose an appropriate image size (e.g., 1920x1080 pixels).",
+          "rule3": "Make sure the background is white."
+        }
+      }
+    },
+    "tabs": {
+      "profile": "Profile",
+      "contract": "Employment Contract",
+      "attendance": "Attendance Policy",
+      "usersActions": "User Actions",
+      "contractTabs": {
+        "personalTab": "Personal Data",
+        "academicAndExperience": "Academic and Experience Data",
+        "employmentAndContractalData": "Employment and Contractual Data",
+        "financialPrivileges": "Financial Benefits",
+        "contractManagement": "Contract Management"
+      },
+      "verticalLists": {
+        "personalList": {
+          "personalData": "Personal Data",
+          "bankingData": "Banking Information",
+          "connectionData": "Contact Information",
+          "iqamaData": "Residence Information"
+        },
+        "academicAndExperienceList": {
+          "qualification": "Qualification",
+          "summary": "Brief Overview",
+          "experiences": "Previous Experience",
+          "courses": "Educational Courses",
+          "certifications": "Professional Certifications",
+          "cv": "CV"
+        }
+      }
+    }
   }
 }

@@ -10,45 +10,45 @@ const NationalAddressDataPreview = ({
 }) => {
   const previewData = [
     {
-      valid: true,
+      valid: Boolean(companyAddress.country_name),
       label: "الدولة",
       value: companyAddress.country_name ?? "",
       needRequest: true,
     },
     {
-      valid: true,
+      valid: Boolean(companyAddress.state_name),
       label: "المنطقة",
       value: companyAddress.state_name ?? "",
     },
     {
-      valid: true,
+      valid: Boolean(companyAddress.city_name),
       label: "المدينة",
       value: companyAddress.city_name ?? "",
     },
     {
-      valid: true,
+      valid: Boolean(companyAddress.neighborhood_name),
       label: "الحي",
       value: companyAddress.neighborhood_name ?? "",
     },
 
     {
-      valid: true,
+      valid: Boolean(companyAddress.building_number),
       label: "رقم المبنى",
       value: companyAddress.building_number ?? "",
     },
     {
-      valid: true,
+      valid: Boolean(companyAddress.additional_phone),
       label: "الرقم الاضافي",
       value: companyAddress.additional_phone ?? "",
     },
 
     {
-      valid: true,
+      valid: Boolean(companyAddress.postal_code),
       label: "الرمز البريدي",
       value: companyAddress.postal_code ?? "",
     },
     {
-      valid: true,
+      valid: Boolean(companyAddress.street_name),
       label: "الشارع",
       value: companyAddress.street_name ?? "",
     },

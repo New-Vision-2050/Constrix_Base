@@ -1,0 +1,70 @@
+.custom-hijri-calendar {
+    &.rmdp-wrapper{
+      @apply z-50 rounded-md bg-popover text-popover-foreground shadow-md outline-none
+      data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0
+      data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95
+      data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2
+      data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-auto p-0
+    }
+   .rmdp-calendar{
+     @apply p-3
+   }
+   .rmdp-header{
+     @apply p-0 pt-1
+   }
+   .rmdp-header-values{
+     @apply text-sm font-medium text-popover-foreground
+   }
+   .rmdp-arrow-container{
+     @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium
+     ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2
+     focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none
+     disabled:opacity-50 [&_i]:pointer-events-none [&_i]:size-2 [&_i]:shrink-0 border
+     border-input hover:bg-accent hover:text-accent-foreground h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100;
+   }
+   .rmdp-arrow{
+     @apply text-popover-foreground mt-0;
+     border-color: hsl(var(--popover-foreground));
+   }
+   .rmdp-day{
+     @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background
+     transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+     focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none
+     [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 w-9 p-0 font-normal
+     aria-selected:opacity-100 text-popover-foreground;
+        &.rmdp-deactive{
+          @apply text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30;
+        }
+        &.rmdp-today{
+          @apply bg-accent text-accent-foreground;
+          span {
+            background-color: transparent;
+            color: inherit;
+            @apply rounded-md
+          }
+        }
+        &.rmdp-selected{
+          @apply focus:rounded-md bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground;
+          span:not(.highlight) {
+            background-color: transparent;
+            color: inherit;
+            box-shadow: none;
+            @apply rounded-md
+          }
+          .highlight{
+            box-shadow: none;
+          }
+        }
+   }
+   .rmdp-week-day{
+     @apply text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]
+   }
+   .rmdp-week:not(:first-child){
+     @apply flex w-full mt-2
+   }
+
+   .rmdp-month-picker,
+   .rmdp-year-picker{
+     @apply rounded-md bg-popover text-popover-foreground
+   }
+}

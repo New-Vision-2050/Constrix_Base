@@ -97,7 +97,7 @@ export const companyUserFormConfig: FormConfig = {
                         },
                         {
                             type: "apiValidation",
-                            message:  <InvalidMessage formId="company-user-form" /> ,
+                            message: <InvalidMessage formId="company-user-form" />,
                             apiConfig: {
                                 url: `${baseURL}/company-users/check-email`,
                                 method: "POST",
@@ -107,6 +107,10 @@ export const companyUserFormConfig: FormConfig = {
                                     useFormStore.getState().setValues("company-user-form", {
                                         exist_user_id: response.payload?.[0]?.id,
                                     });
+                                    useFormStore.getState().setValues("company-user-form", {
+                                        error_sentence: response.payload?.[0]?.sentence,
+                                    });
+
                                     return response.payload?.[0]?.status === 1;
                                 },
                             },
@@ -129,16 +133,16 @@ export const companyUserFormConfig: FormConfig = {
                     type: "select",
                     name: "job_title_id",
                     disabled: true,
-                    defaultValue: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
                     label: "المسمى الوظيفي",
                     placeholder: "اختر المسمى الوظيفي",
                     required: true,
                     dynamicOptions: {
-                        url: `${baseURL}/job_titles`,
+                        url: `${baseURL}/job_titles?type=general_manager`,
                         valueField: "id",
                         labelField: "name",
                         searchParam: "name",
                         paginationEnabled: true,
+                        setFirstAsDefault: true,
                         pageParam: "page",
                         limitParam: "per_page",
                         itemsPerPage: 10,
@@ -154,9 +158,6 @@ export const companyUserFormConfig: FormConfig = {
             ],
         },
     ],
-    initialValues: {
-        job_title_id: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
-    },
     submitButtonText: "حفظ",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -167,7 +168,7 @@ export const companyUserFormConfig: FormConfig = {
     showBackButton: false,
     editDataTransformer:(data)=>{
         return {
-            'company_id' : data.company[0].id,
+            'company_id' : data.company.id,
             'first_name' : data.name,
             'last_name' : data.name,
             'email' : data.email,

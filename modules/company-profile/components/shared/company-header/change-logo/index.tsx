@@ -7,6 +7,12 @@ import { useForm } from "react-hook-form";
 import { AlertCircle, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import validCompanyProfileImage from "@/modules/company-profile/service/validate-company-image";
+import { cn } from "@/lib/utils";
+import uploadCompanyImage from "@/modules/company-profile/service/upload-company-image";
+import { deleteCookie, getCookie } from "cookies-next";
 
 interface FormValues {
   image: FileList;
@@ -16,12 +22,45 @@ interface IChangeLogo {
   handleClose: () => void;
 }
 
+interface ValidationRule {
+  sentence: string;
+  sub_title: string | null;
+  status: number;
+  validate: string;
+}
+
 const ChangeLogo = ({ handleClose }: IChangeLogo) => {
-  const rules = [
-    "حجم الصورة لا يتعدى 5 ميجابايت.",
-    "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
-    "تأكد من أن الخلفية بيضاء.",
-  ];
+  const queryClient = useQueryClient();
+  const [rules, setRules] = useState<ValidationRule[]>([
+    {
+      sentence: "حجم الصورة يجب أن لا يتعدى 5 ميجابايت",
+      sub_title: null,
+      status: 0,
+      validate: "required",
+    },
+    {
+      sentence: "أبعاد الصورة غير صحيحة. يجب أن تكون الأبعاد بين  1920*1080",
+      sub_title: null,
+      status: 0,
+      validate: "required",
+    },
+    {
+      sentence: "تأكد ان الخلفية بيضاء",
+      sub_title: null,
+      status: 0,
+      validate: "required",
+    },
+  ]);
+
+  const { mutate: mutateValidation, isPending: isValidationPending } =
+    useMutation({
+      mutationFn: async (file: File) => await validCompanyProfileImage(file),
+    });
+
+  const { mutate: mutateUpload, isPending: isUploadPending } = useMutation({
+    mutationFn: async (file: File) => await uploadCompanyImage(file),
+  });
+
   const {
     register,
     handleSubmit,
@@ -45,9 +84,32 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
       return;
     }
 
-    console.log("uploaded...");
-    handleClose();
-    reset();
+    mutateValidation(file, {
+      onSuccess: () => {
+        setRules((prev) =>
+          prev.map((rule) => ({
+            ...rule,
+            status: 1,
+          }))
+        );
+        mutateUpload(file, {
+          onSuccess: () => {
+            deleteCookie("company-data");
+            window.location.reload();
+            handleClose();
+          },
+        });
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError: (err: any) => {
+        const messageObj = err?.response?.data?.message;
+        const newRule = Object.values(messageObj).filter(
+          (item) =>
+            item !== null && typeof item === "object" && !Array.isArray(item)
+        );
+        setRules(newRule as ValidationRule[]);
+      },
+    });
   };
 
   return (
@@ -57,9 +119,16 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
           <div className="space-y-3 text-right">
             <ul className="list-decimal pr-5 space-y-2 text-sm">
               {rules.map((rule) => (
-                <li key={rule} className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-yellow-400 shrink-0" />
-                  <p className="text-lg">{rule}</p>
+                <li key={rule.sentence} className="flex items-center gap-2">
+                  <AlertCircle
+                    className={cn(
+                      "w-4 h-4  shrink-0",
+                      Boolean(rule.status)
+                        ? "text-green-500"
+                        : "text-yellow-400"
+                    )}
+                  />
+                  <p className="text-lg">{rule.sentence}</p>
                 </li>
               ))}
             </ul>
@@ -103,7 +172,11 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
       </div>
 
       <div className="flex items-center justify-center gap-4 text-xs">
-        <Button type="submit" className="w-32">
+        <Button
+          type="submit"
+          className="w-32"
+          loading={isValidationPending || isUploadPending}
+        >
           حفظ
         </Button>
         <Button

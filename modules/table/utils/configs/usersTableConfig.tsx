@@ -8,12 +8,16 @@ import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { companyUserFormConfig } from "@/modules/form-builder";
+import { companyUserFormConfig, formConfig } from "@/modules/form-builder";
+import GearIcon from "@/public/icons/gear";
+import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
 
 // Define types for the company data
 interface CompanyData {
   id: string;
   name: string;
+  phone: string;
   roles: Array<{
     role: 1 | 2 | 3; // Keys in rulesIcons
     status: number;
@@ -37,6 +41,7 @@ interface UsersData {
 // Create a component that uses the translations
 export const UsersConfig = () => {
   const t = useTranslations();
+  const router = useRouter();
 
   return {
     url: `${baseURL}/company-users`,
@@ -58,15 +63,22 @@ export const UsersConfig = () => {
         label: t("Companies.Email"),
         sortable: true,
       },
-      {
-        key: "phone",
-        label: "رقم الجوال",
-        render: (value: string) => (
-          <p style={{ direction: "ltr" }} className="text-start">
-            {value}
-          </p>
-        ),
-      },
+        {
+            key: "phone",
+            label: "رقم الجوال",
+            render: (_: unknown, row: UsersData) => {
+                const companies = row.companies || [];
+                return (
+                    <div className="line-clamp-3">
+                        {companies.map((company) => (
+                            <p key={company.id} className="line-clamp-1 h-5">
+                                {company?.phone || ''}
+                            </p>
+                        ))}
+                    </div>
+                );
+            }
+        },
       {
         key: "country.name",
         label: "الجنسية",
@@ -96,7 +108,6 @@ export const UsersConfig = () => {
               {companies.map((company) => (
                 <div key={company.id} className="flex items-center gap-x-1">
                   {Array.from({ length: 3 }).map((_, index) => {
-                    console.log(company.roles);
                     // Find role matching index + 1
                     const role =
                       company.roles.find((r) => Number(r.role) === index + 1) ||
@@ -130,17 +141,6 @@ export const UsersConfig = () => {
         label: t("Companies.DataStatus"),
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
-      },
-      {
-        key: "id",
-        label: t("Companies.Actions"),
-        render: (_: unknown, row: UsersData) => (
-          <Execution
-            id={row.id}
-            user_id={row.user_id}
-            formConfig={companyUserFormConfig}
-          />
-        ),
       },
     ],
     allSearchedFields: [
@@ -192,5 +192,17 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    formConfig: companyUserFormConfig,
+    executions: [
+      {
+        label: "اكمال الملف الشخصي",
+        icon: <GearIcon className="w-4 h-4" />,
+        action: () => router.push(ROUTER.USER_PROFILE),
+      },
+    ],
+    executionConfig: {
+      canEdit: false,
+      canDelete: true,
+    },
   };
 };
