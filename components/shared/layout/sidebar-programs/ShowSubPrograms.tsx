@@ -32,7 +32,7 @@ export default function ShowSubPrograms(props: PropsT) {
               className={cn(sub.url === activeUrl && "text-primary")}
               onClick={() => handleSubMenuItemClick(sub.url)}
             >
-              <div className="pr-5 flex gap-5 items-center cursor-pointer">
+              <div className="pr-5 flex gap-5 items-center cursor-pointer ">
                 {sub.icon ? <sub.icon /> : "i"}
                 <span>{sub.name}</span>
               </div>
