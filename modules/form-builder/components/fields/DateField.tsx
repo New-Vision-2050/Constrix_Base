@@ -6,7 +6,8 @@ import { Button } from '@/modules/table/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import { FieldConfig } from '../../types/formTypes';
 import { cn } from '@/lib/utils';
-import { DayPickerSingleProps } from 'react-day-picker'; 
+import { DayPickerSingleProps } from 'react-day-picker';
+import { HijriCalendar } from '@/modules/table/components/ui/HijriCalendar'
 
 interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
@@ -26,31 +27,44 @@ const DateField: React.FC<DateFieldProps> = ({
   onBlur,
   ...props
 }) => {
-  const date = value ? new Date(value) : undefined;
+  const date = field?.isHijri? value?.toString(): value ? new Date(value) : undefined;
   const [isOpen, setIsOpen] = useState(false);
-
   return (
     <div className="relative">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button
-            id={field.name}
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground",
-              !!error && touched ? 'border-destructive' : '',
-              field.className,
-              field.width ? field.width : 'w-full'
-            )}
-            disabled={field.disabled}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, 'PPP') : field.placeholder || 'Select a date'}
-          </Button>
-        </PopoverTrigger>
+        <Button
+          id={field.name}
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground",
+            !!error && touched ? 'border-destructive' : '',
+            field.className,
+            field.width ? field.width : 'w-full'
+          )}
+          disabled={field.disabled}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date ? (field?.isHijri? date: format(date, 'PPP')) : field.placeholder || 'Select a date'}
+        </Button>
+      </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
+        {field?.isHijri
+          ? <HijriCalendar
+              highlightToday
+              value={value}
+              onChange={(dateObj) => {
+                onChange(dateObj ? dateObj?.format() : '');
+                onBlur();
+                setIsOpen(false);
+              }}
+              isLeap
+              disabled={field.disabled}
+              editable={false}
+              {...props}
+            />
+          : <Calendar
             mode="single"
             selected={date}
             onSelect={(date) => {
@@ -61,7 +75,7 @@ const DateField: React.FC<DateFieldProps> = ({
             disabled={field.disabled}
             initialFocus
             {...props}
-          />
+          />}
         </PopoverContent>
       </Popover>
       
