@@ -26,7 +26,7 @@ export interface DialogProps {
 export type MenuItem = {
   label: string;
   icon?: ReactNode;
-  action: string | (() => void);
+  action: string | ((row: { id: string; [key: string]: unknown }) => void);
   color?: string;
   // Optional component property for custom dialogs
   dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
@@ -49,7 +49,7 @@ export type ActionState = {
 };
 
 const Execution = ({
-  id,
+  row,
   executions = [],
   formConfig,
   buttonLabel = "Actions",
@@ -58,7 +58,7 @@ const Execution = ({
   showEdit = true,
   showDelete = true,
 }: {
-  id: string;
+  row: { id: string; [key: string]: unknown };
   executions?: MenuItem[];
   formConfig?: FormConfig;
   buttonLabel?: string;
@@ -127,9 +127,9 @@ const Execution = ({
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
 
-  const handleMenuItemClick = (action: string | (() => void)) => {
+  const handleMenuItemClick = (action: string | ((row: { id: string; [key: string]: unknown }) => void)) => {
     if (typeof action === "function") {
-      action();
+      action(row);
     } else {
       setActionState((prev) => ({
         ...prev,
@@ -138,7 +138,7 @@ const Execution = ({
           open: true,
           url:
             action === "delete"
-              ? `${formConfig?.apiUrl}/${id}`
+              ? `${formConfig?.apiUrl}/${row.id}`
               : prev[action]?.url,
         },
       }));
@@ -190,7 +190,7 @@ const Execution = ({
       {/* Edit Form */}
       {formConfig && actionState.edit && actionState.edit.config && (
         <SheetFormBuilder
-          recordId={id}
+          recordId={row.id}
           config={actionState.edit.config}
           isOpen={actionState.edit.open}
           onOpenChange={() => handleCloseDialog("edit")}

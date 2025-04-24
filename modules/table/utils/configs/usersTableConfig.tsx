@@ -17,6 +17,7 @@ import { ROUTER } from "@/router";
 interface CompanyData {
   id: string;
   name: string;
+  phone: string;
   roles: Array<{
     role: 1 | 2 | 3; // Keys in rulesIcons
     status: number;
@@ -62,15 +63,22 @@ export const UsersConfig = () => {
         label: t("Companies.Email"),
         sortable: true,
       },
-      {
-        key: "phone",
-        label: "رقم الجوال",
-        render: (value: string) => (
-          <p style={{ direction: "ltr" }} className="text-start">
-            {value}
-          </p>
-        ),
-      },
+        {
+            key: "phone",
+            label: "رقم الجوال",
+            render: (_: unknown, row: UsersData) => {
+                const companies = row.companies || [];
+                return (
+                    <div className="line-clamp-3">
+                        {companies.map((company) => (
+                            <p key={company.id} className="line-clamp-1 h-5">
+                                {company?.phone || ''}
+                            </p>
+                        ))}
+                    </div>
+                );
+            }
+        },
       {
         key: "country.name",
         label: "الجنسية",

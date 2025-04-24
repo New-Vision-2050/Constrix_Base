@@ -87,7 +87,7 @@ export const useTableInitialization = ({
           label: t("Companies.Actions"),
           render: (_: unknown, row: any) => (
             <Execution
-              id={row.id}
+              row={row}
               formConfig={formConfig}
               executions={executions}
               buttonLabel={t("Companies.Actions")}
