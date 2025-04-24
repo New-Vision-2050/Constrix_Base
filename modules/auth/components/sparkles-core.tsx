@@ -109,7 +109,6 @@ export const SparklesCore = (props: ParticlesProps) => {
           },
           enable: false,
           maxSpeed: 50,
-          mode: "bounce",
           overlap: {
             enable: true,
             retries: 0,
@@ -170,7 +169,6 @@ export const SparklesCore = (props: ParticlesProps) => {
           center: {
             x: 50,
             y: 50,
-            mode: "percent",
             radius: 0,
           },
           decay: 0,
@@ -420,7 +418,7 @@ export const SparklesCore = (props: ParticlesProps) => {
         },
       },
       detectRetina: true,
-    }),
+    } as const),
     [background, minSize, maxSize, speed, particleColor, particleDensity]
   );
 

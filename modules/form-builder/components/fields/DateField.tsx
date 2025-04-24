@@ -27,7 +27,7 @@ const DateField: React.FC<DateFieldProps> = ({
   onBlur,
   ...props
 }) => {
-  const date = field?.isHijri? value?.toString(): value ? new Date(value) : undefined;
+  const date = !field?.isHijri && value ? new Date(value) : undefined;
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="relative">
@@ -38,7 +38,7 @@ const DateField: React.FC<DateFieldProps> = ({
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground",
+            (!date|| !value) && "text-muted-foreground",
             !!error && touched ? 'border-destructive' : '',
             field.className,
             field.width ? field.width : 'w-full'
@@ -46,23 +46,23 @@ const DateField: React.FC<DateFieldProps> = ({
           disabled={field.disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? (field?.isHijri? date: format(date, 'PPP')) : field.placeholder || 'Select a date'}
+          {value
+            ? field?.isHijri
+              ? value
+              : format(new Date(value), 'PPP')
+            : field.placeholder || 'Select a date'}
         </Button>
       </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
         {field?.isHijri
           ? <HijriCalendar
-              highlightToday
-              value={value}
+              value={value ?? undefined}
               onChange={(dateObj) => {
-                onChange(dateObj ? dateObj?.format() : '');
+                onChange(dateObj ? dateObj?.toString() : '');
                 onBlur();
                 setIsOpen(false);
               }}
-              isLeap
-              disabled={field.disabled}
-              editable={false}
-              {...props}
+              {...Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'locale'))}
             />
           : <Calendar
             mode="single"
