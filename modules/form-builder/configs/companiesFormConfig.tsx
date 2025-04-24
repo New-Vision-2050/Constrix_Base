@@ -103,7 +103,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             validation: [
               {
                 type: "apiValidation",
-                message: "الاسم المختصر يجب ان يكون بالغه الانجليزية ولا يتخلله رموز",
+                message: "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
