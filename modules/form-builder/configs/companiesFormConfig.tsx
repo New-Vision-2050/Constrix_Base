@@ -81,7 +81,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             validation: [
               {
                 type: "apiValidation",
-                message: "برجاء إدخال الاسم التجاري",
+                message: "الاسم التجاري يجب ان يكون بالغه العربية",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -103,7 +103,7 @@ export function GetCompaniesFormConfig(): FormConfig {
             validation: [
               {
                 type: "apiValidation",
-                message: "برجاء إدخال الاسم المختصر",
+                message: "الاسم المختصر يجب ان يكون بالغه الانجليزية ولا يتخلله رموز",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
