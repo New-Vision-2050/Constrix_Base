@@ -198,6 +198,12 @@ export function GetCompaniesFormConfig(): FormConfig {
             defaultValue: "",
           },
           {
+            type: "hiddenObject",
+            name: "error_sentence",
+            label: "error_sentence",
+            defaultValue: "",
+          },
+          {
             type: "text",
             name: "company_id",
             label: "الشركة",
@@ -275,6 +281,10 @@ export function GetCompaniesFormConfig(): FormConfig {
                     useFormStore.getState().setValues("companies-form", {
                       exist_user_id: response.payload?.[0]?.id,
                     });
+                    useFormStore.getState().setValues("companies-form", {
+                      error_sentence: response.payload?.[0]?.sentence,
+                    });
+                    
                     return response.payload?.[0]?.status === 1;
                   },
                 },
