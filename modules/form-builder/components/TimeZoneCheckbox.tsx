@@ -21,13 +21,17 @@ export const TimeZoneCheckbox: React.FC<TimeZoneCheckboxProps> = ({
         checked={value}
         onCheckedChange={(b: boolean) => {
           if (b) {
-            const countryId = useFormStore
+            const country = useFormStore
               ?.getState()
-              .getValue("companies-form", "local-time")['country-id'];
-            if (countryId)
-              useFormStore.getState().setValues("companies-form", {
-                country_id: countryId,
-              });
+              .getValue("companies-form", "local-time");
+
+            if(country) {
+                const countryId = country['country-id'];
+                if (countryId)
+                    useFormStore.getState().setValues("companies-form", {
+                        country_id: countryId,
+                    });
+            }
           }
           onChange(b);
         }}
