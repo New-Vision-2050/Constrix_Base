@@ -80,11 +80,6 @@ export const UsersConfig = () => {
         },
       },
       {
-        key: "country.name",
-        label: "الجنسية",
-        sortable: true,
-      },
-      {
         key: "companies",
         label: "الشركة",
         render: (value: any[] | null) => (
