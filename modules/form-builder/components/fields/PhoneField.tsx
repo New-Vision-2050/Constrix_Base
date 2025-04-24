@@ -60,11 +60,10 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
   // Phone validation function
   const validatePhone = (phone: string): boolean => {
-      return true; //TODO To Be enhanced
-    // Basic phone validation - can be enhanced as needed
-    // Format: "+XX XXXXXXXX" where XX is country code and XXXXXXXX is phone number
-    const phoneRegex = /^\+\d{1,4}\s\d{6,14}$/;
-    return phoneRegex.test(phone);
+    // Accept any format that has digits, possibly with a + prefix
+    // This allows formats like: +966 542138116, 966542138116, +1-555-123-4567, etc.
+    const phoneRegex = /^(\+?\d[\d\s-]{6,})$/;
+    return phoneRegex.test(phone.trim());
   };
 
   // Find the selected country code object
@@ -72,28 +71,96 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
     return countryCodes.find(country => country.value === countryCode) || countryCodes[0];
   }, [countryCode]);
 
-  // Initialize from value
+  // Parse value whenever it changes (for initial values and edit mode)
   useEffect(() => {
     if (value) {
-      // Try to extract country code and phone number from the value
-      // Format could be: "+XX XXXXXXXX" or "+XX-XXXXXXXX"
-      const match = value.match(/^(\+\d+)[\s-](.*)$/);
-      if (match) {
-        const [, code, number] = match;
-        setCountryCode(code);
-        setPhoneNumber(number.trim());
-      } else {
-        // If no match found, check if it's just a country code
-        if (value.startsWith('+')) {
-          setCountryCode(value);
-          setPhoneNumber('');
+      // Handle different phone number formats
+      let code = '+966'; // Default country code
+      let number = '';
+
+      // Clean the value by removing any extra spaces
+      const cleanValue = value.trim();
+
+      // Case 1: Value starts with + (e.g., +966542138116 or +966 542138116)
+      if (cleanValue.startsWith('+')) {
+        // Try to extract country code and phone number
+        const match = cleanValue.match(/^(\+\d+)[\s-]?(.*)$/);
+        if (match) {
+          const [, extractedCode, extractedNumber] = match;
+
+          // Find if this is a valid country code in our list
+          const foundCountry = countryCodes.find(country =>
+            extractedCode === country.value ||
+            country.value.startsWith(extractedCode)
+          );
+
+          if (foundCountry) {
+            code = foundCountry.value;
+            number = extractedNumber || '';
+          } else {
+            // If no matching country code found, try to extract based on common lengths
+            // Most country codes are 1-4 digits
+            for (let i = 1; i <= 4; i++) {
+              const potentialCode = extractedCode.substring(0, i + 1); // +1, +2, +3, +4 digits
+              const foundCountry = countryCodes.find(country => country.value === potentialCode);
+              if (foundCountry) {
+                code = foundCountry.value;
+                number = cleanValue.substring(i + 1); // +1 for the + character
+                break;
+              }
+            }
+
+            // If still no match, use the default and put everything in the number
+            if (code === '+966' && !number) {
+              number = cleanValue.substring(1); // Remove the + and use as number
+            }
+          }
         } else {
-          // If no country code is found, just set the phone number
-          setPhoneNumber(value);
+          // Just a + with no digits after it
+          number = '';
         }
       }
+      // Case 2: Value doesn't start with + (e.g., 966542138116)
+      else {
+        // Try to match the beginning with a country code (without +)
+        let matched = false;
+
+        // Sort country codes by length (descending) to match longer codes first
+        const sortedCodes = [...countryCodes].sort((a, b) =>
+          b.value.length - a.value.length
+        );
+
+        for (const country of sortedCodes) {
+          const codeWithoutPlus = country.value.substring(1); // Remove the +
+          if (cleanValue.startsWith(codeWithoutPlus)) {
+            code = country.value;
+            number = cleanValue.substring(codeWithoutPlus.length);
+            matched = true;
+            break;
+          }
+        }
+
+        // If no country code matched, use the default and put everything in the number
+        if (!matched) {
+          number = cleanValue;
+        }
+      }
+
+      // Special case for numbers like 966542138116 (Saudi Arabia)
+      if (cleanValue.startsWith('966') && cleanValue.length > 9) {
+        code = '+966';
+        number = cleanValue.substring(3);
+
+        // Don't trigger onChange to avoid infinite loop
+        setCountryCode(code);
+        setPhoneNumber(number);
+        return;
+      }
+
+      setCountryCode(code);
+      setPhoneNumber(number);
     }
-  }, []);
+  }, [value]); // Add value to dependency array so it runs when value changes
 
   // Combine country code and phone number when either changes
   const handleCountryCodeChange = (code: string) => {
@@ -113,11 +180,15 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPhoneNumber = e.target.value;
-    setPhoneNumber(newPhoneNumber);
-    const combinedValue = `${countryCode} ${newPhoneNumber}`.trim();
+
+    // Allow only digits, spaces, and hyphens in the phone number field
+    const sanitizedPhoneNumber = newPhoneNumber.replace(/[^\d\s-]/g, '');
+
+    setPhoneNumber(sanitizedPhoneNumber);
+    const combinedValue = `${countryCode} ${sanitizedPhoneNumber}`.trim();
 
     // Validate the combined value
-    if (newPhoneNumber && !validatePhone(combinedValue)) {
+    if (sanitizedPhoneNumber && !validatePhone(combinedValue)) {
       setLocalError("Please enter a valid phone number");
     } else {
       setLocalError(undefined);
@@ -128,16 +199,6 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
 
   return (
     <div className="space-y-2">
-      {field.label && (
-        <label
-          htmlFor={`phone-${field.name}`}
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          {field.label}
-          {field.required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      )}
-
       <div className="flex gap-2">
         <div className="flex-grow">
           <Input

@@ -129,16 +129,16 @@ export const companyUserFormConfig: FormConfig = {
                     type: "select",
                     name: "job_title_id",
                     disabled: true,
-                    defaultValue: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
                     label: "المسمى الوظيفي",
                     placeholder: "اختر المسمى الوظيفي",
                     required: true,
                     dynamicOptions: {
-                        url: `${baseURL}/job_titles`,
+                        url: `${baseURL}/job_titles?type=general_manager`,
                         valueField: "id",
                         labelField: "name",
                         searchParam: "name",
                         paginationEnabled: true,
+                        setFirstAsDefault: true,
                         pageParam: "page",
                         limitParam: "per_page",
                         itemsPerPage: 10,
@@ -154,9 +154,6 @@ export const companyUserFormConfig: FormConfig = {
             ],
         },
     ],
-    initialValues: {
-        job_title_id: "8326ca2c-a0ea-443d-a073-4b16f21a3302",
-    },
     submitButtonText: "حفظ",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -167,7 +164,7 @@ export const companyUserFormConfig: FormConfig = {
     showBackButton: false,
     editDataTransformer:(data)=>{
         return {
-            'company_id' : data.company[0].id,
+            'company_id' : data.company.id,
             'first_name' : data.name,
             'last_name' : data.name,
             'email' : data.email,

@@ -42,6 +42,7 @@ export interface FieldConfig {
   render?: (field: FieldConfig, value: any, onChange: (newValue: any) => void) => React.ReactNode;
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
+  isHijri?: boolean; // Whether to enable Hijri calendar works only with type=date
 }
 
 export interface FormSection {

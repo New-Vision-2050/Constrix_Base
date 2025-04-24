@@ -26,7 +26,6 @@ const LegalDataSection = ({
   companyLegalData: CompanyLegalData[];
   id?: string;
 }) => {
-  console.log("id in legal data section: ", id);
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -57,7 +56,13 @@ const LegalDataSection = ({
     <>
       <FormFieldSet
         title="البيانات القانونية"
-        valid={false}
+        valid={
+          !!companyLegalData &&
+          companyLegalData.length > 0 &&
+          companyLegalData.every((entry) =>
+            Object.values(entry).every((value) => !!value)
+          )
+        }
         secondTitle={
           <FieldSetSecondTitle
             mode={"Preview"}
@@ -68,7 +73,7 @@ const LegalDataSection = ({
       >
         {mode === "Preview" ? (
           <>
-            {companyLegalData.length > 0 ? (
+            {!!companyLegalData && companyLegalData.length > 0 ? (
               <LegalDataPreview companyLegalData={companyLegalData} />
             ) : (
               <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">

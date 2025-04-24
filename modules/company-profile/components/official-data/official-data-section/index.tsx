@@ -50,7 +50,7 @@ const OfficialDataSection = ({
     <>
       <FormFieldSet
         title="البيانات الرسمية"
-        valid={false}
+        valid={Object.values(officialData).every(value => !!value)}
         secondTitle={
           <FieldSetSecondTitle
             mode={mode}

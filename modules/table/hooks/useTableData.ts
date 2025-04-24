@@ -1,4 +1,7 @@
-import { useTableInstance, useTableStore } from "@/modules/table/store/useTableStore";
+import {
+  useTableInstance,
+  useTableStore,
+} from "@/modules/table/store/useTableStore";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { SearchConfig } from "@/modules/table/utils/tableTypes";
 import { createTableFetcher } from "./useTableFetcher";
@@ -19,33 +22,33 @@ export const useTableData = (
   config?: any // Accept config object to extract tableId
 ) => {
   // Use tableId from config if provided, otherwise use default
-  const tableId = config?.tableId || 'default';
+  const tableId = config?.tableId || "default";
   // Set the active table ID
   const setTableId = useTableStore((state) => state.setTableId);
-  
+
   // Use a ref to track if we've already set the table ID
   const tableIdSetRef = useRef(false);
-  
+
   // Set the active table ID only once
   useEffect(() => {
     if (!tableIdSetRef.current) {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         console.log(`[TableData] Setting active table ID: ${tableId}`);
       }
       setTableId(tableId);
       tableIdSetRef.current = true;
     }
-    
+
     // Return cleanup function
     return () => {
       // Don't reset the table on unmount to allow for data persistence
       // This is important for maintaining table state across route changes
     };
   }, []); // Empty dependency array to run only once on mount
-  
+
   // Get state and actions from the table instance
   const tableInstance = useTableInstance(tableId);
-  
+
   const {
     data,
     columns,
@@ -84,6 +87,9 @@ export const useTableData = (
 
   // Initialize table state
   useTableInitialization({
+    formConfig: config?.formConfig,
+    executions: config?.executions,
+    executionsConfig: config?.executionConfig,
     configColumns,
     defaultItemsPerPage,
     defaultSortColumn,
@@ -161,7 +167,7 @@ export const useTableData = (
     const allColumnKeys = columns.map((col: ColumnConfig) => col.key);
     // Update both the old and new APIs
     setVisibleColumns(allColumnKeys);
-    
+
     // Also update the columnVisibility state if it exists
     if (setColumnVisibility && setColumnVisibilityKeys) {
       setColumnVisibility(true);
@@ -172,11 +178,13 @@ export const useTableData = (
   // Handler for setting minimal columns visible (just the first few columns)
   const handleSetMinimalColumnsVisible = () => {
     // Show only the first 2-3 columns as minimal view
-    const minimalColumns = columns.slice(0, Math.min(3, columns.length)).map((col: ColumnConfig) => col.key);
-    
+    const minimalColumns = columns
+      .slice(0, Math.min(3, columns.length))
+      .map((col: ColumnConfig) => col.key);
+
     // Update both the old and new APIs
     setVisibleColumns(minimalColumns);
-    
+
     // Also update the columnVisibility state if it exists
     if (setColumnVisibility && setColumnVisibilityKeys) {
       setColumnVisibility(true);

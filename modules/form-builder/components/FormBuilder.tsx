@@ -160,6 +160,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   // Load edit data when in edit mode
   useEffect(() => {
     if (isEditMode) {
+       setValue('id',recordId)
       loadEditData();
     }
   }, [isEditMode]);

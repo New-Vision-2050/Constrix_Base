@@ -132,4 +132,5 @@ export interface CompanyData {
   company_address: CompanyAddress;
   company_official_documents: CompanyDocument[] | [];
   branches: Branch[];
+  created_at: string | null;
 }

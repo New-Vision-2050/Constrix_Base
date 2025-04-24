@@ -20,52 +20,52 @@ const OfficialDataPreview = ({
 
   const previewData = [
     {
-      valid: true,
       label: "اسم الشركة",
       value: name ?? "",
+      valid: Boolean(name),
       needRequest: true,
     },
     {
-      valid: false,
+      valid: Boolean(branch),
       label: "اسم الفرع",
       value: branch ?? "",
     },
     {
-      valid: true,
+      valid: Boolean(name_en),
       label: "اسم الشركة بالانجليزي",
       value: name_en ?? "",
       containerClassName: "col-span-2",
     },
     {
-      valid: true,
+      valid: Boolean(company_type),
       label: "كيان الشركة",
       value: company_type ?? "",
       needRequest: true,
     },
     {
-      valid: true,
+      valid: Boolean(country_name),
       label: "دولة المركز الرئيسي",
       value: country_name ?? "",
       needRequest: true,
     },
     {
-      valid: true,
+      valid: Boolean(company_field),
       label: "مجال الشركة",
       value: company_field ?? "",
       needRequest: true,
     },
     {
-      valid: true,
+      valid: Boolean(phone),
       label: "رقم الجوال",
       value: phone ?? "",
     },
     {
-      valid: true,
+      valid: Boolean(email),
       label: "البريد الالكتروني",
       value: email ?? "",
     },
     {
-      valid: true,
+      valid: Boolean("متميز"),
       label: "الباقة",
       value: "متميز",
       needRequest: true,

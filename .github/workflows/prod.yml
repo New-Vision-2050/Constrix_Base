@@ -1,13 +1,9 @@
 name: CI/CD Pipeline
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, closed, edited]
   push:
     branches:
-      - dev
-      - stage
-      - testing
+      - master
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -142,19 +138,6 @@ jobs:
               ./devops/deploy.sh
               rm -rf $DEPLOY_DIR
               echo "Deployment of $CONTAINER_NAME completed successfully."
-
-      - name: Post Deployment Comment
-        if: github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🚀 **Deployment Successful**
-
-            Your backend has been deployed to the following URL:
-            🔗 [FE Preview](https://core-${{ env.DEPLOYMENT_ID }}.constrix-nv.com)  
-            🔗 [Backend URL](${{ env.BE_URL }})
 
   cleanup:
     runs-on: ubuntu-latest

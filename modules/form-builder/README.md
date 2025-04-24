@@ -187,12 +187,14 @@ interface FormConfig {
   
   // Backend API configuration
   apiUrl?: string;                // URL to submit the form data to
+  apiMethod?: 'POST' | 'PUT' | 'PATCH' | 'DELETE'; // HTTP method for form submission in create mode (default: POST)
   apiHeaders?: Record<string, string>; // Custom headers for the API request
   
   // Edit mode configuration
   isEditMode?: boolean;           // Whether the form is in edit mode
   editValues?: Record<string, any>; // Values to use for editing (direct values)
-  editApiUrl?: string;            // URL to fetch data for editing (can include :id placeholder)
+  editApiUrl?: string;            // URL to fetch data for editing and for form submission in edit mode (can include :id placeholder)
+  editApiMethod?: 'POST' | 'PUT' | 'PATCH'; // HTTP method for form submission in edit mode (default: PUT)
   editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
   editDataPath?: string;          // Path to the data in the API response (e.g., 'data' or 'data.user')
   editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
@@ -407,10 +409,20 @@ Submit form data to an API endpoint:
 const apiFormConfig: FormConfig = {
   // Form fields...
   apiUrl: "/api/submit-form",
+  apiMethod: "POST", // HTTP method for form submission (default: POST)
   apiHeaders: {
     "Authorization": "Bearer your-token",
   },
   // Other configuration...
+};
+
+// API-based form update (edit mode) with different methods
+const apiUpdateFormConfig: FormConfig = {
+  isEditMode: true,
+  editApiUrl: "/api/users/:id", // URL for both fetching data and form submission in edit mode
+  editApiMethod: "PATCH", // Use PATCH for partial updates in edit mode
+  editDataPath: "data",
+  // Form fields...
 };
 ```
 
@@ -430,9 +442,11 @@ const editFormConfig: FormConfig = {
   // Form fields...
 };
 
-// API-based values
+// API-based values for editing
 const apiEditFormConfig: FormConfig = {
-  editApiUrl: "/api/users/:id", // :id will be replaced with the recordId
+  isEditMode: true,
+  editApiUrl: "/api/users/:id", // URL for both fetching data and form submission in edit mode
+  editApiMethod: "PUT", // HTTP method for form submission in edit mode (default: PUT)
   editDataPath: "data", // Path to the data in the API response
   // Form fields...
 };

@@ -21,9 +21,25 @@ export const defaultSubmitHandler = async (
       values
     );
 
-    // For step-based forms (wizard or accordion), use the last step's API URL if available
-    let apiUrl = config.apiUrl;
-    let apiHeaders = config.apiHeaders;
+    // Determine which URL, headers and method to use based on mode
+    let apiUrl, apiHeaders, apiMethod;
+    if (config.isEditMode) {
+      // In edit mode, use editApiUrl if available, otherwise fall back to apiUrl
+      apiUrl = config.editApiUrl || config.apiUrl;
+
+      // If editApiUrl contains :id placeholder, replace it with recordId from values
+      if (apiUrl && apiUrl.includes(':id') && values.id) {
+        apiUrl = apiUrl.replace(':id', values.id);
+      }
+
+      apiHeaders = config.editApiHeaders || config.apiHeaders;
+      apiMethod = config.editApiMethod || 'PUT';
+    } else {
+      // In create mode, use apiUrl and apiHeaders
+      apiUrl = config.apiUrl;
+      apiHeaders = config.apiHeaders;
+      apiMethod = config.apiMethod || 'POST';
+    }
 
     // If this is a step-based form (wizard or accordion)
     if (config.wizard || config.accordion) {
@@ -56,10 +72,24 @@ export const defaultSubmitHandler = async (
     // Log the API URL being used
     console.log(`Default submit handler - Using API URL: ${apiUrl}`);
 
-    // Make the POST request to the API
-    const response = await apiClient.post(apiUrl, values, {
-      headers: apiHeaders,
-    });
+    // Make the API request using the specified method
+    let response;
+
+    switch (apiMethod) {
+      case 'PUT':
+        response = await apiClient.put(apiUrl, values, { headers: apiHeaders });
+        break;
+      case 'PATCH':
+        response = await apiClient.patch(apiUrl, values, { headers: apiHeaders });
+        break;
+      case 'DELETE':
+        response = await apiClient.delete(apiUrl, { headers: apiHeaders, data: values });
+        break;
+      case 'POST':
+      default:
+        response = await apiClient.post(apiUrl, values, { headers: apiHeaders });
+        break;
+    }
 
     // Return success response
     return {
