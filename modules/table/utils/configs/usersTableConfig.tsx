@@ -9,6 +9,9 @@ import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { companyUserFormConfig, formConfig } from "@/modules/form-builder";
+import GearIcon from "@/public/icons/gear";
+import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
 
 // Define types for the company data
 interface CompanyData {
@@ -37,6 +40,7 @@ interface UsersData {
 // Create a component that uses the translations
 export const UsersConfig = () => {
   const t = useTranslations();
+  const router = useRouter();
 
   return {
     url: `${baseURL}/company-users`,
@@ -182,5 +186,16 @@ export const UsersConfig = () => {
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     formConfig: companyUserFormConfig,
+    executions: [
+      {
+        label: "اكمال الملف الشخصي",
+        icon: <GearIcon className="w-4 h-4" />,
+        action: () => router.push(ROUTER.USER_PROFILE),
+      },
+    ],
+    executionConfig: {
+      canEdit: true,
+      canDelete: true,
+    },
   };
 };

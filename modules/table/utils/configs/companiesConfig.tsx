@@ -7,6 +7,8 @@ import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
+import { useRouter } from "next/navigation";
+import { ROUTER } from "@/router";
 
 // Define types for the company data
 interface CompanyData {
@@ -23,6 +25,7 @@ interface CompanyData {
 // Create a component that uses the translations
 export const CompaniesConfig = () => {
   const t = useTranslations();
+  const router = useRouter();
 
   return {
     url: `${baseURL}/companies`,
@@ -129,14 +132,9 @@ export const CompaniesConfig = () => {
         action: () => console.log("Login as manager clicked"),
       },
       {
-        label: t("Companies.PackageSettings"),
+        label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
-        action: "packageSettings",
-        dialogComponent: DeleteConfirmationDialog,
-        dialogProps: {
-          title: "Package Settings",
-          shouldReloadTable: true,
-        },
+        action: () => router.push(ROUTER.COMPANY_PROFILE),
       },
     ],
     executionConfig: {
