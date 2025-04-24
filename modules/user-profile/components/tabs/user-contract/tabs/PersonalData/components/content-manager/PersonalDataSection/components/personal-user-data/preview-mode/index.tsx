@@ -63,13 +63,7 @@ export default function UserProfilePersonalDataReview() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الميلاد (هجري)"
-          value={
-            userPersonalData?.birthdate_hijri
-              ? new Date(
-                  userPersonalData?.birthdate_hijri ?? ""
-                ).toLocaleDateString()
-              : ""
-          }
+          value={userPersonalData?.birthdate_hijri ?? ""}
           valid={Boolean(userPersonalData?.birthdate_hijri)}
           type="date"
         />

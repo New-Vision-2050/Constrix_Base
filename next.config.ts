@@ -17,12 +17,23 @@ const nextConfig: NextConfig = {
     return process.env.NEXT_PUBLIC_CACHE_BUST || `build-${Date.now()}`;
   },
   // Disable static optimization to ensure fresh builds
-  experimental: {
-    // This ensures that the server always re-renders pages
-    optimizeCss: false
-  },
+  // experimental: {
+  //   // This ensures that the server always re-renders pages
+  //   optimizeCss: false
+  // },
+  // images: {
+  //    domains: ['constrix.fra1.digitaloceanspaces.com'],
+  // },
   images: {
-     domains: ['constrix.fra1.digitaloceanspaces.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'constrix.fra1.digitaloceanspaces.com',
+        port: '',
+        pathname: '/**/**',
+        search: '',
+      },
+    ],
   },
    output: 'standalone',
 };

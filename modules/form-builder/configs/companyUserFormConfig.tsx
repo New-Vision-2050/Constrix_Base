@@ -167,7 +167,7 @@ export const companyUserFormConfig: FormConfig = {
     showBackButton: false,
     editDataTransformer:(data)=>{
         return {
-            'company_id' : data.company[0].id,
+            'company_id' : data.company.id,
             'first_name' : data.name,
             'last_name' : data.name,
             'email' : data.email,
