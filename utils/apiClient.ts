@@ -9,18 +9,19 @@ import { getCookie } from "cookies-next";
  */
 export const useApiClient = () => {
   const locale = useLocale();
-  
+
   // Create a new instance with the current locale
   const instance = axios.create({
     baseURL: apiClient.defaults.baseURL,
     headers: {
       ...apiClient.defaults.headers,
       "Accept-Language": locale,
+      "Lang": locale,
       // Add domain header if in browser environment
       ...(typeof window !== 'undefined' ? { "X-Domain": window.location.hostname } : {}),
     },
   });
-  
+
   // Add the same interceptors as the main apiClient
   instance.interceptors.request.use(
     (config) => {
@@ -32,7 +33,7 @@ export const useApiClient = () => {
     },
     (error) => Promise.reject(error)
   );
-  
+
   return instance;
 };
 
@@ -47,16 +48,17 @@ export const createApiRequestOptions = (
   controller?: AbortController
 ): RequestInit => {
   const token = getCookie("new-vision-token");
-  
+
   // Get domain if in browser environment
   const domain = typeof window !== 'undefined' ? window.location.hostname : '';
-  
+
   return {
     signal: controller?.signal,
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       "Accept-Language": locale,
+      "Lang": locale,
       "X-Domain": domain,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
@@ -82,11 +84,11 @@ export const apiGet = async <T>(
     url,
     createApiRequestOptions(locale, controller)
   );
-  
+
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -104,17 +106,17 @@ export const apiPost = async <T>(
   controller?: AbortController
 ): Promise<T> => {
   const options = createApiRequestOptions(locale, controller);
-  
+
   const response = await fetch(url, {
     ...options,
     method: "POST",
     body: JSON.stringify(data),
   });
-  
+
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -132,17 +134,17 @@ export const apiPut = async <T>(
   controller?: AbortController
 ): Promise<T> => {
   const options = createApiRequestOptions(locale, controller);
-  
+
   const response = await fetch(url, {
     ...options,
     method: "PUT",
     body: JSON.stringify(data),
   });
-  
+
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 };
 
@@ -158,15 +160,15 @@ export const apiDelete = async <T>(
   controller?: AbortController
 ): Promise<T> => {
   const options = createApiRequestOptions(locale, controller);
-  
+
   const response = await fetch(url, {
     ...options,
     method: "DELETE",
   });
-  
+
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 };
