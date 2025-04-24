@@ -48,7 +48,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { options, loading, error } = useDropdownSearch({
+  const { options, loading, error, dataFetched } = useDropdownSearch({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
@@ -59,10 +59,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   useEffect(() => {
     if (
       setFirstAsDefault &&
+      dataFetched &&
       options.length > 0 &&
       (!value || (isMulti && Array.isArray(value) && value.length === 0))
-    ) {
-      onChange(isMulti ? [options[0].value] : options[0].value);
+    ) { onChange("")
+        setTimeout(function(){
+            onChange(isMulti ? [options[0].value] : options[0].value);
+        },1000)
+
     }
   }, [options, value, setFirstAsDefault, isMulti, onChange]);
 
@@ -78,22 +82,22 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       // For single select
       const singleValue = value as string;
       const option = options.find((option) => option.value === singleValue);
-      
+
       // If we have a proper label, use it
       if (option) {
         return option.label;
       }
-      
+
       // If we're still loading and have a value, show loading indicator
       if (loading && singleValue) {
         return `${singleValue} (loading...)`;
       }
-      
+
       // Fallback to the value itself
       return singleValue;
     }
   };
-  
+
   const selectedLabel = getSelectedLabels();
 
   // Handle keyboard navigation

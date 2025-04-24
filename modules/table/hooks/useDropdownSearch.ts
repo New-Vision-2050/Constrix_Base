@@ -17,6 +17,7 @@ interface UseDropdownSearchResult {
   options: DropdownOption[];
   loading: boolean;
   error: string | null;
+  dataFetched: boolean;
 }
 
 export const useDropdownSearch = ({
@@ -31,6 +32,7 @@ export const useDropdownSearch = ({
   const [backupOptions, setBackupOptions] = useState<DropdownOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dataFetched, setDataFetched] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
   const initialFetchDoneRef = useRef(false);
@@ -493,6 +495,7 @@ export const useDropdownSearch = ({
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
+        setDataFetched(true)
       }
     }
   }, [dynamicConfig, dependencies, buildSearchUrl, debouncedSearchTerm]);
@@ -514,6 +517,7 @@ export const useDropdownSearch = ({
     options,
     loading,
     error,
+    dataFetched,
   };
 };
 

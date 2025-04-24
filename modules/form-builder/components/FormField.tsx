@@ -33,7 +33,7 @@ interface FormFieldProps {
   >;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
-  formId?: string; // Add formId prop to identify which form instance to use
+  formId: string|undefined; // Add formId prop to identify which form instance to use
 }
 
 // This component subscribes to validating state
