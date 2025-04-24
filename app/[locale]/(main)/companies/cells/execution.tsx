@@ -19,9 +19,11 @@ import { useRouter } from "next/navigation";
 
 const Execution = ({
   id,
+  user_id,
   formConfig,
 }: {
   id: string;
+  user_id: string;
   formConfig: FormConfig;
 }) => {
   const router = useRouter();
@@ -42,7 +44,7 @@ const Execution = ({
       label: t("Companies.completeProfileData"),
       icon: <PencilLineIcon additionalClass="w-4 h-4 me-2 text-primary" />,
       func: () => {
-        router.push(`/user-profile?id=${id}`);
+        router.push(`/user-profile?id=${user_id}`);
       },
     },
     {
