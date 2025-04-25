@@ -6,7 +6,7 @@ import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import { useTranslations } from 'next-intl'
 
-export function GetCompaniesFormConfig(t:ReturnType<useTranslations>): FormConfig {
+export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
   return {
     formId: "companies-form",
     title: "اضافة شركة جديدة",

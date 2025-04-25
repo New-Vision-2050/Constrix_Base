@@ -30,19 +30,18 @@ const DateField: React.FC<DateFieldProps> = ({
 }) => {
   const date = !field?.isHijri && value ? new Date(value) : undefined;
   const [isOpen, setIsOpen] = useState(false);
-  console.log(field)
 
   const getMinDate = () =>{
-    let minDate = field?.minDate?.value ?? useFormStore
+    let minDate = field?.minDate?.value ?? (field?.minDate?.formId ? useFormStore
       ?.getState()
-      .getValue(field?.minDate?.formId, field?.minDate?.field)
+      .getValue(field?.minDate?.formId || '', field?.minDate?.field || ''): undefined)
 
     return minDate ? new Date(minDate): undefined;
   }
   const getMaxDate = () =>{
-    let maxDate = field?.maxDate?.value ?? useFormStore
+    let maxDate = field?.maxDate?.value ?? (field?.maxDate?.formId ? useFormStore
       ?.getState()
-      .getValue(field?.maxDate?.formId, field?.maxDate?.field)
+      .getValue(field?.maxDate?.formId || '', field?.maxDate?.field || ''): undefined)
 
     return maxDate ? new Date(maxDate): undefined;
   }
