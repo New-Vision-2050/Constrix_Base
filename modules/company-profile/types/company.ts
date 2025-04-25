@@ -95,7 +95,11 @@ export interface officialData {
   company_type_id: string;
   country_name: string;
   country_id: string;
-  company_field: string;
+  company_field: {
+    id: number;
+    name: string;
+    description: string;
+  }[];
   company_field_id: string;
   phone: string;
   email: string;
