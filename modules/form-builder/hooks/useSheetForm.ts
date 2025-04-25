@@ -178,86 +178,19 @@ export function useSheetForm({
         if (field.condition && !field.condition(values)) {
           return;
         }
-
-        // Skip fields that are hidden or disabled
-        if (field.hidden || field.disabled) {
-          return;
-        }
-
-        // Check required fields
-        if (
-          field.required &&
-          (!values[field.name] || values[field.name] === "")
-        ) {
-          newErrors[field.name] = `${field.label} is required`;
-          isValid = false;
-        }
-
-        // Check validation rules
-        if (field.validation && field.validation.length > 0) {
-          for (const rule of field.validation) {
-            const value = values[field.name];
-
-            switch (rule.type) {
-              case "required":
-                if (value === undefined || value === null || value === "") {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "minLength":
-                if (typeof value === "string" && value.length < rule.value) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "maxLength":
-                if (typeof value === "string" && value.length > rule.value) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "pattern":
-                if (
-                  typeof value === "string" &&
-                  !new RegExp(rule.value).test(value)
-                ) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "email":
-                if (
-                  typeof value === "string" &&
-                  !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-                ) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "custom":
-                if (rule.validator && !rule.validator(value, values)) {
-                  return rule.message;
-                }
-                break;
-              // Add other validation types as needed
-            }
-
-            // Break the loop if we already found an error for this field
-            if (newErrors[field.name]) {
-              break;
-            }
+          if (field.hidden || field.disabled) {
+              return;
           }
+        if(field.validation && config.formId) {
+            isValid = useFormStore.getState().validateField(config.formId, field.name, values[field.name], field.validation, values);
         }
       });
     });
 
-    // Update form state with errors
-    setErrors(newErrors);
     setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, values, setErrors, setIsValid]);
+  }, [config.sections, values, setIsValid]);
 
   // Handle form submission
   const handleSubmit = useCallback(
