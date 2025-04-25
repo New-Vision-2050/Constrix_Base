@@ -235,6 +235,11 @@ export function useSheetForm({
                   isValid = false;
                 }
                 break;
+              case "custom":
+                if (rule.validator && !rule.validator(value, values)) {
+                  return rule.message;
+                }
+                break;
               // Add other validation types as needed
             }
 

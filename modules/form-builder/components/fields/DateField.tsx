@@ -8,6 +8,7 @@ import { FieldConfig } from '../../types/formTypes';
 import { cn } from '@/lib/utils';
 import { DayPickerSingleProps } from 'react-day-picker';
 import { HijriCalendar } from '@/modules/table/components/ui/HijriCalendar'
+import { useFormStore } from '@/modules/form-builder'
 
 interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
@@ -29,6 +30,22 @@ const DateField: React.FC<DateFieldProps> = ({
 }) => {
   const date = !field?.isHijri && value ? new Date(value) : undefined;
   const [isOpen, setIsOpen] = useState(false);
+  console.log(field)
+
+  const getMinDate = () =>{
+    let minDate = field?.minDate?.value ?? useFormStore
+      ?.getState()
+      .getValue(field?.minDate?.formId, field?.minDate?.field)
+
+    return minDate ? new Date(minDate): undefined;
+  }
+  const getMaxDate = () =>{
+    let maxDate = field?.maxDate?.value ?? useFormStore
+      ?.getState()
+      .getValue(field?.maxDate?.formId, field?.maxDate?.field)
+
+    return maxDate ? new Date(maxDate): undefined;
+  }
   return (
     <div className="relative">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -62,6 +79,8 @@ const DateField: React.FC<DateFieldProps> = ({
                 onBlur();
                 setIsOpen(false);
               }}
+              {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {minDate: getMinDate()}:{}}
+              {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {maxDate: getMaxDate()}:{}}
               {...Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'locale'))}
             />
           : <Calendar
@@ -74,6 +93,8 @@ const DateField: React.FC<DateFieldProps> = ({
             }}
             disabled={field.disabled}
             initialFocus
+            {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {fromDate: getMinDate()}:{}}
+            {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {toDate: getMaxDate()}:{}}
             {...props}
           />}
         </PopoverContent>

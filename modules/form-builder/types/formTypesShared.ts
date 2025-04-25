@@ -8,6 +8,12 @@ export interface ValidationRule {
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
 }
 
+export interface minMaxDate {
+  formId?: string,
+  field?: string
+  value?: string
+}
+
 export interface FieldConfig {
   type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'email' | 'password' | 'number' | 'date' | 'search' | 'image';
   name: string;
@@ -43,6 +49,8 @@ export interface FieldConfig {
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isHijri?: boolean; // Whether to enable Hijri calendar works only with type=date
+  minDate?: minMaxDate,
+  maxDate?: minMaxDate,
 }
 
 export interface FormSection {

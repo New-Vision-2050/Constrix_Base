@@ -4,8 +4,9 @@ import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
+import { useTranslations } from 'next-intl'
 
-export function GetCompaniesFormConfig(): FormConfig {
+export function GetCompaniesFormConfig(t:ReturnType<useTranslations>): FormConfig {
   return {
     formId: "companies-form",
     title: "اضافة شركة جديدة",
@@ -79,6 +80,11 @@ export function GetCompaniesFormConfig(): FormConfig {
             placeholder: "برجاء إدخال الاسم التجاري",
             required: true,
             validation: [
+              {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicName"),
+              },
               {
                 type: "apiValidation",
                 message: "الاسم التجاري يجب ان يكون بالغه العربية",
@@ -232,6 +238,11 @@ export function GetCompaniesFormConfig(): FormConfig {
                 message: "اسم المستخدم الاول مطلوب",
               },
               {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicFirstName"),
+              },
+              {
                 type: "minLength",
                 value: 2,
                 message: "Name must be at least 2 characters",
@@ -248,6 +259,11 @@ export function GetCompaniesFormConfig(): FormConfig {
               {
                 type: "required",
                 message: "الاسم مطلوب",
+              },
+              {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicLastName"),
               },
               {
                 type: "minLength",
@@ -377,7 +393,7 @@ export function GetCompaniesFormConfig(): FormConfig {
         const result = await defaultStepSubmitHandler(
           step,
           values,
-          GetCompaniesFormConfig()
+          GetCompaniesFormConfig(t)
         );
         console.log("result before success", result);
         useFormStore.getState().setValues("companies-form", {

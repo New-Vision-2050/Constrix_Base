@@ -73,6 +73,12 @@ export interface SearchTypeConfig {
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
 }
 
+export interface minMaxDate {
+  formId?: string,
+  field?: string
+  value?: string
+}
+
 export interface FieldConfig {
   type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows' | 'image' | 'file';
   name: string;
@@ -124,6 +130,8 @@ export interface FieldConfig {
   postfix?: string; // Text to display after the input field
   defaultValue?: any; // Default value for the field
   dynamicRowOptions?: DynamicRowOptions; // Configuration for dynamic rows field
+  minDate?: minMaxDate,
+  maxDate?: minMaxDate,
 }
 
 export interface FormSection {

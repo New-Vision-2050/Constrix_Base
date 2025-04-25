@@ -36,8 +36,8 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="ارفاق رخصة العمل"
-          value={userIdentityData?.file_work_permit?'رخصة العمل pdf':''}
-          valid={Boolean(userIdentityData?.file_work_permit)}
+          value={userIdentityData?.file_work_permit?.url ? 'رخصة العمل pdf' :''}
+          valid={Boolean(userIdentityData?.file_work_permit?.url)}
           type="pdf"
           fileUrl={userIdentityData?.file_work_permit?.url}
         />
