@@ -16,7 +16,7 @@ import MultiImageField from "./fields/MultiImageField";
 import FileField from "./fields/FileField";
 import MultiFileField from "./fields/MultiFileField";
 import FieldHelperText from "./fields/FieldHelperText";
-import { useFormInstance, useFormStore } from "../hooks/useFormStore";
+import {useFormInstance, useFormStore} from "../hooks/useFormStore";
 import { hasApiValidation, triggerApiValidation } from "../utils/apiValidation";
 
 interface FormFieldProps {
@@ -33,7 +33,7 @@ interface FormFieldProps {
   >;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
-  formId: string|undefined; // Add formId prop to identify which form instance to use
+  formId: string; // Add formId prop to identify which form instance to use
 }
 
 // This component subscribes to validating state
@@ -99,7 +99,14 @@ const FormField: React.FC<FormFieldProps> = ({
               useFormStore.getState()
             );
           }
+
         });
+      } else if(field.validation){
+         formInstance.validateField(
+             field.name,
+             newValue,
+             field.validation,
+             values)
       }
     },
     [
