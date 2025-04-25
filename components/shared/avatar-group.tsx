@@ -7,8 +7,8 @@ type AvatarGroupProps = {
 };
 
 const getInitials = (name: string) => {
-  const words = name.trim().split(" ");
-  const firstLetter = words[0]?.[0] || "";
+  const words = name?.trim().split(" ") || [];
+  const firstLetter = words ? words[0]?.[0] : "";
   const lastLetter = words.length > 1 ? words[words.length - 1][0] : "";
   return (firstLetter + lastLetter).toUpperCase();
 };
