@@ -59,7 +59,7 @@ interface FormState {
     value: any,
     rules: ValidationRule[],
     formValues: Record<string, any>
-  ) => void;
+  ) => boolean;
   hasValidatingFields: (formId: string) => boolean;
   setEditMode: (formId: string, isEditMode: boolean) => void; // Add setEditMode action
 }
@@ -384,12 +384,12 @@ export const useFormStore = create<FormState>((set, get) => ({
         value: any,
         rules: ValidationRule[],
         formValues: Record<string, any> = {},
-    ) => {
-        if (!rules) return null;
+    ) :boolean => {
+        if (!rules) return true;
         const store = get();
         if(!store) {
             console.log('No Store')
-            return null;
+            return true;
         }
         let hasError:boolean = false
         for (const rule of rules) {
@@ -492,7 +492,7 @@ export const useFormStore = create<FormState>((set, get) => ({
         }
         store.setTouched(formId,fieldName, true);
 
-        return null;
+        return !hasError;
     },
 
   // Check if any fields are currently being validated
