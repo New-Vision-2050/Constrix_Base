@@ -37,9 +37,9 @@ export default function UserIqamaDataPreviewMode() {
         <PreviewTextField
           label="ارفاق رقم الاقامة"
           value={
-            Boolean(userIdentityData?.file_entry_number) ? "رقم الاقامة" : ""
+            Boolean(userIdentityData?.file_entry_number?.url) ? "رقم الاقامة" : ""
           }
-          valid={Boolean(userIdentityData?.file_entry_number)}
+          valid={Boolean(userIdentityData?.file_entry_number?.url)}
           type="pdf"
           fileUrl={userIdentityData?.file_entry_number?.url}
         />

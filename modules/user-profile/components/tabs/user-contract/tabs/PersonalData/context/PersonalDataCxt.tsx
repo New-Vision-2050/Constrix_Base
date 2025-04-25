@@ -55,6 +55,7 @@ export const PersonalDataTabCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
+  
   const { data: userPersonalData, refetch: refreshPersonalData } =
     useUserPersonalData();
   const { data: userConnectionData, refetch: refreshConnectionData } =

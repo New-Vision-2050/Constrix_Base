@@ -12,9 +12,11 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
+import { useTranslations } from 'next-intl'
 
 const CompaniesPage = () => {
   // Get the translated config using the component
+  const t = useTranslations('Companies');
   const config = CompaniesConfig();
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
@@ -57,8 +59,8 @@ const CompaniesPage = () => {
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
-              config={GetCompaniesFormConfig()}
-              trigger={<Button>انشاء شركة</Button>}
+              config={GetCompaniesFormConfig(t)}
+              trigger={<Button>{t("createCompany")}</Button>}
               onSuccess={handleFormSuccess}
             />{" "}
             <CompanySaveDialog
