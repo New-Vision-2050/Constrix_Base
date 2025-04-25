@@ -4,6 +4,8 @@ import { debounce } from "lodash";
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
 import {apiClient} from "@/config/axios-config";
 import {triggerApiValidation} from "@/modules/form-builder";
+import {messages} from "@/config/messages";
+import {boolean} from "zod";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -389,42 +391,48 @@ export const useFormStore = create<FormState>((set, get) => ({
             console.log('No Store')
             return null;
         }
-
+        let hasError:boolean = false
         for (const rule of rules) {
             switch (rule.type) {
                 case "required":
                     if (value === undefined || value === null || value === "") {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
                 case "min":
                     if (typeof value === "number" && value < rule.value) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
                 case "max":
                     if (typeof value === "number" && value > rule.value) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
                 case "minLength":
                     if (typeof value === "string" && value.length < rule.value) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
                 case "maxLength":
                     if (typeof value === "string" && value.length > rule.value) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
                 case "pattern":
                     if (typeof value === "string" && !new RegExp(rule.value).test(value)) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
@@ -434,6 +442,7 @@ export const useFormStore = create<FormState>((set, get) => ({
                         !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
                     ) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
@@ -445,12 +454,14 @@ export const useFormStore = create<FormState>((set, get) => ({
                         )
                     ) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
                 case "custom":
                     if (rule.validator && !rule.validator(value, formValues)) {
                         store.setError(formId, fieldName, rule.message);
+                        hasError = true;
                         break;
                     }
                     break;
@@ -459,22 +470,12 @@ export const useFormStore = create<FormState>((set, get) => ({
                     if (fieldName) {
                         // Make sure rule and apiConfig exist
                         if (!rule || !rule.apiConfig) {
-                            return null;
+                            break;
                         }
 
                         // Use the provided store or get it from the global state
                         const formStore = store || useFormStore.getState();
 
-                        // Check if there's an existing error for this field
-                        // We need to get the active form ID and then access its errors
-                        const activeFormId = formStore.activeFormId;
-                        const activeForm = formStore.forms[activeFormId];
-
-                        if (activeForm && activeForm.errors && activeForm.errors[fieldName]) {
-                            return activeForm.errors[fieldName];
-                        }
-
-                        // Use the triggerApiValidation utility function which handles formId correctly
                         try {
                             // Import the utility function to avoid circular dependencies
                             const { triggerApiValidation } = require('../utils/apiValidation');
@@ -482,12 +483,11 @@ export const useFormStore = create<FormState>((set, get) => ({
                         } catch (error) {
                             console.error("Error in API validation:", error);
                         }
-
-                        // Return null here as the validation is async and will update the form state later
-                        // We'll check the validatingFields state to show a loading indicator
-                        return null;
                     }
                     break;
+            }
+            if(hasError) {
+                break;
             }
         }
         store.setTouched(formId,fieldName, true);

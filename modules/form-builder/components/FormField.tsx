@@ -87,21 +87,7 @@ const FormField: React.FC<FormFieldProps> = ({
       // Clear any existing errors for this field when the value changes
       formInstance.setError(field.name, null);
 
-      // Check if field has API validation rules and trigger validation
-      if (field.validation && hasApiValidation(field.validation)) {
-        field.validation.forEach((rule) => {
-          if (rule.type === "apiValidation") {
-            // Pass the store instance to avoid getState() call in the validation function
-            triggerApiValidation(
-              field.name,
-              newValue,
-              rule,
-              useFormStore.getState()
-            );
-          }
-
-        });
-      } else if(field.validation){
+     if(field.validation){
          formInstance.validateField(
              field.name,
              newValue,
