@@ -1,13 +1,15 @@
 import PreviewTextField from "../../../components/previewTextField";
+import { useFunctionalContractualCxt } from "../../context";
 
 export default function JobInformationPreviewMode() {
+  const { professionalData } = useFunctionalContractualCxt();
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
           label="الفرع"
-          value={"offer?.job_offer_number"}
-          valid={Boolean("offer?.job_offer_number")}
+          value={professionalData?.branch?.name ?? ""}
+          valid={Boolean(professionalData?.branch?.name)}
           required
         />
       </div>
@@ -15,8 +17,8 @@ export default function JobInformationPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="الادارة"
-          value={"offer?.job_offer_number"}
-          valid={Boolean("offer?.job_offer_number")}
+          value={professionalData?.management?.name ?? ""}
+          valid={Boolean(professionalData?.management?.name)}
           required
         />
       </div>
@@ -24,8 +26,8 @@ export default function JobInformationPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="القسم"
-          value={"offer?.job_offer_number"}
-          valid={Boolean("offer?.job_offer_number")}
+          value={professionalData?.department?.name ?? ""}
+          valid={Boolean(professionalData?.department?.name)}
           required
         />
       </div>
@@ -33,8 +35,8 @@ export default function JobInformationPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="نوع الوظيفة"
-          value={"offer?.job_offer_number"}
-          valid={Boolean("offer?.job_offer_number")}
+          value={professionalData?.job_type?.name ?? ""}
+          valid={Boolean(professionalData?.job_type?.name)}
           required
         />
       </div>
@@ -42,8 +44,8 @@ export default function JobInformationPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="المسمى الوظيفي"
-          value={"offer?.job_offer_number"}
-          valid={Boolean("offer?.job_offer_number")}
+          value={professionalData?.job_title ?? ""}
+          valid={Boolean(professionalData?.job_title)}
           required
         />
       </div>
@@ -51,8 +53,8 @@ export default function JobInformationPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="الرقم الوظيفي"
-          value={"offer?.job_offer_number"}
-          valid={Boolean("offer?.job_offer_number")}
+          value={professionalData?.job_code ?? ""}
+          valid={Boolean(professionalData?.job_code)}
           required
         />
       </div>

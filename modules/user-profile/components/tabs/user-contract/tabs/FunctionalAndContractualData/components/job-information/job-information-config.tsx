@@ -2,9 +2,12 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useFunctionalContractualCxt } from "../../context";
 
 export const JobFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { professionalData, handleRefetchProfessionalData } =
+    useFunctionalContractualCxt();
 
   const jobFormConfig: FormConfig = {
     formId: "job-data-form",
@@ -22,14 +25,11 @@ export const JobFormConfig = () => {
             placeholder: "الفرع",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies`,
+              url: `${baseURL}/management_hierarchies/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -46,18 +46,15 @@ export const JobFormConfig = () => {
             placeholder: "الادارة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies?type=management`,
+              url: `${baseURL}/management_hierarchies/list?type=management`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
 
-              dependsOn: "parentId",
-              filterParam: "branch_id",
+              dependsOn: "branch_id",
+              filterParam: "parentId",
             },
             validation: [
               {
@@ -73,18 +70,15 @@ export const JobFormConfig = () => {
             placeholder: "القسم",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies?type=department`,
+              url: `${baseURL}/management_hierarchies/list?type=department`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
 
-              dependsOn: "parentId",
-              filterParam: "management_id",
+              dependsOn: "management_id",
+              filterParam: "parentId",
             },
             validation: [
               {
@@ -124,7 +118,7 @@ export const JobFormConfig = () => {
             placeholder: "المسمى الوظيفي",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_types`,
+              url: `${baseURL}/job_titles`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -158,7 +152,14 @@ export const JobFormConfig = () => {
         columns: 2,
       },
     ],
-    initialValues: {},
+    initialValues: {
+      branch_id: professionalData?.branch?.id,
+      management_id: professionalData?.management?.id,
+      department_id: professionalData?.department?.id,
+      job_type_id: professionalData?.job_type?.id,
+      job_title_id: professionalData?.job_title,
+      job_code: professionalData?.job_code,
+    },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
     showReset: false,
@@ -169,6 +170,7 @@ export const JobFormConfig = () => {
     showBackButton: false,
     onSuccess: () => {
       handleRefetchDataStatus();
+      handleRefetchProfessionalData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
@@ -178,7 +180,10 @@ export const JobFormConfig = () => {
 
       console.log("asd.asd.asd.body", body);
 
-      const response = await apiClient.post(`/user_salaries`, serialize(body));
+      const response = await apiClient.post(
+        `/user_professional_data`,
+        serialize(body)
+      );
 
       return {
         success: true,
