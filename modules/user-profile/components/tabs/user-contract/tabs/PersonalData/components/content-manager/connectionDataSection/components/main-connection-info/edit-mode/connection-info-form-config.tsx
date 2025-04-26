@@ -2,7 +2,6 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import { countryPhoneCodes } from "../../../../../../constants/ContriesPhoneCodeList";
 
 export const ConnectionInformationFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -20,18 +19,9 @@ export const ConnectionInformationFormConfig = () => {
       {
         fields: [
           {
-            name: "phone_code",
-            label: "كود الدولة",
-            type: "select",
-            options: countryPhoneCodes?.map((item) => ({
-              label: item,
-              value: item,
-            })),
-          },
-          {
             name: "phone",
             label: "رقم الجوال",
-            type: "text",
+            type: "phone",
             placeholder: "رقم الجوال",
           },
           {
@@ -43,13 +33,13 @@ export const ConnectionInformationFormConfig = () => {
           {
             name: "other_phone",
             label: "رقم   الجوال البديل",
-            type: "text",
+            type: "phone",
             placeholder: "رقم   الجوال البديل",
           },
           {
             name: "landline_number",
             label: "رقم الهاتف الأرضي",
-            type: "text",
+            type: "phone",
             placeholder: "رقم الهاتف الأرضي",
           },
         ],
@@ -74,8 +64,11 @@ export const ConnectionInformationFormConfig = () => {
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
+      const phoneCode =
+        ((formData?.phone as string) ?? "")?.split(" ")?.[0] ?? undefined;
       const body = {
         ...formData,
+        phone_code: phoneCode,
       };
 
       const response = await apiClient.put(
