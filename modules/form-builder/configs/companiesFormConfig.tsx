@@ -87,7 +87,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               },
               {
                 type: "apiValidation",
-                message: "الاسم التجاري يجب ان يكون بالغه العربية",
+                message: "الاسم التجاري يجب ان يكون باللغة العربية",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
