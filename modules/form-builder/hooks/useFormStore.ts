@@ -350,7 +350,7 @@ export const useFormStore = create<FormState>((set, get) => ({
             // Update form state based on validation result
             const store = get();
             if (!isValid) {
-              store.setError(formId, fieldName, rule.message);
+              store.setError(formId, fieldName, response.data?.message ?? response.data?.payload?.sentence ?? rule.message);
             } else {
               store.setError(formId, fieldName, null);
             }
