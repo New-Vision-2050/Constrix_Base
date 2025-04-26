@@ -46,6 +46,10 @@ export const SingleExperienceFormConfig = ({
             type: "date",
             name: "training_from",
             placeholder: "تاريخ البداية",
+            maxDate: {
+              formId: `user-experiences-data-form-${experience?.id ?? ""}`,
+              field: 'training_to'
+            },
             validation: [
               {
                 type: "required",
@@ -58,6 +62,10 @@ export const SingleExperienceFormConfig = ({
             type: "date",
             name: "training_to",
             placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `user-experiences-data-form-${experience?.id ?? ""}`,
+              field: 'training_from'
+            },
           },
           {
             name: "company_name",
