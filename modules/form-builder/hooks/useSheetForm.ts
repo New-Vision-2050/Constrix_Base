@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
 import { FormConfig } from "../types/formTypes";
+import { RequestOptions } from "../types/requestTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
 import { useFormInstance, useFormStore } from "./useFormStore";
@@ -10,6 +11,7 @@ interface UseSheetFormProps {
   recordId?: string | number | null; // Optional record ID for editing
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
+  requestOptions?: RequestOptions; // Optional request options for API calls
 }
 
 interface UseSheetFormResult {
@@ -66,6 +68,7 @@ export function useSheetForm({
   recordId,
   onSuccess,
   onCancel,
+  requestOptions,
 }: UseSheetFormProps): UseSheetFormResult {
   const { toast } = useToast();
 
@@ -258,7 +261,7 @@ export function useSheetForm({
 
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
-          config.onSubmit || ((values) => defaultSubmitHandler(values, config));
+          config.onSubmit || ((values) => defaultSubmitHandler(values, config, requestOptions));
         const result = await submitHandler(finalValues);
         if (result.success) {
           setSubmitSuccess(true);
