@@ -124,6 +124,7 @@
     "AreYouSureDeactivate": "Do you want to confirm deactivating the company?",
     "createCompany": "Create Company",
     "Validation": {
+      "englishName": "Short name should be in English",
       "arabicName": "The name should be in Arabic letters",
       "arabicFirstName": "The first name should be in Arabic letters",
       "arabicLastName": "The last name should be in Arabic letters"

@@ -107,6 +107,15 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             containerClassName: "rtl:flex-row-reverse",
             required: true,
             validation: [
+                {
+                    type: "required",
+                    message: "ادخل الاسم المختصر",
+                },
+                {
+                    type: "pattern",
+                    value: /^[a-zA-Z]+$/,
+                    message: t("Validation.englishName"),
+                },
               {
                 type: "apiValidation",
                 message:
@@ -119,10 +128,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
                   successCondition: (response) => response.payload.status === 1,
                 },
               },
-              {
-                type: "required",
-                message: "اختر مسؤول الدعم",
-              },
+
             ],
           },
           {
@@ -166,18 +172,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
                   onChange={onChange}
                 />
               );
-            },
-            validation: [
-              {
-                type: "custom",
-                message: "Order must have at least one item",
-                validator: (value) => {
-                  console.log("checkbox error: -----: ", value);
-
-                  return false;
-                },
-              },
-            ],
+            }
           },
           {
             type: "hiddenObject",
