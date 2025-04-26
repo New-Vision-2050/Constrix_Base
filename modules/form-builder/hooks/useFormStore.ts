@@ -1,11 +1,9 @@
 import { create } from "zustand";
 import { ValidationRule } from "../types/formTypes";
-import { debounce } from "lodash";
+import {debounce} from "lodash";
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
 import {apiClient} from "@/config/axios-config";
 import {triggerApiValidation} from "@/modules/form-builder";
-import {messages} from "@/config/messages";
-import {boolean} from "zod";
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -40,6 +38,8 @@ interface FormState {
   setValues: (formId: string, values: Record<string, any>) => void;
   setError: (formId: string, field: string, error: string | React.ReactNode | null) => void;
   setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => void;
+  getErrors: (formId: string) => Record<string, string | React.ReactNode>;
+  hasErrors: (formId: string) => boolean;
   setTouched: (formId: string, field: string, isTouched: boolean) => void;
   setAllTouched: (formId: string) => void;
   resetForm: (formId: string, values?: Record<string, any>) => void;
@@ -52,15 +52,16 @@ interface FormState {
     field: string,
     value: any,
     rule: ValidationRule
-  ) => void;
+  ) => boolean;
   validateField: (
     formId: string,
     fieldName: string,
     value: any,
     rules: ValidationRule[],
-    formValues: Record<string, any>
+    formValues: Record<string, any>,
+    isSubmitting?: boolean
   ) => boolean;
-  hasValidatingFields: (formId: string) => boolean;
+  hasValidatingFields: (formId: string, isSubmitting?: boolean) => boolean;
   setEditMode: (formId: string, isEditMode: boolean) => void; // Add setEditMode action
 }
 
@@ -166,6 +167,18 @@ export const useFormStore = create<FormState>((set, get) => ({
       }
     };
   }),
+    hasErrors: (formId: string):boolean => {
+        // Get the current state
+        const state = get();
+        const formState = state.forms[formId] || getDefaultFormState();
+        return Object.values(formState.errors).length > 0;
+    },
+    getErrors: (formId: string) => {
+        // Get the current state
+        const state = get();
+        const formState = state.forms[formId] || getDefaultFormState();
+        return formState.errors;
+    },
 
   setErrors: (formId: string, errors: Record<string, string | React.ReactNode>) => set((state: FormState) => {
     const formState = state.forms[formId] || getDefaultFormState();
@@ -279,10 +292,9 @@ export const useFormStore = create<FormState>((set, get) => ({
     };
   }),
 
-  validateFieldWithApi: (formId: string, field: string, value: any, rule: ValidationRule) => {
+  validateFieldWithApi: (formId: string, field: string, value: any, rule: ValidationRule):boolean => {
     // Check if rule and apiConfig exist
-    if (!rule || !rule.apiConfig) return;
-
+    if (!rule || !rule.apiConfig) return false;
     const {
       url,
       method = "GET",
@@ -292,9 +304,9 @@ export const useFormStore = create<FormState>((set, get) => ({
       successCondition,
     } = rule.apiConfig;
 
+    let isValid = false;
     // Get the current state
     const store = get();
-    const formState = store.forms[formId] || getDefaultFormState();
 
     // Set field as validating
     store.setFieldValidating(formId, field, true);
@@ -376,6 +388,9 @@ export const useFormStore = create<FormState>((set, get) => ({
     if (debouncedFn) {
       debouncedFn(formId, field, value);
     }
+    
+    // Return true to indicate validation has been triggered
+    return true;
   },
 
     validateField: (
@@ -384,6 +399,7 @@ export const useFormStore = create<FormState>((set, get) => ({
         value: any,
         rules: ValidationRule[],
         formValues: Record<string, any> = {},
+        isSubmitting: boolean = false
     ) :boolean => {
         if (!rules) return true;
         const store = get();
@@ -466,25 +482,76 @@ export const useFormStore = create<FormState>((set, get) => ({
                     }
                     break;
                 case "apiValidation":
-                    // For API validation, we trigger the validation but also check if there's an existing error
-                    if (fieldName) {
-                        // Make sure rule and apiConfig exist
-                        if (!rule || !rule.apiConfig) {
-                            break;
-                        }
+                        // For API validation, we trigger the validation but also check if there's an existing error
+                        if (fieldName) {
+                            // Make sure rule and apiConfig exist
+                            if (!rule || !rule.apiConfig) {
+                                break;
+                            }
 
-                        // Use the provided store or get it from the global state
-                        const formStore = store || useFormStore.getState();
+                            // Get the current form state
+                            const formState = get().forms[formId];
+                            
+                            // Check if this is being called during form submission
+                            if (isSubmitting) {
+                                // During form submission, check if the field has an error
+                                if (formState && formState.errors[fieldName]) {
+                                    hasError = true;
+                                    break;
+                                }
+                                
+                                // Check if the field is currently being validated
+                                if (formState && formState.validatingFields[fieldName]) {
+                                    // If the field is still being validated, consider it an error
+                                    hasError = true;
+                                    break;
+                                }
+                                
+                                // If the field has a value but has never been validated, consider it an error
+                                // This ensures that all fields with API validation rules must be validated before submission
+                                if (value !== undefined && value !== null && value !== '') {
+                                    // Check if this field has ever been validated
+                                    const hasBeenValidated = formState &&
+                                        (formState.touched[fieldName] ||
+                                         Object.keys(formState.errors).includes(fieldName) ||
+                                         formState.validatingFields[fieldName]);
+                                    
+                                    if (!hasBeenValidated) {
+                                        hasError = true;
+                                        store.setError(formId, fieldName, rule.message || "This field requires validation");
+                                        break;
+                                    }
+                                }
+                                
+                                // Check if this field has a failed API validation
+                                // We need to check if the field has been validated and has an error
+                                // This ensures that if a field has failed API validation, the form won't submit
+                                if (formState && formState.touched[fieldName] && formState.errors[fieldName]) {
+                                    hasError = true;
+                                    break;
+                                }
+                                
+                                // Do NOT trigger validation during form submission
+                                // This prevents the "Please wait for field validation to complete" error
+                                break;
+                            }
 
-                        try {
-                            // Import the utility function to avoid circular dependencies
-                            const { triggerApiValidation } = require('../utils/apiValidation');
-                            triggerApiValidation(fieldName, value, rule, formStore);
-                        } catch (error) {
-                            console.error("Error in API validation:", error);
+                            try {
+                                // Import the utility function to avoid circular dependencies
+                                const {triggerApiValidation} = require('../utils/apiValidation');
+                                if (!triggerApiValidation(fieldName, value, rule, formId)) {
+                                    hasError = true;
+                                    break;
+                                }
+                            } catch (error) {
+                                console.error("Error in API validation:", error);
+                            }
                         }
-                    }
-                    break;
+                        break;
+
+            }
+            if(hasError && rule.message){
+                console.log(rule.message)
             }
             if(hasError) {
                 break;
@@ -496,12 +563,25 @@ export const useFormStore = create<FormState>((set, get) => ({
     },
 
   // Check if any fields are currently being validated
-  hasValidatingFields: (formId: string) => {
+  hasValidatingFields: (formId: string, isSubmitting: boolean = false) => {
     const state = get();
     const formState = state.forms[formId] || getDefaultFormState();
-    return Object.values(formState.validatingFields).some(
+    
+    // Always check if any fields are being validated
+    // This prevents the form from submitting if any fields are still being validated
+    const hasValidatingFields = Object.values(formState.validatingFields).some(
       (isValidating) => isValidating
     );
+    
+    // During form submission, we also need to check if there are any fields
+    // with API validation rules that haven't been validated yet
+    if (isSubmitting) {
+      // We'll rely on validateField to check for unvalidated fields
+      // and set appropriate errors
+      return hasValidatingFields;
+    }
+    
+    return hasValidatingFields;
   },
 
   // Set edit mode for a form
@@ -587,16 +667,16 @@ export const useFormInstance = (formId: string = 'default', initialValues: Recor
     useFormStore.getState().setFieldValidating(formId, field, isValidating);
   }, [formId]);
 
-  const validateFieldWithApi = useCallback((field: string, value: any, rule: ValidationRule) => {
-    useFormStore.getState().validateFieldWithApi(formId, field, value, rule);
+  const validateFieldWithApi = useCallback((field: string, value: any, rule: ValidationRule) :boolean => {
+   return  useFormStore.getState().validateFieldWithApi(formId, field, value, rule);
   }, [formId]);
 
-  const validateField = useCallback((fieldName: string, value: any, rules: ValidationRule[],formValues: Record<string, any>) => {
-    useFormStore.getState().validateField(formId, fieldName, value, rules,formValues);
+  const validateField = useCallback((fieldName: string, value: any, rules: ValidationRule[], formValues: Record<string, any>, isSubmitting: boolean = false):boolean => {
+    return useFormStore.getState().validateField(formId, fieldName, value, rules, formValues, isSubmitting);
   }, [formId]);
 
-  const hasValidatingFields = useCallback(() => {
-    return useFormStore.getState().hasValidatingFields(formId);
+  const hasValidatingFields = useCallback((isSubmitting: boolean = false) => {
+    return useFormStore.getState().hasValidatingFields(formId, isSubmitting);
   }, [formId]);
 
   const setEditMode = useCallback((isEditMode: boolean) => {

@@ -163,8 +163,7 @@ export function useSheetForm({
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
-    const newErrors: Record<string, string | React.ReactNode> = {};
-    let isValid = true;
+    let isValid = false;
 
     // Iterate through all sections and fields
     config.sections.forEach((section) => {
@@ -173,7 +172,7 @@ export function useSheetForm({
         return;
       }
 
-      section.fields.forEach((field) => {
+      section.fields.some((field) => {
         // Skip fields that don't meet their condition
         if (field.condition && !field.condition(values)) {
           return;
@@ -182,12 +181,15 @@ export function useSheetForm({
               return;
           }
         if(field.validation && config.formId) {
-            isValid = useFormStore.getState().validateField(config.formId, field.name, values[field.name], field.validation, values);
+            // Pass true as the last parameter to indicate this is being called during form submission
+            isValid = useFormStore.getState().validateField(config.formId, field.name, values[field.name], field.validation, values, true);
+            if(!isValid){
+                setIsValid(isValid);
+                return isValid;
+            }
         }
       });
     });
-
-    setIsValid(isValid);
 
     return isValid;
   }, [config.sections, values, setIsValid]);
@@ -208,9 +210,9 @@ export function useSheetForm({
 
       // Validate all fields before submission
       const isValid = validateAllFields();
-
       // Check if any fields are currently being validated via API
-      const fieldsValidating = hasValidatingFields();
+      // Pass true to indicate this is during form submission
+      const fieldsValidating = hasValidatingFields(true);
 
       // If form is not valid or fields are being validated, stop submission
       if (!isValid || fieldsValidating) {
@@ -362,6 +364,7 @@ export function useSheetForm({
     const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
 
+
     // Get the current section
     const currentSection = config.sections[currentStep];
 
@@ -369,85 +372,33 @@ export function useSheetForm({
     if (currentSection.condition && !currentSection.condition(values)) {
       return true;
     }
-
     // Validate fields in the current section
-    currentSection.fields.forEach((field) => {
-      // Skip fields that don't meet their condition
-      if (field.condition && !field.condition(values)) {
-        return;
-      }
-
-      // Skip fields that are hidden or disabled
-      if (field.hidden || field.disabled) {
-        return;
-      }
-
-      // Check required fields
-      if (
-        field.required &&
-        (!values[field.name] || values[field.name] === "")
-      ) {
-        newErrors[field.name] = `${field.label} is required`;
-        isValid = false;
-      }
-
-      // Check validation rules
-      if (field.validation && field.validation.length > 0) {
-        for (const rule of field.validation) {
-          const value = values[field.name];
-
-          switch (rule.type) {
-            case "required":
-              if (value === undefined || value === null || value === "") {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "minLength":
-              if (typeof value === "string" && value.length < rule.value) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "maxLength":
-              if (typeof value === "string" && value.length > rule.value) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "pattern":
-              if (
-                typeof value === "string" &&
-                !new RegExp(rule.value).test(value)
-              ) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            case "email":
-              if (
-                typeof value === "string" &&
-                !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-              ) {
-                newErrors[field.name] = rule.message;
-                isValid = false;
-              }
-              break;
-            // Add other validation types as needed
-          }
-
-          // Break the loop if we already found an error for this field
-          if (newErrors[field.name]) {
-            break;
-          }
+    currentSection.fields.some((field) => {
+        // Skip fields that don't meet their condition
+        if (field.condition && !field.condition(values)) {
+            return;
         }
-      }
+
+        // Skip fields that are hidden or disabled
+        if (field.hidden || field.disabled) {
+            return;
+        }
+        console.log('Current Step Validation Field',field);
+        if(field.validation){
+           isValid = useFormStore.getState().validateField(
+                config.formId ?? 'default',
+                field.name,
+                values[field.name],
+                field.validation,
+                values,
+                true) // Pass true to indicate this is during form submission
+            if(!isValid){
+                return isValid;
+            }
+        }
     });
 
-    // Update form state with errors
-    setErrors(newErrors);
     setIsValid(isValid);
-
     return isValid;
   }, [
     config.sections,

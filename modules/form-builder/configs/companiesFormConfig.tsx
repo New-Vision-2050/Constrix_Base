@@ -116,18 +116,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
                     value: /^[a-zA-Z]+$/,
                     message: t("Validation.englishName"),
                 },
-              {
-                type: "apiValidation",
-                message:
-                  "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز",
-                apiConfig: {
-                  url: `${baseURL}/companies/validated`,
-                  method: "POST",
-                  debounceMs: 500,
-                  paramName: "user_name",
-                  successCondition: (response) => response.payload.status === 1,
-                },
-              },
+
 
             ],
           },
