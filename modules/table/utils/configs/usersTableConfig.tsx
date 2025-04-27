@@ -197,7 +197,7 @@ export const UsersConfig = () => {
       {
         label: "اكمال الملف الشخصي",
         icon: <GearIcon className="w-4 h-4" />,
-        action: (row) => router.push(`${ROUTER.USER_PROFILE}?id=${row.user_id}`),
+        action: (row:UsersData) => router.push(`${ROUTER.USER_PROFILE}?id=${row.user_id}`),
       },
     ],
     executionConfig: {
