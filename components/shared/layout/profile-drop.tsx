@@ -15,11 +15,13 @@ import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
 import UserIcon from "@/public/icons/user";
+// import { useLogout } from '@/modules/auth/store/mutations'
 
 const ProfileDrop = () => {
   const t = useTranslations("Header");
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  // const { mutate: logoutMutation } = useLogout();
 
   const menuItems = [
     {
@@ -52,7 +54,16 @@ const ProfileDrop = () => {
       icon: <LogoutIcon />,
       func: () => {
         deleteCookie("new-vision-token");
-        window.location.reload();
+        router?.push('/');
+        // logoutMutation(undefined,
+        //   {
+        //     onSuccess: (res) => {
+        //       deleteCookie("new-vision-token");
+        //       router?.push('/');
+        //     },
+        //   }
+        // );
+
       },
     },
   ];
