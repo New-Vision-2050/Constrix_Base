@@ -23,24 +23,66 @@ export const ConnectionInformationFormConfig = () => {
             label: "رقم الجوال",
             type: "phone",
             placeholder: "رقم الجوال",
+            validation:[
+              {
+                type: "minLength",
+                value: 8,
+                message: "Phone must be at least 8 digits"
+              },
+              {
+                type: "maxLength",
+                value: 15,
+                message: "Phone must be at most 15 digits"
+              }
+            ]
           },
           {
             name: "email",
             label: "البريد الالكتروني",
             type: "text",
             placeholder: "البريد الالكتروني",
+            validation: [
+              {
+                type: "email",
+                message: "Please enter a valid email address"
+              }
+            ]
           },
           {
             name: "other_phone",
             label: "رقم   الجوال البديل",
             type: "phone",
             placeholder: "رقم   الجوال البديل",
+            validation:[
+              {
+                type: "minLength",
+                value: 8,
+                message: "Phone must be at least 8 digits"
+              },
+              {
+                type: "maxLength",
+                value: 15,
+                message: "Phone must be at most 15 digits"
+              }
+            ]
           },
           {
             name: "landline_number",
             label: "رقم الهاتف الأرضي",
             type: "phone",
             placeholder: "رقم الهاتف الأرضي",
+            validation:[
+              {
+                type: "minLength",
+                value: 7,
+                message: "landline must be at least 7 digits"
+              },
+              {
+                type: "maxLength",
+                value: 12,
+                message: "landline must be at most 12 digits"
+              }
+            ]
           },
         ],
         columns: 2,
