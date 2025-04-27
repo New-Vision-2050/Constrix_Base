@@ -9,6 +9,7 @@ export interface ValidationRule {
     | "maxLength"
     | "pattern"
     | "email"
+    | "phone"
     | "url"
     | "custom"
     | "apiValidation";

@@ -25,14 +25,8 @@ export const ConnectionInformationFormConfig = () => {
             placeholder: "رقم الجوال",
             validation:[
               {
-                type: "minLength",
-                value: 8,
-                message: "Phone must be at least 8 digits"
-              },
-              {
-                type: "maxLength",
-                value: 15,
-                message: "Phone must be at most 15 digits"
+                type: "phone",
+                message: ''
               }
             ]
           },
@@ -55,14 +49,8 @@ export const ConnectionInformationFormConfig = () => {
             placeholder: "رقم   الجوال البديل",
             validation:[
               {
-                type: "minLength",
-                value: 8,
-                message: "Phone must be at least 8 digits"
-              },
-              {
-                type: "maxLength",
-                value: 15,
-                message: "Phone must be at most 15 digits"
+                type: "phone",
+                message: ''
               }
             ]
           },
@@ -73,14 +61,8 @@ export const ConnectionInformationFormConfig = () => {
             placeholder: "رقم الهاتف الأرضي",
             validation:[
               {
-                type: "minLength",
-                value: 7,
-                message: "landline must be at least 7 digits"
-              },
-              {
-                type: "maxLength",
-                value: 12,
-                message: "landline must be at most 12 digits"
+                type: "phone",
+                message: ''
               }
             ]
           },
