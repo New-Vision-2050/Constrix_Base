@@ -74,7 +74,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   const { data: userDataStatus, refetch: refetchDataStatus } =
     useProfileDataStatus((userId || _user?.user_id) ?? "");
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
-    useUserPersonalData();
+    useUserPersonalData(user?.user_id);
   const { data: widgetData } = useProfileWidgetData(
     (userId || _user?.user_id) ?? ""
   );

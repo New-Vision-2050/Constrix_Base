@@ -13,6 +13,7 @@ import { useConnectionOTPCxt } from "../context/ConnectionOTPCxt";
 import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 type PropsT = {
   open: boolean;
@@ -21,6 +22,7 @@ type PropsT = {
 };
 
 export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
+  const { user } = useUserProfileCxt();
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
   const { handleRefreshConnectionData } = usePersonalDataTabCxt();
@@ -54,7 +56,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         otp: otp,
         type,
       };
-      await apiClient.post(`/company-users/validate-otp`, body);
+      await apiClient.post(`/company-users/validate-otp/${user?.user_id}`, body);
       handleClose();
       toast.success("تم التغير بنجاح");
       setLoading(false);
