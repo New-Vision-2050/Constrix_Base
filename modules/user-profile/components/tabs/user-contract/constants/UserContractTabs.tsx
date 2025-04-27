@@ -3,6 +3,7 @@ import PersonalDataTab from "../tabs/PersonalData/PersonalData";
 import AcademicAndExperience from "../tabs/AcademicAndExperience";
 import FunctionalAndContractualData from "../tabs/FunctionalAndContractualData";
 import FinancialBenefits from "../tabs/FinancialData";
+import InfoIcon from "@/public/icons/InfoIcon";
 
 export const GetUserContractTabsList = (
   t: (key: string) => string
@@ -10,6 +11,7 @@ export const GetUserContractTabsList = (
   {
     id: "user-contract-tab-personal-data",
     title: t("personalTab"),
+    icon: <InfoIcon />,
     content: <PersonalDataTab />,
   },
   {
