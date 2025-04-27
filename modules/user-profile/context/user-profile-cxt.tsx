@@ -1,9 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // types
-import type { ReactNode } from "react";
+import type { ReactNode, SetStateAction } from "react";
 
 // import packages
 import { createContext, useContext, useEffect, useState } from "react";
@@ -36,6 +36,8 @@ type UserProfileCxtType = {
 
   tab1: string | null;
   tab2: string | null;
+  setTab1: React.Dispatch<SetStateAction<string>>;
+  setTab2: React.Dispatch<SetStateAction<string>>;
   verticalSection: string | null;
 };
 
@@ -57,10 +59,11 @@ export const useUserProfileCxt = () => {
 type PropsT = { children: ReactNode };
 export const UserProfileCxtProvider = ({ children }: PropsT) => {
   // ** declare and define component state and variables
+  const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
-  const tab1 = searchParams.get("tab1");
-  const tab2 = searchParams.get("tab2");
+  const [tab1, setTab1] = useState(searchParams.get("tab1") ?? "");
+  const [tab2, setTab2] = useState(searchParams.get("tab2") ?? "");
   const verticalSection = searchParams.get("verticalSection");
   const [user, setUser] = useState<UserProfileData>();
   const {
@@ -71,7 +74,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   const { data: userDataStatus, refetch: refetchDataStatus } =
     useProfileDataStatus((userId || _user?.user_id) ?? "");
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
-    useUserPersonalData();
+    useUserPersonalData(user?.user_id);
   const { data: widgetData } = useProfileWidgetData(
     (userId || _user?.user_id) ?? ""
   );
@@ -80,6 +83,24 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   useEffect(() => {
     if (_user) setUser(_user);
   }, [_user]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (tab1) {
+      params.set("tab1", tab1);
+    } else {
+      params.delete("tab1");
+    }
+
+    if (tab2) {
+      params.set("tab2", tab2);
+    } else {
+      params.delete("tab2");
+    }
+
+    router.replace(`?${params.toString()}`);
+  }, [tab1, tab2, router, searchParams]);
 
   // ** declare and define component helper methods
   const handleRefetchProfileData = () => {
@@ -122,6 +143,8 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
         // external routes
         tab1,
         tab2,
+        setTab1,
+        setTab2,
         verticalSection,
       }}
     >

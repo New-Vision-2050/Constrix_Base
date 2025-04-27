@@ -76,7 +76,7 @@ export const PrivilegeItemFormConfig = ({
           },
           {
             name: "charge_amount",
-            label: "معدل حساب النسبة من اصل الراتب",
+            label: "معدل حساب (نسبة - مبلغ) من اصل الراتب",
             type: "text",
             condition: (values) => {
               if (
