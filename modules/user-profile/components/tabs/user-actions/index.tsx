@@ -5,12 +5,15 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export default function UserActionsTabs() {
   // declare and define component state and variables
-  const { tab2 } = useUserProfileCxt();
+  const { tab2, setTab2 } = useUserProfileCxt();
   // declare and define component helper methods
   // return component ui.
   return (
     <UserActionsCxtProvider>
       <HorizontalTabs
+        onTabClick={(tab) => {
+          setTab2(tab.id);
+        }}
         list={UserActionsTabsList}
         defaultValue={tab2 !== null ? tab2 : undefined}
       />
