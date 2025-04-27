@@ -56,19 +56,15 @@ export const PrivilegeItemFormConfig = ({
           },
           {
             type: "select",
-            name: "type_allowance_id",
+            name: "type_allowance_code",
             label: " (ثابت - نسبة - توفير) نوع البدل",
             placeholder: "اختر البدل",
             required: true,
             dynamicOptions: {
               url: `${baseURL}/type_allowances`,
-              valueField: "id",
+              valueField: "code",
               labelField: "name",
               searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -84,8 +80,8 @@ export const PrivilegeItemFormConfig = ({
             type: "text",
             condition: (values) => {
               if (
-                values.type_allowance_id === AllowancesTypes?.Saving ||
-                values.type_allowance_id == null
+                values.type_allowance_code === AllowancesTypes?.Saving ||
+                values.type_allowance_code == null
               )
                 return false;
               return true;
@@ -140,7 +136,7 @@ export const PrivilegeItemFormConfig = ({
     ],
     initialValues: {
       type_privilege_id: privilegeData?.type_privilege_id,
-      type_allowance_id: privilegeData?.type_allowance_id,
+      type_allowance_code: privilegeData?.type_allowance_code,
       charge_amount: privilegeData?.charge_amount,
       period_id: privilegeData?.period_id,
       description: privilegeData?.description,
@@ -169,7 +165,7 @@ export const PrivilegeItemFormConfig = ({
         ? `/user_privileges/${privilegeData?.id}`
         : `/user_privileges`;
 
-      const _apiClient = isEdit ? apiClient.put : apiClient.post;
+      const _apiClient = isEdit ? apiClient.post : apiClient.post;
 
       const response = await _apiClient(url, serialize(body));
 

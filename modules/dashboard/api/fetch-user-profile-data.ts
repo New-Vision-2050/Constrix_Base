@@ -1,4 +1,4 @@
-import { UserProfileData } from "../types/user-profile-response";
+import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 import { apiClient } from "@/config/axios-config";
 
 type ResponseT = {

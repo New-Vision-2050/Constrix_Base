@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest) {
 
   const res = intlMiddleware(req);
 
-  if (!existingCompanyCookie && host) {
+  if ((!existingCompanyCookie && host) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
         headers: {
@@ -43,6 +43,10 @@ export async function middleware(req: NextRequest) {
           maxAge: 60 * 60 * 24,
         });
       }
+      else
+      {
+          res.cookies.delete("company-data");
+      }
 
       if (
         !!company?.payload.is_central_company &&
@@ -51,11 +55,12 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     } catch (error) {
+       res.cookies.delete("company-data");
       console.log(" Company fetch error:", error);
     }
   }
 
-  if (!!existingCompanyCookie) {
+  if (!!existingCompanyCookie && !isLoginPage) {
     const company = existingCompanyCookie
       ? JSON.parse(existingCompanyCookie)
       : null;

@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 // import packages
 import { createContext, useContext } from "react";
 import useUserProfileData from "../hooks/useUserProfileData";
-import { UserProfileData } from "../types/user-profile-response";
+import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 import useUserPersonalData from "@/modules/user-profile/components/tabs/user-contract/tabs/PersonalData/hooks/useUserPersonalData";
 import { PersonalUserDataSectionT } from "@/modules/user-profile/components/tabs/user-contract/tabs/PersonalData/api/get-personal-data";
 

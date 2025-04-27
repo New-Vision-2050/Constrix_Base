@@ -1,0 +1,187 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Deployment ID
+        id: set_deployment_id
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "DEPLOYMENT_ID=pr${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            BRANCH_NAME="${{ github.ref_name }}"
+            echo "DEPLOYMENT_ID=${BRANCH_NAME}" >> $GITHUB_ENV
+          fi
+
+      - name: Echo Deployment ID
+        run: |
+          echo "Deployment ID: $DEPLOYMENT_ID"
+
+      - name: Extract BE_URL
+        id: extract_be_url
+        run: |
+          #!/bin/bash
+          set -e  # Exit immediately if a command exits with a non-zero status
+
+          # Determine the event type
+          EVENT_NAME="${GITHUB_EVENT_NAME}"
+
+          if [ "$EVENT_NAME" == "pull_request" ]; then
+           # For pull_request events, extract the PR body
+           PR_BODY=$(jq --raw-output .pull_request.body < "$GITHUB_EVENT_PATH")
+           echo "$PR_BODY"
+           # Extract BE_URL from PR body using grep
+           BE_URL=$(echo "$PR_BODY" | sed -n 's/.*BE_URL:\s*\(https\?:\/\/\S\+\).*/\1/p')
+
+           if [ -z "$BE_URL" ]; then
+             # If BE_URL is not provided, derive it based on the branch name
+             BRANCH_NAME="${GITHUB_BASE_REF}"
+             ALLOWED_ENVS=("dev" "stage" "master")
+             VALID=false
+
+             for env in "${ALLOWED_ENVS[@]}"; do
+               if [ "$BRANCH_NAME" == "$env" ]; then
+                 VALID=true
+                 break
+               fi
+             done
+
+             if [ "$VALID" = false ]; then
+               # Default BE_URL for unspecified or invalid environments
+               BRANCH_NAME="master"
+             fi
+
+             BE_URL="https://core-be-${BRANCH_NAME}.constrix-nv.com"
+           fi
+          else
+           # For push events, extract the branch name from GITHUB_REF
+           BRANCH_NAME="${GITHUB_REF##*/}"
+           BE_URL="https://core-be-${BRANCH_NAME}.constrix-nv.com"
+          fi
+          echo "BE_URL=${BE_URL}" >> $GITHUB_ENV
+
+      - name: Echo BE URL
+        run: |
+          echo "BE URL: $BE_URL"
+
+      - name: Clean Old Data
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
+            rm -rf $DEPLOY_DIR
+
+      - name: Transfer Repo Files to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "."
+          target: "/home/deployer/nextjs/deployments/${{ env.DEPLOYMENT_ID }}/"
+
+      - name: Set Environment Variables Based on Branch
+        id: set_env
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" || "${GITHUB_REF}" == "refs/heads/master" ]]; then
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
+            echo "NODE_ENV=development" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+            echo "NODE_ENV=staging" >> $GITHUB_ENV
+          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            echo "NODE_ENV=pr" >> $GITHUB_ENV
+          else
+            echo "NODE_ENV=development" >> $GITHUB_ENV
+          fi
+
+      - name: Echo Environment Variables
+        run: |
+          echo "BE_URL: $BE_URL"
+          echo "NODE_ENV: $NODE_ENV"
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        env:
+          BE_URL: ${{ env.BE_URL }}
+          NODE_ENV: ${{ env.NODE_ENV }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+              #!/bin/bash
+              set -e
+              set -x
+              export BE_URL=${{env.BE_URL}}
+              export DEPLOYMENT_ID=${{env.DEPLOYMENT_ID}}
+              DEPLOY_DIR=/home/deployer/nextjs/deployments/${{env.DEPLOYMENT_ID}}
+              mkdir -p $DEPLOY_DIR
+              cd $DEPLOY_DIR
+              echo $DEPLOY_DIR
+              chmod +x ./devops/deploy.sh
+              ./devops/deploy.sh
+              rm -rf $DEPLOY_DIR
+              echo "Deployment of $CONTAINER_NAME completed successfully."
+
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && (github.event.action == 'merged' || github.event.action == 'closed')
+    steps:
+      - name: Set Deployment ID for Cleanup
+        id: set_cleanup_deployment_id
+        run: |
+          if [ "${{ github.event.pull_request.merged }}" == "false" ]; then
+            echo "DEPLOYMENT_ID=pr${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            # Optionally handle merged PRs if you have separate deployments for them
+            echo "DEPLOYMENT_ID=pr${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          fi
+
+      - name: Echo Deployment ID for Cleanup
+        run: |
+          echo "Cleanup Deployment ID: $DEPLOYMENT_ID"
+
+      - name: Cleanup Deployment on Server via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            DEPLOYMENT_ID=${{ env.DEPLOYMENT_ID }}
+
+            echo "Starting cleanup for Deployment ID: $DEPLOYMENT_ID"
+
+            # Navigate to the deployments directory
+            cd /home/deployer/nextjs/deployments/
+
+            # Stop and remove Docker services for the specific deployment
+            if [ -d "$DEPLOYMENT_ID" ]; then
+              echo "Stopping and removing Docker for $DEPLOYMENT_ID"
+              docker rm -f $PROJECT_NAME
+            else
+              echo "Deployment directory $DEPLOYMENT_ID does not exist. Skipping Docker Compose cleanup."
+            fi
+
+            # Remove the deployment directory
+            echo "Removing deployment directory: /home/deployer/nextjs/deployments/$DEPLOYMENT_ID"
+            rm -rf /home/deployer/nextjs/deployments/$DEPLOYMENT_ID/
+
+            echo "Cleanup for $DEPLOYMENT_ID completed successfully."

@@ -66,8 +66,8 @@ export default function SingleQualificationDataPreview({
         <PreviewTextField
           valid={Boolean(qualification?.files?.[0]?.url)}
           label="ارفاق شهادة"
-          value="ملف"
-          type="pdf"
+          value={qualification?.files?.[0]?.name ?? "-"}
+          type={qualification?.files?.[0]?.type == "image" ? "image" : "pdf"}
           fileUrl={qualification?.files?.[0]?.url ?? ""}
         />
       </div>

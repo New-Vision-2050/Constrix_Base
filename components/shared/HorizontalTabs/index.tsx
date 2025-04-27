@@ -6,22 +6,31 @@ import TabsTriggerList from "./TabsTriggerList";
 import TabsContentList from "./TabsContentList";
 
 type PropsT = {
+  defaultValue?: string;
   list: SystemTab[];
+  bgStyleApproach?: boolean;
 };
-export default function HorizontalTabs({ list }: PropsT) {
+export default function HorizontalTabs({
+  list,
+  defaultValue,
+  bgStyleApproach,
+}: PropsT) {
   // declare and define component state and variables.
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const bgColor = bgStyleApproach ? "bg-sidebar" : "bg-transparent";
   // declare and define component helper methods.
   // return component ui.
   return (
     <Tabs
-      defaultValue={list?.[0]?.id ?? "_"}
+      defaultValue={defaultValue ?? list?.[0]?.id ?? "_"}
       dir={isRtl ? "rtl" : "ltr"}
-      className={`${isRtl ? "text-right" : "text-left"} w-full`}
+      className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
-      <TabsList className="bg-transparent min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start">
-        <TabsTriggerList list={list} />
+      <TabsList
+        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start`}
+      >
+        <TabsTriggerList list={list} bgStyleApproach={bgStyleApproach} />
       </TabsList>
       <TabsContentList list={list} />
     </Tabs>

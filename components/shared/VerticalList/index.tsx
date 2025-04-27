@@ -5,11 +5,12 @@ import { useVerticalListCxt, VerticalListCxtProvider } from "./VerticalListCxt";
 import { CircleCheckIcon } from "lucide-react";
 type PropsT = {
   items: UserProfileNestedTab[];
+  defaultValue?: UserProfileNestedTab;
 };
 
-export default function VerticalBtnsList({ items }: PropsT) {
+export default function VerticalBtnsList({ items, defaultValue }: PropsT) {
   return (
-    <VerticalListCxtProvider defaultSection={items[0]}>
+    <VerticalListCxtProvider defaultSection={defaultValue ?? items[0]}>
       <div className="w-[200px] p-4 m-2 flex flex-col gap-6 bg-sidebar rounded-md shadow-md">
         <RegularList<UserProfileNestedTab, "btn">
           items={items}

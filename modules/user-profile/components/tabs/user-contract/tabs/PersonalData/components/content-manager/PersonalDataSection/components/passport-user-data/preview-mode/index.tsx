@@ -39,13 +39,15 @@ export default function UserProfilePassportDataReview() {
       </div>
       <div className="p-2">
         <PreviewTextField
-          valid={Boolean(userIdentityData?.file_passport?.url)}
+          valid={Boolean(userIdentityData?.file_passport?.[0]?.url)}
           label="ارفاق الهوية"
-          value={
-            userIdentityData?.file_passport ? "passport_attached_file.pdf" : ""
+          value={userIdentityData?.file_passport?.[0]?.name ?? ""}
+          type={
+            userIdentityData?.file_passport?.[0]?.type == "image"
+              ? "image"
+              : "pdf"
           }
-          type="pdf"
-          fileUrl={userIdentityData?.file_passport?.url}
+          fileUrl={userIdentityData?.file_passport?.[0]?.url}
         />
       </div>
     </div>

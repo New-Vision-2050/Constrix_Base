@@ -35,13 +35,15 @@ export default function UserIqamaDataPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="ارفاق رقم الاقامة"
-          value={
-            Boolean(userIdentityData?.file_entry_number) ? "رقم الاقامة" : ""
+          valid={Boolean(userIdentityData?.file_entry_number?.[0]?.url)}
+          label="ارفاق الهوية"
+          value={userIdentityData?.file_entry_number?.[0]?.name ?? ""}
+          type={
+            userIdentityData?.file_entry_number?.[0]?.type == "image"
+              ? "image"
+              : "pdf"
           }
-          valid={Boolean(userIdentityData?.file_entry_number)}
-          type="pdf"
-          fileUrl={userIdentityData?.file_entry_number?.url}
+          fileUrl={userIdentityData?.file_entry_number?.[0]?.url}
         />
       </div>
     </div>

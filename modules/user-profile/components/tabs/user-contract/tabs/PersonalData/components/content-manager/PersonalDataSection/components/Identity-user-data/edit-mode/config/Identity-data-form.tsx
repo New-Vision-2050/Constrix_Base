@@ -72,6 +72,7 @@ export const IdentityDataFormConfig = () => {
       identity: userIdentityData?.identity,
       identity_start_date: userIdentityData?.identity_start_date,
       identity_end_date: userIdentityData?.identity_end_date,
+      file_identity: userIdentityData?.file_identity
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",

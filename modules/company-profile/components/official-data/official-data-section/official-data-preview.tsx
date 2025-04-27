@@ -49,9 +49,9 @@ const OfficialDataPreview = ({
       needRequest: true,
     },
     {
-      valid: Boolean(company_field),
+      valid: company_field.length > 0 && Boolean(company_field),
       label: "مجال الشركة",
-      value: company_field ?? "",
+      value: company_field.map((field) => field.name).join(" , "),
       needRequest: true,
     },
     {

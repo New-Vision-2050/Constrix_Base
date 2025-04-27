@@ -13,6 +13,7 @@ export default function UserStatusEntryPoint() {
             handleChangeActiveSection(section);
           },
         })}
+        defaultValue={activeSection}
       />
       <div className="p-4 flex-grow gap-8 bg-sidebar">
         {activeSection?.content}

@@ -13,9 +13,11 @@ export const BankingDataFormConfig = (props: PropsT) => {
   const { bank, onSuccess } = props ?? {};
   const formType = bank ? "Edit" : "Create";
   const { handleRefreshBankingData } = useUserBankingDataCxt();
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus, handleRefetchProfileData } =
+    useUserProfileCxt();
 
   // form config
+
   const BankingFormConfig: FormConfig = {
     formId: `Banking-data-form-${formType}-${bank?.id ?? ""}`,
     apiUrl: `${baseURL}/bank_accounts`,
@@ -59,6 +61,12 @@ export const BankingDataFormConfig = (props: PropsT) => {
               url: `${baseURL}/banks`,
               valueField: "id",
               labelField: "name",
+              dependsOn: "country_id",
+              filterParam: "country_id",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 1000,
             },
             validation: [
               {
@@ -93,6 +101,12 @@ export const BankingDataFormConfig = (props: PropsT) => {
               url: `${baseURL}/currencies`,
               valueField: "id",
               labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
             validation: [
               {
@@ -172,6 +186,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchProfileData();
       handleRefreshBankingData();
       handleRefetchDataStatus();
       onSuccess?.();

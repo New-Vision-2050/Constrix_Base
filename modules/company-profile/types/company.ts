@@ -95,7 +95,11 @@ export interface officialData {
   company_type_id: string;
   country_name: string;
   country_id: string;
-  company_field: string;
+  company_field: {
+    id: number;
+    name: string;
+    description: string;
+  }[];
   company_field_id: string;
   phone: string;
   email: string;
@@ -119,7 +123,11 @@ export interface CompanyData {
   registration_no: null | string;
   general_manager: GeneralManager;
   company_type: string;
-  company_field: string;
+  company_field: {
+    id: number;
+    name: string;
+    description: string;
+  }[];
   registration_type: string;
   logo: string;
   is_active: number;

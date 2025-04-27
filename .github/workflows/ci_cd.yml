@@ -7,7 +7,6 @@ on:
     branches:
       - dev
       - stage
-      - master
       - testing
 jobs:
   deploy:

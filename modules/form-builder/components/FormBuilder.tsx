@@ -89,7 +89,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
 
     // If no ID is provided, we can't load data
     if (!targetId) {
-      setEditError("No record ID provided for editing");
+      //setEditError("No record ID provided for editing");
       return;
     }
 
@@ -160,6 +160,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   // Load edit data when in edit mode
   useEffect(() => {
     if (isEditMode) {
+       setValue('id',recordId)
       loadEditData();
     }
   }, [isEditMode]);
@@ -262,6 +263,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             getStepResponseData={getStepResponseData}
             currentStep={currentStep}
             clearFiledError={clearFiledError}
+            formId={config.formId}
           />
         ) : isAccordion ? (
           config.sections.map((section, index) => (
@@ -285,6 +287,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
                 }
               }}
               clearFiledError={clearFiledError}
+              formId={config.formId}
             />
           ))
         ) : (
@@ -300,6 +303,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               onBlur={(field) => setTouched(field, true)}
               collapsible={section.collapsible}
               clearFiledError={clearFiledError}
+              formId={config.formId}
             />
           ))
         )}

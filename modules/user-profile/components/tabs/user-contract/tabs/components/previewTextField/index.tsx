@@ -29,6 +29,7 @@ const PreviewTextField = ({
   type,
   value,
   valid,
+  fileUrl,
   required,
   needRequest,
 }: PropsT) => {
@@ -57,7 +58,7 @@ const PreviewTextField = ({
       />
 
       {/* suffix icon */}
-      <PreviewTextFieldSuffixIcon isRTL={isRTL} type={type} />
+      <PreviewTextFieldSuffixIcon fileUrl={fileUrl} isRTL={isRTL} type={type} />
 
       {/* icon showing validation state */}
       <PreviewTextFieldValidationIcon valid={valid} spanDir={spanDir} />

@@ -1,7 +1,7 @@
 services:
   nextjs:
     build:
-      context: ..
+      context: ../..
       dockerfile: devops/Dockerfile
       args:
         - DEPLOYMENT_ID=${DEPLOYMENT_ID}

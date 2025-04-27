@@ -2,27 +2,28 @@ import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
 import LoadingMenuData from "../LoadingMenuData";
 import { useEffect, useState } from "react";
-import { UserProfileData } from "../../types/user-profile-response";
+import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
+import { checkString } from "@/utils/check-string";
 
 type PropsT = {
   user: UserProfileData | undefined;
   isLoading: boolean;
 };
-export default function UserProfilePersonalData({user, isLoading}:PropsT) {
+export default function UserProfilePersonalData({ user, isLoading }: PropsT) {
   const [items, setItems] = useState<string[]>([]);
 
   // handle side effects
   useEffect(() => {
     if (user) {
       const userItems = [
-        `الاسم: ${user.name}`,
-        `حالة الموظف: ${"--"}`,
-        `المهنة: ${user.job_title}`,
-        `الدور الوظيفي: ${user.Job_role}`,
-        `التواصل: ${user.phone}`,
-        `الرقم الاضافي: ${user.other_phone}`,
-        `البريد الالكتروني: ${user.email}`,
-        `العنوان الوطني: ${user.address}`,
+        `الاسم: ${checkString(user.name)}`,
+        `حالة الموظف: ${checkString("--")}`,
+        `المهنة: ${checkString(user.job_title ?? "")}`,
+        `الدور الوظيفي: ${checkString(user.job_title ?? "")}`,
+        `التواصل: ${checkString(user.phone ?? "")}`,
+        `الرقم الاضافي: ${checkString(user.other_phone ?? "")}`,
+        `البريد الالكتروني: ${checkString(user.email)}`,
+        `العنوان الوطني: ${checkString(user.address ?? "")}`,
       ];
       setItems(userItems);
     }

@@ -1,17 +1,20 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 type AvatarGroupProps = {
-  fullName: string;
+  fullName?: string | null;
   src?: string;
   alt?: string;
 };
 
-const getInitials = (name: string) => {
-  const words = name?.trim().split(" ") || [];
-  const firstLetter = words ? words[0]?.[0] : "";
-  const lastLetter = words.length > 1 ? words[words.length - 1][0] : "";
-  return (firstLetter + lastLetter).toUpperCase();
+const getInitials = (name: string | null | undefined) => {
+  if (!name) return "";
+    const parts = name.toUpperCase().trim().split(/\s+/);
+    if(parts.length > 1) {
+        return parts[0][0] + '\u200C' + parts[parts.length-1][0];
+    }
+    return parts[0][0];
 };
+
 
 export const AvatarGroup = ({
   fullName,
@@ -21,7 +24,7 @@ export const AvatarGroup = ({
 }: AvatarGroupProps) => {
   return (
     <Avatar {...props}>
-      {src ? <AvatarImage src={src} alt={alt || fullName} /> : null}
+      {src ? <AvatarImage src={src} alt={alt || fullName || ''} /> : null}
       <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
     </Avatar>
   );

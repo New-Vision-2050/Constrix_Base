@@ -6,7 +6,9 @@ import { Button } from '@/modules/table/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import { FieldConfig } from '../../types/formTypes';
 import { cn } from '@/lib/utils';
-import { DayPickerSingleProps } from 'react-day-picker'; 
+import { DayPickerSingleProps } from 'react-day-picker';
+import { HijriCalendar } from '@/modules/table/components/ui/HijriCalendar'
+import { useFormStore } from '@/modules/form-builder'
 
 interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
@@ -26,31 +28,61 @@ const DateField: React.FC<DateFieldProps> = ({
   onBlur,
   ...props
 }) => {
-  const date = value ? new Date(value) : undefined;
+  const date = !field?.isHijri && value ? new Date(value) : undefined;
   const [isOpen, setIsOpen] = useState(false);
 
+  const getMinDate = () =>{
+    let minDate = field?.minDate?.value ?? (field?.minDate?.formId ? useFormStore
+      ?.getState()
+      .getValue(field?.minDate?.formId || '', field?.minDate?.field || ''): undefined)
+
+    return minDate ? new Date(minDate): undefined;
+  }
+  const getMaxDate = () =>{
+    let maxDate = field?.maxDate?.value ?? (field?.maxDate?.formId ? useFormStore
+      ?.getState()
+      .getValue(field?.maxDate?.formId || '', field?.maxDate?.field || ''): undefined)
+
+    return maxDate ? new Date(maxDate): undefined;
+  }
   return (
     <div className="relative">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button
-            id={field.name}
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground",
-              !!error && touched ? 'border-destructive' : '',
-              field.className,
-              field.width ? field.width : 'w-full'
-            )}
-            disabled={field.disabled}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, 'PPP') : field.placeholder || 'Select a date'}
-          </Button>
-        </PopoverTrigger>
+        <Button
+          id={field.name}
+          variant="outline"
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            (!date|| !value) && "text-muted-foreground",
+            !!error && touched ? 'border-destructive' : '',
+            field.className,
+            field.width ? field.width : 'w-full'
+          )}
+          disabled={field.disabled}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {value
+            ? field?.isHijri
+              ? value
+              : format(new Date(value), 'PPP')
+            : field.placeholder || 'Select a date'}
+        </Button>
+      </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
+        {field?.isHijri
+          ? <HijriCalendar
+              value={value ?? undefined}
+              onChange={(dateObj) => {
+                onChange(dateObj ? dateObj?.toString() : '');
+                onBlur();
+                setIsOpen(false);
+              }}
+              {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {minDate: getMinDate()}:{}}
+              {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {maxDate: getMaxDate()}:{}}
+              {...Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'locale'))}
+            />
+          : <Calendar
             mode="single"
             selected={date}
             onSelect={(date) => {
@@ -60,8 +92,10 @@ const DateField: React.FC<DateFieldProps> = ({
             }}
             disabled={field.disabled}
             initialFocus
+            {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {fromDate: getMinDate()}:{}}
+            {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {toDate: getMaxDate()}:{}}
             {...props}
-          />
+          />}
         </PopoverContent>
       </Popover>
       

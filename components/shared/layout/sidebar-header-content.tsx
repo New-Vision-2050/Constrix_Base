@@ -27,6 +27,7 @@ const SidebarHeaderContent = ({
             alt={name || "Company Logo"}
             width={open ? 60 : 30}
             height={47}
+            priority={true}
             className="transition-[width] ease-linear duration-200"
           />
         ) : (

@@ -28,6 +28,7 @@ interface PaginatedDropdownProps {
   dynamicConfig?: DynamicDropdownConfig;
   dependencies?: Record<string, string | string[]>;
   isMulti?: boolean;
+  setFirstAsDefault?: boolean;
 }
 
 const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
@@ -40,18 +41,31 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   dynamicConfig,
   dependencies,
   isMulti = false,
+  setFirstAsDefault = dynamicConfig?.setFirstAsDefault ?? false,
 }) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { options, loading, error } = useDropdownSearch({
+  const { options, loading, error, dataFetched } = useDropdownSearch({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
-    selectedValue: value,
+    selectedValue: value
   });
+
+  // Set first option as default when options change and no value is selected
+  useEffect(() => {
+    if (
+      setFirstAsDefault &&
+      dataFetched &&
+      options.length > 0 &&
+      (!value || (isMulti && Array.isArray(value) && value.length === 0))
+    ) {
+            onChange(isMulti ? [options[0].value] : options[0].value);
+    }
+  }, [options, value, setFirstAsDefault, isMulti, onChange,dataFetched]);
 
   // Find the label(s) for the current value(s)
   const getSelectedLabels = () => {
@@ -65,22 +79,22 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       // For single select
       const singleValue = value as string;
       const option = options.find((option) => option.value === singleValue);
-      
+
       // If we have a proper label, use it
       if (option) {
         return option.label;
       }
-      
+
       // If we're still loading and have a value, show loading indicator
       if (loading && singleValue) {
         return `${singleValue} (loading...)`;
       }
-      
+
       // Fallback to the value itself
       return singleValue;
     }
   };
-  
+
   const selectedLabel = getSelectedLabels();
 
   // Handle keyboard navigation
@@ -114,7 +128,10 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
   return (
     <div>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={isDisabled ? false : open}
+        onOpenChange={isDisabled ? undefined : setOpen}
+      >
         <div className="flex gap-2">
           <PopoverTrigger asChild>
             <Button
@@ -125,7 +142,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               disabled={isDisabled}
               className={cn(
                 "w-full justify-between bg-sidebar whitespace-normal",
-                (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground"
+                (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground",
+                isDisabled && "opacity-50 cursor-not-allowed"
               )}
               onKeyDown={handleKeyDown}
             >
@@ -141,7 +159,11 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-auto w-8 p-1.5 hover:bg-transparent"
+              disabled={isDisabled}
+              className={cn(
+                "h-auto w-8 p-1.5 hover:bg-transparent",
+                isDisabled && "opacity-50 cursor-not-allowed"
+              )}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

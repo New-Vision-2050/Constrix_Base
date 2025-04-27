@@ -17,6 +17,7 @@ interface DropdownSearchProps {
   dependencies?: Record<string, string | string[]>;
   placeholder?: string;
   isMulti?: boolean;
+  isDisabled?: boolean;
 }
 const DropdownSearch: React.FC<DropdownSearchProps> = ({
   columnKey,
@@ -28,6 +29,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   dependencies,
   placeholder = "Select option",
   isMulti = false,
+  isDisabled=undefined
 }) => {
   const { toast } = useToast();
 
@@ -176,31 +178,33 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     [onChange, columnKey, value, isMulti]
   );
 
-  // Determine if the dropdown should be disabled
-  const isDisabled = (() => {
-    if (!dynamicConfig?.dependsOn || !dependencies) return false;
+if(isDisabled === undefined) {
+    // Determine if the dropdown should be disabled
+    isDisabled = (() => {
+        if (!dynamicConfig?.dependsOn || !dependencies) return false;
 
-    // Case 1: String format (backward compatibility)
-    if (typeof dynamicConfig.dependsOn === 'string') {
-      return !dependencies[dynamicConfig.dependsOn];
-    }
+        // Case 1: String format (backward compatibility)
+        if (typeof dynamicConfig.dependsOn === 'string') {
+            return !dependencies[dynamicConfig.dependsOn];
+        }
 
-    // Case 2: Array of dependency configs
-    if (Array.isArray(dynamicConfig.dependsOn)) {
-      return dynamicConfig.dependsOn.some(
-        depConfig => !dependencies[depConfig.field]
-      );
-    }
+        // Case 2: Array of dependency configs
+        if (Array.isArray(dynamicConfig.dependsOn)) {
+            return dynamicConfig.dependsOn.some(
+                depConfig => !dependencies[depConfig.field]
+            );
+        }
 
-    // Case 3: Object with field names as keys
-    if (typeof dynamicConfig.dependsOn === 'object') {
-      return Object.keys(dynamicConfig.dependsOn).some(
-        field => !dependencies[field]
-      );
-    }
+        // Case 3: Object with field names as keys
+        if (typeof dynamicConfig.dependsOn === 'object') {
+            return Object.keys(dynamicConfig.dependsOn).some(
+                field => !dependencies[field]
+            );
+        }
 
-    return false;
-  })();
+        return false;
+    })();
+}
 
   // Convert value to appropriate type based on isMulti
   const processedValue = isMulti

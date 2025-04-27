@@ -1,5 +1,7 @@
 import { UserCompany } from "@/modules/dashboard/types/user-company";
 import { Country } from "@/modules/settings/types/Country";
+import { BankAccount } from "./bank-account";
+import { ProfessionalT } from "../components/tabs/user-contract/tabs/FunctionalAndContractualData/api/get-professinal-data";
 
 // Define the user profile data type
 export interface UserProfileData {
@@ -25,6 +27,20 @@ export interface UserProfileData {
   company?: UserCompany;
   global_id?: string;
   user_id?: string;
+  bank_account?: BankAccount;
+  Job_role?: string;
+  address_attendance?: string;
+  border_number?: string;
+  branch?: string;
+  // companies:Company
+  data_status?: string;
+  identity?: string;
+  job_title_id?: string;
+  other_phone?: string;
+  passport?: string;
+  phone?: string;
+  residence?: string;
+  user_professional_data?: ProfessionalT;
 }
 
 // Define the API response type

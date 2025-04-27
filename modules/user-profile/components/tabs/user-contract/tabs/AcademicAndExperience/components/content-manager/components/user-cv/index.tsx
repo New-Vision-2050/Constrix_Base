@@ -25,7 +25,7 @@ export default function UserCV() {
         }
       >
         {userCV?.files ? (
-          <PdfViewer src={userCV?.files ?? ""} />
+          <PdfViewer src={userCV?.files?.url ?? ""} />
         ) : (
           <NoDataFounded
             title="لا يوجد بيانات"

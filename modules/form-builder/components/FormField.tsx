@@ -16,8 +16,7 @@ import MultiImageField from "./fields/MultiImageField";
 import FileField from "./fields/FileField";
 import MultiFileField from "./fields/MultiFileField";
 import FieldHelperText from "./fields/FieldHelperText";
-import { useFormInstance, useFormStore } from "../hooks/useFormStore";
-import { hasApiValidation, triggerApiValidation } from "../utils/apiValidation";
+import {useFormInstance} from "../hooks/useFormStore";
 
 interface FormFieldProps {
   field: FieldConfig;
@@ -33,7 +32,7 @@ interface FormFieldProps {
   >;
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
-  formId?: string; // Add formId prop to identify which form instance to use
+  formId: string; // Add formId prop to identify which form instance to use
 }
 
 // This component subscribes to validating state
@@ -87,19 +86,12 @@ const FormField: React.FC<FormFieldProps> = ({
       // Clear any existing errors for this field when the value changes
       formInstance.setError(field.name, null);
 
-      // Check if field has API validation rules and trigger validation
-      if (field.validation && hasApiValidation(field.validation)) {
-        field.validation.forEach((rule) => {
-          if (rule.type === "apiValidation") {
-            // Pass the store instance to avoid getState() call in the validation function
-            triggerApiValidation(
-              field.name,
-              newValue,
-              rule,
-              useFormStore.getState()
-            );
-          }
-        });
+     if(field.validation){
+         formInstance.validateField(
+             field.name,
+             newValue,
+             field.validation,
+             values)
       }
     },
     [
@@ -151,7 +143,6 @@ const FormField: React.FC<FormFieldProps> = ({
             onChange={onChange}
             onBlur={onBlur}
             isValidating={formInstance.validatingFields?.[field.name] || false}
-            formId={formId}
           />
         );
 
