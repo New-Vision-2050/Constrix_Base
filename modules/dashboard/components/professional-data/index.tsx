@@ -10,7 +10,7 @@ const getProfessionalDataItems = (data?: ProfessionalT): string[] => {
     `الأدارة: ${checkString(data?.management?.name)}`,
     `القسم: ${checkString(data?.department?.name)}`,
     `نوع الوظيفة: ${checkString(data?.job_type?.name)}`,
-    `المسمى الوظيفي: ${checkString(data?.job_title)}`,
+    `المسمى الوظيفي: ${checkString(data?.job_title?.name)}`,
     `الرقم الوظيفي: ${checkString(data?.job_code)}`,
   ];
 };

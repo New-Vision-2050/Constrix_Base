@@ -157,7 +157,7 @@ export const JobFormConfig = () => {
       management_id: professionalData?.management?.id,
       department_id: professionalData?.department?.id,
       job_type_id: professionalData?.job_type?.id,
-      job_title_id: professionalData?.job_title,
+      job_title_id: professionalData?.job_title?.id,
       job_code: professionalData?.job_code,
     },
     submitButtonText: "Submit",

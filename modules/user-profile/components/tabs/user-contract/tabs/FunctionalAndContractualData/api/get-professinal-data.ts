@@ -10,7 +10,7 @@ export type ProfessionalT = {
   global_id: string;
   id: string;
   job_code: string;
-  job_title: string;
+  job_title: { id: string; name: string };
   job_type: { id: string; name: string };
   management: Management;
 };

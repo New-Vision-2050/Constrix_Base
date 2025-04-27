@@ -44,8 +44,8 @@ export default function JobInformationPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="المسمى الوظيفي"
-          value={professionalData?.job_title ?? ""}
-          valid={Boolean(professionalData?.job_title)}
+          value={professionalData?.job_title?.name ?? ""}
+          valid={Boolean(professionalData?.job_title?.name)}
           required
         />
       </div>
