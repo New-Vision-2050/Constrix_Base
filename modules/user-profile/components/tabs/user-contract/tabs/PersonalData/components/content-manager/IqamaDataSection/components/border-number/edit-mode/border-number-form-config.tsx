@@ -25,18 +25,26 @@ export const BorderNumberFormConfig = () => {
             type: "text",
             placeholder: "رقم الحدود",
           },
-          {
-            name: "border_number_start_date",
-            label: "تاريخ الدخول",
-            type: "date",
-            placeholder: "تاريخ الدخول",
-          },
-          {
-            name: "border_number_end_date",
-            label: "تاريخ الانتهاء",
-            type: "date",
-            placeholder: "تاريخ الانتهاء",
-          },
+            {
+                name: "border_number_start_date",
+                label: "تاريخ الدخول",
+                type: "date",
+                placeholder: "تاريخ الدخول",
+                maxDate: {
+                    formId: `ConnectionInformation-data-form`,
+                    field: 'border_number_end_date'
+                },
+            },
+            {
+                name: "border_number_end_date",
+                label: "تاريخ الانتهاء",
+                type: "date",
+                placeholder: "تاريخ الانتهاء",
+                minDate: {
+                    formId: `ConnectionInformation-data-form`,
+                    field: 'border_number_start_date'
+                }
+            },
           {
             name: "file_border_number",
             label: "ارفاق رقم الحدود",

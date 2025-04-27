@@ -1,13 +1,20 @@
 import { FormConfig } from "../types/formTypes";
+import { RequestOptions } from "../types/requestTypes";
+import { handleFormSubmissionError } from "./handleFormSubmissionError";
 
 /**
  * Default submit handler for form submissions
  * Makes a POST request to the apiUrl specified in the form config
  * Handles Laravel validation errors
+ *
+ * @param values - Form values to submit
+ * @param config - Form configuration
+ * @param options - Optional request options to override URL, method, and add request config
  */
 export const defaultSubmitHandler = async (
   values: Record<string, any>,
-  config: FormConfig
+  config: FormConfig,
+  options?: RequestOptions
 ): Promise<{
   success: boolean;
   message?: string;
@@ -15,30 +22,41 @@ export const defaultSubmitHandler = async (
   data?: any;
 }> => {
   try {
-    // Log the form submission
-    console.log(
-      "Default submit handler - Submitting form with values:",
-      values
-    );
+    // Determine which URL, headers and method to use based on mode or custom options
+    let apiUrl = options?.url;
+    let apiMethod = options?.method;
+    let apiHeaders;
+    
+    // If URL is not provided in options, determine from config
+    if (!apiUrl) {
+      if (config.isEditMode) {
+        // In edit mode, use editApiUrl if available, otherwise fall back to apiUrl
+        apiUrl = config.editApiUrl || config.apiUrl;
 
-    // Determine which URL, headers and method to use based on mode
-    let apiUrl, apiHeaders, apiMethod;
-    if (config.isEditMode) {
-      // In edit mode, use editApiUrl if available, otherwise fall back to apiUrl
-      apiUrl = config.editApiUrl || config.apiUrl;
-
-      // If editApiUrl contains :id placeholder, replace it with recordId from values
-      if (apiUrl && apiUrl.includes(':id') && values.id) {
-        apiUrl = apiUrl.replace(':id', values.id);
+        // If editApiUrl contains :id placeholder, replace it with recordId from values
+        if (apiUrl && apiUrl.includes(':id') && values.id) {
+          apiUrl = apiUrl.replace(':id', values.id);
+        }
+      } else {
+        // In create mode, use apiUrl
+        apiUrl = config.apiUrl;
       }
-
+    }
+    
+    // If method is not provided in options, determine from config
+    if (!apiMethod) {
+      if (config.isEditMode) {
+        apiMethod = config.editApiMethod || 'PUT';
+      } else {
+        apiMethod = config.apiMethod || 'POST';
+      }
+    }
+    
+    // Determine headers from config
+    if (config.isEditMode) {
       apiHeaders = config.editApiHeaders || config.apiHeaders;
-      apiMethod = config.editApiMethod || 'PUT';
     } else {
-      // In create mode, use apiUrl and apiHeaders
-      apiUrl = config.apiUrl;
       apiHeaders = config.apiHeaders;
-      apiMethod = config.apiMethod || 'POST';
     }
 
     // If this is a step-based form (wizard or accordion)
@@ -72,22 +90,37 @@ export const defaultSubmitHandler = async (
     // Log the API URL being used
     console.log(`Default submit handler - Using API URL: ${apiUrl}`);
 
+    // Prepare request config by merging headers with any custom config
+    const requestConfig = {
+      headers: apiHeaders,
+      ...options?.config
+    };
+    
     // Make the API request using the specified method
     let response;
 
     switch (apiMethod) {
       case 'PUT':
-        response = await apiClient.put(apiUrl, values, { headers: apiHeaders });
+        response = await apiClient.put(apiUrl, values, requestConfig);
         break;
       case 'PATCH':
-        response = await apiClient.patch(apiUrl, values, { headers: apiHeaders });
+        response = await apiClient.patch(apiUrl, values, requestConfig);
         break;
       case 'DELETE':
-        response = await apiClient.delete(apiUrl, { headers: apiHeaders, data: values });
+        response = await apiClient.delete(apiUrl, {
+          ...requestConfig,
+          data: values
+        });
+        break;
+      case 'GET':
+        response = await apiClient.get(apiUrl, {
+          ...requestConfig,
+          params: values
+        });
         break;
       case 'POST':
       default:
-        response = await apiClient.post(apiUrl, values, { headers: apiHeaders });
+        response = await apiClient.post(apiUrl, values, requestConfig);
         break;
     }
 
@@ -98,26 +131,6 @@ export const defaultSubmitHandler = async (
       data: response.data || {},
     };
   } catch (error: any) {
-    console.log("Form submission error:", error);
-
-    // Handle Laravel validation errors
-    if (error.response?.status === 422 && config.laravelValidation?.enabled) {
-      const errorsPath = config.laravelValidation.errorsPath || "errors";
-      const validationErrors = error.response.data?.[errorsPath] || {};
-
-      // Return the validation errors in the expected format
-      return {
-        success: false,
-        message: error.response.data?.message || "Validation failed",
-        errors: validationErrors,
-      };
-    }
-
-    // Handle other errors
-    return {
-      success: false,
-      message:
-        error.response?.data?.message || error.message || "An error occurred",
-    };
+    return handleFormSubmissionError(error, config);
   }
 };

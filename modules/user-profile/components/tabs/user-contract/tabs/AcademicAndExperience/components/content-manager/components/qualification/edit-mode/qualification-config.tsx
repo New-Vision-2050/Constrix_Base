@@ -63,6 +63,8 @@ export const QualificationFormConfig = ({
               valueField: "id",
               labelField: "name",
               searchParam: "name",
+              dependsOn: "country_id",
+              filterParam: "country_id",
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",

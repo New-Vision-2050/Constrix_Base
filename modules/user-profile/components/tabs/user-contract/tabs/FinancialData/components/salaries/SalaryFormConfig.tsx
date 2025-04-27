@@ -3,6 +3,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
+import {defaultSubmitHandler} from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const SalaryFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -10,6 +11,7 @@ export const SalaryFormConfig = () => {
 
   const salaryFormConfig: FormConfig = {
     formId: "salary-data-form",
+      apiUrl: `${baseURL}/user_salaries`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -104,14 +106,7 @@ export const SalaryFormConfig = () => {
         ...formData,
         user_id: user?.user_id,
       };
-
-      const response = await apiClient.post(`/user_salaries`, serialize(body));
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+    return await defaultSubmitHandler(body,salaryFormConfig);
     },
   };
   return salaryFormConfig;

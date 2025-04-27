@@ -29,7 +29,7 @@ interface ExpandableFormSectionProps {
   onToggle?: (isOpen: boolean) => void; // Callback when section is toggled
   forceDisabled?: boolean; // Force disable the collapsible trigger
   clearFiledError?: (field: string) => void; // Function to clear field errors
-  formId: string|undefined;
+  formId?: string;
 }
 
 const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
@@ -145,7 +145,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
 
               return (
                 <FormField
-                  formId={formId}
+                  formId={formId ?? 'default'}
                   key={field.name}
                   field={field}
                   value={values[field.name]}
@@ -251,7 +251,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                 stepResponses={stepResponses}
                 getStepResponseData={getStepResponseData}
                 currentStep={currentStep}
-                formId={formId}
+                formId={formId ?? 'default'}
               />
             );
           })}

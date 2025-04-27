@@ -5,5 +5,6 @@ export default function useUserPersonalData(userId?: string) {
   return useQuery({
     queryKey: [`user-profile-personal-data`, userId],
     queryFn: () => GetPersonalUserData(userId),
+    refetchOnWindowFocus: false, // don't refetch on tab switch
   });
 }
