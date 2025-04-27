@@ -189,6 +189,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
                   "latitude",
                   "longitude",
                 ]}
+                inGeneral={true}
               />
             ),
           },
