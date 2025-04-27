@@ -116,15 +116,12 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       </div>
 
       <div className="p-2">
-        <PreviewTextField
-          label="ارفاق العقد"
-          value={
-            contract?.contract_number
-              ? contract?.contract_number + " file "
-              : ""
-          }
-          valid={Boolean(contract?.file_url)}
-          required
+         <PreviewTextField
+          valid={Boolean(contract?.files?.url)}
+          label="ارفاق العرض"
+          value={contract?.files?.name ?? "-"}
+          type={contract?.files?.type == "image" ? "image" : "pdf"}
+          fileUrl={contract?.files?.url ?? ""}
         />
       </div>
     </div>

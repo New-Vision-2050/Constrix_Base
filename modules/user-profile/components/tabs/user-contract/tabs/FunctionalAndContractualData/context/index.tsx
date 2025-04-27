@@ -12,6 +12,8 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import useUserContractData from "../hooks/useUserContractData";
 import { Contract } from "@/modules/user-profile/types/Contract";
+import useProfessionalData from "../hooks/useUserProfessionalData";
+import { ProfessionalT } from "../api/get-professinal-data";
 
 // declare context types
 type FunctionalContractualCxtType = {
@@ -23,6 +25,9 @@ type FunctionalContractualCxtType = {
   // user contract data
   userContractData: Contract | undefined;
   handleRefetchContractData: () => void;
+  // professional data
+  professionalData: ProfessionalT | undefined;
+  handleRefetchProfessionalData: () => void
 };
 
 export const FunctionalContractualCxt =
@@ -59,7 +64,13 @@ export const FunctionalContractualCxtProvider = ({
   const { data: userContractData, refetch: refetchContractData } =
     useUserContractData(user?.user_id ?? "");
 
+  const { data: professionalData, refetch: refetchProfessionalData } =
+    useProfessionalData(user?.user_id ?? "");
+
   // ** declare and define component helper methods
+  const handleRefetchProfessionalData = () => {
+    refetchProfessionalData();
+  };
   const handleRefetchContractData = () => {
     refetchContractData();
   };
@@ -83,6 +94,9 @@ export const FunctionalContractualCxtProvider = ({
         // contract data
         userContractData,
         handleRefetchContractData,
+        // professional data
+        professionalData,
+        handleRefetchProfessionalData
       }}
     >
       {children}

@@ -36,10 +36,10 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="ارفاق رقم الحدود"
-          value={userIdentityData?.file_border_number?.url ? "رقم الحدود" : ""}
-          valid={Boolean(userIdentityData?.file_border_number?.url)}
+          value={userIdentityData?.file_border_number?.[0]?.name ? "رقم الحدود" : ""}
+          valid={Boolean(userIdentityData?.file_border_number)}
           type="pdf"
-          fileUrl={userIdentityData?.file_border_number?.url}
+          fileUrl={userIdentityData?.file_border_number?.[0]?.url}
         />
       </div>
     </div>
