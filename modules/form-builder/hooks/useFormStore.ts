@@ -4,8 +4,10 @@ import { debounce } from "lodash";
 import React, { useEffect, useMemo, useCallback, useRef } from "react";
 import {apiClient} from "@/config/axios-config";
 import {triggerApiValidation} from "@/modules/form-builder";
+import libphonenumbers from 'libphonenumbers';
 import {messages} from "@/config/messages";
 import {boolean} from "zod";
+import { useTranslations } from 'next-intl'
 
 // Store debounced validation functions for each form and field
 const debouncedValidations = new Map<string, Map<string, ReturnType<typeof debounce>>>();
@@ -465,6 +467,25 @@ export const useFormStore = create<FormState>((set, get) => ({
                         break;
                     }
                     break;
+                case "phone":
+                    const phoneUtil = libphonenumbers.PhoneNumberUtil.getInstance();
+                    let phoneArr = value?.split(' ')
+                    let message = rule.message && rule.message !== '' ? rule.message : "رقم الجوال غير صحيح"
+                    if(phoneArr?.length > 1 && phoneArr[1].length){
+                      if(phoneArr[1].length > 1) {
+                        const number = phoneUtil.parseAndKeepRawInput(value)
+                        if (!phoneUtil.isValidNumber(number)) {
+                          store.setError(formId, fieldName, message);
+                          hasError = true;
+                          break;
+                        }
+                      }else{
+                        store.setError(formId, fieldName, message);
+                        hasError = true;
+                        break;
+                      }
+                    }
+                break;
                 case "apiValidation":
                     // For API validation, we trigger the validation but also check if there's an existing error
                     if (fieldName) {
