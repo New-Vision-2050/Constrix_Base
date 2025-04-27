@@ -37,7 +37,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="مدة العقد"
-          value={contract?.contract_duration ?? ""}
+          value={`${contract?.contract_duration} ${contract?.contract_duration_unit?.name}`}
           valid={Boolean(contract?.contract_duration)}
           required
         />
@@ -46,7 +46,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="فترة الاشعار"
-          value={contract?.notice_period?.toString() ?? ""}
+          value={`${contract?.notice_period?.toString()} ${contract?.notice_period_unit?.name}`}
           valid={Boolean(contract?.notice_period)}
           required
         />
@@ -55,7 +55,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="فترة التجربة"
-          value={contract?.probation_period?.toString() ?? ""}
+          value={`${contract?.probation_period?.toString()} ${contract?.probation_period_unit?.name}`}
           valid={Boolean(contract?.probation_period)}
           required
         />
@@ -64,7 +64,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="طبيعة العمل"
-          value={contract?.nature_work ?? ""}
+          value={contract?.nature_work?.name ?? ""}
           valid={Boolean(contract?.nature_work)}
           required
         />
@@ -73,8 +73,8 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="نوع ساعات العمل"
-          value={contract?.type_working_hours ?? ""}
-          valid={Boolean(contract?.type_working_hours)}
+          value={contract?.type_working_hour?.name ?? ""}
+          valid={Boolean(contract?.type_working_hour)}
           required
         />
       </div>
@@ -82,7 +82,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="ساعات العمل الاسبوعية"
-          value={contract?.working_hours?.toString() ?? ""}
+          value={`${contract?.working_hours?.toString()} ساعة`}
           valid={Boolean(contract?.working_hours?.toString())}
           required
         />
@@ -91,7 +91,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="ايام الاجازات السنوية"
-          value={contract?.annual_leave?.toString() ?? ""}
+          value={`${contract?.annual_leave?.toString()} يوم`}
           valid={Boolean(contract?.annual_leave)}
           required
         />
@@ -109,7 +109,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="حق الانهاء خلال فترة التجربة"
-          value={contract?.right_terminate ?? ""}
+          value={contract?.right_terminate?.name ?? ""}
           valid={Boolean(contract?.right_terminate)}
           required
         />

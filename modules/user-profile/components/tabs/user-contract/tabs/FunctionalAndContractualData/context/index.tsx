@@ -14,6 +14,8 @@ import useUserContractData from "../hooks/useUserContractData";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import useProfessionalData from "../hooks/useUserProfessionalData";
 import { ProfessionalT } from "../api/get-professinal-data";
+import useTimeUnitsData from "../hooks/useTimeUnitsData";
+import { TimeUnit } from "../api/get-time-units";
 
 // declare context types
 type FunctionalContractualCxtType = {
@@ -27,7 +29,9 @@ type FunctionalContractualCxtType = {
   handleRefetchContractData: () => void;
   // professional data
   professionalData: ProfessionalT | undefined;
-  handleRefetchProfessionalData: () => void
+  handleRefetchProfessionalData: () => void;
+  // time units
+  timeUnits: TimeUnit[] | undefined;
 };
 
 export const FunctionalContractualCxt =
@@ -67,6 +71,8 @@ export const FunctionalContractualCxtProvider = ({
   const { data: professionalData, refetch: refetchProfessionalData } =
     useProfessionalData(user?.user_id ?? "");
 
+  const { data: timeUnits } = useTimeUnitsData();
+
   // ** declare and define component helper methods
   const handleRefetchProfessionalData = () => {
     refetchProfessionalData();
@@ -96,7 +102,9 @@ export const FunctionalContractualCxtProvider = ({
         handleRefetchContractData,
         // professional data
         professionalData,
-        handleRefetchProfessionalData
+        handleRefetchProfessionalData,
+        // time unit
+        timeUnits,
       }}
     >
       {children}
