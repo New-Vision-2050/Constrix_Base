@@ -16,6 +16,6 @@ export type UserPrivilege = {
   type_allowance: { id: string; name: string };
   period: { id: string; name: string };
   period_id: string;
-  type_allowance_id: string;
+  type_allowance_code: string;
   type_privilege_id: string;
 };

@@ -11,7 +11,7 @@ export default function ProfileGridRightSide() {
   return (
     <div className="flex flex-col gap-3">
       <UserProfilePersonalData user={user} isLoading={isLoading} />
-      <UserProfileProfessionalData />
+      <UserProfileProfessionalData data={user?.user_professional_data} />
       <UserProfileBankingData bank={user?.bank_account} />
       <UserActivitiesDataList />
     </div>

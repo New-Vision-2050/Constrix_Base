@@ -1,13 +1,14 @@
 import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
+import { checkString } from "@/utils/check-string";
 
 const getBankingDataItems = (bank?: BankAccount): string[] => {
   if (!bank) return [];
   return [
-    `اسم البنك: ${bank?.bank_name ?? "-"}`,
-    `الحساب البنكي: ${bank?.iban ?? "-"}`,
-    `عملة الحساب:  ${bank?.currency_name ?? "-"}`,
+    `اسم البنك: ${checkString(bank?.bank_name)}`,
+    `الحساب البنكي: ${checkString(bank?.iban)}`,
+    `عملة الحساب:  ${checkString(bank?.currency_name)}`,
   ];
 };
 

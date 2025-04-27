@@ -11,6 +11,7 @@ export default function UserProfileTabs() {
   // return component ui.
   return (
     <HorizontalTabs
+      bgStyleApproach
       list={getEditModeTabsList(t)}
       defaultValue={tab1 !== null ? tab1 : undefined}
     />

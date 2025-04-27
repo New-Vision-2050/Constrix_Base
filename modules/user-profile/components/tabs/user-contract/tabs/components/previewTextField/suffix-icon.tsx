@@ -24,23 +24,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
 
     if (!fileUrl) return; // prevent fetch if no URL
 
-    try {
-      const response = await fetch(fileUrl);
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.download = "attachment-file.pdf";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      // memory cleanup
-      window.URL.revokeObjectURL(downloadUrl);
-    } catch (err) {
-      console.error("Download failed:", err);
-    }
+    window.open(fileUrl, "_blank");
   };
 
   /**
@@ -51,7 +35,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
       case "select":
         return <ChevronDownIcon />;
       case "date":
-        return <CalendarRangeIcon additionalClass="w-4"/>;
+        return <CalendarRangeIcon additionalClass="w-4" />;
       case "image":
       case "pdf":
         return <ArrowDownToLineIcon />;

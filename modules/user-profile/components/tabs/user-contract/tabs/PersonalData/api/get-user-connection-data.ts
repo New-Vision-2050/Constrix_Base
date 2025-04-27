@@ -11,8 +11,8 @@ type ResponseT = {
   payload: UserConnectionInformationT;
 };
 
-export default async function GetUserConnectionData() {
-  const res = await apiClient.get<ResponseT>(`company-users/show-contact-information`);
+export default async function GetUserConnectionData(userId?: string) {
+  const res = await apiClient.get<ResponseT>(`company-users/show-contact-information${userId ? "?id=" + userId : ""}`);
 
   return res.data.payload;
 }
