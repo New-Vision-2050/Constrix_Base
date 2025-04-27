@@ -7,7 +7,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export const IdentityDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
-  const { handleRefetchDataStatus } = useUserProfileCxt();
+  const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const IdentityFormConfig: FormConfig = {
     formId: "Identity-data-form",
@@ -72,7 +72,7 @@ export const IdentityDataFormConfig = () => {
       identity: userIdentityData?.identity,
       identity_start_date: userIdentityData?.identity_start_date,
       identity_end_date: userIdentityData?.identity_end_date,
-      file_identity: userIdentityData?.file_identity
+      file_identity: userIdentityData?.file_identity,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -96,7 +96,7 @@ export const IdentityDataFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
 

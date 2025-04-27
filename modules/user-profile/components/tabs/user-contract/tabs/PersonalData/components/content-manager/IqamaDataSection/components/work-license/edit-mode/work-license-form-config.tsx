@@ -6,7 +6,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export const WorkLicenseFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
-  const { handleRefetchDataStatus } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   const workLicenseFormConfig: FormConfig = {
     formId: "ConnectionInformation-license-data-form",
@@ -81,7 +81,7 @@ export const WorkLicenseFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
       return {
