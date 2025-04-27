@@ -109,29 +109,21 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             ],
           },
           {
-            name: "branch_type",
-            label: "نوع الفرع",
+            name: "parent_id",
+            label: "الفرع الرئيسي",
             type: "select",
-            options: [
-              { label: "رئيسي", value: "رئيسي" },
-              { label: "فرعي", value: "فرعي" },
-            ],
+            options: branches
+              .filter((branch) => !!!branch.parent_id)
+              .map((branch) => ({
+                value: branch.id,
+                label: branch.name,
+              })),
             validation: [
               {
                 type: "required",
                 message: "ادخل نوع الفرع",
               },
             ],
-          },
-          {
-            name: "parent_id",
-            label: "الفرع الرئيسي",
-            type: "select",
-            options: branches.map((branch) => ({
-              value: branch.id,
-              label: branch.name,
-            })),
-            condition: (values) => values.branch_type === "فرعي",
           },
           {
             type: "select",
@@ -197,6 +189,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
                   "latitude",
                   "longitude",
                 ]}
+                inGeneral={true}
               />
             ),
           },

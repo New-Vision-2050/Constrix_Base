@@ -4,6 +4,7 @@ import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalData
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const PersonalDataFormConfig = () => {
+  const { user } = useUserProfileCxt();
   const { userPersonalData } = usePersonalDataTabCxt();
   const {
     handleRefetchUserPersonalData,
@@ -141,7 +142,10 @@ export const PersonalDataFormConfig = () => {
         ...formData,
         is_default: formData?.is_default ? 1 : 0,
       };
-      const response = await apiClient.put(`/company-users/data-info`, body);
+      const response = await apiClient.put(
+        `/company-users/data-info/${user?.user_id}`,
+        body
+      );
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

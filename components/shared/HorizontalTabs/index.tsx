@@ -8,10 +8,13 @@ import TabsContentList from "./TabsContentList";
 type PropsT = {
   defaultValue?: string;
   list: SystemTab[];
+  onTabClick?: (tab: SystemTab) => void;
   bgStyleApproach?: boolean;
 };
+
 export default function HorizontalTabs({
   list,
+  onTabClick,
   defaultValue,
   bgStyleApproach,
 }: PropsT) {
@@ -30,7 +33,11 @@ export default function HorizontalTabs({
       <TabsList
         className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start`}
       >
-        <TabsTriggerList list={list} bgStyleApproach={bgStyleApproach} />
+        <TabsTriggerList
+          onTabClick={onTabClick}
+          list={list}
+          bgStyleApproach={bgStyleApproach}
+        />
       </TabsList>
       <TabsContentList list={list} />
     </Tabs>
