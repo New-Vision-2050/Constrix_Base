@@ -150,6 +150,7 @@ export const NationalAddressFormConfig = (
                 lat={companyAddress.country_lat}
                 long={companyAddress.country_long}
                 containerClassName='col-span-2'
+                branchId={id}
                 
               />
             ),

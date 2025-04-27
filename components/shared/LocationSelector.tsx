@@ -40,6 +40,7 @@ interface LocationSelectorProps {
     longitude: number;
   };
   inGeneral?: boolean;
+  branchId?: string;
 }
 
 interface payloadSuccess {
@@ -81,6 +82,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   onSave,
   initialLocation,
   inGeneral,
+  branchId,
 }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: LocationFormValues) => {
@@ -95,6 +97,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         {
           params: {
             ...(inGeneral && { in_general: true }),
+            ...(branchId && { branch_id: branchId }),
           },
         }
       );
