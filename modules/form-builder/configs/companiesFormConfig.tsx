@@ -427,7 +427,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
     editDataTransformer: (data) => {
       if (data.company_field) {
         data.company_field_id = (data?.company_field || []).map(
-          (item: { id: string | Number }) => item.id
+          (item: { id: string | number }) => item.id
         );
       }
       return data;
