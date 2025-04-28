@@ -14,7 +14,7 @@ export default function PersonalDataEntryPoint() {
           },
         })}
       />
-      <div className="p-4 flex-grow gap-8">
+      <div className="p-4 flex-grow gap-8 min-h-[400px] transition-all duration-300">
         <PersonalDataTabContentManager />
       </div>
     </div>

@@ -8,8 +8,8 @@ import { apiClient } from "@/config/axios-config";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCookie } from "cookies-next/client";
 
-const CompanyHeader = () => {
-  const { data, isPending, isSuccess } = useQuery({
+export const useCurrentCompany = () => {
+  return useQuery({
     queryKey: ["main-company-data", undefined],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
@@ -18,6 +18,10 @@ const CompanyHeader = () => {
       return response.data;
     },
   });
+}
+
+const CompanyHeader = () => {
+  const { data, isPending, isSuccess } = useCurrentCompany();
 
   const companyData = JSON.parse(getCookie("company-data") ?? "");
 

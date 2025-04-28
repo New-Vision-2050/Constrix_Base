@@ -5,8 +5,8 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const PassportDataFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
-  const { handleRefetchDataStatus } = useUserProfileCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
@@ -70,6 +70,7 @@ export const PassportDataFormConfig = () => {
       passport: userIdentityData?.passport,
       passport_start_date: userIdentityData?.passport_start_date,
       passport_end_date: userIdentityData?.passport_end_date,
+      file_passport: userIdentityData?.file_passport,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -80,6 +81,7 @@ export const PassportDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
@@ -100,7 +102,7 @@ export const PassportDataFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
       return {

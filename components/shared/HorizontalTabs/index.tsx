@@ -8,21 +8,36 @@ import TabsContentList from "./TabsContentList";
 type PropsT = {
   defaultValue?: string;
   list: SystemTab[];
+  onTabClick?: (tab: SystemTab) => void;
+  bgStyleApproach?: boolean;
 };
-export default function HorizontalTabs({ list, defaultValue }: PropsT) {
+
+export default function HorizontalTabs({
+  list,
+  onTabClick,
+  defaultValue,
+  bgStyleApproach,
+}: PropsT) {
   // declare and define component state and variables.
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const bgColor = bgStyleApproach ? "bg-sidebar" : "bg-transparent";
   // declare and define component helper methods.
   // return component ui.
   return (
     <Tabs
-      defaultValue={defaultValue ?? list?.[0]?.id ?? "_"}
+      defaultValue={defaultValue || list?.[0]?.id ||  "_"}
       dir={isRtl ? "rtl" : "ltr"}
-      className={`${isRtl ? "text-right" : "text-left"} w-full`}
+      className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
-      <TabsList className="bg-transparent min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start">
-        <TabsTriggerList list={list} />
+      <TabsList
+        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start`}
+      >
+        <TabsTriggerList
+          onTabClick={onTabClick}
+          list={list}
+          bgStyleApproach={bgStyleApproach}
+        />
       </TabsList>
       <TabsContentList list={list} />
     </Tabs>

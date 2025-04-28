@@ -9,7 +9,7 @@ export default function UserIqamaData() {
 
   return (
     <TabTemplate
-      title={"بيانات رقم الحدود - الدخول"}
+      title={"بيانات رقم الأقامة"}
       reviewMode={<UserIqamaDataPreviewMode />}
       editMode={<UserIqamaDataEditMode />}
       onChangeMode={() => {

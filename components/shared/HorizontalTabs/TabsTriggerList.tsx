@@ -12,10 +12,16 @@ import { TabsTrigger } from "@radix-ui/react-tabs";
 
 type PropsT = {
   list: SystemTab[];
+  onTabClick?: (tab: SystemTab) => void;
+  bgStyleApproach?: boolean;
 };
 
-export default function TabsTriggerList({ list }: PropsT) {
-  return <>{renderTabs(list)}</>;
+export default function TabsTriggerList({
+  list,
+  bgStyleApproach,
+  onTabClick,
+}: PropsT) {
+  return <>{renderTabs(list, bgStyleApproach, onTabClick)}</>;
 }
 
 /**
@@ -26,8 +32,19 @@ export default function TabsTriggerList({ list }: PropsT) {
  *
  * @returns JSX.Element[] - An array of tab trigger elements.
  */
-function renderTabs(list: SystemTab[]) {
-  return list.map((tab) => <SingleTabTrigger key={tab.id} tab={tab} />);
+function renderTabs(
+  list: SystemTab[],
+  bgStyleApproach?: boolean,
+  onTabClick?: (tab: SystemTab) => void
+) {
+  return list.map((tab) => (
+    <SingleTabTrigger
+      key={tab.id}
+      tab={tab}
+      onTabClick={onTabClick}
+      bgStyleApproach={bgStyleApproach}
+    />
+  ));
 }
 
 /**
@@ -40,15 +57,31 @@ function renderTabs(list: SystemTab[]) {
  * @param {SystemTab} tab - The tab object containing id and title.
  * @returns JSX.Element - A styled tab trigger.
  */
-const SingleTabTrigger = ({ tab }: { tab: SystemTab }) => {
+const SingleTabTrigger = ({
+  tab,
+  onTabClick,
+  bgStyleApproach,
+}: {
+  tab: SystemTab;
+  onTabClick?: (tab: SystemTab) => void;
+  bgStyleApproach?: boolean;
+}) => {
+  const activeTabColor = bgStyleApproach
+    ? "data-[state=active]:text-primary"
+    : "data-[state=active]:text-foreground";
+
   return (
     <TabsTrigger
       key={tab.id}
       value={tab.id}
-      className="px-4 py-2 text-gray-600 rounded-none 
-                 data-[state=active]:border-b-2 data-[state=active]:border-primary 
-                 data-[state=active]:text-foreground"
+      onClick={() => {
+        onTabClick?.(tab);
+      }}
+      className={`px-4 py-2 text-gray-600 rounded-none flex items-center gap-1
+        data-[state=active]:border-b-2 data-[state=active]:border-primary 
+        ${activeTabColor}`}
     >
+      {Boolean(tab.icon) && tab.icon}
       {tab.title}
     </TabsTrigger>
   );

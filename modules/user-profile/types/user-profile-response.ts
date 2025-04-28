@@ -1,6 +1,7 @@
 import { UserCompany } from "@/modules/dashboard/types/user-company";
 import { Country } from "@/modules/settings/types/Country";
 import { BankAccount } from "./bank-account";
+import { ProfessionalT } from "../components/tabs/user-contract/tabs/FunctionalAndContractualData/api/get-professinal-data";
 
 // Define the user profile data type
 export interface UserProfileData {
@@ -39,6 +40,7 @@ export interface UserProfileData {
   passport?: string;
   phone?: string;
   residence?: string;
+  user_professional_data?: ProfessionalT;
 }
 
 // Define the API response type

@@ -83,7 +83,7 @@ export const changeLocalTimeConfig: FormConfig = {
             itemsPerPage: 10,
             totalCountHeader: "X-Total-Count",
             dependsOn: "country-id",
-            filterParam: "country_id",
+            filterParam: "order_country_id",
           },
           validation: [
             {

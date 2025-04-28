@@ -121,7 +121,14 @@
     "Confirmation": "Confirmation",
     "AreYouSure": "Are you sure?",
     "AreYouSureReactivate": "Do you want to confirm activating the company?",
-    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?"
+    "AreYouSureDeactivate": "Do you want to confirm deactivating the company?",
+    "createCompany": "Create Company",
+    "Validation": {
+      "englishName": "Short name should be in English",
+      "arabicName": "The name should be in Arabic letters",
+      "arabicFirstName": "The first name should be in Arabic letters",
+      "arabicLastName": "The last name should be in Arabic letters"
+    }
   },
   "Sidebar": {
     "Dashboard": "Profile",

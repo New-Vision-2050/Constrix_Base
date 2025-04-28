@@ -36,10 +36,13 @@ export const UserCertificationFormConfig = ({
             placeholder: "اختر الجهة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/professional_bodies`,
+              url: `${baseURL}/professional_bodies/user/${
+                user?.user_id
+              }?now=${Date.now()}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
+              setFirstAsDefault: true,
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",

@@ -5,8 +5,8 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const WorkLicenseFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
-  const { handleRefetchDataStatus } = useUserProfileCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   const workLicenseFormConfig: FormConfig = {
     formId: "ConnectionInformation-license-data-form",
@@ -41,6 +41,7 @@ export const WorkLicenseFormConfig = () => {
             name: "file_work_permit",
             label: "ارفاق رخصة العمل",
             type: "image",
+            isMulti: true,
             placeholder: "ارفاق رخصة العمل",
           },
         ],
@@ -51,6 +52,7 @@ export const WorkLicenseFormConfig = () => {
       work_permit: userIdentityData?.work_permit,
       work_permit_start_date: userIdentityData?.work_permit_start_date,
       work_permit_end_date: userIdentityData?.work_permit_end_date,
+      file_work_permit: userIdentityData?.file_work_permit,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -61,6 +63,7 @@ export const WorkLicenseFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
@@ -81,7 +84,7 @@ export const WorkLicenseFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
       return {

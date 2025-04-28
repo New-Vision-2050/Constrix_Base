@@ -121,7 +121,14 @@
     "Confirmation": "تأكيد",
     "AreYouSure": "هل أنت متأكد؟",
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
-    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟"
+    "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
+    "createCompany": "انشاء شركة",
+    "Validation": {
+      "arabicName": "الاسم التجاري يجب ان يكون بالغه العربية",
+      "englishName": "الاسم المختصر يجب ان يكون بالغه الانجليزية",
+      "arabicFirstName": "اسم المستخدم الاول يجب ان يكون بالغه العربية",
+      "arabicLastName": "اسم المستخدم الأخير يجب ان يكون بالغه العربية"
+    }
   },
   "Sidebar": {
     "Dashboard": "الملف الشخصي",

@@ -4,8 +4,9 @@ import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
+import { useTranslations } from 'next-intl'
 
-export function GetCompaniesFormConfig(): FormConfig {
+export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
   return {
     formId: "companies-form",
     title: "اضافة شركة جديدة",
@@ -80,8 +81,13 @@ export function GetCompaniesFormConfig(): FormConfig {
             required: true,
             validation: [
               {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicName"),
+              },
+              {
                 type: "apiValidation",
-                message: "الاسم التجاري يجب ان يكون بالغه العربية",
+                message: "الاسم التجاري يجب ان يكون باللغة العربية",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -101,6 +107,15 @@ export function GetCompaniesFormConfig(): FormConfig {
             containerClassName: "rtl:flex-row-reverse",
             required: true,
             validation: [
+                {
+                    type: "required",
+                    message: "ادخل الاسم المختصر",
+                },
+                {
+                    type: "pattern",
+                    value: /^[a-zA-Z]+$/,
+                    message: t("Validation.englishName"),
+                },
               {
                 type: "apiValidation",
                 message:
@@ -113,10 +128,7 @@ export function GetCompaniesFormConfig(): FormConfig {
                   successCondition: (response) => response.payload.status === 1,
                 },
               },
-              {
-                type: "required",
-                message: "اختر مسؤول الدعم",
-              },
+
             ],
           },
           {
@@ -160,18 +172,7 @@ export function GetCompaniesFormConfig(): FormConfig {
                   onChange={onChange}
                 />
               );
-            },
-            validation: [
-              {
-                type: "custom",
-                message: "Order must have at least one item",
-                validator: (value) => {
-                  console.log("checkbox error: -----: ", value);
-
-                  return false;
-                },
-              },
-            ],
+            }
           },
           {
             type: "hiddenObject",
@@ -232,6 +233,11 @@ export function GetCompaniesFormConfig(): FormConfig {
                 message: "اسم المستخدم الاول مطلوب",
               },
               {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicFirstName"),
+              },
+              {
                 type: "minLength",
                 value: 2,
                 message: "Name must be at least 2 characters",
@@ -248,6 +254,11 @@ export function GetCompaniesFormConfig(): FormConfig {
               {
                 type: "required",
                 message: "الاسم مطلوب",
+              },
+              {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicLastName"),
               },
               {
                 type: "minLength",
@@ -377,7 +388,7 @@ export function GetCompaniesFormConfig(): FormConfig {
         const result = await defaultStepSubmitHandler(
           step,
           values,
-          GetCompaniesFormConfig()
+          GetCompaniesFormConfig(t)
         );
         console.log("result before success", result);
         useFormStore.getState().setValues("companies-form", {
@@ -416,7 +427,7 @@ export function GetCompaniesFormConfig(): FormConfig {
     editDataTransformer: (data) => {
       if (data.company_field) {
         data.company_field_id = (data?.company_field || []).map(
-          (item: { id: string | Number }) => item.id
+          (item: { id: string | number }) => item.id
         );
       }
       return data;

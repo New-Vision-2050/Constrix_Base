@@ -5,7 +5,8 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const IqamaDataFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { user } = useUserProfileCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const iqamaDataFormConfig: FormConfig = {
@@ -41,6 +42,7 @@ export const IqamaDataFormConfig = () => {
             name: "file_entry_number",
             label: "ارفاق رقم الاقامة",
             type: "image",
+            isMulti: true,
             placeholder: "ارفاق رقم الاقامة",
           },
         ],
@@ -51,6 +53,7 @@ export const IqamaDataFormConfig = () => {
       entry_number: userIdentityData?.entry_number,
       entry_number_start_date: userIdentityData?.entry_number_start_date,
       entry_number_end_date: userIdentityData?.entry_number_end_date,
+      file_entry_number: userIdentityData?.file_entry_number,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -61,6 +64,7 @@ export const IqamaDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
@@ -81,7 +85,7 @@ export const IqamaDataFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
       return {

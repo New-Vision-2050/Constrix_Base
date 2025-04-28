@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
 import { FormConfig } from "../types/formTypes";
+import { RequestOptions } from "../types/requestTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
 import { useFormInstance, useFormStore } from "./useFormStore";
@@ -10,6 +11,7 @@ interface UseSheetFormProps {
   recordId?: string | number | null; // Optional record ID for editing
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
+  requestOptions?: RequestOptions; // Optional request options for API calls
 }
 
 interface UseSheetFormResult {
@@ -66,6 +68,7 @@ export function useSheetForm({
   recordId,
   onSuccess,
   onCancel,
+  requestOptions,
 }: UseSheetFormProps): UseSheetFormResult {
   const { toast } = useToast();
 
@@ -178,81 +181,19 @@ export function useSheetForm({
         if (field.condition && !field.condition(values)) {
           return;
         }
-
-        // Skip fields that are hidden or disabled
-        if (field.hidden || field.disabled) {
-          return;
-        }
-
-        // Check required fields
-        if (
-          field.required &&
-          (!values[field.name] || values[field.name] === "")
-        ) {
-          newErrors[field.name] = `${field.label} is required`;
-          isValid = false;
-        }
-
-        // Check validation rules
-        if (field.validation && field.validation.length > 0) {
-          for (const rule of field.validation) {
-            const value = values[field.name];
-
-            switch (rule.type) {
-              case "required":
-                if (value === undefined || value === null || value === "") {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "minLength":
-                if (typeof value === "string" && value.length < rule.value) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "maxLength":
-                if (typeof value === "string" && value.length > rule.value) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "pattern":
-                if (
-                  typeof value === "string" &&
-                  !new RegExp(rule.value).test(value)
-                ) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              case "email":
-                if (
-                  typeof value === "string" &&
-                  !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-                ) {
-                  newErrors[field.name] = rule.message;
-                  isValid = false;
-                }
-                break;
-              // Add other validation types as needed
-            }
-
-            // Break the loop if we already found an error for this field
-            if (newErrors[field.name]) {
-              break;
-            }
+          if (field.hidden || field.disabled) {
+              return;
           }
+        if(field.validation && config.formId) {
+            isValid = useFormStore.getState().validateField(config.formId, field.name, values[field.name], field.validation, values);
         }
       });
     });
 
-    // Update form state with errors
-    setErrors(newErrors);
     setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, values, setErrors, setIsValid]);
+  }, [config.sections, values, setIsValid]);
 
   // Handle form submission
   const handleSubmit = useCallback(
@@ -320,7 +261,7 @@ export function useSheetForm({
 
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
-          config.onSubmit || ((values) => defaultSubmitHandler(values, config));
+          config.onSubmit || ((values) => defaultSubmitHandler(values, config, requestOptions));
         const result = await submitHandler(finalValues);
         if (result.success) {
           setSubmitSuccess(true);

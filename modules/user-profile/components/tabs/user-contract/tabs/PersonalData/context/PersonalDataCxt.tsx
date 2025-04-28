@@ -5,7 +5,7 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import useUserPersonalData from "../hooks/useUserPersonalData";
 import { PersonalUserDataSectionT } from "../api/get-personal-data";
 import { UserConnectionInformationT } from "../api/get-user-connection-data";
@@ -14,6 +14,8 @@ import useUserIdentityData from "../hooks/useUserIdentityData";
 import { UserIdentityInformationT } from "../api/get-identity-data";
 import { PersonalDataSections } from "../constants/PersonalDataSections";
 import { useTranslations } from "next-intl";
+import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 
 // declare context types
 type PersonalDataTabCxtType = {
@@ -55,17 +57,24 @@ export const PersonalDataTabCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
+  const { user: _user } = useUserProfileCxt();
+  const [user, setUser] = useState<UserProfileData>();
+
   const { data: userPersonalData, refetch: refreshPersonalData } =
-    useUserPersonalData();
+    useUserPersonalData(user?.user_id);
   const { data: userConnectionData, refetch: refreshConnectionData } =
-    useUserConnectionData();
+    useUserConnectionData(user?.user_id);
   const { data: userIdentityData, refetch: refetchIdentityData } =
-    useUserIdentityData();
+    useUserIdentityData(user?.user_id);
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
     PersonalDataSections(t)[0]
   );
 
+  console.log("user?.user_iduser?.user_id", user?.user_id);
   // ** handle side effects
+  useEffect(() => {
+    if (_user) setUser(_user);
+  }, [_user]);
 
   // ** declare and define component helper methods
   const handleRefreshIdentityData = () => {

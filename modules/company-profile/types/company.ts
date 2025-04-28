@@ -85,6 +85,16 @@ export interface Branch {
   country_name: string;
   state_name: null | string;
   city_name: null | string;
+  manager: Manager | null
+  user_count:string | number
+  department_count:string | number
+}
+
+export interface Manager {
+    id: string;
+    email: null | string;
+    name: string;
+    phone: null | string;
 }
 
 export interface officialData {
@@ -95,7 +105,11 @@ export interface officialData {
   company_type_id: string;
   country_name: string;
   country_id: string;
-  company_field: string;
+  company_field: {
+    id: number;
+    name: string;
+    description: string;
+  }[];
   company_field_id: string;
   phone: string;
   email: string;
@@ -119,7 +133,11 @@ export interface CompanyData {
   registration_no: null | string;
   general_manager: GeneralManager;
   company_type: string;
-  company_field: string;
+  company_field: {
+    id: number;
+    name: string;
+    description: string;
+  }[];
   registration_type: string;
   logo: string;
   is_active: number;

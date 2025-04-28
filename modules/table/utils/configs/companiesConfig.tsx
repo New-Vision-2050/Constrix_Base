@@ -24,7 +24,7 @@ interface CompanyData {
 
 // Create a component that uses the translations
 export const CompaniesConfig = () => {
-  const t = useTranslations();
+  const t = useTranslations('Companies');
   const router = useRouter();
 
   return {
@@ -33,13 +33,13 @@ export const CompaniesConfig = () => {
     columns: [
       {
         key: "name",
-        label: t("Companies.Companies"),
+        label: t("Companies"),
         sortable: true,
         render: (_: unknown, row: CompanyData) => <Company row={row} />,
       },
       {
         key: "email",
-        label: t("Companies.Email"),
+        label: t("Email"),
         sortable: true,
       },
       {
@@ -58,18 +58,18 @@ export const CompaniesConfig = () => {
       },
       {
         key: "general_manager.name",
-        label: t("Companies.Manager"),
+        label: t("Manager"),
         sortable: true,
       },
       {
         key: "complete_data",
-        label: t("Companies.DataStatus"),
+        label: t("DataStatus"),
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
       {
         key: "is_active",
-        label: t("Companies.Status"),
+        label: t("Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
           <TheStatus theStatus={value} id={row.id} />
         ),
@@ -80,7 +80,7 @@ export const CompaniesConfig = () => {
         key: "country_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("Companies.CountryFilter"),
+          placeholder: t("CountryFilter"),
           dynamicDropdown: {
             url: `${baseURL}/countries`,
             valueField: "id",
@@ -98,7 +98,7 @@ export const CompaniesConfig = () => {
         key: "company_field_id",
         searchType: {
           type: "dropdown",
-          placeholder: t("Companies.CompanySection"),
+          placeholder: t("CompanySection"),
           dynamicDropdown: {
             url: `${baseURL}/company_fields`,
             valueField: "id",
@@ -124,10 +124,10 @@ export const CompaniesConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: GetCompaniesFormConfig(),
+    formConfig: GetCompaniesFormConfig(t),
     executions: [
       {
-        label: t("Companies.LoginAsManager"),
+        label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: () => console.log("Login as manager clicked"),
       },

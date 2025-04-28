@@ -1,10 +1,12 @@
+import { MediaFile } from "@/types/media-file";
+
 export type Qualification = {
   id: string;
   academic_qualification_id: string;
   academic_specialization_id: string;
   company_id: string;
   country_id: string;
-  files: { id: string; url: string }[];
+  files: MediaFile[];
   global_id: string;
   graduation_date: string;
   study_rate: number;
