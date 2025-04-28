@@ -113,7 +113,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             label: "الفرع الرئيسي",
             type: "select",
             options: branches
-              .filter((branch) => !!!branch.parent_id)
+              .filter((branch) => !branch.parent_id)
               .map((branch) => ({
                 value: branch.id,
                 label: branch.name,
