@@ -308,6 +308,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             name: "phone",
             label: "الهاتف",
             type: "phone",
+            required: true,
             placeholder: "Enter your phone",
             validation: [
               {
