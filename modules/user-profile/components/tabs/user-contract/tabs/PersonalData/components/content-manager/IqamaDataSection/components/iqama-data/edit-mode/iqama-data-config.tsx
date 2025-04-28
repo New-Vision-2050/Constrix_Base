@@ -6,7 +6,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export const IqamaDataFormConfig = () => {
   const { user } = useUserProfileCxt();
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const iqamaDataFormConfig: FormConfig = {
@@ -42,6 +42,7 @@ export const IqamaDataFormConfig = () => {
             name: "file_entry_number",
             label: "ارفاق رقم الاقامة",
             type: "image",
+            isMulti: true,
             placeholder: "ارفاق رقم الاقامة",
           },
         ],
@@ -62,6 +63,7 @@ export const IqamaDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

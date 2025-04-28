@@ -1,3 +1,3 @@
 export function checkString(str: string) {
-  return str == null || str === "" ? "-" : str;
+  return str == null || str === "" ? "---" : str;
 }

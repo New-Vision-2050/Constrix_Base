@@ -9,6 +9,7 @@ import PreviewTextFieldPrefixIcon from "./prefix-icon";
 import PreviewTextFieldLabel from "./label";
 import PreviewTextFieldSuffixIcon from "./suffix-icon";
 import PreviewTextFieldValidationIcon from "./validation-icon";
+import { checkString } from "@/utils/check-string";
 
 // types
 export type PreviewTextFieldType = "pdf" | "image" | "select" | "date";
@@ -46,7 +47,7 @@ const PreviewTextField = ({
       {/* input field with prefix icon */}
       <div className="flex w-full items-center gap-1">
         <PreviewTextFieldPrefixIcon type={type} />
-        <Input disabled type="text" value={value ?? ""} />
+        <Input disabled type="text" value={checkString(value)} />
       </div>
 
       {/* label with optional asterisk for required fields */}
