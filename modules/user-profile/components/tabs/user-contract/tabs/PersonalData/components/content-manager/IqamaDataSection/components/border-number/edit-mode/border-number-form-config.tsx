@@ -5,6 +5,7 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const BorderNumberFormConfig = () => {
+  const { user } = useUserProfileCxt();
   const { userIdentityData } = usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
@@ -25,26 +26,26 @@ export const BorderNumberFormConfig = () => {
             type: "text",
             placeholder: "رقم الحدود",
           },
-            {
-                name: "border_number_start_date",
-                label: "تاريخ الدخول",
-                type: "date",
-                placeholder: "تاريخ الدخول",
-                maxDate: {
-                    formId: `ConnectionInformation-data-form`,
-                    field: 'border_number_end_date'
-                },
+          {
+            name: "border_number_start_date",
+            label: "تاريخ الدخول",
+            type: "date",
+            placeholder: "تاريخ الدخول",
+            maxDate: {
+              formId: `ConnectionInformation-data-form`,
+              field: "border_number_end_date",
             },
-            {
-                name: "border_number_end_date",
-                label: "تاريخ الانتهاء",
-                type: "date",
-                placeholder: "تاريخ الانتهاء",
-                minDate: {
-                    formId: `ConnectionInformation-data-form`,
-                    field: 'border_number_start_date'
-                }
+          },
+          {
+            name: "border_number_end_date",
+            label: "تاريخ الانتهاء",
+            type: "date",
+            placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `ConnectionInformation-data-form`,
+              field: "border_number_start_date",
             },
+          },
           {
             name: "file_border_number",
             label: "ارفاق رقم الحدود",
@@ -89,9 +90,10 @@ export const BorderNumberFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

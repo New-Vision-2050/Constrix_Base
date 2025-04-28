@@ -81,9 +81,9 @@ export const BankingDataFormConfig = (props: PropsT) => {
             label: "نوع الحساب",
             placeholder: "اختر نوع الحساب",
             options: [
-              { label: "default", value: "default" },
-              { label: "custody", value: "custody" },
-              { label: "salaries", value: "salaries" },
+              { label: "أفتراضي", value: "default" },
+              { label: "عهد", value: "custody" },
+              { label: "رواتب", value: "salaries" },
             ],
             validation: [
               {

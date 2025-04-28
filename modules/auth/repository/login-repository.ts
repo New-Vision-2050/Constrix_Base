@@ -6,6 +6,7 @@ import {
   resendOtp,
   resetPassword,
   validateResetPasswordOtp,
+  logout
 } from "../service/login-services";
 import { LoginOption } from "../types/login-responses";
 
@@ -50,6 +51,10 @@ export const loginRepository = {
   },
   validateResetPasswordOtp: async (identifier: string, otp: string) => {
     const response = await validateResetPasswordOtp(identifier, otp);
+    return response.data;
+  },
+  logout: async () => {
+    const response = await logout();
     return response.data;
   },
 };

@@ -89,3 +89,11 @@ export const useValidateResetPasswordOtp = () =>
     mutationFn: ({ identifier, otp }) =>
       loginRepository.validateResetPasswordOtp(identifier, otp),
   });
+
+export const useLogout = () =>
+  useMutation<
+    AxiosError<ServerErrorResponse>
+  >({
+    mutationFn: () =>
+      loginRepository.logout(),
+  });

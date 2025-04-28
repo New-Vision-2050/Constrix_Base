@@ -39,6 +39,7 @@ interface LocationSelectorProps {
     latitude: number;
     longitude: number;
   };
+  inGeneral?: boolean;
 }
 
 interface payloadSuccess {
@@ -79,15 +80,24 @@ const libraries: Libraries = ["places"];
 const LocationSelector: React.FC<LocationSelectorProps> = ({
   onSave,
   initialLocation,
+  inGeneral,
 }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: LocationFormValues) => {
       const response = await apiClient.post<
         ServerSuccessResponse<payloadSuccess>
-      >("companies/company-profile/national-address", {
-        lat: data.latitude,
-        long: data.longitude,
-      });
+      >(
+        "companies/company-profile/national-address",
+        {
+          lat: data.latitude,
+          long: data.longitude,
+        },
+        {
+          params: {
+            ...(inGeneral && { in_general: true }),
+          },
+        }
+      );
       return response.data;
     },
   });
@@ -186,7 +196,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           neighborhood_name,
           postal_code,
           street_name,
-        ...locationData,
+          ...locationData,
         });
       },
     });

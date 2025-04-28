@@ -36,7 +36,7 @@ export const UserCertificationFormConfig = ({
             placeholder: "اختر الجهة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/professional_bodies`,
+              url: `${baseURL}/professional_bodies/user/${user?.user_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

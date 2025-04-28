@@ -5,6 +5,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const IqamaDataFormConfig = () => {
+  const { user } = useUserProfileCxt();
   const { userIdentityData } = usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
@@ -81,7 +82,7 @@ export const IqamaDataFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
       return {

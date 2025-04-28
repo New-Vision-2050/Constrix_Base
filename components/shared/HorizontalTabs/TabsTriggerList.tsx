@@ -12,11 +12,16 @@ import { TabsTrigger } from "@radix-ui/react-tabs";
 
 type PropsT = {
   list: SystemTab[];
+  onTabClick?: (tab: SystemTab) => void;
   bgStyleApproach?: boolean;
 };
 
-export default function TabsTriggerList({ list, bgStyleApproach }: PropsT) {
-  return <>{renderTabs(list, bgStyleApproach)}</>;
+export default function TabsTriggerList({
+  list,
+  bgStyleApproach,
+  onTabClick,
+}: PropsT) {
+  return <>{renderTabs(list, bgStyleApproach, onTabClick)}</>;
 }
 
 /**
@@ -27,11 +32,16 @@ export default function TabsTriggerList({ list, bgStyleApproach }: PropsT) {
  *
  * @returns JSX.Element[] - An array of tab trigger elements.
  */
-function renderTabs(list: SystemTab[], bgStyleApproach?: boolean) {
+function renderTabs(
+  list: SystemTab[],
+  bgStyleApproach?: boolean,
+  onTabClick?: (tab: SystemTab) => void
+) {
   return list.map((tab) => (
     <SingleTabTrigger
       key={tab.id}
       tab={tab}
+      onTabClick={onTabClick}
       bgStyleApproach={bgStyleApproach}
     />
   ));
@@ -49,9 +59,11 @@ function renderTabs(list: SystemTab[], bgStyleApproach?: boolean) {
  */
 const SingleTabTrigger = ({
   tab,
+  onTabClick,
   bgStyleApproach,
 }: {
   tab: SystemTab;
+  onTabClick?: (tab: SystemTab) => void;
   bgStyleApproach?: boolean;
 }) => {
   const activeTabColor = bgStyleApproach
@@ -62,6 +74,9 @@ const SingleTabTrigger = ({
     <TabsTrigger
       key={tab.id}
       value={tab.id}
+      onClick={() => {
+        onTabClick?.(tab);
+      }}
       className={`px-4 py-2 text-gray-600 rounded-none flex items-center gap-1
         data-[state=active]:border-b-2 data-[state=active]:border-primary 
         ${activeTabColor}`}

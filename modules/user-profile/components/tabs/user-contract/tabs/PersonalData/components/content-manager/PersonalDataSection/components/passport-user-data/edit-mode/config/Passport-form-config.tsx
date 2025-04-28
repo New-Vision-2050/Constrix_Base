@@ -6,7 +6,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export const PassportDataFormConfig = () => {
   const { userIdentityData } = usePersonalDataTabCxt();
-  const { handleRefetchDataStatus } = useUserProfileCxt();
+  const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
@@ -100,7 +100,7 @@ export const PassportDataFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
       return {

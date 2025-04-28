@@ -41,7 +41,7 @@ export default function UserProfilePassportDataReview() {
         <PreviewTextField
           valid={Boolean(userIdentityData?.file_passport?.[0]?.url)}
           label="ارفاق الهوية"
-          value={userIdentityData?.file_passport?.[0]?.name ?? ""}
+          value={userIdentityData?.file_passport?.[0]?.name ?? "-"}
           type={
             userIdentityData?.file_passport?.[0]?.type == "image"
               ? "image"

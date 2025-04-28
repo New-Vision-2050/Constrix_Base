@@ -52,3 +52,5 @@ export const validateResetPasswordOtp = async (
   otp: string
 ) =>
   await apiClient.post(endPoints.validateResetPasswordOtp, { identifier, otp });
+
+export const logout = async () => await apiClient.post(endPoints.logout);

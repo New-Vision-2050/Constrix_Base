@@ -41,7 +41,7 @@ function renderTabsContent(list: SystemTab[]) {
  */
 const SingleTabContent = ({ tab }: { tab: SystemTab }) => {
   return (
-    <TabsContent value={tab.id} className="p-4">
+    <TabsContent value={tab.id} className="p-4 min-h-[350px] transition-all duration-300">
       {tab.content}
     </TabsContent>
   );

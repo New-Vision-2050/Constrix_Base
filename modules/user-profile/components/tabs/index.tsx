@@ -5,13 +5,16 @@ import { useUserProfileCxt } from "../../context/user-profile-cxt";
 
 export default function UserProfileTabs() {
   // declare and define component state and variables
-  const { tab1 } = useUserProfileCxt();
+  const { tab1, setTab1 } = useUserProfileCxt();
   const t = useTranslations("UserProfile.tabs");
   // declare and define component helper methods
   // return component ui.
   return (
     <HorizontalTabs
       bgStyleApproach
+      onTabClick={(tab) => {
+        setTab1(tab.id);
+      }}
       list={getEditModeTabsList(t)}
       defaultValue={tab1 !== null ? tab1 : undefined}
     />

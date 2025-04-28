@@ -12,7 +12,7 @@ type ResponseT = {
 };
 
 export default async function GetUserConnectionData(userId?: string) {
-  const res = await apiClient.get<ResponseT>(`company-users/show-contact-information${userId ? "?id=" + userId : ""}`);
+  const res = await apiClient.get<ResponseT>(`company-users/show-contact-information${userId ? "/" + userId : ""}`);
 
   return res.data.payload;
 }
