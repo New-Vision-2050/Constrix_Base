@@ -62,6 +62,7 @@ export const BorderNumberFormConfig = () => {
       border_number_end_date: userIdentityData?.border_number_end_date,
       border_number_start_date: userIdentityData?.border_number_start_date,
       border_number: userIdentityData?.border_number,
+      file_border_number: userIdentityData?.file_border_number,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",

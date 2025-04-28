@@ -23,6 +23,8 @@ type PropsT = {
   required?: boolean;
   fileUrl?: string;
   needRequest?: boolean;
+  mediaId?: string | number;
+  fireAfterDeleteMedia?: () => void;
 };
 
 const PreviewTextField = ({
@@ -33,6 +35,8 @@ const PreviewTextField = ({
   fileUrl,
   required,
   needRequest,
+  mediaId,
+  fireAfterDeleteMedia,
 }: PropsT) => {
   // get current locale for RTL/LTR
   const locale = useLocale();
@@ -59,7 +63,13 @@ const PreviewTextField = ({
       />
 
       {/* suffix icon */}
-      <PreviewTextFieldSuffixIcon fileUrl={fileUrl} isRTL={isRTL} type={type} />
+      <PreviewTextFieldSuffixIcon
+        fileUrl={fileUrl}
+        isRTL={isRTL}
+        type={type}
+        mediaId={mediaId}
+        fireAfterDeleteMedia={fireAfterDeleteMedia}
+      />
 
       {/* icon showing validation state */}
       <PreviewTextFieldValidationIcon valid={valid} spanDir={spanDir} />

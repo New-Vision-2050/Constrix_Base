@@ -1,10 +1,12 @@
 import { Contract } from "@/modules/user-profile/types/Contract";
 import PreviewTextField from "../../../../components/previewTextField";
+import { useFunctionalContractualCxt } from "../../../context";
 
 type PropsT = {
   contract?: Contract | undefined;
 };
 export default function ContractDataFormPreviewMode({ contract }: PropsT) {
+  const { handleRefetchContractData } = useFunctionalContractualCxt();
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
@@ -46,7 +48,9 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="فترة الاشعار"
-          value={`${contract?.notice_period?.toString()} ${contract?.notice_period_unit?.name}`}
+          value={`${contract?.notice_period?.toString()} ${
+            contract?.notice_period_unit?.name
+          }`}
           valid={Boolean(contract?.notice_period)}
           required
         />
@@ -55,7 +59,9 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="فترة التجربة"
-          value={`${contract?.probation_period?.toString()} ${contract?.probation_period_unit?.name}`}
+          value={`${contract?.probation_period?.toString()} ${
+            contract?.probation_period_unit?.name
+          }`}
           valid={Boolean(contract?.probation_period)}
           required
         />
@@ -116,7 +122,11 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       </div>
 
       <div className="p-2">
-         <PreviewTextField
+        <PreviewTextField
+          mediaId={contract?.files?.id}
+          fireAfterDeleteMedia={() => {
+            handleRefetchContractData();
+          }}
           valid={Boolean(contract?.files?.url)}
           label="ارفاق العرض"
           value={contract?.files?.name ?? "---"}
