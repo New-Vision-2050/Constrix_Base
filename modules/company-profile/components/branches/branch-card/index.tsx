@@ -128,9 +128,9 @@ const BranchInfo = ({ branches }: { branches: Branch[] }) => {
           branchId={branch.id}
           branchName={branch.name}
           country={branch.country_name}
-          manager="—" // Replace with actual manager field if available
-          employeesCount="—" // Replace with actual value if available
-          departmentsCount="—" // Replace with actual value if available
+          manager={branch.manager?.name ?? '-'} // Replace with actual manager field if available
+          employeesCount={branch.user_count ?? 0} // Replace with actual value if available
+          departmentsCount={branch.department_count ?? 0} // Replace with actual value if available
           email={branch.email ?? "—"}
           phoneNumber={branch.phone ?? "—"}
           isMainBranch={branch.parent_id === null}
