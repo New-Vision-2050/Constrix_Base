@@ -5,7 +5,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const WorkLicenseFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   const workLicenseFormConfig: FormConfig = {
@@ -41,6 +41,7 @@ export const WorkLicenseFormConfig = () => {
             name: "file_work_permit",
             label: "ارفاق رخصة العمل",
             type: "image",
+            isMulti: true,
             placeholder: "ارفاق رخصة العمل",
           },
         ],
@@ -61,6 +62,7 @@ export const WorkLicenseFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

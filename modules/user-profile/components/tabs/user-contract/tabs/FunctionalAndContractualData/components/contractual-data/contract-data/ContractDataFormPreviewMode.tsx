@@ -119,7 +119,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
          <PreviewTextField
           valid={Boolean(contract?.files?.url)}
           label="ارفاق العرض"
-          value={contract?.files?.name ?? "-"}
+          value={contract?.files?.name ?? "---"}
           type={contract?.files?.type == "image" ? "image" : "pdf"}
           fileUrl={contract?.files?.url ?? ""}
         />

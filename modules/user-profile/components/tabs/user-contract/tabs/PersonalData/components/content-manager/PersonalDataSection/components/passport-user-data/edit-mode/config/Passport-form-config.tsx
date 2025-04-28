@@ -5,7 +5,7 @@ import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const PassportDataFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const PassportFormConfig: FormConfig = {
@@ -80,6 +80,7 @@ export const PassportDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

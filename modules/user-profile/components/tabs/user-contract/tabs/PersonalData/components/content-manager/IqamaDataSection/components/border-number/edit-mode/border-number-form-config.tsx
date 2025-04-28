@@ -6,7 +6,8 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 
 export const BorderNumberFormConfig = () => {
   const { user } = useUserProfileCxt();
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const borderNumberFormConfig: FormConfig = {
@@ -50,6 +51,7 @@ export const BorderNumberFormConfig = () => {
             name: "file_border_number",
             label: "ارفاق رقم الحدود",
             type: "image",
+            isMulti: true,
             placeholder: "ارفاق رقم الحدود",
           },
         ],
@@ -70,6 +72,7 @@ export const BorderNumberFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
