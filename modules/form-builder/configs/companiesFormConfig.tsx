@@ -311,8 +311,8 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             placeholder: "Enter your phone",
             validation: [
               {
-                type: "required",
-                message: "برجاء إدخال رقم الهاتف",
+                type: "phone",
+                message: "",
               },
             ],
           },

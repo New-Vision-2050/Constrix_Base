@@ -126,8 +126,8 @@ export const companyUserFormConfig: FormConfig = {
                     validation: [
                         {
                             type: "phone",
-                            message: "",
-                        },
+                            message: ''
+                        }
                     ],
                 },
                 {
