@@ -52,6 +52,7 @@ export const WorkLicenseFormConfig = () => {
       work_permit: userIdentityData?.work_permit,
       work_permit_start_date: userIdentityData?.work_permit_start_date,
       work_permit_end_date: userIdentityData?.work_permit_end_date,
+      file_work_permit: userIdentityData?.file_work_permit,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",

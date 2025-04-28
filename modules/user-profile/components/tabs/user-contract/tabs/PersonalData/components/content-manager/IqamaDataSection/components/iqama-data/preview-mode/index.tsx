@@ -2,7 +2,8 @@ import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaDataPreviewMode() {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -33,19 +34,22 @@ export default function UserIqamaDataPreviewMode() {
         />
       </div>
 
-      <div className="p-2">
-        <PreviewTextField
-          valid={Boolean(userIdentityData?.file_entry_number?.[0]?.name)}
-          label="ارفاق الهوية"
-          value={userIdentityData?.file_entry_number?.[0]?.name ?? "---"}
-          type={
-            userIdentityData?.file_entry_number?.[0]?.type == "image"
-              ? "image"
-              : "pdf"
-          }
-          fileUrl={userIdentityData?.file_entry_number?.[0]?.url}
-        />
-      </div>
+      {Array.isArray(userIdentityData?.file_entry_number) &&
+        userIdentityData?.file_entry_number?.map((media) => (
+          <div key={media.id} className="p-2">
+            <PreviewTextField
+              mediaId={media?.id}
+              fireAfterDeleteMedia={() => {
+                handleRefreshIdentityData();
+              }}
+              valid={Boolean(media?.name)}
+              label="ارفاق الهوية"
+              value={media?.name ?? "---"}
+              type={media?.type == "image" ? "image" : "pdf"}
+              fileUrl={media?.url}
+            />
+          </div>
+        ))}
     </div>
   );
 }

@@ -1,11 +1,13 @@
 import { Qualification } from "@/modules/user-profile/types/qualification";
 import PreviewTextField from "../../../../../../components/previewTextField";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 
 type PropsT = { qualification: Qualification };
 
 export default function SingleQualificationDataPreview({
   qualification,
 }: PropsT) {
+  const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
@@ -62,15 +64,22 @@ export default function SingleQualificationDataPreview({
         />
       </div>
 
-      <div className="p-2">
-        <PreviewTextField
-          valid={Boolean(qualification?.files?.[0]?.name)}
-          label="ارفاق شهادة"
-          value={qualification?.files?.[0]?.name ?? "---"}
-          type={qualification?.files?.[0]?.type == "image" ? "image" : "pdf"}
-          fileUrl={qualification?.files?.[0]?.url ?? ""}
-        />
-      </div>
+      {Array.isArray(qualification?.files) &&
+        qualification?.files?.map((media) => (
+          <div key={media.id} className="p-2">
+            <PreviewTextField
+              mediaId={media?.id}
+              fireAfterDeleteMedia={() => {
+                handleRefreshUserQualifications();
+              }}
+              valid={Boolean(media?.name)}
+              label="ارفاق شهادة"
+              value={media?.name ?? "---"}
+              type={media?.type == "image" ? "image" : "pdf"}
+              fileUrl={media?.url}
+            />
+          </div>
+        ))}
     </div>
   );
 }

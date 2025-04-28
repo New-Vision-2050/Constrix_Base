@@ -70,6 +70,7 @@ export const PassportDataFormConfig = () => {
       passport: userIdentityData?.passport,
       passport_start_date: userIdentityData?.passport_start_date,
       passport_end_date: userIdentityData?.passport_end_date,
+      file_passport: userIdentityData?.file_passport,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
