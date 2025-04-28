@@ -153,6 +153,7 @@ export const QualificationFormConfig = ({
           {
             type: "image",
             name: "file",
+            isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
           },
@@ -167,6 +168,7 @@ export const QualificationFormConfig = ({
       academic_qualification_id: qualification?.academic_qualification_id,
       graduation_date: qualification?.graduation_date,
       study_rate: qualification?.study_rate,
+      file: qualification?.files,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",

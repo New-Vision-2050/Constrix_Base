@@ -3,9 +3,8 @@ import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaBorderNumberPreviewMode() {
-  const { userIdentityData } = usePersonalDataTabCxt();
-
-  console.log('check file',userIdentityData?.file_border_number?.[0]?.name,Boolean(userIdentityData?.file_border_number?.[0]?.name))
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -21,7 +20,9 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الدخول"
-          value={checkString(userIdentityData?.border_number_start_date as string)}
+          value={checkString(
+            userIdentityData?.border_number_start_date as string
+          )}
           valid={Boolean(userIdentityData?.border_number_start_date)}
           type="date"
         />
@@ -30,25 +31,30 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الانتهاء"
-          value={checkString(userIdentityData?.border_number_end_date as string)}
+          value={checkString(
+            userIdentityData?.border_number_end_date as string
+          )}
           valid={Boolean(userIdentityData?.border_number_end_date)}
           type="date"
         />
       </div>
 
-      <div className="p-2">
-        <PreviewTextField
-          label="ارفاق رقم الحدود"
-          value={checkString(userIdentityData?.file_border_number?.[0]?.name as string)}
-          valid={Boolean(userIdentityData?.file_border_number?.[0]?.name)}
-          type={
-            userIdentityData?.file_border_number?.[0]?.type == "image"
-              ? "image"
-              : "pdf"
-          }
-          fileUrl={userIdentityData?.file_border_number?.[0]?.url}
-        />
-      </div>
+      {Array.isArray(userIdentityData?.file_border_number) &&
+        userIdentityData?.file_border_number?.map((media) => (
+          <div key={media.id} className="p-2">
+            <PreviewTextField
+              mediaId={media?.id}
+              fireAfterDeleteMedia={() => {
+                handleRefreshIdentityData();
+              }}
+              valid={Boolean(media?.name)}
+              label="ارفاق رقم الحدود"
+              value={media?.name ?? "---"}
+              type={media?.type == "image" ? "image" : "pdf"}
+              fileUrl={media?.url}
+            />
+          </div>
+        ))}
     </div>
   );
 }

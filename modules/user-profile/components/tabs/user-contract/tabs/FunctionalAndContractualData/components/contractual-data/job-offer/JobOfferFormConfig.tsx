@@ -5,7 +5,6 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
-import * as React from 'react'
 
 type PropsT = {
   offer?: JobOffer;
