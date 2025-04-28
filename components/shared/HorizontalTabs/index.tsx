@@ -26,7 +26,7 @@ export default function HorizontalTabs({
   // return component ui.
   return (
     <Tabs
-      defaultValue={defaultValue ?? list?.[0]?.id ?? "_"}
+      defaultValue={defaultValue || list?.[0]?.id ||  "_"}
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
