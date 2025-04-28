@@ -257,9 +257,7 @@ export interface FormConfig {
     enabled: boolean;
     errorsPath?: string; // Default is 'errors'
   };
-  onSubmit?: (
-    values: Record<string, any>
-  ) => Promise<{
+  onSubmit?: (values: Record<string, any>) => Promise<{
     success: boolean;
     message?: string;
     errors?: Record<string, string | string[]>;
@@ -278,4 +276,5 @@ export interface FormConfig {
   ) => void;
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
+  wrapperClassName?: string;
 }

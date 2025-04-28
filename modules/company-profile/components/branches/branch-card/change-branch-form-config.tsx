@@ -46,6 +46,8 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
     showCancelButton: false,
     showBackButton: false,
     className: "overflow-visible",
+    wrapperClassName: "overflow-y-visible",
+
     onSuccess: () => {
       queryClient.refetchQueries({
         queryKey: ["main-company-data"],
