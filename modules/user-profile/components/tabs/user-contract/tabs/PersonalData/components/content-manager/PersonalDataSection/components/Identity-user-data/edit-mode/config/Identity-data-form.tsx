@@ -6,7 +6,7 @@ import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const IdentityDataFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const IdentityFormConfig: FormConfig = {
@@ -83,6 +83,7 @@ export const IdentityDataFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {

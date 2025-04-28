@@ -1,8 +1,11 @@
+import { checkString } from "@/utils/check-string";
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserIqamaBorderNumberPreviewMode() {
   const { userIdentityData } = usePersonalDataTabCxt();
+
+  console.log('check file',userIdentityData?.file_border_number?.[0]?.name,Boolean(userIdentityData?.file_border_number?.[0]?.name))
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -10,7 +13,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="رقم الحدود"
-          value={userIdentityData?.border_number ?? ""}
+          value={checkString(userIdentityData?.border_number as string)}
           valid={Boolean(userIdentityData?.border_number)}
         />
       </div>
@@ -18,7 +21,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الدخول"
-          value={userIdentityData?.border_number_start_date ?? ""}
+          value={checkString(userIdentityData?.border_number_start_date as string)}
           valid={Boolean(userIdentityData?.border_number_start_date)}
           type="date"
         />
@@ -27,7 +30,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الانتهاء"
-          value={userIdentityData?.border_number_end_date ?? ""}
+          value={checkString(userIdentityData?.border_number_end_date as string)}
           valid={Boolean(userIdentityData?.border_number_end_date)}
           type="date"
         />
@@ -36,8 +39,8 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="ارفاق رقم الحدود"
-          value={userIdentityData?.file_border_number?.[0]?.name ? "-" : ""}
-          valid={Boolean(userIdentityData?.file_border_number?.[0]?.url)}
+          value={checkString(userIdentityData?.file_border_number?.[0]?.name as string)}
+          valid={Boolean(userIdentityData?.file_border_number?.[0]?.name)}
           type={
             userIdentityData?.file_border_number?.[0]?.type == "image"
               ? "image"

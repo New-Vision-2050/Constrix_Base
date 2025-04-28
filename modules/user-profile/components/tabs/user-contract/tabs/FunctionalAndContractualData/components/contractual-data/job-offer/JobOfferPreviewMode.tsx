@@ -39,7 +39,7 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
         <PreviewTextField
           valid={Boolean(offer?.files?.url)}
           label="ارفاق العرض"
-          value={offer?.files?.name ?? "-"}
+          value={offer?.files?.name ?? "---"}
           type={offer?.files?.type == "image" ? "image" : "pdf"}
           fileUrl={offer?.files?.url ?? ""}
         />
