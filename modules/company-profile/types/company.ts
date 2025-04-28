@@ -86,8 +86,8 @@ export interface Branch {
   state_name: null | string;
   city_name: null | string;
   manager: Manager | null
-  user_count:string | Number
-  department_count:string | Number
+  user_count:string | number
+  department_count:string | number
 }
 
 export interface Manager {
