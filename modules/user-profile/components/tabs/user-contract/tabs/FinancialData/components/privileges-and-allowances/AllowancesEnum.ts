@@ -1,3 +1,5 @@
 export enum AllowancesTypes {
-  Saving = "saving"
+  Saving = "saving",
+  Percentage = "percentage",
+  Constant = "constant",
 }

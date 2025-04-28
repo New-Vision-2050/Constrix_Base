@@ -89,7 +89,7 @@ export const SalaryFormConfig = () => {
             type: "text",
             placeholder: "وصف اساس حساب الراتب",
             condition: (values) =>
-              values.salary_type_code === SalaryTypes.constants,
+              values.salary_type_code === SalaryTypes.percentage,
             validation: [
               {
                 type: "required",
@@ -100,10 +100,11 @@ export const SalaryFormConfig = () => {
           {
             name: "hour_rate",
             label: "قيمة الساعة",
-            type: "text",
+            type: "number",
+            postfix: "ر.س",
             placeholder: "قيمة الساعة",
             condition: (values) =>
-              values.salary_type_code === SalaryTypes.percentage,
+              values.salary_type_code === SalaryTypes.constants,
             validation: [
               {
                 type: "required",
