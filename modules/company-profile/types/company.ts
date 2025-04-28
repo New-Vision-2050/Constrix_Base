@@ -85,6 +85,16 @@ export interface Branch {
   country_name: string;
   state_name: null | string;
   city_name: null | string;
+  manager: Manager | null
+  user_count:string | Number
+  department_count:string | Number
+}
+
+export interface Manager {
+    id: string;
+    email: null | string;
+    name: string;
+    phone: null | string;
 }
 
 export interface officialData {
