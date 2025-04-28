@@ -24,6 +24,46 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
       {
         fields: [
           {
+            name: "name",
+            label: "اسم الفرع",
+            placeholder: "اسم الفرع",
+            type: "text",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل اسم الفرع",
+              },
+            ],
+          },
+          {
+            label: "تعديل الموقع من الخريطة",
+            name: "map",
+            type: "text",
+            render: () => (
+              <PickupMap
+                formId={formId}
+                keysToUpdate={[
+                  "country_id",
+                  "state_id",
+                  "city_id",
+                  "latitude",
+                  "longitude",
+                ]}
+                inGeneral={true}
+              />
+            ),
+          },
+          {
+            label: "",
+            name: "",
+            type: "text",
+            render: () => (
+              <p className="text-xs">
+                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+              </p>
+            ),
+          },
+          {
             type: "select",
             name: "country_id",
             label: "الدولة",
@@ -46,18 +86,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               },
             ],
           },
-          {
-            name: "name",
-            label: "اسم الفرع",
-            placeholder: "اسم الفرع",
-            type: "text",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل اسم الفرع",
-              },
-            ],
-          },
+
           {
             type: "select",
             name: "state_id",
@@ -152,12 +181,12 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "phone",
             label: "رقم الجوال",
             type: "phone",
-            required:true,
+            required: true,
             validation: [
-            {
+              {
                 type: "phone",
                 message: "",
-            },
+              },
             ],
           },
           {
@@ -176,34 +205,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               },
             ],
           },
-          {
-            label: "تعديل الموقع من الخريطة",
-            name: "map",
-            type: "text",
-            render: () => (
-              <PickupMap
-                formId={formId}
-                keysToUpdate={[
-                  "country_id",
-                  "state_id",
-                  "city_id",
-                  "latitude",
-                  "longitude",
-                ]}
-                inGeneral={true}
-              />
-            ),
-          },
-          {
-            label: "",
-            name: "",
-            type: "text",
-            render: () => (
-              <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-              </p>
-            ),
-          },
+
           {
             name: "latitude",
             label: "latitude",
