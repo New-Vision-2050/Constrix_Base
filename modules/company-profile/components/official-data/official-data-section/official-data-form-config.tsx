@@ -112,7 +112,10 @@ export const CompanyOfficialData = (
       name_en: officialData?.name_en ?? "",
       company_type: officialData?.company_type ?? "",
       country: officialData?.country_name ?? "",
-      company_field: officialData?.company_field ?? "",
+      company_field:
+        !!officialData?.company_field && officialData?.company_field.length > 0
+          ? officialData?.company_field.map((field) => field.name).join(" , ")
+          : "",
       phone: officialData?.phone ?? "",
       email: officialData?.email ?? "",
       bucket: "متميز",
