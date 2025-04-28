@@ -57,7 +57,7 @@ export const PrivilegeItemFormConfig = ({
           {
             type: "select",
             name: "type_allowance_code",
-            label: " (ثابت - نسبة - توفير) نوع البدل",
+            label: "نوع البدل (ثابت - نسبة - توفير)",
             placeholder: "اختر البدل",
             required: true,
             dynamicOptions: {
@@ -76,21 +76,35 @@ export const PrivilegeItemFormConfig = ({
           },
           {
             name: "charge_amount",
-            label: "معدل حساب (نسبة - مبلغ) من اصل الراتب",
+            label: "معدل حساب النسبة من اصل الراتب",
             type: "text",
+            postfix: "%",
             condition: (values) => {
-              if (
-                values.type_allowance_code === AllowancesTypes?.Saving ||
-                values.type_allowance_code == null
-              )
-                return false;
-              return true;
+              if (values.type_allowance_code == null) return false;
+              return values.type_allowance_code === AllowancesTypes?.Percentage;
             },
             placeholder: "معدل حساب النسبة من اصل الراتب",
             validation: [
               {
                 type: "required",
                 message: "معدل حساب النسبة من اصل الراتب مطلوب",
+              },
+            ],
+          },
+          {
+            name: "charge_amount",
+            label: "المبلغ",
+            type: "text",
+            postfix: "ر.س",
+            condition: (values) => {
+              if (values.type_allowance_code == null) return false;
+              return values.type_allowance_code === AllowancesTypes?.Constant;
+            },
+            placeholder: "المبلغ",
+            validation: [
+              {
+                type: "required",
+                message: "المبلغ مطلوب",
               },
             ],
           },

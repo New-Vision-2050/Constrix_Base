@@ -37,7 +37,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
         <PreviewTextField
           valid={Boolean(userIdentityData?.file_work_permit?.[0]?.url)}
           label="ارفاق الهوية"
-          value={userIdentityData?.file_work_permit?.[0]?.name ?? ""}
+          value={userIdentityData?.file_work_permit?.[0]?.name ?? "-"}
           type={
             userIdentityData?.file_work_permit?.[0]?.type == "image"
               ? "image"
