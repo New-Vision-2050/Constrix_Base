@@ -152,7 +152,7 @@ export const QualificationFormConfig = ({
           },
           {
             type: "image",
-            name: "graduation_file",
+            name: "file",
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
           },

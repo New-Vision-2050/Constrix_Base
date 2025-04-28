@@ -37,7 +37,7 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{t("jobTitle")}</span>
               <span className="font-medium dark:text-white">
-                {job_title ?? "-"}
+                {job_title ?? "--"}
               </span>
             </div>
           </div>
@@ -48,7 +48,7 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{t("address")}</span>
               <span className="font-medium dark:text-white">
-                {address ?? "-"}
+                {address ?? "--"}
               </span>
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
                 {t("appointmentDate")}
               </span>
               <span className="font-medium dark:text-white">
-                {date_appointment ?? "-"}
+                {date_appointment ?? "--"}
               </span>
             </div>
           </div>
