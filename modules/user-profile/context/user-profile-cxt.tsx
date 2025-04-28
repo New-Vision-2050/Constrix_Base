@@ -99,7 +99,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
       params.delete("tab2");
     }
 
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
   }, [tab1, tab2, router, searchParams]);
 
   // ** declare and define component helper methods
