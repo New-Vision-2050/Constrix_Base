@@ -156,7 +156,7 @@ export const ReqOfficialDataEdit = (
       bucket: "متميز",
     },
     submitButtonText: "ارسال طلب التعديل",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

@@ -345,8 +345,8 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       probation_period_unit:
         contract?.probation_period_unit?.id || timeUnits?.[0]?.id,
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

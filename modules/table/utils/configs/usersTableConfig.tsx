@@ -12,6 +12,7 @@ import { companyUserFormConfig, formConfig } from "@/modules/form-builder";
 import GearIcon from "@/public/icons/gear";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
+import {GetCompanyUserFormConfig} from "@/modules/form-builder/configs/companyUserFormConfig";
 
 // Define types for the company data
 interface CompanyData {
@@ -187,7 +188,7 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: companyUserFormConfig,
+    formConfig: GetCompanyUserFormConfig,
     executions: [
       {
         label: "اكمال الملف الشخصي",

@@ -124,7 +124,7 @@ export const changeLocalTimeConfig: FormConfig = {
   ],
   isEditMode: false,
   submitButtonText: "حفظ",
-  cancelButtonText: "Cancel",
+  cancelButtonText: "إلغاء",
   showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,

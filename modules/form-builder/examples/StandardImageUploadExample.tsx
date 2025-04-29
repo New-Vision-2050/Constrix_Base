@@ -63,7 +63,7 @@ const StandardImageUploadExample: React.FC = () => {
         ],
       },
     ],
-    submitButtonText: "Submit",
+    submitButtonText: "حفظ",
     resetButtonText: "Reset",
     showReset: true,
     onSubmit: async (values) => {

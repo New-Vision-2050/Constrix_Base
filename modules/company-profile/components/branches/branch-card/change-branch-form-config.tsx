@@ -38,7 +38,7 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
       },
     ],
     submitButtonText: "حفظ",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

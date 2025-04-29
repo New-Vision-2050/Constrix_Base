@@ -142,7 +142,7 @@ const reactHookFormConfig: FormConfig = {
     },
   ],
   submitButtonText: "Submit Form",
-  cancelButtonText: "Cancel",
+  cancelButtonText: "إلغاء",
   showReset: true,
   resetButtonText: "Reset Form",
   showSubmitLoader: true,
