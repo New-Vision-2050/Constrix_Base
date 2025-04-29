@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { AlertCircle, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import validCompanyProfileImage from "@/modules/company-profile/service/validate-company-image";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,8 @@ interface ValidationRule {
 
 const ChangeLogo = ({ handleClose }: IChangeLogo) => {
   const queryClient = useQueryClient();
+  const [valid, setValid] = useState(false);
+
   const [rules, setRules] = useState<ValidationRule[]>([
     {
       sentence: "حجم الصورة يجب أن لا يتعدى 5 ميجابايت",
@@ -73,6 +75,11 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
   const imageFile = watch("image")?.[0];
   const imagePreview = imageFile ? URL.createObjectURL(imageFile) : null;
 
+  useEffect(() => {
+    const test = rules.every((rules) => rules.status === 1);
+    setValid(test);
+  }, [rules]);
+
   const onSubmit = (data: FormValues) => {
     const file = data.image[0];
 
@@ -84,32 +91,38 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
       return;
     }
 
-    mutateValidation(file, {
-      onSuccess: () => {
-        setRules((prev) =>
-          prev.map((rule) => ({
-            ...rule,
-            status: 1,
-          }))
-        );
-        mutateUpload(file, {
-          onSuccess: () => {
-            deleteCookie("company-data");
-            window.location.reload();
-            handleClose();
-          },
-        });
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        const messageObj = err?.response?.data?.message;
-        const newRule = Object.values(messageObj).filter(
-          (item) =>
-            item !== null && typeof item === "object" && !Array.isArray(item)
-        );
-        setRules(newRule as ValidationRule[]);
-      },
-    });
+    if (!valid) {
+      // Just validate
+      mutateValidation(file, {
+        onSuccess: () => {
+          setRules((prev) =>
+            prev.map((rule) => ({
+              ...rule,
+              status: 1,
+            }))
+          );
+          setValid(true); // Allow next submit to proceed with upload
+        },
+        onError: (err: any) => {
+          const messageObj = err?.response?.data?.message;
+          const newRule = Object.values(messageObj).filter(
+            (item) =>
+              item !== null && typeof item === "object" && !Array.isArray(item)
+          );
+          setRules(newRule as ValidationRule[]);
+          setValid(false);
+        },
+      });
+    } else {
+      // Already validated, proceed with upload
+      mutateUpload(file, {
+        onSuccess: () => {
+          deleteCookie("company-data");
+          window.location.reload();
+          handleClose();
+        },
+      });
+    }
   };
 
   return (
@@ -177,7 +190,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
           className="w-32"
           loading={isValidationPending || isUploadPending}
         >
-          حفظ
+          {valid ? "حفظ" : " تحقق من الصوره"}
         </Button>
         <Button
           type="button"

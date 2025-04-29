@@ -347,7 +347,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
       },
     ],
     submitButtonText: "Send Message",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

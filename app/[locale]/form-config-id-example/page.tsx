@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 const formConfig: FormConfig = {
   formId: "example-form-with-id", // This formId will be used by all hooks
   title: "Form with Config ID Example",
-  submitButtonText: "Submit",
+  submitButtonText: "حفظ",
   resetOnSuccess: true,
   sections: [
     {

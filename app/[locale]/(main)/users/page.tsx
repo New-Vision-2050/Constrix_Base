@@ -6,11 +6,12 @@ import TableBuilder from "@/modules/table/components/TableBuilder";
 import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
 import { statisticsConfig } from "@/modules/users/components/statistics-config";
 import React from "react";
-import { companyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
+import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
+import {useTranslations} from "next-intl";
 
 const UsersPage = () => {
   const config = UsersConfig();
-
+    const t = useTranslations('Companies');
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
@@ -19,7 +20,7 @@ const UsersPage = () => {
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
-              config={companyUserFormConfig}
+              config={GetCompanyUserFormConfig(t)}
               trigger={<Button>إنشاء مستخدم</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);

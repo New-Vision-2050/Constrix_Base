@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 // Example form configuration
 const formConfig: FormConfig = {
   title: "Isolated Form Example",
-  submitButtonText: "Submit",
+  submitButtonText: "حفظ",
   resetOnSuccess: true,
   sections: [
     {

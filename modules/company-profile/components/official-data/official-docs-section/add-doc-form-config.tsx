@@ -130,7 +130,7 @@ export const AddDocFormConfig = (id?: string) => {
       },
     ],
     submitButtonText: "إضافة",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

@@ -11,7 +11,7 @@ export const SocialFormConfig: FormConfig = {
     errorsPath: "errors",
   },
   sections: [],
-  cancelButtonText: "Cancel",
+  cancelButtonText: "إلغاء",
   showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,

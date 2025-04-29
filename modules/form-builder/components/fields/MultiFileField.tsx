@@ -17,12 +17,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
+// Define the file object type that has mime_type
+interface FileObject {
+  name: string;
+  size?: number;
+  mime_type: string;
+}
+
 interface MultiFileFieldProps {
   field: FieldConfig;
-  value: Array<File | string> | null;
+  value: Array<File | string | FileObject> | null;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: Array<File | string> | null) => void;
+  onChange: (value: Array<File | string | FileObject> | null) => void;
   onBlur: () => void;
   formId?: string;
 }
@@ -117,7 +124,7 @@ interface FileInfo {
   size?: string;
   type?: string;
   icon: React.ReactNode;
-  file: File | string;
+  file: File | string | FileObject;
   isUploading?: boolean;
   uploadProgress?: number;
 }
@@ -162,6 +169,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
     }
 
     const newFilesInfo: FileInfo[] = normalizedValue.map((item, index) => {
+
       if (typeof item === "string") {
         // If item is a URL string, extract file name and use generic icon
         const fileName = getFileName(item);
@@ -184,6 +192,15 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
           icon: getFileIcon(item.type, 32),
           file: item,
         };
+      } else if (item?.mime_type) {
+          return {
+              id: `file-${index}`,
+              name: item.name,
+              size: formatFileSize(item.size ?? 0),
+              type: item.mime_type,
+              icon: getFileIcon(item.mime_type, 32),
+              file: item,
+          };
       }
 
       // This should never happen, but TypeScript requires a return

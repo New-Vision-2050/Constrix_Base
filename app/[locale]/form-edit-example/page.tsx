@@ -76,7 +76,7 @@ const editableFormConfig: FormConfig = {
   ],
   submitButtonText: "Save Changes",
   resetButtonText: "Reset",
-  cancelButtonText: "Cancel",
+  cancelButtonText: "إلغاء",
   showSubmitLoader: true,
   resetOnSuccess: false,
   initialValues: {

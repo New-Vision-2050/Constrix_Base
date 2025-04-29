@@ -18,14 +18,14 @@ export const useCurrentCompany = () => {
       return response.data;
     },
   });
-}
+};
 
 const CompanyHeader = () => {
   const { data, isPending, isSuccess } = useCurrentCompany();
 
   const companyData = JSON.parse(getCookie("company-data") ?? "");
 
-  console.log({ companyData });
+  console.log("abdo", { data });
 
   const logo = companyData?.logo || data?.payload?.logo || "";
   const companyName = companyData?.name || data?.payload?.name || "";
@@ -43,14 +43,18 @@ const CompanyHeader = () => {
         <h2 className="text-2xl font-bold mb-4">{companyName}</h2>
         {isPending && <Skeleton className="h-6 w-[250px]" />}
         {isSuccess && (
-          <div className="flex gap-8 text-sm">
-            <div className="flex items-center gap-2">
+          <div className="flex items-start gap-8 text-sm">
+            <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-foreground/70" />
-            </div>
 
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-yellow-400" />
-              <span>الفروع</span>
+              <div className="flex flex-col  gap-2">
+                {data.payload?.branches.map((branch) => (
+                  <div key={branch.id} className="flex  gap-2">
+                    <AlertCircle className="w-4 h-4 text-yellow-400" />
+                    <span>{branch.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

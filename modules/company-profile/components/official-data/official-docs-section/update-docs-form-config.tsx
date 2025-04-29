@@ -122,7 +122,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
       ...doc,
     },
     submitButtonText: "تحديث",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
