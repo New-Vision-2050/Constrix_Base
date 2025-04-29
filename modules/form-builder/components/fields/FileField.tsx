@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 
 // Define the file object type that has mime_type
-interface FileObject {
+export interface FileObject {
   name: string;
   size?: number;
   mime_type: string;

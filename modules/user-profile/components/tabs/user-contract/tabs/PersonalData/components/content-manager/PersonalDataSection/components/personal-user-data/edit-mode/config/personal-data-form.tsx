@@ -1,7 +1,8 @@
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from '@/modules/form-builder'
 import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { getHijriDate } from '@/modules/table/components/ui/HijriCalendar'
 
 export const PersonalDataFormConfig = () => {
   const { user } = useUserProfileCxt();
@@ -11,6 +12,8 @@ export const PersonalDataFormConfig = () => {
     handleRefetchProfileData,
     handleRefetchDataStatus,
   } = useUserProfileCxt();
+
+
 
   const PersonalFormConfig: FormConfig = {
     formId: `personal-data-form`,
@@ -74,6 +77,11 @@ export const PersonalDataFormConfig = () => {
             label: "تاريخ الميلاد",
             type: "date",
             placeholder: "Birthdate Gregorian",
+            onChange: (newValue, values)=>{
+              useFormStore
+                ?.getState()
+                .setValue('personal-data-form', 'birthdate_hijri', getHijriDate(newValue))
+            },
             validation: [
               {
                 type: "required",

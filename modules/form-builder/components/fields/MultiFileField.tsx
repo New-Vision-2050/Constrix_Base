@@ -16,13 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-
-// Define the file object type that has mime_type
-interface FileObject {
-  name: string;
-  size?: number;
-  mime_type: string;
-}
+import { FileObject } from './FileField'
 
 interface MultiFileFieldProps {
   field: FieldConfig;

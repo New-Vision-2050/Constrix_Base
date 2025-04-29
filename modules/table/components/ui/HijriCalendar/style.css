@@ -32,13 +32,18 @@
      focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none
      [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-9 w-9 p-0 font-normal
      aria-selected:opacity-100 text-popover-foreground;
+        &:not(.rmdp-disabled,.rmdp-day-hidden) span {
+           background-color: transparent !important;
+           color: inherit;
+           @apply rounded-md
+         }
         &.rmdp-deactive{
           @apply text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30;
         }
         &.rmdp-today{
           @apply bg-accent text-accent-foreground;
           span {
-            background-color: transparent;
+            background-color: transparent !important;
             color: inherit;
             @apply rounded-md
           }
