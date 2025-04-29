@@ -16,13 +16,16 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { CustomFileLike } from '@/modules/form-builder/components/fields/FileField'
+
+type FileFieldValue = File | string | CustomFileLike ;
 
 interface MultiFileFieldProps {
   field: FieldConfig;
-  value: Array<File | string> | null;
+  value: Array<FileFieldValue> | null;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: Array<File | string> | null) => void;
+  onChange: (value: Array<FileFieldValue> | null) => void;
   onBlur: () => void;
   formId?: string;
 }
@@ -117,7 +120,7 @@ interface FileInfo {
   size?: string;
   type?: string;
   icon: React.ReactNode;
-  file: File | string;
+  file: FileFieldValue;
   isUploading?: boolean;
   uploadProgress?: number;
 }
@@ -189,7 +192,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
           return {
               id: `file-${index}`,
               name: item.name,
-              size: formatFileSize(item.size),
+              size: formatFileSize(item.size ?? 0),
               type: item.mime_type,
               icon: getFileIcon(item.mime_type, 32),
               file: item,

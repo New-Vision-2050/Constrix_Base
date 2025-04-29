@@ -17,12 +17,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 
+export interface CustomFileLike {
+  name: string;
+  mime_type: string;
+  size?: number;
+}
+type FileFieldValue = File | string | CustomFileLike | null;
+
 interface FileFieldProps {
   field: FieldConfig;
-  value: File | string | null;
+  value: FileFieldValue;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: File | string | null) => void;
+  onChange: (value: FileFieldValue) => void;
   onBlur: () => void;
   formId?: string;
 }
