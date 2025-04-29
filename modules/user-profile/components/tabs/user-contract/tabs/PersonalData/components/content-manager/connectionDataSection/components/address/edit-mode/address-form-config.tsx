@@ -5,7 +5,8 @@ import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
 export const AddressFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
-  const { userContactData } = useConnectionDataCxt();
+  const { userContactData, handleRefetchUserContactData } =
+    useConnectionDataCxt();
 
   const addressFormConfig: FormConfig = {
     formId: "ConnectionInformation-address-data-form",
@@ -48,6 +49,7 @@ export const AddressFormConfig = () => {
     showBackButton: false,
     onSuccess: () => {
       handleRefetchDataStatus();
+      handleRefetchUserContactData();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
