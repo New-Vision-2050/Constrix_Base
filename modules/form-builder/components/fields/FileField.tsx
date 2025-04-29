@@ -182,7 +182,7 @@ const FileField: React.FC<FileFieldProps> = ({
         icon: getFileIcon(value.type, 40),
       });
     }
-    else if (value?.mime_type) {
+    else if (value && value.mime_type) {
         setFileInfo({
             name: value.name,
             size: formatFileSize(value.size ?? 0),
