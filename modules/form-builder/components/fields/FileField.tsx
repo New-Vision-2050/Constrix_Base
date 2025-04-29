@@ -17,12 +17,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 
+// Define the file object type that has mime_type
+interface FileObject {
+  name: string;
+  size?: number;
+  mime_type: string;
+}
+
 interface FileFieldProps {
   field: FieldConfig;
-  value: File | string | null;
+  value: File | string | FileObject | null;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: File | string | null) => void;
+  onChange: (value: File | string | FileObject | null) => void;
   onBlur: () => void;
   formId?: string;
 }
