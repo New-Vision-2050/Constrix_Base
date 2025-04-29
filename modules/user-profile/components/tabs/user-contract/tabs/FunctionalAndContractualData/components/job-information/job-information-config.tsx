@@ -25,7 +25,7 @@ export const JobFormConfig = () => {
             placeholder: "الفرع",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list`,
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

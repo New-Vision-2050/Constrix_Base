@@ -17,19 +17,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 
-export interface CustomFileLike {
+// Define the file object type that has mime_type
+export interface FileObject {
   name: string;
-  mime_type: string;
   size?: number;
+  mime_type: string;
 }
-type FileFieldValue = File | string | CustomFileLike | null;
 
 interface FileFieldProps {
   field: FieldConfig;
-  value: FileFieldValue;
+  value: File | string | FileObject | null;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: FileFieldValue) => void;
+  onChange: (value: File | string | FileObject | null) => void;
   onBlur: () => void;
   formId?: string;
 }
@@ -189,7 +189,7 @@ const FileField: React.FC<FileFieldProps> = ({
         icon: getFileIcon(value.type, 40),
       });
     }
-    else if (value?.mime_type) {
+    else if (value && value.mime_type) {
         setFileInfo({
             name: value.name,
             size: formatFileSize(value.size ?? 0),

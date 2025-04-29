@@ -39,7 +39,9 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="مدة العقد"
-          value={`${contract?.contract_duration} ${contract?.contract_duration_unit?.name}`}
+          value={`${contract?.contract_duration ?? ""} ${
+            contract?.contract_duration_unit?.name ?? ""
+          }`}
           valid={Boolean(contract?.contract_duration)}
           required
         />
@@ -48,8 +50,8 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="فترة الاشعار"
-          value={`${contract?.notice_period?.toString()} ${
-            contract?.notice_period_unit?.name
+          value={`${(contract?.notice_period ?? "")?.toString()} ${
+            contract?.notice_period_unit?.name ?? ""
           }`}
           valid={Boolean(contract?.notice_period)}
           required
@@ -59,8 +61,8 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="فترة التجربة"
-          value={`${contract?.probation_period?.toString()} ${
-            contract?.probation_period_unit?.name
+          value={`${(contract?.probation_period ?? "")?.toString()} ${
+            contract?.probation_period_unit?.name ?? ""
           }`}
           valid={Boolean(contract?.probation_period)}
           required
@@ -88,7 +90,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="ساعات العمل الاسبوعية"
-          value={`${contract?.working_hours?.toString()} ساعة`}
+          value={`${(contract?.working_hours ?? "")?.toString()} ساعة`}
           valid={Boolean(contract?.working_hours?.toString())}
           required
         />
@@ -97,7 +99,7 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="ايام الاجازات السنوية"
-          value={`${contract?.annual_leave?.toString()} يوم`}
+          value={`${(contract?.annual_leave ?? "")?.toString()} يوم`}
           valid={Boolean(contract?.annual_leave)}
           required
         />
