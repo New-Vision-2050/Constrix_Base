@@ -156,7 +156,6 @@ export const QualificationFormConfig = ({
             isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
-            isMulti: true,
             gridArea: 2,
             fileConfig: {
               allowedFileTypes: ["application/pdf", "image/jpeg", "image/png"],
