@@ -25,6 +25,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const { user } = useUserProfileCxt();
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
+  const [error, setError] = useState("");
   const { handleRefreshConnectionData } = usePersonalDataTabCxt();
   const type = openMailOtp ? "email" : "phone";
   const [loading, setLoading] = useState(false);
@@ -50,13 +51,17 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
 
   const handleConfirmOtp = async () => {
     try {
+      setError("");
       setLoading(true);
       const body = {
         identifier: identifier,
         otp: otp,
         type,
       };
-      await apiClient.post(`/company-users/validate-otp/${user?.user_id}`, body);
+      await apiClient.post(
+        `/company-users/validate-otp/${user?.user_id}`,
+        body
+      );
       handleClose();
       toast.success("تم التغير بنجاح");
       setLoading(false);
@@ -64,6 +69,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
     } catch (error) {
       setLoading(false);
       console.log("error", error);
+      setError(`كلمه المرور الموقته غير صحيحية`);
     }
   };
 
@@ -82,6 +88,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         <div className="w-full flex items-center justify-center gap-1">
           <OtpInput otp={otp} setOtp={setOtp} />
         </div>
+        <small className="text-red-500">{error}</small>
 
         <div className="flex items-center justify-center gap-4">
           <Button disabled={loading} onClick={handleConfirmOtp}>

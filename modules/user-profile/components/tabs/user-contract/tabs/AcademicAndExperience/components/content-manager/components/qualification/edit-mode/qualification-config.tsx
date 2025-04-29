@@ -152,10 +152,10 @@ export const QualificationFormConfig = ({
           },
           {
             type: "file",
-            name: "graduation_file",
+            name: "file",//field name
+            isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
-            isMulti: true,
             gridArea: 2,
             fileConfig: {
               allowedFileTypes: ["application/pdf", "image/jpeg", "image/png"],

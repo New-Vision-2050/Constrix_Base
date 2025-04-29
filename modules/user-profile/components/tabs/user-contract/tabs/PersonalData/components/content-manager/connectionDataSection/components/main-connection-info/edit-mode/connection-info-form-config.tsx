@@ -28,10 +28,6 @@ export const ConnectionInformationFormConfig = () => {
                 type: "email",
                 message: "Please enter a valid email address",
               },
-              {
-                type: "required",
-                message: "field is required",
-              },
             ],
           },
           {
@@ -43,10 +39,6 @@ export const ConnectionInformationFormConfig = () => {
               {
                 type: "phone",
                 message: "",
-              },
-              {
-                type: "required",
-                message: "field is required",
               },
             ],
           },
@@ -60,10 +52,6 @@ export const ConnectionInformationFormConfig = () => {
                 type: "phone",
                 message: "",
               },
-              {
-                type: "required",
-                message: "field is required",
-              },
             ],
           },
           {
@@ -75,10 +63,6 @@ export const ConnectionInformationFormConfig = () => {
               {
                 type: "phone",
                 message: "",
-              },
-              {
-                type: "required",
-                message: "field is required",
               },
             ],
           },

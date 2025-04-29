@@ -55,7 +55,7 @@ export default function UserProfileConnectionDataEditForm() {
         setOpen={toggleMailOtpDialog}
       />
       <OTPVerifyDialog
-        identifier={phone}
+        identifier={`${code}${phone}`}
         open={openPhoneOtp}
         setOpen={togglePhoneOtpDialog}
       />
