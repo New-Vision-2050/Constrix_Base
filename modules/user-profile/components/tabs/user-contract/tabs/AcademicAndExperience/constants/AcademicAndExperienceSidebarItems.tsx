@@ -45,8 +45,8 @@ export const AcademicAndExperienceSidebarItems = (
   {
     id: "contract-tab-academic-experience-certificates",
     icon: <GraduationCapIcon />,
-    title: "الشهادات المهنية",
-    type: t("certifications"),
+    title: t("certifications"),
+    type: "professional_certificate",
     content: <UserCertifications />,
   },
   {
