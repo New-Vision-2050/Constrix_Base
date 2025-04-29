@@ -152,7 +152,7 @@ export const QualificationFormConfig = ({
           },
           {
             type: "file",
-            name: "file",
+            name: "file",//field name
             isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
