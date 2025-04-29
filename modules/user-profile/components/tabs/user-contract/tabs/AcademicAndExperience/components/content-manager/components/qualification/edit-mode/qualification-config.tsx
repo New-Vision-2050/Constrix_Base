@@ -151,7 +151,7 @@ export const QualificationFormConfig = ({
             ],
           },
           {
-            type: "image",
+            type: "file",
             name: "file",
             isMulti: true,
             label: "ارفاق شهادة",

@@ -50,7 +50,7 @@ export const BorderNumberFormConfig = () => {
           {
             name: "file_border_number",
             label: "ارفاق رقم الحدود",
-            type: "image",
+            type: "file",
             isMulti: true,
             placeholder: "ارفاق رقم الحدود",
           },

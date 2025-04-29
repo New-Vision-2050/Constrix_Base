@@ -318,7 +318,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           {
             name: "file",
             label: "ارفاق العقد",
-            type: "image",
+            type: "file",
             placeholder: "ارفاق العقد",
           },
         ],
