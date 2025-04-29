@@ -162,6 +162,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
     }
 
     const newFilesInfo: FileInfo[] = normalizedValue.map((item, index) => {
+
       if (typeof item === "string") {
         // If item is a URL string, extract file name and use generic icon
         const fileName = getFileName(item);
@@ -184,6 +185,15 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
           icon: getFileIcon(item.type, 32),
           file: item,
         };
+      } else if (item?.mime_type) {
+          return {
+              id: `file-${index}`,
+              name: item.name,
+              size: formatFileSize(item.size),
+              type: item.mime_type,
+              icon: getFileIcon(item.mime_type, 32),
+              file: item,
+          };
       }
 
       // This should never happen, but TypeScript requires a return

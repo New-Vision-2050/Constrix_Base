@@ -28,6 +28,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "country_id",
             label: "الدولة",
             placeholder: "الدولة",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -50,6 +51,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "name",
             label: "اسم الفرع",
             placeholder: "اسم الفرع",
+            required:true,
             type: "text",
             validation: [
               {
@@ -63,6 +65,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "state_id",
             label: "المحافظة",
             placeholder: "المحافظة",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -88,6 +91,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "city_id",
             label: "المدينة",
             placeholder: "المدينة",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -130,6 +134,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "manager_id",
             label: "مدير الفرع",
             placeholder: "اختر مدير الفرع",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -162,9 +167,10 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           },
           {
             name: "email",
-            label: "البريد الالكتروني",
+            label: "البريد الإلكتروني",
             type: "email",
             placeholder: "البريد الالكتروني",
+            required:true,
             validation: [
               {
                 type: "required",
@@ -180,6 +186,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             label: "تعديل الموقع من الخريطة",
             name: "map",
             type: "text",
+            required:true,
             render: () => (
               <PickupMap
                 formId={formId}
