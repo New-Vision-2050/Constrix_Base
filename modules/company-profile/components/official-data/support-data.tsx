@@ -9,10 +9,10 @@ const SupportData = ({
 }) => {
   const data = [
     {
-      name: generalManager.name,
-      phone: generalManager.phone,
-      email: generalManager.email,
-      nationality: generalManager.nationality,
+      name: generalManager?.name,
+      phone: generalManager?.phone,
+      email: generalManager?.email,
+      nationality: generalManager?.nationality,
     },
   ];
 

@@ -22,7 +22,7 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
             label: "نوع الفرع",
             type: "select",
             options: branches
-              .filter((branch) => !branch.parent_id)
+              .filter((branch) => branch.parent_id)
               .map((branch) => ({
                 value: branch.id,
                 label: branch.name,
@@ -46,6 +46,8 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
     showCancelButton: false,
     showBackButton: false,
     className: "overflow-visible",
+    wrapperClassName: "overflow-y-visible",
+
     onSuccess: () => {
       queryClient.refetchQueries({
         queryKey: ["main-company-data"],

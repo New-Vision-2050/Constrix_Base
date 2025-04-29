@@ -7,7 +7,7 @@ services:
         - DEPLOYMENT_ID=${DEPLOYMENT_ID}
         - NODE_ENV=${NODE_ENV}
         - CACHEBUST=${CACHEBUST}
-    container_name: nextjs-${DEPLOYMENT_ID}
+    container_name: default-router
     restart: always
     environment:
       - NODE_ENV=${NODE_ENV}
@@ -19,11 +19,11 @@ services:
       - DEPLOYMENT_ID=${DEPLOYMENT_ID}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.rule=HostRegexp(`^(?!core-)[a-z0-9-]+\.constrix-nv\.com$`)"
-      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.entrypoints=https"
-      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.tls.certresolver=letsencrypt"
-      - "traefik.http.services.nextjs-${DEPLOYMENT_ID}.loadbalancer.server.port=3000"
-      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.priority=1000"
+      - "traefik.http.routers.default-router.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.default-router.entrypoints=https"
+      - "traefik.http.routers.default-router.tls.certresolver=letsencrypt"
+      - "traefik.http.services.default-router.loadbalancer.server.port=3000"
+      - "traefik.http.routers.default-router.priority=1"
     networks:
       - traefik_network
 

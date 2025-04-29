@@ -177,6 +177,8 @@
         "RemoveFile": "Remove File",
         "ClickToUpload": "Click to upload a file",
         "ClickToUploadMultiple": "Click to upload files",
+        "Upload": "Upload",
+        "AttachFile": "Attach the document",
         "AddMoreFiles": "Add More Files",
         "Uploading": "Uploading...",
         "AllowedTypes": "Allowed types",

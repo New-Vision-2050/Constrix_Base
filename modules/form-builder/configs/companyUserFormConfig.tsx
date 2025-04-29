@@ -122,11 +122,12 @@ export const companyUserFormConfig: FormConfig = {
                     label: "الهاتف",
                     type: "phone",
                     placeholder: "الهاتف",
+                    required:true,
                     validation: [
                         {
-                            type: "required",
-                            message: "برجاء إدخال رقم الهاتف",
-                        },
+                            type: "phone",
+                            message: ''
+                        }
                     ],
                 },
                 {

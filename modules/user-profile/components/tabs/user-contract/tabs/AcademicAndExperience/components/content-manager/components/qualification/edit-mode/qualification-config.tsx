@@ -92,7 +92,7 @@ export const QualificationFormConfig = ({
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -116,7 +116,7 @@ export const QualificationFormConfig = ({
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -156,6 +156,12 @@ export const QualificationFormConfig = ({
             isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
+            isMulti: true,
+            gridArea: 2,
+            fileConfig: {
+              allowedFileTypes: ["application/pdf", "image/jpeg", "image/png"],
+              maxFileSize: 200 * 1024 * 1024, // 200MB
+            },
           },
         ],
         columns: 2,

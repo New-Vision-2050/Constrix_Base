@@ -1,3 +1,5 @@
+"use client";
+
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import { TabsTrigger } from "@radix-ui/react-tabs";
 

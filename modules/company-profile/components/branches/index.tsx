@@ -54,7 +54,7 @@ const Branches = () => {
         dir={isRtl ? "rtl" : "ltr"}
       >
         <TabsList
-          className="flex flex-col bg-sidebar p-2 w-32 h-full gap-4 rounded-lg justify-start"
+          className="flex flex-col bg-sidebar p-2 w-36 h-full gap-4 rounded-lg justify-start"
           dir={isRtl ? "rtl" : "ltr"}
         >
           {tabs().map((tab) => (
@@ -62,10 +62,11 @@ const Branches = () => {
               key={tab.value}
               className="flex items-start justify-between w-full px-2 py-4 rounded-md data-[state=active]:bg-sidebar gap-2 whitespace-normal"
               value={tab.value}
+              title={tab.label}
             >
               <div className="flex text-sm items-start text-start gap-2 grow">
                 <MapPin size={18} className="shrink-0" />
-                {tab.label}
+                <p className="w-[60px] truncate whitespace-normal">{tab.label}</p>
               </div>
               <CircleCheck
                 size={18}

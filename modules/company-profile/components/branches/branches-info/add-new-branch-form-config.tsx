@@ -152,11 +152,12 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "phone",
             label: "رقم الجوال",
             type: "phone",
+            required:true,
             validation: [
-              {
-                type: "required",
-                message: "ادخل رقم الجوال",
-              },
+            {
+                type: "phone",
+                message: "",
+            },
             ],
           },
           {
