@@ -40,7 +40,7 @@ export const WorkLicenseFormConfig = () => {
           {
             name: "file_work_permit",
             label: "ارفاق رخصة العمل",
-            type: "image",
+            type: "file",
             isMulti: true,
             placeholder: "ارفاق رخصة العمل",
           },

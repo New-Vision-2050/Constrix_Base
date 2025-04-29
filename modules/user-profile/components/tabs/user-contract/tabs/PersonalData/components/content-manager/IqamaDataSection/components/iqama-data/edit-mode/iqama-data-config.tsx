@@ -41,7 +41,7 @@ export const IqamaDataFormConfig = () => {
           {
             name: "file_entry_number",
             label: "ارفاق رقم الاقامة",
-            type: "image",
+            type: "file",
             isMulti: true,
             placeholder: "ارفاق رقم الاقامة",
           },

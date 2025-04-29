@@ -59,7 +59,7 @@ export const IdentityDataFormConfig = () => {
           },
           {
             label: "ارفاق الهوية",
-            type: "image",
+            type: "file",
             isMulti: true,
             name: "file_identity",
             placeholder: "رقم جواز السفر",
