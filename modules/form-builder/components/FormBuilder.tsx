@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { apiClient } from "@/config/axios-config";
-import {useFormStore} from "@/modules/form-builder";
+import { useFormStore } from "@/modules/form-builder";
 
 interface FormBuilderProps {
   config: FormConfig;
@@ -76,91 +76,105 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   editError: initialEditError,
   recordId,
 }) => {
+  console.log({config})
   // Local state for edit mode
 
-  const [isEditMode] = useState( config.isEditMode || false);
-  const [isLoadingEditData, setIsLoadingEditData] = useState(initialIsLoadingEditData || false);
-  const [editError, setEditError] = useState<string | null>(initialEditError || null);
+  const [isEditMode] = useState(config.isEditMode || false);
+  const [isLoadingEditData, setIsLoadingEditData] = useState(
+    initialIsLoadingEditData || false
+  );
+  const [editError, setEditError] = useState<string | null>(
+    initialEditError || null
+  );
 
   // Function to load data for editing
-  const loadEditData = useCallback(async (id?: string | number) => {
-    // Use provided id or fallback to recordId from props
-    const targetId = id || recordId;
+  const loadEditData = useCallback(
+    async (id?: string | number) => {
+      // Use provided id or fallback to recordId from props
+      const targetId = id || recordId;
 
-    // If no ID is provided, we can't load data
-    if (!targetId) {
-      //setEditError("No record ID provided for editing");
-      return;
-    }
-
-    // If editValues are directly provided in the config, use those
-    if (config.editValues) {
-      if (setValues) {
-        setValues(config.editValues);
+      // If no ID is provided, we can't load data
+      if (!targetId) {
+        //setEditError("No record ID provided for editing");
+        return;
       }
-      else
-      {
-          useFormStore.getState().setValues(config.formId || '',config.editValues);
-      }
-      return;
-    }
 
-    // If no editApiUrl is provided, we can't load data
-    if (!config.editApiUrl) {
-      setEditError("No API URL configured for editing");
-      return;
-    }
-
-    try {
-      setIsLoadingEditData(true);
-      setEditError(null);
-
-      // Replace :id placeholder in URL if present
-      const url = config.editApiUrl.replace(":id", String(targetId));
-
-      // Make the API request
-      const response = await apiClient.get(url, {headers: config.editApiHeaders});
-
-      // Extract data from response
-      let data = response.data;
-
-      // If a data path is specified, extract the data from that path
-      if (config.editDataPath) {
-        const paths = config.editDataPath.split('.');
-        for (const path of paths) {
-          data = data[path];
-          if (data === undefined) {
-            throw new Error(`Data path '${config.editDataPath}' not found in response`);
-          }
+      // If editValues are directly provided in the config, use those
+      if (config.editValues) {
+        if (setValues) {
+          setValues(config.editValues);
+        } else {
+          useFormStore
+            .getState()
+            .setValues(config.formId || "", config.editValues);
         }
+        return;
       }
-      else{
+
+      // If no editApiUrl is provided, we can't load data
+      if (!config.editApiUrl) {
+        setEditError("No API URL configured for editing");
+        return;
+      }
+
+      try {
+        setIsLoadingEditData(true);
+        setEditError(null);
+
+        // Replace :id placeholder in URL if present
+        const url = config.editApiUrl.replace(":id", String(targetId));
+
+        // Make the API request
+        const response = await apiClient.get(url, {
+          headers: config.editApiHeaders,
+        });
+
+        // Extract data from response
+        let data = response.data;
+
+        // If a data path is specified, extract the data from that path
+        if (config.editDataPath) {
+          const paths = config.editDataPath.split(".");
+          for (const path of paths) {
+            data = data[path];
+            if (data === undefined) {
+              throw new Error(
+                `Data path '${config.editDataPath}' not found in response`
+              );
+            }
+          }
+        } else {
           data = data.payload;
-      }
+        }
 
-      // If a data transformer is provided, transform the data
-      if (config.editDataTransformer) {
-        data = config.editDataTransformer(data);
-      }
+        // If a data transformer is provided, transform the data
+        if (config.editDataTransformer) {
+          data = config.editDataTransformer(data);
+        }
 
-      // Set the form values
-      if (setValues) {
-        setValues(data);
-      } else {
-         useFormStore.getState().setValues(config.formId || '',data);
+        // Set the form values
+        if (setValues) {
+          setValues(data);
+        } else {
+          useFormStore.getState().setValues(config.formId || "", data);
+        }
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to load data";
+        setEditError(errorMessage);
+      } finally {
+        setIsLoadingEditData(false);
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
-      setEditError(errorMessage);
-    } finally {
-      setIsLoadingEditData(false);
-    }
-  }, [config, recordId, setValue, setValues]);
+    },
+    [config, recordId, setValue, setValues]
+  );
 
   // Load edit data when in edit mode
   useEffect(() => {
     if (isEditMode) {
-       setValue('id',recordId)
+      setValue("id", recordId);
       loadEditData();
     }
   }, [isEditMode]);
@@ -245,7 +259,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-gray-300
           [&::-webkit-scrollbar-thumb]:rounded-full
           hover:[&::-webkit-scrollbar-thumb]:bg-gray-400
-          ${isLoadingEditData ? 'hidden' : ''}`}
+          ${isLoadingEditData ? "hidden" : ""}
+          ${config?.wrapperClassName ? config?.wrapperClassName : ""}
+          
+          `}
       >
         {/* Render form sections based on mode */}
         {isWizard ? (

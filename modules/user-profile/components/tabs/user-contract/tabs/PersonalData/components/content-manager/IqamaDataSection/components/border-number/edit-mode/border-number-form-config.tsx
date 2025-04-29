@@ -5,7 +5,9 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 export const BorderNumberFormConfig = () => {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { user } = useUserProfileCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const borderNumberFormConfig: FormConfig = {
@@ -25,30 +27,31 @@ export const BorderNumberFormConfig = () => {
             type: "text",
             placeholder: "رقم الحدود",
           },
-            {
-                name: "border_number_start_date",
-                label: "تاريخ الدخول",
-                type: "date",
-                placeholder: "تاريخ الدخول",
-                maxDate: {
-                    formId: `ConnectionInformation-data-form`,
-                    field: 'border_number_end_date'
-                },
+          {
+            name: "border_number_start_date",
+            label: "تاريخ الدخول",
+            type: "date",
+            placeholder: "تاريخ الدخول",
+            maxDate: {
+              formId: `ConnectionInformation-data-form`,
+              field: "border_number_end_date",
             },
-            {
-                name: "border_number_end_date",
-                label: "تاريخ الانتهاء",
-                type: "date",
-                placeholder: "تاريخ الانتهاء",
-                minDate: {
-                    formId: `ConnectionInformation-data-form`,
-                    field: 'border_number_start_date'
-                }
+          },
+          {
+            name: "border_number_end_date",
+            label: "تاريخ الانتهاء",
+            type: "date",
+            placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `ConnectionInformation-data-form`,
+              field: "border_number_start_date",
             },
+          },
           {
             name: "file_border_number",
             label: "ارفاق رقم الحدود",
-            type: "image",
+            type: "file",
+            isMulti: true,
             placeholder: "ارفاق رقم الحدود",
           },
         ],
@@ -59,6 +62,7 @@ export const BorderNumberFormConfig = () => {
       border_number_end_date: userIdentityData?.border_number_end_date,
       border_number_start_date: userIdentityData?.border_number_start_date,
       border_number: userIdentityData?.border_number,
+      file_border_number: userIdentityData?.file_border_number,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -69,6 +73,7 @@ export const BorderNumberFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefreshIdentityData();
       handleRefetchDataStatus();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
@@ -89,9 +94,10 @@ export const BorderNumberFormConfig = () => {
       };
 
       const response = await apiClient.post(
-        `/company-users/identity-data`,
+        `/company-users/identity-data/${user?.user_id}`,
         serialize(body)
       );
+
       return {
         success: true,
         message: response.data?.message || "Form submitted successfully",

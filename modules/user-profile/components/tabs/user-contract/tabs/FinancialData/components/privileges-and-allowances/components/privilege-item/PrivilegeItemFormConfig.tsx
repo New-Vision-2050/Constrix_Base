@@ -56,19 +56,15 @@ export const PrivilegeItemFormConfig = ({
           },
           {
             type: "select",
-            name: "type_allowance_id",
-            label: " (ثابت - نسبة - توفير) نوع البدل",
+            name: "type_allowance_code",
+            label: "نوع البدل (ثابت - نسبة - توفير)",
             placeholder: "اختر البدل",
             required: true,
             dynamicOptions: {
               url: `${baseURL}/type_allowances`,
-              valueField: "id",
+              valueField: "code",
               labelField: "name",
               searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -82,19 +78,33 @@ export const PrivilegeItemFormConfig = ({
             name: "charge_amount",
             label: "معدل حساب النسبة من اصل الراتب",
             type: "text",
+            postfix: "%",
             condition: (values) => {
-              if (
-                values.type_allowance_id === AllowancesTypes?.Saving ||
-                values.type_allowance_id == null
-              )
-                return false;
-              return true;
+              if (values.type_allowance_code == null) return false;
+              return values.type_allowance_code === AllowancesTypes?.Percentage;
             },
             placeholder: "معدل حساب النسبة من اصل الراتب",
             validation: [
               {
                 type: "required",
                 message: "معدل حساب النسبة من اصل الراتب مطلوب",
+              },
+            ],
+          },
+          {
+            name: "charge_amount",
+            label: "المبلغ",
+            type: "text",
+            postfix: "ر.س",
+            condition: (values) => {
+              if (values.type_allowance_code == null) return false;
+              return values.type_allowance_code === AllowancesTypes?.Constant;
+            },
+            placeholder: "المبلغ",
+            validation: [
+              {
+                type: "required",
+                message: "المبلغ مطلوب",
               },
             ],
           },
@@ -140,7 +150,7 @@ export const PrivilegeItemFormConfig = ({
     ],
     initialValues: {
       type_privilege_id: privilegeData?.type_privilege_id,
-      type_allowance_id: privilegeData?.type_allowance_id,
+      type_allowance_code: privilegeData?.type_allowance_code,
       charge_amount: privilegeData?.charge_amount,
       period_id: privilegeData?.period_id,
       description: privilegeData?.description,
@@ -169,7 +179,7 @@ export const PrivilegeItemFormConfig = ({
         ? `/user_privileges/${privilegeData?.id}`
         : `/user_privileges`;
 
-      const _apiClient = isEdit ? apiClient.put : apiClient.post;
+      const _apiClient = isEdit ? apiClient.post : apiClient.post;
 
       const response = await _apiClient(url, serialize(body));
 

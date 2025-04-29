@@ -5,7 +5,6 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
-import * as React from 'react'
 
 type PropsT = {
   offer?: JobOffer;
@@ -67,7 +66,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
           },
           {
             label: "ارفاق العرض",
-            type: "image",
+            type: "file",
             name: "file",
             placeholder: "job_offer.pdf",
           },

@@ -1,10 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
+import { Branch } from "@/modules/company-profile/types/company";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const changeBranchForm = () => {
+export const changeBranchForm = (branchId: string, branches: Branch[]) => {
+  const queryClient = useQueryClient();
+
   const changeBranchForm: FormConfig = {
     formId: "changeBranchForm",
-    apiUrl: `${baseURL}/write-ur-url`,
+    apiUrl: `${baseURL}/management_hierarchies/make-branch-main/${branchId}`,
     title: "اضافة فرع جديد",
     laravelValidation: {
       enabled: true,
@@ -14,14 +18,19 @@ export const changeBranchForm = () => {
       {
         fields: [
           {
-            name: "branch_name",
+            name: "branch_id",
             label: "نوع الفرع",
             type: "select",
-            options: [{ label: "فرع الرياض", value: "فرع الرياض" }],
+            options: branches
+              .filter((branch) => branch.parent_id)
+              .map((branch) => ({
+                value: branch.id,
+                label: branch.name,
+              })),
             validation: [
               {
                 type: "required",
-                message: "ادخل اسم الفرع",
+                message: "ادخل نوع الفرع",
               },
             ],
           },
@@ -37,6 +46,13 @@ export const changeBranchForm = () => {
     showCancelButton: false,
     showBackButton: false,
     className: "overflow-visible",
+    wrapperClassName: "overflow-y-visible",
+
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data"],
+      });
+    },
   };
   return changeBranchForm;
 };

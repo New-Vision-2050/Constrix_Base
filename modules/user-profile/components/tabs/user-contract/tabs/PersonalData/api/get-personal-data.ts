@@ -19,8 +19,10 @@ type ResponseT = {
   payload: PersonalUserDataSectionT;
 };
 
-export default async function GetPersonalUserData() {
-  const res = await apiClient.get<ResponseT>(`company-users/show-data-info`);
+export default async function GetPersonalUserData(userId?: string) {
+  const res = await apiClient.get<ResponseT>(
+    `company-users/show-data-info${userId ? "/" + userId : ""}`
+  );
 
   return res.data.payload;
 }

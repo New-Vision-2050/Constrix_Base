@@ -1,10 +1,12 @@
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import PreviewTextField from "../../../../components/previewTextField";
+import { useFunctionalContractualCxt } from "../../../context";
 
 type PropsT = {
   offer: JobOffer | undefined;
 };
 export default function JobOfferFormPreviewMode({ offer }: PropsT) {
+  const { handleRefetchJobOffer } = useFunctionalContractualCxt();
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
@@ -37,10 +39,15 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
+          mediaId={offer?.files?.id}
+          fireAfterDeleteMedia={() => {
+            handleRefetchJobOffer();
+          }}
+          valid={Boolean(offer?.files?.url)}
           label="ارفاق العرض"
-          value={offer?.job_offer_number??''}
-          valid={Boolean(offer?.job_offer_number)}
-          required
+          value={offer?.files?.name ?? "---"}
+          type={offer?.files?.type == "image" ? "image" : "pdf"}
+          fileUrl={offer?.files?.url ?? ""}
         />
       </div>
     </div>

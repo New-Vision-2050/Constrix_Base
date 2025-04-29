@@ -1,10 +1,11 @@
-import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
+import { baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFunctionalContractualCxt } from "../../../context";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   contract?: Contract;
@@ -12,10 +13,12 @@ type PropsT = {
 
 export const ContractDataFormConfig = ({ contract }: PropsT) => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
-  const { handleRefetchContractData } = useFunctionalContractualCxt();
+  const { handleRefetchContractData, timeUnits } =
+    useFunctionalContractualCxt();
 
   const contractDataFormConfig: FormConfig = {
     formId: `user-contract-data-form-${contract?.id}`,
+    apiUrl: `${baseURL}/employment_contracts`,
     sections: [
       {
         fields: [
@@ -56,10 +59,47 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
+            name: "contract_duration_unit",
+            label: "contract_duration_unit",
+            placeholder: "contract_duration_unit",
+            type: "hiddenObject",
+            validation: [
+              {
+                type: "required",
+                message: "contract duration time unit required",
+              },
+            ],
+          },
+          {
             name: "contract_duration",
             label: "مدة العقد",
             type: "text",
             placeholder: "مدة العقد",
+            postfix: (
+              <div className="w-full h-full">
+                <select
+                  className="rounded-lg p-2 bg-transparent"
+                  defaultValue={contract?.contract_duration_unit?.id}
+                  onChange={(e) => {
+                    useFormStore
+                      .getState()
+                      .setValues(`user-contract-data-form-${contract?.id}`, {
+                        contract_duration_unit: e.target.value,
+                      });
+                  }}
+                >
+                  {timeUnits?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="bg-sidebar"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ),
             validation: [
               {
                 type: "required",
@@ -68,10 +108,47 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
+            name: "notice_period_unit",
+            label: "notice_period_unit",
+            placeholder: "notice_period_unit",
+            type: "hiddenObject",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل دائرة العرض",
+              },
+            ],
+          },
+          {
             name: "notice_period",
             label: "فترة الاشعار",
             type: "text",
             placeholder: "فترة الاشعار",
+            postfix: (
+              <div className="w-full h-full">
+                <select
+                  className="rounded-lg p-2 bg-transparent"
+                  defaultValue={contract?.notice_period_unit?.id}
+                  onChange={(e) => {
+                    useFormStore
+                      .getState()
+                      .setValues(`user-contract-data-form-${contract?.id}`, {
+                        notice_period_unit: e.target.value,
+                      });
+                  }}
+                >
+                  {timeUnits?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="bg-sidebar"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ),
             validation: [
               {
                 type: "required",
@@ -80,10 +157,47 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
+            name: "probation_period_unit",
+            label: "probation_period_unit",
+            placeholder: "probation_period_unit",
+            type: "hiddenObject",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل دائرة العرض",
+              },
+            ],
+          },
+          {
             name: "probation_period",
             label: "فترة التجربة",
             type: "text",
             placeholder: "فترة التجربة",
+            postfix: (
+              <div className="w-full h-full">
+                <select
+                  className="rounded-lg p-2 bg-transparent"
+                  defaultValue={contract?.probation_period_unit?.id}
+                  onChange={(e) => {
+                    useFormStore
+                      .getState()
+                      .setValues(`user-contract-data-form-${contract?.id}`, {
+                        probation_period_unit: e.target.value,
+                      });
+                  }}
+                >
+                  {timeUnits?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="bg-sidebar"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ),
             validation: [
               {
                 type: "required",
@@ -92,10 +206,18 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
-            name: "nature_work",
+            name: "nature_work_id",
             label: "طبيعة العمل",
-            type: "text",
+            type: "select",
             placeholder: "طبيعة العمل",
+            dynamicOptions: {
+              url: `${baseURL}/nature_works`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
@@ -104,10 +226,18 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
-            name: "type_working_hours",
+            name: "type_working_hour_id",
             label: "نوع ساعات العمل",
-            type: "text",
+            type: "select",
             placeholder: "نوع ساعات العمل",
+            dynamicOptions: {
+              url: `${baseURL}/type_working_hours`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
@@ -120,6 +250,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: "ساعات العمل الاسبوعية",
             type: "text",
             placeholder: "ساعات العمل الاسبوعية",
+            postfix: "ساعة",
             validation: [
               {
                 type: "required",
@@ -132,6 +263,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: "ايام الاجازات السنوية",
             type: "text",
             placeholder: "ايام الاجازات السنوية",
+            postfix: "ايام",
             validation: [
               {
                 type: "required",
@@ -164,10 +296,18 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             ],
           },
           {
-            name: "right_terminate",
+            name: "right_terminate_id",
             label: "حق الانهاء خلال فترة التجربة",
-            type: "text",
+            type: "select",
             placeholder: "حق الانهاء خلال فترة التجربة",
+            dynamicOptions: {
+              url: `${baseURL}/right_terminates`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
@@ -178,25 +318,29 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           {
             name: "file",
             label: "ارفاق العقد",
-            type: "image",
+            type: "file",
             placeholder: "ارفاق العقد",
           },
         ],
+        columns: 2,
       },
     ],
     initialValues: {
+      annual_leave: contract?.annual_leave,
       contract_number: contract?.contract_number,
       start_date: contract?.start_date,
       commencement_date: contract?.commencement_date,
       contract_duration: contract?.contract_duration,
       notice_period: contract?.notice_period,
       probation_period: contract?.probation_period,
-      nature_work: contract?.nature_work,
-      type_working_hours: contract?.type_working_hours,
+      nature_work_id: contract?.nature_work?.id,
+      type_working_hour_id: contract?.type_working_hour?.id,
       working_hours: contract?.working_hours,
-      annual_leave: contract?.annual_leave,
       country_id: contract?.country_id,
-      right_terminate: contract?.right_terminate,
+      right_terminate_id: contract?.right_terminate?.id,
+      notice_period_unit: contract?.notice_period_unit?.id,
+      contract_duration_unit: contract?.contract_duration_unit?.id,
+      probation_period_unit: contract?.probation_period_unit?.id,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",
@@ -220,17 +364,10 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         start_date: formatDateYYYYMMDD(startDate),
         commencement_date: formatDateYYYYMMDD(commencementDate),
       };
-
-      const response = await apiClient.post(
-        `/employment_contracts`,
-        serialize(body)
+      return await defaultSubmitHandler(
+        serialize(body),
+        contractDataFormConfig
       );
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
     },
   };
   return contractDataFormConfig;

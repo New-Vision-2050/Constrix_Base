@@ -92,7 +92,7 @@ export const QualificationFormConfig = ({
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -116,7 +116,7 @@ export const QualificationFormConfig = ({
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -173,6 +173,7 @@ export const QualificationFormConfig = ({
       academic_qualification_id: qualification?.academic_qualification_id,
       graduation_date: qualification?.graduation_date,
       study_rate: qualification?.study_rate,
+      file: qualification?.files,
     },
     submitButtonText: "Submit",
     cancelButtonText: "Cancel",

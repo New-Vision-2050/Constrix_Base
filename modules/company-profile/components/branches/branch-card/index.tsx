@@ -29,6 +29,7 @@ interface BranchInfoProps {
   isMainBranch?: boolean;
   className?: string;
   branches: Branch[];
+  branchId:string;
 }
 
 const BranchCard = ({
@@ -43,6 +44,7 @@ const BranchCard = ({
   className = "",
   isMultipleBranch,
   branches,
+  branchId
 }: BranchInfoProps) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const local = useLocale();
@@ -110,7 +112,9 @@ const BranchCard = ({
         isOpen={isOpen}
         onOpenChange={handleClose}
       />{" "} */}
-      {/* {isMultipleBranch && isMainBranch && <ChangeBranchDialog />} */}
+      {isMultipleBranch && isMainBranch && (
+        <ChangeBranchDialog branches={branches} branchId={branchId} />
+      )}
     </div>
   );
 };
@@ -121,11 +125,12 @@ const BranchInfo = ({ branches }: { branches: Branch[] }) => {
       {branches.map((branch) => (
         <BranchCard
           key={branch.id}
+          branchId={branch.id}
           branchName={branch.name}
           country={branch.country_name}
-          manager="—" // Replace with actual manager field if available
-          employeesCount="—" // Replace with actual value if available
-          departmentsCount="—" // Replace with actual value if available
+          manager={branch.manager?.name ?? '-'} // Replace with actual manager field if available
+          employeesCount={branch.user_count ?? 0} // Replace with actual value if available
+          departmentsCount={branch.department_count ?? 0} // Replace with actual value if available
           email={branch.email ?? "—"}
           phoneNumber={branch.phone ?? "—"}
           isMainBranch={branch.parent_id === null}

@@ -87,7 +87,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               },
               {
                 type: "apiValidation",
-                message: "الاسم التجاري يجب ان يكون بالغه العربية",
+                message: "الاسم التجاري يجب ان يكون باللغة العربية",
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -308,11 +308,12 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             name: "phone",
             label: "الهاتف",
             type: "phone",
+            required: true,
             placeholder: "Enter your phone",
             validation: [
               {
-                type: "required",
-                message: "برجاء إدخال رقم الهاتف",
+                type: "phone",
+                message: "",
               },
             ],
           },
@@ -427,7 +428,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
     editDataTransformer: (data) => {
       if (data.company_field) {
         data.company_field_id = (data?.company_field || []).map(
-          (item: { id: string | Number }) => item.id
+          (item: { id: string | number }) => item.id
         );
       }
       return data;

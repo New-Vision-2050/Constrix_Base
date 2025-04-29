@@ -2,7 +2,8 @@ import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 
 export default function UserProfilePassportDataReview() {
-  const { userIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
 
   console.log("userIdentityData", userIdentityData);
 
@@ -37,17 +38,33 @@ export default function UserProfilePassportDataReview() {
           required
         />
       </div>
-      <div className="p-2">
-        <PreviewTextField
-          valid={Boolean(userIdentityData?.file_passport?.url)}
-          label="ارفاق الهوية"
-          value={
-            userIdentityData?.file_passport ? "passport_attached_file.pdf" : ""
-          }
-          type="pdf"
-          fileUrl={userIdentityData?.file_passport?.url}
-        />
-      </div>
+      {Array.isArray(userIdentityData?.file_passport) &&
+      userIdentityData?.file_passport?.length > 0 ? (
+        userIdentityData?.file_passport?.map((media) => (
+          <div key={media.id} className="p-2">
+            <PreviewTextField
+              mediaId={media?.id}
+              fireAfterDeleteMedia={() => {
+                handleRefreshIdentityData();
+              }}
+              valid={Boolean(media?.name)}
+              label="ارفاق الهوية"
+              value={media?.name ?? "---"}
+              type={media?.type == "image" ? "image" : "pdf"}
+              fileUrl={media?.url}
+            />
+          </div>
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق الهوية"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

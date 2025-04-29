@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import GetPersonalUserData from "../api/get-personal-data";
 
-export default function useUserPersonalData() {
+export default function useUserPersonalData(userId?: string) {
   return useQuery({
-    queryKey: [`user-profile-personal-data`],
-    queryFn: GetPersonalUserData,
+    queryKey: [`user-profile-personal-data`, userId],
+    queryFn: () => GetPersonalUserData(userId),
     refetchOnWindowFocus: false, // don't refetch on tab switch
   });
 }

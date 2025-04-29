@@ -1,13 +1,24 @@
-import React from 'react';
+import React from "react";
 
 export interface ValidationRule {
-  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'email' | 'url' | 'custom' | 'apiValidation';
+  type:
+    | "required"
+    | "min"
+    | "max"
+    | "minLength"
+    | "maxLength"
+    | "pattern"
+    | "email"
+    | "phone"
+    | "url"
+    | "custom"
+    | "apiValidation";
   value?: any;
   message: string | React.ReactNode;
   validator?: (value: any, formValues?: Record<string, any>) => boolean;
   apiConfig?: {
     url: string;
-    method?: 'GET' | 'POST' | 'PUT';
+    method?: "GET" | "POST" | "PUT";
     debounceMs?: number;
     paramName?: string;
     headers?: Record<string, string>;
@@ -32,14 +43,14 @@ export interface DynamicRowOptions {
   columnsMedium?: number; // Number of columns on medium screens (default: 2)
   columnsLarge?: number; // Number of columns on large screens (default: 3)
   enableDrag?: boolean; // Enable drag-and-drop reordering of rows
-  dragHandlePosition?: 'left' | 'right'; // Position of the drag handle (default: 'left')
+  dragHandlePosition?: "left" | "right"; // Position of the drag handle (default: 'left')
   onDragStart?: (index: number) => void; // Callback when drag starts
   onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
 }
 
 export interface DependencyConfig {
   field: string; // The field/column key this dropdown depends on
-  method: 'replace' | 'query'; // Method to add value to URL: replace = replace in URL path, query = add as query parameter
+  method: "replace" | "query"; // Method to add value to URL: replace = replace in URL path, query = add as query parameter
   paramName?: string; // The parameter name to use when method is 'query' (defaults to field name)
 }
 
@@ -48,7 +59,10 @@ export interface DynamicDropdownConfig {
   valueField: string;
   labelField: string;
   setFirstAsDefault?: boolean; // Whether to automatically select the first option when no value is selected
-  dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>; // The field/column key this dropdown depends on
+  dependsOn?:
+    | string
+    | DependencyConfig[]
+    | Record<string, { method: "replace" | "query"; paramName?: string }>; // The field/column key this dropdown depends on
   // dependsOn can be:
   // 1. A string (for backward compatibility)
   // 2. An array of DependencyConfig objects
@@ -67,20 +81,36 @@ export interface DynamicDropdownConfig {
 }
 
 export interface SearchTypeConfig {
-  type: 'text' | 'dropdown' | 'date' | 'number';
+  type: "text" | "dropdown" | "date" | "number";
   placeholder?: string;
   dropdownOptions?: DropdownOption[]; // Static options
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
 }
 
 export interface minMaxDate {
-  formId?: string,
-  field?: string
-  value?: string
+  formId?: string;
+  field?: string;
+  value?: string;
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'multiSelect' | 'email' | 'password' | 'number' | 'date' | 'search' | 'phone' | 'hiddenObject' | 'dynamicRows' | 'image' | 'file';
+  type:
+    | "text"
+    | "textarea"
+    | "checkbox"
+    | "radio"
+    | "select"
+    | "multiSelect"
+    | "email"
+    | "password"
+    | "number"
+    | "date"
+    | "search"
+    | "phone"
+    | "hiddenObject"
+    | "dynamicRows"
+    | "image"
+    | "file";
   name: string;
   // Image field specific properties
   imageConfig?: {
@@ -94,7 +124,7 @@ export interface FieldConfig {
     uploadUrl?: string; // URL to upload the image to
     uploadHeaders?: Record<string, string>; // Custom headers for the upload request
   };
-  
+
   // File field specific properties
   fileConfig?: {
     allowedFileTypes?: string[]; // e.g., ['application/pdf', 'text/plain']
@@ -122,16 +152,20 @@ export interface FieldConfig {
   condition?: (values: Record<string, any>) => boolean;
   onChange?: (newValue: any, values: Record<string, any>) => void;
   onBlur?: (value: any, values: Record<string, any>) => void;
-  render?: (field: FieldConfig, value: any, onChange: (newValue: any) => void) => React.ReactNode;
+  render?: (
+    field: FieldConfig,
+    value: any,
+    onChange: (newValue: any) => void
+  ) => React.ReactNode;
   dynamicOptions?: DynamicDropdownConfig; // Using shared DynamicDropdownConfig type
   searchType?: SearchTypeConfig; // Using shared SearchTypeConfig type
   isMulti?: boolean; // Whether to enable multi-select functionality
   isHijri?: boolean; // Whether to enable Hijri calendar works only with type=date
-  postfix?: string; // Text to display after the input field
+  postfix?: React.ReactNode; // Text to display after the input field
   defaultValue?: any; // Default value for the field
   dynamicRowOptions?: DynamicRowOptions; // Configuration for dynamic rows field
-  minDate?: minMaxDate,
-  maxDate?: minMaxDate,
+  minDate?: minMaxDate;
+  maxDate?: minMaxDate;
 }
 
 export interface FormSection {
@@ -140,7 +174,7 @@ export interface FormSection {
   className?: string;
   columns?: number;
   fields: FieldConfig[];
-  collapsible?: boolean
+  collapsible?: boolean;
   condition?: (values: Record<string, any>) => boolean;
 }
 
@@ -152,7 +186,11 @@ export interface WizardOptions {
   nextButtonText?: string; // Text for the next button
   prevButtonText?: string; // Text for the previous button
   finishButtonText?: string; // Text for the finish button on the last step
-  onStepChange?: (prevStep: number, nextStep: number, values: Record<string, any>) => void; // Callback when step changes
+  onStepChange?: (
+    prevStep: number,
+    nextStep: number,
+    values: Record<string, any>
+  ) => void; // Callback when step changes
 
   // New options for step submission
   submitEachStep?: boolean; // Whether to submit each step individually
@@ -162,7 +200,10 @@ export interface WizardOptions {
   stepApiUrls?: Record<number, string>; // API URLs for each step (key is step index)
   stepApiHeaders?: Record<number, Record<string, string>>; // API headers for each step (key is step index)
 
-  onStepSubmit?: (step: number, values: Record<string, any>) => Promise<{
+  onStepSubmit?: (
+    step: number,
+    values: Record<string, any>
+  ) => Promise<{
     success: boolean;
     message?: string;
     data?: Record<string, any>; // Data that can be used in subsequent steps
@@ -170,11 +211,14 @@ export interface WizardOptions {
   }>;
 
   // Store responses from each step
-  stepResponses?: Record<number, {
-    success: boolean;
-    message?: string;
-    data?: Record<string, any>;
-  }>;
+  stepResponses?: Record<
+    number,
+    {
+      success: boolean;
+      message?: string;
+      data?: Record<string, any>;
+    }
+  >;
 }
 
 export interface FormConfig {
@@ -198,13 +242,13 @@ export interface FormConfig {
   wizardOptions?: WizardOptions; // Configuration options for wizard/accordion mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
-  apiMethod?: 'POST' | 'PUT' | 'PATCH' | 'DELETE'; // HTTP method for form submission in create mode (default: POST)
+  apiMethod?: "POST" | "PUT" | "PATCH" | "DELETE"; // HTTP method for form submission in create mode (default: POST)
   apiHeaders?: Record<string, string>; // Custom headers for the API request
   // Edit mode configuration
   isEditMode?: boolean; // Whether the form is in edit mode
   editValues?: Record<string, any>; // Values to use for editing (direct values)
   editApiUrl?: string; // URL to fetch data for editing (can include :id placeholder)
-  editApiMethod?: 'POST' | 'PUT' | 'PATCH'; // HTTP method for form submission in edit mode (default: PUT)
+  editApiMethod?: "POST" | "PUT" | "PATCH"; // HTTP method for form submission in edit mode (default: PUT)
   editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
   editDataPath?: string; // Path to the data in the API response (e.g., 'data' or 'data.user')
   editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
@@ -213,11 +257,24 @@ export interface FormConfig {
     enabled: boolean;
     errorsPath?: string; // Default is 'errors'
   };
-  onSubmit?: (values: Record<string, any>) => Promise<{ success: boolean; message?: string; errors?: Record<string, string | string[]> }>;
-  onSuccess?: (values: Record<string, any>, result: { success: boolean; message?: string }) => void;
-  onError?: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => void;
+  onSubmit?: (values: Record<string, any>) => Promise<{
+    success: boolean;
+    message?: string;
+    errors?: Record<string, string | string[]>;
+  }>;
+  onSuccess?: (
+    values: Record<string, any>,
+    result: { success: boolean; message?: string }
+  ) => void;
+  onError?: (
+    values: Record<string, any>,
+    error: { message?: string; errors?: Record<string, string | string[]> }
+  ) => void;
   onCancel?: () => void;
-  onValidationError?: (errors: Record<string, string | React.ReactNode>) => void;
+  onValidationError?: (
+    errors: Record<string, string | React.ReactNode>
+  ) => void;
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
+  wrapperClassName?: string;
 }
