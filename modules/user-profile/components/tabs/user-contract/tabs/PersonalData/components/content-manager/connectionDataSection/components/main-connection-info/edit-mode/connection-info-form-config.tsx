@@ -19,18 +19,6 @@ export const ConnectionInformationFormConfig = () => {
       {
         fields: [
           {
-            name: "phone",
-            label: "رقم الجوال",
-            type: "phone",
-            placeholder: "رقم الجوال",
-            validation:[
-              {
-                type: "phone",
-                message: ''
-              }
-            ]
-          },
-          {
             name: "email",
             label: "البريد الالكتروني",
             type: "text",
@@ -38,33 +26,61 @@ export const ConnectionInformationFormConfig = () => {
             validation: [
               {
                 type: "email",
-                message: "Please enter a valid email address"
-              }
-            ]
+                message: "Please enter a valid email address",
+              },
+              {
+                type: "required",
+                message: "field is required",
+              },
+            ],
+          },
+          {
+            name: "phone",
+            label: "رقم الجوال",
+            type: "phone",
+            placeholder: "رقم الجوال",
+            validation: [
+              {
+                type: "phone",
+                message: "",
+              },
+              {
+                type: "required",
+                message: "field is required",
+              },
+            ],
           },
           {
             name: "other_phone",
             label: "رقم   الجوال البديل",
             type: "phone",
             placeholder: "رقم   الجوال البديل",
-            validation:[
+            validation: [
               {
                 type: "phone",
-                message: ''
-              }
-            ]
+                message: "",
+              },
+              {
+                type: "required",
+                message: "field is required",
+              },
+            ],
           },
           {
             name: "landline_number",
             label: "رقم الهاتف الأرضي",
             type: "phone",
             placeholder: "رقم الهاتف الأرضي",
-            validation:[
+            validation: [
               {
                 type: "phone",
-                message: ''
-              }
-            ]
+                message: "",
+              },
+              {
+                type: "required",
+                message: "field is required",
+              },
+            ],
           },
         ],
         columns: 2,
@@ -90,9 +106,12 @@ export const ConnectionInformationFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const phoneCode =
         ((formData?.phone as string) ?? "")?.split(" ")?.[0] ?? undefined;
+      const otherPhoneCode =
+        ((formData?.other_phone as string) ?? "")?.split(" ")?.[0] ?? undefined;
       const body = {
         ...formData,
         phone_code: phoneCode,
+        code_other_phone: otherPhoneCode,
       };
 
       const response = await apiClient.put(
