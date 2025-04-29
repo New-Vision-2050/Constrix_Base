@@ -1,8 +1,8 @@
 name: CI/CD Pipeline
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, closed, edited]
+#  pull_request:
+#    types: [opened, synchronize, reopened, closed, edited]
   push:
     branches:
       - dev
