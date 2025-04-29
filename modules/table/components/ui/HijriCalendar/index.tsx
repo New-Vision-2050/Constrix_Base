@@ -1,6 +1,8 @@
 import * as React from "react";
 import arabic from "react-date-object/calendars/arabic";
 import arabic_ar from "react-date-object/locales/arabic_ar";
+import gregorian from "react-date-object/calendars/gregorian";
+import gregorian_en from "react-date-object/locales/gregorian_en";
 // import arabic_en from "react-date-object/locales/arabic_en";
 import { Calendar, CalendarProps, DateObject } from 'react-multi-date-picker'
 import { cn } from "@/lib/utils";
@@ -50,4 +52,13 @@ export const getHijriDate = (date: DateType) => {
     locale: arabic_ar
   })
   return dateObject?.toString() ?? undefined
+}
+export const convertHijriDate = (date: DateType) => {
+  let dateObject = new DateObject({
+    date: date,
+    calendar: newCalendar,
+    locale: arabic_ar
+  })
+  let gregorianDate = dateObject?.convert(gregorian,gregorian_en)?.toDate()
+  return gregorianDate ? gregorianDate?.toISOString() : undefined
 }

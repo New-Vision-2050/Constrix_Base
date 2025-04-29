@@ -2,7 +2,7 @@ import { FormConfig, useFormStore } from '@/modules/form-builder'
 import { apiClient, baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import { getHijriDate } from '@/modules/table/components/ui/HijriCalendar'
+import { convertHijriDate, getHijriDate } from '@/modules/table/components/ui/HijriCalendar'
 
 export const PersonalDataFormConfig = () => {
   const { user } = useUserProfileCxt();
@@ -95,6 +95,11 @@ export const PersonalDataFormConfig = () => {
             type: "date",
             isHijri: true,
             placeholder: "Birthdate Hijri",
+            onChange: (newValue, values)=>{
+              useFormStore
+                ?.getState()
+                .setValue('personal-data-form', 'birthdate_gregorian', convertHijriDate(newValue))
+            },
             validation: [
               {
                 type: "required",
