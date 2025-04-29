@@ -62,7 +62,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       phone: relative?.phone,
       relationship: relative?.relationship,
     },
-    submitButtonText: "اضافة حقل اخر",
+    submitButtonText: "حفظ",
     cancelButtonText: "Cancel",
     showReset: false,
     resetButtonText: "Clear Form",
