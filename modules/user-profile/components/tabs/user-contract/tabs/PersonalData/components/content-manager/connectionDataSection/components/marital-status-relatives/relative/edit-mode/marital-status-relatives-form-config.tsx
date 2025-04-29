@@ -49,7 +49,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
           {
             name: "phone",
             label: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
-            type: "text",
+            type: "phone",
             placeholder: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
           },
         ],
@@ -62,7 +62,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       phone: relative?.phone,
       relationship: relative?.relationship,
     },
-    submitButtonText: "اضافة حقل اخر",
+    submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
