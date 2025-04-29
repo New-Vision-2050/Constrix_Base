@@ -30,12 +30,20 @@ export const IqamaDataFormConfig = () => {
             name: "entry_number_start_date",
             label: "تاريخ الاصدار",
             type: "date",
+              maxDate: {
+                  formId: `iqama-entry-data-form`,
+                  field: 'entry_number_end_date'
+              },
             placeholder: "تاريخ الاصدار",
           },
           {
             name: "entry_number_end_date",
             label: "تاريخ الانتهاء",
             type: "date",
+              minDate: {
+                  formId: `iqama-entry-data-form`,
+                  field: 'entry_number_start_date'
+              },
             placeholder: "تاريخ الانتهاء",
           },
           {

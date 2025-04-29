@@ -77,6 +77,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
       job_offer_number: offer?.job_offer_number,
       date_send: offer?.date_send,
       date_accept: offer?.date_accept,
+      file: offer?.files,
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",

@@ -182,6 +182,14 @@ const FileField: React.FC<FileFieldProps> = ({
         icon: getFileIcon(value.type, 40),
       });
     }
+    else if (value?.mime_type) {
+        setFileInfo({
+            name: value.name,
+            size: formatFileSize(value.size ?? 0),
+            type: value.mime_type,
+            icon: getFileIcon(value.mime_type, 32),
+        });
+    }
   }, [value]);
 
   // Handle file selection
