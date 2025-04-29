@@ -15,13 +15,14 @@ export default function UserProfileConnectionDataEditForm() {
   } = useConnectionOTPCxt();
   const { userConnectionData } = usePersonalDataTabCxt();
   const [loading, setLoading] = useState(false);
+  const [code, setCode] = useState("+966");
   const [phone, setPhone] = useState(userConnectionData?.phone ?? "");
   const [email, setEmail] = useState(userConnectionData?.email ?? "");
 
   const handleChange = async (type: "phone" | "email") => {
     try {
       setLoading(true);
-      const newValue = type === "email" ? email : phone;
+      const newValue = type === "email" ? email : `${code}${phone}`;
       const oldValue =
         type === "email"
           ? userConnectionData?.email
@@ -36,7 +37,6 @@ export default function UserProfileConnectionDataEditForm() {
         type: type, //phone - email
       };
       await apiClient.post(`/company-users/send-otp`, body);
-
 
       if (type === "email") toggleMailOtpDialog();
       else togglePhoneOtpDialog();
@@ -55,22 +55,25 @@ export default function UserProfileConnectionDataEditForm() {
         setOpen={toggleMailOtpDialog}
       />
       <OTPVerifyDialog
-        identifier={phone}
+        identifier={`${code}${phone}`}
         open={openPhoneOtp}
         setOpen={togglePhoneOtpDialog}
       />
       <div className="flex items-center justify-around gap-2">
-        <div className="flex items-center gap-1">
+        <div className="flex items-start gap-1">
           <CustomInputField
+            type="phone"
             value={phone}
             disabled={loading}
+            setPhoneCode={setCode}
             label="رقم الجوال"
             onChange={(str: string) => setPhone(str)}
           />
           <Button onClick={() => handleChange("phone")}>Change</Button>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-start gap-1">
           <CustomInputField
+            type="email"
             value={email}
             disabled={loading}
             label="البريد الألكتروني"

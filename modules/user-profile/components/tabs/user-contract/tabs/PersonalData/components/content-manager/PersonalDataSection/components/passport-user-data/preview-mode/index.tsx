@@ -39,6 +39,7 @@ export default function UserProfilePassportDataReview() {
         />
       </div>
       {Array.isArray(userIdentityData?.file_passport) &&
+      userIdentityData?.file_passport?.length > 0 ? (
         userIdentityData?.file_passport?.map((media) => (
           <div key={media.id} className="p-2">
             <PreviewTextField
@@ -53,7 +54,17 @@ export default function UserProfilePassportDataReview() {
               fileUrl={media?.url}
             />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق الهوية"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

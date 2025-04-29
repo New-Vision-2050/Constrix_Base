@@ -19,18 +19,6 @@ export const ConnectionInformationFormConfig = () => {
       {
         fields: [
           {
-            name: "phone",
-            label: "رقم الجوال",
-            type: "phone",
-            placeholder: "رقم الجوال",
-            validation:[
-              {
-                type: "phone",
-                message: ''
-              }
-            ]
-          },
-          {
             name: "email",
             label: "البريد الالكتروني",
             type: "text",
@@ -38,33 +26,45 @@ export const ConnectionInformationFormConfig = () => {
             validation: [
               {
                 type: "email",
-                message: "Please enter a valid email address"
-              }
-            ]
+                message: "Please enter a valid email address",
+              },
+            ],
+          },
+          {
+            name: "phone",
+            label: "رقم الجوال",
+            type: "phone",
+            placeholder: "رقم الجوال",
+            validation: [
+              {
+                type: "phone",
+                message: "",
+              },
+            ],
           },
           {
             name: "other_phone",
             label: "رقم   الجوال البديل",
             type: "phone",
             placeholder: "رقم   الجوال البديل",
-            validation:[
+            validation: [
               {
                 type: "phone",
-                message: ''
-              }
-            ]
+                message: "",
+              },
+            ],
           },
           {
             name: "landline_number",
             label: "رقم الهاتف الأرضي",
             type: "phone",
             placeholder: "رقم الهاتف الأرضي",
-            validation:[
+            validation: [
               {
                 type: "phone",
-                message: ''
-              }
-            ]
+                message: "",
+              },
+            ],
           },
         ],
         columns: 2,
@@ -76,8 +76,8 @@ export const ConnectionInformationFormConfig = () => {
       other_phone: userContactData?.other_phone,
       landline_number: userContactData?.landline_number,
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
@@ -90,9 +90,12 @@ export const ConnectionInformationFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const phoneCode =
         ((formData?.phone as string) ?? "")?.split(" ")?.[0] ?? undefined;
+      const otherPhoneCode =
+        ((formData?.other_phone as string) ?? "")?.split(" ")?.[0] ?? undefined;
       const body = {
         ...formData,
         phone_code: phoneCode,
+        code_other_phone: otherPhoneCode,
       };
 
       const response = await apiClient.put(

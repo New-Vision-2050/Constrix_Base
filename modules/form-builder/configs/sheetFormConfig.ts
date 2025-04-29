@@ -1,5 +1,4 @@
 import { FormConfig, SearchTypeConfig } from "../types/formTypes";
-import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { baseURL } from "@/config/axios-config";
 
 // Define search configurations for form fields
@@ -198,7 +197,7 @@ export const sheetFormConfig: FormConfig = {
     },
   ],
   submitButtonText: "Send Message",
-  cancelButtonText: "Cancel",
+  cancelButtonText: "إلغاء",
   showReset: false,
   resetButtonText: "Clear Form",
   showSubmitLoader: true,

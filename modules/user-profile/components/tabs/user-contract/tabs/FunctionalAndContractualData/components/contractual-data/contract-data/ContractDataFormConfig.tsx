@@ -318,7 +318,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           {
             name: "file",
             label: "ارفاق العقد",
-            type: "image",
+            type: "file",
             placeholder: "ارفاق العقد",
           },
         ],
@@ -338,12 +338,15 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       working_hours: contract?.working_hours,
       country_id: contract?.country_id,
       right_terminate_id: contract?.right_terminate?.id,
-      notice_period_unit: contract?.notice_period_unit?.id,
-      contract_duration_unit: contract?.contract_duration_unit?.id,
-      probation_period_unit: contract?.probation_period_unit?.id,
+      notice_period_unit:
+        contract?.notice_period_unit?.id || timeUnits?.[0]?.id,
+      contract_duration_unit:
+        contract?.contract_duration_unit?.id || timeUnits?.[0]?.id,
+      probation_period_unit:
+        contract?.probation_period_unit?.id || timeUnits?.[0]?.id,
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

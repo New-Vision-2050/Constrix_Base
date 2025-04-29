@@ -40,6 +40,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       </div>
 
       {Array.isArray(userIdentityData?.file_border_number) &&
+      userIdentityData?.file_border_number?.length > 0 ? (
         userIdentityData?.file_border_number?.map((media) => (
           <div key={media.id} className="p-2">
             <PreviewTextField
@@ -54,7 +55,17 @@ export default function UserIqamaBorderNumberPreviewMode() {
               fileUrl={media?.url}
             />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق رقم الحدود"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

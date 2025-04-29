@@ -75,12 +75,16 @@ export const CompanyOfficialData = (
           {
             name: "phone",
             label: "رقم الجوال",
-            type: "text",
+            type: "phone",
             placeholder: "رقم الجوال",
             validation: [
               {
+                type: "phone",
+                message: "",
+              },
+              {
                 type: "required",
-                message: "رقم الجوال مطلوب",
+                message: "field is required",
               },
             ],
           },
@@ -92,7 +96,11 @@ export const CompanyOfficialData = (
             validation: [
               {
                 type: "required",
-                message: "البريد الالكتروني مطلوب",
+                message: "ادخل البريد الالكتروني",
+              },
+              {
+                type: "email",
+                message: "البريد الالكتروني غير صحيح",
               },
             ],
           },
@@ -120,8 +128,8 @@ export const CompanyOfficialData = (
       email: officialData?.email ?? "",
       bucket: "متميز",
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

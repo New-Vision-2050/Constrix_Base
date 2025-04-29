@@ -35,7 +35,7 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
 
   const handleDeleteMedia = async () => {
     try {
-      if (loading) return;
+      if (loading || !mediaId) return;
       setLoading(true);
       await apiClient.delete(`/media/${mediaId}`);
       fireAfterDeleteMedia?.();

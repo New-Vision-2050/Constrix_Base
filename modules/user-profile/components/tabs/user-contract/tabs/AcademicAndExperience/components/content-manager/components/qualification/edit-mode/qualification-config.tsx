@@ -151,11 +151,16 @@ export const QualificationFormConfig = ({
             ],
           },
           {
-            type: "image",
-            name: "file",
+            type: "file",
+            name: "file",//field name
             isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
+            gridArea: 2,
+            fileConfig: {
+              allowedFileTypes: ["application/pdf", "image/jpeg", "image/png"],
+              maxFileSize: 200 * 1024 * 1024, // 200MB
+            },
           },
         ],
         columns: 2,
@@ -170,8 +175,8 @@ export const QualificationFormConfig = ({
       study_rate: qualification?.study_rate,
       file: qualification?.files,
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

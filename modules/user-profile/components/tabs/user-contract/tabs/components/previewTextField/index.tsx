@@ -10,6 +10,7 @@ import PreviewTextFieldLabel from "./label";
 import PreviewTextFieldSuffixIcon from "./suffix-icon";
 import PreviewTextFieldValidationIcon from "./validation-icon";
 import { checkString } from "@/utils/check-string";
+import { truncateString } from "@/utils/truncate-string";
 
 // types
 export type PreviewTextFieldType = "pdf" | "image" | "select" | "date";
@@ -51,7 +52,11 @@ const PreviewTextField = ({
       {/* input field with prefix icon */}
       <div className="flex w-full items-center gap-1">
         <PreviewTextFieldPrefixIcon type={type} />
-        <Input disabled type="text" value={checkString(value)} />
+        <Input
+          disabled
+          type="text"
+          value={truncateString(checkString(value), 25)}
+        />
       </div>
 
       {/* label with optional asterisk for required fields */}

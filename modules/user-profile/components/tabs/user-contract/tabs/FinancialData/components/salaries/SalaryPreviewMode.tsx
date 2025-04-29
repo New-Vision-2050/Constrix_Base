@@ -32,7 +32,7 @@ export default function SalaryPreviewMode({ salary }: { salary: Salary }) {
         />
       </div>
 
-      {salary?.salary_type_code === SalaryTypes.constants ? (
+      {salary?.salary_type_code === SalaryTypes.percentage ? (
         <div className="p-2">
           <PreviewTextField
             label="وصف اساس حساب الراتب"

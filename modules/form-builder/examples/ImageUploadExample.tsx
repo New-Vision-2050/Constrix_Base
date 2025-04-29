@@ -63,13 +63,13 @@ const ImageUploadExample: React.FC = () => {
         ],
       },
     ],
-    submitButtonText: "Submit",
+    submitButtonText: "حفظ",
     resetButtonText: "Reset",
     showReset: true,
     onSubmit: async (values) => {
       // In a real application, you would handle the form submission here
       console.log("Form values:", values);
-      
+
       // For demonstration purposes, we'll just return a success response
       return {
         success: true,
@@ -81,7 +81,7 @@ const ImageUploadExample: React.FC = () => {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Image Upload Form Example</h1>
-      
+
       <SheetFormBuilder
         config={formConfig}
         trigger={<Button>Open Form</Button>}
@@ -90,7 +90,7 @@ const ImageUploadExample: React.FC = () => {
           alert("Form submitted successfully!");
         }}
       />
-      
+
       <div className="mt-8 p-4 bg-muted rounded-md">
         <h2 className="text-lg font-semibold mb-2">Usage Notes:</h2>
         <ul className="list-disc pl-5 space-y-2">

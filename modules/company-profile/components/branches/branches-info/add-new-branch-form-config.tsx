@@ -68,6 +68,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "country_id",
             label: "الدولة",
             placeholder: "الدولة",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -86,12 +87,12 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               },
             ],
           },
-
           {
             type: "select",
             name: "state_id",
             label: "المحافظة",
             placeholder: "المحافظة",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -117,6 +118,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "city_id",
             label: "المدينة",
             placeholder: "المدينة",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -159,6 +161,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "manager_id",
             label: "مدير الفرع",
             placeholder: "اختر مدير الفرع",
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -191,9 +194,10 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           },
           {
             name: "email",
-            label: "البريد الالكتروني",
+            label: "البريد الإلكتروني",
             type: "email",
             placeholder: "البريد الالكتروني",
+            required:true,
             validation: [
               {
                 type: "required",
@@ -205,7 +209,6 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               },
             ],
           },
-
           {
             name: "latitude",
             label: "latitude",
@@ -233,8 +236,8 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
         ],
       },
     ],
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

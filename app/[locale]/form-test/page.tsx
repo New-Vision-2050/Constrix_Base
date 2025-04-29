@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 const formConfig: FormConfig = {
   formId: "form-test-form", // Add formId to the config
   title: "Add New Item",
-  submitButtonText: "Submit",
+  submitButtonText: "حفظ",
   resetOnSuccess: true,
   sections: [
     {

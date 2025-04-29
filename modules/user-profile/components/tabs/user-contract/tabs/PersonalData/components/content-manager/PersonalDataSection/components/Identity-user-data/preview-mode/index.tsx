@@ -38,6 +38,7 @@ export default function UserProfileIdentityDataReview() {
       </div>
 
       {Array.isArray(userIdentityData?.file_identity) &&
+      userIdentityData?.file_identity?.length > 0 ? (
         userIdentityData?.file_identity?.map((media) => (
           <div key={media.id} className="p-2">
             <PreviewTextField
@@ -52,7 +53,17 @@ export default function UserProfileIdentityDataReview() {
               fileUrl={media?.url}
             />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق الهوية"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

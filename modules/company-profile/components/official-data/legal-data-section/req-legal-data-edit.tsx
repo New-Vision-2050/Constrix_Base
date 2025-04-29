@@ -126,7 +126,7 @@ export const ReqLegalDataEdit = () => {
       company_type: "هندسي",
     },
     submitButtonText: "ارسال طلب التعديل",
-    cancelButtonText: "Cancel",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

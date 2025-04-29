@@ -99,8 +99,8 @@ export const LegalDataFormConfig = (
     initialValues: {
       data: companyLegalData,
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

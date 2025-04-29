@@ -30,17 +30,25 @@ export const WorkLicenseFormConfig = () => {
             label: "تاريخ الدخول",
             type: "date",
             placeholder: "تاريخ الدخول",
+              maxDate: {
+                  formId: `ConnectionInformation-license-data-form`,
+                  field: 'entry_number_end_date'
+              },
           },
           {
             name: "work_permit_end_date",
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
+              minDate: {
+                  formId: `ConnectionInformation-license-data-form`,
+                  field: 'work_permit_start_date'
+              },
           },
           {
             name: "file_work_permit",
             label: "ارفاق رخصة العمل",
-            type: "image",
+            type: "file",
             isMulti: true,
             placeholder: "ارفاق رخصة العمل",
           },
@@ -54,8 +62,8 @@ export const WorkLicenseFormConfig = () => {
       work_permit_end_date: userIdentityData?.work_permit_end_date,
       file_work_permit: userIdentityData?.file_work_permit,
     },
-    submitButtonText: "Submit",
-    cancelButtonText: "Cancel",
+    submitButtonText: "حفظ",
+    cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

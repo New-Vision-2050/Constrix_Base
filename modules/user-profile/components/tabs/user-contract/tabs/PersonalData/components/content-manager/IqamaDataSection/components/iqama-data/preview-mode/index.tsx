@@ -35,6 +35,7 @@ export default function UserIqamaDataPreviewMode() {
       </div>
 
       {Array.isArray(userIdentityData?.file_entry_number) &&
+      userIdentityData?.file_entry_number?.length > 0 ? (
         userIdentityData?.file_entry_number?.map((media) => (
           <div key={media.id} className="p-2">
             <PreviewTextField
@@ -49,7 +50,17 @@ export default function UserIqamaDataPreviewMode() {
               fileUrl={media?.url}
             />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق الهوية"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

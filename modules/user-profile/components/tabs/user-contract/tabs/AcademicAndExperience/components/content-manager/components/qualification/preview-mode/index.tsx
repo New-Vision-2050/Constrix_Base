@@ -65,6 +65,7 @@ export default function SingleQualificationDataPreview({
       </div>
 
       {Array.isArray(qualification?.files) &&
+      qualification?.files?.length > 0 ? (
         qualification?.files?.map((media) => (
           <div key={media.id} className="p-2">
             <PreviewTextField
@@ -79,7 +80,17 @@ export default function SingleQualificationDataPreview({
               fileUrl={media?.url}
             />
           </div>
-        ))}
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق شهادة"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

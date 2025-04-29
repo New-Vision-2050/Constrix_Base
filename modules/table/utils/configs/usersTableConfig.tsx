@@ -1,17 +1,14 @@
-import Company from "@/app/[locale]/(main)/companies/cells/company";
 import DataStatus from "@/app/[locale]/(main)/companies/cells/data-status";
-import Execution from "@/app/[locale]/(main)/companies/cells/execution";
-import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { AvatarGroup } from "@/components/shared/avatar-group";
 import { baseURL } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { companyUserFormConfig, formConfig } from "@/modules/form-builder";
 import GearIcon from "@/public/icons/gear";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
+import {GetCompanyUserFormConfig} from "@/modules/form-builder/configs/companyUserFormConfig";
 
 // Define types for the company data
 interface CompanyData {
@@ -71,7 +68,7 @@ export const UsersConfig = () => {
           return (
             <div className="line-clamp-3">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5">
+                <p key={company.id} className="line-clamp-1 h-5" dir={'ltr'}>
                   {company?.phone || ""}
                 </p>
               ))}
@@ -187,7 +184,7 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: companyUserFormConfig,
+    formConfig: GetCompanyUserFormConfig,
     executions: [
       {
         label: "اكمال الملف الشخصي",
