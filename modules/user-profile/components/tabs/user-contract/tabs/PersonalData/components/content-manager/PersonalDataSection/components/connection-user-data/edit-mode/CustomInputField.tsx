@@ -5,6 +5,7 @@ import { Input } from "@/modules/table/components/ui/input";
 import CountryCodeSelect from "./CountriesCodesSelect";
 import { isValidPhone } from "@/utils/valid-phone";
 import { isValidEmail } from "@/utils/valid-email";
+import libphonenumbers from "libphonenumbers";
 
 type PropsT = {
   value: string;
@@ -34,10 +35,21 @@ const CustomInputField = ({
   const handleChange = (str: string) => {
     let valid = true;
     if (type === "phone") {
-      valid = isValidPhone(`${code}${str}`);
-      const cleanedStr = str.replace(/[^\d+]/g, "");
-      if (!valid) setError("invalid phone");
-      else setError("");
+      const phoneUtil = libphonenumbers.PhoneNumberUtil.getInstance();
+      const message = "رقم الجوال غير صحيح";
+
+      try {
+        const number = phoneUtil.parseAndKeepRawInput(`${code} ${str}`);
+
+        if (!phoneUtil.isValidNumber(number)) {
+          setError(message);
+        } else {
+          setError("");
+        }
+      } catch (error) {
+        setError(message);
+      }
+      const cleanedStr = str.replace(/[^\d]/g, "");
 
       onChange(cleanedStr);
     } else if (type === "email") {
