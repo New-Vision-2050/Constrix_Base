@@ -1,10 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFinancialDataCxt } from "../../../../context/financialDataCxt";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
 import { AllowancesTypes } from "../../AllowancesEnum";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   privilegeData?: UserPrivilege;
@@ -178,16 +179,12 @@ export const PrivilegeItemFormConfig = ({
       const url = isEdit
         ? `/user_privileges/${privilegeData?.id}`
         : `/user_privileges`;
+      // const method = isEdit ? "PUT" : "POST";
 
-      const _apiClient = isEdit ? apiClient.post : apiClient.post;
-
-      const response = await _apiClient(url, serialize(body));
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), privilegeItemFormConfig, {
+        url: url,
+        method: "POST",
+      });
     },
   };
   return privilegeItemFormConfig;
