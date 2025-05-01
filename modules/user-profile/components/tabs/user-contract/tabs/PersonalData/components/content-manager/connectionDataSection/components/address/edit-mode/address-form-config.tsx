@@ -5,7 +5,8 @@ import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const AddressFormConfig = () => {
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus, handleRefetchProfileData } =
+    useUserProfileCxt();
   const { userContactData, handleRefetchUserContactData } =
     useConnectionDataCxt();
 
@@ -49,6 +50,7 @@ export const AddressFormConfig = () => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchProfileData();
       handleRefetchDataStatus();
       handleRefetchUserContactData();
     },
