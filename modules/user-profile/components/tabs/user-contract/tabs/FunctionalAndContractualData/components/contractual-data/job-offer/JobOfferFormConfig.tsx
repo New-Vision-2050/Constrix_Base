@@ -1,10 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   offer?: JobOffer;
@@ -39,7 +39,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             placeholder: "تاريخ الارسال",
             maxDate: {
               formId: `job-offer-data-form-${offer?.id}`,
-              field: 'date_accept'
+              field: "date_accept",
             },
             validation: [
               {
@@ -55,7 +55,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             placeholder: "تاريخ الموافقة",
             minDate: {
               formId: `job-offer-data-form-${offer?.id}`,
-              field: 'date_send'
+              field: "date_send",
             },
             validation: [
               {
@@ -103,13 +103,10 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
         date_accept: formatDateYYYYMMDD(dateAccept),
       };
 
-      const response = await apiClient.post(`/job_offers`, serialize(body));
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), jobOfferFormConfig, {
+        url: `/job_offers`,
+        method: "POST",
+      });
     },
   };
   return jobOfferFormConfig;

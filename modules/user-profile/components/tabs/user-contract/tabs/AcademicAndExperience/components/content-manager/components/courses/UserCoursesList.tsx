@@ -3,12 +3,13 @@ import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import SingleCourse from "./single-course";
 import { Course } from "@/modules/user-profile/types/Course";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
+import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
 
 export default function UserCoursesList() {
-  const { userCourses } = useUserAcademicTabsCxt();
+  const { userCourses, userCoursesLoading } = useUserAcademicTabsCxt();
 
   // handle there is no data found
-  if (userCourses && userCourses.length === 0)
+  if (!userCoursesLoading && userCourses && userCourses.length === 0)
     return (
       <NoDataFounded
         title="لا يوجد بيانات"
@@ -18,10 +19,16 @@ export default function UserCoursesList() {
 
   // render data
   return (
-    <RegularList<Course, "course">
-      sourceName="course"
-      items={userCourses ?? []}
-      ItemComponent={SingleCourse}
-    />
+    <>
+      {userCoursesLoading ? (
+        <TabTemplateListLoading />
+      ) : (
+        <RegularList<Course, "course">
+          sourceName="course"
+          items={userCourses ?? []}
+          ItemComponent={SingleCourse}
+        />
+      )}
+    </>
   );
 }

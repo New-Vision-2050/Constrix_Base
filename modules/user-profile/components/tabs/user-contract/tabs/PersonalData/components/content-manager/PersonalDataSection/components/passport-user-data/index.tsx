@@ -1,15 +1,17 @@
 import UserProfilePassportDataReview from "./preview-mode";
 import UserProfilePassportDataEditForm from "./edit-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 
 export default function PassportDataSectionPersonalForm() {
   // declare and define component state and vars
-  const { handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { handleRefreshIdentityData, userIdentityDataLoading } =
+    usePersonalDataTabCxt();
 
   return (
     <TabTemplate
       title="البيانات جواز السفر"
+      loading={userIdentityDataLoading}
       reviewMode={<UserProfilePassportDataReview />}
       editMode={<UserProfilePassportDataEditForm />}
       onChangeMode={() => {

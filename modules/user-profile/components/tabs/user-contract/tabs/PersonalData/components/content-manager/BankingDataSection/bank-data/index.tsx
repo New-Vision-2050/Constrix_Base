@@ -1,7 +1,7 @@
 import UserProfileBankingDataReview from "./review-mode";
 import BankingDataSectionEditMode from "./edit-mode";
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { apiClient } from "@/config/axios-config";
 import { useUserBankingDataCxt } from "../context";
 import { useModal } from "@/hooks/use-modal";

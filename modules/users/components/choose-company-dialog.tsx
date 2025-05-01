@@ -1,0 +1,74 @@
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ROUTER } from "@/router";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
+import { UserTableRow } from "@/modules/table/utils/configs/usersTableConfig";
+
+interface PropsT {
+  open: boolean;
+  onClose: () => void;
+  user: UserTableRow;
+}
+
+const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
+  const router = useRouter();
+
+  const handleRedirect = (id: string) => {
+    if (!id) return;
+    router.push(`${ROUTER.USER_PROFILE}?id=${id}`);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader className="items-center justify-center mb-9">
+          <DialogTitle>
+            <button
+              className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-white"
+              onClick={onClose}
+            >
+              ✕
+            </button>
+            <p className="text-lg font-bold">برجاء أختيار الشركة</p>
+          </DialogTitle>
+        </DialogHeader>
+        <DialogDescription asChild>
+          <div className="flex gap-6 items-center justify-center flex-wrap">
+            {user?.companies?.map((company) => (
+              <div
+                key={company?.id}
+                onClick={() => handleRedirect(company?.users?.[0]?.id ?? "")}
+                className="flex flex-col items-center justify-center cursor-pointer"
+              >
+                <img
+                  title={company?.name}
+                  src={company?.logo??LogoPlaceholder}
+                  width={70}
+                  height={70}
+                  className="rounded-2xl"
+                />
+                <p className="text-sm font-semibold">{company?.name}</p>
+              </div>
+            ))}
+          </div>
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} className="w-32 h-10">
+            الغاء
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ChooseUserCompany;

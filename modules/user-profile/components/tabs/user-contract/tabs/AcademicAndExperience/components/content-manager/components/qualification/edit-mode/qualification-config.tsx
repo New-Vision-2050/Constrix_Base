@@ -1,9 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { Qualification } from "@/modules/user-profile/types/qualification";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { serialize } from "object-to-formdata";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   qualification?: Qualification;
@@ -152,7 +153,7 @@ export const QualificationFormConfig = ({
           },
           {
             type: "file",
-            name: "file",//field name
+            name: "file", //field name
             isMulti: true,
             label: "ارفاق شهادة",
             placeholder: "ارفاق شهادة",
@@ -214,13 +215,14 @@ export const QualificationFormConfig = ({
       // const _body = formType === "Edit" ? body : serialize(body);
       // const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
 
-      const response = await apiClient.post(url, serialize(body));
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(
+        serialize(body),
+        qualificationFormConfig,
+        {
+          url: url,
+          method: "POST",
+        }
+      );
     },
   };
   return qualificationFormConfig;

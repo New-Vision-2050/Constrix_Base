@@ -1,7 +1,7 @@
 import UserCertificationPreview from "./UserCertificationPreview";
 import UserCertificationEdit from "./UserCertificationEdit";
 import { Certification } from "@/modules/user-profile/types/Certification";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { apiClient } from "@/config/axios-config";
 

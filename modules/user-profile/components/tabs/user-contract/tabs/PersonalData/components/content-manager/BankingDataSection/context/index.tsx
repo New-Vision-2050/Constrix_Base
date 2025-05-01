@@ -12,6 +12,7 @@ import { BankAccount } from "@/modules/user-profile/types/bank-account";
 type UserBankingDataCxtType = {
   bankAccounts: BankAccount[] | undefined;
   handleRefreshBankingData: () => void;
+  bankAccountsLoading: boolean
 };
 
 export const UserBankingDataCxt = createContext<UserBankingDataCxtType>(
@@ -36,8 +37,11 @@ export const UserBankingDataCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const { user } = useUserProfileCxt();
-  const { data: bankAccounts, refetch: refreshBankingData } =
-    useUserBankingData(user?.user_id ?? "");
+  const {
+    data: bankAccounts,
+    isLoading: bankAccountsLoading,
+    refetch: refreshBankingData,
+  } = useUserBankingData(user?.user_id ?? "");
 
   // ** handle side effects
 
@@ -49,7 +53,7 @@ export const UserBankingDataCxtProvider = ({
   // ** return component ui
   return (
     <UserBankingDataCxt.Provider
-      value={{ bankAccounts, handleRefreshBankingData }}
+      value={{ bankAccounts,bankAccountsLoading, handleRefreshBankingData }}
     >
       {children}
     </UserBankingDataCxt.Provider>

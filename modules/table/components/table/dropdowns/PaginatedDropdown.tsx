@@ -72,13 +72,13 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     if (isMulti && Array.isArray(value)) {
       // For multi-select, return comma-separated labels
       return value.map(val => {
-        const option = options.find(opt => opt.value === val);
+        const option = options.find(opt => opt.value == val);
         return option ? option.label : val;
       }).join(', ');
     } else {
       // For single select
       const singleValue = value as string;
-      const option = options.find((option) => option.value === singleValue);
+      const option = options.find((option) => option.value == singleValue);
 
       // If we have a proper label, use it
       if (option) {
@@ -244,7 +244,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                           ? Array.isArray(value) && value.includes(option.value)
                             ? "opacity-100"
                             : "opacity-0"
-                          : value === option.value
+                          : value == option.value
                           ? "opacity-100"
                           : "opacity-0"
                       )}

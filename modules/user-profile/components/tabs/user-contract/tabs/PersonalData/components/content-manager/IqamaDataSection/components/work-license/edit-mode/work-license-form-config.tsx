@@ -1,11 +1,13 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const WorkLicenseFormConfig = () => {
-  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   const workLicenseFormConfig: FormConfig = {
@@ -30,20 +32,20 @@ export const WorkLicenseFormConfig = () => {
             label: "تاريخ الدخول",
             type: "date",
             placeholder: "تاريخ الدخول",
-              maxDate: {
-                  formId: `ConnectionInformation-license-data-form`,
-                  field: 'entry_number_end_date'
-              },
+            maxDate: {
+              formId: `ConnectionInformation-license-data-form`,
+              field: "entry_number_end_date",
+            },
           },
           {
             name: "work_permit_end_date",
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
-              minDate: {
-                  formId: `ConnectionInformation-license-data-form`,
-                  field: 'work_permit_start_date'
-              },
+            minDate: {
+              formId: `ConnectionInformation-license-data-form`,
+              field: "work_permit_start_date",
+            },
           },
           {
             name: "file_work_permit",
@@ -90,16 +92,12 @@ export const WorkLicenseFormConfig = () => {
         work_permit_start_date: formatDate(startDate),
         work_permit_end_date: formatDate(endDate),
       };
+      
 
-      const response = await apiClient.post(
-        `/company-users/identity-data/${user?.user_id}`,
-        serialize(body)
-      );
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), workLicenseFormConfig, {
+        url: `/company-users/identity-data/${user?.user_id}`,
+        method: "POST",
+      });
     },
   };
   return workLicenseFormConfig;

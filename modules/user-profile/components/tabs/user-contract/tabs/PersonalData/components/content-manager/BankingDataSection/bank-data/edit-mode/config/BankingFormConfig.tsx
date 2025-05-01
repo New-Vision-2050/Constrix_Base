@@ -1,8 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useUserBankingDataCxt } from "../../../context";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   bank?: BankAccount;
@@ -196,16 +197,13 @@ export const BankingDataFormConfig = (props: PropsT) => {
         ...formData,
         user_id: user?.user_id,
       };
+      const method = formType !== "Edit" ? "POST" : "PUT";
       const url = `/bank_accounts${formType === "Edit" ? `/${bank?.id}` : ""}`;
-      const response = await (formType == "Create"
-        ? apiClient.post
-        : apiClient.put)(url, body);
 
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(body, BankingFormConfig, {
+        url: url,
+        method: method,
+      });
     },
   };
   return BankingFormConfig;

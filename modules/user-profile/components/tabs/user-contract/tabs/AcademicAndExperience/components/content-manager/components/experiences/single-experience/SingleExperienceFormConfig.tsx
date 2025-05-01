@@ -1,9 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { Experience } from "@/modules/user-profile/types/experience";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   experience?: Experience;
@@ -48,7 +48,7 @@ export const SingleExperienceFormConfig = ({
             placeholder: "تاريخ البداية",
             maxDate: {
               formId: `user-experiences-data-form-${experience?.id ?? ""}`,
-              field: 'training_to'
+              field: "training_to",
             },
             validation: [
               {
@@ -64,7 +64,7 @@ export const SingleExperienceFormConfig = ({
             placeholder: "تاريخ الانتهاء",
             minDate: {
               formId: `user-experiences-data-form-${experience?.id ?? ""}`,
-              field: 'training_from'
+              field: "training_from",
             },
           },
           {
@@ -125,15 +125,13 @@ export const SingleExperienceFormConfig = ({
           ? `/user_experiences/${experience?.id}`
           : `/user_experiences`;
 
-      const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
+      const method = formType === "Edit" ? "PUT" : "POST";
 
-      const response = await _apiClient(url, body);
+      return await defaultSubmitHandler(body, singleExperienceFormConfig, {
+        url: url,
+        method: method,
+      });
 
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
     },
   };
   return singleExperienceFormConfig;

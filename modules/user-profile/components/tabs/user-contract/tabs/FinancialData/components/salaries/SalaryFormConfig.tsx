@@ -4,11 +4,9 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { SalaryTypes } from "./salary_type_enum";
-import { useState } from "react";
 
 export const SalaryFormConfig = () => {
   // declare and define component state and variables
-  const [salaryType, setSalaryType] = useState("");
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
 
@@ -36,9 +34,6 @@ export const SalaryFormConfig = () => {
 
               totalCountHeader: "X-Total-Count",
             },
-            onChange(newValue) {
-              setSalaryType(newValue);
-            },
             validation: [
               {
                 type: "required",
@@ -57,7 +52,24 @@ export const SalaryFormConfig = () => {
                 message: "مبلغ الراتب الاساسي مطلوب",
               },
             ],
-            postfix: salaryType === SalaryTypes.percentage ? "%" : "ر.س",
+            condition: (values) =>
+              values.salary_type_code == SalaryTypes.percentage,
+            postfix: "%",
+          },
+          {
+            name: "salary",
+            label: "مبلغ الراتب الاساسي",
+            type: "text",
+            placeholder: "مبلغ الراتب الاساسي",
+            validation: [
+              {
+                type: "required",
+                message: "مبلغ الراتب الاساسي مطلوب",
+              },
+            ],
+            condition: (values) =>
+              values.salary_type_code == SalaryTypes.constants,
+            postfix: "ر.س",
           },
           {
             type: "select",

@@ -1,12 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const IdentityDataFormConfig = () => {
-  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const IdentityFormConfig: FormConfig = {
@@ -96,16 +98,10 @@ export const IdentityDataFormConfig = () => {
         identity_end_date: formatDateYYYYMMDD(endDate),
       };
 
-      const response = await apiClient.post(
-        `/company-users/identity-data/${user?.user_id}`,
-        serialize(body)
-      );
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), IdentityFormConfig, {
+        url: `/company-users/identity-data/${user?.user_id}`,
+        method: "POST",
+      });
     },
   };
   return IdentityFormConfig;

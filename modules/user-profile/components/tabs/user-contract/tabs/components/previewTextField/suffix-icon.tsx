@@ -7,6 +7,7 @@ import { PreviewTextFieldType } from ".";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { apiClient } from "@/config/axios-config";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 
 type PropsT = {
   isRTL: boolean;
@@ -17,8 +18,9 @@ type PropsT = {
 };
 
 export default function PreviewTextFieldSuffixIcon(props: PropsT) {
-  const { isRTL, type, fileUrl, mediaId, fireAfterDeleteMedia } = props;
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { isRTL, type, fileUrl, mediaId, fireAfterDeleteMedia } = props;
 
   /**
    * handles downloading a file when the icon is clicked.
@@ -32,6 +34,8 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
 
     window.open(fileUrl, "_blank");
   };
+
+  const handleCancel = () => setOpen(false);
 
   const handleDeleteMedia = async () => {
     try {
@@ -64,32 +68,42 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
   };
 
   return (
-    <div className="flex items-center">
-      <span
-        className={`absolute top-[8px] text-slate-400 ${
-          isRTL ? "left-[50px]" : "right-[50px]"
-        }`}
-        onClick={handleDownload}
-        style={{
-          cursor: type === "pdf" || type === "image" ? "pointer" : "default",
-        }}
-      >
-        {renderSuffixIcon()}
-      </span>
-      {(type === "image" || type == "pdf") && (
+    <>
+      <div className="flex items-center">
         <span
           className={`absolute top-[8px] text-slate-400 ${
-            isRTL ? "left-[85px]" : "right-[85px]"
+            isRTL ? "left-[50px]" : "right-[50px]"
           }`}
-          title={loading ? "جاري التنفيذ" : "حذف"}
-          onClick={handleDeleteMedia}
+          onClick={handleDownload}
           style={{
             cursor: type === "pdf" || type === "image" ? "pointer" : "default",
           }}
         >
-          <Trash2 color={loading ? "lightgray" : "red"} />
+          {renderSuffixIcon()}
         </span>
-      )}
-    </div>
+        {(type === "image" || type == "pdf") && (
+          <span
+            className={`absolute top-[8px] text-slate-400 ${
+              isRTL ? "left-[85px]" : "right-[85px]"
+            }`}
+            title={loading ? "جاري التنفيذ" : "حذف"}
+            onClick={() => setOpen(true)}
+            style={{
+              cursor:
+                type === "pdf" || type === "image" ? "pointer" : "default",
+            }}
+          >
+            <Trash2 color={loading ? "lightgray" : "red"} />
+          </span>
+        )}
+      </div>
+      <ConfirmationDialog
+        open={open}
+        onClose={handleCancel}
+        onConfirm={handleDeleteMedia}
+        description={`هل أنت متاكد من حذف الملف؟`}
+        showDatePicker={false}
+      />
+    </>
   );
 }

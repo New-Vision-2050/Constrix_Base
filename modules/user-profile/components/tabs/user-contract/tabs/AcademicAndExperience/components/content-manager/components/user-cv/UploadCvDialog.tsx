@@ -10,7 +10,7 @@ import CloudUploadIcon from "@/public/icons/cloud-upload";
 import FormFieldSet from "../../../../../components/FormFieldSet";
 import pdfImg from "@/assets/icons/PDF.png";
 import TrashIcon from "@/public/icons/trash";
-import PencilLineIcon from "@/public/icons/pencil-line";
+// import PencilLineIcon from "@/public/icons/pencil-line";
 import VisuallyHiddenInput from "@/components/shared/VisuallyHiddenInput";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { apiClient } from "@/config/axios-config";
@@ -97,7 +97,10 @@ export default function UploadCvDialog(props: PropsT) {
           {uploadedFile && (
             <div className="flex flex-col items-center justify-center gap-6">
               <FormFieldSet title={"ارفاق السيرة الذاتية"}>
-                <UploadedFile file={uploadedFile} />
+                <UploadedFile
+                  file={uploadedFile}
+                  setUploadedFile={setUploadedFile}
+                />
               </FormFieldSet>
               <Button onClick={handleFileUpload}>تحديث</Button>
             </div>
@@ -108,7 +111,13 @@ export default function UploadCvDialog(props: PropsT) {
   );
 }
 
-const UploadedFile = ({ file }: { file: File }) => {
+const UploadedFile = ({
+  file,
+  setUploadedFile,
+}: {
+  file: File;
+  setUploadedFile: React.Dispatch<SetStateAction<File | undefined>>;
+}) => {
   const truncatedName =
     file.name.length > 20 ? file.name.slice(0, 17) + "..." : file.name;
   const fileSizeKB = (file.size / 1024).toFixed(2);
@@ -130,12 +139,12 @@ const UploadedFile = ({ file }: { file: File }) => {
       </div>
       {/* actions */}
       <div>
-        <Button variant={"ghost"}>
+        <Button variant={"ghost"} onClick={() => setUploadedFile(undefined)}>
           <TrashIcon color="red" />
         </Button>
-        <Button variant={"ghost"}>
+        {/* <Button variant={"ghost"}>
           <PencilLineIcon additionalClass="text-pink-500" />
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

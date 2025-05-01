@@ -29,6 +29,7 @@ type UserProfileCxtType = {
 
   // widgets data
   widgetData: ProfileWidgetData | undefined;
+  handleRefetchWidgetData: () => void;
 
   // personal data
   userPersonalData: PersonalUserDataSectionT | undefined;
@@ -75,7 +76,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
     useProfileDataStatus((userId || _user?.user_id) ?? "");
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
     useUserPersonalData(user?.user_id);
-  const { data: widgetData } = useProfileWidgetData(
+  const { data: widgetData, refetch: refetchWidgetData } = useProfileWidgetData(
     (userId || _user?.user_id) ?? ""
   );
 
@@ -103,6 +104,10 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   }, [tab1, tab2, router, searchParams]);
 
   // ** declare and define component helper methods
+  const handleRefetchWidgetData = () => {
+    refetchWidgetData();
+  };
+
   const handleRefetchProfileData = () => {
     refetchProfileData();
   };
@@ -135,6 +140,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
 
         // widgetData
         widgetData,
+        handleRefetchWidgetData,
 
         // personal data
         userPersonalData,

@@ -1,8 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const BorderNumberFormConfig = () => {
   const { user } = useUserProfileCxt();
@@ -93,16 +94,14 @@ export const BorderNumberFormConfig = () => {
         border_number_end_date: formatDate(endDate),
       };
 
-      const response = await apiClient.post(
-        `/company-users/identity-data/${user?.user_id}`,
-        serialize(body)
+      return await defaultSubmitHandler(
+        serialize(body),
+        borderNumberFormConfig,
+        {
+          url: `/company-users/identity-data/${user?.user_id}`,
+          method: "POST",
+        }
       );
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
     },
   };
   return borderNumberFormConfig;
