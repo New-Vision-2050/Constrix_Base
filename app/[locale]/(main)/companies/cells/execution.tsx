@@ -30,7 +30,9 @@ export type MenuItem = {
   color?: string;
   // Optional component property for custom dialogs
   dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
-  dialogProps?: DialogProps;
+  dialogProps?:
+    | DialogProps
+    | ((row: { id: string; [key: string]: unknown }) => DialogProps);
   position?: "before" | "after";
 };
 
@@ -45,7 +47,9 @@ export type ActionState = {
     open: boolean;
     config: FormConfig | null;
   };
-  [key: string]: { open: boolean; url?: string; config?: FormConfig | null } | undefined;
+  [key: string]:
+    | { open: boolean; url?: string; config?: FormConfig | null }
+    | undefined;
 };
 
 const Execution = ({
@@ -127,7 +131,9 @@ const Execution = ({
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
 
-  const handleMenuItemClick = (action: string | ((row: { id: string; [key: string]: unknown }) => void)) => {
+  const handleMenuItemClick = (
+    action: string | ((row: { id: string; [key: string]: unknown }) => void)
+  ) => {
     if (typeof action === "function") {
       action(row);
     } else {
@@ -220,7 +226,9 @@ const Execution = ({
           <div key={`dialog-${index}`}>
             {typeof DialogComponent === "function" ? (
               <DialogComponent
-                {...item.dialogProps}
+                {...(typeof item.dialogProps === "function"
+                  ? item.dialogProps(row)
+                  : item.dialogProps)}
                 open={dialogState.open}
                 onClose={() => handleCloseDialog(item.action as string)}
                 onSuccess={() => {
