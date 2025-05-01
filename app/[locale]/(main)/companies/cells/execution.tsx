@@ -232,7 +232,11 @@ const Execution = ({
                 open={dialogState.open}
                 onClose={() => handleCloseDialog(item.action as string)}
                 onSuccess={() => {
-                  if (item.dialogProps?.shouldReloadTable) {
+                  const _dialogProps =
+                    typeof item.dialogProps === "function"
+                      ? item.dialogProps(row)
+                      : item.dialogProps;
+                  if (_dialogProps?.shouldReloadTable) {
                     reloadTable();
                   }
                 }}
