@@ -6,9 +6,8 @@ import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
 import React from "react";
 import GearIcon from "@/public/icons/gear";
-import { useRouter } from "next/navigation";
-import { ROUTER } from "@/router";
-import {GetCompanyUserFormConfig} from "@/modules/form-builder/configs/companyUserFormConfig";
+import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
+import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 
 // Define types for the company data
 interface CompanyData {
@@ -19,10 +18,12 @@ interface CompanyData {
     role: 1 | 2 | 3; // Keys in rulesIcons
     status: number;
   }>;
+  users: { id: string }[];
 }
 
-interface UsersData {
+export interface UserTableRow {
   id: string;
+  logo:string;
   name: string;
   user_name: string;
   email: string;
@@ -38,7 +39,6 @@ interface UsersData {
 // Create a component that uses the translations
 export const UsersConfig = () => {
   const t = useTranslations();
-  const router = useRouter();
 
   return {
     url: `${baseURL}/company-users`,
@@ -49,7 +49,7 @@ export const UsersConfig = () => {
         label: "الاسم",
         sortable: true,
         searchable: true,
-        render: (_: unknown, row: UsersData) => (
+        render: (_: unknown, row: UserTableRow) => (
           <div className="flex items-center gap-2">
             <AvatarGroup fullName={row.name} alt={row.name} /> {row.name}
           </div>
@@ -63,12 +63,12 @@ export const UsersConfig = () => {
       {
         key: "phone",
         label: "رقم الجوال",
-        render: (_: unknown, row: UsersData) => {
+        render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
             <div className="line-clamp-3">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5" dir={'ltr'}>
+                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"}>
                   {company?.phone || ""}
                 </p>
               ))}
@@ -93,7 +93,7 @@ export const UsersConfig = () => {
       {
         key: "user-type",
         label: "نوع المستخدم",
-        render: (_: unknown, row: UsersData) => {
+        render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
             <div className="line-clamp-3 ">
@@ -189,7 +189,13 @@ export const UsersConfig = () => {
       {
         label: "اكمال الملف الشخصي",
         icon: <GearIcon className="w-4 h-4" />,
-        action: (row:UsersData) => router.push(`${ROUTER.USER_PROFILE}?id=${row.user_id}`),
+        action: "openDialog",
+        dialogComponent: ChooseUserCompany, // Your custom dialog component
+        dialogProps: (row: UserTableRow) => {
+          return {
+            user: row,
+          };
+        },
       },
     ],
     executionConfig: {
