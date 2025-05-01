@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import FormFieldSet from "./tabs/user-contract/tabs/components/FormFieldSet";
-import FieldSetSecondTitle from "./tabs/user-contract/tabs/components/FieldSetSecondTitle";
+import FormFieldSet from "../../../modules/user-profile/components/tabs/user-contract/tabs/components/FormFieldSet";
+import FieldSetSecondTitle from "../../../modules/user-profile/components/tabs/user-contract/tabs/components/FieldSetSecondTitle";
 import { DropdownItemT } from "@/components/shared/IconBtnDropdown";
+import { TabTemplateLoading } from "./TabTemplateLoading";
 
 type PropsT = {
   title: string;
+  loading?: boolean;
   editMode: React.ReactNode;
   reviewMode: React.ReactNode;
   onChangeMode?: () => void;
@@ -16,7 +18,14 @@ type PropsT = {
 
 export default function TabTemplate(props: PropsT) {
   // declare and define helper state and variables
-  const { title, reviewMode, editMode, onChangeMode, settingsBtn } = props;
+  const {
+    title,
+    reviewMode,
+    editMode,
+    onChangeMode,
+    settingsBtn,
+    loading = false,
+  } = props;
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
   // handle side effects
@@ -40,7 +49,13 @@ export default function TabTemplate(props: PropsT) {
         />
       }
     >
-      {mode === "Preview" ? reviewMode : editMode}
+      {loading ? (
+        <TabTemplateLoading />
+      ) : mode === "Preview" ? (
+        reviewMode
+      ) : (
+        editMode
+      )}
     </FormFieldSet>
   );
 }

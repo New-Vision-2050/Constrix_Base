@@ -3,12 +3,17 @@ import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import SingleExperience from "./single-experience";
 import { Experience } from "@/modules/user-profile/types/experience";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
+import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
 
 export default function ExperiencesList() {
-  const { userExperiences } = useUserAcademicTabsCxt();
+  const { userExperiences, userExperiencesLoading } = useUserAcademicTabsCxt();
 
   // handle there is no data found
-  if (userExperiences && userExperiences.length === 0)
+  if (
+    !userExperiencesLoading &&
+    userExperiences &&
+    userExperiences.length === 0
+  )
     return (
       <NoDataFounded
         title="لا يوجد بيانات"
@@ -18,10 +23,16 @@ export default function ExperiencesList() {
 
   // render data
   return (
-    <RegularList<Experience, "experience">
-      sourceName="experience"
-      items={userExperiences ?? []}
-      ItemComponent={SingleExperience}
-    />
+    <>
+      {userExperiencesLoading ? (
+        <TabTemplateListLoading />
+      ) : (
+        <RegularList<Experience, "experience">
+          sourceName="experience"
+          items={userExperiences ?? []}
+          ItemComponent={SingleExperience}
+        />
+      )}
+    </>
   );
 }

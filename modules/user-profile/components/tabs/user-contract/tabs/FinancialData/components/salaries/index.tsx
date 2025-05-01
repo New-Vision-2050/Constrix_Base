@@ -2,11 +2,11 @@ import SalaryPreviewMode from "./SalaryPreviewMode";
 import SalaryEditMode from "./SalaryEditMode";
 import { Salary } from "@/modules/user-profile/types/Salary";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 
 export default function Salaries() {
   // declare and define helper state and variables
-  const { userSalary } = useFinancialDataCxt();
+  const { userSalary, userSalaryLoading } = useFinancialDataCxt();
 
   // return component ui
   return (
@@ -15,6 +15,7 @@ export default function Salaries() {
 
       <TabTemplate
         title={"الراتب الاساسي"}
+        loading={userSalaryLoading}
         reviewMode={<SalaryPreviewMode salary={userSalary as Salary} />}
         editMode={<SalaryEditMode />}
         settingsBtn={{

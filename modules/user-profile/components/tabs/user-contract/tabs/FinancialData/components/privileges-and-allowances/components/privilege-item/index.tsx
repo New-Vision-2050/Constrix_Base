@@ -1,4 +1,4 @@
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import PrivilegeItemEditMode from "./PrivilegeItemEditMode";
 import PrivilegeItemPreviewMode from "./PrivilegeItemPreviewMode";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";

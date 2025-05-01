@@ -1,9 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { Relative } from "@/modules/user-profile/types/relative";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 import { MaritalStatusList } from "../../marital-status-enum";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   relative?: Relative;
@@ -80,21 +81,21 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
         formMode === "Create"
           ? "/user_relatives"
           : `/user_relatives/${relative?.id}`;
+      const method = formMode === "Create" ? "POST" : `PUT`;
 
       const body = {
         ...formData,
         user_id: user?.user_id,
       };
 
-      const response = await (formMode === "Edit"
-        ? apiClient.put
-        : apiClient.post)(url, body);
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(
+        body,
+        maritalStatusRelativesFormConfig,
+        {
+          url: url,
+          method: method,
+        }
+      );
     },
   };
   return maritalStatusRelativesFormConfig;

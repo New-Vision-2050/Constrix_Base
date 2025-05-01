@@ -22,18 +22,22 @@ import { UserCVFilesT } from "../../../api/get-user-cv";
 // declare context types
 type UserAcademicTabsCxtType = {
   // user qualifications
+  userQualificationsLoading: boolean;
   userQualifications: Qualification[] | undefined;
   handleRefreshUserQualifications: () => void;
   // user brief information
   userBrief: BriefInfoT | undefined;
   handleRefetchUserBrief: () => void;
   // user experiences
+  userExperiencesLoading: boolean;
   userExperiences: Experience[] | undefined;
   handleRefetchUserExperiences: () => void;
   // user courses
+  userCoursesLoading: boolean;
   userCourses: Course[] | undefined;
   handleRefetchUserCourses: () => void;
   // user certifications
+  userCertificationsLoading: boolean;
   userCertifications: Certification[] | undefined;
   handleRefetchUserCertifications: () => void;
   // user cv
@@ -64,8 +68,11 @@ export const UserAcademicTabsCxtProvider = ({
   // ** declare and define component state and variables
   const { user } = useUserProfileCxt();
   // user qualifications
-  const { data: userQualifications, refetch: refreshUserQualifications } =
-    useUserQualifications(user?.user_id ?? "");
+  const {
+    data: userQualifications,
+    isLoading: userQualificationsLoading,
+    refetch: refreshUserQualifications,
+  } = useUserQualifications(user?.user_id ?? "");
 
   // user brief
   const { data: userBrief, refetch: refetchUserBrief } = useUserBriefData(
@@ -73,17 +80,25 @@ export const UserAcademicTabsCxtProvider = ({
   );
 
   // user experiences
-  const { data: userExperiences, refetch: refetchUserExperiences } =
-    useUserExperiences(user?.user_id ?? "");
+  const {
+    data: userExperiences,
+    isLoading: userExperiencesLoading,
+    refetch: refetchUserExperiences,
+  } = useUserExperiences(user?.user_id ?? "");
 
   // user courses
-  const { data: userCourses, refetch: refetchUserCourses } = useUserCoursesData(
-    user?.user_id ?? ""
-  );
+  const {
+    data: userCourses,
+    isLoading: userCoursesLoading,
+    refetch: refetchUserCourses,
+  } = useUserCoursesData(user?.user_id ?? "");
 
   // user certifications
-  const { data: userCertifications, refetch: refetchUserCertifications } =
-    useUserCertificationsData(user?.user_id ?? "");
+  const {
+    data: userCertifications,
+    isLoading: userCertificationsLoading,
+    refetch: refetchUserCertifications,
+  } = useUserCertificationsData(user?.user_id ?? "");
 
   // user cv
   const { data: userCV, refetch: refetchUserCV } = useUserCVData(
@@ -123,18 +138,22 @@ export const UserAcademicTabsCxtProvider = ({
       value={{
         // user qualifications
         userQualifications,
+        userQualificationsLoading,
         handleRefreshUserQualifications,
         // user brief information
         userBrief,
         handleRefetchUserBrief,
         // user experiences
         userExperiences,
+        userExperiencesLoading,
         handleRefetchUserExperiences,
         // user courses
         userCourses,
+        userCoursesLoading,
         handleRefetchUserCourses,
         // user certifications
         userCertifications,
+        userCertificationsLoading,
         handleRefetchUserCertifications,
         // user cv
         userCV,

@@ -1,11 +1,13 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const PassportDataFormConfig = () => {
-  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
 
   const PassportFormConfig: FormConfig = {
@@ -101,15 +103,10 @@ export const PassportDataFormConfig = () => {
         passport_end_date: formatDate(endDate),
       };
 
-      const response = await apiClient.post(
-        `/company-users/identity-data/${user?.user_id}`,
-        serialize(body)
-      );
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), PassportFormConfig, {
+        url: `/company-users/identity-data/${user?.user_id}`,
+        method: "POST",
+      });
     },
   };
   return PassportFormConfig;

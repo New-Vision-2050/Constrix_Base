@@ -1,7 +1,7 @@
 import MaritalStatusRelativesSectionPreviewMode from "./preview-mode";
 import MaritalStatusRelativesSectionEditMode from "./edit-mode";
 import { Relative } from "@/modules/user-profile/types/relative";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { apiClient } from "@/config/axios-config";
 
@@ -10,7 +10,8 @@ type PropsT = {
 };
 export default function RelativeData({ relative }: PropsT) {
   // declare and define component state and vars
-  const { handleRefetchUserRelativesData } = useConnectionDataCxt();
+  const { handleRefetchUserRelativesData, userContactDataLoading } =
+    useConnectionDataCxt();
 
   // declare and define component methods
   const handleDeleteRelative = async () => {
@@ -28,6 +29,7 @@ export default function RelativeData({ relative }: PropsT) {
     <>
       <TabTemplate
         title={"الحالة الاجتماعية"}
+        loading={userContactDataLoading}
         reviewMode={
           <MaritalStatusRelativesSectionPreviewMode relative={relative} />
         }

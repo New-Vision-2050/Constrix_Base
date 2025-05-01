@@ -1,15 +1,17 @@
 import UserProfilePersonalDataEditForm from "./edit-mode";
 import UserProfilePersonalDataReview from "./preview-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 
 export default function PersonalDataSectionPersonalForm() {
   // declare and define component state and vars
-  const { handleRefreshPersonalData } = usePersonalDataTabCxt();
+  const { userPersonalDataLoading, handleRefreshPersonalData } =
+    usePersonalDataTabCxt();
 
   return (
     <TabTemplate
       title="البيانات الشخصية"
+      loading={userPersonalDataLoading}
       reviewMode={<UserProfilePersonalDataReview />}
       editMode={<UserProfilePersonalDataEditForm />}
       onChangeMode={() => {

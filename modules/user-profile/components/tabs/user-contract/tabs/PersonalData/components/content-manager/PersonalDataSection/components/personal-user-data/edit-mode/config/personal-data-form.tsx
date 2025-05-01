@@ -1,8 +1,12 @@
-import { FormConfig, useFormStore } from '@/modules/form-builder'
-import { apiClient, baseURL } from "@/config/axios-config";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
+import { baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
-import { convertHijriDate, getHijriDate } from '@/modules/table/components/ui/HijriCalendar'
+import {
+  convertHijriDate,
+  getHijriDate,
+} from "@/modules/table/components/ui/HijriCalendar";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const PersonalDataFormConfig = () => {
   const { user } = useUserProfileCxt();
@@ -12,8 +16,6 @@ export const PersonalDataFormConfig = () => {
     handleRefetchProfileData,
     handleRefetchDataStatus,
   } = useUserProfileCxt();
-
-
 
   const PersonalFormConfig: FormConfig = {
     formId: `personal-data-form`,
@@ -77,10 +79,14 @@ export const PersonalDataFormConfig = () => {
             label: "تاريخ الميلاد",
             type: "date",
             placeholder: "Birthdate Gregorian",
-            onChange: (newValue, values)=>{
+            onChange: (newValue, values) => {
               useFormStore
                 ?.getState()
-                .setValue('personal-data-form', 'birthdate_hijri', getHijriDate(newValue))
+                .setValue(
+                  "personal-data-form",
+                  "birthdate_hijri",
+                  getHijriDate(newValue)
+                );
             },
             validation: [
               {
@@ -95,10 +101,14 @@ export const PersonalDataFormConfig = () => {
             type: "date",
             isHijri: true,
             placeholder: "Birthdate Hijri",
-            onChange: (newValue, values)=>{
+            onChange: (newValue, values) => {
               useFormStore
                 ?.getState()
-                .setValue('personal-data-form', 'birthdate_gregorian', convertHijriDate(newValue))
+                .setValue(
+                  "personal-data-form",
+                  "birthdate_gregorian",
+                  convertHijriDate(newValue)
+                );
             },
             validation: [
               {
@@ -155,15 +165,11 @@ export const PersonalDataFormConfig = () => {
         ...formData,
         is_default: formData?.is_default ? 1 : 0,
       };
-      const response = await apiClient.put(
-        `/company-users/data-info/${user?.user_id}`,
-        body
-      );
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+
+      return await defaultSubmitHandler(body, PersonalFormConfig, {
+        url: `/company-users/data-info/${user?.user_id}`,
+        method: "PUT",
+      });
     },
   };
   return PersonalFormConfig;

@@ -12,7 +12,8 @@ type PropsT = {
 };
 
 export const ContractDataFormConfig = ({ contract }: PropsT) => {
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { user, handleRefetchDataStatus, handleRefetchWidgetData } =
+    useUserProfileCxt();
   const { handleRefetchContractData, timeUnits } =
     useFunctionalContractualCxt();
 
@@ -354,6 +355,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      handleRefetchWidgetData();
       handleRefetchDataStatus();
       handleRefetchContractData();
     },
@@ -367,6 +369,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         start_date: formatDateYYYYMMDD(startDate),
         commencement_date: formatDateYYYYMMDD(commencementDate),
       };
+
       return await defaultSubmitHandler(
         serialize(body),
         contractDataFormConfig

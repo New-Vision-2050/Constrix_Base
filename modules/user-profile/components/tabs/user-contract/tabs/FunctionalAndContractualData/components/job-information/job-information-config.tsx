@@ -1,8 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useFunctionalContractualCxt } from "../../context";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const JobFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -178,18 +179,10 @@ export const JobFormConfig = () => {
         user_id: user?.user_id,
       };
 
-      console.log("asd.asd.asd.body", body);
-
-      const response = await apiClient.post(
-        `/user_professional_data`,
-        serialize(body)
-      );
-
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), jobFormConfig, {
+        url: `/user_professional_data`,
+        method: "POST",
+      });
     },
   };
   return jobFormConfig;

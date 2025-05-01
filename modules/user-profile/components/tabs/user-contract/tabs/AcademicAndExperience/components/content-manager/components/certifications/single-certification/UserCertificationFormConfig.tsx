@@ -1,9 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Certification } from "@/modules/user-profile/types/Certification";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   onSuccess?: () => void;
@@ -155,15 +156,13 @@ export const UserCertificationFormConfig = ({
         formType === "Edit"
           ? `professional_certificates/${certification?.id}`
           : `professional_certificates`;
-      const _apiClient = formType === "Edit" ? apiClient.put : apiClient.post;
 
-      const response = await _apiClient(url, body);
+      const method = formType === "Edit" ? "PUT" : "POST";
 
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(body, userCertificationFormConfig, {
+        url: url,
+        method: method,
+      });
     },
   };
   return userCertificationFormConfig;

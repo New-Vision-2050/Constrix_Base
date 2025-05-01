@@ -1,12 +1,14 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const IqamaDataFormConfig = () => {
   const { user } = useUserProfileCxt();
-  const { userIdentityData,handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { userIdentityData, handleRefreshIdentityData } =
+    usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
 
   const iqamaDataFormConfig: FormConfig = {
@@ -30,20 +32,20 @@ export const IqamaDataFormConfig = () => {
             name: "entry_number_start_date",
             label: "تاريخ الاصدار",
             type: "date",
-              maxDate: {
-                  formId: `iqama-entry-data-form`,
-                  field: 'entry_number_end_date'
-              },
+            maxDate: {
+              formId: `iqama-entry-data-form`,
+              field: "entry_number_end_date",
+            },
             placeholder: "تاريخ الاصدار",
           },
           {
             name: "entry_number_end_date",
             label: "تاريخ الانتهاء",
             type: "date",
-              minDate: {
-                  formId: `iqama-entry-data-form`,
-                  field: 'entry_number_start_date'
-              },
+            minDate: {
+              formId: `iqama-entry-data-form`,
+              field: "entry_number_start_date",
+            },
             placeholder: "تاريخ الانتهاء",
           },
           {
@@ -92,15 +94,10 @@ export const IqamaDataFormConfig = () => {
         entry_number_end_date: formatDate(endDate),
       };
 
-      const response = await apiClient.post(
-        `/company-users/identity-data/${user?.user_id}`,
-        serialize(body)
-      );
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      return await defaultSubmitHandler(serialize(body), iqamaDataFormConfig, {
+        url: `/company-users/identity-data/${user?.user_id}`,
+        method: "POST",
+      });
     },
   };
   return iqamaDataFormConfig;

@@ -1,9 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Course } from "@/modules/user-profile/types/Course";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   course?: Course;
@@ -149,14 +149,13 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
         formType === "Create"
           ? `/user_educational_courses`
           : `/user_educational_courses/${course?.id}`;
-      const _apiClient = formType === "Create" ? apiClient.post : apiClient.put;
 
-      const response = await _apiClient(url, body);
-      return {
-        success: true,
-        message: response.data?.message || "Form submitted successfully",
-        data: response.data || {},
-      };
+      const method = formType === "Edit" ? "PUT" : "POST";
+
+      return await defaultSubmitHandler(body, singleCourseFormConfig, {
+        url: url,
+        method: method,
+      });
     },
   };
   return singleCourseFormConfig;
