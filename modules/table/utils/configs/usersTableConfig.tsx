@@ -14,6 +14,7 @@ interface CompanyData {
   id: string;
   name: string;
   phone: string;
+  logo: string;
   roles: Array<{
     role: 1 | 2 | 3; // Keys in rulesIcons
     status: number;
@@ -23,7 +24,7 @@ interface CompanyData {
 
 export interface UserTableRow {
   id: string;
-  logo:string;
+  logo: string;
   name: string;
   user_name: string;
   email: string;

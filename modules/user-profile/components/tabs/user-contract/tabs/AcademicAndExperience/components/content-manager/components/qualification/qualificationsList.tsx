@@ -2,14 +2,17 @@ import RegularList from "@/components/shared/RegularList";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import { Qualification } from "@/modules/user-profile/types/qualification";
 import SingleQualificationData from "./SingleQualificationData";
+import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
+import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
 
 type PropsT = {
   items: Qualification[] | undefined;
 };
 
 export default function QualificationsList({ items }: PropsT) {
+  const { userQualificationsLoading } = useUserAcademicTabsCxt();
   // handle there is no data found
-  if (items && items.length === 0)
+  if (!userQualificationsLoading && items && items.length === 0)
     return (
       <NoDataFounded
         title="لا يوجد بيانات"
@@ -19,10 +22,16 @@ export default function QualificationsList({ items }: PropsT) {
 
   // render data
   return (
-    <RegularList<Qualification, "qualification">
-      sourceName="qualification"
-      ItemComponent={SingleQualificationData}
-      items={items ?? []}
-    />
+    <>
+      {userQualificationsLoading ? (
+        <TabTemplateListLoading />
+      ) : (
+        <RegularList<Qualification, "qualification">
+          sourceName="qualification"
+          ItemComponent={SingleQualificationData}
+          items={items ?? []}
+        />
+      )}
+    </>
   );
 }

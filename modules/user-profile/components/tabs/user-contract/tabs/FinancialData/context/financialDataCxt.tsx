@@ -22,14 +22,16 @@ type FinancialDataCxtType = {
   activeSection: UserProfileNestedTab | undefined;
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;
   // user salary
+  userSalaryLoading: boolean;
   userSalary: Salary | undefined;
   handleRefreshSalaryData: () => void;
   // privileges data
   privileges: Privilege[] | undefined;
   handleRefreshPrivileges: () => void;
   // added privileges
+  addedPrivilegesListLoading: boolean;
   addedPrivilegesList: UserPrivilege[] | undefined;
-  handleRefreshPrivilegesList: () => void
+  handleRefreshPrivilegesList: () => void;
 };
 
 export const FinancialDataCxt = createContext<FinancialDataCxtType>(
@@ -59,16 +61,21 @@ export const FinancialDataCxtProvider = ({
   );
 
   // user salary data
-  const { data: userSalary, refetch: refetchSalaryData } = useUserSalaryData(
-    user?.user_id ?? ""
-  );
+  const {
+    data: userSalary,
+    isLoading: userSalaryLoading,
+    refetch: refetchSalaryData,
+  } = useUserSalaryData(user?.user_id ?? "");
 
   // privileges data
   const { data: privileges, refetch: refreshPrivileges } = usePrivilegesData();
 
   // privileges list
-  const { data: addedPrivilegesList, refetch: refreshPrivilegesList } =
-    usePrivileges(user?.user_id ?? "");
+  const {
+    data: addedPrivilegesList,
+    isLoading: addedPrivilegesListLoading,
+    refetch: refreshPrivilegesList,
+  } = usePrivileges(user?.user_id ?? "");
 
   // ** declare and define component helper methods
   const handleRefreshPrivilegesList = () => {
@@ -94,13 +101,15 @@ export const FinancialDataCxtProvider = ({
         handleChangeActiveSection,
         // user salary
         userSalary,
+        userSalaryLoading,
         handleRefreshSalaryData,
         // privileges data
         privileges,
         handleRefreshPrivileges,
         // added privileges
         addedPrivilegesList,
-        handleRefreshPrivilegesList
+        handleRefreshPrivilegesList,
+        addedPrivilegesListLoading,
       }}
     >
       {children}

@@ -1,15 +1,17 @@
 import UserProfileConnectionDataEditForm from "./edit-mode";
 import UserProfileIdentityDataReview from "./preview-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 
 export default function IdentityDataSectionPersonalForm() {
   // declare and define component state and vars
-  const { handleRefreshIdentityData } = usePersonalDataTabCxt();
+  const { handleRefreshIdentityData, userIdentityDataLoading } =
+    usePersonalDataTabCxt();
 
   return (
     <TabTemplate
       title={"البيانات الهوية"}
+      loading={userIdentityDataLoading}
       reviewMode={<UserProfileIdentityDataReview />}
       editMode={<UserProfileConnectionDataEditForm />}
       onChangeMode={() => {

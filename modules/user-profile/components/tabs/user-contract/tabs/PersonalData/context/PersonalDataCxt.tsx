@@ -23,14 +23,17 @@ type PersonalDataTabCxtType = {
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;
 
   // user -personal data
+  userPersonalDataLoading: boolean;
   userPersonalData: PersonalUserDataSectionT | undefined;
   handleRefreshPersonalData: () => void;
 
   // user - connection data
+  userConnectionDataLoading: boolean;
   userConnectionData: UserConnectionInformationT | undefined;
   handleRefreshConnectionData: () => void;
 
   // user - identity data
+  userIdentityDataLoading: boolean;
   userIdentityData: UserIdentityInformationT | undefined;
   handleRefreshIdentityData: () => void;
 };
@@ -60,12 +63,21 @@ export const PersonalDataTabCxtProvider = ({
   const { user: _user } = useUserProfileCxt();
   const [user, setUser] = useState<UserProfileData>();
 
-  const { data: userPersonalData, refetch: refreshPersonalData } =
-    useUserPersonalData(user?.user_id);
-  const { data: userConnectionData, refetch: refreshConnectionData } =
-    useUserConnectionData(user?.user_id);
-  const { data: userIdentityData, refetch: refetchIdentityData } =
-    useUserIdentityData(user?.user_id);
+  const {
+    data: userPersonalData,
+    isLoading: userPersonalDataLoading,
+    refetch: refreshPersonalData,
+  } = useUserPersonalData(user?.user_id);
+  const {
+    data: userConnectionData,
+    isLoading: userConnectionDataLoading,
+    refetch: refreshConnectionData,
+  } = useUserConnectionData(user?.user_id);
+  const {
+    data: userIdentityData,
+    isLoading: userIdentityDataLoading,
+    refetch: refetchIdentityData,
+  } = useUserIdentityData(user?.user_id);
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
     PersonalDataSections(t)[0]
   );
@@ -100,12 +112,15 @@ export const PersonalDataTabCxtProvider = ({
         handleChangeActiveSection,
         // user -personal data
         userPersonalData,
+        userPersonalDataLoading,
         handleRefreshPersonalData,
         // user - connection data
         userConnectionData,
+        userConnectionDataLoading,
         handleRefreshConnectionData,
         // user - identity data
         userIdentityData,
+        userIdentityDataLoading,
         handleRefreshIdentityData,
       }}
     >

@@ -15,12 +15,15 @@ import { Relative } from "@/modules/user-profile/types/relative";
 // declare context types
 type ConnectionDataCxtType = {
   //contact data
+  userContactDataLoading: boolean;
   userContactData: ResponseContactInfoDataT | undefined;
   handleRefetchUserContactData: () => void;
   // social data
+  userSocialDataLoading: boolean;
   userSocialData: ResponseSocialDataT | undefined;
   handleRefetchUserSocialData: () => void;
   // relatives data
+  userRelativesDataLoading: boolean;
   userRelativesData: Relative[] | undefined;
   handleRefetchUserRelativesData: () => void;
 };
@@ -47,14 +50,23 @@ export const ConnectionDataCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const { user } = useUserProfileCxt();
-  const { data: userSocialData, refetch: refetchUserSocialData } =
-    useUserSocialData(user?.user_id ?? "");
+  const {
+    data: userSocialData,
+    isLoading: userSocialDataLoading,
+    refetch: refetchUserSocialData,
+  } = useUserSocialData(user?.user_id ?? "");
 
-  const { data: userContactData, refetch: refetchUserContactData } =
-    useUserContactInfoData(user?.user_id ?? "");
+  const {
+    data: userContactData,
+    isLoading: userContactDataLoading,
+    refetch: refetchUserContactData,
+  } = useUserContactInfoData(user?.user_id ?? "");
 
-  const { data: userRelativesData, refetch: refetchUserRelativesData } =
-    useUserRelativesData(user?.user_id ?? "");
+  const {
+    data: userRelativesData,
+    isLoading: userRelativesDataLoading,
+    refetch: refetchUserRelativesData,
+  } = useUserRelativesData(user?.user_id ?? "");
 
   // ** handle side effects
 
@@ -77,12 +89,15 @@ export const ConnectionDataCxtProvider = ({
       value={{
         // contact data
         userContactData,
+        userContactDataLoading,
         handleRefetchUserContactData,
         // social
         userSocialData,
+        userSocialDataLoading,
         handleRefetchUserSocialData,
         // relatives data
         userRelativesData,
+        userRelativesDataLoading,
         handleRefetchUserRelativesData,
       }}
     >

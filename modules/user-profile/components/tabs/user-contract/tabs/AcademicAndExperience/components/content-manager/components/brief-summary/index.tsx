@@ -1,7 +1,7 @@
 import ProfileBriefSummaryEdit from "./ProfileBriefSummaryEdit";
 import ProfileBriefSummaryPreview from "./ProfileBriefSummaryPreview";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
-import TabTemplate from "@/modules/user-profile/components/TabTemplate";
+import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 
 export default function ProfileBriefSummary() {
   // declare and define component state and vars

@@ -5,8 +5,6 @@ export default function UserProfilePassportDataReview() {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
 
-  console.log("userIdentityData", userIdentityData);
-
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}

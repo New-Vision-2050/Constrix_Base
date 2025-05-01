@@ -22,12 +22,15 @@ type FunctionalContractualCxtType = {
   activeSection: UserProfileNestedTab | undefined;
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;
   // job offers data
+  userJobOffersDataLoading: boolean;
   userJobOffersData: JobOffer | undefined;
   handleRefetchJobOffer: () => void;
   // user contract data
+  userContractDataLoading: boolean;
   userContractData: Contract | undefined;
   handleRefetchContractData: () => void;
   // professional data
+  professionalDataLoading: boolean;
   professionalData: ProfessionalT | undefined;
   handleRefetchProfessionalData: () => void;
   // time units
@@ -61,15 +64,24 @@ export const FunctionalContractualCxtProvider = ({
     FunctionalContractualList[0]
   );
   // user job offers data
-  const { data: userJobOffersData, refetch: refetchJobOffer } =
-    useUserJobOffersData(user?.user_id ?? "");
+  const {
+    data: userJobOffersData,
+    isLoading: userJobOffersDataLoading,
+    refetch: refetchJobOffer,
+  } = useUserJobOffersData(user?.user_id ?? "");
 
   // user contract data
-  const { data: userContractData, refetch: refetchContractData } =
-    useUserContractData(user?.user_id ?? "");
+  const {
+    data: userContractData,
+    isLoading: userContractDataLoading,
+    refetch: refetchContractData,
+  } = useUserContractData(user?.user_id ?? "");
 
-  const { data: professionalData, refetch: refetchProfessionalData } =
-    useProfessionalData(user?.user_id ?? "");
+  const {
+    data: professionalData,
+    isLoading: professionalDataLoading,
+    refetch: refetchProfessionalData,
+  } = useProfessionalData(user?.user_id ?? "");
 
   const { data: timeUnits } = useTimeUnitsData();
 
@@ -96,12 +108,15 @@ export const FunctionalContractualCxtProvider = ({
         handleChangeActiveSection,
         // job offer
         userJobOffersData,
+        userJobOffersDataLoading,
         handleRefetchJobOffer,
         // contract data
         userContractData,
+        userContractDataLoading,
         handleRefetchContractData,
         // professional data
         professionalData,
+        professionalDataLoading,
         handleRefetchProfessionalData,
         // time unit
         timeUnits,
