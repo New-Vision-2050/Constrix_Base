@@ -48,7 +48,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { options, loading, error, dataFetched } = useDropdownSearch({
+  const { options, loading, error, dataFetched, fetchOptions, hasMore } = useDropdownSearch({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
@@ -126,6 +126,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     }
   }, [open]);
 
+
   return (
     <div>
       <Popover
@@ -199,6 +200,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               onWheel={(e) => e.stopPropagation()}
               ref={listRef}
               className="max-h-[200px] overflow-auto"
+              onScroll={(event)=> {
+                const target = event.target as HTMLElement;
+                let total = target.scrollTop + target.clientHeight;
+                let content = target.querySelector(`[id='inner-list']`) as HTMLElement | null;
+                if (hasMore && !loading && total + 65 >= (content?.clientHeight || 0)) {
+                  fetchOptions(true)
+                }
+              }}
             >
               <CommandEmpty>
                 {loading ? (
@@ -216,10 +225,10 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   </div>
                 )}
               </CommandEmpty>
-              <CommandGroup>
-                {options.map((option) => (
+              <CommandGroup id={'inner-list'}>
+                {options.map((option, index) => (
                   <CommandItem
-                    key={option.value}
+                    key={index}
                     onSelect={() => {
                       if (isMulti) {
                         // For multi-select, toggle the selected value
