@@ -18,6 +18,8 @@ interface UseDropdownSearchResult {
   loading: boolean;
   error: string | null;
   dataFetched: boolean;
+  fetchOptions: (nextPage?: boolean) => void;
+  hasMore: boolean;
 }
 
 export const useDropdownSearch = ({
@@ -33,6 +35,8 @@ export const useDropdownSearch = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dataFetched, setDataFetched] = useState(false);
+  const currentPage = useRef(1);
+  const [hasMore, setHasMore] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
   const initialFetchDoneRef = useRef(false);
@@ -241,7 +245,7 @@ export const useDropdownSearch = ({
   }, [selectedValue, options, isMulti]);
 
   // Build the URL for the request
-  const buildSearchUrl = useCallback(() => {
+  const buildSearchUrl = useCallback((nextPage?:boolean) => {
     if (!dynamicConfig) return null;
 
     let url = dynamicConfig.url;
@@ -319,8 +323,13 @@ export const useDropdownSearch = ({
       const limitParam = dynamicConfig.limitParam || "per_page";
       const itemsPerPage = dynamicConfig.itemsPerPage || 10;
 
-      params.append(pageParam, "1");
+      params.append(pageParam, String(nextPage ? currentPage.current + 1 : 1) );
       params.append(limitParam, String(itemsPerPage));
+      if(nextPage){
+        currentPage.current++;
+      }else {
+        currentPage.current = 1
+      }
     }
 
     // Append params to URL
@@ -333,12 +342,12 @@ export const useDropdownSearch = ({
   }, [dynamicConfig, debouncedSearchTerm, dependencies]);
 
   // Function to fetch options from the API
-  const fetchOptions = useCallback(async () => {
+  const fetchOptions = useCallback(async (nextPage?: boolean) => {
     // Skip if we don't have dynamic config
     if (!dynamicConfig) return;
 
     // Skip if we have a dependsOn value but don't have the required dependencies
-    if (dynamicConfig.dependsOn) {
+    if (dynamicConfig.dependsOn && !nextPage) {
       if (typeof dynamicConfig.dependsOn === 'string') {
         // Case 1: String format (backward compatibility)
         if (!dependencies || !dependencies[dynamicConfig.dependsOn]) {
@@ -368,7 +377,7 @@ export const useDropdownSearch = ({
       }
     }
 
-    const url = buildSearchUrl();
+    const url = buildSearchUrl(nextPage);
     if (!url) return;
 
     // Abort any ongoing requests
@@ -413,6 +422,9 @@ export const useDropdownSearch = ({
         throw new Error("Expected array response from API");
       }
 
+      if (dynamicConfig.paginationEnabled) {
+        setHasMore(response.data.pagination.last_page > response.data.pagination.page)
+      }
       // Extract values and labels from the response
       const extractedOptions = data.map((item) => {
         // Handle primitive values (string, number)
@@ -470,7 +482,7 @@ export const useDropdownSearch = ({
       // Merge the backup options with the new options if they exist and there is a selected value
       let mergedOptions = validOptions;
 
-      if (selectedValue && backupOptions.length > 0) {
+      if (selectedValue && backupOptions.length > 0 && !nextPage) {
         // Add any backup options that aren't already in the results
         const optionsToAdd = backupOptions.filter(
           backupOpt => !mergedOptions.some(option => option.value === backupOpt.value)
@@ -481,7 +493,7 @@ export const useDropdownSearch = ({
         }
       }
 
-      setOptions(mergedOptions);
+      setOptions(prev => nextPage? [...prev, ...mergedOptions] : mergedOptions);
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
         console.log("Request aborted");
@@ -519,6 +531,8 @@ export const useDropdownSearch = ({
     loading,
     error,
     dataFetched,
+    fetchOptions,
+    hasMore
   };
 };
 
