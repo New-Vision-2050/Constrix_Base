@@ -3,6 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { Branch } from "@/modules/company-profile/types/company";
 import PickupMap from "../../official-data/national-address/pickup-map";
 import { useQueryClient } from "@tanstack/react-query";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const addNewBranchFormConfig = (branches: Branch[]) => {
   const queryClient = useQueryClient();
@@ -68,7 +69,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "country_id",
             label: "الدولة",
             placeholder: "الدولة",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -92,7 +93,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "state_id",
             label: "المحافظة",
             placeholder: "المحافظة",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -118,7 +119,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "city_id",
             label: "المدينة",
             placeholder: "المدينة",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -161,7 +162,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "manager_id",
             label: "مدير الفرع",
             placeholder: "اختر مدير الفرع",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -184,12 +185,12 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "phone",
             label: "رقم الجوال",
             type: "phone",
-            required:true,
+            required: true,
             validation: [
-            {
+              {
                 type: "phone",
                 message: "",
-            },
+              },
             ],
           },
           {
@@ -197,7 +198,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             label: "البريد الإلكتروني",
             type: "email",
             placeholder: "البريد الالكتروني",
-            required:true,
+            required: true,
             validation: [
               {
                 type: "required",
@@ -244,6 +245,11 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
+        url: `${baseURL}/management_hierarchies/create-branch`,
+      });
+    },
   };
   return addNewBranchFormConfig;
 };
