@@ -1,6 +1,7 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const LegalDataReqFormEditConfig = (
   companyLegalData: CompanyLegalData[],
@@ -82,18 +83,16 @@ export const LegalDataReqFormEditConfig = (
         registration_number: obj.registration_number,
       }));
 
-      await apiClient.post(
-        "companies/company-profile/legal-data/request",
+      return await defaultSubmitHandler(
         {
           data: obj,
         },
-        config
+        LegalDataReqFormEditConfig,
+        {
+          config,
+          url: `${baseURL}/companies/company-profile/legal-data/request`,
+        }
       );
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
     },
   };
   return LegalDataReqFormEditConfig;
