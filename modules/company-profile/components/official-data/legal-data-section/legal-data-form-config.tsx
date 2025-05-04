@@ -4,14 +4,17 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { serialize } from "object-to-formdata";
+import { useParams } from "next/navigation";
 
 export const LegalDataFormConfig = (
   companyLegalData: CompanyLegalData[],
   id?: string
 ) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const queryClient = useQueryClient();
   const LegalDataFormConfig: FormConfig = {
-    formId: `company-official-data-form-${id}`,
+    formId: `company-official-data-form-${id}-${company_id}`,
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -110,8 +113,6 @@ export const LegalDataFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       const obj = formData.data.map((obj: any) => ({
         start_date: obj.start_date,
         end_date: obj.end_date,
@@ -127,14 +128,19 @@ export const LegalDataFormConfig = (
       );
 
       return await defaultSubmitHandler(newFormData, LegalDataFormConfig, {
-        config,
+        config: {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        },
         url: `${baseURL}/companies/company-profile/legal-data/update`,
       });
     },
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", id],
+        queryKey: ["main-company-data", id, company_id],
       });
     },
   };
