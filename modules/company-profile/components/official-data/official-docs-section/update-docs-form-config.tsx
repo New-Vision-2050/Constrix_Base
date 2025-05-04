@@ -3,13 +3,15 @@ import { CompanyDocument } from "@/modules/company-profile/types/company";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import { serialize } from "object-to-formdata";
 
 export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
   const queryClient = useQueryClient();
 
   const updateDocsFormConfig: FormConfig = {
-    formId: `updateDocsFormConfig-${doc.id}-${id}`,
+    formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
     title: "تحديث مستند رسمي",
     laravelValidation: {
       enabled: true,
@@ -59,7 +61,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             type: "date",
             placeholder: "تاريخ الإصدار",
             maxDate: {
-              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "end_date",
             },
             validation: [
@@ -75,7 +77,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             type: "date",
             placeholder: "تاريخ الانتهاء",
             minDate: {
-              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
             },
             validation: [
@@ -91,11 +93,11 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             type: "date",
             placeholder: "تاريخ الاشعار",
             minDate: {
-              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
             },
             maxDate: {
-              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "end_date",
             },
             validation: [
@@ -148,8 +150,6 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       const pastFiles = doc.files;
       const serverFiles: number[] = formData.files
         .filter((file: any) => !(file instanceof File))
@@ -176,14 +176,19 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
       const newFormData = serialize(obj);
 
       return await defaultSubmitHandler(newFormData, updateDocsFormConfig, {
-        config,
+        config: {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        },
         url: `${baseURL}/companies/company-profile/official-document/update/${doc.id}`,
       });
     },
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", id],
+        queryKey: ["main-company-data", id, company_id],
       });
     },
   };
