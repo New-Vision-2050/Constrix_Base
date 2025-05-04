@@ -2,13 +2,16 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { officialData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const ReqOfficialDataEdit = (
   officialData: officialData,
   id?: string
 ) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const reqOfficialDataEdit: FormConfig = {
-    formId: `ReqOfficialDataEdit-${id}`,
+    formId: `ReqOfficialDataEdit-${id}-${company_id}`,
     title: "طلب تعديل البيانات الرسمية",
     laravelValidation: {
       enabled: true,
@@ -165,10 +168,13 @@ export const ReqOfficialDataEdit = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       return await defaultSubmitHandler(formData, reqOfficialDataEdit, {
-        config,
+        config: {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        },
         url: `${baseURL}/companies/company-profile/official-data/request`,
         method: "PUT",
       });
