@@ -4,16 +4,19 @@ import { Branch } from "@/modules/company-profile/types/company";
 import PickupMap from "../../official-data/national-address/pickup-map";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const addNewBranchFormConfig = (branches: Branch[]) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const queryClient = useQueryClient();
-  const formId = "add-new-branch-form";
+  const formId = `add-new-branch-form-${company_id}`;
   const addNewBranchFormConfig: FormConfig = {
     formId,
     apiUrl: `${baseURL}/management_hierarchies/create-branch`,
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data"],
+        queryKey: ["main-company-data", undefined, company_id],
       });
     },
     title: "اضافة فرع جديد",
@@ -248,6 +251,11 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     onSubmit: async (formData) => {
       return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
         url: `${baseURL}/management_hierarchies/create-branch`,
+        config: {
+          params: {
+            ...(company_id && { company_id }),
+          },
+        },
       });
     },
   };
