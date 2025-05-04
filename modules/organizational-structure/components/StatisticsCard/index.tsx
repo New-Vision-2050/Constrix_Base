@@ -4,10 +4,10 @@ import StatisticsCardHeader from "./StatisticsCardHeader";
 export type StatisticsCardInfo = { count?: string; description?: string };
 
 type PropsT = {
-  title?: string | number;
-  number?: string | number;
+  title?: string;
+  number?: string;
   icon?: JSX.Element;
-  description?: string | number;
+  description?: string;
   progressBarValue?: number;
   leftSideInfo?: StatisticsCardInfo;
   rightSideInfo?: StatisticsCardInfo;
