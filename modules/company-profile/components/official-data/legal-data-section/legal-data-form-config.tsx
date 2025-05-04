@@ -2,6 +2,8 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
 
 export const LegalDataFormConfig = (
   companyLegalData: CompanyLegalData[],
@@ -117,23 +119,23 @@ export const LegalDataFormConfig = (
         ...(typeof obj.file !== "string" && { file: obj.file }),
       }));
 
-      const response = await apiClient.postForm(
-        "companies/company-profile/legal-data/update",
+      const newFormData = serialize(
         { data: obj },
-        config
+        {
+          indices: true,
+        }
       );
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
+      return await defaultSubmitHandler(newFormData, LegalDataFormConfig, {
+        config,
+        url: `${baseURL}/companies/company-profile/legal-data/update`,
+      });
+    },
 
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id],
+      });
     },
   };
   return LegalDataFormConfig;
