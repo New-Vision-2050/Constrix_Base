@@ -4,12 +4,15 @@ import { CompanyAddress } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import PickupMap from "./pickup-map";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const NationalAddressFormConfig = (
   companyAddress: CompanyAddress,
   id?: string
 ) => {
-  const formId = `NationalAddressFormConfig-${id}`;
+  const { company_id }: { company_id: string | undefined } = useParams();
+
+  const formId = `NationalAddressFormConfig-${id}-${company_id}`;
   const queryClient = useQueryClient();
 
   const NationalAddressFormConfig: FormConfig = {
@@ -152,6 +155,7 @@ export const NationalAddressFormConfig = (
                 long={companyAddress.country_long}
                 containerClassName="col-span-2"
                 branchId={id}
+                companyId={company_id}
               />
             ),
           },
@@ -178,8 +182,6 @@ export const NationalAddressFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       const obj = {
         country_id: formData.country_id,
         state_id: formData.state_id,
@@ -192,7 +194,12 @@ export const NationalAddressFormConfig = (
       };
 
       return await defaultSubmitHandler(obj, NationalAddressFormConfig, {
-        config,
+        config: {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        },
         url: `${baseURL}/companies/company-profile/national-address/${companyAddress.id}`,
         method: "PUT",
       });
@@ -200,7 +207,7 @@ export const NationalAddressFormConfig = (
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", id],
+        queryKey: ["main-company-data", id, company_id],
       });
     },
   };
