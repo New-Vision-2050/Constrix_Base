@@ -57,6 +57,10 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             label: "تاريخ الإصدار",
             type: "date",
             placeholder: "تاريخ الإصدار",
+            maxDate: {
+              formId: `company-official-data-form-${id}`,
+              field: "end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -69,6 +73,10 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `company-official-data-form-${id}`,
+              field: "start_date",
+            },
             validation: [
               {
                 type: "required",
