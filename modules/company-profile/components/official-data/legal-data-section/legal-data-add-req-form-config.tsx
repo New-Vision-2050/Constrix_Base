@@ -2,6 +2,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const LegalDataAddReqFormEditConfig = (id?: string) => {
   const queryClient = useQueryClient();
@@ -115,22 +116,20 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
 
       const newFormData = serialize(obj);
 
-      const response = await apiClient.post(
-        "companies/company-profile/legal-data/create-legal-data",
+      return await defaultSubmitHandler(
         newFormData,
-        config
+        LegalDataAddReqFormEditConfig,
+        {
+          config,
+          url: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
+        }
       );
+    },
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
-      return {
-        success: true,
-        message: "dummy return",
-        data: response.data,
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id],
+      });
     },
   };
   return LegalDataAddReqFormEditConfig;
