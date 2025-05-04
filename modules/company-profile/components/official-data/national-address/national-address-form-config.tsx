@@ -3,6 +3,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyAddress } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import PickupMap from "./pickup-map";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const NationalAddressFormConfig = (
   companyAddress: CompanyAddress,
@@ -149,9 +150,8 @@ export const NationalAddressFormConfig = (
                 formId={formId}
                 lat={companyAddress.country_lat}
                 long={companyAddress.country_long}
-                containerClassName='col-span-2'
+                containerClassName="col-span-2"
                 branchId={id}
-                
               />
             ),
           },
@@ -191,23 +191,17 @@ export const NationalAddressFormConfig = (
         postal_code: formData.postal_code,
       };
 
-      const response = await apiClient.put(
-        `companies/company-profile/national-address/${companyAddress.id}`,
-        obj,
-        config
-      );
+      return await defaultSubmitHandler(obj, NationalAddressFormConfig, {
+        config,
+        url: `${baseURL}/companies/company-profile/national-address/${companyAddress.id}`,
+        method: "PUT",
+      });
+    },
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
-
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id],
+      });
     },
   };
   return NationalAddressFormConfig;
