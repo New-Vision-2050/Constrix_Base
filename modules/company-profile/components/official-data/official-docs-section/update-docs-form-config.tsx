@@ -1,7 +1,9 @@
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyDocument } from "@/modules/company-profile/types/company";
 import { FormConfig } from "@/modules/form-builder";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
+import { serialize } from "object-to-formdata";
 
 export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
   const queryClient = useQueryClient();
@@ -56,6 +58,10 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             label: "تاريخ الإصدار",
             type: "date",
             placeholder: "تاريخ الإصدار",
+            maxDate: {
+              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              field: "end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -68,6 +74,10 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              field: "start_date",
+            },
             validation: [
               {
                 type: "required",
@@ -80,6 +90,14 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             label: "تاريخ الاشعار",
             type: "date",
             placeholder: "تاريخ الاشعار",
+            minDate: {
+              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              field: "start_date",
+            },
+            maxDate: {
+              formId: `updateDocsFormConfig-${doc.id}-${id}`,
+              field: "end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -155,23 +173,18 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
         document_type_id: formData.document_type_id,
       };
 
-      const response = await apiClient.postForm(
-        `companies/company-profile/official-document/update/${doc.id}`,
-        obj,
-        config
-      );
+      const newFormData = serialize(obj);
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
+      return await defaultSubmitHandler(newFormData, updateDocsFormConfig, {
+        config,
+        url: `${baseURL}/companies/company-profile/official-document/update/${doc.id}`,
+      });
+    },
 
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id],
+      });
     },
   };
   return updateDocsFormConfig;
