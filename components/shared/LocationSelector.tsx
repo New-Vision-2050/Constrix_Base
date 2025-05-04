@@ -41,6 +41,7 @@ interface LocationSelectorProps {
   };
   inGeneral?: boolean;
   branchId?: string;
+  companyId?: string;
 }
 
 interface payloadSuccess {
@@ -83,6 +84,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   initialLocation,
   inGeneral,
   branchId,
+  companyId,
 }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: LocationFormValues) => {
@@ -98,6 +100,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           params: {
             ...(inGeneral && { in_general: true }),
             ...(branchId && { branch_id: branchId }),
+            ...(companyId && { company_id: companyId }),
           },
         }
       );
