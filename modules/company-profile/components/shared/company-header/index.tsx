@@ -30,22 +30,20 @@ export const useCurrentCompany = () => {
 const CompanyHeader = () => {
   const { data, isPending, isSuccess } = useCurrentCompany();
 
-  const companyData = JSON.parse(getCookie("company-data") ?? "");
-
-  const logo = companyData?.logo || data?.payload?.logo || "";
-  const companyName = companyData?.name || data?.payload?.name || "";
   const createdAt = data?.payload?.created_at;
   const joinDate = createdAt
     ? new Date(createdAt).toLocaleDateString("en-GB")
     : "";
 
-  console.log({ logo });
   return (
     <div className="bg-sidebar rounded-lg w-full flex items-center justify-between p-4">
-      <CompanyLogo logo={logo} />
+      <CompanyLogo logo={data?.payload?.logo || ""} isPending={isPending} />
 
       <div className="flex flex-col text-right w-full pr-6">
-        <h2 className="text-2xl font-bold mb-4">{companyName}</h2>
+        {isPending && <Skeleton className="h-6 w-[150px] mb-4" />}
+        {isSuccess && (
+          <h2 className="text-2xl font-bold mb-4">{data?.payload?.name}</h2>
+        )}
         {isPending && <Skeleton className="h-6 w-[250px]" />}
         {isSuccess && (
           <div className="flex items-start gap-8 text-sm">
