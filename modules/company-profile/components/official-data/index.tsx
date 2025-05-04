@@ -9,15 +9,22 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
+import { useParams } from "next/navigation";
 
 const OfficialData = ({ id }: { id?: string }) => {
+  const { company_id } = useParams();
+
   const { data, isLoading } = useQuery({
-    queryKey: ["main-company-data", id],
+    queryKey: ["main-company-data", id, company_id],
     queryFn: async () => {
-      const config = id ? { params: { branch_id: id } } : undefined;
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
         "/companies/current-auth-company",
-        config
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        }
       );
 
       return response.data;
@@ -71,7 +78,7 @@ const OfficialData = ({ id }: { id?: string }) => {
 
           <SupportData generalManager={general_manager} />
 
-          <NationalAddress companyAddress={company_address} id={id}  />
+          <NationalAddress companyAddress={company_address} id={id} />
 
           <OfficialDocsSection
             companyOfficialDocuments={company_official_documents}

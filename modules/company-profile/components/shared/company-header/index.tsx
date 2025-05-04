@@ -7,13 +7,20 @@ import { CompanyData } from "@/modules/company-profile/types/company";
 import { apiClient } from "@/config/axios-config";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCookie } from "cookies-next/client";
+import { useParams } from "next/navigation";
 
 export const useCurrentCompany = () => {
+  const { company_id } = useParams();
   return useQuery({
-    queryKey: ["main-company-data", undefined],
+    queryKey: ["main-company-data", undefined, company_id],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
-        "/companies/current-auth-company"
+        "/companies/current-auth-company",
+        {
+          params: {
+            ...(company_id && { company_id }),
+          },
+        }
       );
       return response.data;
     },
@@ -24,8 +31,6 @@ const CompanyHeader = () => {
   const { data, isPending, isSuccess } = useCurrentCompany();
 
   const companyData = JSON.parse(getCookie("company-data") ?? "");
-
-  console.log("abdo", { data });
 
   const logo = companyData?.logo || data?.payload?.logo || "";
   const companyName = companyData?.name || data?.payload?.name || "";
