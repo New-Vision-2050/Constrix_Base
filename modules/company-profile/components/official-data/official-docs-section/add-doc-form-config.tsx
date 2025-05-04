@@ -1,6 +1,8 @@
 import { apiClient, baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
+import { serialize } from "object-to-formdata";
 
 export const AddDocFormConfig = (id?: string) => {
   const queryClient = useQueryClient();
@@ -8,6 +10,7 @@ export const AddDocFormConfig = (id?: string) => {
   const AddDocFormConfig: FormConfig = {
     formId: `AddDocFormConfig-${id}`,
     title: "اضافة مستند رسمي",
+    apiUrl: `${baseURL}/companies/company-profile/official-document`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -67,6 +70,10 @@ export const AddDocFormConfig = (id?: string) => {
             label: "تاريخ الإصدار",
             type: "date",
             placeholder: "تاريخ الإصدار",
+            maxDate: {
+              formId: `AddDocFormConfig-${id}`,
+              field: "end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -79,6 +86,10 @@ export const AddDocFormConfig = (id?: string) => {
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `AddDocFormConfig-${id}`,
+              field: "start_date",
+            },
             validation: [
               {
                 type: "required",
@@ -91,6 +102,14 @@ export const AddDocFormConfig = (id?: string) => {
             label: "تاريخ الاشعار",
             type: "date",
             placeholder: "تاريخ الاشعار",
+            minDate: {
+              formId: `AddDocFormConfig-${id}`,
+              field: "start_date",
+            },
+            maxDate: {
+              formId: `AddDocFormConfig-${id}`,
+              field: "end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -139,31 +158,25 @@ export const AddDocFormConfig = (id?: string) => {
     showBackButton: false,
     onSubmit: async (formData) => {
       const config = id ? { params: { branch_id: id } } : undefined;
+      const sendForm = serialize({
+        ...formData,
+        start_date: new Date(formData.start_date).toISOString().split("T")[0],
+        end_date: new Date(formData.end_date).toISOString().split("T")[0],
+        notification_date: new Date(formData.notification_date)
+          .toISOString()
+          .split("T")[0],
+      });
 
-      const response = await apiClient.postForm(
-        "companies/company-profile/official-document",
-        {
-          ...formData,
-          start_date: new Date(formData.start_date).toISOString().split("T")[0],
-          end_date: new Date(formData.end_date).toISOString().split("T")[0],
-          notification_date: new Date(formData.notification_date)
-            .toISOString()
-            .split("T")[0],
-        },
-        config
-      );
+      return await defaultSubmitHandler(sendForm, AddDocFormConfig, {
+        config,
+        url: `${baseURL}/companies/company-profile/official-document`,
+      });
+    },
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
-
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id],
+      });
     },
   };
   return AddDocFormConfig;
