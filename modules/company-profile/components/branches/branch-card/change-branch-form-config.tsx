@@ -2,6 +2,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { Branch } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const changeBranchForm = (branchId: string, branches: Branch[]) => {
   const queryClient = useQueryClient();
@@ -51,6 +52,12 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
     onSuccess: () => {
       queryClient.refetchQueries({
         queryKey: ["main-company-data"],
+      });
+    },
+
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(formData, changeBranchForm, {
+        url: `${baseURL}/management_hierarchies/make-branch-main/${branchId}`,
       });
     },
   };
