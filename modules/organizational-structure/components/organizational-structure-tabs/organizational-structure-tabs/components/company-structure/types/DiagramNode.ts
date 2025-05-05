@@ -1,4 +1,3 @@
-import { UserHierarchies } from "../../employees-structure/types/UserHierarchies";
 import { CustomBranchNodeT } from "./CustomBranchNode";
 
 type Position = {
@@ -10,5 +9,5 @@ export type DiagramNode = {
   id: string;
   type: string;
   position: Position;
-  data: CustomBranchNodeT & UserHierarchies;
+  data: CustomBranchNodeT;
 };

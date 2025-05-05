@@ -10,7 +10,6 @@ export type CustomBranchNodeT = {
   name?: string;
   type?: string;
   manager?: Manager;
-  deputy_manager?: Manager;
   department_count?: number;
   management_count?: number;
   branch_count?: number;

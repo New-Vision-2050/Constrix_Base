@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import GetBranchHierarchiesData from "../api/branch-tree-data";
 
-export default function useBranchHierarchiesData(type?: string) {
+export default function useBranchHierarchiesData() {
   return useQuery({
-    queryKey: [`branch-hierarchies-data`, type],
-    queryFn: () => GetBranchHierarchiesData(type),
+    queryKey: [`branch-hierarchies-data`],
+    queryFn: GetBranchHierarchiesData,
   });
 }

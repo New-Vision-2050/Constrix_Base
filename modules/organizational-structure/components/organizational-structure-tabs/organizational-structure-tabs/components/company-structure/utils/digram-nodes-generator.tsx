@@ -14,7 +14,7 @@ export const generateDiagramNodes = (
 ): DiagramNode[] => {
   // declare and define helper variables
   const spacingX = 300;
-  const spacingY = 200;
+  const spacingY = 150;
 
   data.forEach((item, i) => {
     const x = parentX + i * spacingX;
@@ -30,7 +30,6 @@ export const generateDiagramNodes = (
         name: item.name,
         type: item.type,
         manager: item.manager,
-        deputy_manager: item.deputy_manager,
         department_count: item.department_count,
         management_count: item.management_count,
         branch_count: item.branch_count,
