@@ -8,15 +8,23 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 import { apiClient } from "@/config/axios-config";
+import { useParams } from "next/navigation";
 
 const Branches = () => {
+  const { company_id } = useParams();
+
   const locale = useLocale();
   const isRtl = locale === "ar";
   const { data: cachedData, isLoading } = useQuery({
-    queryKey: ["main-company-data", undefined],
+    queryKey: ["main-company-data", undefined, company_id],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
-        "/companies/current-auth-company"
+        "/companies/current-auth-company",
+        {
+          params: {
+            ...(company_id && { company_id }),
+          },
+        }
       );
 
       return response.data;
@@ -66,7 +74,9 @@ const Branches = () => {
             >
               <div className="flex text-sm items-start text-start gap-2 grow">
                 <MapPin size={18} className="shrink-0" />
-                <p className="w-[60px] truncate whitespace-normal">{tab.label}</p>
+                <p className="w-[60px] truncate whitespace-normal">
+                  {tab.label}
+                </p>
               </div>
               <CircleCheck
                 size={18}

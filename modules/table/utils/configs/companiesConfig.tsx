@@ -133,10 +133,8 @@ export const CompaniesConfig = () => {
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
-        action: (row: CompanyData) =>{
-          console.log('rowrow',row)
-          router.push(`${ROUTER.COMPANY_PROFILE}?id=${row.id}`);
-        },
+        action: (row: CompanyData) =>
+          router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
       },
     ],
     executionConfig: {

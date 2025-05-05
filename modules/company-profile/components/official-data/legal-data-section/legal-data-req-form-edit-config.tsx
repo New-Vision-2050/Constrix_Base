@@ -1,14 +1,16 @@
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const LegalDataReqFormEditConfig = (
   companyLegalData: CompanyLegalData[],
   id?: string
 ) => {
-  console.log("id in LegalDataReqFormEditConfig : ", id);
+  const { company_id }: { company_id: string | undefined } = useParams();
   const LegalDataReqFormEditConfig: FormConfig = {
-    formId: `LegalDataReqFormEditConfig-${id}`,
+    formId: `LegalDataReqFormEditConfig-${id}-${company_id}`,
     title: "طلب تعديل البيان القانوني",
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
@@ -74,26 +76,27 @@ export const LegalDataReqFormEditConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       const obj = formData?.data.map((obj: any) => ({
         id: obj.id,
         registration_type_id: obj.registration_type_id,
         registration_number: obj.registration_number,
       }));
 
-      await apiClient.post(
-        "companies/company-profile/legal-data/request",
+      return await defaultSubmitHandler(
         {
           data: obj,
         },
-        config
+        LegalDataReqFormEditConfig,
+        {
+          config: {
+            params: {
+              ...(id && { branch_id: id }),
+              ...(company_id && { company_id }),
+            },
+          },
+          url: `${baseURL}/companies/company-profile/legal-data/request`,
+        }
       );
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
     },
   };
   return LegalDataReqFormEditConfig;

@@ -1,15 +1,19 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { officialData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const CompanyOfficialData = (
   officialData: officialData,
   id?: string
 ) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const queryClient = useQueryClient();
-  const PersonalFormConfig: FormConfig = {
-    formId: `company-official-data-form-${id}`,
+  const OfficialDataFormConfig: FormConfig = {
+    formId: `company-official-data-form-${id}-${company_id}`,
     // apiUrl: `${baseURL}/companies/company-profile/official-data`,
     laravelValidation: {
       enabled: true,
@@ -141,26 +145,23 @@ export const CompanyOfficialData = (
     },
 
     onSubmit: async (formData: Record<string, unknown>) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
+      return await defaultSubmitHandler(formData, OfficialDataFormConfig, {
+        config: {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        },
+        url: `${baseURL}/companies/company-profile/official-data`,
+        method: "PUT",
+      });
+    },
 
-      const response = await apiClient.put(
-        "companies/company-profile/official-data",
-        formData,
-        config
-      );
-
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
-
-      return {
-        success: true,
-        message: "dummy return",
-        data: response.data,
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id, company_id],
+      });
     },
   };
-  return PersonalFormConfig;
+  return OfficialDataFormConfig;
 };

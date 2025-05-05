@@ -2,11 +2,15 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const LegalDataAddReqFormEditConfig = (id?: string) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const queryClient = useQueryClient();
   const LegalDataAddReqFormEditConfig: FormConfig = {
-    formId: `company-official-data-form-${id}`,
+    formId: `company-official-data-form-${id}-${company_id}`,
     title: "اضافة بيان قانوني",
     apiUrl: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
     laravelValidation: {
@@ -56,6 +60,10 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             label: "تاريخ الإصدار",
             type: "date",
             placeholder: "تاريخ الإصدار",
+            maxDate: {
+              formId: `company-official-data-form-${id}-${company_id}`,
+              field: "end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -68,6 +76,10 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
+            minDate: {
+              formId: `company-official-data-form-${id}-${company_id}`,
+              field: "start_date",
+            },
             validation: [
               {
                 type: "required",
@@ -103,8 +115,6 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       const obj = {
         registration_type_id: formData.registration_type_id,
         regestration_number: formData.regestration_number,
@@ -115,22 +125,25 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
 
       const newFormData = serialize(obj);
 
-      const response = await apiClient.post(
-        "companies/company-profile/legal-data/create-legal-data",
+      return await defaultSubmitHandler(
         newFormData,
-        config
+        LegalDataAddReqFormEditConfig,
+        {
+          config: {
+            params: {
+              ...(id && { branch_id: id }),
+              ...(company_id && { company_id }),
+            },
+          },
+          url: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
+        }
       );
+    },
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
-      return {
-        success: true,
-        message: "dummy return",
-        data: response.data,
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id, company_id],
+      });
     },
   };
   return LegalDataAddReqFormEditConfig;
