@@ -7,6 +7,7 @@ export type HierarchiesBranch = {
   id: number;
   management_count: number;
   manager: Manager;
+  deputy_manager: Manager;
   manager_id: number;
   name: string;
   parent_id: number;

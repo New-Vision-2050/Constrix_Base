@@ -3,6 +3,7 @@ import BackpackIcon from "@/public/icons/backpack";
 import { LayoutDashboardIcon, UserIcon } from "lucide-react";
 import CompanyStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure";
 import UsersStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/employees-structure";
+import ManagementsStructure from "../components/organizational-structure-tabs/organizational-structure-tabs/components/management-structure";
 
 export const OrganizationalStructureSubTabs: SystemTab[] = [
   {
@@ -21,6 +22,6 @@ export const OrganizationalStructureSubTabs: SystemTab[] = [
     id: "organizational-structure-sub-tab-managements",
     title: "الادارات",
     icon: <BackpackIcon />,
-    content: <>الادارات</>,
+    content: <ManagementsStructure />,
   },
 ];
