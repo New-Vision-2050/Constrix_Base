@@ -5,7 +5,6 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
-import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
