@@ -18,7 +18,7 @@ interface IErrorDialog {
 
 const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
   const t = useTranslations();
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-80 w-full rounded-2xl p-10 flex flex-col">
@@ -29,7 +29,7 @@ const ErrorDialog = ({ isOpen, handleClose, desc }: IErrorDialog) => {
         </DialogHeader>
         <DialogDescription
           asChild
-          className="text-2xl text-white font-bold text-center mb-6"
+          className="text-2xl font-bold text-center mb-6"
         >
           <p>{desc}</p>
         </DialogDescription>
