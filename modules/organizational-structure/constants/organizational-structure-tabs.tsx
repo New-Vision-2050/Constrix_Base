@@ -1,13 +1,14 @@
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import BackpackIcon from "@/public/icons/backpack";
 import { LayoutDashboardIcon, UserIcon } from "lucide-react";
+import CompanyStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure";
 
 export const OrganizationalStructureSubTabs: SystemTab[] = [
   {
     id: "organizational-structure-sub-tab-company-structure",
     title: "بنية الشركة",
     icon: <LayoutDashboardIcon />,
-    content: <>بنية الشركة</>,
+    content: <CompanyStructureTab />,
   },
   {
     id: "organizational-structure-sub-tab-employees",
@@ -20,5 +21,5 @@ export const OrganizationalStructureSubTabs: SystemTab[] = [
     title: "الادارات",
     icon: <BackpackIcon />,
     content: <>الادارات</>,
-  }
+  },
 ];
