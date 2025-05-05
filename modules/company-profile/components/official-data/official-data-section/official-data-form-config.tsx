@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { officialData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -52,11 +52,21 @@ export const CompanyOfficialData = (
             gridArea: 2,
           },
           {
-            name: "company_type",
+            name: "company_type_id",
             label: "كيان الشركة",
-            type: "text",
+            type: "select",
             placeholder: "كيان الشركة",
-            disabled: true,
+            dynamicOptions: {
+              url: `${baseURL}/company_types`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
           },
           {
             name: "country",
@@ -118,7 +128,7 @@ export const CompanyOfficialData = (
       name: officialData?.name ?? "",
       branch_name: officialData?.branch ?? "",
       name_en: officialData?.name_en ?? "",
-      company_type: officialData?.company_type ?? "",
+      company_type_id: officialData?.company_type_id ?? "",
       country: officialData?.country_name ?? "",
       company_field:
         !!officialData?.company_field && officialData?.company_field.length > 0

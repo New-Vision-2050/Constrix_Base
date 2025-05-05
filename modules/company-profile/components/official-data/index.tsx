@@ -71,7 +71,7 @@ const OfficialData = ({ id }: { id?: string }) => {
 
           <SupportData generalManager={general_manager} />
 
-          <NationalAddress companyAddress={company_address} id={id}  />
+          <NationalAddress companyAddress={company_address} id={id} />
 
           <OfficialDocsSection
             companyOfficialDocuments={company_official_documents}
