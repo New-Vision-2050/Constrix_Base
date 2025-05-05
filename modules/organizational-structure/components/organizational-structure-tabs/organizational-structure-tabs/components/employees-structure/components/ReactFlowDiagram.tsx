@@ -21,7 +21,6 @@ export default function ReactFlowDiagram() {
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        defaultEdgeOptions={{ type: 'step' }}
       />
     </div>
   );
