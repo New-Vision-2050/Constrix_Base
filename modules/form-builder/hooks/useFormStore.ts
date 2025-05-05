@@ -527,11 +527,12 @@ export const useFormStore = create<FormState>((set, get) => ({
 
           try {
             const number = phoneUtil.parseAndKeepRawInput(value);
-            
-            if (!phoneUtil.isValidNumber(number)) {
-              store.setError(formId, fieldName, message);
-              hasError = true;
-              break;
+            const splitValue = value.split(' ');
+              // Reject if national number starts with 0
+            if ((splitValue.length > 0 && splitValue[1].startsWith("0")) || !phoneUtil.isValidNumber(number)) {
+                  store.setError(formId, fieldName, message);
+                  hasError = true;
+                  break;
             }
           } catch (error) {
             store.setError(formId, fieldName, message);
