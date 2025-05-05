@@ -25,6 +25,7 @@ export const LegalDataReqFormEditConfig = (
             name: "data",
             label: "",
             dynamicRowOptions: {
+              enableAdd:false,
               rowFields: [
                 {
                   type: "select",
