@@ -5,7 +5,6 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import EnterIcon from "@/public/icons/enter";
 import GearIcon from "@/public/icons/gear";
-import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
@@ -24,7 +23,7 @@ interface CompanyData {
 
 // Create a component that uses the translations
 export const CompaniesConfig = () => {
-  const t = useTranslations('Companies');
+  const t = useTranslations("Companies");
   const router = useRouter();
 
   return {
@@ -134,7 +133,8 @@ export const CompaniesConfig = () => {
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
-        action: () => router.push(ROUTER.COMPANY_PROFILE),
+        action: (row: CompanyData) =>
+          router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
       },
     ],
     executionConfig: {

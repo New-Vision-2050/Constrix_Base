@@ -1,5 +1,5 @@
 import { z } from "zod";
-import {getCookie} from "cookies-next";
+import { getCookie } from "cookies-next";
 
 // Define error messages for different locales
 const errorMessages = {
@@ -26,18 +26,24 @@ const errorMessages = {
     passwordSpecialChar: "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل",
     passwordRequired: "يجب إدخال كلمة المرور",
     passwordMatch: "يجب أن تتطابق كلمة المرور الجديدة مع تأكيد كلمة المرور",
-    emailMatch: "يجب أن تتطابق البريد الالكتروني الجديد مع تأكيد البريد الالكتروني",
+    emailMatch:
+      "يجب أن تتطابق البريد الالكتروني الجديد مع تأكيد البريد الالكتروني",
     otpRequired: "يجب إدخال كلمة المرور المؤقتة",
   },
 };
 
 // Get error message based on current locale
-export const getMessage = (key: keyof typeof errorMessages.en, param?: any): string => {
+export const getMessage = (
+  key: keyof typeof errorMessages.en,
+  param?: any
+): string => {
   const localeValue = getCookie("NEXT_LOCALE");
-  const locale = (typeof localeValue === 'string' && (localeValue === 'en' || localeValue === 'ar'))
-    ? localeValue as 'en' | 'ar'
-    : 'en';
-    
+  const locale =
+    typeof localeValue === "string" &&
+    (localeValue === "en" || localeValue === "ar")
+      ? (localeValue as "en" | "ar")
+      : "ar";
+
   const message = errorMessages[locale][key];
   if (typeof message === "function" && param !== undefined) {
     return message(param);

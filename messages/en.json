@@ -67,7 +67,7 @@
       "SessionExpired": "Your session has expired. Please log in again.",
       "InvalidCredentials": "Invalid username or password",
       "InvalidIdentifier": "Invalid identifier or not found",
-      "UserNotFound": "User not found",
+      "UserNotFound": "This user is invalid",
       "GenericError": "An error occurred"
     },
     "Back": "Back"

@@ -9,15 +9,23 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
+import { useParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const OfficialData = ({ id }: { id?: string }) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["main-company-data", id],
+  const { company_id } = useParams();
+
+  const { data, isPending, isSuccess } = useQuery({
+    queryKey: ["main-company-data", id, company_id],
     queryFn: async () => {
-      const config = id ? { params: { branch_id: id } } : undefined;
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
         "/companies/current-auth-company",
-        config
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        }
       );
 
       return response.data;
@@ -42,13 +50,17 @@ const OfficialData = ({ id }: { id?: string }) => {
     company_official_documents,
   } = payload as CompanyData;
 
-  console.log({ payload, company_legal_data });
-
   return (
     <div className="bg-sidebar p-5 rounded-md space-y-5">
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
+      {isPending && (
+        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <Skeleton key={index} className="w-full h-10" />
+          ))}
+        </div>
+      )}
+
+      {isSuccess && (
         <>
           <OfficialDataSection
             officialData={{
@@ -71,7 +83,7 @@ const OfficialData = ({ id }: { id?: string }) => {
 
           <SupportData generalManager={general_manager} />
 
-          <NationalAddress companyAddress={company_address} id={id}  />
+          <NationalAddress companyAddress={company_address} id={id} />
 
           <OfficialDocsSection
             companyOfficialDocuments={company_official_documents}
