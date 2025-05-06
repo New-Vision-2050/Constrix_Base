@@ -15,6 +15,7 @@ const errorMessages = {
     passwordMatch: "Passwords must match",
     emailMatch: "Email addresses must match",
     otpRequired: "Temporary password is required",
+    passwordNoSpaces: "Password must not contain spaces",
   },
   ar: {
     required: "هذا الحقل مطلوب",
@@ -29,6 +30,7 @@ const errorMessages = {
     emailMatch:
       "يجب أن تتطابق البريد الالكتروني الجديد مع تأكيد البريد الالكتروني",
     otpRequired: "يجب إدخال كلمة المرور المؤقتة",
+    passwordNoSpaces: "يجب ألا تحتوي كلمة المرور على مسافات",
   },
 };
 
