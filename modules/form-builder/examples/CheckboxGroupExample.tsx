@@ -99,6 +99,41 @@ const CheckboxGroupExample: React.FC = () => {
           },
         ],
       },
+      {
+        title: "Dynamic Checkbox Group",
+        description: "This example shows how to use checkbox groups with dynamic options from an API",
+        fields: [
+          {
+            type: "select",
+            name: "country",
+            label: "Country",
+            options: [
+              { value: "us", label: "United States" },
+              { value: "ca", label: "Canada" },
+              { value: "uk", label: "United Kingdom" },
+              { value: "au", label: "Australia" },
+            ],
+          },
+          {
+            type: "checkboxGroup",
+            name: "cities",
+            label: "Cities",
+            isMulti: true,
+            dynamicOptions: {
+              url: "/api/cities",
+              valueField: "id",
+              labelField: "name",
+              dependsOn: "country", // This field depends on the country field
+            },
+            validation: [
+              {
+                type: "required",
+                message: "Please select at least one city",
+              },
+            ],
+          },
+        ],
+      },
     ],
     onSubmit: async (values) => {
       console.log("Form values:", values);

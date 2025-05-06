@@ -6,6 +6,7 @@ The Checkbox Group field provides a group of checkboxes that can operate in eith
 
 - **Single-select mode**: Only one option can be selected at a time (similar to radio buttons)
 - **Multi-select mode**: Multiple options can be selected simultaneously
+- **Dynamic options**: Options can be loaded from an API based on the value of another field
 - **Validation support**: Full support for all validation types
 - **Conditional fields**: Can be used with conditional fields
 - **Styling options**: Customizable appearance
@@ -70,6 +71,23 @@ The Checkbox Group field provides a group of checkboxes that can operate in eith
 }
 ```
 
+### With Dynamic Options
+
+```typescript
+{
+  type: "checkboxGroup",
+  name: "cities",
+  label: "Cities",
+  isMulti: true,
+  dynamicOptions: {
+    url: "/api/cities",
+    valueField: "id",
+    labelField: "name",
+    dependsOn: "country", // This field depends on the country field
+  },
+}
+```
+
 ### With Conditional Fields
 
 ```typescript
@@ -105,7 +123,8 @@ The Checkbox Group field provides a group of checkboxes that can operate in eith
 | `name` | `string` | Field name (used as form value key) |
 | `label` | `string` | Field label |
 | `isMulti` | `boolean` | Whether multiple options can be selected (default: `false`) |
-| `options` | `Array<{value: string, label: string}>` | Array of options |
+| `options` | `Array<{value: string, label: string}>` | Array of static options |
+| `dynamicOptions` | `DynamicDropdownConfig` | Configuration for loading options from an API |
 | `required` | `boolean` | Whether the field is required |
 | `disabled` | `boolean` | Whether the field is disabled |
 | `className` | `string` | Custom CSS class for the field |

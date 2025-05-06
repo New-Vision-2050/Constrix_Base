@@ -634,6 +634,20 @@ const apiEditFormConfig: FormConfig = {
     { value: "music", label: "Music" },
   ],
 }
+
+// Dynamic checkbox group with options from API
+{
+  type: "checkboxGroup",
+  name: "cities",
+  label: "Cities",
+  isMulti: true,
+  dynamicOptions: {
+    url: "/api/cities",
+    valueField: "id",
+    labelField: "name",
+    dependsOn: "country", // This field depends on the country field
+  },
+}
 ```
 
 ## Examples
