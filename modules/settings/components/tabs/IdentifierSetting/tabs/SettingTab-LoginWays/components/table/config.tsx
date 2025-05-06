@@ -1,7 +1,6 @@
+import TableStatus from "./TableStatus";
 import { baseURL } from "@/config/axios-config";
 import { LoginWay } from "@/modules/settings/types/LoginWay";
-import LoginWaysExecutionBtn from "./ExecutionBtn";
-import TableStatus from "./TableStatus";
 import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import {
     loginWayFormConfig

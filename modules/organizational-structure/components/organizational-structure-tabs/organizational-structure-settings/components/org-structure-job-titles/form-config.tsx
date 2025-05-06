@@ -1,7 +1,6 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 
-
 export function GetOrgStructureSettingsFormConfig(): FormConfig {
   return {
     formId: "job-titles-form",
@@ -30,12 +29,12 @@ export function GetOrgStructureSettingsFormConfig(): FormConfig {
           },
           {
             type: "select",
-            name: "job_title_id",
+            name: "job_type_id",
             label: "نوع الوظيفة",
             placeholder: "اختر نوع الوظيفة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_titles`,
+              url: `${baseURL}/job_types`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -69,12 +68,8 @@ export function GetOrgStructureSettingsFormConfig(): FormConfig {
       },
     ],
     submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
-    showReset: false,
-    resetButtonText: "Clear Form",
     showSubmitLoader: true,
     resetOnSuccess: true,
     showCancelButton: false,
-    showBackButton: false
   };
 }

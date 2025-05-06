@@ -146,7 +146,6 @@ export function useSheetForm({
   }, [isStepBased]);
 
   const closeSheet = useCallback(() => {
-    setIsOpen(false);
     // Reset form state when sheet is closed
     if (config.resetOnSuccess) {
       resetForm();
@@ -155,6 +154,8 @@ export function useSheetForm({
     if (isStepBased) {
       setCurrentStep(0);
     }
+
+    setIsOpen(false);
   }, [config.resetOnSuccess, isStepBased, resetForm]);
 
   const clearFiledError = useCallback(
@@ -181,11 +182,19 @@ export function useSheetForm({
         if (field.condition && !field.condition(values)) {
           return;
         }
-          if (field.hidden || field.disabled) {
-              return;
-          }
-        if(field.validation && config.formId) {
-            isValid = useFormStore.getState().validateField(config.formId, field.name, values[field.name], field.validation, values);
+        if (field.hidden || field.disabled) {
+          return;
+        }
+        if (field.validation && config.formId) {
+          isValid = useFormStore
+            .getState()
+            .validateField(
+              config.formId,
+              field.name,
+              values[field.name],
+              field.validation,
+              values
+            );
         }
       });
     });
@@ -261,7 +270,8 @@ export function useSheetForm({
 
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
-          config.onSubmit || ((values) => defaultSubmitHandler(values, config, requestOptions));
+          config.onSubmit ||
+          ((values) => defaultSubmitHandler(values, config, requestOptions));
         const result = await submitHandler(finalValues);
         if (result.success) {
           setSubmitSuccess(true);
