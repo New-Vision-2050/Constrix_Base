@@ -10,6 +10,7 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import CopyIcon from "@/public/icons/copy";
 import FolderIcon from "@/public/icons/folder";
+import ImageIcon from "@/public/icons/image-icon";
 import { Trash } from "lucide-react";
 import UserActivityLog from "./show-table";
 import CopyButton from "@/components/shared/CopyButton";
@@ -19,6 +20,9 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { updateDocsFormConfig } from "./update-docs-form-config";
 import { baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import PDFIcon from "@/assets/icons/PDF.png";
 
 // Row component
 const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
@@ -45,7 +49,64 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         <td className="py-3 px-3 border-b">{doc.start_date}</td>
         <td className="py-3 px-3 border-b">{doc.end_date}</td>
         <td className="py-3 px-3 border-b">{doc.notification_date}</td>
-        <td className="py-3 px-3 border-b">{doc.files?.length} مرفقات</td>
+        <td className="py-3 px-3 border-b">
+          <div className="flex items-center gap-1">
+            {doc.files?.slice(0, 4).map((file, index) => {
+              // Determine icon based on mime_type
+              const getFileIcon = () => {
+                if (file.mime_type.includes('pdf')) {
+                  return (
+                    <Image
+                      src={PDFIcon}
+                      alt="PDF"
+                      width={20}
+                      height={20}
+                    />
+                  );
+                } else if (file.mime_type.includes('image')) {
+                  return <ImageIcon additionalClass="w-5 h-5 text-blue-500" />;
+                } else {
+                  return <FolderIcon />;
+                }
+              };
+              
+              return (
+                <TooltipProvider key={file.id}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="cursor-pointer"
+                      >
+                        {getFileIcon()}
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{file.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            })}
+            {doc.files && doc.files.length > 4 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-xs text-primary font-bold cursor-pointer">...</span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{doc.files.length - 4} مرفقات إضافية</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {doc.files?.length > 0 && (
+              <span className="text-xs text-gray-500 mr-1">({doc.files.length})</span>
+            )}
+          </div>
+        </td>
         <td className="py-3 px-3 border-b">
           <button onClick={handleOpenShow} className="text-primary underline">
             عرض
@@ -128,3 +189,4 @@ const DocsTable = ({
 };
 
 export default DocsTable;
+
