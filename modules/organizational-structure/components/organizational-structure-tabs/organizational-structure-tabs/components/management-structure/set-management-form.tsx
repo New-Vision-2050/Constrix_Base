@@ -5,7 +5,7 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
   return {
     formId: "org-structure-management-form",
     title: "اضافة ادارة",
-    apiUrl: `${baseURL}/management_hierarchies/create-management`,
+    apiUrl: `${baseURL}/organization-structure/management`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -83,7 +83,7 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             ],
           },
           {
-            name: "deputy_manager_ids",
+            name: "deputy_manager_id",
             label: "نائب المدير",
             type: "select",
             placeholder: "نائب المدير",
@@ -105,7 +105,7 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             ],
           },
           {
-            name: "reference_user_id",
+            name: "reference_person_id",
             label: "الشخص المرجعي",
             type: "select",
             placeholder: "الشخص المرجعي",
@@ -127,14 +127,14 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             ],
           },
           {
-            name: "is_active",
+            name: "status",
             label: "الحالة",
             type: "select",
             placeholder: "الحالة",
             required: true,
             options: [
-              { value: "1", label: "نشط" },
-              { value: "0", label: "غير نشط" },
+              { value: "active", label: "نشط" },
+              { value: "inactive", label: "غير نشط" },
             ],
             validation: [
               {

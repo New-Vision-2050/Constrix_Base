@@ -1,8 +1,7 @@
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import BackpackIcon from "@/public/icons/backpack";
 import { LayoutDashboardIcon, UserIcon } from "lucide-react";
-import CompanyStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure";
-import UsersStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/employees-structure";
+import CompanyOrganizationStructure from "@/modules/organizational-structure/components/company-organization-structure";
 import ManagementsStructure from "../components/organizational-structure-tabs/organizational-structure-tabs/components/management-structure";
 
 export const OrganizationalStructureSubTabs: SystemTab[] = [
@@ -10,7 +9,7 @@ export const OrganizationalStructureSubTabs: SystemTab[] = [
     id: "organizational-structure-sub-tab-company-structure",
     title: "بنية الشركة",
     icon: <LayoutDashboardIcon />,
-    content: <CompanyStructureTab />,
+    content: <CompanyOrganizationStructure />,
   },
   {
     id: "organizational-structure-sub-tab-employees",
