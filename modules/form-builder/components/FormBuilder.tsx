@@ -76,7 +76,6 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   editError: initialEditError,
   recordId,
 }) => {
-  console.log({config})
   // Local state for edit mode
 
   const [isEditMode] = useState(config.isEditMode || false);

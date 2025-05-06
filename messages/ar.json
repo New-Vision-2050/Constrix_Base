@@ -141,7 +141,9 @@
     "DashboardSettings": "ملف الشركة",
     "UserProfileSettings": "الملف الشخصي",
     "Welcome": "مرحبا",
-    "CompanyName": "نيو فيجن"
+    "CompanyName": "نيو فيجن",
+    "OrganizationalStructure": "الهيكل التنظيمي",
+    "HumanResources": "الموارد البشرية"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -197,6 +199,7 @@
       "placeholder": {
         "userName": "اسم المستخدم",
         "jobTitle": "الوظيفة",
+        "branch": "الفرع",
         "address": "العنوان",
         "appointmentDate": "تاريخ التعيين",
         "image": "يلزم اضافة صورة خلفية بيضاء 6*4"

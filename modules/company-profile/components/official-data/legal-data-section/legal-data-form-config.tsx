@@ -2,14 +2,19 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
+import { useParams } from "next/navigation";
 
 export const LegalDataFormConfig = (
   companyLegalData: CompanyLegalData[],
   id?: string
 ) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const queryClient = useQueryClient();
   const LegalDataFormConfig: FormConfig = {
-    formId: `company-official-data-form-${id}`,
+    formId: `company-official-data-form-${id}-${company_id}`,
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -108,8 +113,6 @@ export const LegalDataFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const config = id ? { params: { branch_id: id } } : undefined;
-
       const obj = formData.data.map((obj: any) => ({
         start_date: obj.start_date,
         end_date: obj.end_date,
@@ -117,23 +120,28 @@ export const LegalDataFormConfig = (
         ...(typeof obj.file !== "string" && { file: obj.file }),
       }));
 
-      const response = await apiClient.postForm(
-        "companies/company-profile/legal-data/update",
+      const newFormData = serialize(
         { data: obj },
-        config
+        {
+          indices: true,
+        }
       );
 
-      if (response.status === 200) {
-        queryClient.refetchQueries({
-          queryKey: ["main-company-data", id],
-        });
-      }
+      return await defaultSubmitHandler(newFormData, LegalDataFormConfig, {
+        config: {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(company_id && { company_id }),
+          },
+        },
+        url: `${baseURL}/companies/company-profile/legal-data/update`,
+      });
+    },
 
-      return {
-        success: true,
-        message: "dummy return",
-        data: {},
-      };
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["main-company-data", id, company_id],
+      });
     },
   };
   return LegalDataFormConfig;
