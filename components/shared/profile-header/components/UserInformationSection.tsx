@@ -8,7 +8,6 @@ type PropsT = {
   name?: string;
   address?: string;
   job_title?: string;
-  branch?: string;
   date_appointment?: string;
 };
 /**
@@ -20,7 +19,7 @@ type PropsT = {
 export default function UserProfileHeaderUserInformationSection(props: PropsT) {
   // declare and define vars and state
   const t = useTranslations("UserProfile.header.placeholder");
-  const { loading, name, branch, job_title, address, date_appointment } = props;
+  const { loading, name, job_title, address, date_appointment } = props;
 
   // handle loading state
   if (loading)
@@ -32,17 +31,6 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
     <div className="flex flex-col items-center justify-center md:justify-around md:items-start gap-4 w-full">
       <h2 className="text-xl font-bold">{name}</h2>
       <div className="flex flex-wrap gap-4 text-gray-600">
-        {branch && (
-          <div className="flex items-center gap-2">
-            <MapPinIcon />
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">{t("branch")}</span>
-              <span className="font-medium dark:text-white">
-                {branch ?? "--"}
-              </span>
-            </div>
-          </div>
-        )}
         {job_title && (
           <div className="flex items-center gap-2">
             <BackpackIcon />

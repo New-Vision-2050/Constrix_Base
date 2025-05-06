@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { AudioWaveform, Command, GalleryVerticalEnd, LayoutDashboardIcon } from "lucide-react";
+import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -110,19 +110,6 @@ export function AppSidebar({
               url: ROUTER.USERS,
               icon: UserIcon,
               isActive: pageName === ROUTER.USERS,
-            },
-          ],
-        },
-        {
-          name: t("Sidebar.HumanResources"),
-          icon: LayoutDashboardIcon,
-          isActive: pageName === ROUTER.Organizational_Structure,
-          submenu: [
-            {
-              name: t("Sidebar.OrganizationalStructure"),
-              url: ROUTER.Organizational_Structure,
-              icon: LayoutDashboardIcon,
-              isActive: pageName === ROUTER.Organizational_Structure,
             },
           ],
         },

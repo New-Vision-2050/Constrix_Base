@@ -6,5 +6,4 @@ export const ROUTER = {
   DASHBOARD: "/dashboard",
   COMPANY_PROFILE: "/company-profile",
   USER_PROFILE: "/user-profile",
-  Organizational_Structure: "/organizational-structure",
 };
