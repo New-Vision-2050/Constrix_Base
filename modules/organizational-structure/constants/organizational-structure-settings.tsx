@@ -1,6 +1,7 @@
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 import { UserIcon } from "lucide-react";
 import OrgStructureJobTitlesSetting from "../components/organizational-structure-tabs/organizational-structure-settings/components/org-structure-job-titles";
+import OrgStructureJobTypesSetting from "../components/organizational-structure-tabs/organizational-structure-settings/components/org-structure-job-types";
 
 export const OrganizationalStructureSettingsTabs: SystemTab[] = [
   {
@@ -13,6 +14,6 @@ export const OrganizationalStructureSettingsTabs: SystemTab[] = [
     id: "organizational-structure-settings-job-types",
     title: "انواع الوظائف",
     icon: <UserIcon />,
-    content: <>انواع الوظائف</>,
+    content: <OrgStructureJobTypesSetting />,
   },
 ];

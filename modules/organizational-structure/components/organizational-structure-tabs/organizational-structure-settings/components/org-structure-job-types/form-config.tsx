@@ -29,13 +29,13 @@ export function GetOrgStructureSettingsJobTypesFormConfig(): FormConfig {
           },
           {
             type: "select",
-            name: "status",
+            name: "job_title_id",
             label: "الحالة",
             placeholder: "نشط / غير نشط",
             required: true,
             options: [
-              { value: "1", label: "نشط" },
-              { value: "0", label: "غير نشط" },
+              { value: "active", label: "نشط" },
+              { value: "inactive", label: "غير نشط" },
             ],
             validation: [
               {
