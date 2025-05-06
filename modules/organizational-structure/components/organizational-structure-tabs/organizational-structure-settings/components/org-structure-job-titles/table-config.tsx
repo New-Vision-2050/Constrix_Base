@@ -1,6 +1,8 @@
+import { JobTitle } from "@/types/job-title";
 import { baseURL } from "@/config/axios-config";
+import { Label } from "@/modules/table/components/ui/label";
+import { Switch } from "@/modules/table/components/ui/switch";
 import { GetOrgStructureSettingsFormConfig } from "./form-config";
-
 
 export const OrgStructureSettingsTableConfig = () => {
   return {
@@ -13,19 +15,27 @@ export const OrgStructureSettingsTableConfig = () => {
         sortable: true,
       },
       {
-        key: "email",
+        key: "user_count",
         label: "عدد الموظفيين",
         sortable: true,
       },
       {
-        key: "company_field",
+        key: "job_type.name",
         label: "نوع الوظيفة",
         sortable: true,
       },
       {
-        key: "general_manager.name",
+        key: "status",
         label: "الحالة",
         sortable: true,
+        render: (_: unknown, row: JobTitle) => (
+          <div className="flex items-center gap-2">
+            <Label htmlFor={`${row.id}-switcher`} className="font-normal">
+              نشط
+            </Label>
+            <Switch id={`${row.id}-switcher`} checked={row.status == 1} />
+          </div>
+        ),
       },
     ],
     defaultSortColumn: "id",
@@ -35,7 +45,6 @@ export const OrgStructureSettingsTableConfig = () => {
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
-    searchFields: ["name", "email"],
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
