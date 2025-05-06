@@ -67,7 +67,7 @@
       "SessionExpired": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
       "InvalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة",
       "InvalidIdentifier": "المعرف غير صحيح أو غير موجود",
-      "UserNotFound": "المستخدم غير موجود",
+      "UserNotFound": "هذا المستخدم غير صحيح",
       "GenericError": "حدث خطأ"
     },
     "Back": "رجوع"
