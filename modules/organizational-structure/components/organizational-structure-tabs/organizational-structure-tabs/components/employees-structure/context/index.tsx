@@ -54,7 +54,7 @@ export const UsersStructureCxtProvider = (props: React.PropsWithChildren) => {
 
       handleChangeDiagramNodes(_nodes);
       handleChangeDiagramEdges(_edges);
-      console.log("Data of _nodes::", _nodes, data);
+      console.log("Data of _nodes::", _nodes, _edges);
     }
   }, [data]);
 
