@@ -33,7 +33,7 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2">
             <FolderIcon />
-            {doc.name}
+            {doc.document_type}
           </div>
         </td>
         <td className="py-3 px-3 border-b">{doc.description}</td>
