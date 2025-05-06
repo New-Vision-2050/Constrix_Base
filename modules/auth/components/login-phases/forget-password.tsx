@@ -30,10 +30,9 @@ const ForgetPasswordPhase = ({
     getValues,
     setValue,
   } = useFormContext<IdentifierType & ForgetPasswordType>();
-  const { mutate, isPending } = useValidateResetPasswordOtp();
+  const { mutate, isPending, error } = useValidateResetPasswordOtp();
   const identifier = getValues("identifier");
   const token = getValues("token");
-
   const onSubmit = () => {
     const otp = getValues("forgetPasswordOtp");
 
@@ -66,7 +65,10 @@ const ForgetPasswordPhase = ({
               <InputOTP
                 maxLength={5}
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(val) => {
+                  const digitsOnly = val.replace(/\D/g, "");
+                  field.onChange(digitsOnly);
+                }}
               >
                 <InputOTPGroup>
                   {Array.from({ length: 5 }).map((_, index) => (
@@ -79,7 +81,12 @@ const ForgetPasswordPhase = ({
                 </InputOTPGroup>
               </InputOTP>
             </div>
-            <InputError error={errors?.forgetPasswordOtp?.message} />
+            <InputError
+              error={
+                errors?.forgetPasswordOtp?.message ||
+                error?.response?.data?.error
+              }
+            />
           </div>
         )}
       />
