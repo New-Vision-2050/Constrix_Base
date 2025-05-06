@@ -67,7 +67,7 @@ export const createIdentifierValidation = () => {
     .min(5, getMessage("required"))
     .refine(
       (value) => {
-        if (value.includes("@")) {
+        if (value.includes("@") || value.includes(".")) {
           return z.string().email().safeParse(value).success;
         }
         return true;
