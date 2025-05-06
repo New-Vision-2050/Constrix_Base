@@ -16,7 +16,6 @@ const IdentifierPhase = ({
 }: {
   handleSetStep: (step: LoginPhase) => void;
 }) => {
-
   const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -38,10 +37,10 @@ const IdentifierPhase = ({
       }
     };
 
-    errorEvent.addEventListener('auth-error', handleAuthError);
+    errorEvent.addEventListener("auth-error", handleAuthError);
 
     return () => {
-      errorEvent.removeEventListener('auth-error', handleAuthError);
+      errorEvent.removeEventListener("auth-error", handleAuthError);
     };
   }, [handleOpen, t]);
 
@@ -80,17 +79,20 @@ const IdentifierPhase = ({
         },
         onError(error) {
           const messageKey = getErrorMessage(error);
-          setErrorMessage(messageKey || t("Errors.Authentication.InvalidIdentifier"));
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.UserNotFound")
+          );
           handleOpen();
-
-       },
+        },
       }
     );
   };
 
   return (
     <>
-      <h1 className="text-xl sm:text-2xl text-center mb-4">{t("Login.SignIn")}</h1>
+      <h1 className="text-xl sm:text-2xl text-center mb-4">
+        {t("Login.SignIn")}
+      </h1>
       <div className="space-y-4">
         <Input
           {...register("identifier")}
@@ -115,7 +117,6 @@ const IdentifierPhase = ({
         handleClose={handleClose}
         desc={errorMessage}
       />
-
     </>
   );
 };

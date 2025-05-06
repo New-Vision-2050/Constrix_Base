@@ -10,23 +10,36 @@ import {
 } from "@/components/ui/dialog";
 import ChangeLogo from "../change-logo";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const CompanyLogo = ({ logo }: { logo: string | undefined }) => {
+const CompanyLogo = ({
+  logo,
+  isPending,
+}: {
+  logo: string | undefined;
+  isPending: boolean;
+}) => {
   const [isOpen, handleOpen, handleClose] = useModal();
 
   return (
     <>
       <div
         onClick={handleOpen}
-        className="w-[180px] shrink-0 h-[100px] bg-foreground text-background rounded-md text-center flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+        className="w-[180px] shrink-0 h-[100px] text-background rounded-md text-center flex flex-col items-center justify-center cursor-pointer overflow-hidden self-start"
       >
-        {logo ? (
-          <Image src={logo} alt="company-logo" width={180} height={90} />
+        {isPending ? (
+          <Skeleton className="w-full h-full" />
         ) : (
           <>
-            <Camera className="w-6 h-6 text-background mb-2" />
-            <span className="text-sm leading-tight">لا يلزم تحميل</span>
-            <span className="text-sm leading-tight">لوجو الشركة</span>
+            {logo ? (
+              <Image src={logo} alt="company-logo" width={180} height={90} />
+            ) : (
+              <div className="w-full h-full bg-foreground flex flex-col items-center justify-center cursor-pointer">
+                <Camera className="w-6 h-6 text-background mb-2" />
+                <span className="text-sm leading-tight">لا يلزم تحميل</span>
+                <span className="text-sm leading-tight">لوجو الشركة</span>
+              </div>
+            )}
           </>
         )}
       </div>

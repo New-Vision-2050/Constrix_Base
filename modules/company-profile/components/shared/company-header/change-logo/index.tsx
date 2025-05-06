@@ -13,6 +13,7 @@ import validCompanyProfileImage from "@/modules/company-profile/service/validate
 import { cn } from "@/lib/utils";
 import uploadCompanyImage from "@/modules/company-profile/service/upload-company-image";
 import { deleteCookie, getCookie } from "cookies-next";
+import { useParams } from "next/navigation";
 
 interface FormValues {
   image: FileList;
@@ -31,6 +32,8 @@ interface ValidationRule {
 
 const ChangeLogo = ({ handleClose }: IChangeLogo) => {
   const queryClient = useQueryClient();
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const [valid, setValid] = useState(false);
 
   const [rules, setRules] = useState<ValidationRule[]>([
@@ -56,11 +59,13 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
 
   const { mutate: mutateValidation, isPending: isValidationPending } =
     useMutation({
-      mutationFn: async (file: File) => await validCompanyProfileImage(file),
+      mutationFn: async (file: File) =>
+        await validCompanyProfileImage(file, company_id),
     });
 
   const { mutate: mutateUpload, isPending: isUploadPending } = useMutation({
-    mutationFn: async (file: File) => await uploadCompanyImage(file),
+    mutationFn: async (file: File) =>
+      await uploadCompanyImage(file, company_id),
   });
 
   const {
@@ -117,8 +122,9 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
       // Already validated, proceed with upload
       mutateUpload(file, {
         onSuccess: () => {
-          deleteCookie("company-data");
-          window.location.reload();
+          queryClient.refetchQueries({
+            queryKey: ["main-company-data"],
+          });
           handleClose();
         },
       });

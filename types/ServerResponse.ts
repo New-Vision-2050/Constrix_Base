@@ -7,6 +7,7 @@ type ServerResponse<T extends "success" | "error", P = null> = {
     description: string;
   };
   payload?: P;
+  error?: string;
 };
 
 export type ServerErrorResponse<P = null> = ServerResponse<"error", P>;

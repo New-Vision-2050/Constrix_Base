@@ -27,6 +27,7 @@ const PickupMap = ({
   keysToUpdate,
   inGeneral = false,
   branchId,
+  companyId,
 }: {
   formId: string;
   lat?: string;
@@ -35,6 +36,7 @@ const PickupMap = ({
   keysToUpdate?: string[];
   inGeneral?: boolean;
   branchId?: string;
+  companyId?: string;
 }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue } = useFormStore();
@@ -84,6 +86,7 @@ const PickupMap = ({
               : {})}
             inGeneral={inGeneral}
             branchId={branchId}
+            companyId={companyId}
           />
         </DialogContent>
       </Dialog>

@@ -3,16 +3,20 @@ import { baseURL } from "@/config/axios-config";
 import { Branch } from "@/modules/company-profile/types/company";
 import PickupMap from "../../official-data/national-address/pickup-map";
 import { useQueryClient } from "@tanstack/react-query";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 export const addNewBranchFormConfig = (branches: Branch[]) => {
+  const { company_id }: { company_id: string | undefined } = useParams();
+
   const queryClient = useQueryClient();
-  const formId = "add-new-branch-form";
+  const formId = `add-new-branch-form-${company_id}`;
   const addNewBranchFormConfig: FormConfig = {
     formId,
     apiUrl: `${baseURL}/management_hierarchies/create-branch`,
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data"],
+        queryKey: ["main-company-data", undefined, company_id],
       });
     },
     title: "اضافة فرع جديد",
@@ -24,11 +28,51 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
       {
         fields: [
           {
+            name: "name",
+            label: "اسم الفرع",
+            placeholder: "اسم الفرع",
+            type: "text",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل اسم الفرع",
+              },
+            ],
+          },
+          {
+            label: "تعديل الموقع من الخريطة",
+            name: "map",
+            type: "text",
+            render: () => (
+              <PickupMap
+                formId={formId}
+                keysToUpdate={[
+                  "country_id",
+                  "state_id",
+                  "city_id",
+                  "latitude",
+                  "longitude",
+                ]}
+                inGeneral={true}
+              />
+            ),
+          },
+          {
+            label: "",
+            name: "",
+            type: "text",
+            render: () => (
+              <p className="text-xs">
+                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+              </p>
+            ),
+          },
+          {
             type: "select",
             name: "country_id",
             label: "الدولة",
             placeholder: "الدولة",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -48,24 +92,11 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             ],
           },
           {
-            name: "name",
-            label: "اسم الفرع",
-            placeholder: "اسم الفرع",
-            required:true,
-            type: "text",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل اسم الفرع",
-              },
-            ],
-          },
-          {
             type: "select",
             name: "state_id",
             label: "المحافظة",
             placeholder: "المحافظة",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -91,7 +122,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "city_id",
             label: "المدينة",
             placeholder: "المدينة",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -134,7 +165,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "manager_id",
             label: "مدير الفرع",
             placeholder: "اختر مدير الفرع",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -157,12 +188,12 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "phone",
             label: "رقم الجوال",
             type: "phone",
-            required:true,
+            required: true,
             validation: [
-            {
+              {
                 type: "phone",
                 message: "",
-            },
+              },
             ],
           },
           {
@@ -170,7 +201,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             label: "البريد الإلكتروني",
             type: "email",
             placeholder: "البريد الالكتروني",
-            required:true,
+            required: true,
             validation: [
               {
                 type: "required",
@@ -181,35 +212,6 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
                 message: "البريد الالكتروني غير صحيح",
               },
             ],
-          },
-          {
-            label: "تعديل الموقع من الخريطة",
-            name: "map",
-            type: "text",
-            required:true,
-            render: () => (
-              <PickupMap
-                formId={formId}
-                keysToUpdate={[
-                  "country_id",
-                  "state_id",
-                  "city_id",
-                  "latitude",
-                  "longitude",
-                ]}
-                inGeneral={true}
-              />
-            ),
-          },
-          {
-            label: "",
-            name: "",
-            type: "text",
-            render: () => (
-              <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-              </p>
-            ),
           },
           {
             name: "latitude",
@@ -246,6 +248,16 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
+        url: `${baseURL}/management_hierarchies/create-branch`,
+        config: {
+          params: {
+            ...(company_id && { company_id }),
+          },
+        },
+      });
+    },
   };
   return addNewBranchFormConfig;
 };

@@ -40,7 +40,6 @@ const OfficialDataPreview = ({
       valid: Boolean(company_type),
       label: "كيان الشركة",
       value: company_type ?? "",
-      needRequest: true,
     },
     {
       valid: Boolean(country_name),
