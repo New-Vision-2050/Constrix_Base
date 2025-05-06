@@ -17,7 +17,8 @@
       "Barcode": "الباركود",
       "LocalNetwork": "الشبكة المحلية",
       "ChooseAnotherMethod": "او اختر طريقة تحقق اخرى",
-      "VerifyVia": "التحقق عن طريق"
+      "VerifyVia": "التحقق عن طريق",
+      "InvalidOtp": "كلمه المرور الموقته غير صحيحية"
     },
     "PhoneVerification": {
       "Title": "التحقق من رقم الجوال",

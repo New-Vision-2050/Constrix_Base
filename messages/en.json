@@ -17,7 +17,8 @@
       "Barcode": "Barcode",
       "LocalNetwork": "Local Network",
       "ChooseAnotherMethod": "Or choose another verification method",
-      "VerifyVia": "Verify via"
+      "VerifyVia": "Verify via",
+      "InvalidOtp": "The temporary password is incorrect"
     },
     "PhoneVerification": {
       "Title": "Phone Number Verification",

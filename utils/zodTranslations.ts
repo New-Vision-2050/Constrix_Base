@@ -64,7 +64,7 @@ export const createPasswordValidation = () => {
 export const createIdentifierValidation = () => {
   return z
     .string()
-    .min(2, getMessage("required"))
+    .min(1, getMessage("required"))
     .refine(
       (value) => {
         if (
