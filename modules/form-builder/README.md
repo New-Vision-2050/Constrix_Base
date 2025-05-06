@@ -218,6 +218,7 @@ The form builder supports various field types:
 - `password`: Password input
 - `number`: Numeric input
 - `checkbox`: Checkbox input
+- `checkboxGroup`: Checkbox group with single or multi-select options
 - `radio`: Radio button group
 - `select`: Dropdown select
 - `multiSelect`: Multi-select dropdown
@@ -605,6 +606,36 @@ const apiEditFormConfig: FormConfig = {
 }
 ```
 
+### Checkbox Group Field
+
+```typescript
+// Single-select checkbox group (radio-like behavior)
+{
+  type: "checkboxGroup",
+  name: "favoriteColor",
+  label: "Favorite Color",
+  isMulti: false, // Single select mode
+  options: [
+    { value: "red", label: "Red" },
+    { value: "green", label: "Green" },
+    { value: "blue", label: "Blue" },
+  ],
+}
+
+// Multi-select checkbox group
+{
+  type: "checkboxGroup",
+  name: "hobbies",
+  label: "Hobbies",
+  isMulti: true, // Multi select mode
+  options: [
+    { value: "reading", label: "Reading" },
+    { value: "sports", label: "Sports" },
+    { value: "music", label: "Music" },
+  ],
+}
+```
+
 ## Examples
 
 The form builder includes several examples to help you get started:
@@ -617,6 +648,7 @@ The form builder includes several examples to help you get started:
 - **Direct Upload with Progress**: `/direct-upload-example` - Shows real-time upload with progress tracking
 - **Role Permissions**: `/role-permissions-example` - Complex form with nested data structure
 - **Multi-step Form**: `/form-wizard-example` - Example of a multi-step form
+- **Checkbox Group**: `/checkbox-group-example` - Demonstrates single and multi-select checkbox groups
 - **Advanced React Hook Form**: `/advanced-react-hook-form-example` - Comprehensive example of React Hook Form integration with advanced features
 
 ## Best Practices

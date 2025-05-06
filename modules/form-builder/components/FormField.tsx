@@ -4,6 +4,7 @@ import { Label } from "@/modules/table/components/ui/label";
 import TextField from "./fields/TextField";
 import TextareaField from "./fields/TextareaField";
 import CheckboxField from "./fields/CheckboxField";
+import CheckboxGroupField from "./fields/CheckboxGroupField";
 import RadioField from "./fields/RadioField";
 import MultiSelectField from "./fields/MultiSelectField";
 import DateField from "./fields/DateField";
@@ -167,6 +168,19 @@ const FormField: React.FC<FormFieldProps> = ({
             touched={touched}
             onChange={onChange}
             onBlur={onBlur}
+          />
+        );
+        
+      case "checkboxGroup":
+        return (
+          <CheckboxGroupField
+            field={field}
+            value={fieldValue}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            dependencyValues={values}
           />
         );
 

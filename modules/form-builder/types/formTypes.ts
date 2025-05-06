@@ -98,6 +98,7 @@ export interface FieldConfig {
     | "text"
     | "textarea"
     | "checkbox"
+    | "checkboxGroup"
     | "radio"
     | "select"
     | "multiSelect"
