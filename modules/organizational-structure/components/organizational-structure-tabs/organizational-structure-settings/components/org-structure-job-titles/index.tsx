@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
 import { OrgStructureSettingsTableConfig } from "./table-config";
-import { OrgStructureSettingsFormConfig } from "./form-config";
+import { GetOrgStructureSettingsFormConfig } from "./form-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+
 
 export default function OrgStructureJobTitlesSetting() {
   // ** declare nad define component state and state
@@ -28,7 +29,7 @@ export default function OrgStructureJobTitlesSetting() {
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
-              config={OrgStructureSettingsFormConfig}
+              config={GetOrgStructureSettingsFormConfig()}
               trigger={<Button>اضافة المسمى الوظيفي</Button>}
               onSuccess={handleFormSuccess}
             />

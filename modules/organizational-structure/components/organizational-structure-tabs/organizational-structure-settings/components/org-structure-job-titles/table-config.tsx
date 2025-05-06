@@ -1,7 +1,6 @@
-import { JobTitle } from "@/types/job-title";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { OrgStructureSettingsFormConfig } from "./form-config";
-import TableStatusSwitcher from "@/components/shared/table-status";
+import { baseURL } from "@/config/axios-config";
+import { GetOrgStructureSettingsFormConfig } from "./form-config";
+
 
 export const OrgStructureSettingsTableConfig = () => {
   return {
@@ -14,35 +13,19 @@ export const OrgStructureSettingsTableConfig = () => {
         sortable: true,
       },
       {
-        key: "user_count",
+        key: "email",
         label: "عدد الموظفيين",
         sortable: true,
       },
       {
-        key: "job_type.name",
+        key: "company_field",
         label: "نوع الوظيفة",
         sortable: true,
       },
       {
-        key: "status",
+        key: "general_manager.name",
         label: "الحالة",
         sortable: true,
-        render: (_: unknown, row: JobTitle) => (
-          <TableStatusSwitcher
-            id={row.id}
-            label={"نشط"}
-            initialStatus={row.status == 1}
-            confirmAction={async (isActive) => {
-              return await apiClient.patch(`/job_titles/${row.id}/status`, {
-                status: Number(isActive),
-              });
-            }}
-            confirmDescription={(isActive) =>
-              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشظ"
-            }
-            showDatePicker={() => false}
-          />
-        ),
       },
     ],
     defaultSortColumn: "id",
@@ -52,10 +35,11 @@ export const OrgStructureSettingsTableConfig = () => {
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
+    searchFields: ["name", "email"],
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: OrgStructureSettingsFormConfig,
+    formConfig: GetOrgStructureSettingsFormConfig(),
     executions: [],
     executionConfig: {
       canEdit: true,
