@@ -64,10 +64,14 @@ export const createPasswordValidation = () => {
 export const createIdentifierValidation = () => {
   return z
     .string()
-    .min(5, getMessage("required"))
+    .min(2, getMessage("required"))
     .refine(
       (value) => {
-        if (value.includes("@") || value.includes(".")) {
+        if (
+          /^[^\d][\w\W]*$/.test(value) ||
+          value.includes("@") ||
+          value.includes(".")
+        ) {
           return z.string().email().safeParse(value).success;
         }
         return true;
@@ -76,8 +80,8 @@ export const createIdentifierValidation = () => {
     )
     .refine(
       (value) => {
-        if (value.startsWith("0")) {
-          return /^0(5[0-9]{8})$/.test(value);
+        if (/^\d/.test(value)) {
+          return /^05\d{8}$/.test(value);
         }
         return true;
       },
