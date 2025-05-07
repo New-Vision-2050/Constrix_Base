@@ -88,10 +88,10 @@ const FormField: React.FC<FormFieldProps> = ({
       formInstance.setError(field.name, null);
 
      if(field.validation){
-         formInstance.validateField(
-             field.name,
-             newValue,
-             field.validation,
+        formInstance.validateField(
+          field.name,
+          newValue,
+          field.validation,
              values)
       }
     },
@@ -170,7 +170,7 @@ const FormField: React.FC<FormFieldProps> = ({
             onBlur={onBlur}
           />
         );
-        
+
       case "checkboxGroup":
         return (
           <CheckboxGroupField
@@ -364,10 +364,12 @@ const FormField: React.FC<FormFieldProps> = ({
       }}
       className="mb-4"
     >
-      <Label htmlFor={field.name} className="block mb-2">
-        {field.label}
-        {field.required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+      {!!field.label && (
+        <Label htmlFor={field.name} className="block mb-2">
+          {field.label}
+          {field.required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
       {renderField()}
       {/*<FieldHelperText*/}
       {/*  error={error}*/}

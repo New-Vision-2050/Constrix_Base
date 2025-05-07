@@ -1,11 +1,16 @@
 "use client";
-import React, { memo, useMemo } from 'react';
-import { Checkbox } from '@/modules/table/components/ui/checkbox';
-import { Label } from '@/modules/table/components/ui/label';
-import { FieldConfig } from '../../types/formTypes';
-import { cn } from '@/lib/utils';
-import { useDynamicOptions } from '@/modules/table/components/table/dropdowns/useDynamicOptions';
-import { Loader2 } from 'lucide-react';
+import React, { memo, useMemo, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { FieldConfig } from "../../types/formTypes";
+import { useDynamicOptions } from "@/modules/table/components/table/dropdowns/useDynamicOptions";
 
 interface CheckboxGroupFieldProps {
   field: FieldConfig;
@@ -26,6 +31,9 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   onBlur,
   dependencyValues = {},
 }) => {
+  // State for collapsible
+  const [isOpen, setIsOpen] = useState(true);
+
   // Use dynamic options if configured
   const { options: dynamicOptions, loading } = field?.dynamicOptions
     ? useDynamicOptions({
@@ -49,7 +57,18 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
     return Array.isArray(value) ? value : [value];
   }, [value]);
 
-  // Handle checkbox change
+  // Determine if all options are selected for parent checkbox state
+  const allSelected = useMemo(() => {
+    if (options.length === 0) return false;
+    return options.every((option) => selectedValues.includes(option.value));
+  }, [options, selectedValues]);
+
+  // Determine if some options are selected (for indeterminate state)
+  const someSelected = useMemo(() => {
+    return selectedValues.length > 0 && !allSelected;
+  }, [selectedValues, allSelected]);
+
+  // Handle individual checkbox change
   const handleChange = (optionValue: string, checked: boolean) => {
     if (field.isMulti) {
       // Multi-select mode
@@ -58,11 +77,25 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
         onChange([...selectedValues, optionValue]);
       } else {
         // Remove from selected values
-        onChange(selectedValues.filter(val => val !== optionValue));
+        onChange(selectedValues.filter((val) => val !== optionValue));
       }
     } else {
       // Single-select mode (radio-like behavior)
-      onChange(checked ? optionValue : '');
+      onChange(checked ? optionValue : "");
+    }
+
+    // Call onBlur to trigger validation
+    onBlur();
+  };
+
+  // Handle parent checkbox change
+  const handleParentChange = (checked: boolean) => {
+    if (checked) {
+      // Select all options
+      onChange(options.map((option) => option.value));
+    } else {
+      // Deselect all options
+      onChange([]);
     }
 
     // Call onBlur to trigger validation
@@ -71,40 +104,84 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
 
   return (
     <div className="flex flex-col space-y-2">
-      {loading && (
-        <div className="flex items-center text-muted-foreground text-sm">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Loading options...
-        </div>
-      )}
+      {!!field?.optionsTitle && (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <div className="w-full flex items-center justify-between">
+            <div className="flex items-center gap-x-2">
+              {field.isMulti && (
+                <Checkbox
+                  id={`${field?.optionsTitle}`}
+                  name={field.name}
+                  disabled={field.disabled || options.length === 0}
+                  className={cn(
+                    field.className,
+                    !!error && touched ? "border-destructive" : ""
+                  )}
+                  checked={allSelected}
+               
+                  onCheckedChange={handleParentChange}
+                  onBlur={onBlur}
+                />
+              )}
+              <Label
+                htmlFor={`${field?.optionsTitle}`}
+                className="text-sm font-normal"
+              >
+                {field?.optionsTitle}
+              </Label>
+            </div>
+            <CollapsibleTrigger>
+              {isOpen ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}{" "}
+            </CollapsibleTrigger>
+          </div>
 
-      {options.map((option) => (
-        <div key={option.value} className="flex items-center space-x-2">
-          <Checkbox
-            id={`${field.name}-${option.value}`}
-            name={field.name}
-            checked={selectedValues.includes(option.value)}
-            disabled={field.disabled}
-            className={cn(
-              field.className,
-              !!error && touched ? 'border-destructive' : ''
+          <CollapsibleContent>
+            {loading && (
+              <div className="flex items-center text-muted-foreground text-sm mt-2">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading options...
+              </div>
             )}
-            onCheckedChange={(checked) => handleChange(option.value, !!checked)}
-            onBlur={onBlur}
-          />
-          <Label
-            htmlFor={`${field.name}-${option.value}`}
-            className="text-sm font-normal"
-          >
-            {option.label}
-          </Label>
-        </div>
-      ))}
+
+            {options.map((option) => (
+              <div
+                key={option.value}
+                className="flex items-center gap-x-2 ps-6 mt-2"
+              >
+                <Checkbox
+                  id={`${field.name}-${option.value}`}
+                  name={field.name}
+                  checked={selectedValues.includes(option.value)}
+                  disabled={field.disabled}
+                  className={cn(
+                    field.className,
+                    !!error && touched ? "border-destructive" : ""
+                  )}
+                  onCheckedChange={(checked) =>
+                    handleChange(option.value, !!checked)
+                  }
+                  onBlur={onBlur}
+                />
+                <Label
+                  htmlFor={`${field.name}-${option.value}`}
+                  className="text-sm font-normal"
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
       {/* Error message */}
       {!!error && touched && (
         <div className="text-destructive text-sm mt-1">
-          {typeof error === 'string' ? error : error}
+          {typeof error === "string" ? error : error}
         </div>
       )}
     </div>
