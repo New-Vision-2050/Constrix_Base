@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const res = intlMiddleware(req);
-  if (pathname.includes("en")) {
+  if (pathname.includes("/en/")) {
     res.cookies.set("NEXT_LOCALE", "en");
   } else {
     res.cookies.set("NEXT_LOCALE", "ar");
