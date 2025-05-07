@@ -1,5 +1,10 @@
 import OrganizationalStructureEntryPoint from "./components/entry-point";
+import { OrgStructureCxtProvider } from "./context/OrgStructureCxt";
 
 export default function OrganizationalStructureMainView() {
-  return <OrganizationalStructureEntryPoint />;
+  return (
+    <OrgStructureCxtProvider>
+      <OrganizationalStructureEntryPoint />
+    </OrgStructureCxtProvider>
+  );
 }
