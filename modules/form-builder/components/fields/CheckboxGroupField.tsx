@@ -27,10 +27,12 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   dependencyValues = {},
 }) => {
   // Use dynamic options if configured
-  const { options: dynamicOptions, loading } = useDynamicOptions({
-    dynamicConfig: field.dynamicOptions,
-    dependencies: dependencyValues,
-  });
+  const { options: dynamicOptions, loading } = field?.dynamicOptions
+    ? useDynamicOptions({
+        dynamicConfig: field.dynamicOptions,
+        dependencies: dependencyValues,
+      })
+    : { options: field?.options ?? [], loading: false };
 
   // Memoize options to prevent unnecessary rerenders
   const options = useMemo(() => {
