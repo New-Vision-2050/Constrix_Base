@@ -17,7 +17,8 @@
       "Barcode": "Barcode",
       "LocalNetwork": "Local Network",
       "ChooseAnotherMethod": "Or choose another verification method",
-      "VerifyVia": "Verify via"
+      "VerifyVia": "Verify via",
+      "InvalidOtp": "The temporary password is incorrect"
     },
     "PhoneVerification": {
       "Title": "Phone Number Verification",
@@ -141,7 +142,9 @@
     "DashboardSettings": "Dashboard",
     "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
-    "CompanyName": "New Vision"
+    "CompanyName": "New Vision",
+    "OrganizationalStructure": "Organizational Structure",
+    "HumanResources": "Human Resources"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
@@ -197,6 +200,7 @@
       "placeholder": {
         "userName": "user name",
         "jobTitle": "job title",
+        "branch": "Branch",
         "address": "address",
         "appointmentDate": "Appointment Date",
         "image": "A 6*4 white background image is required."

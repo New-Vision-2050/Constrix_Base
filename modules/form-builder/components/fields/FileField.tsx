@@ -13,6 +13,7 @@ import {
   Archive,
   Code,
   FileIcon as FilePdf,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
@@ -330,6 +331,60 @@ const FileField: React.FC<FileFieldProps> = ({
     [field, onChange, formInstance, t]
   );
 
+  // Handle downloading the file
+  const handleDownload = useCallback(() => {
+    if (!value) return;
+    
+    if (typeof value === 'string') {
+      // If value is a URL string, create a download link
+      const link = document.createElement('a');
+      link.href = value;
+      link.download = getFileName(value);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (value instanceof File) {
+      // If value is a File object, create a blob URL and download it
+      const url = URL.createObjectURL(value);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = value.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else if (value && value.mime_type) {
+      // For FileObject, we need to check if it has a URL property or if it's stored elsewhere
+      
+      // Check if the FileObject has any property that might contain a URL
+      // Common properties that might contain URLs
+      const possibleUrlProps = ['url', 'path', 'src', 'href', 'link', 'fileUrl', 'downloadUrl'];
+      
+      let fileUrl = null;
+      
+      // Check if any of these properties exist on the file object
+      for (const prop of possibleUrlProps) {
+        if ((value as any)[prop]) {
+          fileUrl = (value as any)[prop];
+          break;
+        }
+      }
+      
+      // If we found a URL property, use it
+      if (fileUrl) {
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = value.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // If we can't determine how to download the file, log an error
+        console.error('Unable to download file: No URL available for FileObject', value);
+      }
+    }
+  }, [value]);
+
   // Handle removing the file
   const handleRemoveFile = useCallback(() => {
     onChange(null);
@@ -388,14 +443,24 @@ const FileField: React.FC<FileFieldProps> = ({
                     </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={handleRemoveFile}
-                  className="flex-shrink-0 ml-2 text-muted-foreground hover:text-destructive transition-colors"
-                  aria-label={t("RemoveFile")}
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex-shrink-0 ml-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownload}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                    aria-label="تحميل الملف"
+                  >
+                    <Download className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveFile}
+                    className="text-muted-foreground hover:text-destructive transition-colors"
+                    aria-label={t("RemoveFile")}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
