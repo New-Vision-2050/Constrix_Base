@@ -1,6 +1,7 @@
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { GetOrgStructureSettingsJobTypesFormConfig } from "./form-config";
-
+import { JobType } from "@/types/job-type";
+import TableStatusSwitcher from "@/components/shared/table-status";
 
 export const OrgStructureSettingsJobTypesTableConfig = () => {
   return {
@@ -8,12 +9,12 @@ export const OrgStructureSettingsJobTypesTableConfig = () => {
     tableId: "org-structure-job-types-table", // Add tableId to the config
     columns: [
       {
-        key: "job_type",
+        key: "name",
         label: "نوع الوظيفة",
         sortable: true,
       },
       {
-        key: "email",
+        key: "user_count",
         label: "عدد الموظفيين",
         sortable: true,
       },
@@ -21,11 +22,37 @@ export const OrgStructureSettingsJobTypesTableConfig = () => {
         key: "job_titles",
         label: "المسميات الوظيفية",
         sortable: true,
+        render: (_: unknown, row: JobType) => {
+          return (
+            <div className="flex flex-col">
+              {row?.job_titles?.length == 0 && <span>--</span>}
+              {row?.job_titles?.map((item) => (
+                <p key={item.id}>{item.name}</p>
+              ))}
+            </div>
+          );
+        },
       },
       {
-        key: "general_manager.name",
+        key: "status",
         label: "الحالة",
         sortable: true,
+        render: (_: unknown, row: JobType) => (
+          <TableStatusSwitcher
+            id={row.id}
+            label={"نشط"}
+            initialStatus={row.status == 1}
+            confirmAction={async (isActive) => {
+              return await apiClient.patch(`/job_types/${row.id}/status`, {
+                status: Number(isActive),
+              });
+            }}
+            confirmDescription={(isActive) =>
+              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشظ"
+            }
+            showDatePicker={() => false}
+          />
+        ),
       },
     ],
     defaultSortColumn: "id",

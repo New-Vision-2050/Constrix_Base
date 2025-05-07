@@ -1,8 +1,7 @@
 import { JobTitle } from "@/types/job-title";
-import { baseURL } from "@/config/axios-config";
-import { Label } from "@/modules/table/components/ui/label";
-import { Switch } from "@/modules/table/components/ui/switch";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { GetOrgStructureSettingsFormConfig } from "./form-config";
+import TableStatusSwitcher from "@/components/shared/table-status";
 
 export const OrgStructureSettingsTableConfig = () => {
   return {
@@ -29,12 +28,20 @@ export const OrgStructureSettingsTableConfig = () => {
         label: "الحالة",
         sortable: true,
         render: (_: unknown, row: JobTitle) => (
-          <div className="flex items-center gap-2">
-            <Label htmlFor={`${row.id}-switcher`} className="font-normal">
-              نشط
-            </Label>
-            <Switch id={`${row.id}-switcher`} checked={row.status == 1} />
-          </div>
+          <TableStatusSwitcher
+            id={row.id}
+            label={"نشط"}
+            initialStatus={row.status == 1}
+            confirmAction={async (isActive) => {
+              return await apiClient.patch(`/job_titles/${row.id}/status`, {
+                status: Number(isActive),
+              });
+            }}
+            confirmDescription={(isActive) =>
+              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشظ"
+            }
+            showDatePicker={() => false}
+          />
         ),
       },
     ],
