@@ -4,10 +4,21 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
 import { OrgStructureSettingsTableConfig } from "./table-config";
 import { GetOrgStructureSettingsFormConfig } from "./form-config";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 export default function OrgStructureJobTitlesSetting() {
   // ** declare nad define component state and state
   const config = OrgStructureSettingsTableConfig();
+
+  const handleFormSuccess = () => {
+    const tableStore = useTableStore.getState();
+
+    tableStore.reloadTable(config.tableId);
+
+    setTimeout(() => {
+      tableStore.setLoading(config.tableId, false);
+    }, 100);
+  };
 
   // ** return component ui.
   return (
@@ -19,6 +30,7 @@ export default function OrgStructureJobTitlesSetting() {
             <SheetFormBuilder
               config={GetOrgStructureSettingsFormConfig()}
               trigger={<Button>اضافة المسمى الوظيفي</Button>}
+              onSuccess={handleFormSuccess}
             />
           </div>
         }
