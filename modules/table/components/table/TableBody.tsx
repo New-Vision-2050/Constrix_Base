@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import { ColumnConfig } from "@/modules/table/utils/configs/columnConfig";
 import { TableData } from "@/modules/table/utils/tableTypes";
