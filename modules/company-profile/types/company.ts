@@ -18,6 +18,7 @@ export interface CompanyLegalData {
 export interface CompanyDocument {
   id: string;
   name: string;
+  document_type?: string;
   files: {
     id: number;
     mime_type: string;
