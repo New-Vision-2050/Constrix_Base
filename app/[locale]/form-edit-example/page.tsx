@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SheetFormBuilder, useFormData, FormConfig } from "@/modules/form-builder";
+import {
+  SheetFormBuilder,
+  useFormData,
+  FormConfig,
+} from "@/modules/form-builder";
+import { useTranslations } from "next-intl";
 
 // Example form configuration with edit mode support
 const editableFormConfig: FormConfig = {
@@ -136,23 +141,23 @@ const apiEditFormConfig: FormConfig = {
 };
 
 export default function FormEditExample() {
+  const t = useTranslations();
+
   const [showDirectEditForm, setShowDirectEditForm] = useState(false);
   const [showApiEditForm, setShowApiEditForm] = useState(false);
   const [recordId, setRecordId] = useState<string | null>(null);
 
   // Form with direct edit values
-  const {
-    isEditMode: isDirectEditMode,
-    values: directEditValues,
-  } = useFormData({
-    config: editableFormConfig,
-    onSuccess: () => {
-      setShowDirectEditForm(false);
-    },
-    onError: (error) => {
-      console.error("Form error:", error);
-    },
-  });
+  const { isEditMode: isDirectEditMode, values: directEditValues } =
+    useFormData({
+      config: editableFormConfig,
+      onSuccess: () => {
+        setShowDirectEditForm(false);
+      },
+      onError: (error) => {
+        console.error("Form error:", error);
+      },
+    });
 
   // Form with API-based edit values
   const {
@@ -196,10 +201,7 @@ export default function FormEditExample() {
           <p className="mb-4">
             This example uses direct values provided in the form configuration.
           </p>
-          <Button
-            onClick={() => setShowDirectEditForm(true)}
-            className="mb-4"
-          >
+          <Button onClick={() => setShowDirectEditForm(true)} className="mb-4">
             Open Edit Form
           </Button>
 
@@ -226,8 +228,8 @@ export default function FormEditExample() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">API Edit Form</h2>
           <p className="mb-4">
-            This example would load data from an API. For demo purposes, we&apos;re
-            simulating an API call.
+            This example would load data from an API. For demo purposes,
+            we&apos;re simulating an API call.
           </p>
           <div className="flex gap-2 mb-4">
             <Button
@@ -258,7 +260,7 @@ export default function FormEditExample() {
             />
           )}
 
-          {isLoadingEditData && <p>Loading data...</p>}
+          {isLoadingEditData && <p>{t("Main.Loading")}</p>}
           {editError && <p className="text-red-500">Error: {editError}</p>}
           {isApiEditMode && !isLoadingEditData && !editError && (
             <div className="mt-4 p-4 bg-gray-100 rounded">
