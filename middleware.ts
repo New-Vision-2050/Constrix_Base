@@ -14,7 +14,6 @@ export async function middleware(req: NextRequest) {
 
   const nvToken = req.cookies.get("new-vision-token")?.value;
   const pathname = req.nextUrl.pathname;
-  console.log("Pathname", pathname);
 
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
 
