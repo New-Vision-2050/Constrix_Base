@@ -1,3 +1,4 @@
+"use client";
 import React, { memo, useMemo } from 'react';
 import { Checkbox } from '@/modules/table/components/ui/checkbox';
 import { Label } from '@/modules/table/components/ui/label';
@@ -39,7 +40,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
     }
     return field.options || [];
   }, [field.options, field.dynamicOptions, dynamicOptions]);
-  
+
   // Convert value to array if it's a string (single select mode)
   const selectedValues = useMemo(() => {
     if (!value) return [];
@@ -61,7 +62,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
       // Single-select mode (radio-like behavior)
       onChange(checked ? optionValue : '');
     }
-    
+
     // Call onBlur to trigger validation
     onBlur();
   };
@@ -74,7 +75,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
           Loading options...
         </div>
       )}
-      
+
       {options.map((option) => (
         <div key={option.value} className="flex items-center space-x-2">
           <Checkbox
@@ -97,7 +98,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
           </Label>
         </div>
       ))}
-      
+
       {/* Error message */}
       {!!error && touched && (
         <div className="text-destructive text-sm mt-1">
