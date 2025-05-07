@@ -194,6 +194,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                   url={dataUrl}
                   selectedRows={selectedRows}
                   disabled={loading || !selectionEnabled}
+                  searchQuery={searchQuery}
+                  searchFields={searchFields}
+                  columnSearchState={columnSearchState}
                 />
                 {/* Include any custom actions passed from the parent */}
                 {searchBarActions}
