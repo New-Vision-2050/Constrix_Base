@@ -1,4 +1,8 @@
 {
+  "Main": {
+    "NoResultsRound": "No results found",
+    "Loading": "Loading data..."
+  },
   "Login": {
     "Control_panel": "Control panel",
     "SignIn": "Sign In",

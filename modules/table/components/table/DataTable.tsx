@@ -1,18 +1,18 @@
-
-import React from 'react';
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ColumnConfig } from '@/modules/table/utils/configs/columnConfig';
-import { TableData } from '@/modules/table/utils/tableTypes';
-import TableHeader from './TableHeader';
-import TableBody from './TableBody';
-import Pagination from './Pagination';
-import LoadingSpinner from './LoadingSpinner';
+import { ColumnConfig } from "@/modules/table/utils/configs/columnConfig";
+import { TableData } from "@/modules/table/utils/tableTypes";
+import TableHeader from "./TableHeader";
+import TableBody from "./TableBody";
+import Pagination from "./Pagination";
+import LoadingSpinner from "./LoadingSpinner";
+import { useTranslations } from "next-intl";
 
 interface DataTableProps {
   data: TableData[];
   columns: ColumnConfig[];
   searchQuery?: string;
-  sortState: { column: string | null; direction: 'asc' | 'desc' | null };
+  sortState: { column: string | null; direction: "asc" | "desc" | null };
   onSort: (column: string) => void;
   enableSorting: boolean;
   enablePagination: boolean;
@@ -23,7 +23,7 @@ interface DataTableProps {
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (items: number) => void;
   loading?: boolean;
-  
+
   // Row selection props
   selectionEnabled?: boolean;
   selectedRows?: Record<string | number, boolean>;
@@ -46,14 +46,15 @@ const DataTable: React.FC<DataTableProps> = ({
   onPageChange,
   onItemsPerPageChange,
   loading = false,
-  
+
   // Row selection props
   selectionEnabled = false,
   selectedRows = {},
   onSelectRow,
-  onSelectAllRows
+  onSelectAllRows,
 }) => {
   const hasColumns = columns && columns.length > 0;
+  const t = useTranslations();
 
   return (
     <motion.div
@@ -85,8 +86,13 @@ const DataTable: React.FC<DataTableProps> = ({
               {loading ? (
                 <tbody>
                   <tr>
-                    <td colSpan={selectionEnabled ? columns.length + 1 : columns.length} className="py-8">
-                      <LoadingSpinner text="Loading data..." size="small" />
+                    <td
+                      colSpan={
+                        selectionEnabled ? columns.length + 1 : columns.length
+                      }
+                      className="py-8"
+                    >
+                      <LoadingSpinner text={t("Main.Loading")} size="small" />
                     </td>
                   </tr>
                 </tbody>
