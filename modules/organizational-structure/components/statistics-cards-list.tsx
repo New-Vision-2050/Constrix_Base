@@ -1,57 +1,107 @@
-import { BackpackIcon, ChartColumnStacked, MapPin, UserIcon } from "lucide-react";
+"use client";
+import {
+  BackpackIcon,
+  ChartColumnStacked,
+  MapPin,
+  UserIcon,
+} from "lucide-react";
 import StatisticsCard from "./StatisticsCard";
+import { useOrgStructureCxt } from "../context/OrgStructureCxt";
+import { useMemo } from "react";
 
 export default function StatisticsCardsList() {
-  const statisticsCardsList = [
-    {
-      number: "120",
-      title: "مؤشر عدد الموظفين",
-      description: "اجمالي عدد الموظفين",
-      icon: <UserIcon color="pink" />,
-      progressBarValue: 85,
-      leftSideInfo: { count: "115", description: "عدد الموظفين المستخدمة" },
-      rightSideInfo: { count: "5", description: "عدد الموظفين المتبقية" },
-    },
-    {
-      number: "10",
-      title: "مؤشر عدد الفروع",
-      description: "اجمالي عدد الفروع",
-      icon: <MapPin color="green" />,
-      progressBarValue: 80,
-      leftSideInfo: { count: "8", description: "عدد الفروع المستخدمة" },
-      rightSideInfo: { count: "2", description: "عدد الفروع المتبقية" },
-    },
-    {
-      number: "120",
-      title: "مؤشر عدد الادارات الرئيسية",
-      description: "اجمالي عدد الادارات الرئيسية",
-      icon: <BackpackIcon color="pink" />,
-      progressBarValue: 40,
-      leftSideInfo: {
-        count: "40",
-        description: "عدد الادارات الرئيسية المستخدمة",
+  const { widgets, widgetsLoading } = useOrgStructureCxt();
+
+  const statisticsCardsList = useMemo(() => {
+    const usersTotal = calculateAchievementPercentage(
+      widgets?.users?.total_users ?? 0,
+      widgets?.users?.users_with_hierarchy ?? 0
+    );
+    const branchesTotal = calculateAchievementPercentage(
+      widgets?.branches?.total_count ?? 0,
+      widgets?.branches?.used_count ?? 0
+    );
+    const managementsTotal = calculateAchievementPercentage(
+      widgets?.management?.total_count ?? 0,
+      widgets?.management?.used_count ?? 0
+    );
+    const departmentsTotal = calculateAchievementPercentage(
+      widgets?.departments?.total_count ?? 0,
+      widgets?.departments?.used_count ?? 0
+    );
+
+    
+    return [
+      {
+        number: widgets?.users?.total_users ?? 0,
+        title: "مؤشر عدد الموظفين",
+        description: "اجمالي عدد الموظفين",
+        icon: <UserIcon color="pink" />,
+        progressBarValue: usersTotal,
+        leftSideInfo: {
+          count: widgets?.users?.users_with_hierarchy ?? 0,
+          description: "عدد الموظفين المستخدمة",
+        },
+        rightSideInfo: {
+          count: widgets?.users?.users_without_hierarchy ?? 0,
+          description: "عدد الموظفين المتبقية",
+        },
       },
-      rightSideInfo: {
-        count: "80",
-        description: "عدد الادارات الرئيسية المتبقية",
+      {
+        number: widgets?.branches?.total_count ?? 0,
+        title: "مؤشر عدد الفروع",
+        description: "اجمالي عدد الفروع",
+        icon: <MapPin color="green" />,
+        progressBarValue: branchesTotal,
+        leftSideInfo: {
+          count: widgets?.branches?.used_count ?? 0,
+          description: "عدد الفروع المستخدمة",
+        },
+        rightSideInfo: {
+          count: widgets?.branches?.unused_count ?? 0,
+          description: "عدد الفروع المتبقية",
+        },
       },
-    },
-    {
-      number: "40",
-      title: "مؤشر عدد الادارات الفرعية",
-      description: "اجمالي عدد الادارات الفرعية",
-      icon: <ChartColumnStacked color="orange" />,
-      progressBarValue: 50,
-      leftSideInfo: {
-        count: "20",
-        description: "عدد الادارات الفرعية المستخدمة",
+      {
+        number: widgets?.management?.total_count ?? 0,
+        title: "مؤشر عدد الادارات الرئيسية",
+        description: "اجمالي عدد الادارات الرئيسية",
+        icon: <BackpackIcon color="pink" />,
+        progressBarValue: managementsTotal,
+        leftSideInfo: {
+          count: widgets?.management?.used_count ?? 0,
+          description: "عدد الادارات الرئيسية المستخدمة",
+        },
+        rightSideInfo: {
+          count: widgets?.management?.unused_count ?? 0,
+          description: "عدد الادارات الرئيسية المتبقية",
+        },
       },
-      rightSideInfo: {
-        count: "20",
-        description: "عدد الادارات الفرعية المتبقية",
+      {
+        number: widgets?.departments?.total_count ?? 0,
+        title: "مؤشر عدد الادارات الفرعية",
+        description: "اجمالي عدد الادارات الفرعية",
+        icon: <ChartColumnStacked color="orange" />,
+        progressBarValue: departmentsTotal ?? 0,
+        leftSideInfo: {
+          count: widgets?.departments?.used_count ?? 0,
+          description: "عدد الادارات الفرعية المستخدمة",
+        },
+        rightSideInfo: {
+          count: widgets?.departments?.unused_count ?? 0,
+          description: "عدد الادارات الفرعية المتبقية",
+        },
       },
-    },
-  ];
+    ];
+  }, [widgets]);
+
+  function calculateAchievementPercentage(
+    total: number,
+    completed: number
+  ): number {
+    if (total === 0) return 0;
+    return (completed / total) * 100;
+  }
 
   return (
     <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4">
