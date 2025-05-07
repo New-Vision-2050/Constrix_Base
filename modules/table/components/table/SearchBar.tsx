@@ -181,7 +181,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             )}
           </div>
         )}
-
         {/*    {searchConfig.allowFieldSelection && (
           <Popover>
             <PopoverTrigger asChild>
