@@ -8,7 +8,11 @@ export const OrganizationalStructureSettingsTabs: SystemTab[] = [
     id: "organizational-structure-settings-job-titles",
     title: "المسميات الوظيفية",
     icon: <UserIcon />,
-    content: <OrgStructureJobTitlesSetting />,
+    content: (
+      <>
+        <OrgStructureJobTitlesSetting />
+      </>
+    ),
   },
   {
     id: "organizational-structure-settings-job-types",

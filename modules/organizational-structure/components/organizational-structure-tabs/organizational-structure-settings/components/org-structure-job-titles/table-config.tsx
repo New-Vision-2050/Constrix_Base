@@ -1,6 +1,6 @@
 import { JobTitle } from "@/types/job-title";
 import { apiClient, baseURL } from "@/config/axios-config";
-import { GetOrgStructureSettingsFormConfig } from "./form-config";
+import { OrgStructureSettingsFormConfig } from "./form-config";
 import TableStatusSwitcher from "@/components/shared/table-status";
 
 export const OrgStructureSettingsTableConfig = () => {
@@ -55,7 +55,7 @@ export const OrgStructureSettingsTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: GetOrgStructureSettingsFormConfig(),
+    formConfig: OrgStructureSettingsFormConfig,
     executions: [],
     executionConfig: {
       canEdit: true,
