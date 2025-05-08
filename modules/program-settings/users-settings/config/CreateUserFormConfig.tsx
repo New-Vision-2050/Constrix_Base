@@ -1,17 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { useQueryClient } from "@tanstack/react-query";
-import { serialize } from "object-to-formdata";
-import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { baseURL } from "@/config/axios-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
-import { SubTableConfig } from "./SubTableConfig";
 
 export const CreateUserFormConfig = () => {
-  const queryClient = useQueryClient();
   const CreateUserFormConfig: FormConfig = {
     formId: `CreateUserFormConfig-programSettings`,
-    title: "اضافة بيان قانوني",
+    title: "اضافة جدول",
     apiUrl: `${baseURL}/sub_entities`,
     laravelValidation: {
       enabled: true,
@@ -42,8 +36,8 @@ export const CreateUserFormConfig = () => {
           {
             type: "select",
             name: "super_entity",
-            label: "الجدول الرئيسي",
-            placeholder: "الجدول الرئيسي",
+            label: "البرنامج الرئيسي",
+            placeholder: "البرنامج الرئيسي",
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/list`,
               valueField: "name",
@@ -65,8 +59,8 @@ export const CreateUserFormConfig = () => {
           {
             type: "select",
             name: "main_program_id",
-            label: "الجدول الرئيسي",
-            placeholder: "الجدول الرئيسي",
+            label: "الجدول المرجعي",
+            placeholder: "الجدول المرجعي",
             dynamicOptions: {
               url: `${baseURL}/programs?program_name=users`,
               valueField: "id",
@@ -91,23 +85,21 @@ export const CreateUserFormConfig = () => {
             label: "",
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
-            options: [
-              { value: "name", label: "name" },
-              { value: "email", label: "email" },
-              { value: "phone", label: "phone" },
-              { value: "phone_code", label: "phone_code" },
-              { value: "login_way_id", label: "login_way_id" },
-              {
-                value: "global_company_user_id",
-                label: "global_company_user_id",
-              },
-              { value: "company_id", label: "company_id" },
-              { value: "is_owner", label: "is_owner" },
-              {
-                value: "management_hierarchy_id",
-                label: "management_hierarchy_id",
-              },
-            ],
+            dynamicOptions: {
+              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: (values) => !!values["main_program_id"],
+            onChange: (a) => {
+              console.log("changed;    ", a);
+            },
           },
           {
             type: "checkboxGroup",
@@ -115,10 +107,18 @@ export const CreateUserFormConfig = () => {
             label: "",
             optionsTitle: "العناصر التنقية",
             isMulti: true,
-            options: [
-              { value: "created_at", label: "created_at" },
-              { value: "updated_at", label: "updated_at" },
-            ],
+            dynamicOptions: {
+              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: (values) => !!values["main_program_id"],
           },
           {
             type: "select",

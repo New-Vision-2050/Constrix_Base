@@ -4,7 +4,10 @@ import React from "react";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
-
+import EmployeeTableContent from "../components/sub-tables/EmployeeTableContent";
+import { SheetFormBuilder } from "@/modules/form-builder";
+import { AddDocFormConfig } from "@/modules/company-profile/components/official-data/official-docs-section/add-doc-form-config";
+import { UpdateSubTableAttributes } from "./UpdateSubTableAttributes";
 
 interface Entity {
   id: string;
@@ -147,17 +150,17 @@ export const SubTableConfig = () => {
     executions: [
       {
         label: "محتويات الجدول",
-        action: "openDialog",
-        dialogComponent: ChooseUserCompany,
+        action: "openEmployeeTableContentDialog",
+        dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
-            user: row,
+            config: UpdateSubTableAttributes(row?.id),
           };
         },
       },
       {
         label: "اعدادات الجدول",
-        action: "openDialog",
+        action: () => null,
         dialogComponent: ChooseUserCompany,
         dialogProps: (row: Entity) => {
           return {
