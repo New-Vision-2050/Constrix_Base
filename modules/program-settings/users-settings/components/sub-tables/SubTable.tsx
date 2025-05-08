@@ -14,7 +14,7 @@ const SubTables = () => {
         <div className="flex items-center gap-3">
           <SheetFormBuilder
             config={CreateUserFormConfig()}
-            trigger={<Button>إنشاء مستخدم</Button>}
+            trigger={<Button>إنشاء جدول</Button>}
           />{" "}
         </div>
       }
