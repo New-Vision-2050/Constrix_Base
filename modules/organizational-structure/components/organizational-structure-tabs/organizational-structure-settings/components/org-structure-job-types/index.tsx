@@ -30,7 +30,7 @@ export default function OrgStructureJobTypesSetting() {
           <div className="flex items-center gap-3">
             <SheetFormBuilder
               config={GetOrgStructureSettingsJobTypesFormConfig()}
-              trigger={<Button>اضافة المسمى الوظيفي</Button>}
+              trigger={<Button>اضافة نوع الوظيفة</Button>}
               onSuccess={handleFormSuccess}
             />
           </div>
