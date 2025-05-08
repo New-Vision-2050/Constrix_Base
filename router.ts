@@ -9,4 +9,5 @@ export const ROUTER = {
   PROGRAM_SETTINGS: {
     USERS: "users-settings",
   },
+  Organizational_Structure: "/organizational-structure",
 };

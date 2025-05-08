@@ -17,12 +17,18 @@ interface ExportButtonProps {
   url: string;
   selectedRows: Record<string | number, boolean>;
   disabled?: boolean;
+  searchQuery?: string;
+  searchFields?: string[];
+  columnSearchState?: Record<string, any>;
 }
 
 const ExportButton: React.FC<ExportButtonProps> = ({
   url,
   selectedRows,
-  disabled = false
+  disabled = false,
+  searchQuery = '',
+  searchFields = [],
+  columnSearchState = {}
 }) => {
   const t = useTranslations();
   const { toast } = useToast();
@@ -40,10 +46,13 @@ const ExportButton: React.FC<ExportButtonProps> = ({
     try {
       setLoading(true);
 
-      // Make the API call with the selected row IDs
+      // Make the API call with the selected row IDs and search parameters
       const response = await apiClient.post(exportUrl, {
         ids: selectedIds,
         format,
+        searchQuery,
+        searchFields,
+        columnSearchState
       }, {
         responseType: 'blob', // Important for handling file streams
       });
