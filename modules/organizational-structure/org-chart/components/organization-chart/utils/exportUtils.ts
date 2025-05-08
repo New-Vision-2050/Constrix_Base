@@ -1,7 +1,6 @@
 
 import { FlattenedNode } from "./flattenOrgNodes";
 import { OrgChartNode } from "@/types/organization";
-import { TableHead } from '@/components/ui/table'
 import React from 'react'
 
 // Convert flattened org chart nodes to CSV format
