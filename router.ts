@@ -7,7 +7,7 @@ export const ROUTER = {
   COMPANY_PROFILE: "/company-profile",
   USER_PROFILE: "/user-profile",
   PROGRAM_SETTINGS: {
-    USERS: "users-settings",
+    USERS: "/users-settings",
   },
   Organizational_Structure: "/organizational-structure",
 };
