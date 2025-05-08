@@ -203,7 +203,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                 <ExportButton
                   url={dataUrl}
                   selectedRows={selectedRows}
-                  disabled={loading || !selectionEnabled}
+                  disabled={loading || !selectionEnabled || !data.length}
                   searchQuery={searchQuery}
                   searchFields={searchFields}
                   columnSearchState={columnSearchState}

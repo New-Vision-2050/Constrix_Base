@@ -1,10 +1,10 @@
-
-import React from 'react';
-import { ColumnConfig } from '@/modules/table/utils/configs/columnConfig';
-import { TableData } from '@/modules/table/utils/tableTypes';
-import { formatValue, getNestedValue } from '@/modules/table/utils/dataUtils';
-import { Database, Check } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
+import React from "react";
+import { ColumnConfig } from "@/modules/table/utils/configs/columnConfig";
+import { TableData } from "@/modules/table/utils/tableTypes";
+import { formatValue, getNestedValue } from "@/modules/table/utils/dataUtils";
+import { Database } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslations } from "next-intl";
 
 interface TableBodyProps {
   data: TableData[];
@@ -23,16 +23,23 @@ const TableBody: React.FC<TableBodyProps> = ({
   selectionEnabled = false,
   selectedRows = {},
   onSelectRow,
-  onSelectAllRows
+  onSelectAllRows,
 }) => {
+  const t = useTranslations();
   if (data.length === 0) {
     return (
       <tbody>
         <tr>
-          <td colSpan={selectionEnabled ? columns.length + 1 : columns.length} className="p-6 text-center text-muted-foreground">
+          <td
+            colSpan={selectionEnabled ? columns.length + 1 : columns.length}
+            className="p-6 text-center text-muted-foreground"
+          >
             <div className="flex flex-col items-center justify-center py-4">
               <Database className="h-8 w-8 text-muted-foreground/60 mb-2" />
-              <span>No results found{searchQuery ? ` for "${searchQuery}"` : ''}</span>
+              <span>
+                {t("Main.NoResultsRound")}
+                {searchQuery ? ` ${searchQuery}` : ""}
+              </span>
             </div>
           </td>
         </tr>
@@ -41,10 +48,12 @@ const TableBody: React.FC<TableBodyProps> = ({
   }
 
   // Calculate if all rows are selected
-  const allSelected = data.length > 0 && data.every((row, index) => {
-    const rowId = row.id !== undefined ? row.id : index;
-    return selectedRows[rowId];
-  });
+  const allSelected =
+    data.length > 0 &&
+    data.every((row, index) => {
+      const rowId = row.id !== undefined ? row.id : index;
+      return selectedRows[rowId];
+    });
 
   const handleSelectAll = (checked: boolean) => {
     if (onSelectAllRows) {
@@ -63,35 +72,41 @@ const TableBody: React.FC<TableBodyProps> = ({
       {data.map((row, rowIndex) => {
         const rowId = row.id !== undefined ? row.id : rowIndex;
         const isSelected = selectedRows[rowId] || false;
-        
+
         return (
           <tr
             key={rowIndex}
-            className={`border-b border-border last:border-0 transition-colors ${isSelected ? 'bg-muted/30' : ''}`}
+            className={`border-b border-border last:border-0 transition-colors ${
+              isSelected ? "bg-muted/30" : ""
+            }`}
           >
             {selectionEnabled && (
               <td className="p-2 md:p-3 w-10 text-center">
                 <Checkbox
                   checked={isSelected}
-                  onCheckedChange={(checked) => handleSelectRow(rowId, !!checked)}
+                  onCheckedChange={(checked) =>
+                    handleSelectRow(rowId, !!checked)
+                  }
                   aria-label={`Select row ${rowIndex + 1}`}
                 />
               </td>
             )}
             {columns.map((column, colIndex) => {
               const value = getNestedValue(row, column.key);
-              const isMobileHidden = column.hideOnMobile ? 'hidden sm:table-cell' : '';
-              
+              const isMobileHidden = column.hideOnMobile
+                ? "hidden sm:table-cell"
+                : "";
+
               // Use logical properties for RTL/LTR support
               const alignment = column.align
                 ? `text-${column.align}`
-                : 'text-start'; // text-start respects RTL/LTR
-              
+                : "text-start"; // text-start respects RTL/LTR
+
               return (
                 <td
                   key={`${rowIndex}-${column.key}`}
                   className={`p-2 md:p-3 text-sm table-cell-fade-in ${alignment} ${isMobileHidden}`}
-                  style={{ '--index': colIndex } as React.CSSProperties}
+                  style={{ "--index": colIndex } as React.CSSProperties}
                 >
                   {formatValue(value, column, row)}
                 </td>
