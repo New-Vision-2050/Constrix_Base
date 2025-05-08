@@ -128,6 +128,7 @@
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
     "createCompany": "انشاء شركة",
+    "SaveCompany":"تم حفظ الشركة برقم",
     "Validation": {
       "arabicName": "الاسم التجاري يجب ان يكون باللغه العربية",
       "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية",
