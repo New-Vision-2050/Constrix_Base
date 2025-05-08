@@ -29,7 +29,10 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   tableId: propTableId,
 }) => {
   // Generate a random ID if not provided in config or props
-  const tableId = propTableId || config?.tableId || `table-${Math.random().toString(36).substring(2, 9)}`;
+  const tableId =
+    propTableId ||
+    config?.tableId ||
+    `table-${Math.random().toString(36).substring(2, 9)}`;
   const { toast } = useToast();
 
   // Use the reset hook to clear table state on route changes
@@ -113,9 +116,15 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
 
   useEffect(() => {
     // Only initialize once and only if we have columns
-    if (!columnsInitializedRef.current && config?.columns && config.columns.length > 0) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[TableBuilder] Initializing columns for table ${tableIdRef.current}`);
+    if (
+      !columnsInitializedRef.current &&
+      config?.columns &&
+      config.columns.length > 0
+    ) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(
+          `[TableBuilder] Initializing columns for table ${tableIdRef.current}`
+        );
       }
       setColumns(config.columns);
       columnsInitializedRef.current = true;
@@ -138,7 +147,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   const searchableColumns = columns;
   const hasSearchableColumns = searchableColumns.length > 0;
   const allSearchedFields = config?.allSearchedFields;
-
 
   // Show error toast when an error occurs
   React.useEffect(() => {
@@ -175,6 +183,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
 
         {enableSearch && hasSearchableColumns && (
           <SearchBar
+            tableTitle={config?.tableTitle}
+            hideSearchField={config?.hideSearchField}
             searchQuery={searchQuery}
             onSearch={handleSearch}
             searchConfig={searchConfig}
@@ -211,19 +221,20 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
           columns={
             // Never return an empty array of columns
             // If columnVisibility.visible is false, still show the columns but respect the keys
-            (columnVisibility?.keys?.length > 0 || visibleColumnKeys.length > 0)
+            columnVisibility?.keys?.length > 0 || visibleColumnKeys.length > 0
               ? (config?.columns || columns).filter((col: ColumnConfig) => {
                   // If columnVisibility.visible is false, don't filter by keys
                   if (columnVisibility?.visible === false) {
                     return true;
                   }
 
-                  const keysToUse = columnVisibility?.keys?.length > 0
-                    ? columnVisibility.keys
-                    : visibleColumnKeys;
+                  const keysToUse =
+                    columnVisibility?.keys?.length > 0
+                      ? columnVisibility.keys
+                      : visibleColumnKeys;
                   return keysToUse.includes(col.key);
                 })
-              : (config?.columns || columns)
+              : config?.columns || columns
           }
           searchQuery={searchQuery}
           sortState={sortState}
@@ -237,7 +248,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
           onPageChange={handlePageChange}
           onItemsPerPageChange={handleItemsPerPageChange}
           loading={loading}
-
           // Row selection props
           selectionEnabled={selectionEnabled}
           selectedRows={selectedRows}

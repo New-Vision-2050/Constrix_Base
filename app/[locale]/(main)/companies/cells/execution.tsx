@@ -230,7 +230,9 @@ const Execution = ({
                   ? item.dialogProps(row)
                   : item.dialogProps)}
                 open={dialogState.open}
+                isOpen={dialogState.open}
                 onClose={() => handleCloseDialog(item.action as string)}
+                onOpenChange={() => handleCloseDialog(item.action as string)}
                 onSuccess={() => {
                   const _dialogProps =
                     typeof item.dialogProps === "function"

@@ -1,5 +1,5 @@
-import { ColumnSearchConfig } from '../tableTypes';
-import { ColumnConfig } from './columnConfig';
+import { ColumnSearchConfig } from "../tableTypes";
+import { ColumnConfig } from "./columnConfig";
 
 export interface TableConfig {
   url: string;
@@ -7,7 +7,7 @@ export interface TableConfig {
   columns?: ColumnConfig[];
   defaultItemsPerPage?: number;
   defaultSortColumn?: string;
-  defaultSortDirection?: 'asc' | 'desc' | null;
+  defaultSortDirection?: "asc" | "desc" | null;
   defaultSearchQuery?: string;
   enableSorting?: boolean;
   enablePagination?: boolean;
@@ -24,4 +24,6 @@ export interface TableConfig {
   columnSearchConfig?: ColumnSearchConfig;
   // Additional search fields for advanced filtering
   allSearchedFields?: any[];
+  hideSearchField?: boolean;
+  tableTitle?: string;
 }
