@@ -37,7 +37,7 @@ export default function MainLayout({
       />{" "}
       <SidebarProvider>
         <AppSidebar name={name} mainLogo={mainLogo} isCentral={isCentral} />
-        <SidebarInset className="bg-transparent">
+        <SidebarInset className="bg-transparent md:max-w-[calc(100vw-(var(--sidebar-width)))] md:overflow-hidden">
           <Header />
           {children}
         </SidebarInset>

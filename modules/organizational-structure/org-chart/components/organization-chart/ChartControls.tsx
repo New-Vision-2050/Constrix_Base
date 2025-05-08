@@ -1,4 +1,4 @@
-import { ZoomIn, ZoomOut, RefreshCw, UserPlus, List, Trees, Download, FileType } from 'lucide-react'
+import { ZoomIn, ZoomOut, RefreshCw, UserPlus, List, Trees, Download, FileType, Maximize, Minimize } from "lucide-react";
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import {
@@ -23,6 +23,8 @@ interface ChartControlsProps {
   viewMode: 'tree' | 'list';
   onViewModeChange: (mode: 'tree' | 'list') => void;
   onExportPDF?: () => void;
+  isFullScreen?: boolean;
+  onToggleFullScreen?: () => void;
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
@@ -37,7 +39,9 @@ const ChartControls: React.FC<ChartControlsProps> = ({
                                                        viewMode,
                                                        onViewModeChange,
                                                        onExportPDF,
-                                                       listView
+                                                       listView,
+                                                       isFullScreen = false,
+                                                       onToggleFullScreen,
                                                      }) => {
   const locale = useLocale()
   return (
@@ -79,7 +83,14 @@ const ChartControls: React.FC<ChartControlsProps> = ({
           </Button>
         )}
 
-        {listView &&(
+        {viewMode === 'tree' && onToggleFullScreen && (
+          <Button variant="outline" size="sm" onClick={onToggleFullScreen}
+                  title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'}>
+            {isFullScreen ? <Minimize className="h-4 w-4"/> : <Maximize className="h-4 w-4"/>}
+          </Button>
+        )}
+
+        {listView && !isFullScreen &&(
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
