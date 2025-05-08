@@ -126,6 +126,19 @@ export function AppSidebar({
             },
           ],
         },
+           {
+          name: t("Sidebar.ProgramManagement"),
+          icon: LayoutDashboardIcon,
+          isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+          submenu: [
+            {
+              name: t("Sidebar.Users"),
+              url: ROUTER.PROGRAM_SETTINGS.USERS,
+              icon: LayoutDashboardIcon,
+              isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+            },
+          ],
+        },
         settingsRoutes,
       ]
     : [settingsRoutes];
