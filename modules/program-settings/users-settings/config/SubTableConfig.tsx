@@ -26,7 +26,7 @@ export const SubTableConfig = () => {
 
   return {
     url: `${baseURL}/sub_entities/programs/sub_tables?program_name=users`,
-    tableId: "users-table", // Add tableId to the config
+    tableId: "program-settings-sub-table", // Add tableId to the config
     columns: [
       {
         key: "name",
