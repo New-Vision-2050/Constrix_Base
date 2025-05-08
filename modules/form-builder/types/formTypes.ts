@@ -98,6 +98,7 @@ export interface FieldConfig {
     | "text"
     | "textarea"
     | "checkbox"
+    | "checkboxGroup"
     | "radio"
     | "select"
     | "multiSelect"
@@ -147,6 +148,7 @@ export interface FieldConfig {
   containerClassName?: string; // Class name for the container element
   width?: string;
   gridArea?: number;
+  optionsTitle?: string;
   options?: DropdownOption[]; // Using shared DropdownOption type
   validation?: ValidationRule[];
   condition?: (values: Record<string, any>) => boolean;
