@@ -1,6 +1,5 @@
 import React from 'react'
 import { OrgChartNode } from '@/types/organization'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useListView } from './useListView'
 import ListViewNode from './ListViewNode'
 import ListViewSearch from './ListViewSearch'

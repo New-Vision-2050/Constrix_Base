@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/modules/table/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, List, Trees } from 'lucide-react'
 import { OrgChartNode } from '@/types/organization'
