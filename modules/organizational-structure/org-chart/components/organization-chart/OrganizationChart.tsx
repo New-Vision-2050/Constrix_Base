@@ -30,14 +30,56 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
   const [displayNode, setDisplayNode] = useState<OrgChartNode>(data)
   const [originalData, setOriginalData] = useState<OrgChartNode>(data)
   const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree')
-  const chartContainerRef = useRef<HTMLDivElement>(null)
-  const chartTreeRef = useRef<HTMLDivElement>(null)
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartTreeRef = useRef<HTMLDivElement>(null);
+  const chartWrapperRef = useRef<HTMLDivElement>(null);
 
   // Set original data on component mount
   useEffect(() => {
     setOriginalData(data)
     setDisplayNode(data)
   }, [data])
+
+  // Handle full screen mode
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      // Enter full screen mode
+      if (chartWrapperRef.current?.requestFullscreen) {
+        chartWrapperRef.current.requestFullscreen().then(() => {
+          setIsFullScreen(true);
+        }).catch((err) => {
+          toast({
+            title: "Full Screen Error",
+            description: `Error attempting to enable full-screen mode: ${err.message}`,
+            duration: 3000,
+          });
+        });
+      }
+    } else {
+      // Exit full screen mode
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          setIsFullScreen(false);
+        }).catch((err) => {
+          console.error(`Error attempting to exit full-screen mode: ${err.message}`);
+        });
+      }
+    }
+  };
+
+  // Listen for full screen change events
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+    };
+  }, []);
 
   const handleNodeClick = (node: OrgChartNode) => {
     setSelectedNode(node)
@@ -109,7 +151,10 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+      <div
+        ref={chartWrapperRef}
+        className={`flex flex-col h-full ${isFullScreen ? 'bg-[#18003a] fixed inset-0 z-50' : ''}`}
+      >
       <ChartControls
         zoomLevel={[zoomLevel]} // Convert single number to array
         onZoomIn={zoomIn}
@@ -123,6 +168,8 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
         listView={listView}
         onViewModeChange={handleViewModeChange}
         onExportPDF={viewMode === 'tree' ? handleExportPDF : undefined}
+        isFullScreen={isFullScreen}
+        onToggleFullScreen={toggleFullScreen}
       />
 
       {((viewMode === 'tree') || !listView) ? (
