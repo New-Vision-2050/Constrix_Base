@@ -6,6 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"; // Adjust import based on your setup
 import CircleCheckIcon from "@/public/icons/circle-check";
+import { useTranslations } from "next-intl";
 
 interface CompanySaveDialogProps {
   open: boolean;
@@ -20,6 +21,8 @@ const CompanySaveDialog: React.FC<CompanySaveDialogProps> = ({
   handleClose,
   number,
 }) => {
+    const t = useTranslations('Companies');
+  
   return (
     <Dialog
       open={open}
@@ -34,10 +37,10 @@ const CompanySaveDialog: React.FC<CompanySaveDialogProps> = ({
             ✕
           </button>
           <CircleCheckIcon />
-          <DialogTitle className="text-white text-xl font-semibold !mt-7">
-            تم حفظ الشركة برقم
+          <DialogTitle className="text-xl font-semibold !mt-7">
+            {t("SaveCompany")}
           </DialogTitle>
-          <DialogDescription className="text-gray-300 text-lg mt-2">
+          <DialogDescription className=" text-lg mt-2">
             {number}
           </DialogDescription>
         </DialogHeader>

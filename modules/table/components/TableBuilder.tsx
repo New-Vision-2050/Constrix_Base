@@ -183,6 +183,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
 
         {enableSearch && hasSearchableColumns && (
           <SearchBar
+            tableTitle={config?.tableTitle}
+            hideSearchField={config?.hideSearchField}
             searchQuery={searchQuery}
             onSearch={handleSearch}
             searchConfig={searchConfig}

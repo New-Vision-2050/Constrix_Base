@@ -90,6 +90,7 @@ export const useTableInitialization = ({
               row={row}
               formConfig={formConfig}
               executions={executions}
+              tableName={tableId}
               buttonLabel={t("Companies.Actions")}
               showEdit={Boolean(executionsConfig?.canEdit)}
               showDelete={Boolean(executionsConfig?.canDelete)}
