@@ -45,6 +45,7 @@ export type ActionState = {
   };
   edit?: {
     open: boolean;
+    tableName?: string;
     config: FormConfig | null;
   };
   [key: string]:
@@ -197,6 +198,9 @@ const Execution = ({
       {formConfig && actionState.edit && actionState.edit.config && (
         <SheetFormBuilder
           recordId={row.id}
+          onSuccess={() => {
+            reloadTable();
+          }}
           config={actionState.edit.config}
           isOpen={actionState.edit.open}
           onOpenChange={() => handleCloseDialog("edit")}

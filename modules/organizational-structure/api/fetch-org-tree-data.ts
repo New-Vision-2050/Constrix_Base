@@ -1,4 +1,3 @@
-import { organizationTreeData } from '@/modules/user-profile/types/organization-tree-response'
 import { apiClient } from "@/config/axios-config";
 import { OrgChartNode } from '@/types/organization'
 
