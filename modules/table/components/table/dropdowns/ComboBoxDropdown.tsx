@@ -65,7 +65,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
     ? selectOptions.filter((opt) =>
         Array.isArray(localValue) && localValue.includes(opt.value)
       )
-    : selectOptions.find((opt) => opt.value === localValue) || null;
+    : selectOptions.find((opt) => opt.value == localValue) || null;
 
   return (
     <div className="space-y-2">
