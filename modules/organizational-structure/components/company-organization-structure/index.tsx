@@ -55,7 +55,7 @@ const CompanyOrganizationStructure = () => {
               key={tab.id}
               value={tab.id}
               dir={locale === "ar" ? "rtl" : "ltr"}
-              className="h-full pr-6"
+              className="h-full ltr:pl-6 rtl:pr-6"
             >
               <BranchOrganizationStructure branchId={tab.id}/>
             </TabsContent>

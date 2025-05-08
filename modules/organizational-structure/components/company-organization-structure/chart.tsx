@@ -18,7 +18,7 @@ const BranchOrganizationStructure = (props: PropsT) => {
         {isLoading && (
           <div className="flex justify-center items-center h-96">
             <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-            <span className="ml-2 text-lg text-gray-600">Loading organization data...</span>
+            <span className="ltr:ml-2 rtl:mr-2 text-lg text-gray-600">Loading organization data...</span>
           </div>
         )}
 
