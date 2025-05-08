@@ -38,8 +38,9 @@ export const CreateUserFormConfig = () => {
             name: "super_entity",
             label: "البرنامج الرئيسي",
             placeholder: "البرنامج الرئيسي",
+            required:true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/list`,
+              url: `${baseURL}/programs?program_name=users`,
               valueField: "name",
               labelField: "name",
               searchParam: "name",
@@ -61,8 +62,9 @@ export const CreateUserFormConfig = () => {
             name: "main_program_id",
             label: "الجدول المرجعي",
             placeholder: "الجدول المرجعي",
+            required:true,
             dynamicOptions: {
-              url: `${baseURL}/programs?program_name=users`,
+              url: `${baseURL}/sub_entities/super_entities/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -85,6 +87,7 @@ export const CreateUserFormConfig = () => {
             label: "",
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
+            required:true,
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/users/attributes`,
               valueField: "id",
@@ -106,6 +109,7 @@ export const CreateUserFormConfig = () => {
             name: "optional_attributes",
             label: "",
             optionsTitle: "العناصر التنقية",
+            required:true,
             isMulti: true,
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/users/attributes`,
