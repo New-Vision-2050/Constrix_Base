@@ -17,6 +17,7 @@ export interface PersonData {
 export interface OrgChartNode {
   id: string;
   name: string;
+  description?: string;
   branch_count?: string | number;
   department_count?: string | number;
   management_count?: string | number;
