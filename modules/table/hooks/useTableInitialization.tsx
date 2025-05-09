@@ -13,6 +13,8 @@ interface TableInitializationProps {
     canDelete?: boolean;
   };
   configColumns?: ColumnConfig[];
+  availableColumnKeys?: string[]; // New: Array of column keys that should be available
+  defaultVisibleColumnKeys?: string[]; // New: Array of column keys that should be visible by default
   defaultItemsPerPage: number;
   defaultSortColumn: string | null;
   defaultSortDirection: "asc" | "desc" | null;
@@ -35,6 +37,8 @@ export const useTableInitialization = ({
   executions = [],
   executionsConfig,
   configColumns,
+  availableColumnKeys,
+  defaultVisibleColumnKeys,
   defaultItemsPerPage,
   defaultSortColumn,
   defaultSortDirection,
@@ -99,11 +103,23 @@ export const useTableInitialization = ({
         });
       }
 
-      setColumns(configColumns);
+      // Filter columns based on availableColumnKeys if provided
+      let filteredColumns = [...configColumns];
+      if (availableColumnKeys && availableColumnKeys.length > 0) {
+        filteredColumns = filteredColumns.filter(col =>
+          availableColumnKeys.includes(col.key)
+        );
+      }
+
+      setColumns(filteredColumns);
 
       // Also initialize visible columns if the function is provided
       if (setVisibleColumns) {
-        const columnKeys = configColumns.map((col) => col.key);
+        // Use defaultVisibleColumnKeys if provided, otherwise use all column keys
+        const columnKeys = defaultVisibleColumnKeys && defaultVisibleColumnKeys.length > 0
+          ? defaultVisibleColumnKeys
+          : filteredColumns.map((col) => col.key);
+        
         setVisibleColumns(columnKeys);
       }
     }

@@ -126,9 +126,24 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
           `[TableBuilder] Initializing columns for table ${tableIdRef.current}`
         );
       }
-      setColumns(config.columns);
+      
+      // Filter columns based on availableColumnKeys if provided
+      let filteredColumns = [...config.columns];
+      if (config.availableColumnKeys && config.availableColumnKeys.length > 0) {
+        filteredColumns = filteredColumns.filter(col =>
+          config.availableColumnKeys!.includes(col.key)
+        );
+      }
+      
+      setColumns(filteredColumns);
+      
+      // Set default visible columns if provided
+      if (config.defaultVisibleColumnKeys && config.defaultVisibleColumnKeys.length > 0) {
+        setColumnVisibilityKeys(config.defaultVisibleColumnKeys);
+      }
+      
       columnsInitializedRef.current = true;
-      configColumnsRef.current = config.columns;
+      configColumnsRef.current = filteredColumns;
     }
   }, []); // Empty dependency array to run only once on mount
 
@@ -203,7 +218,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                 <ExportButton
                   url={dataUrl}
                   selectedRows={selectedRows}
-                  disabled={loading || !selectionEnabled}
+                  disabled={loading || !selectionEnabled || !data.length}
                   searchQuery={searchQuery}
                   searchFields={searchFields}
                   columnSearchState={columnSearchState}
@@ -222,7 +237,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             // Never return an empty array of columns
             // If columnVisibility.visible is false, still show the columns but respect the keys
             columnVisibility?.keys?.length > 0 || visibleColumnKeys.length > 0
-              ? (config?.columns || columns).filter((col: ColumnConfig) => {
+              ? columns.filter((col: ColumnConfig) => {
                   // If columnVisibility.visible is false, don't filter by keys
                   if (columnVisibility?.visible === false) {
                     return true;
@@ -234,7 +249,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                       : visibleColumnKeys;
                   return keysToUse.includes(col.key);
                 })
-              : config?.columns || columns
+              : columns
           }
           searchQuery={searchQuery}
           sortState={sortState}

@@ -91,6 +91,8 @@ export const useTableData = (
     executions: config?.executions,
     executionsConfig: config?.executionConfig,
     configColumns,
+    availableColumnKeys: config?.availableColumnKeys, // Pass the availableColumnKeys
+    defaultVisibleColumnKeys: config?.defaultVisibleColumnKeys, // Pass the defaultVisibleColumnKeys
     defaultItemsPerPage,
     defaultSortColumn,
     defaultSortDirection,

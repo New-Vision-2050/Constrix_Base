@@ -181,6 +181,15 @@ const FormField: React.FC<FormFieldProps> = ({
             onChange={onChange}
             onBlur={onBlur}
             dependencyValues={values}
+            formValues={values}
+            setFieldValue={(fieldName, newValue) => {
+              // Update the form value for the specified field
+              if (propOnChange) {
+                propOnChange(fieldName, newValue);
+              }
+              // Clear any existing errors for this field
+              formInstance.setError(fieldName, null);
+            }}
           />
         );
 
