@@ -99,6 +99,9 @@ export const CreateUserFormConfig = () => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+              syncWithField:"optional_attributes",
+              syncDirection:"unidirectional",
+              syncOn:"both",
             condition: (values) => !!values["main_program_id"],
             onChange: (a) => {
               console.log("changed;    ", a);
@@ -122,6 +125,9 @@ export const CreateUserFormConfig = () => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            syncWithField:"default_attributes",
+            syncDirection:"unidirectional",
+            syncOn:"unselect",
             condition: (values) => !!values["main_program_id"],
           },
           {
