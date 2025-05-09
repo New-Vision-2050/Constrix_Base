@@ -148,25 +148,6 @@ export const CreateUserFormConfig = () => {
     resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
-    // onSubmit: async (formData: Record<string, unknown>) => {
-    //   const obj = {
-    //     registration_type_id: formData.registration_type_id,
-    //     regestration_number: formData.regestration_number,
-    //     start_date: formData.start_date,
-    //     end_date: formData.end_date,
-    //     file: formData.file,
-    //   };
-
-    //   const newFormData = serialize(obj);
-
-    //   return await defaultSubmitHandler(newFormData, CreateUserFormConfig, {
-    //     config: {
-    //       params: {},
-    //     },
-    //     url: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
-    //   });
-    // },
-
     onSuccess: () => {
       const tableStore = useTableStore.getState();
       tableStore.reloadTable("program-settings-sub-table");
