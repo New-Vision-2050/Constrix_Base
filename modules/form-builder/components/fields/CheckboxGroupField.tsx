@@ -75,7 +75,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   // Handle individual checkbox change
   const handleChange = (optionValue: string, checked: boolean) => {
     let newValue: string | string[];
-    
+
     if (field.isMulti) {
       // Multi-select mode
       if (checked) {
@@ -89,42 +89,49 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
       // Single-select mode (radio-like behavior)
       newValue = checked ? optionValue : "";
     }
-    
+
     // Update this field's value
     onChange(newValue);
-    
+
     // Handle synchronization with another checkbox group if configured
     if (field.syncWithField && setFieldValue) {
       const shouldSync =
         (field.syncOn === "select" && checked) ||
         (field.syncOn === "unselect" && !checked) ||
         field.syncOn === "both";
-      
+
       if (shouldSync) {
         // Get the target field's current value
         const targetFieldValue = formValues[field.syncWithField];
         let targetNewValue: string | string[];
-        
-        // Determine if the target field is multi-select by checking its current value type
-        const isTargetMulti = Array.isArray(targetFieldValue);
-        
+
+        // Check if the target field is configured for multi-select
+        // We need to check the field config in formValues to determine this
+        const targetFieldConfig = Object.values(formValues)
+          .find((val: any) => val?.name === field.syncWithField) as FieldConfig | undefined;
+
+        // Default to multi-select if we can't determine
+        const isTargetMulti = targetFieldConfig?.isMulti !== false;
+
         if (isTargetMulti) {
+          // Ensure targetFieldValue is treated as an array
+          const targetValueArray = Array.isArray(targetFieldValue)
+            ? targetFieldValue
+            : (targetFieldValue ? [targetFieldValue] : []);
+
           if (checked) {
             // Add the value to the target field if not already present
-            targetNewValue = Array.isArray(targetFieldValue)
-              ? [...targetFieldValue, optionValue].filter((v, i, a) => a.indexOf(v) === i)
-              : [optionValue];
+            targetNewValue = [...targetValueArray, optionValue]
+              .filter((v, i, a) => a.indexOf(v) === i);
           } else {
             // Remove the value from the target field
-            targetNewValue = Array.isArray(targetFieldValue)
-              ? targetFieldValue.filter(val => val !== optionValue)
-              : [];
+            targetNewValue = targetValueArray.filter(val => val !== optionValue);
           }
         } else {
           // For single-select target fields
           targetNewValue = checked ? optionValue : "";
         }
-        
+
         // Update the target field
         setFieldValue(field.syncWithField, targetNewValue);
       }
@@ -139,37 +146,44 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
     const newValue = checked
       ? options.map((option) => option.value)
       : [];
-    
+
     // Update this field's value
     onChange(newValue);
-    
+
     // Handle synchronization with another checkbox group if configured
     if (field.syncWithField && setFieldValue && field.isMulti) {
       const shouldSync =
         (field.syncOn === "select" && checked) ||
         (field.syncOn === "unselect" && !checked) ||
         field.syncOn === "both";
-      
+
       if (shouldSync) {
         // Get the target field's current value
         const targetFieldValue = formValues[field.syncWithField];
-        
-        // Determine if the target field is multi-select
-        const isTargetMulti = Array.isArray(targetFieldValue);
-        
+
+        // Check if the target field is configured for multi-select
+        const targetFieldConfig = Object.values(formValues)
+          .find((val: any) => val?.name === field.syncWithField) as FieldConfig | undefined;
+
+        // Default to multi-select if we can't determine
+        const isTargetMulti = targetFieldConfig?.isMulti !== false;
+
         if (isTargetMulti) {
+          // Ensure targetFieldValue is treated as an array
+          const targetValueArray = Array.isArray(targetFieldValue)
+            ? targetFieldValue
+            : (targetFieldValue ? [targetFieldValue] : []);
+
           // For multi-select target fields
           if (checked) {
             // Add all options to the target field
-            const targetNewValue = Array.isArray(targetFieldValue)
-              ? [...targetFieldValue, ...options.map(opt => opt.value)].filter((v, i, a) => a.indexOf(v) === i)
-              : options.map(opt => opt.value);
+            const targetNewValue = [...targetValueArray, ...options.map(opt => opt.value)]
+              .filter((v, i, a) => a.indexOf(v) === i);
             setFieldValue(field.syncWithField, targetNewValue);
           } else {
             // Remove all options from the target field
-            const targetNewValue = Array.isArray(targetFieldValue)
-              ? targetFieldValue.filter(val => !options.map(opt => opt.value).includes(val))
-              : [];
+            const targetNewValue = targetValueArray
+              .filter(val => !options.map(opt => opt.value).includes(val));
             setFieldValue(field.syncWithField, targetNewValue);
           }
         }
@@ -179,14 +193,21 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
     // Call onBlur to trigger validation
     onBlur();
   };
-  
+
   // Handle bidirectional sync when the target field changes
   useEffect(() => {
     if (field.syncWithField && field.syncDirection === "bidirectional") {
       const syncFieldValue = formValues[field.syncWithField];
-      
+
       // Only sync if the sync field has a value and it's different from current value
-      if (syncFieldValue !== undefined && JSON.stringify(syncFieldValue) !== JSON.stringify(value)) {
+      // Make sure we don't trigger unnecessary updates
+      if (syncFieldValue !== undefined &&
+          JSON.stringify(syncFieldValue) !== JSON.stringify(value) &&
+          // Prevent infinite loops by checking if the value is actually different
+          // and not just empty arrays or similar edge cases
+          !(Array.isArray(syncFieldValue) && syncFieldValue.length === 0 &&
+            (Array.isArray(value) && value.length === 0 || value === undefined || value === null))
+      ) {
         onChange(syncFieldValue);
       }
     }
@@ -208,7 +229,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
                     !!error && touched ? "border-destructive" : ""
                   )}
                   checked={allSelected}
-               
+
                   onCheckedChange={handleParentChange}
                   onBlur={onBlur}
                 />
