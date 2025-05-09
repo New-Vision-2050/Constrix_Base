@@ -114,6 +114,11 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
+  
+  // CheckboxGroup sync properties
+  syncWithField?: string; // Name of another checkbox group field to sync with
+  syncDirection?: "bidirectional" | "unidirectional"; // Whether the sync is two-way or one-way
+  syncOn?: "select" | "unselect" | "both"; // When to trigger the sync
   name: string;
   // Image field specific properties
   imageConfig?: {

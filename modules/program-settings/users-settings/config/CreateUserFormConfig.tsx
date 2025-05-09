@@ -35,13 +35,13 @@ export const CreateUserFormConfig = () => {
           },
           {
             type: "select",
-            name: "super_entity",
+            name: "main_program_id",
             label: "البرنامج الرئيسي",
             placeholder: "البرنامج الرئيسي",
             required:true,
             dynamicOptions: {
               url: `${baseURL}/programs?program_name=users`,
-              valueField: "name",
+              valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
@@ -59,7 +59,7 @@ export const CreateUserFormConfig = () => {
           },
           {
             type: "select",
-            name: "main_program_id",
+            name: "super_entity",
             label: "الجدول المرجعي",
             placeholder: "الجدول المرجعي",
             required:true,
@@ -99,10 +99,10 @@ export const CreateUserFormConfig = () => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            condition: (values) => !!values["main_program_id"],
-            onChange: (a) => {
-              console.log("changed;    ", a);
-            },
+              syncWithField:"optional_attributes",
+              syncDirection:"unidirectional",
+              syncOn:"both",
+            condition: (values) => !!values["super_entity"],
           },
           {
             type: "checkboxGroup",
@@ -122,7 +122,10 @@ export const CreateUserFormConfig = () => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            condition: (values) => !!values["main_program_id"],
+            syncWithField:"default_attributes",
+            syncDirection:"unidirectional",
+            syncOn:"unselect",
+            condition: (values) => !!values["super_entity"],
           },
           {
             type: "select",
