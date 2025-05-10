@@ -1,10 +1,12 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import SelectIcon from "../components/sub-tables/SelectIcon";
 
 export const CreateUserFormConfig = () => {
+  const formId = `CreateUserFormConfig-programSettings`;
   const CreateUserFormConfig: FormConfig = {
-    formId: `CreateUserFormConfig-programSettings`,
+    formId,
     title: "اضافة جدول",
     apiUrl: `${baseURL}/sub_entities`,
     laravelValidation: {
@@ -14,13 +16,6 @@ export const CreateUserFormConfig = () => {
     sections: [
       {
         fields: [
-          {
-            name: "icon",
-            label: "",
-            type: "hiddenObject",
-            placeholder: "ادخل اسم الجدول",
-            defaultValue: 1,
-          },
           {
             name: "name",
             label: "اسم الجدول",
@@ -34,11 +29,33 @@ export const CreateUserFormConfig = () => {
             ],
           },
           {
+            name: "icon",
+            label: "ايقونة الجدول",
+            type: "text",
+            required: true,
+            render(field, value, onChange) {
+              return (
+                <SelectIcon
+                  formId={formId}
+                  field={field}
+                  value={value}
+                  onChange={onChange}
+                />
+              );
+            },
+            validation: [
+              {
+                type: "required",
+                message: "اختر ايقونة الجدول",
+              },
+            ],
+          },
+          {
             type: "select",
             name: "main_program_id",
             label: "البرنامج الرئيسي",
             placeholder: "البرنامج الرئيسي",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/programs?program_name=users`,
               valueField: "id",
@@ -62,7 +79,7 @@ export const CreateUserFormConfig = () => {
             name: "super_entity",
             label: "الجدول المرجعي",
             placeholder: "الجدول المرجعي",
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/list`,
               valueField: "id",
@@ -87,7 +104,7 @@ export const CreateUserFormConfig = () => {
             label: "",
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
-            required:true,
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/users/attributes`,
               valueField: "id",
@@ -99,9 +116,9 @@ export const CreateUserFormConfig = () => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-              syncWithField:"optional_attributes",
-              syncDirection:"unidirectional",
-              syncOn:"both",
+            syncWithField: "optional_attributes",
+            syncDirection: "unidirectional",
+            syncOn: "both",
             condition: (values) => !!values["super_entity"],
           },
           {
@@ -109,7 +126,7 @@ export const CreateUserFormConfig = () => {
             name: "optional_attributes",
             label: "",
             optionsTitle: "العناصر التنقية",
-            required:true,
+            required: true,
             isMulti: true,
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/users/attributes`,
@@ -122,9 +139,9 @@ export const CreateUserFormConfig = () => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            syncWithField:"default_attributes",
-            syncDirection:"unidirectional",
-            syncOn:"unselect",
+            syncWithField: "default_attributes",
+            syncDirection: "unidirectional",
+            syncOn: "unselect",
             condition: (values) => !!values["super_entity"],
           },
           {
