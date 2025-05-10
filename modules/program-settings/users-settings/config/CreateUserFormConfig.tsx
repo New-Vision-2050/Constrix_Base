@@ -3,7 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import SelectIcon from "../components/sub-tables/SelectIcon";
 
-export const CreateUserFormConfig = () => {
+export const CreateUserFormConfig = (programSlug: string) => {
   const formId = `CreateUserFormConfig-programSettings`;
   const CreateUserFormConfig: FormConfig = {
     formId,
@@ -149,7 +149,7 @@ export const CreateUserFormConfig = () => {
             name: "form",
             label: "نموذج التسجيل",
             placeholder: "نموذج التسجيل",
-            options: [{ value: "نموذج 1", label: "form 1" }],
+            options: [{ value: "نموذج 1", label: "نموذج 1" }],
             validation: [
               {
                 type: "required",

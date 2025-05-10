@@ -10,12 +10,8 @@ import { AddDocFormConfig } from "@/modules/company-profile/components/official-
 import { UpdateSubTableAttributes } from "./UpdateSubTableAttributes";
 import { Entity } from "../types/entity";
 
-
-
 // Create a component that uses the translations
-export const SubTableConfig = () => {
-  const t = useTranslations();
-
+export const SubTableConfig = (programSlug: string) => {
   return {
     url: `${baseURL}/sub_entities/programs/sub_tables?program_id=f872bcc1-8734-4ada-9b6a-dcaf7ad34564`,
     tableId: "program-settings-sub-table", // Add tableId to the config
@@ -62,6 +58,32 @@ export const SubTableConfig = () => {
     ],
     allSearchedFields: [
       {
+        key: "entity_name",
+        searchType: {
+          type: "dropdown",
+          placeholder: "اسم الجدول",
+          dynamicDropdown: {
+            url: `${baseURL}/programs?program_name=users`,
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 5,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
+      },
+      {
+        key: "registered_form",
+        searchType: {
+          type: "dropdown",
+          placeholder: "نموذج التسجيل",
+          options: [{ value: "نموذج المستخدمين", label: "نموذج المستخدمين" }],
+        },
+      },
+      {
         key: "super_entity",
         searchType: {
           type: "dropdown",
@@ -79,24 +101,6 @@ export const SubTableConfig = () => {
           },
         },
       },
-      {
-        key: "main_program_id",
-        searchType: {
-          type: "dropdown",
-          placeholder: "الجدول المرجعي",
-          dynamicDropdown: {
-            url: `${baseURL}/sub_entities/super_entities/list`,
-            valueField: "id",
-            labelField: "name",
-            searchParam: "name",
-            paginationEnabled: true,
-            pageParam: "page",
-            limitParam: "per_page",
-            itemsPerPage: 10,
-            totalCountHeader: "X-Total-Count",
-          },
-        },
-      },
     ],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
@@ -106,7 +110,7 @@ export const SubTableConfig = () => {
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchParamName: "name",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     formConfig: GetCompanyUserFormConfig,
@@ -117,7 +121,7 @@ export const SubTableConfig = () => {
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
-            config: UpdateSubTableAttributes(row?.id , row),
+            config: UpdateSubTableAttributes(row?.id, row),
           };
         },
       },

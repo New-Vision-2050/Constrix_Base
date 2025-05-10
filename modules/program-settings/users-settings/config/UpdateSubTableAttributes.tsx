@@ -2,6 +2,7 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { useQuery } from "@tanstack/react-query";
 import { Entity } from "../types/entity";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 const fetchChecked = async (id: string) => {
   const res = await apiClient.get(`/sub_entities/${id}/show/attributes`);
@@ -94,6 +95,14 @@ export const UpdateSubTableAttributes = (id: string, row: Entity) => {
       default_attributes,
       optional_attributes,
     },
+    onSuccess: () => {
+      const tableStore = useTableStore.getState();
+      tableStore.reloadTable("program-settings-sub-table");
+      setTimeout(() => {
+        tableStore.setLoading("program-settings-sub-table", false);
+      }, 100);
+    },
+
     // onSubmit: async (formData: Record<string, unknown>) => {
     //   const obj = {
     //     registration_type_id: formData.registration_type_id,
