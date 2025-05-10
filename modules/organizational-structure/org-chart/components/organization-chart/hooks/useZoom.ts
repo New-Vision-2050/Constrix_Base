@@ -9,11 +9,11 @@ interface UseZoomOptions {
 }
 
 export function useZoom({
-  initialZoom = 1,
-  minZoom = 0.5,
-  maxZoom = 2.0,
-  step = 0.1
-}: UseZoomOptions = {}) {
+                          initialZoom = 1,
+                          minZoom = 0.5,
+                          maxZoom = 2.0,
+                          step = 0.1
+                        }: UseZoomOptions = {}) {
   const [zoomLevel, setZoomLevel] = useState<number>(initialZoom);
 
   const zoomIn = () => {
@@ -36,7 +36,7 @@ export function useZoom({
   };
 
   return {
-    zoomLevel,
+    zoomLevel, // Return as a number
     zoomIn,
     zoomOut,
     setZoom,
