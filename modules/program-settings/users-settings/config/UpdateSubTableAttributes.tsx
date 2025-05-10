@@ -25,8 +25,6 @@ export const UpdateSubTableAttributes = (id: string, row: Entity) => {
   const default_attributes = DA.map((item: attr) => item.id) ?? [];
   const optional_attributes = OA.map((item: attr) => item.id) ?? [];
 
-  console.log({ default_attributes, optional_attributes });
-
   const updateSubTableAttributes: FormConfig = {
     formId: `UpdateSubTableAttributes-programSettings-${id}`,
     title: "محتويات جدول الموظفين",

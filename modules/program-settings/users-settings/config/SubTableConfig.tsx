@@ -80,7 +80,7 @@ export const SubTableConfig = (programSlug: string) => {
         searchType: {
           type: "dropdown",
           placeholder: "نموذج التسجيل",
-          options: [{ value: "نموذج المستخدمين", label: "نموذج المستخدمين" }],
+          dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
         },
       },
       {
@@ -109,7 +109,7 @@ export const SubTableConfig = (programSlug: string) => {
     defaultItemsPerPage: 5,
     enableSearch: true,
     enableColumnSearch: true,
-    searchFields: ["name", "email"],
+    searchFields: ["name"],
     searchParamName: "name",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
