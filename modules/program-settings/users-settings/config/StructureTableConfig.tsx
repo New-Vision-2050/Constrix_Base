@@ -44,7 +44,7 @@ export const StructureTableConfig = () => {
   return {
     url: `${baseURL}/company-users`,
     tableId: "users-settings-table", // Add tableId to the config
-    tableTitle: "هيكل الجدول",
+    //tableTitle: "هيكل الجدول",
     hideSearchField: true,
     columns: [
       {

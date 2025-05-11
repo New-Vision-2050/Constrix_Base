@@ -1,7 +1,8 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
-import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useQuery } from "@tanstack/react-query";
+import { Entity } from "../types/entity";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 const fetchChecked = async (id: string) => {
   const res = await apiClient.get(`/sub_entities/${id}/show/attributes`);
@@ -9,18 +10,29 @@ const fetchChecked = async (id: string) => {
   return res.data;
 };
 
-export const UpdateSubTableAttributes = (id: string) => {
+interface attr {
+  id: string;
+  name: string;
+}
 
-  const { data } = useQuery({
-    queryKey: ["show-attributes", id],
-    queryFn: () => fetchChecked(id),
-  });
+export const UpdateSubTableAttributes = (
+  id: string,
+  row: Entity,
+  slug: string
+) => {
+  const tableId = `program-settings-sub-table-${slug}`;
 
-  const default_attributes = data?.payload?.default_attributes ?? [];
-  const optional_attributes = data?.payload?.optional_attributes ?? [];
+  const { optional_attributes: OA, default_attributes: DA } = row;
+  // const { data } = useQuery({
+  //   queryKey: ["show-attributes", id],
+  //   queryFn: () => fetchChecked(id),
+  // });
+
+  const default_attributes = DA.map((item: attr) => item.id) ?? [];
+  const optional_attributes = OA.map((item: attr) => item.id) ?? [];
 
   const updateSubTableAttributes: FormConfig = {
-    formId: `UpdateSubTableAttributes-programSettings`,
+    formId: `UpdateSubTableAttributes-programSettings-${id}`,
     title: "محتويات جدول الموظفين",
     apiUrl: `${baseURL}/sub_entities/${id}/update/attributes`,
     apiMethod: "PUT",
@@ -38,7 +50,7 @@ export const UpdateSubTableAttributes = (id: string) => {
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/attributes?super_entity_id=${row.super_entity.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -48,13 +60,9 @@ export const UpdateSubTableAttributes = (id: string) => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            onChange: (a) => {
-              console.log(
-                "changed;    ",
-
-                a
-              );
-            },
+            syncWithField: "optional_attributes",
+            syncDirection: "unidirectional",
+            syncOn: "both",
           },
           {
             type: "checkboxGroup",
@@ -63,7 +71,7 @@ export const UpdateSubTableAttributes = (id: string) => {
             optionsTitle: "العناصر التنقية",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/attributes?super_entity_id=${row.super_entity.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -73,6 +81,9 @@ export const UpdateSubTableAttributes = (id: string) => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            syncWithField: "default_attributes",
+            syncDirection: "unidirectional",
+            syncOn: "unselect",
           },
         ],
       },
@@ -88,6 +99,14 @@ export const UpdateSubTableAttributes = (id: string) => {
       default_attributes,
       optional_attributes,
     },
+    onSuccess: () => {
+      const tableStore = useTableStore.getState();
+      tableStore.reloadTable(tableId);
+      setTimeout(() => {
+        tableStore.setLoading(tableId, false);
+      }, 100);
+    },
+
     // onSubmit: async (formData: Record<string, unknown>) => {
     //   const obj = {
     //     registration_type_id: formData.registration_type_id,

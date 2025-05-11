@@ -8,28 +8,14 @@ import EmployeeTableContent from "../components/sub-tables/EmployeeTableContent"
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { AddDocFormConfig } from "@/modules/company-profile/components/official-data/official-docs-section/add-doc-form-config";
 import { UpdateSubTableAttributes } from "./UpdateSubTableAttributes";
+import { Entity } from "../types/entity";
+import SubTableStatus from "../components/sub-tables/SubTableStatus";
 
-interface Entity {
-  id: string;
-  name: string;
-  icon: number;
-  super_entity: string;
-  is_active: number;
-  is_registrable: number;
-  main_program: string;
-  main_program_id: string;
-  default_attributes: string[];
-  optional_attributes: string[];
-  created_at: string;
-  updated_at: string;
-}
 // Create a component that uses the translations
-export const SubTableConfig = () => {
-  const t = useTranslations();
-
+export const SubTableConfig = (slug: string) => {
   return {
-    url: `${baseURL}/sub_entities/programs/sub_tables?program_name=users`,
-    tableId: "program-settings-sub-table", // Add tableId to the config
+    url: `${baseURL}/sub_entities/super_entity/sub_tables?super_entity_id=${slug}`,
+    tableId: `program-settings-sub-table-${slug}`,
     columns: [
       {
         key: "name",
@@ -38,12 +24,12 @@ export const SubTableConfig = () => {
         searchable: true,
       },
       {
-        key: "super_entity",
+        key: "super_entity.name",
         label: "الجدول الرئيسي",
         sortable: true,
       },
       {
-        key: "main_program",
+        key: "main_program.name",
         label: "البرنامج الرئيسي",
         sortable: true,
       },
@@ -54,66 +40,66 @@ export const SubTableConfig = () => {
         render: () => <div>نموذج 1</div>,
       },
       {
-        key: "dummy-2",
+        key: "attributes_count",
         label: "عدد عناصر التصفية",
         sortable: true,
-        render: () => <div>5</div>,
       },
       {
-        key: "dummy-3",
+        key: "usage_count",
         label: "عدد مستخدمين الجدول",
         sortable: true,
-        render: () => <div>13</div>,
-      },
-      {
-        key: "dummy-4",
-        label: "عدد مستخدمين الجدول",
-        sortable: true,
-        render: () => <div>13</div>,
       },
       {
         key: "is_active",
         label: "الحالة",
-        render: (value: "active" | "inActive", row: Entity) => (
-          <TheStatus theStatus={value} id={row.id} />
+        render: (value: 0 | 1, row: Entity) => (
+          <SubTableStatus theStatus={value} id={row.id} />
         ),
       },
     ],
     allSearchedFields: [
-        {
-            key: "super_entity",
-            searchType: {
-                type: "dropdown",
-                placeholder: "البرنامج الرئيسي",
-                dynamicDropdown: {
-                    url: `${baseURL}/programs?program_name=users`,
-                    valueField: "id",
-                    labelField: "name",
-                    paginationEnabled: true,
-                    itemsPerPage: 5,
-                    searchParam: "name",
-                    pageParam: "page",
-                    limitParam: "per_page",
-                    totalCountHeader: "x-total-count",
-                },
-            },
-        },
       {
-        key: "main_program_id",
+        key: "entity_name",
         searchType: {
           type: "dropdown",
-          placeholder: "الجدول المرجعي",
-            dynamicDropdown: {
-                url: `${baseURL}/sub_entities/super_entities/list`,
-                valueField: "id",
-                labelField: "name",
-                searchParam: "name",
-                paginationEnabled: true,
-                pageParam: "page",
-                limitParam: "per_page",
-                itemsPerPage: 10,
-                totalCountHeader: "X-Total-Count",
-            }
+          placeholder: "اسم الجدول",
+          dynamicDropdown: {
+            url: `${baseURL}/sub_entities/list/selection`,
+            valueField: "name",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 5,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
+      },
+      {
+        key: "registered_form",
+        searchType: {
+          type: "dropdown",
+          placeholder: "نموذج التسجيل",
+          dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
+        },
+      },
+      {
+        key: "main_program_slug",
+        searchType: {
+          type: "dropdown",
+          placeholder: "البرنامج الرئيسي",
+          dynamicDropdown: {
+            url: `${baseURL}/programs`,
+            valueField: "slug",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 5,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
         },
       },
     ],
@@ -124,8 +110,8 @@ export const SubTableConfig = () => {
     defaultItemsPerPage: 5,
     enableSearch: true,
     enableColumnSearch: true,
-    searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchFields: ["name"],
+    searchParamName: "name",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     formConfig: GetCompanyUserFormConfig,
@@ -136,7 +122,7 @@ export const SubTableConfig = () => {
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
-            config: UpdateSubTableAttributes(row?.id),
+            config: UpdateSubTableAttributes(row?.id, row, slug),
           };
         },
       },
