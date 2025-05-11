@@ -43,14 +43,14 @@ const ManagementCustomNode: React.FC<ManagementNodeData> = (props) => {
         <div>
           <p className="text-slate-500 text-sm">المدير</p>
           <p className="text-white text-md">
-            {(data?.manager?.name as string) ?? "-"}
+            {((data?.manager as Manager)?.name as string) ?? "-"}
           </p>
         </div>
 
         <div>
           <p className="text-slate-500 text-sm">المدير النائب</p>
           <p className="text-white text-md">
-            {(data?.deputy_manager?.name as string) ?? "-"}
+            {((data?.deputy_manager as Manager)?.name as string) ?? "-"}
           </p>
         </div>
       </div>
