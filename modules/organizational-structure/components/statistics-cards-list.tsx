@@ -39,11 +39,11 @@ export default function StatisticsCardsList() {
         icon: <UserIcon color="pink" />,
         progressBarValue: usersTotal,
         leftSideInfo: {
-          count: String(widgets?.users?.users_with_hierarchy ?? 0),
+          count: widgets?.users?.users_with_hierarchy ?? 0,
           description: "عدد الموظفين المستخدمة",
         },
         rightSideInfo: {
-          count: String(widgets?.users?.users_without_hierarchy ?? 0),
+          count: widgets?.users?.users_without_hierarchy ?? 0,
           description: "عدد الموظفين المتبقية",
         },
       },
@@ -54,11 +54,11 @@ export default function StatisticsCardsList() {
         icon: <MapPin color="green" />,
         progressBarValue: branchesTotal,
         leftSideInfo: {
-          count: String(widgets?.branches?.used_count ?? 0),
+          count: widgets?.branches?.used_count ?? 0,
           description: "عدد الفروع المستخدمة",
         },
         rightSideInfo: {
-          count: String(widgets?.branches?.unused_count ?? 0),
+          count: widgets?.branches?.unused_count ?? 0,
           description: "عدد الفروع المتبقية",
         },
       },
@@ -69,11 +69,11 @@ export default function StatisticsCardsList() {
         icon: <BackpackIcon color="pink" />,
         progressBarValue: managementsTotal,
         leftSideInfo: {
-          count: String(widgets?.management?.used_count ?? 0),
+          count: widgets?.management?.used_count ?? 0,
           description: "عدد الادارات الرئيسية المستخدمة",
         },
         rightSideInfo: {
-          count: String(widgets?.management?.unused_count ?? 0),
+          count: widgets?.management?.unused_count ?? 0,
           description: "عدد الادارات الرئيسية المتبقية",
         },
       },
@@ -84,11 +84,11 @@ export default function StatisticsCardsList() {
         icon: <ChartColumnStacked color="orange" />,
         progressBarValue: departmentsTotal ?? 0,
         leftSideInfo: {
-          count: String(widgets?.departments?.used_count ?? 0),
+          count: widgets?.departments?.used_count ?? 0,
           description: "عدد الادارات الفرعية المستخدمة",
         },
         rightSideInfo: {
-          count: String(widgets?.departments?.unused_count ?? 0),
+          count: widgets?.departments?.unused_count ?? 0,
           description: "عدد الادارات الفرعية المتبقية",
         },
       },

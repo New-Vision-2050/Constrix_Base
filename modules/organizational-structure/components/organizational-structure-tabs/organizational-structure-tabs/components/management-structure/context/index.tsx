@@ -7,12 +7,21 @@ import {
   useNodesState,
 } from "@xyflow/react";
 // import packages
-import { createContext, useCallback, useContext, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import { DiagramNode } from "../../company-structure/types/DiagramNode";
 import { DiagramEdge } from "../../company-structure/types/DiagramEdge";
 import useBranchHierarchiesData from "../../company-structure/hooks/useBranchHierarchiesData";
 import { generateDiagramNodes } from "../../company-structure/utils/digram-nodes-generator";
 import { generateDiagramEdges } from "../../company-structure/utils/diagram-edges-generator";
+import { useOrgStructureCxt } from "@/modules/organizational-structure/context/OrgStructureCxt";
+
 
 // declare context types
 type CxtType = {
@@ -22,6 +31,11 @@ type CxtType = {
   // edges
   edges: DiagramEdge[];
   onEdgesChange: OnEdgesChange<DiagramEdge>;
+
+  // active branch
+  activeBranch: string | undefined;
+  handleChangeActiveBranch: (id: string) => void;
+
 };
 
 export const ManagementsStructureCxt = createContext<CxtType>({} as CxtType);
@@ -44,11 +58,13 @@ export const ManagementsStructureCxtProvider = (
 ) => {
   // ** declare and define component state and variables
   const { children } = props;
+  const { branchiesList } = useOrgStructureCxt();
   const { data } = useBranchHierarchiesData("management");
+  const [activeBranch, setActiveBranch] = useState<string>(
+    branchiesList?.[0]?.id ?? ""
+  );
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  console.log("management_management_data", data);
 
   // ** handle side effects
   useEffect(() => {
@@ -70,6 +86,11 @@ export const ManagementsStructureCxtProvider = (
     setEdges(edges);
   }, []);
 
+  const handleChangeActiveBranch = useCallback(
+    (id: string) => setActiveBranch(id),
+    []
+  );
+
   // ** return component ui
   return (
     <ManagementsStructureCxt.Provider
@@ -80,6 +101,9 @@ export const ManagementsStructureCxtProvider = (
         // diagram edges
         edges,
         onEdgesChange,
+        // active branch
+        activeBranch,
+        handleChangeActiveBranch,
       }}
     >
       {children}

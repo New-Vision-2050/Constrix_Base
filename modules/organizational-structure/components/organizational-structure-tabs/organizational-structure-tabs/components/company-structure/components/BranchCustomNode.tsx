@@ -10,7 +10,7 @@ type BranchNodeData = NodeProps & {
   branch_count?: number;
   department_count?: number;
   management_count?: number;
-  manager?: Manager;
+  manager: Manager;
   parent_id?: number;
   user_count?: number;
   statistics?: {
