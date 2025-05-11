@@ -3,7 +3,7 @@ import StatisticsCardHeader from "./StatisticsCardHeader";
 
 export type StatisticsCardInfo = { count?: string; description?: string };
 
-type PropsT = {
+export type CardInfoT = {
   title?: string | number;
   number?: string | number;
   icon?: JSX.Element;
@@ -13,7 +13,7 @@ type PropsT = {
   rightSideInfo?: StatisticsCardInfo;
 };
 
-export default function StatisticsCard(props: PropsT) {
+export default function StatisticsCard(props: CardInfoT) {
   const {
     icon,
     title,
