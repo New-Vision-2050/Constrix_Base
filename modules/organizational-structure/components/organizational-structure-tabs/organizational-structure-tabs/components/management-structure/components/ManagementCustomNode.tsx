@@ -21,6 +21,7 @@ type ManagementNodeData = NodeProps & {
   };
 };
 
+
 const ManagementCustomNode: React.FC<ManagementNodeData> = (props) => {
   const { data } = props;
 

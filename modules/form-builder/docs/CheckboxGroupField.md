@@ -10,6 +10,7 @@ The Checkbox Group field provides a group of checkboxes that can operate in eith
 - **Validation support**: Full support for all validation types
 - **Conditional fields**: Can be used with conditional fields
 - **Styling options**: Customizable appearance
+- **Synchronization**: Can be synchronized with another checkbox group field
 
 ## Usage
 
@@ -130,6 +131,9 @@ The Checkbox Group field provides a group of checkboxes that can operate in eith
 | `className` | `string` | Custom CSS class for the field |
 | `validation` | `ValidationRule[]` | Validation rules |
 | `condition` | `(values: Record<string, any>) => boolean` | Condition for showing the field |
+| `syncWithField` | `string` | Name of another checkbox group field to sync with |
+| `syncDirection` | `"bidirectional" \| "unidirectional"` | Whether the sync is two-way or one-way |
+| `syncOn` | `"select" \| "unselect" \| "both"` | When to trigger the sync |
 
 ## Value Format
 
@@ -139,3 +143,54 @@ The Checkbox Group field provides a group of checkboxes that can operate in eith
 ## Example
 
 See the complete example in `modules/form-builder/examples/CheckboxGroupExample.tsx`.
+
+## Synchronization
+
+The checkbox group field can be synchronized with another checkbox group field. This is useful when you have two related sets of options that should be kept in sync.
+
+### Synchronization Properties
+
+- **syncWithField**: The name of another checkbox group field to sync with
+- **syncDirection**: Whether the sync is bidirectional or unidirectional
+  - `"bidirectional"`: Changes in either field will update the other field
+  - `"unidirectional"`: Changes in this field will update the target field, but not vice versa
+- **syncOn**: When to trigger the sync
+  - `"select"`: Sync only when an option is selected
+  - `"unselect"`: Sync only when an option is unselected
+  - `"both"`: Sync on both select and unselect actions
+
+### Example with Synchronization
+
+```typescript
+// Two checkbox groups that sync with each other
+{
+  type: "checkboxGroup",
+  name: "primaryLanguages",
+  label: "Primary Programming Languages",
+  isMulti: true,
+  options: [
+    { value: "javascript", label: "JavaScript" },
+    { value: "python", label: "Python" },
+    { value: "java", label: "Java" },
+  ],
+  syncWithField: "secondaryLanguages",
+  syncDirection: "bidirectional",
+  syncOn: "both"
+},
+{
+  type: "checkboxGroup",
+  name: "secondaryLanguages",
+  label: "Secondary Programming Languages",
+  isMulti: true,
+  options: [
+    { value: "javascript", label: "JavaScript" },
+    { value: "python", label: "Python" },
+    { value: "java", label: "Java" },
+  ],
+  syncWithField: "primaryLanguages",
+  syncDirection: "bidirectional",
+  syncOn: "both"
+}
+```
+
+In this example, selecting or unselecting an option in either field will update the other field to maintain synchronization.

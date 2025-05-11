@@ -181,5 +181,6 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
     showCancelButton: false,
     showBackButton: false,
   };
+  
   return _config;
 }

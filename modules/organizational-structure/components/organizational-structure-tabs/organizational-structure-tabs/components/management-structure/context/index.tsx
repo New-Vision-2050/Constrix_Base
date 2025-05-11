@@ -14,12 +14,14 @@ import {
   useEffect,
   useState,
 } from "react";
+
 import { DiagramNode } from "../../company-structure/types/DiagramNode";
 import { DiagramEdge } from "../../company-structure/types/DiagramEdge";
 import useBranchHierarchiesData from "../../company-structure/hooks/useBranchHierarchiesData";
 import { generateDiagramNodes } from "../../company-structure/utils/digram-nodes-generator";
 import { generateDiagramEdges } from "../../company-structure/utils/diagram-edges-generator";
 import { useOrgStructureCxt } from "@/modules/organizational-structure/context/OrgStructureCxt";
+
 
 // declare context types
 type CxtType = {
@@ -33,6 +35,7 @@ type CxtType = {
   // active branch
   activeBranch: string | undefined;
   handleChangeActiveBranch: (id: string) => void;
+
 };
 
 export const ManagementsStructureCxt = createContext<CxtType>({} as CxtType);

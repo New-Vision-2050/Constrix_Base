@@ -13,6 +13,7 @@ import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import useUserData from "@/hooks/use-user-data";
 import { CurrentUser } from "@/types/current-user";
 
+
 // declare context types
 type OrgStructureCxtType = {
   widgetsLoading: boolean;
