@@ -5,14 +5,18 @@ import {
   MapPin,
   UserIcon,
 } from "lucide-react";
-import StatisticsCard from "./StatisticsCard";
+import StatisticsCard, {
+  CardInfoT,
+  StatisticsCardInfo,
+} from "./StatisticsCard";
 import { useOrgStructureCxt } from "../context/OrgStructureCxt";
 import { useMemo } from "react";
 
 export default function StatisticsCardsList() {
-  const { widgets, widgetsLoading } = useOrgStructureCxt();
+  const { widgets } = useOrgStructureCxt();
 
-  const statisticsCardsList = useMemo(() => {
+  const statisticsCardsList: CardInfoT[] = useMemo(() => {
+    if (!widgets) return [];
     const usersTotal = calculateAchievementPercentage(
       widgets?.users?.total_users ?? 0,
       widgets?.users?.users_with_hierarchy ?? 0
@@ -30,7 +34,6 @@ export default function StatisticsCardsList() {
       widgets?.departments?.used_count ?? 0
     );
 
-    
     return [
       {
         number: widgets?.users?.total_users ?? 0,
@@ -39,11 +42,11 @@ export default function StatisticsCardsList() {
         icon: <UserIcon color="pink" />,
         progressBarValue: usersTotal,
         leftSideInfo: {
-          count: widgets?.users?.users_with_hierarchy ?? 0,
+          count: String(widgets?.users?.users_with_hierarchy ?? 0),
           description: "عدد الموظفين المستخدمة",
         },
         rightSideInfo: {
-          count: widgets?.users?.users_without_hierarchy ?? 0,
+          count: String(widgets?.users?.users_without_hierarchy ?? 0),
           description: "عدد الموظفين المتبقية",
         },
       },
@@ -54,11 +57,11 @@ export default function StatisticsCardsList() {
         icon: <MapPin color="green" />,
         progressBarValue: branchesTotal,
         leftSideInfo: {
-          count: widgets?.branches?.used_count ?? 0,
+          count: String(widgets?.branches?.used_count ?? 0),
           description: "عدد الفروع المستخدمة",
         },
         rightSideInfo: {
-          count: widgets?.branches?.unused_count ?? 0,
+          count: String(widgets?.branches?.unused_count ?? 0),
           description: "عدد الفروع المتبقية",
         },
       },
@@ -69,11 +72,11 @@ export default function StatisticsCardsList() {
         icon: <BackpackIcon color="pink" />,
         progressBarValue: managementsTotal,
         leftSideInfo: {
-          count: widgets?.management?.used_count ?? 0,
+          count: String(widgets?.management?.used_count ?? 0),
           description: "عدد الادارات الرئيسية المستخدمة",
         },
         rightSideInfo: {
-          count: widgets?.management?.unused_count ?? 0,
+          count: String(widgets?.management?.unused_count ?? 0),
           description: "عدد الادارات الرئيسية المتبقية",
         },
       },
@@ -84,11 +87,11 @@ export default function StatisticsCardsList() {
         icon: <ChartColumnStacked color="orange" />,
         progressBarValue: departmentsTotal ?? 0,
         leftSideInfo: {
-          count: widgets?.departments?.used_count ?? 0,
+          count: String(widgets?.departments?.used_count ?? 0),
           description: "عدد الادارات الفرعية المستخدمة",
         },
         rightSideInfo: {
-          count: widgets?.departments?.unused_count ?? 0,
+          count: String(widgets?.departments?.unused_count ?? 0),
           description: "عدد الادارات الفرعية المتبقية",
         },
       },
@@ -106,7 +109,16 @@ export default function StatisticsCardsList() {
   return (
     <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4">
       {statisticsCardsList?.map((card, index) => (
-        <StatisticsCard key={index} {...card} />
+        <StatisticsCard
+          key={index}
+          title={card.title}
+          number={card.number}
+          icon={card.icon}
+          description={card.description}
+          progressBarValue={card.progressBarValue}
+          leftSideInfo={card.leftSideInfo as StatisticsCardInfo}
+          rightSideInfo={card.rightSideInfo}
+        />
       ))}
     </div>
   );
