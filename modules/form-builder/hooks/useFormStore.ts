@@ -43,6 +43,7 @@ interface FormState {
   getValues: (formId: string) => any;
   setValue: (formId: string, field: string, value: any) => void;
   setValues: (formId: string, values: Record<string, any>) => void;
+  getError: (formId: string, field: string) => any;
   setError: (
     formId: string,
     field: string,
@@ -147,6 +148,12 @@ export const useFormStore = create<FormState>((set, get) => ({
     const state = get();
     const formState = state.forms[formId] || getDefaultFormState();
     return formState.values;
+  },
+
+  getError: (formId: string, field: string) => {
+    const state = get();
+    const formState = state.forms[formId] || getDefaultFormState();
+    return formState.errors[field];
   },
 
   setValues: (formId: string, values: Record<string, any>) =>
@@ -528,11 +535,11 @@ export const useFormStore = create<FormState>((set, get) => ({
           try {
             const number = phoneUtil.parseAndKeepRawInput(value);
             const splitValue = value.split(' ');
-              // Reject if national number starts with 0
+            // Reject if national number starts with 0
             if ((splitValue.length > 0 && splitValue[1].startsWith("0")) || !phoneUtil.isValidNumber(number)) {
-                  store.setError(formId, fieldName, message);
-                  hasError = true;
-                  break;
+              store.setError(formId, fieldName, message);
+              hasError = true;
+              break;
             }
           } catch (error) {
             store.setError(formId, fieldName, message);
@@ -627,6 +634,14 @@ export const useFormInstance = (
   const setValue = useCallback(
     (field: string, value: any) => {
       useFormStore.getState().setValue(formId, field, value);
+    },
+    [formId]
+  );
+
+  const getError = useCallback(
+    (field: string) => {
+      console.log("in get error callback");
+      useFormStore.getState().getError(formId, field);
     },
     [formId]
   );
@@ -747,5 +762,6 @@ export const useFormInstance = (
     validateField,
     hasValidatingFields,
     setEditMode,
+    getError,
   };
 };
