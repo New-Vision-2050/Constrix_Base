@@ -8,6 +8,7 @@ export const CompanyStructureBranch: UserProfileNestedTab[] = [
     icon: <MapPin />,
     content: <>الفرع الرئيسي</>,
     ignoreValidation: true,
+    onClick() {},
   },
   {
     id: "company-structure-branch-2",
