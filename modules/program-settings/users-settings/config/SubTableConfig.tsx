@@ -9,12 +9,13 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { AddDocFormConfig } from "@/modules/company-profile/components/official-data/official-docs-section/add-doc-form-config";
 import { UpdateSubTableAttributes } from "./UpdateSubTableAttributes";
 import { Entity } from "../types/entity";
+import SubTableStatus from "../components/sub-tables/SubTableStatus";
 
 // Create a component that uses the translations
-export const SubTableConfig = (programSlug: string) => {
+export const SubTableConfig = (slug: string) => {
   return {
-    url: `${baseURL}/sub_entities/programs/sub_tables?program_id=f872bcc1-8734-4ada-9b6a-dcaf7ad34564`,
-    tableId: "program-settings-sub-table", // Add tableId to the config
+    url: `${baseURL}/sub_entities/super_entity/sub_tables?super_entity_id=${slug}`,
+    tableId: `program-settings-sub-table-${slug}`,
     columns: [
       {
         key: "name",
@@ -51,8 +52,8 @@ export const SubTableConfig = (programSlug: string) => {
       {
         key: "is_active",
         label: "الحالة",
-        render: (value: "active" | "inActive", row: Entity) => (
-          <TheStatus theStatus={value} id={row.id} />
+        render: (value: 0 | 1, row: Entity) => (
+          <SubTableStatus theStatus={value} id={row.id} />
         ),
       },
     ],
@@ -63,8 +64,8 @@ export const SubTableConfig = (programSlug: string) => {
           type: "dropdown",
           placeholder: "اسم الجدول",
           dynamicDropdown: {
-            url: `${baseURL}/programs?program_name=users`,
-            valueField: "id",
+            url: `${baseURL}/sub_entities/list/selection`,
+            valueField: "name",
             labelField: "name",
             paginationEnabled: true,
             itemsPerPage: 5,
@@ -84,13 +85,13 @@ export const SubTableConfig = (programSlug: string) => {
         },
       },
       {
-        key: "super_entity",
+        key: "main_program_slug",
         searchType: {
           type: "dropdown",
           placeholder: "البرنامج الرئيسي",
           dynamicDropdown: {
-            url: `${baseURL}/programs?program_name=users`,
-            valueField: "id",
+            url: `${baseURL}/programs`,
+            valueField: "slug",
             labelField: "name",
             paginationEnabled: true,
             itemsPerPage: 5,
@@ -121,7 +122,7 @@ export const SubTableConfig = (programSlug: string) => {
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
-            config: UpdateSubTableAttributes(row?.id, row),
+            config: UpdateSubTableAttributes(row?.id, row, slug),
           };
         },
       },

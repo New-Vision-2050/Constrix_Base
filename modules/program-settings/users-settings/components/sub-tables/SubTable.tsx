@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { CreateUserFormConfig } from "../../config/CreateUserFormConfig";
 
 const SubTables = () => {
-  const programSlug = "users";
+  const slug = "users";
   return (
     <TableBuilder
-      config={SubTableConfig(programSlug)}
+      config={SubTableConfig(slug)}
       searchBarActions={
         <div className="flex items-center gap-3">
           <SheetFormBuilder
-            config={CreateUserFormConfig(programSlug)}
+            config={CreateUserFormConfig(slug)}
             trigger={<Button>إنشاء جدول</Button>}
           />{" "}
         </div>

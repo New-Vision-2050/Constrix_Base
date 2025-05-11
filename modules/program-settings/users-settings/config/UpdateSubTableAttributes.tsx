@@ -15,7 +15,13 @@ interface attr {
   name: string;
 }
 
-export const UpdateSubTableAttributes = (id: string, row: Entity) => {
+export const UpdateSubTableAttributes = (
+  id: string,
+  row: Entity,
+  slug: string
+) => {
+  const tableId = `program-settings-sub-table-${slug}`;
+
   const { optional_attributes: OA, default_attributes: DA } = row;
   // const { data } = useQuery({
   //   queryKey: ["show-attributes", id],
@@ -44,7 +50,7 @@ export const UpdateSubTableAttributes = (id: string, row: Entity) => {
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/attributes?super_entity_id=${row.super_entity.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -65,7 +71,7 @@ export const UpdateSubTableAttributes = (id: string, row: Entity) => {
             optionsTitle: "العناصر التنقية",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/attributes?super_entity_id=${row.super_entity.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -95,9 +101,9 @@ export const UpdateSubTableAttributes = (id: string, row: Entity) => {
     },
     onSuccess: () => {
       const tableStore = useTableStore.getState();
-      tableStore.reloadTable("program-settings-sub-table");
+      tableStore.reloadTable(tableId);
       setTimeout(() => {
-        tableStore.setLoading("program-settings-sub-table", false);
+        tableStore.setLoading(tableId, false);
       }, 100);
     },
 

@@ -3,8 +3,9 @@ import { baseURL } from "@/config/axios-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import SelectIcon from "../components/sub-tables/SelectIcon";
 
-export const CreateUserFormConfig = (programSlug: string) => {
+export const CreateUserFormConfig = (slug: string) => {
   const formId = `CreateUserFormConfig-programSettings`;
+  const tableId = `program-settings-sub-table-${slug}`;
   const CreateUserFormConfig: FormConfig = {
     formId,
     title: "اضافة جدول",
@@ -57,7 +58,7 @@ export const CreateUserFormConfig = (programSlug: string) => {
             placeholder: "البرنامج الرئيسي",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/programs?program_name=users`,
+              url: `${baseURL}/programs`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -106,7 +107,7 @@ export const CreateUserFormConfig = (programSlug: string) => {
             isMulti: true,
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/attributes`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -115,6 +116,8 @@ export const CreateUserFormConfig = (programSlug: string) => {
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "super_entity",
+              filterParam: "super_entity_id",
             },
             syncWithField: "optional_attributes",
             syncDirection: "unidirectional",
@@ -129,7 +132,7 @@ export const CreateUserFormConfig = (programSlug: string) => {
             required: true,
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/users/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/attributes`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -138,6 +141,8 @@ export const CreateUserFormConfig = (programSlug: string) => {
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "super_entity",
+              filterParam: "super_entity_id",
             },
             syncWithField: "default_attributes",
             syncDirection: "unidirectional",
@@ -170,9 +175,9 @@ export const CreateUserFormConfig = (programSlug: string) => {
     showBackButton: false,
     onSuccess: () => {
       const tableStore = useTableStore.getState();
-      tableStore.reloadTable("program-settings-sub-table");
+      tableStore.reloadTable(tableId);
       setTimeout(() => {
-        tableStore.setLoading("program-settings-sub-table", false);
+        tableStore.setLoading(tableId, false);
       }, 100);
     },
   };
