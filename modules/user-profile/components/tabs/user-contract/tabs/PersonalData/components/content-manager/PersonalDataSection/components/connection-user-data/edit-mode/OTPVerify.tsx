@@ -14,6 +14,7 @@ import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useEffect } from "react";
 
 type PropsT = {
   open: boolean;
@@ -23,6 +24,7 @@ type PropsT = {
 
 export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const { user } = useUserProfileCxt();
+  const [timer, setTimer] = useState(0);
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
   const [error, setError] = useState("");
@@ -34,6 +36,32 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const [otp, setOtp] = useState("");
   const label = type === "email" ? "البريد الالكتروني" : "رقم الجوال";
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            if (interval) clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer]);
+
+  useEffect(() => {
+    if (open) {
+      setTimer(60);
+    }
+  }, [open]);
+
   const handleResend = async () => {
     try {
       setLoading(true);
@@ -42,6 +70,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         type: type,
       };
       await apiClient.post(`/company-users/send-otp`, body);
+      setTimer(60); // Restart the timer when the resend action is executed
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -94,8 +123,12 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
           <Button disabled={loading} onClick={handleConfirmOtp}>
             تأكيد
           </Button>
-          <Button disabled={loading} variant={"ghost"} onClick={handleResend}>
-            اعادة الارسال
+          <Button
+            disabled={loading || timer > 0}
+            variant={"ghost"}
+            onClick={handleResend}
+          >
+            اعادة الارسال {timer > 0 && `(${timer})`}
           </Button>
         </div>
       </DialogContent>
