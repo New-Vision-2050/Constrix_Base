@@ -9,6 +9,11 @@ type PropsT = {
 export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
   const isSaving =
     privilegeData?.type_allowance_code === AllowancesTypes?.Saving;
+  const isPercentage =
+    privilegeData?.type_allowance_code === AllowancesTypes?.Percentage;
+  const chargeAmountValue = isPercentage?privilegeData?.charge_amount:`${privilegeData?.charge_amount} ر.س`;
+  
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
@@ -30,14 +35,26 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
       </div>
 
       {!isSaving && (
-        <div className="p-2">
-          <PreviewTextField
-            label="معدل حساب النسبة من اصل الراتب"
-            value={privilegeData?.charge_amount}
-            valid={Boolean(privilegeData?.charge_amount)}
-            required
-          />
-        </div>
+        <>
+          <div className="p-2">
+            <PreviewTextField
+              label="معدل حساب النسبة من اصل الراتب"
+              value={chargeAmountValue}
+              valid={Boolean(privilegeData?.charge_amount)}
+              required
+            />
+          </div>
+          {isPercentage && (
+            <div className="p-2">
+              <PreviewTextField
+                label="وحدة المدة"
+                value={privilegeData?.period?.name}
+                valid={Boolean(privilegeData?.period?.name)}
+                required
+              />
+            </div>
+          )}
+        </>
       )}
 
       <div className={`p-2 ${isSaving ? "col-span-2" : ""}`}>
