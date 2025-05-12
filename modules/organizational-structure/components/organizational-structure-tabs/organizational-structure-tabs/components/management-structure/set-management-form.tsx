@@ -76,7 +76,7 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             // required: true,
             disabled: user?.id !== companyOwnerId,
             dynamicOptions: {
-              url: `${baseURL}/users/admin-users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
