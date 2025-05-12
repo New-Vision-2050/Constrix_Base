@@ -7,7 +7,8 @@ const errorMessages = {
     required: "This field is required",
     minLength: (min: number) => `Must be at least ${min} characters`,
     invalidEmail: "Invalid email address",
-    invalidPhone: "Invalid phone number, must be in the format 05xxxxxxxx",
+    invalidPhone:
+      "Invalid phone number, must be in the format 05xxxxxxxx or 01xxxxxxxxx",
     passwordMinLength: "Password must be at least 8 characters",
     passwordUpperCase: "Password must contain at least one uppercase letter",
     passwordSpecialChar: "Password must contain at least one special character",
@@ -21,7 +22,8 @@ const errorMessages = {
     required: "هذا الحقل مطلوب",
     minLength: (min: number) => `يجب أن يكون طول النص ${min} أحرف على الأقل`,
     invalidEmail: "البريد الإلكتروني غير صالح",
-    invalidPhone: "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx",
+    invalidPhone:
+      "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx أو 01xxxxxxxxx",
     passwordMinLength: "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل",
     passwordUpperCase: "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
     passwordSpecialChar: "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل",
@@ -83,7 +85,7 @@ export const createIdentifierValidation = () => {
     .refine(
       (value) => {
         if (/^\d/.test(value)) {
-          return /^05\d{8}$/.test(value);
+          return /^05\d{8}$/.test(value) || /^01\d{9}$/.test(value);
         }
         return true;
       },
