@@ -3,7 +3,6 @@ import { useLocale } from "next-intl";
 import { Asterisk } from "lucide-react";
 import { Input } from "@/modules/table/components/ui/input";
 import CountryCodeSelect from "./CountriesCodesSelect";
-import { isValidPhone } from "@/utils/valid-phone";
 import { isValidEmail } from "@/utils/valid-email";
 import libphonenumbers from "libphonenumbers";
 
@@ -64,10 +63,10 @@ const CustomInputField = ({
   return (
     <div className="relative">
       <div className="flex flex-col">
-        <div className="flex w-full items-center gap-1">
+        <div className="flex w-full items-end gap-1 mt-2">
           <Input
             type="text"
-            className={`${Boolean(error) ? "text-red-600" : ""}`}
+            className={`${Boolean(error) ? "text-red-600" : ""} focus-visible:ring-0`}
             value={value}
             disabled={disabled}
             onChange={(e) => handleChange(e.target.value)}

@@ -60,7 +60,7 @@ export default function UserProfileConnectionDataEditForm() {
         setOpen={togglePhoneOtpDialog}
       />
       <div className="flex items-center justify-around gap-2">
-        <div className="flex items-start gap-1">
+        <div className="flex items-end gap-1">
           <CustomInputField
             type="phone"
             value={phone}
@@ -69,9 +69,9 @@ export default function UserProfileConnectionDataEditForm() {
             label="رقم الجوال"
             onChange={(str: string) => setPhone(str)}
           />
-          <Button onClick={() => handleChange("phone")}>Change</Button>
+          <Button  className="my-[2px]" onClick={() => handleChange("phone")}>Change</Button>
         </div>
-        <div className="flex items-start gap-1">
+        <div className="flex items-end gap-1">
           <CustomInputField
             type="email"
             value={email}
@@ -79,7 +79,7 @@ export default function UserProfileConnectionDataEditForm() {
             label="البريد الألكتروني"
             onChange={(str: string) => setEmail(str)}
           />
-          <Button onClick={() => handleChange("email")}>Change</Button>
+          <Button className="my-[2px]" onClick={() => handleChange("email")}>Change</Button>
         </div>
       </div>
     </>
