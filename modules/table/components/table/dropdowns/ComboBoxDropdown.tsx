@@ -100,7 +100,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
             "cursor-pointer px-3 py-2 text-sm transition-colors " +
             (state.isFocused ? "bg-accent text-accent-foreground" : "") +
             (state.isSelected
-              ? "bg-primary text-primary-foreground font-medium"
+              ? "bg-primary text-black dark:text-white font-medium"
               : ""),
           singleValue: () => "text-foreground",
           input: () => "text-foreground",

@@ -93,7 +93,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                     <option
                       key={item.id}
                       value={item.id}
-                      className="bg-sidebar"
+                      className="bg-sidebar text-black dark:text-white"
                     >
                       {item.name}
                     </option>
@@ -142,7 +142,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                     <option
                       key={item.id}
                       value={item.id}
-                      className="bg-sidebar"
+                      className="bg-sidebar text-black dark:text-white"
                     >
                       {item.name}
                     </option>
@@ -191,7 +191,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                     <option
                       key={item.id}
                       value={item.id}
-                      className="bg-sidebar"
+                      className="bg-sidebar text-black dark:text-white"
                     >
                       {item.name}
                     </option>
