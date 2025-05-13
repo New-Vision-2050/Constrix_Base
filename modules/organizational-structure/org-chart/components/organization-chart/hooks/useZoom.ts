@@ -35,7 +35,7 @@ export function useZoom({
     // if (!e.ctrlKey) return;
     e.preventDefault()
     const ZOOM_LEVELS = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
-    const dir = Math.sign(e.deltaY) // 1 = down (zoom out), -1 = up (zoom in)
+    const dir = -Math.sign(e.deltaY) // -1 = down (zoom out), 1 = up (zoom in)
 
     setZoomLevel((prevZoom) => {
       const currentIndex = ZOOM_LEVELS.findIndex((z) => z === prevZoom)
