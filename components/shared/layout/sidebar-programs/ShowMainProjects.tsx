@@ -1,11 +1,12 @@
 import { SidebarProjectItem } from "@/types/sidebar-project-item";
 import RegularList from "../../RegularList";
 import { SetStateAction } from "react";
+import { Project } from "@/types/sidebar-menu";
 
 type PropsT = {
-  projects: SidebarProjectItem[];
-  activeProject: SidebarProjectItem;
-  setActiveProject: React.Dispatch<SetStateAction<SidebarProjectItem>>;
+  projects: Project[];
+  activeProject: Project;
+  setActiveProject: React.Dispatch<SetStateAction<Project>>;
 };
 
 export default function ShowMainProjects({
@@ -31,9 +32,9 @@ export default function ShowMainProjects({
 }
 
 type MainProjectsListProps = {
-  projects: SidebarProjectItem[];
-  activeProject: SidebarProjectItem;
-  setActiveProject: React.Dispatch<SetStateAction<SidebarProjectItem>>;
+  projects: Project[];
+  activeProject: Project;
+  setActiveProject: React.Dispatch<SetStateAction<Project>>;
 };
 
 const MainProjectsList = (props: MainProjectsListProps) => {
@@ -55,7 +56,7 @@ const MainProjectsList = (props: MainProjectsListProps) => {
       onChange={handleChange}
       className="block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold bg-[#2D174D] text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0"
     >
-      <RegularList<SidebarProjectItem, "item">
+      <RegularList<Project, "item">
         sourceName="item"
         items={projects}
         ItemComponent={MainProjectOption}
@@ -64,7 +65,7 @@ const MainProjectsList = (props: MainProjectsListProps) => {
   );
 };
 
-const MainProjectOption = ({ item }: { item: SidebarProjectItem }) => (
+const MainProjectOption = ({ item }: { item: Project }) => (
   <option value={item.name} key={item.name}>
     {item.name}
   </option>

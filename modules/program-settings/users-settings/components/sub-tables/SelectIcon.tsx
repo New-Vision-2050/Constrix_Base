@@ -64,11 +64,11 @@ const SelectIcon = ({
         <CollapsibleContent className="mt-2">
           <div className="grid grid-cols-4 md:grid-cols-4 gap-4">
             {Object.entries(tableIcon).map(([key, Icon]) => {
-              const isSelected = value === Number(key);
+              const isSelected = value === key;
               return (
                 <div
                   key={key}
-                  onClick={() => onChange(Number(key))}
+                  onClick={() => onChange(key)}
                   className={`px-3 py-4  cursor-pointer rounded-lg border transition-all duration-200 flex items-center justify-center ${
                     isSelected
                       ? "border-primary bg-transparent"
