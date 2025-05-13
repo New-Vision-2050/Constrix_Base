@@ -1,4 +1,3 @@
-import { SidebarProjectItem } from "@/types/sidebar-project-item";
 import RegularList from "../../RegularList";
 import { SetStateAction } from "react";
 import { Project } from "@/types/sidebar-menu";

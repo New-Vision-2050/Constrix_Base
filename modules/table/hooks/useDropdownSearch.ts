@@ -441,9 +441,13 @@ export const useDropdownSearch = ({
         //   `Fetching dropdown options for search: ${debouncedSearchTerm}`,
         //   url
         // );
-        /*       const response = await apiClient.get(url, { signal: controller.signal });
-         */
-        const response = await queryClient.fetchQuery({
+        let response;
+      if (dynamicConfig.disableReactQuery) {
+        // Use direct API call without React Query
+        response = await apiClient.get(url, { signal: controller.signal });
+      } else {
+        // Use React Query
+        response = await queryClient.fetchQuery({
           queryKey: ["data", url],
           queryFn: async () => {
             const response = await apiClient.get(url);
@@ -451,6 +455,7 @@ export const useDropdownSearch = ({
           },
           staleTime: 1000 * 60 * 5,
         });
+      }
 
         if (!isMountedRef.current) return;
 

@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { SidebarProjectItem } from "@/types/sidebar-project-item";
 import { tableIcon } from "@/modules/program-settings/users-settings/tableIcon";
 import React from "react";
 import Link from "next/link";
@@ -23,8 +22,6 @@ function isValidIconKey(key: string): key is IconKey {
 export default function ShowSubPrograms(props: PropsT) {
   // declare and define component state and variables
   const { activeProject, activeUrl, handleSub_entitiesItemClick } = props;
-
-  console.log({ activeProject });
 
   return (
     <div className="w-full">

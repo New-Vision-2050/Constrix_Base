@@ -185,7 +185,7 @@ export function AppSidebar({
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        {isLoading && <p> pending .......... </p>}
+        {isLoading && <div className="p-4 flex justify-center">Loading...</div>}
         <SidebarProgramsList projects={all} />
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
