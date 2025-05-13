@@ -2,8 +2,13 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import SelectIcon from "../components/sub-tables/SelectIcon";
+import { useTranslations } from "next-intl";
+import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 
 export const CreateUserFormConfig = (slug: string) => {
+  const { refetch } = useSidebarMenu();
+  const t = useTranslations("Companies");
+
   const formId = `CreateUserFormConfig-programSettings`;
   const tableId = `program-settings-sub-table-${slug}`;
   const CreateUserFormConfig: FormConfig = {
@@ -26,6 +31,23 @@ export const CreateUserFormConfig = (slug: string) => {
               {
                 type: "required",
                 message: "ادخل اسم الجدول",
+              },
+            ],
+          },
+          {
+            name: "slug",
+            label: "الاسم المختصد",
+            type: "text",
+            placeholder: "ادخل الاسم المختصر",
+            validation: [
+              {
+                type: "required",
+                message: "ادخل الاسم المختصر",
+              },
+              {
+                type: "pattern",
+                value: /^[a-zA-Z]+$/,
+                message: t("Validation.englishName"),
               },
             ],
           },
@@ -154,7 +176,17 @@ export const CreateUserFormConfig = (slug: string) => {
             name: "form",
             label: "نموذج التسجيل",
             placeholder: "نموذج التسجيل",
-            options: [{ value: "نموذج 1", label: "نموذج 1" }],
+            dynamicOptions: {
+              url: `${baseURL}/sub_entities/super_entities/registration_forms?super_entity_id=${slug}`,
+              valueField: "slug",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
@@ -174,6 +206,7 @@ export const CreateUserFormConfig = (slug: string) => {
     showCancelButton: false,
     showBackButton: false,
     onSuccess: () => {
+      refetch();
       const tableStore = useTableStore.getState();
       tableStore.reloadTable(tableId);
       setTimeout(() => {
