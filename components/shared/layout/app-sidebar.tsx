@@ -2,9 +2,6 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
   LayoutDashboardIcon,
   UserIcon,
 } from "lucide-react";
@@ -24,11 +21,34 @@ import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
 import InboxIcon from "@/public/icons/inbox-icon";
 import { SidebarProgramsList } from "./sidebar-programs";
+import { useSidebarMenu } from "@/hooks/useSidebarMenu";
+import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
+import { Menu, Project } from "@/types/sidebar-menu";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isCentral: boolean;
   name?: string;
   mainLogo?: string;
+}
+
+function mergeProjectsAndMenu(projects: Project[], menu: Menu[]) {
+  return projects.map((project) => {
+    const matchedMenu = menu.find((m) => m.slug === project.slug);
+
+    if (!matchedMenu) return project;
+
+    // Extract all menu fields except sub_entities
+    const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
+
+    return {
+      ...project,
+      ...restMenuProps,
+      sub_entities: [
+        ...(project.sub_entities || []),
+        ...(menuSubEntities || []),
+      ],
+    };
+  });
 }
 
 export function AppSidebar({
@@ -37,6 +57,7 @@ export function AppSidebar({
   mainLogo,
   ...props
 }: AppSidebarProps) {
+  const { menu, isLoading } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
@@ -58,7 +79,8 @@ export function AppSidebar({
     name: t("Sidebar.Settings"),
     icon: SettingsIcon,
     isActive: settingsRoutesNames.indexOf(pageName) !== -1,
-    submenu: [
+    slug: SUPER_ENTITY_SLUG.SETTINGS,
+    sub_entities: [
       {
         name: t("Sidebar.UserProfileSettings"),
         url: ROUTER.USER_PROFILE,
@@ -86,8 +108,6 @@ export function AppSidebar({
     ],
   };
 
-  // This is sample data with translated names
-
   const projects = isCentral
     ? [
         {
@@ -95,7 +115,8 @@ export function AppSidebar({
           url: ROUTER.COMPANIES,
           icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.COMPANIES,
-          submenu: [
+          slug: SUPER_ENTITY_SLUG.COMPANY,
+          sub_entities: [
             {
               name: t("Sidebar.CompaniesList"),
               url: ROUTER.COMPANIES,
@@ -108,7 +129,8 @@ export function AppSidebar({
           name: t("Sidebar.Users"),
           icon: UserIcon,
           isActive: pageName === ROUTER.USERS,
-          submenu: [
+          slug: SUPER_ENTITY_SLUG.USERS,
+          sub_entities: [
             {
               name: t("Sidebar.UsersList"),
               url: ROUTER.USERS,
@@ -121,7 +143,8 @@ export function AppSidebar({
           name: t("Sidebar.HumanResources"),
           icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.Organizational_Structure,
-          submenu: [
+          slug: SUPER_ENTITY_SLUG.HRM,
+          sub_entities: [
             {
               name: t("Sidebar.OrganizationalStructure"),
               url: ROUTER.Organizational_Structure,
@@ -130,11 +153,12 @@ export function AppSidebar({
             },
           ],
         },
-           {
+        {
           name: t("Sidebar.ProgramManagement"),
+          slug: SUPER_ENTITY_SLUG.PM,
           icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
-          submenu: [
+          sub_entities: [
             {
               name: t("Sidebar.Users"),
               url: ROUTER.PROGRAM_SETTINGS.USERS,
@@ -147,31 +171,7 @@ export function AppSidebar({
       ]
     : [settingsRoutes];
 
-  const data = {
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
-    },
-    teams: [
-      {
-        name: "Acme Inc",
-        logo: GalleryVerticalEnd,
-        plan: "Enterprise",
-      },
-      {
-        name: "Acme Corp.",
-        logo: AudioWaveform,
-        plan: "Startup",
-      },
-      {
-        name: "Evil Corp.",
-        logo: Command,
-        plan: "Free",
-      },
-    ],
-    projects: [...projects],
-  };
+  const all = mergeProjectsAndMenu(projects, menu);
 
   return (
     <Sidebar
@@ -185,7 +185,8 @@ export function AppSidebar({
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarProgramsList projects={data.projects} />
+        {isLoading && <div className="p-4 flex justify-center">Loading...</div>}
+        <SidebarProgramsList projects={all} />
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>

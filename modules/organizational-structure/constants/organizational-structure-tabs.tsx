@@ -10,7 +10,7 @@ export const OrganizationalStructureSubTabs: SystemTab[] = [
     id: "organizational-structure-sub-tab-company-structure",
     title: "بنية الشركة",
     icon: <LayoutDashboardIcon />,
-    content: <CompanyOrganizationStructure />,
+    content: <CompanyOrganizationStructure/>,
   },
   {
     id: "organizational-structure-sub-tab-employees",

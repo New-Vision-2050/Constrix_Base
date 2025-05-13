@@ -80,6 +80,7 @@ export interface DynamicDropdownConfig {
   queryParameters?: Record<string, string>; // Additional query parameters
   transformResponse?: (data: any) => DropdownOption[]; // Transform API response to dropdown options
   enableServerSearch?: boolean; // Whether to enable server-side search
+  disableReactQuery?: boolean; // Whether to disable React Query caching and use direct API calls
 }
 
 export interface SearchTypeConfig {

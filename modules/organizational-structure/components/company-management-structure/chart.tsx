@@ -8,6 +8,7 @@ import OrganizationChart from "@/modules/organizational-structure/org-chart/comp
 import { GetOrgStructureManagementFormConfig } from "./set-management-form";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 
+
 type PropsT = {
   branchId: string | number;
 };

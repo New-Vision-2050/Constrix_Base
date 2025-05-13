@@ -31,7 +31,7 @@ export default function TabTemplate(props: PropsT) {
   // handle side effects
   useEffect(() => {
     if (mode === "Preview") onChangeMode?.();
-  }, [mode]);
+  }, [mode, onChangeMode]);
 
   // declare and define component methods
   const handleEditClick = () =>
