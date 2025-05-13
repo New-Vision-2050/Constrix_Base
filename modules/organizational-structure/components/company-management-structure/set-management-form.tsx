@@ -1,13 +1,15 @@
-import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import { useManagementsStructureCxt } from "./context";
+import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useOrgStructureCxt } from "@/modules/organizational-structure/context/OrgStructureCxt";
 
-export function GetOrgStructureManagementFormConfig(): FormConfig {
-  const { companyOwnerId, user } = useOrgStructureCxt();
-  const { activeBranch } = useManagementsStructureCxt();
-  console.log("companyOwnerId", companyOwnerId, user);
+type PropsT = {
+  isUserCompanyOwner: boolean;
+  branchId: string | number;
+  companyOwnerId: string | undefined;
+};
+
+export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
+  const { isUserCompanyOwner, companyOwnerId, branchId } = props;
 
   const _config: FormConfig = {
     formId: "org-structure-management-form",
@@ -73,8 +75,7 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             label: "الشخص المرجعي",
             type: "select",
             placeholder: "الشخص المرجعي",
-            // required: true,
-            disabled: user?.id !== companyOwnerId,
+            disabled: isUserCompanyOwner,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -83,20 +84,13 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "الشخص المرجعي مطلوب",
-            //   },
-            // ],
           },
           {
             name: "manager_id",
             label: "اسم المدير",
             type: "select",
             placeholder: "اسم المدير",
-            // required: true,
-            disabled: user?.id !== companyOwnerId,
+            disabled: isUserCompanyOwner,
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/user-lower-levels`,
               valueField: "id",
@@ -107,21 +101,14 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               dependsOn: "reference_user_id",
               filterParam: "user_id",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "اسم المدير مطلوب",
-            //   },
-            // ],
           },
           {
             name: "deputy_manager_ids",
             label: "نائب المدير",
             type: "select",
             placeholder: "نائب المدير",
-            // required: true,
             isMulti: true,
-            disabled: user?.id !== companyOwnerId,
+            disabled: isUserCompanyOwner,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -130,12 +117,6 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "نائب المدير مطلوب",
-            //   },
-            // ],
           },
           {
             name: "is_active",
@@ -158,16 +139,16 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
       },
     ],
     initialValues: {
-      manager_id: user?.id !== companyOwnerId ? companyOwnerId : undefined,
-      reference_user_id:
-        user?.id !== companyOwnerId ? companyOwnerId : undefined,
-      deputy_manager_ids: user?.id !== companyOwnerId ? [companyOwnerId] : [],
+      branch_id: branchId,
+      manager_id: isUserCompanyOwner ? companyOwnerId : undefined,
+      reference_user_id: isUserCompanyOwner ? companyOwnerId : undefined,
+      deputy_manager_ids: isUserCompanyOwner ? [companyOwnerId] : [],
     },
     onSubmit: async (formData) => {
       const body = {
         ...formData,
       };
-      console.log("activeBranch", activeBranch, "body", body);
+
       return await defaultSubmitHandler(body, _config, {
         url: `${baseURL}/management_hierarchies/create-management`,
       });
