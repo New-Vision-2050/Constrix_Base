@@ -43,6 +43,8 @@ export interface DynamicRowOptions {
   columnsMedium?: number; // Number of columns on medium screens (default: 2)
   columnsLarge?: number; // Number of columns on large screens (default: 3)
   enableDrag?: boolean; // Enable drag-and-drop reordering of rows
+  enableRemove?: boolean; // Enable row removal (overrides minRows constraint if set to true)
+  enableAdd?: boolean; // Enable row addition (overrides maxRows constraint if set to false)
   dragHandlePosition?: "left" | "right"; // Position of the drag handle (default: 'left')
   onDragStart?: (index: number) => void; // Callback when drag starts
   onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
@@ -112,6 +114,11 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
+  
+  // CheckboxGroup sync properties
+  syncWithField?: string; // Name of another checkbox group field to sync with
+  syncDirection?: "bidirectional" | "unidirectional"; // Whether the sync is two-way or one-way
+  syncOn?: "select" | "unselect" | "both"; // When to trigger the sync
   name: string;
   // Image field specific properties
   imageConfig?: {

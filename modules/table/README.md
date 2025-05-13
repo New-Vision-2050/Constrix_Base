@@ -104,6 +104,8 @@ const tableConfig: TableConfig = {
 |----------|------|-------------|
 | `url` | `string` | API endpoint to fetch data from |
 | `columns` | `ColumnConfig[]` | Array of column configurations |
+| `availableColumnKeys` | `string[]` | Array of column keys that should be available, filtering out others |
+| `defaultVisibleColumnKeys` | `string[]` | Array of column keys that should be visible by default |
 | `defaultItemsPerPage` | `number` | Default number of items per page |
 | `defaultSortColumn` | `string` | Default column to sort by |
 | `defaultSortDirection` | `'asc' \| 'desc' \| null` | Default sort direction |
@@ -229,6 +231,17 @@ Individual column search allows for more precise filtering of data.
 ### Column Visibility
 
 Users can toggle the visibility of columns using the column visibility dropdown.
+
+#### Column Filtering and Default Visibility
+
+The table now supports two new configuration options for controlling column visibility:
+
+1. `availableColumnKeys`: An array of column keys that should be available in the table. Any columns not in this list will be filtered out.
+2. `defaultVisibleColumnKeys`: An array of column keys that should be visible by default. Any columns not in this list will be hidden initially but can be toggled on by the user.
+
+These options provide more control over which columns are shown in the table and their default visibility state. This is particularly useful for tables with many columns where you want to limit which columns are available or set a default view with only the most important columns visible.
+
+See the [Table with Column Filtering and Default Visibility](#table-with-column-filtering-and-default-visibility) example for usage details.
 
 ### Row Selection and Export
 
@@ -498,6 +511,46 @@ const ProductsTable = () => {
       { key: 'id', title: 'ID', sortable: true },
       { key: 'name', title: 'Product Name', sortable: true, searchable: true },
       { key: 'price', title: 'Price', sortable: true },
+    ],
+  };
+
+  return <TableBuilder config={tableConfig} />;
+};
+```
+
+### Table with Column Filtering and Default Visibility
+
+```tsx
+import { TableBuilder } from '@/modules/table';
+
+const FilteredColumnsTable = () => {
+  const tableConfig = {
+    url: '/api/products',
+    columns: [
+      { key: 'id', title: 'ID', sortable: true },
+      { key: 'name', title: 'Product Name', sortable: true, searchable: true },
+      { key: 'price', title: 'Price', sortable: true },
+      { key: 'category', title: 'Category', sortable: true, searchable: true },
+      { key: 'stock', title: 'Stock', sortable: true },
+      { key: 'created_at', title: 'Created At', sortable: true },
+      { key: 'updated_at', title: 'Updated At', sortable: true },
+    ],
+    // Only show these columns in the table (filter out others)
+    availableColumnKeys: ['id', 'name', 'price', 'category', 'stock'],
+    
+    // Only these columns will be visible by default
+    defaultVisibleColumnKeys: ['name', 'price', 'category'],
+  };
+
+  return <TableBuilder config={tableConfig} />;
+};
+```
+
+This example demonstrates:
+1. Using `availableColumnKeys` to filter which columns are available in the table (only 'id', 'name', 'price', 'category', and 'stock' will be included)
+2. Using `defaultVisibleColumnKeys` to set which columns are visible by default (only 'name', 'price', and 'category' will be initially visible)
+
+Users can still toggle column visibility through the column visibility dropdown, but only for the columns specified in `availableColumnKeys`.
       { key: 'category', title: 'Category', sortable: true, searchable: true },
     ],
     dataMapper: (response) => {

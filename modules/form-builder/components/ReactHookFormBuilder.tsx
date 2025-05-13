@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { apiClient } from "@/config/axios-config";
-import {useFormStore} from "@/modules/form-builder";
+import { useFormStore } from "@/modules/form-builder";
+import { useTranslations } from "next-intl";
 
 interface ReactHookFormBuilderProps {
   config: FormConfig;
@@ -79,78 +80,91 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
   editError: initialEditError,
   recordId,
 }) => {
-  const [isEditMode] = useState( config.isEditMode || false);
-  const [isLoadingEditData, setIsLoadingEditData] = useState(initialIsLoadingEditData || false);
-  const [editError, setEditError] = useState<string | null>(initialEditError || null);
+  const [isEditMode] = useState(config.isEditMode || false);
+  const [isLoadingEditData, setIsLoadingEditData] = useState(
+    initialIsLoadingEditData || false
+  );
+  const [editError, setEditError] = useState<string | null>(
+    initialEditError || null
+  );
+  const t = useTranslations();
 
   // Function to load data for editing
-  const loadEditData = useCallback(async (id?: string | number) => {
-    // Use provided id or fallback to recordId from props
-    const targetId = id || recordId;
+  const loadEditData = useCallback(
+    async (id?: string | number) => {
+      // Use provided id or fallback to recordId from props
+      const targetId = id || recordId;
 
-    // If no ID is provided, we can't load data
-    if (!targetId) {
-      setEditError("No record ID provided for editing");
-      return;
-    }
+      // If no ID is provided, we can't load data
+      if (!targetId) {
+        setEditError("No record ID provided for editing");
+        return;
+      }
 
-    // If editValues are directly provided in the config, use those
-    if (config.editValues) {
-      form.reset(config.editValues);
-      return;
-    }
-    else
-    {
-        useFormStore.getState().setValues(config.formId || '',config.editValues || []);
-    }
+      // If editValues are directly provided in the config, use those
+      if (config.editValues) {
+        form.reset(config.editValues);
+        return;
+      } else {
+        useFormStore
+          .getState()
+          .setValues(config.formId || "", config.editValues || []);
+      }
 
-    // If no editApiUrl is provided, we can't load data
-    if (!config.editApiUrl) {
-      setEditError("No API URL configured for editing");
-      return;
-    }
+      // If no editApiUrl is provided, we can't load data
+      if (!config.editApiUrl) {
+        setEditError("No API URL configured for editing");
+        return;
+      }
 
-    try {
-      setIsLoadingEditData(true);
-      setEditError(null);
+      try {
+        setIsLoadingEditData(true);
+        setEditError(null);
 
-      // Replace :id placeholder in URL if present
-      const url = config.editApiUrl.replace(":id", String(targetId));
+        // Replace :id placeholder in URL if present
+        const url = config.editApiUrl.replace(":id", String(targetId));
 
-      // Make the API request
-      const response = await apiClient.get(url, {
-        headers: config.editApiHeaders,
-      });
+        // Make the API request
+        const response = await apiClient.get(url, {
+          headers: config.editApiHeaders,
+        });
 
-      // Extract data from response
-      let data = response.data;
+        // Extract data from response
+        let data = response.data;
 
-      // If a data path is specified, extract the data from that path
-      if (config.editDataPath) {
-        const paths = config.editDataPath.split('.');
-        for (const path of paths) {
-          data = data[path];
-          if (data === undefined) {
-            throw new Error(`Data path '${config.editDataPath}' not found in response`);
+        // If a data path is specified, extract the data from that path
+        if (config.editDataPath) {
+          const paths = config.editDataPath.split(".");
+          for (const path of paths) {
+            data = data[path];
+            if (data === undefined) {
+              throw new Error(
+                `Data path '${config.editDataPath}' not found in response`
+              );
+            }
           }
         }
-      }
 
-      // If a data transformer is provided, transform the data
-      if (config.editDataTransformer) {
-        data = config.editDataTransformer(data);
-      }
+        // If a data transformer is provided, transform the data
+        if (config.editDataTransformer) {
+          data = config.editDataTransformer(data);
+        }
 
-      // Reset the form with the loaded data
-      form.reset(data);
-    } catch (error: any) {
-      console.error("Error loading data for editing:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to load data";
-      setEditError(errorMessage);
-    } finally {
-      setIsLoadingEditData(false);
-    }
-  }, [config, recordId, form]);
+        // Reset the form with the loaded data
+        form.reset(data);
+      } catch (error: any) {
+        console.error("Error loading data for editing:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to load data";
+        setEditError(errorMessage);
+      } finally {
+        setIsLoadingEditData(false);
+      }
+    },
+    [config, recordId, form]
+  );
 
   // Load edit data when in edit mode
   useEffect(() => {
@@ -168,7 +182,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
       {isLoadingEditData && (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="animate-spin h-8 w-8 text-primary" />
-          <span className="ml-2 text-lg">Loading data...</span>
+          <span className="ml-2 text-lg">{t("Main.Loading")}</span>
         </div>
       )}
 
@@ -181,56 +195,58 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
       )}
 
       {/* Step indicator for wizard/accordion mode */}
-      {isStepBased && config.wizardOptions?.showStepIndicator && !isLoadingEditData && (
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            {config.sections.map((section, index) => (
-              <div
-                key={index}
-                className={`flex flex-col items-center ${
-                  config.wizardOptions?.allowStepNavigation
-                    ? "cursor-pointer"
-                    : index <= currentStep
-                    ? "cursor-pointer"
-                    : "cursor-not-allowed opacity-50"
-                }`}
-                onClick={() => {
-                  if (
-                    config.wizardOptions?.allowStepNavigation ||
-                    index <= currentStep
-                  ) {
-                    goToStep(index);
-                  }
-                }}
-              >
+      {isStepBased &&
+        config.wizardOptions?.showStepIndicator &&
+        !isLoadingEditData && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              {config.sections.map((section, index) => (
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                    index < currentStep
-                      ? "bg-green-500 text-white"
-                      : index === currentStep
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-gray-200 text-gray-500"
+                  key={index}
+                  className={`flex flex-col items-center ${
+                    config.wizardOptions?.allowStepNavigation
+                      ? "cursor-pointer"
+                      : index <= currentStep
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed opacity-50"
                   }`}
+                  onClick={() => {
+                    if (
+                      config.wizardOptions?.allowStepNavigation ||
+                      index <= currentStep
+                    ) {
+                      goToStep(index);
+                    }
+                  }}
                 >
-                  {index + 1}
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+                      index < currentStep
+                        ? "bg-green-500 text-white"
+                        : index === currentStep
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-gray-200 text-gray-500"
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                  {config.wizardOptions?.showStepTitles && section.title && (
+                    <span className="text-xs text-center">{section.title}</span>
+                  )}
                 </div>
-                {config.wizardOptions?.showStepTitles && section.title && (
-                  <span className="text-xs text-center">{section.title}</span>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="relative mt-2">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200"></div>
+              <div
+                className="absolute top-0 left-0 h-1 bg-primary transition-all duration-300"
+                style={{
+                  width: `${(currentStep / (totalSteps - 1)) * 100}%`,
+                }}
+              ></div>
+            </div>
           </div>
-          <div className="relative mt-2">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200"></div>
-            <div
-              className="absolute top-0 left-0 h-1 bg-primary transition-all duration-300"
-              style={{
-                width: `${(currentStep / (totalSteps - 1)) * 100}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-      )}
+        )}
 
       <div
         className={`max-h-[calc(80vh-120px)] overflow-y-auto pr-2
@@ -239,7 +255,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
           [&::-webkit-scrollbar-thumb]:bg-gray-300
           [&::-webkit-scrollbar-thumb]:rounded-full
           hover:[&::-webkit-scrollbar-thumb]:bg-gray-400
-          ${isLoadingEditData ? 'hidden' : ''}`}
+          ${isLoadingEditData ? "hidden" : ""}`}
       >
         {/* Render form sections based on mode */}
         {isWizard ? (

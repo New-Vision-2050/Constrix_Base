@@ -1,7 +1,7 @@
 type PropsT = {
-  title?: string;
-  number?: string;
-  description?: string;
+  title?: string | number;
+  number?: string | number;
+  description?: string | number;
   icon?: JSX.Element;
 };
 
@@ -24,7 +24,7 @@ export default function StatisticsCardHeader(props: PropsT) {
       <div>
         <p className="text-lg font-bold">{title}</p>
         <p className="text-sm font-thin">
-          <span className="text-lg font-bold">{number}</span>
+          <span className="text-lg font-bold">{number+' '}</span>
           {description}
         </p>
       </div>

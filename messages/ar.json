@@ -1,4 +1,8 @@
 {
+  "Main": {
+    "NoResultsRound": "لم يتم العثور على نتائج",
+    "Loading": "جاري تحميل البيانات..."
+  },
   "Login": {
     "Control_panel": "لوحة التحكم",
     "SignIn": "تسجيل الدخول",
@@ -124,6 +128,7 @@
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
     "createCompany": "انشاء شركة",
+    "SaveCompany":"تم حفظ الشركة برقم",
     "Validation": {
       "arabicName": "الاسم التجاري يجب ان يكون باللغه العربية",
       "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية",
@@ -144,7 +149,8 @@
     "Welcome": "مرحبا",
     "CompanyName": "نيو فيجن",
     "OrganizationalStructure": "الهيكل التنظيمي",
-    "HumanResources": "الموارد البشرية"
+    "HumanResources": "الموارد البشرية",
+    "ProgramManagement":"ادارة البرامج"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",

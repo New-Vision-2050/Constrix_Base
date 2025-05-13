@@ -1,4 +1,8 @@
 {
+  "Main": {
+    "NoResultsRound": "No results found",
+    "Loading": "Loading data..."
+  },
   "Login": {
     "Control_panel": "Control panel",
     "SignIn": "Sign In",
@@ -124,6 +128,7 @@
     "AreYouSureReactivate": "Do you want to confirm activating the company?",
     "AreYouSureDeactivate": "Do you want to confirm deactivating the company?",
     "createCompany": "Create Company",
+    "SaveCompany":"The company was saved with number",
     "Validation": {
       "englishName": "Short name should be in English",
       "arabicName": "The name should be in Arabic letters",
@@ -144,7 +149,8 @@
     "Welcome": "Hello",
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
-    "HumanResources": "Human Resources"
+    "HumanResources": "Human Resources",
+    "ProgramManagement":"Program Management"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

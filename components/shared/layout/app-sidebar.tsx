@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { AudioWaveform, Command, GalleryVerticalEnd, LayoutDashboardIcon } from "lucide-react";
+import {
+  AudioWaveform,
+  Command,
+  GalleryVerticalEnd,
+  LayoutDashboardIcon,
+  UserIcon,
+} from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -10,8 +16,6 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import CompaniesIcon from "@/public/icons/companies";
-import UserIcon from "@/public/icons/user";
 import SidebarHeaderContent from "./sidebar-header-content";
 import SidebarFooterContent from "./sidebar-footer-content";
 import { useLocale, useTranslations } from "next-intl";
@@ -89,13 +93,13 @@ export function AppSidebar({
         {
           name: t("Sidebar.Companies"),
           url: ROUTER.COMPANIES,
-          icon: CompaniesIcon,
+          icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.COMPANIES,
           submenu: [
             {
               name: t("Sidebar.CompaniesList"),
               url: ROUTER.COMPANIES,
-              icon: CompaniesIcon,
+              icon: LayoutDashboardIcon,
               isActive: pageName === ROUTER.COMPANIES,
             },
           ],
@@ -123,6 +127,19 @@ export function AppSidebar({
               url: ROUTER.Organizational_Structure,
               icon: LayoutDashboardIcon,
               isActive: pageName === ROUTER.Organizational_Structure,
+            },
+          ],
+        },
+           {
+          name: t("Sidebar.ProgramManagement"),
+          icon: LayoutDashboardIcon,
+          isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+          submenu: [
+            {
+              name: t("Sidebar.Users"),
+              url: ROUTER.PROGRAM_SETTINGS.USERS,
+              icon: LayoutDashboardIcon,
+              isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
             },
           ],
         },
