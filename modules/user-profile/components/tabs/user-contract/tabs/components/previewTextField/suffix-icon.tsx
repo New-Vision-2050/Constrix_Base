@@ -87,7 +87,10 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
               isRTL ? "left-[85px]" : "right-[85px]"
             }`}
             title={loading ? "جاري التنفيذ" : "حذف"}
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              if (!mediaId) return;
+              setOpen(true);
+            }}
             style={{
               cursor:
                 type === "pdf" || type === "image" ? "pointer" : "default",

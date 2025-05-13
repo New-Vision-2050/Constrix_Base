@@ -73,29 +73,29 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             label: "الشخص المرجعي",
             type: "select",
             placeholder: "الشخص المرجعي",
-            required: true,
+            // required: true,
             disabled: user?.id !== companyOwnerId,
             dynamicOptions: {
-              url: `${baseURL}/users/admin-users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "الشخص المرجعي مطلوب",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "الشخص المرجعي مطلوب",
+            //   },
+            // ],
           },
           {
             name: "manager_id",
             label: "اسم المدير",
             type: "select",
             placeholder: "اسم المدير",
-            required: true,
+            // required: true,
             disabled: user?.id !== companyOwnerId,
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/user-lower-levels`,
@@ -107,19 +107,19 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               dependsOn: "reference_user_id",
               filterParam: "user_id",
             },
-            validation: [
-              {
-                type: "required",
-                message: "اسم المدير مطلوب",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "اسم المدير مطلوب",
+            //   },
+            // ],
           },
           {
             name: "deputy_manager_ids",
             label: "نائب المدير",
             type: "select",
             placeholder: "نائب المدير",
-            required: true,
+            // required: true,
             isMulti: true,
             disabled: user?.id !== companyOwnerId,
             dynamicOptions: {
@@ -130,12 +130,12 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "نائب المدير مطلوب",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "نائب المدير مطلوب",
+            //   },
+            // ],
           },
           {
             name: "is_active",
@@ -181,6 +181,6 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
     showCancelButton: false,
     showBackButton: false,
   };
-  
+
   return _config;
 }

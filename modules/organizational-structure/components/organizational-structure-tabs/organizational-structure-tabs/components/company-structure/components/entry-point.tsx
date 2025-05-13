@@ -1,7 +1,6 @@
 "use client";
 import VerticalBtnsList from "@/components/shared/VerticalList";
 import TabContentHeader from "@/modules/organizational-structure/components/TabContentHeader";
-import ReactFlowDiagram from "./ReactFlowDiagram";
 import { useOrgStructureCxt } from "@/modules/organizational-structure/context/OrgStructureCxt";
 import { useEffect, useState } from "react";
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
@@ -25,16 +24,13 @@ export default function CompanyStructureEntryPoint() {
       setItems(_items);
     }
   }, [branchiesList]);
-  
 
   return (
     <div className="flex flex-col gap-7">
       <TabContentHeader title="بنية الشركة" />
       <div className="flex gap-8">
         <VerticalBtnsList items={items} />
-        <div className="p-4 flex-grow gap-8">
-          <ReactFlowDiagram />
-        </div>
+        <div className="p-4 flex-grow gap-8">{/* <ReactFlowDiagram /> */}</div>
       </div>
     </div>
   );
