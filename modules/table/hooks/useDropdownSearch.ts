@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { processApiResponse } from "@/modules/table/utils/dataUtils";
 import { apiClient } from "@/config/axios-config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { DropdownOption, DynamicDropdownConfig } from "@/modules/form-builder";
+import {DropdownOption, DynamicDropdownConfig} from "@/modules/form-builder";
 
 interface UseDropdownSearchProps {
   searchTerm: string;
@@ -101,14 +101,21 @@ export const useDropdownSearch = ({
           url = `${url}${url.includes("?") ? "&" : "?"}${queryString}`;
         }
 
-        const response = await queryClient.fetchQuery({
-          queryKey: ["initialLabel", url],
-          queryFn: async () => {
-            const response = await apiClient.get(url);
-            return response;
-          },
-          staleTime: 1000 * 60 * 5,
-        });
+        let response;
+        if (dynamicConfig.disableReactQuery) {
+          // Use direct API call without React Query
+          response = await apiClient.get(url);
+        } else {
+          // Use React Query
+          response = await queryClient.fetchQuery({
+            queryKey: ["initialLabel", url],
+            queryFn: async () => {
+              const response = await apiClient.get(url);
+              return response;
+            },
+            staleTime: 1000 * 60 * 5,
+          });
+        }
 
         if (!isMountedRef.current) return;
 
@@ -434,16 +441,18 @@ export const useDropdownSearch = ({
         //   `Fetching dropdown options for search: ${debouncedSearchTerm}`,
         //   url
         // );
-        /*       const response = await apiClient.get(url, { signal: controller.signal });
-         */
-        const response = await queryClient.fetchQuery({
+        let response;
+      if (dynamicConfig.disableReactQuery) {
+        // Use direct API call without React Query response = await apiClient.get(url, { signal: controller.signal });
+         } else {
+        // Use React Query response = await queryClient.fetchQuery({
           queryKey: ["data", url],
           queryFn: async () => {
             const response = await apiClient.get(url);
             return response;
           },
           staleTime: 1000 * 60 * 5,
-        });
+        });}
 
         if (!isMountedRef.current) return;
 
