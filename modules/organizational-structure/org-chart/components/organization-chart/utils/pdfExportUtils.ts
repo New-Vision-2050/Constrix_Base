@@ -23,9 +23,10 @@ export const exportChartAsPDF = async (element: HTMLElement | null, filename: st
     
     // Temporarily add the cloned element to the DOM with fixed width and height
     clonedElement.style.overflow = 'visible';
-    clonedElement.style.width = `${element.scrollWidth}px`;
-    clonedElement.style.height = `${element.scrollHeight}px`;
+    clonedElement.style.width = `${element.scrollWidth + 32}px`;
+    clonedElement.style.height = `${element.scrollHeight + 32}px`;
     clonedElement.style.position = 'absolute';
+    clonedElement.style.padding = '16px';
     clonedElement.style.top = '-9999px';
     clonedElement.style.left = '-9999px';
     document.body.appendChild(clonedElement);

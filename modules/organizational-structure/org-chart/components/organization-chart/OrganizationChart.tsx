@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, MouseEvent } from 'react'
 import { OrgChartNode } from '@/types/organization'
 import { useToast } from '@/modules/table/hooks/use-toast'
 import { Tree } from 'react-organizational-chart'
@@ -11,29 +11,33 @@ import { exportChartAsPDF } from './utils/pdfExportUtils'
 import './style.css'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react' // or use custom styles
+import { useLocale } from 'next-intl'
 
 interface OrganizationChartProps {
   data: OrgChartNode;
   listView?: boolean;
 }
 
-const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
+const OrganizationChart = ({ data, listView = true }: OrganizationChartProps) => {
   const { toast } = useToast()
   const {
     zoomLevel,
     zoomIn,
     zoomOut,
     setZoom,
+    handleWheelZoom,
     zoomStyle
   } = useZoom()
   const [selectedNode, setSelectedNode] = useState<OrgChartNode | null>(null)
   const [displayNode, setDisplayNode] = useState<OrgChartNode>(data)
   const [originalData, setOriginalData] = useState<OrgChartNode>(data)
   const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree')
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartTreeRef = useRef<HTMLDivElement>(null);
-  const chartWrapperRef = useRef<HTMLDivElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
+  const chartTreeRef = useRef<HTMLDivElement>(null)
+  const chartWrapperRef = useRef<HTMLDivElement>(null)
+  const isDragging = useRef<boolean>(false)
+  const dragStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 })
 
   // Set original data on component mount
   useEffect(() => {
@@ -47,39 +51,39 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
       // Enter full screen mode
       if (chartWrapperRef.current?.requestFullscreen) {
         chartWrapperRef.current.requestFullscreen().then(() => {
-          setIsFullScreen(true);
+          setIsFullScreen(true)
         }).catch((err) => {
           toast({
-            title: "Full Screen Error",
+            title: 'Full Screen Error',
             description: `Error attempting to enable full-screen mode: ${err.message}`,
-            duration: 3000,
-          });
-        });
+            duration: 3000
+          })
+        })
       }
     } else {
       // Exit full screen mode
       if (document.exitFullscreen) {
         document.exitFullscreen().then(() => {
-          setIsFullScreen(false);
+          setIsFullScreen(false)
         }).catch((err) => {
-          console.error(`Error attempting to exit full-screen mode: ${err.message}`);
-        });
+          console.error(`Error attempting to exit full-screen mode: ${err.message}`)
+        })
       }
     }
-  };
+  }
 
   // Listen for full screen change events
   useEffect(() => {
     const handleFullScreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
+      setIsFullScreen(!!document.fullscreenElement)
+    }
 
-    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('fullscreenchange', handleFullScreenChange)
 
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullScreenChange);
-    };
-  }, []);
+      document.removeEventListener('fullscreenchange', handleFullScreenChange)
+    }
+  }, [])
 
   const handleNodeClick = (node: OrgChartNode) => {
     setSelectedNode(node)
@@ -150,11 +154,89 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
     exportChartAsPDF(chartElement, `organization-chart-${displayNode.name}.pdf`)
   }
 
+  // const locale = useLocale();
+  // const pos = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
+  // const [isPanning, setIsPanning] = useState(false);
+  //
+  // const handleMouseDown = (e) => {
+  //   if (e.target.closest('.node-content')) return;
+  //   setIsPanning(true);
+  //   pos.current.startX = e.clientX;
+  //   pos.current.startY = e.clientY;
+  //   console.log(pos)
+  //   document.body.style.cursor = 'grabbing';
+  // };
+  //
+  // const handleMouseMove = (e) => {
+  //   if (!isPanning) return;
+  //   const dx = e.clientX - pos.current.startX;
+  //   const dy = e.clientY - pos.current.startY;
+  //   chartTreeRef.current.style[locale === 'ar' ?'right': 'left'] = `${pos.current.x + (locale === 'ar' ?-dx: dx)}px`;
+  //   chartTreeRef.current.style.top = `${pos.current.y + dy}px`;
+  // };
+  //
+  // const handleMouseUp = () => {
+  //   if (!isPanning) return;
+  //   setIsPanning(false);
+  //   pos.current.x = parseInt(chartTreeRef.current.style[locale === 'ar' ?'right': 'left'] || 0);
+  //   pos.current.y = parseInt(chartTreeRef.current.style.top || 0);
+  //   document.body.style.cursor = 'default';
+  // };
+
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('.node-content')) return
+    if (!chartContainerRef.current) return;
+    isDragging.current = true
+    dragStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      scrollLeft: chartContainerRef.current.scrollLeft,
+      scrollTop: chartContainerRef.current.scrollTop
+    }
+    document.body.classList.add('no-select')
+    document.body.style.cursor = 'grabbing'
+  }
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging.current || !chartContainerRef.current) return;
+    const dx = e.clientX - dragStart.current.x
+    const dy = e.clientY - dragStart.current.y
+    chartContainerRef.current.scrollLeft = dragStart.current.scrollLeft - dx
+    chartContainerRef.current.scrollTop = dragStart.current.scrollTop - dy
+  }
+
+  const handleMouseUp = () => {
+    isDragging.current = false
+    document.body.classList.remove('no-select')
+    document.body.style.cursor = 'default'
+  }
+
+  useEffect(() => {
+    const preventDrag = (e: DragEvent) => e.preventDefault()
+    document.addEventListener('dragstart', preventDrag)
+    return () => document.removeEventListener('dragstart', preventDrag)
+  }, [])
+
+
+  useEffect(() => {
+    const wrapper = chartContainerRef.current
+    if (!wrapper) return
+
+    const handleWheel = (e: WheelEvent) =>{
+      handleWheelZoom(e, chartContainerRef)
+    }
+    wrapper.addEventListener('wheel', handleWheel , { passive: false })
+
+    return () => {
+      wrapper.removeEventListener('wheel', handleWheel)
+    }
+  }, [chartContainerRef, handleWheelZoom])
+
   return (
-      <div
-        ref={chartWrapperRef}
-        className={`flex flex-col h-full ${isFullScreen ? 'bg-[#18003a] fixed inset-0 z-50' : ''}`}
-      >
+    <div
+      ref={chartWrapperRef}
+      className={`flex flex-col h-full ${isFullScreen ? 'bg-[#18003a] fixed inset-0 z-50' : ''}`}
+    >
       <ChartControls
         zoomLevel={[zoomLevel]} // Convert single number to array
         onZoomIn={zoomIn}
@@ -175,10 +257,16 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
       {((viewMode === 'tree') || !listView) ? (
         <div
           ref={chartContainerRef}
-          className="w-full h-full min-h-[700px] overflow-auto px-4 py-8"
+          /*relative overflow-hidden*/
+          className="w-full h-full min-h-[700px] overflow-auto px-4 py-8 cursor-grab"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
         >
           <div
             ref={chartTreeRef}
+            /*absolute*/
             className="org-chart-container"
             style={zoomStyle}
           >
@@ -189,7 +277,8 @@ const OrganizationChart = ({ data, listView=true }: OrganizationChartProps) => {
               lineHeight="30px"
               nodePadding="20px"
               label={
-                <div className={`flex flex-col items-center item-${displayNode.children?.length === 1 ? displayNode.children[0]?.type:displayNode?.type}`}>
+                <div
+                  className={`flex flex-col items-center item-${displayNode.children?.length === 1 ? displayNode.children[0]?.type : displayNode?.type}`}>
                   <ChartNode
                     node={displayNode}
                     onNodeClick={handleNodeClick}
