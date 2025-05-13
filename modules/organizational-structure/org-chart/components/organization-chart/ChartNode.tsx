@@ -16,7 +16,7 @@ const ChartNode: React.FC<ChartNodeProps> = ({ node, onNodeClick, isSelected = f
         e.stopPropagation()
         onNodeClick(node)
       }}
-      className={`w-full bg-sidebar border-0 ${isSelected ? 'border-primary ring-2 ring-primary' : ''} rounded-lg shadow p-4 py-8 min-w-[200px] min-h-[200px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${isFirst ? 'max-w-[400px] mx-auto' : ''} item-${node.children?.length === 1 ? node.children[0]?.type : node?.type}`}
+      className={`node-content w-full bg-sidebar border-0 ${isSelected ? 'border-primary ring-2 ring-primary' : ''} rounded-lg shadow p-4 py-8 min-w-[200px] min-h-[200px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${isFirst ? 'max-w-[400px] mx-auto' : ''} item-${node.children?.length === 1 ? node.children[0]?.type : node?.type}`}
     >
       <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5"><DepartmentIcon
         className={'text-primary'}/> {node.name}</h3>
