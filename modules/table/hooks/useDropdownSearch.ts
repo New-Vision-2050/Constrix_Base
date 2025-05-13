@@ -443,16 +443,19 @@ export const useDropdownSearch = ({
         // );
         let response;
       if (dynamicConfig.disableReactQuery) {
-        // Use direct API call without React Query response = await apiClient.get(url, { signal: controller.signal });
-         } else {
-        // Use React Query response = await queryClient.fetchQuery({
+        // Use direct API call without React Query
+        response = await apiClient.get(url, { signal: controller.signal });
+      } else {
+        // Use React Query
+        response = await queryClient.fetchQuery({
           queryKey: ["data", url],
           queryFn: async () => {
             const response = await apiClient.get(url);
             return response;
           },
           staleTime: 1000 * 60 * 5,
-        });}
+        });
+      }
 
         if (!isMountedRef.current) return;
 
