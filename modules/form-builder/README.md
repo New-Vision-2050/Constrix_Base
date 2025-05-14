@@ -513,9 +513,12 @@ const apiEditFormConfig: FormConfig = {
     valueField: "id",
     labelField: "name",
     dependsOn: "country", // This field depends on the country field
+    disableReactQuery: false, // Optional: Set to true to disable React Query caching and use direct API calls
   },
 }
 ```
+
+The `disableReactQuery` option allows you to bypass React Query caching for specific dropdowns. This can be useful in scenarios where you need real-time data without caching, or when you're experiencing issues with cached data becoming stale.
 
 ### Image Upload Field
 

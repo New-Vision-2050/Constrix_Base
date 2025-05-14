@@ -1,13 +1,26 @@
-import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import { useManagementsStructureCxt } from "./context";
+import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useOrgStructureCxt } from "@/modules/organizational-structure/context/OrgStructureCxt";
+import { OrgChartNode } from "@/types/organization";
 
-export function GetOrgStructureManagementFormConfig(): FormConfig {
-  const { companyOwnerId, user } = useOrgStructureCxt();
-  const { activeBranch } = useManagementsStructureCxt();
-  console.log("companyOwnerId", companyOwnerId, user);
+type PropsT = {
+  isEdit?: boolean;
+  branchId: string | number;
+  isUserCompanyOwner: boolean;
+  selectedNode: OrgChartNode | undefined;
+  companyOwnerId: string | undefined;
+  onClose?: () => void;
+};
+
+export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
+  const {
+    isEdit = false,
+    isUserCompanyOwner,
+    companyOwnerId,
+    selectedNode,
+    branchId,
+    onClose,
+  } = props;
 
   const _config: FormConfig = {
     formId: "org-structure-management-form",
@@ -23,12 +36,17 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
         fields: [
           {
             name: "branch_id",
+            label: "branch_id",
+            type: "hiddenObject",
+          },
+          {
+            name: "management_id",
             label: "الادارة التابعة الى",
             type: "select",
             placeholder: "الادارة التابعة الى",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list`,
+              url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -73,8 +91,7 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             label: "الشخص المرجعي",
             type: "select",
             placeholder: "الشخص المرجعي",
-            // required: true,
-            disabled: user?.id !== companyOwnerId,
+            disabled: isUserCompanyOwner,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -83,20 +100,13 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "الشخص المرجعي مطلوب",
-            //   },
-            // ],
           },
           {
             name: "manager_id",
             label: "اسم المدير",
             type: "select",
             placeholder: "اسم المدير",
-            // required: true,
-            disabled: user?.id !== companyOwnerId,
+            disabled: isUserCompanyOwner,
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/user-lower-levels`,
               valueField: "id",
@@ -107,21 +117,14 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               dependsOn: "reference_user_id",
               filterParam: "user_id",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "اسم المدير مطلوب",
-            //   },
-            // ],
           },
           {
             name: "deputy_manager_ids",
             label: "نائب المدير",
             type: "select",
             placeholder: "نائب المدير",
-            // required: true,
             isMulti: true,
-            disabled: user?.id !== companyOwnerId,
+            disabled: isUserCompanyOwner,
             dynamicOptions: {
               url: `${baseURL}/users`,
               valueField: "id",
@@ -130,12 +133,6 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "نائب المدير مطلوب",
-            //   },
-            // ],
           },
           {
             name: "is_active",
@@ -158,26 +155,50 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
       },
     ],
     initialValues: {
-      manager_id: user?.id !== companyOwnerId ? companyOwnerId : undefined,
-      reference_user_id:
-        user?.id !== companyOwnerId ? companyOwnerId : undefined,
-      deputy_manager_ids: user?.id !== companyOwnerId ? [companyOwnerId] : [],
+      branch_id: selectedNode?.branch_id,
+      name: isEdit ? selectedNode?.name : undefined,
+      description: isEdit ? selectedNode?.description : undefined,
+      is_active: isEdit ? selectedNode?.status == 1 : undefined,
+      management_id: isEdit ? selectedNode?.parent_id : selectedNode?.id,
+      manager_id: isUserCompanyOwner
+        ? companyOwnerId
+        : !isEdit
+        ? undefined
+        : selectedNode?.manager_id,
+      reference_user_id: isUserCompanyOwner
+        ? companyOwnerId
+        : !isEdit
+        ? undefined
+        : selectedNode?.reference_user_id,
+      deputy_manager_ids: isUserCompanyOwner
+        ? [companyOwnerId]
+        : !isEdit
+        ? []
+        : selectedNode?.deputy_managers?.map((ele) => ele.id),
     },
     onSubmit: async (formData) => {
+      const method = isEdit ? "PUT" : "POST";
       const body = {
         ...formData,
+        branch_id: branchId || selectedNode?.branch_id,
       };
-      console.log("activeBranch", activeBranch, "body", body);
+
       return await defaultSubmitHandler(body, _config, {
-        url: `${baseURL}/management_hierarchies/create-management`,
+        method: method,
+        url: `${baseURL}/management_hierarchies/${
+          isEdit ? `update-management/${selectedNode?.id}` : "create-management"
+        }`,
       });
+    },
+    onSuccess: () => {
+      onClose?.();
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
   };

@@ -36,3 +36,6 @@ li.tree-fix-ar{
   border-radius: var(--tree-line-border-radius) 0 0 0;
 }
 }
+.no-select {
+  user-select: none !important;
+}
