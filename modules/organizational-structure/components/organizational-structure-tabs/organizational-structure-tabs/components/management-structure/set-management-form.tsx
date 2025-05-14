@@ -1,8 +1,15 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
+import { useManagementsStructureCxt } from "./context";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useOrgStructureCxt } from "@/modules/organizational-structure/context/OrgStructureCxt";
 
 export function GetOrgStructureManagementFormConfig(): FormConfig {
-  return {
+  const { companyOwnerId, user } = useOrgStructureCxt();
+  const { activeBranch } = useManagementsStructureCxt();
+  console.log("companyOwnerId", companyOwnerId, user);
+
+  const _config: FormConfig = {
     formId: "org-structure-management-form",
     title: "اضافة ادارة",
     apiUrl: `${baseURL}/management_hierarchies/create-management`,
@@ -15,13 +22,13 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
         title: "اضافة ادارة",
         fields: [
           {
-            name: "management_id",
+            name: "branch_id",
             label: "الادارة التابعة الى",
             type: "select",
             placeholder: "الادارة التابعة الى",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=management`,
+              url: `${baseURL}/management_hierarchies/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -62,69 +69,73 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
             ],
           },
           {
-            name: "manager_id",
-            label: "اسم المدير",
+            name: "reference_user_id",
+            label: "الشخص المرجعي",
             type: "select",
-            placeholder: "اسم المدير",
-            required: true,
+            placeholder: "الشخص المرجعي",
+            // required: true,
+            disabled: user?.id !== companyOwnerId,
             dynamicOptions: {
-              url: `${baseURL}/company-users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "اسم المدير مطلوب",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "الشخص المرجعي مطلوب",
+            //   },
+            // ],
+          },
+          {
+            name: "manager_id",
+            label: "اسم المدير",
+            type: "select",
+            placeholder: "اسم المدير",
+            // required: true,
+            disabled: user?.id !== companyOwnerId,
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-lower-levels`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "reference_user_id",
+              filterParam: "user_id",
+            },
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "اسم المدير مطلوب",
+            //   },
+            // ],
           },
           {
             name: "deputy_manager_ids",
             label: "نائب المدير",
             type: "select",
             placeholder: "نائب المدير",
-            required: true,
+            // required: true,
             isMulti: true,
+            disabled: user?.id !== companyOwnerId,
             dynamicOptions: {
-              url: `${baseURL}/company-users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "نائب المدير مطلوب",
-              },
-            ],
-          },
-          {
-            name: "reference_user_id",
-            label: "الشخص المرجعي",
-            type: "select",
-            placeholder: "الشخص المرجعي",
-            required: true,
-            isMulti: true,
-            dynamicOptions: {
-              url: `${baseURL}/company-users`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              totalCountHeader: "X-Total-Count",
-            },
-            validation: [
-              {
-                type: "required",
-                message: "الشخص المرجعي مطلوب",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "نائب المدير مطلوب",
+            //   },
+            // ],
           },
           {
             name: "is_active",
@@ -146,6 +157,21 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
         ],
       },
     ],
+    initialValues: {
+      manager_id: user?.id !== companyOwnerId ? companyOwnerId : undefined,
+      reference_user_id:
+        user?.id !== companyOwnerId ? companyOwnerId : undefined,
+      deputy_manager_ids: user?.id !== companyOwnerId ? [companyOwnerId] : [],
+    },
+    onSubmit: async (formData) => {
+      const body = {
+        ...formData,
+      };
+      console.log("activeBranch", activeBranch, "body", body);
+      return await defaultSubmitHandler(body, _config, {
+        url: `${baseURL}/management_hierarchies/create-management`,
+      });
+    },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
@@ -155,4 +181,6 @@ export function GetOrgStructureManagementFormConfig(): FormConfig {
     showCancelButton: false,
     showBackButton: false,
   };
+
+  return _config;
 }

@@ -5,14 +5,18 @@ import {
   MapPin,
   UserIcon,
 } from "lucide-react";
-import StatisticsCard from "./StatisticsCard";
+import StatisticsCard, {
+  CardInfoT,
+  StatisticsCardInfo,
+} from "./StatisticsCard";
 import { useOrgStructureCxt } from "../context/OrgStructureCxt";
 import { useMemo } from "react";
 
 export default function StatisticsCardsList() {
-  const { widgets, widgetsLoading } = useOrgStructureCxt();
+  const { widgets } = useOrgStructureCxt();
 
-  const statisticsCardsList = useMemo(() => {
+  const statisticsCardsList: CardInfoT[] = useMemo(() => {
+    if (!widgets) return [];
     const usersTotal = calculateAchievementPercentage(
       widgets?.users?.total_users ?? 0,
       widgets?.users?.users_with_hierarchy ?? 0
@@ -30,7 +34,6 @@ export default function StatisticsCardsList() {
       widgets?.departments?.used_count ?? 0
     );
 
-    
     return [
       {
         number: widgets?.users?.total_users ?? 0,
@@ -106,7 +109,16 @@ export default function StatisticsCardsList() {
   return (
     <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4">
       {statisticsCardsList?.map((card, index) => (
-        <StatisticsCard key={index} {...card} />
+        <StatisticsCard
+          key={index}
+          title={card.title}
+          number={card.number}
+          icon={card.icon}
+          description={card.description}
+          progressBarValue={card.progressBarValue}
+          leftSideInfo={card.leftSideInfo as StatisticsCardInfo}
+          rightSideInfo={card.rightSideInfo}
+        />
       ))}
     </div>
   );

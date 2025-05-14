@@ -28,7 +28,7 @@ const TextField: React.FC<TextFieldProps> = ({
   onChange,
   onBlur,
   isValidating,
-  formId = 'default',
+  formId = "default",
 }) => {
   // Track whether the field has been API validated
   const [hasBeenApiValidated, setHasBeenApiValidated] = useState(false);
@@ -113,7 +113,8 @@ const TextField: React.FC<TextFieldProps> = ({
             isValidated ? "border-green-500" : "",
             hasPostfix ? "rtl:rounded-s-none ltr:rounded-e-none" : "", // Use logical properties (end) instead of directional (right)
             showIcon ? (isRtl ? "pl-8" : "pl-8") : "", // Add padding based on text direction
-            hasPostfix ? "" : field.width ? field.width : "w-full"
+            hasPostfix ? "" : field.width ? field.width : "w-full",
+            "focus-visible:ring-0"
           )}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
@@ -144,7 +145,7 @@ const TextField: React.FC<TextFieldProps> = ({
           ) : null}
         </div>
       )}
-      
+
       {/* Error message */}
       {showError && (
         <div className="text-destructive text-sm mt-1">

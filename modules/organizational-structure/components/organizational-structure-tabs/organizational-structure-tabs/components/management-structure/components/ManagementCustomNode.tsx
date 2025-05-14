@@ -4,8 +4,7 @@ import { Building2, EllipsisVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Manager } from "../../company-structure/types/CustomBranchNode";
 
-// Define the expected data structure
-type ManagementData = {
+type ManagementNodeData = NodeProps & {
   name?: string;
   type?: string;
   branch_count?: number;
@@ -22,13 +21,8 @@ type ManagementData = {
   };
 };
 
-// Update the node props to include our data structure
-type ManagementNodeData = NodeProps & {
-  data?: ManagementData;
-};
-
 const ManagementCustomNode: React.FC<ManagementNodeData> = (props) => {
-  const { data = {} } = props;
+  const { data } = props;
 
   return (
     <div
@@ -49,14 +43,14 @@ const ManagementCustomNode: React.FC<ManagementNodeData> = (props) => {
         <div>
           <p className="text-slate-500 text-sm">المدير</p>
           <p className="text-white text-md">
-            {(data?.manager?.name as string) ?? "-"}
+            {((data?.manager as Manager)?.name as string) ?? "-"}
           </p>
         </div>
 
         <div>
           <p className="text-slate-500 text-sm">المدير النائب</p>
           <p className="text-white text-md">
-            {(data?.deputy_manager?.name as string) ?? "-"}
+            {((data?.deputy_manager as Manager)?.name as string) ?? "-"}
           </p>
         </div>
       </div>
