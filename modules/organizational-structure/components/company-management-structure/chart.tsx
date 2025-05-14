@@ -1,6 +1,6 @@
 "use client";
 import { Loader2 } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { OrgChartNode } from "@/types/organization";
 import { SheetFormBuilder, useSheetForm } from "@/modules/form-builder";
 import useManagementsTreeData from "@/modules/organizational-structure/hooks/useManagementsTreeData";
@@ -14,19 +14,44 @@ type PropsT = {
 
 const BranchManagementsStructure = (props: PropsT) => {
   const { branchId } = props;
-  const { isUserCompanyOwner, companyOwnerId, handleStoreBranch } =
-    useManagementsStructureCxt();
+  const [isEdit, setIsEdit] = useState(false);
+  const {
+    isUserCompanyOwner,
+    selectedNode,
+    companyOwnerId,
+    handleStoreSelectedNode,
+  } = useManagementsStructureCxt();
   const config = useMemo(() => {
     return GetOrgStructureManagementFormConfig({
+      isEdit,
+      onClose,
       branchId,
+      selectedNode,
       isUserCompanyOwner,
       companyOwnerId,
     });
-  }, [isUserCompanyOwner, companyOwnerId,branchId]);
+  }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
   const { openSheet, isOpen, closeSheet } = useSheetForm({ config });
-  const { data: orgData, isLoading, error } = useManagementsTreeData(branchId);
+  const {
+    data: orgData,
+    isLoading,
+    error,
+    refetch: refreshOrgChart,
+  } = useManagementsTreeData(branchId);
   const onAddBtnClick = useCallback((node: OrgChartNode) => {
-    handleStoreBranch(node);
+    setIsEdit(false);
+    handleStoreSelectedNode(node);
+    openSheet();
+  }, []);
+
+  function onClose() {
+    refreshOrgChart();
+    closeSheet();
+  }
+
+  const onEditBtnClick = useCallback((node: OrgChartNode) => {
+    setIsEdit(true);
+    handleStoreSelectedNode(node);
     openSheet();
   }, []);
 
@@ -47,10 +72,11 @@ const BranchManagementsStructure = (props: PropsT) => {
         </div>
       )}
 
-      {!isLoading && !error && orgData && (
+      {!isLoading && !error && orgData && orgData?.length > 0 && (
         <div className="overflow-hidden">
           <OrganizationChart
-            data={orgData[0] as OrgChartNode}
+            data={orgData?.[0] as OrgChartNode}
+            onEditBtnClick={(node) => onEditBtnClick(node)}
             onAddBtnClick={(node) => onAddBtnClick(node)}
           />
         </div>
