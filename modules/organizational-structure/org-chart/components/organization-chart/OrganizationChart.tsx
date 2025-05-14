@@ -15,12 +15,14 @@ interface OrganizationChartProps {
   data: OrgChartNode;
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
+  onEditBtnClick?: (node: OrgChartNode) => void;
 }
 
 const OrganizationChart = ({
   data,
   listView = true,
   onAddBtnClick,
+  onEditBtnClick
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
@@ -256,7 +258,7 @@ const OrganizationChart = ({
         onResetView={handleResetView}
         onMakeParent={handleMakeParent}
         selectedNode={selectedNode}
-        isRootView={displayNode.id === originalData.id}
+        isRootView={displayNode?.id === originalData?.id}
         viewMode={viewMode}
         listView={listView}
         onViewModeChange={handleViewModeChange}
@@ -290,7 +292,7 @@ const OrganizationChart = ({
               label={
                 <div
                   className={`flex flex-col items-center item-${
-                    displayNode.children?.length === 1
+                    displayNode?.children?.length === 1
                       ? displayNode.children[0]?.type
                       : displayNode?.type
                   }`}
@@ -300,6 +302,7 @@ const OrganizationChart = ({
                     onNodeClick={handleNodeClick}
                     isSelected={selectedNode?.id === displayNode.id}
                     isFirst={true}
+                    onEditBtnClick={onEditBtnClick}
                   />
                   <OrgChartAddButton
                     node={displayNode}
@@ -313,6 +316,7 @@ const OrganizationChart = ({
                   key={childNode.id}
                   node={childNode}
                   onNodeClick={handleNodeClick}
+                  onEditBtnClick={onEditBtnClick}
                   onAddBtnClick={onAddBtnClick}
                   selectedNodeId={selectedNode?.id || null}
                 />
