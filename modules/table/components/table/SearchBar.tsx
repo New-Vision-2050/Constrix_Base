@@ -159,25 +159,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex p-5 flex-wrap items-center gap-3 mb-4 ">
       <div className="flex grow items-center space-x-2">
-        <div className="relative w-full">
-          <Search className="absolute  start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder={t("Table.Search")}
-            value={localSearchQuery}
-            onChange={handleInputChange}
-            className="w-full pl-8 pr-10"
-          />
-          {/* {localSearchQuery && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )} */}
-        </div>
 
         {tableTitle && <h2 className="font-medium text-xl">{tableTitle}</h2>}
         {!hideSearchField && (
@@ -190,7 +171,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               onChange={handleInputChange}
               className="w-full pl-8 pr-10"
             />
-            {localSearchQuery && (
+            {/* {localSearchQuery && (
               <button
                 type="button"
                 onClick={clearSearch}
@@ -198,7 +179,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               >
                 <X className="h-4 w-4" />
               </button>
-            )}
+            )} */}
           </div>
         )}
         {/*    {searchConfig.allowFieldSelection && (
