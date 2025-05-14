@@ -7,6 +7,8 @@ import useManagementsTreeData from "@/modules/organizational-structure/hooks/use
 import OrganizationChart from "@/modules/organizational-structure/org-chart/components/organization-chart";
 import { GetOrgStructureManagementFormConfig } from "./set-management-form";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
+import { apiClient } from "@/config/axios-config";
+import { toast } from "sonner";
 
 type PropsT = {
   branchId: string | number;
@@ -55,6 +57,18 @@ const BranchManagementsStructure = (props: PropsT) => {
     openSheet();
   }, []);
 
+  const handleDeleteManagement = async (id: string | number) => {
+    apiClient
+      .delete(`/management_hierarchies/${id}`)
+      .then(() => {
+        refreshOrgChart();
+        toast.success("management deleted successfully");
+      })
+      .catch((err) => {
+        console.log("error in delete management", err);
+      });
+  };
+
   return (
     <main className="flex-grow md:max-w-[calc(100vw-580px)]">
       <SheetFormBuilder
@@ -78,6 +92,7 @@ const BranchManagementsStructure = (props: PropsT) => {
             data={orgData?.[0] as OrgChartNode}
             onEditBtnClick={(node) => onEditBtnClick(node)}
             onAddBtnClick={(node) => onAddBtnClick(node)}
+            handleDeleteManagement={(id)=>handleDeleteManagement(id)}
           />
         </div>
       )}
