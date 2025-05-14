@@ -1,15 +1,26 @@
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { OrgChartNode } from "@/types/organization";
 
 type PropsT = {
-  isUserCompanyOwner: boolean;
+  isEdit?: boolean;
   branchId: string | number;
+  isUserCompanyOwner: boolean;
+  selectedNode: OrgChartNode | undefined;
   companyOwnerId: string | undefined;
+  onClose?: () => void;
 };
 
 export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
-  const { isUserCompanyOwner, companyOwnerId, branchId } = props;
+  const {
+    isEdit = false,
+    isUserCompanyOwner,
+    companyOwnerId,
+    selectedNode,
+    branchId,
+    onClose,
+  } = props;
 
   const _config: FormConfig = {
     formId: "org-structure-management-form",
@@ -25,12 +36,17 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
         fields: [
           {
             name: "branch_id",
+            label: "branch_id",
+            type: "hiddenObject",
+          },
+          {
+            name: "management_id",
             label: "الادارة التابعة الى",
             type: "select",
             placeholder: "الادارة التابعة الى",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list`,
+              url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -139,26 +155,50 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
       },
     ],
     initialValues: {
-      branch_id: branchId,
-      manager_id: isUserCompanyOwner ? companyOwnerId : undefined,
-      reference_user_id: isUserCompanyOwner ? companyOwnerId : undefined,
-      deputy_manager_ids: isUserCompanyOwner ? [companyOwnerId] : [],
+      branch_id: selectedNode?.branch_id,
+      name: isEdit ? selectedNode?.name : undefined,
+      description: isEdit ? selectedNode?.description : undefined,
+      is_active: isEdit ? selectedNode?.status == 1 : undefined,
+      management_id: isEdit ? selectedNode?.parent_id : selectedNode?.id,
+      manager_id: isUserCompanyOwner
+        ? companyOwnerId
+        : !isEdit
+        ? undefined
+        : selectedNode?.manager_id,
+      reference_user_id: isUserCompanyOwner
+        ? companyOwnerId
+        : !isEdit
+        ? undefined
+        : selectedNode?.reference_user_id,
+      deputy_manager_ids: isUserCompanyOwner
+        ? [companyOwnerId]
+        : !isEdit
+        ? []
+        : selectedNode?.deputy_managers?.map((ele) => ele.id),
     },
     onSubmit: async (formData) => {
+      const method = isEdit ? "PUT" : "POST";
       const body = {
         ...formData,
+        branch_id: branchId || selectedNode?.branch_id,
       };
 
       return await defaultSubmitHandler(body, _config, {
-        url: `${baseURL}/management_hierarchies/create-management`,
+        method: method,
+        url: `${baseURL}/management_hierarchies/${
+          isEdit ? `update-management/${selectedNode?.id}` : "create-management"
+        }`,
       });
+    },
+    onSuccess: () => {
+      onClose?.();
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: true,
+    resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
   };

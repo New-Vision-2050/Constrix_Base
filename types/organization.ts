@@ -1,4 +1,3 @@
-
 // Type definitions for organization chart
 
 // Original types (kept for compatibility)
@@ -14,9 +13,17 @@ export interface PersonData {
   totalReports?: number;
 }
 
+type OrgChartManager = {
+  id?: string | number;
+  name?: string | number;
+  email?: string | number;
+  phone?: string | number;
+  photo?: string | number;
+};
 export interface OrgChartNode {
   id: string;
   name: string;
+  branch_id: string;
   description?: string;
   branch_count?: string | number;
   department_count?: string | number;
@@ -24,21 +31,12 @@ export interface OrgChartNode {
   user_count?: string | number;
   manager_id?: string | number;
   parent_id?: string | number;
-  type?: string
-  manager?: {
-    id?: string | number;
-    name?: string | number;
-    email?: string | number;
-    phone?: string | number;
-    photo?: string | number;
-  };
-  deputy_manager?: {
-    id?: string | number;
-    name?: string | number;
-    email?: string | number;
-    phone?: string | number;
-    photo?: string | number;
-  }
+  type?: string;
+  status?: number;
+  reference_user_id: string;
+  manager?: OrgChartManager;
+  deputy_manager?: OrgChartManager;
+  deputy_managers?: OrgChartManager[];
   person?: PersonData;
   children: OrgChartNode[];
 }
@@ -66,7 +64,7 @@ export interface OrgNode {
   id: number;
   parent_id: number | null;
   name: string;
-  type: 'branch' | 'management' | 'department';
+  type: "branch" | "management" | "department";
   manager_id: string | null;
   manager: Manager;
   department_count: number;

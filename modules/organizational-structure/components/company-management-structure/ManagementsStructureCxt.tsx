@@ -9,8 +9,8 @@ import { useOrgStructureCxt } from "../../context/OrgStructureCxt";
 type CxtType = {
   isUserCompanyOwner: boolean;
   companyOwnerId: string | undefined;
-  branch: OrgChartNode | undefined;
-  handleStoreBranch: (branch: OrgChartNode) => void;
+  selectedNode: OrgChartNode | undefined;
+  handleStoreSelectedNode: (selectedNode: OrgChartNode) => void;
 };
 
 export const ManagementsStructureCxt = createContext<CxtType>({} as CxtType);
@@ -33,20 +33,20 @@ export const ManagementsStructureCxtProvider = (
   const { children } = props;
   const { companyOwnerId, user } = useOrgStructureCxt();
   const isUserCompanyOwner = user?.id !== companyOwnerId;
-  const [branch, setBranch] = useState<OrgChartNode>();
+  const [selectedNode, setSelectedNode] = useState<OrgChartNode>();
 
   // ** handle side effects
 
   // ** declare and define component helper methods
-  const handleStoreBranch = useCallback(
-    (branch: OrgChartNode) => setBranch(branch),
+  const handleStoreSelectedNode = useCallback(
+    (selectedNode: OrgChartNode) => setSelectedNode(selectedNode),
     []
   );
 
   // ** return component ui
   return (
     <ManagementsStructureCxt.Provider
-      value={{ branch, companyOwnerId, isUserCompanyOwner, handleStoreBranch }}
+      value={{ selectedNode, companyOwnerId, isUserCompanyOwner, handleStoreSelectedNode }}
     >
       {children}
     </ManagementsStructureCxt.Provider>

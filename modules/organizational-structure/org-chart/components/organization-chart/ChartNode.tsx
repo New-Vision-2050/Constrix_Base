@@ -1,39 +1,122 @@
-import { OrgChartNode } from '@/types/organization'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import DepartmentIcon from '@/public/icons/department'
+import { OrgChartNode } from "@/types/organization";
+import DepartmentIcon from "@/public/icons/department";
+import { EllipsisVertical } from "lucide-react";
+import { DropdownButton } from "@/components/shared/dropdown-button";
 
 interface ChartNodeProps {
   node: OrgChartNode;
   onNodeClick: (node: OrgChartNode) => void;
   isSelected?: boolean;
   isFirst?: boolean;
+  onEditBtnClick?: (node: OrgChartNode) => void;
 }
 
-const ChartNode: React.FC<ChartNodeProps> = ({ node, onNodeClick, isSelected = false, isFirst = false }) => {
+const ChartNode: React.FC<ChartNodeProps> = ({
+  node,
+  onNodeClick,
+  isSelected = false,
+  isFirst = false,
+  onEditBtnClick,
+}) => {
   return (
     <div
       onClick={(e) => {
-        e.stopPropagation()
-        onNodeClick(node)
+        e.stopPropagation();
+        onNodeClick(node);
       }}
-      className={`node-content w-full bg-sidebar border-0 ${isSelected ? 'border-primary ring-2 ring-primary' : ''} rounded-lg shadow p-4 py-8 min-w-[200px] min-h-[200px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${isFirst ? 'max-w-[400px] mx-auto' : ''} item-${node.children?.length === 1 ? node.children[0]?.type : node?.type}`}
+      className={`node-content w-full bg-sidebar border-0 ${
+        isSelected ? "border-primary ring-2 ring-primary" : ""
+      } rounded-lg shadow p-4 py-8 min-w-[200px] min-h-[200px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${
+        isFirst ? "max-w-[400px] mx-auto" : ""
+      } item-${
+        node.children?.length === 1 ? node.children[0]?.type : node?.type
+      }`}
     >
-      <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5"><DepartmentIcon
-        className={'text-primary'}/> {node.name}</h3>
-      <p
-        className="text-white/50 mb-6">{node?.manager?.name ? `المسؤول: ${node?.manager?.name}` : 'فرع الادارة العامة'}</p>
+      <div className="w-full flex items-center justify-between">
+        <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5">
+          <DepartmentIcon className={"text-primary"} /> {node.name}
+        </h3>
+        <DropdownButton
+          triggerButton={<EllipsisVertical />}
+          items={[
+            {
+              text: "تعديل",
+              onClick: () => {
+                onEditBtnClick?.(node);
+                console.log("edit node");
+              },
+            },
+          ]}
+        />
+      </div>
+      <div className="w-full flex items-center justify-around my-3">
+        {node?.manager?.name && (
+          <ManagerComponent
+            name={node?.manager?.name as string}
+            label="المدير"
+          />
+        )}
+
+        {node?.deputy_managers && node?.deputy_managers?.length > 0 && (
+          <div className="flex flex-col flex-grow items-start">
+            <p className="text-slate-400">المدير النائب</p>
+            {node?.deputy_managers?.map((deputy_manager, index) => (
+              <ManagerComponent
+                key={deputy_manager.id + "." + index}
+                name={deputy_manager?.name as string}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="flex flex-wrap gap-2 max-w-[300px]">
-        {node?.user_count ? <div
-          className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#512B4F] rounded-2xl text-[12px] text-primary flex justify-center items-center">{node?.user_count} موظف</div> : ''}
-        {node?.branch_count ? <div
-          className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#211732] rounded-2xl text-[12px] text-[#F19B02] flex justify-center items-center">{node?.branch_count} فرع</div> : ''}
-        {node?.management_count ? <div
-          className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#38484A] rounded-2xl text-[12px] text-[#18CB5F] flex justify-center items-center">{node?.management_count} إدارة</div> : ''}
-        {node?.department_count ? <div
-          className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#512B4F] rounded-2xl text-[12px] text-primary flex justify-center items-center">{node?.department_count} قسم</div> : ''}
+        {node?.user_count ? (
+          <div className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#512B4F] rounded-2xl text-[12px] text-primary flex justify-center items-center">
+            {node?.user_count} موظف
+          </div>
+        ) : (
+          ""
+        )}
+        {node?.branch_count ? (
+          <div className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#211732] rounded-2xl text-[12px] text-[#F19B02] flex justify-center items-center">
+            {node?.branch_count} فرع
+          </div>
+        ) : (
+          ""
+        )}
+        {node?.management_count ? (
+          <div className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#38484A] rounded-2xl text-[12px] text-[#18CB5F] flex justify-center items-center">
+            {node?.management_count} إدارة
+          </div>
+        ) : (
+          ""
+        )}
+        {node?.department_count ? (
+          <div className="w-1/2 p-1 flex-1 min-w-[82px] bg-[#512B4F] rounded-2xl text-[12px] text-primary flex justify-center items-center">
+            {node?.department_count} قسم
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChartNode
+const ManagerComponent = ({
+  name,
+  label,
+}: {
+  label?: string;
+  name: string;
+}) => {
+  return (
+    <div className="flex flex-col items-center flex-grow">
+      {label && <p className="text-slate-400">{label}</p>}
+      <p className="text-white">{name}</p>
+    </div>
+  );
+};
+
+export default ChartNode;
