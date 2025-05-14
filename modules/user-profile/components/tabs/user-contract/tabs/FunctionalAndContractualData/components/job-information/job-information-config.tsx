@@ -95,7 +95,7 @@ export const JobFormConfig = () => {
             placeholder: "نوع الوظيفة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_types`,
+              url: `${baseURL}/job_types/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -119,7 +119,7 @@ export const JobFormConfig = () => {
             placeholder: "المسمى الوظيفي",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_titles`,
+              url: `${baseURL}/job_titles/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
