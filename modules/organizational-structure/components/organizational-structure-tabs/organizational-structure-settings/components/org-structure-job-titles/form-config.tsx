@@ -33,7 +33,7 @@ export const OrgStructureSettingsFormConfig: FormConfig = {
           placeholder: "اختر نوع الوظيفة",
           required: true,
           dynamicOptions: {
-            url: `${baseURL}/job_types`,
+            url: `${baseURL}/job_types/list`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
