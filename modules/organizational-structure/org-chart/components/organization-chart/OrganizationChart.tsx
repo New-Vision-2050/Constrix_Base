@@ -16,13 +16,15 @@ interface OrganizationChartProps {
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
   onEditBtnClick?: (node: OrgChartNode) => void;
+  handleDeleteManagement?: (id: string | number) => Promise<void>
 }
 
 const OrganizationChart = ({
   data,
   listView = true,
   onAddBtnClick,
-  onEditBtnClick
+  onEditBtnClick,
+  handleDeleteManagement
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
@@ -303,6 +305,7 @@ const OrganizationChart = ({
                     isSelected={selectedNode?.id === displayNode.id}
                     isFirst={true}
                     onEditBtnClick={onEditBtnClick}
+                    handleDeleteManagement={handleDeleteManagement}
                   />
                   <OrgChartAddButton
                     node={displayNode}
@@ -317,6 +320,7 @@ const OrganizationChart = ({
                   node={childNode}
                   onNodeClick={handleNodeClick}
                   onEditBtnClick={onEditBtnClick}
+                  handleDeleteManagement={handleDeleteManagement}
                   onAddBtnClick={onAddBtnClick}
                   selectedNodeId={selectedNode?.id || null}
                 />

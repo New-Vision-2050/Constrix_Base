@@ -9,6 +9,7 @@ interface ChartNodeProps {
   isSelected?: boolean;
   isFirst?: boolean;
   onEditBtnClick?: (node: OrgChartNode) => void;
+  handleDeleteManagement?: (id: string | number) => Promise<void>;
 }
 
 const ChartNode: React.FC<ChartNodeProps> = ({
@@ -17,6 +18,7 @@ const ChartNode: React.FC<ChartNodeProps> = ({
   isSelected = false,
   isFirst = false,
   onEditBtnClick,
+  handleDeleteManagement,
 }) => {
   return (
     <div
@@ -44,6 +46,12 @@ const ChartNode: React.FC<ChartNodeProps> = ({
               onClick: () => {
                 onEditBtnClick?.(node);
                 console.log("edit node");
+              },
+            },
+            {
+              text: "حذف",
+              onClick: () => {
+                handleDeleteManagement?.(node.id);
               },
             },
           ]}
