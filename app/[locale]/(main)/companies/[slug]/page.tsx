@@ -1,7 +1,8 @@
+import CompaniesSubEntityTable from "@/modules/companies/components/CompaniesSubEntityTable";
 import React from "react";
 
 const CompaniesSubProgram = () => {
-  return <div>companies sub program</div>;
+  return <CompaniesSubEntityTable />;
 };
 
 export default CompaniesSubProgram;

@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 
 export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
   return {
+    
     formId: "companies-form",
     title: "اضافة شركة جديدة",
     apiUrl: `${baseURL}/companies`,
