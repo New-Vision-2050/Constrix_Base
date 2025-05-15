@@ -8,7 +8,7 @@ interface SuperEntity {
   name: string;
 }
 
-interface MainProgram {
+export interface MainProgram {
   id: string;
   name: string;
   slug: string;

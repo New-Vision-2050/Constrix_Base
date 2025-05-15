@@ -2,7 +2,13 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { ROUTER } from "@/router";
 import axios from "axios";
 import { deleteCookie, getCookie } from "cookies-next";
-import { getErrorMessage, showErrorToast, dispatchErrorEvent, errorEvent } from "@/utils/errorHandler";
+import {
+  getErrorMessage,
+  showErrorToast,
+  dispatchErrorEvent,
+  errorEvent,
+} from "@/utils/errorHandler";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
 export const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL +
@@ -24,13 +30,13 @@ apiClient.interceptors.request.use(
 
     // Add language headers
     const lang = getCookie("NEXT_LOCALE");
-    config.headers.Lang = lang || 'ar';
-    config.headers['Accept-Language'] = lang || 'ar';
-    config.headers['Lang'] = lang || 'ar';
+    config.headers.Lang = lang || "ar";
+    config.headers["Accept-Language"] = lang || "ar";
+    config.headers["Lang"] = lang || "ar";
 
     // Add current domain to headers
-    if (typeof window !== 'undefined') {
-      config.headers['X-Domain'] = window.location.hostname;
+    if (typeof window !== "undefined") {
+      config.headers["X-Domain"] = window.location.hostname;
     }
 
     return config;
@@ -41,19 +47,21 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log('in interceptor.... ')
+    console.log("in interceptor.... ");
     const status = error.response?.status;
     const errorMessageKey = getErrorMessage(error);
 
     // Handle authentication errors
     if (status === 401 || status === 403) {
       // Don't redirect if we're already on the login page
-      const isLoginPage = typeof window !== "undefined" &&
+      const isLoginPage =
+        typeof window !== "undefined" &&
         window.location.pathname.includes(ROUTER.LOGIN);
 
       if (!isLoginPage) {
         deleteCookie("new-vision-token");
         useAuthStore.getState().clearUser();
+        useSidebarStore.getState().clearMenu();
 
         // Show toast notification
         showErrorToast(
@@ -66,7 +74,10 @@ apiClient.interceptors.response.use(
         }
       } else {
         // Dispatch error event for login page components to handle
-        dispatchErrorEvent(status, errorMessageKey || "Errors.Authentication.GenericError");
+        dispatchErrorEvent(
+          status,
+          errorMessageKey || "Errors.Authentication.GenericError"
+        );
       }
     }
 

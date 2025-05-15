@@ -202,6 +202,5 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     showCancelButton: false,
     showBackButton: false,
   };
-
   return _config;
 }

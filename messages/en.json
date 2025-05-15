@@ -149,8 +149,7 @@
     "Welcome": "Hello",
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
-    "HumanResources": "Human Resources",
-    "ProgramManagement":"Program Management"
+    "HumanResources": "Human Resources"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

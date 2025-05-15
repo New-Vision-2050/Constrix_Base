@@ -6,6 +6,7 @@ type SidebarState = {
   setMenu: (menu: any[]) => void;
   hasHydrated: boolean;
   setHasHydrated: (hasHydrated: boolean) => void;
+  clearMenu: () => void;
 };
 
 export const useSidebarStore = create<SidebarState>()(
@@ -15,6 +16,7 @@ export const useSidebarStore = create<SidebarState>()(
       setMenu: (menu) => set({ menu }),
       hasHydrated: false,
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+      clearMenu: () => set({ menu: [] }),
     }),
     {
       name: "sidebar-menu",
