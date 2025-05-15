@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { DropdownItemT } from "@/components/shared/dropdown-button";
 
 type PropsT = {
   branchId: string | number;
@@ -63,6 +64,24 @@ const BranchManagementsStructure = (props: PropsT) => {
     openSheet();
   }, []);
 
+  const DropDownMenu = (node: OrgChartNode): DropdownItemT[] => {
+    return [
+      {
+        text: "تعديل",
+        onClick: () => {
+          onEditBtnClick?.(node);
+          console.log("edit node");
+        },
+      },
+      {
+        text: "حذف",
+        onClick: () => {
+          handleDeleteManagement?.(node.id);
+        },
+      },
+    ];
+  };
+
   const handleDeleteManagement = (id: string | number) => {
     setDeletedId(id as string);
     setOpenDeleteDialog(true);
@@ -110,9 +129,8 @@ const BranchManagementsStructure = (props: PropsT) => {
         <div className="overflow-hidden">
           <OrganizationChart
             data={orgData?.[0] as OrgChartNode}
-            onEditBtnClick={(node) => onEditBtnClick(node)}
             onAddBtnClick={(node) => onAddBtnClick(node)}
-            handleDeleteManagement={(id) => handleDeleteManagement(id)}
+            DropDownMenu={DropDownMenu}
             listViewAdditionalActions={
               <>
                 <Button onClick={() => openSheet()}>اضافة ادارة</Button>

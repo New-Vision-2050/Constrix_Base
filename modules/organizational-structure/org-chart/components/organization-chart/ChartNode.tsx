@@ -1,15 +1,17 @@
 import { OrgChartNode } from "@/types/organization";
 import DepartmentIcon from "@/public/icons/department";
 import { EllipsisVertical } from "lucide-react";
-import { DropdownButton } from "@/components/shared/dropdown-button";
+import {
+  DropdownButton,
+  DropdownItemT,
+} from "@/components/shared/dropdown-button";
 
 interface ChartNodeProps {
   node: OrgChartNode;
   onNodeClick: (node: OrgChartNode) => void;
   isSelected?: boolean;
   isFirst?: boolean;
-  onEditBtnClick?: (node: OrgChartNode) => void;
-  handleDeleteManagement?: (id: string | number) => void;
+  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
 }
 
 const ChartNode: React.FC<ChartNodeProps> = ({
@@ -17,8 +19,7 @@ const ChartNode: React.FC<ChartNodeProps> = ({
   onNodeClick,
   isSelected = false,
   isFirst = false,
-  onEditBtnClick,
-  handleDeleteManagement,
+  DropDownMenu,
 }) => {
   return (
     <div
@@ -38,24 +39,12 @@ const ChartNode: React.FC<ChartNodeProps> = ({
         <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5">
           <DepartmentIcon className={"text-primary"} /> {node.name}
         </h3>
-        <DropdownButton
-          triggerButton={<EllipsisVertical />}
-          items={[
-            {
-              text: "تعديل",
-              onClick: () => {
-                onEditBtnClick?.(node);
-                console.log("edit node");
-              },
-            },
-            {
-              text: "حذف",
-              onClick: () => {
-                handleDeleteManagement?.(node.id);
-              },
-            },
-          ]}
-        />
+        {DropDownMenu && (
+          <DropdownButton
+            triggerButton={<EllipsisVertical />}
+            items={DropDownMenu(node)}
+          />
+        )}
       </div>
       <div className="w-full flex items-center justify-around my-3">
         {node?.manager?.name && (
