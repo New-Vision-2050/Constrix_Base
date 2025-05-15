@@ -16,10 +16,9 @@ interface OrganizationChartProps {
   data: OrgChartNode;
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
-  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
     onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
-  handleDeleteManagement?: (id: string | number) => void;
+  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
 }
 
 const OrganizationChart = ({
@@ -29,7 +28,6 @@ const OrganizationChart = ({
   DropDownMenu,
   listViewAdditionalActions,
   onEditBtnClick,
-  handleDeleteManagement,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
