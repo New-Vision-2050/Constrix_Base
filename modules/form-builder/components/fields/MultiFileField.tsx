@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { FileObject } from './FileField'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MultiFileFieldProps {
   field: FieldConfig;
@@ -587,7 +588,22 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
                       {fileInfo.icon}
                     </div>
                     <div>
-                      <p className=" font-medium">{fileInfo.name}</p>
+                      {fileInfo.name && fileInfo.name.length > 4 && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-xs text-primary font-bold cursor-pointer">
+                                {fileInfo.name.length > 15
+                                  ? `${fileInfo.name.slice(0, 15)}...`
+                                  : fileInfo.name}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="font-medium">{fileInfo.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                       <p className=" text-sm">11:31 21-05-2024</p>
                     </div>
                   </div>
@@ -642,42 +658,46 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
           {field.fileConfig?.allowedFileTypes && (
             <p className="text-xs text-muted-foreground mt-1">
               {t("AllowedTypes")}:{" "}
-              {field.fileConfig.allowedFileTypes.map(mimeType => {
-                // Convert MIME types to readable extensions
-                switch (mimeType) {
-                  case "application/pdf":
-                    return "PDF";
-                  case "application/msword":
-                  case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                    return "DOC/DOCX";
-                  case "application/vnd.ms-excel":
-                  case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                    return "XLS/XLSX";
-                  case "application/vnd.ms-powerpoint":
-                  case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-                    return "PPT/PPTX";
-                  case "image/jpeg":
-                    return "JPG";
-                  case "image/png":
-                    return "PNG";
-                  case "image/gif":
-                    return "GIF";
-                  case "image/svg+xml":
-                    return "SVG";
-                  case "text/plain":
-                    return "TXT";
-                  case "text/csv":
-                    return "CSV";
-                  case "application/zip":
-                  case "application/x-zip-compressed":
-                    return "ZIP";
-                  case "application/x-rar-compressed":
-                    return "RAR";
-                  default:
-                    // For unknown MIME types, extract the part after the slash
-                    return mimeType.split('/').pop()?.toUpperCase() || mimeType;
-                }
-              }).join(", ")}
+              {field.fileConfig.allowedFileTypes
+                .map((mimeType) => {
+                  // Convert MIME types to readable extensions
+                  switch (mimeType) {
+                    case "application/pdf":
+                      return "PDF";
+                    case "application/msword":
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                      return "DOC/DOCX";
+                    case "application/vnd.ms-excel":
+                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                      return "XLS/XLSX";
+                    case "application/vnd.ms-powerpoint":
+                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                      return "PPT/PPTX";
+                    case "image/jpeg":
+                      return "JPG";
+                    case "image/png":
+                      return "PNG";
+                    case "image/gif":
+                      return "GIF";
+                    case "image/svg+xml":
+                      return "SVG";
+                    case "text/plain":
+                      return "TXT";
+                    case "text/csv":
+                      return "CSV";
+                    case "application/zip":
+                    case "application/x-zip-compressed":
+                      return "ZIP";
+                    case "application/x-rar-compressed":
+                      return "RAR";
+                    default:
+                      // For unknown MIME types, extract the part after the slash
+                      return (
+                        mimeType.split("/").pop()?.toUpperCase() || mimeType
+                      );
+                  }
+                })
+                .join(", ")}
             </p>
           )}
           {field.fileConfig?.maxFileSize && (
