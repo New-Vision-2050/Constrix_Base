@@ -1,10 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  LayoutDashboardIcon,
-  UserIcon,
-} from "lucide-react";
+import { LayoutDashboardIcon, UserIcon } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -75,101 +72,111 @@ export function AppSidebar({
     ROUTER.USER_PROFILE,
     ROUTER.COMPANY_PROFILE,
   ];
-  const settingsRoutes = {
-    name: t("Sidebar.Settings"),
-    icon: SettingsIcon,
-    isActive: settingsRoutesNames.indexOf(pageName) !== -1,
-    slug: SUPER_ENTITY_SLUG.SETTINGS,
-    sub_entities: [
-      {
-        name: t("Sidebar.UserProfileSettings"),
-        url: ROUTER.USER_PROFILE,
-        icon: UserIcon,
-        isActive: pageName === ROUTER.USER_PROFILE,
-      },
-      {
-        name: "اعداد ملف الشركة",
-        url: ROUTER.COMPANY_PROFILE,
-        icon: InboxIcon,
-        isActive: pageName === ROUTER.COMPANY_PROFILE,
-      },
-      // {
-      //   name: t("Sidebar.DashboardSettings"),
-      //   url: ROUTER.DASHBOARD,
-      //   icon: InboxIcon,
-      //   isActive: pageName === ROUTER.DASHBOARD,
-      // },
-      {
-        name: t("Sidebar.SystemSettings"),
-        url: ROUTER.SETTINGS,
-        icon: InboxIcon,
-        isActive: pageName === ROUTER.SETTINGS,
-      },
-    ],
-  };
 
-  const projects = isCentral
-    ? [
+  // just companies & program management are not central
+  const SidebarProjects = [
+    // companies
+    {
+      name: t("Sidebar.Companies"),
+      urls: [ROUTER.COMPANIES],
+      icon: LayoutDashboardIcon,
+      isActive: pageName === ROUTER.COMPANIES,
+      slug: SUPER_ENTITY_SLUG.COMPANY,
+      sub_entities: [
         {
-          name: t("Sidebar.Companies"),
+          name: t("Sidebar.CompaniesList"),
           url: ROUTER.COMPANIES,
           icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.COMPANIES,
-          slug: SUPER_ENTITY_SLUG.COMPANY,
-          sub_entities: [
-            {
-              name: t("Sidebar.CompaniesList"),
-              url: ROUTER.COMPANIES,
-              icon: LayoutDashboardIcon,
-              isActive: pageName === ROUTER.COMPANIES,
-            },
-          ],
         },
+      ],
+      isNotCentral: true,
+    },
+    // users
+    {
+      name: t("Sidebar.Users"),
+      icon: UserIcon,
+      urls: [ROUTER.USERS],
+      isActive: pageName === ROUTER.USERS,
+      slug: SUPER_ENTITY_SLUG.USERS,
+      sub_entities: [
         {
-          name: t("Sidebar.Users"),
+          name: t("Sidebar.UsersList"),
+          url: ROUTER.USERS,
           icon: UserIcon,
           isActive: pageName === ROUTER.USERS,
-          slug: SUPER_ENTITY_SLUG.USERS,
-          sub_entities: [
-            {
-              name: t("Sidebar.UsersList"),
-              url: ROUTER.USERS,
-              icon: UserIcon,
-              isActive: pageName === ROUTER.USERS,
-            },
-          ],
         },
+      ],
+      isNotCentral: false,
+    },
+    // human resources
+    {
+      name: t("Sidebar.HumanResources"),
+      icon: LayoutDashboardIcon,
+      urls: [ROUTER.Organizational_Structure],
+      isActive: pageName === ROUTER.Organizational_Structure,
+      slug: SUPER_ENTITY_SLUG.HRM,
+      sub_entities: [
         {
-          name: t("Sidebar.HumanResources"),
+          name: t("Sidebar.OrganizationalStructure"),
+          url: ROUTER.Organizational_Structure,
           icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.Organizational_Structure,
-          slug: SUPER_ENTITY_SLUG.HRM,
-          sub_entities: [
-            {
-              name: t("Sidebar.OrganizationalStructure"),
-              url: ROUTER.Organizational_Structure,
-              icon: LayoutDashboardIcon,
-              isActive: pageName === ROUTER.Organizational_Structure,
-            },
-          ],
         },
+      ],
+      isNotCentral: false,
+    },
+    // program management
+    {
+      name: t("Sidebar.ProgramManagement"),
+      slug: SUPER_ENTITY_SLUG.PM,
+      icon: LayoutDashboardIcon,
+      urls: [ROUTER.PROGRAM_SETTINGS.USERS],
+      isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+      sub_entities: [
         {
-          name: t("Sidebar.ProgramManagement"),
-          slug: SUPER_ENTITY_SLUG.PM,
+          name: t("Sidebar.Users"),
+          url: ROUTER.PROGRAM_SETTINGS.USERS,
           icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
-          sub_entities: [
-            {
-              name: t("Sidebar.Users"),
-              url: ROUTER.PROGRAM_SETTINGS.USERS,
-              icon: LayoutDashboardIcon,
-              isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
-            },
-          ],
         },
-        settingsRoutes,
-      ]
-    : [settingsRoutes];
+      ],
+      isNotCentral: true,
+    },
+    // settings
+    {
+      name: t("Sidebar.Settings"),
+      icon: SettingsIcon,
+      isActive: settingsRoutesNames.indexOf(pageName) !== -1,
+      slug: SUPER_ENTITY_SLUG.SETTINGS,
+      urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+      sub_entities: [
+        {
+          name: t("Sidebar.UserProfileSettings"),
+          url: ROUTER.USER_PROFILE,
+          icon: UserIcon,
+          isActive: pageName === ROUTER.USER_PROFILE,
+        },
+        {
+          name: "اعداد ملف الشركة",
+          url: ROUTER.COMPANY_PROFILE,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.COMPANY_PROFILE,
+        },
+        {
+          name: t("Sidebar.SystemSettings"),
+          url: ROUTER.SETTINGS,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.SETTINGS,
+        },
+      ],
+      isNotCentral: false,
+    },
+  ];
+
+  const projects = isCentral
+    ? SidebarProjects
+    : SidebarProjects.filter((ele) => !ele.isNotCentral);
 
   const all = mergeProjectsAndMenu(projects, menu);
 
