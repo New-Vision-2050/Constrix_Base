@@ -73,7 +73,7 @@ export function AppSidebar({
     ROUTER.COMPANY_PROFILE,
   ];
 
-  // just companies & program management are not central
+  // just users & companies & program management are not central
   const SidebarProjects = [
     // companies
     {
@@ -107,7 +107,7 @@ export function AppSidebar({
           isActive: pageName === ROUTER.USERS,
         },
       ],
-      isNotCentral: false,
+      isNotCentral: true,
     },
     // human resources
     {
