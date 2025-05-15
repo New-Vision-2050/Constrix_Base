@@ -126,22 +126,25 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
           `[TableBuilder] Initializing columns for table ${tableIdRef.current}`
         );
       }
-      
+
       // Filter columns based on availableColumnKeys if provided
       let filteredColumns = [...config.columns];
       if (config.availableColumnKeys && config.availableColumnKeys.length > 0) {
-        filteredColumns = filteredColumns.filter(col =>
+        filteredColumns = filteredColumns.filter((col) =>
           config.availableColumnKeys!.includes(col.key)
         );
       }
-      
+
       setColumns(filteredColumns);
-      
+
       // Set default visible columns if provided
-      if (config.defaultVisibleColumnKeys && config.defaultVisibleColumnKeys.length > 0) {
+      if (
+        config.defaultVisibleColumnKeys &&
+        config.defaultVisibleColumnKeys.length > 0
+      ) {
         setColumnVisibilityKeys(config.defaultVisibleColumnKeys);
       }
-      
+
       columnsInitializedRef.current = true;
       configColumnsRef.current = filteredColumns;
     }

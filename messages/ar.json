@@ -149,7 +149,8 @@
     "Welcome": "مرحبا",
     "CompanyName": "نيو فيجن",
     "OrganizationalStructure": "الهيكل التنظيمي",
-    "HumanResources": "الموارد البشرية"
+    "HumanResources": "الموارد البشرية",
+    "ProgramManagement":"ادارة البرامج"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",

@@ -12,37 +12,48 @@ import CompanySaveDialog from "./CompanySaveDialog";
 import { useTranslations } from "next-intl";
 import { useModal } from "@/hooks/use-modal";
 import { useState } from "react";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
 const CompaniesSubEntityTable = () => {
+  const hasHydrated = useSidebarStore((s) => s.hasHydrated);
   const { slug }: { slug: string } = useParams();
   const { subEntity } = useGetSubEntity(SUPER_ENTITY_SLUG.COMPANY, slug);
-  const defaultAttr = subEntity?.default_attributes ?? [];
-  const optionalAttr = subEntity?.optional_attributes ?? [];
+  const defaultAttr =
+    subEntity?.default_attributes.map((item) => item.id) ?? [];
+  const optionalAttr =
+    subEntity?.optional_attributes.map((item) => item.id) ?? [];
 
   const t = useTranslations("Companies");
-  const config = CompaniesConfig();
+  const config = {
+    ...CompaniesConfig(),
+    defaultVisibleColumnKeys: [...defaultAttr],
+    availableColumnKeys: [...optionalAttr],
+  };
+
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
 
   return (
     <div className="px-8 py-7">
-      <TableBuilder
-        config={config}
-        searchBarActions={
-          <div className="flex items-center gap-3">
-            <SheetFormBuilder
-              config={GetCompaniesFormConfig(t)}
-              trigger={<Button>{t("createCompany")}</Button>}
-            />{" "}
-            <CompanySaveDialog
-              open={isOpen}
-              handleOpen={handleOpen}
-              handleClose={handleClose}
-              number={companyNumber}
-            />
-          </div>
-        }
-      />
+      {hasHydrated && (
+        <TableBuilder
+          config={config}
+          searchBarActions={
+            <div className="flex items-center gap-3">
+              <SheetFormBuilder
+                config={GetCompaniesFormConfig(t)}
+                trigger={<Button>{t("createCompany")}</Button>}
+              />{" "}
+              <CompanySaveDialog
+                open={isOpen}
+                handleOpen={handleOpen}
+                handleClose={handleClose}
+                number={companyNumber}
+              />
+            </div>
+          }
+        />
+      )}
     </div>
   );
 };

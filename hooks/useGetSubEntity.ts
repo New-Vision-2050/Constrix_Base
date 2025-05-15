@@ -23,6 +23,6 @@ export const useGetSubEntity = (
       (sub: MainProgram) => sub.slug === subEntitySlug
     );
 
-    return { superEntity, subEntity: subEntity || null };
+    return { superEntity, subEntity };
   }, [menu, superEntitySlug, subEntitySlug]);
 };
