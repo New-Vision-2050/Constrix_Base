@@ -128,7 +128,7 @@
     "AreYouSureReactivate": "Do you want to confirm activating the company?",
     "AreYouSureDeactivate": "Do you want to confirm deactivating the company?",
     "createCompany": "Create Company",
-    "SaveCompany":"The company was saved with number",
+    "SaveCompany": "The company was saved with number",
     "Validation": {
       "englishName": "Short name should be in English",
       "arabicName": "The name should be in Arabic letters",
@@ -149,7 +149,8 @@
     "Welcome": "Hello",
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
-    "HumanResources": "Human Resources"
+    "HumanResources": "Human Resources",
+    "ProgramManagement": "Program Management"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
@@ -317,6 +318,12 @@
           "cv": "CV"
         }
       }
+    }
+  },
+  "CompanyStructure": {
+    "ManagementStructure": {
+      "loading": "Loading Managements data...",
+      "confirmDelete": "Are you sure you want to delete this management?"
     }
   }
 }
