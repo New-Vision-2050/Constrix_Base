@@ -10,6 +10,7 @@ interface TreeNodesProps {
   selectedNodeId: string | null;
   onAddBtnClick?: (node: OrgChartNode) => void;
   onEditBtnClick?: (node: OrgChartNode) => void;
+  handleDeleteManagement?: (id: string | number) => void
 }
 
 const TreeNodes = ({
@@ -18,6 +19,7 @@ const TreeNodes = ({
   selectedNodeId,
   onAddBtnClick,
   onEditBtnClick,
+  handleDeleteManagement
 }: TreeNodesProps) => {
   const locale = useLocale();
   return (
@@ -34,6 +36,7 @@ const TreeNodes = ({
             isSelected={node.id === selectedNodeId}
             isFirst={!node.children?.length}
             onEditBtnClick={onEditBtnClick}
+            handleDeleteManagement={handleDeleteManagement}
           />
           <OrgChartAddButton node={node} onAddBtnClick={onAddBtnClick} />
         </div>
@@ -47,6 +50,7 @@ const TreeNodes = ({
           onNodeClick={onNodeClick}
           selectedNodeId={selectedNodeId}
           onEditBtnClick={onEditBtnClick}
+          handleDeleteManagement={handleDeleteManagement}
           onAddBtnClick={onAddBtnClick}
         />
       ))}
