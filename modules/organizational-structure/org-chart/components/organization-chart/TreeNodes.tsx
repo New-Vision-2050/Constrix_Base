@@ -10,7 +10,7 @@ interface TreeNodesProps {
   selectedNodeId: string | null;
   onAddBtnClick?: (node: OrgChartNode) => void;
   onEditBtnClick?: (node: OrgChartNode) => void;
-  handleDeleteManagement?: (id: string | number) => Promise<void>
+  handleDeleteManagement?: (id: string | number) => void
 }
 
 const TreeNodes = ({

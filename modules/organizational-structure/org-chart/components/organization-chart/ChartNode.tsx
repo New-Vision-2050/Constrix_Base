@@ -9,7 +9,7 @@ interface ChartNodeProps {
   isSelected?: boolean;
   isFirst?: boolean;
   onEditBtnClick?: (node: OrgChartNode) => void;
-  handleDeleteManagement?: (id: string | number) => Promise<void>;
+  handleDeleteManagement?: (id: string | number) => void;
 }
 
 const ChartNode: React.FC<ChartNodeProps> = ({

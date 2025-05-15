@@ -9,6 +9,7 @@ import { GetOrgStructureManagementFormConfig } from "./set-management-form";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 
 type PropsT = {
   branchId: string | number;
@@ -16,6 +17,8 @@ type PropsT = {
 
 const BranchManagementsStructure = (props: PropsT) => {
   const { branchId } = props;
+  const [deletedId, setDeletedId] = useState("");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const {
     isUserCompanyOwner,
@@ -57,11 +60,17 @@ const BranchManagementsStructure = (props: PropsT) => {
     openSheet();
   }, []);
 
-  const handleDeleteManagement = async (id: string | number) => {
+  const handleDeleteManagement = (id: string | number) => {
+    setDeletedId(id as string);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleConfirm = async () => {
     apiClient
-      .delete(`/management_hierarchies/${id}`)
+      .delete(`/management_hierarchies/${deletedId}`)
       .then(() => {
         refreshOrgChart();
+        setOpenDeleteDialog(false);
         toast.success("management deleted successfully");
       })
       .catch((err) => {
@@ -71,10 +80,18 @@ const BranchManagementsStructure = (props: PropsT) => {
 
   return (
     <main className="flex-grow md:max-w-[calc(100vw-580px)]">
+      {/* sheet form */}
       <SheetFormBuilder
         isOpen={isOpen}
         config={config}
         onOpenChange={(open) => (open ? openSheet() : closeSheet())}
+      />
+      {/* confirm delete dialog */}
+      <ConfirmationDialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        onConfirm={handleConfirm}
+        description={"هل انت متأكد من حذف هذه الإدارة؟"}
       />
 
       {isLoading && (
@@ -92,7 +109,7 @@ const BranchManagementsStructure = (props: PropsT) => {
             data={orgData?.[0] as OrgChartNode}
             onEditBtnClick={(node) => onEditBtnClick(node)}
             onAddBtnClick={(node) => onAddBtnClick(node)}
-            handleDeleteManagement={(id)=>handleDeleteManagement(id)}
+            handleDeleteManagement={(id) => handleDeleteManagement(id)}
           />
         </div>
       )}
