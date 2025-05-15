@@ -16,7 +16,8 @@ interface OrganizationChartProps {
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
   onEditBtnClick?: (node: OrgChartNode) => void;
-  handleDeleteManagement?: (id: string | number) => void
+  listViewAdditionalActions?: React.ReactNode;
+  handleDeleteManagement?: (id: string | number) => void;
 }
 
 const OrganizationChart = ({
@@ -24,7 +25,8 @@ const OrganizationChart = ({
   listView = true,
   onAddBtnClick,
   onEditBtnClick,
-  handleDeleteManagement
+  handleDeleteManagement,
+  listViewAdditionalActions
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
@@ -335,6 +337,7 @@ const OrganizationChart = ({
               data={displayNode}
               onSelectNode={handleNodeClick}
               selectedNodeId={selectedNode?.id || null}
+              additionalActions={listViewAdditionalActions}
             />
           </div>
         )

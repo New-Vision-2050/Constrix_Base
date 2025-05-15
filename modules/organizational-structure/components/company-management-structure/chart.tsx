@@ -11,6 +11,7 @@ import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 
 type PropsT = {
   branchId: string | number;
@@ -112,6 +113,11 @@ const BranchManagementsStructure = (props: PropsT) => {
             onEditBtnClick={(node) => onEditBtnClick(node)}
             onAddBtnClick={(node) => onAddBtnClick(node)}
             handleDeleteManagement={(id) => handleDeleteManagement(id)}
+            listViewAdditionalActions={
+              <>
+                <Button onClick={() => openSheet()}>اضافة ادارة</Button>
+              </>
+            }
           />
         </div>
       )}

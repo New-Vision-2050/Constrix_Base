@@ -1,19 +1,25 @@
-import React from 'react'
-import { OrgChartNode } from '@/types/organization'
-import { useListView } from './useListView'
-import ListViewNode from './ListViewNode'
-import ListViewSearch from './ListViewSearch'
-import { Button } from '@/components/ui/button'
-import { Download } from 'lucide-react'
-import { exportToCSV, prepareOrgDataForExport } from '../utils/exportUtils'
+import React from "react";
+import { OrgChartNode } from "@/types/organization";
+import { useListView } from "./useListView";
+import ListViewNode from "./ListViewNode";
+import ListViewSearch from "./ListViewSearch";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { exportToCSV, prepareOrgDataForExport } from "../utils/exportUtils";
 
 interface ListViewProps {
   data: OrgChartNode;
   onSelectNode: (node: OrgChartNode) => void;
   selectedNodeId: string | null;
+  additionalActions?: React.ReactNode;
 }
 
-const ListView: React.FC<ListViewProps> = ({ data, onSelectNode, selectedNodeId }) => {
+const ListView: React.FC<ListViewProps> = ({
+  data,
+  onSelectNode,
+  selectedNodeId,
+  additionalActions,
+}) => {
   const {
     expandedNodes,
     expandedDetails,
@@ -21,33 +27,37 @@ const ListView: React.FC<ListViewProps> = ({ data, onSelectNode, selectedNodeId 
     searchTerm,
     setSearchTerm,
     toggleNodeExpansion,
-    toggleDetailsExpansion
-  } = useListView(data)
+    toggleDetailsExpansion,
+  } = useListView(data);
 
   const handleNodeSelection = (node: OrgChartNode) => {
-    toggleDetailsExpansion(node)
-    onSelectNode(node)
-  }
+    toggleDetailsExpansion(node);
+    onSelectNode(node);
+  };
 
   const handleExport = () => {
     // Prepare the full organizational data for export
-    const exportData = prepareOrgDataForExport(data)
-    exportToCSV(exportData)
-  }
+    const exportData = prepareOrgDataForExport(data);
+    exportToCSV(exportData);
+  };
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-stretch gap-4 mb-4">
         <div className="flex-1">
-          <ListViewSearch searchTerm={searchTerm} onSearchChange={setSearchTerm}/>
+          <ListViewSearch
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
         </div>
+        {additionalActions && <div>{additionalActions}</div>}
         <Button
           variant="outline"
           size="sm"
           className="ml-2 h-[43px] whitespace-nowrap "
           onClick={handleExport}
         >
-          <Download className="w-4 h-a mr-2 "/>
+          <Download className="w-4 h-a mr-2 " />
           Export CSV
         </Button>
       </div>
@@ -75,7 +85,7 @@ const ListView: React.FC<ListViewProps> = ({ data, onSelectNode, selectedNodeId 
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ListView
+export default ListView;
