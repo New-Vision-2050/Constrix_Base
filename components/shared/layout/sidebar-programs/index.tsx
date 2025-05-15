@@ -30,7 +30,7 @@ export function SidebarProgramsList({ projects }: PropsT) {
         setActiveUrl(pathname);
       }
     }
-  }, [pathname, projects]);
+  }, []);
 
   //  declare and define helper methods
   const handleSub_entitiesItemClick = useCallback((url: string) => {
