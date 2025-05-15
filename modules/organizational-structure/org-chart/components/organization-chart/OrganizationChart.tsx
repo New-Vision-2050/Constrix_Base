@@ -16,7 +16,7 @@ interface OrganizationChartProps {
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
   onEditBtnClick?: (node: OrgChartNode) => void;
-  handleDeleteManagement?: (id: string | number) => Promise<void>
+  handleDeleteManagement?: (id: string | number) => void
 }
 
 const OrganizationChart = ({
