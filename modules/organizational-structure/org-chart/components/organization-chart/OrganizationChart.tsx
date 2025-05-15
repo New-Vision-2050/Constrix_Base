@@ -27,8 +27,8 @@ const OrganizationChart = ({
   listView = true,
   onAddBtnClick,
   DropDownMenu,
-  listViewAdditionalActions,
   onEditBtnClick,
+  listViewAdditionalActions,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
