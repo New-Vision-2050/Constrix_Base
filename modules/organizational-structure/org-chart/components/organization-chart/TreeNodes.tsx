@@ -3,14 +3,14 @@ import { TreeNode } from "react-organizational-chart";
 import ChartNode from "./ChartNode";
 import { useLocale } from "next-intl";
 import OrgChartAddButton from "./chart-add-button";
+import { DropdownItemT } from "@/components/shared/dropdown-button";
 
 interface TreeNodesProps {
   node: OrgChartNode;
   onNodeClick: (node: OrgChartNode) => void;
   selectedNodeId: string | null;
   onAddBtnClick?: (node: OrgChartNode) => void;
-  onEditBtnClick?: (node: OrgChartNode) => void;
-  handleDeleteManagement?: (id: string | number) => void
+  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
 }
 
 const TreeNodes = ({
@@ -18,8 +18,7 @@ const TreeNodes = ({
   onNodeClick,
   selectedNodeId,
   onAddBtnClick,
-  onEditBtnClick,
-  handleDeleteManagement
+  DropDownMenu,
 }: TreeNodesProps) => {
   const locale = useLocale();
   return (
@@ -35,8 +34,7 @@ const TreeNodes = ({
             onNodeClick={onNodeClick}
             isSelected={node.id === selectedNodeId}
             isFirst={!node.children?.length}
-            onEditBtnClick={onEditBtnClick}
-            handleDeleteManagement={handleDeleteManagement}
+            DropDownMenu={DropDownMenu}
           />
           <OrgChartAddButton node={node} onAddBtnClick={onAddBtnClick} />
         </div>
@@ -49,8 +47,7 @@ const TreeNodes = ({
           node={childNode}
           onNodeClick={onNodeClick}
           selectedNodeId={selectedNodeId}
-          onEditBtnClick={onEditBtnClick}
-          handleDeleteManagement={handleDeleteManagement}
+          DropDownMenu={DropDownMenu}
           onAddBtnClick={onAddBtnClick}
         />
       ))}
