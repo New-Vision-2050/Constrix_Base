@@ -36,7 +36,7 @@ export const CreateUserFormConfig = (slug: string) => {
           },
           {
             name: "slug",
-            label: "الاسم المختصد",
+            label: "الاسم المختصر",
             type: "text",
             placeholder: "ادخل الاسم المختصر",
             validation: [

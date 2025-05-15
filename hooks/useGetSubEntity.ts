@@ -7,7 +7,7 @@ import {
 } from "@/modules/program-settings/users-settings/types/entity";
 
 type ValueOf<T> = T[keyof T];
-type SuperEntitySlug = ValueOf<typeof SUPER_ENTITY_SLUG>;
+export type SuperEntitySlug = ValueOf<typeof SUPER_ENTITY_SLUG>;
 
 export const useGetSubEntity = (
   superEntitySlug: SuperEntitySlug,

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
-import { useGetSubEntity } from "@/hooks/useGetSubEntity";
+import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 import {
   SheetFormBuilder,
@@ -14,12 +14,18 @@ import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-const UsersSubEntityTable = () => {
+const UsersSubEntityTable = ({
+  programName,
+}: {
+  programName: SuperEntitySlug;
+}) => {
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
   const { slug }: { slug: string } = useParams();
-  const { subEntity } = useGetSubEntity(SUPER_ENTITY_SLUG.USERS, slug);
+  const { subEntity } = useGetSubEntity(programName, slug);
   const defaultAttr = subEntity?.default_attributes.map((item) => item.id);
   const optionalAttr = subEntity?.optional_attributes.map((item) => item.id);
+
+  console.log({ defaultAttr, optionalAttr }, subEntity?.optional_attributes);
 
   const config = {
     ...UsersConfig(),
