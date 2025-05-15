@@ -128,7 +128,7 @@
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
     "createCompany": "انشاء شركة",
-    "SaveCompany":"تم حفظ الشركة برقم",
+    "SaveCompany": "تم حفظ الشركة برقم",
     "Validation": {
       "arabicName": "الاسم التجاري يجب ان يكون باللغه العربية",
       "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية",
@@ -150,7 +150,7 @@
     "CompanyName": "نيو فيجن",
     "OrganizationalStructure": "الهيكل التنظيمي",
     "HumanResources": "الموارد البشرية",
-    "ProgramManagement":"ادارة البرامج"
+    "ProgramManagement": "ادارة البرامج"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -318,6 +318,12 @@
           "cv": "السيرة الذاتية"
         }
       }
+    }
+  },
+  "CompanyStructure": {
+    "ManagementStructure": {
+      "loading": "تحميل بيانات الإدارات...",
+      "confirmDelete": "هل انت متأكد من حذف هذه الإدارة؟"
     }
   }
 }
