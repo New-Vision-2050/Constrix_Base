@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { processApiResponse } from "@/modules/table/utils/dataUtils";
 import { apiClient } from "@/config/axios-config";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {DropdownOption, DynamicDropdownConfig} from "@/modules/form-builder";
+import { DropdownOption, DynamicDropdownConfig } from "@/modules/form-builder";
 
 interface UseDropdownSearchProps {
   searchTerm: string;

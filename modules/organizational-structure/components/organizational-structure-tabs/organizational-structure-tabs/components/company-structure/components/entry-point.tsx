@@ -24,7 +24,6 @@ export default function CompanyStructureEntryPoint() {
       setItems(_items);
     }
   }, [branchiesList]);
-
   return (
     <div className="flex flex-col gap-7">
       <TabContentHeader title="بنية الشركة" />

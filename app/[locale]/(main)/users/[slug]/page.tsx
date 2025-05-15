@@ -1,7 +1,8 @@
+import UsersSubEntityTable from "@/modules/users/components/users-sub-entity-table";
 import React from "react";
 
 const UsersSubProgram = () => {
-  return <div>users sub program</div>;
+  return <UsersSubEntityTable />;
 };
 
 export default UsersSubProgram;
