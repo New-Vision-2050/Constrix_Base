@@ -10,6 +10,7 @@ import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   branchId: string | number;
@@ -17,6 +18,7 @@ type PropsT = {
 
 const BranchManagementsStructure = (props: PropsT) => {
   const { branchId } = props;
+  const t = useTranslations("CompanyStructure.ManagementStructure");
   const [deletedId, setDeletedId] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -91,14 +93,14 @@ const BranchManagementsStructure = (props: PropsT) => {
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
         onConfirm={handleConfirm}
-        description={"هل انت متأكد من حذف هذه الإدارة؟"}
+        description={t("confirmDelete")}
       />
 
       {isLoading && (
         <div className="flex justify-center items-center h-96">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ltr:ml-2 rtl:mr-2 text-lg text-gray-600">
-            Loading Managements data...
+            {t("loading")}
           </span>
         </div>
       )}
