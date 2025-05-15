@@ -45,6 +45,7 @@ export type Project = {
   name: string;
   slug: string;
   url?: string;
+  urls?: string[];
   icon?: string | ComponentType;
   isActive: boolean;
   sub_entities: Entity[];
