@@ -10,23 +10,22 @@ import ListView from "./list-view/ListView";
 import { exportChartAsPDF } from "./utils/pdfExportUtils";
 import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
+import { DropdownItemT } from "@/components/shared/dropdown-button";
 
 interface OrganizationChartProps {
   data: OrgChartNode;
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
-  onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
-  handleDeleteManagement?: (id: string | number) => void;
+  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
 }
 
 const OrganizationChart = ({
   data,
   listView = true,
   onAddBtnClick,
-  onEditBtnClick,
-  handleDeleteManagement,
-  listViewAdditionalActions
+  DropDownMenu,
+  listViewAdditionalActions,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
@@ -306,8 +305,7 @@ const OrganizationChart = ({
                     onNodeClick={handleNodeClick}
                     isSelected={selectedNode?.id === displayNode.id}
                     isFirst={true}
-                    onEditBtnClick={onEditBtnClick}
-                    handleDeleteManagement={handleDeleteManagement}
+                    DropDownMenu={DropDownMenu}
                   />
                   <OrgChartAddButton
                     node={displayNode}
@@ -321,8 +319,7 @@ const OrganizationChart = ({
                   key={childNode.id}
                   node={childNode}
                   onNodeClick={handleNodeClick}
-                  onEditBtnClick={onEditBtnClick}
-                  handleDeleteManagement={handleDeleteManagement}
+                  DropDownMenu={DropDownMenu}
                   onAddBtnClick={onAddBtnClick}
                   selectedNodeId={selectedNode?.id || null}
                 />
