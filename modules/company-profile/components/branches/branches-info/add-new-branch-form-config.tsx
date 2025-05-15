@@ -147,12 +147,15 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "parent_id",
             label: "الفرع الرئيسي",
             type: "select",
+            disabled: true,
             options: branches
               .filter((branch) => !branch.parent_id)
               .map((branch) => ({
                 value: branch.id,
                 label: branch.name,
               })),
+            defaultValue: branches.filter((branch) => !branch.parent_id)?.[0]
+              ?.id,
             validation: [
               {
                 type: "required",
@@ -240,6 +243,9 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
         ],
       },
     ],
+    initialValues: {
+      parent_id: branches.filter((branch) => !branch.parent_id)?.[0]?.id,
+    },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
