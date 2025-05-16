@@ -131,7 +131,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       let filteredColumns = [...config.columns];
       if (config.availableColumnKeys && config.availableColumnKeys.length > 0) {
         filteredColumns = filteredColumns.filter((col) =>
-          config.availableColumnKeys!.includes(col.key)
+          config.availableColumnKeys?.includes(col.key)
         );
       }
 
@@ -252,7 +252,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                       : visibleColumnKeys;
                   return keysToUse.includes(col.key);
                 })
-              : config?.columns || columns
+              : columns || config?.columns
           }
           searchQuery={searchQuery}
           sortState={sortState}
