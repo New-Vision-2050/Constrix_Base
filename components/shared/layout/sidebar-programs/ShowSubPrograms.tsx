@@ -41,12 +41,14 @@ export default function ShowSubPrograms(props: PropsT) {
               className={cn(sub.url === activeUrl && "text-primary")}
               onClick={() =>
                 handleSub_entitiesItemClick(
-                  sub.url ? sub.url : `/${activeProject.slug}/${sub.slug}`
+                  sub.url ? sub.url : `/${sub.origin_super_entity}/${sub.slug}`
                 )
               }
             >
               <Link
-                href={sub.url ? sub.url : `/${activeProject.slug}/${sub.slug}`}
+                href={
+                  sub.url ? sub.url : `/${sub.origin_super_entity}/${sub.slug}`
+                }
                 className="pr-5 flex gap-5 items-center cursor-pointer"
               >
                 {sub.icon &&
