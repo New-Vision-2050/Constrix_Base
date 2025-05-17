@@ -9,7 +9,7 @@ export function employeeFormConfig(
   return {
     formId: "employee-form",
     title: "اضافة موظف",
-    apiUrl: `${baseURL}/write-url`,
+    apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -130,6 +130,11 @@ export function employeeFormConfig(
             label: "الهاتف",
             type: "phone",
             placeholder: "يرجى إدخال رقم هاتفك.",
+            required: true,
+            validation: [
+              { type: "required", message: "رقم الهاتف مطلوب" },
+              { type: "phone", message: "رقم الهاتف غير صحيح" },
+            ],
           },
           {
             type: "select",
@@ -142,7 +147,6 @@ export function employeeFormConfig(
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
-              setFirstAsDefault: true,
               pageParam: "page",
               limitParam: "per_page",
               itemsPerPage: 10,
@@ -150,13 +154,12 @@ export function employeeFormConfig(
             },
           },
           {
-            name: "company_field_id",
-            label: "الفرع - ستاتيك",
+            name: "branch_id",
+            label: "الفرع",
             type: "select",
-            isMulti: true,
             placeholder: "اختر الفرع",
             dynamicOptions: {
-              url: `${baseURL}/company_fields`,
+              url: `${baseURL}/management_hierarchies?type=branch`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -166,18 +169,15 @@ export function employeeFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
- 
           },
-
           {
-            name: "state",
+            name: "status",
             label: "حالة الموظف",
             type: "select",
             placeholder: "اختر حالة الموظف",
-            required: true,
             options: [
-              { label: "نشط", value: "active" },
-              { label: "غير نشط", value: "inactive" },
+              { label: "نشط", value: "1" },
+              { label: "غير نشط", value: "0" },
             ],
           },
         ],
