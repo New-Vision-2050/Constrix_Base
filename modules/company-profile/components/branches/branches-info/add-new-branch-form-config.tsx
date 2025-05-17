@@ -1,7 +1,7 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { Branch } from "@/modules/company-profile/types/company";
-import PickupMap from "../../official-data/national-address/pickup-map";
+import PickupMap from "../../../../../components/shared/pickup-map";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "next/navigation";
