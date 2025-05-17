@@ -9,10 +9,10 @@ export function employeeFormConfig(
   return {
     formId: "employee-form",
     title: "اضافة موظف",
-    apiUrl: `${baseURL}/company-users/employees`,
+    apiUrl: `${baseURL}/write-url`,
     laravelValidation: {
       enabled: true,
-      errorsPath: "errors",
+      errorsPath: "errors", // This is the default in Laravel
     },
     sections: [
       {
@@ -70,17 +70,10 @@ export function employeeFormConfig(
             type: "select",
             placeholder: "اختر الجنسية",
             dynamicOptions: {
-              url: `${baseURL}/countries`,
+              url: "/countries",
               valueField: "id",
               labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
             },
-            required: true,
             validation: [
               {
                 type: "required",
@@ -129,37 +122,50 @@ export function employeeFormConfig(
             name: "phone",
             label: "الهاتف",
             type: "phone",
-            placeholder: "يرجى إدخال رقم هاتفك.",
             required: true,
+            placeholder: "يرجى إدخال رقم هاتفك.",
             validation: [
-              { type: "required", message: "رقم الهاتف مطلوب" },
-              { type: "phone", message: "رقم الهاتف غير صحيح" },
+              {
+                type: "phone",
+                message: "",
+              },
             ],
           },
+
           {
             type: "select",
             name: "job_title_id",
             label: "المسمى الوظيفي",
             placeholder: "اختر المسمى الوظيفي",
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/job_titles/list?type=general_manager`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
+              setFirstAsDefault: true,
               pageParam: "page",
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "المسمى الوظيفي مطلوب.",
+              },
+            ],
           },
           {
-            name: "branch_id",
-            label: "الفرع",
+            name: "company_field_id",
+            label: "الفرع - ستاتيك",
             type: "select",
+            isMulti: true,
             placeholder: "اختر الفرع",
+            required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies?type=branch`,
+              url: `${baseURL}/company_fields`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -169,15 +175,30 @@ export function employeeFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "برجاء اختيار الفرع",
+              },
+            ],
           },
+
           {
-            name: "status",
+            name: "state",
             label: "حالة الموظف",
             type: "select",
-            placeholder: "اختر حالة الموظف",
+            isMulti: true,
+            placeholder: "اختر الفرع",
+            required: true,
             options: [
-              { label: "نشط", value: "1" },
-              { label: "غير نشط", value: "0" },
+              { label: "نشط", value: "active" },
+              { label: "غير نشط", value: "inactive" },
+            ],
+            validation: [
+              {
+                type: "required",
+                message: "برجاء اختيار الفرع",
+              },
             ],
           },
         ],
