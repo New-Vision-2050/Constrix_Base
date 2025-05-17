@@ -92,6 +92,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     selectRow,
     selectAllRows,
     clearSelectedRows,
+    setVisibleColumns,
   } = useTableData(
     dataUrl,
     config?.columns,
@@ -143,7 +144,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         config.defaultVisibleColumnKeys &&
         config.defaultVisibleColumnKeys.length > 0
       ) {
-        setColumnVisibilityKeys(config.defaultVisibleColumnKeys);
+        setColumnVisibilityKeys([...config.defaultVisibleColumnKeys, "id"]);
+        setVisibleColumns([...config.defaultVisibleColumnKeys, "id"]);
       }
 
       columnsInitializedRef.current = true;

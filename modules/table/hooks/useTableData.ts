@@ -235,5 +235,6 @@ export const useTableData = (
     selectRow: tableInstance.selectRow,
     selectAllRows: tableInstance.selectAllRows,
     clearSelectedRows: tableInstance.clearSelectedRows,
+    setVisibleColumns
   };
 };

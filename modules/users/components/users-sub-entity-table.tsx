@@ -25,6 +25,8 @@ const UsersSubEntityTable = ({
   const defaultAttr = subEntity?.default_attributes.map((item) => item.id);
   const optionalAttr = subEntity?.optional_attributes.map((item) => item.id);
 
+  console.log({ subEntity });
+
   console.log({ defaultAttr, optionalAttr }, subEntity?.optional_attributes);
 
   const config = {
@@ -37,7 +39,7 @@ const UsersSubEntityTable = ({
 
   return (
     <div className="px-8 space-y-7">
-      {hasHydrated && (
+      {hasHydrated && !!subEntity && (
         <TableBuilder
           config={config}
           searchBarActions={

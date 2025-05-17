@@ -24,6 +24,7 @@ export interface Entity {
   id: string;
   name: string;
   icon: number;
+  slug?: string;
   super_entity: SuperEntity;
   is_active: number;
   is_registrable: number;
