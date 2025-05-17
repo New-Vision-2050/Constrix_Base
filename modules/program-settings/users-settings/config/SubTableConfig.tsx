@@ -10,6 +10,7 @@ import { AddDocFormConfig } from "@/modules/company-profile/components/official-
 import { UpdateSubTableAttributes } from "./UpdateSubTableAttributes";
 import { Entity } from "../types/entity";
 import SubTableStatus from "../components/sub-tables/SubTableStatus";
+import { UpdateSubTableSettings } from "./UpdateSubTableSettings";
 
 // Create a component that uses the translations
 export const SubTableConfig = (slug: string) => {
@@ -128,11 +129,11 @@ export const SubTableConfig = (slug: string) => {
       },
       {
         label: "اعدادات الجدول",
-        action: () => null,
-        dialogComponent: ChooseUserCompany,
+        action:"openSettingsTable", 
+        dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
-            user: row,
+            config: UpdateSubTableSettings(row?.id, row, slug),
           };
         },
       },
