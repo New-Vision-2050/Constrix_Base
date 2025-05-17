@@ -130,8 +130,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       // Filter columns based on availableColumnKeys if provided
       let filteredColumns = [...config.columns];
       if (config.availableColumnKeys && config.availableColumnKeys.length > 0) {
-        filteredColumns = filteredColumns.filter((col) =>
-          config.availableColumnKeys?.includes(col.key)
+        filteredColumns = filteredColumns.filter(
+          (col) =>
+            config.availableColumnKeys?.includes(col.key) || col.key === "id"
         );
       }
 
