@@ -33,7 +33,7 @@ export const UpdateSubTableAttributes = (
 
   const updateSubTableAttributes: FormConfig = {
     formId: `UpdateSubTableAttributes-programSettings-${id}`,
-    title: "محتويات جدول الموظفين",
+    title: "محتويات الجدول",
     apiUrl: `${baseURL}/sub_entities/${id}/update/attributes`,
     apiMethod: "PUT",
     laravelValidation: {
