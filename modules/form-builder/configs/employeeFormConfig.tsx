@@ -12,7 +12,7 @@ export function employeeFormConfig(
     apiUrl: `${baseURL}/write-url`,
     laravelValidation: {
       enabled: true,
-      errorsPath: "errors", // This is the default in Laravel
+      errorsPath: "errors",
     },
     sections: [
       {
@@ -70,10 +70,17 @@ export function employeeFormConfig(
             type: "select",
             placeholder: "اختر الجنسية",
             dynamicOptions: {
-              url: "/countries",
+              url: `${baseURL}/countries`,
               valueField: "id",
               labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
+            required: true,
             validation: [
               {
                 type: "required",
@@ -122,22 +129,13 @@ export function employeeFormConfig(
             name: "phone",
             label: "الهاتف",
             type: "phone",
-            required: true,
             placeholder: "يرجى إدخال رقم هاتفك.",
-            validation: [
-              {
-                type: "phone",
-                message: "",
-              },
-            ],
           },
-
           {
             type: "select",
             name: "job_title_id",
             label: "المسمى الوظيفي",
             placeholder: "اختر المسمى الوظيفي",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/job_titles/list?type=general_manager`,
               valueField: "id",
@@ -150,12 +148,6 @@ export function employeeFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "المسمى الوظيفي مطلوب.",
-              },
-            ],
           },
           {
             name: "company_field_id",
@@ -163,7 +155,6 @@ export function employeeFormConfig(
             type: "select",
             isMulti: true,
             placeholder: "اختر الفرع",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/company_fields`,
               valueField: "id",
@@ -175,30 +166,18 @@ export function employeeFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "برجاء اختيار الفرع",
-              },
-            ],
+ 
           },
 
           {
             name: "state",
             label: "حالة الموظف",
             type: "select",
-            isMulti: true,
-            placeholder: "اختر الفرع",
+            placeholder: "اختر حالة الموظف",
             required: true,
             options: [
               { label: "نشط", value: "active" },
               { label: "غير نشط", value: "inactive" },
-            ],
-            validation: [
-              {
-                type: "required",
-                message: "برجاء اختيار الفرع",
-              },
             ],
           },
         ],
