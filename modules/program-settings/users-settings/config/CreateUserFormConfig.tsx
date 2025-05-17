@@ -173,12 +173,12 @@ export const CreateUserFormConfig = (slug: string) => {
           },
           {
             type: "select",
-            name: "form",
+            name: "registration_form_id",
             label: "نموذج التسجيل",
             placeholder: "نموذج التسجيل",
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/registration_forms?super_entity_id=${slug}`,
-              valueField: "slug",
+              url: `${baseURL}/sub_entities/super_entities/registration_forms`,
+              valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
@@ -186,6 +186,8 @@ export const CreateUserFormConfig = (slug: string) => {
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "super_entity",
+              filterParam: "super_entity_id",
             },
             validation: [
               {
