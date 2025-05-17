@@ -4,7 +4,7 @@ import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
 
-export function clientFormConfig(
+export function customerFormConfig(
   t: ReturnType<typeof useTranslations>
 ): FormConfig {
   const formId = `client-form-config`;

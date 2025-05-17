@@ -1,9 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
+import {
+  REGISTRATION_FORMS,
+  REGISTRATION_FORMS_SLUGS,
+} from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
-import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 import {
   SheetFormBuilder,
   GetCompanyUserFormConfig,
@@ -25,9 +27,19 @@ const UsersSubEntityTable = ({
   const defaultAttr = subEntity?.default_attributes.map((item) => item.id);
   const optionalAttr = subEntity?.optional_attributes.map((item) => item.id);
 
-  console.log({ subEntity });
+  const registrationFormSlug = subEntity?.registration_form?.slug;
+  const registrationFromConfig = registrationFormSlug
+    ? REGISTRATION_FORMS[registrationFormSlug]
+    : GetCompanyUserFormConfig;
 
-  console.log({ defaultAttr, optionalAttr }, subEntity?.optional_attributes);
+  const buttonText =
+    subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
+      ? "موظف"
+      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CUSTOMER
+      ? "عميل"
+      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.RESELLER
+      ? "وسيط"
+      : "مستخدم";
 
   const config = {
     ...UsersConfig(),
@@ -45,8 +57,12 @@ const UsersSubEntityTable = ({
           searchBarActions={
             <div className="flex items-center gap-3">
               <SheetFormBuilder
-                config={GetCompanyUserFormConfig(t)}
-                trigger={<Button>إنشاء مستخدم</Button>}
+                config={
+                  registrationFromConfig
+                    ? registrationFromConfig(t)
+                    : GetCompanyUserFormConfig(t)
+                }
+                trigger={<Button>إنشاء {buttonText}</Button>}
                 onSuccess={(values) => {
                   console.log("Form submitted successfully:", values);
                 }}
