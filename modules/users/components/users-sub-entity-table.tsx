@@ -11,6 +11,7 @@ import {
   GetCompanyUserFormConfig,
 } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
@@ -21,11 +22,14 @@ const UsersSubEntityTable = ({
 }: {
   programName: SuperEntitySlug;
 }) => {
+  const t = useTranslations("Companies");
+
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
   const { slug }: { slug: string } = useParams();
   const { subEntity } = useGetSubEntity(programName, slug);
   const defaultAttr = subEntity?.default_attributes.map((item) => item.id);
   const optionalAttr = subEntity?.optional_attributes.map((item) => item.id);
+  const TABLE_ID = `${subEntity?.slug}-users`;
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
   const registrationFromConfig = registrationFormSlug
@@ -41,27 +45,35 @@ const UsersSubEntityTable = ({
       ? "وسيط"
       : "مستخدم";
 
-  const config = {
+  const tableConfig = {
     ...UsersConfig(),
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
+    tableId: TABLE_ID,
   };
 
-  const t = useTranslations("Companies");
+  const finalFormConfig = Boolean(registrationFromConfig)
+    ? registrationFromConfig
+    : GetCompanyUserFormConfig;
 
   return (
     <div className="px-8 space-y-7">
       {hasHydrated && !!subEntity && (
         <TableBuilder
-          config={config}
+          config={tableConfig}
           searchBarActions={
             <div className="flex items-center gap-3">
               <SheetFormBuilder
-                config={
-                  registrationFromConfig
-                    ? registrationFromConfig(t)
-                    : GetCompanyUserFormConfig(t)
-                }
+                config={{
+                  ...finalFormConfig(t),
+                  onSuccess: () => {
+                    const tableStore = useTableStore.getState();
+                    tableStore.reloadTable(TABLE_ID);
+                    setTimeout(() => {
+                      tableStore.setLoading(TABLE_ID, false);
+                    }, 100);
+                  },
+                }}
                 trigger={<Button>إنشاء {buttonText}</Button>}
                 onSuccess={(values) => {
                   console.log("Form submitted successfully:", values);
