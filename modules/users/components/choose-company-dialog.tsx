@@ -22,9 +22,9 @@ interface PropsT {
 const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
   const router = useRouter();
 
-  const handleRedirect = (id: string) => {
+  const handleRedirect = (id: string, companyId: string) => {
     if (!id) return;
-    router.push(`${ROUTER.USER_PROFILE}?id=${id}`);
+    router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
   };
 
   return (
@@ -46,12 +46,17 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
             {user?.companies?.map((company) => (
               <div
                 key={company?.id}
-                onClick={() => handleRedirect(company?.users?.[0]?.id ?? "")}
+                onClick={() =>
+                  handleRedirect(
+                    company?.users?.[0]?.id ?? "",
+                    company?.id ?? ""
+                  )
+                }
                 className="flex flex-col items-center justify-center cursor-pointer"
               >
                 <img
                   title={company?.name}
-                  src={company?.logo??LogoPlaceholder}
+                  src={company?.logo ?? LogoPlaceholder}
                   width={70}
                   height={70}
                   className="rounded-2xl"

@@ -5,7 +5,7 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { FunctionalContractualList } from "../constants/FunctionalContractualList";
 import useUserJobOffersData from "../hooks/useUserJobOffersData";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
@@ -16,6 +16,8 @@ import useProfessionalData from "../hooks/useUserProfessionalData";
 import { ProfessionalT } from "../api/get-professinal-data";
 import useTimeUnitsData from "../hooks/useTimeUnitsData";
 import { TimeUnit } from "../api/get-time-units";
+import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
+import { CompanyData } from "@/modules/company-profile/types/company";
 
 // declare context types
 type FunctionalContractualCxtType = {
@@ -35,6 +37,8 @@ type FunctionalContractualCxtType = {
   handleRefetchProfessionalData: () => void;
   // time units
   timeUnits: TimeUnit[] | undefined;
+  // company data
+  company: CompanyData | undefined;
 };
 
 export const FunctionalContractualCxt =
@@ -60,9 +64,13 @@ export const FunctionalContractualCxtProvider = ({
 }) => {
   // ** declare and define component state and variables
   const { user } = useUserProfileCxt();
+  const { data: companyData } = useCurrentCompany();
+  const company = useMemo(() => companyData?.payload, [companyData]);
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
     FunctionalContractualList[0]
   );
+
+  console.log("companyDatacompanyData", companyData);
   // user job offers data
   const {
     data: userJobOffersData,
@@ -120,6 +128,8 @@ export const FunctionalContractualCxtProvider = ({
         handleRefetchProfessionalData,
         // time unit
         timeUnits,
+        // company data
+        company,
       }}
     >
       {children}

@@ -40,6 +40,9 @@ type UserProfileCxtType = {
   setTab1: React.Dispatch<SetStateAction<string>>;
   setTab2: React.Dispatch<SetStateAction<string>>;
   verticalSection: string | null;
+
+  // company id
+  companyId: string | null;
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -63,6 +66,7 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
+  const companyId = searchParams.get("company_id");
   const [tab1, setTab1] = useState(searchParams.get("tab1") ?? "");
   const [tab2, setTab2] = useState(searchParams.get("tab2") ?? "");
   const verticalSection = searchParams.get("verticalSection");
@@ -152,6 +156,9 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
         setTab1,
         setTab2,
         verticalSection,
+
+        // company id
+        companyId,
       }}
     >
       {children}
