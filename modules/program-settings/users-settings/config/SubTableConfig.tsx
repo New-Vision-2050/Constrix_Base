@@ -35,10 +35,12 @@ export const SubTableConfig = (slug: string) => {
         sortable: true,
       },
       {
-        key: "dummy-1",
-        label: "نموذج التسجيل",
-        sortable: true,
-        render: () => <div>نموذج 1</div>,
+         key: "registered_form",
+         searchType: {
+             type: "dropdown",
+             placeholder: "نموذج التسجيل",
+             dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
+         },
       },
       {
         key: "attributes_count",
@@ -129,7 +131,7 @@ export const SubTableConfig = (slug: string) => {
       },
       {
         label: "اعدادات الجدول",
-        action:"openSettingsTable", 
+        action:"openSettingsTable",
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
