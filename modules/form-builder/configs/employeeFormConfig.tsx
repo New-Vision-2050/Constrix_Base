@@ -20,14 +20,14 @@ export function employeeFormConfig(
         fields: [
           {
             name: "first_name",
-            label: "اسم المستخدم الاول",
+            label: "اسم الموظف الاول",
             type: "text",
-            placeholder: "ادخل اسم المستخدم الاول",
+            placeholder: "ادخل اسم الموظف الاول",
             required: true,
             validation: [
               {
                 type: "required",
-                message: "اسم المستخدم الاول مطلوب",
+                message: "اسم الموظف الاول مطلوب",
               },
               {
                 type: "pattern",
@@ -43,9 +43,9 @@ export function employeeFormConfig(
           },
           {
             name: "last_name",
-            label: "اسم المستخدم الأخير",
+            label: "اسم الموظف الأخير",
             type: "text",
-            placeholder: "اسم المستخدم الأخير",
+            placeholder: "اسم الموظف الأخير",
             required: true,
             validation: [
               {
