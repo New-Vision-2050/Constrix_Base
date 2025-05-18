@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { baseURL } from "@/config/axios-config";
 import {
   REGISTRATION_FORMS,
   REGISTRATION_FORMS_SLUGS,
@@ -30,6 +31,8 @@ const UsersSubEntityTable = ({
   const defaultAttr = subEntity?.default_attributes.map((item) => item.id);
   const optionalAttr = subEntity?.optional_attributes.map((item) => item.id);
   const TABLE_ID = `${subEntity?.slug}-users`;
+  const sub_entity_id = subEntity?.id;
+  const registration_form_id = subEntity?.registration_form?.id;
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
   const registrationFromConfig = registrationFormSlug
@@ -50,6 +53,7 @@ const UsersSubEntityTable = ({
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,
+    // url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
   };
 
   const finalFormConfig = Boolean(registrationFromConfig)
