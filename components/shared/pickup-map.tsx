@@ -41,7 +41,7 @@ const PickupMap = ({
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue } = useFormStore();
 
-  const handleSaveMap = (obj: any) => {
+  const handleSaveMap = (obj: Record<string, string | number | undefined>) => {
     const keys = keysToUpdate ?? defaultKeys;
     keys.forEach((key) => {
       if (obj[key] !== undefined) {
