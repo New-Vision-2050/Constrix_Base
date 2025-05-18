@@ -19,7 +19,6 @@ interface OrganizationChartProps {
   onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
-    onEditBtnClick?: (node: OrgChartNode) => void;
   handleDeleteManagement?: (id: string | number) => void;
 }
 
@@ -28,7 +27,6 @@ const OrganizationChart = ({
   listView = true,
   onAddBtnClick,
   DropDownMenu,
-  onEditBtnClick,
   listViewAdditionalActions,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
