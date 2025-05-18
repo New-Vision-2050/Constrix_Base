@@ -37,7 +37,6 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
     }
   }, [open, user, router]);
 
-  // declare and define functions
   const handleRedirect = (id: string, companyId: string) => {
     if (!id) return;
     router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
@@ -72,7 +71,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
               >
                 <img
                   title={company?.name}
-                  src={company?.logo ?? LogoPlaceholder.src}
+                  src={company?.logo ?? LogoPlaceholder}
                   width={70}
                   height={70}
                   className="rounded-2xl"
