@@ -35,12 +35,9 @@ export const SubTableConfig = (slug: string) => {
         sortable: true,
       },
       {
-         key: "registered_form",
-         searchType: {
-             type: "dropdown",
-             placeholder: "نموذج التسجيل",
-             dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
-         },
+        key: "registration_form.name",
+        label: "نموذج التسجيل",
+        sortable: true,
       },
       {
         key: "attributes_count",
