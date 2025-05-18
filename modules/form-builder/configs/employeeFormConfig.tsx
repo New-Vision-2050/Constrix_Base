@@ -159,7 +159,7 @@ export function employeeFormConfig(
             type: "select",
             placeholder: "اختر الفرع",
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies?type=branch`,
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
