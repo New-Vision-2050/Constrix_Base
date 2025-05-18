@@ -111,7 +111,7 @@ export const SubTableConfig = (slug: string) => {
             totalCountHeader: "x-total-count",
           },
         },
-      },
+      }
     ],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
