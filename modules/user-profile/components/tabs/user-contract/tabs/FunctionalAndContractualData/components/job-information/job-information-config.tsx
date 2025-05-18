@@ -68,21 +68,21 @@ export const JobFormConfig = () => {
               },
             ],
           },
-          // {
-          //   name: "department_id",
-          //   label: "القسم",
-          //   type: "select",
-          //   placeholder: "القسم",
-          //   required: true,
-          //   dynamicOptions: {
-          //     url: `${baseURL}/management_hierarchies/list?type=department&company_id=${
-          //       companyId || company?.id
-          //     }`,
-          //     valueField: "id",
-          //     labelField: "name",
-          //     searchParam: "name",
-          //     paginationEnabled: true,
-          //     totalCountHeader: "X-Total-Count",
+          {
+            name: "department_id",
+            label: "القسم",
+            type: "select",
+            placeholder: "القسم",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=department&company_id=${
+                companyId || company?.id
+              }`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              totalCountHeader: "X-Total-Count",
 
           //     dependsOn: "management_id",
           //     filterParam: "parentId",
