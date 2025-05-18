@@ -6,8 +6,8 @@ import { useFunctionalContractualCxt } from "../../context";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const JobFormConfig = () => {
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
-  const { professionalData, handleRefetchProfessionalData } =
+  const { user, handleRefetchDataStatus, companyId } = useUserProfileCxt();
+  const { professionalData, company, handleRefetchProfessionalData } =
     useFunctionalContractualCxt();
 
   const jobFormConfig: FormConfig = {
@@ -26,7 +26,9 @@ export const JobFormConfig = () => {
             placeholder: "الفرع",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              url: `${baseURL}/management_hierarchies/list?type=branch&company_id=${
+                companyId || company?.id
+              }`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -47,7 +49,9 @@ export const JobFormConfig = () => {
             placeholder: "الادارة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=management`,
+              url: `${baseURL}/management_hierarchies/list?type=management&company_id=${
+                companyId || company?.id
+              }`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -71,7 +75,9 @@ export const JobFormConfig = () => {
             placeholder: "القسم",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=department`,
+              url: `${baseURL}/management_hierarchies/list?type=department&company_id=${
+                companyId || company?.id
+              }`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
