@@ -20,7 +20,7 @@ export const useGetSubEntity = (
     if (!superEntity) return { superEntity: null, subEntity: null };
 
     const subEntity: Entity = superEntity.sub_entities?.find(
-      (sub: MainProgram) => sub.slug === subEntitySlug
+      (sub: Entity) => sub.slug === subEntitySlug
     );
 
     return { superEntity, subEntity };

@@ -16,8 +16,10 @@ interface OrganizationChartProps {
   data: OrgChartNode;
   listView?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
+  onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
+  handleDeleteManagement?: (id: string | number) => void;
 }
 
 const OrganizationChart = ({

@@ -92,6 +92,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     selectRow,
     selectAllRows,
     clearSelectedRows,
+    setVisibleColumns,
   } = useTableData(
     dataUrl,
     config?.columns,
@@ -130,8 +131,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       // Filter columns based on availableColumnKeys if provided
       let filteredColumns = [...config.columns];
       if (config.availableColumnKeys && config.availableColumnKeys.length > 0) {
-        filteredColumns = filteredColumns.filter((col) =>
-          config.availableColumnKeys!.includes(col.key)
+        filteredColumns = filteredColumns.filter(
+          (col) =>
+            config.availableColumnKeys?.includes(col.key) || col.key === "id"
         );
       }
 
@@ -142,7 +144,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         config.defaultVisibleColumnKeys &&
         config.defaultVisibleColumnKeys.length > 0
       ) {
-        setColumnVisibilityKeys(config.defaultVisibleColumnKeys);
+        setColumnVisibilityKeys([...config.defaultVisibleColumnKeys, "id"]);
+        setVisibleColumns([...config.defaultVisibleColumnKeys, "id"]);
       }
 
       columnsInitializedRef.current = true;
@@ -252,7 +255,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                       : visibleColumnKeys;
                   return keysToUse.includes(col.key);
                 })
-              : config?.columns || columns
+              : columns || config?.columns
           }
           searchQuery={searchQuery}
           sortState={sortState}
