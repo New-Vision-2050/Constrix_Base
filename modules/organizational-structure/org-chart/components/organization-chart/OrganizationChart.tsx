@@ -305,7 +305,8 @@ const OrganizationChart = ({
                     onNodeClick={handleNodeClick}
                     isSelected={selectedNode?.id === displayNode.id}
                     isFirst={true}
-                    DropDownMenu={DropDownMenu}
+                    // !Dropdown is temporarily disabled until a field is returned from the pack indicating that this command is controlled dynamically.
+                    // DropDownMenu={DropDownMenu} 
                   />
                   <OrgChartAddButton
                     node={displayNode}
