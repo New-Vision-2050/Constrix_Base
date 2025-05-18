@@ -76,14 +76,7 @@ export const SubTableConfig = (slug: string) => {
           },
         },
       },
-      {
-        key: "registered_form",
-        searchType: {
-          type: "dropdown",
-          placeholder: "نموذج التسجيل",
-          dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
-        },
-      },
+
       {
         key: "main_program_slug",
         searchType: {
@@ -101,7 +94,7 @@ export const SubTableConfig = (slug: string) => {
             totalCountHeader: "x-total-count",
           },
         },
-      },
+      }
     ],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
