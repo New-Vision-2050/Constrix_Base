@@ -110,22 +110,22 @@ export function AppSidebar({
       isNotCentral: true,
     },
     // human resources
-    {
-      name: t("Sidebar.HumanResources"),
-      icon: LayoutDashboardIcon,
-      urls: [ROUTER.Organizational_Structure],
-      isActive: pageName === ROUTER.Organizational_Structure,
-      slug: SUPER_ENTITY_SLUG.HRM,
-      sub_entities: [
-        {
-          name: t("Sidebar.OrganizationalStructure"),
-          url: ROUTER.Organizational_Structure,
-          icon: LayoutDashboardIcon,
-          isActive: pageName === ROUTER.Organizational_Structure,
-        },
-      ],
-      isNotCentral: false,
-    },
+    // {
+    //   name: t("Sidebar.HumanResources"),
+    //   icon: LayoutDashboardIcon,
+    //   urls: [ROUTER.Organizational_Structure],
+    //   isActive: pageName === ROUTER.Organizational_Structure,
+    //   slug: SUPER_ENTITY_SLUG.HRM,
+    //   sub_entities: [
+    //     {
+    //       name: t("Sidebar.OrganizationalStructure"),
+    //       url: ROUTER.Organizational_Structure,
+    //       icon: LayoutDashboardIcon,
+    //       isActive: pageName === ROUTER.Organizational_Structure,
+    //     },
+    //   ],
+    //   isNotCentral: false,
+    // },
     // program management
     {
       name: t("Sidebar.ProgramManagement"),

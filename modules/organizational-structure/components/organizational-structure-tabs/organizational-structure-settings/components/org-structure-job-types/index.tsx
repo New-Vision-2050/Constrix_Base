@@ -5,7 +5,7 @@ import { TableBuilder } from "@/modules/table";
 import { OrgStructureSettingsJobTypesTableConfig } from "./table-config";
 import { GetOrgStructureSettingsJobTypesFormConfig } from "./form-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
-
+import { ArrowDownNarrowWide } from "lucide-react";
 
 export default function OrgStructureJobTypesSetting() {
   // ** declare nad define component state and state
@@ -33,6 +33,10 @@ export default function OrgStructureJobTypesSetting() {
               trigger={<Button>اضافة نوع الوظيفة</Button>}
               onSuccess={handleFormSuccess}
             />
+            <Button variant="outline" size="sm" disabled>
+              <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+              ترتيب
+            </Button>
           </div>
         }
       />

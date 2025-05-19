@@ -151,6 +151,7 @@ export function employeeFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              filterParam:'id'
             },
           },
           {

@@ -8,14 +8,14 @@ export function customerFormConfig(
   t: ReturnType<typeof useTranslations>
 ): FormConfig {
   const formId = `client-form-config`;
-  const isCompany = (values: Record<string, string>) =>
-    values["client_type"] === "company";
+  const isCompany = (values: Record<string, string>) => values["type"] === "2";
   const isIndividual = (values: Record<string, string>) =>
-    values["client_type"] === "individual";
+    values["type"] === "1";
+
   return {
     formId,
     title: "اضافة عميل",
-    apiUrl: `${baseURL}/write-url`,
+    apiUrl: `${baseURL}/company-users/clients`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -26,12 +26,12 @@ export function customerFormConfig(
         fields: [
           {
             type: "select",
-            name: "client_type",
+            name: "type",
             label: "نوع العميل",
             placeholder: "نوع العميل",
             options: [
-              { label: "فرد", value: "individual" },
-              { label: "شركة", value: "company" },
+              { label: "فرد", value: "1" },
+              { label: "شركة", value: "2" },
             ],
             required: true,
             validation: [
@@ -42,7 +42,7 @@ export function customerFormConfig(
             ],
           },
           {
-            name: "client_name",
+            name: "name",
             label: "اسم العميل",
             type: "text",
             placeholder: "ادخل اسم العميل",
@@ -66,7 +66,7 @@ export function customerFormConfig(
             ],
           },
           {
-            name: "company_name",
+            name: "name",
             label: "اسم الشركة",
             type: "text",
             placeholder: "ادخل اسم الشركة",
@@ -96,19 +96,18 @@ export function customerFormConfig(
             render: () => (
               <PickupMap
                 formId={formId}
-                keysToUpdate={["latitude", "longitude"]}
+                keysToUpdate={[
+                  "latitude",
+                  "longitude",
+                  "country_id",
+                  "state_id",
+                  "city_id",
+                  "neighborhood_name",
+                  "postal_code",
+                  "street_name",
+                ]}
                 inGeneral={true}
               />
-            ),
-          },
-          {
-            label: "",
-            name: "",
-            type: "text",
-            render: () => (
-              <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-              </p>
             ),
           },
           {
@@ -116,37 +115,113 @@ export function customerFormConfig(
             label: "latitude",
             placeholder: "latitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل دائرة العرض",
-              },
-            ],
           },
           {
             name: "longitude",
             label: "longitude",
             placeholder: "longitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل خط الطول",
-              },
-            ],
           },
           {
-            name: "company_representative",
+            type: "select",
+            name: "country_id",
+            label: "الدولة",
+            placeholder: "الدولة",
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            type: "select",
+            name: "state_id",
+            label: "المنطقة",
+            placeholder: "المنطقة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "country_id",
+              filterParam: "country_id",
+            },
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            type: "select",
+            name: "city_id",
+            label: "المدينة",
+            placeholder: "المدينة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "state_id",
+              filterParam: "state_id",
+            },
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "neighborhood_name",
+            label: "الحي",
+            type: "text",
+            placeholder: "الحي",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "building_number",
+            label: "رقم المبنى",
+            type: "text",
+            placeholder: "رقم المبنى",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "additional_phone",
+            label: "الرقم الاضافي",
+            type: "phone",
+            placeholder: "الرقم الاضافي",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "postal_code",
+            label: "الرمز البريدي",
+            type: "text",
+            placeholder: "الرمز البريدي",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "street_name",
+            label: "الشارع",
+            type: "text",
+            placeholder: "الشارع",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "company_representative_name",
             label: "اسم ممثل الشركة",
             type: "text",
             placeholder: "ادخل اسم ممثل الشركة",
-            required: true,
             condition: (values) => isCompany(values),
             validation: [
-              {
-                type: "required",
-                message: "اسم ممثل الشركة مطلوب",
-              },
               {
                 type: "pattern",
                 value: /^[\p{Script=Arabic}\s]+$/u,
@@ -160,32 +235,18 @@ export function customerFormConfig(
             ],
           },
           {
-            name: "commercial_number",
+            name: "registration_number",
             label: " السجل التجاري",
             type: "text",
             placeholder: "ادخل السجل التجاري",
-            required: true,
             condition: (values) => isCompany(values),
-            validation: [
-              {
-                type: "required",
-                message: "اسم السجل التجاري",
-              },
-            ],
           },
           {
-            name: "identity",
+            name: "residence",
             label: "رقم الهوية",
             type: "text",
             placeholder: "رقم الهوية",
-            required: true,
             condition: (values) => isIndividual(values),
-            validation: [
-              {
-                type: "required",
-                message: "رقم الهوية مطلوب",
-              },
-            ],
           },
           {
             name: "email",
@@ -206,7 +267,7 @@ export function customerFormConfig(
                 type: "apiValidation",
                 message: <InvalidMessage formId={formId} />,
                 apiConfig: {
-                  url: `${baseURL}/company-users/check-email`,
+                  url: `${baseURL}/2-users/check-email`,
                   method: "POST",
                   debounceMs: 500,
                   paramName: "email",
@@ -238,14 +299,13 @@ export function customerFormConfig(
             ],
           },
           {
-            name: "company_field_id",
-            label: "الفرع - ستاتيك",
+            name: "branch_ids",
+            label: "الفروع",
             type: "select",
             isMulti: true,
-            placeholder: "اختر الفرع",
-            required: true,
+            placeholder: "اختر الفروع",
             dynamicOptions: {
-              url: `${baseURL}/company_fields`,
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -255,21 +315,15 @@ export function customerFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "برجاء اختيار الفرع",
-              },
-            ],
           },
           {
             type: "select",
-            name: "broker",
+            name: "broker_id",
             label: "الوسيط",
             placeholder: "الوسيط",
             dynamicOptions: {
-              url: `${baseURL}/write-url`,
-              valueField: "slug",
+              url: `${baseURL}/company-users/brokers`,
+              valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
@@ -278,25 +332,12 @@ export function customerFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل الوسيط",
-              },
-            ],
           },
           {
             name: "message_address",
             label: "عنوان المراسلات",
             type: "email",
             placeholder: "ادخل عنوان المراسلات",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "عنوان المراسلات مطلوب",
-              },
-            ],
           },
         ],
       },

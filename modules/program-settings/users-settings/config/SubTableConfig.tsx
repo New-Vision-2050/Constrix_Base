@@ -77,14 +77,6 @@ export const SubTableConfig = (slug: string) => {
         },
       },
       {
-        key: "registered_form",
-        searchType: {
-          type: "dropdown",
-          placeholder: "نموذج التسجيل",
-          dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
-        },
-      },
-      {
         key: "main_program_slug",
         searchType: {
           type: "dropdown",
@@ -101,7 +93,7 @@ export const SubTableConfig = (slug: string) => {
             totalCountHeader: "x-total-count",
           },
         },
-      },
+      }
     ],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
@@ -128,7 +120,7 @@ export const SubTableConfig = (slug: string) => {
       },
       {
         label: "اعدادات الجدول",
-        action:"openSettingsTable",
+        action: "openSettingsTable",
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
