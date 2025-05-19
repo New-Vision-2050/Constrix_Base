@@ -34,36 +34,36 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
       <div style={{ width: `${depth * 24}px` }} className="flex-shrink-0" />
       <div className="overflow-auto flex-1 mb-3 border-[1px] rounded-lg shadow shadow-[#1415212E] border-[#141521]">
         <Table className=" ">
-          <TableHeader className="bg-[#18003A]">
+          <TableHeader className="bg-sidebar">
             <TableRow>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 إسم الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 وصف الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 مدير الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الادارات الفرعية
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الفروع
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الموظفين
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 rtl:text-right">
                 الحالة
               </TableHead>
-              <TableHead className="p-3 py-4 ltr:text-right text-[#EAEAFF]/87">
+              <TableHead className="p-3 py-4 ltr:text-right">
                 الاعدادات
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow className="bg-[#140F35] border-t border-dashed">
+            <TableRow className="bg-sidebar/70 border-t border-dashed">
               <TableCell className="p-3 py-4">{node.name || "N/A"}</TableCell>
               <TableCell className="p-3 py-4">
                 {node.description || "N/A"}
