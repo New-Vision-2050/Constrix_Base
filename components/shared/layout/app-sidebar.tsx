@@ -109,7 +109,6 @@ export function AppSidebar({
       ],
       isNotCentral: true,
     },
-    // HumanResources organizational structure
     {
       name: t("Sidebar.HumanResources"),
       icon: LayoutDashboardIcon,
@@ -124,7 +123,7 @@ export function AppSidebar({
           isActive: pageName === ROUTER.Organizational_Structure,
         },
       ],
-      isNotCentral: true,
+      isNotCentral: false,
     },
     // program management
     {
