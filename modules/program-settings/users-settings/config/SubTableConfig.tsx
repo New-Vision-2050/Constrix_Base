@@ -76,7 +76,6 @@ export const SubTableConfig = (slug: string) => {
           },
         },
       },
-
       {
         key: "main_program_slug",
         searchType: {
@@ -121,7 +120,7 @@ export const SubTableConfig = (slug: string) => {
       },
       {
         label: "اعدادات الجدول",
-        action:"openSettingsTable",
+        action: "openSettingsTable",
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
