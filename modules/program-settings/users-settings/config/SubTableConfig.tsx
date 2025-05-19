@@ -77,11 +77,21 @@ export const SubTableConfig = (slug: string) => {
         },
       },
       {
-        key: "registered_form",
+        key: "registration_form_id",
         searchType: {
           type: "dropdown",
           placeholder: "نموذج التسجيل",
-          dropdownOptions: [{ value: "form 1", label: "نموذج 1" }],
+          dynamicDropdown: {
+            url: `${baseURL}/sub_entities/super_entities/registration_forms?super_entity_id=${slug}`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
         },
       },
       {
@@ -128,7 +138,7 @@ export const SubTableConfig = (slug: string) => {
       },
       {
         label: "اعدادات الجدول",
-        action:"openSettingsTable",
+        action: "openSettingsTable",
         dialogComponent: SheetFormBuilder,
         dialogProps: (row: Entity) => {
           return {
