@@ -3,6 +3,7 @@ import React from "react";
 import NodeRow from "./NodeRow";
 import NodeDetailsRow from "./NodeDetailsRow";
 import { OrgChartNode } from "@/types/organization";
+import { DropdownItemT } from "@/components/shared/dropdown-button";
 
 interface ListViewNodeProps {
   node: OrgChartNode;
@@ -14,6 +15,7 @@ interface ListViewNodeProps {
   expandedDetails: Set<string>;
   onToggleNodeExpansion: (nodeId: string) => void;
   onToggleDetailsExpansion: (node: OrgChartNode) => void;
+  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
 }
 
 const ListViewNode: React.FC<ListViewNodeProps> = ({
@@ -21,6 +23,7 @@ const ListViewNode: React.FC<ListViewNodeProps> = ({
   parentName,
   depth,
   path,
+  DropDownMenu,
   selectedNodeId,
   expandedNodes,
   expandedDetails,
@@ -46,6 +49,7 @@ const ListViewNode: React.FC<ListViewNodeProps> = ({
       <NodeDetailsRow
         node={node}
         depth={depth}
+        DropDownMenu={DropDownMenu}
         isExpanded={expandedDetails.has(node.id?.toString())}
       />
     </React.Fragment>
