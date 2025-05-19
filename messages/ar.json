@@ -321,6 +321,61 @@
     }
   },
   "CompanyStructure": {
+    "actions": {
+      "viewMode": "عرض",
+      "exportPdf": "تصدير PDF",
+      "setAsParent": "تعيين كأب",
+      "treeView": "عرض شجري",
+      "listView": "عرض قائمة"
+    },
+    "cards": {
+      "users": {
+        "title": "مؤشر عدد الموظفين",
+        "subtitle": "اجمالي عدد الموظفين",
+        "reminderStatement": "عدد الموظفين المتبقية",
+        "achievedStatement": "عدد الموظفين المستخدمة"
+      },
+      "departments": {
+        "title": "مؤشر عدد الأقسام الفرعية",
+        "subtitle": "اجمالي عدد الأقسام الفرعية",
+        "reminderStatement": "عدد الأقسام الفرعية المتبقية",
+        "achievedStatement": "عدد الأقسام الفرعية المستخدمة"
+      },
+      "managements": {
+        "title": "مؤشر عدد الادارات الرئيسية",
+        "subtitle": "اجمالي عدد الادارات الرئيسية",
+        "reminderStatement": "عدد الادارات الرئيسية المتبقية",
+        "achievedStatement": "عدد الادارات الرئيسية المستخدمة"
+      },
+      "branches": {
+        "title": "مؤشر عدد الفروع",
+        "subtitle": "اجمالي عدد الفروع",
+        "reminderStatement": "عدد الفروع المتبقية",
+        "achievedStatement": "عدد الفروع المستخدمة"
+      }
+    },
+    "tabs": {
+      "mainTabs": {
+        "organizational-structure-main-tab-1": {
+          "title": "الهيكل التنظيمي",
+          "tabs": {
+            "companyStructure": { "title": "بنية الشركة" },
+            "usersStructure": { "title": "هيكل الموظفين" },
+            "managements": { "title": "الادارات" }
+          }
+        },
+        "organizational-structure-main-tab-2": {
+          "title": "أعدادات الهيكل",
+          "tabs": {
+            "jobTitles": { "title": "المسميات الوظيفية" },
+            "jobTypes": { "title": "أنواع الوظائف" }
+          }
+        }
+      }
+    },
+    "CompanyOrganizationalStructure": {
+      "loading": "تحميل بيانات الهيكل التنظيمي..."
+    },
     "ManagementStructure": {
       "loading": "تحميل بيانات الإدارات...",
       "confirmDelete": "هل انت متأكد من حذف هذه الإدارة؟"
