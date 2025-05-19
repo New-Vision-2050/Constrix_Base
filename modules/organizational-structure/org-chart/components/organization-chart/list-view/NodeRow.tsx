@@ -30,7 +30,7 @@ const NodeRow: React.FC<NodeRowProps> = ({
     <div className="flex items-center">
       <div style={{ width: `${depth * 24}px` }} className="flex-shrink-0"/>
       <div
-        className={`${depth === 0 ? 'bg-[#2D174D] mb-[12px]' : 'bg-[#463D5D] mb-[18px]'} rounded-xl flex-1 flex items-center p-4 gap-2 shadow-sm shadow-[#1415212E]`}>
+        className={`${depth === 0 ? 'bg-[var(--list-node-background)] mb-[12px]' : 'bg-[var(--list-sub-node-background)] mb-[18px]'} rounded-xl flex-1 flex items-center p-4 gap-2 shadow-sm shadow-[#1415212E]`}>
         {node.children.length > 0 ? (
           <Button
             variant="ghost"
@@ -47,7 +47,7 @@ const NodeRow: React.FC<NodeRowProps> = ({
           <div className="w-10 mr-1"/>
         )}
         <div className="flex flex-1 gap-5 items-center">
-          <h3 className="font-bold text-white text-lg">{node.name}</h3>
+          <h3 className="font-bold text-lg">{node.name}</h3>
           <div className="flex flex-1 gap-3">
             {node?.user_count ? <div
               className="w-1/2 p-1 flex-1 min-w-[82px] max-w-[130px] bg-[#512B4F] rounded-2xl text-[12px] text-primary flex justify-center items-center">{node?.user_count} موظف</div> : ''}

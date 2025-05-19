@@ -4,6 +4,10 @@
 
 @layer base {
   :root {
+    --list-node-background: #F3F4F6;
+
+    --list-sub-node-background: #d4d6d9;
+
     --background: 0 0% 100%;
 
     --foreground: 0 0% 3.9%;
@@ -77,6 +81,10 @@
     --purple: 248 44% 38%;
   }
   .dark {
+    --list-node-background: #2D174D;
+
+    --list-sub-node-background: #463D5D;
+
     --background: 265 100% 11%;
 
     --foreground: 0 0% 98%;
