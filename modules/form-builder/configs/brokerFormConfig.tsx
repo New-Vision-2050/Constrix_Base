@@ -11,7 +11,7 @@ export function brokerFormConfig(
   return {
     formId,
     title: "اضافة وسيط",
-    apiUrl: `${baseURL}/write-url`,
+    apiUrl: `${baseURL}/company-users/brokers`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -21,7 +21,7 @@ export function brokerFormConfig(
         collapsible: false,
         fields: [
           {
-            name: "broker_name",
+            name: "name",
             label: "اسم الوسيط",
             type: "text",
             placeholder: "ادخل اسم الوسيط",
@@ -50,19 +50,18 @@ export function brokerFormConfig(
             render: () => (
               <PickupMap
                 formId={formId}
-                keysToUpdate={["latitude", "longitude"]}
+                keysToUpdate={[
+                  "latitude",
+                  "longitude",
+                  "country_id",
+                  "state_id",
+                  "city_id",
+                  "neighborhood_name",
+                  "postal_code",
+                  "street_name",
+                ]}
                 inGeneral={true}
               />
-            ),
-          },
-          {
-            label: "",
-            name: "",
-            type: "text",
-            render: () => (
-              <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-              </p>
             ),
           },
           {
@@ -70,37 +69,111 @@ export function brokerFormConfig(
             label: "latitude",
             placeholder: "latitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل دائرة العرض",
-              },
-            ],
           },
           {
             name: "longitude",
             label: "longitude",
             placeholder: "longitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل خط الطول",
-              },
-            ],
+          },
+          {
+            type: "select",
+            name: "country_id",
+            label: "الدولة",
+            placeholder: "الدولة",
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            type: "select",
+            name: "state_id",
+            label: "المنطقة",
+            placeholder: "المنطقة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "country_id",
+              filterParam: "country_id",
+            },
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            type: "select",
+            name: "city_id",
+            label: "المدينة",
+            placeholder: "المدينة",
+            dynamicOptions: {
+              url: `${baseURL}/countries/get-country-states-cities`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "state_id",
+              filterParam: "state_id",
+            },
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "neighborhood_name",
+            label: "الحي",
+            type: "text",
+            placeholder: "الحي",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "building_number",
+            label: "رقم المبنى",
+            type: "text",
+            placeholder: "رقم المبنى",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "additional_phone",
+            label: "الرقم الاضافي",
+            type: "phone",
+            placeholder: "الرقم الاضافي",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "postal_code",
+            label: "الرمز البريدي",
+            type: "text",
+            placeholder: "الرمز البريدي",
+            condition: (values) => !!values["country_id"],
+          },
+          {
+            name: "street_name",
+            label: "الشارع",
+            type: "text",
+            placeholder: "الشارع",
+            condition: (values) => !!values["country_id"],
           },
           {
             name: "identity",
             label: "رقم الهوية",
             type: "text",
             placeholder: "رقم الهوية",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "رقم الهوية مطلوب",
-              },
-            ],
           },
           {
             name: "email",
@@ -153,14 +226,13 @@ export function brokerFormConfig(
             ],
           },
           {
-            name: "company_field_id",
-            label: "الفرع - ستاتيك",
+            name: "branch_ids",
+            label: "الفروع",
             type: "select",
             isMulti: true,
-            placeholder: "اختر الفرع",
-            required: true,
+            placeholder: "اختر الفروع",
             dynamicOptions: {
-              url: `${baseURL}/company_fields`,
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -170,25 +242,12 @@ export function brokerFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "برجاء اختيار الفرع",
-              },
-            ],
           },
           {
             name: "message_address",
             label: "عنوان المراسلات",
             type: "email",
-            placeholder:"ادخل عنوان المراسلات",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "عنوان المراسلات مطلوب",
-              },
-            ],
+            placeholder: "ادخل عنوان المراسلات",
           },
         ],
       },
