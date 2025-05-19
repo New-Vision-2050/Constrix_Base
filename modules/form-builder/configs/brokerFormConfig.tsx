@@ -170,7 +170,7 @@ export function brokerFormConfig(
             condition: (values) => !!values["country_id"],
           },
           {
-            name: "identity",
+            name: "residence",
             label: "رقم الهوية",
             type: "text",
             placeholder: "رقم الهوية",
