@@ -68,32 +68,32 @@ export const JobFormConfig = () => {
               },
             ],
           },
-          {
-            name: "department_id",
-            label: "القسم",
-            type: "select",
-            placeholder: "القسم",
-            required: true,
-            dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=department&company_id=${
-                companyId || company?.id
-              }`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              totalCountHeader: "X-Total-Count",
+          // {
+          //   name: "department_id",
+          //   label: "القسم",
+          //   type: "select",
+          //   placeholder: "القسم",
+          //   required: true,
+          //   dynamicOptions: {
+          //     url: `${baseURL}/management_hierarchies/list?type=department&company_id=${
+          //       companyId || company?.id
+          //     }`,
+          //     valueField: "id",
+          //     labelField: "name",
+          //     searchParam: "name",
+          //     paginationEnabled: true,
+          //     totalCountHeader: "X-Total-Count",
 
-              dependsOn: "management_id",
-              filterParam: "parentId",
-            },
-            validation: [
-              {
-                type: "required",
-                message: "القسم مطلوب",
-              },
-            ],
-          },
+          //     dependsOn: "management_id",
+          //     filterParam: "parentId",
+          //   },
+          //   validation: [
+          //     {
+          //       type: "required",
+          //       message: "القسم مطلوب",
+          //     },
+          //   ],
+          // },
           {
             name: "job_type_id",
             label: "نوع الوظيفة",
@@ -101,7 +101,9 @@ export const JobFormConfig = () => {
             placeholder: "نوع الوظيفة",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_types/list`,
+              url: `${baseURL}/job_types/list?company_id=${
+                companyId || company?.id
+              }`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -125,7 +127,9 @@ export const JobFormConfig = () => {
             placeholder: "المسمى الوظيفي",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_titles/list`,
+              url: `${baseURL}/job_titles/list?company_id=${
+                companyId || company?.id
+              }`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -134,6 +138,8 @@ export const JobFormConfig = () => {
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "job_type_id",
+              filterParam: "job_type_id",
             },
             validation: [
               {
