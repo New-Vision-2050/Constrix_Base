@@ -1,17 +1,20 @@
 import RegularList from "../../RegularList";
 import { SetStateAction } from "react";
 import { Project } from "@/types/sidebar-menu";
+import { useRouter } from "next/navigation";
 
 type PropsT = {
   projects: Project[];
   activeProject: Project;
   setActiveProject: React.Dispatch<SetStateAction<Project>>;
+  handleSub_entitiesItemClick: (url: string) => void;
 };
 
 export default function ShowMainProjects({
   activeProject,
   setActiveProject,
   projects,
+  handleSub_entitiesItemClick,
 }: PropsT) {
   return (
     <div className="w-full">
@@ -25,6 +28,7 @@ export default function ShowMainProjects({
         projects={projects}
         activeProject={activeProject}
         setActiveProject={setActiveProject}
+        handleSub_entitiesItemClick={handleSub_entitiesItemClick}
       />
     </div>
   );
@@ -34,17 +38,28 @@ type MainProjectsListProps = {
   projects: Project[];
   activeProject: Project;
   setActiveProject: React.Dispatch<SetStateAction<Project>>;
+  handleSub_entitiesItemClick: (url: string) => void;
 };
 
 const MainProjectsList = (props: MainProjectsListProps) => {
   // declare and define component state and variables
-  const { projects, activeProject, setActiveProject } = props;
+  const {
+    projects,
+    activeProject,
+    setActiveProject,
+    handleSub_entitiesItemClick,
+  } = props;
   // declare and define helper methods
+  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProject =
       projects.find((project) => project.name === e.target.value) ||
       projects?.[0];
     setActiveProject(selectedProject);
+    if (selectedProject?.sub_entities?.[0]?.url) {
+      router.push(selectedProject.sub_entities[0].url);
+      handleSub_entitiesItemClick(selectedProject.sub_entities[0].url);
+    }
   };
 
   return (
