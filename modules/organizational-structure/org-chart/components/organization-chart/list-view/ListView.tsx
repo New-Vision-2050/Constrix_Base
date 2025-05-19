@@ -6,12 +6,14 @@ import ListViewSearch from "./ListViewSearch";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { exportToCSV, prepareOrgDataForExport } from "../utils/exportUtils";
+import { DropdownItemT } from "@/components/shared/dropdown-button";
 
 interface ListViewProps {
   data: OrgChartNode;
   onSelectNode: (node: OrgChartNode) => void;
   selectedNodeId: string | null;
   additionalActions?: React.ReactNode;
+  DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
 }
 
 const ListView: React.FC<ListViewProps> = ({
@@ -19,6 +21,7 @@ const ListView: React.FC<ListViewProps> = ({
   onSelectNode,
   selectedNodeId,
   additionalActions,
+  DropDownMenu,
 }) => {
   const {
     expandedNodes,
@@ -71,6 +74,7 @@ const ListView: React.FC<ListViewProps> = ({
               parentName={parentName}
               depth={depth}
               path={path}
+              DropDownMenu={DropDownMenu}
               selectedNodeId={selectedNodeId}
               expandedNodes={expandedNodes}
               expandedDetails={expandedDetails}
