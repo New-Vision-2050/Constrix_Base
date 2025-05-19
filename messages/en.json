@@ -321,6 +321,61 @@
     }
   },
   "CompanyStructure": {
+    "actions": {
+      "viewMode": "View Mode",
+      "exportPdf": "Export PDF",
+      "setAsParent": "Set as Parent",
+      "treeView": "Tree View",
+      "listView": "List View"
+    },
+    "cards": {
+      "users": {
+        "title": "Number of Employees Indicator",
+        "subtitle": "Total Number of Employees",
+        "reminderStatement": "Number of Employees Remaining",
+        "achievedStatement": "Number of Employees Used"
+      },
+      "departments": {
+        "title": "Number of Sub-Departments Indicator",
+        "subtitle": "Total Number of Sub-Departments",
+        "reminderStatement": "Number of Sub-Departments Remaining",
+        "achievedStatement": "Number of Sub-Departments Used"
+      },
+      "managements": {
+        "title": "Number of Main Departments Indicator",
+        "subtitle": "Total Number of Main Departments",
+        "reminderStatement": "Number of Main Departments Remaining",
+        "achievedStatement": "Number of Main Departments Used"
+      },
+      "branches": {
+        "title": "Number of Branches Indicator",
+        "subtitle": "Total Number of Branches",
+        "reminderStatement": "Number of branches remaining",
+        "achievedStatement": "Number of branches used"
+      }
+    },
+    "tabs": {
+      "mainTabs": {
+        "organizational-structure-main-tab-1": {
+          "title": "Organizational Structure",
+          "tabs": {
+            "companyStructure": { "title": "Company Structure" },
+            "usersStructure": { "title": "Employee Structure" },
+            "managements": { "title": "Departments" }
+          }
+        },
+        "organizational-structure-main-tab-2": {
+          "title": "Structure Settings",
+          "tabs": {
+            "jobTitles": { "title": "Job Titles" },
+            "jobTypes": { "title": "Job Types" }
+          }
+        }
+      }
+    },
+    "CompanyOrganizationalStructure": {
+      "loading": "Loading organizational structure data..."
+    },
     "ManagementStructure": {
       "loading": "Loading Managements data...",
       "confirmDelete": "Are you sure you want to delete this management?"

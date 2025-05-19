@@ -11,9 +11,11 @@ import StatisticsCard, {
 } from "./StatisticsCard";
 import { useOrgStructureCxt } from "../context/OrgStructureCxt";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 export default function StatisticsCardsList() {
   const { widgets } = useOrgStructureCxt();
+  const t = useTranslations("CompanyStructure.cards");
 
   const statisticsCardsList: CardInfoT[] = useMemo(() => {
     if (!widgets) return [];
@@ -37,62 +39,62 @@ export default function StatisticsCardsList() {
     return [
       {
         number: widgets?.users?.total_users ?? 0,
-        title: "مؤشر عدد الموظفين",
-        description: "اجمالي عدد الموظفين",
-        icon: <UserIcon color="pink" />,
+        title: t("users.title"),
+        description: t("users.subtitle"),
+        icon: <UserIcon color="blue" />,
         progressBarValue: usersTotal,
         leftSideInfo: {
           count: String(widgets?.users?.users_with_hierarchy ?? 0),
-          description: "عدد الموظفين المستخدمة",
+          description: t("users.achievedStatement"),
         },
         rightSideInfo: {
           count: String(widgets?.users?.users_without_hierarchy ?? 0),
-          description: "عدد الموظفين المتبقية",
+          description: t("users.reminderStatement"),
         },
       },
       {
         number: widgets?.branches?.total_count ?? 0,
-        title: "مؤشر عدد الفروع",
-        description: "اجمالي عدد الفروع",
+        title: t("branches.title"),
+        description: t("branches.subtitle"),
         icon: <MapPin color="green" />,
         progressBarValue: branchesTotal,
         leftSideInfo: {
           count: String(widgets?.branches?.used_count ?? 0),
-          description: "عدد الفروع المستخدمة",
+          description: t("branches.achievedStatement"),
         },
         rightSideInfo: {
           count: String(widgets?.branches?.unused_count ?? 0),
-          description: "عدد الفروع المتبقية",
+          description: t("branches.reminderStatement"),
         },
       },
       {
         number: widgets?.management?.total_count ?? 0,
-        title: "مؤشر عدد الادارات الرئيسية",
-        description: "اجمالي عدد الادارات الرئيسية",
+        title: t("managements.title"),
+        description: t("managements.subtitle"),
         icon: <BackpackIcon color="pink" />,
         progressBarValue: managementsTotal,
         leftSideInfo: {
           count: String(widgets?.management?.used_count ?? 0),
-          description: "عدد الادارات الرئيسية المستخدمة",
+          description: t("managements.achievedStatement"),
         },
         rightSideInfo: {
           count: String(widgets?.management?.unused_count ?? 0),
-          description: "عدد الادارات الرئيسية المتبقية",
+          description: t("managements.reminderStatement"),
         },
       },
       {
         number: widgets?.departments?.total_count ?? 0,
-        title: "مؤشر عدد الادارات الفرعية",
-        description: "اجمالي عدد الادارات الفرعية",
+        title: t("departments.title"),
+        description: t("departments.subtitle"),
         icon: <ChartColumnStacked color="orange" />,
         progressBarValue: departmentsTotal ?? 0,
         leftSideInfo: {
           count: String(widgets?.departments?.used_count ?? 0),
-          description: "عدد الادارات الفرعية المستخدمة",
+          description: t("departments.achievedStatement"),
         },
         rightSideInfo: {
           count: String(widgets?.departments?.unused_count ?? 0),
-          description: "عدد الادارات الفرعية المتبقية",
+          description: t("departments.reminderStatement"),
         },
       },
     ];

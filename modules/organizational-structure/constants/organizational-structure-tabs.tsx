@@ -5,22 +5,22 @@ import CompanyOrganizationStructure from "@/modules/organizational-structure/com
 import CompanyManagementsStructure from "@/modules/organizational-structure/components/company-management-structure";
 import UsersStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/employees-structure";
 
-export const OrganizationalStructureSubTabs: SystemTab[] = [
+export const OrganizationalStructureSubTabs = (t: (key: string) => string): SystemTab[] => [
   {
     id: "organizational-structure-sub-tab-company-structure",
-    title: "بنية الشركة",
+    title: t("companyStructure.title"),
     icon: <LayoutDashboardIcon />,
     content: <CompanyOrganizationStructure />,
   },
   {
     id: "organizational-structure-sub-tab-employees",
-    title: "هيكل الموظفين",
+    title: t("usersStructure.title"),
     icon: <UserIcon />,
     content: <UsersStructureTab />,
   },
   {
     id: "organizational-structure-sub-tab-managements",
-    title: "الادارات",
+    title: t("managements.title"),
     icon: <BackpackIcon />,
     content: <CompanyManagementsStructure />,
   },
