@@ -36,34 +36,34 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
         <Table className=" ">
           <TableHeader className="bg-sidebar">
             <TableRow>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 إسم الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 وصف الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 مدير الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 عدد الادارات الفرعية
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 عدد الفروع
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 عدد الموظفين
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              <TableHead className="p-3 py-4 rtl:text-right text-[#EAEAFF]/87">
                 الحالة
               </TableHead>
-              <TableHead className="p-3 py-4 ltr:text-right">
+              <TableHead className="p-3 py-4 ltr:text-right text-[#EAEAFF]/87">
                 الاعدادات
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow className="bg-sidebar/70 border-t border-dashed">
+            <TableRow className="bg-[#140F35] border-t border-dashed">
               <TableCell className="p-3 py-4">{node.name || "N/A"}</TableCell>
               <TableCell className="p-3 py-4">
                 {node.description || "N/A"}
