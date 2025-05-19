@@ -45,6 +45,7 @@ export function SidebarProgramsList({ projects }: PropsT) {
           projects={projects}
           activeProject={activeProject}
           setActiveProject={setActiveProject}
+          handleSub_entitiesItemClick={handleSub_entitiesItemClick}
         />
 
         <ShowSubPrograms
