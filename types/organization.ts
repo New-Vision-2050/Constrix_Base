@@ -39,6 +39,8 @@ export interface OrgChartNode {
   deputy_managers?: OrgChartManager[];
   person?: PersonData;
   children: OrgChartNode[];
+  list?: OrgChartNode[];
+  [key: string]: any;
 }
 
 export interface OrgChartConfig {
