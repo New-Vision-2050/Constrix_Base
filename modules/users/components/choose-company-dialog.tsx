@@ -56,7 +56,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
               >
                 <img
                   title={company?.name}
-                  src={company?.logo ?? LogoPlaceholder}
+                  src={company?.logo ?? LogoPlaceholder.src}
                   width={70}
                   height={70}
                   className="rounded-2xl"
