@@ -39,3 +39,31 @@ li.tree-fix-ar{
 .no-select {
   user-select: none !important;
 }
+
+.combined-nodes-wrapper{
+  > li {
+    padding: 0;
+    &:not(:last-child){
+    margin-bottom: var(--tree-node-padding);
+     }
+    &:before,
+    &:after{
+      display: none;
+    }
+    & .node-content{
+    max-width: 100%;
+      }
+  }
+}
+.combined-nodes-container{
+  @apply shadow ring-2 ring-secondary rounded-lg shadow p-4 bg-sidebar/50;
+  &.list-management{
+    @apply ring-[#18CB5F]/40
+  }
+  &.list-branch{
+   @apply ring-[#F19B02]/40
+  }
+  &.list-department{
+   @apply ring-[#F42588]/40
+  }
+}

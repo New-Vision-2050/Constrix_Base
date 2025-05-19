@@ -12,6 +12,7 @@ import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
 import { printChart } from "./utils/printChart";
+import { orgTreeReOrganizationPayload } from '@/modules/organizational-structure/org-chart/components/organization-chart/utils'
 
 interface OrganizationChartProps {
   data: OrgChartNode;
@@ -22,6 +23,7 @@ interface OrganizationChartProps {
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   listModeDropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   handleDeleteManagement?: (id: string | number) => void;
+  reOrganize?: {concatKey: string, concatValue: string | number| undefined}
 }
 
 const OrganizationChart = ({
@@ -31,6 +33,7 @@ const OrganizationChart = ({
   DropDownMenu,
   listModeDropDownMenu,
   listViewAdditionalActions,
+  reOrganize
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
@@ -48,9 +51,16 @@ const OrganizationChart = ({
 
   // Set original data on component mount
   useEffect(() => {
-    setOriginalData(data);
-    setDisplayNode(data);
-  }, [data]);
+    if(reOrganize?.concatKey){
+      let newData = orgTreeReOrganizationPayload(data, reOrganize?.concatKey, reOrganize?.concatValue);
+      console.log(newData)
+      setOriginalData(newData);
+      setDisplayNode(newData);
+    }else{
+      setOriginalData(data);
+      setDisplayNode(data);
+    }
+  }, [reOrganize, data]);
 
   // Handle full screen mode
   const toggleFullScreen = () => {
@@ -333,6 +343,7 @@ const OrganizationChart = ({
                   DropDownMenu={DropDownMenu}
                   onAddBtnClick={onAddBtnClick}
                   selectedNodeId={selectedNode?.id || null}
+                  reOrganize={reOrganize}
                 />
               ))}
             </Tree>
