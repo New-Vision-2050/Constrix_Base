@@ -5,6 +5,7 @@ import { TableBuilder } from "@/modules/table";
 import { OrgStructureSettingsTableConfig } from "./table-config";
 import { OrgStructureSettingsFormConfig } from "./form-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import { ArrowDownNarrowWide } from "lucide-react";
 
 export default function OrgStructureJobTitlesSetting() {
   // ** declare nad define component state and state
@@ -32,6 +33,10 @@ export default function OrgStructureJobTitlesSetting() {
               trigger={<Button>اضافة المسمى الوظيفي</Button>}
               onSuccess={handleFormSuccess}
             />
+            <Button variant="outline" size="sm" disabled>
+              <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+              ترتيب
+            </Button>
           </div>
         }
       />
