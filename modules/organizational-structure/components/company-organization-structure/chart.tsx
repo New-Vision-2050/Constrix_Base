@@ -3,6 +3,7 @@ import OrganizationChart from '@/modules/organizational-structure/org-chart/comp
 import { Loader2 } from 'lucide-react'
 import useOrgTreeData from '@/modules/organizational-structure/hooks/useOrgTreeData'
 import { OrgChartNode } from '@/types/organization'
+import { useTranslations } from 'next-intl'
 
 type PropsT = {
   branchId: string | number;
@@ -10,6 +11,7 @@ type PropsT = {
 
 const BranchOrganizationStructure = (props: PropsT) => {
   const { branchId } = props;
+  const t = useTranslations("CompanyStructure.CompanyOrganizationalStructure");
   const { data: orgData, isLoading, error } = useOrgTreeData(branchId)
 
   return (
@@ -17,7 +19,7 @@ const BranchOrganizationStructure = (props: PropsT) => {
         {isLoading && (
           <div className="flex justify-center items-center h-96">
             <Loader2 className="h-8 w-8 animate-spin text-primary"/>
-            <span className="ltr:ml-2 rtl:mr-2 text-lg text-gray-600">Loading organization data...</span>
+            <span className="ltr:ml-2 rtl:mr-2 text-lg text-gray-600">{t("loading")}</span>
           </div>
         )}
 
