@@ -82,6 +82,18 @@ const BranchManagementsStructure = (props: PropsT) => {
     ];
   };
 
+  const listModeDropDownMenu = (node: OrgChartNode): DropdownItemT[] => {
+    return [
+      {
+        text: "أضافة ادارة",
+        onClick: () => {
+          onAddBtnClick?.(node);
+        },
+      },
+      ...DropDownMenu(node),
+    ];
+  };
+
   const handleDeleteManagement = (id: string | number) => {
     setDeletedId(id as string);
     setOpenDeleteDialog(true);
@@ -131,6 +143,7 @@ const BranchManagementsStructure = (props: PropsT) => {
             data={orgData?.[0] as OrgChartNode}
             onAddBtnClick={(node) => onAddBtnClick(node)}
             DropDownMenu={DropDownMenu}
+            listModeDropDownMenu={listModeDropDownMenu}
             listViewAdditionalActions={
               <>
                 <Button onClick={() => openSheet()}>اضافة ادارة</Button>
