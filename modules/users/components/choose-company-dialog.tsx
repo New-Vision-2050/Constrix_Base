@@ -37,6 +37,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
     }
   }, [open, user, router]);
 
+  // declare and define functions
   const handleRedirect = (id: string, companyId: string) => {
     if (!id) return;
     router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
