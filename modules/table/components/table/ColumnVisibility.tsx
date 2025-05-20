@@ -59,7 +59,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
                 className="h-auto py-1 px-2 text-xs"
                 onClick={onSetAllColumnsVisible}
               >
-                All
+                {t("Table.All")}
               </Button>
               <Button
                 type="button"
@@ -68,7 +68,7 @@ const ColumnVisibility: React.FC<ColumnVisibilityProps> = ({
                 className="h-auto py-1 px-2 text-xs"
                 onClick={onSetMinimalColumnsVisible}
               >
-                Minimal
+                {t("Table.Minimal")}
               </Button>
             </div>
           </div>
