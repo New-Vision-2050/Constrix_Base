@@ -338,7 +338,7 @@ const OrganizationChart = ({
             <ListView
               data={displayNode}
               onSelectNode={handleNodeClick}
-              DropDownMenu={DropDownMenu}
+              DropDownMenu={listModeDropDownMenu || DropDownMenu}
               selectedNodeId={selectedNode?.id || null}
               additionalActions={listViewAdditionalActions}
             />
