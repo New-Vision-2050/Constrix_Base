@@ -111,7 +111,7 @@ const ManagerComponent = ({
   return (
     <div className="flex flex-col items-center flex-grow">
       {label && <p className="text-slate-400">{label}</p>}
-      <p className="text-white">{name}</p>
+      <p>{name}</p>
     </div>
   );
 };
