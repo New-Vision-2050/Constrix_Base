@@ -124,7 +124,7 @@ export function AppSidebar({
           isActive: pageName === ROUTER.Organizational_Structure,
         },
       ],
-      isNotCentral: true,
+      isNotCentral: false,
     },
     // program management
     {
