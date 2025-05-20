@@ -109,7 +109,6 @@ export function AppSidebar({
       ],
       isNotCentral: true,
     },
-    // HumanResources organizational structure
     {
       name: t("Sidebar.HumanResources"),
       icon: LayoutDashboardIcon,
