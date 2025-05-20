@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,24 @@ interface PropsT {
 }
 
 const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
+  // declare and define vars and state
   const router = useRouter();
+  // handle redirect to user profile page if user has one company
+  useEffect(() => {
+    if (
+      open == true &&
+      user?.companies?.length === 1 &&
+      user?.companies[0]?.users?.length
+    ) {
+      const company = user.companies[0];
+      const userId = company?.users?.[0]?.id ?? "";
+      router.push(
+        `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${company?.id}`
+      );
+    }
+  }, [open, user, router]);
 
+  // declare and define functions
   const handleRedirect = (id: string, companyId: string) => {
     if (!id) return;
     router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
