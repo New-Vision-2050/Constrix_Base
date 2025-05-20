@@ -171,13 +171,43 @@ export function AppSidebar({
       ],
       isNotCentral: false,
     },
+    {
+      name: t("Sidebar.Settings"),
+      icon: SettingsIcon,
+      isActive: settingsRoutesNames.indexOf(pageName) !== -1,
+      slug: SUPER_ENTITY_SLUG.SETTINGS,
+      urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+      sub_entities: [
+        {
+          name: t("Sidebar.UserProfileSettings"),
+          url: ROUTER.USER_PROFILE,
+          icon: UserIcon,
+          isActive: pageName === ROUTER.USER_PROFILE,
+        },
+        {
+          name: "اعداد ملف الشركة",
+          url: ROUTER.COMPANY_PROFILE,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.COMPANY_PROFILE,
+        },
+        {
+          name: t("Sidebar.SystemSettings"),
+          url: ROUTER.SETTINGS,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.SETTINGS,
+        },
+      ],
+      isNotCentral: true,
+    },
   ];
 
   const projects = isCentral
-    ? SidebarProjects
+    ? SidebarProjects.filter((ele) => ele.isNotCentral)
     : SidebarProjects.filter((ele) => !ele.isNotCentral);
 
-  const all = mergeProjectsAndMenu(projects, menu);
+  const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
+
+  console.log("Breakpoint110: Projects merged", all);
 
   return (
     <Sidebar

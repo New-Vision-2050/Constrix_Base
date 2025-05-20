@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { SparklesCore } from "@/modules/auth/components/sparkles-core";
@@ -6,6 +6,8 @@ import { AppSidebar } from "./app-sidebar";
 import { useLocale } from "next-intl";
 import Header from "./header";
 import { useTheme } from "next-themes";
+import { useEffect } from "react";
+import { useSidebarStore } from "@/store/useSidebarStore";
 
 export default function MainLayout({
   children,
@@ -22,7 +24,17 @@ export default function MainLayout({
   const isRtl = locale === "ar";
 
   const { theme } = useTheme();
-  const isLight = theme === "light" 
+  const isLight = theme === "light";
+
+  // handle side effects - clear side-menu when page reload
+  useEffect(() => {
+    const navType = performance.getEntriesByType("navigation")?.[0]
+      ?.type as string;
+
+    if (navType === "reload") {
+      useSidebarStore.getState().clearMenu();
+    }
+  }, []);
 
   return (
     <main className="relative" dir={isRtl ? "rtl" : "ltr"}>
