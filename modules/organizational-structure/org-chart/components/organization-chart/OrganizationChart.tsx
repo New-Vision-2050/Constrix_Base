@@ -19,6 +19,7 @@ interface OrganizationChartProps {
   onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
+  listModeDropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   handleDeleteManagement?: (id: string | number) => void;
 }
 
@@ -27,6 +28,7 @@ const OrganizationChart = ({
   listView = true,
   onAddBtnClick,
   DropDownMenu,
+  listModeDropDownMenu,
   listViewAdditionalActions,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
@@ -199,7 +201,7 @@ const OrganizationChart = ({
   //   pos.current.y = parseInt(chartTreeRef.current.style.top || 0);
   //   document.body.style.cursor = 'default';
   // };
-
+  
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest(".node-content")) return;
     if (!chartContainerRef.current) return;
@@ -336,7 +338,7 @@ const OrganizationChart = ({
             <ListView
               data={displayNode}
               onSelectNode={handleNodeClick}
-              DropDownMenu={DropDownMenu}
+              DropDownMenu={listModeDropDownMenu || DropDownMenu}
               selectedNodeId={selectedNode?.id || null}
               additionalActions={listViewAdditionalActions}
             />
