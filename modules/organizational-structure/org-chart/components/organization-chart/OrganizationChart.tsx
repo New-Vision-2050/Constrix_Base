@@ -11,6 +11,7 @@ import { exportChartAsPDF } from "./utils/pdfExportUtils";
 import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
+import { printChart } from "./utils/printChart";
 
 interface OrganizationChartProps {
   data: OrgChartNode;
@@ -19,6 +20,7 @@ interface OrganizationChartProps {
   onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
+  listModeDropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   handleDeleteManagement?: (id: string | number) => void;
 }
 
@@ -27,6 +29,7 @@ const OrganizationChart = ({
   listView = true,
   onAddBtnClick,
   DropDownMenu,
+  listModeDropDownMenu,
   listViewAdditionalActions,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
@@ -100,11 +103,11 @@ const OrganizationChart = ({
   const handleNodeClick = (node: OrgChartNode) => {
     setSelectedNode(node);
 
-    toast({
-      title: node.name,
-      description: `${node.type}`,
-      duration: 3000,
-    });
+    // toast({
+    //   title: node.name,
+    //   description: `${node.type}`,
+    //   duration: 3000,
+    // });
 
     // Scroll to focus on selected node with delay to allow render
     if (viewMode === "tree") {
@@ -170,6 +173,10 @@ const OrganizationChart = ({
       `organization-chart-${displayNode.name}.pdf`
     );
   };
+  const handlePrint = () => {
+    const chartElement = chartTreeRef.current;
+    printChart(chartElement);
+  };
 
   // const locale = useLocale();
   // const pos = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
@@ -199,7 +206,7 @@ const OrganizationChart = ({
   //   pos.current.y = parseInt(chartTreeRef.current.style.top || 0);
   //   document.body.style.cursor = 'default';
   // };
-
+  
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest(".node-content")) return;
     if (!chartContainerRef.current) return;
@@ -268,6 +275,7 @@ const OrganizationChart = ({
         listView={listView}
         onViewModeChange={handleViewModeChange}
         onExportPDF={viewMode === "tree" ? handleExportPDF : undefined}
+        onPrint={viewMode === "tree" ? handlePrint : undefined}
         isFullScreen={isFullScreen}
         onToggleFullScreen={toggleFullScreen}
       />
@@ -336,7 +344,7 @@ const OrganizationChart = ({
             <ListView
               data={displayNode}
               onSelectNode={handleNodeClick}
-              DropDownMenu={DropDownMenu}
+              DropDownMenu={listModeDropDownMenu || DropDownMenu}
               selectedNodeId={selectedNode?.id || null}
               additionalActions={listViewAdditionalActions}
             />

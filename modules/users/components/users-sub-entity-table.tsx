@@ -5,6 +5,7 @@ import { baseURL } from "@/config/axios-config";
 import {
   REGISTRATION_FORMS,
   REGISTRATION_FORMS_SLUGS,
+  REGISTRATION_TABLES,
 } from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import {
@@ -35,9 +36,14 @@ const UsersSubEntityTable = ({
   const registration_form_id = subEntity?.registration_form?.id;
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
+
   const registrationFromConfig = registrationFormSlug
     ? REGISTRATION_FORMS[registrationFormSlug]
     : GetCompanyUserFormConfig;
+
+  const RegistrationTableConfig = registrationFormSlug
+    ? REGISTRATION_TABLES[registrationFormSlug]
+    : UsersConfig;
 
   const buttonText =
     subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
@@ -48,8 +54,13 @@ const UsersSubEntityTable = ({
       ? "وسيط"
       : "مستخدم";
 
+  console.log({ registrationFormSlug });
+
   const tableConfig = {
-    ...UsersConfig(),
+    ...RegistrationTableConfig({
+      sub_entity_id: sub_entity_id as string,
+      registration_form_id: subEntity?.registration_form?.id as string,
+    }),
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,
