@@ -323,6 +323,7 @@
   "CompanyStructure": {
     "actions": {
       "viewMode": "عرض",
+      "print": "طباعة",
       "exportPdf": "تصدير PDF",
       "setAsParent": "تعيين كأب",
       "treeView": "عرض شجري",

@@ -322,6 +322,7 @@
   },
   "CompanyStructure": {
     "actions": {
+      "print": "Print",
       "viewMode": "View Mode",
       "exportPdf": "Export PDF",
       "setAsParent": "Set as Parent",
