@@ -21,6 +21,10 @@ const ChartNode: React.FC<ChartNodeProps> = ({
   isFirst = false,
   DropDownMenu,
 }) => {
+  const isDeputyManagersExist =
+    node?.deputy_managers && node?.deputy_managers?.length > 0;
+  const isManagerExist = node?.manager?.name;
+
   return (
     <div
       onClick={(e) => {
@@ -46,15 +50,19 @@ const ChartNode: React.FC<ChartNodeProps> = ({
           />
         )}
       </div>
-      <div className="w-full flex items-center justify-around my-3">
-        {node?.manager?.name && (
+      <div
+        className={`w-full flex items-start ${
+          !isDeputyManagersExist ? "justify-start" : "justify-center"
+        } my-3`}
+      >
+        {isManagerExist && (
           <ManagerComponent
             name={node?.manager?.name as string}
             label="المدير"
           />
         )}
 
-        {node?.deputy_managers && node?.deputy_managers?.length > 0 && (
+        {isDeputyManagersExist && (
           <div className="flex flex-col flex-grow items-start">
             <p className="text-slate-400">المدير النائب</p>
             {node?.deputy_managers?.map((deputy_manager, index) => (
@@ -109,7 +117,7 @@ const ManagerComponent = ({
   name: string;
 }) => {
   return (
-    <div className="flex flex-col items-center flex-grow">
+    <div className="flex flex-col items-start flex-grow">
       {label && <p className="text-slate-400">{label}</p>}
       <p>{name}</p>
     </div>

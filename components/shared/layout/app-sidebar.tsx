@@ -208,8 +208,6 @@ export function AppSidebar({
 
   const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
 
-  console.log("Breakpoint110: Projects merged", all);
-
   return (
     <Sidebar
       collapsible="icon"
