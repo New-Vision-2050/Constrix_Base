@@ -5,10 +5,10 @@ import {
   UserPlus,
   List,
   Trees,
-  Download,
   FileType,
   Maximize,
   Minimize,
+  Printer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -18,7 +18,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { OrgChartNode } from "@/types/organization";
 import { useLocale, useTranslations } from "next-intl";
 
 interface ChartControlsProps {
@@ -34,6 +33,7 @@ interface ChartControlsProps {
   viewMode: "tree" | "list";
   onViewModeChange: (mode: "tree" | "list") => void;
   onExportPDF?: () => void;
+  onPrint: () => void;
   isFullScreen?: boolean;
   onToggleFullScreen?: () => void;
 }
@@ -50,6 +50,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
   viewMode,
   onViewModeChange,
   onExportPDF,
+  onPrint,
   listView,
   isFullScreen = false,
   onToggleFullScreen,
@@ -92,14 +93,19 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             {t("setAsParent")}
           </Button>
         )}
-
+        
         {viewMode === "tree" && onExportPDF && (
           <Button variant="outline" size="sm" onClick={onExportPDF}>
             <FileType className="h-4 w-4" />
             {t("exportPdf")}
           </Button>
         )}
-
+        {viewMode === "tree" && onPrint && (
+          <Button variant="outline" size="sm" onClick={onPrint}>
+            <Printer className="h-4 w-4" />
+            {t("print")}
+          </Button>
+        )}
         {viewMode === "tree" && onToggleFullScreen && (
           <Button
             variant="outline"
@@ -114,7 +120,6 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             )}
           </Button>
         )}
-
         {listView && !isFullScreen && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

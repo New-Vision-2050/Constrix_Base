@@ -11,6 +11,7 @@ import { exportChartAsPDF } from "./utils/pdfExportUtils";
 import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
+import { printChart } from "./utils/printChart";
 
 interface OrganizationChartProps {
   data: OrgChartNode;
@@ -172,6 +173,10 @@ const OrganizationChart = ({
       `organization-chart-${displayNode.name}.pdf`
     );
   };
+  const handlePrint = () => {
+    const chartElement = chartTreeRef.current;
+    printChart(chartElement);
+  };
 
   // const locale = useLocale();
   // const pos = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
@@ -270,6 +275,7 @@ const OrganizationChart = ({
         listView={listView}
         onViewModeChange={handleViewModeChange}
         onExportPDF={viewMode === "tree" ? handleExportPDF : undefined}
+        onPrint={viewMode === "tree" ? handlePrint : undefined}
         isFullScreen={isFullScreen}
         onToggleFullScreen={toggleFullScreen}
       />
