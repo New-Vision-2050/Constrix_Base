@@ -102,11 +102,11 @@ const OrganizationChart = ({
   const handleNodeClick = (node: OrgChartNode) => {
     setSelectedNode(node);
 
-    toast({
-      title: node.name,
-      description: `${node.type}`,
-      duration: 3000,
-    });
+    // toast({
+    //   title: node.name,
+    //   description: `${node.type}`,
+    //   duration: 3000,
+    // });
 
     // Scroll to focus on selected node with delay to allow render
     if (viewMode === "tree") {
