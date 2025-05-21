@@ -33,6 +33,7 @@ export interface OrgChartNode {
   parent_id?: string | number;
   type?: string;
   status?: number;
+  is_main?: number;
   reference_user_id: string;
   manager?: OrgChartManager;
   deputy_manager?: OrgChartManager;

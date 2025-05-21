@@ -5,6 +5,7 @@ import {
   DropdownButton,
   DropdownItemT,
 } from "@/components/shared/dropdown-button";
+import { useMemo } from "react";
 
 interface ChartNodeProps {
   node: OrgChartNode;
@@ -24,6 +25,17 @@ const ChartNode: React.FC<ChartNodeProps> = ({
   const isDeputyManagersExist =
     node?.deputy_managers && node?.deputy_managers?.length > 0;
   const isManagerExist = node?.manager?.name;
+  
+  const nodeDescriptionType = useMemo(() => {
+    switch (node.type) {
+      case "branch":
+        return node?.is_main ? "فرع الادارة العامة" : "فرع الادارة الفرعية";
+      case "management":
+        return node?.is_main ? "الادارة الرئيسية" : "ادارة الفرعية";
+      default:
+        return "Unknown Type";
+    }
+  }, [node]);
 
   return (
     <div
@@ -39,17 +51,23 @@ const ChartNode: React.FC<ChartNodeProps> = ({
         node.children?.length === 1 ? node.children[0]?.type : node?.type
       }`}
     >
-      <div className="w-full flex items-center justify-between">
-        <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5">
-          <DepartmentIcon className={"text-primary"} /> {node.name}
-        </h3>
-        {DropDownMenu && (
-          <DropdownButton
-            triggerButton={<EllipsisVertical />}
-            items={DropDownMenu(node)}
-          />
-        )}
+      <div className="w-full items-start flex flex-col">
+        <div className="w-full flex items-center justify-between">
+          <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5">
+            <DepartmentIcon className={"text-primary"} /> {node.name}
+          </h3>
+          {DropDownMenu && (
+            <DropdownButton
+              triggerButton={<EllipsisVertical />}
+              items={DropDownMenu(node)}
+            />
+          )}
+        </div>
+        <p className="text-slate-400 px-2 truncate text-sm">
+          {nodeDescriptionType}
+        </p>
       </div>
+
       <div
         className={`w-full flex items-start ${
           !isDeputyManagersExist ? "justify-start" : "justify-center"
