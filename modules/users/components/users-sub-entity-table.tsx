@@ -79,6 +79,9 @@ const UsersSubEntityTable = ({
               <SheetFormBuilder
                 config={{
                   ...finalFormConfig(t),
+                  apiParams: {
+                    sub_entity_id: sub_entity_id as string,
+                  },
                   onSuccess: () => {
                     const tableStore = useTableStore.getState();
                     tableStore.reloadTable(TABLE_ID);
