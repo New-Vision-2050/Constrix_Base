@@ -14,8 +14,8 @@ export default function MaritalStatusRelativesSectionPreviewMode({
       <div className="p-2 col-span-2">
         <PreviewTextField
           label="الحالة الاجتماعية"
-          value={relative?.marital_status}
-          valid={Boolean(relative?.marital_status)}
+          value={relative?.marital_status?.name}
+          valid={Boolean(relative?.marital_status?.name)}
           type="select"
         />
       </div>
