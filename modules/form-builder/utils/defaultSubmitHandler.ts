@@ -26,7 +26,10 @@ export const defaultSubmitHandler = async (
     let apiUrl = options?.url;
     let apiMethod = options?.method;
     let apiHeaders;
-    
+    const params = config?.apiParams;
+
+    console.log({ params });
+
     // If URL is not provided in options, determine from config
     if (!apiUrl) {
       if (config.isEditMode) {
@@ -34,24 +37,35 @@ export const defaultSubmitHandler = async (
         apiUrl = config.editApiUrl || config.apiUrl;
 
         // If editApiUrl contains :id placeholder, replace it with recordId from values
-        if (apiUrl && apiUrl.includes(':id') && values.id) {
-          apiUrl = apiUrl.replace(':id', values.id);
+        if (apiUrl && apiUrl.includes(":id") && values.id) {
+          apiUrl = apiUrl.replace(":id", values.id);
         }
       } else {
         // In create mode, use apiUrl
         apiUrl = config.apiUrl;
       }
     }
-    
+
+    if (params && apiUrl) {
+      console.log("in param condition");
+      const url = new URL(apiUrl, window.location.origin);
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+      apiUrl = url.toString();
+    }
+
     // If method is not provided in options, determine from config
     if (!apiMethod) {
       if (config.isEditMode) {
-        apiMethod = config.editApiMethod || 'PUT';
+        apiMethod = config.editApiMethod || "PUT";
       } else {
-        apiMethod = config.apiMethod || 'POST';
+        apiMethod = config.apiMethod || "POST";
       }
     }
-    
+
     // Determine headers from config
     if (config.isEditMode) {
       apiHeaders = config.editApiHeaders || config.apiHeaders;
@@ -93,32 +107,32 @@ export const defaultSubmitHandler = async (
     // Prepare request config by merging headers with any custom config
     const requestConfig = {
       headers: apiHeaders,
-      ...options?.config
+      ...options?.config,
     };
-    
+
     // Make the API request using the specified method
     let response;
 
     switch (apiMethod) {
-      case 'PUT':
+      case "PUT":
         response = await apiClient.put(apiUrl, values, requestConfig);
         break;
-      case 'PATCH':
+      case "PATCH":
         response = await apiClient.patch(apiUrl, values, requestConfig);
         break;
-      case 'DELETE':
+      case "DELETE":
         response = await apiClient.delete(apiUrl, {
           ...requestConfig,
-          data: values
+          data: values,
         });
         break;
-      case 'GET':
+      case "GET":
         response = await apiClient.get(apiUrl, {
           ...requestConfig,
-          params: values
+          params: values,
         });
         break;
-      case 'POST':
+      case "POST":
       default:
         response = await apiClient.post(apiUrl, values, requestConfig);
         break;

@@ -115,7 +115,7 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
-  
+
   // CheckboxGroup sync properties
   syncWithField?: string; // Name of another checkbox group field to sync with
   syncDirection?: "bidirectional" | "unidirectional"; // Whether the sync is two-way or one-way
@@ -252,6 +252,7 @@ export interface FormConfig {
   wizardOptions?: WizardOptions; // Configuration options for wizard/accordion mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
+  apiParams?: Record<string, string | number>;
   apiMethod?: "POST" | "PUT" | "PATCH" | "DELETE"; // HTTP method for form submission in create mode (default: POST)
   apiHeaders?: Record<string, string>; // Custom headers for the API request
   // Edit mode configuration
