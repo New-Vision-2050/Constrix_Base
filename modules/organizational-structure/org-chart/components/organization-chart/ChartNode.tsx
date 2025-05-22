@@ -25,7 +25,7 @@ const ChartNode: React.FC<ChartNodeProps> = ({
   const isDeputyManagersExist =
     node?.deputy_managers && node?.deputy_managers?.length > 0;
   const isManagerExist = node?.manager?.name;
-  
+
   const nodeDescriptionType = useMemo(() => {
     switch (node.type) {
       case "branch":

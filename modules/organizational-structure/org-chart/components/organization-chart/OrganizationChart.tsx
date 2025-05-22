@@ -275,7 +275,7 @@ const OrganizationChart = ({
         listView={listView}
         onViewModeChange={handleViewModeChange}
         onExportPDF={viewMode === "tree" ? handleExportPDF : undefined}
-        onPrint={viewMode === "tree" ? handlePrint : undefined}
+        onPrint={viewMode === "tree" ? handlePrint : () => {}}
         isFullScreen={isFullScreen}
         onToggleFullScreen={toggleFullScreen}
       />
