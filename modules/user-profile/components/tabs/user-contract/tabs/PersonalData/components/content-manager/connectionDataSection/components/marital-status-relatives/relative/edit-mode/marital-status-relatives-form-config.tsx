@@ -29,10 +29,15 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       {
         fields: [
           {
-            name: "marital_status",
+            name: "marital_status_id",
             label: "الحالة الاجتماعية",
             type: "select",
             options: MaritalStatusList,
+            dynamicOptions: {
+              url: `${baseURL}/marital_statuses`,
+              valueField: "id",
+              labelField: "name",
+            },
             placeholder: "الحالة الاجتماعية",
           },
           {
