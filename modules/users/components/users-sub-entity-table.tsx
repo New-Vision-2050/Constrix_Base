@@ -5,6 +5,7 @@ import { baseURL } from "@/config/axios-config";
 import {
   REGISTRATION_FORMS,
   REGISTRATION_FORMS_SLUGS,
+  REGISTRATION_TABLES,
 } from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import {
@@ -35,21 +36,29 @@ const UsersSubEntityTable = ({
   const registration_form_id = subEntity?.registration_form?.id;
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
+
   const registrationFromConfig = registrationFormSlug
     ? REGISTRATION_FORMS[registrationFormSlug]
     : GetCompanyUserFormConfig;
 
+  const RegistrationTableConfig = registrationFormSlug
+    ? REGISTRATION_TABLES[registrationFormSlug]
+    : UsersConfig;
+
   const buttonText =
     subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
       ? "موظف"
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CUSTOMER
+      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CLIENT
       ? "عميل"
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.RESELLER
+      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.BROKER
       ? "وسيط"
       : "مستخدم";
 
+  console.log({ registrationFormSlug });
+
   const tableConfig = {
     ...UsersConfig(),
+    url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,
@@ -70,6 +79,9 @@ const UsersSubEntityTable = ({
               <SheetFormBuilder
                 config={{
                   ...finalFormConfig(t),
+                  apiParams: {
+                    sub_entity_id: sub_entity_id as string,
+                  },
                   onSuccess: () => {
                     const tableStore = useTableStore.getState();
                     tableStore.reloadTable(TABLE_ID);

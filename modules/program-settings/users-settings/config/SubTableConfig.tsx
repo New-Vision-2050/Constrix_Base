@@ -77,6 +77,24 @@ export const SubTableConfig = (slug: string) => {
         },
       },
       {
+        key: "registration_form_id",
+        searchType: {
+          type: "dropdown",
+          placeholder: "نموذج التسجيل",
+          dynamicDropdown: {
+            url: `${baseURL}/sub_entities/super_entities/registration_forms?super_entity_id=${slug}`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
+        },
+      },
+      {
         key: "main_program_slug",
         searchType: {
           type: "dropdown",

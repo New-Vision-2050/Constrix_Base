@@ -129,7 +129,7 @@ export const CreateUserFormConfig = (slug: string) => {
             isMulti: true,
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/allowed_attributes/config`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -154,7 +154,7 @@ export const CreateUserFormConfig = (slug: string) => {
             required: true,
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/attributes`,
+              url: `${baseURL}/sub_entities/super_entities/allowed_attributes/config`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

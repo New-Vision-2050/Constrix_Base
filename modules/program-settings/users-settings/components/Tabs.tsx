@@ -3,6 +3,8 @@ import { Tab } from "@/types/Tab";
 import { Sheet, Table2, Settings, FileCog, Database } from "lucide-react";
 import TableStructure from "./main-table/TableStructure";
 import SubTables from "./sub-tables/SubTable";
+import MainTableContent from "./main-table/MainTableContent";
+import MainTableSettings from "./main-table/MainTableSettings";
 
 export const MainTables: Tab[] = [
   {
@@ -15,11 +17,13 @@ export const MainTables: Tab[] = [
     label: "محتويات الجدول",
     icon: <FileCog size={18} />,
     value: "table-content",
+    component: <MainTableContent />,
   },
   {
     label: "اعدادات الجدول",
     icon: <Settings size={18} />,
     value: "table-settings",
+    component: <MainTableSettings />,
   },
 ];
 
