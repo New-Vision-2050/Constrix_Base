@@ -30,6 +30,13 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
+          label="نوع الحساب البنكي"
+          value={bank?.bank_type_account?.name ?? ""}
+          valid={Boolean(bank?.bank_type_account?.name)}
+        />
+      </div>
+      <div className="p-2">
+        <PreviewTextField
           label="عملة الحساب"
           value={bank?.currency_name ?? ""}
           valid={Boolean(bank?.currency_name)}
