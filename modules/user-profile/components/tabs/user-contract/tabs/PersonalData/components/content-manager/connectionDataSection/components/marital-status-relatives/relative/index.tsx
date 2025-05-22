@@ -3,27 +3,17 @@ import MaritalStatusRelativesSectionEditMode from "./edit-mode";
 import { Relative } from "@/modules/user-profile/types/relative";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
-import { apiClient } from "@/config/axios-config";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
+import { useState } from "react";
 
 type PropsT = {
   relative: Relative;
 };
 export default function RelativeData({ relative }: PropsT) {
   // declare and define component state and vars
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserRelativesData, userContactDataLoading } =
     useConnectionDataCxt();
-
-  // declare and define component methods
-  const handleDeleteRelative = async () => {
-    await apiClient
-      .delete(`/user_relatives/${relative?.id}`)
-      .then(() => {
-        handleRefetchUserRelativesData();
-      })
-      .catch((err) => {
-        console.log("delete bank error", err);
-      });
-  };
 
   return (
     <>
@@ -39,10 +29,19 @@ export default function RelativeData({ relative }: PropsT) {
             {
               title: "حذف",
               onClick: () => {
-                handleDeleteRelative();
+                setDeleteDialog(true);
               },
             },
           ],
+        }}
+      />
+      <DeleteConfirmationDialog
+        deleteUrl={`/user_relatives/${relative?.id}`}
+        onClose={() => setDeleteDialog(false)}
+        open={deleteDialog}
+        onSuccess={() => {
+          handleRefetchUserRelativesData();
+          setDeleteDialog(false);
         }}
       />
     </>
