@@ -78,14 +78,14 @@ export const BankingDataFormConfig = (props: PropsT) => {
           },
           {
             type: "select",
-            name: "type",
+            name: "type_id",
             label: "نوع الحساب",
             placeholder: "اختر نوع الحساب",
-            options: [
-              { label: "أفتراضي", value: "default" },
-              { label: "عهد", value: "custody" },
-              { label: "رواتب", value: "salaries" },
-            ],
+            dynamicOptions: {
+              url: `${baseURL}/bank_type_accounts`,
+              valueField: "id",
+              labelField: "name",
+            },
             validation: [
               {
                 type: "required",
