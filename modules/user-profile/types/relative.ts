@@ -2,7 +2,10 @@ export type Relative = {
   company_id: string;
   global_id: string;
   id: string;
-  marital_status: string;
+  marital_status: {
+    name: string;
+    id: string;
+  };
   name: string;
   phone: string;
   relationship: string;
