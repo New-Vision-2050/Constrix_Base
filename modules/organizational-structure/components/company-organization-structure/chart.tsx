@@ -25,7 +25,7 @@ const BranchOrganizationStructure = (props: PropsT) => {
 
         {!isLoading && !error && orgData && (
           <div className="overflow-hidden">
-            <OrganizationChart data={orgData[0] as OrgChartNode} />
+            <OrganizationChart listView={false} data={orgData[0] as OrgChartNode} />
           </div>
         )}
     </main>
