@@ -26,7 +26,7 @@ const CompanyOrganizationStructure = () => {
         dir={locale === "ar" ? "rtl" : "ltr"}
       >
         <TabsList
-          className="flex flex-col bg-sidebar p-2 w-36 h-full gap-4 rounded-lg justify-start"
+          className="flex flex-col bg-sidebar p-2 w-44 h-auto gap-4 rounded-lg justify-start"
           dir={locale === "ar" ? "rtl" : "ltr"}
         >
           {companyData?.payload?.branches?.map((tab) => (
@@ -38,7 +38,7 @@ const CompanyOrganizationStructure = () => {
             >
               <div className="flex text-sm items-start text-start gap-2 grow">
                 <MapPin size={18} className="shrink-0" />
-                <p className="w-[60px] truncate whitespace-normal">
+                <p className="truncate">
                   {tab.name}
                 </p>
               </div>

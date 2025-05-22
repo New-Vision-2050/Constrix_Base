@@ -9,7 +9,7 @@ export default function UserAddressSectionPreviewMode() {
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          label="العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) "
+          label="العنوان السكني بمقر العمل/العنوان الوطنى) "
           value={userContactData?.address ?? ""}
           valid={Boolean(userContactData?.address)}
         />

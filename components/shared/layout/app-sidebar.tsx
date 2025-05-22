@@ -109,6 +109,7 @@ export function AppSidebar({
       ],
       isNotCentral: true,
     },
+    // HumanResources organizational structure
     {
       name: t("Sidebar.HumanResources"),
       icon: LayoutDashboardIcon,
@@ -123,7 +124,7 @@ export function AppSidebar({
           isActive: pageName === ROUTER.Organizational_Structure,
         },
       ],
-      isNotCentral: false,
+      isNotCentral: true,
     },
     // program management
     {
@@ -206,8 +207,6 @@ export function AppSidebar({
     : SidebarProjects.filter((ele) => !ele.isNotCentral);
 
   const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
-
-  console.log("Breakpoint110: Projects merged", all);
 
   return (
     <Sidebar

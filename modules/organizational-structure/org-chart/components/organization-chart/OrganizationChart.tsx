@@ -11,6 +11,7 @@ import { exportChartAsPDF } from "./utils/pdfExportUtils";
 import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
+import { printChart } from "./utils/printChart";
 
 interface OrganizationChartProps {
   data: OrgChartNode;
@@ -102,11 +103,11 @@ const OrganizationChart = ({
   const handleNodeClick = (node: OrgChartNode) => {
     setSelectedNode(node);
 
-    toast({
-      title: node.name,
-      description: `${node.type}`,
-      duration: 3000,
-    });
+    // toast({
+    //   title: node.name,
+    //   description: `${node.type}`,
+    //   duration: 3000,
+    // });
 
     // Scroll to focus on selected node with delay to allow render
     if (viewMode === "tree") {
@@ -171,6 +172,10 @@ const OrganizationChart = ({
       chartElement,
       `organization-chart-${displayNode.name}.pdf`
     );
+  };
+  const handlePrint = () => {
+    const chartElement = chartTreeRef.current;
+    printChart(chartElement);
   };
 
   // const locale = useLocale();
@@ -270,6 +275,7 @@ const OrganizationChart = ({
         listView={listView}
         onViewModeChange={handleViewModeChange}
         onExportPDF={viewMode === "tree" ? handleExportPDF : undefined}
+        onPrint={viewMode === "tree" ? handlePrint : undefined}
         isFullScreen={isFullScreen}
         onToggleFullScreen={toggleFullScreen}
       />
@@ -338,7 +344,7 @@ const OrganizationChart = ({
             <ListView
               data={displayNode}
               onSelectNode={handleNodeClick}
-              DropDownMenu={DropDownMenu}
+              DropDownMenu={listModeDropDownMenu || DropDownMenu}
               selectedNodeId={selectedNode?.id || null}
               additionalActions={listViewAdditionalActions}
             />
