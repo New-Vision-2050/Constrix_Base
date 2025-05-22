@@ -52,6 +52,12 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
             type: "phone",
             placeholder: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
+            validation: [
+              {
+                type: "phone",
+                message: "",
+              },
+            ],
           },
         ],
         columns: 2,
