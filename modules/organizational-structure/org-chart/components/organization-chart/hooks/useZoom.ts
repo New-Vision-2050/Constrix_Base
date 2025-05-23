@@ -1,63 +1,71 @@
-
-import { RefObject, useState } from 'react'
-import { useLocale } from "next-intl";
+import { RefObject, useCallback, useState } from 'react'
+import { useLocale } from 'next-intl'
 
 interface UseZoomOptions {
   initialZoom?: number;
   minZoom?: number;
   maxZoom?: number;
   step?: number;
+  setPan?: ({x:number, y:number})=>void
+  pan?: {x:number, y:number}
 }
 
-export function useZoom({
-                          initialZoom = 1,
-                          minZoom = 0.5,
-                          maxZoom = 2.0,
-                          step = 0.1
-                        }: UseZoomOptions = {}) {
-  const locale = useLocale();
-  const [zoomLevel, setZoomLevel] = useState<number>(initialZoom);
+export function useZoom(params : UseZoomOptions) {
+  let {
+    initialZoom = 1,
+    minZoom = 0.5,
+    maxZoom = 2.0,
+    step = 0.1,
+    setPan,
+    pan = {x:0,y:0}
+  } = params
+  const locale = useLocale()
+  const [zoomLevel, setZoomLevel] = useState<number>(initialZoom)
 
   const zoomIn = () => {
-    setZoomLevel((prev) => Math.min(prev + step, maxZoom));
-  };
-
-  const zoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - step, minZoom));
-  };
-
-  const setZoom = (value: number | number[]) => {
-    const newZoom = Array.isArray(value) ? value[0] : value;
-    setZoomLevel(Math.max(minZoom, Math.min(maxZoom, newZoom)));
-  };
-
-  const handleWheelZoom = (e: WheelEvent, containerRef?: RefObject<HTMLDivElement>) => {
-    // if (!e.ctrlKey) return;
-    e.preventDefault()
-    const ZOOM_LEVELS = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
-    const dir = -Math.sign(e.deltaY) // -1 = down (zoom out), 1 = up (zoom in)
-
-    setZoomLevel((prevZoom) => {
-      const currentIndex = ZOOM_LEVELS.findIndex((z) => z === prevZoom)
-      let newIndex = currentIndex + dir
-      if (newIndex < 0) newIndex = 0
-      if (newIndex >= ZOOM_LEVELS.length) newIndex = ZOOM_LEVELS.length - 1
-      if(containerRef?.current) {
-        setTimeout(() => {
-          if(containerRef?.current) {
-            containerRef.current.style.textIndent = '0'
-          }
-        }, 0)
-        containerRef.current.style.textIndent = '0.01px'
-      }
-      return ZOOM_LEVELS[newIndex]
-    })
+    setZoomLevel((prev) => Math.min(prev + step, maxZoom))
+    // setPan({ x: 0, y: 0 })
   }
 
+  const zoomOut = () => {
+    setZoomLevel((prev) => Math.max(prev - step, minZoom))
+    // setPan({ x: 0, y: 0 })
+  }
+
+  const setZoom = (value: number | number[]) => {
+    const newZoom = Array.isArray(value) ? value[0] : value
+    setZoomLevel(Math.max(minZoom, Math.min(maxZoom, newZoom)))
+    // setPan({ x: 0, y: 0 })
+  }
+
+  const zoomSensitivity = 0.0015;
+  const handleWheelZoom = useCallback((e: WheelEvent, containerRef: RefObject<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    e.preventDefault();
+    const container = containerRef.current;
+    const rect = container.getBoundingClientRect();
+
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const prevZoom = zoomLevel;
+    let newZoom = prevZoom * (1 - e.deltaY * zoomSensitivity);
+    newZoom = Math.min(maxZoom, Math.max(minZoom, newZoom));
+
+    const contentX = (mouseX - pan.x) / prevZoom;
+    const contentY = (mouseY - pan.y) / prevZoom;
+    const newPanX = pan.x - contentX * (newZoom - prevZoom);
+    const newPanY = pan.y - contentY * (newZoom - prevZoom);
+    setZoomLevel(newZoom);
+    setPan({ x: newPanX, y: newPanY });
+  }, [zoomLevel, pan]);
+
   const zoomStyle = {
-    transform: `scale(${zoomLevel})`,
-    transformOrigin: `${locale === "ar"? 'right': 'left'} top`,
-    transition: 'transform 0.3s ease'
+    // transformOrigin: '0 0', // top-left
+    transformOrigin: (pan?.x === 0 && pan?.y === 0) ? `top ${locale === 'ar' ? 'right' : 'left'}`: '0 0',
+    transform: `translate(${pan?.x??0}px, ${pan?.y??0}px) scale(${zoomLevel})`,
+    transition: 'transform 0s',
+    willChange: 'transform',
+    touchAction: 'none',
   };
 
   return {
@@ -70,5 +78,5 @@ export function useZoom({
     minZoom,
     maxZoom,
     step
-  };
+  }
 }
