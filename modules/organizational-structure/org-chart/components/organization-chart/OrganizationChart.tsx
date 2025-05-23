@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, MouseEvent } from "react";
+import { useState, useRef, useEffect, MouseEvent, useCallback } from 'react'
 import { OrgChartNode } from "@/types/organization";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import { Tree } from "react-organizational-chart";
@@ -12,6 +12,7 @@ import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
 import { orgTreeReOrganizationPayload } from '@/modules/organizational-structure/org-chart/components/organization-chart/utils'
+import { useLocale } from "next-intl";
 
 interface OrganizationChartProps {
   data: OrgChartNode;
@@ -33,8 +34,8 @@ const OrganizationChart = ({
   reOrganize
 }: OrganizationChartProps) => {
   const { toast } = useToast();
-  const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
-    useZoom();
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } = useZoom({setPan, pan});
   const [selectedNode, setSelectedNode] = useState<OrgChartNode | null>(null);
   const [displayNode, setDisplayNode] = useState<OrgChartNode>(data);
   const [originalData, setOriginalData] = useState<OrgChartNode>(data);
@@ -43,8 +44,12 @@ const OrganizationChart = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartTreeRef = useRef<HTMLDivElement>(null);
   const chartWrapperRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef<boolean>(false);
-  const dragStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+
+  const isDragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const panStart = useRef({ x: 0, y: 0 });
+
+  const locale = useLocale();
 
   // Set original data on component mount
   useEffect(() => {
@@ -181,82 +186,65 @@ const OrganizationChart = ({
     );
   };
 
-  // const locale = useLocale();
-  // const pos = useRef({ x: 0, y: 0, startX: 0, startY: 0 });
-  // const [isPanning, setIsPanning] = useState(false);
-  //
-  // const handleMouseDown = (e) => {
-  //   if (e.target.closest('.node-content')) return;
-  //   setIsPanning(true);
-  //   pos.current.startX = e.clientX;
-  //   pos.current.startY = e.clientY;
-  //   console.log(pos)
-  //   document.body.style.cursor = 'grabbing';
-  // };
-  //
-  // const handleMouseMove = (e) => {
-  //   if (!isPanning) return;
-  //   const dx = e.clientX - pos.current.startX;
-  //   const dy = e.clientY - pos.current.startY;
-  //   chartTreeRef.current.style[locale === 'ar' ?'right': 'left'] = `${pos.current.x + (locale === 'ar' ?-dx: dx)}px`;
-  //   chartTreeRef.current.style.top = `${pos.current.y + dy}px`;
-  // };
-  //
-  // const handleMouseUp = () => {
-  //   if (!isPanning) return;
-  //   setIsPanning(false);
-  //   pos.current.x = parseInt(chartTreeRef.current.style[locale === 'ar' ?'right': 'left'] || 0);
-  //   pos.current.y = parseInt(chartTreeRef.current.style.top || 0);
-  //   document.body.style.cursor = 'default';
-  // };
-
-  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
-    if ((e.target as HTMLElement).closest(".node-content")) return;
-    if (!chartContainerRef.current) return;
+  // Mouse down to start dragging
+  const handleMouseDown = (e: MouseEvent) => {
+    if (e.button !== 0) return; // left button only
     isDragging.current = true;
-    dragStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      scrollLeft: chartContainerRef.current.scrollLeft,
-      scrollTop: chartContainerRef.current.scrollTop,
-    };
-    document.body.classList.add("no-select");
-    document.body.style.cursor = "grabbing";
+    dragStart.current = { x: e.clientX, y: e.clientY };
+    panStart.current = { ...pan };
+    chartContainerRef.current.style.cursor = 'grabbing';
+    // Disable user select on drag
+    document.body.style.userSelect = 'none';
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging.current || !chartContainerRef.current) return;
-    const dx = e.clientX - dragStart.current.x;
-    const dy = e.clientY - dragStart.current.y;
-    chartContainerRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
-    chartContainerRef.current.scrollTop = dragStart.current.scrollTop - dy;
-  };
-
-  const handleMouseUp = () => {
-    isDragging.current = false;
-    document.body.classList.remove("no-select");
-    document.body.style.cursor = "default";
-  };
 
   useEffect(() => {
-    const preventDrag = (e: DragEvent) => e.preventDefault();
-    document.addEventListener("dragstart", preventDrag);
-    return () => document.removeEventListener("dragstart", preventDrag);
+    // Mouse move to drag pan
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - dragStart.current.x;
+      const dy = e.clientY - dragStart.current.y;
+      setPan({
+        x: panStart.current.x + dx,
+        y: panStart.current.y + dy
+      });
+    };
+    // Mouse up to stop dragging
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      chartContainerRef.current.style.cursor = 'grab';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, locale]);
+
+  // Set initial cursor
+  useEffect(() => {
+    if (chartContainerRef.current) {
+      chartContainerRef.current.style.cursor = 'grab';
+    }
   }, []);
 
+  // Add wheel event listener to containerRef
   useEffect(() => {
-    const wrapper = chartContainerRef.current;
-    if (!wrapper) return;
-
+    const container = chartContainerRef.current;
+    if (!container) return;
     const handleWheel = (e: WheelEvent) => {
       handleWheelZoom(e, chartContainerRef);
     };
-    wrapper.addEventListener("wheel", handleWheel, { passive: false });
 
+    container.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
-      wrapper.removeEventListener("wheel", handleWheel);
+      container.removeEventListener('wheel', handleWheel);
     };
-  }, [chartContainerRef, handleWheelZoom]);
+  }, [handleWheelZoom]);
 
   return (
     <div
@@ -285,18 +273,15 @@ const OrganizationChart = ({
       {viewMode === "tree" || !listView ? (
         <div
           ref={chartContainerRef}
-          /*relative overflow-hidden*/
-          className="w-full h-full min-h-[700px] overflow-auto px-4 py-8 cursor-grab"
+          className="w-full h-full min-h-[700px] overflow-auto px-4 py-8 cursor-grab relative overflow-hidden"
           onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          // style={{ direction: locale === 'ar' ? 'rtl' : 'ltr' }}
         >
           <div
             ref={chartTreeRef}
-            /*absolute*/
-            className="org-chart-container"
+            className="org-chart-container absolute"
             style={zoomStyle}
+            // dir={locale === 'ar' ? 'rtl' : 'ltr'}
           >
             <Tree
               lineWidth="2px"
