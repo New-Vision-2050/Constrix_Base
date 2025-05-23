@@ -87,6 +87,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
         isDisabled={shouldBeDisabled}
         placeholder={placeholder}
         isClearable
+        menuPortalTarget={document.body}
         classNames={{
           control: (state) =>
             "bg-sidebar border border-input hover:border-ring rounded-md shadow-sm transition-colors " +
@@ -113,6 +114,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
             "text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent/50 transition-colors",
           valueContainer: () => "gap-1 px-3 py-1.5",
           noOptionsMessage: () => "text-muted-foreground p-2 text-sm",
+          menuPortal: () => `!z-[9999]`,
         }}
         unstyled
         className="min-w-[200px]"
