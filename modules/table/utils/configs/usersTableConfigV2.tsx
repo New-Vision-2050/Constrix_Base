@@ -166,6 +166,7 @@ export const UsersConfigV2 = () => {
     allSearchedFields: [
       {
         key: "company_id",
+        name: "companies",
         searchType: {
           type: "dropdown",
           placeholder: "الشركة",
@@ -195,6 +196,7 @@ export const UsersConfigV2 = () => {
       // },
       {
         key: "email_or_phone",
+        name: "email_or_phone",
         searchType: {
           type: "text",
           placeholder: "البريد الإليكتروني / الجوال",
