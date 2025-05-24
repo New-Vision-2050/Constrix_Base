@@ -14,7 +14,7 @@ import {
 } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
 import { useTableStore } from "@/modules/table/store/useTableStore";
-import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
+import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -43,7 +43,7 @@ const UsersSubEntityTable = ({
 
   const RegistrationTableConfig = registrationFormSlug
     ? REGISTRATION_TABLES[registrationFormSlug]
-    : UsersConfig;
+    : UsersConfigV2;
 
   const buttonText =
     subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
@@ -57,7 +57,7 @@ const UsersSubEntityTable = ({
   console.log({ registrationFormSlug });
 
   const tableConfig = {
-    ...UsersConfig(),
+    ...UsersConfigV2(),
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
