@@ -1,10 +1,10 @@
 "use client";
 import { TableBuilder } from "@/modules/table";
 import React from "react";
-import { StructureTableConfig } from "../../config/StructureTableConfig";
+import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 
 const TableStructure = () => {
-  return <TableBuilder config={StructureTableConfig()} />;
+  return <TableBuilder config={UsersConfigV2()} />;
 };
 
 export default TableStructure;
