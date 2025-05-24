@@ -54,15 +54,20 @@ const UsersSubEntityTable = ({
       ? "وسيط"
       : "مستخدم";
 
-  console.log({ registrationFormSlug });
+  const usersConfig = UsersConfigV2();
+  const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
+    field.key === "email_or_phone"
+      ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
+      : optionalAttr?.includes(field.name || field.key)
+  );
 
   const tableConfig = {
-    ...UsersConfigV2(),
+    ...usersConfig,
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,
-    // url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
+    allSearchedFields,
   };
 
   const finalFormConfig = Boolean(registrationFromConfig)
