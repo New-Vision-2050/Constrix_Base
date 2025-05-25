@@ -16,8 +16,8 @@ export default function PrivilegeItem(props: PropsT) {
       reviewMode={<PrivilegeItemPreviewMode privilegeData={privilegeData} />}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} },
-          { title: "أنشاء طلب", onClick: () => {} },
+          { title: "طلباتي", onClick: () => {} ,disabled:true},
+          { title: "أنشاء طلب", onClick: () => {},disabled:true },
         ],
       }}
     />
