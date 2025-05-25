@@ -67,3 +67,6 @@ li.tree-fix-ar{
    @apply ring-[#F42588]/40
   }
 }
+.org-chart-container ul:not(:has(li)){
+  display: none;
+}

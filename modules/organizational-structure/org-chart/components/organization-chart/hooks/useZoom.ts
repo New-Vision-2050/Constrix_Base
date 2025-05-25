@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useState } from 'react'
+import { Dispatch, RefObject, SetStateAction, useCallback, useState } from 'react'
 import { useLocale } from 'next-intl'
 
 interface UseZoomOptions {
@@ -6,14 +6,14 @@ interface UseZoomOptions {
   minZoom?: number;
   maxZoom?: number;
   step?: number;
-  setPan?: ({x:number, y:number})=>void
+  setPan?: Dispatch<SetStateAction<{ x: number; y: number; }>>
   pan?: {x:number, y:number}
 }
 
 export function useZoom(params : UseZoomOptions) {
   let {
     initialZoom = 1,
-    minZoom = 0.5,
+    minZoom = 0.2,
     maxZoom = 2.0,
     step = 0.1,
     setPan,
@@ -43,10 +43,14 @@ export function useZoom(params : UseZoomOptions) {
     if (!containerRef.current) return;
     e.preventDefault();
     const container = containerRef.current;
+
+    // device pixel ratio (1.0 for no zoom, >1.0 if zoomed in)
+    const dpr = window.devicePixelRatio || 1;
+
     const rect = container.getBoundingClientRect();
 
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const mouseX = (e.clientX - rect.left) / dpr;
+    const mouseY = (e.clientY - rect.top) / dpr;
     const prevZoom = zoomLevel;
     let newZoom = prevZoom * (1 - e.deltaY * zoomSensitivity);
     newZoom = Math.min(maxZoom, Math.max(minZoom, newZoom));
@@ -56,7 +60,9 @@ export function useZoom(params : UseZoomOptions) {
     const newPanX = pan.x - contentX * (newZoom - prevZoom);
     const newPanY = pan.y - contentY * (newZoom - prevZoom);
     setZoomLevel(newZoom);
-    setPan({ x: newPanX, y: newPanY });
+    if(setPan){
+      setPan({ x: newPanX, y: newPanY });
+    }
   }, [zoomLevel, pan]);
 
   const zoomStyle = {
