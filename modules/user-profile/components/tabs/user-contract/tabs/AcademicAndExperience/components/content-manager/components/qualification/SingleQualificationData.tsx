@@ -34,8 +34,8 @@ export default function SingleQualificationData({ qualification }: PropsT) {
       }
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} },
-          { title: "أنشاء طلب", onClick: () => {} },
+          { title: "طلباتي", onClick: () => {} ,disabled:true},
+          { title: "أنشاء طلب", onClick: () => {},disabled:true },
           {
             title: "حذف",
             onClick: () => {
