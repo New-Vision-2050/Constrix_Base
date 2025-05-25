@@ -423,7 +423,7 @@ export const useDropdownSearch = ({
       }
 
       if (dynamicConfig.paginationEnabled) {
-        setHasMore(response.data.pagination.last_page > response.data.pagination.page)
+        setHasMore(response.data.pagination?.last_page > response.data.pagination?.page)
       }
       // Extract values and labels from the response
       const extractedOptions = data.map((item) => {
