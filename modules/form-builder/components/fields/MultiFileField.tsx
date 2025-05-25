@@ -6,8 +6,6 @@ import { useFormInstance } from "../../hooks/useFormStore";
 import {
   File as FileIcon,
   FileText,
-  Image,
-  Archive,
   Code,
   Plus,
   FileIcon as FilePdf,
@@ -19,7 +17,11 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { FileObject } from './FileField'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
+import PdfImg from "@/assets/icons/PDF.png";
+import ZipImg from "@/assets/icons/zip-folder.png";
+import NoteImg from "@/assets/icons/note.png";
+import PhotoImg from "@/assets/icons/photo.png";
+import ExcelImg from "@/assets/icons/excel.png";
 interface MultiFileFieldProps {
   field: FieldConfig;
   value: Array<File | string | FileObject> | null;
@@ -35,17 +37,57 @@ const getFileIcon = (fileType: string | undefined, size: number = 24) => {
   if (!fileType) return <FileIcon size={size} />;
 
   if (fileType.startsWith("image/")) {
-    return <Image size={size} />;
+    return (
+      <img
+        src={PhotoImg.src}
+        width={`${size}px`}
+        height={`${size}px`}
+        alt="pdf file"
+      />
+    );
   } else if (fileType === "application/pdf") {
-    return <FilePdf size={size} />;
+    return (
+      <img
+        src={PdfImg.src}
+        width={`${size}px`}
+        height={`${size}px`}
+        alt="pdf file"
+      />
+    );
+  } else if (
+    fileType.includes("application/vnd" ) ||
+    fileType.includes("text/csv")
+  ) {
+    return (
+      <img
+        src={ExcelImg.src}
+        width={`${size}px`}
+        height={`${size}px`}
+        alt="Excel file"
+      />
+    );
   } else if (fileType.startsWith("text/")) {
-    return <FileText size={size} />;
+    return (
+      <img
+        src={NoteImg.src}
+        width={`${size}px`}
+        height={`${size}px`}
+        alt="pdf file"
+      />
+    );
   } else if (
     fileType.includes("zip") ||
     fileType.includes("compressed") ||
     fileType.includes("archive")
   ) {
-    return <Archive size={size} />;
+    return (
+      <img
+        src={ZipImg.src}
+        width={`${size}px`}
+        height={`${size}px`}
+        alt="pdf file"
+      />
+    );
   } else if (
     fileType.includes("javascript") ||
     fileType.includes("json") ||
@@ -156,6 +198,45 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
 
   // Normalize value to array
   const normalizedValue = Array.isArray(value) ? value : value ? [value] : [];
+
+  // Allow Type 
+  const typesName = field?.fileConfig?.allowedFileTypes?.map((mimeType) => {
+    // Convert MIME types to readable extensions
+    switch (mimeType) {
+      case "application/pdf":
+        return "PDF";
+      case "application/msword":
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return "DOC/DOCX";
+      case "application/vnd.ms-excel":
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        return "XLS/XLSX";
+      case "application/vnd.ms-powerpoint":
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        return "PPT/PPTX";
+      case "image/jpeg":
+        return "JPG";
+      case "image/png":
+        return "PNG";
+      case "image/gif":
+        return "GIF";
+      case "image/svg+xml":
+        return "SVG";
+      case "text/plain":
+        return "TXT";
+      case "text/csv":
+        return "CSV";
+      case "application/zip":
+      case "application/x-zip-compressed":
+        return "ZIP";
+      case "application/x-rar-compressed":
+        return "RAR";
+      default:
+        // For unknown MIME types, extract the part after the slash
+        return mimeType.split("/").pop()?.toUpperCase() || mimeType;
+    }
+  })
+  .join(", ")||"";
 
   // Update files info when value changes
   useEffect(() => {
@@ -604,7 +685,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
                           </Tooltip>
                         </TooltipProvider>
                       )}
-                      <p className=" text-sm">11:31 21-05-2024</p>
+                      <p className="text-sm">11:31 21-05-2024</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -655,51 +736,27 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
               <p className="text-lg text-foreground mb-2">{t("AttachFile")}</p>
             </>
           )}
-          {field.fileConfig?.allowedFileTypes && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {t("AllowedTypes")}:{" "}
-              {field.fileConfig.allowedFileTypes
-                .map((mimeType) => {
-                  // Convert MIME types to readable extensions
-                  switch (mimeType) {
-                    case "application/pdf":
-                      return "PDF";
-                    case "application/msword":
-                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                      return "DOC/DOCX";
-                    case "application/vnd.ms-excel":
-                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                      return "XLS/XLSX";
-                    case "application/vnd.ms-powerpoint":
-                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-                      return "PPT/PPTX";
-                    case "image/jpeg":
-                      return "JPG";
-                    case "image/png":
-                      return "PNG";
-                    case "image/gif":
-                      return "GIF";
-                    case "image/svg+xml":
-                      return "SVG";
-                    case "text/plain":
-                      return "TXT";
-                    case "text/csv":
-                      return "CSV";
-                    case "application/zip":
-                    case "application/x-zip-compressed":
-                      return "ZIP";
-                    case "application/x-rar-compressed":
-                      return "RAR";
-                    default:
-                      // For unknown MIME types, extract the part after the slash
-                      return (
-                        mimeType.split("/").pop()?.toUpperCase() || mimeType
-                      );
-                  }
-                })
-                .join(", ")}
-            </p>
-          )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="text-xs text-muted-foreground my-2 cursor-pointer ">
+                  {t("AllowedTypes")}:{" "}
+                  {typesName.length > 15
+                    ? `${typesName.slice(0, 15)}...`
+                    : typesName}
+                </p>
+              </TooltipTrigger>
+              {typesName.length > 15 && (
+                <TooltipContent>
+                  <p className="font-medium  my-2 ">
+                    {" "}
+                    {t("AllowedTypes")}:{typesName}
+                  </p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+
           {field.fileConfig?.maxFileSize && (
             <p className="text-xs text-muted-foreground">
               {t("MaxSize")}:{" "}
