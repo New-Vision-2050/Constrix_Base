@@ -17,8 +17,8 @@ export default function ConnectionDataSectionPersonalForm() {
         editMode={<UserProfileConnectionDataEditForm />}
         settingsBtn={{
           items: [
-            { title: "طلباتي", onClick: () => {} },
-            { title: "أنشاء طلب", onClick: () => {} },
+            { title: "طلباتي", onClick: () => {} ,disabled:true},
+            { title: "أنشاء طلب", onClick: () => {},disabled:true },
           ],
         }}
       />

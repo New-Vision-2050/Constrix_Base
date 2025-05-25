@@ -1,7 +1,7 @@
 'use client'
 import OrganizationChart from '@/modules/organizational-structure/org-chart/components/organization-chart'
 import { Loader2 } from 'lucide-react'
-import useOrgTreeData from '@/modules/organizational-structure/hooks/useOrgTreeData'
+import useEmployeesTreeData from '@/modules/organizational-structure/hooks/useEmployeesTreeData'
 import { OrgChartNode } from '@/types/organization'
 import { useTranslations } from 'next-intl'
 
@@ -9,10 +9,10 @@ type PropsT = {
   branchId: string | number;
 };
 
-const BranchOrganizationStructure = (props: PropsT) => {
+const BranchEmployeesOrganizationStructure = (props: PropsT) => {
   const { branchId } = props;
   const t = useTranslations("CompanyStructure.CompanyOrganizationalStructure");
-  const { data: orgData, isLoading, error } = useOrgTreeData(branchId)
+  const { data: employeesData, isLoading, error } = useEmployeesTreeData(branchId)
 
   return (
     <main className="flex-grow md:max-w-[calc(100vw-580px)]">
@@ -23,14 +23,14 @@ const BranchOrganizationStructure = (props: PropsT) => {
           </div>
         )}
 
-        {!isLoading && !error && orgData && (
+        {!isLoading && !error && employeesData && (
           <div className="overflow-hidden">
             {/*<OrganizationChart data={orgData[0] as OrgChartNode} reOrganize={{concatKey: 'type', concatValue: 'branch'}} />*/}
-            <OrganizationChart listView={false} data={orgData[0] as OrgChartNode} />
+            <OrganizationChart data={employeesData[0] as OrgChartNode} isEmployees reOrganize={{concatKey: 'type', concatValue: 'employee'}} />
           </div>
         )}
     </main>
   )
 }
 
-export default BranchOrganizationStructure
+export default BranchEmployeesOrganizationStructure
