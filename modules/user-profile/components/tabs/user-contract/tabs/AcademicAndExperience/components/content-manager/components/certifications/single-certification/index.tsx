@@ -31,8 +31,8 @@ export default function UserCertification({ certification }: PropsT) {
       editMode={<UserCertificationEdit certification={certification} />}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} },
-          { title: "أنشاء طلب", onClick: () => {} },
+          { title: "طلباتي", onClick: () => {} ,disabled:true},
+          { title: "أنشاء طلب", onClick: () => {},disabled:true },
           {
             title: "حذف",
             onClick: () => {
