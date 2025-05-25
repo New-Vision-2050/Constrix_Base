@@ -5,6 +5,7 @@ import { Tree } from "react-organizational-chart";
 import TreeNodes from "./TreeNodes";
 import ChartControls from "./ChartControls";
 import ChartNode from "./ChartNode";
+import EmployeeNode from './EmployeeNode'
 import { useZoom } from "./hooks/useZoom";
 import ListView from "./list-view/ListView";
 import { exportChartAsPDF } from "./utils/pdfExportUtils";
@@ -17,6 +18,7 @@ import { useLocale } from "next-intl";
 interface OrganizationChartProps {
   data: OrgChartNode;
   listView?: boolean;
+  isEmployees?: boolean;
   onAddBtnClick?: (node: OrgChartNode) => void;
   onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
@@ -31,7 +33,8 @@ const OrganizationChart = ({
   onAddBtnClick,
   DropDownMenu,
   listViewAdditionalActions,
-  reOrganize
+  reOrganize,
+  isEmployees
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -55,7 +58,6 @@ const OrganizationChart = ({
   useEffect(() => {
     if(reOrganize?.concatKey){
       let newData = orgTreeReOrganizationPayload(data, reOrganize?.concatKey, reOrganize?.concatValue);
-      console.log(newData)
       setOriginalData(newData);
       setDisplayNode(newData);
     }else{
@@ -192,7 +194,9 @@ const OrganizationChart = ({
     isDragging.current = true;
     dragStart.current = { x: e.clientX, y: e.clientY };
     panStart.current = { ...pan };
-    chartContainerRef.current.style.cursor = 'grabbing';
+    if (chartContainerRef.current) {
+      chartContainerRef.current.style.cursor = 'grabbing';
+    }
     // Disable user select on drag
     document.body.style.userSelect = 'none';
   };
@@ -200,7 +204,7 @@ const OrganizationChart = ({
 
   useEffect(() => {
     // Mouse move to drag pan
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: WindowEventMap['mousemove']) => {
       if (!isDragging.current) return;
       const dx = e.clientX - dragStart.current.x;
       const dy = e.clientY - dragStart.current.y;
@@ -212,7 +216,9 @@ const OrganizationChart = ({
     // Mouse up to stop dragging
     const handleMouseUp = () => {
       isDragging.current = false;
-      chartContainerRef.current.style.cursor = 'grab';
+      if (chartContainerRef.current) {
+        chartContainerRef.current.style.cursor = 'grab';
+      }
       document.body.style.userSelect = '';
     };
 
@@ -293,18 +299,27 @@ const OrganizationChart = ({
                 <div
                   className={`flex flex-col items-center item-${
                     displayNode?.children?.length === 1
-                      ? displayNode.children[0]?.type
-                      : displayNode?.type
+                      ? (Boolean(isEmployees)? displayNode.children[0]?.hierarchy_info?.type :displayNode.children[0]?.type)
+                      : (Boolean(isEmployees)? displayNode?.hierarchy_info?.type : displayNode?.type)
                   }`}
                 >
-                  <ChartNode
-                    node={displayNode}
-                    onNodeClick={handleNodeClick}
-                    isSelected={selectedNode?.id === displayNode.id}
-                    isFirst={true}
-                    // !Dropdown is temporarily disabled until a field is returned from the pack indicating that this command is controlled dynamically.
-                    // DropDownMenu={DropDownMenu}
-                  />
+                  {Boolean(isEmployees)
+                    ? <EmployeeNode
+                      node={displayNode}
+                      onNodeClick={handleNodeClick}
+                      isSelected={selectedNode?.id === displayNode.id}
+                      isFirst={true}
+                      // !Dropdown is temporarily disabled until a field is returned from the pack indicating that this command is controlled dynamically.
+                      // DropDownMenu={DropDownMenu}
+                    />
+                    : <ChartNode
+                      node={displayNode}
+                      onNodeClick={handleNodeClick}
+                      isSelected={selectedNode?.id === displayNode.id}
+                      isFirst={true}
+                      // !Dropdown is temporarily disabled until a field is returned from the pack indicating that this command is controlled dynamically.
+                      // DropDownMenu={DropDownMenu}
+                    />}
                   <OrgChartAddButton
                     node={displayNode}
                     onAddBtnClick={onAddBtnClick}
@@ -321,6 +336,7 @@ const OrganizationChart = ({
                   onAddBtnClick={onAddBtnClick}
                   selectedNodeId={selectedNode?.id || null}
                   reOrganize={reOrganize}
+                  isEmployees={isEmployees}
                 />
               ))}
             </Tree>
