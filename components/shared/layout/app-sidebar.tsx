@@ -205,7 +205,9 @@ export function AppSidebar({
     ? SidebarProjects.filter((ele) => ele.isNotCentral)
     : SidebarProjects.filter((ele) => !ele.isNotCentral);
 
-  const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
+  // const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
+
+  const all = mergeProjectsAndMenu(projects, menu);
 
   return (
     <Sidebar
