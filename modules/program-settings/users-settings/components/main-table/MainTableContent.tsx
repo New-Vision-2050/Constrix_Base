@@ -24,11 +24,7 @@ const MainTableContent = () => {
   const payload = data.payload;
   const config = UpdateMainTableAttributes("users", payload);
 
-  return (
-    <div className="grid grid-cols-2">
-      <FormContent config={config} />
-    </div>
-  );
+  return <FormContent config={config} />;
 };
 
 export default MainTableContent;
