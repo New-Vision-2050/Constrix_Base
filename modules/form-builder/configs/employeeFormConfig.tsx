@@ -8,7 +8,7 @@ export function employeeFormConfig(
 ): FormConfig {
   return {
     formId: "employee-form",
-    title: "اضافة موظف",
+    title: "انشاء",
     apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
       enabled: true,
