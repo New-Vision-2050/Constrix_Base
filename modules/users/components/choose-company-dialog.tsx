@@ -25,7 +25,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
   // handle redirect to user profile page if user has one company
   useEffect(() => {
     if (
-      open == true &&
+      open === true &&
       user?.companies?.length === 1 &&
       user?.companies[0]?.users?.length
     ) {
@@ -34,8 +34,9 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
       router.push(
         `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${company?.id}`
       );
+      onClose(); // close the dialog after redirect
     }
-  }, [open, user, router]);
+  }, [open, user, router, onClose]);
 
   // declare and define functions
   const handleRedirect = (id: string, companyId: string) => {

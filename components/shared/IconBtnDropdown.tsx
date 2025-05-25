@@ -8,6 +8,7 @@ import {
 
 export type DropdownItemT = {
   title: string;
+  disabled?: boolean;
   onClick?: () => void;
 };
 
@@ -31,6 +32,7 @@ export function IconBtnDropdown(props: PropsT) {
               item?.onClick?.();
             }}
             key={item.title}
+            disabled={item.disabled} 
           >
             {item.title}
           </DropdownMenuItem>

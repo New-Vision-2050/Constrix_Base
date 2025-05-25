@@ -38,6 +38,10 @@ export const PassportDataFormConfig = () => {
             type: "date",
             name: "passport_start_date",
             placeholder: "تاريخ الأستلام",
+            maxDate: {
+              formId: `Passport-data-form`,
+              field: "passport_end_date",
+            },
             validation: [
               {
                 type: "required",
@@ -49,6 +53,10 @@ export const PassportDataFormConfig = () => {
             label: "تاريخ الأنتهاء",
             type: "date",
             name: "passport_end_date",
+            minDate: {
+              formId: `Passport-data-form`,
+              field: "passport_start_date",
+            },
             placeholder: "تاريخ الأنتهاء",
             validation: [
               {

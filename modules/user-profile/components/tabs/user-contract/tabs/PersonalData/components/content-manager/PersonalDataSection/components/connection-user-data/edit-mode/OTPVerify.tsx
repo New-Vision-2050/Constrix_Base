@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useEffect } from "react";
+import { X } from "lucide-react";
 
 type PropsT = {
   open: boolean;
@@ -105,7 +106,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px] flex flex-col gap-5">
-        <DialogHeader className="flex items-center justify-center">
+        <DialogHeader className="flex items-center justify-center relative">
           <DialogTitle>
             <InfoIcon additionClass="text-pink-500 text-[22px]" />
           </DialogTitle>
@@ -113,6 +114,12 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
             يرجى ادخال رمز التحقق المرسل الى {label}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="absolute top-2 right-2">
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            <X />
+          </Button>
+        </div>
 
         <div className="w-full flex items-center justify-center gap-1">
           <OtpInput otp={otp} setOtp={setOtp} />
