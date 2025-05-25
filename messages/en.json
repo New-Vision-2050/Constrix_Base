@@ -104,7 +104,9 @@
     "Search": "Search",
     "Actions": "Actions",
     "ToggleColumns": "Toggle visible columns",
-    "VisibleColumns": "Visible Columns"
+    "VisibleColumns": "Visible Columns",
+    "Minimal": "Minimal",
+    "All": "All"
   },
   "Companies": {
     "Companies": "Companies",
@@ -322,6 +324,7 @@
   },
   "CompanyStructure": {
     "actions": {
+      "print": "Print",
       "viewMode": "View Mode",
       "exportPdf": "Export PDF",
       "setAsParent": "Set as Parent",

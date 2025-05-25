@@ -14,6 +14,7 @@ import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
 import { orgTreeReOrganizationPayload } from '@/modules/organizational-structure/org-chart/components/organization-chart/utils'
 import { useLocale } from "next-intl";
+import { printChart } from "./utils/printChart";
 
 interface OrganizationChartProps {
   data: OrgChartNode;
@@ -23,6 +24,7 @@ interface OrganizationChartProps {
   onEditBtnClick?: (node: OrgChartNode) => void;
   listViewAdditionalActions?: React.ReactNode;
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
+  listModeDropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   handleDeleteManagement?: (id: string | number) => void;
   reOrganize?: {concatKey: string, concatValue: string | number| undefined}
 }
@@ -32,6 +34,7 @@ const OrganizationChart = ({
   listView = true,
   onAddBtnClick,
   DropDownMenu,
+  listModeDropDownMenu,
   listViewAdditionalActions,
   reOrganize,
   isEmployees
@@ -117,11 +120,11 @@ const OrganizationChart = ({
   const handleNodeClick = (node: OrgChartNode) => {
     setSelectedNode(node);
 
-    toast({
-      title: node.name,
-      description: `${node.type}`,
-      duration: 3000,
-    });
+    // toast({
+    //   title: node.name,
+    //   description: `${node.type}`,
+    //   duration: 3000,
+    // });
 
     // Scroll to focus on selected node with delay to allow render
     if (viewMode === "tree") {
@@ -187,10 +190,16 @@ const OrganizationChart = ({
       `organization-chart-${displayNode.name}.pdf`
     );
   };
+  const handlePrint = () => {
+    const chartElement = chartTreeRef.current;
+    printChart(chartElement);
+  };
 
-  // Mouse down to start dragging
-  const handleMouseDown = (e: MouseEvent) => {
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if (e.button !== 0) return; // left button only
+    // if ((e.target as HTMLElement).closest(".node-content")) return;
+    // if (!chartContainerRef.current) return;
+
     isDragging.current = true;
     dragStart.current = { x: e.clientX, y: e.clientY };
     panStart.current = { ...pan };
@@ -272,6 +281,7 @@ const OrganizationChart = ({
         listView={listView}
         onViewModeChange={handleViewModeChange}
         onExportPDF={viewMode === "tree" ? handleExportPDF : undefined}
+        onPrint={viewMode === "tree" ? handlePrint : () => {}}
         isFullScreen={isFullScreen}
         onToggleFullScreen={toggleFullScreen}
       />
@@ -348,7 +358,7 @@ const OrganizationChart = ({
             <ListView
               data={displayNode}
               onSelectNode={handleNodeClick}
-              DropDownMenu={DropDownMenu}
+              DropDownMenu={listModeDropDownMenu || DropDownMenu}
               selectedNodeId={selectedNode?.id || null}
               additionalActions={listViewAdditionalActions}
             />

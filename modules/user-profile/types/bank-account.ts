@@ -14,4 +14,8 @@ export type BankAccount = {
   swift_bic: string;
   type: string;
   user_name: string;
+  bank_type_account: {
+    name: string;
+    id: string;
+  };
 };

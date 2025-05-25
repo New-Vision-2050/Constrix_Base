@@ -5,6 +5,7 @@ import { baseURL } from "@/config/axios-config";
 import {
   REGISTRATION_FORMS,
   REGISTRATION_FORMS_SLUGS,
+  REGISTRATION_TABLES,
 } from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import {
@@ -13,7 +14,7 @@ import {
 } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
 import { useTableStore } from "@/modules/table/store/useTableStore";
-import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
+import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -35,25 +36,38 @@ const UsersSubEntityTable = ({
   const registration_form_id = subEntity?.registration_form?.id;
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
+
   const registrationFromConfig = registrationFormSlug
     ? REGISTRATION_FORMS[registrationFormSlug]
     : GetCompanyUserFormConfig;
 
+  const RegistrationTableConfig = registrationFormSlug
+    ? REGISTRATION_TABLES[registrationFormSlug]
+    : UsersConfigV2;
+
   const buttonText =
     subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
       ? "موظف"
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CUSTOMER
+      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CLIENT
       ? "عميل"
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.RESELLER
+      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.BROKER
       ? "وسيط"
       : "مستخدم";
 
+  const usersConfig = UsersConfigV2();
+  const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
+    field.key === "email_or_phone"
+      ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
+      : optionalAttr?.includes(field.name || field.key)
+  );
+
   const tableConfig = {
-    ...UsersConfig(),
+    ...usersConfig,
+    url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,
-    // url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
+    allSearchedFields,
   };
 
   const finalFormConfig = Boolean(registrationFromConfig)
@@ -70,6 +84,9 @@ const UsersSubEntityTable = ({
               <SheetFormBuilder
                 config={{
                   ...finalFormConfig(t),
+                  apiParams: {
+                    sub_entity_id: sub_entity_id as string,
+                  },
                   onSuccess: () => {
                     const tableStore = useTableStore.getState();
                     tableStore.reloadTable(TABLE_ID);

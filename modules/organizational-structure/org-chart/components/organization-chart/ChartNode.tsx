@@ -5,6 +5,7 @@ import {
   DropdownButton,
   DropdownItemT,
 } from "@/components/shared/dropdown-button";
+import { useMemo } from "react";
 
 interface ChartNodeProps {
   node: OrgChartNode;
@@ -21,6 +22,21 @@ const ChartNode: React.FC<ChartNodeProps> = ({
   isFirst = false,
   DropDownMenu,
 }) => {
+  const isDeputyManagersExist =
+    node?.deputy_managers && node?.deputy_managers?.length > 0;
+  const isManagerExist = node?.manager?.name;
+
+  const nodeDescriptionType = useMemo(() => {
+    switch (node.type) {
+      case "branch":
+        return node?.is_main ? "فرع الادارة العامة" : "فرع الادارة الفرعية";
+      case "management":
+        return node?.is_main ? "الادارة الرئيسية" : "ادارة الفرعية";
+      default:
+        return "Unknown Type";
+    }
+  }, [node]);
+
   return (
     <div
       onClick={(e) => {
@@ -35,26 +51,36 @@ const ChartNode: React.FC<ChartNodeProps> = ({
         node.children?.length === 1 ? node.children[0]?.type : node?.type
       }`}
     >
-      <div className="w-full flex items-center justify-between">
-        <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5">
-          <DepartmentIcon className={"text-primary"} /> {node.name}
-        </h3>
-        {DropDownMenu && (
-          <DropdownButton
-            triggerButton={<EllipsisVertical />}
-            items={DropDownMenu(node)}
-          />
-        )}
+      <div className="w-full items-start flex flex-col">
+        <div className="w-full flex items-center justify-between">
+          <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center p-2.5">
+            <DepartmentIcon className={"text-primary"} /> {node.name}
+          </h3>
+          {DropDownMenu && (
+            <DropdownButton
+              triggerButton={<EllipsisVertical />}
+              items={DropDownMenu(node)}
+            />
+          )}
+        </div>
+        <p className="text-slate-400 px-2 truncate text-sm">
+          {nodeDescriptionType}
+        </p>
       </div>
-      <div className="w-full flex items-center justify-around my-3">
-        {node?.manager?.name && (
+
+      <div
+        className={`w-full flex items-start ${
+          !isDeputyManagersExist ? "justify-start" : "justify-center"
+        } my-3`}
+      >
+        {isManagerExist && (
           <ManagerComponent
             name={node?.manager?.name as string}
             label="المدير"
           />
         )}
 
-        {node?.deputy_managers && node?.deputy_managers?.length > 0 && (
+        {isDeputyManagersExist && (
           <div className="flex flex-col flex-grow items-start">
             <p className="text-slate-400">المدير النائب</p>
             {node?.deputy_managers?.map((deputy_manager, index) => (
@@ -109,9 +135,9 @@ const ManagerComponent = ({
   name: string;
 }) => {
   return (
-    <div className="flex flex-col items-center flex-grow">
+    <div className="flex flex-col items-start flex-grow">
       {label && <p className="text-slate-400">{label}</p>}
-      <p className="text-white">{name}</p>
+      <p>{name}</p>
     </div>
   );
 };

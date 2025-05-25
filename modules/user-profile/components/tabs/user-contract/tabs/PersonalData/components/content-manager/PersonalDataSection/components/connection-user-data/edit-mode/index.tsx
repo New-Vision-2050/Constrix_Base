@@ -16,6 +16,7 @@ export default function UserProfileConnectionDataEditForm() {
   const { userConnectionData } = usePersonalDataTabCxt();
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState("+966");
+  const [error, setError] = useState("");
   const [phone, setPhone] = useState(userConnectionData?.phone ?? "");
   const [email, setEmail] = useState(userConnectionData?.email ?? "");
 
@@ -28,7 +29,12 @@ export default function UserProfileConnectionDataEditForm() {
           ? userConnectionData?.email
           : userConnectionData?.phone;
 
-      if (oldValue === newValue) {
+      if (oldValue === newValue || (type === "phone" && newValue == phone)) {
+        const _message =
+          type === "email"
+            ? "البريد الألكتروني هو نفس البريد المسجل مسبقا"
+            : "رقم الجوال هو نفس رقم الجوال المسجل مسبقا";
+        setError(_message);
         setLoading(false);
         return;
       }
@@ -69,7 +75,9 @@ export default function UserProfileConnectionDataEditForm() {
             label="رقم الجوال"
             onChange={(str: string) => setPhone(str)}
           />
-          <Button  className="my-[2px]" onClick={() => handleChange("phone")}>Change</Button>
+          <Button className="my-[2px]" onClick={() => handleChange("phone")}>
+            Change
+          </Button>
         </div>
         <div className="flex items-end gap-1">
           <CustomInputField
@@ -78,8 +86,12 @@ export default function UserProfileConnectionDataEditForm() {
             disabled={loading}
             label="البريد الألكتروني"
             onChange={(str: string) => setEmail(str)}
+            error={error}
+            setError={setError}
           />
-          <Button className="my-[2px]" onClick={() => handleChange("email")}>Change</Button>
+          <Button className="my-[2px]" onClick={() => handleChange("email")}>
+            Change
+          </Button>
         </div>
       </div>
     </>

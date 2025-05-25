@@ -104,7 +104,9 @@
     "Search": "بحث",
     "Actions": "إجراء",
     "ToggleColumns": "تبديل الأعمدة المرئية",
-    "VisibleColumns": "الأعمدة المرئية"
+    "VisibleColumns": "الأعمدة المرئية",
+    "Minimal": "الحد الأدنى",
+    "All": "الكل" 
   },
   "Companies": {
     "Companies": "الشركات",
@@ -323,6 +325,7 @@
   "CompanyStructure": {
     "actions": {
       "viewMode": "عرض",
+      "print": "طباعة",
       "exportPdf": "تصدير PDF",
       "setAsParent": "تعيين كأب",
       "treeView": "عرض شجري",
