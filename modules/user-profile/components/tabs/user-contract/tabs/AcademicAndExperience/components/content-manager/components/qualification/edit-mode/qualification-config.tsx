@@ -133,13 +133,24 @@ export const QualificationFormConfig = ({
             label: "تاريخ الحصول على الشهادة",
             placeholder: "تاريخ الحصول على الشهادة",
             required: true,
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الحصول على الشهادة مطلوب",
+              },
+            ],
           },
           {
             type: "text",
             name: "study_rate",
             label: "المعدلات الدراسية",
             placeholder: "المعدلات الدراسية",
-            required: true
+            validation: [
+              {
+                type: "required",
+                message: "المعدلات الدراسية مطلوبة",
+              },
+            ],
           },
           {
             type: "file",
