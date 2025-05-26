@@ -55,7 +55,7 @@ const PreviewTextField = ({
         <Input
           disabled
           type="text"
-          value={truncateString(checkString(value), 25)}
+          value={truncateString(checkString(value), 21)}
         />
       </div>
 
