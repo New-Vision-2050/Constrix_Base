@@ -132,24 +132,14 @@ export const QualificationFormConfig = ({
             name: "graduation_date",
             label: "تاريخ الحصول على الشهادة",
             placeholder: "تاريخ الحصول على الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "graduation date is required",
-              },
-            ],
+            required: true,
           },
           {
             type: "text",
             name: "study_rate",
             label: "المعدلات الدراسية",
             placeholder: "المعدلات الدراسية",
-            validation: [
-              {
-                type: "required",
-                message: "graduation grade is required",
-              },
-            ],
+            required: true
           },
           {
             type: "file",
