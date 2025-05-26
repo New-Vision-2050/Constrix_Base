@@ -5,6 +5,7 @@ import { Label } from '@/modules/table/components/ui/label';
 import TextField from './fields/TextField';
 import TextareaField from './fields/TextareaField';
 import CheckboxField from './fields/CheckboxField';
+import CheckboxGroupField from './fields/CheckboxGroupField';
 import RadioField from './fields/RadioField';
 import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
@@ -132,6 +133,27 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
 
           // Render different field types
           switch (field.type) {
+            case 'checkboxGroup':
+              return (
+                <CheckboxGroupField
+                  field={field}
+                  value={fieldProps.value}
+                  error={error}
+                  touched={touched}
+                  onChange={fieldProps.onChange}
+                  onBlur={fieldProps.onBlur}
+                  dependencyValues={values}
+                  formValues={values}
+                  setFieldValue={(fieldName: string, newValue: any) => {
+                    // Update the form value for the specified field
+                    form.setValue(fieldName, newValue);
+                    // Trigger onChange to handle any side effects
+                    if (propOnChange) {
+                      propOnChange(fieldName, newValue);
+                    }
+                  }}
+                />
+              );
             case 'text':
             case 'email':
             case 'password':

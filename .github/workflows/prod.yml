@@ -31,42 +31,8 @@ jobs:
         run: |
           #!/bin/bash
           set -e  # Exit immediately if a command exits with a non-zero status
-
-          # Determine the event type
-          EVENT_NAME="${GITHUB_EVENT_NAME}"
-
-          if [ "$EVENT_NAME" == "pull_request" ]; then
-           # For pull_request events, extract the PR body
-           PR_BODY=$(jq --raw-output .pull_request.body < "$GITHUB_EVENT_PATH")
-           echo "$PR_BODY"
-           # Extract BE_URL from PR body using grep
-           BE_URL=$(echo "$PR_BODY" | sed -n 's/.*BE_URL:\s*\(https\?:\/\/\S\+\).*/\1/p')
-
-           if [ -z "$BE_URL" ]; then
-             # If BE_URL is not provided, derive it based on the branch name
-             BRANCH_NAME="${GITHUB_BASE_REF}"
-             ALLOWED_ENVS=("dev" "stage" "master")
-             VALID=false
-
-             for env in "${ALLOWED_ENVS[@]}"; do
-               if [ "$BRANCH_NAME" == "$env" ]; then
-                 VALID=true
-                 break
-               fi
-             done
-
-             if [ "$VALID" = false ]; then
-               # Default BE_URL for unspecified or invalid environments
-               BRANCH_NAME="master"
-             fi
-
-             BE_URL="https://core-be-${BRANCH_NAME}.constrix-nv.com"
-           fi
-          else
-           # For push events, extract the branch name from GITHUB_REF
-           BRANCH_NAME="${GITHUB_REF##*/}"
-           BE_URL="https://core-be-${BRANCH_NAME}.constrix-nv.com"
-          fi
+          
+          BE_URL="https://core-be-production.constrix-nv.com"
           echo "BE_URL=${BE_URL}" >> $GITHUB_ENV
 
       - name: Echo BE URL

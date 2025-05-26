@@ -65,7 +65,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
     ? selectOptions.filter((opt) =>
         Array.isArray(localValue) && localValue.includes(opt.value)
       )
-    : selectOptions.find((opt) => opt.value === localValue) || null;
+    : selectOptions.find((opt) => opt.value == localValue) || null;
 
   return (
     <div className="space-y-2">
@@ -87,6 +87,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
         isDisabled={shouldBeDisabled}
         placeholder={placeholder}
         isClearable
+        menuPortalTarget={document.body}
         classNames={{
           control: (state) =>
             "bg-sidebar border border-input hover:border-ring rounded-md shadow-sm transition-colors " +
@@ -100,7 +101,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
             "cursor-pointer px-3 py-2 text-sm transition-colors " +
             (state.isFocused ? "bg-accent text-accent-foreground" : "") +
             (state.isSelected
-              ? "bg-primary text-primary-foreground font-medium"
+              ? "bg-primary text-black dark:text-white font-medium"
               : ""),
           singleValue: () => "text-foreground",
           input: () => "text-foreground",
@@ -113,6 +114,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
             "text-muted-foreground hover:text-foreground p-1 rounded-md hover:bg-accent/50 transition-colors",
           valueContainer: () => "gap-1 px-3 py-1.5",
           noOptionsMessage: () => "text-muted-foreground p-2 text-sm",
+          menuPortal: () => `!z-[9999]`,
         }}
         unstyled
         className="min-w-[200px]"

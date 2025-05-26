@@ -91,6 +91,8 @@ export const useTableData = (
     executions: config?.executions,
     executionsConfig: config?.executionConfig,
     configColumns,
+    availableColumnKeys: config?.availableColumnKeys, // Pass the availableColumnKeys
+    defaultVisibleColumnKeys: config?.defaultVisibleColumnKeys, // Pass the defaultVisibleColumnKeys
     defaultItemsPerPage,
     defaultSortColumn,
     defaultSortDirection,
@@ -130,7 +132,8 @@ export const useTableData = (
         setTotalItems: (totalItems) => setTotalItems(totalItems),
         setPagination: (currentPage, totalPages, itemsPerPage) =>
           setPagination(currentPage, totalPages, itemsPerPage),
-        setColumns: (columns) => setColumns(columns),
+        // assigned to null to prevent column setting after fetching
+        setColumns: (columns) => null,
         setData: (data) => setData(data),
         dataMapper,
       }),
@@ -226,11 +229,12 @@ export const useTableData = (
     setColumns, // Export setColumns so it can be used directly
     setColumnVisibility,
     setColumnVisibilityKeys,
-    
+
     // Row selection actions
     setSelectionEnabled: tableInstance.setSelectionEnabled,
     selectRow: tableInstance.selectRow,
     selectAllRows: tableInstance.selectAllRows,
     clearSelectedRows: tableInstance.clearSelectedRows,
+    setVisibleColumns
   };
 };

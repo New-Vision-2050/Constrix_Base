@@ -23,14 +23,14 @@ export default function JobInformationPreviewMode() {
         />
       </div>
 
-      <div className="p-2">
+      {/* <div className="p-2">
         <PreviewTextField
           label="القسم"
           value={professionalData?.department?.name ?? ""}
           valid={Boolean(professionalData?.department?.name)}
           required
         />
-      </div>
+      </div> */}
 
       <div className="p-2">
         <PreviewTextField

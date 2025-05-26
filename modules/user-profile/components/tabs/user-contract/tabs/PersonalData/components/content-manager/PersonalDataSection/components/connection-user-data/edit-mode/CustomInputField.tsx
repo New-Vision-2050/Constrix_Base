@@ -3,7 +3,6 @@ import { useLocale } from "next-intl";
 import { Asterisk } from "lucide-react";
 import { Input } from "@/modules/table/components/ui/input";
 import CountryCodeSelect from "./CountriesCodesSelect";
-import { isValidPhone } from "@/utils/valid-phone";
 import { isValidEmail } from "@/utils/valid-email";
 import libphonenumbers from "libphonenumbers";
 
@@ -14,6 +13,8 @@ type PropsT = {
   required?: boolean;
   type: "email" | "phone";
   onChange: (str: string) => void;
+  error?: string;
+  setError?: React.Dispatch<React.SetStateAction<string>>;
   setPhoneCode?: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -24,13 +25,14 @@ const CustomInputField = ({
   disabled,
   required,
   onChange,
+  error,
+  setError,
   setPhoneCode,
 }: PropsT) => {
   const locale = useLocale();
   const isRTL = locale === "ar";
   const [code, setCode] = useState("+966");
   const labelDir = isRTL ? "right-[15px]" : "left-[15px]";
-  const [error, setError] = useState("");
 
   const handleChange = (str: string) => {
     let valid = true;
@@ -42,20 +44,21 @@ const CustomInputField = ({
         const number = phoneUtil.parseAndKeepRawInput(`${code} ${str}`);
 
         if (!phoneUtil.isValidNumber(number)) {
-          setError(message);
+          setError?.(message);
         } else {
-          setError("");
+          setError?.("");
         }
       } catch (error) {
-        setError(message);
+        console.log("Error :: ", error);
+        setError?.(message);
       }
       const cleanedStr = str.replace(/[^\d]/g, "");
 
       onChange(cleanedStr);
     } else if (type === "email") {
       valid = isValidEmail(str);
-      if (!valid) setError("invalid email");
-      else setError("");
+      if (!valid) setError?.("invalid email");
+      else setError?.("");
 
       onChange(str);
     }
@@ -64,10 +67,12 @@ const CustomInputField = ({
   return (
     <div className="relative">
       <div className="flex flex-col">
-        <div className="flex w-full items-center gap-1">
+        <div className="flex w-full items-end gap-1 mt-2">
           <Input
             type="text"
-            className={`${Boolean(error) ? "text-red-600" : ""}`}
+            className={`${
+              Boolean(error) ? "text-red-600" : ""
+            } focus-visible:ring-0`}
             value={value}
             disabled={disabled}
             onChange={(e) => handleChange(e.target.value)}
@@ -82,7 +87,11 @@ const CustomInputField = ({
             />
           )}
         </div>
-        {error && <small className="text-red-500">{error}</small>}
+        {error && (
+          <small className="text-red-500 absolute bottom-[-16px] text-[12px]">
+            {error}
+          </small>
+        )}
       </div>
       {/* label */}
       {label && (

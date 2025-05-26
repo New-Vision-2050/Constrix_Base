@@ -14,6 +14,8 @@ import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
+import { useEffect } from "react";
+import { X } from "lucide-react";
 
 type PropsT = {
   open: boolean;
@@ -23,6 +25,7 @@ type PropsT = {
 
 export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const { user } = useUserProfileCxt();
+  const [timer, setTimer] = useState(0);
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
   const [error, setError] = useState("");
@@ -34,6 +37,32 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const [otp, setOtp] = useState("");
   const label = type === "email" ? "البريد الالكتروني" : "رقم الجوال";
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            if (interval) clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timer]);
+
+  useEffect(() => {
+    if (open) {
+      setTimer(60);
+    }
+  }, [open]);
+
   const handleResend = async () => {
     try {
       setLoading(true);
@@ -42,6 +71,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         type: type,
       };
       await apiClient.post(`/company-users/send-otp`, body);
+      setTimer(60); // Restart the timer when the resend action is executed
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -76,7 +106,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px] flex flex-col gap-5">
-        <DialogHeader className="flex items-center justify-center">
+        <DialogHeader className="flex items-center justify-center relative">
           <DialogTitle>
             <InfoIcon additionClass="text-pink-500 text-[22px]" />
           </DialogTitle>
@@ -84,6 +114,12 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
             يرجى ادخال رمز التحقق المرسل الى {label}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="absolute top-2 right-2">
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            <X />
+          </Button>
+        </div>
 
         <div className="w-full flex items-center justify-center gap-1">
           <OtpInput otp={otp} setOtp={setOtp} />
@@ -94,8 +130,12 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
           <Button disabled={loading} onClick={handleConfirmOtp}>
             تأكيد
           </Button>
-          <Button disabled={loading} variant={"ghost"} onClick={handleResend}>
-            اعادة الارسال
+          <Button
+            disabled={loading || timer > 0}
+            variant={"ghost"}
+            onClick={handleResend}
+          >
+            اعادة الارسال {timer > 0 && `(${timer})`}
           </Button>
         </div>
       </DialogContent>

@@ -3,7 +3,7 @@ import PasswordIcon from "@/public/icons/password";
 import { forwardRef, useMemo, useState } from "react";
 import AutoHeight from "../animation/auto-height";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   containerClassName?: string;
   inputClassName?: string;
   error?: string | null;

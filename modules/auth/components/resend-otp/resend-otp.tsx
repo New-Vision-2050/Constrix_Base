@@ -7,7 +7,9 @@ const ResendOtp = ({
   identifier,
   resendFor,
   token,
+  timerStart,
 }: {
+  timerStart: () => void;
   timerReset: () => void;
   identifier: string;
   resendFor: "resend-otp" | "forget-password";
@@ -24,7 +26,15 @@ const ResendOtp = ({
         mutateOtp(
           { identifier, token },
           {
-            onSuccess: timerReset,
+            onSuccess: () => {
+              timerStart();
+            },
+            onError: () => {
+              timerReset();
+            },
+            onSettled: () => {
+              timerStart();
+            },
           }
         );
         break;
@@ -32,7 +42,18 @@ const ResendOtp = ({
         mutateForget(
           { identifier, token },
           {
-            onSuccess: timerReset,
+            onSuccess: () => {
+              timerStart();
+            },
+            onError: () => {
+              timerReset();
+            },
+            onSettled: () => {
+              timerStart();
+            },
+            // onSettled: () => {
+            //   timerStart();
+            // },
           }
         );
         break;

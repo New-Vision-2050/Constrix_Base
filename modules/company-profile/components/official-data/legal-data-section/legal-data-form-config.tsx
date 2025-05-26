@@ -28,6 +28,7 @@ export const LegalDataFormConfig = (
             name: "data",
             label: "",
             dynamicRowOptions: {
+              enableAdd:false,
               rowFields: [
                 {
                   name: "registration_type",

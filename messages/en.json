@@ -1,4 +1,8 @@
 {
+  "Main": {
+    "NoResultsRound": "No results found",
+    "Loading": "Loading data..."
+  },
   "Login": {
     "Control_panel": "Control panel",
     "SignIn": "Sign In",
@@ -17,7 +21,8 @@
       "Barcode": "Barcode",
       "LocalNetwork": "Local Network",
       "ChooseAnotherMethod": "Or choose another verification method",
-      "VerifyVia": "Verify via"
+      "VerifyVia": "Verify via",
+      "InvalidOtp": "The temporary password is incorrect"
     },
     "PhoneVerification": {
       "Title": "Phone Number Verification",
@@ -99,7 +104,9 @@
     "Search": "Search",
     "Actions": "Actions",
     "ToggleColumns": "Toggle visible columns",
-    "VisibleColumns": "Visible Columns"
+    "VisibleColumns": "Visible Columns",
+    "Minimal": "Minimal",
+    "All": "All"
   },
   "Companies": {
     "Companies": "Companies",
@@ -123,6 +130,7 @@
     "AreYouSureReactivate": "Do you want to confirm activating the company?",
     "AreYouSureDeactivate": "Do you want to confirm deactivating the company?",
     "createCompany": "Create Company",
+    "SaveCompany": "The company was saved with number",
     "Validation": {
       "englishName": "Short name should be in English",
       "arabicName": "The name should be in Arabic letters",
@@ -141,7 +149,10 @@
     "DashboardSettings": "Dashboard",
     "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
-    "CompanyName": "New Vision"
+    "CompanyName": "New Vision",
+    "OrganizationalStructure": "Organizational Structure",
+    "HumanResources": "Human Resources",
+    "ProgramManagement": "Program Management"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
@@ -197,6 +208,7 @@
       "placeholder": {
         "userName": "user name",
         "jobTitle": "job title",
+        "branch": "Branch",
         "address": "address",
         "appointmentDate": "Appointment Date",
         "image": "A 6*4 white background image is required."
@@ -308,6 +320,68 @@
           "cv": "CV"
         }
       }
+    }
+  },
+  "CompanyStructure": {
+    "actions": {
+      "print": "Print",
+      "viewMode": "View Mode",
+      "exportPdf": "Export PDF",
+      "setAsParent": "Set as Parent",
+      "treeView": "Tree View",
+      "listView": "List View"
+    },
+    "cards": {
+      "users": {
+        "title": "Number of Employees Indicator",
+        "subtitle": "Total Number of Employees",
+        "reminderStatement": "Number of Employees Remaining",
+        "achievedStatement": "Number of Employees Used"
+      },
+      "departments": {
+        "title": "Number of Sub-Departments Indicator",
+        "subtitle": "Total Number of Sub-Departments",
+        "reminderStatement": "Number of Sub-Departments Remaining",
+        "achievedStatement": "Number of Sub-Departments Used"
+      },
+      "managements": {
+        "title": "Number of Main Departments Indicator",
+        "subtitle": "Total Number of Main Departments",
+        "reminderStatement": "Number of Main Departments Remaining",
+        "achievedStatement": "Number of Main Departments Used"
+      },
+      "branches": {
+        "title": "Number of Branches Indicator",
+        "subtitle": "Total Number of Branches",
+        "reminderStatement": "Number of branches remaining",
+        "achievedStatement": "Number of branches used"
+      }
+    },
+    "tabs": {
+      "mainTabs": {
+        "organizational-structure-main-tab-1": {
+          "title": "Organizational Structure",
+          "tabs": {
+            "companyStructure": { "title": "Company Structure" },
+            "usersStructure": { "title": "Employee Structure" },
+            "managements": { "title": "Departments" }
+          }
+        },
+        "organizational-structure-main-tab-2": {
+          "title": "Structure Settings",
+          "tabs": {
+            "jobTitles": { "title": "Job Titles" },
+            "jobTypes": { "title": "Job Types" }
+          }
+        }
+      }
+    },
+    "CompanyOrganizationalStructure": {
+      "loading": "Loading organizational structure data..."
+    },
+    "ManagementStructure": {
+      "loading": "Loading Managements data...",
+      "confirmDelete": "Are you sure you want to delete this management?"
     }
   }
 }

@@ -8,7 +8,7 @@ import { useModal } from "@/hooks/use-modal";
 import { useFormStore } from "@/modules/form-builder";
 import { MapPin } from "lucide-react";
 import React from "react";
-import LocationSelector from "../../../../../components/shared/LocationSelector";
+import LocationSelector from "./LocationSelector";
 import { cn } from "@/lib/utils";
 
 const defaultKeys = [
@@ -41,7 +41,7 @@ const PickupMap = ({
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue } = useFormStore();
 
-  const handleSaveMap = (obj: any) => {
+  const handleSaveMap = (obj: Record<string, string | number | undefined>) => {
     const keys = keysToUpdate ?? defaultKeys;
     keys.forEach((key) => {
       if (obj[key] !== undefined) {

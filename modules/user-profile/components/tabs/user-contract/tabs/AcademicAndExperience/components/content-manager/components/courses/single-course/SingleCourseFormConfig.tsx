@@ -95,6 +95,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
                 type: "required",
                 message: "تاريخ الحصول على الشهادة مطلوب",
               },
+             
             ],
           },
           {
@@ -106,6 +107,15 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
               {
                 type: "required",
                 message: "تاريخ انتهاء الشهادة مطلوب",
+              },
+              {
+                type: "custom",
+                message:
+                  "تاريخ انتهاء الشهادة يجب أن يكون بعد تاريخ الحصول على الشهادة",
+                validator: (value, allValues) => {
+                  if (!value || !allValues?.date_obtain) return true;
+                  return new Date(value) > new Date(allValues.date_obtain);
+                },
               },
             ],
           },

@@ -32,6 +32,7 @@ const OtpHub = ({
       <AutoHeight condition={time === 0}>
         <ResendOtp
           timerReset={timerReset}
+          timerStart={timerStart}
           identifier={identifier}
           resendFor={resendFor}
           token={token}
