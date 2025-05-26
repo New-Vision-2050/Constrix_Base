@@ -10,61 +10,43 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "next-intl";
-import { Button } from "@/components/ui/button";
-import ChangeBranchDialog from "./change-branch-dialog";
 import { Branch } from "@/modules/company-profile/types/company";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { addNewBranchFormConfig } from "../branches-info/add-new-branch-form-config";
 import { useModal } from "@/hooks/use-modal";
+import ChangeBranchDialog from "./change-branch-dialog";
+import { baseURL } from "@/config/axios-config";
+import { updateBranchFormConfig } from "../branches-info/update-branch-form-config";
 
-interface BranchInfoProps {
-  branchName: string;
-  country: string;
-  manager: string;
-  employeesCount: number | string;
-  departmentsCount: number | string;
-  email: string;
-  phoneNumber: string;
-  isMultipleBranch?: boolean;
-  isMainBranch?: boolean;
-  className?: string;
+interface BranchCardProps {
+  branch: Branch;
   branches: Branch[];
-  branchId:string;
+  className?: string;
 }
 
-const BranchCard = ({
-  branchName,
-  country,
-  manager,
-  employeesCount,
-  departmentsCount,
-  email,
-  phoneNumber,
-  isMainBranch = false,
-  className = "",
-  isMultipleBranch,
-  branches,
-  branchId
-}: BranchInfoProps) => {
+const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const local = useLocale();
   const isRTL = local === "ar";
+  const isMainBranch = branch.parent_id === null;
+  const isMultipleBranch = branches.length > 1;
+
   const detailRows = [
-    { label: "مدير الفرع", value: manager },
-    { label: "عدد الموظفين", value: employeesCount },
-    { label: "عدد الاقسام", value: departmentsCount },
-    { label: "البريد الالكتروني", value: email },
-    { label: "رقم الجوال", value: phoneNumber },
+    { label: "مدير الفرع", value: branch.manager?.name ?? "-" },
+    { label: "عدد الموظفين", value: branch.user_count ?? 0 },
+    { label: "عدد الاقسام", value: branch.department_count ?? 0 },
+    { label: "البريد الالكتروني", value: branch.email ?? "—" },
+    { label: "رقم الجوال", value: branch.phone ?? "—" },
   ];
 
   return (
-    <div className={`w-full  p-4 rounded-md ${className}`}>
+    <div className={`w-full p-4 rounded-md ${className}`}>
       <div className="flex justify-between items-center mb-4">
         <div className="flex flex-col items-start">
-          <h2 className="text-2xl font-bold mb-1">{branchName}</h2>
+          <h2 className="text-2xl font-bold mb-1">{branch.name}</h2>
           <div className="flex items-center">
             <MapPin className="ml-1 text-pink-500" size={18} />
-            <span>{country}</span>
+            <span>{branch.country_name}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -107,13 +89,15 @@ const BranchCard = ({
           ))}
         </div>
       </Card>
-      {/* <SheetFormBuilder
-        config={{ ...addNewBranchFormConfig(branches), isEditMode: true }}
+      <SheetFormBuilder
+        config={{
+          ...updateBranchFormConfig(branches, branch, isMainBranch),
+        }}
         isOpen={isOpen}
         onOpenChange={handleClose}
-      />{" "} */}
+      />
       {isMultipleBranch && isMainBranch && (
-        <ChangeBranchDialog branches={branches} branchId={branchId} />
+        <ChangeBranchDialog branches={branches} branchId={branch.id} />
       )}
     </div>
   );
@@ -121,22 +105,9 @@ const BranchCard = ({
 
 const BranchInfo = ({ branches }: { branches: Branch[] }) => {
   return (
-    <div className=" bg-sidebar grid grid-cols-2 ">
+    <div className="bg-sidebar grid grid-cols-2">
       {branches.map((branch) => (
-        <BranchCard
-          key={branch.id}
-          branchId={branch.id}
-          branchName={branch.name}
-          country={branch.country_name}
-          manager={branch.manager?.name ?? '-'} // Replace with actual manager field if available
-          employeesCount={branch.user_count ?? 0} // Replace with actual value if available
-          departmentsCount={branch.department_count ?? 0} // Replace with actual value if available
-          email={branch.email ?? "—"}
-          phoneNumber={branch.phone ?? "—"}
-          isMainBranch={branch.parent_id === null}
-          isMultipleBranch={branches.length > 1}
-          branches={branches}
-        />
+        <BranchCard key={branch.id} branch={branch} branches={branches} />
       ))}
     </div>
   );

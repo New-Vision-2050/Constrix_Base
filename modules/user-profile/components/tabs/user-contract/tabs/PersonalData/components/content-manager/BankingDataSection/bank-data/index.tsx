@@ -9,6 +9,7 @@ import ErrorDialog from "@/components/shared/error-dialog";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { DropdownItemT } from "@/components/shared/IconBtnDropdown";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 
 type PropsT = { bank: BankAccount };
 
@@ -16,6 +17,7 @@ export default function BankSection({ bank }: PropsT) {
   // declare and define component state & vars
   const [menuItems, setMenuItems] = useState<DropdownItemT[]>([]);
   const [isOpen, handleOpen, handleClose] = useModal();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const { bankAccounts, handleRefreshBankingData, bankTypes } =
     useUserBankingDataCxt();
 
@@ -96,6 +98,12 @@ export default function BankSection({ bank }: PropsT) {
         desc={
           "لا يمكنك حذف حساب افتراضي، قم بإضافة حساب بنكي اخر على الاقل للحذف"
         }
+      />
+      <ConfirmationDialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        onConfirm={handleDeleteBank}
+        description={"هل أنت متأكد أنك تريد حذف هذا البنك؟"}
       />
     </>
   );

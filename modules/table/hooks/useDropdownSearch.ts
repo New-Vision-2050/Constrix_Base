@@ -470,22 +470,19 @@ export const useDropdownSearch = ({
           throw new Error("Expected array response from API");
         }
 
-        if (dynamicConfig.paginationEnabled) {
-          setHasMore(
-            response.data?.pagination?.last_page >
-              response.data?.pagination?.page
-          );
+      if (dynamicConfig.paginationEnabled) {
+        setHasMore(response.data.pagination?.last_page > response.data.pagination?.page)
+      }
+      // Extract values and labels from the response
+      const extractedOptions = data.map((item) => {
+        // Handle primitive values (string, number)
+        if (typeof item === 'string' || typeof item === 'number') {
+          // For primitive values, use the value as both value and label
+          return {
+            value: String(item),
+            label: String(item),
+          };
         }
-        // Extract values and labels from the response
-        const extractedOptions = data.map((item) => {
-          // Handle primitive values (string, number)
-          if (typeof item === "string" || typeof item === "number") {
-            // For primitive values, use the value as both value and label
-            return {
-              value: String(item),
-              label: String(item),
-            };
-          }
 
           // Handle array format [value, label]
           if (Array.isArray(item)) {

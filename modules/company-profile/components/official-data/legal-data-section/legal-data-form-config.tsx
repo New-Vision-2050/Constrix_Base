@@ -97,6 +97,12 @@ export const LegalDataFormConfig = (
               ],
               maxRows: 10,
               columns: 1,
+              deleteUrl: `${baseURL}/companies/company-profile/legal-data`,
+              onDeleteSuccess: () => {
+                queryClient.refetchQueries({
+                  queryKey: ["main-company-data", id, company_id],
+                });
+              },
             },
           },
         ],
