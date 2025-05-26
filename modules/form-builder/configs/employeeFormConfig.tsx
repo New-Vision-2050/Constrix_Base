@@ -1,11 +1,23 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import { useTranslations } from "next-intl";
+import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 
 export function employeeFormConfig(
   t: ReturnType<typeof useTranslations>
 ): FormConfig {
+
+  const handleConfirm = async (email: string | undefined) => {
+    console.log(`Email confirmation for: ${email}`);
+    const response = await apiClient.post(
+      `${baseURL}/company-users/check-email`,
+      { email }
+    );
+    console.log(`Email confirmation for: ${email} response:`, response);
+    return response;
+  };
+
   return {
     formId: "employee-form",
     title: "انشاء",
@@ -105,7 +117,15 @@ export function employeeFormConfig(
               },
               {
                 type: "apiValidation",
-                message: <InvalidMessage formId="companies-form" />,
+                message: (
+                  <InvalidMailDialog
+                    formId="employee-form"
+                    btnText="أضغط هنا"
+                    dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
+                    errorStatement="البريد الألكتروني مضاف مسبقأ"
+                    onConfirm={handleConfirm}
+                  />
+                ),
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,
                   method: "POST",
@@ -151,7 +171,7 @@ export function employeeFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
-              filterParam:'id'
+              filterParam: "id",
             },
           },
           {
