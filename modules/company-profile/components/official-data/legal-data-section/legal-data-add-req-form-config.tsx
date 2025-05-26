@@ -97,7 +97,7 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
                 message: "اضافة مرفق مطلوب",
               },
             ],
-            isMulti: false,
+            isMulti: true,
             fileConfig: {
               maxFileSize: 5 * 1024 * 1024, // 10MB
               showThumbnails: true,

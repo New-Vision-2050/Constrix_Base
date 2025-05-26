@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
@@ -28,7 +28,7 @@ export const LegalDataFormConfig = (
             name: "data",
             label: "",
             dynamicRowOptions: {
-              enableAdd:false,
+              enableAdd: false,
               rowFields: [
                 {
                   name: "registration_type",
@@ -80,8 +80,7 @@ export const LegalDataFormConfig = (
                       message: "اضافة مرفق مطلوب",
                     },
                   ],
-
-                  isMulti: false,
+                  isMulti: true,
                   fileConfig: {
                     maxFileSize: 5 * 1024 * 1024, // 10MB
                     showThumbnails: true,
