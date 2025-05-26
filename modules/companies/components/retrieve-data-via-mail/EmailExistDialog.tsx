@@ -10,6 +10,7 @@ import { memo, useState } from "react";
 
 // Props interface for the InvalidMessage component
 interface InvalidMessageProps {
+  formId?: string;
   email?: string;
   error_sentence?: string;
   company_id?: string | number;
@@ -22,8 +23,10 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
   error_sentence,
   company_id,
   exist_user_id,
+  formId,
 }: InvalidMessageProps) {
   // declare and define component state and variables
+  const formValues = useFormStore((state) => state.forms[formId ?? ""]?.values);
   const [loading, setLoading] = useState(false);
   const [isOpen, handleOpen, handleClose] = useModal();
 
@@ -64,7 +67,7 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
             <div className="flex flex-col">
               <p className="font-bold text-lg">
                 {error_sentence}
-                <br />(<span className="text-primary">{email}</span>
+                <br />(<span className="text-primary">{formValues?.email}</span>
                 )؟
               </p>
             </div>
@@ -94,6 +97,7 @@ export function InvalidMessage({
   const formValues = useFormStore((state) => state.forms[formId]?.values);
   return (
     <MemoizedInvalidMessage
+      formId={formId}
       email={formValues?.email}
       error_sentence={formValues?.error_sentence}
       exist_user_id={formValues?.exist_user_id}

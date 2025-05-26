@@ -3,6 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
+import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 
 export function brokerFormConfig(
   t: ReturnType<typeof useTranslations>
@@ -285,17 +286,25 @@ export function brokerFormConfig(
               },
               {
                 type: "apiValidation",
-                message: <InvalidMessage formId={formId} />,
+                message: (
+                  <InvalidMailDialog
+                    formId={formId}
+                    btnText="أضغط هنا"
+                    dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
+                    errorStatement="البريد الألكتروني مضاف مسبقأ"
+                    // onConfirm={handleConfirm}
+                  />
+                ),
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,
                   method: "POST",
                   debounceMs: 500,
                   paramName: "email",
                   successCondition: (response) => {
-                    useFormStore.getState().setValues(formId, {
+                    useFormStore.getState().setValues("companies-form", {
                       exist_user_id: response.payload?.[0]?.id,
                     });
-                    useFormStore.getState().setValues(formId, {
+                    useFormStore.getState().setValues("companies-form", {
                       error_sentence: response.payload?.[0]?.sentence,
                     });
 
