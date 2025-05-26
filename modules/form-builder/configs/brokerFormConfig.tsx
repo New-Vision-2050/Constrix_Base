@@ -22,6 +22,16 @@ export function brokerFormConfig(
         collapsible: false,
         fields: [
           {
+            name: "branches",
+            label: "branches",
+            type: "hiddenObject",
+          },
+          {
+            name: "user_id",
+            label: "user_id",
+            type: "hiddenObject",
+          },
+          {
             name: "name",
             label: "اسم الوسيط",
             type: "text",
@@ -291,7 +301,6 @@ export function brokerFormConfig(
                     formId={formId}
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                    errorStatement="البريد الألكتروني مضاف مسبقأ"
                     // onConfirm={handleConfirm}
                   />
                 ),
@@ -301,12 +310,20 @@ export function brokerFormConfig(
                   debounceMs: 500,
                   paramName: "email",
                   successCondition: (response) => {
-                    useFormStore.getState().setValues("companies-form", {
-                      exist_user_id: response.payload?.[0]?.id,
-                    });
-                    useFormStore.getState().setValues("companies-form", {
-                      error_sentence: response.payload?.[0]?.sentence,
-                    });
+                    const userId = response.payload?.[0]?.id || "";
+                    const branches = response.payload?.[0]?.branches || [];
+                    // Update the branches in the form store
+                    if (branches.length > 0) {
+                      useFormStore.getState().setValues(formId, {
+                        branches: JSON.stringify(branches),
+                      });
+                    }
+                    // store the user ID in the form store
+                    if (userId) {
+                      useFormStore.getState().setValues(formId, {
+                        user_id: userId,
+                      });
+                    }
 
                     return response.payload?.[0]?.status === 1;
                   },
