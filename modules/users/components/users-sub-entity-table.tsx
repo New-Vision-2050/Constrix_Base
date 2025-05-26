@@ -47,7 +47,7 @@ const UsersSubEntityTable = ({
 
   const buttonText =
     subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
-      ? "موظف"
+      ? ""
       : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CLIENT
       ? "عميل"
       : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.BROKER
