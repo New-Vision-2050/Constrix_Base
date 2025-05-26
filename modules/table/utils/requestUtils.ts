@@ -47,8 +47,8 @@ export const buildRequestUrl = (
 
   // Add sorting parameters
   if (sortColumn && sortDirection) {
-    newUrl.searchParams.append("_sort", sortColumn);
-    newUrl.searchParams.append("_order", sortDirection);
+    newUrl.searchParams.append("sort", sortColumn);
+    newUrl.searchParams.append("order", sortDirection);
   }
 
   // Add global search parameters

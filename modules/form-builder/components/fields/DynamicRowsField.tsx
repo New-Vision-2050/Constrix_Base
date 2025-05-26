@@ -131,13 +131,13 @@ const DynamicRowsField = React.forwardRef<
     const locale = useLocale();
     const isRtl = locale === "ar";
 
-    // Get form instance from the store
-    const formInstance = useFormInstance(formId);
+  // Get form instance from the store
+  const formInstance = useFormInstance(formId);
 
-    // Get dynamic row options with defaults
-    const options = useMemo(() => {
-      return field.dynamicRowOptions || {};
-    }, [field.dynamicRowOptions]);
+  // Get dynamic row options with defaults
+  const options = useMemo(() => {
+    return field.dynamicRowOptions || {};
+  }, [field.dynamicRowOptions]);
 
     // State for delete confirmation
     const [deleteID, setDeleteID] = useState<string | null>(null);

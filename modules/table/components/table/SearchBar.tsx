@@ -24,6 +24,8 @@ interface SearchBarProps {
   };
   onSetColumnVisibility?: (visible: boolean) => void;
   onSetColumnVisibilityKeys?: (keys: string[]) => void;
+  hideSearchField?: boolean;
+  tableTitle?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -40,6 +42,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   columnVisibility,
   onSetColumnVisibility,
   onSetColumnVisibilityKeys,
+  hideSearchField = false,
+  tableTitle,
 }) => {
   const t = useTranslations();
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
@@ -67,7 +71,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   useEffect(() => {
     // Skip the initial render
     if (selectedSearchColumns.length > 0) {
-      console.log("Selected search columns changed, triggering search with fields:", selectedSearchColumns);
+      console.log(
+        "Selected search columns changed, triggering search with fields:",
+        selectedSearchColumns
+      );
       onSearch(localSearchQuery, selectedSearchColumns);
     }
   }, [selectedSearchColumns]);
@@ -108,7 +115,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ? newColumns
           : searchConfig.defaultFields;
 
-        console.log("Search columns changed, triggering search with fields:", fieldsToPass);
+        console.log(
+          "Search columns changed, triggering search with fields:",
+          fieldsToPass
+        );
         onSearch(localSearchQuery, fieldsToPass);
       }, 0);
 
@@ -123,7 +133,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     // Trigger a search with all columns
     setTimeout(() => {
-      console.log("Selected all search columns, triggering search with fields:", allColumns);
+      console.log(
+        "Selected all search columns, triggering search with fields:",
+        allColumns
+      );
       onSearch(localSearchQuery, allColumns);
     }, 0);
   };
@@ -134,7 +147,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
     // Trigger a search with no columns
     setTimeout(() => {
-      console.log("Cleared all search columns, triggering search with no fields");
+      console.log(
+        "Cleared all search columns, triggering search with no fields"
+      );
       onSearch(localSearchQuery, []);
     }, 0);
   };
@@ -144,25 +159,28 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex p-5 flex-wrap items-center gap-3 mb-4 ">
       <div className="flex grow items-center space-x-2">
-        <div className="relative w-full">
-          <Search className="absolute  start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder={t("Table.Search")}
-            value={localSearchQuery}
-            onChange={handleInputChange}
-            className="w-full pl-8 pr-10"
-          />
-          {localSearchQuery && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+        {tableTitle && <h2 className="font-medium text-xl">{tableTitle}</h2>}
+        {!hideSearchField && (
+          <div className="relative w-full">
+            <Search className="absolute  start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder={t("Table.Search")}
+              value={localSearchQuery}
+              onChange={handleInputChange}
+              className="w-full pl-8 pr-10"
+            />
+            {localSearchQuery && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
         {/*    {searchConfig.allowFieldSelection && (
           <Popover>
             <PopoverTrigger asChild>

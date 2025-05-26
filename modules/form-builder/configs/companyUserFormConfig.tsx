@@ -150,7 +150,7 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
                         placeholder: "اختر المسمى الوظيفي",
                         required: true,
                         dynamicOptions: {
-                            url: `${baseURL}/job_titles?type=general_manager`,
+                            url: `${baseURL}/job_titles/list?type=general_manager`,
                             valueField: "id",
                             labelField: "name",
                             searchParam: "name",

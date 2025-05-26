@@ -3,21 +3,19 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteCookie, getCookie } from "cookies-next"; // Ensure you have this package installed
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
-import UserIcon from "@/public/icons/user";
-import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { useCurrentCompany } from '@/modules/company-profile/components/shared/company-header'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
 // import { useLogout } from '@/modules/auth/store/mutations'

@@ -4,6 +4,7 @@ import { Label } from "@/modules/table/components/ui/label";
 import TextField from "./fields/TextField";
 import TextareaField from "./fields/TextareaField";
 import CheckboxField from "./fields/CheckboxField";
+import CheckboxGroupField from "./fields/CheckboxGroupField";
 import RadioField from "./fields/RadioField";
 import MultiSelectField from "./fields/MultiSelectField";
 import DateField from "./fields/DateField";
@@ -87,10 +88,10 @@ const FormField: React.FC<FormFieldProps> = ({
       formInstance.setError(field.name, null);
 
      if(field.validation){
-         formInstance.validateField(
-             field.name,
-             newValue,
-             field.validation,
+        formInstance.validateField(
+          field.name,
+          newValue,
+          field.validation,
              values)
       }
     },
@@ -167,6 +168,28 @@ const FormField: React.FC<FormFieldProps> = ({
             touched={touched}
             onChange={onChange}
             onBlur={onBlur}
+          />
+        );
+
+      case "checkboxGroup":
+        return (
+          <CheckboxGroupField
+            field={field}
+            value={fieldValue}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
+            dependencyValues={values}
+            formValues={values}
+            setFieldValue={(fieldName, newValue) => {
+              // Update the form value for the specified field
+              if (propOnChange) {
+                propOnChange(fieldName, newValue);
+              }
+              // Clear any existing errors for this field
+              formInstance.setError(fieldName, null);
+            }}
           />
         );
 
@@ -350,10 +373,12 @@ const FormField: React.FC<FormFieldProps> = ({
       }}
       className="mb-4"
     >
-      <Label htmlFor={field.name} className="block mb-2">
-        {field.label}
-        {field.required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+      {!!field.label && (
+        <Label htmlFor={field.name} className="block mb-2">
+          {field.label}
+          {field.required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
       {renderField()}
       {/*<FieldHelperText*/}
       {/*  error={error}*/}

@@ -6,11 +6,14 @@ import { apiClient } from "@/config/axios-config";
 import { useUserBankingDataCxt } from "../context";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import { useState } from "react";
 
 type PropsT = { bank: BankAccount };
 export default function BankSection({ bank }: PropsT) {
   // declare and define component state & vars
   const [isOpen, handleOpen, handleClose] = useModal();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const { bankAccounts, handleRefreshBankingData } = useUserBankingDataCxt();
 
   // declare and define component methods
@@ -41,7 +44,7 @@ export default function BankSection({ bank }: PropsT) {
               title: "حذف البنك",
               onClick: () => {
                 if (bankAccounts?.length === 1) handleOpen();
-                else handleDeleteBank();
+                else setOpenDeleteDialog(true);
               },
             },
           ],
@@ -53,6 +56,12 @@ export default function BankSection({ bank }: PropsT) {
         desc={
           "لا يمكنك حذف حساب افتراضي، قم بإضافة حساب بنكي اخر على الاقل للحذف"
         }
+      />
+      <ConfirmationDialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        onConfirm={handleDeleteBank}
+        description={"هل أنت متأكد أنك تريد حذف هذا البنك؟"}
       />
     </>
   );

@@ -1,4 +1,8 @@
 {
+  "Main": {
+    "NoResultsRound": "لم يتم العثور على نتائج",
+    "Loading": "جاري تحميل البيانات..."
+  },
   "Login": {
     "Control_panel": "لوحة التحكم",
     "SignIn": "تسجيل الدخول",
@@ -17,7 +21,8 @@
       "Barcode": "الباركود",
       "LocalNetwork": "الشبكة المحلية",
       "ChooseAnotherMethod": "او اختر طريقة تحقق اخرى",
-      "VerifyVia": "التحقق عن طريق"
+      "VerifyVia": "التحقق عن طريق",
+      "InvalidOtp": "كلمه المرور الموقته غير صحيحية"
     },
     "PhoneVerification": {
       "Title": "التحقق من رقم الجوال",
@@ -99,7 +104,9 @@
     "Search": "بحث",
     "Actions": "إجراء",
     "ToggleColumns": "تبديل الأعمدة المرئية",
-    "VisibleColumns": "الأعمدة المرئية"
+    "VisibleColumns": "الأعمدة المرئية",
+    "Minimal": "الحد الأدنى",
+    "All": "الكل" 
   },
   "Companies": {
     "Companies": "الشركات",
@@ -123,6 +130,7 @@
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
     "createCompany": "انشاء شركة",
+    "SaveCompany": "تم حفظ الشركة برقم",
     "Validation": {
       "arabicName": "الاسم التجاري يجب ان يكون باللغه العربية",
       "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية",
@@ -141,7 +149,10 @@
     "DashboardSettings": "ملف الشركة",
     "UserProfileSettings": "الملف الشخصي",
     "Welcome": "مرحبا",
-    "CompanyName": "نيو فيجن"
+    "CompanyName": "نيو فيجن",
+    "OrganizationalStructure": "الهيكل التنظيمي",
+    "HumanResources": "الموارد البشرية",
+    "ProgramManagement": "ادارة البرامج"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -197,6 +208,7 @@
       "placeholder": {
         "userName": "اسم المستخدم",
         "jobTitle": "الوظيفة",
+        "branch": "الفرع",
         "address": "العنوان",
         "appointmentDate": "تاريخ التعيين",
         "image": "يلزم اضافة صورة خلفية بيضاء 6*4"
@@ -308,6 +320,68 @@
           "cv": "السيرة الذاتية"
         }
       }
+    }
+  },
+  "CompanyStructure": {
+    "actions": {
+      "viewMode": "عرض",
+      "print": "طباعة",
+      "exportPdf": "تصدير PDF",
+      "setAsParent": "تعيين كأب",
+      "treeView": "عرض شجري",
+      "listView": "عرض قائمة"
+    },
+    "cards": {
+      "users": {
+        "title": "مؤشر عدد الموظفين",
+        "subtitle": "اجمالي عدد الموظفين",
+        "reminderStatement": "عدد الموظفين المتبقية",
+        "achievedStatement": "عدد الموظفين المستخدمة"
+      },
+      "departments": {
+        "title": "مؤشر عدد الأقسام الفرعية",
+        "subtitle": "اجمالي عدد الأقسام الفرعية",
+        "reminderStatement": "عدد الأقسام الفرعية المتبقية",
+        "achievedStatement": "عدد الأقسام الفرعية المستخدمة"
+      },
+      "managements": {
+        "title": "مؤشر عدد الادارات الرئيسية",
+        "subtitle": "اجمالي عدد الادارات الرئيسية",
+        "reminderStatement": "عدد الادارات الرئيسية المتبقية",
+        "achievedStatement": "عدد الادارات الرئيسية المستخدمة"
+      },
+      "branches": {
+        "title": "مؤشر عدد الفروع",
+        "subtitle": "اجمالي عدد الفروع",
+        "reminderStatement": "عدد الفروع المتبقية",
+        "achievedStatement": "عدد الفروع المستخدمة"
+      }
+    },
+    "tabs": {
+      "mainTabs": {
+        "organizational-structure-main-tab-1": {
+          "title": "الهيكل التنظيمي",
+          "tabs": {
+            "companyStructure": { "title": "بنية الشركة" },
+            "usersStructure": { "title": "هيكل الموظفين" },
+            "managements": { "title": "الادارات" }
+          }
+        },
+        "organizational-structure-main-tab-2": {
+          "title": "أعدادات الهيكل",
+          "tabs": {
+            "jobTitles": { "title": "المسميات الوظيفية" },
+            "jobTypes": { "title": "أنواع الوظائف" }
+          }
+        }
+      }
+    },
+    "CompanyOrganizationalStructure": {
+      "loading": "تحميل بيانات الهيكل التنظيمي..."
+    },
+    "ManagementStructure": {
+      "loading": "تحميل بيانات الإدارات...",
+      "confirmDelete": "هل انت متأكد من حذف هذه الإدارة؟"
     }
   }
 }

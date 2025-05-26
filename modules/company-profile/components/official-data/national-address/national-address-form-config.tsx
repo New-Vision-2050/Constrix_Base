@@ -2,7 +2,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyAddress } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
-import PickupMap from "./pickup-map";
+import PickupMap from "../../../../../components/shared/pickup-map";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "next/navigation";
 

@@ -23,7 +23,7 @@ export const AddressFormConfig = () => {
         fields: [
           {
             name: "address",
-            label: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
+            label: "العنوان السكني بمقر العمل/العنوان الوطنى)",
             type: "text",
             placeholder: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
           },

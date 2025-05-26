@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { LOGIN_PHASES } from "../constant/login-phase";
-import { createPasswordValidation, createIdentifierValidation, getMessage } from "@/utils/zodTranslations";
+import {
+  createPasswordValidation,
+  createIdentifierValidation,
+  getMessage,
+} from "@/utils/zodTranslations";
 
 // Create schemas with translated messages
 const passwordValidation = createPasswordValidation();
@@ -14,7 +18,12 @@ const identifierSchema = z.object({
 });
 
 const passwordSchema = z.object({
-  password: z.string().min(1, getMessage("passwordRequired") as string),
+  password: z
+    .string()
+    .min(1, getMessage("passwordRequired") as string)
+    .refine((val) => !/\s/.test(val), {
+      message: getMessage("passwordNoSpaces") as string,
+    }),
 });
 
 const forgetPasswordSchema = z.object({
