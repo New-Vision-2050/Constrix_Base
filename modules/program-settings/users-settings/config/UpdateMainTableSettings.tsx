@@ -30,7 +30,7 @@ export const UpdateMainTableSettings = (
             optionsTitle: "نماذج التسجيل",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/registration_forms?super_entity_id=${id}`,
+              url: `${baseURL}/sub_entities/registration_forms/selection/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

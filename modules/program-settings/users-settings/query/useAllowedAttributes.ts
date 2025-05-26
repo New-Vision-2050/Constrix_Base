@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const fetchAllowedAttributes = async (id: string) => {
   const response = await apiClient.get(
-    "/sub_entities/super_entities/allowed_attributes/config",
+    "/sub_entities/super_entities/attributes/config",
     {
       params: { super_entity_id: id },
     }
