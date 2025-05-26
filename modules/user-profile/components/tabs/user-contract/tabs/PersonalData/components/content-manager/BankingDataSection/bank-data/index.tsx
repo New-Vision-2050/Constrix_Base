@@ -6,12 +6,53 @@ import { apiClient } from "@/config/axios-config";
 import { useUserBankingDataCxt } from "../context";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { DropdownItemT } from "@/components/shared/IconBtnDropdown";
 
 type PropsT = { bank: BankAccount };
+
 export default function BankSection({ bank }: PropsT) {
   // declare and define component state & vars
+  const [menuItems, setMenuItems] = useState<DropdownItemT[]>([]);
   const [isOpen, handleOpen, handleClose] = useModal();
-  const { bankAccounts, handleRefreshBankingData } = useUserBankingDataCxt();
+  const { bankAccounts, handleRefreshBankingData, bankTypes } =
+    useUserBankingDataCxt();
+
+  // ** handle side effects
+  useEffect(() => {
+    if (!bankAccounts || !bankTypes) return;
+    // set menu items based on bank accounts and types
+    setMenuItems(() => {
+      if (!bankTypes || bankAccounts.length === 0) {
+        return [
+          {
+            title: "حذف البنك",
+            onClick: () => {
+              if (bankAccounts.length === 1) handleOpen();
+              else handleDeleteBank();
+            },
+          },
+        ];
+      }
+
+      return [
+        ...bankTypes.map((type) => ({
+          title: type.name,
+          onClick: () => {
+            handleUpdateBankType(type.id);
+          },
+        })),
+        {
+          title: "حذف البنك",
+          onClick: () => {
+            if (bankAccounts.length === 1) handleOpen();
+            else handleDeleteBank();
+          },
+        },
+      ];
+    });
+  }, [bankAccounts, bankTypes]);
 
   // declare and define component methods
   const handleDeleteBank = async () => {
@@ -25,6 +66,19 @@ export default function BankSection({ bank }: PropsT) {
       });
   };
 
+  const handleUpdateBankType = async (typeId: string) => {
+    try {
+      await apiClient.put(`/bank_accounts/${bank?.id}/type`, {
+        type_id: typeId,
+      });
+      // refresh banking data after update
+      handleRefreshBankingData();
+      toast.success("تم تحديث نوع الحساب البنكي بنجاح");
+    } catch (err) {
+      console.log("update bank type error", err);
+    }
+  };
+
   // return ui
   return (
     <>
@@ -33,18 +87,7 @@ export default function BankSection({ bank }: PropsT) {
         reviewMode={<UserProfileBankingDataReview bank={bank} />}
         editMode={<BankingDataSectionEditMode bank={bank} />}
         settingsBtn={{
-          items: [
-            { title: "افتراضي", onClick: () => {} },
-            { title: "رواتب", onClick: () => {} },
-            { title: "عهد", onClick: () => {} },
-            {
-              title: "حذف البنك",
-              onClick: () => {
-                if (bankAccounts?.length === 1) handleOpen();
-                else handleDeleteBank();
-              },
-            },
-          ],
+          items: menuItems,
         }}
       />
       <ErrorDialog
