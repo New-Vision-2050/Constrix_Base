@@ -33,7 +33,7 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
       }}
       className={`node-content w-full bg-sidebar border-0 ${
         isSelected ? "border-primary ring-2 ring-primary" : ""
-      } rounded-lg shadow p-4 py-8 min-w-[360px] flex-shrink-0 min-h-[250px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${
+      } rounded-lg shadow p-4 py-8 min-w-[360px] flex-shrink-0 min-h-[260px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${
         isFirst ? "max-w-[400px] mx-auto" : ""
       } item-${
         node.children?.length === 1 ? node.children[0]?.type : node?.type
@@ -51,10 +51,10 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
       <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center pt-2">
         {node.name}
       </h3>
-      {(node.type || isDeputy) && <h4 className="font-normal mt--1 mb-2 flex gap-2 align-middle items-center capitalize text-white/50">
+      {(node.type || isDeputy) && <h4 className="font-normal mt--1 mb-2.5 flex gap-2 align-middle items-center capitalize text-white/50">
         {node.type ?? "Deputy Manager"}
       </h4>}
-      <div className="flex flex-col mt-3 gap-2">
+      <div className="flex flex-col mt-4 gap-3">
         {node?.phone && <div className="flex items-center gap-2"><Phone className="fill-primary text-primary" strokeWidth={0} /> <span dir={'ltr'}>{node.phone}</span></div>}
         {node?.email && <div className="flex items-center gap-2"><EnvelopIcon className="fill-primary text-primary"/> <span dir={'ltr'}>{node.email}</span></div>}
       </div>
