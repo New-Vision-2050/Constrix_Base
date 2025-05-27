@@ -17,10 +17,17 @@ type PropsT = {
   btnText?: string;
   dialogStatement?: string;
   errorStatement?: string;
+  onSuccess?: () => void;
 };
 export default function InvalidMailDialog(props: PropsT) {
   //  declare and define component state and variables
-  const { formId, btnText, dialogStatement, errorStatement } = props;
+  const {
+    formId,
+    btnText,
+    dialogStatement,
+    errorStatement,
+    onSuccess,
+  } = props;
   const formValues = useFormStore((state) => state.forms[formId]?.values);
   const [isOpen, handleOpen, handleClose] = useModal();
   const branches: Branch[] = useMemo(() => {
@@ -30,7 +37,7 @@ export default function InvalidMailDialog(props: PropsT) {
       return [];
     }
   }, [formValues.branches]);
-  
+
   const branchesIds: string[] = useMemo(() => {
     if (!branches || branches.length === 0) return [];
     return branches.map((branch: Branch) => branch.id);
@@ -47,11 +54,15 @@ export default function InvalidMailDialog(props: PropsT) {
       : `البريد الإلكتروني مسجل مسبقا`);
 
   // declare and define the form configuration for retrieving broker data
-  
   const _config = useMemo(
-    () => RetrieveBrokerFormConfig(userId, branchesIds),
+    () =>
+      RetrieveBrokerFormConfig(userId, branchesIds, () => {
+        handleClose();
+        onSuccess?.();
+      }),
     [userId, branchesIds]
   );
+
   const {
     values,
     errors,

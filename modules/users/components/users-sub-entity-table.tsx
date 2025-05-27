@@ -11,6 +11,7 @@ import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import {
   SheetFormBuilder,
   GetCompanyUserFormConfig,
+  useSheetForm,
 } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
 import { useTableStore } from "@/modules/table/store/useTableStore";
@@ -74,6 +75,19 @@ const UsersSubEntityTable = ({
     ? registrationFromConfig
     : GetCompanyUserFormConfig;
 
+  const { closeSheet } = useSheetForm({
+    config: finalFormConfig(t),
+  });
+
+  const handleCloseForm = () => {
+    closeSheet();
+    const tableStore = useTableStore.getState();
+    tableStore.reloadTable(TABLE_ID);
+    setTimeout(() => {
+      tableStore.setLoading(TABLE_ID, false);
+    }, 100);
+  };
+
   return (
     <div className="px-8 space-y-7">
       {hasHydrated && !!subEntity && (
@@ -83,7 +97,7 @@ const UsersSubEntityTable = ({
             <div className="flex items-center gap-3">
               <SheetFormBuilder
                 config={{
-                  ...finalFormConfig(t),
+                  ...finalFormConfig(t, handleCloseForm),
                   apiParams: {
                     sub_entity_id: sub_entity_id as string,
                   },

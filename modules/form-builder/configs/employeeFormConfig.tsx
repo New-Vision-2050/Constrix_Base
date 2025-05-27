@@ -1,23 +1,12 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
+import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 
 export function employeeFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  handleCloseForm?: () => void
 ): FormConfig {
-
-  const handleConfirm = async (email: string | undefined) => {
-    console.log(`Email confirmation for: ${email}`);
-    const response = await apiClient.post(
-      `${baseURL}/company-users/check-email`,
-      { email }
-    );
-    console.log(`Email confirmation for: ${email} response:`, response);
-    return response;
-  };
-
   return {
     formId: "employee-form",
     title: "انشاء",
@@ -123,7 +112,9 @@ export function employeeFormConfig(
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
                     errorStatement="البريد الألكتروني مضاف مسبقأ"
-                    onConfirm={handleConfirm}
+                    onSuccess={() => {
+                      handleCloseForm?.();
+                    }}
                   />
                 ),
                 apiConfig: {

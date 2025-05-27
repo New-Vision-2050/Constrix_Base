@@ -1,14 +1,15 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
 import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 
 export function brokerFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  handleCloseForm?: () => void
 ): FormConfig {
   const formId = `broker-form-config`;
+
   return {
     formId,
     title: "اضافة وسيط",
@@ -301,7 +302,10 @@ export function brokerFormConfig(
                     formId={formId}
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                    // onConfirm={handleConfirm}
+                    onSuccess={() => {
+                      console.log('onSuccess handleCloseForm')
+                      handleCloseForm?.();
+                    }}
                   />
                 ),
                 apiConfig: {

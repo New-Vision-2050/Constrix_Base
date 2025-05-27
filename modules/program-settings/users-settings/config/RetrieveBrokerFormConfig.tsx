@@ -2,18 +2,11 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { UsersTypes } from "../../constants/users-types";
 
-// Create a stable empty array to prevent infinite loops
-const EMPTY_BRANCHES: string[] = [];
-
 export const RetrieveBrokerFormConfig = (
   userId: string,
-  branchesIds?: string[]
+  branchesIds?: string[],
+  handleOnSuccess?: () => void
 ) => {
-  console.log(
-    "BranchesIds? ",
-    branchesIds && branchesIds.length > 0,
-    branchesIds
-  );
   const formId = `RetrieveBrokerFormConfig-programSettings`;
 
   const CreateUserFormConfig: FormConfig = {
@@ -56,6 +49,11 @@ export const RetrieveBrokerFormConfig = (
     ],
     initialValues: {
       branch_ids: [6],
+    },
+    onSuccess: () => {
+      if (handleOnSuccess) {
+        handleOnSuccess();
+      }
     },
     isEditMode: true,
     submitButtonText: "حفظ",
