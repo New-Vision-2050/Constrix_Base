@@ -68,6 +68,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             label: "ارفاق العرض",
             type: "file",
             name: "file",
+            isMulti: true,
             placeholder: "job_offer.pdf",
           },
         ],
