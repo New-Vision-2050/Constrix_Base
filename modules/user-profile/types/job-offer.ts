@@ -7,7 +7,7 @@ export type JobOffer = {
   date_send: string;
   global_id: string;
   id: string;
-  files: MediaFile;
+  files: MediaFile[];
   job_offer_number: string;
   updated_at: string;
 };
