@@ -14,5 +14,18 @@ export default async function fetchEmployeesTreeData(branchId: string|number) {
     },
   });
 
-  return res.data.payload;
+  return res.data.payload?.map(makeIdsUnique);
 }
+
+const generateUniqueId = (baseId: string) =>
+  `${baseId}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
+const makeIdsUnique = (node: any): any => ({
+  ...node,
+  id: typeof node.id === 'string' ? generateUniqueId(node.id) : node.id,
+  children: node.children?.map(makeIdsUnique),
+  deputy_managers: node.deputy_managers?.map(dm => ({
+    ...dm,
+    id: typeof dm.id === 'string' ? generateUniqueId(dm.id) : dm.id
+  }))
+});
