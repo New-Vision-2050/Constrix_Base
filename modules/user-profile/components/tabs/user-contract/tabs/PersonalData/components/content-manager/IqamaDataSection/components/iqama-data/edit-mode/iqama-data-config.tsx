@@ -53,6 +53,13 @@ export const IqamaDataFormConfig = () => {
             label: "ارفاق رقم الاقامة",
             type: "file",
             isMulti: true,
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
             placeholder: "ارفاق رقم الاقامة",
           },
         ],

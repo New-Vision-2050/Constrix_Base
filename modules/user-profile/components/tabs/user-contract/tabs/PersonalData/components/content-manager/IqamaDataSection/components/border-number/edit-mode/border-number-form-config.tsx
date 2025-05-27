@@ -53,6 +53,13 @@ export const BorderNumberFormConfig = () => {
             label: "ارفاق رقم الحدود",
             type: "file",
             isMulti: true,
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
             placeholder: "ارفاق رقم الحدود",
           },
         ],
