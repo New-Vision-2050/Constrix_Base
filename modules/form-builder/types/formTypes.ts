@@ -118,6 +118,8 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
+    
+  fieldClassName?: string; // Class name for the field container
 
   // CheckboxGroup sync properties
   syncWithField?: string; // Name of another checkbox group field to sync with
@@ -291,4 +293,6 @@ export interface FormConfig {
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
   wrapperClassName?: string;
+  subWrapperClassName?:string
+  subWrapperParentClassName?:string;
 }
