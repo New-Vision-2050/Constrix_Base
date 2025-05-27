@@ -34,7 +34,7 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
   const detailRows = [
     { label: "مدير الفرع", value: branch.manager?.name ?? "-" },
     { label: "عدد الموظفين", value: branch.user_count ?? 0 },
-    { label: "عدد الاقسام", value: branch.department_count ?? 0 },
+    // { label: "عدد الاقسام", value: branch.department_count ?? 0 },
     { label: "البريد الالكتروني", value: branch.email ?? "—" },
     { label: "رقم الجوال", value: branch.phone ?? "—" },
   ];
