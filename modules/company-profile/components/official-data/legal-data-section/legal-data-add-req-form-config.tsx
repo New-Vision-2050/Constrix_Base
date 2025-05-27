@@ -1,9 +1,10 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "next/navigation";
+import { RegistrationTypes } from "./registration-types";
 
 export const LegalDataAddReqFormEditConfig = (id?: string) => {
   const { company_id }: { company_id: string | undefined } = useParams();
@@ -27,7 +28,7 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             placeholder: "نوع التسجل",
             dynamicOptions: {
               url: `${baseURL}/company_registration_types`,
-              valueField: "id",
+              valueField: "id_type",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
@@ -45,15 +46,16 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
           },
           {
             name: "regestration_number",
-            label: "ادخل رقم الترخيص",
+            label: "رقم السجل التجاري / رقم الـ 700",
             type: "text",
-            placeholder: "ادخل رقم الترخيص",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل رقم الترخيص",
-              },
-            ],
+            placeholder: "رقم السجل التجاري / رقم الـ 700",
+            condition: (values) => {
+              // Disable the field if registration_type_id is 3 (Without Commercial Register)
+              const typeId = values["registration_type_id"]?.split(
+                "_"
+              )?.[1];
+              return typeId !== RegistrationTypes.WithoutARegister;
+            },
           },
           {
             name: "start_date",
@@ -64,12 +66,6 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
               formId: `company-official-data-form-${id}-${company_id}`,
               field: "end_date",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل تاريخ الاصدار",
-              },
-            ],
           },
           {
             name: "end_date",
@@ -80,23 +76,11 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
               formId: `company-official-data-form-${id}-${company_id}`,
               field: "start_date",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل تاريخ الانتهاء",
-              },
-            ],
           },
           {
             type: "file",
             name: "file",
             label: "اضافة مرفق",
-            validation: [
-              {
-                type: "required",
-                message: "اضافة مرفق مطلوب",
-              },
-            ],
             isMulti: true,
             fileConfig: {
               maxFileSize: 5 * 1024 * 1024, // 10MB
@@ -116,7 +100,7 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
       const obj = {
-        registration_type_id: formData.registration_type_id,
+        registration_type_id: (formData.registration_type_id as string).split("_")?.[0],
         regestration_number: formData.regestration_number,
         start_date: formData.start_date,
         end_date: formData.end_date,
