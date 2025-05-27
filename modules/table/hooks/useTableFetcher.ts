@@ -29,6 +29,7 @@ type FetchDataBaseProps = {
   abortControllerRef: React.MutableRefObject<AbortController | null>;
   configColumns?: ColumnConfig[];
   _forceRefetch?: number; // Add _forceRefetch property
+  apiParams?: Record<string, string>;
 };
 
 type FetchDataAdditionalProps = {
@@ -55,6 +56,7 @@ export const createTableFetcher = () => {
   const fetchData = useCallback(async (props: FetchDataProps) => {
     const {
       url,
+      apiParams,
       currentPage,
       itemsPerPage,
       sortColumn,
@@ -98,7 +100,8 @@ export const createTableFetcher = () => {
         searchQuery,
         searchFields,
         columnSearchState,
-        searchConfig
+        searchConfig,
+        apiParams,
       );
 
       console.log(`Fetching data from: ${apiUrl.toString()}`);

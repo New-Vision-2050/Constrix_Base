@@ -4,6 +4,7 @@ import { ColumnConfig } from "./columnConfig";
 export interface TableConfig {
   url: string;
   tableId?: string; // Unique identifier for the table instance
+  apiParams?: Record<string, string>;
   columns?: ColumnConfig[];
   availableColumnKeys?: string[]; // New: Array of column keys that should be available, filtering out others
   defaultVisibleColumnKeys?: string[]; // New: Array of column keys that should be visible by default
