@@ -39,7 +39,7 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
         node.children?.length === 1 ? node.children[0]?.type : node?.type
       }`}
     >
-      <div className={cn('w-[42] h-[42] flex justify-center items-center font-semibold rounded-full',
+      <div className={cn('w-[42px] h-[42px] flex justify-center items-center font-semibold rounded-full',
         isDeputy
           ? 'bg-[#18CB5F]'
           : (node.name === 'No Manager Assigned'

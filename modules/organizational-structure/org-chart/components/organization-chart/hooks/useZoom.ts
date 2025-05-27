@@ -45,7 +45,8 @@ export function useZoom(params : UseZoomOptions) {
     const container = containerRef.current;
 
     // device pixel ratio (1.0 for no zoom, >1.0 if zoomed in)
-    const dpr = window.devicePixelRatio || 1;
+    // const dpr = window.devicePixelRatio || 1;
+    const dpr = 1;
 
     const rect = container.getBoundingClientRect();
 
