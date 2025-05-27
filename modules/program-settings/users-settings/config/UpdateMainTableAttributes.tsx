@@ -30,6 +30,7 @@ export const UpdateMainTableAttributes = (
             label: "",
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
+            fieldClassName: "bg-background border border-border rounded-md p-2",
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/attributes/all?super_entity_id=${id}`,
               valueField: "id",
@@ -51,6 +52,7 @@ export const UpdateMainTableAttributes = (
             label: "",
             optionsTitle: "العناصر التنقية",
             isMulti: true,
+            fieldClassName: "bg-background border border-border rounded-md p-2",
             dynamicOptions: {
               url: `${baseURL}/sub_entities/super_entities/attributes/all?super_entity_id=${id}`,
               valueField: "id",
@@ -69,6 +71,8 @@ export const UpdateMainTableAttributes = (
         ],
       },
     ],
+    subWrapperClassName: "bg-transparent border-none",
+    subWrapperParentClassName: "border-none",
     submitButtonText: "تعديل",
     cancelButtonText: "إلغاء",
     showReset: false,

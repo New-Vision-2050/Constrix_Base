@@ -20,6 +20,7 @@ interface ExportButtonProps {
   searchQuery?: string;
   searchFields?: string[];
   columnSearchState?: Record<string, any>;
+  apiParams?: Record<string, string>;
 }
 
 const ExportButton: React.FC<ExportButtonProps> = ({
@@ -29,6 +30,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   searchQuery = "",
   searchFields = [],
   columnSearchState = {},
+  apiParams
 }) => {
   const t = useTranslations();
   const { toast } = useToast();
@@ -42,7 +44,17 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   const hasSelectedRows = selectedIds.length > 0;
 
   // Construct the export URL by appending "/export" to the base URL
-  const exportUrl = `${url.endsWith("/") ? url.slice(0, -1) : url}/export`;
+  let exportUrl = `${url.endsWith("/") ? url.slice(0, -1) : url}/export`;
+
+  if(apiParams){
+    const params = new URLSearchParams(apiParams);
+    if (params.toString()) {
+      exportUrl += `?${params.toString()}`;
+    }
+  }
+
+
+
 
   const handleExport = async (format: "csv" | "json") => {
     try {
