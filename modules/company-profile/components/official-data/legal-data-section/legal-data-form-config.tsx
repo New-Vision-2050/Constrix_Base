@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { serialize } from "object-to-formdata";
 import { useParams } from "next/navigation";
+import { RegistrationTypes } from "./registration-types";
 
 export const LegalDataFormConfig = (
   companyLegalData: CompanyLegalData[],
@@ -13,6 +14,9 @@ export const LegalDataFormConfig = (
   const { company_id }: { company_id: string | undefined } = useParams();
 
   const queryClient = useQueryClient();
+
+  console.log("companyLegalData_companyLegalData:", companyLegalData);
+
   const LegalDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
     apiUrl: `${baseURL}/write-the-url`,
@@ -31,6 +35,11 @@ export const LegalDataFormConfig = (
               enableAdd: false,
               rowFields: [
                 {
+                  name: "registration_type_type",
+                  label: "registration_type_type",
+                  type: "hiddenObject",
+                },
+                {
                   name: "registration_type",
                   label: "نوع التسجل",
                   type: "text",
@@ -45,41 +54,30 @@ export const LegalDataFormConfig = (
                   placeholder: "رقم السجل التجاري",
                   disabled: true,
                   gridArea: 2,
+                  condition: (values) => {
+                    console.log("registration_type_type value:", values["registration_type_type"]);
+                    return (
+                      values["registration_type_type"] !=
+                      RegistrationTypes.WithoutARegister
+                    );
+                  },
                 },
                 {
                   name: "start_date",
                   label: "تاريخ الإصدار",
                   type: "date",
                   placeholder: "تاريخ الإصدار",
-                  validation: [
-                    {
-                      type: "required",
-                      message: "تاريخ الإصدار مطلوب",
-                    },
-                  ],
                 },
                 {
                   name: "end_date",
                   label: "تاريخ الانتهاء",
                   type: "date",
                   placeholder: "تاريخ الانتهاء",
-                  validation: [
-                    {
-                      type: "required",
-                      message: "تاريخ الانتهاء مطلوب",
-                    },
-                  ],
                 },
                 {
                   type: "file",
                   name: "file",
                   label: "اضافة مرفق",
-                  validation: [
-                    {
-                      type: "required",
-                      message: "اضافة مرفق مطلوب",
-                    },
-                  ],
                   isMulti: true,
                   fileConfig: {
                     maxFileSize: 5 * 1024 * 1024, // 10MB
