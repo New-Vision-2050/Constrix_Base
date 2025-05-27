@@ -65,6 +65,13 @@ export const IdentityDataFormConfig = () => {
             isMulti: true,
             name: "file_identity",
             placeholder: "رقم جواز السفر",
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
           },
         ],
         columns: 2,

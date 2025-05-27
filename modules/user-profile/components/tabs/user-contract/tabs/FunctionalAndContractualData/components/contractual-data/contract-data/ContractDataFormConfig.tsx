@@ -322,6 +322,13 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             type: "file",
             placeholder: "ارفاق العقد",
             isMulti: true,
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
           },
         ],
         columns: 2,
