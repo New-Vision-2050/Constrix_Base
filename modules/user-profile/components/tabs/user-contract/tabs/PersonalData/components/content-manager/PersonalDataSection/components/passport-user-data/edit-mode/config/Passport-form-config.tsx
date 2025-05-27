@@ -71,6 +71,13 @@ export const PassportDataFormConfig = () => {
             isMulti: true,
             name: "file_passport",
             placeholder: "ارفاق الهوية",
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
           },
         ],
         columns: 2,
