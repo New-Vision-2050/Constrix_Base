@@ -5,13 +5,7 @@ import { useFormInstance, useFormStore } from "../../hooks/useFormStore";
 import { cn } from "@/lib/utils";
 import { Trash2, ArrowUp, ArrowDown, Plus, GripVertical } from "lucide-react";
 import { useLocale } from "next-intl";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
 import FormField from "../../components/FormField";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
