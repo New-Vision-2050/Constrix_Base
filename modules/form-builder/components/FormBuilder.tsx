@@ -321,6 +321,8 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               collapsible={section.collapsible}
               clearFiledError={clearFiledError}
               formId={config.formId}
+              subWrapperClassName={config?.subWrapperClassName}
+              subWrapperParentClassName={config?.subWrapperParentClassName}
             />
           ))
         )}
