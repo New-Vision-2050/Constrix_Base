@@ -321,6 +321,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: "ارفاق العقد",
             type: "file",
             placeholder: "ارفاق العقد",
+            isMulti: true,
           },
         ],
         columns: 2,
