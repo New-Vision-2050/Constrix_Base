@@ -2,9 +2,8 @@ import { useModal } from "@/hooks/use-modal";
 import InfoIcon from "@/public/icons/InfoIcon";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useFormStore, useSheetForm } from "@/modules/form-builder";
+import { useFormStore, useSheetForm, FormConfig } from "@/modules/form-builder";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
-import { RetrieveBrokerFormConfig } from "../users-settings/config/RetrieveBrokerFormConfig";
 import { useMemo } from "react";
 
 type Branch = {
@@ -18,6 +17,7 @@ type PropsT = {
   dialogStatement?: string;
   errorStatement?: string;
   onSuccess?: () => void;
+  formConfig: (userId: string, branchesIds?: string[], handleOnSuccess?: () => void) => FormConfig;
 };
 export default function InvalidMailDialog(props: PropsT) {
   //  declare and define component state and variables
@@ -27,6 +27,7 @@ export default function InvalidMailDialog(props: PropsT) {
     dialogStatement,
     errorStatement,
     onSuccess,
+    formConfig
   } = props;
   const formValues = useFormStore((state) => state.forms[formId]?.values);
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -56,7 +57,7 @@ export default function InvalidMailDialog(props: PropsT) {
   // declare and define the form configuration for retrieving broker data
   const _config = useMemo(
     () =>
-      RetrieveBrokerFormConfig(userId, branchesIds, () => {
+       formConfig(userId, branchesIds, () => {
         handleClose();
         onSuccess?.();
       }),

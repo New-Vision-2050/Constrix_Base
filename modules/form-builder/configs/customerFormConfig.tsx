@@ -1,11 +1,13 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
+import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
+import { RetrieveClientFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveClientFormConfig";
 
 export function customerFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  handleCloseForm?: () => void
 ): FormConfig {
   const formId = `client-form-config`;
   const isCompany = (values: Record<string, string>) => values["type"] === "2";
@@ -24,6 +26,16 @@ export function customerFormConfig(
       {
         collapsible: false,
         fields: [
+          {
+            name: "branches",
+            label: "branches",
+            type: "hiddenObject",
+          },
+          {
+            name: "user_id",
+            label: "user_id",
+            type: "hiddenObject",
+          },
           {
             type: "select",
             name: "type",
@@ -265,19 +277,37 @@ export function customerFormConfig(
               },
               {
                 type: "apiValidation",
-                message: <InvalidMessage formId={formId} />,
+                message: (
+                  <InvalidMailDialog
+                    formId={formId}
+                    btnText="أضغط هنا"
+                    dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
+                    onSuccess={() => {
+                      handleCloseForm?.();
+                    }}
+                    formConfig={RetrieveClientFormConfig}
+                  />
+                ),
                 apiConfig: {
-                  url: `${baseURL}/2-users/check-email`,
+                  url: `${baseURL}/company-users/check-email`,
                   method: "POST",
                   debounceMs: 500,
                   paramName: "email",
                   successCondition: (response) => {
-                    useFormStore.getState().setValues(formId, {
-                      exist_user_id: response.payload?.[0]?.id,
-                    });
-                    useFormStore.getState().setValues(formId, {
-                      error_sentence: response.payload?.[0]?.sentence,
-                    });
+                    const userId = response.payload?.[0]?.id || "";
+                    const branches = response.payload?.[0]?.branches || [];
+                    // Update the branches in the form store
+                    if (branches.length > 0) {
+                      useFormStore.getState().setValues(formId, {
+                        branches: JSON.stringify(branches),
+                      });
+                    }
+                    // store the user ID in the form store
+                    if (userId) {
+                      useFormStore.getState().setValues(formId, {
+                        user_id: userId,
+                      });
+                    }
 
                     return response.payload?.[0]?.status === 1;
                   },

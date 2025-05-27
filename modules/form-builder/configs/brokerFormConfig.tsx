@@ -3,6 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
 import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
+import { RetrieveBrokerFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveBrokerFormConfig";
 
 export function brokerFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -303,9 +304,10 @@ export function brokerFormConfig(
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
                     onSuccess={() => {
-                      console.log('onSuccess handleCloseForm')
+                      console.log("onSuccess handleCloseForm");
                       handleCloseForm?.();
                     }}
+                    formConfig={RetrieveBrokerFormConfig}
                   />
                 ),
                 apiConfig: {
