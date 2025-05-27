@@ -2,13 +2,15 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
+import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
 
 export function employeeFormConfig(
   t: ReturnType<typeof useTranslations>,
   handleCloseForm?: () => void
 ): FormConfig {
+  const formId = "employee-form";
   return {
-    formId: "employee-form",
+    formId,
     title: "انشاء",
     apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
@@ -19,6 +21,16 @@ export function employeeFormConfig(
       {
         collapsible: false,
         fields: [
+          {
+            name: "branches",
+            label: "branches",
+            type: "hiddenObject",
+          },
+          {
+            name: "user_id",
+            label: "user_id",
+            type: "hiddenObject",
+          },
           {
             name: "first_name",
             label: "اسم الموظف الاول",
@@ -108,13 +120,13 @@ export function employeeFormConfig(
                 type: "apiValidation",
                 message: (
                   <InvalidMailDialog
-                    formId="employee-form"
+                    formId={formId}
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                    errorStatement="البريد الألكتروني مضاف مسبقأ"
                     onSuccess={() => {
                       handleCloseForm?.();
                     }}
+                    formConfig={RetrieveEmployeeFormConfig}
                   />
                 ),
                 apiConfig: {
@@ -123,12 +135,20 @@ export function employeeFormConfig(
                   debounceMs: 500,
                   paramName: "email",
                   successCondition: (response) => {
-                    useFormStore.getState().setValues("companies-form", {
-                      exist_user_id: response.payload?.[0]?.id,
-                    });
-                    useFormStore.getState().setValues("companies-form", {
-                      error_sentence: response.payload?.[0]?.sentence,
-                    });
+                    const userId = response.payload?.[0]?.id || "";
+                    const branches = response.payload?.[0]?.branches || [];
+                    // Update the branches in the form store
+                    if (branches.length > 0) {
+                      useFormStore.getState().setValues(formId, {
+                        branches: JSON.stringify(branches),
+                      });
+                    }
+                    // store the user ID in the form store
+                    if (userId) {
+                      useFormStore.getState().setValues(formId, {
+                        user_id: userId,
+                      });
+                    }
 
                     return response.payload?.[0]?.status === 1;
                   },
