@@ -30,12 +30,21 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
   const [loading, setLoading] = useState(false);
   const [isOpen, handleOpen, handleClose] = useModal();
 
+  console.log(
+    "email,error_sentence,company_id,exist_user_id,formId,",
+    email,
+    error_sentence,
+    company_id,
+    exist_user_id,
+    formId
+  );
+
   const handleConfirmUserData = async () => {
     setLoading(true);
     const url = `/company-users/${exist_user_id}/assign-role`;
     await apiClient
       .post(url, {
-        company_id: company_id,
+        company_id: formValues.company_id || company_id,
       })
       .then(() => {
         location.reload();
@@ -67,7 +76,10 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
             <div className="flex flex-col">
               <p className="font-bold text-lg">
                 {error_sentence}
-                <br />(<span className="text-primary">{formValues?.email}</span>
+                <br />(
+                <span className="text-primary">
+                  {formValues?.email || email}
+                </span>
                 )؟
               </p>
             </div>
