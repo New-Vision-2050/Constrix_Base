@@ -67,14 +67,14 @@ const ListView: React.FC<ListViewProps> = ({
 
       <div className="overflow-auto">
         {visibleNodes.length > 0 ? (
-          visibleNodes.map(({ node, parentName, depth, path }) => (
+          visibleNodes.map(({ node, parentName, depth, path }, index) => (
             <ListViewNode
               key={path}
               node={node}
               parentName={parentName}
               depth={depth}
               path={path}
-              DropDownMenu={DropDownMenu}
+              DropDownMenu={index != 0 ? DropDownMenu : undefined}
               selectedNodeId={selectedNodeId}
               expandedNodes={expandedNodes}
               expandedDetails={expandedDetails}
