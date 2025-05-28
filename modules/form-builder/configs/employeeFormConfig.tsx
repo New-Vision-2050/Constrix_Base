@@ -1,8 +1,8 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
-import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
+import EmployeeInvalidMailDialog from "@/modules/program-settings/components/EmployeeInvalidMailDialog";
 
 export function employeeFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -22,8 +22,13 @@ export function employeeFormConfig(
         collapsible: false,
         fields: [
           {
-            name: "branches",
-            label: "branches",
+            name: "roles",
+            label: "roles",
+            type: "hiddenObject",
+          },
+          {
+            name: "employee_in_company",
+            label: "employee_in_company",
             type: "hiddenObject",
           },
           {
@@ -119,7 +124,7 @@ export function employeeFormConfig(
               {
                 type: "apiValidation",
                 message: (
-                  <InvalidMailDialog
+                  <EmployeeInvalidMailDialog
                     formId={formId}
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
@@ -136,11 +141,11 @@ export function employeeFormConfig(
                   paramName: "email",
                   successCondition: (response) => {
                     const userId = response.payload?.[0]?.id || "";
-                    const branches = response.payload?.[0]?.branches || [];
-                    // Update the branches in the form store
-                    if (branches.length > 0) {
+                    const roles = response.payload?.[0]?.roles || [];
+                    // Update the roles in the form store
+                    if (roles.length > 0) {
                       useFormStore.getState().setValues(formId, {
-                        branches: JSON.stringify(branches),
+                        roles: JSON.stringify(roles),
                       });
                     }
                     // store the user ID in the form store
@@ -149,6 +154,11 @@ export function employeeFormConfig(
                         user_id: userId,
                       });
                     }
+
+                    useFormStore.getState().setValues(formId, {
+                      employee_in_company:
+                        response.payload?.[0]?.status_in_company,
+                    });
 
                     return response.payload?.[0]?.status === 1;
                   },

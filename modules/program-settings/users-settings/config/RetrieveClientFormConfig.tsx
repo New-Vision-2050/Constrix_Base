@@ -5,6 +5,8 @@ import { UsersTypes } from "../../constants/users-types";
 export const RetrieveClientFormConfig = (
   userId: string,
   branchesIds?: string[],
+  roleTwoIds?: string[], //employee
+  roleThreeIds?: string[], //broker
   handleOnSuccess?: () => void
 ) => {
   const formId = `RetrieveClientFormConfig-programSettings`;
@@ -27,10 +29,11 @@ export const RetrieveClientFormConfig = (
             type: "hiddenObject",
           },
           {
-            name: "branch_ids",
-            label: "الفروع",
+            name: "roleTwoIds",
+            label: "موظف لدى",
             type: "select",
             isMulti: true,
+            disabled: true,
             placeholder: "اختر الفروع",
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
@@ -43,12 +46,54 @@ export const RetrieveClientFormConfig = (
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            condition: () => roleTwoIds && roleTwoIds?.length > 0,
+          },
+          {
+            name: "roleThreeIds",
+            label: "وسيط لدي",
+            type: "select",
+            isMulti: true,
+            disabled: true,
+            placeholder: "اختر الفروع",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: () => roleThreeIds && roleThreeIds?.length > 0,
+          },
+          {
+            name: "branch_ids",
+            label: "عميل لدي",
+            type: "select",
+            isMulti: true,
+            placeholder: "اختر الفروع",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              filterParam: "id",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
           },
         ],
       },
     ],
     initialValues: {
-      branch_ids: [6],
+      roleTwoIds,
+      roleThreeIds,
+      branch_ids: branchesIds,
     },
     onSuccess: () => {
       if (handleOnSuccess) {

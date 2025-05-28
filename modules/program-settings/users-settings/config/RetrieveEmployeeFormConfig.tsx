@@ -5,6 +5,8 @@ import { UsersTypes } from "../../constants/users-types";
 export const RetrieveEmployeeFormConfig = (
   userId: string,
   branchesIds?: string[],
+  roleTwoIds?: string[], //client
+  roleThreeIds?: string[], //broker
   handleOnSuccess?: () => void
 ) => {
   const formId = `RetrieveEmployeeFormConfig-programSettings`;
@@ -25,6 +27,46 @@ export const RetrieveEmployeeFormConfig = (
             label: "role",
             defaultValue: UsersTypes.Employee,
             type: "hiddenObject",
+          },
+          {
+            name: "roleTwoIds",
+            label: "عميل لدى",
+            type: "select",
+            isMulti: true,
+            disabled: true,
+            placeholder: "اختر الفروع",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: () => roleTwoIds && roleTwoIds?.length > 0,
+          },
+          {
+            name: "roleThreeIds",
+            label: "وسيط لدي",
+            type: "select",
+            isMulti: true,
+            disabled: true,
+            placeholder: "اختر الفروع",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: () => roleThreeIds && roleThreeIds?.length > 0,
           },
           {
             name: "branch_ids",
@@ -48,6 +90,8 @@ export const RetrieveEmployeeFormConfig = (
       },
     ],
     initialValues: {
+      roleTwoIds,
+      roleThreeIds,
       branch_ids: branchesIds,
     },
     onSuccess: () => {

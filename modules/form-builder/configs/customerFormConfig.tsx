@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
 import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 import { RetrieveClientFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveClientFormConfig";
+import { UsersTypes } from "@/modules/program-settings/constants/users-types";
 
 export function customerFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -27,8 +28,8 @@ export function customerFormConfig(
         collapsible: false,
         fields: [
           {
-            name: "branches",
-            label: "branches",
+            name: "roles",
+            label: "roles",
             type: "hiddenObject",
           },
           {
@@ -285,6 +286,7 @@ export function customerFormConfig(
                     onSuccess={() => {
                       handleCloseForm?.();
                     }}
+                    currentRole={UsersTypes.Client}
                     formConfig={RetrieveClientFormConfig}
                   />
                 ),
@@ -295,11 +297,11 @@ export function customerFormConfig(
                   paramName: "email",
                   successCondition: (response) => {
                     const userId = response.payload?.[0]?.id || "";
-                    const branches = response.payload?.[0]?.branches || [];
-                    // Update the branches in the form store
-                    if (branches.length > 0) {
+                    const roles = response.payload?.[0]?.roles || [];
+                    // Update the roles in the form store
+                    if (roles.length > 0) {
                       useFormStore.getState().setValues(formId, {
-                        branches: JSON.stringify(branches),
+                        roles: JSON.stringify(roles),
                       });
                     }
                     // store the user ID in the form store

@@ -19,6 +19,7 @@ import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2"
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import { useMemo } from "react";
 
 const UsersSubEntityTable = ({
   programName,
@@ -37,10 +38,6 @@ const UsersSubEntityTable = ({
   const registration_form_id = subEntity?.registration_form?.id;
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
-
-  const registrationFromConfig = registrationFormSlug
-    ? REGISTRATION_FORMS[registrationFormSlug]
-    : GetCompanyUserFormConfig;
 
   const RegistrationTableConfig = registrationFormSlug
     ? REGISTRATION_TABLES[registrationFormSlug]
@@ -71,9 +68,16 @@ const UsersSubEntityTable = ({
     allSearchedFields,
   };
 
-  const finalFormConfig = Boolean(registrationFromConfig)
-    ? registrationFromConfig
-    : GetCompanyUserFormConfig;
+  const finalFormConfig = useMemo(() => {
+    const registrationFromConfig = registrationFormSlug
+      ? REGISTRATION_FORMS[registrationFormSlug]
+      : GetCompanyUserFormConfig;
+
+
+    return Boolean(registrationFromConfig)
+      ? registrationFromConfig
+      : GetCompanyUserFormConfig;
+  }, [registrationFormSlug, slug]);
 
   const { closeSheet } = useSheetForm({
     config: finalFormConfig(t),

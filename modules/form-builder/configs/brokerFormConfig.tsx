@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
 import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 import { RetrieveBrokerFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveBrokerFormConfig";
+import { UsersTypes } from "@/modules/program-settings/constants/users-types";
 
 export function brokerFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -24,8 +25,8 @@ export function brokerFormConfig(
         collapsible: false,
         fields: [
           {
-            name: "branches",
-            label: "branches",
+            name: "roles",
+            label: "roles",
             type: "hiddenObject",
           },
           {
@@ -280,6 +281,33 @@ export function brokerFormConfig(
             label: "رقم الهوية",
             type: "text",
             placeholder: "رقم الهوية",
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "رقم الهوية مطلوب",
+              },
+              {
+                type: "pattern",
+                value: /^[12]\d{9}$/,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+              },
+              {
+                type: "minLength",
+                value: 10,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+              },
+              {
+                type: "maxLength",
+                value: 10,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+              },
+              {
+                type: "pattern",
+                value: /^\d+$/,
+                message: "رقم الهوية يجب أن يحتوي على أرقام فقط",
+              },
+            ],
           },
           {
             name: "email",
@@ -307,6 +335,7 @@ export function brokerFormConfig(
                       console.log("onSuccess handleCloseForm");
                       handleCloseForm?.();
                     }}
+                    currentRole={UsersTypes.Broker}
                     formConfig={RetrieveBrokerFormConfig}
                   />
                 ),
@@ -317,11 +346,11 @@ export function brokerFormConfig(
                   paramName: "email",
                   successCondition: (response) => {
                     const userId = response.payload?.[0]?.id || "";
-                    const branches = response.payload?.[0]?.branches || [];
-                    // Update the branches in the form store
-                    if (branches.length > 0) {
+                    const roles = response.payload?.[0]?.roles || [];
+                    // Update the roles in the form store
+                    if (roles.length > 0) {
                       useFormStore.getState().setValues(formId, {
-                        branches: JSON.stringify(branches),
+                        roles: JSON.stringify(roles),
                       });
                     }
                     // store the user ID in the form store
