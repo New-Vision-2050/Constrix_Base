@@ -80,14 +80,14 @@ export default function ChangeUserPassword() {
       </RadioGroup>
 
       {changeType === "manual" && (
-        <EnterPassword password={password} setPassword={setPassword} />
+        <EnterPassword loading={loading} password={password} setPassword={setPassword} />
       )}
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <div className="flex items-center justify-end">
         <Button
           onClick={handleChangeUserPassword}
-          disabled={!changeType || loading}
+          disabled={!changeType || password.length == 0 || loading}
         >
           تحديث
         </Button>

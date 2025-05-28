@@ -5,11 +5,12 @@ import { SetStateAction, useState } from "react";
 
 type PropsT = {
   password: string;
+  loading: boolean;
   setPassword: React.Dispatch<SetStateAction<string>>;
 };
 export default function EnterPassword(props: PropsT) {
   // declare and define component state and variables
-  const { password, setPassword } = props;
+  const { password, setPassword,loading } = props;
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -30,7 +31,7 @@ export default function EnterPassword(props: PropsT) {
   return (
     <div className="flex flex-col">
       {/* advice */}
-      <div className="flex flex-col gap-1 p-3 bg-[#121426]">
+      <div className="flex flex-col gap-1 p-3 dark:bg-[#121426]">
         <p className="text-primary font-semibold">
           تأكد من تلبية هذه المتطلبات:
         </p>
@@ -49,6 +50,7 @@ export default function EnterPassword(props: PropsT) {
             id="password"
             type={showPassword ? "text" : "password"}
             value={password}
+            disabled={loading}
             onChange={handleChange}
             className={`w-full px-4 py-2 pr-10 border rounded-md shadow-sm focus:outline-none focus:ring-2 ${
               error
