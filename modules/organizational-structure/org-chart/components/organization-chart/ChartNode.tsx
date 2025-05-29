@@ -6,6 +6,7 @@ import {
   DropdownItemT,
 } from "@/components/shared/dropdown-button";
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 interface ChartNodeProps {
   node: OrgChartNode;
@@ -82,9 +83,10 @@ const ChartNode: React.FC<ChartNodeProps> = ({
 
         {isDeputyManagersExist && (
           <div className="flex flex-col flex-grow items-start">
-            <p className="text-slate-400">المدير النائب</p>
+            <p className="text-slate-400">نائب المدير</p>
             {node?.deputy_managers?.map((deputy_manager, index) => (
               <ManagerComponent
+                isDeputy={true}
                 key={deputy_manager.id + "." + index}
                 name={deputy_manager?.name as string}
               />
@@ -130,14 +132,30 @@ const ChartNode: React.FC<ChartNodeProps> = ({
 const ManagerComponent = ({
   name,
   label,
+  isDeputy,
 }: {
   label?: string;
+  isDeputy?: boolean;
   name: string;
 }) => {
   return (
-    <div className="flex flex-col items-start flex-grow">
-      {label && <p className="text-slate-400">{label}</p>}
-      <p>{name}</p>
+    <div className="flex gap-2 items-center mx-2">
+      <div
+        className={cn(
+          "w-[30px] h-[30px] flex justify-center items-center font-semibold rounded-full",
+          !isDeputy
+            ? "bg-primary"
+            : name === "No Manager Assigned"
+            ? "bg-gray-600"
+            : "bg-[#F19B02]"
+        )}
+      >
+        {name ? name?.[0]?.toUpperCase() : "N/A"}
+      </div>
+      <div className="flex flex-col items-start flex-grow">
+        {label && <p className="text-slate-400">{label}</p>}
+        <p>{name}</p>
+      </div>
     </div>
   );
 };
