@@ -12,7 +12,7 @@ export default function UserCertifications() {
           className="bg-primary text-white px-4 py-2 rounded"
           onClick={() => setOpen(true)}
         >
-          اضافة حقل اخر
+          اضافة شهادة
         </button>
       </div>
       <AddNewCertification open={open} setOpen={setOpen} />

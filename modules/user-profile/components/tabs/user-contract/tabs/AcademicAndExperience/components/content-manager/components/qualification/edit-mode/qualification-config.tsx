@@ -131,12 +131,12 @@ export const QualificationFormConfig = ({
             type: "date",
             name: "graduation_date",
             label: "تاريخ الحصول على الشهادة",
-            placeholder: "تاريخ الحصول على الشهادة",
+            placeholder: "تاريخ الشهادة",
             required: true,
             validation: [
               {
                 type: "required",
-                message: "تاريخ الحصول على الشهادة مطلوب",
+                message: "تاريخ الشهادة مطلوب",
               },
             ],
           },
