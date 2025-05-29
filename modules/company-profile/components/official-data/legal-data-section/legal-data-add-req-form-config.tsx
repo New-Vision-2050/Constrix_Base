@@ -51,9 +51,7 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             placeholder: "رقم السجل التجاري / رقم الـ 700",
             condition: (values) => {
               // Disable the field if registration_type_id is 3 (Without Commercial Register)
-              const typeId = values["registration_type_id"]?.split(
-                "_"
-              )?.[1];
+              const typeId = values["registration_type_id"]?.split("_")?.[1];
               return typeId !== RegistrationTypes.WithoutARegister;
             },
           },
@@ -83,8 +81,14 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             label: "اضافة مرفق",
             isMulti: true,
             fileConfig: {
-              maxFileSize: 5 * 1024 * 1024, // 10MB
               showThumbnails: true,
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "application/msword", // doc
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
             },
           },
         ],
@@ -100,7 +104,9 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
       const obj = {
-        registration_type_id: (formData.registration_type_id as string).split("_")?.[0],
+        registration_type_id: (formData.registration_type_id as string).split(
+          "_"
+        )?.[0],
         regestration_number: formData.regestration_number,
         start_date: formData.start_date,
         end_date: formData.end_date,
