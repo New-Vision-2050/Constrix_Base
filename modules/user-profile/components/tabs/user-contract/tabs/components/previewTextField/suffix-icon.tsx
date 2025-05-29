@@ -93,10 +93,12 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
             }}
             style={{
               cursor:
-                type === "pdf" || type === "image" ? "pointer" : "default",
+                (type === "pdf" || type === "image") && mediaId
+                  ? "pointer"
+                  : "default",
             }}
           >
-            <Trash2 color={loading ? "lightgray" : "red"} />
+            <Trash2 color={loading || !mediaId ? "lightgray" : "red"} />
           </span>
         )}
       </div>
