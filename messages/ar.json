@@ -129,6 +129,7 @@
     "AreYouSure": "هل أنت متأكد؟",
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
+    "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الشركة؟",
     "createCompany": "انشاء شركة",
     "SaveCompany": "تم حفظ الشركة برقم",
     "Validation": {

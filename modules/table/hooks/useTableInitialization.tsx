@@ -30,6 +30,7 @@ interface TableInitializationProps {
   setColumns: (columns: ColumnConfig[]) => void;
   setVisibleColumns?: (columnKeys: string[]) => void;
   tableId?: string; // Add tableId parameter
+  deleteConfirmMessage?: string; // Add deleteConfirmMessage parameter
 }
 
 export const useTableInitialization = ({
@@ -50,6 +51,7 @@ export const useTableInitialization = ({
   setColumns,
   setVisibleColumns,
   tableId = "default", // Default to 'default' if not provided
+  deleteConfirmMessage,
 }: TableInitializationProps) => {
   const t = useTranslations();
 
@@ -98,6 +100,7 @@ export const useTableInitialization = ({
               buttonLabel={t("Companies.Actions")}
               showEdit={Boolean(executionsConfig?.canEdit)}
               showDelete={Boolean(executionsConfig?.canDelete)}
+              deleteConfirmMessage={deleteConfirmMessage}
             />
           ),
         });
