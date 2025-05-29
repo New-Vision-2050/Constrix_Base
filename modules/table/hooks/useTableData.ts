@@ -105,6 +105,7 @@ export const useTableData = (
     setColumns: (columns) => setColumns(columns),
     setVisibleColumns: (columnKeys) => setVisibleColumns(columnKeys),
     tableId, // Pass the tableId
+    deleteConfirmMessage: config?.deleteConfirmMessage, // Pass the deleteConfirmMessage
   });
 
   // Get data fetcher

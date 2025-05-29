@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { ColumnSearchConfig } from "../tableTypes";
 import { ColumnConfig } from "./columnConfig";
 
@@ -29,4 +30,5 @@ export interface TableConfig {
   allSearchedFields?: any[];
   hideSearchField?: boolean;
   tableTitle?: string;
+  deleteConfirmMessage?: string;
 }
