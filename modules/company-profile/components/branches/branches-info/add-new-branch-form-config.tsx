@@ -146,19 +146,8 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           {
             name: "parent_id",
             label: "الفرع الرئيسي",
-            type: "select",
-            options: branches
-              .filter((branch) => !branch.parent_id)
-              .map((branch) => ({
-                value: branch.id,
-                label: branch.name,
-              })),
-            validation: [
-              {
-                type: "required",
-                message: "ادخل نوع الفرع",
-              },
-            ],
+            type: "text",
+            disabled: true,
           },
           {
             type: "select",
@@ -248,6 +237,10 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     resetOnSuccess: false,
     showCancelButton: false,
     showBackButton: false,
+    initialValues: {
+      parent_id:
+        branches.find((branch) => !Boolean(branch.parent_id))?.name ?? "",
+    },
     onSubmit: async (formData) => {
       return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
         url: `${baseURL}/management_hierarchies/create-branch`,
