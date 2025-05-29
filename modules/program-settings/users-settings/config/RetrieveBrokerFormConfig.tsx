@@ -46,7 +46,7 @@ export const RetrieveBrokerFormConfig = (
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            condition: () => roleTwoIds && roleTwoIds?.length > 0,
+            condition: () => Boolean(roleTwoIds && roleTwoIds?.length > 0),
           },
           {
             name: "roleThreeIds",
@@ -66,7 +66,7 @@ export const RetrieveBrokerFormConfig = (
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            condition: () => roleThreeIds && roleThreeIds?.length > 0,
+            condition: () => Boolean(roleThreeIds && roleThreeIds?.length > 0),
           },
           {
             name: "branch_ids",

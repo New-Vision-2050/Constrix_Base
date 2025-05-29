@@ -20,11 +20,11 @@ export default async function fetchEmployeesTreeData(branchId: string|number) {
 const generateUniqueId = (baseId: string) =>
   `${baseId}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
-const makeIdsUnique = (node: any): any => ({
+const makeIdsUnique = (node: OrgChartNode): OrgChartNode => ({
   ...node,
   id: typeof node.id === 'string' ? generateUniqueId(node.id) : node.id,
   children: node.children?.map(makeIdsUnique),
-  deputy_managers: node.deputy_managers?.map(dm => ({
+  deputy_managers: node.deputy_managers?.map((dm: OrgChartNode) => ({
     ...dm,
     id: typeof dm.id === 'string' ? generateUniqueId(dm.id) : dm.id
   }))

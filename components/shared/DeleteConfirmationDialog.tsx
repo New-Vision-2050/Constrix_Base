@@ -39,8 +39,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       if (onSuccess) onSuccess();
       onClose();
     },
-    onError: (error) => {
-      const errorMsg = error?.response?.data?.message || error.message;
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
+      const errorMsg = error?.response?.data?.message || error.message || 'An error occurred';
       setErrorMsg(errorMsg as string);
     },
   });

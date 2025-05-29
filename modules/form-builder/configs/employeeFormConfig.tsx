@@ -131,7 +131,9 @@ export function employeeFormConfig(
                     onSuccess={() => {
                       handleCloseForm?.();
                     }}
-                    formConfig={RetrieveEmployeeFormConfig}
+                    formConfig={(userId: string, branchesIds?: string[], handleOnSuccess?: () => void) =>
+                      RetrieveEmployeeFormConfig(userId, branchesIds, undefined, undefined, handleOnSuccess)
+                    }
                   />
                 ),
                 apiConfig: {
