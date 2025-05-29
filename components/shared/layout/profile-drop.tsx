@@ -3,10 +3,9 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Button } from "@/components/ui/button";
 import { ChevronDown, UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -15,8 +14,8 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
-import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { useCurrentCompany } from '@/modules/company-profile/components/shared/company-header'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
 import {

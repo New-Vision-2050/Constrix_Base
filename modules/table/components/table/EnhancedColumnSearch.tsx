@@ -82,6 +82,7 @@ const EnhancedColumnSearch: React.FC<EnhancedColumnSearchProps> = ({
                 columnKey={column.key}
                 label={column.label}
                 value={value}
+                isMulti={column.searchType?.isMulti || false}
                 onChange={(newValue) => handleSearchChange(column.key, newValue)}
                 options={searchType.dropdownOptions}
                 dynamicConfig={searchType.dynamicDropdown}

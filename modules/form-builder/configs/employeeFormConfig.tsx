@@ -1,13 +1,16 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import { useTranslations } from "next-intl";
+import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
+import EmployeeInvalidMailDialog from "@/modules/program-settings/components/EmployeeInvalidMailDialog";
 
 export function employeeFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  handleCloseForm?: () => void
 ): FormConfig {
+  const formId = "employee-form";
   return {
-    formId: "employee-form",
+    formId,
     title: "انشاء",
     apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
@@ -18,6 +21,21 @@ export function employeeFormConfig(
       {
         collapsible: false,
         fields: [
+          {
+            name: "roles",
+            label: "roles",
+            type: "hiddenObject",
+          },
+          {
+            name: "employee_in_company",
+            label: "employee_in_company",
+            type: "hiddenObject",
+          },
+          {
+            name: "user_id",
+            label: "user_id",
+            type: "hiddenObject",
+          },
           {
             name: "first_name",
             label: "اسم الموظف الاول",
@@ -105,18 +123,41 @@ export function employeeFormConfig(
               },
               {
                 type: "apiValidation",
-                message: <InvalidMessage formId="companies-form" />,
+                message: (
+                  <EmployeeInvalidMailDialog
+                    formId={formId}
+                    btnText="أضغط هنا"
+                    dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
+                    onSuccess={() => {
+                      handleCloseForm?.();
+                    }}
+                    formConfig={RetrieveEmployeeFormConfig}
+                  />
+                ),
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,
                   method: "POST",
                   debounceMs: 500,
                   paramName: "email",
                   successCondition: (response) => {
-                    useFormStore.getState().setValues("companies-form", {
-                      exist_user_id: response.payload?.[0]?.id,
-                    });
-                    useFormStore.getState().setValues("companies-form", {
-                      error_sentence: response.payload?.[0]?.sentence,
+                    const userId = response.payload?.[0]?.id || "";
+                    const roles = response.payload?.[0]?.roles || [];
+                    // Update the roles in the form store
+                    if (roles.length > 0) {
+                      useFormStore.getState().setValues(formId, {
+                        roles: JSON.stringify(roles),
+                      });
+                    }
+                    // store the user ID in the form store
+                    if (userId) {
+                      useFormStore.getState().setValues(formId, {
+                        user_id: userId,
+                      });
+                    }
+
+                    useFormStore.getState().setValues(formId, {
+                      employee_in_company:
+                        response.payload?.[0]?.status_in_company,
                     });
 
                     return response.payload?.[0]?.status === 1;
@@ -151,7 +192,7 @@ export function employeeFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
-              filterParam:'id'
+              filterParam: "id",
             },
           },
           {
