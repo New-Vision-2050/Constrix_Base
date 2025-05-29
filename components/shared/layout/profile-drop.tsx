@@ -19,6 +19,11 @@ import { useCurrentCompany } from "@/modules/company-profile/components/shared/c
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
+import {
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@radix-ui/react-dropdown-menu";
 // import { useLogout } from '@/modules/auth/store/mutations'
 
 interface menuItem {
@@ -40,7 +45,10 @@ const ProfileDrop = () => {
   const user = useAuthStore((state) => state.user);
   const { data, isSuccess } = useCurrentCompany();
   const [open, setOpen] = useState<boolean>(false);
-  const [menuItems, setMenuItems] = useState<menuItem[]>([
+  const [branches, setBranches] = useState<menuItem[]>([]);
+
+  // main items without branches and logout
+  const mainMenuItems: menuItem[] = [
     {
       label: t("profile"),
       icon: <UserIcon />,
@@ -66,23 +74,16 @@ const ProfileDrop = () => {
         );
       },
     },
-    {
-      label: t("Logout"),
-      icon: <LogoutIcon />,
-      func: () => {
-        deleteCookie("new-vision-token");
-        router?.push("/");
-        // logoutMutation(undefined,
-        //   {
-        //     onSuccess: (res) => {
-        //       deleteCookie("new-vision-token");
-        //       router?.push('/');
-        //     },
-        //   }
-        // );
-      },
+  ];
+  // logout element
+  const logoutMenuItem: menuItem = {
+    label: t("Logout"),
+    icon: <LogoutIcon />,
+    func: () => {
+      deleteCookie("new-vision-token");
+      router?.push("/");
     },
-  ]);
+  };
   // const { mutate: logoutMutation } = useLogout();
 
   const handleClose = (fallback: () => void) => {
@@ -98,7 +99,7 @@ const ProfileDrop = () => {
   useEffect(
     () => {
       if (isSuccess && data?.payload?.branches?.length) {
-        const branches = data?.payload?.branches?.map((branch, index) => ({
+        const _branches = data?.payload?.branches?.map((branch, index) => ({
           id: branch.id,
           label: branch?.name,
           icon: <CompanyIcon />,
@@ -116,10 +117,7 @@ const ProfileDrop = () => {
             );
           },
         }));
-
-        const allMenuItems = menuItems;
-        const logout = allMenuItems.splice(-1);
-        setMenuItems([...allMenuItems, ...branches, ...logout]);
+        setBranches(_branches);
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     [isSuccess]
@@ -145,7 +143,7 @@ const ProfileDrop = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {menuItems.map((item, index) => (
+          {mainMenuItems.map((item, index) => (
             <Fragment key={index}>
               {item.hasTopSeparator ? <DropdownMenuSeparator /> : ""}
               <DropdownMenuItem
@@ -158,6 +156,45 @@ const ProfileDrop = () => {
               {item?.hasBottomSeparator && <DropdownMenuSeparator />}
             </Fragment>
           ))}
+
+          {/* branches */}
+          {branches.length > 0 && (
+            <>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="flex items-center justify-between px-5 gap-2">
+                  <div className="flex gap-1">
+                    <CompanyIcon />
+                    {t("branches")}
+                  </div>
+                  <ChevronDown size={14} />
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-sidebar">
+                  {branches.map((branch) => (
+                    <DropdownMenuItem
+                      key={branch.id}
+                      onClick={() => handleClose(branch.func)}
+                      className={`${branchId === branch.id && "bg-sidebar"}`}
+                    >
+                      {branch.icon}
+                      {branch.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </>
+          )}
+
+          {/* logout element */}
+          {logoutMenuItem && (
+            <>
+              <DropdownMenuItem
+                onClick={() => handleClose(logoutMenuItem.func)}
+              >
+                {logoutMenuItem.icon}
+                {logoutMenuItem.label}
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
