@@ -2,14 +2,14 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { UsersTypes } from "../../constants/users-types";
 
-export const RetrieveBrokerFormConfig = (
+export const RetrieveEmployeeFormConfig = (
   userId: string,
   branchesIds?: string[],
-  roleTwoIds?: string[], //employee
-  roleThreeIds?: string[], //client
+  roleTwoIds?: string[], //client
+  roleThreeIds?: string[], //broker
   handleOnSuccess?: () => void
 ) => {
-  const formId = `RetrieveBrokerFormConfig-programSettings`;
+  const formId = `RetrieveEmployeeFormConfig-programSettings`;
 
   const CreateUserFormConfig: FormConfig = {
     formId,
@@ -25,12 +25,12 @@ export const RetrieveBrokerFormConfig = (
           {
             name: "role",
             label: "role",
-            defaultValue: UsersTypes.Broker,
+            defaultValue: UsersTypes.Employee,
             type: "hiddenObject",
           },
           {
             name: "roleTwoIds",
-            label: "موظف لدى",
+            label: "عميل لدى",
             type: "select",
             isMulti: true,
             disabled: true,
@@ -50,7 +50,7 @@ export const RetrieveBrokerFormConfig = (
           },
           {
             name: "roleThreeIds",
-            label: "عميل لدي",
+            label: "وسيط لدي",
             type: "select",
             isMulti: true,
             disabled: true,
@@ -70,7 +70,7 @@ export const RetrieveBrokerFormConfig = (
           },
           {
             name: "branch_ids",
-            label: "وسيط لدي",
+            label: "الفروع",
             type: "select",
             isMulti: true,
             placeholder: "اختر الفروع",

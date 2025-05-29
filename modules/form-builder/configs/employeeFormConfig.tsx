@@ -1,25 +1,16 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
-import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
+import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
-import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
+import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
+import EmployeeInvalidMailDialog from "@/modules/program-settings/components/EmployeeInvalidMailDialog";
 
 export function employeeFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  handleCloseForm?: () => void
 ): FormConfig {
-
-  const handleConfirm = async (email: string | undefined) => {
-    console.log(`Email confirmation for: ${email}`);
-    const response = await apiClient.post(
-      `${baseURL}/company-users/check-email`,
-      { email }
-    );
-    console.log(`Email confirmation for: ${email} response:`, response);
-    return response;
-  };
-
+  const formId = "employee-form";
   return {
-    formId: "employee-form",
+    formId,
     title: "انشاء",
     apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
@@ -30,6 +21,21 @@ export function employeeFormConfig(
       {
         collapsible: false,
         fields: [
+          {
+            name: "roles",
+            label: "roles",
+            type: "hiddenObject",
+          },
+          {
+            name: "employee_in_company",
+            label: "employee_in_company",
+            type: "hiddenObject",
+          },
+          {
+            name: "user_id",
+            label: "user_id",
+            type: "hiddenObject",
+          },
           {
             name: "first_name",
             label: "اسم الموظف الاول",
@@ -118,12 +124,14 @@ export function employeeFormConfig(
               {
                 type: "apiValidation",
                 message: (
-                  <InvalidMailDialog
-                    formId="employee-form"
+                  <EmployeeInvalidMailDialog
+                    formId={formId}
                     btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                    errorStatement="البريد الألكتروني مضاف مسبقأ"
-                    // onConfirm={handleConfirm}
+                    onSuccess={() => {
+                      handleCloseForm?.();
+                    }}
+                    formConfig={RetrieveEmployeeFormConfig}
                   />
                 ),
                 apiConfig: {
@@ -132,11 +140,24 @@ export function employeeFormConfig(
                   debounceMs: 500,
                   paramName: "email",
                   successCondition: (response) => {
-                    useFormStore.getState().setValues("companies-form", {
-                      exist_user_id: response.payload?.[0]?.id,
-                    });
-                    useFormStore.getState().setValues("companies-form", {
-                      error_sentence: response.payload?.[0]?.sentence,
+                    const userId = response.payload?.[0]?.id || "";
+                    const roles = response.payload?.[0]?.roles || [];
+                    // Update the roles in the form store
+                    if (roles.length > 0) {
+                      useFormStore.getState().setValues(formId, {
+                        roles: JSON.stringify(roles),
+                      });
+                    }
+                    // store the user ID in the form store
+                    if (userId) {
+                      useFormStore.getState().setValues(formId, {
+                        user_id: userId,
+                      });
+                    }
+
+                    useFormStore.getState().setValues(formId, {
+                      employee_in_company:
+                        response.payload?.[0]?.status_in_company,
                     });
 
                     return response.payload?.[0]?.status === 1;

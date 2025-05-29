@@ -4,7 +4,8 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useFormStore, useSheetForm, FormConfig } from "@/modules/form-builder";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import ErrorDialog from "@/components/shared/error-dialog";
 import { UsersTypes } from "../constants/users-types";
 
 type Branch = {
@@ -23,17 +24,13 @@ type PropsT = {
   dialogStatement?: string;
   errorStatement?: string;
   onSuccess?: () => void;
-  currentRole?: string;
   formConfig: (
     userId: string,
     branchesIds?: string[],
-    roleTwoIds?: string[],
-    roleThreeIds?: string[],
     handleOnSuccess?: () => void
   ) => FormConfig;
 };
-
-export default function InvalidMailDialog(props: PropsT) {
+export default function EmployeeInvalidMailDialog(props: PropsT) {
   //  declare and define component state and variables
   const {
     formId,
@@ -41,10 +38,15 @@ export default function InvalidMailDialog(props: PropsT) {
     dialogStatement,
     onSuccess,
     formConfig,
-    currentRole = UsersTypes.Client,
   } = props;
-  const formValues = useFormStore((state) => state.forms[formId]?.values);
+
   const [isOpen, handleOpen, handleClose] = useModal();
+  const formValues = useFormStore((state) => state.forms[formId]?.values);
+
+  // user id
+  const userId = formValues?.user_id;
+
+  // retrieve roles
   const roles: Role[] = useMemo(() => {
     try {
       return JSON.parse(formValues.roles) || [];
@@ -53,17 +55,11 @@ export default function InvalidMailDialog(props: PropsT) {
     }
   }, [formValues.roles]);
 
-  // get user id
-  const userId = formValues?.user_id;
-
   // branches of same role
   const branches = useMemo(() => {
-    return roles?.find((role) => role.role.toString() == currentRole)?.branches;
+    return roles?.find((role) => role.role.toString() == UsersTypes.Employee)
+      ?.branches;
   }, [roles]);
-
-  const branchesNames = useMemo(() => {
-    return branches?.map((ele) => ele.name)?.join(",");
-  }, [branches]);
 
   const branchesIds = useMemo(() => {
     return branches?.map((ele) => ele.id);
@@ -73,64 +69,50 @@ export default function InvalidMailDialog(props: PropsT) {
   const sameTypeExist = useMemo(() => {
     return branchesIds && branchesIds?.length > 0;
   }, [branchesIds]);
+  const employeeInCompany = useMemo(
+    () => Boolean(formValues?.employee_in_company) && Boolean(sameTypeExist),
+    [formValues, sameTypeExist]
+  );
+  const [openEmployeeErr, setOpenEmployeeErr] = useState(employeeInCompany);
 
-  const employeeBranchesIds = useMemo(() => {
-    return roles
-      ?.find((role) => role.role.toString() == UsersTypes.Employee)
-      ?.branches?.map((ele) => ele.id.toString());
+  // determine other types
+  const clientBranches = useMemo(() => {
+    return roles?.find((role) => role.role.toString() == UsersTypes.Client)
+      ?.branches;
   }, [roles]);
 
-  const brokerBranchesIds = useMemo(() => {
-    return roles
-      ?.find((role) => role.role.toString() == UsersTypes.Broker)
-      ?.branches?.map((ele) => ele.id.toString());
+  const brokerBranches = useMemo(() => {
+    return roles?.find((role) => role.role.toString() == UsersTypes.Broker)
+      ?.branches;
   }, [roles]);
 
-  const employeeExist = useMemo(() => {
-    return employeeBranchesIds && employeeBranchesIds?.length > 0;
-  }, [employeeBranchesIds]);
+  const clientExist = useMemo(() => {
+    return clientBranches && clientBranches?.length > 0;
+  }, [clientBranches]);
 
   const brokerExist = useMemo(() => {
-    return brokerBranchesIds && brokerBranchesIds?.length > 0;
-  }, [brokerBranchesIds]);
-  // set correct message
+    return brokerBranches && brokerBranches?.length > 0;
+  }, [brokerBranches]);
+
+  //sameTypeExist
   const message = useMemo(() => {
-    return sameTypeExist
-      ? `البريد الإلكتروني مسجل لدى الفروع الاتية (${branchesNames ?? "-"}) `
-      : `يظهر لدينا ان البريد الإلكتروني مسجل
-      ${employeeExist ? "كموظف" : ""}
-       ${brokerExist ? "كوسيط" : ""}
-      على نفس الشركة. `;
-  }, [sameTypeExist, branchesNames, employeeExist, brokerExist]);
+    return employeeInCompany
+      ? `الأيميل مسجل كموظف مسبقأ فى الشركة`
+      : `البريد الإلكتروني مسجل مسبقا 
+      ${clientExist ? "كعميل" : ""} 
+      ${brokerExist ? "كوسيط" : ""}`;
+  }, [employeeInCompany, brokerExist, clientExist]);
 
   // declare and define the form configuration for retrieving broker data
-  const handleSuccess = useMemo(() => {
-    return () => {
-      handleClose();
-      onSuccess?.();
-    };
-  }, [handleClose, onSuccess]);
-
   const _config = useMemo(
     () =>
-      formConfig(
-        userId,
-        branchesIds,
-        employeeBranchesIds,
-        brokerBranchesIds,
-        handleSuccess
-      ),
-    [
-      userId,
-      branchesIds,
-      handleSuccess,
-      formConfig,
-      employeeBranchesIds,
-      brokerBranchesIds,
-    ]
+      formConfig(userId, branchesIds, () => {
+        handleClose();
+        onSuccess?.();
+      }),
+    [userId, branchesIds]
   );
 
-  // prepare vars which form builder need
   const {
     values,
     errors,
@@ -158,16 +140,27 @@ export default function InvalidMailDialog(props: PropsT) {
     stepResponses,
     getStepResponseData,
     clearFiledError,
-  } = useSheetForm({ config: _config });
-
-  console.log("userId, roles", roles, formValues.roles);
+  } = useSheetForm({
+    config: _config,
+  });
 
   // return the JSX for the component
   return (
     <>
+      <ErrorDialog
+        isOpen={openEmployeeErr}
+        handleClose={() => setOpenEmployeeErr(false)}
+        desc={`الموظف مسجل بالفعل فى الشركة مسبقأ`}
+      />
       <p className="text-white">
         {message}
-        <span onClick={handleOpen} className="text-primary cursor-pointer">
+        <span
+          onClick={() => {
+            if (employeeInCompany) setOpenEmployeeErr(true);
+            else handleOpen();
+          }}
+          className="text-primary cursor-pointer"
+        >
           {btnText || "اضغط هنا"}
         </span>
       </p>

@@ -2,14 +2,14 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { UsersTypes } from "../../constants/users-types";
 
-export const RetrieveBrokerFormConfig = (
+export const RetrieveClientFormConfig = (
   userId: string,
   branchesIds?: string[],
   roleTwoIds?: string[], //employee
-  roleThreeIds?: string[], //client
+  roleThreeIds?: string[], //broker
   handleOnSuccess?: () => void
 ) => {
-  const formId = `RetrieveBrokerFormConfig-programSettings`;
+  const formId = `RetrieveClientFormConfig-programSettings`;
 
   const CreateUserFormConfig: FormConfig = {
     formId,
@@ -25,7 +25,7 @@ export const RetrieveBrokerFormConfig = (
           {
             name: "role",
             label: "role",
-            defaultValue: UsersTypes.Broker,
+            defaultValue: UsersTypes.Client,
             type: "hiddenObject",
           },
           {
@@ -50,7 +50,7 @@ export const RetrieveBrokerFormConfig = (
           },
           {
             name: "roleThreeIds",
-            label: "عميل لدي",
+            label: "وسيط لدي",
             type: "select",
             isMulti: true,
             disabled: true,
@@ -70,7 +70,7 @@ export const RetrieveBrokerFormConfig = (
           },
           {
             name: "branch_ids",
-            label: "وسيط لدي",
+            label: "عميل لدي",
             type: "select",
             isMulti: true,
             placeholder: "اختر الفروع",
@@ -79,6 +79,7 @@ export const RetrieveBrokerFormConfig = (
               valueField: "id",
               labelField: "name",
               searchParam: "name",
+              filterParam: "id",
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
