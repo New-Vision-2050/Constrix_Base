@@ -39,9 +39,11 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
               <TableHead className="p-3 py-4 rtl:text-right">
                 إسم الإدارة
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
-                وصف الإدارة
-              </TableHead>
+              {node.is_main != 1 && (
+                <TableHead className="p-3 py-4 rtl:text-right">
+                  وصف الإدارة
+                </TableHead>
+              )}
               <TableHead className="p-3 py-4 rtl:text-right">
                 مدير الإدارة
               </TableHead>
@@ -54,9 +56,7 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
               <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الموظفين
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
-                الحالة
-              </TableHead>
+              <TableHead className="p-3 py-4 rtl:text-right">الحالة</TableHead>
               <TableHead className="p-3 py-4 ltr:text-right">
                 الاعدادات
               </TableHead>
@@ -65,9 +65,11 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
           <TableBody>
             <TableRow className="bg-sidebar/70 border-t border-dashed">
               <TableCell className="p-3 py-4">{node.name || "N/A"}</TableCell>
-              <TableCell className="p-3 py-4">
-                {node.description || "N/A"}
-              </TableCell>
+              {node.is_main != 1 && (
+                <TableCell className="p-3 py-4">
+                  {node.description || "N/A"}
+                </TableCell>
+              )}
               <TableCell className="p-3 py-4">
                 {node.manager?.name || "N/A"}
               </TableCell>
