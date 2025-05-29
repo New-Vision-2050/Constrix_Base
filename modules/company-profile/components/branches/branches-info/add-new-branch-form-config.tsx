@@ -9,6 +9,8 @@ import { useParams } from "next/navigation";
 export const addNewBranchFormConfig = (branches: Branch[]) => {
   const { company_id }: { company_id: string | undefined } = useParams();
 
+  const mainBranch = branches.find((branch) => !Boolean(branch.parent_id));
+
   const queryClient = useQueryClient();
   const formId = `add-new-branch-form-${company_id}`;
   const addNewBranchFormConfig: FormConfig = {
@@ -144,7 +146,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             ],
           },
           {
-            name: "parent_id",
+            name: "parent_name",
             label: "الفرع الرئيسي",
             type: "text",
             disabled: true,
@@ -234,12 +236,13 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: false,
+    resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
+
     initialValues: {
-      parent_id:
-        branches.find((branch) => !Boolean(branch.parent_id))?.name ?? "",
+      parent_id: mainBranch?.id ?? "",
+      parent_name: mainBranch?.name ?? "",
     },
     onSubmit: async (formData) => {
       return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
