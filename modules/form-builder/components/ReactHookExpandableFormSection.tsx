@@ -27,6 +27,7 @@ interface ReactHookExpandableFormSectionProps {
   currentStep?: number;
   onToggle?: (isOpen: boolean) => void;
   clearFiledError: (field: string) => void;
+  onDeletedFilesChange?: (field: string, deletedFiles: Array<string | any>) => void;
 }
 
 const ReactHookExpandableFormSection: React.FC<ReactHookExpandableFormSectionProps> = ({
@@ -45,6 +46,7 @@ const ReactHookExpandableFormSection: React.FC<ReactHookExpandableFormSectionPro
   currentStep,
   onToggle,
   clearFiledError,
+  onDeletedFilesChange,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -95,6 +97,7 @@ const ReactHookExpandableFormSection: React.FC<ReactHookExpandableFormSectionPro
               getStepResponseData={getStepResponseData}
               currentStep={currentStep}
               clearFiledError={clearFiledError}
+              onDeletedFilesChange={onDeletedFilesChange}
             />
           ))}
         </div>
@@ -157,6 +160,7 @@ const ReactHookExpandableFormSection: React.FC<ReactHookExpandableFormSectionPro
               getStepResponseData={getStepResponseData}
               currentStep={currentStep}
               clearFiledError={clearFiledError}
+              onDeletedFilesChange={onDeletedFilesChange}
             />
           ))}
         </div>

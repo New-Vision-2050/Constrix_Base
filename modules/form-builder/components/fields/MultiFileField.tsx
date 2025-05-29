@@ -28,6 +28,7 @@ interface MultiFileFieldProps {
   onChange: (value: Array<File | string | FileObject> | null) => void;
   onBlur: () => void;
   formId?: string;
+  onDeletedFilesChange?: (deletedFiles: Array<string | FileObject>) => void;
 }
 
 // Helper function to get file icon based on file type
@@ -133,12 +134,16 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
   onChange,
   onBlur,
   formId = "default",
+  onDeletedFilesChange,
 }) => {
   // Reference to the file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // State for file info
   const [filesInfo, setFilesInfo] = useState<FileInfo[]>([]);
+
+  // State to track deleted files (only existing files, not newly added ones)
+  const [deletedFiles, setDeletedFiles] = useState<Array<string | FileObject>>([]);
 
   // Get the current locale to determine text direction
 
@@ -210,6 +215,22 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
 
     setFilesInfo(newFilesInfo);
   }, [normalizedValue]);
+
+  // Notify parent component when deleted files change
+  useEffect(() => {
+    const shouldTrackDeleted = field.fileConfig?.trackDeletedFiles !== false; // Default to true
+    if (shouldTrackDeleted && onDeletedFilesChange && deletedFiles.length > 0) {
+      onDeletedFilesChange(deletedFiles);
+    }
+  }, [deletedFiles, field.fileConfig?.trackDeletedFiles, onDeletedFilesChange]);
+
+  // Method to reset deleted files (can be called externally)
+  const resetDeletedFiles = useCallback(() => {
+    setDeletedFiles([]);
+    if (onDeletedFilesChange) {
+      onDeletedFilesChange([]);
+    }
+  }, [onDeletedFilesChange]);
 
   // Handle file selection
   const handleFileChange = useCallback(
@@ -450,8 +471,20 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
     (index: number) => {
       if (!Array.isArray(value)) return;
 
+      const fileToRemove = value[index];
       const newValue = [...value];
       newValue.splice(index, 1);
+
+      // Track deleted files only if they are existing files (strings or FileObjects with URLs)
+      // Don't track newly added File objects as deleted
+      const shouldTrackDeleted = field.fileConfig?.trackDeletedFiles !== false; // Default to true
+      if (shouldTrackDeleted && onDeletedFilesChange) {
+        if (typeof fileToRemove === 'string' || (fileToRemove && typeof fileToRemove === 'object' && 'mime_type' in fileToRemove)) {
+          const newDeletedFiles = [...deletedFiles, fileToRemove];
+          setDeletedFiles(newDeletedFiles);
+          onDeletedFilesChange(newDeletedFiles);
+        }
+      }
 
       // If the array is now empty, set to null or empty array based on your preference
       onChange(newValue.length === 0 ? [] : newValue);
@@ -459,7 +492,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
       // Clear any errors
       formInstance.setError(field.name, null);
     },
-    [onChange, formInstance, field.name, value]
+    [onChange, formInstance, field.name, value, deletedFiles, onDeletedFilesChange, field.fileConfig?.trackDeletedFiles]
   );
 
   // Handle downloading a file

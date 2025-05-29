@@ -34,6 +34,7 @@ interface ReactHookFormFieldProps {
   currentStep?: number;
   clearFiledError: (fieldName: string) => void;
   formId?: string;
+  onDeletedFilesChange?: (field: string, deletedFiles: Array<string | any>) => void;
 }
 
 const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
@@ -51,6 +52,7 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
   currentStep,
   clearFiledError,
   formId = 'default',
+  onDeletedFilesChange,
 }) => {
   // Check if this field's value exists in any previous step's response
   let fieldValue = value;
@@ -93,6 +95,16 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
       field.onBlur(fieldValue, values);
     }
   }, [field.name, field.onBlur, propOnBlur, fieldValue, values]);
+
+  // Handle deleted files callback
+  const handleDeletedFilesChange = useCallback(
+    (deletedFiles: Array<string | any>) => {
+      if (onDeletedFilesChange) {
+        onDeletedFilesChange(field.name, deletedFiles);
+      }
+    },
+    [onDeletedFilesChange, field.name]
+  );
 
   // Use custom renderer if provided
   if (field.render) {
@@ -323,6 +335,7 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
                     onChange={fieldProps.onChange}
                     onBlur={fieldProps.onBlur}
                     formId={formId}
+                    onDeletedFilesChange={handleDeletedFilesChange}
                   />
                 ) : (
                   <FileField

@@ -42,6 +42,7 @@ interface FormBuilderProps {
   isLoadingEditData?: boolean;
   editError?: string | null;
   recordId?: string | number;
+  onDeletedFilesChange?: (field: string, deletedFiles: Array<string | any>) => void;
 }
 
 const FormBuilder: React.FC<FormBuilderProps> = ({
@@ -76,6 +77,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   isLoadingEditData: initialIsLoadingEditData,
   editError: initialEditError,
   recordId,
+  onDeletedFilesChange,
 }) => {
   // Local state for edit mode
   const t = useTranslations();
@@ -86,6 +88,44 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   const [editError, setEditError] = useState<string | null>(
     initialEditError || null
   );
+
+  // State to track deleted files from all MultiFileField components
+  const [deletedFilesMap, setDeletedFilesMap] = useState<Record<string, Array<string | any>>>({});
+
+  // Handle deleted files changes from MultiFileField components
+  const handleDeletedFilesChange = useCallback((fieldName: string, deletedFiles: Array<string | any>) => {
+    setDeletedFilesMap(prev => ({
+      ...prev,
+      [fieldName]: deletedFiles
+    }));
+  }, []);
+
+  // Create a custom handleSubmit that includes deleted files in the payload
+  const handleSubmitWithDeletedFiles = useCallback((e: React.FormEvent) => {
+    // Flatten all deleted files into a single array
+    const allDeletedFiles = Object.values(deletedFilesMap).flat();
+
+    // Store deleted files in form values using form store before submission
+    if (allDeletedFiles.length > 0) {
+      const formStore = useFormStore.getState();
+      const formId = config.formId || 'default-form';
+      const currentValues = formStore.getValues(formId);
+
+      // Update values with deleted files
+      formStore.setValue(formId, 'deleted_files', allDeletedFiles);
+
+      // Also update local values if setValues is available
+      if (setValues) {
+        setValues({
+          ...currentValues,
+          deleted_files: allDeletedFiles
+        });
+      }
+    }
+
+    // Call the original handleSubmit
+    handleSubmit(e);
+  }, [handleSubmit, deletedFilesMap, config.formId, setValues]);
 
   // Function to load data for editing
   const loadEditData = useCallback(
@@ -180,7 +220,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   }, [isEditMode]);
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmitWithDeletedFiles}
       className="space-y-6 py-6"
       onClick={(e) => e.stopPropagation()}
     >
@@ -281,6 +321,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
             currentStep={currentStep}
             clearFiledError={clearFiledError}
             formId={config.formId}
+            onDeletedFilesChange={(fieldName, deletedFiles) => {
+              handleDeletedFilesChange(fieldName, deletedFiles);
+              onDeletedFilesChange?.(fieldName, deletedFiles);
+            }}
           />
         ) : isAccordion ? (
           config.sections.map((section, index) => (
@@ -305,6 +349,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               }}
               clearFiledError={clearFiledError}
               formId={config.formId}
+              onDeletedFilesChange={(fieldName, deletedFiles) => {
+                handleDeletedFilesChange(fieldName, deletedFiles);
+                onDeletedFilesChange?.(fieldName, deletedFiles);
+              }}
             />
           ))
         ) : (
@@ -321,6 +369,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               collapsible={section.collapsible}
               clearFiledError={clearFiledError}
               formId={config.formId}
+              onDeletedFilesChange={(fieldName, deletedFiles) => {
+                handleDeletedFilesChange(fieldName, deletedFiles);
+                onDeletedFilesChange?.(fieldName, deletedFiles);
+              }}
               subWrapperClassName={config?.subWrapperClassName}
               subWrapperParentClassName={config?.subWrapperParentClassName}
             />

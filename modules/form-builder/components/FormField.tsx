@@ -34,6 +34,7 @@ interface FormFieldProps {
   getStepResponseData?: (step: number, key?: string) => any;
   currentStep?: number;
   formId: string; // Add formId prop to identify which form instance to use
+  onDeletedFilesChange?: (field: string, deletedFiles: Array<string | any>) => void;
 }
 
 // This component subscribes to validating state
@@ -49,6 +50,7 @@ const FormField: React.FC<FormFieldProps> = ({
   getStepResponseData,
   currentStep,
   formId = "default", // Use a default form ID if not provided
+  onDeletedFilesChange,
 }) => {
   // Get the form instance
   const formInstance = useFormInstance(formId);
@@ -116,6 +118,16 @@ const FormField: React.FC<FormFieldProps> = ({
       field.onBlur(fieldValue, values);
     }
   }, [field.name, field.onBlur, propOnBlur, fieldValue, values]);
+
+  // Handle deleted files callback
+  const handleDeletedFilesChange = useCallback(
+    (deletedFiles: Array<string | any>) => {
+      if (onDeletedFilesChange) {
+        onDeletedFilesChange(field.name, deletedFiles);
+      }
+    },
+    [onDeletedFilesChange, field.name]
+  );
 
   // Use custom renderer if provided
   if (field.render) {
@@ -323,6 +335,7 @@ const FormField: React.FC<FormFieldProps> = ({
             onChange={onChange}
             onBlur={onBlur}
             formId={formId}
+            onDeletedFilesChange={handleDeletedFilesChange}
           />
         ) : (
           <FileField

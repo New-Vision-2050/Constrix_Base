@@ -145,6 +145,7 @@ export interface FieldConfig {
     uploadUrl?: string; // URL to upload the file to
     uploadHeaders?: Record<string, string>; // Custom headers for the upload request
     showThumbnails?: boolean; // Whether to show thumbnails for files
+    trackDeletedFiles?: boolean; // Whether to track deleted files for payload inclusion (default: true)
   };
   label: string;
   placeholder?: string;

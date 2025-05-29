@@ -45,6 +45,7 @@ interface ReactHookFormBuilderProps {
   editError?: string | null;
   recordId?: string | number;
   isEditMode?: boolean;
+  onDeletedFilesChange?: (field: string, deletedFiles: Array<string | any>) => void;
 }
 
 const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
@@ -79,6 +80,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
   isLoadingEditData: initialIsLoadingEditData,
   editError: initialEditError,
   recordId,
+  onDeletedFilesChange,
 }) => {
   const [isEditMode] = useState(config.isEditMode || false);
   const [isLoadingEditData, setIsLoadingEditData] = useState(
@@ -274,6 +276,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
             getStepResponseData={getStepResponseData}
             currentStep={currentStep}
             clearFiledError={clearFiledError}
+            onDeletedFilesChange={onDeletedFilesChange}
           />
         ) : isAccordion ? (
           config.sections.map((section, index) => (
@@ -298,6 +301,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
                 }
               }}
               clearFiledError={clearFiledError}
+              onDeletedFilesChange={onDeletedFilesChange}
             />
           ))
         ) : (
@@ -314,6 +318,7 @@ const ReactHookFormBuilder: React.FC<ReactHookFormBuilderProps> = ({
               onBlur={(field: string) => setTouched(field, true)}
               collapsible={section.collapsible}
               clearFiledError={clearFiledError}
+              onDeletedFilesChange={onDeletedFilesChange}
             />
           ))
         )}

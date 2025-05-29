@@ -30,6 +30,7 @@ interface ExpandableFormSectionProps {
   forceDisabled?: boolean; // Force disable the collapsible trigger
   clearFiledError?: (field: string) => void; // Function to clear field errors
   formId?: string;
+  onDeletedFilesChange?: (field: string, deletedFiles: Array<string | any>) => void;
   subWrapperClassName?:string
   subWrapperParentClassName?:string
 }
@@ -49,9 +50,10 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   onToggle,
   forceDisabled = false,
   clearFiledError,
-    formId,
-    subWrapperClassName,
-    subWrapperParentClassName
+  formId,
+  onDeletedFilesChange,
+  subWrapperClassName,
+  subWrapperParentClassName
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -164,6 +166,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
                   stepResponses={stepResponses}
                   getStepResponseData={getStepResponseData}
                   currentStep={currentStep}
+                  onDeletedFilesChange={onDeletedFilesChange}
                 />
               );
             })}
