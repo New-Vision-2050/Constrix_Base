@@ -62,6 +62,7 @@ const Execution = ({
   className = "px-5 bg-[#8785A2] hover:bg-[#8785A2] rotate-svg-child",
   showEdit = true,
   showDelete = true,
+  deleteConfirmMessage,
 }: {
   row: { id: string; [key: string]: unknown };
   executions?: MenuItem[];
@@ -71,6 +72,7 @@ const Execution = ({
   className?: string;
   showEdit?: boolean;
   showDelete?: boolean;
+  deleteConfirmMessage?: string;
 }) => {
   const t = useTranslations();
 
@@ -191,6 +193,7 @@ const Execution = ({
           onSuccess={() => {
             reloadTable();
           }}
+          deleteConfirmMessage={deleteConfirmMessage}
         />
       )}
 
