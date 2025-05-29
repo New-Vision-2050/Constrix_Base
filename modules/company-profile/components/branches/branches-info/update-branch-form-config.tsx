@@ -11,7 +11,7 @@ export const updateBranchFormConfig = (
   branch: Branch,
   isMainBranch?: boolean
 ) => {
-  console.log({ branch });
+  const mainBranch = branches.find((branch) => !Boolean(branch.parent_id));
   const { company_id }: { company_id: string | undefined } = useParams();
 
   const queryClient = useQueryClient();
@@ -150,22 +150,10 @@ export const updateBranchFormConfig = (
             ],
           },
           {
-            name: "parent_id",
+            name: "parent_name",
             label: "الفرع الرئيسي",
-            type: "select",
-            options: branches
-              .filter((branch) => !branch.parent_id)
-              .map((branch) => ({
-                value: branch.id,
-                label: branch.name,
-              })),
-            condition: () => !isMainBranch,
-            validation: [
-              {
-                type: "required",
-                message: "ادخل نوع الفرع",
-              },
-            ],
+            type: "text",
+            disabled: true,
           },
           {
             type: "select",
@@ -247,7 +235,11 @@ export const updateBranchFormConfig = (
         ],
       },
     ],
-    initialValues: { ...branch },
+    initialValues: {
+      ...branch,
+      parent_id: mainBranch?.id ?? "",
+      parent_name: mainBranch?.name ?? "",
+    },
     submitButtonText: "تعديل",
     cancelButtonText: "إلغاء",
     showReset: false,
