@@ -30,6 +30,8 @@ interface ExpandableFormSectionProps {
   forceDisabled?: boolean; // Force disable the collapsible trigger
   clearFiledError?: (field: string) => void; // Function to clear field errors
   formId?: string;
+  subWrapperClassName?:string
+  subWrapperParentClassName?:string
 }
 
 const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
@@ -47,7 +49,9 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
   onToggle,
   forceDisabled = false,
   clearFiledError,
-    formId
+    formId,
+    subWrapperClassName,
+    subWrapperParentClassName
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -101,7 +105,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
 
   if (!collapsible || !section.title) {
     return (
-      <div className="w-full border rounded-md mb-4 border-border">
+      <div className={`"w-full border rounded-md mb-4 border-border" ${subWrapperParentClassName ?? ''}`}>
         {section.title && (
           <div className="p-4 bg-muted/50">
             <div className="flex items-center">
@@ -126,7 +130,7 @@ const ExpandableFormSection: React.FC<ExpandableFormSectionProps> = ({
             </div>
           </div>
         )}
-        <div className="p-4 bg-background">
+        <div className={`p-4 bg-background ${subWrapperClassName ?? ''}`}>
           <div
             style={{
               gridTemplateColumns: section.columns

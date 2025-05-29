@@ -34,6 +34,7 @@ export const CreateUserFormConfig = (slug: string) => {
               },
             ],
           },
+
           {
             name: "slug",
             label: "الاسم المختصر",
@@ -48,6 +49,18 @@ export const CreateUserFormConfig = (slug: string) => {
                 type: "pattern",
                 value: /^[a-zA-Z]+$/,
                 message: t("Validation.englishName"),
+              },
+              {
+                type: "apiValidation",
+                message: "تم اخذ هذا الاسم بالفعل",
+                apiConfig: {
+                  url: `${baseURL}/sub_entities/slug-validate`,
+                  method: "POST",
+                  debounceMs: 422,
+                  paramName: "slug",
+                  successCondition: (response) =>
+                    response?.payload?.valid === true,
+                },
               },
             ],
           },

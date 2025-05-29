@@ -371,7 +371,7 @@ const FormField: React.FC<FormFieldProps> = ({
       style={{
         ...(field?.gridArea && { gridColumn: `span ${field.gridArea}` }),
       }}
-      className="mb-4"
+      className={`mb-4 ${field.fieldClassName || ""}`}
     >
       {!!field.label && (
         <Label htmlFor={field.name} className="block mb-2">

@@ -32,8 +32,8 @@ export default function UserProfileConnectionDataEditForm() {
       if (oldValue === newValue || (type === "phone" && newValue == phone)) {
         const _message =
           type === "email"
-            ? "البريد الألكتروني هو نفس البريد المسجل مسبقا"
-            : "رقم الجوال هو نفس رقم الجوال المسجل مسبقا";
+            ? "البريد الألكتروني مسجل مسبقا"
+            : "";
         setError(_message);
         setLoading(false);
         return;

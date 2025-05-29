@@ -295,7 +295,7 @@ const OrganizationChart = ({
         >
           <div
             ref={chartTreeRef}
-            className="org-chart-container absolute"
+            className="w-full h-full org-chart-container absolute"
             style={zoomStyle}
             // dir={locale === 'ar' ? 'rtl' : 'ltr'}
           >

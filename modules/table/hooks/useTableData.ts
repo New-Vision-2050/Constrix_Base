@@ -116,6 +116,7 @@ export const useTableData = (
   // Setup data fetching with dependencies
   useTableFetchEffect({
     url,
+    apiParams: config?.apiParams,
     currentPage,
     itemsPerPage,
     sortColumn,
