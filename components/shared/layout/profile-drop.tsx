@@ -160,7 +160,7 @@ const ProfileDrop = () => {
           {branches.length > 0 && (
             <>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="flex items-center justify-between px-5 gap-2">
+                <DropdownMenuSubTrigger className="bg-sidebar flex items-center justify-between px-5 gap-2">
                   <div className="flex gap-1">
                     <CompanyIcon />
                     {t("branches")}
@@ -187,6 +187,7 @@ const ProfileDrop = () => {
           {logoutMenuItem && (
             <>
               <DropdownMenuItem
+              className='bg-sidebar'
                 onClick={() => handleClose(logoutMenuItem.func)}
               >
                 {logoutMenuItem.icon}
