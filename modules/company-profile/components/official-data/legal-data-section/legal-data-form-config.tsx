@@ -76,7 +76,7 @@ export const LegalDataFormConfig = (
                 },
                 {
                   type: "file",
-                  name: "file",
+                  name: "files",
                   label: "اضافة مرفق",
                   isMulti: true,
                   fileConfig: {
@@ -100,7 +100,10 @@ export const LegalDataFormConfig = (
       },
     ],
     initialValues: {
-      data: companyLegalData,
+      data: [...companyLegalData].map((entry) => ({
+        ...entry,
+        files: entry.file,
+      })),
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
@@ -111,13 +114,25 @@ export const LegalDataFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const obj = formData.data.map((obj: any) => ({
-        start_date: obj.start_date,
-        end_date: obj.end_date,
-        id: obj.id,
-        ...(typeof obj.file !== "string" && { file: obj.file }),
-      }));
-
+      const obj = formData.data.map((obj: any) => {
+        const backendFiles = Array.isArray(obj.files)
+          ? obj.files.filter(
+              (file: any) => file && typeof file === "object" && "url" in file
+            )
+          : [];
+        const binaryFiles = Array.isArray(obj.files)
+          ? obj.files.filter(
+              (file: any) => file instanceof File || file instanceof Blob
+            )
+          : [];
+        return {
+          start_date: obj.start_date,
+          end_date: obj.end_date,
+          id: obj.id,
+          file: binaryFiles,
+          files: backendFiles,
+        };
+      });
       const newFormData = serialize(
         { data: obj },
         {
