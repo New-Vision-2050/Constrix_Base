@@ -158,6 +158,7 @@
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
     "Logout": "تسجيل الخروج",
+    "branches": "الفروع",
     "profile": "حسابي",
     "changeMail": "تغيير البريد الالكتروني",
     "changePassword": "تغيير كلمة المرور"

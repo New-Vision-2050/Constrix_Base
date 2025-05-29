@@ -89,11 +89,11 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
             name: "date_obtain",
             label: "تاريخ الحصول على الشهادة",
             type: "date",
-            placeholder: "تاريخ الحصول على الشهادة",
+            placeholder: "تاريخ الشهادة",
             validation: [
               {
                 type: "required",
-                message: "تاريخ الحصول على الشهادة مطلوب",
+                message: "تاريخ الشهادة مطلوب",
               },
              
             ],

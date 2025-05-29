@@ -158,6 +158,7 @@
   "Header": {
     "MainSystemManagement": "Main System Management",
     "Logout": "Logout",
+    "branches": "Branches",
     "profile": "My account",
     "changeMail": "Change email",
     "changePassword": "Change password"
