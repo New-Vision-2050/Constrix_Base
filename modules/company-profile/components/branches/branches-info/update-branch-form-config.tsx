@@ -60,6 +60,8 @@ export const updateBranchFormConfig = (
                   "longitude",
                 ]}
                 inGeneral={true}
+                lat={branch.latitude ?? ""}
+                long={branch.longitude ?? ""}
               />
             ),
           },
