@@ -167,8 +167,13 @@ export function useSheetForm({
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
-    const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
+    const store = useFormStore.getState();
+    const formState = store.forms[config.formId || "sheet-form"];
+
+    if (!formState) {
+      return true;
+    }
 
     // Iterate through all sections and fields
     config.sections.forEach((section) => {
@@ -185,16 +190,31 @@ export function useSheetForm({
         if (field.hidden || field.disabled) {
           return;
         }
+        
+        // Check if field is required and has validation
         if (field.validation && config.formId) {
-          isValid = useFormStore
-            .getState()
-            .validateField(
+          // Check if field has been touched (blurred)
+          const fieldTouched = formState.touched[field.name];
+          
+          if (fieldTouched) {
+            // Field has been touched, get existing validation result from store
+            const existingError = formState.errors[field.name];
+            if (existingError) {
+              isValid = false;
+            }
+          } else {
+            // Field hasn't been touched, validate it now
+            const fieldIsValid = store.validateField(
               config.formId,
               field.name,
               values[field.name],
               field.validation,
               values
             );
+            if (!fieldIsValid) {
+              isValid = false;
+            }
+          }
         }
       });
     });
@@ -202,7 +222,7 @@ export function useSheetForm({
     setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, values, setIsValid]);
+  }, [config.sections, config.formId, values, setIsValid]);
 
   // Handle form submission
   const handleSubmit = useCallback(
