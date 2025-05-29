@@ -77,7 +77,7 @@ export interface Branch {
   phone: null | string;
   phone_code: null | string;
   email: null | string;
-  lattitude: null | string;
+  latitude: null | string;
   longitude: null | string;
   country_id: string;
   state_id: null | string;
