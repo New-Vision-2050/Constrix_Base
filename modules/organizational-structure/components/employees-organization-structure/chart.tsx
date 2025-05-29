@@ -26,7 +26,7 @@ const BranchEmployeesOrganizationStructure = (props: PropsT) => {
         {!isLoading && !error && employeesData && (
           <div className="overflow-hidden">
             {/*<OrganizationChart data={orgData[0] as OrgChartNode} reOrganize={{concatKey: 'type', concatValue: 'branch'}} />*/}
-            <OrganizationChart data={employeesData[0] as OrgChartNode} isEmployees reOrganize={{concatKey: 'type', concatValue: 'employee'}} />
+            <OrganizationChart listView={false} data={employeesData[0] as OrgChartNode} isEmployees reOrganize={{concatKey: 'type', concatValue: 'employee'}} />
           </div>
         )}
     </main>
