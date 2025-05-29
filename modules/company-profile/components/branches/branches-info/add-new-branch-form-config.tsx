@@ -239,6 +239,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
+
     initialValues: {
       parent_id: mainBranch?.id ?? "",
       parent_name: mainBranch?.name ?? "",
