@@ -27,6 +27,7 @@ export const AddressFormConfig = () => {
             label: "العنوان السكني بمقر العمل/العنوان الوطنى)",
             type: "text",
             placeholder: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
+            required: true,
             validation: [
               {
                 type: "required",
