@@ -59,7 +59,7 @@ export const JobFormConfig = () => {
               totalCountHeader: "X-Total-Count",
 
               dependsOn: "branch_id",
-              filterParam: "parentId",
+              filterParam: "parent_children_id",
             },
             validation: [
               {
