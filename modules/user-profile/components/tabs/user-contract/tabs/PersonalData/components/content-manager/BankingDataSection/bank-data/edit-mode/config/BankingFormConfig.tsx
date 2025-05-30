@@ -103,6 +103,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               valueField: "id",
               labelField: "name",
               searchParam: "name",
+              disableReactQuery:true,
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
