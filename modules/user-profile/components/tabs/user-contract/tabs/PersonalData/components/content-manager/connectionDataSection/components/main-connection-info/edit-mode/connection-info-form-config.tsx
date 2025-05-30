@@ -10,7 +10,7 @@ export const ConnectionInformationFormConfig = () => {
 
   const _ConnectionInformationFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "البيانات الاتصال",
+    title: "بيانات الاتصال",
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
