@@ -1,6 +1,4 @@
 import { baseURL } from "@/config/axios-config";
-import { Country } from "@/modules/settings/types/Country";
-import CountriesSettingsActionsBtn from "../components/ActionsBtn";
 
 export const CountriesTableConfig = () => {
   return {
@@ -16,13 +14,6 @@ export const CountriesTableConfig = () => {
         label: "الدولة",
         sortable: true,
         searchable: true,
-      },
-      {
-        key: "actions",
-        label: "الأجراء",
-        render: (_: unknown, row: Country) => (
-          <CountriesSettingsActionsBtn id={row.id} />
-        ),
       },
     ],
     allSearchedFields: [],

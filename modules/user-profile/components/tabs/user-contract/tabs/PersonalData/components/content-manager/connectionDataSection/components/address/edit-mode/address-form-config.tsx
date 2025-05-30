@@ -20,18 +20,31 @@ export const AddressFormConfig = () => {
     },
     sections: [
       {
+        title: "بيانات العنوان",
         fields: [
           {
             name: "address",
             label: "العنوان السكني بمقر العمل/العنوان الوطنى)",
             type: "text",
             placeholder: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
+            validation: [
+              {
+                type: "required",
+                message: "العنوان السكني مطلوب",
+              },
+            ],
           },
           {
             name: "postal_code",
             label: "العنوان البريدي",
             type: "text",
             placeholder: "العنوان البريدي",
+            validation: [
+              {
+                type: "required",
+                message: "العنوان البريدي مطلوب",
+              },
+            ],
           },
         ],
         columns: 2,

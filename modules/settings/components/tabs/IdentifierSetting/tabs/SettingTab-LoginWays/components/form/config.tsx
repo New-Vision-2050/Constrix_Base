@@ -1,7 +1,7 @@
 // Define the form configuration
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-import {defaultSubmitHandler} from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const loginWayFormConfig: FormConfig = {
   formId: "login-way-form",
@@ -34,7 +34,7 @@ export const loginWayFormConfig: FormConfig = {
                 label: "Login Option",
                 placeholder: "Select Login Option",
                 dynamicOptions: {
-                    paginationEnabled:true,
+                  paginationEnabled: true,
                   url: `${baseURL}/settings/login-way/login-options`,
                   valueField: "login_option",
                   labelField: "login_option",
@@ -56,7 +56,7 @@ export const loginWayFormConfig: FormConfig = {
                 label: "Login Driver",
                 placeholder: "Select Login Driver",
                 dynamicOptions: {
-                    paginationEnabled:true,
+                  paginationEnabled: true,
                   url: `${baseURL}/settings/driver/get-drivers-by-login-option`,
                   valueField: "value",
                   labelField: "name",
@@ -76,7 +76,7 @@ export const loginWayFormConfig: FormConfig = {
                 label: "Login Way Alternative",
                 placeholder: "Select Login Way Alternative",
                 dynamicOptions: {
-                    paginationEnabled:true,
+                  paginationEnabled: true,
                   url: `${baseURL}/settings/driver/get-alternatives-drivers-by-login-option`,
                   dependsOn: "drivers",
                   filterParam: "login_option_driver",
@@ -100,6 +100,25 @@ export const loginWayFormConfig: FormConfig = {
       ],
     },
   ],
+  /*
+    interface ApiResponse {
+  data?: User[];
+  error?: string;
+}
+    dataMapper: (response: ApiResponse | null | undefined) => {
+      // If the API isn't available, return mock data
+      if (!response || response.error) {
+        return [
+          { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
+          { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
+          { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor' },
+          { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'User' },
+          { id: 5, name: 'Charlie Wilson', email: 'charlie@example.com', role: 'Viewer' },
+        ];
+      }
+      return response.data || [];
+    },
+  */
   submitButtonText: "حفظ",
   cancelButtonText: "إلغاء",
   showReset: false,
@@ -108,13 +127,13 @@ export const loginWayFormConfig: FormConfig = {
   resetOnSuccess: true,
   showCancelButton: false,
   showBackButton: false,
-    editDataTransformer:(data)=>{
-            return {
-               id:data.id,
-               name:data.name,
-                login_options:data.steps
-            }
-        },
+  editDataTransformer: (data) => {
+    return {
+      id: data.id,
+      name: data.name,
+      login_options: data.steps,
+    };
+  },
 
   onSubmit: async (formData: Record<string, unknown>) => {
     const body = {
@@ -142,23 +161,28 @@ export const loginWayFormConfig: FormConfig = {
               login_option_alternatives,
             };
           })
-        : []
+        : [],
     };
 
     // Log the form data
-    console.log("Form data received bodybody:", body);
     return await defaultSubmitHandler(body, loginWayFormConfig);
   },
 
   // Example onSuccess handler
-  onSuccess: (values: Record<string, any>, result: { success: boolean; message?: string }) => {
+  onSuccess: (
+    values: Record<string, any>,
+    result: { success: boolean; message?: string }
+  ) => {
     console.log("Form submitted successfully with values:", values);
     console.log("Result from API:", result);
     // const response = await apiClient.post(`${baseURL}/settings/login-way`,{})
   },
 
   // Example onError handler
-  onError: (values: Record<string, any>, error: { message?: string; errors?: Record<string, string | string[]> }) => {
+  onError: (
+    values: Record<string, any>,
+    error: { message?: string; errors?: Record<string, string | string[]> }
+  ) => {
     console.log("Form submission failed with values:", values);
     console.log("Error details:", error);
   },
