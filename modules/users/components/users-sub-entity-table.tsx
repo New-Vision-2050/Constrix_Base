@@ -39,19 +39,6 @@ const UsersSubEntityTable = ({
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
 
-  const RegistrationTableConfig = registrationFormSlug
-    ? REGISTRATION_TABLES[registrationFormSlug]
-    : UsersConfigV2;
-
-  const buttonText =
-    subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
-      ? ""
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CLIENT
-      ? "عميل"
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.BROKER
-      ? "وسيط"
-      : "مستخدم";
-
   const usersConfig = UsersConfigV2();
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"
@@ -113,7 +100,7 @@ const UsersSubEntityTable = ({
                     }, 100);
                   },
                 }}
-                trigger={<Button>إنشاء {buttonText}</Button>}
+                trigger={<Button>إنشاء</Button>}
                 onSuccess={(values) => {
                   console.log("Form submitted successfully:", values);
                 }}
