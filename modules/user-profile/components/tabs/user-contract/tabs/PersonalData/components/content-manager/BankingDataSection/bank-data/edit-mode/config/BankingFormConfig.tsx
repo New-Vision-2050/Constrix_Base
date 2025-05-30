@@ -174,6 +174,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
       bank_id: bank?.bank_id,
       country_id: bank?.country_id,
       currency_id: bank?.currency_id,
+      type_id: bank?.type_id,
       iban: bank?.iban,
       swift_bic: bank?.swift_bic,
       type: bank?.type,
