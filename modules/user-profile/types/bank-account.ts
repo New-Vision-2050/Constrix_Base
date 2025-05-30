@@ -5,6 +5,7 @@ export type BankAccount = {
   company_id: string;
   company_name: string;
   country_id: string;
+  type_id: string;
   country_name: string;
   currency_id: string;
   currency_name: string;
