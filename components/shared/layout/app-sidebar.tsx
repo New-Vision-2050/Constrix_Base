@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
+import { LayoutDashboardIcon, UserIcon } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -10,8 +10,6 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import CompaniesIcon from "@/public/icons/companies";
-import UserIcon from "@/public/icons/user";
 import SidebarHeaderContent from "./sidebar-header-content";
 import SidebarFooterContent from "./sidebar-footer-content";
 import { useLocale, useTranslations } from "next-intl";
@@ -20,11 +18,34 @@ import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
 import InboxIcon from "@/public/icons/inbox-icon";
 import { SidebarProgramsList } from "./sidebar-programs";
+import { useSidebarMenu } from "@/hooks/useSidebarMenu";
+import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
+import { Menu, Project } from "@/types/sidebar-menu";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isCentral: boolean;
   name?: string;
   mainLogo?: string;
+}
+
+function mergeProjectsAndMenu(projects: Project[], menu: Menu[]) {
+  return projects.map((project) => {
+    const matchedMenu = menu.find((m) => m.slug === project.slug);
+
+    if (!matchedMenu) return project;
+
+    // Extract all menu fields except sub_entities
+    const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
+
+    return {
+      ...project,
+      ...restMenuProps,
+      sub_entities: [
+        ...(project.sub_entities || []),
+        ...(menuSubEntities || []),
+      ],
+    };
+  });
 }
 
 export function AppSidebar({
@@ -33,6 +54,7 @@ export function AppSidebar({
   mainLogo,
   ...props
 }: AppSidebarProps) {
+  const { menu, isLoading } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
@@ -50,98 +72,142 @@ export function AppSidebar({
     ROUTER.USER_PROFILE,
     ROUTER.COMPANY_PROFILE,
   ];
-  const settingsRoutes = {
-    name: t("Sidebar.Settings"),
-    icon: SettingsIcon,
-    isActive: settingsRoutesNames.indexOf(pageName) !== -1,
-    submenu: [
-      {
-        name: t("Sidebar.UserProfileSettings"),
-        url: ROUTER.USER_PROFILE,
-        icon: UserIcon,
-        isActive: pageName === ROUTER.USER_PROFILE,
-      },
-      {
-        name: "اعداد ملف الشركة",
-        url: ROUTER.COMPANY_PROFILE,
-        icon: InboxIcon,
-        isActive: pageName === ROUTER.COMPANY_PROFILE,
-      },
-      // {
-      //   name: t("Sidebar.DashboardSettings"),
-      //   url: ROUTER.DASHBOARD,
-      //   icon: InboxIcon,
-      //   isActive: pageName === ROUTER.DASHBOARD,
-      // },
-      {
-        name: t("Sidebar.SystemSettings"),
-        url: ROUTER.SETTINGS,
-        icon: InboxIcon,
-        isActive: pageName === ROUTER.SETTINGS,
-      },
-    ],
-  };
 
-  // This is sample data with translated names
-
-  const projects = isCentral
-    ? [
+  // just users & companies & program management are not central
+  const SidebarProjects = [
+    // companies
+    {
+      name: t("Sidebar.Companies"),
+      urls: [ROUTER.COMPANIES],
+      icon: LayoutDashboardIcon,
+      isActive: pageName === ROUTER.COMPANIES,
+      slug: SUPER_ENTITY_SLUG.COMPANY,
+      sub_entities: [
         {
-          name: t("Sidebar.Companies"),
+          name: t("Sidebar.CompaniesList"),
           url: ROUTER.COMPANIES,
-          icon: CompaniesIcon,
+          icon: LayoutDashboardIcon,
           isActive: pageName === ROUTER.COMPANIES,
-          submenu: [
-            {
-              name: t("Sidebar.CompaniesList"),
-              url: ROUTER.COMPANIES,
-              icon: CompaniesIcon,
-              isActive: pageName === ROUTER.COMPANIES,
-            },
-          ],
         },
+      ],
+      isNotCentral: true,
+    },
+    // users
+    {
+      name: t("Sidebar.Users"),
+      icon: UserIcon,
+      urls: [ROUTER.USERS],
+      isActive: pageName === ROUTER.USERS,
+      slug: SUPER_ENTITY_SLUG.USERS,
+      sub_entities: [
         {
-          name: t("Sidebar.Users"),
+          name: t("Sidebar.UsersList"),
+          url: ROUTER.USERS,
           icon: UserIcon,
           isActive: pageName === ROUTER.USERS,
-          submenu: [
-            {
-              name: t("Sidebar.UsersList"),
-              url: ROUTER.USERS,
-              icon: UserIcon,
-              isActive: pageName === ROUTER.USERS,
-            },
-          ],
         },
-        settingsRoutes,
-      ]
-    : [settingsRoutes];
-
-  const data = {
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
+      ],
+      isNotCentral: true,
     },
-    teams: [
-      {
-        name: "Acme Inc",
-        logo: GalleryVerticalEnd,
-        plan: "Enterprise",
-      },
-      {
-        name: "Acme Corp.",
-        logo: AudioWaveform,
-        plan: "Startup",
-      },
-      {
-        name: "Evil Corp.",
-        logo: Command,
-        plan: "Free",
-      },
-    ],
-    projects: [...projects],
-  };
+    {
+      name: t("Sidebar.HumanResources"),
+      icon: LayoutDashboardIcon,
+      urls: [ROUTER.Organizational_Structure],
+      isActive: pageName === ROUTER.Organizational_Structure,
+      slug: SUPER_ENTITY_SLUG.HRM,
+      sub_entities: [
+        {
+          name: t("Sidebar.OrganizationalStructure"),
+          url: ROUTER.Organizational_Structure,
+          icon: LayoutDashboardIcon,
+          isActive: pageName === ROUTER.Organizational_Structure,
+        },
+      ],
+      isNotCentral: false,
+    },
+    // program management
+    {
+      name: t("Sidebar.ProgramManagement"),
+      slug: SUPER_ENTITY_SLUG.PM,
+      icon: LayoutDashboardIcon,
+      urls: [ROUTER.PROGRAM_SETTINGS.USERS],
+      isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+      sub_entities: [
+        {
+          name: t("Sidebar.Users"),
+          url: ROUTER.PROGRAM_SETTINGS.USERS,
+          icon: LayoutDashboardIcon,
+          isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+        },
+      ],
+      isNotCentral: true,
+    },
+    // settings
+    {
+      name: t("Sidebar.Settings"),
+      icon: SettingsIcon,
+      isActive: settingsRoutesNames.indexOf(pageName) !== -1,
+      slug: SUPER_ENTITY_SLUG.SETTINGS,
+      urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+      sub_entities: [
+        {
+          name: t("Sidebar.UserProfileSettings"),
+          url: ROUTER.USER_PROFILE,
+          icon: UserIcon,
+          isActive: pageName === ROUTER.USER_PROFILE,
+        },
+        {
+          name: "اعداد ملف الشركة",
+          url: ROUTER.COMPANY_PROFILE,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.COMPANY_PROFILE,
+        },
+        {
+          name: t("Sidebar.SystemSettings"),
+          url: ROUTER.SETTINGS,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.SETTINGS,
+        },
+      ],
+      isNotCentral: false,
+    },
+    {
+      name: t("Sidebar.Settings"),
+      icon: SettingsIcon,
+      isActive: settingsRoutesNames.indexOf(pageName) !== -1,
+      slug: SUPER_ENTITY_SLUG.SETTINGS,
+      urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+      sub_entities: [
+        {
+          name: t("Sidebar.UserProfileSettings"),
+          url: ROUTER.USER_PROFILE,
+          icon: UserIcon,
+          isActive: pageName === ROUTER.USER_PROFILE,
+        },
+        {
+          name: "اعداد ملف الشركة",
+          url: ROUTER.COMPANY_PROFILE,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.COMPANY_PROFILE,
+        },
+        {
+          name: t("Sidebar.SystemSettings"),
+          url: ROUTER.SETTINGS,
+          icon: InboxIcon,
+          isActive: pageName === ROUTER.SETTINGS,
+        },
+      ],
+      isNotCentral: true,
+    },
+  ];
+
+  const projects = isCentral
+    ? SidebarProjects.filter((ele) => ele.isNotCentral)
+    : SidebarProjects.filter((ele) => !ele.isNotCentral);
+
+  // const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
+
+  const all = mergeProjectsAndMenu(projects, menu);
 
   return (
     <Sidebar
@@ -155,7 +221,8 @@ export function AppSidebar({
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarProgramsList projects={data.projects} />
+        {isLoading && <div className="p-4 flex justify-center">Loading...</div>}
+        <SidebarProgramsList projects={all} />
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>

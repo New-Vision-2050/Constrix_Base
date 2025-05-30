@@ -13,10 +13,12 @@ import {
   FileIcon as FilePdf,
   UploadCloud,
   Trash2Icon,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { FileObject } from './FileField'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MultiFileFieldProps {
   field: FieldConfig;
@@ -460,6 +462,90 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
     [onChange, formInstance, field.name, value]
   );
 
+  // Handle downloading a file
+  const handleDownload = useCallback((fileInfo: FileInfo) => {
+    const file = fileInfo.file;
+    
+    if (typeof file === 'string') {
+      // If file is a URL string, create a download link
+      const link = document.createElement('a');
+      link.href = file;
+      link.download = fileInfo.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (file instanceof File) {
+      // If file is a File object, create a blob URL and download it
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else if (file?.mime_type) {
+      // For FileObject, we need to check if it has a URL property or if it's stored elsewhere
+      
+      // Check if the FileObject has any property that might contain a URL
+      // Common properties that might contain URLs
+      const possibleUrlProps = ['url', 'path', 'src', 'href', 'link', 'fileUrl', 'downloadUrl'];
+      
+      let fileUrl = null;
+      
+      // Check if any of these properties exist on the file object
+      for (const prop of possibleUrlProps) {
+        if ((file as any)[prop]) {
+          fileUrl = (file as any)[prop];
+          break;
+        }
+      }
+      
+      // If we found a URL property, use it
+      if (fileUrl) {
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = fileInfo.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+      
+      // If not, check if the original value in normalizedValue is a string URL
+      const fileIndex = filesInfo.indexOf(fileInfo);
+      const fileValue = normalizedValue[fileIndex];
+      
+      if (typeof fileValue === 'string') {
+        // If the value is a string URL, use it for download
+        const link = document.createElement('a');
+        link.href = fileValue;
+        link.download = fileInfo.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // If we still can't determine how to download the file, try to use the uploadUrl if available
+        if (field.fileConfig?.uploadUrl) {
+          // Construct a URL based on the file name and upload URL
+          // This is a guess and might not work in all cases
+          const baseUrl = field.fileConfig.uploadUrl.split('/').slice(0, -1).join('/');
+          const downloadUrl = `${baseUrl}/download/${encodeURIComponent(fileInfo.name)}`;
+          
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = fileInfo.name;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          // If all else fails, log an error
+          console.error('Unable to download file: No URL available for FileObject', file);
+        }
+      }
+    }
+  }, []);
+
   // Handle clicking the upload button
   const handleUploadClick = useCallback(() => {
     if (fileInputRef.current) {
@@ -502,15 +588,38 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
                       {fileInfo.icon}
                     </div>
                     <div>
-                      <p className=" font-medium">{fileInfo.name}</p>
+                      {fileInfo.name && fileInfo.name.length > 4 && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="text-xs text-primary font-bold cursor-pointer">
+                                {fileInfo.name.length > 15
+                                  ? `${fileInfo.name.slice(0, 15)}...`
+                                  : fileInfo.name}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="font-medium">{fileInfo.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
                       <p className=" text-sm">11:31 21-05-2024</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
+                      onClick={() => handleDownload(fileInfo)}
+                      className="text-primary transition-colors"
+                      aria-label="Download File"
+                    >
+                      <Download />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleRemoveFile(index)}
-                      className="text-[#D32F2F]  transition-colors"
+                      className="text-[#D32F2F] transition-colors"
                       aria-label="Delete File"
                     >
                       <Trash2Icon />
@@ -549,7 +658,46 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
           {field.fileConfig?.allowedFileTypes && (
             <p className="text-xs text-muted-foreground mt-1">
               {t("AllowedTypes")}:{" "}
-              {field.fileConfig.allowedFileTypes.join(", ")}
+              {field.fileConfig.allowedFileTypes
+                .map((mimeType) => {
+                  // Convert MIME types to readable extensions
+                  switch (mimeType) {
+                    case "application/pdf":
+                      return "PDF";
+                    case "application/msword":
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                      return "DOC/DOCX";
+                    case "application/vnd.ms-excel":
+                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                      return "XLS/XLSX";
+                    case "application/vnd.ms-powerpoint":
+                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                      return "PPT/PPTX";
+                    case "image/jpeg":
+                      return "JPG";
+                    case "image/png":
+                      return "PNG";
+                    case "image/gif":
+                      return "GIF";
+                    case "image/svg+xml":
+                      return "SVG";
+                    case "text/plain":
+                      return "TXT";
+                    case "text/csv":
+                      return "CSV";
+                    case "application/zip":
+                    case "application/x-zip-compressed":
+                      return "ZIP";
+                    case "application/x-rar-compressed":
+                      return "RAR";
+                    default:
+                      // For unknown MIME types, extract the part after the slash
+                      return (
+                        mimeType.split("/").pop()?.toUpperCase() || mimeType
+                      );
+                  }
+                })
+                .join(", ")}
             </p>
           )}
           {field.fileConfig?.maxFileSize && (

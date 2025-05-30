@@ -15,7 +15,8 @@ export const buildRequestUrl = (
   searchQuery: string,
   searchFields?: string[],
   columnSearchState?: ColumnSearchState,
-  searchConfig?: SearchConfig
+  searchConfig?: SearchConfig,
+  apiParams?: Record<string, string>
 ): URL => {
   // Fix URL handling: ensure URL is properly formatted
   let apiUrl: URL;
@@ -41,14 +42,21 @@ export const buildRequestUrl = (
     newUrl.searchParams.append(key, value);
   });
 
+  if (apiParams) {
+    const additionalParams = new URLSearchParams(apiParams);
+    additionalParams.forEach((value, key) => {
+      newUrl.searchParams.append(key, value);
+    });
+  }
+
   // Add pagination parameters
   newUrl.searchParams.append("page", currentPage.toString());
   newUrl.searchParams.append("per_page", itemsPerPage.toString());
 
   // Add sorting parameters
   if (sortColumn && sortDirection) {
-    newUrl.searchParams.append("_sort", sortColumn);
-    newUrl.searchParams.append("_order", sortDirection);
+    newUrl.searchParams.append("sort", sortColumn);
+    newUrl.searchParams.append("order", sortDirection);
   }
 
   // Add global search parameters
@@ -67,27 +75,27 @@ export const buildRequestUrl = (
   }
 
   // Add column-specific search parameters
-if (columnSearchState && Object.keys(columnSearchState).length > 0) {
-Object.entries(columnSearchState).forEach(([columnKey, searchValue]) => {
-  // Skip empty values and special "_clear_" value
-  if (
-    searchValue &&
-    searchValue !== "_clear_" &&
-    searchValue !== "__clear__"
-  ) {
-    // Handle both string and string[] values
-    if (Array.isArray(searchValue)) {
-      // For array values, join them with commas or add multiple parameters
-      if (searchValue.length > 0) {
+  if (columnSearchState && Object.keys(columnSearchState).length > 0) {
+    Object.entries(columnSearchState).forEach(([columnKey, searchValue]) => {
+      // Skip empty values and special "_clear_" value
+      if (
+        searchValue &&
+        searchValue !== "_clear_" &&
+        searchValue !== "__clear__"
+      ) {
+        // Handle both string and string[] values
+        if (Array.isArray(searchValue)) {
+          // For array values, join them with commas or add multiple parameters
+          if (searchValue.length > 0) {
         newUrl.searchParams.append(columnKey, searchValue.join(','));
+          }
+        } else {
+          // For string values, add as normal
+          newUrl.searchParams.append(columnKey, searchValue);
+        }
       }
-    } else {
-      // For string values, add as normal
-      newUrl.searchParams.append(columnKey, searchValue);
-    }
+    });
   }
-});
-}
 
   console.log("Built URL with parameters:", newUrl.toString());
   return newUrl;

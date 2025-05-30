@@ -22,7 +22,11 @@ export async function middleware(req: NextRequest) {
   }
 
   const res = intlMiddleware(req);
-
+  if (pathname.includes("/en/")) {
+    res.cookies.set("NEXT_LOCALE", "en");
+  } else {
+    res.cookies.set("NEXT_LOCALE", "ar");
+  }
   if ((!existingCompanyCookie && host) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
@@ -42,10 +46,8 @@ export async function middleware(req: NextRequest) {
           path: "/",
           maxAge: 60 * 60 * 24,
         });
-      }
-      else
-      {
-          res.cookies.delete("company-data");
+      } else {
+        res.cookies.delete("company-data");
       }
 
       if (
@@ -55,7 +57,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     } catch (error) {
-       res.cookies.delete("company-data");
+      res.cookies.delete("company-data");
       console.log(" Company fetch error:", error);
     }
   }

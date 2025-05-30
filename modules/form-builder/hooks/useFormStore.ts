@@ -43,6 +43,7 @@ interface FormState {
   getValues: (formId: string) => any;
   setValue: (formId: string, field: string, value: any) => void;
   setValues: (formId: string, values: Record<string, any>) => void;
+  getError: (formId: string, field: string) => any;
   setError: (
     formId: string,
     field: string,
@@ -147,6 +148,12 @@ export const useFormStore = create<FormState>((set, get) => ({
     const state = get();
     const formState = state.forms[formId] || getDefaultFormState();
     return formState.values;
+  },
+
+  getError: (formId: string, field: string) => {
+    const state = get();
+    const formState = state.forms[formId] || getDefaultFormState();
+    return formState.errors[field];
   },
 
   setValues: (formId: string, values: Record<string, any>) =>
@@ -527,8 +534,12 @@ export const useFormStore = create<FormState>((set, get) => ({
 
           try {
             const number = phoneUtil.parseAndKeepRawInput(value);
-            
-            if (!phoneUtil.isValidNumber(number)) {
+            const splitValue = value.split(" ");
+            // Reject if national number starts with 0
+            if (
+              (splitValue.length > 0 && splitValue[1].startsWith("0")) ||
+              !phoneUtil.isValidNumber(number)
+            ) {
               store.setError(formId, fieldName, message);
               hasError = true;
               break;
@@ -555,7 +566,7 @@ export const useFormStore = create<FormState>((set, get) => ({
               const {
                 triggerApiValidation,
               } = require("../utils/apiValidation");
-              triggerApiValidation(fieldName, value, rule, formStore);
+              triggerApiValidation(fieldName, value, rule, formStore, formId);
             } catch (error) {
               console.error("Error in API validation:", error);
             }
@@ -626,6 +637,13 @@ export const useFormInstance = (
   const setValue = useCallback(
     (field: string, value: any) => {
       useFormStore.getState().setValue(formId, field, value);
+    },
+    [formId]
+  );
+
+  const getError = useCallback(
+    (field: string) => {
+      return useFormStore.getState().getError(formId, field);
     },
     [formId]
   );
@@ -708,7 +726,7 @@ export const useFormInstance = (
       rules: ValidationRule[],
       formValues: Record<string, any>
     ) => {
-      useFormStore
+      return useFormStore
         .getState()
         .validateField(formId, fieldName, value, rules, formValues);
     },
@@ -746,5 +764,6 @@ export const useFormInstance = (
     validateField,
     hasValidatingFields,
     setEditMode,
+    getError,
   };
 };

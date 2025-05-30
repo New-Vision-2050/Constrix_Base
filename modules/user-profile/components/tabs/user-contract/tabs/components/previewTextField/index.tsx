@@ -48,14 +48,14 @@ const PreviewTextField = ({
   const labelDir = isRTL ? "right-[15px]" : "left-[15px]";
 
   return (
-    <div className={cn("relative grow", needRequest && "bg-background")}>
+    <div className={cn("relative grow","border-2", "mb-6", needRequest && "bg-background")}>
       {/* input field with prefix icon */}
       <div className="flex w-full items-center gap-1">
         <PreviewTextFieldPrefixIcon type={type} />
         <Input
           disabled
           type="text"
-          value={truncateString(checkString(value), 25)}
+          value={truncateString(checkString(value), 21)}
         />
       </div>
 

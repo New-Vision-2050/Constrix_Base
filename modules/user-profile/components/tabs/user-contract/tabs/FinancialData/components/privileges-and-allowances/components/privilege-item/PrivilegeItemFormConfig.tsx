@@ -126,6 +126,10 @@ export const PrivilegeItemFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            condition: (values) => {
+              if (values.type_allowance_code == null) return false;
+              return values.type_allowance_code !== AllowancesTypes?.Saving;
+            },
             validation: [
               {
                 type: "required",

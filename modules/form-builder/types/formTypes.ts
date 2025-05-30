@@ -43,6 +43,8 @@ export interface DynamicRowOptions {
   columnsMedium?: number; // Number of columns on medium screens (default: 2)
   columnsLarge?: number; // Number of columns on large screens (default: 3)
   enableDrag?: boolean; // Enable drag-and-drop reordering of rows
+  enableRemove?: boolean; // Enable row removal (overrides minRows constraint if set to true)
+  enableAdd?: boolean; // Enable row addition (overrides maxRows constraint if set to false)
   dragHandlePosition?: "left" | "right"; // Position of the drag handle (default: 'left')
   onDragStart?: (index: number) => void; // Callback when drag starts
   onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
@@ -80,6 +82,7 @@ export interface DynamicDropdownConfig {
   queryParameters?: Record<string, string>; // Additional query parameters
   transformResponse?: (data: any) => DropdownOption[]; // Transform API response to dropdown options
   enableServerSearch?: boolean; // Whether to enable server-side search
+  disableReactQuery?: boolean; // Whether to disable React Query caching and use direct API calls
 }
 
 export interface SearchTypeConfig {
@@ -87,6 +90,7 @@ export interface SearchTypeConfig {
   placeholder?: string;
   dropdownOptions?: DropdownOption[]; // Static options
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
+  isMulti?: boolean;
 }
 
 export interface minMaxDate {
@@ -100,6 +104,7 @@ export interface FieldConfig {
     | "text"
     | "textarea"
     | "checkbox"
+    | "checkboxGroup"
     | "radio"
     | "select"
     | "multiSelect"
@@ -113,6 +118,13 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
+    
+  fieldClassName?: string; // Class name for the field container
+
+  // CheckboxGroup sync properties
+  syncWithField?: string; // Name of another checkbox group field to sync with
+  syncDirection?: "bidirectional" | "unidirectional"; // Whether the sync is two-way or one-way
+  syncOn?: "select" | "unselect" | "both"; // When to trigger the sync
   name: string;
   // Image field specific properties
   imageConfig?: {
@@ -149,6 +161,7 @@ export interface FieldConfig {
   containerClassName?: string; // Class name for the container element
   width?: string;
   gridArea?: number;
+  optionsTitle?: string;
   options?: DropdownOption[]; // Using shared DropdownOption type
   validation?: ValidationRule[];
   condition?: (values: Record<string, any>) => boolean;
@@ -244,6 +257,7 @@ export interface FormConfig {
   wizardOptions?: WizardOptions; // Configuration options for wizard/accordion mode
   // Backend API configuration
   apiUrl?: string; // URL to submit the form data to
+  apiParams?: Record<string, string | number>;
   apiMethod?: "POST" | "PUT" | "PATCH" | "DELETE"; // HTTP method for form submission in create mode (default: POST)
   apiHeaders?: Record<string, string>; // Custom headers for the API request
   // Edit mode configuration
@@ -279,4 +293,6 @@ export interface FormConfig {
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
   wrapperClassName?: string;
+  subWrapperClassName?:string
+  subWrapperParentClassName?:string;
 }

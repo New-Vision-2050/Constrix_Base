@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Calendar } from '@/modules/table/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/table/components/ui/popover';
@@ -15,7 +15,7 @@ interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' 
   value: string;
   error?: string | React.ReactNode;
   touched?: boolean;
-  onChange: (value: string) => void;
+  onChange: (value: any) => void;
   onBlur: () => void;
 }
 
@@ -28,7 +28,15 @@ const DateField: React.FC<DateFieldProps> = ({
   onBlur,
   ...props
 }) => {
-  const date = !field?.isHijri && value ? new Date(value) : undefined;
+  // Handle both string date and Date object for flexibility
+  const [valueState, setValueState] = useState(value);
+  
+  // Update internal state when prop changes
+  useEffect(() => {
+    setValueState(value);
+  }, [value]);
+  
+  const date = !field?.isHijri && valueState ? new Date(valueState) : undefined;
   const [isOpen, setIsOpen] = useState(false);
 
   const getMinDate = () =>{
@@ -38,6 +46,7 @@ const DateField: React.FC<DateFieldProps> = ({
 
     return minDate ? new Date(minDate): undefined;
   }
+  
   const getMaxDate = () =>{
     let maxDate = field?.maxDate?.value ?? (field?.maxDate?.formId ? useFormStore
       ?.getState()
@@ -45,6 +54,15 @@ const DateField: React.FC<DateFieldProps> = ({
 
     return maxDate ? new Date(maxDate): undefined;
   }
+  
+  const handleDateChange = (newValue: string | null) => {
+    const finalValue = newValue || '';
+    // Update internal state for UI
+    setValueState(finalValue);
+    // Call parent onChange
+    onChange(finalValue);
+  };
+  
   return (
     <div className="relative">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -54,7 +72,7 @@ const DateField: React.FC<DateFieldProps> = ({
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal",
-            (!date|| !value) && "text-muted-foreground",
+            (!date || !valueState) && "text-muted-foreground",
             !!error && touched ? 'border-destructive' : '',
             field.className,
             field.width ? field.width : 'w-full'
@@ -62,19 +80,19 @@ const DateField: React.FC<DateFieldProps> = ({
           disabled={field.disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {value
+          {valueState
             ? field?.isHijri
-              ? value
-              : format(new Date(value), 'PPP')
+              ? valueState
+              : format(new Date(valueState), 'PPP')
             : field.placeholder || 'Select a date'}
         </Button>
       </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
         {field?.isHijri
           ? <HijriCalendar
-              value={value ?? undefined}
+              value={valueState ?? undefined}
               onChange={(dateObj) => {
-                onChange(dateObj ? dateObj?.toString() : '');
+                handleDateChange(dateObj ? dateObj?.toString() : null);
                 onBlur();
                 setIsOpen(false);
               }}
@@ -86,7 +104,7 @@ const DateField: React.FC<DateFieldProps> = ({
             mode="single"
             selected={date}
             onSelect={(date) => {
-              onChange(date ? date.toISOString() : '');
+              handleDateChange(date ? date.toISOString() : null);
               onBlur();
               setIsOpen(false);
             }}

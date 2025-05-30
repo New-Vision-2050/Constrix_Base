@@ -13,6 +13,8 @@ interface TableInitializationProps {
     canDelete?: boolean;
   };
   configColumns?: ColumnConfig[];
+  availableColumnKeys?: string[]; // New: Array of column keys that should be available
+  defaultVisibleColumnKeys?: string[]; // New: Array of column keys that should be visible by default
   defaultItemsPerPage: number;
   defaultSortColumn: string | null;
   defaultSortDirection: "asc" | "desc" | null;
@@ -28,6 +30,7 @@ interface TableInitializationProps {
   setColumns: (columns: ColumnConfig[]) => void;
   setVisibleColumns?: (columnKeys: string[]) => void;
   tableId?: string; // Add tableId parameter
+  deleteConfirmMessage?: string; // Add deleteConfirmMessage parameter
 }
 
 export const useTableInitialization = ({
@@ -35,6 +38,8 @@ export const useTableInitialization = ({
   executions = [],
   executionsConfig,
   configColumns,
+  availableColumnKeys,
+  defaultVisibleColumnKeys,
   defaultItemsPerPage,
   defaultSortColumn,
   defaultSortDirection,
@@ -46,6 +51,7 @@ export const useTableInitialization = ({
   setColumns,
   setVisibleColumns,
   tableId = "default", // Default to 'default' if not provided
+  deleteConfirmMessage,
 }: TableInitializationProps) => {
   const t = useTranslations();
 
@@ -90,19 +96,33 @@ export const useTableInitialization = ({
               row={row}
               formConfig={formConfig}
               executions={executions}
+              tableName={tableId}
               buttonLabel={t("Companies.Actions")}
               showEdit={Boolean(executionsConfig?.canEdit)}
               showDelete={Boolean(executionsConfig?.canDelete)}
+              deleteConfirmMessage={deleteConfirmMessage}
             />
           ),
         });
       }
 
-      setColumns(configColumns);
+      // Filter columns based on availableColumnKeys if provided
+      let filteredColumns = [...configColumns];
+      if (availableColumnKeys && availableColumnKeys.length > 0) {
+        filteredColumns = filteredColumns.filter(col =>
+          availableColumnKeys.includes(col.key)
+        );
+      }
+
+      setColumns(filteredColumns);
 
       // Also initialize visible columns if the function is provided
       if (setVisibleColumns) {
-        const columnKeys = configColumns.map((col) => col.key);
+        // Use defaultVisibleColumnKeys if provided, otherwise use all column keys
+        const columnKeys = defaultVisibleColumnKeys && defaultVisibleColumnKeys.length > 0
+          ? defaultVisibleColumnKeys
+          : filteredColumns.map((col) => col.key);
+        
         setVisibleColumns(columnKeys);
       }
     }

@@ -1,0 +1,72 @@
+.item-management{
+--tree-line-color: #18CB5F;
+  + ul:before{
+    border-color: #18CB5F;
+  }
+}
+.item-branch{
+--tree-line-color: #F19B02;
+  + ul:before{
+    border-color: #F19B02;
+  }
+}
+.item-department{
+--tree-line-color: #F42588;
+  + ul:before{
+    border-color: #F42588;
+  }
+}
+li.tree-fix-ar{
+  &:before, &:after{
+     left: 50%;
+     right: auto;
+   }
+&:after{
+     right: 50%;
+     left: auto;
+   border-right: var(--tree-line-width) var(--tree-node-line-style) var(--tree-line-color);
+  border-left: 0;
+   }
+&:first-of-type::after{
+   border-radius: 0 var(--tree-line-border-radius) 0 0;
+ }
+&:last-of-type::before {
+  border-left: var(--tree-line-width) var(--tree-node-line-style) var(--tree-line-color);
+   border-right: 0;
+  border-radius: var(--tree-line-border-radius) 0 0 0;
+}
+}
+.no-select {
+  user-select: none !important;
+}
+
+.combined-nodes-wrapper{
+  > li {
+    padding: 0;
+    &:not(:last-child){
+    margin-bottom: var(--tree-node-padding);
+     }
+    &:before,
+    &:after{
+      display: none;
+    }
+    & .node-content{
+    max-width: 100%;
+      }
+  }
+}
+.combined-nodes-container{
+  @apply shadow ring-2 ring-secondary rounded-lg shadow p-4 bg-sidebar/50;
+  &.list-management{
+    @apply ring-[#18CB5F]/40
+  }
+  &.list-branch{
+   @apply ring-[#F19B02]/40
+  }
+  &.list-department{
+   @apply ring-[#F42588]/40
+  }
+}
+.org-chart-container ul:not(:has(li)){
+  display: none;
+}

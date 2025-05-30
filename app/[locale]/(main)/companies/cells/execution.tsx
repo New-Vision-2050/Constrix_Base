@@ -45,6 +45,7 @@ export type ActionState = {
   };
   edit?: {
     open: boolean;
+    tableName?: string;
     config: FormConfig | null;
   };
   [key: string]:
@@ -61,6 +62,7 @@ const Execution = ({
   className = "px-5 bg-[#8785A2] hover:bg-[#8785A2] rotate-svg-child",
   showEdit = true,
   showDelete = true,
+  deleteConfirmMessage,
 }: {
   row: { id: string; [key: string]: unknown };
   executions?: MenuItem[];
@@ -70,6 +72,7 @@ const Execution = ({
   className?: string;
   showEdit?: boolean;
   showDelete?: boolean;
+  deleteConfirmMessage?: string;
 }) => {
   const t = useTranslations();
 
@@ -190,6 +193,7 @@ const Execution = ({
           onSuccess={() => {
             reloadTable();
           }}
+          deleteConfirmMessage={deleteConfirmMessage}
         />
       )}
 
@@ -197,6 +201,9 @@ const Execution = ({
       {formConfig && actionState.edit && actionState.edit.config && (
         <SheetFormBuilder
           recordId={row.id}
+          onSuccess={() => {
+            reloadTable();
+          }}
           config={actionState.edit.config}
           isOpen={actionState.edit.open}
           onOpenChange={() => handleCloseDialog("edit")}
@@ -230,7 +237,9 @@ const Execution = ({
                   ? item.dialogProps(row)
                   : item.dialogProps)}
                 open={dialogState.open}
+                isOpen={dialogState.open}
                 onClose={() => handleCloseDialog(item.action as string)}
+                onOpenChange={() => handleCloseDialog(item.action as string)}
                 onSuccess={() => {
                   const _dialogProps =
                     typeof item.dialogProps === "function"

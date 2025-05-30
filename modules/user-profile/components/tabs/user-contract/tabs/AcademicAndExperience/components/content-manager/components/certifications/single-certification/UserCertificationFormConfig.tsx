@@ -97,11 +97,15 @@ export const UserCertificationFormConfig = ({
             name: "date_obtain",
             label: "تاريخ الحصول على الشهادة",
             type: "date",
-            placeholder: "تاريخ الحصول على الشهادة",
+            maxDate: {
+              formId: `user-certification-data-form-${certification?.id}`,
+              field: "date_end",
+            },
+            placeholder: "تاريخ الشهادة",
             validation: [
               {
                 type: "required",
-                message: "تاريخ الحصول على الشهادة مطلوب",
+                message: "تاريخ الشهادة مطلوب",
               },
             ],
           },
@@ -109,6 +113,10 @@ export const UserCertificationFormConfig = ({
             name: "date_end",
             label: "تاريخ انتهاء الشهادة",
             type: "date",
+            minDate: {
+              formId: `user-certification-data-form-${certification?.id}`,
+              field: "date_obtain",
+            },
             placeholder: "تاريخ انتهاء الشهادة",
             validation: [
               {

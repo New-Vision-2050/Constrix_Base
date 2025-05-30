@@ -7,7 +7,8 @@ const errorMessages = {
     required: "This field is required",
     minLength: (min: number) => `Must be at least ${min} characters`,
     invalidEmail: "Invalid email address",
-    invalidPhone: "Invalid phone number, must be in the format 05xxxxxxxx",
+    invalidPhone:
+      "Invalid phone number, must be in the format 05xxxxxxxx or 01xxxxxxxxx",
     passwordMinLength: "Password must be at least 8 characters",
     passwordUpperCase: "Password must contain at least one uppercase letter",
     passwordSpecialChar: "Password must contain at least one special character",
@@ -15,12 +16,14 @@ const errorMessages = {
     passwordMatch: "Passwords must match",
     emailMatch: "Email addresses must match",
     otpRequired: "Temporary password is required",
+    passwordNoSpaces: "Password must not contain spaces",
   },
   ar: {
     required: "هذا الحقل مطلوب",
     minLength: (min: number) => `يجب أن يكون طول النص ${min} أحرف على الأقل`,
     invalidEmail: "البريد الإلكتروني غير صالح",
-    invalidPhone: "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx",
+    invalidPhone:
+      "رقم الهاتف غير صالح، يجب أن يكون بصيغة 05xxxxxxxx أو 01xxxxxxxxx",
     passwordMinLength: "يجب أن تكون كلمة المرور بطول 8 أحرف على الأقل",
     passwordUpperCase: "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
     passwordSpecialChar: "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل",
@@ -29,6 +32,7 @@ const errorMessages = {
     emailMatch:
       "يجب أن تتطابق البريد الالكتروني الجديد مع تأكيد البريد الالكتروني",
     otpRequired: "يجب إدخال كلمة المرور المؤقتة",
+    passwordNoSpaces: "يجب ألا تحتوي كلمة المرور على مسافات",
   },
 };
 
@@ -64,10 +68,14 @@ export const createPasswordValidation = () => {
 export const createIdentifierValidation = () => {
   return z
     .string()
-    .min(5, getMessage("required"))
+    .min(1, getMessage("required"))
     .refine(
       (value) => {
-        if (value.includes("@")) {
+        if (
+          /^[^\d][\w\W]*$/.test(value) ||
+          value.includes("@") ||
+          value.includes(".")
+        ) {
           return z.string().email().safeParse(value).success;
         }
         return true;
@@ -76,8 +84,8 @@ export const createIdentifierValidation = () => {
     )
     .refine(
       (value) => {
-        if (value.startsWith("0")) {
-          return /^0(5[0-9]{8})$/.test(value);
+        if (/^\d/.test(value)) {
+          return /^05\d{8}$/.test(value) || /^01\d{9}$/.test(value);
         }
         return true;
       },

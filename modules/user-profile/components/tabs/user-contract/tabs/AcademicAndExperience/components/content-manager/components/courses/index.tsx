@@ -14,7 +14,7 @@ export default function UserCourses() {
             setOpen(true);
           }}
         >
-          اضافة حقل اخر
+          اضافة كورس
         </button>
       </div>
       <CreateCourseDialog open={open} setOpen={setOpen} />

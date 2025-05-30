@@ -7,6 +7,7 @@ import { FormConfig } from "../types/formTypes";
 import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import { apiClient } from "@/config/axios-config";
 import { useFormStore } from "@/modules/form-builder";
+import { useTranslations } from "next-intl";
 
 interface FormBuilderProps {
   config: FormConfig;
@@ -76,9 +77,8 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   editError: initialEditError,
   recordId,
 }) => {
-  console.log({config})
   // Local state for edit mode
-
+  const t = useTranslations();
   const [isEditMode] = useState(config.isEditMode || false);
   const [isLoadingEditData, setIsLoadingEditData] = useState(
     initialIsLoadingEditData || false
@@ -240,7 +240,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
       {isLoadingEditData && (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="animate-spin h-8 w-8 text-primary" />
-          <span className="ml-2 text-lg">Loading data...</span>
+          <span className="ml-2 text-lg">{t("Main.Loading")}</span>
         </div>
       )}
 
@@ -321,6 +321,8 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               collapsible={section.collapsible}
               clearFiledError={clearFiledError}
               formId={config.formId}
+              subWrapperClassName={config?.subWrapperClassName}
+              subWrapperParentClassName={config?.subWrapperParentClassName}
             />
           ))
         )}

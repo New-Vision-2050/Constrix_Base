@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +20,28 @@ interface PropsT {
 }
 
 const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
+  // declare and define vars and state
   const router = useRouter();
+  // handle redirect to user profile page if user has one company
+  useEffect(() => {
+    if (
+      open === true &&
+      user?.companies?.length === 1 &&
+      user?.companies[0]?.users?.length
+    ) {
+      const company = user.companies[0];
+      const userId = company?.users?.[0]?.id ?? "";
+      router.push(
+        `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${company?.id}`
+      );
+      onClose(); // close the dialog after redirect
+    }
+  }, [open, user, router, onClose]);
 
-  const handleRedirect = (id: string) => {
+  // declare and define functions
+  const handleRedirect = (id: string, companyId: string) => {
     if (!id) return;
-    router.push(`${ROUTER.USER_PROFILE}?id=${id}`);
+    router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
   };
 
   return (
@@ -46,12 +63,17 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
             {user?.companies?.map((company) => (
               <div
                 key={company?.id}
-                onClick={() => handleRedirect(company?.users?.[0]?.id ?? "")}
+                onClick={() =>
+                  handleRedirect(
+                    company?.users?.[0]?.id ?? "",
+                    company?.id ?? ""
+                  )
+                }
                 className="flex flex-col items-center justify-center cursor-pointer"
               >
                 <img
                   title={company?.name}
-                  src={company?.logo??LogoPlaceholder}
+                  src={company?.logo ?? LogoPlaceholder.src}
                   width={70}
                   height={70}
                   className="rounded-2xl"

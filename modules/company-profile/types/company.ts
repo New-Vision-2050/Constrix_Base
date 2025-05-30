@@ -10,14 +10,16 @@ export interface CompanyLegalData {
   registration_number: string;
   registration_type: string;
   registration_type_id: string;
+  registration_type_type: string;
   start_date: string;
   end_date: string;
-  file: string;
+  file: string[];
 }
 
 export interface CompanyDocument {
   id: string;
   name: string;
+  document_type?: string;
   files: {
     id: number;
     mime_type: string;
@@ -85,16 +87,16 @@ export interface Branch {
   country_name: string;
   state_name: null | string;
   city_name: null | string;
-  manager: Manager | null
-  user_count:string | number
-  department_count:string | number
+  manager: Manager | null;
+  user_count: string | number;
+  department_count: string | number;
 }
 
 export interface Manager {
-    id: string;
-    email: null | string;
-    name: string;
-    phone: null | string;
+  id: string;
+  email: null | string;
+  name: string;
+  phone: null | string;
 }
 
 export interface officialData {
@@ -151,4 +153,6 @@ export interface CompanyData {
   company_official_documents: CompanyDocument[] | [];
   branches: Branch[];
   created_at: string | null;
+  owner_id: string;
+  owner_name: string;
 }

@@ -146,7 +146,6 @@ export function useSheetForm({
   }, [isStepBased]);
 
   const closeSheet = useCallback(() => {
-    setIsOpen(false);
     // Reset form state when sheet is closed
     if (config.resetOnSuccess) {
       resetForm();
@@ -155,6 +154,8 @@ export function useSheetForm({
     if (isStepBased) {
       setCurrentStep(0);
     }
+
+    setIsOpen(false);
   }, [config.resetOnSuccess, isStepBased, resetForm]);
 
   const clearFiledError = useCallback(
@@ -166,8 +167,13 @@ export function useSheetForm({
 
   // Validate all form fields
   const validateAllFields = useCallback(() => {
-    const newErrors: Record<string, string | React.ReactNode> = {};
     let isValid = true;
+    const store = useFormStore.getState();
+    const formState = store.forms[config.formId || "sheet-form"];
+
+    if (!formState) {
+      return true;
+    }
 
     // Iterate through all sections and fields
     config.sections.forEach((section) => {
@@ -181,11 +187,34 @@ export function useSheetForm({
         if (field.condition && !field.condition(values)) {
           return;
         }
-          if (field.hidden || field.disabled) {
-              return;
+        if (field.hidden || field.disabled) {
+          return;
+        }
+        
+        // Check if field is required and has validation
+        if (field.validation && config.formId) {
+          // Check if field has been touched (blurred)
+          const fieldTouched = formState.touched[field.name];
+          
+          if (fieldTouched) {
+            // Field has been touched, get existing validation result from store
+            const existingError = formState.errors[field.name];
+            if (existingError) {
+              isValid = false;
+            }
+          } else {
+            // Field hasn't been touched, validate it now
+            const fieldIsValid = store.validateField(
+              config.formId,
+              field.name,
+              values[field.name],
+              field.validation,
+              values
+            );
+            if (!fieldIsValid) {
+              isValid = false;
+            }
           }
-        if(field.validation && config.formId) {
-            isValid = useFormStore.getState().validateField(config.formId, field.name, values[field.name], field.validation, values);
         }
       });
     });
@@ -193,7 +222,7 @@ export function useSheetForm({
     setIsValid(isValid);
 
     return isValid;
-  }, [config.sections, values, setIsValid]);
+  }, [config.sections, config.formId, values, setIsValid]);
 
   // Handle form submission
   const handleSubmit = useCallback(
@@ -261,7 +290,8 @@ export function useSheetForm({
 
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
-          config.onSubmit || ((values) => defaultSubmitHandler(values, config, requestOptions));
+          config.onSubmit ||
+          ((values) => defaultSubmitHandler(values, config, requestOptions));
         const result = await submitHandler(finalValues);
         if (result.success) {
           setSubmitSuccess(true);

@@ -17,7 +17,7 @@ export default function PreviewTextFieldLabel(props: PropsT) {
 
   return (
     <span
-      className={`absolute top-[-14px] text-[12px] ${labelDir} flex items-center text-gray-600`}
+      className={`absolute top-[-30px]  text-[12px] ${labelDir} flex items-center text-gray-600`}
     >
       {needRequest && <PinIcon className="me-1" />}
 

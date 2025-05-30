@@ -109,17 +109,17 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
                             },
                             {
                                 type: "apiValidation",
-                                message: <InvalidMessage formId="companies-form"/>,
+                                message: <InvalidMessage formId="company-user-form"/>,
                                 apiConfig: {
                                     url: `${baseURL}/company-users/check-email`,
                                     method: "POST",
                                     debounceMs: 500,
                                     paramName: "email",
                                     successCondition: (response) => {
-                                        useFormStore.getState().setValues("companies-form", {
+                                        useFormStore.getState().setValues("company-user-form", {
                                             exist_user_id: response.payload?.[0]?.id,
                                         });
-                                        useFormStore.getState().setValues("companies-form", {
+                                        useFormStore.getState().setValues("company-user-form", {
                                             error_sentence: response.payload?.[0]?.sentence,
                                         });
 
@@ -150,7 +150,7 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
                         placeholder: "اختر المسمى الوظيفي",
                         required: true,
                         dynamicOptions: {
-                            url: `${baseURL}/job_titles?type=general_manager`,
+                            url: `${baseURL}/job_titles/list?type=general_manager`,
                             valueField: "id",
                             labelField: "name",
                             searchParam: "name",

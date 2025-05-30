@@ -2,28 +2,19 @@ import SingleQualificationDataPreview from "./preview-mode";
 import SingleQualificationDataEditMode from "./edit-mode";
 import { Qualification } from "@/modules/user-profile/types/qualification";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
-import { apiClient } from "@/config/axios-config";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
+import { useState } from "react";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 
 type PropsT = { qualification: Qualification };
 export default function SingleQualificationData({ qualification }: PropsT) {
   // declare and define component state and vars
+  const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
-
-  // declare and define component methods
-  const handleDelete = async () => {
-    await apiClient
-      .delete(`/qualifications/${qualification?.id}`)
-      .then(() => {
-        handleRefreshUserQualifications();
-      })
-      .catch((err) => {
-        console.log("delete bank error", err);
-      });
-  };
 
   // return component ui
   return (
+    <>
     <TabTemplate
       title={""}
       reviewMode={
@@ -34,16 +25,28 @@ export default function SingleQualificationData({ qualification }: PropsT) {
       }
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} },
-          { title: "أنشاء طلب", onClick: () => {} },
+          { title: "طلباتي", onClick: () => {} ,disabled:true},
+          { title: "أنشاء طلب", onClick: () => {},disabled:true },
           {
             title: "حذف",
             onClick: () => {
-              handleDelete();
+              setDeleteDialog(true);
             },
           },
         ],
       }}
     />
+
+    
+      <DeleteConfirmationDialog
+        deleteUrl={`/qualifications/${qualification?.id}`}
+        onClose={() => setDeleteDialog(false)}
+        open={deleteDialog}
+        onSuccess={() => {
+          handleRefreshUserQualifications();
+          setDeleteDialog(false);
+        }}
+      />
+    </>
   );
 }

@@ -5,6 +5,7 @@ import UserProfileHeaderUserInformationSection from "./components/UserInformatio
 type PropsT = {
   loading: boolean;
   name?: string;
+  branch?: string;
   imgSrc?: string;
   address?: string;
   job_title?: string;
@@ -12,7 +13,6 @@ type PropsT = {
   children?: React.ReactNode;
   setOpenUploadImgDialog?: React.Dispatch<SetStateAction<boolean>>;
 };
-
 
 /**
  * UserProfileHeader Component
@@ -27,6 +27,7 @@ export default function UserProfileHeader(props: PropsT) {
     imgSrc,
     loading,
     name,
+    branch,
     job_title,
     address,
     date_appointment,
@@ -46,6 +47,7 @@ export default function UserProfileHeader(props: PropsT) {
       {/* user information */}
       <UserProfileHeaderUserInformationSection
         name={name}
+        branch={branch}
         loading={loading}
         address={address}
         job_title={job_title}

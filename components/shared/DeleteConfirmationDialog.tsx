@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ interface DeleteConfirmationDialogProps {
   onClose: () => void;
   deleteUrl: string;
   onSuccess?: () => void;
+  deleteConfirmMessage?: ReactNode;
 }
 
 const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
@@ -24,7 +25,10 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   onClose,
   deleteUrl,
   onSuccess,
+  deleteConfirmMessage
 }) => {
+  // declare and define error state
+  const [errorMsg, setErrorMsg] = useState("");
   // Type-safe mutation with React Query
   const mutation = useMutation({
     mutationFn: async (url: string) => {
@@ -35,8 +39,9 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       if (onSuccess) onSuccess();
       onClose();
     },
-    onError: (error) => {
-      console.log("Error deleting:", error.message);
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
+      const errorMsg = error?.response?.data?.message || error.message || 'An error occurred';
+      setErrorMsg(errorMsg as string);
     },
   });
 
@@ -61,9 +66,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
-          <h3 className="text-center !text-2xl mb-9">
-            هل انت متاكد تريد الحذف؟
-          </h3>
+          <div>
+            <h3 className="text-center !text-2xl mb-9">
+              {deleteConfirmMessage ?? "هل انت متاكد تريد الحذف؟"}
+            </h3>
+            {errorMsg && (
+              <p className="text-red-500 text-center text-sm mt-2">
+                {errorMsg}
+              </p>
+            )}
+          </div>
         </DialogDescription>
         <DialogFooter className="!items-center !justify-center gap-3">
           {" "}
