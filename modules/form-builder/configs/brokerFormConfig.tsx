@@ -14,7 +14,7 @@ export function brokerFormConfig(
 
   return {
     formId,
-    title: "اضافة وسيط",
+    title: "اضافة",
     apiUrl: `${baseURL}/company-users/brokers`,
     laravelValidation: {
       enabled: true,

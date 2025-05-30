@@ -100,7 +100,7 @@ const UsersSubEntityTable = ({
                     }, 100);
                   },
                 }}
-                trigger={<Button>إنشاء</Button>}
+                trigger={<Button>اضافة</Button>}
                 onSuccess={(values) => {
                   console.log("Form submitted successfully:", values);
                 }}

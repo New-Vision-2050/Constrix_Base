@@ -17,7 +17,7 @@ export function customerFormConfig(
 
   return {
     formId,
-    title: "اضافة عميل",
+    title: "اضافة",
     apiUrl: `${baseURL}/company-users/clients`,
     laravelValidation: {
       enabled: true,
