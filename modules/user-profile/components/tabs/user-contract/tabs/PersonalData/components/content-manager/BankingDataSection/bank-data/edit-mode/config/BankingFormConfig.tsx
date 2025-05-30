@@ -43,7 +43,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -85,6 +85,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               url: `${baseURL}/bank_type_accounts`,
               valueField: "id",
               labelField: "name",
+              paginationEnabled: true,
             },
             validation: [
               {
@@ -103,11 +104,10 @@ export const BankingDataFormConfig = (props: PropsT) => {
               valueField: "id",
               labelField: "name",
               searchParam: "name",
-              disableReactQuery:true,
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
