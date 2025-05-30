@@ -11,7 +11,7 @@ export default function ConnectionDataSectionPersonalForm() {
   return (
     <ConnectionOTPCxtProvider>
       <TabTemplate
-        title={"البيانات الاتصال"}
+        title={"بيانات الاتصال"}
         loading={userConnectionDataLoading}
         reviewMode={<UserProfileConnectionDataReview />}
         editMode={<UserProfileConnectionDataEditForm />}
