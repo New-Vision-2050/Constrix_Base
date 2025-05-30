@@ -100,25 +100,6 @@ export const loginWayFormConfig: FormConfig = {
       ],
     },
   ],
-  /*
-    interface ApiResponse {
-  data?: User[];
-  error?: string;
-}
-    dataMapper: (response: ApiResponse | null | undefined) => {
-      // If the API isn't available, return mock data
-      if (!response || response.error) {
-        return [
-          { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin' },
-          { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User' },
-          { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Editor' },
-          { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'User' },
-          { id: 5, name: 'Charlie Wilson', email: 'charlie@example.com', role: 'Viewer' },
-        ];
-      }
-      return response.data || [];
-    },
-  */
   submitButtonText: "حفظ",
   cancelButtonText: "إلغاء",
   showReset: false,
