@@ -158,6 +158,12 @@ export const CreateUserFormConfig = (slug: string) => {
             syncDirection: "unidirectional",
             syncOn: "both",
             condition: (values) => !!values["super_entity"],
+            validation: [
+              {
+                type: "required",
+                message: "ادخل العناصر الاساسية",
+              },
+            ],
           },
           {
             type: "checkboxGroup",
@@ -183,6 +189,12 @@ export const CreateUserFormConfig = (slug: string) => {
             syncDirection: "unidirectional",
             syncOn: "unselect",
             condition: (values) => !!values["super_entity"],
+            validation: [
+              {
+                type: "required",
+                message: "ادخل العناصر التنقية",
+              },
+            ],
           },
           {
             type: "select",
