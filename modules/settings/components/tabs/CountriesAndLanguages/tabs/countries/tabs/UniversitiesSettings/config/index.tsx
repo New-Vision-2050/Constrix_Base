@@ -1,6 +1,4 @@
 import { baseURL } from "@/config/axios-config";
-import CountriesSettingsActionsBtn from "../components/ActionsBtn";
-import { University } from "@/modules/settings/types/University";
 
 export const UniversitiesTableConfig = () => {
   return {
@@ -12,13 +10,6 @@ export const UniversitiesTableConfig = () => {
         label: "أسم الجامعة",
         sortable: true,
         searchable: true,
-      },
-      {
-        key: "actions",
-        label: "الأجراء",
-        render: (_: unknown, row: University) => (
-          <CountriesSettingsActionsBtn id={row.id} />
-        ),
       },
     ],
     allSearchedFields: [],

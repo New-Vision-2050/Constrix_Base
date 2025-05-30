@@ -27,7 +27,7 @@ export const ConnectionInformationFormConfig = () => {
             validation: [
               {
                 type: "email",
-                message: "Please enter a valid email address",
+                message: "يرجى إدخال بريد إلكتروني صحيح",
               },
             ],
           },
@@ -39,7 +39,7 @@ export const ConnectionInformationFormConfig = () => {
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: "يرجى إدخال رقم الجوال صحيح",
               },
             ],
           },

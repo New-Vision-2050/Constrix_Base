@@ -19,17 +19,7 @@ const LoginIdentifierExecutionBtn = ({ id }: { id: string }) => {
 
   const menuItems = [
     {
-      label: "Action 1",
-      icon: <EnterIcon className="w-4 h-4 me-2" />,
-      func: () => console.log(id),
-    },
-    {
-      label: "Action 2",
-      icon: <GearIcon className="w-4 h-4 me-2" />,
-      func: () => null,
-    },
-    {
-      label: "Action 3",
+      label: "حذف",
       icon: <TrashIcon className="w-4 h-4 me-2" />,
       func: handleOpen,
     },
@@ -46,7 +36,7 @@ const LoginIdentifierExecutionBtn = ({ id }: { id: string }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {menuItems.map((item, index) => (
-            <DropdownMenuItem key={index} onClick={item.func}>
+            <DropdownMenuItem key={index} className="text-error" onClick={item.func}>
               {item.icon}
               {item.label}
             </DropdownMenuItem>
