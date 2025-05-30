@@ -26,6 +26,12 @@ export const WorkLicenseFormConfig = () => {
             label: "رقم رخصة العمل",
             type: "text",
             placeholder: "رقم رخصة العمل",
+             validation: [
+              {
+                type: "required",
+                message: "رقم رخصة العمل مطلوب",
+              },
+            ],
           },
           {
             name: "work_permit_start_date",

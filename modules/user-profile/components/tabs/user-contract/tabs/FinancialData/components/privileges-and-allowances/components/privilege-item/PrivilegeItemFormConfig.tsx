@@ -90,6 +90,11 @@ export const PrivilegeItemFormConfig = ({
                 type: "required",
                 message: "معدل حساب النسبة من اصل الراتب مطلوب",
               },
+              {
+                type: "pattern",
+                value: /^\d+(\.\d+)?$/,
+                message: "يجب إدخال رقم فقط",
+              }
             ],
           },
           {
@@ -107,6 +112,11 @@ export const PrivilegeItemFormConfig = ({
                 type: "required",
                 message: "المبلغ مطلوب",
               },
+              {
+                type: "pattern",
+                value: /^\d+(\.\d+)?$/,
+                message: "يجب إدخال رقم فقط",
+              }
             ],
           },
           {
@@ -140,7 +150,7 @@ export const PrivilegeItemFormConfig = ({
           {
             name: "description",
             label: "وصف",
-            type: "text",
+            type: "textarea",
             placeholder: "وصف",
             validation: [
               {

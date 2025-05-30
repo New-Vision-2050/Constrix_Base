@@ -10,7 +10,7 @@ export default function MainUserConnectionInfoSection() {
 
   return (
     <TabTemplate
-      title={"البيانات الاتصال"}
+      title={"بيانات الاتصال"}
       loading={userContactDataLoading}
       reviewMode={<MainUserConnectionInfoSectionPreview />}
       editMode={<MainUserConnectionInfoSectionEdit />}

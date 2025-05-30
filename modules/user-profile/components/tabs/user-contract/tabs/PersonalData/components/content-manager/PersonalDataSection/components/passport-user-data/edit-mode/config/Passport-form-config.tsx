@@ -31,6 +31,11 @@ export const PassportDataFormConfig = () => {
                 type: "required",
                 message: "رقم الجواز مطلوب",
               },
+              {
+                type: "pattern",
+                value: /^[A-Za-z0-9]{6,20}$/,
+                message: "رقم الجواز يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+              }
             ],
           },
           {

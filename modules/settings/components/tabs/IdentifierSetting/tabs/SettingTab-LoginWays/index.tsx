@@ -20,10 +20,10 @@ export default function LoginWaysTab() {
             <DialogFormBuilder
               config={loginWayFormConfig}
               trigger={<Button>أضافة طريقة دخول جديدة</Button>}
-              onSuccess={(values) => {
+              onSuccess={() => {
                 tableStore.reloadTable(config.tableId);
               }}
-            />{" "}
+            />
             <ExportButton data={[]} />
           </div>
         }
