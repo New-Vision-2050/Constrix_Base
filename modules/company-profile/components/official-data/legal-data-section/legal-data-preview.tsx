@@ -45,8 +45,8 @@ const LegalDataPreview = ({
               type="date"
               value={new Date(obj.end_date).toLocaleDateString("en-GB")}
             />
-            <div className="border border-dashed  flex items-center justify-center w-9 rounded-md">
-              <FilePlus className="w-4 text-[#18CB5F]" />
+            <div className="border shrink-0 border-dashed  flex items-center justify-center w-9 h-11 rounded-md">
+              <FilePlus className="w-4 text-[#18CB5F] shrink-0" />
             </div>
           </div>
         ),
