@@ -231,9 +231,6 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
         ],
       },
     ],
-    initialValues: {
-      parent_id: branches.filter((branch) => !branch.parent_id)?.[0]?.id,
-    },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
@@ -242,7 +239,6 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
-
     initialValues: {
       parent_id: mainBranch?.id ?? "",
       parent_name: mainBranch?.name ?? "",

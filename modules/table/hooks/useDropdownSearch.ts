@@ -469,12 +469,9 @@ export const useDropdownSearch = ({
         if (!Array.isArray(data)) {
           throw new Error("Expected array response from API");
         }
-        const data = processApiResponse(await response.data);
-        if (!isMountedRef.current) return;
 
-        if (!Array.isArray(data)) {
-          throw new Error("Expected array response from API");
-        }
+        // Extract options from the array data
+        const extractedOptions = data.map((item) => {
           // Handle array format [value, label]
           if (Array.isArray(item)) {
             // If item is an array, use indices as valueField and labelField
