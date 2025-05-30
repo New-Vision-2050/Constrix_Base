@@ -91,7 +91,7 @@ export const useDropdownSearch = ({
 
         // Add ID parameter
         params.append(
-          dynamicConfig.filterParam ?? "",
+          dynamicConfig.filterParam ??  dynamicConfig.valueField,
           valuesToFetchFiltered.join(",")
         );
 
