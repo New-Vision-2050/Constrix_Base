@@ -27,6 +27,12 @@ export const BorderNumberFormConfig = () => {
             label: "رقم الحدود",
             type: "text",
             placeholder: "رقم الحدود",
+            validation: [
+              {
+                type: "required",
+                message: "رقم الحدود مطلوب",
+              },
+            ],
           },
           {
             name: "border_number_start_date",

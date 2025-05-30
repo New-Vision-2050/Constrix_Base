@@ -54,6 +54,13 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
               const typeId = values["registration_type_id"]?.split("_")?.[1];
               return typeId !== RegistrationTypes.WithoutARegister;
             },
+            validation: [
+              {
+                type: "pattern",
+                value: /^700\d*$/,
+                message: "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط",
+              },
+            ],
           },
           {
             name: "start_date",

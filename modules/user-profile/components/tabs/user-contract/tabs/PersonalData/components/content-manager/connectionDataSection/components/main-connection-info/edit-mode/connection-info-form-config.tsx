@@ -10,7 +10,7 @@ export const ConnectionInformationFormConfig = () => {
 
   const _ConnectionInformationFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "البيانات الاتصال",
+    title: "بيانات الاتصال",
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -27,7 +27,7 @@ export const ConnectionInformationFormConfig = () => {
             validation: [
               {
                 type: "email",
-                message: "Please enter a valid email address",
+                message: "يرجى إدخال بريد إلكتروني صحيح",
               },
             ],
           },
@@ -39,7 +39,7 @@ export const ConnectionInformationFormConfig = () => {
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: "يرجى إدخال رقم الجوال صحيح",
               },
             ],
           },

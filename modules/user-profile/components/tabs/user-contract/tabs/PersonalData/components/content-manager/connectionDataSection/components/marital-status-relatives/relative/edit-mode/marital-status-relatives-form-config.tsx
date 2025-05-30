@@ -45,6 +45,12 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: "اسم شخص في حالة الطواري",
             type: "text",
             placeholder: "اسم شخص في حالة الطواري",
+            validation: [
+              {
+                type: "required",
+                message: "هذا الحقل مطلوب",
+              },
+            ],
           },
           {
             name: "relationship",
@@ -65,7 +71,6 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             ],
           },
         ],
-        columns: 2,
       },
     ],
     initialValues: {

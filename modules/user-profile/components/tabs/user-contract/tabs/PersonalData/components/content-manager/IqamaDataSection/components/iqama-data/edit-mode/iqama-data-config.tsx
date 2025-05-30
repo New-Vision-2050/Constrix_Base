@@ -27,6 +27,12 @@ export const IqamaDataFormConfig = () => {
             label: "رقم الاقامة",
             type: "text",
             placeholder: "رقم الاقامة",
+            validation: [
+              {
+                type: "required",
+                message: "رقم الاقامة مطلوب",
+              },
+            ],
           },
           {
             name: "entry_number_start_date",

@@ -27,13 +27,6 @@ export const LanguagesSettingTableConfig = () => {
           <p>{row.status == 1 ? "نعم" : "لا"}</p>
         ),
       },
-      {
-        key: "actions",
-        label: "الأجراء",
-        render: (_: unknown, row: Language) => (
-          <LanguagesSettingsActionsBtn id={row.id} />
-        ),
-      },
     ],
     allSearchedFields: [],
     defaultSortColumn: "id",
