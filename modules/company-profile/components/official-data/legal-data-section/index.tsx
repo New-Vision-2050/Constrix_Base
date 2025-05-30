@@ -83,7 +83,7 @@ const LegalDataSection = ({
             )}
           </>
         ) : (
-          <LegalDataForm companyLegalData={companyLegalData} id={id} />
+          <LegalDataForm companyLegalData={companyLegalData} id={id} handleEditClick={handleEditClick} />
         )}
       </FormFieldSet>
 
