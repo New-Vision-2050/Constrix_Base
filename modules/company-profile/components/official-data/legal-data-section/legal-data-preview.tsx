@@ -22,7 +22,7 @@ const LegalDataPreview = ({
       },
       {
         valid: Boolean(obj.registration_number),
-        label: "ادخل رقم السجل التجاري / رقم الـ 700",
+        label: " رقم السجل التجاري / رقم الـ 700",
         needRequest: true,
         value: obj.registration_number,
         containerClassName: "col-span-2",
