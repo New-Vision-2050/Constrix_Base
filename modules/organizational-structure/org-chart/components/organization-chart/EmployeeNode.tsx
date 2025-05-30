@@ -51,6 +51,7 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
       <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center pt-2">
         {node.name}
       </h3>
+      {node.name === 'No Manager Assigned' && <p>{node?.hierarchy_info?.name}</p>}
       {(node.type || isDeputy) && <h4 className="font-normal mt--1 mb-2.5 flex gap-2 align-middle items-center capitalize text-white/50">
         {node.type ?? "Deputy Manager"}
       </h4>}

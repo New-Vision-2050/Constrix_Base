@@ -643,8 +643,7 @@ export const useFormInstance = (
 
   const getError = useCallback(
     (field: string) => {
-      console.log("in get error callback");
-      useFormStore.getState().getError(formId, field);
+      return useFormStore.getState().getError(formId, field);
     },
     [formId]
   );
@@ -727,7 +726,7 @@ export const useFormInstance = (
       rules: ValidationRule[],
       formValues: Record<string, any>
     ) => {
-      useFormStore
+      return useFormStore
         .getState()
         .validateField(formId, fieldName, value, rules, formValues);
     },
