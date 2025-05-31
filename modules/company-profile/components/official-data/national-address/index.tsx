@@ -50,7 +50,7 @@ const NationalAddress = ({
           )}
         </>
       ) : (
-        <NationalAddressForm companyAddress={companyAddress} id={id} />
+        <NationalAddressForm companyAddress={companyAddress} id={id} handleEditClick={handleEditClick}/>
       )}
     </FormFieldSet>
   );

@@ -155,17 +155,17 @@ export const AddDocFormConfig = (id?: string) => {
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: false,
+    resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
       const sendForm = serialize({
         ...formData,
-        start_date: new Date(formData.start_date).toISOString().split("T")[0],
-        end_date: new Date(formData.end_date).toISOString().split("T")[0],
-        notification_date: new Date(formData.notification_date)
-          .toISOString()
-          .split("T")[0],
+        start_date: new Date(formData.start_date).toLocaleDateString("en-CA"),
+        end_date: new Date(formData.end_date).toLocaleDateString("en-CA"),
+        notification_date: new Date(formData.notification_date).toLocaleDateString(
+          "en-CA"
+        ),
       });
 
       return await defaultSubmitHandler(sendForm, AddDocFormConfig, {

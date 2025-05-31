@@ -26,6 +26,7 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             name: "registration_type_id",
             label: "نوع التسجل",
             placeholder: "نوع التسجل",
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/company_registration_types`,
               valueField: "id_type",
@@ -67,20 +68,34 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
             label: "تاريخ الإصدار",
             type: "date",
             placeholder: "تاريخ الإصدار",
+            required: true,
             maxDate: {
               formId: `company-official-data-form-${id}-${company_id}`,
               field: "end_date",
             },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل تاريخ الإصدار",
+              },
+            ],
           },
           {
             name: "end_date",
             label: "تاريخ الانتهاء",
             type: "date",
             placeholder: "تاريخ الانتهاء",
+            required: true,
             minDate: {
               formId: `company-official-data-form-${id}-${company_id}`,
               field: "start_date",
             },
+            validation: [
+              {
+                type: "required",
+                message: "ادخل تاريخ الانتهاء",
+              },
+            ],
           },
           {
             type: "file",

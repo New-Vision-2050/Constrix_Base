@@ -14,7 +14,7 @@ export const useSidebarMenu = () => {
       const res = await apiClient.get("/programs/sub_entities/list");
       return res.data.payload;
     },
-    enabled: hasHydrated && currentMenu.length === 0,
+    // enabled: hasHydrated && currentMenu.length === 0,
     staleTime: 1000 * 60 * 60 * 24,
   });
 
