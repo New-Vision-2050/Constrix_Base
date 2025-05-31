@@ -39,6 +39,11 @@ export const SingleExperienceFormConfig = ({
                 type: "required",
                 message: "المسمى الوظيفي مطلوب",
               },
+              {
+                    type: "pattern",
+                    value: "^[a-zA-Z\u0600-\u06FF\\s]+$",
+                    message: "يجب أن يحتوي فقط على أحرف",
+              }
             ],
           },
           {
@@ -82,7 +87,7 @@ export const SingleExperienceFormConfig = ({
           {
             name: "about",
             label: "نبذه عن المشاريع والاعمال",
-            type: "text",
+            type: "textarea",
             placeholder: "نبذه عن المشاريع والاعمال",
           },
         ],

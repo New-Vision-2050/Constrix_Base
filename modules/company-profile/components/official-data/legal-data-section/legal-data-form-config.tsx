@@ -15,8 +15,6 @@ export const LegalDataFormConfig = (
 
   const queryClient = useQueryClient();
 
-  console.log("companyLegalData_companyLegalData:", companyLegalData);
-
   const LegalDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
     apiUrl: `${baseURL}/write-the-url`,
@@ -55,7 +53,10 @@ export const LegalDataFormConfig = (
                   disabled: true,
                   gridArea: 2,
                   condition: (values) => {
-                    console.log("registration_type_type value:", values["registration_type_type"]);
+                    console.log(
+                      "registration_type_type value:",
+                      values["registration_type_type"]
+                    );
                     return (
                       values["registration_type_type"] !=
                       RegistrationTypes.WithoutARegister
@@ -67,12 +68,32 @@ export const LegalDataFormConfig = (
                   label: "تاريخ الإصدار",
                   type: "date",
                   placeholder: "تاريخ الإصدار",
+                  maxDate: {
+                    formId: `company-official-data-form-${id}-${company_id}`,
+                    field: "end_date",
+                  },
+                  validation: [
+                    {
+                      type: "required",
+                      message: "ادخل تاريخ الاصدار",
+                    },
+                  ],
                 },
                 {
                   name: "end_date",
                   label: "تاريخ الانتهاء",
                   type: "date",
                   placeholder: "تاريخ الانتهاء",
+                  minDate: {
+                    formId: `company-official-data-form-${id}-${company_id}`,
+                    field: "start_date",
+                  },
+                  validation: [
+                    {
+                      type: "required",
+                      message: "ادخل تاريخ الانتهاء",
+                    },
+                  ],
                 },
                 {
                   type: "file",
@@ -145,7 +166,6 @@ export const LegalDataFormConfig = (
           indices: true,
         }
       );
-
       return await defaultSubmitHandler(newFormData, LegalDataFormConfig, {
         config: {
           params: {

@@ -16,9 +16,18 @@ export default function SingleExperiencePreviewMode({ experience }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="حدد فترة التدريب"
-          value={experience?.training_from + " - " + experience?.training_to}
-          valid={Boolean(experience?.training_from) && Boolean(experience?.training_to)}
+          label="تاريخ بدء التدريب"
+          value={experience?.training_from ?? ""}
+          valid={Boolean(experience?.training_from)}
+          type="date"
+        />
+      </div>
+      
+      <div className="p-2">
+        <PreviewTextField
+          label="تاريخ انتهاء التدريب"
+          value={experience?.training_to ?? ""}
+          valid={Boolean(experience?.training_to)}
           type="date"
         />
       </div>

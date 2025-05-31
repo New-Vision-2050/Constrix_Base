@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl'
 
 export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
   return {
-    
+
     formId: "companies-form",
     title: "اضافة شركة جديدة",
     apiUrl: `${baseURL}/companies`,
@@ -64,7 +64,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [

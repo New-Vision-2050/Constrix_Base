@@ -62,7 +62,7 @@ const OfficialDataSection = ({
         {mode === "Preview" ? (
           <OfficialDataPreview officialData={officialData} />
         ) : (
-          <OfficialDataForm officialData={officialData} id={id}/>
+          <OfficialDataForm officialData={officialData} id={id} handleEditClick={handleEditClick}/>
         )}
       </FormFieldSet>
       <SheetFormBuilder

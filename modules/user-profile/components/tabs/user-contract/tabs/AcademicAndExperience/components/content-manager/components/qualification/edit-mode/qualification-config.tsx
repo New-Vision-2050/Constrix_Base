@@ -150,6 +150,21 @@ export const QualificationFormConfig = ({
                 type: "required",
                 message: "المعدلات الدراسية مطلوبة",
               },
+              {
+                type: "pattern",
+                value: "^[0-9]+(\\.[0-9]+)?$",
+                message: "المعدلات الدراسية يجب أن تكون أرقام فقط",
+              },
+              {
+                type: "min",
+                value: 0,
+                message: "المعدلات الدراسية يجب أن تكون أكبر من أو تساوي 0",
+              },
+              {
+                type: "max",
+                value: 100,
+                message: "المعدلات الدراسية يجب أن لا تتجاوز 100",
+              }
             ],
           },
           {

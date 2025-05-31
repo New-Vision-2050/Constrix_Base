@@ -33,6 +33,27 @@ export const IdentityDataFormConfig = () => {
                 type: "required",
                 message: "رقم الهوية مطلوب",
               },
+              {
+                type: "pattern",
+                value: /^[12]\d{9}$/,
+                message:
+                  "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+              },
+              {
+                type: "minLength",
+                value: 10,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+              },
+              {
+                type: "maxLength",
+                value: 10,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+              },
+              {
+                type: "pattern",
+                value: /^\d+$/,
+                message: "رقم الهوية يجب أن يحتوي على أرقام فقط",
+              },
             ],
           },
           {
@@ -46,6 +67,10 @@ export const IdentityDataFormConfig = () => {
                 message: "تاريخ الدخول مطلوب",
               },
             ],
+            maxDate: {
+              formId: `Identity-data-form`,
+              field: "identity_end_date",
+            },
           },
           {
             label: "تاريخ الانتهاء",
@@ -58,6 +83,10 @@ export const IdentityDataFormConfig = () => {
                 message: "تاريخ الأنتهاء مطلوب",
               },
             ],
+            minDate: {
+              formId: `Identity-data-form`,
+              field: "identity_start_date",
+            },
           },
           {
             label: "ارفاق الهوية",

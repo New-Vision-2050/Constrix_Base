@@ -14,8 +14,9 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
-import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+
+import { useCurrentCompany } from '@/modules/company-profile/components/shared/company-header'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
 import {

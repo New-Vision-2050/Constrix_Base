@@ -11,7 +11,7 @@ export function employeeFormConfig(
   const formId = "employee-form";
   return {
     formId,
-    title: "انشاء",
+    title: "اضافة",
     apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
       enabled: true,

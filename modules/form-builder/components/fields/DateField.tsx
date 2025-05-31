@@ -104,7 +104,8 @@ const DateField: React.FC<DateFieldProps> = ({
             mode="single"
             selected={date}
             onSelect={(date) => {
-              handleDateChange(date ? date.toISOString() : null);
+              const formattedDate = date ? format(date, "yyyy-MM-dd'T'00:00:00.000'Z'") : null;
+              handleDateChange(formattedDate);
               onBlur();
               setIsOpen(false);
             }}

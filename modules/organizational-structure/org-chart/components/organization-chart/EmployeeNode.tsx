@@ -55,6 +55,7 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
       {(node.type || isDeputy) && <h4 className="font-normal mt--1 mb-2.5 flex gap-2 align-middle items-center capitalize text-white/50">
         {node.type ?? "Deputy Manager"}
       </h4>}
+      <p>{node?.hierarchy_info?.name}</p>
       <div className="flex flex-col mt-4 gap-3">
         {node?.phone && <div className="flex items-center gap-2"><Phone className="fill-primary text-primary" strokeWidth={0} /> <span dir={'ltr'}>{node.phone}</span></div>}
         {node?.email && <div className="flex items-center gap-2"><EnvelopIcon className="fill-primary text-primary"/> <span dir={'ltr'}>{node.email}</span></div>}
