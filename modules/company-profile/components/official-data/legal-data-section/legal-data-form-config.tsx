@@ -68,12 +68,32 @@ export const LegalDataFormConfig = (
                   label: "تاريخ الإصدار",
                   type: "date",
                   placeholder: "تاريخ الإصدار",
+                  maxDate: {
+                    formId: `company-official-data-form-${id}-${company_id}`,
+                    field: "end_date",
+                  },
+                  validation: [
+                    {
+                      type: "required",
+                      message: "ادخل تاريخ الاصدار",
+                    },
+                  ],
                 },
                 {
                   name: "end_date",
                   label: "تاريخ الانتهاء",
                   type: "date",
                   placeholder: "تاريخ الانتهاء",
+                  minDate: {
+                    formId: `company-official-data-form-${id}-${company_id}`,
+                    field: "start_date",
+                  },
+                  validation: [
+                    {
+                      type: "required",
+                      message: "ادخل تاريخ الانتهاء",
+                    },
+                  ],
                 },
                 {
                   type: "file",
