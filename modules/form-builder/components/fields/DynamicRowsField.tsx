@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldConfig, DynamicRowOptions } from "../../types/formTypes";
-import { useFormInstance } from "../../hooks/useFormStore";
+import { useFormInstance, useFormStore } from "../../hooks/useFormStore";
 import { cn } from "@/lib/utils";
 import { Trash2, ArrowUp, ArrowDown, Plus, GripVertical } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -120,7 +120,7 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
   onBlur,
   formId = 'default',
 }, ref) => {
-  // Get the current locale to determine text direction
+    // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
 
@@ -597,8 +597,9 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                           touched={row.touched?.[fieldKey]}
                           onChange={(fieldName, fieldValue) => updateRowField(index, fieldName, fieldValue)}
                           onBlur={() => {
+                            const {data} = useFormStore.getState().getValues(formId);
                             // Mark field as touched on blur
-                            const newRows = [...rows];
+                            const newRows = [...data]
                             if (!newRows[index].touched) {
                               newRows[index].touched = {};
                             }
