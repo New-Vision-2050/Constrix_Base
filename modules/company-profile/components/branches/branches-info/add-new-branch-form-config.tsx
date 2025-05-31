@@ -64,9 +64,9 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             name: "",
             type: "text",
             render: () => (
-              <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-              </p>
+                <p className="text-xs text-red-500">
+                    - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+                </p>
             ),
           },
           {
