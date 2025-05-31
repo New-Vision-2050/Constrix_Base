@@ -135,6 +135,7 @@ const DynamicRowsField = React.forwardRef<
 
   // State for delete confirmation
     const [deleteID, setDeleteID] = useState<string | null>(null);
+
   const [isDeleting, setIsDeleting] = useState(false);
 
   // State for drag and drop
@@ -177,6 +178,7 @@ const DynamicRowsField = React.forwardRef<
             break;
             case "select":
             case "radio":
+
             // If options are available, use the first option's value as default
             if (field.options && field.options.length > 0) {
               template[field.name] = field.options[0].value;
@@ -189,6 +191,7 @@ const DynamicRowsField = React.forwardRef<
             break;
           default:
               template[field.name] = "";
+
         }
       });
       return template;
@@ -207,6 +210,7 @@ const DynamicRowsField = React.forwardRef<
         errors: {},
           touched: {},
         },
+
     ];
     onChange(newRows);
   }, [rows, onChange, defaultRowTemplate]);
@@ -236,6 +240,7 @@ const DynamicRowsField = React.forwardRef<
   // Move row up
     const moveRowUp = useCallback(
       (index: number) => {
+
     if (index <= 0) return;
 
     const newRows = [...rows];
@@ -251,6 +256,7 @@ const DynamicRowsField = React.forwardRef<
   // Move row down
     const moveRowDown = useCallback(
       (index: number) => {
+
     if (index >= rows.length - 1) return;
 
     const newRows = [...rows];
@@ -267,6 +273,7 @@ const DynamicRowsField = React.forwardRef<
     const handleDragStart = useCallback(
       (e: React.DragEvent, index: number) => {
         e.dataTransfer.setData("text/plain", index.toString());
+
     setDraggedIndex(index);
     if (options.onDragStart) {
       options.onDragStart(index);
@@ -274,6 +281,7 @@ const DynamicRowsField = React.forwardRef<
       },
       [options]
     );
+
 
   const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
@@ -292,6 +300,7 @@ const DynamicRowsField = React.forwardRef<
       (e: React.DragEvent, index: number) => {
     e.preventDefault();
         const draggedIdx = Number(e.dataTransfer.getData("text/plain"));
+
 
     if (isNaN(draggedIdx) || draggedIdx === index) return;
 
@@ -477,6 +486,7 @@ const DynamicRowsField = React.forwardRef<
                   break;
               }
 
+
               if (validationFailed) {
                 row.errors[rowField.name] = rule.message;
                 isValid = false;
@@ -510,6 +520,7 @@ const DynamicRowsField = React.forwardRef<
       field.label,
       formInstance,
     ]);
+
 
   // Generate grid column classes based on configuration
   const getGridColumnClasses = useCallback(() => {
@@ -556,6 +567,7 @@ const DynamicRowsField = React.forwardRef<
                 <p className="text-xs mt-1">
                   أضف {field.label || "صف جديد"} للبدء
                 </p>
+
             </div>
           </div>
         ) : (
@@ -603,6 +615,7 @@ const DynamicRowsField = React.forwardRef<
                   options.rowHeaderBgColor
                     )}
                   >
+
                   <div className="flex items-center">
                     {options.enableDrag && (
                       <div
@@ -646,6 +659,7 @@ const DynamicRowsField = React.forwardRef<
                         variant="ghost"
                         size="icon"
                           onClick={() => handleDeleteRow(row.id)}
+
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         title="Delete row"
                       >
@@ -659,6 +673,7 @@ const DynamicRowsField = React.forwardRef<
                   <div
                     className={cn("flex-1 grid gap-5", getGridColumnClasses())}
                   >
+
                   {options.rowFields?.map((rowField) => {
                     const fieldKey = rowField.name;
                     return (
@@ -694,6 +709,7 @@ const DynamicRowsField = React.forwardRef<
                                 newRows[index].errors[
                                   fieldKey
                                 ] = `${rowField.label} is required`;
+
                             }
 
                             onChange(newRows);
@@ -721,6 +737,7 @@ const DynamicRowsField = React.forwardRef<
             <span className="absolute inset-0 bg-primary/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             <Plus className="h-4 w-4 mr-2 text-primary" />
               <span>إضافة {field.label || "صف جديد"}</span>
+
           </Button>
         </div>
       )}
@@ -747,5 +764,6 @@ const DynamicRowsField = React.forwardRef<
   );
   }
 );
+
 
 export default DynamicRowsField;
