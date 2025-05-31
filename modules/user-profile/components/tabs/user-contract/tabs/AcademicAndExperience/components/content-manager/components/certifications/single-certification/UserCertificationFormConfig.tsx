@@ -101,11 +101,11 @@ export const UserCertificationFormConfig = ({
               formId: `user-certification-data-form-${certification?.id}`,
               field: "date_end",
             },
-            placeholder: "تاريخ الحصول على الشهادة",
+            placeholder: "تاريخ الشهادة",
             validation: [
               {
                 type: "required",
-                message: "تاريخ الحصول على الشهادة مطلوب",
+                message: "تاريخ الشهادة مطلوب",
               },
             ],
           },

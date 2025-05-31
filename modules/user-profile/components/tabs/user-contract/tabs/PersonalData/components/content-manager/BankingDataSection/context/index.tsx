@@ -7,12 +7,15 @@ import { createContext, useContext } from "react";
 import useUserBankingData from "../../../../hooks/useUserBankingData";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
+import useBankAccountTypes from "../../../../hooks/useBankAccountTypes";
+import { BankType } from "../../../../api/get-bank-types";
 
 // declare context types
 type UserBankingDataCxtType = {
   bankAccounts: BankAccount[] | undefined;
   handleRefreshBankingData: () => void;
-  bankAccountsLoading: boolean
+  bankAccountsLoading: boolean;
+  bankTypes: BankType[] | undefined;
 };
 
 export const UserBankingDataCxt = createContext<UserBankingDataCxtType>(
@@ -42,6 +45,7 @@ export const UserBankingDataCxtProvider = ({
     isLoading: bankAccountsLoading,
     refetch: refreshBankingData,
   } = useUserBankingData(user?.user_id ?? "");
+  const { data: bankTypes } = useBankAccountTypes();
 
   // ** handle side effects
 
@@ -53,7 +57,12 @@ export const UserBankingDataCxtProvider = ({
   // ** return component ui
   return (
     <UserBankingDataCxt.Provider
-      value={{ bankAccounts,bankAccountsLoading, handleRefreshBankingData }}
+      value={{
+        bankAccounts,
+        bankAccountsLoading,
+        handleRefreshBankingData,
+        bankTypes,
+      }}
     >
       {children}
     </UserBankingDataCxt.Provider>

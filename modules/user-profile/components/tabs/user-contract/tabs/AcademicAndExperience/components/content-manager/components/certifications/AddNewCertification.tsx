@@ -21,7 +21,7 @@ export default function AddNewCertification(props: PropsT) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-center">اضافة خبرة جديد</DialogTitle>
+          <DialogTitle className="text-center">اضافة شهادة جديدة</DialogTitle>
         </DialogHeader>
         <FormContent
           config={UserCertificationFormConfig({

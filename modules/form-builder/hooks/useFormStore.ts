@@ -534,9 +534,12 @@ export const useFormStore = create<FormState>((set, get) => ({
 
           try {
             const number = phoneUtil.parseAndKeepRawInput(value);
-            const splitValue = value.split(' ');
+            const splitValue = value.split(" ");
             // Reject if national number starts with 0
-            if ((splitValue.length > 0 && splitValue[1].startsWith("0")) || !phoneUtil.isValidNumber(number)) {
+            if (
+              (splitValue.length > 0 && splitValue[1].startsWith("0")) ||
+              !phoneUtil.isValidNumber(number)
+            ) {
               store.setError(formId, fieldName, message);
               hasError = true;
               break;
@@ -563,7 +566,7 @@ export const useFormStore = create<FormState>((set, get) => ({
               const {
                 triggerApiValidation,
               } = require("../utils/apiValidation");
-              triggerApiValidation(fieldName, value, rule, formStore);
+              triggerApiValidation(fieldName, value, rule, formStore, formId);
             } catch (error) {
               console.error("Error in API validation:", error);
             }
@@ -640,8 +643,7 @@ export const useFormInstance = (
 
   const getError = useCallback(
     (field: string) => {
-      console.log("in get error callback");
-      useFormStore.getState().getError(formId, field);
+      return useFormStore.getState().getError(formId, field);
     },
     [formId]
   );
@@ -724,7 +726,7 @@ export const useFormInstance = (
       rules: ValidationRule[],
       formValues: Record<string, any>
     ) => {
-      useFormStore
+      return useFormStore
         .getState()
         .validateField(formId, fieldName, value, rules, formValues);
     },

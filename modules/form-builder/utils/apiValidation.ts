@@ -1,5 +1,5 @@
-import { ValidationRule } from '../types/formTypes';
-import { useFormStore } from '../hooks/useFormStore';
+import { ValidationRule } from "../types/formTypes";
+import { useFormStore } from "../hooks/useFormStore";
 
 // Define types for the different kinds of stores we might receive
 type GlobalFormStore = ReturnType<typeof useFormStore.getState>;
@@ -18,24 +18,23 @@ export const triggerApiValidation = (
   fieldName: string,
   value: any,
   rule: ValidationRule,
-  store?: GlobalFormStore | FormInstance
+  store?: GlobalFormStore | FormInstance,
+  currentFormId?: string
 ): void => {
-  if (rule.type !== 'apiValidation' || !rule.apiConfig) {
+  if (rule.type !== "apiValidation" || !rule.apiConfig) {
     return;
   }
-  
+
   // Use the provided store or get it from the global state
   const formStore = store || useFormStore.getState();
   const globalStore = useFormStore.getState();
-  
+
   // Determine which formId to use
   let formId: string;
-  
-  if ('activeFormId' in formStore) {
-    // If it's the global store
-    formId = formStore.activeFormId;
-    formStore.validateFieldWithApi(formId, fieldName, value, rule);
-  } else if ('formId' in formStore && typeof formStore.formId === 'string') {
+  if (currentFormId) {
+    formId = currentFormId;
+    globalStore.validateFieldWithApi(formId, fieldName, value, rule);
+  } else if ("formId" in formStore && typeof formStore.formId === "string") {
     // If it's a form instance with formId property
     formId = formStore.formId;
     globalStore.validateFieldWithApi(formId, fieldName, value, rule);
@@ -44,16 +43,20 @@ export const triggerApiValidation = (
     formId = globalStore.activeFormId;
     globalStore.validateFieldWithApi(formId, fieldName, value, rule);
   }
+
+  console.log("ApiValidation formId", formId);
 };
 
 /**
  * Checks if a field has an API validation rule
- * 
+ *
  * @param rules The validation rules for the field
  * @returns boolean - True if the field has an API validation rule
  */
 export const hasApiValidation = (rules?: ValidationRule[]): boolean => {
   if (!rules) return false;
-  
-  return rules.some(rule => rule.type === 'apiValidation' && !!rule.apiConfig);
+
+  return rules.some(
+    (rule) => rule.type === "apiValidation" && !!rule.apiConfig
+  );
 };

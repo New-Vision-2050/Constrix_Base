@@ -105,6 +105,7 @@ export const useTableData = (
     setColumns: (columns) => setColumns(columns),
     setVisibleColumns: (columnKeys) => setVisibleColumns(columnKeys),
     tableId, // Pass the tableId
+    deleteConfirmMessage: config?.deleteConfirmMessage, // Pass the deleteConfirmMessage
   });
 
   // Get data fetcher
@@ -116,6 +117,7 @@ export const useTableData = (
   // Setup data fetching with dependencies
   useTableFetchEffect({
     url,
+    apiParams: config?.apiParams,
     currentPage,
     itemsPerPage,
     sortColumn,

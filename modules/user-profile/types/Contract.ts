@@ -11,7 +11,7 @@ export type Contract = {
   file_url: string;
   global_id: string;
   id: string;
-  files: MediaFile;
+  files: MediaFile[];
   nature_work: { id: string; name: string };
   notice_period: number;
   probation_period: number;

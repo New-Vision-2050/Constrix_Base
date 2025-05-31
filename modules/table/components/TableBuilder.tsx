@@ -223,6 +223,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                 {/* Add the ExportButton component */}
                 <ExportButton
                   url={dataUrl}
+                  apiParams={config?.apiParams}
                   selectedRows={selectedRows}
                   disabled={loading || !selectionEnabled || !data.length}
                   searchQuery={searchQuery}

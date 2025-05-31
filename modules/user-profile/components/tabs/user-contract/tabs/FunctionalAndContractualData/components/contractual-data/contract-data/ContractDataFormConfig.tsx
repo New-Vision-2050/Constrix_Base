@@ -321,6 +321,14 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: "ارفاق العقد",
             type: "file",
             placeholder: "ارفاق العقد",
+            isMulti: true,
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
           },
         ],
         columns: 2,
@@ -345,6 +353,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         contract?.contract_duration_unit?.id || timeUnits?.[0]?.id,
       probation_period_unit:
         contract?.probation_period_unit?.id || timeUnits?.[0]?.id,
+      file: contract?.files,
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",

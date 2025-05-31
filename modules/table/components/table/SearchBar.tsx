@@ -164,7 +164,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <div className="relative w-full">
             <Search className="absolute  start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              type="search"
+              type="text"
               placeholder={t("Table.Search")}
               value={localSearchQuery}
               onChange={handleInputChange}
@@ -174,7 +174,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <button
                 type="button"
                 onClick={clearSearch}
-                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                className="absolute end-2.5 top-2.5 text-muted-foreground hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>

@@ -37,19 +37,32 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
         />
       </div>
 
-      <div className="p-2">
-        <PreviewTextField
-          mediaId={offer?.files?.id}
-          fireAfterDeleteMedia={() => {
-            handleRefetchJobOffer();
-          }}
-          valid={Boolean(offer?.files?.url)}
-          label="ارفاق العرض"
-          value={offer?.files?.name ?? "---"}
-          type={offer?.files?.type == "image" ? "image" : "pdf"}
-          fileUrl={offer?.files?.url ?? ""}
-        />
-      </div>
+      {Array.isArray(offer?.files) && offer?.files?.length > 0 ? (
+        offer?.files?.map((media) => (
+          <div key={media.id} className="p-2">
+            <PreviewTextField
+              mediaId={media?.id}
+              fireAfterDeleteMedia={() => {
+                handleRefetchJobOffer();
+              }}
+              valid={Boolean(media?.name)}
+              label="ارفاق العرض"
+              value={media?.name ?? "---"}
+              type={media?.type == "image" ? "image" : "pdf"}
+              fileUrl={media?.url}
+            />
+          </div>
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق العرض"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

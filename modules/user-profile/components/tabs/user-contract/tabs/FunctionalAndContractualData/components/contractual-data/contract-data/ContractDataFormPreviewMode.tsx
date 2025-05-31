@@ -122,20 +122,32 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           required
         />
       </div>
-
-      <div className="p-2">
-        <PreviewTextField
-          mediaId={contract?.files?.id}
-          fireAfterDeleteMedia={() => {
-            handleRefetchContractData();
-          }}
-          valid={Boolean(contract?.files?.url)}
-          label="ارفاق العرض"
-          value={contract?.files?.name ?? "---"}
-          type={contract?.files?.type == "image" ? "image" : "pdf"}
-          fileUrl={contract?.files?.url ?? ""}
-        />
-      </div>
+      {Array.isArray(contract?.files) && contract?.files?.length > 0 ? (
+        contract?.files?.map((media) => (
+          <div key={media.id} className="p-2">
+            <PreviewTextField
+              mediaId={media?.id}
+              fireAfterDeleteMedia={() => {
+                handleRefetchContractData();
+              }}
+              valid={Boolean(media?.name)}
+              label="ارفاق العرض"
+              value={media?.name ?? "---"}
+              type={media?.type == "image" ? "image" : "pdf"}
+              fileUrl={media?.url}
+            />
+          </div>
+        ))
+      ) : (
+        <div className="p-2">
+          <PreviewTextField
+            valid={false}
+            label="ارفاق العرض"
+            value={"---"}
+            type={"pdf"}
+          />
+        </div>
+      )}
     </div>
   );
 }

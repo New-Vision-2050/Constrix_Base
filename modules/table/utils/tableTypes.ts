@@ -45,6 +45,7 @@ export interface SearchTypeConfig {
   placeholder?: string;
   dropdownOptions?: DropdownOption[]; // Static options
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
+  isMulti?: boolean;
 }
 
 export interface ColumnSearchConfig {

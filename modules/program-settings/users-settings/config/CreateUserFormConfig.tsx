@@ -34,6 +34,7 @@ export const CreateUserFormConfig = (slug: string) => {
               },
             ],
           },
+
           {
             name: "slug",
             label: "الاسم المختصر",
@@ -48,6 +49,18 @@ export const CreateUserFormConfig = (slug: string) => {
                 type: "pattern",
                 value: /^[a-zA-Z]+$/,
                 message: t("Validation.englishName"),
+              },
+              {
+                type: "apiValidation",
+                message: "تم اخذ هذا الاسم بالفعل",
+                apiConfig: {
+                  url: `${baseURL}/sub_entities/slug-validate`,
+                  method: "POST",
+                  debounceMs: 422,
+                  paramName: "slug",
+                  successCondition: (response) =>
+                    response?.payload?.valid === true,
+                },
               },
             ],
           },
@@ -129,7 +142,7 @@ export const CreateUserFormConfig = (slug: string) => {
             isMulti: true,
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/allowed_attributes/config`,
+              url: `${baseURL}/sub_entities/super_entities/default_attributes`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -154,7 +167,7 @@ export const CreateUserFormConfig = (slug: string) => {
             required: true,
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/allowed_attributes/config`,
+              url: `${baseURL}/sub_entities/super_entities/optional_attributes`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
