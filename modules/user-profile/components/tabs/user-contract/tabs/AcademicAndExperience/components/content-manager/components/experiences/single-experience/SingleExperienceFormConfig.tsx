@@ -40,9 +40,9 @@ export const SingleExperienceFormConfig = ({
                 message: "المسمى الوظيفي مطلوب",
               },
               {
-                type: "pattern",
-                value: "^[\\p{L}\\s]+$",
-                message: "يجب أن يحتوي فقط على أحرف",
+                    type: "pattern",
+                    value: "^[a-zA-Z\u0600-\u06FF\\s]+$",
+                    message: "يجب أن يحتوي فقط على أحرف",
               }
             ],
           },
