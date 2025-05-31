@@ -247,7 +247,10 @@ export const useDropdownSearch = ({
 
   // Store the selected option(s) as backup when they change
   useEffect(() => {
-    if (!selectedValue) return;
+    if (!selectedValue) {
+      setBackupOptions([]);
+      return;
+    }
 
     if (isMulti && Array.isArray(selectedValue)) {
       // For multi-select, handle array of values
@@ -262,9 +265,8 @@ export const useDropdownSearch = ({
         }
       });
 
-      if (newBackupOptions.length > 0) {
-        setBackupOptions(newBackupOptions);
-      }
+      // Always update backup options for multi-select to ensure they persist during search
+      setBackupOptions(newBackupOptions);
     } else if (!isMulti && typeof selectedValue === "string") {
       // For single select, handle string value
       const selectedOption = options.find(
@@ -567,7 +569,7 @@ export const useDropdownSearch = ({
         }
       }
     },
-    [dynamicConfig, dependencies, buildSearchUrl, debouncedSearchTerm]
+    [dynamicConfig, dependencies, buildSearchUrl, debouncedSearchTerm, isMulti]
   );
 
   // Fetch options when dependencies or search term change

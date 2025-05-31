@@ -52,7 +52,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
-    selectedValue: value
+    selectedValue: value,
+    isMulti
   });
 
   // Set first option as default when options change and no value is selected
