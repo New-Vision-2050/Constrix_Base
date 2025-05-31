@@ -42,6 +42,7 @@ interface LocationSelectorProps {
   inGeneral?: boolean;
   branchId?: string;
   companyId?: string;
+  viewOnly?: boolean;
 }
 
 interface payloadSuccess {
@@ -85,6 +86,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   inGeneral,
   branchId,
   companyId,
+  viewOnly,
 }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: LocationFormValues) => {
@@ -269,7 +271,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
             mapContainerStyle={containerStyle}
             center={markerPosition}
             zoom={5}
-            onClick={handleMapClick}
+            onClick={viewOnly ? undefined : handleMapClick}
             onLoad={onLoad}
             onUnmount={onUnmount}
             options={{
@@ -280,9 +282,9 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           >
             <Marker
               position={markerPosition}
-              draggable={true}
+              draggable={!viewOnly}
               onDragEnd={(e) => {
-                if (e.latLng) {
+                if (e.latLng && !viewOnly) {
                   setMarkerPosition({
                     lat: e.latLng.lat(),
                     lng: e.latLng.lng(),
@@ -298,16 +300,18 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         )}
       </div>
 
-      <div className="flex justify-center">
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          type="button"
-          loading={isPending}
-          className="w-1/4"
-        >
-          حفظ
-        </Button>
-      </div>
+      {!viewOnly && (
+        <div className="flex justify-center">
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            type="button"
+            loading={isPending}
+            className="w-1/4"
+          >
+            حفظ
+          </Button>
+        </div>
+      )}
     </form>
   );
 };

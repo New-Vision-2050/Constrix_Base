@@ -17,7 +17,7 @@ export function customerFormConfig(
 
   return {
     formId,
-    title: "اضافة عميل",
+    title: "اضافة",
     apiUrl: `${baseURL}/company-users/clients`,
     laravelValidation: {
       enabled: true,
@@ -260,6 +260,33 @@ export function customerFormConfig(
             type: "text",
             placeholder: "رقم الهوية",
             condition: (values) => isIndividual(values),
+            validation: [
+              {
+                type: "required",
+                message: "رقم الهوية مطلوب",
+              },
+              {
+                type: "pattern",
+                value: /^[12]\d{9}$/,
+                message:
+                  "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+              },
+              {
+                type: "minLength",
+                value: 10,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+              },
+              {
+                type: "maxLength",
+                value: 10,
+                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+              },
+              {
+                type: "pattern",
+                value: /^\d+$/,
+                message: "رقم الهوية يجب أن يحتوي على أرقام فقط",
+              },
+            ],
           },
           {
             name: "email",
