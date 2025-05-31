@@ -165,7 +165,7 @@ export default function InvalidMailDialog(props: PropsT) {
   // return the JSX for the component
   return (
     <>
-      <p className="text-white">
+      <p className="text-foreground">
         {message}
         <span onClick={handleOpen} className="text-primary cursor-pointer">
           {btnText || "اضغط هنا"}
