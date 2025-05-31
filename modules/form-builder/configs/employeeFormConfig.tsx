@@ -185,7 +185,7 @@ export function employeeFormConfig(
             label: "المسمى الوظيفي",
             placeholder: "اختر المسمى الوظيفي",
             dynamicOptions: {
-              url: `${baseURL}/job_titles/list`,
+              url: `${baseURL}/job_titles/list?type=general_manager`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
