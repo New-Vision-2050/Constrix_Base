@@ -77,7 +77,7 @@ export const UsersConfigV2 = () => {
           return (
             <div className="line-clamp-3">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"}>
+                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"} style={{width: "fit-content"}}>
                   {company?.phone || ""}
                 </p>
               ))}
