@@ -72,8 +72,7 @@ export const RetrieveEmployeeFormConfig = (
             name: "branch_ids",
             label: "الفروع",
             type: "select",
-            isMulti: true,
-            placeholder: "اختر الفروع",
+            placeholder: "اختر الفرع",
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
