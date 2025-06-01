@@ -32,7 +32,7 @@ export default function BankSection({ bank }: PropsT) {
             title: "حذف البنك",
             onClick: () => {
               if (bankAccounts.length === 1) handleOpen();
-              else handleDeleteBank();
+              else setOpenDeleteDialog(true)
             },
           },
         ];
@@ -49,7 +49,7 @@ export default function BankSection({ bank }: PropsT) {
           title: "حذف البنك",
           onClick: () => {
             if (bankAccounts.length === 1) handleOpen();
-            else handleDeleteBank();
+            else setOpenDeleteDialog(true);
           },
         },
       ];
