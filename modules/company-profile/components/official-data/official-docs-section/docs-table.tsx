@@ -122,9 +122,9 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
                 </button>
               }
             />
-            <button onClick={handleOpenDelete}>
+            {/* <button onClick={handleOpenDelete}>
               <Trash className="w-4 text-red-500" />
-            </button>
+            </button> */}
           </div>
         </td>
       </tr>
