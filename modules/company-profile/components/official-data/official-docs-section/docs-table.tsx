@@ -21,7 +21,12 @@ import { updateDocsFormConfig } from "./update-docs-form-config";
 import { baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import PDFIcon from "@/assets/icons/PDF.png";
 
 // Row component
@@ -54,22 +59,17 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
             {doc.files?.slice(0, 4).map((file, index) => {
               // Determine icon based on mime_type
               const getFileIcon = () => {
-                if (file.mime_type.includes('pdf')) {
+                if (file.mime_type.includes("pdf")) {
                   return (
-                    <Image
-                      src={PDFIcon}
-                      alt="PDF"
-                      width={20}
-                      height={20}
-                    />
+                    <Image src={PDFIcon} alt="PDF" width={20} height={20} />
                   );
-                } else if (file.mime_type.includes('image')) {
+                } else if (file.mime_type.includes("image")) {
                   return <ImageIcon additionalClass="w-5 h-5 text-blue-500" />;
                 } else {
                   return <FolderIcon />;
                 }
               };
-              
+
               return (
                 <TooltipProvider key={file.id}>
                   <Tooltip>
@@ -94,7 +94,9 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="text-xs text-primary font-bold cursor-pointer">...</span>
+                    <span className="text-xs text-primary font-bold cursor-pointer">
+                      ...
+                    </span>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>{doc.files.length - 4} مرفقات إضافية</p>
@@ -103,7 +105,9 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
               </TooltipProvider>
             )}
             {doc.files?.length > 0 && (
-              <span className="text-xs text-gray-500 mr-1">({doc.files.length})</span>
+              <span className="text-xs text-gray-500 mr-1">
+                ({doc.files.length})
+              </span>
             )}
           </div>
         </td>
@@ -122,9 +126,21 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
                 </button>
               }
             />
-            {/* <button onClick={handleOpenDelete}>
-              <Trash className="w-4 text-red-500" />
-            </button> */}
+            {/* company_legal_data */}
+            <button
+              onClick={handleOpenDelete}
+              disabled={Boolean(doc?.company_legal_data)}
+            >
+              <Trash
+                className={`
+                w-4 ${
+                  !Boolean(doc?.company_legal_data)
+                    ? "text-red-500"
+                    : "text-gray-500"
+                }
+                `}
+              />
+            </button>
           </div>
         </td>
       </tr>
@@ -189,4 +205,3 @@ const DocsTable = ({
 };
 
 export default DocsTable;
-
