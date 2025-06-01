@@ -45,7 +45,7 @@ export const OrgStructureSettingsTableConfig = () => {
         ),
       },
     ],
-    deleteConfirmMessage:"حذف  نوع الوظيفة تأكيد حذف  نوع الوظيفة",
+    deleteConfirmMessage:"حذف  المسمي الوظيفي تأكيد حذف  المسمي الوظيفي",
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
     enableSorting: true,

@@ -59,16 +59,16 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               />
             ),
           },
-          {
-            label: "",
-            name: "",
-            type: "text",
-              render: () => (
-                  <p className="text-xs text-red-500">
-                      - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-                  </p>
-              ),
-          },
+          // {
+          //   label: "",
+          //   name: "",
+          //   type: "text",
+          //     render: () => (
+          //         <p className="text-xs text-red-500">
+          //             - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+          //         </p>
+          //     ),
+          // },
           {
             type: "select",
             name: "country_id",
@@ -209,24 +209,24 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             label: "latitude",
             placeholder: "latitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل دائرة العرض",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "ادخل دائرة العرض",
+            //   },
+            // ],
           },
           {
             name: "longitude",
             label: "longitude",
             placeholder: "longitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل خط الطول",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "ادخل خط الطول",
+            //   },
+            // ],
           },
         ],
       },
@@ -244,6 +244,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
       parent_name: mainBranch?.name ?? "",
     },
     onSubmit: async (formData) => {
+      console.log("formData", formData);
       return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
         url: `${baseURL}/management_hierarchies/create-branch`,
         config: {
