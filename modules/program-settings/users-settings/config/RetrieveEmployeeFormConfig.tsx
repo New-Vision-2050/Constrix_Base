@@ -69,8 +69,8 @@ export const RetrieveEmployeeFormConfig = (
             condition: () => Boolean(roleThreeIds && roleThreeIds?.length > 0),
           },
           {
-            name: "branch_ids",
-            label: "الفروع",
+            name: "branch_id",
+            label: "الفرع",
             type: "select",
             placeholder: "اختر الفرع",
             dynamicOptions: {
@@ -91,7 +91,7 @@ export const RetrieveEmployeeFormConfig = (
     initialValues: {
       roleTwoIds,
       roleThreeIds,
-      branch_ids: branchesIds?.map(ele=>ele.toString()),
+      branch_id: branchesIds?[0] : null
     },
     onSuccess: () => {
       if (handleOnSuccess) {
