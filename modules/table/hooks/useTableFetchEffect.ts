@@ -157,9 +157,12 @@ export const useTableFetchEffect = ({
             console.log('[TableFetch] No cached data found for URL, resetting state');
           }
           setData([]);
-          // Don't reset columns here if they're provided in config
+          // Don't reset columns here if they're provided in config or if we're doing a reload
           if (!configColumns || configColumns.length === 0) {
-            setColumns([]);
+            // Only reset columns if this is not a force refetch (reload)
+            if (!_forceRefetch) {
+              setColumns([]);
+            }
           }
           setError(null);
           setIsFirstLoad(true);

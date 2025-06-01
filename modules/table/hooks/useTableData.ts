@@ -134,8 +134,8 @@ export const useTableData = (
         setTotalItems: (totalItems) => setTotalItems(totalItems),
         setPagination: (currentPage, totalPages, itemsPerPage) =>
           setPagination(currentPage, totalPages, itemsPerPage),
-        // assigned to null to prevent column setting after fetching
-        setColumns: (columns) => null,
+        // Allow column setting during reload to preserve action buttons
+        setColumns: (columns) => setColumns(columns),
         setData: (data) => setData(data),
         dataMapper,
       }),
@@ -143,7 +143,7 @@ export const useTableData = (
     setColumns: (columns) => setColumns(columns),
     setError: (error) => setError(error),
     setIsFirstLoad: (isFirstLoad) => setIsFirstLoad(isFirstLoad),
-    configColumns,
+    configColumns: columns.length > 0 ? columns : configColumns, // Use current columns if available
     _forceRefetch, // Pass _forceRefetch to useTableFetchEffect
   });
 
