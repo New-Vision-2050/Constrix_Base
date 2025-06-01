@@ -33,13 +33,13 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
       }}
       className={`node-content w-full bg-sidebar border-0 ${
         isSelected ? "border-primary ring-2 ring-primary" : ""
-      } rounded-lg shadow p-4 py-8 min-w-[360px] flex-shrink-0 min-h-[250px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${
+      } rounded-lg shadow p-4 py-8 min-w-[360px] flex-shrink-0 min-h-[260px] cursor-pointer hover:ring-1 hover:ring-primary transition-colors flex flex-col items-center ${
         isFirst ? "max-w-[400px] mx-auto" : ""
       } item-${
         node.children?.length === 1 ? node.children[0]?.type : node?.type
       }`}
     >
-      <div className={cn('w-[42] h-[42] flex justify-center items-center font-semibold rounded-full',
+      <div className={cn('w-[42px] h-[42px] flex justify-center items-center font-semibold rounded-full',
         isDeputy
           ? 'bg-[#18CB5F]'
           : (node.name === 'No Manager Assigned'
@@ -51,10 +51,11 @@ const EmployeeNode: React.FC<EmployeeNodeProps> = ({
       <h3 className="font-semibold text-lg my-1 flex gap-2 align-middle items-center pt-2">
         {node.name}
       </h3>
-      {(node.type || isDeputy) && <h4 className="font-normal mt--1 mb-2 flex gap-2 align-middle items-center capitalize text-white/50">
+      {(node.type || isDeputy) && <h4 className="font-normal mt--1 mb-2.5 flex gap-2 align-middle items-center capitalize text-white/50">
         {node.type ?? "Deputy Manager"}
       </h4>}
-      <div className="flex flex-col mt-3 gap-2">
+      <p>{node?.hierarchy_info?.name}</p>
+      <div className="flex flex-col mt-4 gap-3">
         {node?.phone && <div className="flex items-center gap-2"><Phone className="fill-primary text-primary" strokeWidth={0} /> <span dir={'ltr'}>{node.phone}</span></div>}
         {node?.email && <div className="flex items-center gap-2"><EnvelopIcon className="fill-primary text-primary"/> <span dir={'ltr'}>{node.email}</span></div>}
       </div>

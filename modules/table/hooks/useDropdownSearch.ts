@@ -91,7 +91,7 @@ export const useDropdownSearch = ({
 
         // Add ID parameter
         params.append(
-          dynamicConfig.filterParam ?? "",
+          dynamicConfig.filterParam ??  dynamicConfig.valueField,
           valuesToFetchFiltered.join(",")
         );
 
@@ -247,7 +247,10 @@ export const useDropdownSearch = ({
 
   // Store the selected option(s) as backup when they change
   useEffect(() => {
-    if (!selectedValue) return;
+    if (!selectedValue) {
+      setBackupOptions([]);
+      return;
+    }
 
     if (isMulti && Array.isArray(selectedValue)) {
       // For multi-select, handle array of values
@@ -262,9 +265,8 @@ export const useDropdownSearch = ({
         }
       });
 
-      if (newBackupOptions.length > 0) {
-        setBackupOptions(newBackupOptions);
-      }
+      // Always update backup options for multi-select to ensure they persist during search
+      setBackupOptions(newBackupOptions);
     } else if (!isMulti && typeof selectedValue === "string") {
       // For single select, handle string value
       const selectedOption = options.find(
@@ -285,7 +287,6 @@ export const useDropdownSearch = ({
 
       let url = dynamicConfig.url;
       const params = new URLSearchParams();
-
       // Add search parameter if configured and search term exists
       if (dynamicConfig.searchParam && debouncedSearchTerm) {
         params.append(dynamicConfig.searchParam, debouncedSearchTerm);
@@ -463,6 +464,7 @@ export const useDropdownSearch = ({
           throw new Error(`Failed to fetch options: ${response.status}`);
         }
 
+
         const data = processApiResponse(await response.data);
         if (!isMountedRef.current) return;
 
@@ -470,24 +472,20 @@ export const useDropdownSearch = ({
           throw new Error("Expected array response from API");
         }
 
-        if (dynamicConfig.paginationEnabled) {
-          setHasMore(
-            response.data?.pagination?.last_page >
-              response.data?.pagination?.page
-          );
-        }
-        // Extract values and labels from the response
-        const extractedOptions = data.map((item) => {
-          // Handle primitive values (string, number)
-          if (typeof item === "string" || typeof item === "number") {
-            // For primitive values, use the value as both value and label
-            return {
-              value: String(item),
-              label: String(item),
-            };
-          }
-
-          // Handle array format [value, label]
+        
+  if (dynamicConfig.paginationEnabled) {
+        setHasMore(response.data.pagination?.last_page > response.data.pagination?.page)
+      }
+      // Extract values and labels from the response
+      const extractedOptions = data.map((item) => {
+        // Handle primitive values (string, number)
+        if (typeof item === 'string' || typeof item === 'number') {
+          // For primitive values, use the value as both value and label
+          return {
+            value: String(item),
+            label: String(item),
+          };
+        }          // Handle array format [value, label]
           if (Array.isArray(item)) {
             // If item is an array, use indices as valueField and labelField
             // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label
@@ -571,7 +569,7 @@ export const useDropdownSearch = ({
         }
       }
     },
-    [dynamicConfig, dependencies, buildSearchUrl, debouncedSearchTerm]
+    [dynamicConfig, dependencies, buildSearchUrl, debouncedSearchTerm, isMulti]
   );
 
   // Fetch options when dependencies or search term change

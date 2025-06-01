@@ -1,13 +1,14 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldConfig, DynamicRowOptions } from "../../types/formTypes";
-import { useFormInstance } from "../../hooks/useFormStore";
+import { useFormInstance, useFormStore } from "../../hooks/useFormStore";
 import { cn } from "@/lib/utils";
 import { Trash2, ArrowUp, ArrowDown, Plus, GripVertical } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import InfoIcon from "@/public/icons/info";
 import FormField from "../../components/FormField";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 
 // Define a ref type for the component
 export interface DynamicRowsFieldRef {
@@ -111,15 +112,15 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
   );
 };
 
-const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldProps>(({
-  field,
-  value,
-  error,
-  touched,
-  onChange,
-  onBlur,
-  formId = 'default',
-}, ref) => {
+const DynamicRowsField = React.forwardRef<
+  DynamicRowsFieldRef,
+  DynamicRowsFieldProps
+>(
+  (
+    { field, value, error, touched, onChange, onBlur, formId = "default" },
+    ref
+  ) => {
+    console.log({ field, value });
   // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -133,7 +134,8 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
   }, [field.dynamicRowOptions]);
 
   // State for delete confirmation
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+    const [deleteID, setDeleteID] = useState<string | null>(null);
+
   const [isDeleting, setIsDeleting] = useState(false);
 
   // State for drag and drop
@@ -154,40 +156,42 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     // If no template is provided, create one from rowFields
     if (options.rowFields) {
       const template: Record<string, any> = {};
-      options.rowFields.forEach(field => {
+        options.rowFields.forEach((field) => {
         // Set default values based on field type
         switch (field.type) {
-          case 'text':
-          case 'email':
-          case 'password':
-          case 'textarea':
-          case 'search':
-          case 'phone':
-            template[field.name] = '';
+            case "text":
+            case "email":
+            case "password":
+            case "textarea":
+            case "search":
+            case "phone":
+              template[field.name] = "";
             break;
-          case 'number':
+            case "number":
             template[field.name] = 0;
             break;
-          case 'checkbox':
+            case "checkbox":
             template[field.name] = false;
             break;
-          case 'date':
-            template[field.name] = '';
+            case "date":
+              template[field.name] = "";
             break;
-          case 'select':
-          case 'radio':
+            case "select":
+            case "radio":
+
             // If options are available, use the first option's value as default
             if (field.options && field.options.length > 0) {
               template[field.name] = field.options[0].value;
             } else {
-              template[field.name] = '';
+                template[field.name] = "";
             }
             break;
-          case 'multiSelect':
+            case "multiSelect":
             template[field.name] = [];
             break;
           default:
-            template[field.name] = '';
+              template[field.name] = "";
+
         }
       });
       return template;
@@ -204,36 +208,39 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
         ...defaultRowTemplate,
         id: Date.now(),
         errors: {},
-        touched: {}
-      }
+          touched: {},
+        },
+
     ];
     onChange(newRows);
   }, [rows, onChange, defaultRowTemplate]);
 
   // Delete a row
-  const handleDeleteRow = useCallback((index: number) => {
-    setDeleteIndex(index);
+  const handleDeleteRow = useCallback((id: string) => {
+    setDeleteID(id);
   }, []);
 
   // Confirm row deletion
-  const confirmDelete = useCallback(() => {
-    if (deleteIndex !== null) {
-      setIsDeleting(true);
-      const newRows = [...rows];
-      newRows.splice(deleteIndex, 1);
-      onChange(newRows);
-      setIsDeleting(false);
-      setDeleteIndex(null);
-    }
-  }, [deleteIndex, rows, onChange]);
+    // const confirmDelete = useCallback(() => {
+    //   if (deleteID !== null) {
+    //     setIsDeleting(true);
+    //     const newRows = [...rows];
+    //     newRows.splice(deleteID, 1);
+    //     onChange(newRows);
+    //     setIsDeleting(false);
+    //     setDeleteID(null);
+    //   }
+    // }, [deleteID, rows, onChange]);
 
   // Cancel row deletion
   const cancelDelete = useCallback(() => {
-    setDeleteIndex(null);
+      setDeleteID(null);
   }, []);
 
   // Move row up
-  const moveRowUp = useCallback((index: number) => {
+    const moveRowUp = useCallback(
+      (index: number) => {
+
     if (index <= 0) return;
 
     const newRows = [...rows];
@@ -242,10 +249,14 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     newRows[index - 1] = temp;
 
     onChange(newRows);
-  }, [rows, onChange]);
+      },
+      [rows, onChange]
+    );
 
   // Move row down
-  const moveRowDown = useCallback((index: number) => {
+    const moveRowDown = useCallback(
+      (index: number) => {
+
     if (index >= rows.length - 1) return;
 
     const newRows = [...rows];
@@ -254,16 +265,23 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     newRows[index + 1] = temp;
 
     onChange(newRows);
-  }, [rows, onChange]);
+      },
+      [rows, onChange]
+    );
 
   // Drag handlers
-  const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData('text/plain', index.toString());
+    const handleDragStart = useCallback(
+      (e: React.DragEvent, index: number) => {
+        e.dataTransfer.setData("text/plain", index.toString());
+
     setDraggedIndex(index);
     if (options.onDragStart) {
       options.onDragStart(index);
     }
-  }, [options]);
+      },
+      [options]
+    );
+
 
   const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
@@ -278,9 +296,11 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     // Optional: Add visual feedback when dragging leaves an item
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent, index: number) => {
+    const handleDrop = useCallback(
+      (e: React.DragEvent, index: number) => {
     e.preventDefault();
-    const draggedIdx = Number(e.dataTransfer.getData('text/plain'));
+        const draggedIdx = Number(e.dataTransfer.getData("text/plain"));
+
 
     if (isNaN(draggedIdx) || draggedIdx === index) return;
 
@@ -305,7 +325,9 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     if (options.onDragEnd) {
       options.onDragEnd(draggedIdx, index);
     }
-  }, [rows, onChange, options]);
+      },
+      [rows, onChange, options]
+    );
 
   const handleDragEnd = useCallback(() => {
     setDraggedIndex(null);
@@ -313,7 +335,8 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
   }, []);
 
   // Update a specific field in a row
-  const updateRowField = useCallback((rowIndex: number, fieldName: string, fieldValue: any) => {
+    const updateRowField = useCallback(
+      (rowIndex: number, fieldName: string, fieldValue: any) => {
     const newRows = [...rows];
 
     // Initialize errors object if it doesn't exist
@@ -329,25 +352,30 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     // Update the field value
     newRows[rowIndex] = {
       ...newRows[rowIndex],
-      [fieldName]: fieldValue
+          [fieldName]: fieldValue,
     };
 
     onChange(newRows);
-  }, [rows, onChange]);
+      },
+      [rows, onChange]
+    );
 
   // Validate a field in a row
-  const validateRowField = useCallback((rowIndex: number, fieldName: string, fieldValue: any, rules?: any[]) => {
+    const validateRowField = useCallback(
+      (rowIndex: number, fieldName: string, fieldValue: any, rules?: any[]) => {
     if (!rules || rules.length === 0) return null;
 
     // Simple validation logic - can be expanded as needed
     for (const rule of rules) {
-      if (rule.type === 'required' && (!fieldValue || fieldValue === '')) {
+          if (rule.type === "required" && (!fieldValue || fieldValue === "")) {
         return rule.message;
       }
     }
 
     return null;
-  }, []);
+      },
+      []
+    );
 
   // Check if we can add more rows
   const canAddRow = useMemo(() => {
@@ -391,14 +419,19 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
       // Mark all fields as touched during validation
       // This ensures errors are displayed even if the user hasn't interacted with the field
       if (options.rowFields) {
-        options.rowFields.forEach(rowField => {
+          options.rowFields.forEach((rowField) => {
           row.touched[rowField.name] = true;
 
           // Clear previous errors for this field
           row.errors[rowField.name] = null;
 
           // Required field validation
-          if (rowField.required && (row[rowField.name] === undefined || row[rowField.name] === null || row[rowField.name] === '')) {
+            if (
+              rowField.required &&
+              (row[rowField.name] === undefined ||
+                row[rowField.name] === null ||
+                row[rowField.name] === "")
+            ) {
             row.errors[rowField.name] = `${rowField.label} is required`;
             isValid = false;
           }
@@ -407,42 +440,62 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
           if (rowField.validation && Array.isArray(rowField.validation)) {
             for (const rule of rowField.validation) {
               // Skip if already has error or if it's a required rule (already handled)
-              if (row.errors[rowField.name] || rule.type === 'required') continue;
+                if (row.errors[rowField.name] || rule.type === "required")
+                  continue;
 
               let validationFailed = false;
 
               switch (rule.type) {
-                case 'minLength':
-                  if (typeof row[rowField.name] === 'string' && row[rowField.name].length < rule.value) {
+                  case "minLength":
+                    if (
+                      typeof row[rowField.name] === "string" &&
+                      row[rowField.name].length < rule.value
+                    ) {
                     validationFailed = true;
                   }
                   break;
-                case 'maxLength':
-                  if (typeof row[rowField.name] === 'string' && row[rowField.name].length > rule.value) {
+                  case "maxLength":
+                    if (
+                      typeof row[rowField.name] === "string" &&
+                      row[rowField.name].length > rule.value
+                    ) {
                     validationFailed = true;
                   }
                   break;
-                case 'min':
-                  if (typeof row[rowField.name] === 'number' && row[rowField.name] < rule.value) {
+                  case "min":
+                    if (
+                      typeof row[rowField.name] === "number" &&
+                      row[rowField.name] < rule.value
+                    ) {
                     validationFailed = true;
                   }
                   break;
-                case 'max':
-                  if (typeof row[rowField.name] === 'number' && row[rowField.name] > rule.value) {
+                  case "max":
+                    if (
+                      typeof row[rowField.name] === "number" &&
+                      row[rowField.name] > rule.value
+                    ) {
                     validationFailed = true;
                   }
                   break;
-                case 'pattern':
-                  if (typeof row[rowField.name] === 'string' && !new RegExp(rule.value).test(row[rowField.name])) {
+                  case "pattern":
+                    if (
+                      typeof row[rowField.name] === "string" &&
+                      !new RegExp(rule.value).test(row[rowField.name])
+                    ) {
                     validationFailed = true;
                   }
                   break;
-                case 'custom':
-                  if (rule.validator && !rule.validator(row[rowField.name], row)) {
+                  case "custom":
+                    if (
+                      rule.validator &&
+                      !rule.validator(row[rowField.name], row)
+                    ) {
                     validationFailed = true;
                   }
                   break;
               }
+
 
               if (validationFailed) {
                 row.errors[rowField.name] = rule.message;
@@ -459,14 +512,25 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
 
     // If validation failed, set the field error to indicate the dynamic rows have errors
     if (!isValid && formInstance) {
-      formInstance.setError(field.name, `One or more ${field.label || 'rows'} have validation errors`);
+        formInstance.setError(
+          field.name,
+          `One or more ${field.label || "rows"} have validation errors`
+        );
     } else if (formInstance) {
       // Clear the error by setting it to null
       formInstance.setError(field.name, null);
     }
 
     return isValid;
-  }, [options.rowFields, rows, onChange, field.name, field.label, formInstance]);
+    }, [
+      options.rowFields,
+      rows,
+      onChange,
+      field.name,
+      field.label,
+      formInstance,
+    ]);
+
 
   // Generate grid column classes based on configuration
   const getGridColumnClasses = useCallback(() => {
@@ -476,17 +540,32 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
     }
 
     // Otherwise, use responsive column values or defaults
-    const smallCols = options.columnsSmall ? `grid-cols-${options.columnsSmall}` : "grid-cols-1";
-    const mediumCols = options.columnsMedium ? `md:grid-cols-${options.columnsMedium}` : "md:grid-cols-2";
-    const largeCols = options.columnsLarge ? `lg:grid-cols-${options.columnsLarge}` : "lg:grid-cols-3";
+      const smallCols = options.columnsSmall
+        ? `grid-cols-${options.columnsSmall}`
+        : "grid-cols-1";
+      const mediumCols = options.columnsMedium
+        ? `md:grid-cols-${options.columnsMedium}`
+        : "md:grid-cols-2";
+      const largeCols = options.columnsLarge
+        ? `lg:grid-cols-${options.columnsLarge}`
+        : "lg:grid-cols-3";
 
     return `${smallCols} ${mediumCols} ${largeCols}`;
-  }, [options.columns, options.columnsSmall, options.columnsMedium, options.columnsLarge]);
+    }, [
+      options.columns,
+      options.columnsSmall,
+      options.columnsMedium,
+      options.columnsLarge,
+    ]);
 
   // Expose validateAllRows to parent component through ref
-  React.useImperativeHandle(ref, () => ({
-    validateAllRows
-  }), [validateAllRows]);
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        validateAllRows,
+      }),
+      [validateAllRows]
+    );
 
   return (
     <div className={cn("w-full", field.containerClassName)}>
@@ -495,23 +574,38 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
           <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-lg bg-transparent">
             <div className="text-muted-foreground text-center mb-4">
               <p className="text-sm">لا توجد بيانات حتى الآن</p>
-              <p className="text-xs mt-1">أضف {field.label || 'صف جديد'} للبدء</p>
+                <p className="text-xs mt-1">
+                  أضف {field.label || "صف جديد"} للبدء
+                </p>
+
             </div>
           </div>
         ) : (
           rows.map((row, index) => {
             // Determine if the row has any errors
-            const hasErrors = row.errors && Object.values(row.errors).some(error => !!error);
+              const hasErrors =
+                row.errors &&
+                Object.values(row.errors).some((error) => !!error);
 
             return (
               <div
                 key={row.id || index}
                 draggable={!!options.enableDrag}
-                onDragStart={options.enableDrag ? (e) => handleDragStart(e, index) : undefined}
-                onDragOver={options.enableDrag ? (e) => handleDragOver(e, index) : undefined}
+                  onDragStart={
+                    options.enableDrag
+                      ? (e) => handleDragStart(e, index)
+                      : undefined
+                  }
+                  onDragOver={
+                    options.enableDrag
+                      ? (e) => handleDragOver(e, index)
+                      : undefined
+                  }
                 onDragEnter={options.enableDrag ? handleDragEnter : undefined}
                 onDragLeave={options.enableDrag ? handleDragLeave : undefined}
-                onDrop={options.enableDrag ? (e) => handleDrop(e, index) : undefined}
+                  onDrop={
+                    options.enableDrag ? (e) => handleDrop(e, index) : undefined
+                  }
                 onDragEnd={options.enableDrag ? handleDragEnd : undefined}
                 className={cn(
                   "flex flex-col p-5 border rounded-lg transition-all duration-300 animate-in fade-in-50 slide-in-from-bottom-5",
@@ -525,10 +619,13 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                 )}
               >
                 {/* Row header with index and actions */}
-                <div className={cn(
+                  <div
+                    className={cn(
                   "flex items-center justify-between mb-4 pb-2 border-b border-border/50",
                   options.rowHeaderBgColor
-                )}>
+                    )}
+                  >
+
                   <div className="flex items-center">
                     {options.enableDrag && (
                       <div
@@ -571,7 +668,8 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleDeleteRow(index)}
+                          onClick={() => handleDeleteRow(row.id)}
+
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         title="Delete row"
                       >
@@ -582,7 +680,10 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                 </div>
 
                 {/* Row fields */}
-                <div className={cn("flex-1 grid gap-5", getGridColumnClasses())}>
+                  <div
+                    className={cn("flex-1 grid gap-5", getGridColumnClasses())}
+                  >
+
                   {options.rowFields?.map((rowField) => {
                     const fieldKey = rowField.name;
                     return (
@@ -592,24 +693,33 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
                           key={fieldKey}
                           values={row}
                           field={rowField}
-                          value={row[fieldKey] || ''}
+                            value={row[fieldKey] || ""}
                           error={row.errors?.[fieldKey]}
                           touched={row.touched?.[fieldKey]}
-                          onChange={(fieldName, fieldValue) => updateRowField(index, fieldName, fieldValue)}
+                            onChange={(fieldName, fieldValue) =>
+                              updateRowField(index, fieldName, fieldValue)
+                            }
                           onBlur={() => {
+                            const {data} = useFormStore.getState().getValues(formId);
                             // Mark field as touched on blur
-                            const newRows = [...rows];
+                            const newRows = [...data]
                             if (!newRows[index].touched) {
                               newRows[index].touched = {};
                             }
                             newRows[index].touched[fieldKey] = true;
 
                             // Validate field on blur if required
-                            if (rowField.required && (!row[fieldKey] || row[fieldKey] === '')) {
+                              if (
+                                rowField.required &&
+                                (!row[fieldKey] || row[fieldKey] === "")
+                              ) {
                               if (!newRows[index].errors) {
                                 newRows[index].errors = {};
                               }
-                              newRows[index].errors[fieldKey] = `${rowField.label} is required`;
+                                newRows[index].errors[
+                                  fieldKey
+                                ] = `${rowField.label} is required`;
+
                             }
 
                             onChange(newRows);
@@ -636,20 +746,34 @@ const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldP
           >
             <span className="absolute inset-0 bg-primary/5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             <Plus className="h-4 w-4 mr-2 text-primary" />
-            <span>إضافة {field.label || 'صف جديد'}</span>
+              <span>إضافة {field.label || "صف جديد"}</span>
+
           </Button>
         </div>
       )}
 
       {/* Delete confirmation dialog */}
-      <DeleteConfirmation
-        open={deleteIndex !== null}
+        {/* <DeleteConfirmation
+          open={deleteID !== null}
         onClose={cancelDelete}
         onConfirm={confirmDelete}
         isLoading={isDeleting}
+        /> */}
+
+        <DeleteConfirmationDialog
+          deleteUrl={`${field?.dynamicRowOptions?.deleteUrl}/${deleteID}`}
+          onClose={cancelDelete}
+          open={deleteID !== null}
+          onSuccess={() => {
+            field?.dynamicRowOptions?.onDeleteSuccess
+              ? field?.dynamicRowOptions?.onDeleteSuccess()
+              : null;
+          }}
       />
     </div>
   );
-});
+  }
+);
+
 
 export default DynamicRowsField;

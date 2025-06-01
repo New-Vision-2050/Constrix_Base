@@ -70,18 +70,22 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
   return (
     <>
       <div className="flex items-center">
-        <span
-          className={`absolute top-[8px] text-slate-400 ${
-            isRTL ? "left-[50px]" : "right-[50px]"
-          }`}
-          onClick={handleDownload}
-          style={{
-            cursor: type === "pdf" || type === "image" ? "pointer" : "default",
-          }}
-        >
-          {renderSuffixIcon()}
-        </span>
-        {(type === "image" || type == "pdf") && (
+        {Boolean(fileUrl) && (
+          <span
+            className={`absolute top-[8px] text-slate-400 ${
+              isRTL ? "left-[50px]" : "right-[50px]"
+            }`}
+            onClick={handleDownload}
+            style={{
+              cursor:
+                type === "pdf" || type === "image" ? "pointer" : "default",
+            }}
+          >
+            {renderSuffixIcon()}
+          </span>
+        )}
+
+        {(type === "image" || type == "pdf") && Boolean(mediaId) && (
           <span
             className={`absolute top-[8px] text-slate-400 ${
               isRTL ? "left-[85px]" : "right-[85px]"
@@ -93,10 +97,12 @@ export default function PreviewTextFieldSuffixIcon(props: PropsT) {
             }}
             style={{
               cursor:
-                type === "pdf" || type === "image" ? "pointer" : "default",
+                (type === "pdf" || type === "image") && mediaId
+                  ? "pointer"
+                  : "default",
             }}
           >
-            <Trash2 color={loading ? "lightgray" : "red"} />
+            <Trash2 color={loading || !mediaId ? "lightgray" : "red"} />
           </span>
         )}
       </div>

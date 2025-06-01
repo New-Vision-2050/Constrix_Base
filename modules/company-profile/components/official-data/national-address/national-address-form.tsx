@@ -6,12 +6,26 @@ import { CompanyAddress } from "@/modules/company-profile/types/company";
 const NationalAddressForm = ({
   companyAddress,
   id,
+  handleEditClick,
 }: {
   companyAddress: CompanyAddress;
   id?: string;
+  handleEditClick?: () => void;
 }) => {
   const config = NationalAddressFormConfig(companyAddress, id);
-  return <FormContent config={config} />;
+  return (
+    <FormContent
+      config={{
+        ...config,
+        onSuccess: (values, result) => {
+          if (typeof config.onSuccess === "function") {
+            config.onSuccess(values, result);
+          }
+          handleEditClick?.();
+        },
+      }}
+    />
+  );
 };
 
 export default NationalAddressForm;

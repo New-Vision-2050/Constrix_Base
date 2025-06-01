@@ -102,11 +102,11 @@
     "FilterSearch": "فلتر البحث",
     "RowsPerPage": "الصفوف لكل صفحة :",
     "Search": "بحث",
-    "Actions": "إجراء",
+    "Actions": "الاجراء",
     "ToggleColumns": "تبديل الأعمدة المرئية",
     "VisibleColumns": "الأعمدة المرئية",
     "Minimal": "الحد الأدنى",
-    "All": "الكل" 
+    "All": "الكل"
   },
   "Companies": {
     "Companies": "الشركات",
@@ -129,6 +129,7 @@
     "AreYouSure": "هل أنت متأكد؟",
     "AreYouSureReactivate": "هل تريد تاكيد تنشيط الشركة؟",
     "AreYouSureDeactivate": "هل تريد تاكيد الغاء تنشيط الشركة؟",
+    "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الشركة؟",
     "createCompany": "انشاء شركة",
     "SaveCompany": "تم حفظ الشركة برقم",
     "Validation": {
@@ -157,6 +158,7 @@
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
     "Logout": "تسجيل الخروج",
+    "branches": "الفروع",
     "profile": "حسابي",
     "changeMail": "تغيير البريد الالكتروني",
     "changePassword": "تغيير كلمة المرور"

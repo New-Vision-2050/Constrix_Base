@@ -103,10 +103,15 @@ export const usePaginatedDropdown = ({
         if (response.status !== 200)
           throw new Error(`Error ${response.status}: ${response.statusText}`);
 
-        const total = response.headers[totalCountHeader];
+        const responseData = await response.data;
+        let total = response.headers[totalCountHeader];
+        if(!total){
+              total = responseData?.pagination?.result_count;
+        }
         const totalCount = total ? parseInt(total, 10) : 0;
 
-        const data = processApiResponse(await response.data);
+        const data = processApiResponse(responseData);
+
         if (!Array.isArray(data)) throw new Error("Expected array response");
 
         const newOptions = extractDropdownOptions(

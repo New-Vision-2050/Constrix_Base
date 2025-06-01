@@ -6,12 +6,26 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 const LegalDataForm = ({
   companyLegalData,
   id,
+  handleEditClick
 }: {
   companyLegalData: CompanyLegalData[];
   id?: string;
+  handleEditClick?: () => void;
 }) => {
   const config = LegalDataFormConfig(companyLegalData, id);
-  return <FormContent config={config} />;
+  return (
+    <FormContent
+      config={{
+        ...config,
+        onSuccess: (values, result) => {
+          if (typeof config.onSuccess === "function") {
+            config.onSuccess(values, result);
+          }
+          handleEditClick?.();
+        },
+      }}
+    />
+  );
 };
 
 export default LegalDataForm;

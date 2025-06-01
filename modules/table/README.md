@@ -122,6 +122,7 @@ const tableConfig: TableConfig = {
 | `columnSearchConfig` | `ColumnSearchConfig` | Configuration for column search |
 | `allSearchedFields` | `any[]` | Additional search fields for advanced filtering |
 | `enableRowSelection` | `boolean` | Row selection is enabled by default, set to false to disable |
+| `deleteConfirmMessage` | `string` | Custom delete confirmation message to display in DeleteConfirmationDialog |
 
 ### Column Configuration
 
@@ -411,6 +412,60 @@ const DeleteButton = ({ id }) => {
     </>
   );
 };
+```
+
+### Custom Delete Confirmation Message
+
+The Table Builder module supports custom delete confirmation messages through the `deleteConfirmMessage` configuration option. This allows you to provide context-specific confirmation messages instead of the default "هل انت متاكد تريد الحذف؟" message.
+
+```tsx
+import { TableBuilder } from '@/modules/table';
+import { useTranslations } from 'next-intl';
+
+const CompaniesTable = () => {
+  const t = useTranslations('Companies');
+  
+  const tableConfig = {
+    url: '/api/companies',
+    columns: [
+      { key: 'name', label: t('Companies'), sortable: true },
+      { key: 'email', label: t('Email'), sortable: true },
+      { key: 'manager', label: t('Manager'), sortable: true },
+    ],
+    // Custom delete confirmation message
+    deleteConfirmMessage: t('DeleteConfirmMessage'), // "هل أنت متأكد من حذف هذه الشركة؟"
+    
+    // Enable delete functionality
+    executionConfig: {
+      canEdit: false,
+      canDelete: true,
+    },
+    formConfig: companiesFormConfig,
+  };
+
+  return <TableBuilder config={tableConfig} />;
+};
+```
+
+You can also use different messages for different table contexts:
+
+```tsx
+// For users table
+const usersTableConfig = {
+  url: '/api/users',
+  deleteConfirmMessage: 'Are you sure you want to delete this user?',
+  // ... other config
+};
+
+// For products table
+const productsTableConfig = {
+  url: '/api/products',
+  deleteConfirmMessage: 'This will permanently remove the product. Continue?',
+  // ... other config
+};
+```
+
+If no `deleteConfirmMessage` is provided, the component will fall back to the default Arabic message "هل انت متاكد تريد الحذف؟".
 
 ### Table with Row Selection
 

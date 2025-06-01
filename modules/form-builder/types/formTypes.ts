@@ -48,6 +48,8 @@ export interface DynamicRowOptions {
   dragHandlePosition?: "left" | "right"; // Position of the drag handle (default: 'left')
   onDragStart?: (index: number) => void; // Callback when drag starts
   onDragEnd?: (oldIndex: number, newIndex: number) => void; // Callback when drag ends
+  deleteUrl?: string;
+  onDeleteSuccess?: () => void;
 }
 
 export interface DependencyConfig {
@@ -88,6 +90,7 @@ export interface SearchTypeConfig {
   placeholder?: string;
   dropdownOptions?: DropdownOption[]; // Static options
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
+  isMulti?: boolean;
 }
 
 export interface minMaxDate {
@@ -115,6 +118,8 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
+    
+  fieldClassName?: string; // Class name for the field container
 
   // CheckboxGroup sync properties
   syncWithField?: string; // Name of another checkbox group field to sync with
@@ -288,4 +293,6 @@ export interface FormConfig {
   // Additional search fields for advanced filtering (similar to table config)
   allSearchedFields?: FieldConfig[];
   wrapperClassName?: string;
+  subWrapperClassName?:string
+  subWrapperParentClassName?:string;
 }

@@ -21,9 +21,11 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 
 const LegalDataSection = ({
   companyLegalData = [],
+  currentCompanyId,
   id,
 }: {
   companyLegalData: CompanyLegalData[];
+  currentCompanyId:string,
   id?: string;
 }) => {
   const local = useLocale();
@@ -43,7 +45,7 @@ const LegalDataSection = ({
       onClick: handleOpenMyReq,
     },
     {
-      label: "طلب تعديل البيانات الرسمية",
+      label: "طلب تعديل البيانات القانونية",
       onClick: handleOpenReqForm,
     },
     {
@@ -83,7 +85,7 @@ const LegalDataSection = ({
             )}
           </>
         ) : (
-          <LegalDataForm companyLegalData={companyLegalData} id={id} />
+          <LegalDataForm companyLegalData={companyLegalData} id={id} handleEditClick={handleEditClick} />
         )}
       </FormFieldSet>
 
@@ -95,14 +97,14 @@ const LegalDataSection = ({
           <SheetHeader>
             <SheetTitle>طلباتي</SheetTitle>
           </SheetHeader>
-          <MyRequests />
+          <MyRequests type="companyLegalDataUpdate" company_id={currentCompanyId} branch_id={id}  />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
             الرجوع
           </Button>
         </SheetContent>
 
         <SheetFormBuilder
-          config={LegalDataReqFormEditConfig(companyLegalData, id)}
+          config={LegalDataReqFormEditConfig({companyLegalData, company_id:currentCompanyId,id})}
           isOpen={isOpenReqForm}
           onOpenChange={handleCloseReqForm}
         />

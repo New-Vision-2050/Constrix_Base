@@ -9,6 +9,8 @@ import { useParams } from "next/navigation";
 export const addNewBranchFormConfig = (branches: Branch[]) => {
   const { company_id }: { company_id: string | undefined } = useParams();
 
+  const mainBranch = branches.find((branch) => !Boolean(branch.parent_id));
+
   const queryClient = useQueryClient();
   const formId = `add-new-branch-form-${company_id}`;
   const addNewBranchFormConfig: FormConfig = {
@@ -57,16 +59,16 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               />
             ),
           },
-          {
-            label: "",
-            name: "",
-            type: "text",
-            render: () => (
-              <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
-              </p>
-            ),
-          },
+          // {
+          //   label: "",
+          //   name: "",
+          //   type: "text",
+          //     render: () => (
+          //         <p className="text-xs text-red-500">
+          //             - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+          //         </p>
+          //     ),
+          // },
           {
             type: "select",
             name: "country_id",
@@ -144,24 +146,10 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             ],
           },
           {
-            name: "parent_id",
+            name: "parent_name",
             label: "الفرع الرئيسي",
-            type: "select",
+            type: "text",
             disabled: true,
-            options: branches
-              .filter((branch) => !branch.parent_id)
-              .map((branch) => ({
-                value: branch.id,
-                label: branch.name,
-              })),
-            defaultValue: branches.filter((branch) => !branch.parent_id)?.[0]
-              ?.id,
-            validation: [
-              {
-                type: "required",
-                message: "ادخل نوع الفرع",
-              },
-            ],
           },
           {
             type: "select",
@@ -221,40 +209,42 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
             label: "latitude",
             placeholder: "latitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل دائرة العرض",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "ادخل دائرة العرض",
+            //   },
+            // ],
           },
           {
             name: "longitude",
             label: "longitude",
             placeholder: "longitude",
             type: "hiddenObject",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل خط الطول",
-              },
-            ],
+            // validation: [
+            //   {
+            //     type: "required",
+            //     message: "ادخل خط الطول",
+            //   },
+            // ],
           },
         ],
       },
     ],
-    initialValues: {
-      parent_id: branches.filter((branch) => !branch.parent_id)?.[0]?.id,
-    },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: false,
+    resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
+    initialValues: {
+      parent_id: mainBranch?.id ?? "",
+      parent_name: mainBranch?.name ?? "",
+    },
     onSubmit: async (formData) => {
+      console.log("formData", formData);
       return await defaultSubmitHandler(formData, addNewBranchFormConfig, {
         url: `${baseURL}/management_hierarchies/create-branch`,
         config: {

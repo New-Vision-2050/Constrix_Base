@@ -30,6 +30,7 @@ interface TableInitializationProps {
   setColumns: (columns: ColumnConfig[]) => void;
   setVisibleColumns?: (columnKeys: string[]) => void;
   tableId?: string; // Add tableId parameter
+  deleteConfirmMessage?: string; // Add deleteConfirmMessage parameter
 }
 
 export const useTableInitialization = ({
@@ -50,6 +51,7 @@ export const useTableInitialization = ({
   setColumns,
   setVisibleColumns,
   tableId = "default", // Default to 'default' if not provided
+  deleteConfirmMessage,
 }: TableInitializationProps) => {
   const t = useTranslations();
 
@@ -80,13 +82,20 @@ export const useTableInitialization = ({
 
     // Set initial columns if provided
     if (configColumns && configColumns.length > 0) {
-      console.log("--------2-2-2-2-2----", {
-        configColumns,
-      });
       const hasIdKey = configColumns.some((column) => column.key === "id");
 
-      if (!hasIdKey) {
-        configColumns.push({
+      // Create a new array with action column to avoid mutating the original
+      let columnsWithActions = [...configColumns];
+      
+      // Check if we should add action column (if there are any actions available)
+      const shouldAddActionColumn = !hasIdKey && (
+        Boolean(executionsConfig?.canEdit) ||
+        Boolean(executionsConfig?.canDelete) ||
+        (executions && executions.length > 0)
+      );
+      
+      if (shouldAddActionColumn) {
+        columnsWithActions.push({
           key: "id",
           label: t("Companies.Actions"),
           render: (_: unknown, row: any) => (
@@ -98,27 +107,36 @@ export const useTableInitialization = ({
               buttonLabel={t("Companies.Actions")}
               showEdit={Boolean(executionsConfig?.canEdit)}
               showDelete={Boolean(executionsConfig?.canDelete)}
+              deleteConfirmMessage={deleteConfirmMessage}
             />
           ),
         });
       }
 
       // Filter columns based on availableColumnKeys if provided
-      let filteredColumns = [...configColumns];
+      let filteredColumns = [...columnsWithActions];
       if (availableColumnKeys && availableColumnKeys.length > 0) {
         filteredColumns = filteredColumns.filter(col =>
-          availableColumnKeys.includes(col.key)
+          availableColumnKeys.includes(col.key) ||
+          (col.key === "id" && shouldAddActionColumn) // Always include action column if it should be added
         );
       }
-
+      
       setColumns(filteredColumns);
 
       // Also initialize visible columns if the function is provided
       if (setVisibleColumns) {
         // Use defaultVisibleColumnKeys if provided, otherwise use all column keys
-        const columnKeys = defaultVisibleColumnKeys && defaultVisibleColumnKeys.length > 0
+        let columnKeys = defaultVisibleColumnKeys && defaultVisibleColumnKeys.length > 0
           ? defaultVisibleColumnKeys
           : filteredColumns.map((col) => col.key);
+        
+        // Always include action column in visible columns if it should be added and exists
+        if (shouldAddActionColumn && !columnKeys.includes("id")) {
+          columnKeys = [...columnKeys, "id"];
+        }
+        
+        console.log("👁️ Visible columns being set:", columnKeys);
         
         setVisibleColumns(columnKeys);
       }

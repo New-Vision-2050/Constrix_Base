@@ -15,7 +15,10 @@ import { UpdateSubTableSettings } from "./UpdateSubTableSettings";
 // Create a component that uses the translations
 export const SubTableConfig = (slug: string) => {
   return {
-    url: `${baseURL}/sub_entities/super_entity/sub_tables?super_entity_id=${slug}`,
+    url: `${baseURL}/sub_entities/super_entity/sub_tables`,
+    apiParams: {
+      super_entity_id: slug,
+    },
     tableId: `program-settings-sub-table-${slug}`,
     columns: [
       {
@@ -68,7 +71,7 @@ export const SubTableConfig = (slug: string) => {
             valueField: "name",
             labelField: "name",
             paginationEnabled: true,
-            itemsPerPage: 5,
+            itemsPerPage: 10,
             searchParam: "name",
             pageParam: "page",
             limitParam: "per_page",
@@ -104,7 +107,7 @@ export const SubTableConfig = (slug: string) => {
             valueField: "slug",
             labelField: "name",
             paginationEnabled: true,
-            itemsPerPage: 5,
+            itemsPerPage: 10,
             searchParam: "name",
             pageParam: "page",
             limitParam: "per_page",

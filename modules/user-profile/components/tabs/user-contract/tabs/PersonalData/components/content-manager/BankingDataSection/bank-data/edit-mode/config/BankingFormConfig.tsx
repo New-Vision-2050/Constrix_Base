@@ -43,7 +43,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -85,6 +85,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               url: `${baseURL}/bank_type_accounts`,
               valueField: "id",
               labelField: "name",
+              paginationEnabled: true,
             },
             validation: [
               {
@@ -106,7 +107,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -126,6 +127,11 @@ export const BankingDataFormConfig = (props: PropsT) => {
                 type: "required",
                 message: "رمز ال iban مطلوب",
               },
+              {
+                type: "pattern",
+                value: "^[A-Z]{2}[0-9A-Z]{13,32}$",
+                message: "رمز IBAN غير صالح",
+              }
             ],
           },
           {
@@ -150,6 +156,11 @@ export const BankingDataFormConfig = (props: PropsT) => {
                 type: "required",
                 message: "رقم الحساب مطلوب",
               },
+              {
+                type: "pattern",
+                value: "^[0-9]{8,32}$",
+                message: "رقم الحساب يجب أن يكون بين 8 و 32 رقمًا",
+              }
             ],
           },
           {
@@ -162,6 +173,11 @@ export const BankingDataFormConfig = (props: PropsT) => {
                 type: "required",
                 message: "كود ال swift مطلوب",
               },
+              {
+                type: "pattern",
+                value: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+                message: "كود SWIFT غير صالح",
+              }
             ],
           },
         ],
@@ -173,6 +189,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
       bank_id: bank?.bank_id,
       country_id: bank?.country_id,
       currency_id: bank?.currency_id,
+      type_id: bank?.type_id,
       iban: bank?.iban,
       swift_bic: bank?.swift_bic,
       type: bank?.type,

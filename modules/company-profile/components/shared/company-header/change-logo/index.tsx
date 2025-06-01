@@ -119,12 +119,10 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
         },
       });
     } else {
-      // Already validated, proceed with upload
       mutateUpload(file, {
         onSuccess: () => {
-          queryClient.refetchQueries({
-            queryKey: ["main-company-data"],
-          });
+          deleteCookie("company-data");
+          window.location.reload();
           handleClose();
         },
       });
@@ -173,10 +171,17 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
               ارفاق
               <input
                 type="file"
-                accept="image/*"
+                accept=".jpeg,.jpg,.png,.gif,.svg"
                 className="hidden"
                 {...register("image", {
                   required: "الرجاء اختيار صورة",
+                  validate: {
+                    format: (fileList) => {
+                      if (!fileList?.[0]) return true;
+                      const validFormats = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/svg+xml"];
+                      return validFormats.includes(fileList[0].type) || "يجب أن يكون حقل logo ملفًا من نوع: jpeg, jpg, png, gif, svg.";
+                    }
+                  }
                 })}
               />
             </label>

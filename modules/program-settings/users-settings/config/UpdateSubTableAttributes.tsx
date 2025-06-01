@@ -50,7 +50,7 @@ export const UpdateSubTableAttributes = (
             optionsTitle: "العناصر الاساسية",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/attributes?super_entity_id=${row.super_entity.id}`,
+              url: `${baseURL}/sub_entities/super_entities/default_attributes?super_entity_id=${row.super_entity.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -71,7 +71,7 @@ export const UpdateSubTableAttributes = (
             optionsTitle: "العناصر التنقية",
             isMulti: true,
             dynamicOptions: {
-              url: `${baseURL}/sub_entities/super_entities/attributes?super_entity_id=${row.super_entity.id}`,
+              url: `${baseURL}/sub_entities/super_entities/optional_attributes?super_entity_id=${row.super_entity.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

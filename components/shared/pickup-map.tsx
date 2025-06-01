@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 const defaultKeys = [
   "city_id",
   "state_id",
-  "postal_code",
-  "street_name",
-  "neighborhood_name",
+  // "postal_code",
+  // "street_name",
+  // "neighborhood_name",
 ];
 
 const PickupMap = ({
@@ -28,8 +28,9 @@ const PickupMap = ({
   inGeneral = false,
   branchId,
   companyId,
+  viewOnly,
 }: {
-  formId: string;
+  formId?: string;
   lat?: string;
   long?: string;
   containerClassName?: string;
@@ -37,19 +38,22 @@ const PickupMap = ({
   inGeneral?: boolean;
   branchId?: string;
   companyId?: string;
+  viewOnly?: boolean;
 }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue } = useFormStore();
 
   const handleSaveMap = (obj: Record<string, string | number | undefined>) => {
-    const keys = keysToUpdate ?? defaultKeys;
-    keys.forEach((key) => {
-      if (obj[key] !== undefined) {
-        setValue(formId, key, obj[key]);
-      }
-    });
+    if (formId) {
+      const keys = keysToUpdate ?? defaultKeys;
+      keys.forEach((key) => {
+        if (obj[key] !== undefined) {
+          setValue(formId, key, obj[key]);
+        }
+      });
 
-    handleClose();
+      handleClose();
+    }
   };
 
   return (
@@ -71,7 +75,9 @@ const PickupMap = ({
         <DialogContent withCrossButton className="max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-center my-5">
-              تعديل احداثيات موقع العنوان الوطني
+              {viewOnly
+                ? "احداثيات موقع العنوان الوطني"
+                : "تعديل احداثيات موقع العنوان الوطني"}
             </DialogTitle>
           </DialogHeader>
           <LocationSelector
@@ -87,6 +93,7 @@ const PickupMap = ({
             inGeneral={inGeneral}
             branchId={branchId}
             companyId={companyId}
+            viewOnly={viewOnly}
           />
         </DialogContent>
       </Dialog>

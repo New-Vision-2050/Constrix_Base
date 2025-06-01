@@ -52,7 +52,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     searchTerm: searchValue,
     dynamicConfig,
     dependencies,
-    selectedValue: value
+    selectedValue: value,
+    isMulti
   });
 
   // Set first option as default when options change and no value is selected
@@ -87,7 +88,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
       // If we're still loading and have a value, show loading indicator
       if (loading && singleValue) {
-        return `${singleValue} (loading...)`;
+        return `(loading...)`;
       }
 
       // Fallback to the value itself

@@ -117,8 +117,10 @@ export const QualificationFormConfig = ({
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 1000,
+              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "academic_qualification_id",
+              filterParam: "academic_qualification_id",
             },
             validation: [
               {
@@ -131,11 +133,12 @@ export const QualificationFormConfig = ({
             type: "date",
             name: "graduation_date",
             label: "تاريخ الحصول على الشهادة",
-            placeholder: "تاريخ الحصول على الشهادة",
+            placeholder: "تاريخ الشهادة",
+            required: true,
             validation: [
               {
                 type: "required",
-                message: "graduation date is required",
+                message: "تاريخ الشهادة مطلوب",
               },
             ],
           },
@@ -147,8 +150,23 @@ export const QualificationFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "graduation grade is required",
+                message: "المعدلات الدراسية مطلوبة",
               },
+              {
+                type: "pattern",
+                value: "^[0-9]+(\\.[0-9]+)?$",
+                message: "المعدلات الدراسية يجب أن تكون أرقام فقط",
+              },
+              {
+                type: "min",
+                value: 0,
+                message: "المعدلات الدراسية يجب أن تكون أكبر من أو تساوي 0",
+              },
+              {
+                type: "max",
+                value: 100,
+                message: "المعدلات الدراسية يجب أن لا تتجاوز 100",
+              }
             ],
           },
           {

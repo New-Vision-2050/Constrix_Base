@@ -44,6 +44,7 @@ export const CompaniesConfig = () => {
       {
         key: "company_field",
         label: "النشاط",
+        searchable: true,
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
             {value &&
@@ -97,10 +98,12 @@ export const CompaniesConfig = () => {
         key: "company_field_id",
         searchType: {
           type: "dropdown",
+          isMulti: true,
           placeholder: t("CompanySection"),
           dynamicDropdown: {
             url: `${baseURL}/company_fields`,
             valueField: "id",
+            isMulti: true,
             labelField: "name",
             paginationEnabled: true,
             itemsPerPage: 20,
@@ -141,5 +144,6 @@ export const CompaniesConfig = () => {
       canEdit: false,
       canDelete: true,
     },
+    deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };
 };

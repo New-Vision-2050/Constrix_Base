@@ -27,6 +27,12 @@ export const IqamaDataFormConfig = () => {
             label: "رقم الاقامة",
             type: "text",
             placeholder: "رقم الاقامة",
+            validation: [
+              {
+                type: "required",
+                message: "رقم الاقامة مطلوب",
+              },
+            ],
           },
           {
             name: "entry_number_start_date",
@@ -53,6 +59,13 @@ export const IqamaDataFormConfig = () => {
             label: "ارفاق رقم الاقامة",
             type: "file",
             isMulti: true,
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
             placeholder: "ارفاق رقم الاقامة",
           },
         ],

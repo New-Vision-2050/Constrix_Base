@@ -75,9 +75,9 @@ export const UsersConfigV2 = () => {
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
-            <div className="line-clamp-3">
+            <div className="line-clamp-3 flex flex-col items-start justify-start">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"}>
+                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"} style={{width: "fit-content"}}>
                   {company?.phone || ""}
                 </p>
               ))}

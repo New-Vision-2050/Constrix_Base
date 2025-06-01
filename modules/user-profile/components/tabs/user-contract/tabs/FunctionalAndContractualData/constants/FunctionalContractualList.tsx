@@ -15,7 +15,7 @@ export const FunctionalContractualList: UserProfileNestedTab[] = [
   {
     id: "functional-tab-contractual-job-data",
     title: "البيانات الوظيفية",
-    type:"jobOffer",
+    type:"user_professional_data",
     icon: <GraduationCapIcon />,
     content: <JobInformation />,
   },

@@ -28,6 +28,42 @@ export const NationalAddressFormConfig = (
         columns: 2,
         fields: [
           {
+            label: "تعديل الموقع من الخريطة",
+            name: "map",
+            type: "text",
+            render: () => (
+              <PickupMap
+                formId={formId}
+                lat={companyAddress.country_lat}
+                long={companyAddress.country_long}
+                containerClassName="col-span-2"
+                branchId={id}
+                companyId={company_id}
+                keysToUpdate={[
+                  "city_id",
+                  "state_id",
+                  "postal_code",
+                  "street_name",
+                  "neighborhood_name",
+                  "latitude",
+                  "longitude",
+                ]}
+              />
+            ),
+          },
+          {
+            name: "latitude",
+            label: "latitude",
+            placeholder: "latitude",
+            type: "hiddenObject",
+          },
+          {
+            name: "longitude",
+            label: "longitude",
+            placeholder: "longitude",
+            type: "hiddenObject",
+          },
+          {
             name: "country_name",
             label: "الدولة",
             type: "text",
@@ -111,9 +147,13 @@ export const NationalAddressFormConfig = (
           {
             name: "additional_phone",
             label: "الرقم الاضافي",
-            type: "text",
+            type: "phone",
             placeholder: "الرقم الاضافي",
             validation: [
+              {
+                type: "phone",
+                message: "رقم الهاتف غير صالح",
+              },
               {
                 type: "required",
                 message: "الرقم الاضافي مطلوب",
@@ -144,21 +184,6 @@ export const NationalAddressFormConfig = (
               },
             ],
           },
-          {
-            label: "تعديل الموقع من الخريطة",
-            name: "map",
-            type: "text",
-            render: () => (
-              <PickupMap
-                formId={formId}
-                lat={companyAddress.country_lat}
-                long={companyAddress.country_long}
-                containerClassName="col-span-2"
-                branchId={id}
-                companyId={company_id}
-              />
-            ),
-          },
         ],
       },
     ],
@@ -172,6 +197,8 @@ export const NationalAddressFormConfig = (
       additional_phone: companyAddress.additional_phone ?? "",
       postal_code: companyAddress.postal_code ?? "",
       street_name: companyAddress.street_name ?? "",
+      longitude: companyAddress.country_long ?? "",
+      latitude: companyAddress.country_lat ?? "",
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
@@ -191,6 +218,8 @@ export const NationalAddressFormConfig = (
         building_number: formData.building_number,
         additional_phone: formData.additional_phone,
         postal_code: formData.postal_code,
+        longitude: formData.longitude,
+        latitude: formData.latitude,
       };
 
       return await defaultSubmitHandler(obj, NationalAddressFormConfig, {

@@ -1,3 +1,4 @@
+import { useToast } from "@/modules/table/hooks/use-toast";
 import CopyIcon from "@/public/icons/copy";
 import React from "react";
 
@@ -6,13 +7,20 @@ type CopyButtonProps = {
 };
 
 const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
+  const { toast } = useToast();
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(text);
-      alert("تم النسخ!");
+      toast({
+        title: "نجح",
+        description: "تم النسخ بنجاح",
+      });
     } catch {
-      alert("Failed to copy!");
-      console.error("فشل النسخ");
+      toast({
+        title: "فشل",
+        description: "فشل النسخ",
+        variant: "destructive",
+      });
     }
   };
 

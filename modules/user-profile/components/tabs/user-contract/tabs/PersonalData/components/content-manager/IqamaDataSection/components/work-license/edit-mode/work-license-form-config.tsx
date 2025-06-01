@@ -26,6 +26,12 @@ export const WorkLicenseFormConfig = () => {
             label: "رقم رخصة العمل",
             type: "text",
             placeholder: "رقم رخصة العمل",
+             validation: [
+              {
+                type: "required",
+                message: "رقم رخصة العمل مطلوب",
+              },
+            ],
           },
           {
             name: "work_permit_start_date",
@@ -53,6 +59,13 @@ export const WorkLicenseFormConfig = () => {
             type: "file",
             isMulti: true,
             placeholder: "ارفاق رخصة العمل",
+            fileConfig: {
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
           },
         ],
         columns: 2,
@@ -92,12 +105,15 @@ export const WorkLicenseFormConfig = () => {
         work_permit_start_date: formatDate(startDate),
         work_permit_end_date: formatDate(endDate),
       };
-      
 
-      return await defaultSubmitHandler(serialize(body), workLicenseFormConfig, {
-        url: `/company-users/identity-data/${user?.user_id}`,
-        method: "POST",
-      });
+      return await defaultSubmitHandler(
+        serialize(body),
+        workLicenseFormConfig,
+        {
+          url: `/company-users/identity-data/${user?.user_id}`,
+          method: "POST",
+        }
+      );
     },
   };
   return workLicenseFormConfig;

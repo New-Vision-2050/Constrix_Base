@@ -588,7 +588,7 @@ const MultiFileField: React.FC<MultiFileFieldProps> = ({
                       {fileInfo.icon}
                     </div>
                     <div>
-                      {fileInfo.name && fileInfo.name.length > 4 && (
+                      {fileInfo.name && (
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>

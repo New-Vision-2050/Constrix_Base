@@ -11,6 +11,7 @@ import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import {
   SheetFormBuilder,
   GetCompanyUserFormConfig,
+  useSheetForm,
 } from "@/modules/form-builder";
 import { TableBuilder } from "@/modules/table";
 import { useTableStore } from "@/modules/table/store/useTableStore";
@@ -18,6 +19,7 @@ import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2"
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import { useMemo } from "react";
 
 const UsersSubEntityTable = ({
   programName,
@@ -37,23 +39,6 @@ const UsersSubEntityTable = ({
 
   const registrationFormSlug = subEntity?.registration_form?.slug;
 
-  const registrationFromConfig = registrationFormSlug
-    ? REGISTRATION_FORMS[registrationFormSlug]
-    : GetCompanyUserFormConfig;
-
-  const RegistrationTableConfig = registrationFormSlug
-    ? REGISTRATION_TABLES[registrationFormSlug]
-    : UsersConfigV2;
-
-  const buttonText =
-    subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.EMPLOYEE
-      ? ""
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.CLIENT
-      ? "عميل"
-      : subEntity?.registration_form.slug === REGISTRATION_FORMS_SLUGS.BROKER
-      ? "وسيط"
-      : "مستخدم";
-
   const usersConfig = UsersConfigV2();
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"
@@ -70,9 +55,29 @@ const UsersSubEntityTable = ({
     allSearchedFields,
   };
 
-  const finalFormConfig = Boolean(registrationFromConfig)
-    ? registrationFromConfig
-    : GetCompanyUserFormConfig;
+  const finalFormConfig = useMemo(() => {
+    const registrationFromConfig = registrationFormSlug
+      ? REGISTRATION_FORMS[registrationFormSlug]
+      : GetCompanyUserFormConfig;
+
+
+    return Boolean(registrationFromConfig)
+      ? registrationFromConfig
+      : GetCompanyUserFormConfig;
+  }, [registrationFormSlug, slug]);
+
+  const { closeSheet } = useSheetForm({
+    config: finalFormConfig(t),
+  });
+
+  const handleCloseForm = () => {
+    closeSheet();
+    const tableStore = useTableStore.getState();
+    tableStore.reloadTable(TABLE_ID);
+    setTimeout(() => {
+      tableStore.setLoading(TABLE_ID, false);
+    }, 100);
+  };
 
   return (
     <div className="px-8 space-y-7">
@@ -83,7 +88,7 @@ const UsersSubEntityTable = ({
             <div className="flex items-center gap-3">
               <SheetFormBuilder
                 config={{
-                  ...finalFormConfig(t),
+                  ...finalFormConfig(t, handleCloseForm),
                   apiParams: {
                     sub_entity_id: sub_entity_id as string,
                   },
@@ -95,7 +100,7 @@ const UsersSubEntityTable = ({
                     }, 100);
                   },
                 }}
-                trigger={<Button>إنشاء {buttonText}</Button>}
+                trigger={<Button>اضافة</Button>}
                 onSuccess={(values) => {
                   console.log("Form submitted successfully:", values);
                 }}
