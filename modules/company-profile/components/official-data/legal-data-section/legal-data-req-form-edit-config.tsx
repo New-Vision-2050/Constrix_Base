@@ -2,13 +2,20 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const LegalDataReqFormEditConfig = (
-  companyLegalData: CompanyLegalData[],
-  id?: string
-) => {
-  const { company_id }: { company_id: string | undefined } = useParams();
+type LegalDataReqFormEditConfigProps = {
+  companyLegalData: CompanyLegalData[];
+  company_id: string;
+  id?: string;
+};
+
+export const LegalDataReqFormEditConfig = ({
+  companyLegalData,
+  company_id,
+  id,
+}: LegalDataReqFormEditConfigProps) => {
+  const queryClient = useQueryClient();
   const LegalDataReqFormEditConfig: FormConfig = {
     formId: `LegalDataReqFormEditConfig-${id}-${company_id}`,
     title: "طلب تعديل البيان القانوني",
@@ -99,6 +106,11 @@ export const LegalDataReqFormEditConfig = (
         }
       );
     },
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["admin-requests", "companyLegalDataUpdate", company_id, id]
+      });
+    }
   };
   return LegalDataReqFormEditConfig;
 };

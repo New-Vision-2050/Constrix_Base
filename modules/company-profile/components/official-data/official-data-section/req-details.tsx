@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import React from "react";
+import { AdminRequest } from "@/types/admin-request";
+import { format, parse } from 'date-fns';
 
 interface RequestDetailProps {
   id: string;
@@ -11,24 +12,20 @@ interface RequestDetailProps {
   className?: string;
 }
 
-const ReqDetails = () => {
-  const requestData = {
-    id: "1486322",
-    date: "2024/04/22 01:30م",
-    companyName: "نيو فيجن",
-    region: "الرياض",
-    serviceType: "تعديل بيانات قانونية",
-    notes: "تعديل البيانات المدخلة",
-  };
+const ReqDetails = ({request}:{request: AdminRequest | null}) => {
+  if (!request) return null;
+
+const parsedDate = parse(request.created_at, 'yyyy-MM-dd HH:mm:ss', new Date());
+const formatted = format(parsedDate, 'yyyy/MM/dd hh:mma');
 
   return (
     <RequestDetails
-      id={requestData.id}
-      date={requestData.date}
-      companyName={requestData.companyName}
-      region={requestData.region}
-      serviceType={requestData.serviceType}
-      notes={requestData.notes}
+      id={request.id}
+      date={formatted}
+      companyName={request.company_name}
+      region={request.data.country_id || "-"}
+      serviceType={request.action}
+      notes={request.notes}
       className="w-full mx-auto"
     />
   );

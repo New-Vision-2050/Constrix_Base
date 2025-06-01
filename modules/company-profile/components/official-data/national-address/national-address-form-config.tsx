@@ -151,6 +151,10 @@ export const NationalAddressFormConfig = (
             placeholder: "الرقم الاضافي",
             validation: [
               {
+                type: "phone",
+                message: "رقم الهاتف غير صالح",
+              },
+              {
                 type: "required",
                 message: "الرقم الاضافي مطلوب",
               },
