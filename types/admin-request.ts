@@ -1,4 +1,6 @@
-export type AdminRequestType = "companyOfficialDataUpdate" | "companyLegalDataUpdate";
+export type AdminRequestType =
+  | "companyOfficialDataUpdate"
+  | "companyLegalDataUpdate";
 
 export type AdminRequestData = {
   name?: {
@@ -12,15 +14,16 @@ export type AdminRequestData = {
 export type RequestStatus = -1 | 0 | 1;
 
 export type Attachment = {
-    id: number;
-    mime_type:string;
-    name: string;
-    type: string;
-    url: string;
-}
+  id: number;
+  mime_type: string;
+  name: string;
+  type: string;
+  url: string;
+};
 
 export type AdminRequest = {
   id: string;
+  serial_number?: string;
   user_name: string;
   data: AdminRequestData;
   action: string;
@@ -28,7 +31,7 @@ export type AdminRequest = {
   status: RequestStatus;
   notes: string;
   company_name: string;
-  attachments: Attachment[] ;
+  attachments: Attachment[];
   created_at: string;
 };
 
