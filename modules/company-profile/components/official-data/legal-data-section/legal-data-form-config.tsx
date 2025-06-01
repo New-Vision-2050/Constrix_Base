@@ -53,15 +53,19 @@ export const LegalDataFormConfig = (
                   disabled: true,
                   gridArea: 2,
                   condition: (values) => {
-                    console.log(
-                      "registration_type_type value:",
-                      values["registration_type_type"]
-                    );
                     return (
                       values["registration_type_type"] !=
                       RegistrationTypes.WithoutARegister
                     );
                   },
+                  validation: [
+                    {
+                      type: "pattern",
+                      value: /^700\d*$/,
+                      message: "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط",
+                    },
+                  ],
+                  
                 },
                 {
                   name: "start_date",
