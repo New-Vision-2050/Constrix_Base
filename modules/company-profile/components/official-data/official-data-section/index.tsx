@@ -21,9 +21,11 @@ import { officialData } from "@/modules/company-profile/types/company";
 
 const OfficialDataSection = ({
   officialData,
+  currentCompanyId,
   id,
 }: {
   officialData: officialData;
+  currentCompanyId:string
   id?: string;
 }) => {
   const local = useLocale();
@@ -66,7 +68,7 @@ const OfficialDataSection = ({
         )}
       </FormFieldSet>
       <SheetFormBuilder
-        config={ReqOfficialDataEdit(officialData , id)}
+        config={ReqOfficialDataEdit({officialData ,company_id: currentCompanyId ,id})}
         isOpen={isOpenReqForm}
         onOpenChange={handleCloseReqForm}
       />
@@ -78,7 +80,7 @@ const OfficialDataSection = ({
           <SheetHeader>
             <SheetTitle>طلباتي</SheetTitle>
           </SheetHeader>
-          <MyRequests />
+          <MyRequests type="companyOfficialDataUpdate" company_id={currentCompanyId} branch_id={id} />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
             الرجوع
           </Button>

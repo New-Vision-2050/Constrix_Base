@@ -1,25 +1,22 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { AdminRequest } from "@/types/admin-request";
+import { format, parse } from 'date-fns';
+import { downloadFile } from "@/utils/downloadFile";
 
-interface Attachment {
-  id: number;
-  type: string;
-  addedBy: string;
-  date: string;
-}
 
-interface AttachmentsTableProps {
-  attachments: Attachment[];
-  className?: string;
-}
+const RequestAttachments = ({request}:{request: AdminRequest | null}) => {
+  const attachments = request?.attachments || [];
+  const parsedDate = parse(request?.created_at ?? "", 'yyyy-MM-dd HH:mm:ss', new Date());
+  const formatted = format(parsedDate, 'yyyy/MM/dd hh:mma');
 
-const AttachmentsTable = ({
-  attachments,
-  className = "",
-}: AttachmentsTableProps) => {
-  return (
-    <div className={`w-full overflow-x-auto ${className}`}>
-      <table className="w-full border-collapse">
+  return  (
+  <div className={`w-full overflow-x-auto `}>
+    {attachments.length === 0 ?      
+      <div className="text-center text-gray-500 bg-gray-100/10 rounded-lg p-4">
+        لا توجد مرفقات لهذا الطلب
+      </div>
+            :  <table className="w-full border-collapse">
         <thead>
           <tr className="bg-sidebar text-start">
             <th className="p-4 text-start font-normal">م</th>
@@ -36,45 +33,24 @@ const AttachmentsTable = ({
               className="border border-gray-700"
             >
               <td className="p-4 text-start">{attachment.id}</td>
-              <td className="p-4 text-start">{attachment.type}</td>
-              <td className="p-4 text-start">{attachment.addedBy}</td>
-              <td className="p-4 text-start">{attachment.date}</td>
+              <td className="p-4 text-start">غير محدد</td>
+              <td className="p-4 text-start">{request?.user_name}</td>
+              <td className="p-4 text-start">{formatted}</td>
               <td className="p-4">
-                <Button className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-md">
+                <Button 
+                  onClick={() => downloadFile(attachment)}
+                  className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-md"
+                >
                   تحميل
                 </Button>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> }
+    
     </div>
-  );
-};
-
-const RequestAttachments = () => {
-  const attachmentsData = [
-    {
-      id: 1,
-      type: "غير محدد",
-      addedBy: "العميل",
-      date: "2024/04/22 01:30م",
-    },
-    {
-      id: 2,
-      type: "مستندات داعمة",
-      addedBy: "الموظف",
-      date: "2024/04/18 01:30م",
-    },
-    {
-      id: 3,
-      type: "رقم الهوية",
-      addedBy: "العميل",
-      date: "2024/04/25 03:00م",
-    },
-  ];
-
-  return <AttachmentsTable attachments={attachmentsData} />;
+    )
 };
 
 export default RequestAttachments;

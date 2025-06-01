@@ -121,12 +121,19 @@ export const PersonalDataFormConfig = () => {
             name: "country_id",
             label: "الجنسية",
             type: "select",
-            placeholder: "Nationality",
+            placeholder: "اختر الجنسية",
             dynamicOptions: {
-              url: "/countries",
+              url: `${baseURL}/countries`,
               valueField: "id",
               labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
+            required: true,
             validation: [
               {
                 type: "required",

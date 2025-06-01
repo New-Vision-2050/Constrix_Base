@@ -1,3 +1,5 @@
+import { AdminRequest } from "@/types/admin-request";
+import { format, parse } from "date-fns";
 import React from "react";
 
 interface Operation {
@@ -45,39 +47,46 @@ const OperationsHistoryTable = ({
   );
 };
 
-const RequestHistory = () => {
+const RequestHistory = ({request}:{request: AdminRequest | null}) => {
+
+    const parsedDate = parse(request?.created_at ?? "", 'yyyy-MM-dd HH:mm:ss', new Date());
+    const formatted = format(parsedDate, 'yyyy/MM/dd hh:mma');
+  
   const operationsData = [
     {
       id: 1,
-      type: "انشاء الطلب",
-      performedBy: "العميل",
-      date: "2024/04/22 01:30م",
-      notes: "تعديل مدير الشركة",
-    },
-    {
-      id: 2,
-      type: "تعديل الطلب",
-      performedBy: "الموظف",
-      date: "2024/04/18 01:30م",
-      notes: "الرجاء ارفاق الهوية",
-    },
-    {
-      id: 3,
-      type: "تاكيد الطلب",
-      performedBy: "العميل",
-      date: "2024/04/25 03:00م",
-      notes: "تسجيل البيانات",
-    },
-    {
-      id: 4,
-      type: "معالجة الطلب",
-      performedBy: "الموظف",
-      date: "2024/04/29 10:00م",
-      notes: "تحديث الفاتورة",
+      type: request?.action,
+      performedBy: request?.user_name,
+      date: formatted,
+      notes: request?.notes,
     },
   ];
 
-  return <OperationsHistoryTable operations={operationsData} />;
+  return (  <div className={`w-full overflow-x-auto`}>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-sidebar text-start">
+            <th className="p-4 text-start font-normal">م</th>
+            <th className="p-4 text-start font-normal">نوع العملية</th>
+            <th className="p-4 text-start font-normal">تمت بواسطة</th>
+            <th className="p-4 text-start font-normal">وقت العملية</th>
+            <th className="p-4 text-start font-normal">ملاحظات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {operationsData.map((operation) => (
+            <tr key={operation.id} className="border border-gray-700">
+              <td className="p-4 text-start">{operation.id}</td>
+              <td className="p-4 text-start">{operation.type}</td>
+              <td className="p-4 text-start">{operation.performedBy}</td>
+              <td className="p-4 text-start">{operation.date}</td>
+              <td className="p-4 text-start">{operation.notes}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    );
 };
 
 export default RequestHistory;

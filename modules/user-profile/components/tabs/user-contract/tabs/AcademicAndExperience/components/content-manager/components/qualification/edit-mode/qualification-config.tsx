@@ -117,8 +117,10 @@ export const QualificationFormConfig = ({
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 1000,
+              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: "academic_qualification_id",
+              filterParam: "academic_qualification_id",
             },
             validation: [
               {

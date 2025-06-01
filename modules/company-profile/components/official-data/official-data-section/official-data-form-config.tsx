@@ -71,6 +71,12 @@ export const CompanyOfficialData = (
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "كيان الشركة مطلوب",
+              },
+            ],
           },
           {
             name: "country",
