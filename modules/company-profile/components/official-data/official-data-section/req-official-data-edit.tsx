@@ -4,11 +4,21 @@ import { officialData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "next/navigation";
 
-export const ReqOfficialDataEdit = (
-  officialData: officialData,
-  id?: string
-) => {
-  const { company_id }: { company_id: string | undefined } = useParams();
+import { useQueryClient } from "@tanstack/react-query";
+import { serialize } from "object-to-formdata";
+
+type ReqOfficialDataEditProps = {
+  officialData: officialData;
+  company_id: string;
+  id?: string;
+};
+
+export const ReqOfficialDataEdit = ({
+  officialData,
+  company_id,
+  id,
+}: ReqOfficialDataEditProps) => {
+  const queryClient = useQueryClient();
 
   const reqOfficialDataEdit: FormConfig = {
     formId: `ReqOfficialDataEdit-${id}-${company_id}`,
@@ -127,7 +137,7 @@ export const ReqOfficialDataEdit = (
           },
           {
             type: "file",
-            name: "mainDocument",
+            name: "file",
             label: "اضافة المرفقات",
             isMulti: true,
             fileConfig: {
@@ -168,7 +178,10 @@ export const ReqOfficialDataEdit = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
-      return await defaultSubmitHandler(formData, reqOfficialDataEdit, {
+      const sendData = serialize(formData ,{
+          indices: true,
+        })
+      return await defaultSubmitHandler(sendData, reqOfficialDataEdit, {
         config: {
           params: {
             ...(id && { branch_id: id }),
@@ -176,9 +189,14 @@ export const ReqOfficialDataEdit = (
           },
         },
         url: `${baseURL}/companies/company-profile/official-data/request`,
-        method: "PUT",
+        method: "POST",
       });
     },
+    onSuccess: () => {
+      queryClient.refetchQueries({
+        queryKey: ["admin-requests", "companyOfficialDataUpdate", company_id, id]
+      });
+    }
   };
   return reqOfficialDataEdit;
 };
