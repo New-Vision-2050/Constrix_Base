@@ -12,6 +12,7 @@ import DataTable from "./table/DataTable";
 import ExportButton from "./table/ExportButton";
 import { useTableData } from "@/modules/table/hooks/useTableData";
 import { useResetTableOnRouteChange } from "@/modules/table/hooks/useResetTableOnRouteChange";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 
 // Dynamically import the Execution component
@@ -34,6 +35,9 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   searchBarActions,
   tableId: propTableId,
 }) => {
+  // Get translations using the hook
+  const t = useTranslations('Table'); // Use 'Table' namespace for translations
+
   // Generate a random ID if not provided in config or props
   const tableId =
     propTableId ||
@@ -143,18 +147,18 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
 
       // Create a new array with action column if needed
       let columnsWithActions = [...config.columns];
-      
+
       if (shouldAddActionColumn && !hasIdKey) {
         columnsWithActions.push({
           key: "id",
-          label: "Actions", // We'll need to get this from translations
+          label: t('Actions'), // Get from translations
           render: (_: unknown, row: any) => (
             React.createElement(Execution, {
               row,
               formConfig: (config as any)?.formConfig,
               executions: (config as any)?.executions,
               tableName: tableIdRef.current,
-              buttonLabel: "Actions",
+              buttonLabel: t('Actions'), // Also translate the button label
               showEdit: Boolean((config as any)?.executionConfig?.canEdit),
               showDelete: Boolean((config as any)?.executionConfig?.canDelete),
               deleteConfirmMessage: (config as any)?.deleteConfirmMessage,
@@ -185,7 +189,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         const visibleColumns = shouldAddActionColumn
           ? [...config.defaultVisibleColumnKeys, "id"]
           : config.defaultVisibleColumnKeys;
-        
+
         setColumnVisibilityKeys(visibleColumns);
         setVisibleColumns(visibleColumns);
       }
@@ -193,7 +197,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       columnsInitializedRef.current = true;
       configColumnsRef.current = filteredColumns;
     }
-  }, [columns.length]); // Depend on columns.length to avoid overriding
+        }, [columns.length, t]); // Add t to dependencies
 
   const enableSorting = config?.enableSorting !== false;
   const enablePagination = config?.enablePagination !== false;
