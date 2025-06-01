@@ -26,8 +26,10 @@ import { getErrorMessage } from "@/utils/errorHandler";
 
 const ValidatePhonePhase = ({
   handleSetStep,
+  handleStepBack
 }: {
   handleSetStep: (step: LoginPhase) => void;
+  handleStepBack: () => void;
 }) => {
   const t = useTranslations("Login.PhoneVerification");
   const loginT = useTranslations("Login");
@@ -99,7 +101,29 @@ const ValidatePhonePhase = ({
   };
 
   return (
-    <>
+    <div className="relative flex flex-col gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-0 left-0"
+            onClick={() => handleStepBack()}
+            type="button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </Button>
       <div className="space-y-4">
         <h1 className="text-2xl text-start">{t("Title")}</h1>
         <p>
@@ -175,7 +199,7 @@ const ValidatePhonePhase = ({
         handleClose={handleClose}
         desc={errorMessage}
       />
-    </>
+    </div>
   );
 };
 
