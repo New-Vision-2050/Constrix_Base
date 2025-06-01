@@ -379,13 +379,23 @@ const DynamicRowsField = React.forwardRef<
 
   // Check if we can add more rows
   const canAddRow = useMemo(() => {
+    // If enableAdd is explicitly set, use that value
+    if (options.enableAdd !== undefined) {
+      return options.enableAdd;
+    }
+    // Otherwise, use the traditional maxRows constraint check
     return !options.maxRows || rows.length < options.maxRows;
-    }, [options.maxRows, rows.length]);
+  }, [options.maxRows, options.enableAdd, rows.length]);
 
   // Check if we can delete rows
   const canDeleteRow = useMemo(() => {
+    // If enableRemove is explicitly set, use that value
+    if (options.enableRemove !== undefined) {
+      return options.enableRemove;
+    }
+    // Otherwise, use the traditional minRows constraint check
     return !options.minRows || rows.length > options.minRows;
-    }, [options.minRows, rows.length]);
+  }, [options.minRows, options.enableRemove, rows.length]);
 
   // Validate all rows
   const validateAllRows = useCallback(() => {
