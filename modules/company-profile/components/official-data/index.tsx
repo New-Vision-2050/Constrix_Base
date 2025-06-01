@@ -31,6 +31,9 @@ const OfficialData = ({ id }: { id?: string }) => {
       return response.data;
     },
   });
+
+  const currentCompanyId = data?.payload?.id ?? "";
+
   const payload = data?.payload ?? {};
   const {
     branch,
@@ -77,9 +80,10 @@ const OfficialData = ({ id }: { id?: string }) => {
               company_type_id,
             }}
             id={id}
+            currentCompanyId={currentCompanyId}
           />
 
-          <LegalDataSection companyLegalData={company_legal_data} id={id} />
+          <LegalDataSection companyLegalData={company_legal_data} id={id} currentCompanyId={currentCompanyId} />
 
           <SupportData generalManager={general_manager} />
 
