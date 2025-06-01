@@ -62,7 +62,7 @@ export default function MyRequests({type , company_id, branch_id}: {type: AdminR
   return (
     <>
       <div className="mt-4 flex flex-col items-center">
-        <div className="w-full max-w-md space-y-8 mt-4 max-h-[calc(80vh-120px)] overflow-y-auto">
+        <div className="w-full max-w-md space-y-8 pt-4 max-h-[calc(80vh-120px)] overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center">
               <Loader2 className="animate-spin" />
