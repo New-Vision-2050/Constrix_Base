@@ -308,7 +308,6 @@ export function customerFormConfig(
                 message: (
                   <InvalidMailDialog
                     formId={formId}
-                    btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
                     onSuccess={() => {
                       handleCloseForm?.();

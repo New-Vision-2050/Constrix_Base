@@ -27,18 +27,14 @@ type PropsT = {
   formConfig: (
     userId: string,
     branchesIds?: string[],
+    roleTwoIds?: string[], //client
+    roleThreeIds?: string[], //broker
     handleOnSuccess?: () => void
   ) => FormConfig;
 };
 export default function EmployeeInvalidMailDialog(props: PropsT) {
   //  declare and define component state and variables
-  const {
-    formId,
-    btnText,
-    dialogStatement,
-    onSuccess,
-    formConfig,
-  } = props;
+  const { formId, btnText, dialogStatement, onSuccess, formConfig } = props;
 
   const [isOpen, handleOpen, handleClose] = useModal();
   const formValues = useFormStore((state) => state.forms[formId]?.values);
@@ -55,62 +51,102 @@ export default function EmployeeInvalidMailDialog(props: PropsT) {
     }
   }, [formValues.roles]);
 
-  // branches of same role
-  const branches = useMemo(() => {
+  // employee role vars.
+  const employeeBranches = useMemo(() => {
     return roles?.find((role) => role.role.toString() == UsersTypes.Employee)
       ?.branches;
   }, [roles]);
 
-  const branchesIds = useMemo(() => {
-    return branches?.map((ele) => ele.id);
-  }, [branches]);
+  const employeeBranchesIds = useMemo(() => {
+    return employeeBranches?.map((ele) => ele.id);
+  }, [employeeBranches]);
 
   // determine same type exist?
   const sameTypeExist = useMemo(() => {
-    return branchesIds && branchesIds?.length > 0;
-  }, [branchesIds]);
+    return employeeBranchesIds && employeeBranchesIds?.length > 0;
+  }, [employeeBranchesIds]);
+
+  // determined employee in th company or not
   const employeeInCompany = useMemo(
     () => Boolean(formValues?.employee_in_company) && Boolean(sameTypeExist),
     [formValues, sameTypeExist]
   );
   const [openEmployeeErr, setOpenEmployeeErr] = useState(employeeInCompany);
 
-  // determine other types
-  const clientBranches = useMemo(() => {
-    return roles?.find((role) => role.role.toString() == UsersTypes.Client)
-      ?.branches;
+  // client role helper vars
+  const clientBranchesNames = useMemo(() => {
+    return roles
+      ?.find((role) => role.role.toString() == UsersTypes.Client)
+      ?.branches?.map((ele) => ele.name)
+      .join(",");
   }, [roles]);
 
-  const brokerBranches = useMemo(() => {
-    return roles?.find((role) => role.role.toString() == UsersTypes.Broker)
-      ?.branches;
+  const clientBranchesIds = useMemo(() => {
+    return roles
+      ?.find((role) => role.role.toString() == UsersTypes.Client)
+      ?.branches?.map((ele) => ele.id);
   }, [roles]);
 
   const clientExist = useMemo(() => {
-    return clientBranches && clientBranches?.length > 0;
-  }, [clientBranches]);
+    return clientBranchesNames && clientBranchesNames?.length > 0;
+  }, [clientBranchesNames]);
+
+  // broker helper vars
+  const brokerBranchesNames = useMemo(() => {
+    return roles
+      ?.find((role) => role.role.toString() == UsersTypes.Broker)
+      ?.branches?.map((ele) => ele.name)
+      .join(",");
+  }, [roles]);
+
+  const brokerBranchesIds = useMemo(() => {
+    return roles
+      ?.find((role) => role.role.toString() == UsersTypes.Broker)
+      ?.branches?.map((ele) => ele.id);
+  }, [roles]);
 
   const brokerExist = useMemo(() => {
-    return brokerBranches && brokerBranches?.length > 0;
-  }, [brokerBranches]);
+    return brokerBranchesNames && brokerBranchesNames?.length > 0;
+  }, [brokerBranchesNames]);
 
   //sameTypeExist
   const message = useMemo(() => {
-    return employeeInCompany
-      ? `الأيميل مسجل كموظف مسبقأ فى الشركة`
-      : `البريد الإلكتروني مسجل مسبقا 
-      ${clientExist ? "كعميل" : ""} 
-      ${brokerExist ? "كوسيط" : ""}`;
-  }, [employeeInCompany, brokerExist, clientExist]);
+    if (employeeInCompany) return `الأيميل مسجل كموظف مسبقأ فى الشركة`;
+
+    return `البريد الإلكتروني مسجل مسبقا لدي الشركة 
+      ${clientExist ? `كعميل لدي الأفرع الأتية (${clientBranchesNames})` : ""} 
+      ${brokerExist ? `كوسيط لدي الأفرع الأتية (${brokerBranchesNames})` : ""} 
+      `;
+  }, [
+    employeeInCompany,
+    brokerExist,
+    brokerBranchesNames,
+    clientExist,
+    clientBranchesNames,
+  ]);
 
   // declare and define the form configuration for retrieving broker data
   const _config = useMemo(
     () =>
-      formConfig(userId, branchesIds, () => {
-        handleClose();
-        onSuccess?.();
-      }),
-    [userId, branchesIds]
+      formConfig(
+        userId,
+        employeeBranchesIds,
+        clientBranchesIds,
+        brokerBranchesIds,
+        () => {
+          handleClose();
+          onSuccess?.();
+        }
+      ),
+    [
+      formConfig,
+      userId,
+      employeeBranchesIds,
+      brokerBranchesIds,
+      clientBranchesIds,
+      onSuccess,
+      handleClose,
+    ]
   );
 
   const {
@@ -161,7 +197,7 @@ export default function EmployeeInvalidMailDialog(props: PropsT) {
           }}
           className="text-primary cursor-pointer"
         >
-          {btnText || "اضغط هنا"}
+          {btnText || "لأضافته لفرع أخر أضغط هنا"}
         </span>
       </p>
       <Dialog open={isOpen} onOpenChange={handleClose}>

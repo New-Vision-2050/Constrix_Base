@@ -126,13 +126,24 @@ export function employeeFormConfig(
                 message: (
                   <EmployeeInvalidMailDialog
                     formId={formId}
-                    btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
                     onSuccess={() => {
                       handleCloseForm?.();
                     }}
-                    formConfig={(userId: string, branchesIds?: string[], handleOnSuccess?: () => void) =>
-                      RetrieveEmployeeFormConfig(userId, branchesIds, undefined, undefined, handleOnSuccess)
+                    formConfig={(
+                      userId: string,
+                      branchesIds?: string[],
+                      roleTwoIds?: string[],//client
+                      roleThreeIds?: string[],//broker
+                      handleOnSuccess?: () => void
+                    ) =>
+                      RetrieveEmployeeFormConfig(
+                        userId,
+                        branchesIds,
+                        roleTwoIds,
+                        roleThreeIds,
+                        handleOnSuccess
+                      )
                     }
                   />
                 ),

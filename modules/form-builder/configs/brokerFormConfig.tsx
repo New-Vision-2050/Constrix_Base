@@ -236,7 +236,6 @@ export function brokerFormConfig(
                 message: (
                   <InvalidMailDialog
                     formId={formId}
-                    btnText="أضغط هنا"
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
                     onSuccess={() => {
                       console.log("onSuccess handleCloseForm");
