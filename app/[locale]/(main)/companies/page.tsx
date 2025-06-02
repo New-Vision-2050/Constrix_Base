@@ -12,11 +12,11 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
-import { useTranslations } from 'next-intl'
+import { useTranslations } from "next-intl";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
-  const t = useTranslations('Companies');
+  const t = useTranslations("Companies");
   const config = CompaniesConfig();
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
@@ -41,9 +41,21 @@ const CompaniesPage = () => {
 
     // Add type safety for the result structure
     const result = values.result as
-      | { data?: { payload?: { id?: string } } }
+      | {
+          data?: {
+            payload?: { id?: string; company?: { serial_no?: string } };
+          };
+        }
       | undefined;
-    const companyId = result?.data?.payload?.id || "";
+    const companyId =
+      result?.data?.payload?.company?.serial_no ||
+      result?.data?.payload?.id ||
+      "";
+
+    console.log(
+      "handleFormSuccess_values",
+      result?.data?.payload?.company?.serial_no
+    );
     setCompanyNumber(companyId);
     handleOpen();
 

@@ -31,7 +31,7 @@ const CompanySaveDialog: React.FC<CompanySaveDialogProps> = ({
       <DialogContent className="max-w-md rounded-xl border-none px-12 pb-14 pt-9">
         <DialogHeader className="text-center flex flex-col items-center">
           <button
-            className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400 hover:text-white"
+            className="absolute top-4 rtl:left-4 ltr:right-4 text-gray-400"
             onClick={handleClose}
           >
             ✕
