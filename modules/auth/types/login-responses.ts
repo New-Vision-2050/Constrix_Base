@@ -16,6 +16,7 @@ export type LoginWaysSuccessResponse = {
     };
     token: string;
     can_set_pass: 0 | 1;
+    first_login: 0 | 1;
   };
 };
 
