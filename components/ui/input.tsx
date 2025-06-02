@@ -114,7 +114,7 @@ export const getLabelClassNames = (
   error?: string | null
 ) => {
   return cn("absolute duration-300 transform peer-focus:z-10 ", {
-    "top-3 origin-left rtl:origin-right start-0 ": variant === "default",
+    "top-[-0.3rem] origin-left rtl:origin-right start-0 ": variant === "default",
     "-translate-y-6 scale-75 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 peer-placeholder-shown:opacity-50 peer-focus:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-6":
       variant === "default" && !error,
     "text-red-500 -translate-y-6 scale-75": variant === "default" && !!error,
