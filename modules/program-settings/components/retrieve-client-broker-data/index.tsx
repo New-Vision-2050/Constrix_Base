@@ -49,6 +49,7 @@ export default function RetrieveClientBrokerData(props: PropsT) {
         onSuccess={() => {
           handleCloseForm?.();
         }}
+        btnText={currentRole === UsersTypes.Client?`لأضافته كعميل لفرع أخر أضغط هنا`:`لأضافته كوسيط لفرع أخر أضغط هنا`}
         currentRole={currentRole ?? UsersTypes.Broker}
         formConfig={formConfig}
       />

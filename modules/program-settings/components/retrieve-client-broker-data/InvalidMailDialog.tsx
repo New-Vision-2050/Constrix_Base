@@ -125,7 +125,7 @@ export default function InvalidMailDialog(props: PropsT) {
         ? `ك${primaryRole} لدي الافرع الاتية (${currentRoleBranchesNames})`
         : ``
     }
-    ${employeeExist ? `كموظف لدي الأفرع الأتية (${employeeBranchesNames})` : ``}
+    ${employeeExist ? `كموظف لدي الفرع الأتي (${employeeBranchesNames})` : ``}
     ${
       secondaryRoleExist
         ? `ك${secondaryRole} لدي الافرع الاتية (${secondaryRoleBranchesNames})`
