@@ -89,8 +89,8 @@ export const RetrieveEmployeeFormConfig = (
       },
     ],
     initialValues: {
-      roleTwoIds,
-      roleThreeIds,
+      roleTwoIds: roleTwoIds?.map((ele) => ele.toString()),
+      roleThreeIds: roleThreeIds?.map((ele) => ele.toString()),
       branch_id: branchesIds?[0] : null
     },
     onSuccess: () => {

@@ -91,8 +91,8 @@ export const RetrieveClientFormConfig = (
       },
     ],
     initialValues: {
-      roleTwoIds,
-      roleThreeIds,
+      roleTwoIds: roleTwoIds?.map((ele) => ele.toString()),
+      roleThreeIds: roleThreeIds?.map((ele) => ele.toString()),
       branch_ids: branchesIds?.map(ele=>ele.toString()),
     },
     onSuccess: () => {

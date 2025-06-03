@@ -2,7 +2,7 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
-import EmployeeInvalidMailDialog from "@/modules/program-settings/components/EmployeeInvalidMailDialog";
+import RetrieveEmployeeData from "@/modules/program-settings/components/retrieve-employee-data";
 
 export function employeeFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -24,6 +24,16 @@ export function employeeFormConfig(
           {
             name: "roles",
             label: "roles",
+            type: "hiddenObject",
+          },
+          {
+            name: "payload",
+            label: "payload",
+            type: "hiddenObject",
+          },
+          {
+            name: "employee_in_another_company",
+            label: "employee_in_another_company",
             type: "hiddenObject",
           },
           {
@@ -124,15 +134,24 @@ export function employeeFormConfig(
               {
                 type: "apiValidation",
                 message: (
-                  <EmployeeInvalidMailDialog
+                  <RetrieveEmployeeData
                     formId={formId}
-                    btnText="أضغط هنا"
+                    handleCloseForm={handleCloseForm}
                     dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                    onSuccess={() => {
-                      handleCloseForm?.();
-                    }}
-                    formConfig={(userId: string, branchesIds?: string[], handleOnSuccess?: () => void) =>
-                      RetrieveEmployeeFormConfig(userId, branchesIds, undefined, undefined, handleOnSuccess)
+                    formConfig={(
+                      userId: string,
+                      branchesIds?: string[],
+                      roleTwoIds?: string[], //client
+                      roleThreeIds?: string[], //broker
+                      handleOnSuccess?: () => void
+                    ) =>
+                      RetrieveEmployeeFormConfig(
+                        userId,
+                        branchesIds,
+                        roleTwoIds,
+                        roleThreeIds,
+                        handleOnSuccess
+                      )
                     }
                   />
                 ),
@@ -156,6 +175,18 @@ export function employeeFormConfig(
                         user_id: userId,
                       });
                     }
+
+                    // store payload
+                    if (response.payload) {
+                      useFormStore.getState().setValues(formId, {
+                        payload: JSON.stringify(response.payload?.[0]),
+                      });
+                    }
+                    // status = 0 --> mean exist in another company
+                    useFormStore.getState().setValues(formId, {
+                      employee_in_another_company:
+                        response.payload?.[0]?.status,
+                    });
 
                     useFormStore.getState().setValues(formId, {
                       employee_in_company:
