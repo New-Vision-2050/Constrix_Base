@@ -256,16 +256,6 @@ export function brokerFormConfig(
                     formConfig={RetrieveBrokerFormConfig}
                     handleCloseForm={handleCloseForm}
                   />
-                  // <InvalidMailDialog
-                  //   formId={formId}
-                  //   dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                  //   onSuccess={() => {
-                  //     console.log("onSuccess handleCloseForm");
-                  //     handleCloseForm?.();
-                  //   }}
-                  //   currentRole={UsersTypes.Broker}
-                  //   formConfig={RetrieveBrokerFormConfig}
-                  // />
                 ),
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,
