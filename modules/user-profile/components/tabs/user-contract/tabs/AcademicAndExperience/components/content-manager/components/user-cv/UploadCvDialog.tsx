@@ -78,7 +78,7 @@ export default function UploadCvDialog(props: PropsT) {
           <div className="flex flex-col gap-4 items-center justify-center">
             <label className="w-10/12 h-60 p-3 bg-sidebar flex flex-col items-center justify-around text-black cursor-pointer gap-4">
               <CloudUploadIcon additionalClass="w-[70px] h-[70px] text-pink-600" />
-              <p className="text-md font-bold text-foreground">قم بارفاق المستند </p>
+              <p className="text-md font-bold dark:text-white">قم بارفاق المستند </p>
               <p className="text-center text-sm text-gray-500">
                 يُسمح بتنسيق PDF أو JPG أو PNG، والحجم الأقصى هو 200 ميجابايت
               </p>
