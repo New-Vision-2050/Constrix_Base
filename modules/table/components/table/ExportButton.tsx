@@ -30,7 +30,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   searchQuery = "",
   searchFields = [],
   columnSearchState = {},
-  apiParams
+  apiParams,
 }) => {
   const t = useTranslations();
   const { toast } = useToast();
@@ -46,15 +46,12 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   // Construct the export URL by appending "/export" to the base URL
   let exportUrl = `${url.endsWith("/") ? url.slice(0, -1) : url}/export`;
 
-  if(apiParams){
+  if (apiParams) {
     const params = new URLSearchParams(apiParams);
     if (params.toString()) {
       exportUrl += `?${params.toString()}`;
     }
   }
-
-
-
 
   const handleExport = async (format: "csv" | "json") => {
     try {
@@ -102,7 +99,11 @@ const ExportButton: React.FC<ExportButtonProps> = ({
 
       toast({
         title: t("Table.ExportSuccess"),
-        description: `${selectedIds.length} ${t("Table.ItemsExported")}`,
+        description: `${
+          selectedIds.length > 0
+            ? `${selectedIds.length} ${t("Table.ItemsExported")}`
+            : ""
+        }`,
       });
     } catch (error) {
       console.error("Export error:", error);
