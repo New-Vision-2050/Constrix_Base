@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useFormStore, useSheetForm, FormConfig } from "@/modules/form-builder";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { useMemo } from "react";
-import { UsersTypes } from "../constants/users-types";
+import { UsersTypes } from "../../constants/users-types";
 
 type Branch = {
   id: string;

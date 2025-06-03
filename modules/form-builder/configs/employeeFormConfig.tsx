@@ -154,28 +154,6 @@ export function employeeFormConfig(
                       )
                     }
                   />
-                  // <EmployeeInvalidMailDialog
-                  //   formId={formId}
-                  //   dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                  //   onSuccess={() => {
-                  //     handleCloseForm?.();
-                  //   }}
-                  //   formConfig={(
-                  //     userId: string,
-                  //     branchesIds?: string[],
-                  //     roleTwoIds?: string[],//client
-                  //     roleThreeIds?: string[],//broker
-                  //     handleOnSuccess?: () => void
-                  //   ) =>
-                  //     RetrieveEmployeeFormConfig(
-                  //       userId,
-                  //       branchesIds,
-                  //       roleTwoIds,
-                  //       roleThreeIds,
-                  //       handleOnSuccess
-                  //     )
-                  //   }
-                  // />
                 ),
                 apiConfig: {
                   url: `${baseURL}/company-users/check-email`,

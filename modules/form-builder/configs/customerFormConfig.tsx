@@ -2,7 +2,7 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
-import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
+import InvalidMailDialog from "@/modules/program-settings/components/retrieve-client-broker-data/InvalidMailDialog";
 import { RetrieveClientFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveClientFormConfig";
 import { UsersTypes } from "@/modules/program-settings/constants/users-types";
 

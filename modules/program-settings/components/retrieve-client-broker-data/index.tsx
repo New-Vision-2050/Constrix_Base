@@ -1,9 +1,10 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
-import EmployeeInvalidMailDialog from "./EmployeeInvalidMailDialog";
+import InvalidMailDialog from "./InvalidMailDialog";
+import { UsersTypes } from "../../constants/users-types";
 
 type PropsT = {
   formId: string;
-  dialogStatement?: string;
+  currentRole?: string;
   formConfig: (
     userId: string,
     branchesIds?: string[],
@@ -14,9 +15,9 @@ type PropsT = {
   handleCloseForm?: () => void;
 };
 
-export default function RetrieveEmployeeData(props: PropsT) {
+export default function RetrieveClientBrokerData(props: PropsT) {
   // extract data from props
-  const { formId, handleCloseForm, dialogStatement, formConfig } = props;
+  const { formId, handleCloseForm, currentRole, formConfig } = props;
 
   // reach form values
   const formValues = useFormStore((state) => state.forms[formId]?.values);
@@ -26,15 +27,14 @@ export default function RetrieveEmployeeData(props: PropsT) {
     // prepare vars
     const payload = JSON.parse(formValues.payload);
     const phone = (payload?.phone as string) ?? "";
+    const residence = (payload?.identity as string) ?? "";
     const name = (payload?.name as string) ?? "";
-    const first_name = name?.split(" ")?.[0];
-    const last_name = name?.split(" ")?.slice(1).join(" ");
     const country_id = (payload?.country_id as string) ?? "";
     console.log("payload_payload", payload);
     // set data
     useFormStore.getState().setValues(formId, { phone });
-    useFormStore.getState().setValues(formId, { first_name });
-    useFormStore.getState().setValues(formId, { last_name });
+    useFormStore.getState().setValues(formId, { name });
+    useFormStore.getState().setValues(formId, { residence });
     useFormStore.getState().setValues(formId, { country_id });
 
     // set error to null
@@ -43,21 +43,20 @@ export default function RetrieveEmployeeData(props: PropsT) {
 
   if (formValues?.employee_in_company == 1)
     return (
-      <EmployeeInvalidMailDialog
+      <InvalidMailDialog
         formId={formId}
-        dialogStatement={
-          dialogStatement || "البريد الإلكتروني أدناه مضاف مسبقًا"
-        }
+        dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
         onSuccess={() => {
           handleCloseForm?.();
         }}
+        currentRole={currentRole ?? UsersTypes.Broker}
         formConfig={formConfig}
       />
     );
 
   return (
     <p className="text-white">
-      الموظف مسجل لدي شركة أخري {" "}
+      الموظف مسجل لدي شركة أخري{" "}
       <span onClick={handleClick} className="text-primary cursor-pointer">
         أضغط هنا لأسترجاع
       </span>
