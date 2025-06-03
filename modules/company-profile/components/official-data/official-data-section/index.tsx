@@ -25,7 +25,7 @@ const OfficialDataSection = ({
   id,
 }: {
   officialData: officialData;
-  currentCompanyId:string
+  currentCompanyId: string;
   id?: string;
 }) => {
   const local = useLocale();
@@ -52,7 +52,7 @@ const OfficialDataSection = ({
     <>
       <FormFieldSet
         title="البيانات الرسمية"
-        valid={Object.values(officialData).every(value => !!value)}
+        valid={Object.values(officialData).every((value) => !!value)}
         secondTitle={
           <FieldSetSecondTitle
             mode={mode}
@@ -61,14 +61,23 @@ const OfficialDataSection = ({
           />
         }
       >
+        <br />
         {mode === "Preview" ? (
           <OfficialDataPreview officialData={officialData} />
         ) : (
-          <OfficialDataForm officialData={officialData} id={id} handleEditClick={handleEditClick}/>
+          <OfficialDataForm
+            officialData={officialData}
+            id={id}
+            handleEditClick={handleEditClick}
+          />
         )}
       </FormFieldSet>
       <SheetFormBuilder
-        config={ReqOfficialDataEdit({officialData ,company_id: currentCompanyId ,id})}
+        config={ReqOfficialDataEdit({
+          officialData,
+          company_id: currentCompanyId,
+          id,
+        })}
         isOpen={isOpenReqForm}
         onOpenChange={handleCloseReqForm}
       />
@@ -80,7 +89,11 @@ const OfficialDataSection = ({
           <SheetHeader>
             <SheetTitle>طلباتي</SheetTitle>
           </SheetHeader>
-          <MyRequests type="companyOfficialDataUpdate" company_id={currentCompanyId} branch_id={id} />
+          <MyRequests
+            type="companyOfficialDataUpdate"
+            company_id={currentCompanyId}
+            branch_id={id}
+          />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
             الرجوع
           </Button>
