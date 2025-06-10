@@ -3,6 +3,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
+import { RegistrationTypes } from "./registration-types";
 
 type LegalDataReqFormEditConfigProps = {
   companyLegalData: CompanyLegalData[];
@@ -32,7 +33,7 @@ export const LegalDataReqFormEditConfig = ({
             name: "data",
             label: "",
             dynamicRowOptions: {
-              enableAdd:false,
+              enableAdd: false,
               rowFields: [
                 {
                   type: "select",
@@ -59,9 +60,23 @@ export const LegalDataReqFormEditConfig = ({
                 },
                 {
                   name: "registration_number",
-                  label: "ادخل رقم الترخيص",
-                  type: "text",
-                  placeholder: "ادخل رقم الترخيص",
+                  label: "رقم السجل التجاري / رقم الـ 700",
+                  type: "number",
+                  placeholder: "رقم السجل التجاري / رقم الـ 700",
+                  // condition: (values) => {
+                  //   console.log("values", values);
+                  //   // Disable the field if registration_type_id is 3 (Without Commercial Register)
+                  //   const typeId =
+                  //     values["registration_type_id"]?.split("_")?.[1];
+                  //   return typeId !== RegistrationTypes.WithoutARegister;
+                  // },
+                  validation: [
+                    {
+                      type: "pattern",
+                      value: /^700\d*$/,
+                      message: "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط",
+                    },
+                  ],
                 },
               ],
               minRows: 1,
@@ -108,9 +123,9 @@ export const LegalDataReqFormEditConfig = ({
     },
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["admin-requests", "companyLegalDataUpdate", company_id, id]
+        queryKey: ["admin-requests", "companyLegalDataUpdate", company_id, id],
       });
-    }
+    },
   };
   return LegalDataReqFormEditConfig;
 };
