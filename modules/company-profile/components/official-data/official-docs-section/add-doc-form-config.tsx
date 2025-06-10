@@ -1,9 +1,10 @@
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { serialize } from "object-to-formdata";
+import { RegistrationTypes } from "../legal-data-section/registration-types";
 
 export const AddDocFormConfig = (id?: string) => {
   const { company_id }: { company_id: string | undefined } = useParams();
@@ -27,7 +28,7 @@ export const AddDocFormConfig = (id?: string) => {
             placeholder: "نوع المستند",
             dynamicOptions: {
               url: `${baseURL}/company_registration_types`,
-              valueField: "id",
+              valueField: "id_type",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
@@ -60,12 +61,11 @@ export const AddDocFormConfig = (id?: string) => {
             label: "رقم المستند",
             type: "text",
             placeholder: "ادخل رقم المستند",
-            validation: [
-              {
-                type: "required",
-                message: "ادخل رقم المستند",
-              },
-            ],
+            condition: (values) => {
+              // Disable the field if registration_type_id is 3 (Without Commercial Register)
+              const typeId = values["document_type_id"]?.split("_")?.[1];
+              return typeId !== RegistrationTypes.WithoutARegister;
+            },
           },
           {
             name: "start_date",
@@ -161,11 +161,12 @@ export const AddDocFormConfig = (id?: string) => {
     onSubmit: async (formData) => {
       const sendForm = serialize({
         ...formData,
+        document_type_id:(formData.document_type_id as string)?.split("_")?.[0],
         start_date: new Date(formData.start_date).toLocaleDateString("en-CA"),
         end_date: new Date(formData.end_date).toLocaleDateString("en-CA"),
-        notification_date: new Date(formData.notification_date).toLocaleDateString(
-          "en-CA"
-        ),
+        notification_date: new Date(
+          formData.notification_date
+        ).toLocaleDateString("en-CA"),
       });
 
       return await defaultSubmitHandler(sendForm, AddDocFormConfig, {
