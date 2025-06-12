@@ -35,6 +35,8 @@ const ForgetPasswordPhase = ({
   const { mutate, isPending, error } = useValidateResetPasswordOtp();
   const identifier = getValues("identifier");
   const token = getValues("token");
+  const first_login = getValues("first_login");
+  console.log("first_loginfirst_login", first_login);
   const onSubmit = () => {
     const otp = getValues("forgetPasswordOtp");
 
@@ -73,7 +75,12 @@ const ForgetPasswordPhase = ({
           />
         </svg>
       </Button>
-      <h1 className="text-2xl text-center">{t("ForgotPassword.Title")}</h1>
+      <>
+      <h1 className="text-2xl text-center">
+        {first_login == "1"
+          ? t("ForgotPassword.SetUpPassword")
+          : t("ForgotPassword.Title")}
+      </h1>
       <p>
         <span className="opacity-50 block">
           {t("ForgotPassword.EnterTemporaryPassword")}

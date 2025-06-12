@@ -13,6 +13,7 @@ const identifierSchema = z.object({
   identifier: createIdentifierValidation(),
   token: z.string().optional(),
   type: z.string().optional(),
+  first_login: z.string().optional(),
   by: z.string().optional(),
   login_option_alternatives: z.array(z.string()).optional().nullable(),
 });

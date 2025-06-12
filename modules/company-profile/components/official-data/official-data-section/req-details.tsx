@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { AdminRequest } from "@/types/admin-request";
-import { format, parse } from 'date-fns';
+import { format, parse } from "date-fns";
 
 interface RequestDetailProps {
   id: string;
@@ -12,15 +12,21 @@ interface RequestDetailProps {
   className?: string;
 }
 
-const ReqDetails = ({request}:{request: AdminRequest | null}) => {
+const ReqDetails = ({ request }: { request: AdminRequest | null }) => {
   if (!request) return null;
 
-const parsedDate = parse(request.created_at, 'yyyy-MM-dd HH:mm:ss', new Date());
-const formatted = format(parsedDate, 'yyyy/MM/dd hh:mma');
+  const parsedDate = parse(
+    request.created_at,
+    "yyyy-MM-dd HH:mm:ss",
+    new Date()
+  );
+  const formatted = format(parsedDate, "yyyy/MM/dd hh:mma");
+
+  console.log("requestrequest", request);
 
   return (
     <RequestDetails
-      id={request.id}
+      id={request?.serial_number??""}
       date={formatted}
       companyName={request.company_name}
       region={request.data.country_id || "-"}

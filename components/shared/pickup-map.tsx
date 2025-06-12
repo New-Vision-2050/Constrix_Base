@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 const defaultKeys = [
   "city_id",
   "state_id",
-  "postal_code",
-  "street_name",
-  "neighborhood_name",
+  // "postal_code",
+  // "street_name",
+  // "neighborhood_name",
 ];
 
 const PickupMap = ({

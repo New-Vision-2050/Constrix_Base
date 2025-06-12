@@ -50,9 +50,9 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
               <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الادارات الفرعية
               </TableHead>
-              <TableHead className="p-3 py-4 rtl:text-right">
+              {/* <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الفروع
-              </TableHead>
+              </TableHead> */}
               <TableHead className="p-3 py-4 rtl:text-right">
                 عدد الموظفين
               </TableHead>
@@ -76,9 +76,9 @@ const NodeDetailsRow: React.FC<NodeDetailsRowProps> = ({
               <TableCell className="p-3 py-4">
                 {node.management_count || "0"}
               </TableCell>
-              <TableCell className="p-3 py-4">
+              {/* <TableCell className="p-3 py-4">
                 {node.branch_count || "0"}
-              </TableCell>
+              </TableCell> */}
               <TableCell className="p-3 py-4">
                 {node.user_count || "0"}
               </TableCell>

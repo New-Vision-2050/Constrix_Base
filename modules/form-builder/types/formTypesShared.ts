@@ -9,9 +9,13 @@ export interface ValidationRule {
 }
 
 export interface minMaxDate {
-  formId?: string,
-  field?: string
-  value?: string
+  formId?: string;
+  field?: string;
+  value?: string;
+  shift?:{
+    value: number;
+    unit?: 'days' | 'months' | 'years'
+  }
 }
 
 export interface FieldConfig {

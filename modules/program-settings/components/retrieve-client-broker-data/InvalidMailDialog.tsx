@@ -5,7 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useFormStore, useSheetForm, FormConfig } from "@/modules/form-builder";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { useMemo } from "react";
-import { UsersTypes } from "../constants/users-types";
+import { UsersTypes } from "../../constants/users-types";
 
 type Branch = {
   id: string;
@@ -43,6 +43,8 @@ export default function InvalidMailDialog(props: PropsT) {
     formConfig,
     currentRole = UsersTypes.Client,
   } = props;
+  const secondaryRoleV =
+    currentRole !== UsersTypes.Client ? UsersTypes.Client : UsersTypes.Broker;
   const formValues = useFormStore((state) => state.forms[formId]?.values);
   const [isOpen, handleOpen, handleClose] = useModal();
   const roles: Role[] = useMemo(() => {
@@ -56,52 +58,102 @@ export default function InvalidMailDialog(props: PropsT) {
   // get user id
   const userId = formValues?.user_id;
 
-  // branches of same role
-  const branches = useMemo(() => {
+  // Current Role Helper variables
+  const currentRoleBranches = useMemo(() => {
     return roles?.find((role) => role.role.toString() == currentRole)?.branches;
   }, [roles]);
 
-  const branchesNames = useMemo(() => {
-    return branches?.map((ele) => ele.name)?.join(",");
-  }, [branches]);
+  const currentRoleBranchesNames = useMemo(() => {
+    return currentRoleBranches?.map((ele) => ele.name)?.join(",");
+  }, [currentRoleBranches]);
 
-  const branchesIds = useMemo(() => {
-    return branches?.map((ele) => ele.id);
-  }, [branches]);
+  const currentRoleBranchesIds = useMemo(() => {
+    return currentRoleBranches?.map((ele) => ele.id);
+  }, [currentRoleBranches]);
 
   // determine same type exist?
   const sameTypeExist = useMemo(() => {
-    return branchesIds && branchesIds?.length > 0;
-  }, [branchesIds]);
+    return currentRoleBranchesIds && currentRoleBranchesIds?.length > 0;
+  }, [currentRoleBranchesIds]);
 
+  // Employee Role Help Vars.
   const employeeBranchesIds = useMemo(() => {
     return roles
       ?.find((role) => role.role.toString() == UsersTypes.Employee)
       ?.branches?.map((ele) => ele.id.toString());
   }, [roles]);
 
-  const brokerBranchesIds = useMemo(() => {
+  const employeeBranchesNames = useMemo(() => {
     return roles
-      ?.find((role) => role.role.toString() == UsersTypes.Broker)
-      ?.branches?.map((ele) => ele.id.toString());
+      ?.find((role) => role.role.toString() == UsersTypes.Employee)
+      ?.branches?.map((ele) => ele.name.toString())
+      .join(",");
   }, [roles]);
 
   const employeeExist = useMemo(() => {
     return employeeBranchesIds && employeeBranchesIds?.length > 0;
   }, [employeeBranchesIds]);
 
-  const brokerExist = useMemo(() => {
-    return brokerBranchesIds && brokerBranchesIds?.length > 0;
-  }, [brokerBranchesIds]);
+  // secondary role helper vars
+  const isClient = currentRole == UsersTypes.Client;
+  const primaryRole = isClient ? "عميل" : "وسيط";
+  const secondaryRole = isClient ? "وسيط" : "عميل";
+
+  const secondaryRoleBranchesIds = useMemo(() => {
+    return roles
+      ?.find((role) => role.role.toString() == secondaryRoleV)
+      ?.branches?.map((ele) => ele.id.toString());
+  }, [roles, secondaryRoleV]);
+
+  const secondaryRoleBranchesNames = useMemo(() => {
+    return roles
+      ?.find((role) => role.role.toString() == secondaryRoleV)
+      ?.branches?.map((ele) => ele.name.toString())
+      .join(",");
+  }, [roles, secondaryRoleV]);
+
+  const secondaryRoleExist = useMemo(() => {
+    return secondaryRoleBranchesIds && secondaryRoleBranchesIds?.length > 0;
+  }, [secondaryRoleBranchesIds]);
+
   // set correct message
   const message = useMemo(() => {
-    return sameTypeExist
-      ? `البريد الإلكتروني مسجل لدى الفروع الاتية (${branchesNames ?? "-"}) `
-      : `يظهر لدينا ان البريد الإلكتروني مسجل
-      ${employeeExist ? "كموظف" : ""}
-       ${brokerExist ? "كوسيط" : ""}
-      على نفس الشركة. `;
-  }, [sameTypeExist, branchesNames, employeeExist, brokerExist]);
+    const message = `
+    البريد الألكتروني مسجل
+    ${
+      sameTypeExist
+        ? `ك${primaryRole} لدي الافرع الاتية (${currentRoleBranchesNames})`
+        : ``
+    }
+    ${employeeExist ? `كموظف لدي الفرع الأتي (${employeeBranchesNames})` : ``}
+    ${
+      secondaryRoleExist
+        ? `ك${secondaryRole} لدي الافرع الاتية (${secondaryRoleBranchesNames})`
+        : ""
+    }
+    `;
+
+    console.log({
+      sameTypeExist,
+      primaryRole,
+      secondaryRole,
+      currentRoleBranchesNames,
+      employeeExist,
+      employeeBranchesNames,
+      secondaryRoleExist,
+      secondaryRoleBranchesNames,
+    });
+    return message;
+  }, [
+    sameTypeExist,
+    primaryRole,
+    secondaryRole,
+    currentRoleBranchesNames,
+    employeeExist,
+    employeeBranchesNames,
+    secondaryRoleExist,
+    secondaryRoleBranchesNames,
+  ]);
 
   // declare and define the form configuration for retrieving broker data
   const handleSuccess = useMemo(() => {
@@ -111,22 +163,23 @@ export default function InvalidMailDialog(props: PropsT) {
     };
   }, [handleClose, onSuccess]);
 
+  // prepare form config file
   const _config = useMemo(
     () =>
       formConfig(
         userId,
-        branchesIds,
+        currentRoleBranchesIds,
         employeeBranchesIds,
-        brokerBranchesIds,
+        secondaryRoleBranchesIds,
         handleSuccess
       ),
     [
       userId,
-      branchesIds,
+      currentRoleBranchesIds,
       handleSuccess,
       formConfig,
       employeeBranchesIds,
-      brokerBranchesIds,
+      secondaryRoleBranchesIds,
     ]
   );
 
@@ -168,7 +221,7 @@ export default function InvalidMailDialog(props: PropsT) {
       <p className="text-foreground">
         {message}
         <span onClick={handleOpen} className="text-primary cursor-pointer">
-          {btnText || "اضغط هنا"}
+          {btnText || "لأضافته لفرع أخر أضغط هنا"}
         </span>
       </p>
       <Dialog open={isOpen} onOpenChange={handleClose}>

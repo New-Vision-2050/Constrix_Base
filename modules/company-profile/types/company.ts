@@ -33,6 +33,7 @@ export interface CompanyDocument {
   notification_date: string;
   document_type_id: string;
   logs: CompanyDocumentLog[];
+  company_legal_data: { id: string };
 }
 
 export interface CompanyBranch {

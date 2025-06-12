@@ -41,6 +41,7 @@
   },
   "ForgotPassword": {
     "Title": "نسيت كلمة المرور",
+    "SetUpPassword": "لنقم بإعداد كلمة المرور الخاصة بك",
     "EnterTemporaryPassword": "ادخل كلمة المرور المؤقتة المرسلة على البريد الالكتروني",
     "Confirm": "تأكيد",
     "BackToLogin": "الرجوع للدخول"
