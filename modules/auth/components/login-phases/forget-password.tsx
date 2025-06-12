@@ -135,6 +135,7 @@ const ForgetPasswordPhase = ({
         resendFor={"forget-password"}
         token={token ?? ""}
       />
+      </>
     </div>
   );
 };
