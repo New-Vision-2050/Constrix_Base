@@ -6,6 +6,9 @@ import { LOGIN_PHASES, LoginPhase } from "../constant/login-phase";
 import { formDefaultValues } from "../constant/default-values";
 
 const useLogin = () => {
+  const [stepsStack, setStepsStack] = useState<LoginPhase[]>([
+    LOGIN_PHASES.IDENTIFIER,
+  ]);
   const [step, setStep] = useState<LoginPhase>(LOGIN_PHASES.IDENTIFIER);
   const form = useForm<LoginType>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,7 +41,15 @@ const useLogin = () => {
   };
 
   const handleSetStep = (step: LoginPhase) => {
+    setStepsStack((prev) => [...prev, step]);
     setStep(step);
+  };
+
+  const handleStepBack = () => {
+    const lastStep = stepsStack?.[stepsStack?.length - 2];
+    console.log("tracingSteps lastStep",stepsStack, lastStep);
+    if (lastStep) setStep(lastStep);
+    setStepsStack((prev) => prev.slice(0, -1));
   };
 
   return {
@@ -46,6 +57,7 @@ const useLogin = () => {
     form,
     onSubmit,
     handleSetStep,
+    handleStepBack,
   };
 };
 

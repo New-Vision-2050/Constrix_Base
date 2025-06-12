@@ -10,8 +10,10 @@ import { useTranslations } from "next-intl";
 
 const ResetPasswordPhase = ({
   handleSetStep,
+  handleStepBack,
 }: {
   handleSetStep: (step: LoginPhase) => void;
+  handleStepBack: () => void;
 }) => {
   const t = useTranslations();
   const { mutate, isPending } = useResetPassword();
@@ -37,13 +39,35 @@ const ResetPasswordPhase = ({
         onSuccess: () => {
           reset();
           handleSetStep(LOGIN_PHASES.IDENTIFIER);
-        }
+        },
       }
     );
   };
 
   return (
-    <>
+    <div className="relative flex flex-col gap-3">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-0 left-0"
+        onClick={() => handleStepBack()}
+        type="button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </Button>
       <div className="space-y-5">
         <h1 className="text-2xl text-center">{t("ResetPassword.Title")}</h1>
         <Input
@@ -69,7 +93,7 @@ const ResetPasswordPhase = ({
       >
         {t("ResetPassword.Confirm")}
       </Button>
-    </>
+    </div>
   );
 };
 

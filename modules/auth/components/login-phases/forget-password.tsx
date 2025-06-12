@@ -19,8 +19,10 @@ import { useTranslations } from "next-intl";
 
 const ForgetPasswordPhase = ({
   handleSetStep,
+  handleStepBack,
 }: {
   handleSetStep: (step: LoginPhase) => void;
+  handleStepBack: () => void;
 }) => {
   const t = useTranslations();
   const {
@@ -50,7 +52,30 @@ const ForgetPasswordPhase = ({
   };
 
   return (
-    <>
+    <div className="relative flex flex-col gap-3">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-0 left-0"
+        onClick={() => handleStepBack()}
+        type="button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </Button>
+      <>
       <h1 className="text-2xl text-center">
         {first_login == "1"
           ? t("ForgotPassword.SetUpPassword")
@@ -110,7 +135,7 @@ const ForgetPasswordPhase = ({
         resendFor={"forget-password"}
         token={token ?? ""}
       />
-    </>
+    </div>
   );
 };
 

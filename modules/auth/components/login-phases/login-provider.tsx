@@ -13,7 +13,7 @@ import ChangeEmailPhase from "./change-email";
 import ValidatePhonePhase from "./validate-phone";
 
 const LoginProvider = () => {
-  const { form, step, handleSetStep } = useLogin();
+  const { form, step, handleSetStep, handleStepBack } = useLogin();
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,29 +38,50 @@ const LoginProvider = () => {
         )}
         {/* Start Password Flow */}
         {step === LOGIN_PHASES.PASSWORD && (
-          <PasswordPhase handleSetStep={handleSetStep} />
+          <PasswordPhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
         {step === LOGIN_PHASES.FORGET_PASSWORD && (
-          <ForgetPasswordPhase handleSetStep={handleSetStep} />
+          <ForgetPasswordPhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
         {step === LOGIN_PHASES.RESET_PASSWORD && (
-          <ResetPasswordPhase handleSetStep={handleSetStep} />
+          <ResetPasswordPhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
         {/* End Password Flow */}
         {/* Start Email Flow */}
         {step === LOGIN_PHASES.VALIDATE_EMAIL && (
-          <ValidateEmailPhase handleSetStep={handleSetStep} />
+          <ValidateEmailPhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
         {step === LOGIN_PHASES.SECURITY_QUESTIONS && (
-          <SecurityQuestionsPhase handleSetStep={handleSetStep} />
+          <SecurityQuestionsPhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
         {step === LOGIN_PHASES.CHANGE_EMAIL && (
-          <ChangeEmailPhase handleSetStep={handleSetStep} />
+          <ChangeEmailPhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
         {/* End Email Flow */}
         {/* Start Phone Flow */}
         {step === LOGIN_PHASES.VALIDATE_PHONE && (
-          <ValidatePhonePhase handleSetStep={handleSetStep} />
+          <ValidatePhonePhase
+            handleSetStep={handleSetStep}
+            handleStepBack={handleStepBack}
+          />
         )}
       </form>
     </FormProvider>
