@@ -106,20 +106,18 @@ const LegalDataSection = ({
           />
         }
       >
+        {!!companyLegalData && companyLegalData.length > 0 ? <>
         {mode === "Preview" ? (
-          <>
-            {!!companyLegalData && companyLegalData.length > 0 ? (
-              <LegalDataPreview companyLegalData={companyLegalData} />
-            ) : (
-              <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
-                <InfoIcon additionClass="text-orange-500 " />
-                <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
-              </div>
-            )}
-          </>
+          <LegalDataPreview companyLegalData={companyLegalData} />
         ) : (
           <LegalDataForm companyLegalData={companyLegalData} id={id} handleEditClick={handleEditClick} />
         )}
+        </> :    
+        <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
+          <InfoIcon additionClass="text-orange-500 " />
+          <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
+        </div>
+        }
       </FormFieldSet>
       )}
 
