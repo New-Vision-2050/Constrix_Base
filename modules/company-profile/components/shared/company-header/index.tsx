@@ -51,7 +51,7 @@ const CompanyHeader = () => {
               <MapPin className="w-4 h-4 text-foreground/70" />
 
               <div className="flex flex-col  gap-2">
-                {data.payload?.branches.map((branch) => (
+                {data.payload?.branches?.map((branch) => (
                   <div key={branch.id} className="flex  gap-2">
                     <AlertCircle className="w-4 h-4 text-yellow-400" />
                     <span>{branch.name}</span>
