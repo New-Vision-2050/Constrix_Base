@@ -6,8 +6,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useParams } from "next/navigation";
 import { RegistrationTypes } from "./registration-types";
 
-export const LegalDataAddReqFormEditConfig = (id?: string) => {
-  const { company_id }: { company_id: string | undefined } = useParams();
+export const LegalDataAddReqFormEditConfig = (id?: string , company_id?:string) => {
 
   const queryClient = useQueryClient();
   const LegalDataAddReqFormEditConfig: FormConfig = {
@@ -154,7 +153,7 @@ export const LegalDataAddReqFormEditConfig = (id?: string) => {
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", id, company_id],
+        queryKey: ["company-legal-data", id, company_id],
       });
     },
   };
