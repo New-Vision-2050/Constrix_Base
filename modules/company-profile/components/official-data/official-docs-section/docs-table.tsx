@@ -181,7 +181,8 @@ const DocsTable = ({
   id?: string;
 }) => {
   return (
-    <table className="w-full border-collapse">
+  <div className="max-h-[500px] overflow-auto">
+      <table className="w-full border-collapse">
       <thead>
         <tr>
           <td className="text-start p-3 border-b">نوع المستند</td>
@@ -201,6 +202,7 @@ const DocsTable = ({
         ))}
       </tbody>
     </table>
+  </div>
   );
 };
 
