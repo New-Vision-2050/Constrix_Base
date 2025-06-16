@@ -1,10 +1,15 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
-import { parse, format } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/modules/table/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/modules/table/components/ui/popover";
+import { useLocale } from "next-intl";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -13,10 +18,26 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   value,
-  onChange,
   ...props
 }: CalendarProps & { value: string; onChange: (date: string) => void }) {
-  const parsedDate = value ? parse(value, "yyyy-MM-dd", new Date()) : new Date();
+  const [month, setMonth] = React.useState(() => value ? new Date(value): new Date() );
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  // Generate a range of years (start from 1990 to current year + 20)
+  const startYear = 1990;
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear + 21 - startYear }, (_, i) => startYear + i);
+
+  // Handle input year
+  const handleYearChange = (year: number) => {
+    if (!isNaN(year)) {
+      setMonth(new Date(year, month.getMonth(), 1));
+      setPopoverOpen(false);
+    }
+  };
+
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
 console.log("value", value);
   return (
     <DayPicker
@@ -56,45 +77,142 @@ console.log("value", value);
         day_hidden: "invisible",
         ...classNames,
       }}
+      month={month}
+      onMonthChange={setMonth}
       components={{
         IconLeft: () => <ChevronLeft className="h-4 w-4" />,
         IconRight: () => <ChevronRight className="h-4 w-4" />,
         Caption: () => {
-          const date = parse(value, "yyyy-MM-dd", "string");
-          const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newDate = parse(e.target.value, "yyyy-MM-dd", "string");
-            const newYear = newDate.getFullYear();
-            date.setFullYear(newYear);
-            onChange(format(date, "yyyy-MM-dd"));
+          // Month names
+          const monthNames = [
+            "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+          ];
+          const [monthPopoverOpen, setMonthPopoverOpen] = React.useState(false);
+          // Move month left/right
+          const handlePrevMonth = () => {
+            setMonth((prev) => {
+              const m = prev.getMonth() - 1;
+              return new Date(prev.getFullYear(), m, 1);
+            });
           };
-
-          const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const newDate = parse(e.target.value, "yyyy-MM-dd", "string");
-            const newMonth = newDate.getMonth();
-            date.setFullYear(newMonth);
-            onChange(format(date, "yyyy-MM-dd"));
+          const handleNextMonth = () => {
+            setMonth((prev) => {
+              const m = prev.getMonth() + 1;
+              return new Date(prev.getFullYear(), m, 1);
+            });
           };
-
+          // RTL arrow order
+          const leftArrow = (
+            <button
+              type="button"
+              aria-label={isRtl ? "Next Month" : "Previous Month"}
+              className="p-1 rounded hover:bg-accent"
+              onClick={isRtl ? handleNextMonth : handlePrevMonth}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          );
+          const rightArrow = (
+            <button
+              type="button"
+              aria-label={isRtl ? "Previous Month" : "Next Month"}
+              className="p-1 rounded hover:bg-accent"
+              onClick={isRtl ? handlePrevMonth : handleNextMonth}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          );
           return (
-            <div className="flex justify-center items-center space-x-2">
-              <input
-                type="number"
-                value={date.getFullYear()}
-                onChange={handleYearChange}
-                className="w-16 text-center border rounded"
-                placeholder="Year"
-              />
-              <select
-                value={date.getMonth()} 
-                onChange={handleMonthChange}
-                className="border rounded"
-              >
-                {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i} value={i}>
-                    {new Date(0, i).toLocaleString("default", { month: "long" })}
-                  </option>
-                ))}
-              </select>
+            <div className="flex justify-between items-center w-full px-2">
+              {/* Month & Year vertical stack on left */}
+              <div className="flex flex-col items-start space-y-1">
+                {/* Year Popover */}
+                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-md font-medium cursor-pointer hover:underline px-2 py-0 rounded focus:outline-none focus:ring my-0"
+                      onClick={() => setPopoverOpen((open) => !open)}
+                    >
+                      {month.getFullYear()}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    className="max-h-60 overflow-y-auto min-w-[220px] p-0"
+                  >
+                    <div className="grid grid-cols-3 gap-2 p-2">
+                      {years.map((year) => (
+                        <button
+                          key={year}
+                          type="button"
+                          className={`rounded shadow text-center px-2 py-3 hover:bg-accent transition-colors ${
+                            year === month.getFullYear()
+                              ? "bg-accent font-bold"
+                              : "bg-background"
+                          }`}
+                          onClick={() => handleYearChange(year)}
+                        >
+                          {year}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                {/* Month Popover */}
+                <Popover
+                  open={monthPopoverOpen}
+                  onOpenChange={setMonthPopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-xl font-medium cursor-pointer hover:underline px-2 py-0 rounded focus:outline-none focus:ring my-0"
+                      onClick={() => setMonthPopoverOpen((open) => !open)}
+                    >
+                      {monthNames[month.getMonth()]}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    className="max-h-60 overflow-y-auto min-w-[220px] p-0"
+                  >
+                    <div className="grid grid-cols-3 gap-2 p-2">
+                      {monthNames.map((name, idx) => (
+                        <button
+                          key={name}
+                          type="button"
+                          className={`rounded shadow text-center px-2 py-3 hover:bg-accent transition-colors ${
+                            idx === month.getMonth()
+                              ? "bg-accent font-bold"
+                              : "bg-background"
+                          }`}
+                          onClick={() => {
+                            setMonth(new Date(month.getFullYear(), idx, 1));
+                            setMonthPopoverOpen(false);
+                          }}
+                        >
+                          {name}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              {/* Arrows on right, horizontal, RTL aware */}
+              <div className="flex flex-row items-center space-x-1">
+                {isRtl ? (
+                  <>
+                    {rightArrow}
+                    {leftArrow}
+                  </>
+                ) : (
+                  <>
+                    {leftArrow}
+                    {rightArrow}
+                  </>
+                )}
+              </div>
             </div>
           );
         },
