@@ -8,6 +8,7 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
+import fetchCompanyAdmin from "@/modules/companies/api/fetch-company-admin";
 
 // Define types for the company data
 interface CompanyData {
@@ -131,7 +132,17 @@ export const CompaniesConfig = () => {
       {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
-        action: () => console.log("Login as manager clicked"),
+        action: (e) => {
+          fetchCompanyAdmin(e.id)
+            .then((data) => {
+              const { url, token } = data;
+              if (url && token) {
+                router.push(
+                  `${url}/login/?token=${token}}`
+                );    
+              }
+            })
+        },
       },
       {
         label: "اكمال ملف الشركة",
