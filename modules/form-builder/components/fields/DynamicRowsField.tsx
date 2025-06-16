@@ -121,6 +121,15 @@ const DynamicRowsField = React.forwardRef<
     ref
   ) => {
     console.log({ field, value });
+const DynamicRowsField = React.forwardRef<DynamicRowsFieldRef, DynamicRowsFieldProps>(({
+  field,
+  value,
+  error,
+  touched,
+  onChange,
+  onBlur,
+  formId = 'default',
+}, ref) => {
   // Get the current locale to determine text direction
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -700,7 +709,7 @@ const DynamicRowsField = React.forwardRef<
                               updateRowField(index, fieldName, fieldValue)
                             }
                           onBlur={() => {
-                            const {data} = useFormStore.getState().getValues(formId);
+                          const {data} = useFormStore.getState().getValues(formId);
                             // Mark field as touched on blur
                             const newRows = [...data]
                             if (!newRows[index].touched) {
