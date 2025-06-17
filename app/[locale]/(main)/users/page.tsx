@@ -8,6 +8,7 @@ import { statisticsConfig } from "@/modules/users/components/statistics-config";
 import React from "react";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import {useTranslations} from "next-intl";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 const UsersPage = () => {
   const config = UsersConfig();
@@ -17,6 +18,11 @@ const UsersPage = () => {
 
     const onConfirmUserDataEmailValidation = ()=>{
       setIsOpen(false);
+      const tableStore = useTableStore.getState();
+      tableStore.reloadTable(config.tableId);
+      setTimeout(() => {
+        tableStore.setLoading(config.tableId, false);
+      }, 100);
     }
 
   return (
