@@ -3,7 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
 
-export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
+export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations> , onConfirmUserDataEmailValidation:()=>void): FormConfig {
     return {
         formId: "company-user-form",
         title: "إنشاء مستخدم",
@@ -109,7 +109,7 @@ export function GetCompanyUserFormConfig(t:ReturnType<typeof useTranslations>): 
                             },
                             {
                                 type: "apiValidation",
-                                message: <InvalidMessage formId="company-user-form"/>,
+                                message: <InvalidMessage formId="company-user-form" onConfirmUserDataEmailValidation={onConfirmUserDataEmailValidation}/>,
                                 apiConfig: {
                                     url: `${baseURL}/company-users/check-email`,
                                     method: "POST",

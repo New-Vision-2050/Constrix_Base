@@ -15,6 +15,7 @@ interface InvalidMessageProps {
   error_sentence?: string;
   company_id?: string | number;
   exist_user_id?: string | number;
+  onConfirmUserDataEmailValidation?: () => void;
 }
 
 // Memoized version that accepts email as a prop
@@ -24,6 +25,7 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
   company_id,
   exist_user_id,
   formId,
+  onConfirmUserDataEmailValidation
 }: InvalidMessageProps) {
   // declare and define component state and variables
   const formValues = useFormStore((state) => state.forms[formId ?? ""]?.values);
@@ -47,7 +49,9 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
         company_id: formValues.company_id || company_id,
       })
       .then(() => {
-        location.reload();
+        // location.reload();
+        handleClose()
+        onConfirmUserDataEmailValidation?.();
       })
       .finally(() => {
         setLoading(false);
@@ -103,8 +107,10 @@ export const MemoizedInvalidMessage = memo(function InvalidMessageComponent({
 // Original InvalidMessage component that uses the memoized version with email from the form store
 export function InvalidMessage({
   formId = "company-user-form",
+  onConfirmUserDataEmailValidation
 }: {
   formId?: string;
+  onConfirmUserDataEmailValidation?: () => void;
 }) {
   const formValues = useFormStore((state) => state.forms[formId]?.values);
   return (
@@ -114,6 +120,7 @@ export function InvalidMessage({
       error_sentence={formValues?.error_sentence}
       exist_user_id={formValues?.exist_user_id}
       company_id={formValues?.company_id}
+      onConfirmUserDataEmailValidation={onConfirmUserDataEmailValidation}
     />
   );
 }

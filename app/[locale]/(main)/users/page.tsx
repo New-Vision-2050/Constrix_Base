@@ -12,6 +12,13 @@ import {useTranslations} from "next-intl";
 const UsersPage = () => {
   const config = UsersConfig();
     const t = useTranslations('Companies');
+
+    const [isOpen, setIsOpen] = React.useState(false);
+
+    const onConfirmUserDataEmailValidation = ()=>{
+      setIsOpen(false);
+    }
+
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
@@ -20,11 +27,13 @@ const UsersPage = () => {
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
-              config={GetCompanyUserFormConfig(t)}
+              config={GetCompanyUserFormConfig(t , onConfirmUserDataEmailValidation)}
               trigger={<Button>إنشاء مستخدم</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);
               }}
+              isOpen={isOpen}
+              onOpenChange={(s)=> setIsOpen(s)}
             />{" "}
           </div>
         }
