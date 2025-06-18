@@ -19,7 +19,9 @@ import { useTranslations } from "next-intl";
 
 const PasswordPhase = ({
   handleSetStep,
+  handleStepBack,
 }: {
+  handleStepBack: () => void;
   handleSetStep: (step: LoginPhase) => void;
 }) => {
   const t = useTranslations();
@@ -35,7 +37,7 @@ const PasswordPhase = ({
     formState: { errors },
     handleSubmit,
     getValues,
-    setValue
+    setValue,
   } = useFormContext<LoginType>();
 
   const loginOptionAlternatives = getValues("login_option_alternatives");
@@ -50,10 +52,10 @@ const PasswordPhase = ({
       }
     };
 
-    errorEvent.addEventListener('auth-error', handleAuthError);
+    errorEvent.addEventListener("auth-error", handleAuthError);
 
     return () => {
-      errorEvent.removeEventListener('auth-error', handleAuthError);
+      errorEvent.removeEventListener("auth-error", handleAuthError);
     };
   }, [handleOpen, t]);
 
@@ -92,7 +94,9 @@ const PasswordPhase = ({
         },
         onError(error) {
           const messageKey = getErrorMessage(error);
-          setErrorMessage((messageKey) || t("Errors.Authentication.InvalidCredentials"));
+          setErrorMessage(
+            messageKey || t("Errors.Authentication.InvalidCredentials")
+          );
           handleOpen();
         },
       }
@@ -103,7 +107,7 @@ const PasswordPhase = ({
     const data = getValues();
 
     forgetPasswordMutation(
-      { identifier: data.identifier , token: data.token ?? "" },
+      { identifier: data.identifier, token: data.token ?? "" },
       {
         onSuccess: () => {
           handleSetStep(LOGIN_PHASES.FORGET_PASSWORD);
@@ -113,9 +117,33 @@ const PasswordPhase = ({
   };
 
   return (
-    <>
-      <h1 className="text-xl sm:text-2xl text-center mb-4">{t("Login.EnterPassword")}</h1>
-      <div className="space-y-4">
+    <div className="relative flex flex-col gap-3">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-0 left-0"
+        onClick={() => handleStepBack()}
+        type="button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </Button>
+      <h1 className="text-xl sm:text-2xl text-center mb-4">
+        {t("Login.EnterPassword")}
+      </h1>
+      <div className="space-y-4 my-2">
         <Input
           type="password"
           {...register("password")}
@@ -159,7 +187,7 @@ const PasswordPhase = ({
         handleClose={handleClose}
         desc={errorMessage}
       />
-    </>
+    </div>
   );
 };
 

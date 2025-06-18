@@ -54,7 +54,7 @@ export default function ShowSubPrograms(props: PropsT) {
                     <sub.icon />
                   ) : isValidIconKey(sub.icon) ? (
                     React.createElement(tableIcon[sub.icon], {
-                      className: "fill-foreground",
+                      className: "fill-black dark:fill-white",
                     })
                   ) : (
                     "i"

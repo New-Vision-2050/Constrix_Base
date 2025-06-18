@@ -2,9 +2,9 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import PickupMap from "@/components/shared/pickup-map";
-import InvalidMailDialog from "@/modules/program-settings/components/InvalidMailDialog";
 import { RetrieveBrokerFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveBrokerFormConfig";
 import { UsersTypes } from "@/modules/program-settings/constants/users-types";
+import RetrieveClientBrokerData from "@/modules/program-settings/components/retrieve-client-broker-data";
 
 export function brokerFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -27,6 +27,21 @@ export function brokerFormConfig(
           {
             name: "roles",
             label: "roles",
+            type: "hiddenObject",
+          },
+          {
+            name: "payload",
+            label: "payload",
+            type: "hiddenObject",
+          },
+          {
+            name: "employee_in_another_company",
+            label: "employee_in_another_company",
+            type: "hiddenObject",
+          },
+          {
+            name: "employee_in_company",
+            label: "employee_in_company",
             type: "hiddenObject",
           },
           {
@@ -197,7 +212,8 @@ export function brokerFormConfig(
               {
                 type: "pattern",
                 value: /^[12]\d{9}$/,
-                message: "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+                message:
+                  "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
               },
               {
                 type: "minLength",
@@ -234,16 +250,11 @@ export function brokerFormConfig(
               {
                 type: "apiValidation",
                 message: (
-                  <InvalidMailDialog
+                  <RetrieveClientBrokerData
                     formId={formId}
-                    btnText="أضغط هنا"
-                    dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
-                    onSuccess={() => {
-                      console.log("onSuccess handleCloseForm");
-                      handleCloseForm?.();
-                    }}
                     currentRole={UsersTypes.Broker}
                     formConfig={RetrieveBrokerFormConfig}
+                    handleCloseForm={handleCloseForm}
                   />
                 ),
                 apiConfig: {
@@ -266,6 +277,24 @@ export function brokerFormConfig(
                         user_id: userId,
                       });
                     }
+
+                    // store payload
+                    if (response.payload) {
+                      useFormStore.getState().setValues(formId, {
+                        payload: JSON.stringify(response.payload?.[0]),
+                      });
+                    }
+
+                    // status = 0 --> mean exist in another company
+                    useFormStore.getState().setValues(formId, {
+                      employee_in_another_company:
+                        response.payload?.[0]?.status,
+                    });
+
+                    useFormStore.getState().setValues(formId, {
+                      employee_in_company:
+                        response.payload?.[0]?.status_in_company,
+                    });
 
                     return response.payload?.[0]?.status === 1;
                   },

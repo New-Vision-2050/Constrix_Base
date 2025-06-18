@@ -4,7 +4,7 @@ import { Calendar } from '@/modules/table/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/table/components/ui/popover';
 import { Button } from '@/modules/table/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
-import { FieldConfig } from '../../types/formTypes';
+import { FieldConfig } from '../../types/formTypes'
 import { cn } from '@/lib/utils';
 import { DayPickerSingleProps } from 'react-day-picker';
 import { HijriCalendar } from '@/modules/table/components/ui/HijriCalendar'
@@ -44,7 +44,12 @@ const DateField: React.FC<DateFieldProps> = ({
       ?.getState()
       .getValue(field?.minDate?.formId || '', field?.minDate?.field || ''): undefined)
 
-    return minDate ? new Date(minDate): undefined;
+    let newDate =  minDate ? new Date(minDate): undefined;
+    if(newDate && field?.minDate?.shift?.value){
+      newDate = adjustDate(newDate, field?.minDate?.shift?.value, field?.minDate?.shift?.unit??'days');
+    }
+
+    return newDate;
   }
   
   const getMaxDate = () =>{
@@ -52,7 +57,29 @@ const DateField: React.FC<DateFieldProps> = ({
       ?.getState()
       .getValue(field?.maxDate?.formId || '', field?.maxDate?.field || ''): undefined)
 
-    return maxDate ? new Date(maxDate): undefined;
+    let newDate =  maxDate ? new Date(maxDate): undefined;
+    if(newDate && field?.maxDate?.shift?.value){
+      newDate = adjustDate(newDate, field?.maxDate?.shift?.value, field?.maxDate?.shift?.unit??'days');
+    }
+
+    return newDate;
+  }
+
+  const adjustDate = (date: Date, value: number, unit: 'days' | 'months' | 'years' = 'days') => {
+    let result = date;
+
+    switch(unit) {
+      case 'years':
+        result.setFullYear(result.getFullYear() + value);
+        break;
+      case 'months':
+        const currentMonth = result.getMonth();
+        result.setMonth(currentMonth + value);
+        break;
+      default:
+        result.setDate(result.getDate() + value);
+    }
+    return result;
   }
   
   const handleDateChange = (newValue: string | null) => {
@@ -114,6 +141,8 @@ const DateField: React.FC<DateFieldProps> = ({
             {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {fromDate: getMinDate()}:{}}
             {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {toDate: getMaxDate()}:{}}
             {...props}
+            onChange={onChange}
+            value={value ||format(new Date(), "yyyy-MM-dd'T'00:00:00.000'Z'")}
           />}
         </PopoverContent>
       </Popover>

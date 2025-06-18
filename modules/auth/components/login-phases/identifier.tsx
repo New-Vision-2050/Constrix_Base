@@ -50,6 +50,7 @@ const IdentifierPhase = ({
       {
         onSuccess(data) {
           setValue("token", data.payload.token);
+          setValue("first_login", data.payload.first_login?.toString());
           setValue(
             "login_option_alternatives",
             data.payload.login_way.step.login_option_alternatives

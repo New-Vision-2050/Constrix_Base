@@ -90,9 +90,9 @@ export const RetrieveBrokerFormConfig = (
       },
     ],
     initialValues: {
-      roleTwoIds,
-      roleThreeIds,
-      branch_ids: branchesIds?.map(ele=>ele.toString()),
+      roleTwoIds: roleTwoIds?.map((ele) => ele.toString()),
+      roleThreeIds: roleThreeIds?.map((ele) => ele.toString()),
+      branch_ids: branchesIds?.map((ele) => ele.toString()),
     },
     onSuccess: () => {
       if (handleOnSuccess) {

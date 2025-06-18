@@ -17,6 +17,7 @@ import {
 } from "@/modules/table/components/ui/popover";
 import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
+import { useTranslations } from "next-intl";
 
 interface PaginatedDropdownProps {
   columnKey: string;
@@ -43,6 +44,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   isMulti = false,
   setFirstAsDefault = dynamicConfig?.setFirstAsDefault ?? false,
 }) => {
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
@@ -222,7 +224,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   </div>
                 ) : (
                   <div className="py-6 text-center text-sm">
-                    No results found
+                    {t("Main.NoResultsRound")}
                   </div>
                 )}
               </CommandEmpty>

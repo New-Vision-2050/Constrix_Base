@@ -86,6 +86,10 @@ export const IdentityDataFormConfig = () => {
             minDate: {
               formId: `Identity-data-form`,
               field: "identity_start_date",
+              // shift:{
+              //   value: -3, //any number
+              //   unit: 'months' //'days' | 'months' | 'years' ===> default 'days'
+              // }
             },
           },
           {

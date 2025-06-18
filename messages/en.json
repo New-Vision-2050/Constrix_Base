@@ -41,6 +41,7 @@
   },
   "ForgotPassword": {
     "Title": "Forgot Password",
+    "SetUpPassword":"Let's Set Up Your Password",
     "EnterTemporaryPassword": "Enter the temporary password sent to your email",
     "Confirm": "Confirm",
     "BackToLogin": "Back to login"
