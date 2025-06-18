@@ -56,8 +56,10 @@ function CustomDateField(props: PropsT) {
         <Calendar
           mode="single"
           selected={selectedDate}
-          onSelect={(date) => {
-            setSelectedDate(date ?? undefined);
+          value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""}
+          onChange={(dateString: string) => {
+            const date = dateString ? new Date(dateString) : undefined;
+            setSelectedDate(date);
             setIsOpen(false);
           }}
           disabled={disabled}
