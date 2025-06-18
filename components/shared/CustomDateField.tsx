@@ -53,7 +53,9 @@ function CustomDateField(props: PropsT) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-       <Calendar
+        <Calendar
+          mode="single"
+          selected={selectedDate}
           value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""}
           onChange={(dateString: string) => {
             const date = dateString ? new Date(dateString) : undefined;
