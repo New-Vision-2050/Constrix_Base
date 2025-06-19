@@ -1,28 +1,50 @@
 "use client";
-import { Check, MapPin, CircleCheck } from "lucide-react";
+import {  MapPin, CircleCheck } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BranchesInfo from "./branches-info";
 import OfficialData from "../official-data";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 import { apiClient } from "@/config/axios-config";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useBranchStore } from "@/store/branch-select-store";
 
 const Branches = () => {
   const { company_id } = useParams();
-
+  const branchId = useBranchStore((state) => state.branchId);
+  const setBranchId = useBranchStore((state) => state.setBranchId);
+  
   const locale = useLocale();
-  const isRtl = locale === "ar";
-  const { data: cachedData, isLoading } = useQuery({
-    queryKey: ["main-company-data", undefined, company_id],
+  // Initialize activeTab from localStorage if available
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    if (branchId) {
+      try {
+        return branchId || "general";
+      } catch {
+        return "general";
+      }
+    }
+    return "general";
+  });
+
+  useEffect(() => {
+    if (branchId) {
+      setActiveTab(branchId);
+    }
+  }, [branchId]);
+
+  const { data: cachedData } = useQuery({
+    queryKey: ["main-company-data", undefined, company_id,branchId],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
         "/companies/current-auth-company",
         {
           params: {
             ...(company_id && { company_id }),
+            ...(activeTab !== "general" && { branch_id: branchId }),
           },
         }
       );
@@ -30,8 +52,6 @@ const Branches = () => {
       return response.data;
     },
   });
-
-  console.log({ cachedData });
 
   const branches = cachedData?.payload?.branches ?? [];
 
@@ -54,16 +74,29 @@ const Branches = () => {
     ];
   };
 
+  const handleTabChange = (branchId: string) => {
+    console.log(branchId + " tab changed");
+    setActiveTab(branchId);
+    const selectedBranch = branches.find((branch) => branch.id === branchId);
+    if (selectedBranch) {
+      setBranchId(selectedBranch.id);
+    } else {
+      setBranchId(null);
+    }
+  };
+
   return (
     <div>
       <Tabs
         defaultValue="general"
+        value={activeTab}
+        onValueChange={handleTabChange}
         className="w-full flex flex-col md:flex-row"
-        dir={isRtl ? "rtl" : "ltr"}
+        dir={locale === "ar" ? "rtl" : "ltr"}
       >
         <TabsList
           className="flex flex-col bg-sidebar p-2 w-36 h-full gap-4 rounded-lg justify-start"
-          dir={isRtl ? "rtl" : "ltr"}
+          dir={locale === "ar" ? "rtl" : "ltr"}
         >
           {tabs().map((tab) => (
             <TabsTrigger
@@ -90,7 +123,7 @@ const Branches = () => {
             <TabsContent
               key={tab.value}
               value={tab.value}
-              dir={isRtl ? "rtl" : "ltr"}
+              dir={locale === "ar" ? "rtl" : "ltr"}
               className="h-full pr-6"
             >
               {tab.component}

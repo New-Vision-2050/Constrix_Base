@@ -16,6 +16,7 @@ import {
 import { TableBuilder } from "@/modules/table";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
+import { useBranchStore } from "@/store/branch-select-store";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -46,9 +47,11 @@ const UsersSubEntityTable = ({
       : optionalAttr?.includes(field.name || field.key)
   );
 
+  const branchId = useBranchStore((state) => state.branchId);
+
   const tableConfig = {
     ...usersConfig,
-    url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
+    url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}&branch_id=${branchId}`,
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,

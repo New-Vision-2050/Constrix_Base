@@ -11,18 +11,21 @@ import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useBranchStore } from "@/store/branch-select-store";
 
 const OfficialData = ({ id }: { id?: string }) => {
   const { company_id } = useParams();
 
+  const branchId = useBranchStore((state) => state.branchId);
+
   const { data, isPending, isSuccess } = useQuery({
-    queryKey: ["main-company-data", id, company_id],
+    queryKey: ["main-company-data", id, company_id, branchId],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
         "/companies/current-auth-company",
         {
           params: {
-            ...(id && { branch_id: id }),
+            ...(id ? { branch_id: id }: { branch_id: branchId }),
             ...(company_id && { company_id }),
           },
         }

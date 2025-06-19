@@ -8,6 +8,7 @@ import React from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
+import { useBranchStore } from "@/store/branch-select-store";
 
 interface CompanyData {
   id: string;
@@ -42,9 +43,10 @@ export const EmployeeTableConfig = ({
   registration_form_id,
 }: Record<string, string>) => {
   const t = useTranslations();
+  const branchId = useBranchStore((state) => state.branchId);
 
   return {
-    url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
+    url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}&branch_id=${branchId}`,
     tableId: "employee-table", // Add tableId to the config
     //tableTitle: "هيكل الجدول",
     hideSearchField: true,

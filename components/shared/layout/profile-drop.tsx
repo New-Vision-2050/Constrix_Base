@@ -9,20 +9,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown, UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { deleteCookie, getCookie } from "cookies-next"; // Ensure you have this package installed
+import { deleteCookie } from "cookies-next"; // Ensure you have this package installed
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
 import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
 import { Fragment, ReactNode, useEffect, useState } from "react";
-import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
 import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { Check } from "lucide-react";
+import { useBranchStore } from "@/store/branch-select-store";
+
 // import { useLogout } from '@/modules/auth/store/mutations'
 
 interface menuItem {
@@ -36,15 +38,15 @@ interface menuItem {
 
 const ProfileDrop = () => {
   const t = useTranslations("Header");
-  const cookieValue = getCookie("current-branch-obj");
-  const branchObj = cookieValue ? JSON.parse(cookieValue as string) : null;
-  const branchId = branchObj?.id;
-
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const { data, isSuccess } = useCurrentCompany();
   const [open, setOpen] = useState<boolean>(false);
   const [branches, setBranches] = useState<menuItem[]>([]);
+  const setBranchId = useBranchStore((state) => state.setBranchId);
+  const branchId = useBranchStore((state) => state.branchId);
+
+
 
   // main items without branches and logout
   const mainMenuItems: menuItem[] = [
@@ -95,32 +97,23 @@ const ProfileDrop = () => {
     setOpen(!open);
   };
 
-  useEffect(
-    () => {
-      if (isSuccess && data?.payload?.branches?.length) {
-        const _branches = data?.payload?.branches?.map((branch, index) => ({
-          id: branch.id,
-          label: branch?.name,
-          icon: <CompanyIcon />,
-          hasTopSeparator: index === 0,
-          hasBottomSeparator: data?.payload?.branches?.length
-            ? index === data?.payload?.branches?.length - 1
-            : undefined,
-          func: () => {
-            setCookie(
-              "current-branch-obj",
-              JSON.stringify({
-                id: branch.id ?? "",
-                name: branch.name ?? "",
-              })
-            );
-          },
-        }));
-        setBranches(_branches);
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSuccess]
-  );
+  useEffect(() => {
+    if (isSuccess && data?.payload?.branches?.length) {
+      const _branches = data?.payload?.branches?.map((branch, index) => ({
+        id: branch.id,
+        label: branch?.name,
+        icon: <CompanyIcon />,
+        hasTopSeparator: index === 0,
+        hasBottomSeparator: data?.payload?.branches?.length
+          ? index === data?.payload?.branches?.length - 1
+          : undefined,
+        func: () => {
+          setBranchId(branch.id ?? null); 
+        },
+      }));
+      setBranches(_branches);
+    }
+  }, [isSuccess, data?.payload?.branches , setBranchId  , branchId]);
 
   return (
     <div className="flex justify-center items-center">
@@ -176,6 +169,7 @@ const ProfileDrop = () => {
                     >
                       {branch.icon}
                       {branch.label}
+                      {branchId === branch.id && <Check className="ml-2" size={16} />}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuSubContent>
