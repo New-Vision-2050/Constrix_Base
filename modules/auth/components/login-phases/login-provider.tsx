@@ -11,9 +11,31 @@ import ValidateEmailPhase from "./validate-email";
 import SecurityQuestionsPhase from "./security-questions";
 import ChangeEmailPhase from "./change-email";
 import ValidatePhonePhase from "./validate-phone";
+import { useEffect } from "react";
+import fetchLoginAdmin from "@/modules/companies/api/fetch-login-admin";
 
 const LoginProvider = () => {
   const { form, step, handleSetStep, handleStepBack } = useLogin();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    console.log("Token in URL:", token );
+    if (token) {
+      console.log("Token in URL:", token);
+    }
+    const redirectUrl = urlParams.get("url");
+    if (token  && redirectUrl) {
+      fetchLoginAdmin(token)
+        .then((loginToken:any) => {
+          document.cookie = `new-vision-token=${loginToken}; path=/; max-age=604800;`;
+          window.location.href = redirectUrl;
+        })
+        .catch((error:any) => {
+          console.error("Failed to login as admin:", error);
+        });
+    }
+  }, []);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
