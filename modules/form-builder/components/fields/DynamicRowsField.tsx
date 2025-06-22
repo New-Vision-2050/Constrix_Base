@@ -116,10 +116,10 @@ const DynamicRowsField = React.forwardRef<
   DynamicRowsFieldRef,
   DynamicRowsFieldProps
 >(
-  (
+  function DynamicRowsField(
     { field, value, error, touched, onChange, onBlur, formId = "default" },
     ref
-  ) => {
+  ) {
     console.log({ field, value });
   // Get the current locale to determine text direction
   const locale = useLocale();
@@ -765,15 +765,14 @@ const DynamicRowsField = React.forwardRef<
           onClose={cancelDelete}
           open={deleteID !== null}
           onSuccess={() => {
-            field?.dynamicRowOptions?.onDeleteSuccess
-              ? field?.dynamicRowOptions?.onDeleteSuccess()
-              : null;
+            if (field?.dynamicRowOptions?.onDeleteSuccess) {
+              field.dynamicRowOptions.onDeleteSuccess();
+            }
           }}
       />
     </div>
   );
-  }
-);
+});
 
 
 export default DynamicRowsField;
