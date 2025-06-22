@@ -21,6 +21,10 @@ const LoginProvider = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
+    console.log("Token in URL:", token );
+    if (token) {
+      console.log("Token in URL:", token);
+    }
     const redirectUrl = urlParams.get("url");
     console.log("Token:", token);
     console.log("Redirect URL:", redirectUrl);

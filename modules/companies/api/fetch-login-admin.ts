@@ -9,7 +9,6 @@ interface LoginAdminResponse {
 }
 
 export default async function fetchLoginAdmin(token: string) {
-
   const url = `/auths/login-as-admin`;
   const res = await apiClient.post<LoginAdminResponse>(url, { token });
   return res.data.payload.token;
