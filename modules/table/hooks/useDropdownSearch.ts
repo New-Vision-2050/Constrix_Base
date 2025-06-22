@@ -472,9 +472,8 @@ export const useDropdownSearch = ({
           throw new Error("Expected array response from API");
         }
 
-        
+
   if (dynamicConfig.paginationEnabled) {
-      if (dynamicConfig.paginationEnabled) {
         setHasMore(response.data.pagination?.last_page > response.data.pagination?.page)
       }
       // Extract values and labels from the response
@@ -487,9 +486,6 @@ export const useDropdownSearch = ({
             label: String(item),
           };
         }          // Handle array format [value, label]
-        }
-
-          // Handle array format [value, label]
           if (Array.isArray(item)) {
             // If item is an array, use indices as valueField and labelField
             // For example, if valueField is "0" and labelField is "1", use item[0] as value and item[1] as label

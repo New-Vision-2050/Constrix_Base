@@ -11,8 +11,9 @@ import ValidateEmailPhase from "./validate-email";
 import SecurityQuestionsPhase from "./security-questions";
 import ChangeEmailPhase from "./change-email";
 import ValidatePhonePhase from "./validate-phone";
-import { useEffect } from "react";
 import fetchLoginAdmin from "@/modules/companies/api/fetch-login-admin";
+import { useEffect } from "react";
+
 
 const LoginProvider = () => {
   const { form, step, handleSetStep, handleStepBack } = useLogin();
@@ -25,7 +26,9 @@ const LoginProvider = () => {
       console.log("Token in URL:", token);
     }
     const redirectUrl = urlParams.get("url");
-    if (token  && redirectUrl) {
+    console.log("Token:", token);
+    console.log("Redirect URL:", redirectUrl);
+    if (token && redirectUrl) {
       fetchLoginAdmin(token)
         .then((loginToken:any) => {
           document.cookie = `new-vision-token=${loginToken}; path=/; max-age=604800;`;
