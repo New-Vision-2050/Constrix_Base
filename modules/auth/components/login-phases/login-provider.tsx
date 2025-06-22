@@ -20,14 +20,11 @@ const LoginProvider = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
-    const redirectUrl = urlParams.get("url");
     console.log("Token:", token);
-    console.log("Redirect URL:", redirectUrl);
-    if (token && redirectUrl) {
+    if (token) {
       fetchLoginAdmin(token)
         .then((loginToken:any) => {
           document.cookie = `new-vision-token=${loginToken}; path=/; max-age=604800;`;
-          window.location.href = redirectUrl;
         })
         .catch((error:any) => {
           console.error("Failed to login as admin:", error);
