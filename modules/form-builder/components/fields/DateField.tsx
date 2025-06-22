@@ -141,6 +141,8 @@ const DateField: React.FC<DateFieldProps> = ({
             {...((field?.minDate?.formId && field?.minDate?.field) || field?.minDate?.value)? {fromDate: getMinDate()}:{}}
             {...((field?.maxDate?.formId && field?.maxDate?.field) || field?.maxDate?.value)? {toDate: getMaxDate()}:{}}
             {...props}
+            onChange={onChange}
+            value={value ||format(new Date(), "yyyy-MM-dd'T'00:00:00.000'Z'")}
           />}
         </PopoverContent>
       </Popover>
