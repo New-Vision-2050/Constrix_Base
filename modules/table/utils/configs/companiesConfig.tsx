@@ -138,7 +138,7 @@ export const CompaniesConfig = () => {
               const { url, token } = data;
               if (url && token) {
                 router.push(
-                  `${url}/login/?token=${token}}`
+                  `${url}/login/?token=${token}`
                 );    
               }
             })
