@@ -133,12 +133,24 @@ export const CompaniesConfig = () => {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: (e:any) => {
+<<<<<<< HEAD
           fetchCompanyAdmin(e.id).then((data) => {
             const { url, token } = data;
             if (url && token) {
               router.push(`${url}/login/?token=${token}`);
             }
           });
+=======
+          fetchCompanyAdmin(e.id)
+            .then((data) => {
+              const { url, token } = data;
+              if (url && token) {
+                router.push(
+                  `${url}/login/?token=${token}`
+                );    
+              }
+            })
+>>>>>>> 7239737f37cdb3e9611db8ef52b613c67f5f0399
         },
       },
       {
