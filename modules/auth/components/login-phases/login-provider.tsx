@@ -21,13 +21,15 @@ const LoginProvider = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
-    console.log("Token:", token);
     if (token) {
       fetchLoginAdmin(token)
-        .then((loginToken:any) => {
+        .then((loginToken) => {
           document.cookie = `new-vision-token=${loginToken}; path=/; max-age=604800;`;
         })
-        .catch((error:any) => {
+        .then(() => {
+          window.location.href = "/dashboard";
+        })
+        .catch((error) => {
           console.error("Failed to login as admin:", error);
         });
     }
