@@ -39,7 +39,7 @@ export interface UserTableRow {
 
 // Create a component that uses the translations
 export const UsersConfig = () => {
-  const t = useTranslations();
+  const t = useTranslations("Companies");
 
   return {
     url: `${baseURL}/company-users`,
@@ -58,7 +58,7 @@ export const UsersConfig = () => {
       },
       {
         key: "email",
-        label: t("Companies.Email"),
+        label: t("Email"),
         sortable: true,
       },
       {
@@ -131,7 +131,7 @@ export const UsersConfig = () => {
       },
       {
         key: "data_status",
-        label: t("Companies.DataStatus"),
+        label: t("DataStatus"),
         sortable: true,
         render: (value: 0 | 1) => <DataStatus dataStatus={value} />,
       },
@@ -185,8 +185,8 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    deleteUrl: `${baseURL}/users`,
-    formConfig: GetCompanyUserFormConfig,
+    // deleteUrl: `${baseURL}/company-users`,
+    formConfig: GetCompanyUserFormConfig(t),
     executions: [
       {
         label: "اكمال الملف الشخصي",
