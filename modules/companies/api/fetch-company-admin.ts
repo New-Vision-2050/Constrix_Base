@@ -9,7 +9,6 @@ type ResponseT = {
 type CompanyAdmin = {
   url: string;
   token: string;
-
 };
 
 export default async function fetchCompanyAdmin(CompanyId?: string) {
@@ -20,4 +19,3 @@ export default async function fetchCompanyAdmin(CompanyId?: string) {
 
   return res.data.payload;
 }
-

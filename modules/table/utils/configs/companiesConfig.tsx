@@ -139,7 +139,6 @@ export const CompaniesConfig = () => {
               router.push(`${url}/login/?token=${token}`);
             }
           });
-
         },
       },
       {
