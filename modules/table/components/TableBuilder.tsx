@@ -162,6 +162,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
               showEdit: Boolean((config as any)?.executionConfig?.canEdit),
               showDelete: Boolean((config as any)?.executionConfig?.canDelete),
               deleteConfirmMessage: (config as any)?.deleteConfirmMessage,
+              deleteUrl: config?.deleteUrl
             })
           ),
         });

@@ -63,6 +63,7 @@ const Execution = ({
   showEdit = true,
   showDelete = true,
   deleteConfirmMessage,
+  deleteUrl
 }: {
   row: { id: string; [key: string]: unknown };
   executions?: MenuItem[];
@@ -73,6 +74,7 @@ const Execution = ({
   showEdit?: boolean;
   showDelete?: boolean;
   deleteConfirmMessage?: string;
+  deleteUrl?:string
 }) => {
   const t = useTranslations();
 
@@ -147,7 +149,7 @@ const Execution = ({
           open: true,
           url:
             action === "delete"
-              ? `${formConfig?.apiUrl}/${row.id}`
+              ? `${deleteUrl ? deleteUrl : formConfig?.apiUrl}/${row.id}`
               : prev[action]?.url,
         },
       }));

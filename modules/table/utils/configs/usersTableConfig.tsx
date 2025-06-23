@@ -185,6 +185,7 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    deleteUrl: `${baseURL}/users`,
     formConfig: GetCompanyUserFormConfig,
     executions: [
       {
