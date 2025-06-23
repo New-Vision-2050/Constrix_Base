@@ -7,6 +7,7 @@ import React from "react";
 import Link from "next/link";
 import { Project } from "@/types/sidebar-menu";
 import {motion} from 'framer-motion';
+import { useAbility } from "@/contexts/AbilityContext";
 
 type PropsT = {
   activeUrl: string;
@@ -23,6 +24,7 @@ function isValidIconKey(key: string): key is IconKey {
 export default function ShowSubPrograms(props: PropsT) {
   const { open } = useSidebar();
   // declare and define component state and variables
+  const ability = useAbility();
   const { activeProject, activeUrl, handleSub_entitiesItemClick } = props;
 
   return (
@@ -41,7 +43,8 @@ export default function ShowSubPrograms(props: PropsT) {
         </label>
       </motion.div>
       {activeProject.sub_entities && (
-        <div className="ml-8 mt-1 space-y-1">
+        <div className="ml-8 px-2 mt-1 space-y-1">
+          {ability.can("create", "Article") && <p>hello</p>}
           {activeProject.sub_entities.map((sub) => (
             <SidebarMenuButton
               asChild
