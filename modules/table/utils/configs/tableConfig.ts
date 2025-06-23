@@ -31,4 +31,9 @@ export interface TableConfig {
   hideSearchField?: boolean;
   tableTitle?: string;
   deleteConfirmMessage?: string;
+  executionConfig?:{
+    canDelete?:boolean;
+    canEdit?:boolean;
+    deleteUrl?:string;
+  }
 }
