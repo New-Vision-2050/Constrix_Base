@@ -7,8 +7,10 @@ import {
   getHijriDate,
 } from "@/modules/table/components/ui/HijriCalendar";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const PersonalDataFormConfig = () => {
+  const  t = useTranslations();
   const { user } = useUserProfileCxt();
   const { userPersonalData } = usePersonalDataTabCxt();
   const {
@@ -19,7 +21,7 @@ export const PersonalDataFormConfig = () => {
 
   const PersonalFormConfig: FormConfig = {
     formId: `personal-data-form`,
-    title: "البيانات الشخصية",
+    title: t("PersonalDataForm.title"),
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
       enabled: true,
@@ -30,55 +32,55 @@ export const PersonalDataFormConfig = () => {
         fields: [
           {
             name: "name",
-            label: "الاسم ثلاثي",
+            label: t("PersonalDataForm.name"),
             type: "text",
-            placeholder: "Name",
+            placeholder: t("PersonalDataForm.namePlaceholder"),
             validation: [
               {
                 type: "required",
-                message: "الاسم مطلوب",
+                message: t("PersonalDataForm.nameRequired"),
               },
             ],
           },
           {
             name: "nickname",
-            label: "اسم الشهرة",
+            label: t("PersonalDataForm.nickname"),
             type: "text",
-            placeholder: "nick name",
+            placeholder: t("PersonalDataForm.nicknamePlaceholder"),
             validation: [
               {
                 type: "required",
-                message: "الاسم الشهرة مطلوب",
+                message: t("PersonalDataForm.nicknameRequired"),
               },
             ],
           },
           {
             name: "gender",
-            label: "الجنس",
+            label: t("PersonalDataForm.gender"),
             type: "select",
-            placeholder: "Gender",
+            placeholder: t("PersonalDataForm.genderPlaceholder"),
             options: [
-              { label: "Male", value: "male" },
-              { label: "Female", value: "female" },
+              { label: t("PersonalDataForm.genderMale"), value: "male" },
+              { label: t("PersonalDataForm.genderFemale"), value: "female" },
             ],
             validation: [
               {
                 type: "required",
-                message: "الجنس مطلوب",
+                message: t("PersonalDataForm.genderRequired"),
               },
             ],
           },
           {
             name: "is_default",
-            label: "افتراضي ؟",
+            label: t("PersonalDataForm.is_default"),
             type: "checkbox",
-            placeholder: "Is Default?",
+            placeholder: t("PersonalDataForm.isDefaultPlaceholder"),
           },
           {
             name: "birthdate_gregorian",
-            label: "تاريخ الميلاد",
+            label: t("PersonalDataForm.birthdate_gregorian"),
             type: "date",
-            placeholder: "Birthdate Gregorian",
+            placeholder: t("PersonalDataForm.birthdateGregorianPlaceholder"),
             onChange: (newValue, values) => {
               useFormStore
                 ?.getState()
@@ -91,16 +93,16 @@ export const PersonalDataFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "التاريخ الميلادي مطلوب",
+                message: t("PersonalDataForm.birthdateGregorianRequired"),
               },
             ],
           },
           {
             name: "birthdate_hijri",
-            label: "تاريخ الهجري",
+            label: t("PersonalDataForm.birthdate_hijri"),
             type: "date",
             isHijri: true,
-            placeholder: "Birthdate Hijri",
+            placeholder: t("PersonalDataForm.birthdateHijriPlaceholder"),
             onChange: (newValue, values) => {
               useFormStore
                 ?.getState()
@@ -113,15 +115,15 @@ export const PersonalDataFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "التاريخ الهجري مطلوب",
+                message: t("PersonalDataForm.birthdateHijriRequired"),
               },
             ],
           },
           {
             name: "country_id",
-            label: "الجنسية",
+            label: t("PersonalDataForm.country_id"),
             type: "select",
-            placeholder: "اختر الجنسية",
+            placeholder: t("PersonalDataForm.countryPlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -137,7 +139,7 @@ export const PersonalDataFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "الجنسية مطلوب",
+                message: t("PersonalDataForm.countryRequired"),
               },
             ],
           },
@@ -154,10 +156,10 @@ export const PersonalDataFormConfig = () => {
       birthdate_hijri: userPersonalData?.birthdate_hijri,
       country_id: userPersonalData?.country_id?.toString(),
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("PersonalDataForm.submitButtonText"),
+    cancelButtonText: t("PersonalDataForm.cancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("PersonalDataForm.resetButtonText"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

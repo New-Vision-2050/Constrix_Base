@@ -386,5 +386,33 @@
       "loading": "تحميل بيانات الإدارات...",
       "confirmDelete": "هل انت متأكد من حذف هذه الإدارة؟"
     }
+  },
+  "PersonalDataForm": {
+    "title": "البيانات الشخصية",
+    "name": "الاسم ثلاثي",
+    "namePlaceholder": "ادخل الاسم الثلاثي",
+    "nameRequired": "الاسم مطلوب",
+    "nickname": "اسم الشهرة",
+    "nicknamePlaceholder": "ادخل اسم الشهرة",
+    "nicknameRequired": "اسم الشهرة مطلوب",
+    "gender": "الجنس",
+    "genderPlaceholder": "اختر الجنس",
+    "genderMale": "ذكر",
+    "genderFemale": "أنثى",
+    "genderRequired": "الجنس مطلوب",
+    "is_default": "افتراضي ؟",
+    "isDefaultPlaceholder": "افتراضي؟",
+    "birthdate_gregorian": "تاريخ الميلاد",
+    "birthdateGregorianPlaceholder": "ادخل تاريخ الميلاد الميلادي",
+    "birthdateGregorianRequired": "التاريخ الميلادي مطلوب",
+    "birthdate_hijri": "تاريخ الهجري",
+    "birthdateHijriPlaceholder": "ادخل تاريخ الميلاد الهجري",
+    "birthdateHijriRequired": "التاريخ الهجري مطلوب",
+    "country_id": "الجنسية",
+    "countryPlaceholder": "اختر الجنسية",
+    "countryRequired": "الجنسية مطلوبة",
+    "submitButtonText": "حفظ",
+    "cancelButtonText": "إلغاء",
+    "resetButtonText": "مسح النموذج"
   }
 }

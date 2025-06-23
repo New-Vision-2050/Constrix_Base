@@ -386,5 +386,33 @@
       "loading": "Loading Managements data...",
       "confirmDelete": "Are you sure you want to delete this management?"
     }
+  },
+  "PersonalDataForm": {
+    "title": "Personal Data",
+    "name": "Full Name",
+    "namePlaceholder": "Enter full name",
+    "nameRequired": "Name is required",
+    "nickname": "Nickname",
+    "nicknamePlaceholder": "Enter nickname",
+    "nicknameRequired": "Nickname is required",
+    "gender": "Gender",
+    "genderPlaceholder": "Select gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderRequired": "Gender is required",
+    "is_default": "Is Default?",
+    "isDefaultPlaceholder": "Is Default?",
+    "birthdate_gregorian": "Birthdate (Gregorian)",
+    "birthdateGregorianPlaceholder": "Enter Gregorian birthdate",
+    "birthdateGregorianRequired": "Gregorian birthdate is required",
+    "birthdate_hijri": "Birthdate (Hijri)",
+    "birthdateHijriPlaceholder": "Enter Hijri birthdate",
+    "birthdateHijriRequired": "Hijri birthdate is required",
+    "country_id": "Nationality",
+    "countryPlaceholder": "Select nationality",
+    "countryRequired": "Nationality is required",
+    "submitButtonText": "Save",
+    "cancelButtonText": "Cancel",
+    "resetButtonText": "Clear Form"
   }
 }
