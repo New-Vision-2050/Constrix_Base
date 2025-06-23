@@ -74,6 +74,9 @@ const Execution = ({
   showDelete?: boolean;
   deleteConfirmMessage?: string;
 }) => {
+
+  const {config} = useTableInstance(tableName)
+  const deleteUrl = config?.executionConfig?.deleteUrl  
   const t = useTranslations();
 
   const defaultMenuItems = useMemo(() => {
@@ -147,7 +150,7 @@ const Execution = ({
           open: true,
           url:
             action === "delete"
-              ? `${formConfig?.apiUrl}/${row.id}`
+              ? `${ deleteUrl ? deleteUrl : formConfig?.apiUrl}/${row.id}`
               : prev[action]?.url,
         },
       }));
