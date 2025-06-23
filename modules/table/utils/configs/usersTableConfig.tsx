@@ -202,6 +202,7 @@ export const UsersConfig = () => {
     executionConfig: {
       canEdit: false,
       canDelete: true,
+      deleteUrl: `${baseURL}/users`,
     },
   };
 };
