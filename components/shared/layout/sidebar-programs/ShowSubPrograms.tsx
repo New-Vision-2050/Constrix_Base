@@ -6,6 +6,7 @@ import { tableIcon } from "@/modules/program-settings/users-settings/tableIcon";
 import React from "react";
 import Link from "next/link";
 import { Project } from "@/types/sidebar-menu";
+import { useAbility } from "@/contexts/AbilityContext";
 
 type PropsT = {
   activeUrl: string;
@@ -21,6 +22,7 @@ function isValidIconKey(key: string): key is IconKey {
 
 export default function ShowSubPrograms(props: PropsT) {
   // declare and define component state and variables
+  const ability = useAbility();
   const { activeProject, activeUrl, handleSub_entitiesItemClick } = props;
 
   return (
@@ -33,6 +35,7 @@ export default function ShowSubPrograms(props: PropsT) {
       </label>
       {activeProject.sub_entities && (
         <div className="ml-8 px-2 mt-1 space-y-1">
+          {ability.can("create", "Article") && <p>hello</p>}
           {activeProject.sub_entities.map((sub) => (
             <SidebarMenuButton
               asChild
