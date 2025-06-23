@@ -8,51 +8,97 @@ import PencilLineIcon from "@/public/icons/pencil-line";
 import EyeIcon from "@/public/icons/eye-icon";
 import NationalAddressForm from "./national-address-form";
 import { CompanyAddress } from "@/modules/company-profile/types/company";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/config/axios-config";
+import { ServerSuccessResponse } from "@/types/ServerResponse";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const NationalAddress = ({
-  companyAddress,
   id,
+  currentCompanyId
 }: {
-  companyAddress: CompanyAddress;
   id?: string;
+  currentCompanyId?: string
 }) => {
+  const { data, isPending, isSuccess } = useQuery({
+    queryKey: ["company-address", id, currentCompanyId],
+    queryFn: async () => {
+      const response = await apiClient.get<ServerSuccessResponse<CompanyAddress>>(
+        "/companies/company-profile/company-address",
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(currentCompanyId && { company_id: currentCompanyId }),
+          },
+        }
+      );
+
+      return response.data;
+    },
+  });
+
+  const companyAddress = data?.payload;
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
 
+  const noAddressMessage = (
+    <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
+      <InfoIcon additionClass="text-orange-500 " />
+      <p className="text-center px-5">يجب تحديد عنوان واحد على الاقل</p>
+    </div>
+  );
+
   return (
-    <FormFieldSet
-      title="العنوان الوطني"
-      valid={
-        !!companyAddress &&
-        Object.values(companyAddress).every((value) => !!value)
-      }
-      secondTitle={
-        <Button variant={"ghost"} onClick={handleEditClick}>
-          {mode === "Preview" ? (
-            <PencilLineIcon additionalClass="text-pink-600" />
-          ) : (
-            <EyeIcon />
-          )}
-        </Button>
-      }
-    >
-      {mode === "Preview" ? (
-        <>
-          {!!companyAddress ? (
-            <NationalAddressDataPreview companyAddress={companyAddress} />
-          ) : (
-            <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
-              <InfoIcon additionClass="text-orange-500 " />
-              <p className="text-center px-5">يجب تحديد عنوان واحد على الاقل</p>
-            </div>
-          )}
-        </>
-      ) : (
-        <NationalAddressForm companyAddress={companyAddress} id={id} handleEditClick={handleEditClick}/>
+    <>
+      {isPending && (
+        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton key={index} className="w-full h-10" />
+          ))}
+        </div>
       )}
-    </FormFieldSet>
+
+      {isSuccess && (
+        <FormFieldSet
+          title="العنوان الوطني"
+          valid={!!companyAddress}
+          secondTitle={
+            <Button variant={"ghost"} onClick={handleEditClick}>
+              {mode === "Preview" ? (
+                <PencilLineIcon additionalClass="text-pink-600" />
+              ) : (
+                <EyeIcon />
+              )}
+            </Button>
+          }
+        >
+          {mode === "Preview" ? (
+            <>
+              {companyAddress ? (
+                <NationalAddressDataPreview companyAddress={companyAddress} />
+              ) : (
+                noAddressMessage
+              )}
+            </>
+          ) : (
+            <>
+              {companyAddress ? (
+                <NationalAddressForm 
+                  companyAddress={companyAddress} 
+                  id={id} 
+                  handleEditClick={handleEditClick}
+                  currentCompanyId={currentCompanyId}
+                />
+              ) : (
+                noAddressMessage
+              )}
+            </>
+          )}
+        </FormFieldSet>
+      )}
+    </>
   );
 };
 

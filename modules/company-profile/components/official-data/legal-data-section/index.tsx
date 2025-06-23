@@ -18,16 +18,39 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { LegalDataReqFormEditConfig } from "./legal-data-req-form-edit-config";
 import { LegalDataAddReqFormEditConfig } from "./legal-data-add-req-form-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/config/axios-config";
+import { ServerSuccessResponse } from "@/types/ServerResponse";
+import { Skeleton } from '@/components/ui/skeleton';
 
 const LegalDataSection = ({
-  companyLegalData = [],
   currentCompanyId,
   id,
 }: {
-  companyLegalData: CompanyLegalData[];
   currentCompanyId:string,
   id?: string;
 }) => {
+
+    const { data, isPending, isSuccess } = useQuery({
+    queryKey: ["company-legal-data", id, currentCompanyId],
+    queryFn: async () => {
+      const response = await apiClient.get<ServerSuccessResponse<CompanyLegalData[]>>(
+        "/companies/company-profile/company-legal-data",
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(currentCompanyId && { company_id:currentCompanyId }),
+          },
+        }
+      );
+
+      return response.data;
+    },
+  });
+
+  const companyLegalData = data?.payload ?? [];
+
+
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -54,8 +77,18 @@ const LegalDataSection = ({
     },
   ];
 
+
   return (
     <>
+      {isPending && (
+        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="w-full h-10" />
+          ))}
+        </div>
+      )}
+
+      {isSuccess &&  (
       <FormFieldSet
         title="البيانات القانونية"
         valid={
@@ -73,21 +106,20 @@ const LegalDataSection = ({
           />
         }
       >
+        {!!companyLegalData && companyLegalData.length > 0 ? <>
         {mode === "Preview" ? (
-          <>
-            {!!companyLegalData && companyLegalData.length > 0 ? (
-              <LegalDataPreview companyLegalData={companyLegalData} />
-            ) : (
-              <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
-                <InfoIcon additionClass="text-orange-500 " />
-                <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
-              </div>
-            )}
-          </>
+          <LegalDataPreview companyLegalData={companyLegalData} />
         ) : (
           <LegalDataForm companyLegalData={companyLegalData} id={id} handleEditClick={handleEditClick} />
         )}
+        </> :    
+        <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
+          <InfoIcon additionClass="text-orange-500 " />
+          <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
+        </div>
+        }
       </FormFieldSet>
+      )}
 
       <Sheet open={isOpenMyReq} onOpenChange={handleCloseMyReq}>
         <SheetContent
@@ -102,6 +134,7 @@ const LegalDataSection = ({
             الرجوع
           </Button>
         </SheetContent>
+      </Sheet>
 
         <SheetFormBuilder
           config={LegalDataReqFormEditConfig({companyLegalData, company_id:currentCompanyId,id})}
@@ -110,11 +143,10 @@ const LegalDataSection = ({
         />
 
         <SheetFormBuilder
-          config={LegalDataAddReqFormEditConfig(id)}
+          config={LegalDataAddReqFormEditConfig(id ,currentCompanyId)}
           isOpen={isOpenMyForm}
           onOpenChange={handleCloseMyForm}
         />
-      </Sheet>
     </>
   );
 };

@@ -17,22 +17,43 @@ import {
 import { Button } from "@/components/ui/button";
 import SettingsIcon from "@/public/icons/settings";
 import { useLocale } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/config/axios-config";
+import { ServerSuccessResponse } from "@/types/ServerResponse";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const OfficialDocsSection = ({
-  companyOfficialDocuments,
   id,
+  currentCompanyId
 }: {
-  companyOfficialDocuments: CompanyDocument[];
   id?: string;
+  currentCompanyId?: string;
 }) => {
+
+      const { data, isPending, isSuccess } = useQuery({
+    queryKey: ["company-official-documents", id, currentCompanyId],
+    queryFn: async () => {
+      const response = await apiClient.get<ServerSuccessResponse<CompanyDocument[]>>(
+        "/companies/company-profile/company-official-documents",
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(currentCompanyId && { company_id:currentCompanyId }),
+          },
+        }
+      );
+
+      return response.data;
+    },
+  });
+
+  const companyOfficialDocuments = data?.payload ?? [];
+
   const locale = useLocale();
   const isRTL = locale === "ar";
 
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
   const [isOpenAddDoc, handleOpenAddDoc, handleCloseAddDoc] = useModal();
-
-  const handleEditClick = () =>
-    setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
 
   const dropdownItems = [
     {
@@ -43,6 +64,16 @@ const OfficialDocsSection = ({
 
   return (
     <>
+      {isPending && (
+        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="w-full h-10" />
+          ))}
+        </div>
+      )}
+
+      {isSuccess && (
+
       <FormFieldSet
         title="المستندات الرسمية"
         valid={
@@ -65,8 +96,7 @@ const OfficialDocsSection = ({
           </DropdownMenu>
         }
       >
-        {mode === "Preview" ? (
-          <>
+     
             {!!companyOfficialDocuments &&
             companyOfficialDocuments.length > 0 ? (
               <DocsTable
@@ -81,13 +111,14 @@ const OfficialDocsSection = ({
                 </p>
               </div>
             )}
-          </>
-        ) : (
-          <div>form</div>
-        )}
+  
       </FormFieldSet>
+
+      )}
+
+
       <SheetFormBuilder
-        config={AddDocFormConfig(id)}
+        config={AddDocFormConfig(id , currentCompanyId)}
         isOpen={isOpenAddDoc}
         onOpenChange={handleCloseAddDoc}
       />

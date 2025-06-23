@@ -1,12 +1,12 @@
 "use client";
-import { Check, MapPin, CircleCheck } from "lucide-react";
+import { MapPin, CircleCheck } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BranchesInfo from "./branches-info";
 import OfficialData from "../official-data";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
-import { CompanyData } from "../../types/company";
+import { Branch } from "../../types/company";
 import { apiClient } from "@/config/axios-config";
 import { useParams } from "next/navigation";
 
@@ -15,11 +15,11 @@ const Branches = () => {
 
   const locale = useLocale();
   const isRtl = locale === "ar";
-  const { data: cachedData, isLoading } = useQuery({
-    queryKey: ["main-company-data", undefined, company_id],
+    const { data, isPending, isSuccess } = useQuery({
+    queryKey: ["company-branches", company_id],
     queryFn: async () => {
-      const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
-        "/companies/current-auth-company",
+      const response = await apiClient.get<ServerSuccessResponse<Branch[]>>(
+        "/companies/company-profile/company-branches",
         {
           params: {
             ...(company_id && { company_id }),
@@ -30,10 +30,7 @@ const Branches = () => {
       return response.data;
     },
   });
-
-  console.log({ cachedData });
-
-  const branches = cachedData?.payload?.branches ?? [];
+  const branches = data?.payload ?? [];
 
   const tabs = () => {
     const dynamicBranchTabs =
