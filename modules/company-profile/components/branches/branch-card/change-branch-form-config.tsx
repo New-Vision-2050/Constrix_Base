@@ -54,7 +54,7 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", undefined, company_id],
+        queryKey: ["company-branches",  company_id],
       });
     },
 
