@@ -18,7 +18,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     apiUrl: `${baseURL}/management_hierarchies/create-branch`,
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["company-branches", company_id],
+        queryKey: ["main-company-data", undefined, company_id],
       });
     },
     title: "اضافة فرع جديد",

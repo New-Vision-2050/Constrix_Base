@@ -47,7 +47,10 @@ const OfficialData = ({ id }: { id?: string }) => {
     phone,
     email,
     company_type_id,
+    company_legal_data,
     general_manager,
+    company_address,
+    company_official_documents,
   } = payload as CompanyData;
 
   return (
@@ -80,16 +83,16 @@ const OfficialData = ({ id }: { id?: string }) => {
             currentCompanyId={currentCompanyId}
           />
 
-          <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+          <LegalDataSection companyLegalData={company_legal_data} id={id} currentCompanyId={currentCompanyId} />
 
           <SupportData generalManager={general_manager} />
 
-          <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+          <NationalAddress companyAddress={company_address} id={id} />
 
           <OfficialDocsSection
+            companyOfficialDocuments={company_official_documents}
             id={id}
-            currentCompanyId={currentCompanyId}
-          />  
+          />
         </>
       )}
     </div>

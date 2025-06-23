@@ -122,7 +122,7 @@ export const LegalDataFormConfig = (
               deleteUrl: `${baseURL}/companies/company-profile/legal-data`,
               onDeleteSuccess: () => {
                 queryClient.refetchQueries({
-                  queryKey: ["company-legal-data", id, company_id],
+                  queryKey: ["main-company-data", id, company_id],
                 });
               },
             },

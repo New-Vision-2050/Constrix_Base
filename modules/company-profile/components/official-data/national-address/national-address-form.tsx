@@ -6,15 +6,13 @@ import { CompanyAddress } from "@/modules/company-profile/types/company";
 const NationalAddressForm = ({
   companyAddress,
   id,
-  currentCompanyId,
   handleEditClick,
 }: {
-  companyAddress?: CompanyAddress;
+  companyAddress: CompanyAddress;
   id?: string;
-  currentCompanyId?: string;
   handleEditClick?: () => void;
 }) => {
-  const config = NationalAddressFormConfig(companyAddress, id, currentCompanyId);
+  const config = NationalAddressFormConfig(companyAddress, id);
   return (
     <FormContent
       config={{

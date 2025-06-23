@@ -149,6 +149,10 @@ export interface CompanyData {
   is_central_company: number;
   branch: string;
   main_branch: MainBranch;
+  company_legal_data: CompanyLegalData[] | [];
+  company_address: CompanyAddress;
+  company_official_documents: CompanyDocument[] | [];
+  branches: Branch[];
   created_at: string | null;
   owner_id: string;
   owner_name: string;

@@ -22,7 +22,7 @@ export const updateBranchFormConfig = (
     apiUrl: `${baseURL}/management_hierarchies/create-branch`,
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["company-branches", company_id],
+        queryKey: ["main-company-data", undefined, company_id],
       });
     },
     title: "تعديل الفرع",
