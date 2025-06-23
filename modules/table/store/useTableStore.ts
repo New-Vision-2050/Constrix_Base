@@ -1,11 +1,12 @@
 import { create } from 'zustand';
-import { ColumnConfig } from '@/modules/table/utils/tableConfig';
+import { ColumnConfig, TableConfig } from '@/modules/table/utils/tableConfig';
 import { TableData, SortDirection, ColumnSearchState } from '@/modules/table/utils/tableTypes';
 import { useEffect, useMemo, useCallback, useRef } from 'react';
 
 // Define the state for a single table instance
 interface TableInstanceState {
   // Data state
+  config?: TableConfig;
   data: TableData[];
   columns: ColumnConfig[];
   visibleColumnKeys: string[];
@@ -57,6 +58,7 @@ interface TableState {
   // Action methods
   setTableId: (tableId: string) => void;
   initTable: (tableId: string) => void;
+  setTableConfig:(tableId: string, config: TableConfig)=>void;
   setData: (tableId: string, data: TableData[]) => void;
   setColumns: (tableId: string, columns: ColumnConfig[]) => void;
   setVisibleColumns: (tableId: string, columnKeys: string[]) => void;
@@ -125,6 +127,19 @@ export const useTableStore = create<TableState>((set) => ({
       [tableId]: state.tables[tableId] || getDefaultTableState()
     }
   })),
+
+  setTableConfig: (tableId: string, config: TableConfig) => set((state: TableState) => {
+    const tableState = state.tables[tableId] || getDefaultTableState();
+    return {
+      tables: {
+        ...state.tables,
+        [tableId]: {
+          ...tableState,
+          config
+        }
+      }
+    };
+  }),
   
   // Action methods for specific table instances
   setData: (tableId: string, data: TableData[]) => set((state: TableState) => ({
@@ -467,6 +482,9 @@ export const useTableInstance = (tableId: string) => {
   const tableState = useTableStore(selector);
   
   // Get the actions for this table with memoization to prevent unnecessary re-renders
+  const setTableConfig = useCallback((config: TableConfig) =>
+  useTableStore.getState().setTableConfig(tableId, config), [tableId]);
+
   const setData = useCallback((data: TableData[]) =>
     useTableStore.getState().setData(tableId, data), [tableId]);
     
@@ -543,6 +561,7 @@ export const useTableInstance = (tableId: string) => {
     ...tableState,
     
     // Actions
+    setTableConfig,
     setData,
     setColumns,
     setVisibleColumns,

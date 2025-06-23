@@ -25,6 +25,7 @@ export const useTableData = (
   const tableId = config?.tableId || "default";
   // Set the active table ID
   const setTableId = useTableStore((state) => state.setTableId);
+  const setTableConfig = useTableStore((state)=>state.setTableConfig)
 
   // Use a ref to track if we've already set the table ID
   const tableIdSetRef = useRef(false);
@@ -36,6 +37,7 @@ export const useTableData = (
         console.log(`[TableData] Setting active table ID: ${tableId}`);
       }
       setTableId(tableId);
+      setTableConfig(tableId, config)
       tableIdSetRef.current = true;
     }
 
