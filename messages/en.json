@@ -154,7 +154,9 @@
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
     "HumanResources": "Human Resources",
-    "ProgramManagement": "Program Management"
+    "ProgramManagement": "Program Management",
+    "Powers": "Powers"
+    
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

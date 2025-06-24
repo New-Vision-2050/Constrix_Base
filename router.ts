@@ -10,4 +10,6 @@ export const ROUTER = {
     USERS: "/users-settings",
   },
   Organizational_Structure: "/organizational-structure",
+  Powers: "/powers",
+  Bouquets: "/bouquets",
 };
