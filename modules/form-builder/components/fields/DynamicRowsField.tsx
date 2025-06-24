@@ -664,7 +664,7 @@ const DynamicRowsField = React.forwardRef<
                     >
                       <ArrowDown className="h-4 w-4" />
                     </Button>
-                    {canDeleteRow && (
+                    {/* {canDeleteRow && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -675,7 +675,7 @@ const DynamicRowsField = React.forwardRef<
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                    )}
+                    )} */}
                   </div>
                 </div>
 

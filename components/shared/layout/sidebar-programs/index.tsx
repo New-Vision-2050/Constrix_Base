@@ -3,14 +3,16 @@
 import { useCallback, useEffect, useState } from "react";
 import ShowSubPrograms from "./ShowSubPrograms";
 import ShowMainProjects from "./ShowMainProjects";
-import { SidebarGroup, SidebarMenu } from "@/components/ui/sidebar";
+import { SidebarGroup, SidebarMenu, useSidebar } from "@/components/ui/sidebar";
 import { Project } from "@/types/sidebar-menu";
+import {motion} from 'framer-motion'
 
 type PropsT = {
   projects: Project[];
 };
 
 export function SidebarProgramsList({ projects }: PropsT) {
+    const { open } = useSidebar();
   // declare and define component state and variables
   const pathname = window.location.pathname;
   const [activeUrl, setActiveUrl] = useState(
@@ -41,12 +43,19 @@ export function SidebarProgramsList({ projects }: PropsT) {
   return (
     <SidebarGroup>
       <SidebarMenu>
-        <ShowMainProjects
-          projects={projects}
-          activeProject={activeProject}
-          setActiveProject={setActiveProject}
-          handleSub_entitiesItemClick={handleSub_entitiesItemClick}
-        />
+         <motion.div
+          animate={{ height: open ? 100 : 0 }}
+          initial={false}
+          transition={{ duration: 0.3 }}
+          style={{ overflow: open? "visible": "hidden" }}
+        >
+          <ShowMainProjects
+            projects={projects}
+            activeProject={activeProject}
+            setActiveProject={setActiveProject}
+            handleSub_entitiesItemClick={handleSub_entitiesItemClick}
+          />
+        </motion.div>
 
         <ShowSubPrograms
           activeProject={activeProject}
