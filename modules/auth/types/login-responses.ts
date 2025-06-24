@@ -37,6 +37,7 @@ export type LoginStepsSuccessResponse = {
       id: string;
       name: string;
       email: string;
+      is_super_admin: number;
     };
   };
 };
