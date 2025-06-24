@@ -199,6 +199,22 @@ export function AppSidebar({
       ],
       isNotCentral: true,
     },
+    {
+      name: t("Sidebar.Powers"),
+      icon: SettingsIcon,
+      isActive: pageName === ROUTER.Powers,
+      slug: SUPER_ENTITY_SLUG.POWERS,
+      urls: [ROUTER.Bouquets],
+      sub_entities: [
+        {
+          name: "الباقات",
+          url: ROUTER.Bouquets,
+          icon: UserIcon,
+          isActive: pageName === ROUTER.Bouquets,
+        },
+      ],
+      isNotCentral: true,
+    },
   ];
 
   const projects = isCentral

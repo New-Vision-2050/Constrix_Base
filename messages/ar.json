@@ -154,7 +154,8 @@
     "CompanyName": "نيو فيجن",
     "OrganizationalStructure": "الهيكل التنظيمي",
     "HumanResources": "الموارد البشرية",
-    "ProgramManagement": "ادارة البرامج"
+    "ProgramManagement": "ادارة البرامج"  ,
+    "Powers": "الصلاحيات"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
