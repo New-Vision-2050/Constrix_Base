@@ -11,9 +11,28 @@ import ValidateEmailPhase from "./validate-email";
 import SecurityQuestionsPhase from "./security-questions";
 import ChangeEmailPhase from "./change-email";
 import ValidatePhonePhase from "./validate-phone";
+import { useEffect } from "react";
+import fetchLoginAdmin from "@/modules/companies/api/fetch-login-admin";
 
 const LoginProvider = () => {
   const { form, step, handleSetStep, handleStepBack } = useLogin();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+      fetchLoginAdmin(token)
+        .then((loginToken) => {
+          document.cookie = `new-vision-token=${loginToken}; path=/; max-age=604800;`;
+        })
+        .then(() => {
+          window.location.href = "/dashboard";
+        })
+        .catch((error) => {
+          console.error("Failed to login as admin:", error);
+        });
+    }
+  }, []);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
