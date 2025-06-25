@@ -1,5 +1,5 @@
 import { baseURL } from "@/config/axios-config";
-import AttendanceStatusBadge from "./components/AttendanceStatusBadge";
+import AttendanceStatusBadge from "../components/AttendanceStatusBadge";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import React from "react";
 
@@ -25,7 +25,6 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "name", 
         label: "الاسم", 
         sortable: true,
-        searchable: true,
         render: (value: any, row: AttendanceRecord) => row.name 
       },
       { 
@@ -44,21 +43,18 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "branch", 
         label: "الفرع", 
         sortable: true,
-        searchable: true,
         render: (value: any, row: AttendanceRecord) => row.branch 
       },
       { 
         key: "department", 
         label: "الإدارة", 
         sortable: true,
-        searchable: true,
         render: (value: any, row: AttendanceRecord) => row.department 
       },
       { 
         key: "approver", 
         label: "المعتمد", 
         sortable: true,
-        searchable: true,
         render: (value: any, row: AttendanceRecord) => row.approver 
       },
       { 
