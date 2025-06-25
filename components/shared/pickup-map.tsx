@@ -41,7 +41,7 @@ const PickupMap = ({
   viewOnly?: boolean;
 }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
-  const { setValue } = useFormStore();
+  const { setValue, getValue } = useFormStore();
 
   const handleSaveMap = (obj: Record<string, string | number | undefined>) => {
     if (formId) {
@@ -52,8 +52,27 @@ const PickupMap = ({
         }
       });
 
-      handleClose();
+      // Only close the dialog if __skipCloseOnSave is not set
+      if (!obj.__skipCloseOnSave) {
+        handleClose();
+      }
     }
+  };
+
+  // Get current form values when dialog opens
+  const getCurrentLocation = () => {
+    if (!formId) return undefined;
+    
+    const currentLat = getValue(formId, "latitude");
+    const currentLng = getValue(formId, "longitude");
+    
+    if (currentLat && currentLng) {
+      return {
+        latitude: currentLat.toString(),
+        longitude: currentLng.toString(),
+      };
+    }
+    return undefined;
   };
 
   return (
@@ -82,6 +101,7 @@ const PickupMap = ({
           </DialogHeader>
           <LocationSelector
             onSave={handleSaveMap}
+            currentLocation={getCurrentLocation()}
             {...(!!lat && !!long
               ? {
                   initialLocation: {
