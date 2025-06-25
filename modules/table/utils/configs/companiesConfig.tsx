@@ -9,6 +9,7 @@ import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companies
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import fetchCompanyAdmin from "@/modules/companies/api/fetch-company-admin";
+import { useToast } from "../../hooks/use-toast";
 
 // Define types for the company data
 interface CompanyData {
@@ -26,6 +27,7 @@ interface CompanyData {
 export const CompaniesConfig = () => {
   const t = useTranslations("Companies");
   const router = useRouter();
+  const { toast } = useToast();
 
   return {
     url: `${baseURL}/companies`,
@@ -133,12 +135,20 @@ export const CompaniesConfig = () => {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: (e: any) => {
-          fetchCompanyAdmin(e.id).then((data) => {
-            const { url, token } = data;
-            if (url && token) {
-              router.push(`${url}/login/?token=${token}`);
-            }
-          });
+          if(e.is_active){
+            fetchCompanyAdmin(e.id).then((data) => {
+              if (data && data.url && data.token) {
+                const { url, token } = data;
+                router.push(`${url}/login/?token=${token}`);
+              }
+            });
+          }
+          else{
+            toast({
+              title: "خطا",
+              description: "الشركة غير نشطه",
+            });
+          }
         },
       },
       {
