@@ -1,11 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { SidebarMenuButton } from "@/components/ui/sidebar";
+import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { tableIcon } from "@/modules/program-settings/users-settings/tableIcon";
 import React from "react";
 import Link from "next/link";
 import { Project } from "@/types/sidebar-menu";
+import {motion} from 'framer-motion';
 
 type PropsT = {
   activeUrl: string;
@@ -20,19 +21,27 @@ function isValidIconKey(key: string): key is IconKey {
 }
 
 export default function ShowSubPrograms(props: PropsT) {
+  const { open } = useSidebar();
   // declare and define component state and variables
   const { activeProject, activeUrl, handleSub_entitiesItemClick } = props;
 
   return (
     <div className="w-full">
-      <label
-        htmlFor="main-sidebar-item"
-        className="block mb-2 px-2  text-gray-700"
-      >
-        البرامج الفرعية
-      </label>
+      <motion.div
+          animate={{ height: open ? 25 : 0 }}
+          initial={false}
+          transition={{ duration: 0.3 }}
+          style={{ overflow: open? "visible": "hidden" }}
+        >
+        <label
+          htmlFor="main-sidebar-item"
+          className="block mb-2 px-2  text-gray-700"
+        >
+          البرامج الفرعية
+        </label>
+      </motion.div>
       {activeProject.sub_entities && (
-        <div className="ml-8 px-2 mt-1 space-y-1">
+        <div className="ml-8 mt-1 space-y-1">
           {activeProject.sub_entities.map((sub) => (
             <SidebarMenuButton
               asChild
