@@ -8,12 +8,12 @@ import {
   SheetFormBuilder,
 } from "@/modules/form-builder";
 import { useTranslations } from "next-intl";
-import { bouquetsConfig } from "@/modules/table/utils/configs/bouquetsTableConfig";
+import { programsConfig } from "@/modules/table/utils/configs/bouquetsTableConfig";
 import { Button } from "@/components/ui/button";
 
-function EntryPointBouquets() {
+function EntryPointPrograms() {
   const t = useTranslations("Companies");
-  const config = bouquetsConfig();
+  const config = programsConfig();
 
   return (
     <div className="px-8 space-y-7">
@@ -25,7 +25,7 @@ function EntryPointBouquets() {
           <div className="flex items-center gap-3">
             <SheetFormBuilder
               config={GetCompanyUserFormConfig(t)}
-              trigger={<Button>اضافة باقة</Button>}
+              trigger={<Button>اضافة برنامج</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);
               }}
@@ -37,4 +37,4 @@ function EntryPointBouquets() {
   );
 }
 
-export default EntryPointBouquets;
+export default EntryPointPrograms;
