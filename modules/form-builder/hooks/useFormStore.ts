@@ -124,6 +124,8 @@ export const useFormStore = create<FormState>((set, get) => ({
       return;
     }
 
+      state.setError(formId, field, null);
+
     // Update the value
     set((state: FormState) => ({
       forms: {
