@@ -11,8 +11,8 @@ import ValidateEmailPhase from "./validate-email";
 import SecurityQuestionsPhase from "./security-questions";
 import ChangeEmailPhase from "./change-email";
 import ValidatePhonePhase from "./validate-phone";
-import fetchLoginAdmin from "@/modules/companies/api/fetch-login-admin";
 import { useEffect } from "react";
+import fetchLoginAdmin from "@/modules/companies/api/fetch-login-admin";
 
 
 const LoginProvider = () => {
