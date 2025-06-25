@@ -132,7 +132,7 @@ export const CompaniesConfig = () => {
       {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
-        action: (e:any) => {
+        action: (e: any) => {
           fetchCompanyAdmin(e.id).then((data) => {
             const { url, token } = data;
             if (url && token) {
