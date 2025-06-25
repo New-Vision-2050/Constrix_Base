@@ -10,4 +10,5 @@ export const ROUTER = {
     USERS: "/users-settings",
   },
   Organizational_Structure: "/organizational-structure",
+  AttendanceDeparture: "/attendance-departure",
 };

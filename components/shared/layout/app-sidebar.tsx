@@ -132,6 +132,12 @@ export function AppSidebar({
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.Organizational_Structure,
           },
+          {
+            name: t("Sidebar.AttendanceDeparture"),
+            url: ROUTER.AttendanceDeparture,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.AttendanceDeparture,
+          },
         ],
         isNotCentral: false,
       },
