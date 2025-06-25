@@ -124,7 +124,7 @@ export const useFormStore = create<FormState>((set, get) => ({
       return;
     }
 
-      state.setError(formId, field, null);
+
 
     // Update the value
     set((state: FormState) => ({
@@ -136,6 +136,8 @@ export const useFormStore = create<FormState>((set, get) => ({
         },
       },
     }));
+
+    setTimeout( ()=> state.setError(formId, field, null),100)
   },
 
   // Actions for specific form instances
