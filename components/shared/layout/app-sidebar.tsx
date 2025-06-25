@@ -204,13 +204,13 @@ export function AppSidebar({
       icon: SettingsIcon,
       isActive: pageName === ROUTER.Powers,
       slug: SUPER_ENTITY_SLUG.POWERS,
-      urls: [ROUTER.Bouquets],
+      urls: [ROUTER.Programs],
       sub_entities: [
         {
-          name: "الباقات",
-          url: ROUTER.Bouquets,
+          name: "الباقات والبرامج",
+          url: ROUTER.Programs,
           icon: UserIcon,
-          isActive: pageName === ROUTER.Bouquets,
+          isActive: pageName === ROUTER.Programs,
         },
       ],
       isNotCentral: true,

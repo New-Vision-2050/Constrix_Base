@@ -11,5 +11,5 @@ export const ROUTER = {
   },
   Organizational_Structure: "/organizational-structure",
   Powers: "/powers",
-  Bouquets: "/bouquets",
+  Programs: "/programs-bouquets",
 };

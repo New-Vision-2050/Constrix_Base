@@ -39,7 +39,7 @@ export interface UserTableRow {
 }
 
 // Create a component that uses the translations
-export const bouquetsConfig = () => {
+export const programsConfig = () => {
   const t = useTranslations("Companies");
 
   return {
@@ -48,7 +48,7 @@ export const bouquetsConfig = () => {
     columns: [
       {
         key: "name",
-        label: "اسم الباقة",
+        label: "اسم البرنامج",
         // sortable: true,
         searchable: true,
         render: (_: unknown, row: UserTableRow) => (
@@ -61,7 +61,7 @@ export const bouquetsConfig = () => {
       },
       {
         key: "email",
-        label: "عدد الخدمات",
+        label: "عدد البرامج",
         // sortable: true,
         render: (_: unknown, row: UserTableRow) => (
           <p className="font-medium">1</p>
@@ -69,7 +69,7 @@ export const bouquetsConfig = () => {
       },
       {
         key: "email",
-        label: "قيمة الاشتراك",
+        label: "عدد الباقات",
         // sortable: true,
         render: (_: unknown, row: UserTableRow) => (
           <p className="font-medium">1,000 ر.س</p>
@@ -77,18 +77,10 @@ export const bouquetsConfig = () => {
       },
       {
         key: "email",
-        label: "مدة الاشتراك",
+        label: "المجالات المرتبطة",
         // sortable: true,
         render: (_: unknown, row: UserTableRow) => (
           <p className="font-medium">سنوية</p>
-        ),
-      },
-      {
-        key: "email",
-        label: "مجالات الباقة",
-        // sortable: true,
-        render: (_: unknown, row: UserTableRow) => (
-          <p className="font-medium">هندسي</p>
         ),
       },
       {
@@ -104,7 +96,7 @@ export const bouquetsConfig = () => {
         key: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "اسم الباقة",
+          placeholder: "اسم البرنامج",
         },
       },
       {
