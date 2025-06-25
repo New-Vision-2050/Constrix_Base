@@ -62,6 +62,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               url: `${baseURL}/banks`,
               valueField: "id",
               labelField: "name",
+              searchParam: "name",
               dependsOn: "country_id",
               filterParam: "country_id",
               paginationEnabled: true,
@@ -85,6 +86,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               url: `${baseURL}/bank_type_accounts`,
               valueField: "id",
               labelField: "name",
+              searchParam: "name",
               paginationEnabled: true,
             },
             validation: [
