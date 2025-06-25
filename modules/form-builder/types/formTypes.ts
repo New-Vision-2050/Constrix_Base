@@ -29,6 +29,10 @@ export interface ValidationRule {
 export interface DropdownOption {
   value: string;
   label: string;
+  features?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 export interface DynamicRowOptions {
