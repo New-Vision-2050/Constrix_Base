@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -177,22 +177,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         lng: e.latLng.lng(),
       };
       setMarkerPosition(newPosition);
-    }
-  };
-
-  // Handle manual input changes
-  const handleCoordinateChange = (formValues: LocationFormValues): void => {
-    const lat = parseFloat(formValues.latitude);
-    const lng = parseFloat(formValues.longitude);
-
-    if (!isNaN(lat) && !isNaN(lng)) {
-      const newPosition = { lat, lng };
-      setMarkerPosition(newPosition);
-
-      // Center the map on the new coordinates
-      if (map) {
-        map.panTo(newPosition);
-      }
     }
   };
 
