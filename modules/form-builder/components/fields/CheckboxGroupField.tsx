@@ -259,30 +259,59 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
             )}
 
             {options.map((option) => (
-              <div
-                key={option.value}
-                className="flex items-center gap-x-2 ps-6 mt-2"
-              >
-                <Checkbox
-                  id={`${field.name}-${option.value}`}
-                  name={field.name}
-                  checked={selectedValues.includes(option.value)}
-                  disabled={field.disabled}
-                  className={cn(
-                    field.className,
-                    !!error && touched ? "border-destructive" : ""
-                  )}
-                  onCheckedChange={(checked) =>
-                    handleChange(option.value, !!checked)
-                  }
-                  onBlur={onBlur}
-                />
-                <Label
-                  htmlFor={`${field.name}-${option.value}`}
-                  className="text-sm font-normal"
-                >
-                  {option.label}
-                </Label>
+              <div key={option.value}>
+                <div className="flex items-center gap-x-2 ps-6 mt-2">
+                  <Checkbox
+                    id={`${field.name}-${option.value}`}
+                    name={field.name}
+                    checked={selectedValues.includes(option.value)}
+                    disabled={field.disabled}
+                    className={cn(
+                      field.className,
+                      !!error && touched ? "border-destructive" : ""
+                    )}
+                    onCheckedChange={(checked) =>
+                      handleChange(option.value, !!checked)
+                    }
+                    onBlur={onBlur}
+                  />
+                  <Label
+                    htmlFor={`${field.name}-${option.value}`}
+                    className="text-sm font-normal"
+                  >
+                    {option.label}
+                  </Label>
+                </div>
+                
+                {/* Nested features checkboxes */}
+                {option.features && option.features.length > 0 && (
+                  <div className="ml-10 mt-1">
+                    {option.features.map((feature: {id: string; name: string}) => (
+                      <div key={feature.id} className="flex items-center gap-x-2 mt-1">
+                        <Checkbox
+                          id={`${field.name}-${option.value}-feature-${feature.id}`}
+                          name={`${field.name}-features`}
+                          checked={selectedValues.includes(feature.id)}
+                          disabled={field.disabled || !selectedValues.includes(option.value)}
+                          className={cn(
+                            field.className,
+                            !!error && touched ? "border-destructive" : ""
+                          )}
+                          onCheckedChange={(checked) =>
+                            handleChange(feature.id, !!checked)
+                          }
+                          onBlur={onBlur}
+                        />
+                        <Label
+                          htmlFor={`${field.name}-${option.value}-feature-${feature.id}`}
+                          className="text-sm font-normal text-muted-foreground"
+                        >
+                          {feature.name}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </CollapsibleContent>
