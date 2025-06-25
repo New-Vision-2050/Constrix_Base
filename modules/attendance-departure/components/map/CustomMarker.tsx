@@ -3,6 +3,19 @@ import { Marker } from 'react-leaflet';
 import L from 'leaflet';
 import { AttendanceRecord } from '../../constants/static-data';
 import EmployeeTooltip from './EmployeeTooltip';
+import { useAttendance } from '../../context/AttendanceContext';
+import { EmployeeDetails } from '../../types/employee';
+
+// دالة لتحويل حالات الحضور من الإنجليزية إلى العربية
+const mapAttendanceStatus = (status: string): string => {
+    switch (status) {
+        case 'present': return 'حاضر';
+        case 'absent': return 'غائب';
+        case 'late': return 'متأخر';
+        case 'excused': return 'إجازة';
+        default: return '-';
+    }
+};
 
 const getMarkerIcon = (status: string) => {
     const colorMap: { [key: string]: string } = {
@@ -46,15 +59,39 @@ interface CustomMarkerProps {
 }
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
+    // استخدام سياق الحضور للوصول إلى وظائف فتح وإغلاق الـ dialog
+    const { openEmployeeDialog } = useAttendance();
+    
+    // تحويل بيانات الموظف لتناسب المكون الجديد
+    const handleMarkerClick = () => {
+        // تحويل نوع البيانات من AttendanceRecord إلى EmployeeDetails
+        const employeeDetails: EmployeeDetails = {
+            id: employee.id.toString(), // تحويل الرقم إلى نص
+            name: employee.name,
+            phone: employee.employeeId || '-', // استخدام معرف الموظف كبديل للهاتف
+            department: employee.department || '-',
+            email: `${employee.employeeId}@example.com`, // إنشاء بريد إلكتروني افتراضي
+            branch: employee.branch || '-',
+            gender: '-', // قيمة افتراضية
+            birthDate: '-', // قيمة افتراضية
+            nationality: '-', // قيمة افتراضية
+            attendanceStatus: mapAttendanceStatus(employee.attendanceStatus), // تحويل حالة الحضور
+            employeeStatus: employee.employeeStatus || '-',
+            checkInTime: employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined, // وقت افتراضي للحضور
+            checkOutTime: employee.attendanceStatus === 'present' ? '17:00' : undefined, // وقت افتراضي للانصراف
+            avatarUrl: undefined // لا توجد صورة افتراضية
+        };
+        
+        openEmployeeDialog(employeeDetails);
+    };
+    
     return (
         <Marker
             key={employee.id}
             position={[employee.location.lat, employee.location.lng]}
             icon={getMarkerIcon(employee.attendanceStatus)}
             eventHandlers={{
-                click: () => {
-                    console.log(`Marker clicked for employee: ${employee.name}`);
-                },
+                click: handleMarkerClick,
             }}
         >
             <EmployeeTooltip employee={employee} />

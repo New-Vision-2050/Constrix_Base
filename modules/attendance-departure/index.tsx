@@ -5,12 +5,13 @@ import AttendanceDepartureTable from "./components/AttendanceDepartureTable/Atte
 import AttendanceDepartureSearchFilter from "./components/AttendanceDepartureSearchFilter";
 import AttendanceMap from "./components/map/AttendanceMap";
 import MapSearchFilter from "./components/map/MapSearchFilter";
+import EmployeeDetailsSheet from "./components/map/EmployeeDetails";
 import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
 import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
 
 // Internal component that uses the context
 function AttendanceContent() {
-  const { view } = useAttendance();
+  const { view, isEmployeeDialogOpen, selectedEmployee, closeEmployeeDialog } = useAttendance();
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -32,6 +33,13 @@ function AttendanceContent() {
           <AttendanceMap />
         </>
       )}
+      
+      {/* Employee details sheet dialog */}
+      <EmployeeDetailsSheet 
+        isOpen={isEmployeeDialogOpen}
+        onClose={closeEmployeeDialog}
+        employee={selectedEmployee}
+      />
     </div>
   );
 }
