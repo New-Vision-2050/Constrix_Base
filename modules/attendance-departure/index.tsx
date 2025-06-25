@@ -1,31 +1,48 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
 import AttendanceDateSelector from "./components/AttendanceDateSelector";
 import AttendanceDepartureTable from "./components/AttendanceDepartureTable/AttendanceDepartureTable";
 import AttendanceDepartureSearchFilter from "./components/AttendanceDepartureSearchFilter";
-import AttendanceMap from './components/map/AttendanceMap';
-import { Button } from '@/components/ui/button';
+import AttendanceMap from "./components/map/AttendanceMap";
+import MapSearchFilter from "./components/map/MapSearchFilter";
+import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
+import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
 
-export default function AttendanceDepartureIndex() {
-  const [view, setView] = useState('table'); // 'table' or 'map'
+// Internal component that uses the context
+function AttendanceContent() {
+  const { view } = useAttendance();
 
   return (
-    <div className="flex flex-col gap-4 container px-6">
-      <div className='flex justify-between items-center'>
-        <AttendanceDateSelector />
-        <Button onClick={() => setView(view === 'table' ? 'map' : 'table')}>
-          {view === 'table' ? 'عرض الخريطة' : 'عرض الجدول'}
-        </Button>
-      </div>
-      
-      {view === 'table' && <AttendanceDepartureSearchFilter />}
-      
-      {view === 'table' ? (
+    <div className="flex flex-col gap-2 w-full">
+      {/* Date selector */}
+      <AttendanceDateSelector />
+
+      {/* Statistics cards */}
+      <AttendanceDepartureStatisticsCards />
+
+      {/* Search filter */}
+      <AttendanceDepartureSearchFilter />
+
+      {/* Table or map */}
+      {view === "table" ? (
         <AttendanceDepartureTable />
       ) : (
-        <AttendanceMap />
+        <>
+          <MapSearchFilter />
+          <AttendanceMap />
+        </>
       )}
     </div>
+  );
+}
+
+// Main component that provides the context
+export default function AttendanceDepartureIndex() {
+  return (
+    <AttendanceProvider>
+      <div className="flex flex-col gap-4 container px-6">
+        <AttendanceContent />
+      </div>
+    </AttendanceProvider>
   );
 }

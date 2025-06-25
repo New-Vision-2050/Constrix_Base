@@ -7,7 +7,7 @@ import { staticBranches, staticDepartments, staticApprovers } from '../constants
 
 const AttendanceDepartureSearchFilter: React.FC = () => {
   return (
-    <div className="p-4 bg-[#140F35] rounded-lg">
+    <div className="p-4 bg-[#140F35] rounded-lg mb-4">
       <h3 className="text-white mb-4 text-right font-medium">فلتر البحث</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Input 
