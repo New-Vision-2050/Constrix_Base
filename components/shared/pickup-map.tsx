@@ -48,7 +48,7 @@ const PickupMap = ({
       const keys = keysToUpdate ?? defaultKeys;
       keys.forEach((key) => {
         if (obj[key] !== undefined) {
-          setValue(formId, key, obj[key]);
+          setTimeout(() => setValue(formId, key, obj[key]),100);
         }
       });
 
