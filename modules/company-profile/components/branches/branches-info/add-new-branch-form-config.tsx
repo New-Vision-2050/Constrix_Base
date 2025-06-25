@@ -95,7 +95,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           },
           {
             type: "select",
-            name: "city_id",
+            name: "state_id",
             label: "المحافظة",
             placeholder: "المحافظة",
             required: true,
@@ -121,7 +121,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
           },
           {
             type: "select",
-            name: "state_id",
+            name: "city_id",
             label: "المدينة",
             placeholder: "المدينة",
             required: true,
