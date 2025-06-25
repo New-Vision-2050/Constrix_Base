@@ -1,5 +1,5 @@
 import { baseURL } from "@/config/axios-config";
-import AttendanceStatusBadge from "../components/AttendanceStatusBadge";
+import AttendanceStatusBadge from "../components/AttendanceDepartureTable/AttendanceStatusBadge";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import React from "react";
 

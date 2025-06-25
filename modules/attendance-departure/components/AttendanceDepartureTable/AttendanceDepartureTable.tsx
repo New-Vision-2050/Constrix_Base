@@ -1,7 +1,7 @@
 'use client'
 import React from "react";
 import TableBuilder from "@/modules/table/components/TableBuilder";
-import { getAttendanceDepartureTableConfig } from "../config/AttendanceDepartureTableConfig";
+import { getAttendanceDepartureTableConfig } from "../../config/AttendanceDepartureTableConfig";
 import { Button } from "@/components/ui/button";
 
 const AttendanceDepartureTable: React.FC = () => {
