@@ -13,13 +13,15 @@ import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
+import { CompanyData } from "@/modules/company-profile/types/company";
 
 type PropsT = {
   branchId: string | number;
+  companyData?: CompanyData
 };
 
 const BranchManagementsStructure = (props: PropsT) => {
-  const { branchId } = props;
+  const { branchId , companyData} = props;
   const t = useTranslations("CompanyStructure.ManagementStructure");
   const [deletedId, setDeletedId] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -38,6 +40,7 @@ const BranchManagementsStructure = (props: PropsT) => {
       selectedNode,
       isUserCompanyOwner,
       companyOwnerId,
+      companyData
     });
   }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
   const { openSheet, isOpen, closeSheet } = useSheetForm({ config });
