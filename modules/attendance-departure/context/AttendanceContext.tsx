@@ -7,8 +7,8 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-
-import { EmployeeDetails } from "../components/map/EmployeeDetails";
+import { EmployeeDetails } from "../types/employee";
+import { AttendanceStatusRecord } from "../types/attendance";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -29,9 +29,21 @@ interface AttendanceContextType {
   selectedEmployee: EmployeeDetails | null;
   setSelectedEmployee: (employee: EmployeeDetails | null) => void;
   
-  // Functions to open and close the dialog
+  // Attendance status dialog state
+  isAttendanceStatusDialogOpen: boolean;
+  setAttendanceStatusDialogOpen: (isOpen: boolean) => void;
+  
+  // Selected attendance record data
+  selectedAttendanceRecord: AttendanceStatusRecord | null;
+  setSelectedAttendanceRecord: (record: AttendanceStatusRecord | null) => void;
+  
+  // Functions to open and close the employee dialog
   openEmployeeDialog: (employee: EmployeeDetails) => void;
   closeEmployeeDialog: () => void;
+  
+  // Functions to open and close the attendance status dialog
+  openAttendanceStatusDialog: (record: AttendanceStatusRecord) => void;
+  closeAttendanceStatusDialog: () => void;
 }
 
 // Create the context
@@ -59,6 +71,12 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Selected employee data
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeDetails | null>(null);
 
+  // Attendance status dialog state
+  const [isAttendanceStatusDialogOpen, setAttendanceStatusDialogOpen] = useState(false);
+  
+  // Selected attendance record data
+  const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState<AttendanceStatusRecord | null>(null);
+
   // Toggle view function
   const toggleView = useCallback((view: "table" | "map") => setView(view), []);
   
@@ -73,6 +91,18 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     setEmployeeDialogOpen(false);
     setTimeout(() => setSelectedEmployee(null), 300); // Clear employee data after dialog closes
   }, []);
+  
+  // Function to open the attendance status dialog
+  const openAttendanceStatusDialog = useCallback((record: AttendanceStatusRecord) => {
+    setSelectedAttendanceRecord(record);
+    setAttendanceStatusDialogOpen(true);
+  }, []);
+  
+  // Function to close the attendance status dialog
+  const closeAttendanceStatusDialog = useCallback(() => {
+    setAttendanceStatusDialogOpen(false);
+    setTimeout(() => setSelectedAttendanceRecord(null), 300); // Clear record data after dialog closes
+  }, []);
 
   // The value that will be provided to consumers
   const value: AttendanceContextType = {
@@ -86,6 +116,12 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     setSelectedEmployee,
     openEmployeeDialog,
     closeEmployeeDialog,
+    isAttendanceStatusDialogOpen,
+    setAttendanceStatusDialogOpen,
+    selectedAttendanceRecord,
+    setSelectedAttendanceRecord,
+    openAttendanceStatusDialog,
+    closeAttendanceStatusDialog,
   };
 
   return (

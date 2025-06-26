@@ -6,6 +6,7 @@ import AttendanceDepartureSearchFilter from "./components/AttendanceDepartureSea
 import AttendanceMap from "./components/map/AttendanceMap";
 import MapSearchFilter from "./components/map/MapSearchFilter";
 import EmployeeDetailsSheet from "./components/map/EmployeeDetails";
+import AttendanceStatusDialog from "./components/AttendanceDepartureTable/AttendanceStatusDialog";
 import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
 import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
 
@@ -40,6 +41,9 @@ function AttendanceContent() {
         onClose={closeEmployeeDialog}
         employee={selectedEmployee}
       />
+
+      {/* Attendance status dialog */}
+      <AttendanceStatusDialog />
     </div>
   );
 }

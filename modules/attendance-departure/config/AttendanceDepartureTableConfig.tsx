@@ -1,19 +1,8 @@
 import { baseURL } from "@/config/axios-config";
 import AttendanceStatusBadge from "../components/AttendanceDepartureTable/AttendanceStatusBadge";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
+import { AttendanceStatusRecord } from "../types/attendance";
 import React from "react";
-
-interface AttendanceRecord {
-  id: number;
-  name: string;
-  date: string;
-  employeeId: string;
-  branch: string;
-  department: string;
-  approver: string;
-  employeeStatus: string;
-  attendanceStatus: string;
-}
 
 // Creamos una función que retorna la configuración de la tabla
 export const getAttendanceDepartureTableConfig = () => {
@@ -25,49 +14,49 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "name", 
         label: "الاسم", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.name 
+        render: (value: any, row: AttendanceStatusRecord) => row.name 
       },
       { 
         key: "date", 
         label: "التاريخ", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.date 
+        render: (value: any, row: AttendanceStatusRecord) => row.date 
       },
       { 
         key: "employeeId", 
         label: "الرقم الوظيفي", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.employeeId 
+        render: (value: any, row: AttendanceStatusRecord) => row.employeeId 
       },
       { 
         key: "branch", 
         label: "الفرع", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.branch 
+        render: (value: any, row: AttendanceStatusRecord) => row.branch 
       },
       { 
         key: "department", 
         label: "الإدارة", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.department 
+        render: (value: any, row: AttendanceStatusRecord) => row.department 
       },
       { 
         key: "approver", 
         label: "المعتمد", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.approver 
+        render: (value: any, row: AttendanceStatusRecord) => row.approver 
       },
       { 
         key: "employeeStatus", 
         label: "حالة الموظف", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => row.employeeStatus 
+        render: (value: any, row: AttendanceStatusRecord) => row.employeeStatus 
       },
       { 
         key: "attendanceStatus", 
         label: "حالة الحضور", 
         sortable: true,
-        render: (value: any, row: AttendanceRecord) => <AttendanceStatusBadge status={row.attendanceStatus} /> 
+        render: (value: any, row: AttendanceStatusRecord) => <AttendanceStatusBadge status={row.attendanceStatus} record={row} /> 
       }
     ] as ColumnConfig[],
     deleteConfirmMessage: "تأكيد حذف سجل الحضور والانصراف",

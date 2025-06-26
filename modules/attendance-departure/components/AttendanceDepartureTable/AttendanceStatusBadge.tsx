@@ -1,12 +1,20 @@
 import React from "react";
+import { useAttendance } from "../../context/AttendanceContext";
+import { AttendanceStatusRecord } from "../../types/attendance";
 
 interface AttendanceStatusBadgeProps {
   status: string;
+  record: AttendanceStatusRecord; // The full attendance record
 }
 
-const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({ status }) => {
+const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
+  status,
+  record,
+}) => {
+  const { openAttendanceStatusDialog } = useAttendance();
   let color = "";
   let text = status;
+
   switch (status) {
     case "حاضر":
       color = "text-green-500";
@@ -21,7 +29,15 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({ status })
       color = "text-gray-400";
       break;
   }
-  return <span className={`font-bold cursor-pointer ${color}`}>{text}</span>;
+
+  return (
+    <span
+      className={`font-bold cursor-pointer ${color} hover:underline`}
+      onClick={() => openAttendanceStatusDialog(record)}
+    >
+      {text}
+    </span>
+  );
 };
 
 export default AttendanceStatusBadge;
