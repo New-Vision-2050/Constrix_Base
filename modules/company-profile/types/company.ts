@@ -152,4 +152,8 @@ export interface CompanyData {
   created_at: string | null;
   owner_id: string;
   owner_name: string;
+  branches: {
+    id: string;
+    name: string;
+  }[];
 }
