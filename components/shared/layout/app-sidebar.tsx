@@ -119,6 +119,7 @@ export function AppSidebar({
         ],
         isNotCentral: true,
       },
+      // human resources
       {
         name: t("Sidebar.HumanResources"),
         icon: LayoutDashboardIcon,
@@ -137,6 +138,12 @@ export function AppSidebar({
             url: ROUTER.AttendanceDeparture,
             icon: UserIcon,
             isActive: pageName === ROUTER.AttendanceDeparture,
+          },
+          {
+            name: t("Sidebar.HRSettings"),
+            url: ROUTER.HR_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.HR_SETTINGS,
           },
         ],
         isNotCentral: false,
