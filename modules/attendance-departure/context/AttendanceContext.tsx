@@ -37,6 +37,14 @@ interface AttendanceContextType {
   selectedAttendanceRecord: AttendanceStatusRecord | null;
   setSelectedAttendanceRecord: (record: AttendanceStatusRecord | null) => void;
   
+  // Approver dialog state
+  isApproverDialogOpen: boolean;
+  setApproverDialogOpen: (isOpen: boolean) => void;
+  
+  // Selected approver record data
+  selectedApproverRecord: AttendanceStatusRecord | null;
+  setSelectedApproverRecord: (record: AttendanceStatusRecord | null) => void;
+  
   // Functions to open and close the employee dialog
   openEmployeeDialog: (employee: EmployeeDetails) => void;
   closeEmployeeDialog: () => void;
@@ -44,6 +52,10 @@ interface AttendanceContextType {
   // Functions to open and close the attendance status dialog
   openAttendanceStatusDialog: (record: AttendanceStatusRecord) => void;
   closeAttendanceStatusDialog: () => void;
+  
+  // Functions to open and close the approver dialog
+  openApproverDialog: (record: AttendanceStatusRecord) => void;
+  closeApproverDialog: () => void;
 }
 
 // Create the context
@@ -77,6 +89,12 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Selected attendance record data
   const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState<AttendanceStatusRecord | null>(null);
 
+  // Approver dialog state
+  const [isApproverDialogOpen, setApproverDialogOpen] = useState(false);
+  
+  // Selected approver record data
+  const [selectedApproverRecord, setSelectedApproverRecord] = useState<AttendanceStatusRecord | null>(null);
+
   // Toggle view function
   const toggleView = useCallback((view: "table" | "map") => setView(view), []);
   
@@ -103,6 +121,18 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     setAttendanceStatusDialogOpen(false);
     setTimeout(() => setSelectedAttendanceRecord(null), 300); // Clear record data after dialog closes
   }, []);
+  
+  // Function to open the approver dialog
+  const openApproverDialog = useCallback((record: AttendanceStatusRecord) => {
+    setSelectedApproverRecord(record);
+    setApproverDialogOpen(true);
+  }, []);
+  
+  // Function to close the approver dialog
+  const closeApproverDialog = useCallback(() => {
+    setApproverDialogOpen(false);
+    setTimeout(() => setSelectedApproverRecord(null), 300); // Clear record data after dialog closes
+  }, []);
 
   // The value that will be provided to consumers
   const value: AttendanceContextType = {
@@ -122,6 +152,12 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     setSelectedAttendanceRecord,
     openAttendanceStatusDialog,
     closeAttendanceStatusDialog,
+    isApproverDialogOpen,
+    setApproverDialogOpen,
+    selectedApproverRecord,
+    setSelectedApproverRecord,
+    openApproverDialog,
+    closeApproverDialog,
   };
 
   return (

@@ -139,7 +139,7 @@ const AttendanceMap: React.FC = () => {
         </MapContainer>
       </div>
 
-      {/* زر تبديل وضع ملء الشاشة */}
+      {/* Full screen button */}
       <Button
         variant="ghost"
         size="icon"

@@ -2,8 +2,6 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import { useAttendance } from "../../context/AttendanceContext";
-import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,

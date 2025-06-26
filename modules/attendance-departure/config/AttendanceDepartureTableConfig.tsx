@@ -1,5 +1,6 @@
 import { baseURL } from "@/config/axios-config";
 import AttendanceStatusBadge from "../components/AttendanceDepartureTable/AttendanceStatusBadge";
+import ApproverBadge from "../components/AttendanceDepartureTable/ApproverBadge";
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { AttendanceStatusRecord } from "../types/attendance";
 import React from "react";
@@ -44,7 +45,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "approver", 
         label: "المعتمد", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.approver 
+        render: (value: any, row: AttendanceStatusRecord) => <ApproverBadge approver={row.approver} record={row} /> 
       },
       { 
         key: "employeeStatus", 

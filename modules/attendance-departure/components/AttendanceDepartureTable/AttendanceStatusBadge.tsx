@@ -7,6 +7,9 @@ interface AttendanceStatusBadgeProps {
   record: AttendanceStatusRecord; // The full attendance record
 }
 
+/**
+ * Component to display the attendance status in the table and open the attendance status dialog when clicked
+ */
 const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
   status,
   record,

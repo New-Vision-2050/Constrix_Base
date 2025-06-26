@@ -12,3 +12,35 @@ export interface AttendanceStatusRecord {
   attendanceTime?: string;
   departureTime?: string;
 }
+
+// Props for the TimeBox component
+export interface TimeBoxProps {
+  label: string;
+  time: string | undefined;
+  defaultTime?: string;
+}
+
+// Props for the DialogContainer component
+export interface DialogContainerProps {
+  isOpen: boolean;
+  onClose: (open: boolean) => void;
+  title: string;
+  children: React.ReactNode;
+}
+
+// Props for the EmployeeInfoSection component
+export interface EmployeeInfoSectionProps {
+  record: AttendanceStatusRecord;
+}
+
+// Props for the AttendanceStatusBadge component
+export interface AttendanceStatusBadgeProps {
+  status: string;
+  record: AttendanceStatusRecord;
+}
+
+// Props for the ApproverBadge component
+export interface ApproverBadgeProps {
+  approver: string;
+  record: AttendanceStatusRecord;
+}

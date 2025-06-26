@@ -6,7 +6,7 @@ import EmployeeTooltip from './EmployeeTooltip';
 import { useAttendance } from '../../context/AttendanceContext';
 import { EmployeeDetails } from '../../types/employee';
 
-// دالة لتحويل حالات الحضور من الإنجليزية إلى العربية
+// Function to convert attendance statuses from English to Arabic
 const mapAttendanceStatus = (status: string): string => {
     switch (status) {
         case 'present': return 'حاضر';
@@ -59,27 +59,27 @@ interface CustomMarkerProps {
 }
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
-    // استخدام سياق الحضور للوصول إلى وظائف فتح وإغلاق الـ dialog
+    // Use attendance context to open employee dialog
     const { openEmployeeDialog } = useAttendance();
     
-    // تحويل بيانات الموظف لتناسب المكون الجديد
+    // Convert employee data to match the new component
     const handleMarkerClick = () => {
-        // تحويل نوع البيانات من AttendanceRecord إلى EmployeeDetails
+        // Convert AttendanceRecord type to EmployeeDetails
         const employeeDetails: EmployeeDetails = {
-            id: employee.id.toString(), // تحويل الرقم إلى نص
+            id: employee.id.toString(), // Convert number to string
             name: employee.name,
-            phone: employee.employeeId || '-', // استخدام معرف الموظف كبديل للهاتف
+            phone: employee.employeeId || '-', // Use employee ID as phone number
             department: employee.department || '-',
-            email: `${employee.employeeId}@example.com`, // إنشاء بريد إلكتروني افتراضي
+            email: `${employee.employeeId}@example.com`, // Create default email
             branch: employee.branch || '-',
-            gender: '-', // قيمة افتراضية
-            birthDate: '-', // قيمة افتراضية
-            nationality: '-', // قيمة افتراضية
-            attendanceStatus: mapAttendanceStatus(employee.attendanceStatus), // تحويل حالة الحضور
+            gender: '-', // Default value
+            birthDate: '-', // Default value
+            nationality: '-', // Default value
+            attendanceStatus: mapAttendanceStatus(employee.attendanceStatus), // Convert attendance status
             employeeStatus: employee.employeeStatus || '-',
-            checkInTime: employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined, // وقت افتراضي للحضور
-            checkOutTime: employee.attendanceStatus === 'present' ? '17:00' : undefined, // وقت افتراضي للانصراف
-            avatarUrl: undefined // لا توجد صورة افتراضية
+            checkInTime: employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined, // Default check-in time
+            checkOutTime: employee.attendanceStatus === 'present' ? '17:00' : undefined, // Default check-out time
+            avatarUrl: undefined // No default avatar
         };
         
         openEmployeeDialog(employeeDetails);

@@ -7,6 +7,7 @@ import AttendanceMap from "./components/map/AttendanceMap";
 import MapSearchFilter from "./components/map/MapSearchFilter";
 import EmployeeDetailsSheet from "./components/map/EmployeeDetails";
 import AttendanceStatusDialog from "./components/AttendanceDepartureTable/AttendanceStatusDialog";
+import ApproverDialog from "./components/AttendanceDepartureTable/ApproverDialog";
 import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
 import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
 
@@ -44,6 +45,9 @@ function AttendanceContent() {
 
       {/* Attendance status dialog */}
       <AttendanceStatusDialog />
+
+      {/* Approver dialog */}
+      <ApproverDialog />
     </div>
   );
 }
