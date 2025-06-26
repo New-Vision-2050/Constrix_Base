@@ -1,5 +1,5 @@
 import React from "react";
-import { AttendanceDeterminant } from "../../types/attendance-departure";
+import { AttendanceDeterminant } from "../../../../../types/attendance-departure";
 import { Check, AlertCircle, MapPin, CheckCircle2Icon } from "lucide-react";
 
 interface DeterminantItemProps {
