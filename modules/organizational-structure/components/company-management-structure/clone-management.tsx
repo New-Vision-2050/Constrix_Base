@@ -15,8 +15,6 @@ type PropsT = {
 };
 
 export function CloneManagement(props: PropsT): FormConfig {
-  console.log("CloneManagement props", props);
-
   const {
     isEdit = false,
     isUserCompanyOwner,
@@ -27,14 +25,8 @@ export function CloneManagement(props: PropsT): FormConfig {
     companyData,
   } = props;
 
-  const branches = companyData?.branches || [];
-  const branchesOptions = branches.map((branch) => ({
-    value: branch.id,
-    label: branch.name,
-  }));
-
   const _config: FormConfig = {
-    formId: "clone-management-form",
+    formId: `clone-management-form-${selectedNode?.id || ""}`,
     title: "نسخ ادارة",
     apiUrl: `${baseURL}/management_hierarchies/clone-department`,
     laravelValidation: {
@@ -45,25 +37,11 @@ export function CloneManagement(props: PropsT): FormConfig {
       {
         fields: [
           {
-            name: "target_branch_id",
-            label: "اختر الفرع",
-            type: "select",
-            placeholder: "اختر الفرع",
-            required: true,
-            options: branchesOptions,
-            validation: [
-              {
-                type: "required",
-                message: "الفرع مطلوب",
-              },
-            ],
-          },
-          {
             name: "source_department_id",
-            label: "الادارة التابعة الى",
+            label: "الادارة التي سيتم نسخها",
             type: "select",
-            placeholder: "الادارة التابعة الى",
-            required: true,
+            placeholder: "الادارة التي سيتم نسخها",
+            disabled: true,
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
@@ -71,28 +49,28 @@ export function CloneManagement(props: PropsT): FormConfig {
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
-              dependsOn: "target_branch_id",
-              filterParam: "branch_id",
             },
-            validation: [
-              {
-                type: "required",
-                message: "الادارة مطلوب",
-              },
-            ],
           },
-              {
-            name: "name",
-            label: "اسم الادارة",
-            type: "text",
-            placeholder: "برجاء إدخال اسم الادارة",
+          {
+            name: "target_parent_id",
+            label: "الادارة تابعة إلى",
+            type: "select",
+            placeholder: "الادارة تابعة إلى",
             required: true,
-            validation: [
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=management&is_main=false&is_main=0&ignore_branch_id=${branchId}`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation:[
               {
-                type: "required",
-                message: `اسم الادارة مطلوب`,
-              },
-            ],
+                type:"required",
+                message: "الادارة تابعة إلى مطلوب",
+              }
+            ]
           },
           {
             name: "reference_user_id",
@@ -163,21 +141,15 @@ export function CloneManagement(props: PropsT): FormConfig {
       },
     ],
     initialValues: {
-      target_branch_id: selectedNode?.branch_id,
       source_department_id: selectedNode?.id,
     },
     onSubmit: async (formData) => {
       const method = isEdit ? "PUT" : "POST";
       const reqBody = {
         source_department_id: formData.source_department_id,
-        target_branch_id: formData.target_branch_id,
+        target_parent_id: formData.target_parent_id,
         clone_sub_departments: false,
         clone_managers: false,
-        override_params: {
-          name: formData.name,
-          manager_id: formData.manager_id,
-          is_active: false,
-        },
       };
 
       return await defaultSubmitHandler(reqBody, _config, {
@@ -188,7 +160,7 @@ export function CloneManagement(props: PropsT): FormConfig {
     onSuccess: () => {
       onClose?.();
     },
-    submitButtonText: "حفظ",
+    submitButtonText: "نسخ",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
