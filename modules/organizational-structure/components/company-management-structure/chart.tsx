@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
 import { CompanyData } from "@/modules/company-profile/types/company";
+import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
 
 type PropsT = {
   branchId: string | number;
@@ -118,7 +119,7 @@ const BranchManagementsStructure = (props: PropsT) => {
   return (
     <main className="flex-grow md:max-w-[calc(100vw-580px)]">
       {/* sheet form */}
-      <SheetFormBuilder
+      <DialogFormBuilder
         isOpen={isOpen}
         config={config}
         onOpenChange={(open) => (open ? openSheet() : closeSheet())}
