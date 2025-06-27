@@ -284,8 +284,9 @@ const OrganizationChart = ({
         onPrint={viewMode === "tree" ? handlePrint : () => {}}
         isFullScreen={isFullScreen}
         onToggleFullScreen={toggleFullScreen}
+        additionalActions={listViewAdditionalActions}
       />
-
+      
       {viewMode === "tree" || !listView ? (
         <div
           ref={chartContainerRef}
