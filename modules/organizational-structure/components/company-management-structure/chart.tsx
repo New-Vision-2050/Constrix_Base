@@ -56,7 +56,6 @@ const BranchManagementsStructure = (props: PropsT) => {
       selectedNode,
       isUserCompanyOwner,
       companyOwnerId,
-      companyData
     });
   }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
 

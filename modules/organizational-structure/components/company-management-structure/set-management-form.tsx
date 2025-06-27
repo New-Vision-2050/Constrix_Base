@@ -1,5 +1,4 @@
 import { baseURL } from "@/config/axios-config";
-import { CompanyData } from "@/modules/company-profile/types/company";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { OrgChartNode } from "@/types/organization";
@@ -10,12 +9,10 @@ type PropsT = {
   isUserCompanyOwner: boolean;
   selectedNode: OrgChartNode | undefined;
   companyOwnerId: string | undefined;
-  companyData?: CompanyData;
   onClose?: () => void;
 };
 
 export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
-  
   const {
     isEdit = false,
     isUserCompanyOwner,
@@ -23,14 +20,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     selectedNode,
     branchId,
     onClose,
-    companyData
   } = props;
-
-  const branches = companyData?.branches || [];
-  const branchesOptions = branches.map((branch) => ({
-    value: branch.id,
-    label: branch.name,
-  }));
 
   const _config: FormConfig = {
     formId: "org-structure-management-form",
@@ -44,19 +34,10 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
       {
         title: "اضافة ادارة",
         fields: [
-             {
+          {
             name: "branch_id",
-            label: "اختر الفرع",
-            type: "select",
-            placeholder: "اختر الفرع",
-            required: true,
-            options: branchesOptions,
-            validation: [
-              {
-                type: "required",
-                message: "الفرع مطلوب",
-              },
-            ],
+            label: "branch_id",
+            type: "hiddenObject",
           },
           {
             name: "management_id",
@@ -71,8 +52,6 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
-              dependsOn: "branch_id",
-              filterParam: "branch_id",
             },
             validation: [
               {
@@ -219,7 +198,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
-    resetOnSuccess: false,
+    resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
   };
