@@ -14,6 +14,9 @@ import { useTableData } from "@/modules/table/hooks/useTableData";
 import { useResetTableOnRouteChange } from "@/modules/table/hooks/useResetTableOnRouteChange";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
+import { useQuery } from '@tanstack/react-query';
+import { apiClient, baseURL } from "@/config/axios-config";
+import { additionalColumnRenderers } from "@/modules/table/additionalColumnRenderers";
 
 // Dynamically import the Execution component
 const Execution = dynamic(() => import("@/app/[locale]/(main)/companies/cells/execution"), {
@@ -24,10 +27,12 @@ interface TableBuilderProps {
   url?: string;
   config?: TableConfig;
   onReset?: () => void;
-  searchBarActions?: React.ReactNode; // New prop for custom actions in search bar
-  tableId?: string; // Optional table ID override
+  searchBarActions?: React.ReactNode;
+  tableId?: string;
+  useAdditionalComponents?: boolean;
 }
 
+// Rename TableBuilderComponent to TableBuilder
 const TableBuilder: React.FC<TableBuilderProps> = ({
   url,
   config,
@@ -336,5 +341,52 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   );
 };
 
-// Use React.memo to prevent unnecessary re-renders of the entire component
-export default memo(TableBuilder);
+const InternalTableBuilder: React.FC<TableBuilderProps> = (props) => {
+  const { useAdditionalComponents = false, ...restProps } = props;
+  const [config, setConfig] = React.useState<TableConfig | undefined>(props.config);
+
+  const { data: apiData, isSuccess } = useQuery({
+    queryKey: ['table-additional-columns'],
+    queryFn: async () => {
+      const res = await apiClient("table-additional-columns");
+      return res.data();
+    },
+    enabled: !!config && useAdditionalComponents,
+  });
+
+  React.useEffect(() => {
+    if (
+      useAdditionalComponents &&
+      isSuccess &&
+      apiData &&
+      apiData.additionalColumns &&
+      config
+    ) {
+      const additionalColumnsArr = Array.isArray(apiData.additionalColumns)
+        ? apiData.additionalColumns
+        : Object.values(apiData.additionalColumns);
+      const mappedColumns = additionalColumnsArr.map((col: { key: string; label: string }) => ({
+        ...col,
+        render: additionalColumnRenderers[col.key] || undefined,
+      }));
+      setConfig((prev) =>
+        prev
+          ? {
+              ...prev,
+              columns: [...(prev.columns || []), ...mappedColumns],
+            }
+          : prev
+      );
+    }
+  }, [useAdditionalComponents, isSuccess, apiData]);
+
+  if (!useAdditionalComponents) {
+    return <TableBuilder {...props} />;
+  }
+
+  if (!config) return null;
+
+  return <TableBuilder {...restProps} config={config} />;
+};
+
+export default memo(InternalTableBuilder);
