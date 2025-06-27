@@ -6,6 +6,7 @@ import { SheetFormBuilder, useSheetForm } from "@/modules/form-builder";
 import useManagementsTreeData from "@/modules/organizational-structure/hooks/useManagementsTreeData";
 import OrganizationChart from "@/modules/organizational-structure/org-chart/components/organization-chart";
 import { CloneManagement } from "./clone-management";
+import { GetOrgStructureManagementFormConfig } from "./set-management-form";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
@@ -33,7 +34,8 @@ const BranchManagementsStructure = (props: PropsT) => {
     companyOwnerId,
     handleStoreSelectedNode,
   } = useManagementsStructureCxt();
-  const config = useMemo(() => {
+
+  const cloneManagementConfig = useMemo(() => {
     return CloneManagement({
       isEdit,
       onClose,
@@ -44,7 +46,23 @@ const BranchManagementsStructure = (props: PropsT) => {
       companyData
     });
   }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
-  const { openSheet, isOpen, closeSheet } = useSheetForm({ config });
+
+
+  const addManagementConfig = useMemo(() => {
+    return GetOrgStructureManagementFormConfig({
+      isEdit,
+      onClose,
+      branchId,
+      selectedNode,
+      isUserCompanyOwner,
+      companyOwnerId,
+      companyData
+    });
+  }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
+
+  const { openSheet, isOpen, closeSheet } = useSheetForm({ config:cloneManagementConfig });
+  const { openSheet: openAddSheet, isOpen: isAddSheetOpen, closeSheet: closeAddSheet } = useSheetForm({ config:addManagementConfig });
+
   const {
     data: orgData,
     isLoading,
@@ -121,8 +139,13 @@ const BranchManagementsStructure = (props: PropsT) => {
       {/* sheet form */}
       <DialogFormBuilder
         isOpen={isOpen}
-        config={config}
+        config={cloneManagementConfig}
         onOpenChange={(open) => (open ? openSheet() : closeSheet())}
+      />
+      <SheetFormBuilder
+        isOpen={isAddSheetOpen}
+        config={addManagementConfig}
+        onOpenChange={(open) => (open ? openAddSheet() : closeAddSheet())}
       />
       {/* confirm delete dialog */}
       <ConfirmationDialog
@@ -150,7 +173,7 @@ const BranchManagementsStructure = (props: PropsT) => {
             listModeDropDownMenu={listModeDropDownMenu}
             listViewAdditionalActions={
               <>
-                <Button onClick={() => openSheet()}>اضافة ادارة</Button>
+                <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>
               </>
             }
           />
