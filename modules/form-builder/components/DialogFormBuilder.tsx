@@ -92,12 +92,8 @@ const DialogFormBuilder: React.FC<DialogFormBuilderProps> = ({
       open={isOpen}
       onOpenChange={handleOpenChange}
     >
-      {trigger ? (
+      {trigger && (
         <DialogTrigger asChild>{trigger}</DialogTrigger>
-      ) : (
-        <DialogTrigger asChild>
-          <Button variant="outline">Open Form</Button>
-        </DialogTrigger>
       )}
       <DialogContent
         className={`max-h-[90vh] overflow-visible ${className || ""} ${
