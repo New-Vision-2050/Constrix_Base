@@ -5,7 +5,7 @@ import { OrgChartNode } from "@/types/organization";
 import { SheetFormBuilder, useSheetForm } from "@/modules/form-builder";
 import useManagementsTreeData from "@/modules/organizational-structure/hooks/useManagementsTreeData";
 import OrganizationChart from "@/modules/organizational-structure/org-chart/components/organization-chart";
-import { GetOrgStructureManagementFormConfig } from "./set-management-form";
+import { CloneManagement } from "./clone-management";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 import { apiClient } from "@/config/axios-config";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ const BranchManagementsStructure = (props: PropsT) => {
     handleStoreSelectedNode,
   } = useManagementsStructureCxt();
   const config = useMemo(() => {
-    return GetOrgStructureManagementFormConfig({
+    return CloneManagement({
       isEdit,
       onClose,
       branchId,
