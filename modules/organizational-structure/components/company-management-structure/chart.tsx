@@ -20,10 +20,11 @@ import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuild
 type PropsT = {
   branchId: string | number;
   companyData?: CompanyData
+  mainBranch?: {id:string ; name:string}
 };
 
 const BranchManagementsStructure = (props: PropsT) => {
-  const { branchId , companyData} = props;
+  const { branchId , companyData, mainBranch } = props;
   const t = useTranslations("CompanyStructure.ManagementStructure");
   const [deletedId, setDeletedId] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -56,7 +57,7 @@ const BranchManagementsStructure = (props: PropsT) => {
       selectedNode,
       isUserCompanyOwner,
       companyOwnerId,
-      companyData
+      mainBranch
     });
   }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
 
