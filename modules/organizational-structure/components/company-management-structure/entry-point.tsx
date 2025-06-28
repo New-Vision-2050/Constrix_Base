@@ -56,7 +56,7 @@ const CompanyManagementsStructureEntryPoint = () => {
               dir={locale === "ar" ? "rtl" : "ltr"}
               className="h-full ltr:pl-6 rtl:pr-6"
             >
-              <BranchManagementsStructure branchId={tab.id}/>
+              <BranchManagementsStructure branchId={tab.id} companyData={companyData?.payload} />
             </TabsContent>
           ))}
         </div>
