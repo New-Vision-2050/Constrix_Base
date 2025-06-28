@@ -10,6 +10,7 @@ type PropsT = {
   selectedNode: OrgChartNode | undefined;
   companyOwnerId: string | undefined;
   onClose?: () => void;
+  mainBranch?: { id: string; name: string };
 };
 
 export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
@@ -20,7 +21,9 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     selectedNode,
     branchId,
     onClose,
+    mainBranch
   } = props;
+
 
   const _config: FormConfig = {
     formId: "org-structure-management-form",
@@ -155,7 +158,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
       },
     ],
     initialValues: {
-      branch_id: selectedNode?.branch_id,
+      branch_id: mainBranch?.id || selectedNode?.branch_id,
       name: isEdit ? selectedNode?.name : undefined,
       description: isEdit ? selectedNode?.description : undefined,
       is_active: isEdit ? selectedNode?.status == 1 : undefined,
@@ -180,7 +183,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
       const method = isEdit ? "PUT" : "POST";
       const body = {
         ...formData,
-        branch_id: branchId || selectedNode?.branch_id,
+        branch_id: mainBranch?.id|| branchId || selectedNode?.branch_id,
       };
 
       return await defaultSubmitHandler(body, _config, {
