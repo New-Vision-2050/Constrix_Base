@@ -49,7 +49,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
             placeholder: "الادارة التابعة الى",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
+              url: `${baseURL}/management_hierarchies/list?type=management&branch_id=${mainBranch?.id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
