@@ -36,29 +36,16 @@ export function CloneManagement(props: PropsT): FormConfig {
     sections: [
       {
         fields: [
-          {
-            name: "source_department_id",
-            label: "الادارة التي سيتم نسخها",
-            type: "select",
-            placeholder: "الادارة التي سيتم نسخها",
-            disabled: true,
-            dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              totalCountHeader: "X-Total-Count",
-            },
-          },
+
           {
             name: "target_parent_id",
             label: "الادارة تابعة إلى",
             type: "select",
             placeholder: "الادارة تابعة إلى",
             required: true,
+            disabled: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=management&is_main=false&is_main=0&ignore_branch_id=${branchId}`,
+                url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -72,6 +59,20 @@ export function CloneManagement(props: PropsT): FormConfig {
               }
             ]
           },
+            {
+                name: "source_department_id",
+                label: "الادارة التي سيتم نسخها",
+                type: "select",
+                placeholder: "الادارة التي سيتم نسخها",
+                dynamicOptions: {
+                    url: `${baseURL}/management_hierarchies/list?type=management&is_main=false&is_main=0&ignore_branch_id=${branchId}`,
+                    valueField: "id",
+                    labelField: "name",
+                    searchParam: "name",
+                    paginationEnabled: true,
+                    totalCountHeader: "X-Total-Count",
+                },
+            },
           {
             name: "reference_user_id",
             label: "الشخص المرجعي",
@@ -141,7 +142,7 @@ export function CloneManagement(props: PropsT): FormConfig {
       },
     ],
     initialValues: {
-      source_department_id: selectedNode?.id,
+        target_parent_id: selectedNode?.id,
     },
     onSubmit: async (formData) => {
       const method = isEdit ? "PUT" : "POST";
