@@ -1,4 +1,7 @@
 import { FormConfig } from "@/modules/form-builder";
+import { useEffect } from "react";
+import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
+import LocationDialog from "./LocationDialog/LocationDialog";
 
 export const createDeterminantFormConfig: FormConfig = {
   formId: "create-determinant-form",
@@ -78,6 +81,51 @@ export const createDeterminantFormConfig: FormConfig = {
           ],
           defaultValue: "main",
           required: true,
+        },
+        {
+          type: "hiddenObject",
+          name: "show_location_dialog",
+          label: "",
+          defaultValue: false,
+          render: (props: any) => {
+            const location_type = useFormStore
+              ?.getState()
+              .getValues("create-determinant-form").location_type;
+
+            const show_location_dialog = useFormStore
+              ?.getState()
+              .getValues("create-determinant-form").show_location_dialog;
+
+            const showDialog =
+              location_type === "custom" && show_location_dialog !== false;
+            // control dialog open state
+            useEffect(() => {
+              if (location_type === "custom") {
+                useFormStore
+                  ?.getState()
+                  .setValue(
+                    "create-determinant-form",
+                    "show_location_dialog",
+                    true
+                  );
+              }
+            }, [location_type]);
+
+            return (
+              <LocationDialog
+                isOpen={showDialog}
+                onClose={() => {
+                  useFormStore
+                    ?.getState()
+                    .setValue(
+                      "create-determinant-form",
+                      "show_location_dialog",
+                      false
+                    );
+                }}
+              />
+            );
+          },
         },
         {
           type: "checkboxGroup",
