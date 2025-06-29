@@ -46,9 +46,9 @@ const AnotherCheckingWay = memo(
           handleSetStep(LOGIN_PHASES.PASSWORD);
           break;
         case "otp":
-          if (identifier.includes("@")) {
+          if (res.payload.login_way.type === "mail") {
             handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
-          } else {
+          } else if (res.payload.login_way.type === "sms") {
             handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
           }
           break;

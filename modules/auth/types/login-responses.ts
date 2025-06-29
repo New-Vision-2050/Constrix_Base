@@ -25,12 +25,14 @@ export type LoginStepsSuccessResponse = {
   message: string | null;
   payload: {
     login_way: {
+      by?:string;
       id: string;
       name: string;
       step: {
         login_option: "password" | "otp";
         drivers: string[];
       } | null;
+      type: "sms" | "mail";
     };
     token: string;
     user: {

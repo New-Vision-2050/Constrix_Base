@@ -74,14 +74,15 @@ const ValidatePhonePhase = ({
             return;
           }
           const nextStep = data.payload.login_way.step?.login_option;
+          setValue("by", data.payload.login_way.by);
           switch (nextStep) {
             case "password":
               handleSetStep(LOGIN_PHASES.PASSWORD);
               break;
             case "otp":
-              if (variable.identifier.includes("@")) {
+              if (data.payload.login_way.type === "mail") {
                 handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
-              } else {
+              } else if (data.payload.login_way.type === "sms") {
                 handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
               }
               break;

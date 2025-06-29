@@ -68,7 +68,7 @@ const PasswordPhase = ({
         token: data.token ?? "",
       },
       {
-        onSuccess: (data, variable) => {
+        onSuccess: (data) => {
           setValue("token", data.payload.token);
           const nextStep = data.payload.login_way.step?.login_option;
           if (!data.payload.login_way.step) {
@@ -80,11 +80,12 @@ const PasswordPhase = ({
             router.push(ROUTER.COMPANIES);
             return;
           }
+        setValue("by", data.payload.login_way.by);
           switch (nextStep) {
             case "otp":
-              if (variable.identifier.includes("@")) {
+             if (data.payload.login_way.type === "mail") {
                 handleSetStep(LOGIN_PHASES.VALIDATE_EMAIL);
-              } else {
+              } else if (data.payload.login_way.type === "sms") {
                 handleSetStep(LOGIN_PHASES.VALIDATE_PHONE);
               }
               break;
