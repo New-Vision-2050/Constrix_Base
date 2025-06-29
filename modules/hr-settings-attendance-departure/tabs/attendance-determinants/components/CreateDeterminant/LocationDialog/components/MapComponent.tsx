@@ -3,15 +3,38 @@ import React from "react";
 interface MapComponentProps {
   selectedBranch: string;
   isDefaultLocation: boolean;
+  latitude: string;
+  longitude: string;
+  onMapClick: (latitude: string, longitude: string) => void;
 }
 
 export default function MapComponent({
   selectedBranch,
   isDefaultLocation,
+  latitude,
+  longitude,
+  onMapClick,
 }: MapComponentProps) {
+  
+  // Handle map click to select new location
+  const handleMapClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Convert click position to approximate coordinates (simplified)
+    const newLat = (24.7136 + (y / rect.height - 0.5) * 0.1).toFixed(4);
+    const newLng = (46.6753 + (x / rect.width - 0.5) * 0.1).toFixed(4);
+    
+    onMapClick(newLat, newLng);
+  };
   return (
     <div className="mb-6">
-      <div className="bg-gray-200 rounded-lg h-64 relative overflow-hidden">
+      <div 
+        className="bg-gray-200 rounded-lg h-64 relative overflow-hidden cursor-crosshair"
+        onClick={handleMapClick}
+        title="انقر لتحديد موقع جديد"
+      >
         {/* Map Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-green-100">
           {/* Map Grid Lines */}

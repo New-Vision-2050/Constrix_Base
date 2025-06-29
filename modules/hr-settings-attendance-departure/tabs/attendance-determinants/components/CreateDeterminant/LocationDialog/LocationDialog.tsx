@@ -16,11 +16,68 @@ interface LocationDialogProps {
 
 // Internal dialog content component
 function LocationDialogContent({ onClose }: { onClose: () => void }) {
-  const { isLoading, hasBranches } = useLocationDialog();
-  const [selectedBranch, setSelectedBranch] = useState("jeddah");
-  const [isDefaultLocation, setIsDefaultLocation] = useState(true);
-  const [longitude, setLongitude] = useState("25.3253.486.4786.1");
-  const [latitude, setLatitude] = useState("25.3253.486.4786.1");
+  const { isLoading, hasBranches, selectedBranches, getBranchLocation, updateBranchLocation } = useLocationDialog();
+  const [selectedBranch, setSelectedBranch] = useState("");
+  
+  // Initialize selected branch when branches are available
+  React.useEffect(() => {
+    if (selectedBranches.length > 0 && !selectedBranch) {
+      setSelectedBranch(selectedBranches[0]);
+    }
+  }, [selectedBranches, selectedBranch]);
+  
+  // Get current branch location data
+  const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : null;
+  
+  // Handle branch change
+  const handleBranchChange = (branchId: string) => {
+    setSelectedBranch(branchId);
+  };
+  
+  // Handle default location checkbox change
+  const handleDefaultLocationChange = (isDefault: boolean) => {
+    if (selectedBranch) {
+      if (isDefault) {
+        // Reset to default coordinates when checking default location
+        const defaultCoordinates = {
+          "riyadh": { latitude: "24.7136", longitude: "46.6753" },
+          "jeddah": { latitude: "21.4858", longitude: "39.1925" },
+        };
+        
+        const defaults = defaultCoordinates[selectedBranch as keyof typeof defaultCoordinates] || 
+                        { latitude: "24.7136", longitude: "46.6753" };
+        
+        updateBranchLocation(selectedBranch, {
+          isDefault: true,
+          latitude: defaults.latitude,
+          longitude: defaults.longitude,
+        });
+      } else {
+        updateBranchLocation(selectedBranch, { isDefault: false });
+      }
+    }
+  };
+  
+  // Handle coordinate changes
+  const handleCoordinateChange = (field: 'latitude' | 'longitude', value: string) => {
+    if (selectedBranch) {
+      updateBranchLocation(selectedBranch, { 
+        [field]: value,
+        isDefault: false // Uncheck default when manually changing coordinates
+      });
+    }
+  };
+  
+  // Handle map click
+  const handleMapClick = (latitude: string, longitude: string) => {
+    if (selectedBranch) {
+      updateBranchLocation(selectedBranch, {
+        latitude,
+        longitude,
+        isDefault: false // Uncheck default when selecting from map
+      });
+    }
+  };
 
   // Show loading state
   if (isLoading) {
@@ -49,25 +106,32 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
       
       <BranchSelector
         selectedBranch={selectedBranch}
-        onBranchChange={setSelectedBranch}
+        onBranchChange={handleBranchChange}
       />
       
-      <DefaultLocationCheckbox
-        isDefaultLocation={isDefaultLocation}
-        onChange={setIsDefaultLocation}
-      />
-      
-      <CoordinatesInput
-        longitude={longitude}
-        latitude={latitude}
-        onLongitudeChange={setLongitude}
-        onLatitudeChange={setLatitude}
-      />
-      
-      <MapComponent
-        selectedBranch={selectedBranch}
-        isDefaultLocation={isDefaultLocation}
-      />
+      {currentBranchData && (
+        <>
+          <DefaultLocationCheckbox
+            isDefaultLocation={currentBranchData.isDefault}
+            onChange={handleDefaultLocationChange}
+          />
+          
+          <CoordinatesInput
+            longitude={currentBranchData.longitude}
+            latitude={currentBranchData.latitude}
+            onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
+            onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
+          />
+          
+          <MapComponent
+            selectedBranch={selectedBranch}
+            isDefaultLocation={currentBranchData.isDefault}
+            latitude={currentBranchData.latitude}
+            longitude={currentBranchData.longitude}
+            onMapClick={handleMapClick}
+          />
+        </>
+      )}
       
       <SaveButton onSave={onClose} />
     </div>
