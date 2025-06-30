@@ -1,5 +1,5 @@
 import {FormConfig, useFormStore, FieldConfig} from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
 import axios from "axios";
@@ -38,26 +38,35 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
   const generateDynamicFields = async (): Promise<FieldConfig[]> => {
     try {
       // Fetch data from API
-      const response = await axios.get(`${baseURL}/programs/sub_entities/list`);
+      const response = await apiClient.get(`${baseURL}/programs/sub_entities/list`);
       console.log('API Response:', response.data);
       
       // Array to store generated fields
       const generatedData: FieldConfig[] = [];
       
-      // Check if the response has the expected structure
-      if (response.data && response.data.payload && Array.isArray(response.data.payload)) {
-        // Process each program in the payload
-        response.data.payload.forEach((program: any) => {
+      // Process the response data
+      if (Array.isArray(response.data)) {
+        // Process each main program
+        response.data.forEach((program: any) => {
           // Check if the program has sub_entities
           if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
-            // Add a header/divider for this program section
+            // Create options array from sub_entities
+            const options = program.sub_entities.map((subEntity: any) => ({
+              id: subEntity.id,
+              name: subEntity.name,
+              // Include any additional fields needed
+              value: subEntity.id,
+              label: subEntity.name
+            }));
+            
+            // Add a checkboxGroup for the main program with its sub-entities as options
             generatedData.push({
               type: "checkboxGroup" as const,
-              name: `program_header_${program.id}`,
+              name: `program_${program.id}`,
               label: program.name,
-              placeholder: "",
-              disabled: true,
-              className: "font-bold text-lg border-b border-border pb-2 mb-4 mt-6"
+              optionsTitle: program.name,
+              options: options,
+              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
             });
             
             // Store program sub_entities in a hidden field for reference
@@ -70,6 +79,60 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
                 programName: program.name,
                 subEntities: program.sub_entities
               }
+            });
+          } else {
+            // For programs without sub-entities, just show a regular checkbox
+            generatedData.push({
+              type: "checkbox" as const,
+              name: `program_${program.id}`,
+              label: program.name,
+              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
+            });
+          }
+        });
+      } else if (response.data && response.data.payload && Array.isArray(response.data.payload)) {
+        // Alternative response structure
+        response.data.payload.forEach((program: any) => {
+          // Check if the program has sub_entities
+          if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
+            // Create options array from sub_entities
+            const options = program.sub_entities.map((subEntity: any) => ({
+              id: subEntity.id,
+              name: subEntity.name,
+              // Include any additional fields needed
+              value: subEntity.id,
+              label: subEntity.name
+            }));
+            
+            // Add a checkboxGroup for the main program with its sub-entities as options
+            generatedData.push({
+              type: "checkboxGroup" as const,
+              name: `program_${program.id}`,
+              label: program.name,
+              isMulti:true,
+              optionsTitle: program.name,
+              options: options,
+              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
+            });
+            
+            // Store program sub_entities in a hidden field for reference
+            generatedData.push({
+              type: "hiddenObject" as const,
+              name: `program_data_${program.id}`,
+              label: "",
+              defaultValue: {
+                programId: program.id,
+                programName: program.name,
+                subEntities: program.sub_entities
+              }
+            });
+          } else {
+            // For programs without sub-entities, just show a regular checkbox
+            generatedData.push({
+              type: "checkbox" as const,
+              name: `program_${program.id}`,
+              label: program.name,
+              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
             });
           }
         });
@@ -140,6 +203,15 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
       if (toast) {
         toast.success("تم إضافة البرنامج بنجاح");
       }
+    },
+    onSubmit:async (formData: Record<string, unknown>) => {
+      // Log the form data (to use the parameter)
+      console.log("Form data received:", formData);
+      
+      return {
+        success: true,
+        message: "Item added successfully",
+      };
     },
     // Comprehensive error handler
     onError: (values: any, error: any) => {
