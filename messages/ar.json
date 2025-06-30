@@ -374,7 +374,9 @@
           "title": "أعدادات الهيكل",
           "tabs": {
             "jobTitles": { "title": "المسميات الوظيفية" },
-            "jobTypes": { "title": "أنواع الوظائف" }
+            "jobTypes": { "title": "أنواع الوظائف" },
+            "managements": { "title": "اعدادات الادارات" },
+            "departments": { "title": "اعدادات الاقسام" }
           }
         }
       }
