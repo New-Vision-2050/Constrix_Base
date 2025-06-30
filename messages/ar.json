@@ -415,5 +415,9 @@
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
     "resetButtonText": "مسح النموذج"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط البرنامج؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط البرنامج؟"
   }
 }

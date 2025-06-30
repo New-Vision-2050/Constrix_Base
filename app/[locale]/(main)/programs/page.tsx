@@ -1,6 +1,6 @@
 "use client";
 
-import Programs from "@/modules/programs-bouquets/views";
+import Programs from "@/modules/programs/views";
 import React from "react";
 
 function ProgramsPage() {
