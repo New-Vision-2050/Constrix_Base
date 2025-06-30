@@ -420,5 +420,9 @@
     "submitButtonText": "Save",
     "cancelButtonText": "Cancel",
     "resetButtonText": "Clear Form"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this program?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this program?"
   }
 }
