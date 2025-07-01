@@ -10,6 +10,8 @@ const CompanyManagementsStructureEntryPoint = () => {
   const locale = useLocale();
   const { data: companyData, isLoading: isCompanyLoading } = useCurrentCompany();
 
+  const mainBranch = companyData?.payload?.branches[0]
+
   return (
     <div>
       {isCompanyLoading && (
@@ -56,7 +58,7 @@ const CompanyManagementsStructureEntryPoint = () => {
               dir={locale === "ar" ? "rtl" : "ltr"}
               className="h-full ltr:pl-6 rtl:pr-6"
             >
-              <BranchManagementsStructure branchId={tab.id}/>
+              <BranchManagementsStructure branchId={tab.id} companyData={companyData?.payload}  mainBranch={mainBranch}/>
             </TabsContent>
           ))}
         </div>

@@ -21,6 +21,8 @@ interface DialogFormBuilderProps {
   onSuccess?: (values: Record<string, any>) => void;
   onCancel?: () => void;
   className?: string;
+  isOpen?: boolean; // Control the open state externally
+  onOpenChange?: (open: boolean) => void; // Callback when open state changes
 }
 
 const DialogFormBuilder: React.FC<DialogFormBuilderProps> = ({
@@ -29,12 +31,15 @@ const DialogFormBuilder: React.FC<DialogFormBuilderProps> = ({
   onSuccess,
   onCancel,
   className,
+  isOpen: controlledIsOpen,
+  onOpenChange,
+
 }) => {
   const locale = useLocale();
   const isRtl = locale === "ar";
 
   const {
-    isOpen,
+    isOpen: hookIsOpen,
     openSheet,
     closeSheet,
     values,
@@ -69,17 +74,26 @@ const DialogFormBuilder: React.FC<DialogFormBuilderProps> = ({
     onCancel,
   });
 
+    const handleOpenChange = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    }
+      if (open) {
+        openSheet();
+      } else {
+        closeSheet();
+      }
+
+  };
+
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : hookIsOpen;
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(open) => (open ? openSheet() : closeSheet())}
+      onOpenChange={handleOpenChange}
     >
-      {trigger ? (
+      {trigger && (
         <DialogTrigger asChild>{trigger}</DialogTrigger>
-      ) : (
-        <DialogTrigger asChild>
-          <Button variant="outline">Open Form</Button>
-        </DialogTrigger>
       )}
       <DialogContent
         className={`max-h-[90vh] overflow-visible ${className || ""} ${
