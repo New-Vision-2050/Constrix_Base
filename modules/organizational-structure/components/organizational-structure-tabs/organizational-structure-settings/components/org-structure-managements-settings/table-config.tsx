@@ -5,11 +5,11 @@ import { OrgStructureManagementsSettingsFormConfig } from "./form-config";
 
 export const OrgStructureManagementsSettingsTableConfig = () => {
   return {
-    url: `${baseURL}/write-url`,
+    url: `${baseURL}/management_hierarchies/non-copied`,
     tableId: "OrgStructureManagementsSettingsTableConfig", // Add tableId to the config
     columns: [
      {
-        key: "code",
+        key: "id",
         label: "كود الادارة",
       },
       {
@@ -23,12 +23,12 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
         sortable: true,
       },
     {
-        key: "follow-up_department_name",
+        key: "detail.description",
         label: "الادارة التابع لها الفرع",
         sortable: true,
       },
       {
-        key: "user_count",
+        key: "users_count",
         label: "عدد الموظفيين",
         sortable: true,
       },
@@ -38,17 +38,17 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
         sortable: true,
       },
       {
-        key: "status",
+        key: "is_active",
         label: "الحالة",
         sortable: true,
         render: (_: unknown, row: JobTitle) => (
           <TableStatusSwitcher
             id={row.id}
             label={"نشط"}
-            initialStatus={row.status == 1}
+            initialStatus={row.is_active == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.patch(`/write-url/${row.id}/status`, {
-                status: Number(isActive),
+              return await apiClient.patch(`/management_hierarchies/non-copied/${row.id}/status`, {
+                is_active: Number(isActive),
               });
             }}
             confirmDescription={(isActive) =>
