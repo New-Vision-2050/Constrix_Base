@@ -4,7 +4,7 @@ import { baseURL } from "@/config/axios-config";
 export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
   formId: "OrgStructureManagementsSettingsFormConfig",
   title: "اضافة ادارة",
-  apiUrl: `${baseURL}/write-url`,
+  apiUrl: `${baseURL}/management_hierarchies/create-management-with-relations`,
   laravelValidation: {
     enabled: true,
     errorsPath: "errors", // This is the default in Laravel
@@ -14,7 +14,7 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
       fields: [
         {
           name: "name",
-          label: "اضافة ادارة جديدة",
+          label: "اسم الادارة",
           type: "text",
           placeholder: "برجاء إدخال اسم الادارة",
           required: true,
@@ -26,7 +26,7 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
           ],
         },
         {
-        name: "management_id",
+        name: "parent_id",
         label: "اسم الادارة التابع لها",
         type: "select",
         placeholder: "اسم الادارة التابع لها",
@@ -47,13 +47,13 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
         ],
         },
         {
-            name: "1",
+            name: "job_types",
             label: "انواع الوظائف",
             type: "select",
             isMulti: true,
             placeholder: "اختر انواع الوظائف",
             dynamicOptions: {
-              url: `${baseURL}/write-url`,
+              url: `${baseURL}/job_types/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -65,13 +65,14 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
             },
         },
         {
-            name: "2",
+            name: "job_titles",
             label: "المسميات الوظيفية",
             type: "select",
             isMulti: true,
             placeholder: "اختر المسميات الوظيفية",
             dynamicOptions: {
-              url: `${baseURL}/write-url`,
+              url: `${baseURL}/management_hierarchies/lookups`,
+              // url: `${baseURL}/job_titles/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -79,11 +80,13 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
               pageParam: "page",
               limitParam: "per_page",
               itemsPerPage: 10,
+              dependsOn: "job_types",
+              filterParam: "job_type_ids",
               totalCountHeader: "X-Total-Count",
             },
         },
         {
-            name: "branch_ids",
+            name: "branches",
             label: "الفروع",
             type: "select",
             isMulti: true,

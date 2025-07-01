@@ -2,6 +2,7 @@ import { JobTitle } from "@/types/job-title";
 import { apiClient, baseURL } from "@/config/axios-config";
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { OrgStructureManagementsSettingsFormConfig } from "./form-config";
+import { EditIcon, TrashIcon } from "lucide-react";
 
 export const OrgStructureManagementsSettingsTableConfig = () => {
   return {
@@ -71,7 +72,19 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     formConfig: OrgStructureManagementsSettingsFormConfig,
-    executions: [],
+    executions: [
+      {
+        label: "تعديل",
+        icon: <EditIcon className="w-4 h-4" />,
+        action: "edit",
+      },
+      {
+        label: "حذف",
+        icon: <TrashIcon className="w-4 h-4" />,
+        action: "delete",
+        color: "red-500",
+      },
+    ],
     executionConfig: {
       canEdit: true,
       canDelete: true,
