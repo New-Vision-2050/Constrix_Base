@@ -54,6 +54,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
+              disableReactQuery:true,
               totalCountHeader: "X-Total-Count",
             },
             validation: [

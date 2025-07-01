@@ -61,15 +61,16 @@ export function CloneManagement(props: PropsT): FormConfig {
           },
             {
                 name: "source_department_id",
-                label: "الادارة التي سيتم نسخها",
+                label: "الادارة التي سيتم تعيينها",
                 type: "select",
-                placeholder: "الادارة التي سيتم نسخها",
+                placeholder: "الادارة التي سيتم تعيينها",
                 dynamicOptions: {
                     url: `${baseURL}/management_hierarchies/list?type=management&is_main=false&is_main=0&ignore_branch_id=${branchId}`,
                     valueField: "id",
                     labelField: "name",
                     searchParam: "name",
                     paginationEnabled: true,
+                    disableReactQuery:true,
                     totalCountHeader: "X-Total-Count",
                 },
             },
@@ -161,7 +162,7 @@ export function CloneManagement(props: PropsT): FormConfig {
     onSuccess: () => {
       onClose?.();
     },
-    submitButtonText: "نسخ",
+    submitButtonText: "تعيين",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "Clear Form",
