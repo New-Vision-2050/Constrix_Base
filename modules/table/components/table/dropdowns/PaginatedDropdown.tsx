@@ -229,9 +229,10 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 )}
               </CommandEmpty>
               <CommandGroup id={'inner-list'}>
-                {options.map((option, index) => (
+                {options.map((option) => (
                   <CommandItem
-                    key={index}
+                    key={option.value}
+                    value={option.value}
                     onSelect={() => {
                       if (isMulti) {
                         // For multi-select, toggle the selected value
