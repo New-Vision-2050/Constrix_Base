@@ -24,7 +24,7 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
         sortable: true,
       },
     {
-        key: "detail.description",
+        key: "management.name",
         label: "الادارة التابع لها الفرع",
         sortable: true,
       },
