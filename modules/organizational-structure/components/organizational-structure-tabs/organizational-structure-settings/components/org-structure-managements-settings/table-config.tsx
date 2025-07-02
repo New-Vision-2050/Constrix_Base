@@ -25,12 +25,12 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
       },
     {
         key: "management.name",
-        label: "الادارة التابع لها الفرع",
+        label: "الادارة التابع لها",
         sortable: true,
       },
       {
         key: "users_count",
-        label: "عدد الموظفيين",
+        label: "عدد الموظفين",
         sortable: true,
       },
       {
