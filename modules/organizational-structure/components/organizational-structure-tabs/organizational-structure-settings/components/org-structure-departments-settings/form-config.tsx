@@ -4,7 +4,7 @@ import { baseURL } from "@/config/axios-config";
 export const OrgStructureDepartmentsSettingsFormConfig: FormConfig = {
   formId: "OrgStructureDepartmentsSettingsFormConfig",
   title: "اضافة قسم",
-  apiUrl: `${baseURL}/write-url`,
+  apiUrl: `${baseURL}/management_hierarchies/create-department-with-relations`,
   laravelValidation: {
     enabled: true,
     errorsPath: "errors",
@@ -26,11 +26,12 @@ export const OrgStructureDepartmentsSettingsFormConfig: FormConfig = {
           ],
         },
         {
-          name: "management_id",
+          name: "managements",
           label: "اسم الادارة التابع لها",
           type: "select",
           placeholder: "اختر الادارة",
           required: true,
+          isMulti: true,
           dynamicOptions: {
             url: `${baseURL}/management_hierarchies/list?type=management`,
             valueField: "id",
@@ -45,24 +46,6 @@ export const OrgStructureDepartmentsSettingsFormConfig: FormConfig = {
               message: "الادارة مطلوبة",
             },
           ],
-        },
-        {
-          name: "job_titles",
-          label: "المسميات الوظيفية",
-          type: "select",
-          isMulti: true,
-          placeholder: "اختر المسميات الوظيفية",
-          dynamicOptions: {
-            url: `${baseURL}/write-url`,
-            valueField: "id",
-            labelField: "name",
-            searchParam: "name",
-            paginationEnabled: true,
-            pageParam: "page",
-            limitParam: "per_page",
-            itemsPerPage: 10,
-            totalCountHeader: "X-Total-Count",
-          },
         },
       ],
     },
