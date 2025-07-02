@@ -21,10 +21,11 @@ type PropsT = {
   branchId: string | number;
   companyData?: CompanyData
   mainBranch?: {id:string ; name:string}
+  isMainBranch?: boolean
 };
 
 const BranchManagementsStructure = (props: PropsT) => {
-  const { branchId , companyData, mainBranch } = props;
+  const { branchId ,isMainBranch, companyData, mainBranch } = props;
   const t = useTranslations("CompanyStructure.ManagementStructure");
   const [deletedId, setDeletedId] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -165,7 +166,7 @@ const BranchManagementsStructure = (props: PropsT) => {
           </span>
         </div>
       )}
-
+      
       {!isLoading && !error && orgData && orgData?.length > 0 && (
         <div className="overflow-hidden">
           <OrganizationChart
@@ -179,6 +180,7 @@ const BranchManagementsStructure = (props: PropsT) => {
                 <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>
               </>
             }
+            ignoreAddInAll={isMainBranch}
           />
         </div>
       )}

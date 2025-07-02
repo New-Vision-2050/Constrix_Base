@@ -28,6 +28,7 @@ interface OrganizationChartProps {
   handleDeleteManagement?: (id: string | number) => void;
   reOrganize?: { concatKey: string; concatValue: string | number | undefined };
   ignoreAddAtFirstNode?: boolean;
+  ignoreAddInAll?: boolean;
 }
 
 const OrganizationChart = ({
@@ -40,6 +41,7 @@ const OrganizationChart = ({
   reOrganize,
   isEmployees,
   ignoreAddAtFirstNode,
+  ignoreAddInAll,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -348,6 +350,7 @@ const OrganizationChart = ({
                     node={displayNode}
                     onAddBtnClick={onAddBtnClick}
                     ignoreAddAtFirstNode={ignoreAddAtFirstNode}
+                    ignoreAddInAll={ignoreAddInAll}
                   />
                 </div>
               }
@@ -362,6 +365,8 @@ const OrganizationChart = ({
                   selectedNodeId={selectedNode?.id || null}
                   reOrganize={reOrganize}
                   isEmployees={isEmployees}
+                  ignoreAddAtFirstNode={ignoreAddAtFirstNode}
+                  ignoreAddInAll={ignoreAddInAll}
                 />
               ))}
             </Tree>

@@ -16,6 +16,7 @@ interface TreeNodesProps {
   isEmployees?: boolean
   isDeputy?: boolean
   ignoreAddAtFirstNode?: boolean
+  ignoreAddInAll?: boolean
 }
 
 const TreeNodes = ({
@@ -27,7 +28,8 @@ const TreeNodes = ({
                      reOrganize,
                      isEmployees,
                      isDeputy,
-                     ignoreAddAtFirstNode
+                     ignoreAddAtFirstNode,
+                     ignoreAddInAll
                    }: TreeNodesProps) => {
   const locale = useLocale()
   return (
@@ -75,6 +77,7 @@ const TreeNodes = ({
                 node={node} 
                 onAddBtnClick={onAddBtnClick}
                 ignoreAddAtFirstNode={ignoreAddAtFirstNode}
+                ignoreAddInAll={ignoreAddInAll}
               />
             </>
           }
@@ -121,6 +124,7 @@ const TreeNodes = ({
           reOrganize={reOrganize}
           isEmployees={isEmployees}
           ignoreAddAtFirstNode={ignoreAddAtFirstNode}
+          ignoreAddInAll={ignoreAddInAll}
         />
       ))}
     </TreeNode>

@@ -6,11 +6,12 @@ type PropsT = {
   node: OrgChartNode;
   onAddBtnClick?: (node: OrgChartNode) => void;
   ignoreAddAtFirstNode?: boolean;
+  ignoreAddInAll?: boolean;
 };
 
-export default function OrgChartAddButton({ node, onAddBtnClick, ignoreAddAtFirstNode }: PropsT) {
+export default function OrgChartAddButton({ node, onAddBtnClick, ignoreAddAtFirstNode, ignoreAddInAll }: PropsT) {
   // Check if the button should be hidden
-  if (!onAddBtnClick || (ignoreAddAtFirstNode && node.is_main === 1)) return <></>;
+  if (!onAddBtnClick || ignoreAddInAll || (ignoreAddAtFirstNode && node.is_main === 1)) return <></>;
   return (
     <div className="relative w-full h-8">
       <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
