@@ -32,7 +32,7 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
         placeholder: "اسم الادارة التابع لها",
         required: true,
         dynamicOptions: {
-            url: `${baseURL}/management_hierarchies/list?type=management`,
+            url: `${baseURL}/management_hierarchies/non-copied`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
