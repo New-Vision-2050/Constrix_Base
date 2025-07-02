@@ -9,7 +9,7 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
     tableId: "OrgStructureManagementsSettingsTableConfig", // Add tableId to the config
     columns: [
      {
-        key: "id",
+        key: "code_id",
         label: "كود الادارة",
       },
       {
@@ -71,6 +71,7 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     formConfig: OrgStructureManagementsSettingsFormConfig,
+    executions: [],
     executionConfig: {
       canEdit: true,
       canDelete: true,
