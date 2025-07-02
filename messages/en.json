@@ -374,7 +374,9 @@
           "title": "Structure Settings",
           "tabs": {
             "jobTitles": { "title": "Job Titles" },
-            "jobTypes": { "title": "Job Types" }
+            "jobTypes": { "title": "Job Types" },
+            "management": { "title": "Management" },
+            "departments": { "title": "Departments" }
           }
         }
       }

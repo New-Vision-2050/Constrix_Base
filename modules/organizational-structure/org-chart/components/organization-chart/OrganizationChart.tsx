@@ -1,18 +1,18 @@
-import { useState, useRef, useEffect, MouseEvent, useCallback } from 'react'
+import { useState, useRef, useEffect, MouseEvent, useCallback } from "react";
 import { OrgChartNode } from "@/types/organization";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import { Tree } from "react-organizational-chart";
 import TreeNodes from "./TreeNodes";
 import ChartControls from "./ChartControls";
 import ChartNode from "./ChartNode";
-import EmployeeNode from './EmployeeNode'
+import EmployeeNode from "./EmployeeNode";
 import { useZoom } from "./hooks/useZoom";
 import ListView from "./list-view/ListView";
 import { exportChartAsPDF } from "./utils/pdfExportUtils";
 import "./style.css";
 import OrgChartAddButton from "./chart-add-button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
-import { orgTreeReOrganizationPayload } from '@/modules/organizational-structure/org-chart/components/organization-chart/utils'
+import { orgTreeReOrganizationPayload } from "@/modules/organizational-structure/org-chart/components/organization-chart/utils";
 import { useLocale } from "next-intl";
 import { printChart } from "./utils/printChart";
 
@@ -26,7 +26,8 @@ interface OrganizationChartProps {
   DropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   listModeDropDownMenu?: (node: OrgChartNode) => DropdownItemT[];
   handleDeleteManagement?: (id: string | number) => void;
-  reOrganize?: {concatKey: string, concatValue: string | number| undefined}
+  reOrganize?: { concatKey: string; concatValue: string | number | undefined };
+  ignoreAddAtFirstNode?: boolean;
 }
 
 const OrganizationChart = ({
@@ -37,11 +38,13 @@ const OrganizationChart = ({
   listModeDropDownMenu,
   listViewAdditionalActions,
   reOrganize,
-  isEmployees
+  isEmployees,
+  ignoreAddAtFirstNode,
 }: OrganizationChartProps) => {
   const { toast } = useToast();
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } = useZoom({setPan, pan});
+  const { zoomLevel, zoomIn, zoomOut, setZoom, handleWheelZoom, zoomStyle } =
+    useZoom({ setPan, pan });
   const [selectedNode, setSelectedNode] = useState<OrgChartNode | null>(null);
   const [displayNode, setDisplayNode] = useState<OrgChartNode>(data);
   const [originalData, setOriginalData] = useState<OrgChartNode>(data);
@@ -59,11 +62,15 @@ const OrganizationChart = ({
 
   // Set original data on component mount
   useEffect(() => {
-    if(reOrganize?.concatKey){
-      let newData = orgTreeReOrganizationPayload(data, reOrganize?.concatKey, reOrganize?.concatValue);
+    if (reOrganize?.concatKey) {
+      let newData = orgTreeReOrganizationPayload(
+        data,
+        reOrganize?.concatKey,
+        reOrganize?.concatValue
+      );
       setOriginalData(newData);
       setDisplayNode(newData);
-    }else{
+    } else {
       setOriginalData(data);
       setDisplayNode(data);
     }
@@ -204,46 +211,45 @@ const OrganizationChart = ({
     dragStart.current = { x: e.clientX, y: e.clientY };
     panStart.current = { ...pan };
     if (chartContainerRef.current) {
-      chartContainerRef.current.style.cursor = 'grabbing';
+      chartContainerRef.current.style.cursor = "grabbing";
     }
     // Disable user select on drag
-    document.body.style.userSelect = 'none';
+    document.body.style.userSelect = "none";
   };
-
 
   useEffect(() => {
     // Mouse move to drag pan
-    const handleMouseMove = (e: WindowEventMap['mousemove']) => {
+    const handleMouseMove = (e: WindowEventMap["mousemove"]) => {
       if (!isDragging.current) return;
       const dx = e.clientX - dragStart.current.x;
       const dy = e.clientY - dragStart.current.y;
       setPan({
         x: panStart.current.x + dx,
-        y: panStart.current.y + dy
+        y: panStart.current.y + dy,
       });
     };
     // Mouse up to stop dragging
     const handleMouseUp = () => {
       isDragging.current = false;
       if (chartContainerRef.current) {
-        chartContainerRef.current.style.cursor = 'grab';
+        chartContainerRef.current.style.cursor = "grab";
       }
-      document.body.style.userSelect = '';
+      document.body.style.userSelect = "";
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging, locale]);
 
   // Set initial cursor
   useEffect(() => {
     if (chartContainerRef.current) {
-      chartContainerRef.current.style.cursor = 'grab';
+      chartContainerRef.current.style.cursor = "grab";
     }
   }, []);
 
@@ -255,9 +261,9 @@ const OrganizationChart = ({
       handleWheelZoom(e, chartContainerRef);
     };
 
-    container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener("wheel", handleWheel, { passive: false });
     return () => {
-      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener("wheel", handleWheel);
     };
   }, [handleWheelZoom]);
 
@@ -286,7 +292,7 @@ const OrganizationChart = ({
         onToggleFullScreen={toggleFullScreen}
         additionalActions={listViewAdditionalActions}
       />
-      
+
       {viewMode === "tree" || !listView ? (
         <div
           ref={chartContainerRef}
@@ -310,12 +316,16 @@ const OrganizationChart = ({
                 <div
                   className={`flex flex-col items-center item-${
                     displayNode?.children?.length === 1
-                      ? (Boolean(isEmployees)? displayNode.children[0]?.hierarchy_info?.type :displayNode.children[0]?.type)
-                      : (Boolean(isEmployees)? displayNode?.hierarchy_info?.type : displayNode?.type)
+                      ? Boolean(isEmployees)
+                        ? displayNode.children[0]?.hierarchy_info?.type
+                        : displayNode.children[0]?.type
+                      : Boolean(isEmployees)
+                      ? displayNode?.hierarchy_info?.type
+                      : displayNode?.type
                   }`}
                 >
-                  {Boolean(isEmployees)
-                    ? <EmployeeNode
+                  {Boolean(isEmployees) ? (
+                    <EmployeeNode
                       node={displayNode}
                       onNodeClick={handleNodeClick}
                       isSelected={selectedNode?.id === displayNode.id}
@@ -323,17 +333,21 @@ const OrganizationChart = ({
                       // !Dropdown is temporarily disabled until a field is returned from the pack indicating that this command is controlled dynamically.
                       // DropDownMenu={DropDownMenu}
                     />
-                    : <ChartNode
+                  ) : (
+                    <ChartNode
                       node={displayNode}
                       onNodeClick={handleNodeClick}
                       isSelected={selectedNode?.id === displayNode.id}
                       isFirst={true}
                       // !Dropdown is temporarily disabled until a field is returned from the pack indicating that this command is controlled dynamically.
                       // DropDownMenu={DropDownMenu}
-                    />}
+                    />
+                  )}
+                  
                   <OrgChartAddButton
                     node={displayNode}
                     onAddBtnClick={onAddBtnClick}
+                    ignoreAddAtFirstNode={ignoreAddAtFirstNode}
                   />
                 </div>
               }

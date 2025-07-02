@@ -61,6 +61,7 @@ const BranchManagementsStructure = (props: PropsT) => {
     });
   }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
 
+
   const { openSheet, isOpen, closeSheet } = useSheetForm({ config:cloneManagementConfig });
   const { openSheet: openAddSheet, isOpen: isAddSheetOpen, closeSheet: closeAddSheet } = useSheetForm({ config:addManagementConfig });
 
@@ -168,6 +169,7 @@ const BranchManagementsStructure = (props: PropsT) => {
       {!isLoading && !error && orgData && orgData?.length > 0 && (
         <div className="overflow-hidden">
           <OrganizationChart
+            // ignoreAddAtFirstNode={true}
             data={orgData?.[0] as OrgChartNode}
             onAddBtnClick={(node) => onAddBtnClick(node)}
             DropDownMenu={DropDownMenu}

@@ -89,7 +89,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
       </div>
 
       <div className="flex items-center gap-3">
-        {additionalActions}
+        {viewMode === "list" && additionalActions}
         {selectedNode && (
           <Button variant="secondary" size="sm" onClick={onMakeParent}>
             <UserPlus className="h-4 w-4" />

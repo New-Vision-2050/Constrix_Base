@@ -6,8 +6,7 @@ import { useParams } from "next/navigation";
 import { serialize } from "object-to-formdata";
 import { RegistrationTypes } from "../legal-data-section/registration-types";
 
-export const AddDocFormConfig = (id?: string) => {
-  const { company_id }: { company_id: string | undefined } = useParams();
+export const AddDocFormConfig = (id?: string , company_id?:string) => {
   const queryClient = useQueryClient();
 
   const AddDocFormConfig: FormConfig = {
@@ -182,7 +181,7 @@ export const AddDocFormConfig = (id?: string) => {
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", id, company_id],
+        queryKey: ["company-official-documents", id, company_id],
       });
     },
   };
