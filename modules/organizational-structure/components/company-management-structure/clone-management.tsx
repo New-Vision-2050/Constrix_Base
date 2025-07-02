@@ -27,7 +27,7 @@ export function CloneManagement(props: PropsT): FormConfig {
 
   const _config: FormConfig = {
     formId: `clone-management-form-${selectedNode?.id || ""}`,
-    title: "نسخ ادارة",
+    title: "تعيين ادارة",
     apiUrl: `${baseURL}/management_hierarchies/clone-department`,
     laravelValidation: {
       enabled: true,
