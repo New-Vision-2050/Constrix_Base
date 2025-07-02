@@ -6,7 +6,7 @@ import { EditIcon, TrashIcon } from "lucide-react";
 
 export const OrgStructureDepartmentsSettingsTableConfig = () => {
   return {
-    url: `${baseURL}/write-url`,
+    url: `${baseURL}/management_hierarchies/non-copied?type=department`,
     tableId: "OrgStructureDepartmentsSettingsTableConfig",
     columns: [
       {
@@ -43,7 +43,7 @@ export const OrgStructureDepartmentsSettingsTableConfig = () => {
             label={"نشط"}
             initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.patch(`/write-url/${row.id}/status`, {
+              return await apiClient.patch(`/management_hierarchies/non-copied/${row.id}/status`, {
                 status: Number(isActive),
               });
             }}
