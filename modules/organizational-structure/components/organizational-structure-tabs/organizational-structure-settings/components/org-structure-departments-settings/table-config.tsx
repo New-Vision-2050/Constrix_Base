@@ -2,11 +2,10 @@ import { JobTitle } from "@/types/job-title";
 import { apiClient, baseURL } from "@/config/axios-config";
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { OrgStructureDepartmentsSettingsFormConfig } from "./form-config";
-import { EditIcon, TrashIcon } from "lucide-react";
 
 export const OrgStructureDepartmentsSettingsTableConfig = () => {
   return {
-    url: `${baseURL}/write-url`,
+    url: `${baseURL}/management_hierarchies/non-copied?type=department`,
     tableId: "OrgStructureDepartmentsSettingsTableConfig",
     columns: [
       {
@@ -67,19 +66,6 @@ export const OrgStructureDepartmentsSettingsTableConfig = () => {
     searchFieldParamName: "fields",
     formConfig: OrgStructureDepartmentsSettingsFormConfig,
     allowSearchFieldSelection: true,
-    executions: [
-      {
-        label: "تعديل",
-        icon: <EditIcon className="w-4 h-4" />,
-        action: "edit",
-      },
-      {
-        label: "حذف",
-        icon: <TrashIcon className="w-4 h-4" />,
-        action: "delete",
-        color: "red-500",
-      },
-    ],
     executionConfig: {
       canEdit: true,
       canDelete: true,

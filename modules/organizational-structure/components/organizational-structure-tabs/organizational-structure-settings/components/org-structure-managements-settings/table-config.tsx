@@ -2,7 +2,6 @@ import { JobTitle } from "@/types/job-title";
 import { apiClient, baseURL } from "@/config/axios-config";
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { OrgStructureManagementsSettingsFormConfig } from "./form-config";
-import { EditIcon, TrashIcon } from "lucide-react";
 
 export const OrgStructureManagementsSettingsTableConfig = () => {
   return {

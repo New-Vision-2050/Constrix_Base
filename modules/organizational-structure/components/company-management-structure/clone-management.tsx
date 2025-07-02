@@ -63,9 +63,10 @@ export function CloneManagement(props: PropsT): FormConfig {
                 name: "source_department_id",
                 label: "الادارة التي سيتم تعيينها",
                 type: "select",
+                required: true,
                 placeholder: "الادارة التي سيتم تعيينها",
                 dynamicOptions: {
-                    url: `${baseURL}/management_hierarchies/list?type=management&is_main=false&is_main=0&ignore_branch_id=${branchId}`,
+                    url: `${baseURL}/management_hierarchies/non-copied?ignore_branch_id=${branchId}`,
                     valueField: "id",
                     labelField: "name",
                     searchParam: "name",
@@ -73,6 +74,12 @@ export function CloneManagement(props: PropsT): FormConfig {
                     disableReactQuery:true,
                     totalCountHeader: "X-Total-Count",
                 },
+              validation:[
+              {
+                type:"required",
+                message: "الادارة التي سيتم نسخها مطلوب",
+              }
+            ]
             },
           {
             name: "reference_user_id",
