@@ -30,10 +30,10 @@ export const OrganizationalStructureSettingsTabs = (
     icon: <SlidersHorizontal width={18} />,
     content: <OrgStructureManagementSetting />,
   },
-  {
-    id: "organizational-structure-settings-departments",
-    title: t("departments.title"),
-    icon: <SlidersVertical width={18} />,
-    content: <OrgStructureDepartmentSetting />,
-  },
+  // {
+  //   id: "organizational-structure-settings-departments",
+  //   title: t("departments.title"),
+  //   icon: <SlidersVertical width={18} />,
+  //   content: <OrgStructureDepartmentSetting />,
+  // },
 ];
