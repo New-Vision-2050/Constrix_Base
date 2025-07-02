@@ -169,7 +169,7 @@ const BranchManagementsStructure = (props: PropsT) => {
       {!isLoading && !error && orgData && orgData?.length > 0 && (
         <div className="overflow-hidden">
           <OrganizationChart
-            ignoreAddAtFirstNode={true}
+            // ignoreAddAtFirstNode={true}
             data={orgData?.[0] as OrgChartNode}
             onAddBtnClick={(node) => onAddBtnClick(node)}
             DropDownMenu={DropDownMenu}
