@@ -64,14 +64,21 @@ export function CloneManagement(props: PropsT): FormConfig {
                 label: "الادارة التي سيتم نسخها",
                 type: "select",
                 placeholder: "الادارة التي سيتم نسخها",
+                required: true,
                 dynamicOptions: {
-                    url: `${baseURL}/management_hierarchies/list?type=management&is_main=false&is_main=0&ignore_branch_id=${branchId}`,
+                    url: `${baseURL}/management_hierarchies/non-copied?ignore_branch_id=${branchId}`,
                     valueField: "id",
                     labelField: "name",
                     searchParam: "name",
                     paginationEnabled: true,
                     totalCountHeader: "X-Total-Count",
                 },
+              validation:[
+              {
+                type:"required",
+                message: "الادارة التي سيتم نسخها مطلوب",
+              }
+            ]
             },
           {
             name: "reference_user_id",
