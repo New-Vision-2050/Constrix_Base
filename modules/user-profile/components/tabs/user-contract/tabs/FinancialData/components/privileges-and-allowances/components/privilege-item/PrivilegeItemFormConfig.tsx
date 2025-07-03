@@ -152,12 +152,6 @@ export const PrivilegeItemFormConfig = ({
             label: "وصف",
             type: "textarea",
             placeholder: "وصف",
-            validation: [
-              {
-                type: "required",
-                message: "وصف مطلوب",
-              },
-            ],
           },
         ],
         columns: 2,
