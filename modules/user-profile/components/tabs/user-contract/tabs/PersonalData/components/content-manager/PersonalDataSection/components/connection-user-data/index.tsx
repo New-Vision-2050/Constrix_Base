@@ -1,6 +1,7 @@
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import { ConnectionOTPCxtProvider } from "./context/ConnectionOTPCxt";
 import UserProfileConnectionDataEditForm from "./edit-mode";
+import UserProfileConnectionDataEditForm2 from "./edit-mode-v2";
 import UserProfileConnectionDataReview from "./preview-mode";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 
