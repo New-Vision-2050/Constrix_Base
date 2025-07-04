@@ -47,8 +47,14 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             placeholder: "اسم شخص في حالة الطواري",
             validation: [
               {
-                type: "required",
-                message: "هذا الحقل مطلوب",
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty
+                  // Check if the value contains only letters (Arabic or English) and spaces
+                  const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
+                  return lettersOnlyRegex.test(value);
+                },
+                message: "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
               },
             ],
           },
@@ -57,6 +63,18 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: "علاقة الشخص بحاله الطواري",
             type: "text",
             placeholder: "علاقة الشخص بحاله الطواري",
+            validation: [
+              {
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty
+                  // Check if the value contains only letters (Arabic or English) and spaces
+                  const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
+                  return lettersOnlyRegex.test(value);
+                },
+                message: "يجب أن تحتوي العلاقة على حروف فقط (بدون أرقام أو رموز)",
+              },
+            ],
           },
           {
             name: "phone",
@@ -66,7 +84,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: "برجاء ادخال رقم هاتف صحيح",
               },
             ],
           },
