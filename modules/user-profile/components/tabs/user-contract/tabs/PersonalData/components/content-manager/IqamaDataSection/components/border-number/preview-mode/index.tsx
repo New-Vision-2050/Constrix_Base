@@ -12,6 +12,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="رقم الحدود"
+          required
           value={checkString(userIdentityData?.border_number as string)}
           valid={Boolean(userIdentityData?.border_number)}
         />
@@ -20,6 +21,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الدخول"
+          required
           value={checkString(
             userIdentityData?.border_number_start_date as string
           )}
@@ -30,6 +32,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
+          required
           label="تاريخ الانتهاء"
           value={checkString(
             userIdentityData?.border_number_end_date as string
