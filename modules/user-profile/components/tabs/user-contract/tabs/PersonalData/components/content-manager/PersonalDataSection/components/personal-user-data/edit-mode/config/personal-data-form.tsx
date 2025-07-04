@@ -44,6 +44,11 @@ export const PersonalDataFormConfig = () => {
               type: "minLength",
               value: 3,
               message: "الاسم يجب ان يكون على الاقل 3 حروف"
+              },
+              {
+                type: "minWords",
+                value: 3,
+                message: "يرجى إدخال اسمك بالكامل (الاسم الأول، اسم الأب، اسم الجد).",
               }
             ],
           },
