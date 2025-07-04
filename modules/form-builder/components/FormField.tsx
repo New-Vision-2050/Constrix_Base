@@ -377,7 +377,7 @@ const FormField: React.FC<FormFieldProps> = ({
       {!!field.label && (
         <Label htmlFor={field.name} className="block mb-2">
           {field.label}
-          {field.required && <span className="text-destructive ml-1">*</span>}
+          {(field.required || (Array.isArray(field.validation) && field.validation.some((v) => v.type === 'required'))) && <span className="text-destructive ml-1">*</span>}
         </Label>
       )}
       {renderField()}
