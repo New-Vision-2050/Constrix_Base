@@ -401,7 +401,7 @@
     "genderPlaceholder": "اختر الجنس",
     "genderMale": "ذكر",
     "genderFemale": "أنثى",
-    "genderRequired": "الجنس مطلوب",
+    "genderRequired": "يجب اختيار الجنس",
     "is_default": "افتراضي ؟",
     "isDefaultPlaceholder": "افتراضي؟",
     "birthdate_gregorian": "تاريخ الميلاد",
