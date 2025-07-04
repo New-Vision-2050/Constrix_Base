@@ -23,7 +23,7 @@ function Calendar({
   const [month, setMonth] = React.useState(() => value ? new Date(value): new Date() );
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   // Generate a range of years (start from 1950 to current year + 20)
-  const startYear = 1950;
+  const startYear = 1900;
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear + 21 - startYear }, (_, i) => startYear + i);
 
