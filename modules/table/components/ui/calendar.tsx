@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
+import { ar , enUS} from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/modules/table/components/ui/button";
@@ -37,10 +38,32 @@ function Calendar({
 
   const locale = useLocale();
   const isRtl = locale === "ar";
+  // Set date-fns locale for DayPicker
+  const dayPickerLocale = isRtl ? ar : enUS;
 
-console.log("value", value);
+  // Arabic month names
+  const monthNames = isRtl
+    ? [
+        "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+      ]
+    : [
+        "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+      ];
+
+  // Helper to convert numbers to Arabic-Indic numerals
+  const toArabicNumeral = (num: number) =>
+    String(num).replace(/[0-9]/g, d => String.fromCharCode(d.charCodeAt(0) + 0x0660 - 0x0030));
+
+  // Handle day selection and propagate value
+  const handleDaySelect = (selected: Date | undefined) => {
+    if (selected instanceof Date && !isNaN(selected.getTime())) {
+      props.onChange(selected.toISOString());
+    }
+  };
+
   return (
     <DayPicker
+      mode={"single"}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -79,14 +102,14 @@ console.log("value", value);
       }}
       month={month}
       onMonthChange={setMonth}
+      locale={dayPickerLocale}
+      selected={value ? new Date(value) : undefined}
+      onSelect={handleDaySelect}
       components={{
         IconLeft: () => <ChevronLeft className="h-4 w-4" />,
         IconRight: () => <ChevronRight className="h-4 w-4" />,
         Caption: () => {
           // Month names
-          const monthNames = [
-            "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-          ];
           const [monthPopoverOpen, setMonthPopoverOpen] = React.useState(false);
           // Move month left/right
           const handlePrevMonth = () => {
@@ -134,7 +157,7 @@ console.log("value", value);
                       className="text-md font-medium cursor-pointer hover:underline px-2 py-0 rounded focus:outline-none focus:ring my-0"
                       onClick={() => setPopoverOpen((open) => !open)}
                     >
-                      {month.getFullYear()}
+                    {isRtl ? toArabicNumeral(month.getFullYear()) : month.getFullYear()}
                     </button>
                   </PopoverTrigger>
                   <PopoverContent
@@ -153,7 +176,7 @@ console.log("value", value);
                           }`}
                           onClick={() => handleYearChange(year)}
                         >
-                          {year}
+                          {isRtl ? toArabicNumeral(year) : year}
                         </button>
                       ))}
                     </div>
@@ -216,8 +239,12 @@ console.log("value", value);
             </div>
           );
         },
+        DayContent: (props) => {
+          const day = props.date;
+          return <span>{isRtl ? toArabicNumeral(day.getDate()) : day.getDate()}</span>;
+        },
       }}
-      {...props}
+      {...props as Omit<CalendarProps, 'mode' | 'selected' | 'onSelect'>}
     />
   );
 }

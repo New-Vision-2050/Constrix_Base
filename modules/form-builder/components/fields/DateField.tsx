@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { DayPickerSingleProps } from 'react-day-picker';
 import { HijriCalendar } from '@/modules/table/components/ui/HijriCalendar'
 import { useFormStore } from '@/modules/form-builder'
+import { useLocale } from 'next-intl';
 
 interface DateFieldProps extends Omit<DayPickerSingleProps, 'mode' | 'selected' | 'onSelect'> {
   field: FieldConfig;
@@ -28,6 +29,9 @@ const DateField: React.FC<DateFieldProps> = ({
   onBlur,
   ...props
 }) => {
+    const locale = useLocale();
+    const isRtl = locale === "ar";
+  
   // Handle both string date and Date object for flexibility
   const [valueState, setValueState] = useState(value);
   
@@ -89,6 +93,29 @@ const DateField: React.FC<DateFieldProps> = ({
     // Call parent onChange
     onChange(finalValue);
   };
+
+  // Helper to convert numbers to Arabic-Indic numerals
+  const toArabicNumeral = (input: string | number) => {
+    return String(input).replace(/[0-9]/g, (d) =>
+      String.fromCharCode(0x0660 + Number(d))
+    );
+  };
+
+  // Helper to format date as DD MMMM YYYY in Arabic-Indic numerals
+  const formatArabicDate = (date: Date) => {
+    // Use date-fns format for day, month, year
+    // Example: 4 يوليو 2025
+    // You may want to use a more robust i18n solution if needed
+    const day = toArabicNumeral(date.getDate());
+    // Month names in Arabic
+    const months = [
+      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+    const month = months[date.getMonth()];
+    const year = toArabicNumeral(date.getFullYear());
+    return `${day} ${month} ${year}`;
+  };
   
   return (
     <div className="relative">
@@ -110,7 +137,8 @@ const DateField: React.FC<DateFieldProps> = ({
           {valueState
             ? field?.isHijri
               ? valueState
-              : format(new Date(valueState), 'PPP')
+              : isRtl?
+                formatArabicDate(new Date(valueState)) : format(new Date(valueState), 'PPP')
             : field.placeholder || 'Select a date'}
         </Button>
       </PopoverTrigger>
