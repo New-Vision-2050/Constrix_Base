@@ -567,6 +567,16 @@ export const useFormStore = create<FormState>((set, get) => ({
             break;
           }
           break;
+        case "minWords":
+          if (
+            typeof value !== "string" ||
+            value.trim().split(/\s+/).length < (rule.value || 1)
+          ) {
+            store.setError(formId, fieldName, rule.message);
+            hasError = true;
+            break;
+          }
+          break;
         case "apiValidation":
           // For API validation, we trigger the validation but also check if there's an existing error
           if (fieldName) {

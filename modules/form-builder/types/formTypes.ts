@@ -12,6 +12,7 @@ export interface ValidationRule {
     | "phone"
     | "url"
     | "custom"
+    | "minWords"
     | "apiValidation";
   value?: any;
   message: string | React.ReactNode;
