@@ -121,7 +121,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
           </Button>
         </div>
 
-        <div className="w-full flex items-center justify-center gap-1">
+        <div className="w-full">
           <OtpInput otp={otp} setOtp={setOtp} />
         </div>
         <small className="text-red-500">{error}</small>
