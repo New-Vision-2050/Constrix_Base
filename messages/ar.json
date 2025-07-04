@@ -394,6 +394,7 @@
     "name": "الاسم ثلاثي",
     "namePlaceholder": "ادخل الاسم الثلاثي",
     "nameRequired": "الاسم مطلوب",
+    "nameThreeTerms": "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
     "nickname": "اسم الشهرة",
     "nicknamePlaceholder": "ادخل اسم الشهرة",
     "nicknameRequired": "اسم الشهرة مطلوب",

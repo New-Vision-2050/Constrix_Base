@@ -40,6 +40,15 @@ export const PersonalDataFormConfig = () => {
                 type: "required",
                 message: t("PersonalDataForm.nameRequired"),
               },
+              {
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty (handled by required validation)
+                  const nameTerms = value.trim().split(/\s+/).filter(term => term.length > 0);
+                  return nameTerms.length === 3;
+                },
+                message: t("PersonalDataForm.nameThreeTerms") || "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+              },
             ],
           },
           {
