@@ -13,7 +13,7 @@ import { checkString } from "@/utils/check-string";
 import { truncateString } from "@/utils/truncate-string";
 
 // types
-export type PreviewTextFieldType = "pdf" | "image" | "select" | "date";
+export type PreviewTextFieldType = "pdf" | "image" | "select" | "date" | "link";
 
 // props type
 type PropsT = {
@@ -26,6 +26,8 @@ type PropsT = {
   needRequest?: boolean;
   mediaId?: string | number;
   fireAfterDeleteMedia?: () => void;
+  openInNewTab?: boolean; // Option to open links in a new window
+  displayText?: string; // Alternative text to display instead of the actual link
 };
 
 const PreviewTextField = ({
@@ -38,6 +40,8 @@ const PreviewTextField = ({
   needRequest,
   mediaId,
   fireAfterDeleteMedia,
+  openInNewTab = false, // Default value (false) opens the link in the same window
+  displayText, // Alternative text to display
 }: PropsT) => {
   // get current locale for RTL/LTR
   const locale = useLocale();
@@ -91,6 +95,27 @@ const PreviewTextField = ({
           >
             {value}
           </span>
+        ) : type === "link" && value ? (
+          <a
+            href={value}
+            target={openInNewTab ? "_blank" : "_self"}
+            rel={openInNewTab ? "noopener noreferrer" : ""}
+            style={{
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              padding: "10px",
+              color: "#0066cc",
+              textDecoration: "underline",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              direction: "ltr",
+              unicodeBidi: "isolate",
+            }}
+            title={value}
+          >
+            {displayText ? truncateString(displayText, 30) : truncateString(value, 30)}
+          </a>
         ) : (
           <Input
             disabled
