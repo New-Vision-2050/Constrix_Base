@@ -5,6 +5,7 @@ import { useState } from "react";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/config/axios-config";
+import { isValidEmail } from "@/utils/valid-email";
 
 export default function UserProfileConnectionDataEditForm() {
   const {
@@ -21,6 +22,18 @@ export default function UserProfileConnectionDataEditForm() {
   const [email, setEmail] = useState(userConnectionData?.email ?? "");
 
   const handleChange = async (type: "phone" | "email") => {
+    if (type === "email") {
+      if (!email || !email.trim()) {
+        setError("البريد الإلكتروني مطلوب");
+        setLoading(false);
+        return;
+      }
+      if (!isValidEmail(email)) {
+        setError("البريد الإلكتروني غير صالح");
+        setLoading(false);
+        return;
+      }
+    }
     try {
       setLoading(true);
       const newValue = type === "email" ? email : `${code}${phone}`;
