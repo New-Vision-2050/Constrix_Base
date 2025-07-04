@@ -40,6 +40,11 @@ export const PersonalDataFormConfig = () => {
                 type: "required",
                 message: t("PersonalDataForm.nameRequired"),
               },
+              {
+              type: "minLength",
+              value: 3,
+              message: "الاسم يجب ان يكون على الاقل 3 حروف"
+              }
             ],
           },
           {
@@ -52,6 +57,11 @@ export const PersonalDataFormConfig = () => {
                 type: "required",
                 message: t("PersonalDataForm.nicknameRequired"),
               },
+              {
+              type: "minLength",
+              value: 3,
+              message: "اسم الشهرة يجب ان يكون على الاقل 3 حروف"
+              }
             ],
           },
           {
