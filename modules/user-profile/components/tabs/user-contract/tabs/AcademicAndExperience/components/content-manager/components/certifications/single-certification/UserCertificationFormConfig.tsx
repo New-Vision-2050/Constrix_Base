@@ -35,7 +35,6 @@ export const UserCertificationFormConfig = ({
             name: "professional_bodie_id",
             label: "الجهة",
             placeholder: "اختر الجهة",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/professional_bodies/user/${
                 user?.user_id
@@ -50,48 +49,28 @@ export const UserCertificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل الجهة",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_name",
             label: "اسم الاعتماد",
             type: "text",
             placeholder: "اسم الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الاعتماد مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_number",
             label: "رقم الاعتماد",
             type: "text",
             placeholder: "رقم الاعتماد ",
-            validation: [
-              {
-                type: "required",
-                message: "رقم الاعتماد  مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_degree",
             label: "درجة الاعتماد",
             type: "text",
             placeholder: "درجة الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "درجة الاعتماد مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "date_obtain",
@@ -102,12 +81,7 @@ export const UserCertificationFormConfig = ({
               field: "date_end",
             },
             placeholder: "تاريخ الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "date_end",
@@ -118,12 +92,7 @@ export const UserCertificationFormConfig = ({
               field: "date_obtain",
             },
             placeholder: "تاريخ انتهاء الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
-              },
-            ],
+            validation: [],
           },
         ],
         columns: 2,

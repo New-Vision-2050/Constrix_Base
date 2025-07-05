@@ -27,10 +27,16 @@ export const BorderNumberFormConfig = () => {
             label: "رقم الحدود",
             type: "text",
             placeholder: "رقم الحدود",
+            required: true,
             validation: [
               {
                 type: "required",
                 message: "رقم الحدود مطلوب",
+              },
+              {
+                type: "pattern",
+                value: "^[0-9]{10}$",
+                message: "رقم الحدود يجب أن يتكون من 10 أرقام فقط",
               },
             ],
           },
@@ -39,10 +45,17 @@ export const BorderNumberFormConfig = () => {
             label: "تاريخ الدخول",
             type: "date",
             placeholder: "تاريخ الدخول",
+            required: true,
             maxDate: {
               formId: `ConnectionInformation-data-form`,
               field: "border_number_end_date",
             },
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الدخول مطلوب",
+              },
+            ],
           },
           {
             name: "border_number_end_date",
@@ -53,6 +66,13 @@ export const BorderNumberFormConfig = () => {
               formId: `ConnectionInformation-data-form`,
               field: "border_number_start_date",
             },
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الانتهاء مطلوب",
+              },
+            ],
           },
           {
             name: "file_border_number",

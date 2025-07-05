@@ -14,7 +14,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="رقم العقد"
           value={contract?.contract_number ?? ""}
           valid={Boolean(contract?.contract_number)}
-          required
         />
       </div>
 
@@ -23,7 +22,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="تاريخ المباشرة"
           value={contract?.commencement_date ?? ""}
           valid={Boolean(contract?.commencement_date)}
-          required
         />
       </div>
 
@@ -32,7 +30,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="تاريخ البدء"
           value={contract?.start_date ?? ""}
           valid={Boolean(contract?.start_date)}
-          required
         />
       </div>
 
@@ -43,7 +40,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
             contract?.contract_duration_unit?.name ?? ""
           }`}
           valid={Boolean(contract?.contract_duration)}
-          required
         />
       </div>
 
@@ -54,7 +50,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
             contract?.notice_period_unit?.name ?? ""
           }`}
           valid={Boolean(contract?.notice_period)}
-          required
         />
       </div>
 
@@ -65,7 +60,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
             contract?.probation_period_unit?.name ?? ""
           }`}
           valid={Boolean(contract?.probation_period)}
-          required
         />
       </div>
 
@@ -74,7 +68,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="طبيعة العمل"
           value={contract?.nature_work?.name ?? ""}
           valid={Boolean(contract?.nature_work)}
-          required
         />
       </div>
 
@@ -83,7 +76,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="نوع ساعات العمل"
           value={contract?.type_working_hour?.name ?? ""}
           valid={Boolean(contract?.type_working_hour)}
-          required
         />
       </div>
 
@@ -92,7 +84,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="ساعات العمل الاسبوعية"
           value={`${(contract?.working_hours ?? "")?.toString()} ساعة`}
           valid={Boolean(contract?.working_hours?.toString())}
-          required
         />
       </div>
 
@@ -101,7 +92,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="ايام الاجازات السنوية"
           value={`${(contract?.annual_leave ?? "")?.toString()} يوم`}
           valid={Boolean(contract?.annual_leave)}
-          required
         />
       </div>
 
@@ -110,7 +100,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="مكان العمل"
           value={contract?.country_name ?? ""}
           valid={Boolean(contract?.country_name)}
-          required
         />
       </div>
 
@@ -119,7 +108,6 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
           label="حق الانهاء خلال فترة التجربة"
           value={contract?.right_terminate?.name ?? ""}
           valid={Boolean(contract?.right_terminate)}
-          required
         />
       </div>
       {Array.isArray(contract?.files) && contract?.files?.length > 0 ? (

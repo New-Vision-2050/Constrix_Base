@@ -87,12 +87,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               labelField: "name",
               paginationEnabled: true,
             },
-            validation: [
-              {
-                type: "required",
-                message: "نوع الحساب مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
@@ -110,12 +105,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "عملة الحساب مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             type: "text",
@@ -123,10 +113,6 @@ export const BankingDataFormConfig = (props: PropsT) => {
             label: "رمز ال iban",
             placeholder: "اختر رمز ال iban",
             validation: [
-              {
-                type: "required",
-                message: "رمز ال iban مطلوب",
-              },
               {
                 type: "pattern",
                 value: "^[A-Z]{2}[0-9A-Z]{13,32}$",
@@ -139,12 +125,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             name: "user_name",
             label: "أسم المستخدم",
             placeholder: "اختر أسم المستخدم",
-            validation: [
-              {
-                type: "required",
-                message: "أسم المستخدم مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             type: "text",
@@ -152,10 +133,6 @@ export const BankingDataFormConfig = (props: PropsT) => {
             label: "رقم الحساب",
             placeholder: "اختر رقم الحساب",
             validation: [
-              {
-                type: "required",
-                message: "رقم الحساب مطلوب",
-              },
               {
                 type: "pattern",
                 value: "^[0-9]{8,32}$",
@@ -169,10 +146,6 @@ export const BankingDataFormConfig = (props: PropsT) => {
             label: "كود ال swift",
             placeholder: "اختر كود ال swift",
             validation: [
-              {
-                type: "required",
-                message: "كود ال swift مطلوب",
-              },
               {
                 type: "pattern",
                 value: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",

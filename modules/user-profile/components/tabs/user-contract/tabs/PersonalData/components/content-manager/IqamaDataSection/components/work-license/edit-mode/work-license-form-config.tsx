@@ -25,11 +25,17 @@ export const WorkLicenseFormConfig = () => {
             name: "work_permit",
             label: "رقم رخصة العمل",
             type: "text",
+            required:true,
             placeholder: "رقم رخصة العمل",
              validation: [
               {
                 type: "required",
                 message: "رقم رخصة العمل مطلوب",
+              },
+              {
+                type: "pattern",
+                value: "^[0-9]{10}$",
+                message: "رقم رخصة العمل يجب أن يتكون من 10 أرقام فقط",
               },
             ],
           },
@@ -42,6 +48,13 @@ export const WorkLicenseFormConfig = () => {
               formId: `ConnectionInformation-license-data-form`,
               field: "entry_number_end_date",
             },
+            required:true,
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الدخول مطلوب",
+              },
+            ],
           },
           {
             name: "work_permit_end_date",
@@ -52,6 +65,13 @@ export const WorkLicenseFormConfig = () => {
               formId: `ConnectionInformation-license-data-form`,
               field: "work_permit_start_date",
             },
+            required:true,
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الانتهاء مطلوب",
+              },
+            ],
           },
           {
             name: "file_work_permit",

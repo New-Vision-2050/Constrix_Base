@@ -20,18 +20,22 @@ export const AddressFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات العنوان",
         fields: [
           {
             name: "address",
             label: "العنوان السكني بمقر العمل/العنوان الوطنى)",
             type: "text",
             placeholder: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
-            required: true,
             validation: [
               {
-                type: "required",
-                message: "العنوان السكني مطلوب",
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty
+                  // Check if address has valid characters (allows letters, numbers, common symbols)
+                  const validAddressRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z0-9\.,\-_#\/()&]+$/;
+                  return validAddressRegex.test(value);
+                },
+                message: "يجب أن يحتوي العنوان على أحرف وأرقام ورموز صالحة فقط",
               },
             ],
           },
@@ -42,8 +46,9 @@ export const AddressFormConfig = () => {
             placeholder: "العنوان البريدي",
             validation: [
               {
-                type: "required",
-                message: "العنوان البريدي مطلوب",
+                type: "pattern",
+                value: "^[0-9]{5}$",
+                message: "الرمز البريدي يجب أن يتكون من 5 أرقام فقط",
               },
             ],
           },
