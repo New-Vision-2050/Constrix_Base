@@ -12,6 +12,7 @@ export default function UserIqamaDataPreviewMode() {
         <PreviewTextField
           label="رقم الاقامة"
           required
+          enableCopy
           value={userIdentityData?.entry_number ?? ""}
           valid={Boolean(userIdentityData?.entry_number)}
         />

@@ -13,6 +13,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
         <PreviewTextField
           label="رقم الحدود"
           required
+          enableCopy
           value={checkString(userIdentityData?.border_number as string)}
           valid={Boolean(userIdentityData?.border_number)}
         />

@@ -12,6 +12,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
         <PreviewTextField
           required
           label="رقم رخصة العمل"
+          enableCopy
           value={userIdentityData?.work_permit ?? ""}
           valid={Boolean(userIdentityData?.work_permit)}
         />
