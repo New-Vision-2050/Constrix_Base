@@ -15,7 +15,7 @@ export default function ConnectionDataSectionPersonalForm() {
         title={"بيانات الاتصال"}
         loading={userConnectionDataLoading}
         reviewMode={<UserProfileConnectionDataReview />}
-        editMode={<UserProfileConnectionDataEditForm />}
+        editMode={<UserProfileConnectionDataEditForm2 />}
         settingsBtn={{
           items: [
             { title: "طلباتي", onClick: () => {} ,disabled:true},

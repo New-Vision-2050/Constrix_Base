@@ -3,12 +3,12 @@ import { baseURL, apiClient } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useConnectionOTPCxt } from "../context/ConnectionOTPCxt";
 
-export const ConnnectionFormConfig = () => {
+export const EmailFormConfig = () => {
   const { userConnectionData } = usePersonalDataTabCxt();
-  const { togglePhoneOtpDialog } = useConnectionOTPCxt();
+  const { toggleMailOtpDialog } = useConnectionOTPCxt();
 
-  const PersonalFormConfig: FormConfig = {
-    formId: `connection-data-form`,
+  const EmailFormConfig: FormConfig = {
+    formId: `email-data-form`,
     title: "بيانات الاتصال",
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
@@ -17,21 +17,21 @@ export const ConnnectionFormConfig = () => {
     },
     sections: [
       {
-        title:"تغيير رقم الجوال",
+        title: "تغيير البريد الإلكتروني",
         fields: [
           {
-            name: "phone",
-            label: "رقم الجوال",
-            type: "phone",
-            placeholder: "رقم الجوال",
+            name: "email",
+            label: "البريد الإلكتروني",
+            type: "email",
+            placeholder: "البريد الإلكتروني",
             validation: [
               {
                 type: "required",
-                message: "رقم الجوال مطلوب",
+                message: "البريد الإلكتروني مطلوب",
               },
               {
-                type: "phone",
-                message: "برجاء أدخل رقم جوال صحيح",
+                type: "email",
+                message: "برجاء أدخل بريد إلكتروني صحيح",
               },
             ],
           }
@@ -40,9 +40,9 @@ export const ConnnectionFormConfig = () => {
       },
     ],
     initialValues: {
-      phone: userConnectionData?.phone,
+      email: userConnectionData?.email,
     },
-    submitButtonText: "تغيير رقم الجوال",
+    submitButtonText: "تغيير البريد الإلكتروني",
     cancelButtonText: "إلغاء",
     showReset: false,
     resetButtonText: "إلغاء",
@@ -55,20 +55,20 @@ export const ConnnectionFormConfig = () => {
       console.log("formData", formData);
       
       try {
-        // Send OTP to mobile
+        // Send OTP to email
         const body = {
-          identifier: formData.phone,
-          type: "phone",
+          identifier: formData.email,
+          type: "email",
         };
         
         await apiClient.post(`/company-users/send-otp`, body);
         
         // Open OTP dialog
-        togglePhoneOtpDialog();
+        toggleMailOtpDialog();
         
         return {
           success: true,
-          message: "تم إرسال رمز التحقق إلى رقم الجوال",
+          message: "تم إرسال رمز التحقق إلى البريد الإلكتروني",
         };
       } catch (error) {
         console.log("error", error);
@@ -79,5 +79,5 @@ export const ConnnectionFormConfig = () => {
       }
     },
   };
-  return PersonalFormConfig;
+  return EmailFormConfig;
 };
