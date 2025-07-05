@@ -12,6 +12,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
         <PreviewTextField
           required
           label="رقم رخصة العمل"
+          enableCopy
           value={userIdentityData?.work_permit ?? ""}
           valid={Boolean(userIdentityData?.work_permit)}
         />
@@ -19,7 +20,6 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          required
           label="تاريخ الدخول"
           value={userIdentityData?.work_permit_start_date ?? ""}
           valid={Boolean(userIdentityData?.work_permit_start_date)}

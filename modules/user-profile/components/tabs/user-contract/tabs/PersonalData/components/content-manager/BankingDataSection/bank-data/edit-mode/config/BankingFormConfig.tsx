@@ -69,6 +69,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               limitParam: "per_page",
               itemsPerPage: 1000,
             },
+            required: true,
             validation: [
               {
                 type: "required",
@@ -84,10 +85,17 @@ export const BankingDataFormConfig = (props: PropsT) => {
             dynamicOptions: {
               url: `${baseURL}/bank_type_accounts`,
               valueField: "id",
+              setFirstAsDefault: true,
               labelField: "name",
               paginationEnabled: true,
             },
-            validation: [],
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "نوع الحساب مطلوب",
+              },
+            ],
           },
           {
             type: "select",
@@ -105,7 +113,13 @@ export const BankingDataFormConfig = (props: PropsT) => {
               itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [],
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "عملة الحساب مطلوبة",
+              },
+            ],
           },
           {
             type: "text",
@@ -123,16 +137,27 @@ export const BankingDataFormConfig = (props: PropsT) => {
           {
             type: "text",
             name: "user_name",
-            label: "أسم المستخدم",
-            placeholder: "اختر أسم المستخدم",
-            validation: [],
+            label: "اسم صاحب الحساب",
+            placeholder: "اختر اسم صاحب الحساب",
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "اسم صاحب الحساب مطلوب",
+              },
+            ],
           },
           {
             type: "text",
             name: "account_number",
             label: "رقم الحساب",
             placeholder: "اختر رقم الحساب",
+            required: true,
             validation: [
+              {
+                type: "required",
+                message: "رقم الحساب مطلوب",
+              },
               {
                 type: "pattern",
                 value: "^[0-9]{8,32}$",

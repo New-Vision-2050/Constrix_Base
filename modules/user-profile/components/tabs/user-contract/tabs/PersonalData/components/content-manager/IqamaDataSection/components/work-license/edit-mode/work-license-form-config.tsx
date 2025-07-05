@@ -48,13 +48,7 @@ export const WorkLicenseFormConfig = () => {
               formId: `ConnectionInformation-license-data-form`,
               field: "entry_number_end_date",
             },
-            required:true,
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الدخول مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "work_permit_end_date",

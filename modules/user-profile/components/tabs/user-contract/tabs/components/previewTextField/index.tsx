@@ -28,6 +28,7 @@ type PropsT = {
   fireAfterDeleteMedia?: () => void;
   openInNewTab?: boolean; // Option to open links in a new window
   displayText?: string; // Alternative text to display instead of the actual link
+  enableCopy?: boolean; // Option to enable copy icon to copy the value
 };
 
 const PreviewTextField = ({
@@ -42,6 +43,7 @@ const PreviewTextField = ({
   fireAfterDeleteMedia,
   openInNewTab = false, // Default value (false) opens the link in the same window
   displayText, // Alternative text to display
+  enableCopy = false, // Default value (false) disables copy functionality
 }: PropsT) => {
   // get current locale for RTL/LTR
   const locale = useLocale();
@@ -140,6 +142,8 @@ const PreviewTextField = ({
         type={type}
         mediaId={mediaId}
         fireAfterDeleteMedia={fireAfterDeleteMedia}
+        enableCopy={enableCopy}
+        value={value}
       />
 
       {/* icon showing validation state */}

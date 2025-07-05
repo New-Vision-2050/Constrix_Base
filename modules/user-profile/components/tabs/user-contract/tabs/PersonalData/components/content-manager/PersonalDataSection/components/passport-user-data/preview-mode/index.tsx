@@ -14,6 +14,7 @@ export default function UserProfilePassportDataReview() {
           label="رقم جواز السفر"
           value={userIdentityData?.passport ?? ""}
           required
+          enableCopy
         />
       </div>
       <div className="p-2">
