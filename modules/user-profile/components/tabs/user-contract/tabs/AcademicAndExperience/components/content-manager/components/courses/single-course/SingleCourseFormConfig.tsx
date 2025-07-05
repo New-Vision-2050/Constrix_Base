@@ -30,84 +30,57 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
             label: "اسم الشركة",
             type: "text",
             placeholder: "اسم الشركة",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الشركة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "authority",
             label: "الجهة",
             type: "text",
             placeholder: "الجهة",
-            validation: [
-              {
-                type: "required",
-                message: "الجهة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "name",
             label: "اسم الدورة التدريبية ",
             type: "text",
             placeholder: "اسم الدورة التدريبية ",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الدورة التدريبية  مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "institute",
             label: "جهة الاعتماد",
             type: "text",
             placeholder: "جهة الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "جهة الاعتماد مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "certificate",
             label: "الشهادات الممنوحة",
             type: "text",
             placeholder: "الشهادات الممنوحة",
-            validation: [
-              {
-                type: "required",
-                message: "الشهادات الممنوحة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "date_obtain",
             label: "تاريخ الحصول على الشهادة",
             type: "date",
             placeholder: "تاريخ الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-             
-            ],
+            validation: [],
+            maxDate: {
+              formId: `user-courses-data-form-${course?.id ?? ""}`,
+              field: "date_end",
+            },
           },
           {
             name: "date_end",
             label: "تاريخ انتهاء الشهادة",
             type: "date",
             placeholder: "تاريخ انتهاء الشهادة",
+            minDate: {
+              formId: `user-courses-data-form-${course?.id ?? ""}`,
+              field: "date_obtain",
+            },
             validation: [
-              {
-                type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
-              },
               {
                 type: "custom",
                 message:
