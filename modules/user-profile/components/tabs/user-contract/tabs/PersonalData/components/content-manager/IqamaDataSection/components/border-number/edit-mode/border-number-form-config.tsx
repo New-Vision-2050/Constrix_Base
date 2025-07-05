@@ -45,17 +45,11 @@ export const BorderNumberFormConfig = () => {
             label: "تاريخ الدخول",
             type: "date",
             placeholder: "تاريخ الدخول",
-            required: true,
             maxDate: {
               formId: `ConnectionInformation-data-form`,
               field: "border_number_end_date",
             },
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الدخول مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "border_number_end_date",

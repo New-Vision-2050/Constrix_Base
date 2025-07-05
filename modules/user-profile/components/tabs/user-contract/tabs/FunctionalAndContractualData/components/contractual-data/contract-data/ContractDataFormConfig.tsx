@@ -124,6 +124,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                       {
                         contract_duration_unit: e.target.value,
                         // Reset related fields
+                        annual_leave: "",
                         notice_period: "",
                         probation_period: "",
                       }
@@ -155,13 +156,6 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                       "contract_duration",
                       currentFormValues.contract_duration,
                       contractDurationRules,
-                      currentFormValues
-                    );
-
-                    console.log(
-                      "contractValid",
-                      contractValid,
-                      "currentFormValues",
                       currentFormValues
                     );
 
@@ -473,6 +467,36 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                 value: "^[0-9]+$",
                 message: "أيام الإجازات يجب أن تكون أرقام فقط",
               },
+              {
+                type: "custom",
+                validator: (value: any, formValues?: Record<string, any>) => {
+                  // Skip validation if no value is provided
+                  if (!value || !formValues) return true;
+
+                  // Skip validation if contract_duration is not set
+                  if (!formValues.contract_duration) return true;
+
+                  // Convert annual leave (always in days) to a number
+                  const annualLeaveDays = Number(value);
+
+                  // Convert contract duration to days
+                  const contractDurationValue = Number(
+                    formValues.contract_duration
+                  );
+                  const contractDurationUnit =
+                    formValues.contract_duration_unit;
+                  const contractDurationInDays = convertToDays(
+                    contractDurationValue,
+                    contractDurationUnit,
+                    timeUnits
+                  );
+
+                  // Compare values
+                  return annualLeaveDays <= contractDurationInDays;
+                },
+                message:
+                  "عدد أيام الإجازات السنوية لا يمكن أن يكون أكبر من مدة العقد",
+              },
             ],
           },
           {
@@ -480,7 +504,6 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             name: "country_id",
             label: "مكان العمل",
             placeholder: "اختر مكان العمل",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",

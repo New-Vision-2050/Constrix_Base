@@ -21,7 +21,6 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الدخول"
-          required
           value={checkString(
             userIdentityData?.border_number_start_date as string
           )}

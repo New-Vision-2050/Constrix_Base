@@ -35,7 +35,12 @@ export const PersonalDataFormConfig = () => {
             label: t("PersonalDataForm.name"),
             type: "text",
             placeholder: t("PersonalDataForm.namePlaceholder"),
+            required: true,
             validation: [
+              {
+                type: "required",
+                message: t("PersonalDataForm.nameRequired"),
+              },
               {
                 type: "custom",
                 validator: (value: string) => {
@@ -151,7 +156,12 @@ export const PersonalDataFormConfig = () => {
               totalCountHeader: "X-Total-Count",
             },
             required: true,
-            validation: [],
+            validation: [
+              {
+                type: "required",
+                message: t("PersonalDataForm.countryRequired"),
+              },
+            ],
           },
         ],
         columns: 2,
