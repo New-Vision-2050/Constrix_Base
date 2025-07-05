@@ -40,6 +40,10 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: "تاريخ المباشرة",
             type: "date",
             placeholder: "تاريخ المباشرة",
+            maxDate: {
+              formId: `user-contract-data-form-${contract?.id}`,
+              field: "commencement_date",
+            },
             validation: [
               {
                 type: "required",
@@ -52,6 +56,10 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
             label: "تاريخ البدء",
             type: "date",
             placeholder: "تاريخ البدء",
+            minDate: {
+              formId: `user-contract-data-form-${contract?.id}`,
+              field: "start_date",
+            },
             validation: [
               {
                 type: "required",
