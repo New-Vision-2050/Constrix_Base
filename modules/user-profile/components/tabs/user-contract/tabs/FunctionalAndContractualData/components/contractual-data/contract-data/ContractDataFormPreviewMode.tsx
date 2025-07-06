@@ -63,13 +63,13 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
         />
       </div>
 
-      <div className="p-2">
+      {/* <div className="p-2">
         <PreviewTextField
           label="طبيعة العمل"
           value={contract?.nature_work?.name ?? ""}
           valid={Boolean(contract?.nature_work)}
         />
-      </div>
+      </div> */}
 
       <div className="p-2">
         <PreviewTextField
@@ -98,8 +98,8 @@ export default function ContractDataFormPreviewMode({ contract }: PropsT) {
       <div className="p-2">
         <PreviewTextField
           label="مكان العمل"
-          value={contract?.country_name ?? ""}
-          valid={Boolean(contract?.country_name)}
+          value={contract?.state_name ?? ""}
+          valid={Boolean(contract?.state_name)}
         />
       </div>
 
