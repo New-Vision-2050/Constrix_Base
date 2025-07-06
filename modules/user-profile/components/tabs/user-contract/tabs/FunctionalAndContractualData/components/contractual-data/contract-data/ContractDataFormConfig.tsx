@@ -501,11 +501,11 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             type: "select",
-            name: "country_id",
+            name: "state_id",
             label: "مكان العمل",
             placeholder: "اختر مكان العمل",
             dynamicOptions: {
-              url: `${baseURL}/countries`,
+              url: `${baseURL}/countries/get-states-by-branch`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -561,7 +561,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
       nature_work_id: contract?.nature_work?.id,
       type_working_hour_id: contract?.type_working_hour?.id,
       working_hours: contract?.working_hours,
-      country_id: contract?.country_id,
+      state_id: contract?.state_id,
       right_terminate_id: contract?.right_terminate?.id,
       notice_period_unit:
         contract?.notice_period_unit?.id || timeUnits?.[0]?.id,

@@ -1,3 +1,5 @@
+import { MediaFile } from "@/types/media-file";
+
 export type Course = {
   authority: string;
   certificate: string;
@@ -7,4 +9,5 @@ export type Course = {
   id: string;
   institute: string;
   name: string;
+  file: MediaFile;
 };

@@ -6,7 +6,7 @@ export type Contract = {
   company_id: string;
   contract_duration: string;
   contract_number: string;
-  country_id: string;
+  state_id: string;
   country_name: string;
   file_url: string;
   global_id: string;
