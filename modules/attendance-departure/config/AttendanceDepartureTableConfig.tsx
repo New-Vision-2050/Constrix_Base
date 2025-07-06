@@ -8,7 +8,7 @@ import React from "react";
 // Creamos una función que retorna la configuración de la tabla
 export const getAttendanceDepartureTableConfig = () => {
   return {
-    url: `${baseURL}/attendance-departure`,
+    url: `${baseURL}/attendance/team`,
     tableId: "attendance-departure-table",
     columns: [
       { 
