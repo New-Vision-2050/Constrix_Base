@@ -5,7 +5,7 @@ import { useAttendance } from "../../context/AttendanceContext";
 import { AttendanceStatusRecord } from "../../types/attendance";
 
 interface ApproverBadgeProps {
-  approver: string;
+  approver: string; // This will now contain approved_by_user from the backend
   record: AttendanceStatusRecord;
 }
 

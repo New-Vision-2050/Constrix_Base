@@ -20,7 +20,7 @@ const DialogContainer: React.FC<DialogContainerProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#171738] text-white max-w-md">
+      <DialogContent className="bg-[#140F35] text-white">
         <DialogHeader>
           <DialogTitle className="text-2xl text-center font-bold">
             {title}

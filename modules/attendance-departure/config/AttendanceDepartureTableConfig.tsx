@@ -5,59 +5,59 @@ import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { AttendanceStatusRecord } from "../types/attendance";
 import React from "react";
 
-// Creamos una función que retorna la configuración de la tabla
+// Configuration function for the attendance departure table
 export const getAttendanceDepartureTableConfig = () => {
   return {
     url: `${baseURL}/attendance/team`,
     tableId: "attendance-departure-table",
     columns: [
       { 
-        key: "name", 
+        key: "user.name", 
         label: "الاسم", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.name 
+        render: (value: any, row: AttendanceStatusRecord) => row.user?.name || '-' 
       },
       { 
-        key: "date", 
+        key: "work_date", 
         label: "التاريخ", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.date 
+        render: (value: any, row: AttendanceStatusRecord) => row.work_date 
       },
       { 
-        key: "employeeId", 
+        key: "user.id", 
         label: "الرقم الوظيفي", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.employeeId 
+        render: (value: any, row: AttendanceStatusRecord) => row.user?.id || '-' 
       },
       { 
-        key: "branch", 
-        label: "الفرع", 
+        key: "company.name", 
+        label: "الشركة", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.branch 
+        render: (value: any, row: AttendanceStatusRecord) => row.company?.name || '-' 
       },
       { 
-        key: "department", 
-        label: "الإدارة", 
+        key: "clock_in_time", 
+        label: "وقت الحضور", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.department 
+        render: (value: any, row: AttendanceStatusRecord) => row.clock_in_time || '-' 
       },
       { 
-        key: "approver", 
+        key: "approved_by_user", 
         label: "المعتمد", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => <ApproverBadge approver={row.approver} record={row} /> 
+        render: (value: any, row: AttendanceStatusRecord) => <ApproverBadge approver={row.approved_by_user} record={row} /> 
       },
       { 
-        key: "employeeStatus", 
+        key: "is_late", 
         label: "حالة الموظف", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.employeeStatus 
+        render: (value: any, row: AttendanceStatusRecord) => row.is_late ? "متأخر" : "في الوقت" 
       },
       { 
-        key: "attendanceStatus", 
+        key: "status", 
         label: "حالة الحضور", 
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => <AttendanceStatusBadge status={row.attendanceStatus} record={row} /> 
+        render: (value: any, row: AttendanceStatusRecord) => <AttendanceStatusBadge status={row.status} record={row} /> 
       }
     ] as ColumnConfig[],
     deleteConfirmMessage: "تأكيد حذف سجل الحضور والانصراف",

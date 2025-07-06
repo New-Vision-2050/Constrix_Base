@@ -3,7 +3,7 @@ import { useAttendance } from "../../context/AttendanceContext";
 import { AttendanceStatusRecord } from "../../types/attendance";
 
 interface AttendanceStatusBadgeProps {
-  status: string;
+  status: string; // This will now contain the status from the backend
   record: AttendanceStatusRecord; // The full attendance record
 }
 
@@ -16,19 +16,37 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
 }) => {
   const { openAttendanceStatusDialog } = useAttendance();
   let color = "";
-  let text = status;
+  let text = "";
+  //is_late
+  let _status = record.status;
+  if (record.is_late === 0) {
+    _status = "present";
+  } else if (record.is_late === 1) {
+    _status = "late";
+  } else {
+    _status = "absent";
+  }
 
-  switch (status) {
-    case "حاضر":
+  // Map the backend status to display text
+  switch (_status) {
+    case "present":
+      text = "حاضر";
       color = "text-green-500";
       break;
-    case "غائب":
+    case "absent":
+      text = "غائب";
       color = "text-red-500";
       break;
-    case "متأخر":
+    case "late":
+      text = "متأخر";
       color = "text-yellow-400";
       break;
+    case "on_leave":
+      text = "في إجازة";
+      color = "text-blue-500";
+      break;
     default:
+      text = status || "غير محدد";
       color = "text-gray-400";
       break;
   }

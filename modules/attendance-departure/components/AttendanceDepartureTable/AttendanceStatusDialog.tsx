@@ -30,14 +30,14 @@ const AttendanceStatusDialog: React.FC = () => {
       {/* Attendance Time Box */}
       <TimeBox 
         label="الحضور" 
-        time={selectedAttendanceRecord.attendanceTime} 
+        time={selectedAttendanceRecord.clock_in_time} 
         defaultTime="8:12 صباحاً" 
       />
       
       {/* Departure Time Box */}
       <TimeBox 
         label="الانصراف" 
-        time={selectedAttendanceRecord.departureTime} 
+        time={selectedAttendanceRecord.clock_out_time} 
         defaultTime="5:30 مساءاً" 
       />
     </DialogContainer>
