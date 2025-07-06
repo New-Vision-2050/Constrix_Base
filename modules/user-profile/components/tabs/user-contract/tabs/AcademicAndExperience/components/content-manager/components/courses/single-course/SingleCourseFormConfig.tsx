@@ -141,14 +141,12 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
 
       // Create a copy of the form data
       const formDataCopy = { ...formData };
-      
+
       // Check if file is empty or not provided, and remove it if it's empty
-      if (!formDataCopy.file || 
-          (Array.isArray(formDataCopy.file) && formDataCopy.file.length === 0) || 
-          (typeof formDataCopy.file === 'object' && Object.keys(formDataCopy.file).length === 0)) {
+      if (!formDataCopy.file) {
         delete formDataCopy.file;
       }
-      
+
       // Create the final body
       const body = {
         ...formDataCopy,
@@ -156,7 +154,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
         date_obtain: formatDateYYYYMMDD(dateObtain),
         date_end: formatDateYYYYMMDD(endDate),
       };
-      
+
       const url =
         formType === "Create"
           ? `/user_educational_courses`
@@ -164,10 +162,14 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
 
       const method = formType === "Edit" ? "POST" : "POST";
 
-      return await defaultSubmitHandler(serialize(body), singleCourseFormConfig, {
-        url: url,
-        method: method,
-      });
+      return await defaultSubmitHandler(
+        serialize(body),
+        singleCourseFormConfig,
+        {
+          url: url,
+          method: method,
+        }
+      );
     },
   };
   return singleCourseFormConfig;

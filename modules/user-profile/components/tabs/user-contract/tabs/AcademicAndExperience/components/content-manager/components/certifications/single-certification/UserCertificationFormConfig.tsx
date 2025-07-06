@@ -144,9 +144,7 @@ export const UserCertificationFormConfig = ({
       const formDataCopy = { ...formData };
       
       // Check if file is empty or not provided, and remove it if it's empty
-      if (!formDataCopy.file || 
-          (Array.isArray(formDataCopy.file) && formDataCopy.file.length === 0) || 
-          (typeof formDataCopy.file === 'object' && Object.keys(formDataCopy.file).length === 0)) {
+      if (!formDataCopy.file) {
         delete formDataCopy.file;
       }
       
