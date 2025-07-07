@@ -1,43 +1,68 @@
 import StatisticsCard from "./AttendanceDepartureStatisticsCard";
-import { UserIcon, UsersIcon, ActivityIcon, TrendingUpIcon } from "lucide-react";
+import { UserIcon, UsersIcon, ActivityIcon, TrendingUpIcon, Clock, Calendar } from "lucide-react";
+import { useAttendance } from "../../context/AttendanceContext";
 
-const cardsData = [
-  {
-    label: "إجمالي عدد الحضور",
-    value: 900,
-    percentage: 90,
-    percentageColor: "#27C200",
-    icon: <UserIcon size={24} color="#B39DDB" />,
-  },
-  {
-    label: "إجمالي عدد الغياب",
-    value: 50,
-    percentage: 5,
-    percentageColor: "#FF2D2D",
-    icon: <UsersIcon size={24} color="#B39DDB" />,
-  },
-  {
-    label: "إجمالي عدد الانصراف",
-    value: 90,
-    percentage: 10,
-    percentageColor: "#27C200",
-    icon: <ActivityIcon size={24} color="#B39DDB" />,
-  },
-  {
-    label: "الإجازات",
-    value: 50,
-    percentage: 5,
-    percentageColor: "#FF2D2D",
-    icon: <TrendingUpIcon size={24} color="#6EC1E4" />,
-  },
-];
+// Loading skeleton for cards
+const LoadingSkeleton = () => (
+  <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
+    {[...Array(4)].map((_, idx) => (
+      <div key={idx} className="flex-1 min-w-[200px] h-[200px] bg-gray-100 animate-pulse rounded-lg"></div>
+    ))}
+  </div>
+);
 
 export default function AttendanceDepartureStatisticsCards() {
+  const { attendanceSummary, attendanceSummaryLoading } = useAttendance();
+
+  // Show loading skeleton while data is being fetched
+  if (attendanceSummaryLoading || !attendanceSummary) {
+    return <LoadingSkeleton />;
+  }
+
+  // Calculate percentages
+  const totalDays = attendanceSummary.total_days || 1; // Avoid division by zero
+  const attendancePercentage = Math.round((attendanceSummary.total_attendant / totalDays) * 100) || 0;
+  const absentPercentage = Math.round((attendanceSummary.total_absent_days / totalDays) * 100) || 0;
+  const departurePercentage = Math.round((attendanceSummary.total_departures / totalDays) * 100) || 0;
+  const holidayPercentage = Math.round((attendanceSummary.total_holiday_days / totalDays) * 100) || 0;
+
+  // Dynamic card data based on attendance summary
+  const cardsData = [
+    {
+      label: "إجمالي عدد الحضور",
+      value: attendanceSummary.total_attendant,
+      percentage: attendancePercentage,
+      percentageColor: "#27C200",
+      icon: <UserIcon size={24} color="#B39DDB" />,
+    },
+    {
+      label: "إجمالي عدد الغياب",
+      value: attendanceSummary.total_absent_days,
+      percentage: absentPercentage,
+      percentageColor: "#FF2D2D",
+      icon: <UsersIcon size={24} color="#B39DDB" />,
+    },
+    {
+      label: "إجمالي عدد الانصراف",
+      value: attendanceSummary.total_departures,
+      percentage: departurePercentage,
+      percentageColor: "#27C200",
+      icon: <ActivityIcon size={24} color="#B39DDB" />,
+    },
+    {
+      label: "إجمالي أيام الإجازات",
+      value: attendanceSummary.total_holiday_days,
+      percentage: holidayPercentage,
+      percentageColor: "#FF7A00",
+      icon: <Calendar size={24} color="#6EC1E4" />,
+    },
+  ];
+
   return (
     <div className="flex w-full min-h-[250px] items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-      {cardsData.map((card, idx) => (
+      {cardsData.map((card, index) => (
         <StatisticsCard
-          key={idx}
+          key={index}
           label={card.label}
           value={card.value}
           percentage={card.percentage}

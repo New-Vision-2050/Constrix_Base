@@ -10,6 +10,8 @@ import React, {
 import { EmployeeDetails } from "../types/employee";
 import { AttendanceStatusRecord } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
+import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
+import { AttendanceSummaryData } from "../api/attendanceSummary";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -23,6 +25,12 @@ interface AttendanceContextType {
   teamAttendanceLoading: boolean;
   teamAttendanceError: Error | null;
   refetchTeamAttendance: () => void;
+
+  // Attendance summary data for statistics cards
+  attendanceSummary: AttendanceSummaryData | null;
+  attendanceSummaryLoading: boolean;
+  attendanceSummaryError: Error | null;
+  refetchAttendanceSummary: () => void;
 
   // Search date
   selectedDate: Date | null;
@@ -89,6 +97,13 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     refetch: refetchTeamAttendance
   } = useTeamAttendance();
 
+  // Get attendance summary data for statistics cards
+  const {
+    attendanceSummary,
+    attendanceSummaryLoading,
+    attendanceSummaryError,
+    refetchAttendanceSummary
+  } = useAttendanceSummary();
 
   console.log('teamAttendance',teamAttendance)
 
@@ -155,31 +170,55 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // The value that will be provided to consumers
   const value: AttendanceContextType = {
     view,
-    toggleView,
+    toggleView: (newView: "table" | "map") => setView(newView),
+    
+    // Team attendance data
     teamAttendance,
     teamAttendanceLoading,
     teamAttendanceError,
     refetchTeamAttendance,
+    
+    // Attendance summary data
+    attendanceSummary,
+    attendanceSummaryLoading,
+    attendanceSummaryError,
+    refetchAttendanceSummary,
+    
+    // Search date
     selectedDate,
     setSelectedDate,
+    
+    // Employee dialog state
     isEmployeeDialogOpen,
     setEmployeeDialogOpen,
+    
+    // Selected employee
     selectedEmployee,
     setSelectedEmployee,
-    openEmployeeDialog,
-    closeEmployeeDialog,
+    
+    // Attendance status dialog
     isAttendanceStatusDialogOpen,
     setAttendanceStatusDialogOpen,
+    
+    // Selected attendance record
     selectedAttendanceRecord,
     setSelectedAttendanceRecord,
-    openAttendanceStatusDialog,
-    closeAttendanceStatusDialog,
+    
+    // Approver dialog
     isApproverDialogOpen,
     setApproverDialogOpen,
+    
+    // Selected approver record
     selectedApproverRecord,
     setSelectedApproverRecord,
+    
+    // Functions
+    openEmployeeDialog,
+    closeEmployeeDialog,
+    openAttendanceStatusDialog,
+    closeAttendanceStatusDialog,
     openApproverDialog,
-    closeApproverDialog,
+    closeApproverDialog
   };
 
   return (
