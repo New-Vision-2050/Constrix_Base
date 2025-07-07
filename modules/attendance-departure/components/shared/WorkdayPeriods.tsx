@@ -14,6 +14,7 @@ export interface PeriodType {
 interface WorkdayPeriodsProps {
   title: string;
   periods: PeriodType[];
+  hours: number;
   readOnly?: boolean;
 }
 
@@ -24,6 +25,7 @@ interface WorkdayPeriodsProps {
 const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
   title,
   periods,
+  hours,
   readOnly = true
 }) => {
   return (
@@ -48,6 +50,10 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
             readOnly={readOnly}
           />
         ))}
+      </div>
+
+      <div className="text-xs text-gray-400 mb-3">
+      عدد ساعات العمل: <span className="text-pink-500 font-medium">{hours}</span>
       </div>
     </div>
   );

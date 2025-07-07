@@ -14,7 +14,7 @@ const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
       className="transparent-tooltip"
     >
       <div
-        className=" bg-[#8785A2] text-white p-3 rounded-lg shadow-lg text-right font-sans w-auto"
+        className=" bg-[#8785A2] text-white p-3 rounded-lg shadow-lg  font-sans w-auto"
         style={{ textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}
       >
         <p>
@@ -36,8 +36,6 @@ const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
             </span>
             <span className="font-mono text-sm">
               {employee.date}
-              <br />
-              10:14:06
             </span>
           </div>
         </div>

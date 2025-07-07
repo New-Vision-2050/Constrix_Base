@@ -1,21 +1,35 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { MapContainer, TileLayer, LayersControl, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, LayersControl, ZoomControl, MapContainerProps } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { staticAttendanceData } from "../../constants/static-data";
 import CustomMarker from "./CustomMarker";
 import MapController from "./MapController";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Maximize2, Minimize2, Loader2 } from "lucide-react";
+import { useAttendance } from "../../context/AttendanceContext";
+import { AttendanceRecord } from "../../constants/static-data";
+
+// Extended MapContainer props to include center prop explicitly
+interface ExtendedMapContainerProps extends MapContainerProps {
+  center: L.LatLngExpression;
+  zoom: number;
+  zoomControl?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+}
 
 const AttendanceMap: React.FC = () => {
-  const position: [number, number] = [24.7136, 46.6753]; // Default map center (Riyadh)
+  // Default map center (Riyadh)
+  const defaultCenter: L.LatLngExpression = [24.7136, 46.6753];
   const [isFullScreen, setIsFullScreen] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapWrapperRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  
+  // Get team attendance data from context
+  const { teamAttendance, teamAttendanceLoading } = useAttendance();
 
   // Toggle full screen
   const toggleFullScreen = () => {
@@ -95,15 +109,18 @@ const AttendanceMap: React.FC = () => {
         className="relative"
       >
         <MapContainer
-          center={position}
-          zoom={8}
-          style={{
-            height: isFullScreen ? "100vh" : "600px",
-            width: "100%",
-            transition: "height 0.3s ease"
-          }}
-          className={`rounded-lg ${isFullScreen ? "map-fullscreen" : ""}`}
-          zoomControl={false}
+          {...{
+            center: defaultCenter,
+            zoom: 8,
+            zoomControl: false,
+            className: `rounded-lg ${isFullScreen ? "map-fullscreen" : ""}`,
+            style: {
+              height: isFullScreen ? "100vh" : "600px",
+              width: "100%",
+              transition: "height 0.3s ease"
+            },
+            whenCreated: setMapInstance
+          } as ExtendedMapContainerProps}
         >
           <MapController isFullScreen={isFullScreen} setMapRef={setMapRef} />
           <ZoomControl position="topright" />
@@ -133,9 +150,36 @@ const AttendanceMap: React.FC = () => {
             </LayersControl.BaseLayer>
           </LayersControl>
 
-          {staticAttendanceData.map((employee) => (
-            <CustomMarker key={employee.id} employee={employee} />
-          ))}
+          {!teamAttendanceLoading && teamAttendance.map((record) => {
+            // Convert AttendanceStatusRecord to AttendanceRecord format expected by CustomMarker
+            const employee: AttendanceRecord = {
+              id: parseInt(record.user?.id) || Math.floor(Math.random() * 10000),
+              name: record.user?.name || '-',
+              date: record.work_date || new Date().toISOString().split('T')[0],
+              employeeId: record.professional_data?.job_code || '',
+              branch: record.professional_data?.branch || '-',
+              department: record.professional_data?.management || '-',
+              approver: record.applied_constraints?.[0]?.name || '-',
+              employeeStatus: record.is_clocked_in === 1 ? 'نشط' : 'غير نشط',
+              // Map status to expected format
+              attendanceStatus: record.is_late === 1 ? 'late' : 
+                               record.status === 'absent' ? 'absent' : 
+                               record.status === 'excused' ? 'excused' : 'present',
+              location: {
+                lat: record.clock_in_location?.latitude || 24.7136, 
+                lng: record.clock_in_location?.longitude || 46.6753
+              }
+            };
+            return <CustomMarker key={employee.id} employee={employee} />;
+          })}
+          
+          {/* Show loading spinner when data is loading */}
+          {teamAttendanceLoading && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
+              <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
+              <span className="text-gray-700 font-medium">جاري تحميل بيانات الموظفين...</span>
+            </div>
+          )}
         </MapContainer>
       </div>
 

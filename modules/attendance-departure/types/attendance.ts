@@ -1,11 +1,46 @@
+type PeriodType = {
+  end_time: string;
+  start_time: string;
+};
+
+type weeklyScheduleDay = {enabled: boolean,total_work_hours: number, periods: PeriodType[]};
+
+type weeklyScheduleDays = {
+  friday: weeklyScheduleDay;
+  monday: weeklyScheduleDay;
+  saturday: weeklyScheduleDay;
+  sunday: weeklyScheduleDay;
+  thursday: weeklyScheduleDay;
+  tuesday: weeklyScheduleDay;
+  wednesday: weeklyScheduleDay;
+};
+
+type ConstraintConfig = {
+  time_rules: {
+    weekly_schedule: weeklyScheduleDays;
+  };
+};
+
+
+type AppliedConstraint = {
+  id: string;
+  name: string;
+  config: ConstraintConfig;
+};
+
 // Attendance status record interface for attendance tables and dialogs
 export interface AttendanceStatusRecord {
-  applied_constraints: { id: string; name: string }[];
+  applied_constraints: AppliedConstraint[];
   approved_at: string;
   approved_by: string;
   approved_by_user: string;
   break_duration_formatted: string;
   breaks: [];
+  professional_data: {
+    branch: string;
+    job_code: string;
+    management: string;
+  };
   clock_in_location: { latitude: number; longitude: number };
   clock_in_time: string;
   clock_out_location: { latitude: number; longitude: number };
@@ -62,4 +97,3 @@ export interface ApproverBadgeProps {
   approver: string;
   record: AttendanceStatusRecord;
 }
-

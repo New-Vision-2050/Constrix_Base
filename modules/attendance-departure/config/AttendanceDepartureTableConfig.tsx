@@ -25,29 +25,36 @@ export const getAttendanceDepartureTableConfig = () => {
         render: (value: any, row: AttendanceStatusRecord) => row.work_date,
       },
       {
-        key: "user.id",
+        key: "professional_data.job_code",
         label: "الرقم الوظيفي",
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
-          row.user?.id || "-",
+          row.professional_data?.job_code || "-",
       },
       {
-        key: "company.name",
-        label: "الشركة",
+        key: "professional_data.branch",
+        label: "الفرع",
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
-          row.company?.name || "-",
+          row.professional_data?.branch || "-",
       },
       {
-        key: "clock_in_time",
-        label: "وقت الحضور",
+        key: "professional_data.management",
+        label: "الادارة",
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
-          row.clock_in_time || "-",
+          row.professional_data?.management || "-",
       },
+      // {
+      //   key: "clock_in_time",
+      //   label: "وقت الحضور",
+      //   sortable: true,
+      //   render: (value: any, row: AttendanceStatusRecord) =>
+      //     row.clock_in_time || "-",
+      // },
       {
         key: "approved_by_user",
-        label: "المعتمد",
+        label: "المحدد المعتمد",
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
           <ApproverBadge
