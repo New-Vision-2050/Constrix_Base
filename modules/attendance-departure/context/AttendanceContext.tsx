@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import { EmployeeDetails } from "../types/employee";
-import { AttendanceStatusRecord, TeamMemberAttendance } from "../types/attendance";
+import { AttendanceStatusRecord } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
 
 // Define the type of data in the context
@@ -19,7 +19,7 @@ interface AttendanceContextType {
   toggleView: (view: "table" | "map") => void;
   
   // Team attendance data for map display
-  teamAttendance: TeamMemberAttendance[];
+  teamAttendance: AttendanceStatusRecord[];
   teamAttendanceLoading: boolean;
   teamAttendanceError: Error | null;
   refetchTeamAttendance: () => void;

@@ -63,19 +63,3 @@ export interface ApproverBadgeProps {
   record: AttendanceStatusRecord;
 }
 
-// Team member attendance interface with location data for map display
-export interface TeamMemberAttendance {
-  id: string;
-  name: string;
-  position: string;
-  avatar?: string;
-  attendance_status: string;
-  clock_in_time?: string;
-  clock_out_time?: string;
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  department?: string;
-  work_date: string;
-}
