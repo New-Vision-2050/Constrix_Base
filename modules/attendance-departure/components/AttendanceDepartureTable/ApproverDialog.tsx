@@ -15,7 +15,7 @@ import { useAttendance } from "../../context/AttendanceContext";
 const ApproverDialog: React.FC = () => {
   const { isApproverDialogOpen, selectedApproverRecord, closeApproverDialog } =
     useAttendance();
-  console.log('selectedApproverRecord',selectedApproverRecord);
+  console.log('selectedApproverRecord',selectedApproverRecord?.applied_constraints?.[0]?.name,selectedApproverRecord);
 
   if (!selectedApproverRecord) return null;
 
@@ -33,10 +33,10 @@ const ApproverDialog: React.FC = () => {
         <DisplayField
           label="اسم المحدد"
           value={selectedApproverRecord?.applied_constraints?.[0]?.name}
-          defaultValue="فرع القاهرة"
+          defaultValue="غير محدد"
         />
 
-        <DisplayField label="نظام المحدد" value="مصمم" />
+        <DisplayField label="نظام المحدد" value={selectedApproverRecord?.applied_constraints?.[0]?.name} />
 
         {/* Workday Periods */}
         <WorkdayPeriods

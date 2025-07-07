@@ -8,7 +8,8 @@ import React, {
   useCallback,
 } from "react";
 import { EmployeeDetails } from "../types/employee";
-import { AttendanceStatusRecord } from "../types/attendance";
+import { AttendanceStatusRecord, TeamMemberAttendance } from "../types/attendance";
+import { useTeamAttendance } from "../hooks/useTeamAttendance";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -16,6 +17,12 @@ interface AttendanceContextType {
   view: "table" | "map";
   // toggle view function
   toggleView: (view: "table" | "map") => void;
+  
+  // Team attendance data for map display
+  teamAttendance: TeamMemberAttendance[];
+  teamAttendanceLoading: boolean;
+  teamAttendanceError: Error | null;
+  refetchTeamAttendance: () => void;
 
   // Search date
   selectedDate: Date | null;
@@ -73,6 +80,17 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
 }) => {
   // Display state: table or map
   const [view, setView] = useState<"table" | "map">("table");
+  
+  // Get team attendance data for map display
+  const {
+    teamAttendance,
+    isLoading: teamAttendanceLoading,
+    error: teamAttendanceError,
+    refetch: refetchTeamAttendance
+  } = useTeamAttendance();
+
+
+  console.log('teamAttendance',teamAttendance)
 
   // Search date
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -138,6 +156,10 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   const value: AttendanceContextType = {
     view,
     toggleView,
+    teamAttendance,
+    teamAttendanceLoading,
+    teamAttendanceError,
+    refetchTeamAttendance,
     selectedDate,
     setSelectedDate,
     isEmployeeDialogOpen,

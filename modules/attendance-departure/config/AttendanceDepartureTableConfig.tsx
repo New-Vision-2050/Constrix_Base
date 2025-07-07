@@ -85,8 +85,8 @@ export const getAttendanceDepartureTableConfig = () => {
     allowSearchFieldSelection: true,
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: false,
+      canDelete: false,
     },
   };
 };
