@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { MapContainer, TileLayer, LayersControl, ZoomControl, MapContainerProps } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  LayersControl,
+  ZoomControl,
+  MapContainerProps,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import CustomMarker from "./CustomMarker";
@@ -27,7 +33,7 @@ const AttendanceMap: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapWrapperRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
-  
+
   // Get team attendance data from context
   const { teamAttendance, teamAttendanceLoading } = useAttendance();
 
@@ -36,11 +42,11 @@ const AttendanceMap: React.FC = () => {
     if (mapWrapperRef.current) {
       if (!isFullScreen) {
         // Full screen
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
         setIsFullScreen(true);
       } else {
         // Normal
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
         setIsFullScreen(false);
       }
 
@@ -62,10 +68,22 @@ const AttendanceMap: React.FC = () => {
   useEffect(() => {
     return () => {
       if (isFullScreen) {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       }
     };
   }, [isFullScreen]);
+
+  console.log('teamAttendance', teamAttendance)
+  
+  // Log each employee's location data
+  teamAttendance.forEach((record, index) => {
+    console.log(`Employee ${index + 1}: ${record.user?.name || 'Unknown'}`, {
+      has_location: !!record.clock_in_location,
+      latitude: record.clock_in_location?.latitude,
+      longitude: record.clock_in_location?.longitude,
+      will_use_default: !record.clock_in_location?.latitude || !record.clock_in_location?.longitude
+    });
+  });
 
   return (
     <div className="relative" ref={mapWrapperRef}>
@@ -104,12 +122,9 @@ const AttendanceMap: React.FC = () => {
         }
       `}</style>
 
-      <div
-        ref={mapContainerRef}
-        className="relative"
-      >
+      <div ref={mapContainerRef} className="relative">
         <MapContainer
-          {...{
+          {...({
             center: defaultCenter,
             zoom: 8,
             zoomControl: false,
@@ -117,10 +132,10 @@ const AttendanceMap: React.FC = () => {
             style: {
               height: isFullScreen ? "100vh" : "600px",
               width: "100%",
-              transition: "height 0.3s ease"
+              transition: "height 0.3s ease",
             },
-            whenCreated: setMapInstance
-          } as ExtendedMapContainerProps}
+            whenCreated: setMapInstance,
+          } as ExtendedMapContainerProps)}
         >
           <MapController isFullScreen={isFullScreen} setMapRef={setMapRef} />
           <ZoomControl position="topright" />
@@ -141,7 +156,7 @@ const AttendanceMap: React.FC = () => {
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="خريطة القمر الصناعي">
-              <TileLayer 
+              <TileLayer
                 url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
                 maxZoom={20}
                 subdomains={["mt0", "mt1", "mt2", "mt3"]}
@@ -150,34 +165,58 @@ const AttendanceMap: React.FC = () => {
             </LayersControl.BaseLayer>
           </LayersControl>
 
-          {!teamAttendanceLoading && teamAttendance.map((record) => {
-            // Convert AttendanceStatusRecord to AttendanceRecord format expected by CustomMarker
-            const employee: AttendanceRecord = {
-              id: parseInt(record.user?.id) || Math.floor(Math.random() * 10000),
-              name: record.user?.name || '-',
-              date: record.work_date || new Date().toISOString().split('T')[0],
-              employeeId: record.professional_data?.job_code || '',
-              branch: record.professional_data?.branch || '-',
-              department: record.professional_data?.management || '-',
-              approver: record.applied_constraints?.[0]?.name || '-',
-              employeeStatus: record.is_clocked_in === 1 ? 'نشط' : 'غير نشط',
-              // Map status to expected format
-              attendanceStatus: record.is_late === 1 ? 'late' : 
-                               record.status === 'absent' ? 'absent' : 
-                               record.status === 'excused' ? 'excused' : 'present',
-              location: {
-                lat: record.clock_in_location?.latitude || 24.7136, 
-                lng: record.clock_in_location?.longitude || 46.6753
-              }
-            };
-            return <CustomMarker key={employee.id} employee={employee} />;
-          })}
-          
+          {!teamAttendanceLoading &&
+            teamAttendance.map((record) => {
+              // Convert AttendanceStatusRecord to AttendanceRecord format expected by CustomMarker
+              // Create a small offset for employees with missing location data
+              const defaultLat = 24.7136;
+              const defaultLng = 46.6753;
+              const hasLocation = record.clock_in_location?.latitude && record.clock_in_location?.longitude;
+              
+              // If no location data, create a small offset based on employee ID to spread out markers
+              const idOffset = parseInt(record.user?.id || '0') % 50;
+              const latOffset = hasLocation ? 0 : (idOffset * 0.001); // Small offset based on ID
+              const lngOffset = hasLocation ? 0 : (idOffset * 0.002); // Slightly larger offset for longitude
+              
+              const employee: AttendanceRecord = {
+                id:
+                  parseInt(record.user?.id) ||
+                  Math.floor(Math.random() * 10000),
+                name: record.user?.name || "-",
+                user: record.user,
+                clock_in_time: record.clock_in_time || "-",
+                clock_out_time: record.clock_out_time || "-",
+                date:
+                  record.work_date || new Date().toISOString().split("T")[0],
+                employeeId: record.professional_data?.job_code || "",
+                branch: record.professional_data?.branch || "-",
+                department: record.professional_data?.management || "-",
+                approver: record.applied_constraints?.[0]?.name || "-",
+                employeeStatus: record.is_clocked_in === 1 ? "نشط" : "غير نشط",
+                // Map status to expected format
+                attendanceStatus:
+                  record.is_late === 1
+                    ? "late"
+                    : record.status === "absent"
+                    ? "absent"
+                    : record.status === "excused"
+                    ? "excused"
+                    : "present",
+                location: {
+                  lat: record.clock_in_location?.latitude || (defaultLat + latOffset),
+                  lng: record.clock_in_location?.longitude || (defaultLng + lngOffset),
+                },
+              };
+              return <CustomMarker key={employee.id} employee={employee} />;
+            })}
+
           {/* Show loading spinner when data is loading */}
           {teamAttendanceLoading && (
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
               <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-              <span className="text-gray-700 font-medium">جاري تحميل بيانات الموظفين...</span>
+              <span className="text-gray-700 font-medium">
+                جاري تحميل بيانات الموظفين...
+              </span>
             </div>
           )}
         </MapContainer>
@@ -190,7 +229,11 @@ const AttendanceMap: React.FC = () => {
         className="absolute top-3 left-3 z-[1000] bg-white shadow-md hover:bg-gray-100 w-8 h-8 p-0"
         onClick={toggleFullScreen}
       >
-        {isFullScreen ? <Minimize2 size={18} className="text-black" /> : <Maximize2 size={18} className="text-black" />}
+        {isFullScreen ? (
+          <Minimize2 size={18} className="text-black" />
+        ) : (
+          <Maximize2 size={18} className="text-black" />
+        )}
       </Button>
     </div>
   );

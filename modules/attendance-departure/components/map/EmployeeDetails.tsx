@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { EmployeeDetailsProps } from "../../types/employee";
+import EmployeeInfoField from "../../components/shared/EmployeeInfoField";
 
 // Employee details component
 interface EmployeeDetailsSheetProps extends EmployeeDetailsProps {}
@@ -49,30 +50,11 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
           </div>
 
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between items-center">
-              <span className="text-[#FF3B8B] font-medium">اسم الموظف:</span>
-              <span className="text-right">{employee.name}</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span className="text-[#FF3B8B] font-medium">رقم الجوال:</span>
-              <span className="text-right">‎+{employee.phone}</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span className="text-[#FF3B8B] font-medium">القسم:</span>
-              <span className="text-right">{employee.department}</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span className="text-[#FF3B8B] font-medium">البريد الالكتروني:</span>
-              <span className="text-right">{employee.email}</span>
-            </div>
-            
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-[#FF3B8B] font-medium">الفرع:</span>
-              <span className="text-right">{employee.branch}</span>
-            </div>
+            <EmployeeInfoField label="اسم الموظف" value={employee.name} />
+            <EmployeeInfoField label="رقم الجوال" value={employee.phone} className="flex justify-between items-center" />
+            <EmployeeInfoField label="القسم" value={employee.department} className="flex justify-between items-center" />
+            <EmployeeInfoField label="البريد الالكتروني" value={employee.email} className="flex justify-between items-center" />
+            <EmployeeInfoField label="الفرع" value={employee.branch} className="flex justify-between items-center mb-2" />
             
             {/* Gender, Birth Date and Nationality */}
             <div className="flex justify-between mb-3 mt-4">
@@ -92,15 +74,17 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
             
             {/* Attendance status and Employee status */}
             <div className="bg-[#161F3E] p-3 rounded-md mb-3">
-              <div className="flex justify-between items-center">
-                <span className="text-[#FF3B8B] font-medium">حالة الحضور:</span>
-                <span className="text-right font-bold text-green-500">{employee.attendanceStatus}</span>
-              </div>
+              <EmployeeInfoField 
+                label="حالة الحضور" 
+                value={employee.attendanceStatus} 
+                className="flex justify-between items-center"
+              />
               
-              <div className="flex justify-between items-center">
-                <span className="text-[#FF3B8B] font-medium">حالة الموظف:</span>
-                <span className="text-right font-bold">{employee.employeeStatus}</span>
-              </div>
+              <EmployeeInfoField 
+                label="حالة الموظف" 
+                value={employee.employeeStatus} 
+                className="flex justify-between items-center"
+              />
             </div>
             
             {/* Check-in and Check-out times */}

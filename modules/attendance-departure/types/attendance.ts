@@ -3,7 +3,11 @@ type PeriodType = {
   start_time: string;
 };
 
-type weeklyScheduleDay = {enabled: boolean,total_work_hours: number, periods: PeriodType[]};
+type weeklyScheduleDay = {
+  enabled: boolean;
+  total_work_hours: number;
+  periods: PeriodType[];
+};
 
 type weeklyScheduleDays = {
   friday: weeklyScheduleDay;
@@ -20,7 +24,6 @@ type ConstraintConfig = {
     weekly_schedule: weeklyScheduleDays;
   };
 };
-
 
 type AppliedConstraint = {
   id: string;
@@ -62,7 +65,13 @@ export interface AttendanceStatusRecord {
   total_break_hours: number;
   total_work_hours: number;
   updated_at: string;
-  user: { id: string; name: string };
+  user: {
+    id: string;
+    name: string;
+    birthdate: string;
+    country: string;
+    gender: string;
+  };
   work_date: string;
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Marker } from 'react-leaflet';
+import { Marker, MarkerProps } from 'react-leaflet';
 import L from 'leaflet';
+// Using type casting instead of module augmentation
 import { AttendanceRecord } from '../../constants/static-data';
 import EmployeeTooltip from './EmployeeTooltip';
 import { useAttendance } from '../../context/AttendanceContext';
@@ -72,27 +73,40 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
             department: employee.department || '-',
             email: `${employee.employeeId}@example.com`, // Create default email
             branch: employee.branch || '-',
-            gender: '-', // Default value
-            birthDate: '-', // Default value
-            nationality: '-', // Default value
+            gender: employee.user?.gender || '-', // Default value
+            birthDate: employee.user?.birthdate || '-', // Default value
+            nationality: employee.user?.country || '-', // Default value
             attendanceStatus: mapAttendanceStatus(employee.attendanceStatus), // Convert attendance status
             employeeStatus: employee.employeeStatus || '-',
-            checkInTime: employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined, // Default check-in time
-            checkOutTime: employee.attendanceStatus === 'present' ? '17:00' : undefined, // Default check-out time
+            // Use actual clock in/out times if available, otherwise use defaults
+            checkInTime: employee.clock_in_time || (employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined),
+            checkOutTime: employee.clock_out_time || (employee.attendanceStatus === 'present' ? '17:00' : undefined),
+            // Also set the new field names for compatibility with updated component
+            clock_in_time: employee.clock_in_time || (employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined),
+            clock_out_time: employee.clock_out_time || (employee.attendanceStatus === 'present' ? '17:00' : undefined),
             avatarUrl: undefined // No default avatar
         };
         
         openEmployeeDialog(employeeDetails);
     };
     
+    // Create marker position and properties for proper type handling
+    const position: [number, number] = [employee.location.lat, employee.location.lng];
+    const markerIcon = getMarkerIcon(employee.attendanceStatus);
+    
+    // Create custom props for the marker with proper typings
+    const markerProps: any = {
+        position,
+        icon: markerIcon,
+        eventHandlers: {
+            click: handleMarkerClick,
+        }
+    };
+    
     return (
         <Marker
             key={employee.id}
-            position={[employee.location.lat, employee.location.lng]}
-            icon={getMarkerIcon(employee.attendanceStatus)}
-            eventHandlers={{
-                click: handleMarkerClick,
-            }}
+            {...markerProps}
         >
             <EmployeeTooltip employee={employee} />
         </Marker>

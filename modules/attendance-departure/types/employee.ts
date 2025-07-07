@@ -14,6 +14,8 @@ export interface EmployeeDetails {
   checkInTime?: string;
   checkOutTime?: string;
   avatarUrl?: string;
+  clock_in_time?: string;
+  clock_out_time?: string;
 }
 
 // Employee details component props interface
