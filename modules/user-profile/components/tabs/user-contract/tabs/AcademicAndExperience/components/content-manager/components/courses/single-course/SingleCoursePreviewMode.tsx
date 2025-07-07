@@ -72,7 +72,7 @@ export default function SingleCoursePreviewMode({ course }: PropsT) {
             handleRefetchUserCourses();
           }}
           valid={Boolean(course?.file?.name)}
-          label="ارفاق الشهادة"
+          label="الشهادة"
           value={course?.file?.name ?? "---"}
           type={course?.file?.type == "image" ? "image" : "pdf"}
           fileUrl={course?.file?.url}
