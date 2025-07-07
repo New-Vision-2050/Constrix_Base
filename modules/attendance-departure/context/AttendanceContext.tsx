@@ -32,9 +32,11 @@ interface AttendanceContextType {
   attendanceSummaryError: Error | null;
   refetchAttendanceSummary: () => void;
 
-  // Search date
-  selectedDate: Date | null;
-  setSelectedDate: (date: Date | null) => void;
+  // Date range for filtering
+  startDate: Date | null;
+  setStartDate: (date: Date | null) => void;
+  endDate: Date | null;
+  setEndDate: (date: Date | null) => void;
   
   // Employee details dialog state
   isEmployeeDialogOpen: boolean;
@@ -89,26 +91,35 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Display state: table or map
   const [view, setView] = useState<"table" | "map">("table");
   
-  // Get team attendance data for map display
+  // Date range for filtering
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(new Date());
+  
+  // Get team attendance data for map display with date filtering
   const {
     teamAttendance,
     isLoading: teamAttendanceLoading,
     error: teamAttendanceError,
     refetch: refetchTeamAttendance
-  } = useTeamAttendance();
+  } = useTeamAttendance({
+    // Format dates to YYYY-MM-DD string format for API
+    start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
+    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined
+  });
 
-  // Get attendance summary data for statistics cards
+  // Get attendance summary data for statistics cards with date filtering
   const {
     attendanceSummary,
     attendanceSummaryLoading,
     attendanceSummaryError,
     refetchAttendanceSummary
-  } = useAttendanceSummary();
+  } = useAttendanceSummary({
+    // Format dates to YYYY-MM-DD string format for API
+    start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
+    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined
+  });
 
   console.log('teamAttendance',teamAttendance)
-
-  // Search date
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   
   // Employee details dialog state
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
@@ -184,9 +195,11 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     attendanceSummaryError,
     refetchAttendanceSummary,
     
-    // Search date
-    selectedDate,
-    setSelectedDate,
+    // Date range for filtering
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
     
     // Employee dialog state
     isEmployeeDialogOpen,
