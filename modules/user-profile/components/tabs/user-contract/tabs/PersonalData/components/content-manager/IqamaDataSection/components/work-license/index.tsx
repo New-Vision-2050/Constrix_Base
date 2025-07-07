@@ -2,15 +2,17 @@ import UserIqamaWorkLicenseDataPreviewMode from "./preview-mode";
 import UserIqamaWorkLicenseDataEditMode from "./edit-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import { useTranslations } from "next-intl";
 
 export default function UserIqamaWorkLicenseData() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.tabs.CommonSections");
 
   return (
     <TabTemplate
-      title={"بيانات رخصة العمل"}
+      title={t("workLicenseData")}
       loading={userIdentityDataLoading}
       reviewMode={<UserIqamaWorkLicenseDataPreviewMode />}
       editMode={<UserIqamaWorkLicenseDataEditMode />}
@@ -19,8 +21,8 @@ export default function UserIqamaWorkLicenseData() {
       }}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
+          { title: t("myRequests"), onClick: () => {} ,disabled:true},
+          { title: t("createRequest"), onClick: () => {},disabled:true },
         ],
       }}
     />

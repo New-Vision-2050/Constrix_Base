@@ -2,15 +2,17 @@ import UserIqamaDataPreviewMode from "./preview-mode";
 import UserIqamaDataEditMode from "./edit-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import { useTranslations } from "next-intl";
 
 export default function UserIqamaData() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.tabs.CommonSections");
 
   return (
     <TabTemplate
-      title={"بيانات رقم الأقامة"}
+      title={t("iqamaData")}
       loading={userIdentityDataLoading}
       reviewMode={<UserIqamaDataPreviewMode />}
       editMode={<UserIqamaDataEditMode />}
@@ -19,8 +21,8 @@ export default function UserIqamaData() {
       }}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
+          { title: t("myRequests"), onClick: () => {} ,disabled:true},
+          { title: t("createRequest"), onClick: () => {},disabled:true },
         ],
       }}
     />
