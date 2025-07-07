@@ -263,6 +263,21 @@
           "certifications": "الشهادات المهنية",
           "cv": "السيرة الذاتية"
         }
+      },
+      "ConnectionDataSection": {
+        "title": "بيانات الاتصال",
+        "changePhone": "تغيير رقم الجوال",
+        "phoneNumber": "رقم الجوال",
+        "phoneRequired": "رقم الجوال مطلوب",
+        "validPhoneRequired": "برجاء أدخل رقم جوال صحيح",
+        "changeEmail": "تغيير البريد الإلكتروني",
+        "email": "البريد الإلكتروني",
+        "emailRequired": "البريد الإلكتروني مطلوب",
+        "validEmailRequired": "برجاء أدخل بريد إلكتروني صحيح",
+        "cancel": "إلغاء",
+        "otpSentToPhone": "تم إرسال رمز التحقق إلى رقم الجوال",
+        "otpSentToEmail": "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+        "otpSendError": "حدث خطأ أثناء إرسال رمز التحقق"
       }
     }
   },
@@ -365,18 +380,32 @@
         "organizational-structure-main-tab-1": {
           "title": "الهيكل التنظيمي",
           "tabs": {
-            "companyStructure": { "title": "بنية الشركة" },
-            "usersStructure": { "title": "هيكل الموظفين" },
-            "managements": { "title": "الادارات" }
+            "companyStructure": {
+              "title": "بنية الشركة"
+            },
+            "usersStructure": {
+              "title": "هيكل الموظفين"
+            },
+            "managements": {
+              "title": "الادارات"
+            }
           }
         },
         "organizational-structure-main-tab-2": {
           "title": "أعدادات الهيكل",
           "tabs": {
-            "jobTitles": { "title": "المسميات الوظيفية" },
-            "jobTypes": { "title": "أنواع الوظائف" },
-            "managements": { "title": "اعدادات الادارات" },
-            "departments": { "title": "اعدادات الاقسام" }
+            "jobTitles": {
+              "title": "المسميات الوظيفية"
+            },
+            "jobTypes": {
+              "title": "أنواع الوظائف"
+            },
+            "managements": {
+              "title": "اعدادات الادارات"
+            },
+            "departments": {
+              "title": "اعدادات الاقسام"
+            }
           }
         }
       }

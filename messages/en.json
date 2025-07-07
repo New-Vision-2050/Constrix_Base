@@ -263,6 +263,21 @@
           "certifications": "Professional Certifications",
           "cv": "CV"
         }
+      },
+      "ConnectionDataSection": {
+        "title": "Contact Information",
+        "changePhone": "Change Phone Number",
+        "phoneNumber": "Phone Number",
+        "phoneRequired": "Phone number is required",
+        "validPhoneRequired": "Please enter a valid phone number",
+        "changeEmail": "Change Email",
+        "email": "Email",
+        "emailRequired": "Email is required",
+        "validEmailRequired": "Please enter a valid email",
+        "cancel": "Cancel",
+        "otpSentToPhone": "Verification code has been sent to your phone",
+        "otpSentToEmail": "Verification code has been sent to your email",
+        "otpSendError": "An error occurred while sending verification code"
       }
     }
   },

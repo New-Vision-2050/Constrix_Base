@@ -2,14 +2,16 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL, apiClient } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useConnectionOTPCxt } from "../context/ConnectionOTPCxt";
+import { useTranslations } from "next-intl";
 
 export const EmailFormConfig = () => {
   const { userConnectionData } = usePersonalDataTabCxt();
   const { toggleMailOtpDialog } = useConnectionOTPCxt();
+  const t = useTranslations("UserProfile.tabs.ConnectionDataSection");
 
   const EmailFormConfig: FormConfig = {
     formId: `email-data-form`,
-    title: "بيانات الاتصال",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
       enabled: true,
@@ -17,21 +19,21 @@ export const EmailFormConfig = () => {
     },
     sections: [
       {
-        title: "تغيير البريد الإلكتروني",
+        title: t("changeEmail"),
         fields: [
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("email"),
             type: "email",
-            placeholder: "البريد الإلكتروني",
+            placeholder: t("email"),
             validation: [
               {
                 type: "required",
-                message: "البريد الإلكتروني مطلوب",
+                message: t("emailRequired"),
               },
               {
                 type: "email",
-                message: "برجاء أدخل بريد إلكتروني صحيح",
+                message: t("validEmailRequired"),
               },
             ],
           }
@@ -42,10 +44,10 @@ export const EmailFormConfig = () => {
     initialValues: {
       email: userConnectionData?.email,
     },
-    submitButtonText: "تغيير البريد الإلكتروني",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("changeEmail"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "إلغاء",
+    resetButtonText: t("cancel"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,
@@ -68,13 +70,13 @@ export const EmailFormConfig = () => {
         
         return {
           success: true,
-          message: "تم إرسال رمز التحقق إلى البريد الإلكتروني",
+          message: t("otpSentToEmail"),
         };
       } catch (error) {
         console.log("error", error);
         return {
           success: false,
-          message: "حدث خطأ أثناء إرسال رمز التحقق",
+          message: t("otpSendError"),
         };
       }
     },

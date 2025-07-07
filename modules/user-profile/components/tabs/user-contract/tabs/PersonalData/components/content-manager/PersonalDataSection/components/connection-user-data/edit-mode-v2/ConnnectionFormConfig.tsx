@@ -2,14 +2,16 @@ import { FormConfig } from "@/modules/form-builder";
 import { baseURL, apiClient } from "@/config/axios-config";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useConnectionOTPCxt } from "../context/ConnectionOTPCxt";
+import { useTranslations } from "next-intl";
 
 export const ConnnectionFormConfig = () => {
   const { userConnectionData } = usePersonalDataTabCxt();
   const { togglePhoneOtpDialog } = useConnectionOTPCxt();
+  const t = useTranslations("UserProfile.tabs.ConnectionDataSection");
 
   const PersonalFormConfig: FormConfig = {
     formId: `connection-data-form`,
-    title: "بيانات الاتصال",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/data-info`,
     laravelValidation: {
       enabled: true,
@@ -17,21 +19,21 @@ export const ConnnectionFormConfig = () => {
     },
     sections: [
       {
-        title:"تغيير رقم الجوال",
+        title: t("changePhone"),
         fields: [
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("phoneNumber"),
             type: "phone",
-            placeholder: "رقم الجوال",
+            placeholder: t("phoneNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم الجوال مطلوب",
+                message: t("phoneRequired"),
               },
               {
                 type: "phone",
-                message: "برجاء أدخل رقم جوال صحيح",
+                message: t("validPhoneRequired"),
               },
             ],
           }
@@ -42,10 +44,10 @@ export const ConnnectionFormConfig = () => {
     initialValues: {
       phone: userConnectionData?.phone,
     },
-    submitButtonText: "تغيير رقم الجوال",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("changePhone"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "إلغاء",
+    resetButtonText: t("cancel"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,
@@ -68,13 +70,13 @@ export const ConnnectionFormConfig = () => {
         
         return {
           success: true,
-          message: "تم إرسال رمز التحقق إلى رقم الجوال",
+          message: t("otpSentToPhone"),
         };
       } catch (error) {
         console.log("error", error);
         return {
           success: false,
-          message: "حدث خطأ أثناء إرسال رمز التحقق",
+          message: t("otpSendError"),
         };
       }
     },
