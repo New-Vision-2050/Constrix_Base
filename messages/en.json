@@ -394,6 +394,8 @@
     "name": "Full Name",
     "namePlaceholder": "Enter full name",
     "nameRequired": "Name is required",
+    "nameThreeTerms": "Name must consist of exactly three terms (first, middle, and last name)",
+    "nameLettersOnly": "Name must contain only letters (no numbers or symbols)",
     "nickname": "Nickname",
     "nicknamePlaceholder": "Enter nickname",
     "nicknameRequired": "Nickname is required",

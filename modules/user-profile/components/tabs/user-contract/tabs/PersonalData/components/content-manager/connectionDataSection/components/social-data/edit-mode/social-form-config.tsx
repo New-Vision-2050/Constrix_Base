@@ -4,6 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
+
 export const SocialMediaSitesFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSocialData } = useConnectionDataCxt();
@@ -22,38 +23,74 @@ export const SocialMediaSitesFormConfig = () => {
           {
             name: "whatsapp",
             label: "واتساب ",
-            type: "text",
+            type: "phone",
             placeholder: "واتساب ",
+            validation: [
+              {
+                type: "phone",
+                message: "يرجى إدخال رقم جوال صحيح",
+              },
+            ],
           },
           {
             name: "facebook",
             label: "فيسبوك ",
             type: "text",
-            placeholder: "فيسبوك ",
+            placeholder: "https://facebook.com/username",
+            validation: [
+              {
+                type: "url",
+                message: "يرجى إدخال رابط صحيح",
+              }
+            ],
           },
           {
             name: "telegram",
             label: "تيليجرام ",
-            type: "text",
+            type: "phone",
             placeholder: "تيليجرام ",
+            validation: [
+              {
+                type: "phone",
+                message: "يرجى إدخال رقم جوال صحيح",
+              },
+            ],
           },
           {
             name: "instagram",
             label: "انستقرام  ",
             type: "text",
-            placeholder: "انستقرام  ",
+            placeholder: "https://instagram.com/username",
+            validation: [
+              {
+                type: "url",
+                message: "يرجى إدخال رابط صحيح",
+              }
+            ],
           },
           {
             name: "snapchat",
             label: "سناب شات  ",
             type: "text",
-            placeholder: "سناب شات  ",
+            placeholder: "https://snapchat.com/add/username",
+            validation: [
+              {
+                type: "url",
+                message: "يرجى إدخال رابط صحيح",
+              }
+            ],
           },
           {
             name: "linkedin",
             label: "لينك اند  ",
             type: "text",
-            placeholder: "لينك اند  ",
+            placeholder: "https://linkedin.com/in/username",
+            validation: [
+              {
+                type: "url",
+                message: "يرجى إدخال رابط صحيح",
+              }
+            ],
           },
         ],
         columns: 2,

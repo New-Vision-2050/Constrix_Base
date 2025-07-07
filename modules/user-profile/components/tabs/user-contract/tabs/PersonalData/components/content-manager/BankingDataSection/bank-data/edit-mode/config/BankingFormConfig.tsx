@@ -69,6 +69,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
               limitParam: "per_page",
               itemsPerPage: 1000,
             },
+            required: true,
             validation: [
               {
                 type: "required",
@@ -84,9 +85,11 @@ export const BankingDataFormConfig = (props: PropsT) => {
             dynamicOptions: {
               url: `${baseURL}/bank_type_accounts`,
               valueField: "id",
+              setFirstAsDefault: true,
               labelField: "name",
               paginationEnabled: true,
             },
+            required: true,
             validation: [
               {
                 type: "required",
@@ -110,10 +113,11 @@ export const BankingDataFormConfig = (props: PropsT) => {
               itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
+            required: true,
             validation: [
               {
                 type: "required",
-                message: "عملة الحساب مطلوب",
+                message: "عملة الحساب مطلوبة",
               },
             ],
           },
@@ -124,10 +128,6 @@ export const BankingDataFormConfig = (props: PropsT) => {
             placeholder: "اختر رمز ال iban",
             validation: [
               {
-                type: "required",
-                message: "رمز ال iban مطلوب",
-              },
-              {
                 type: "pattern",
                 value: "^[A-Z]{2}[0-9A-Z]{13,32}$",
                 message: "رمز IBAN غير صالح",
@@ -137,12 +137,13 @@ export const BankingDataFormConfig = (props: PropsT) => {
           {
             type: "text",
             name: "user_name",
-            label: "أسم المستخدم",
-            placeholder: "اختر أسم المستخدم",
+            label: "اسم صاحب الحساب",
+            placeholder: "اختر اسم صاحب الحساب",
+            required: true,
             validation: [
               {
                 type: "required",
-                message: "أسم المستخدم مطلوب",
+                message: "اسم صاحب الحساب مطلوب",
               },
             ],
           },
@@ -151,6 +152,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
             name: "account_number",
             label: "رقم الحساب",
             placeholder: "اختر رقم الحساب",
+            required: true,
             validation: [
               {
                 type: "required",
@@ -169,10 +171,6 @@ export const BankingDataFormConfig = (props: PropsT) => {
             label: "كود ال swift",
             placeholder: "اختر كود ال swift",
             validation: [
-              {
-                type: "required",
-                message: "كود ال swift مطلوب",
-              },
               {
                 type: "pattern",
                 value: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",

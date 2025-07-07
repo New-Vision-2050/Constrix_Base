@@ -1,3 +1,5 @@
+import { MediaFile } from "@/types/media-file";
+
 export type Certification = {
   accreditation_degree: string;
   accreditation_name: string;
@@ -7,4 +9,5 @@ export type Certification = {
   id: string;
   professional_bodie_id: string;
   professional_bodie_name: string;
+  file: MediaFile;
 };

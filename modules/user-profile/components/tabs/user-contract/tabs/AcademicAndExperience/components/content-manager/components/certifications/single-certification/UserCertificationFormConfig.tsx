@@ -5,6 +5,7 @@ import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Certification } from "@/modules/user-profile/types/Certification";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
 
 type PropsT = {
   onSuccess?: () => void;
@@ -35,7 +36,6 @@ export const UserCertificationFormConfig = ({
             name: "professional_bodie_id",
             label: "الجهة",
             placeholder: "اختر الجهة",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/professional_bodies/user/${
                 user?.user_id
@@ -50,48 +50,28 @@ export const UserCertificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل الجهة",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_name",
             label: "اسم الاعتماد",
             type: "text",
             placeholder: "اسم الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الاعتماد مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_number",
             label: "رقم الاعتماد",
             type: "text",
             placeholder: "رقم الاعتماد ",
-            validation: [
-              {
-                type: "required",
-                message: "رقم الاعتماد  مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_degree",
             label: "درجة الاعتماد",
             type: "text",
             placeholder: "درجة الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "درجة الاعتماد مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "date_obtain",
@@ -102,12 +82,7 @@ export const UserCertificationFormConfig = ({
               field: "date_end",
             },
             placeholder: "تاريخ الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "date_end",
@@ -118,12 +93,22 @@ export const UserCertificationFormConfig = ({
               field: "date_obtain",
             },
             placeholder: "تاريخ انتهاء الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
-              },
-            ],
+            validation: [],
+          },
+          {
+            name: "file",
+            label: "ارفاق الشهادة",
+            type: "file",
+            // isMulti: true,
+            fileConfig: {
+              showThumbnails: true,
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
+            placeholder: "ارفاق الشهادة",
           },
         ],
         columns: 2,
@@ -136,6 +121,7 @@ export const UserCertificationFormConfig = ({
       accreditation_degree: certification?.accreditation_degree,
       date_obtain: certification?.date_obtain,
       date_end: certification?.date_end,
+      // Initialize file field empty if editing existing certification
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
@@ -154,8 +140,17 @@ export const UserCertificationFormConfig = ({
       const dateObtain = new Date(formData?.date_obtain as string);
       const endDate = new Date(formData?.date_end as string);
 
+      // Create a copy of the form data
+      const formDataCopy = { ...formData };
+      
+      // Check if file is empty or not provided, and remove it if it's empty
+      if (!formDataCopy.file) {
+        delete formDataCopy.file;
+      }
+      
+      // Create the final body
       const body = {
-        ...formData,
+        ...formDataCopy,
         user_id: user?.user_id,
         date_obtain: formatDateYYYYMMDD(dateObtain),
         date_end: formatDateYYYYMMDD(endDate),
@@ -165,9 +160,10 @@ export const UserCertificationFormConfig = ({
           ? `professional_certificates/${certification?.id}`
           : `professional_certificates`;
 
-      const method = formType === "Edit" ? "PUT" : "POST";
+      const method = formType === "Edit" ? "POST" : "POST";
 
-      return await defaultSubmitHandler(body, userCertificationFormConfig, {
+      // Use serialize function to properly handle multipart/form-data for files
+      return await defaultSubmitHandler(serialize(body), userCertificationFormConfig, {
         url: url,
         method: method,
       });
