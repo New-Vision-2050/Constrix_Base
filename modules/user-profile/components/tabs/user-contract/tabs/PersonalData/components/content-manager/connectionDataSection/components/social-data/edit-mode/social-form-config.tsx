@@ -4,19 +4,6 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
-// دالة للتحقق من صحة الرابط
-const isValidUrl = (url: string): boolean => {
-  if (!url) return true; // إذا كان فارغًا، فهذا مقبول لأن الحقل غير مطلوب
-  
-  try {
-    // التحقق من تنسيق URL الصحيح
-    new URL(url);
-    return true;
-  } catch (error) {
-    // إذا حدث خطأ فهذا يعني أن الرابط غير صحيح
-    return false;
-  }
-};
 
 export const SocialMediaSitesFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
@@ -52,8 +39,7 @@ export const SocialMediaSitesFormConfig = () => {
             placeholder: "https://facebook.com/username",
             validation: [
               {
-                type: "custom",
-                validator: (value: string) => isValidUrl(value),
+                type: "url",
                 message: "يرجى إدخال رابط صحيح",
               }
             ],
@@ -77,8 +63,7 @@ export const SocialMediaSitesFormConfig = () => {
             placeholder: "https://instagram.com/username",
             validation: [
               {
-                type: "custom",
-                validator: (value: string) => isValidUrl(value),
+                type: "url",
                 message: "يرجى إدخال رابط صحيح",
               }
             ],
@@ -90,8 +75,7 @@ export const SocialMediaSitesFormConfig = () => {
             placeholder: "https://snapchat.com/add/username",
             validation: [
               {
-                type: "custom",
-                validator: (value: string) => isValidUrl(value),
+                type: "url",
                 message: "يرجى إدخال رابط صحيح",
               }
             ],
@@ -103,8 +87,7 @@ export const SocialMediaSitesFormConfig = () => {
             placeholder: "https://linkedin.com/in/username",
             validation: [
               {
-                type: "custom",
-                validator: (value: string) => isValidUrl(value),
+                type: "url",
                 message: "يرجى إدخال رابط صحيح",
               }
             ],
