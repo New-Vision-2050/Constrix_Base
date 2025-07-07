@@ -31,7 +31,7 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
         <div className="text-white">الرقم الوظيفي: emp-101</div>
         <div className="text-white">الإدارة: {record.company.name}</div>
         <div className="text-white">
-          المحدد: {record.approved_by_user || "غير محدد"}
+          المحدد: {record?.applied_constraints?.[0]?.name || "غير محدد"}
         </div>
         <div className="text-white">
           حالة الحضور:

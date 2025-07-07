@@ -15,6 +15,7 @@ import { useAttendance } from "../../context/AttendanceContext";
 const ApproverDialog: React.FC = () => {
   const { isApproverDialogOpen, selectedApproverRecord, closeApproverDialog } =
     useAttendance();
+  console.log('selectedApproverRecord',selectedApproverRecord);
 
   if (!selectedApproverRecord) return null;
 
@@ -31,7 +32,7 @@ const ApproverDialog: React.FC = () => {
       <div className="flex flex-col gap-4">
         <DisplayField
           label="اسم المحدد"
-          value={selectedApproverRecord.approved_by_user}
+          value={selectedApproverRecord?.applied_constraints?.[0]?.name}
           defaultValue="فرع القاهرة"
         />
 

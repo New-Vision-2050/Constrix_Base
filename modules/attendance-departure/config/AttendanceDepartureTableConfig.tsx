@@ -11,54 +11,66 @@ export const getAttendanceDepartureTableConfig = () => {
     url: `${baseURL}/attendance/team`,
     tableId: "attendance-departure-table",
     columns: [
-      { 
-        key: "user.name", 
-        label: "الاسم", 
+      {
+        key: "user.name",
+        label: "الاسم",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.user?.name || '-' 
+        render: (value: any, row: AttendanceStatusRecord) =>
+          row.user?.name || "-",
       },
-      { 
-        key: "work_date", 
-        label: "التاريخ", 
+      {
+        key: "work_date",
+        label: "التاريخ",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.work_date 
+        render: (value: any, row: AttendanceStatusRecord) => row.work_date,
       },
-      { 
-        key: "user.id", 
-        label: "الرقم الوظيفي", 
+      {
+        key: "user.id",
+        label: "الرقم الوظيفي",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.user?.id || '-' 
+        render: (value: any, row: AttendanceStatusRecord) =>
+          row.user?.id || "-",
       },
-      { 
-        key: "company.name", 
-        label: "الشركة", 
+      {
+        key: "company.name",
+        label: "الشركة",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.company?.name || '-' 
+        render: (value: any, row: AttendanceStatusRecord) =>
+          row.company?.name || "-",
       },
-      { 
-        key: "clock_in_time", 
-        label: "وقت الحضور", 
+      {
+        key: "clock_in_time",
+        label: "وقت الحضور",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.clock_in_time || '-' 
+        render: (value: any, row: AttendanceStatusRecord) =>
+          row.clock_in_time || "-",
       },
-      { 
-        key: "approved_by_user", 
-        label: "المعتمد", 
+      {
+        key: "approved_by_user",
+        label: "المعتمد",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => <ApproverBadge approver={row.approved_by_user} record={row} /> 
+        render: (value: any, row: AttendanceStatusRecord) => (
+          <ApproverBadge
+            approver={row?.applied_constraints?.[0]?.name ?? "غير محدد"}
+            record={row}
+          />
+        ),
       },
-      { 
-        key: "is_late", 
-        label: "حالة الموظف", 
+      {
+        key: "is_late",
+        label: "حالة الموظف",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.is_late ? "متأخر" : "في الوقت" 
+        render: (value: any, row: AttendanceStatusRecord) =>
+          row.is_late ? "متأخر" : "في الوقت",
       },
-      { 
-        key: "status", 
-        label: "حالة الحضور", 
+      {
+        key: "status",
+        label: "حالة الحضور",
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => <AttendanceStatusBadge status={row.status} record={row} /> 
-      }
+        render: (value: any, row: AttendanceStatusRecord) => (
+          <AttendanceStatusBadge status={row.status} record={row} />
+        ),
+      },
     ] as ColumnConfig[],
     deleteConfirmMessage: "تأكيد حذف سجل الحضور والانصراف",
     defaultSortColumn: "id",
@@ -74,7 +86,7 @@ export const getAttendanceDepartureTableConfig = () => {
     executions: [],
     executionConfig: {
       canEdit: true,
-      canDelete: true
-    }
+      canDelete: true,
+    },
   };
 };

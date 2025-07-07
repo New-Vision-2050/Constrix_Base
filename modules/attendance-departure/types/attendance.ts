@@ -1,5 +1,6 @@
 // Attendance status record interface for attendance tables and dialogs
 export interface AttendanceStatusRecord {
+  applied_constraints: { id: string; name: string }[];
   approved_at: string;
   approved_by: string;
   approved_by_user: string;
