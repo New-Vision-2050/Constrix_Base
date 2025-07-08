@@ -278,6 +278,17 @@
         "cancelButtonText": "Cancel",
         "resetButtonText": "Reset"
       },
+      "AddressSection": {
+        "title": "Address",
+        "homeAddress": "Home Address/National Address",
+        "homeAddressPlaceholder": "Home Address at Workplace / Accurate Description of National Address",
+        "invalidAddressChars": "Address must contain only valid letters, numbers and symbols",
+        "postalAddress": "Postal Address",
+        "postalCodeFormat": "Postal code must be 5 digits only",
+        "save": "Save",
+        "cancel": "Cancel",
+        "reset": "Reset"
+      },
       "PassportDataForm": {
         "title": "Passport Data",
         "passportNumber": "Passport Number",

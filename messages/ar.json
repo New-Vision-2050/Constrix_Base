@@ -278,6 +278,17 @@
         "cancelButtonText": "إلغاء",
         "resetButtonText": "إعادة تعيين"
       },
+      "AddressSection": {
+        "title": "العنوان",
+        "homeAddress": "العنوان السكني بمقر العمل/العنوان الوطنى",
+        "homeAddressPlaceholder": "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى",
+        "invalidAddressChars": "يجب أن يحتوي العنوان على أحرف وأرقام ورموز صالحة فقط",
+        "postalAddress": "العنوان البريدي",
+        "postalCodeFormat": "الرمز البريدي يجب أن يتكون من 5 أرقام فقط",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "reset": "إعادة تعيين"
+      },
       "PassportDataForm": {
         "title": "بيانات جواز السفر",
         "passportNumber": "رقم جواز السفر",
