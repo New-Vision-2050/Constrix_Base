@@ -38,6 +38,16 @@ interface AttendanceContextType {
   endDate: Date | null;
   setEndDate: (date: Date | null) => void;
   
+  // Search filters
+  searchText: string;
+  setSearchText: (text: string) => void;
+  selectedApprover: string;
+  setSelectedApprover: (approver: string) => void;
+  selectedDepartment: string;
+  setSelectedDepartment: (department: string) => void;
+  selectedBranch: string;
+  setSelectedBranch: (branch: string) => void;
+  
   // Employee details dialog state
   isEmployeeDialogOpen: boolean;
   setEmployeeDialogOpen: (isOpen: boolean) => void;
@@ -95,17 +105,62 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   
-  // Get team attendance data for map display with date filtering
+  // Search filter states with default values
+  const [searchText, setSearchText] = useState<string>("");
+  const [selectedApprover, setSelectedApprover] = useState<string>("all");
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
+  const [selectedBranch, setSelectedBranch] = useState<string>("all");
+  
+  // Enhanced setters that also trigger refetch directly
+  const updateSearchText = useCallback((text: string) => {
+    console.log("Context updating search text to:", text);
+    setSearchText(text);
+  }, []);
+  
+  const updateSelectedApprover = useCallback((value: string) => {
+    console.log("Context updating approver to:", value);
+    setSelectedApprover(value);
+  }, []);
+  
+  const updateSelectedDepartment = useCallback((value: string) => {
+    console.log("Context updating department to:", value);
+    setSelectedDepartment(value);
+  }, []);
+  
+  const updateSelectedBranch = useCallback((value: string) => {
+    console.log("Context updating branch to:", value);
+    setSelectedBranch(value);
+  }, []);
+  
+  // Debug search values
+  console.log("Context search values:", { searchText, selectedApprover, selectedDepartment, selectedBranch });
+  
+  // Get team attendance data for map display with date and search filtering
+  // إنشاء كائن المعلمات بدون search_text في البداية
+  const searchParams: any = {
+    // Format dates to YYYY-MM-DD string format for API
+    start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
+    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined,
+    // Search filters - don't send 'all' values to API
+    approver: selectedApprover && selectedApprover !== 'all' ? selectedApprover : undefined,
+    department: selectedDepartment && selectedDepartment !== 'all' ? selectedDepartment : undefined,
+    branch: selectedBranch && selectedBranch !== 'all' ? selectedBranch : undefined
+  };
+  
+  // إضافة search_text بشكل منفصل للتأكد من أنه يضاف حتى لو كان فارغًا
+  if (searchText !== undefined) {
+    searchParams.search_text = searchText;
+    console.log("Adding search_text to params explicitly:", searchText);
+  }
+  
+  console.log("Search params for API:", searchParams);
+  
   const {
     teamAttendance,
     isLoading: teamAttendanceLoading,
     error: teamAttendanceError,
     refetch: refetchTeamAttendance
-  } = useTeamAttendance({
-    // Format dates to YYYY-MM-DD string format for API
-    start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
-    end_date: endDate ? endDate.toISOString().split('T')[0] : undefined
-  });
+  } = useTeamAttendance(searchParams);
 
   // Get attendance summary data for statistics cards with date filtering
   const {
@@ -200,6 +255,16 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     setStartDate,
     endDate,
     setEndDate,
+    
+    // Search filter state
+    searchText,
+    setSearchText: updateSearchText,
+    selectedApprover,
+    setSelectedApprover: updateSelectedApprover,
+    selectedDepartment,
+    setSelectedDepartment: updateSelectedDepartment,
+    selectedBranch,
+    setSelectedBranch: updateSelectedBranch,
     
     // Employee dialog state
     isEmployeeDialogOpen,
