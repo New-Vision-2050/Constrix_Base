@@ -1,20 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download, Search } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
 
 const MapSearchFilter: React.FC = () => {
-  const { toggleView } = useAttendance();
+  const { toggleView, searchText, setSearchText } = useAttendance();
+  
+  // معالجة تغيير قيمة البحث
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  }, [setSearchText]);
 
   return (
     <div className="flex items-center justify-between w-full h-[60px] bg-[#140F35] rounded-lg px-4 gap-2">
-      <div className="flex-grow">
+      <div className="flex-grow relative">
         <Input
-        placeholder="البحث"
-        className="bg-[#21174A] text-white border-transparent h-[36px] rounded-md w-full placeholder:text-gray-400 focus:border-[#7453F0] focus:ring-[#7453F0] flex-grow"/>
+          placeholder="البحث"
+          value={searchText}
+          onChange={handleSearchChange}
+          className="bg-[#21174A] text-white border-transparent h-[36px] rounded-md w-full placeholder:text-gray-400 focus:border-[#7453F0] focus:ring-[#7453F0] flex-grow"
+        />
+        <Search className="absolute left-3 top-[9px] text-gray-400" size={18} />
       </div>
       
       <div className="flex items-center gap-2">
