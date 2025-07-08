@@ -439,6 +439,16 @@
       "search": "بحث",
       "clearFilters": "مسح الفلاتر"
     },
+    "SearchFilter": {
+      "title": "فلتر البحث",
+      "branch": "الفرع",
+      "all": "الكل",
+      "loadingBranches": "جاري تحميل الفروع...",
+      "department": "الإدارة",
+      "approver": "المحدد المعتمد",
+      "loadingApprovers": "جاري تحميل المشرفين...",
+      "searchPlaceholder": "الاسم/البريد الالكتروني/رقم الجوال"
+    },
     "StatisticsCards":{
       "totalAttendance": "إجمالي عدد الحضور",
       "totalAbsence": "إجمالي عدد الغياب",

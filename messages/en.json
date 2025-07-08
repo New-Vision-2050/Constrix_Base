@@ -439,6 +439,16 @@
       "search": "Search",
       "clearFilters": "Clear Filters"
     },
+    "SearchFilter": {
+      "title": "Search Filter",
+      "branch": "Branch",
+      "all": "All",
+      "loadingBranches": "Loading branches...",
+      "department": "Department",
+      "approver": "Approver",
+      "loadingApprovers": "Loading approvers...",
+      "searchPlaceholder": "Name/Email/Mobile"
+    },
     "StatisticsCards":{
       "totalAttendance": "Total Attendance",
       "totalAbsence": "Total Absences",

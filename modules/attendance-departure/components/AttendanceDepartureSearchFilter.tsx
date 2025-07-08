@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/select";
 // لم نعد بحاجة إلى البيانات الثابتة، نستخدم البيانات من API
 import { useAttendance } from "../context/AttendanceContext";
+import { useTranslations } from "next-intl";
 
 const AttendanceDepartureSearchFilter: React.FC = () => {
+  const t = useTranslations("AttendanceDepartureModule.SearchFilter");
   // Get the search state and updater functions from the context
   const {
     searchText,
@@ -89,7 +91,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
 
   return (
     <div className="p-4 bg-[#140F35] rounded-lg mb-4">
-      <h3 className="text-white mb-4 font-medium">فلتر البحث</h3>
+      <h3 className="text-white mb-4 font-medium">{t("title")}</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Select
           dir="rtl"
@@ -97,10 +99,10 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           onValueChange={handleBranchChange}
         >
           <SelectTrigger className="bg-transparent text-white border-gray-600 focus:border-purple-500">
-            <SelectValue placeholder="الفرع" />
+            <SelectValue placeholder={t("branch")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">الكل</SelectItem>
+            <SelectItem value="all">{t("all")}</SelectItem>
             {/* عرض الفروع من الـ API مع عرض رسالة تحميل إذا كانت البيانات قيد التحميل */}
             {branchesLoading ? (
               <SelectItem value="loading" disabled>
@@ -122,10 +124,10 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           onValueChange={handleDepartmentChange}
         >
           <SelectTrigger className="bg-transparent text-white border-gray-600 focus:border-purple-500">
-            <SelectValue placeholder="الإدارة" />
+            <SelectValue placeholder={t("department")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">الكل</SelectItem>
+            <SelectItem value="all">{t("all")}</SelectItem>
             {managementsLoading ? (
               <SelectItem value="loading" disabled>
                 جاري تحميل الفروع...
@@ -146,12 +148,12 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           onValueChange={handleApproverChange}
         >
           <SelectTrigger className="bg-transparent text-white border-gray-600 focus:border-purple-500">
-            <SelectValue placeholder="المحدد المعتمد" />
+            <SelectValue placeholder={t("approver")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">الكل</SelectItem>
+            <SelectItem value="all">{t("all")}</SelectItem>
             {constraintsLoading ? (
-              <SelectItem value="loading" disabled>جاري تحميل المشرفين...</SelectItem>
+              <SelectItem value="loading" disabled>{t("loadingApprovers")}</SelectItem>
             ) : (
               constraints?.map((constraint,index) => (
                 <SelectItem key={constraint.id+'-'+index} value={constraint.id}>
@@ -163,7 +165,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
         </Select>
 
         <Input
-          placeholder="الاسم/البريد الالكتروني/رقم الجوال"
+          placeholder={t("searchPlaceholder")}
           className="bg-transparent text-white border-gray-600 border-1 rounded-md w-full ring-1 h-full ring-gray-600 focus:ring-gray-400 focus:border-purple-500 placeholder:text-gray-400"
           value={searchText}
           onChange={handleSearchTextChange}
