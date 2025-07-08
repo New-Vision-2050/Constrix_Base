@@ -1,8 +1,7 @@
 'use client'
-import React, { useState } from "react";
-import { CalendarDaysIcon, ChevronDownIcon } from "lucide-react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState, useEffect } from "react";
+import { CalendarIcon } from "lucide-react";
+import { Input } from "@/modules/table/components/ui/input";
 import { useAttendance } from "../context/AttendanceContext";
 
 interface AttendanceDateSelectorProps {
@@ -14,88 +13,103 @@ const AttendanceDateSelector: React.FC<AttendanceDateSelectorProps> = ({
 }) => {
   const { startDate, setStartDate, endDate, setEndDate } = useAttendance();
   
-  // State to track which calendar is open (from, to, or none)
-  const [openCalendar, setOpenCalendar] = useState<'from' | 'to' | null>(null);
+  // Estado local para las fechas en formato string
+  const [startDateStr, setStartDateStr] = useState<string>("");
+  const [endDateStr, setEndDateStr] = useState<string>("");
 
-  // Format dates for display
-  const formatDate = (date: Date | null) => {
-    if (!date) return locale === "ar" ? "من" : "From";
-    return date.toLocaleDateString(
-      locale === "ar" ? "ar-EG" : "en-US",
-      { year: "numeric", month: "2-digit", day: "2-digit" }
-    );
+  // Formatear fecha como YYYY-MM-DD para los inputs HTML nativos
+  const formatDateForInput = (date: Date | null): string => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-  const fromDisplayLabel = formatDate(startDate);
-  const toDisplayLabel = formatDate(endDate);
+  // Actualizar los campos de texto cuando cambian las fechas en el contexto
+  useEffect(() => {
+    setStartDateStr(formatDateForInput(startDate));
+    setEndDateStr(formatDateForInput(endDate));
+  }, [startDate, endDate]);
 
-  // Handle opening and closing the calendar dropdowns
-  const handleToggleCalendar = (calendarType: 'from' | 'to') => {
-    if (openCalendar === calendarType) {
-      setOpenCalendar(null);
+  // Manejar cambios en el campo de fecha inicial
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value;
+    setStartDateStr(dateValue);
+    
+    if (dateValue) {
+      const newDate = new Date(dateValue);
+      // Evitar actualizaciones cuando el formato no es válido
+      if (!isNaN(newDate.getTime())) {
+        setStartDate(newDate);
+      }
     } else {
-      setOpenCalendar(calendarType);
+      // Si se borra el campo, establecer fecha a null
+      setStartDate(null);
+    }
+  };
+
+  // Manejar cambios en el campo de fecha final
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value;
+    setEndDateStr(dateValue);
+    
+    if (dateValue) {
+      const newDate = new Date(dateValue);
+      // Evitar actualizaciones cuando el formato no es válido
+      if (!isNaN(newDate.getTime())) {
+        setEndDate(newDate);
+      }
+    } else {
+      // Si se borra el campo, establecer fecha a null
+      setEndDate(null);
     }
   };
 
   return (
-    <div className="flex items-center gap-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      {/* From Date Selector */}
-      <div style={{ position: 'relative', display: 'inline-block' }}>
-        <button
-          type="button"
-          onClick={() => handleToggleCalendar('from')}
-          className="flex items-center justify-between min-w-[176px] h-10 rounded-xl bg-[#18123A] border border-[#3C3474] px-4 text-lg text-gray-200 focus:outline-none"
-          style={{ fontWeight: 400 }}
+    <div className="flex flex-wrap items-center gap-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Selector de fecha inicial */}
+      <div className="relative" dir="rtl">
+        <label
+          htmlFor="start-date"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-right"
         >
-          <ChevronDownIcon size={22} className={locale === 'ar' ? "ml-2" : "mr-2"} />
-          <span className="flex-1 text-center">{fromDisplayLabel}</span>
-          <CalendarDaysIcon size={22} className={locale === 'ar' ? "mr-2" : "ml-2"} />
-        </button>
-        {openCalendar === 'from' && (
-          <div style={{ position: 'absolute', top: '110%', right: locale === 'ar' ? 0 : 'auto', left: locale === 'ar' ? 'auto' : 0, zIndex: 1000, direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
-            <DatePicker
-              selected={startDate || undefined}
-              onChange={(date) => {
-                setStartDate(date as Date);
-                setOpenCalendar(null);
-              }}
-              maxDate={endDate || undefined}
-              locale={locale}
-              inline
-              calendarStartDay={locale === 'ar' ? 6 : 0}
-            />
-          </div>
-        )}
+          {locale === 'ar' ? "تاريخ البداية" : "Start Date"}
+        </label>
+        <div className="relative">
+          <Input
+            id="start-date"
+            type="date"
+            value={startDateStr}
+            onChange={handleStartDateChange}
+            className="w-full text-right pl-10 pr-4"
+            style={{ direction: "rtl" }}
+            dir="rtl"
+          />
+          <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        </div>
       </div>
 
-      {/* To Date Selector */}
-      <div style={{ position: 'relative', display: 'inline-block' }}>
-        <button
-          type="button"
-          onClick={() => handleToggleCalendar('to')}
-          className="flex items-center justify-between min-w-[176px] h-10 rounded-xl bg-[#18123A] border border-[#3C3474] px-4 text-lg text-gray-200 focus:outline-none"
-          style={{ fontWeight: 400 }}
+      {/* Selector de fecha final */}
+      <div className="relative" dir="rtl">
+        <label
+          htmlFor="end-date"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-right"
         >
-          <ChevronDownIcon size={22} className={locale === 'ar' ? "ml-2" : "mr-2"} />
-          <span className="flex-1 text-center">{toDisplayLabel}</span>
-          <CalendarDaysIcon size={22} className={locale === 'ar' ? "mr-2" : "ml-2"} />
-        </button>
-        {openCalendar === 'to' && (
-          <div style={{ position: 'absolute', top: '110%', right: locale === 'ar' ? 0 : 'auto', left: locale === 'ar' ? 'auto' : 0, zIndex: 1000, direction: locale === 'ar' ? 'rtl' : 'ltr' }}>
-            <DatePicker
-              selected={endDate || undefined}
-              onChange={(date) => {
-                setEndDate(date as Date);
-                setOpenCalendar(null);
-              }}
-              minDate={startDate || undefined}
-              locale={locale}
-              inline
-              calendarStartDay={locale === 'ar' ? 6 : 0}
-            />
-          </div>
-        )}
+          {locale === 'ar' ? "تاريخ النهاية" : "End Date"}
+        </label>
+        <div className="relative">
+          <Input
+            id="end-date"
+            type="date"
+            value={endDateStr}
+            onChange={handleEndDateChange}
+            className="w-full text-right pl-10 pr-4"
+            style={{ direction: "rtl" }}
+            dir="rtl"
+          />
+          <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        </div>
       </div>
     </div>
   );
