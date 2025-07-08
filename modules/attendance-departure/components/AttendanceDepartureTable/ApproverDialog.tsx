@@ -8,17 +8,7 @@ import WorkdayPeriods, {
   PeriodType,
 } from "../../components/shared/WorkdayPeriods";
 import { useAttendance } from "../../context/AttendanceContext";
-
-
-const days = {
-  sunday: "الأحد",
-  monday: "الإثنين",
-  tuesday: "الثلاثاء",
-  wednesday: "الأربعاء",
-  thursday: "الخميس",
-  friday: "الجمعة",
-  saturday: "السبت"
-};
+import { useTranslations } from "next-intl";
 
 /**
  * Approver dialog component that appears when clicking on the approver cell in the table
@@ -26,6 +16,7 @@ const days = {
 const ApproverDialog: React.FC = () => {
   const { isApproverDialogOpen, selectedApproverRecord, closeApproverDialog } =
     useAttendance();
+  const t = useTranslations("AttendanceDepartureModule.Table.dialogs.approver");
   console.log('selectedApproverRecord',selectedApproverRecord?.applied_constraints?.[0]?.name,selectedApproverRecord);
 
   if (!selectedApproverRecord) return null;
@@ -34,7 +25,7 @@ const ApproverDialog: React.FC = () => {
     <DialogContainer
       isOpen={isApproverDialogOpen}
       onClose={closeApproverDialog}
-      title="بيانات محدد الحضور"
+      title={t("title")}
     >
       {/* Employee Information */}
       <EmployeeInfoSection record={selectedApproverRecord} />
@@ -42,12 +33,12 @@ const ApproverDialog: React.FC = () => {
       {/* Data Input Fields */}
       <div className="flex flex-col gap-4">
         <DisplayField
-          label="اسم المحدد"
+          label={t("approverName")}
           value={selectedApproverRecord?.applied_constraints?.[0]?.name}
-          defaultValue="غير محدد"
+          defaultValue={t("unspecified")}
         />
 
-        <DisplayField label="نظام المحدد" value={selectedApproverRecord?.applied_constraints?.[0]?.name} />
+        <DisplayField label={t("approverSystem")} value={selectedApproverRecord?.applied_constraints?.[0]?.name} />
 
         {/* Workday Periods */}
         {selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules?.weekly_schedule && 
@@ -59,7 +50,7 @@ const ApproverDialog: React.FC = () => {
               <WorkdayPeriods
                 key={day}
                 hours={dayData.total_work_hours}
-                title={days[day as keyof typeof days]}
+                title={t(`days.${day}`)}
                 periods={dayData.periods.map((period, index) => {
                   // Extract hours and convert to 12-hour format for display
                   const startTime = new Date(`2023-01-01T${period.start_time}`);
@@ -75,7 +66,7 @@ const ApproverDialog: React.FC = () => {
                   
                   return {
                     id: index + 1,
-                    label: `الفترة ${index + 1}`,
+                    label: `${t("period")} ${index + 1}`,
                     fromValue: start12Hour.toString(),
                     fromPeriod: startPeriod,
                     toValue: end12Hour.toString(),
@@ -88,14 +79,14 @@ const ApproverDialog: React.FC = () => {
         }
         {!selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules?.weekly_schedule && (
           <WorkdayPeriods
-            title="لا يوجد جدول أسبوعي"
+            title={t("noWeeklySchedule")}
             periods={[]}
             hours={0}
           />
         )}
 
         <div className="text-xs text-[#E91E63] text-left">
-          عدد ساعات العمل: 8 ساعات
+          {t("workHours")} 8 ساعات
         </div>
       </div>
     </DialogContainer>

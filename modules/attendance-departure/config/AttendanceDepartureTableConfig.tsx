@@ -4,16 +4,17 @@ import ApproverBadge from "../components/AttendanceDepartureTable/ApproverBadge"
 import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { AttendanceStatusRecord } from "../types/attendance";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 // Configuration function for the attendance departure table
-export const getAttendanceDepartureTableConfig = () => {
+export const getAttendanceDepartureTableConfig = (t: (key: string) => string) => {
   return {
     url: `${baseURL}/attendance/team`,
     tableId: "attendance-departure-table",
     columns: [
       {
         key: "user.name",
-        label: "الاسم",
+        label: t("columns.name"),
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
@@ -21,20 +22,20 @@ export const getAttendanceDepartureTableConfig = () => {
       },
       {
         key: "work_date",
-        label: "التاريخ",
+        label: t("columns.date"),
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) => row.work_date,
       },
       {
         key: "professional_data.job_code",
-        label: "الرقم الوظيفي",
+        label: t("columns.jobCode"),
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
           row.professional_data?.job_code || "-",
       },
       {
         key: "professional_data.branch",
-        label: "الفرع",
+        label: t("columns.branch"),
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
@@ -42,7 +43,7 @@ export const getAttendanceDepartureTableConfig = () => {
       },
       {
         key: "professional_data.management",
-        label: "الادارة",
+        label: t("columns.management"),
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
@@ -57,7 +58,7 @@ export const getAttendanceDepartureTableConfig = () => {
       // },
       {
         key: "approved_by_user",
-        label: "المحدد المعتمد",
+        label: t("columns.approver"),
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
@@ -69,14 +70,14 @@ export const getAttendanceDepartureTableConfig = () => {
       },
       {
         key: "is_late",
-        label: "حالة الموظف",
+        label: t("columns.employeeStatus"),
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
-          row.is_late ? "متأخر" : "في الوقت",
+          row.is_late ? t("status.late") : t("status.onTime"),
       },
       {
         key: "status",
-        label: "حالة الحضور",
+        label: t("columns.attendanceStatus"),
         sortable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
           <AttendanceStatusBadge status={row.status} record={row} />
@@ -88,14 +89,14 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "search_text",
         searchType: {
           type: "text",
-          placeholder: "بحث",
+          placeholder: t("filters.searchPlaceholder"),
         },
       },
       {
         key: "branch_id",
         searchType: {
           type: "dropdown",
-          placeholder: "الفرع",
+          placeholder: t("filters.branchPlaceholder"),
           dynamicDropdown: {
             url: `${baseURL}/management_hierarchies/list`,
             valueField: "id",
@@ -113,7 +114,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "management_id",
         searchType: {
           type: "dropdown",
-          placeholder: "الادارة",
+          placeholder: t("filters.managementPlaceholder"),
           dynamicDropdown: {
             url: `${baseURL}/management_hierarchies/list`,
             valueField: "id",
@@ -131,7 +132,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "constraint_id",
         searchType: {
           type: "dropdown",
-          placeholder: "المحدد",
+          placeholder: t("filters.constraintPlaceholder"),
           dynamicDropdown: {
             url: `${baseURL}/attendance/constraints`,
             valueField: "id",
@@ -149,7 +150,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "start_date",
         searchType: {
           type: "date",
-          placeholder: "تاريخ البداية",
+          placeholder: t("columns.date"),
           defaultValue: new Date(),
         },
       },
@@ -157,12 +158,12 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "end_date",
         searchType: {
           type: "date",
-          placeholder: "تاريخ النهاية",
+          placeholder: t("columns.date"),
           defaultValue: new Date(),
         },
       },
     ],
-    deleteConfirmMessage: "تأكيد حذف سجل الحضور والانصراف",
+    deleteConfirmMessage: t("deleteConfirm"),
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
     enableSorting: true,

@@ -5,11 +5,13 @@ import { getAttendanceDepartureTableConfig } from "../../config/AttendanceDepart
 import { Button } from "@/components/ui/button";
 import { useAttendance } from "../../context/AttendanceContext";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import { useTranslations } from "next-intl";
 
 const AttendanceDepartureTable: React.FC = () => {
   // declare state & vars
   const { toggleView, setStartDate, setEndDate } = useAttendance();
-  const tableId = useMemo(() => getAttendanceDepartureTableConfig().tableId || 'default', []);
+  const t = useTranslations("AttendanceDepartureModule.Table");
+  const tableId = useMemo(() => getAttendanceDepartureTableConfig(t).tableId || 'default', []);
   
   // استخدام نهج مختلف للوصول إلى حالة العمود لتجنب الحلقة اللانهائية
   const tables = useTableStore((state) => state.tables);
@@ -41,10 +43,10 @@ const AttendanceDepartureTable: React.FC = () => {
   return (
     <div className="mt-4">
       <TableBuilder 
-      config={getAttendanceDepartureTableConfig()} 
+      config={getAttendanceDepartureTableConfig(t)} 
       searchBarActions={
         <div className="flex items-center gap-3">
-          <Button onClick={() => toggleView("map")}>الخريطة</Button>
+          <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>
         </div>
       }
       />

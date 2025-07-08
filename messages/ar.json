@@ -418,9 +418,24 @@
     "resetButtonText": "مسح النموذج"
   },
   "AttendanceDepartureModule":{
+    "shared": {
+      "EmployeeInfoSection": {
+        "branch": "الفرع",
+        "jobId": "الرقم الوظيفي",
+        "department": "الإدارة",
+        "approver": "المحدد",
+        "attendanceStatus": "حالة الحضور",
+        "unspecified": "غير محدد",
+        "status": {
+          "present": "حاضر",
+          "late": "متأخر",
+          "absent": "غائب"
+        }
+      }
+    },
     "AttendanceDateSelector":{
       "startDate": "تاريخ البداية",
-      "endDate": "تاريخ النهاية",
+      "endDate": "تاريخ الانتهاء",
       "search": "بحث",
       "clearFilters": "مسح الفلاتر"
     },
@@ -429,6 +444,55 @@
       "totalAbsence": "إجمالي عدد الغياب",
       "totalDepartures": "إجمالي عدد الانصراف",
       "totalHolidays": "إجمالي أيام الإجازات"
+    },
+    "Table":{
+      "mapView": "الخريطة",
+      "columns": {
+        "name": "الاسم",
+        "date": "التاريخ",
+        "jobCode": "الرقم الوظيفي",
+        "branch": "الفرع",
+        "management": "الادارة",
+        "approver": "المحدد المعتمد",
+        "employeeStatus": "حالة الموظف",
+        "attendanceStatus": "حالة الحضور"
+      },
+      "filters": {
+        "searchPlaceholder": "بحث",
+        "branchPlaceholder": "الفرع",
+        "managementPlaceholder": "الادارة",
+        "constraintPlaceholder": "المحدد"
+      },
+      "deleteConfirm": "تأكيد حذف سجل الحضور والانصراف",
+      "status": {
+        "onTime": "في الوقت",
+        "late": "متأخر"
+      },
+      "dialogs": {
+        "approver": {
+          "title": "بيانات محدد الحضور",
+          "approverName": "اسم المحدد",
+          "approverSystem": "نظام المحدد",
+          "unspecified": "غير محدد",
+          "period": "الفترة",
+          "noWeeklySchedule": "لا يوجد جدول أسبوعي",
+          "workHours": "عدد ساعات العمل:",
+          "days": {
+            "sunday": "الأحد",
+            "monday": "الإثنين",
+            "tuesday": "الثلاثاء",
+            "wednesday": "الأربعاء",
+            "thursday": "الخميس",
+            "friday": "الجمعة",
+            "saturday": "السبت"
+          }
+        },
+        "attendanceStatus": {
+          "title": "حالة الحضور",
+          "attendance": "الحضور",
+          "departure": "الانصراف"
+        }
+      }
     }
   }
 }

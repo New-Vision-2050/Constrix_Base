@@ -2,6 +2,7 @@
 
 import React from "react";
 import { AttendanceStatusRecord } from "../../types/attendance";
+import { useTranslations } from "next-intl";
 
 interface EmployeeInfoSectionProps {
   record: AttendanceStatusRecord;
@@ -13,6 +14,7 @@ interface EmployeeInfoSectionProps {
 const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   record,
 }) => {
+  const t = useTranslations("AttendanceDepartureModule.shared.EmployeeInfoSection");
   // Determine the color for attendance status
   const getStatusColor = () => {
     if (record.is_late === 0) {
@@ -27,16 +29,16 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   return (
     <>
       <div className="flex flex-wrap justify-between items-center text-sm gap-3">
-        <div className="text-white">الفرع: {record.company.name}</div>
-        <div className="text-white">الرقم الوظيفي: emp-101</div>
-        <div className="text-white">الإدارة: {record.company.name}</div>
+        <div className="text-white">{t("branch")}: {record.company.name}</div>
+        <div className="text-white">{t("jobId")}: emp-101</div>
+        <div className="text-white">{t("department")}: {record.company.name}</div>
         <div className="text-white">
-          المحدد: {record?.applied_constraints?.[0]?.name || "غير محدد"}
+          {t("approver")}: {record?.applied_constraints?.[0]?.name || t("unspecified")}
         </div>
         <div className="text-white">
-          حالة الحضور:
+          {t("attendanceStatus")}:
           <span className={`font-bold ${getStatusColor()}`}>
-            {record.is_late === 0 ? "حاضر" : record.is_late === 1 ? "متأخر" : "غائب"}
+            {record.is_late === 0 ? t("status.present") : record.is_late === 1 ? t("status.late") : t("status.absent")}
           </span>
         </div>
       </div>
