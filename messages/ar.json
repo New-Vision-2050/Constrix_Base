@@ -277,7 +277,12 @@
         "cancel": "إلغاء",
         "otpSentToPhone": "تم إرسال رمز التحقق إلى رقم الجوال",
         "otpSentToEmail": "تم إرسال رمز التحقق إلى البريد الإلكتروني",
-        "otpSendError": "حدث خطأ أثناء إرسال رمز التحقق"
+        "otpSendError": "حدث خطأ أثناء إرسال رمز التحقق",
+        "enterOtpSentTo": "يرجى ادخال رمز التحقق المرسل الى {label}",
+        "invalidOtp": "كلمة المرور المؤقتة غير صحيحة",
+        "confirm": "تأكيد",
+        "resend": "اعادة الارسال",
+        "changeSuccess": "تم التغيير بنجاح"
       },
       "CommonSections": {
         "noData": "لا يوجد بيانات",

@@ -277,7 +277,12 @@
         "cancel": "Cancel",
         "otpSentToPhone": "OTP has been sent to your phone number",
         "otpSentToEmail": "OTP has been sent to your email address",
-        "otpSendError": "An error occurred while sending OTP"
+        "otpSendError": "An error occurred while sending OTP",
+        "enterOtpSentTo": "Please enter the verification code sent to {label}",
+        "invalidOtp": "Invalid verification code",
+        "confirm": "Confirm",
+        "resend": "Resend",
+        "changeSuccess": "Changed successfully"
       },
       "CommonSections": {
         "noData": "No Data",

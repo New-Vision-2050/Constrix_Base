@@ -16,6 +16,7 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useEffect } from "react";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   open: boolean;
@@ -28,6 +29,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const [timer, setTimer] = useState(0);
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
+  const t = useTranslations("UserProfile.tabs.ConnectionDataSection");
   const [error, setError] = useState("");
   const { handleRefreshConnectionData } = usePersonalDataTabCxt();
   const type = openMailOtp ? "email" : "phone";
@@ -35,7 +37,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
   const handleClose =
     type === "email" ? toggleMailOtpDialog : togglePhoneOtpDialog;
   const [otp, setOtp] = useState("");
-  const label = type === "email" ? "البريد الالكتروني" : "رقم الجوال";
+  const label = type === "email" ? t("email") : t("phoneNumber");
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -93,13 +95,13 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         body
       );
       handleClose();
-      toast.success("تم التغير بنجاح");
+      toast.success(t("changeSuccess"));
       setLoading(false);
       handleRefreshConnectionData();
     } catch (error) {
       setLoading(false);
       console.log("error", error);
-      setError(`كلمه المرور الموقته غير صحيحية`);
+      setError(t("invalidOtp"));
     }
   };
 
@@ -111,7 +113,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
             <InfoIcon additionClass="text-pink-500 text-[22px]" />
           </DialogTitle>
           <DialogDescription>
-            يرجى ادخال رمز التحقق المرسل الى {label}
+            {t("enterOtpSentTo", {label})}
           </DialogDescription>
         </DialogHeader>
 
@@ -128,14 +130,14 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
 
         <div className="flex items-center justify-center gap-4">
           <Button disabled={loading} onClick={handleConfirmOtp}>
-            تأكيد
+            {t("confirm")}
           </Button>
           <Button
             disabled={loading || timer > 0}
             variant={"ghost"}
             onClick={handleResend}
           >
-            اعادة الارسال {timer > 0 && `(${timer})`}
+            {t("resend")} {timer > 0 && `(${timer})`}
           </Button>
         </div>
       </DialogContent>
