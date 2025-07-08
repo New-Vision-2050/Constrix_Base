@@ -1,6 +1,7 @@
 import StatisticsCard from "./AttendanceDepartureStatisticsCard";
 import { UserIcon, UsersIcon, ActivityIcon, TrendingUpIcon, Clock, Calendar } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
+import { useTranslations } from "next-intl";
 
 // Loading skeleton for cards
 const LoadingSkeleton = () => (
@@ -13,6 +14,7 @@ const LoadingSkeleton = () => (
 
 export default function AttendanceDepartureStatisticsCards() {
   const { attendanceSummary, attendanceSummaryLoading } = useAttendance();
+  const t = useTranslations("AttendanceDepartureModule.StatisticsCards");
 
   // Show loading skeleton while data is being fetched
   if (attendanceSummaryLoading || !attendanceSummary) {
@@ -29,28 +31,28 @@ export default function AttendanceDepartureStatisticsCards() {
   // Dynamic card data based on attendance summary
   const cardsData = [
     {
-      label: "إجمالي عدد الحضور",
+      label: t("totalAttendance"),
       value: attendanceSummary.total_attendant,
       percentage: attendancePercentage,
       percentageColor: "#27C200",
       icon: <UserIcon size={24} color="#B39DDB" />,
     },
     {
-      label: "إجمالي عدد الغياب",
+      label: t("totalAbsence"),
       value: attendanceSummary.total_absent_days,
       percentage: absentPercentage,
       percentageColor: "#FF2D2D",
       icon: <UsersIcon size={24} color="#B39DDB" />,
     },
     {
-      label: "إجمالي عدد الانصراف",
+      label: t("totalDepartures"),
       value: attendanceSummary.total_departures,
       percentage: departurePercentage,
       percentageColor: "#27C200",
       icon: <ActivityIcon size={24} color="#B39DDB" />,
     },
     {
-      label: "إجمالي أيام الإجازات",
+      label: t("totalHolidays"),
       value: attendanceSummary.total_holiday_days,
       percentage: holidayPercentage,
       percentageColor: "#FF7A00",

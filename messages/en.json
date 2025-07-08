@@ -423,6 +423,12 @@
       "endDate": "End Date",
       "search": "Search",
       "clearFilters": "Clear Filters"
+    },
+    "StatisticsCards":{
+      "totalAttendance": "Total Attendance",
+      "totalAbsence": "Total Absences",
+      "totalDepartures": "Total Departures",
+      "totalHolidays": "Total Holiday Days"
     }
   }
 }

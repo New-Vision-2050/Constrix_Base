@@ -23,7 +23,6 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
     <div
       style={{ background: backgroundColor }}
       className="flex items-center justify-between rounded-xl p-4 min-w-[270px] min-h-[110px]"
-      dir="rtl"
     >
       {/* icon */}
       <div

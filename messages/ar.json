@@ -423,6 +423,12 @@
       "endDate": "تاريخ النهاية",
       "search": "بحث",
       "clearFilters": "مسح الفلاتر"
+    },
+    "StatisticsCards":{
+      "totalAttendance": "إجمالي عدد الحضور",
+      "totalAbsence": "إجمالي عدد الغياب",
+      "totalDepartures": "إجمالي عدد الانصراف",
+      "totalHolidays": "إجمالي أيام الإجازات"
     }
   }
 }
