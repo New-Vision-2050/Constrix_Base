@@ -5,15 +5,18 @@ import { serialize } from "object-to-formdata";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const IdentityDataFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.tabs.FormLabels");
+  const formT = useTranslations("UserProfile.tabs.IdentityDataForm");
 
   const IdentityFormConfig: FormConfig = {
     formId: "Identity-data-form",
-    title: "بيانات الهوية",
+    title: formT("title"),
     apiUrl: `${baseURL}/company-users/identity-data`,
     laravelValidation: {
       enabled: true,
@@ -21,50 +24,49 @@ export const IdentityDataFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات الهوية",
+        title: formT("sectionTitle"),
         fields: [
           {
             name: "identity",
-            label: "رقم الهوية",
+            label: t("identityNumber"),
             type: "text",
-            placeholder: "رقم الهوية",
+            placeholder: t("identityNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم الهوية مطلوب",
+                message: formT("identityNumberRequired"),
               },
               {
                 type: "pattern",
                 value: /^[12]\d{9}$/,
-                message:
-                  "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+                message: formT("identityNumberPatternStart"),
               },
               {
                 type: "minLength",
                 value: 10,
-                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+                message: formT("identityNumberLength"),
               },
               {
                 type: "maxLength",
                 value: 10,
-                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+                message: formT("identityNumberLength"),
               },
               {
                 type: "pattern",
                 value: /^\d+$/,
-                message: "رقم الهوية يجب أن يحتوي على أرقام فقط",
+                message: formT("identityNumberDigitsOnly"),
               },
             ],
           },
           {
-            label: "تاريخ الدخول",
+            label: t("entryDate"),
             type: "date",
             name: "identity_start_date",
-            placeholder: "تاريخ الدخول",
+            placeholder: t("entryDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الدخول مطلوب",
+                message: formT("entryDateRequired"),
               },
             ],
             maxDate: {
@@ -73,14 +75,14 @@ export const IdentityDataFormConfig = () => {
             },
           },
           {
-            label: "تاريخ الانتهاء",
+            label: t("expiryDate"),
             type: "date",
             name: "identity_end_date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("expiryDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الأنتهاء مطلوب",
+                message: formT("expiryDateRequired"),
               },
             ],
             minDate: {
@@ -93,11 +95,11 @@ export const IdentityDataFormConfig = () => {
             },
           },
           {
-            label: "ارفاق الهوية",
+            label: t("identityAttachment"),
             type: "file",
             isMulti: true,
             name: "file_identity",
-            placeholder: "رقم جواز السفر",
+            placeholder: t("passportNumber"),
             fileConfig: {
               allowedFileTypes: [
                 "application/pdf", // pdf
@@ -116,10 +118,10 @@ export const IdentityDataFormConfig = () => {
       identity_end_date: userIdentityData?.identity_end_date,
       file_identity: userIdentityData?.file_identity,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: formT("submitButtonText"),
+    cancelButtonText: formT("cancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: formT("resetButtonText"),
     showSubmitLoader: true,
     resetOnSuccess: true,
     showCancelButton: false,

@@ -1,14 +1,16 @@
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
 import PreviewTextField from "../../../../../../components/previewTextField";
+import { useTranslations } from "next-intl";
 
 type PropsT = { bank: BankAccount };
 export default function UserProfileBankingDataReview({ bank }: PropsT) {
+  const t = useTranslations("UserProfile.tabs.FormLabels");
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          label="دولة البنك"
+          label={t("bankCountry")}
           value={bank?.country_name ?? ""}
           valid={Boolean(bank?.country_name)}
           type="select"
@@ -17,7 +19,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="اسم البنك"
+          label={t("bankName")}
           value={bank?.bank_name ?? ""}
           valid={Boolean(bank?.bank_name)}
           required
@@ -25,7 +27,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="الاسم الكامل لصاحب الحساب البنكي"
+          label={t("accountHolderName")}
           value={bank?.user_name ?? ""}
           valid={Boolean(bank?.user_name)}
           required
@@ -33,7 +35,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="نوع الحساب البنكي"
+          label={t("accountType")}
           value={bank?.bank_type_account?.name ?? ""}
           valid={Boolean(bank?.bank_type_account?.name)}
           required
@@ -41,7 +43,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="عملة الحساب"
+          label={t("accountCurrency")}
           value={bank?.currency_name ?? ""}
           valid={Boolean(bank?.currency_name)}
           required
@@ -49,7 +51,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="رقم الحساب البنكي"
+          label={t("accountNumber")}
           value={bank?.account_number ?? ""}
           valid={Boolean(bank?.account_number)}
           required
@@ -57,14 +59,14 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="IBAN"
+          label={t("iban")}
           value={bank?.iban ?? ""}
           valid={Boolean(bank?.iban)}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
-          label="رمز الـ SWIFT/BIC"
+          label={t("swiftBic")}
           value={bank?.swift_bic ?? ""}
           valid={Boolean(bank?.swift_bic)}
         />
