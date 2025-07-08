@@ -8,6 +8,7 @@ import {
 import DropdownSearch from "./DropdownSearch";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
+import { format } from "date-fns";
 
 interface ColumnSearchProps {
   columns: ColumnConfig[];
@@ -135,6 +136,30 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                     `Filter by ${column.label.toLowerCase()}`
                   }
                 />
+              );
+            
+            case "date":
+              return (
+                <div key={column.key} className="text-right" dir="rtl">
+                  <label
+                    htmlFor={`search-${column.key}`}
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right"
+                  >
+                    {column.label}
+                  </label>
+                  <Input
+                    id={`search-${column.key}`}
+                    type="date"
+                    placeholder={searchType.placeholder || `اختر ${column.label}`}
+                    value={typeof displayValue === 'string' ? displayValue : ''}
+                    onChange={(e) =>
+                      handleInputChange(column.key, e.target.value)
+                    }
+                    style={{ textAlign: 'right' }}
+                    className="w-full text-right"
+                    dir="rtl"
+                  />
+                </div>
               );
 
             case "text":

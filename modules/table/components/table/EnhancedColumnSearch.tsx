@@ -4,6 +4,7 @@ import { Input } from "@/modules/table/components/ui/input";
 import { ColumnConfig } from '@/modules/table/utils/tableConfig';
 import { ColumnSearchState, SearchTypeConfig } from '@/modules/table/utils/tableTypes';
 import DropdownSearch from './DropdownSearch';
+import { format } from 'date-fns';
 
 interface EnhancedColumnSearchProps {
   columns: ColumnConfig[];
@@ -89,6 +90,26 @@ const EnhancedColumnSearch: React.FC<EnhancedColumnSearchProps> = ({
                 dependencies={dependencies}
                 placeholder={searchType.placeholder || `Search ${column.label}...`}
               />
+            );
+            
+          case 'date':
+            return (
+              <div key={column.key} className="space-y-1">
+                <label 
+                  htmlFor={`search-${column.key}`} 
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  {column.label}
+                </label>
+                <Input
+                  id={`search-${column.key}`}
+                  type="date"
+                  placeholder={searchType.placeholder || `Select ${column.label}...`}
+                  value={typeof value === 'string' ? value : ''}
+                  onChange={(e) => handleSearchChange(column.key, e.target.value)}
+                  className="w-full"
+                />
+              </div>
             );
           
           case 'text':

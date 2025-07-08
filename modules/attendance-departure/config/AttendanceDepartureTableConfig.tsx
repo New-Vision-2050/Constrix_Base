@@ -83,6 +83,83 @@ export const getAttendanceDepartureTableConfig = () => {
         ),
       },
     ] as ColumnConfig[],
+    allSearchedFields: [
+      {
+        key: "search_text",
+        searchType: {
+          type: "text",
+          placeholder: "بحث",
+        },
+      },
+      {
+        key: "branch_id",
+        searchType: {
+          type: "dropdown",
+          placeholder: "الفرع",
+          dynamicDropdown: {
+            url: `${baseURL}/management_hierarchies/list`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
+        },
+      },
+      {
+        key: "management_id",
+        searchType: {
+          type: "dropdown",
+          placeholder: "الادارة",
+          dynamicDropdown: {
+            url: `${baseURL}/management_hierarchies/list`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
+        },
+      },
+      {
+        key: "constraint_id",
+        searchType: {
+          type: "dropdown",
+          placeholder: "المحدد",
+          dynamicDropdown: {
+            url: `${baseURL}/attendance/constraints`,
+            valueField: "id",
+            labelField: "constraint_name",
+            searchParam: "constraint_name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
+        },
+      },
+      {
+        key: "start_date",
+        searchType: {
+          type: "date",
+          placeholder: "تاريخ البداية",
+        },
+      },
+      {
+        key: "end_date",
+        searchType: {
+          type: "date",
+          placeholder: "تاريخ النهاية",
+        },
+      },
+    ],
     deleteConfirmMessage: "تأكيد حذف سجل الحضور والانصراف",
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,

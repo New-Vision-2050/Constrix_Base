@@ -19,7 +19,7 @@ function AttendanceContent() {
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Date selector */}
-      <AttendanceDateSelector />
+      {view === "map" && <AttendanceDateSelector />}
 
       {/* Statistics cards */}
       <AttendanceDepartureStatisticsCards />
