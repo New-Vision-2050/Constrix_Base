@@ -13,7 +13,8 @@ import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/Att
 
 // Internal component that uses the context
 function AttendanceContent() {
-  const { view, isEmployeeDialogOpen, selectedEmployee, closeEmployeeDialog } = useAttendance();
+  const { view, isEmployeeDialogOpen, selectedEmployee, closeEmployeeDialog } =
+    useAttendance();
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -23,21 +24,21 @@ function AttendanceContent() {
       {/* Statistics cards */}
       <AttendanceDepartureStatisticsCards />
 
-      {/* Search filter */}
-      <AttendanceDepartureSearchFilter />
-
       {/* Table or map */}
       {view === "table" ? (
         <AttendanceDepartureTable />
       ) : (
         <>
+          {/* Search filter */}
+          <AttendanceDepartureSearchFilter />
+
           <MapSearchFilter />
           <AttendanceMap />
         </>
       )}
-      
+
       {/* Employee details sheet dialog */}
-      <EmployeeDetailsSheet 
+      <EmployeeDetailsSheet
         isOpen={isEmployeeDialogOpen}
         onClose={closeEmployeeDialog}
         employee={selectedEmployee}

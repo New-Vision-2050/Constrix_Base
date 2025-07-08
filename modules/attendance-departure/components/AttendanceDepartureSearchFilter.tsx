@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { staticDepartments, staticApprovers } from "../constants/static-data";
+// لم نعد بحاجة إلى البيانات الثابتة، نستخدم البيانات من API
 import { useAttendance } from "../context/AttendanceContext";
 
 const AttendanceDepartureSearchFilter: React.FC = () => {
@@ -24,11 +24,13 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
     selectedBranch,
     setSelectedBranch,
     refetchTeamAttendance,
-    // جلب بيانات الفروع من Context
+    // جلب بيانات الفروع والمشرفين من Context
     branches,
     managements,
+    constraints,
     branchesLoading,
     managementsLoading,
+    constraintsLoading,
   } = useAttendance();
 
   // Handle search text change with debounce
@@ -83,7 +85,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
     [setSelectedBranch, refetchTeamAttendance]
   );
 
-  console.log("branches", branches);
+  console.log("constraints", constraints);
 
   return (
     <div className="p-4 bg-[#140F35] rounded-lg mb-4">
@@ -148,11 +150,15 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">الكل</SelectItem>
-            {staticApprovers.map((approver) => (
-              <SelectItem key={approver.value} value={approver.value}>
-                {approver.label}
-              </SelectItem>
-            ))}
+            {constraintsLoading ? (
+              <SelectItem value="loading" disabled>جاري تحميل المشرفين...</SelectItem>
+            ) : (
+              constraints?.map((constraint,index) => (
+                <SelectItem key={constraint.id+'-'+index} value={constraint.id}>
+                  {constraint.constraint_name}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
 

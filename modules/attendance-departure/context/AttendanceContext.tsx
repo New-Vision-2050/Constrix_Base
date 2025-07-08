@@ -17,6 +17,8 @@ import { SelectOption } from "@/types/select-option";
 import { useBranches } from "../hooks/useBranches";
 import { ManagementHierarchyItem, useManagementHierarchies } from "../hooks/useManagementHierarchies";
 import { useManagements } from "../hooks/useManagements";
+import { useConstraints } from "../hooks/useConstraints";
+import { Constraint } from "../api/getConstraints";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -64,6 +66,12 @@ interface AttendanceContextType {
   managementsLoading: boolean;
   managementsError: Error | null;
   refetchManagements: () => void;
+
+  // Constraints (approvers) data from API
+  constraints: Constraint[]|undefined;
+  constraintsLoading: boolean;
+  constraintsError: Error | null;
+  refetchConstraints: () => void;
   
   // Employee details dialog state
   isEmployeeDialogOpen: boolean;
@@ -206,6 +214,14 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     refetch: refetchManagements
   } = useManagements();
 
+  // Get constraints (approvers) data from API
+  const {
+    data: constraints,
+    isLoading: constraintsLoading,
+    error: constraintsError,
+    refetch: refetchConstraints
+  } = useConstraints();
+
   console.log('teamAttendancebranches',branches)
   
   // Employee details dialog state
@@ -293,6 +309,12 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     managementsLoading,
     managementsError,
     refetchManagements,
+    
+    // Constraints (approvers) data from API
+    constraints,
+    constraintsLoading,
+    constraintsError,
+    refetchConstraints,
     
     // Date range for filtering
     startDate,

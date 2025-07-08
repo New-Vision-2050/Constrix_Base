@@ -15,6 +15,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "user.name",
         label: "الاسم",
         sortable: true,
+        searchable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
           row.user?.name || "-",
       },
@@ -35,6 +36,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "professional_data.branch",
         label: "الفرع",
         sortable: true,
+        searchable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
           row.professional_data?.branch || "-",
       },
@@ -42,6 +44,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "professional_data.management",
         label: "الادارة",
         sortable: true,
+        searchable: true,
         render: (value: any, row: AttendanceStatusRecord) =>
           row.professional_data?.management || "-",
       },
@@ -56,6 +59,7 @@ export const getAttendanceDepartureTableConfig = () => {
         key: "approved_by_user",
         label: "المحدد المعتمد",
         sortable: true,
+        searchable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
           <ApproverBadge
             approver={row?.applied_constraints?.[0]?.name ?? "غير محدد"}

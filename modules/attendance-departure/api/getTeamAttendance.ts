@@ -44,9 +44,11 @@ export const getTeamAttendance = async (params?: GetTeamAttendanceParams): Promi
     // إضافة معلمة search_text بطريقة مضمونة
     // نتحقق من وجود الخاصية نفسها في كائن params بغض النظر عن قيمتها
     if ('search_text' in params) {
-      const searchValue = params.search_text || ''; // حتى لو كانت قيمتها undefined أو null، نستخدم سلسلة فارغة
-      console.log("Adding search_text param with value:", searchValue);
-      queryParams.append("user_search", searchValue);
+      if(params.search_text){
+        const searchValue = params.search_text || ''; // حتى لو كانت قيمتها undefined أو null، نستخدم سلسلة فارغة
+        console.log("Adding search_text param with value:", searchValue);
+        queryParams.append("user_search", searchValue);
+      }
     } else {
       console.log("search_text property is not present in params object!");
     }
