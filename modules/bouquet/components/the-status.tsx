@@ -23,7 +23,7 @@ const TheStatus = ({
 
   const handleConfirm = async (activationDate: string) => {
     try {
-      const response = await apiClient.put(`/company_access_programs/${id}/status`, {
+      const response = await apiClient.put(`/packages/${id}/status`, {
         status: tempIsActive,
       })  ;
 
@@ -72,7 +72,7 @@ const TheStatus = ({
           onClose={handleCancel}
           onConfirm={handleConfirm}
           // title={isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
-          description={!isActive ? t("Programs.AreYouSureReactivate") : t("Programs.AreYouSureDeactivate")}
+          description={!isActive ? t("Bouquets.AreYouSureReactivate") : t("Bouquets.AreYouSureDeactivate")}
         />
       </Dialog>
     </>

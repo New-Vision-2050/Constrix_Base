@@ -9,7 +9,7 @@ import TheStatus from "@/modules/programs/components/the-status";
 export interface ProgramTableRow {
   id: string;
   name: string;
-  features_count: number;
+  programs_count: number;
   packages_count: number;
   company_fields_count: number;
   is_active: "active" | "inActive";
@@ -21,7 +21,7 @@ export const programsConfig = () => {
   const router = useRouter();
 
   return {
-    url: `${baseURL}/program_systems`,
+    url: `${baseURL}/company_access_programs`,
     tableId: "program-systems-table", // Add tableId to the config
     columns: [
       {
@@ -41,11 +41,11 @@ export const programsConfig = () => {
         ),
       },
       {
-        key: "features_count",
+        key: "programs_count",
         label: "عدد البرامج",
         // sortable: true,
         render: (_: unknown, row: ProgramTableRow) => (
-          <p className="font-medium">{row.features_count}</p>
+          <p className="font-medium">{row.programs_count}</p>
         ),
       },
       {
@@ -123,7 +123,7 @@ export const programsConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    deleteUrl: `${baseURL}/program_systems`,
+    deleteUrl: `${baseURL}/company_access_programs`,
     formConfig: GetProgramFormConfig(t),
     executionConfig: {
       canEdit: true,
