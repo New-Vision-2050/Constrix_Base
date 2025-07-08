@@ -4,15 +4,40 @@ import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-m
 import {useTranslations} from "next-intl";
 import axios from "axios";
 
-// Define interfaces for the dynamic options
-interface SubEntity {
-  id: string | number;
+// Define interfaces matching the user's API structure
+export interface Root {
+  code: string;
+  message: any;
+  payload: Payload[];
+}
+
+export interface Payload {
+  id: string;
   name: string;
-  options: Array<{
-    id: string | number;
-    name: string;
-    [key: string]: any;
-  }>;
+  slug: string;
+  is_active: number;
+  sub_entities: SubEntity[];
+  children: any[];
+}
+
+export interface SubEntity {
+  id: string;
+  name: string;
+  slug: string;
+  main_program_id: string;
+  super_entity: string;
+  origin_super_entity: string;
+  is_active: number;
+  children: any[];
+}
+
+// Interface for checkbox options
+interface SubProgramOption {
+  id: string;
+  name: string;
+  value: string;
+  label: string;
+  parentId?: string;
   [key: string]: any;
 }
 
@@ -38,38 +63,56 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
   const generateDynamicFields = async (): Promise<FieldConfig[]> => {
     try {
       // Fetch data from API
-      const response = await apiClient.get(`${baseURL}/programs/sub_entities/list`);
+      const response = await apiClient.get(`${baseURL}/programs/sub_entities/select/list`);
       console.log('API Response:', response.data);
       
       // Array to store generated fields
       const generatedData: FieldConfig[] = [];
       
       // Process the response data
-      if (Array.isArray(response.data)) {
-        // Process each main program
-        response.data.forEach((program: any) => {
-          // Check if the program has sub_entities
-          if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
-            // Create options array from sub_entities
-            const options = program.sub_entities.map((subEntity: any) => ({
+      const programs = Array.isArray(response.data) 
+        ? response.data 
+        : (response.data?.payload && Array.isArray(response.data.payload)) 
+          ? response.data.payload 
+          : [];
+          
+      // Process each main program
+      programs.forEach((program: Payload) => {
+        // Check if the program has sub_entities (subprograms) and they are not empty
+        if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
+          // Filter out inactive or empty sub-entities if needed
+          const activeSubEntities = program.sub_entities.filter((subEntity: SubEntity) => 
+            subEntity.name && subEntity.name.trim() !== ''
+          );
+          
+          // Only create checkboxGroup if there are active sub-entities
+          if (activeSubEntities.length > 0) {
+            // Create subprogram options from active sub_entities
+            const subProgramOptions: SubProgramOption[] = activeSubEntities.map((subEntity: SubEntity) => ({
               id: subEntity.id,
               name: subEntity.name,
-              // Include any additional fields needed
               value: subEntity.id,
-              label: subEntity.name
+              label: subEntity.name,
+              parentId: program.id
             }));
             
-            // Add a checkboxGroup for the main program with its sub-entities as options
+            // Create main program checkboxGroup with subprograms as options
             generatedData.push({
               type: "checkboxGroup" as const,
               name: `program_${program.id}`,
-              label: program.name,
-              optionsTitle: program.name,
-              options: options,
-              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
+              label: program.name, // Main program name from Payload
+              optionsTitle: `${program.name}`,
+              isMulti: true,
+              options: subProgramOptions,
+              className: "font-bold text-xl border-b border-border pb-2 mb-4 mt-6",
+              onChange: (value: any, formState: any) => {
+                // Optional: Add any custom logic when subprograms are selected/deselected
+                console.log(`Selected subprograms for ${program.name}:`, value);
+                return value;
+              }
             });
             
-            // Store program sub_entities in a hidden field for reference
+            // Store program data in a hidden field for reference
             generatedData.push({
               type: "hiddenObject" as const,
               name: `program_data_${program.id}`,
@@ -77,66 +120,16 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
               defaultValue: {
                 programId: program.id,
                 programName: program.name,
-                subEntities: program.sub_entities
+                programSlug: program.slug,
+                isActive: program.is_active,
+                subEntities: activeSubEntities
               }
             });
-          } else {
-            // For programs without sub-entities, just show a regular checkbox
-            generatedData.push({
-              type: "checkbox" as const,
-              name: `program_${program.id}`,
-              label: program.name,
-              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
-            });
           }
-        });
-      } else if (response.data && response.data.payload && Array.isArray(response.data.payload)) {
-        // Alternative response structure
-        response.data.payload.forEach((program: any) => {
-          // Check if the program has sub_entities
-          if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
-            // Create options array from sub_entities
-            const options = program.sub_entities.map((subEntity: any) => ({
-              id: subEntity.id,
-              name: subEntity.name,
-              // Include any additional fields needed
-              value: subEntity.id,
-              label: subEntity.name
-            }));
-            
-            // Add a checkboxGroup for the main program with its sub-entities as options
-            generatedData.push({
-              type: "checkboxGroup" as const,
-              name: `program_${program.id}`,
-              label: program.name,
-              isMulti:true,
-              optionsTitle: program.name,
-              options: options,
-              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
-            });
-            
-            // Store program sub_entities in a hidden field for reference
-            generatedData.push({
-              type: "hiddenObject" as const,
-              name: `program_data_${program.id}`,
-              label: "",
-              defaultValue: {
-                programId: program.id,
-                programName: program.name,
-                subEntities: program.sub_entities
-              }
-            });
-          } else {
-            // For programs without sub-entities, just show a regular checkbox
-            generatedData.push({
-              type: "checkbox" as const,
-              name: `program_${program.id}`,
-              label: program.name,
-              className: "font-bold text-lg border-b border-border pb-2 mb-2 mt-6"
-            });
-          }
-        });
-      } else {
+        }
+      });
+      
+      if (programs.length === 0) {
         console.error('Unexpected API response structure:', response.data);
       }
       
@@ -178,6 +171,60 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
           },
           // Add all dynamically generated checkbox fields
           ...dynamicFields
+          ,  {
+            name: "company_types",
+            label: "الكيانات",
+            type: "select",
+            isMulti: true,
+            placeholder: "اختر الكيانات",
+            dynamicOptions: {
+              url: `${baseURL}/company_types`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+          },
+          {
+            name: "company_fields",
+            label: "مجالات ظهور البرنامج",
+            type: "select",
+            isMulti: true,
+            placeholder: "اختر مجالات ظهور البرنامج",
+            dynamicOptions: {
+              url: `${baseURL}/company_fields`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+          },
+           {
+            name: "country_id",
+            label: "دول الظهور",
+            type: "select",
+            isMulti: true,
+            placeholder: "اختر دول الظهور",
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+          },
         ],
       },
     ],

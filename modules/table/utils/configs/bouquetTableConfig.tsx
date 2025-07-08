@@ -2,40 +2,47 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import React from "react";
 import GearIcon from "@/public/icons/gear";
-import TheStatus from "@/app/[locale]/(main)/companies/cells/the-status";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
+import TheStatus from "@/modules/bouquet/components/the-status";
+import { GetBouquetFormConfig } from "@/modules/form-builder/configs/bouquetFormConfig";
 
 // Define types for the bouquet data
 interface BouquetData {
   id: string;
   name: string;
+  features_count: string;
   price: string;
-  status: string;
+  subscription_period : string;
+  status: string; 
   features: string[];
   duration: string;
   category: string;
 }
 
 export interface BouquetTableRow {
-  id: string;
-  name: string;
-  price: string;
-  status: "active" | "inActive";
-  features_count: number;
-  duration: string;
-  category: string;
-  created_at: string;
+  id: string
+  name: string
+  status: boolean
+  features_count: number
+  price: string
+  currency: string
+  subscription_period: number
+  subscription_period_unit: string
+  company_fields: CompanyField[]
   [key: string]: any; // For any other properties
 }
-
+export interface CompanyField {
+  id: string
+  name: string
+}
 // Create a component that uses the translations
 export const bouquetConfig = () => {
   const t = useTranslations("Bouquets");
   const router = useRouter();
 
   return {
-    url: `${baseURL}/bouquets`,
+    url: `${baseURL}/packages`,
     tableId: "bouquets-table",
     columns: [
       {
@@ -54,70 +61,98 @@ export const bouquetConfig = () => {
         ),
       },
       {
-        key: "price",
-        label: "عدد الخدمات",
-        render: (_: unknown, row: BouquetTableRow) => (
-          <p className="font-medium">{row.price}</p>
-        ),
-      },
-      {
         key: "features_count",
-        label: "عدد قيمة الاشتراك",
+        label: "عدد الخدمات",
         render: (_: unknown, row: BouquetTableRow) => (
           <p className="font-medium">{row.features_count}</p>
         ),
       },
       {
-        key: "duration",
-        label: "مدة الاشتراك ",
+        key: "price",
+        label: "قيمة الاشتراك",
         render: (_: unknown, row: BouquetTableRow) => (
-          <p className="font-medium">{row.duration}</p>
+          <p className="font-medium">{row.price}</p>
         ),
       },
       {
-        key: "category",
+        key: "subscription_period",
+        label: "مدة الاشتراك ",
+        render: (_: unknown, row: BouquetTableRow) => (
+          <p className="font-medium">{row.subscription_period}</p>
+        ),
+      },
+      {
+        key: "company_fields",
         label: "مجالات الباقة",
         render: (_: unknown, row: BouquetTableRow) => (
-          <p className="font-medium">{row.category}</p>
+          <p className="font-medium">{row.company_fields.map((field) => field.name).join(", ")}</p>
         ),
       },
       {
         key: "status",
         label: "الحالة",
         render: (_: unknown, row: BouquetTableRow) => (
-          <TheStatus theStatus={row.status} id={row.id} />
+          <TheStatus theStatus={row.status ? "active" : "inActive"} id={row.id} />
         ),
       },
-      {
-        key: "actions",
-        label: "الإجراءات",
-        render: (_: unknown, row: BouquetTableRow) => (
-          <div className="flex items-center gap-2">
-            <button 
-              className="p-1 hover:bg-gray-100 rounded"
-              onClick={() => console.log("Edit bouquet:", row)}
-            >
-              <GearIcon className="w-4 h-4" />
-            </button>
-          </div>
-        ),
-      },
+     
     ],
-    actions: [
-      {
-        key: "edit",
-        label: "تعديل",
-        onClick: (row: BouquetTableRow) => {
-          console.log("Edit bouquet:", row);
-        },
-      },
-      {
-        key: "delete",
-        label: "حذف",
-        onClick: (row: BouquetTableRow) => {
-          console.log("Delete bouquet:", row);
-        },
-      },
-    ],
+     allSearchedFields: [
+          {
+            key: "name",
+            searchType: {
+              type: "text",
+              placeholder: "اسم الباقة",
+            },
+          },
+          {
+            key: "company_field_id",
+            searchType: {
+              type: "dropdown",
+              placeholder: "المجال",
+              dynamicDropdown: {
+                url: `${baseURL}/company_fields`,
+                valueField: "id",
+                isMulti: true,
+                labelField: "name",
+                paginationEnabled: true,
+                itemsPerPage: 20,
+                searchParam: "name",
+                pageParam: "page",
+                limitParam: "per_page",
+                totalCountHeader: "x-total-count",
+              },
+            },
+          },
+           {
+            key: "status",
+            searchType: {
+              type: "dropdown",
+              placeholder: "الحالة",
+              dropdownOptions: [
+                { value: "1", label: "نشط" },
+                { value: "0", label: "غير نشط" },
+              ],
+            },
+          },
+       
+        ],
+    defaultSortColumn: "id",
+        defaultSortDirection: "asc" as const,
+        enableSorting: true,
+        enablePagination: true,
+        defaultItemsPerPage: 5,
+        enableSearch: true,
+        enableColumnSearch: true,
+        searchFields: ["name", "email"],
+        searchParamName: "q",
+        searchFieldParamName: "fields",
+        allowSearchFieldSelection: true,
+        deleteUrl: `${baseURL}/packages`,
+        formConfig: GetBouquetFormConfig(t),
+        executionConfig: {
+          canEdit: true,
+          canDelete: true,
+    },
   };
 };

@@ -1,13 +1,19 @@
 import {FormConfig, useFormStore} from "@/modules/form-builder";
-import { baseURL } from "@/config/axios-config";
+import { apiClient, baseURL } from "@/config/axios-config";
 import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
+import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 
 export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
+  // Get ID from URL parameters
+  const params = useParams();
+  const id = params?.id 
+  
+
+  
     return {
       formId: "bouquet-form",
-      title: "اضافة باقة",
-      apiUrl: `${baseURL}/bouquets`,
       laravelValidation: {
         enabled: true,
         errorsPath: "errors", // This is the default in Laravel
@@ -23,20 +29,53 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
               placeholder: "اسم الباقة",
               required: true,
             },
+             {
+              name: "currency",
+              label: "currency",
+              placeholder: "currency",
+              type: "hiddenObject",
+             
+            },
             {
               name: "price",
               label: "قيمة الاشتراك",
               type: "number",
-              placeholder: "قيمة الاشتراك",
+              placeholder: "أدخل قيمة الاشتراك",
               required: true,
+              defaultValue: "12",
               postfix: (
-                <div className="flex items-center px-3 text-gray-500">
-                  ر.س
+                <div className="w-full h-full">
+                  <select
+                    className="rounded-lg p-2 bg-transparent border-0 outline-none"
+                    defaultValue="EGP"
+                    onChange={(e) => {
+                      useFormStore
+                        .getState()
+                        .setValues("bouquet-form", {
+                          currency: e.target.value,
+                        });
+                    }}
+                  >
+                    <option value="USD" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                    ر.س
+                    </option>
+                    <option value="EGP" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                    ج.م
+                    </option>
+                  </select>
                 </div>
               ),
             },
+           
             {
-              name: "duration",
+            name: "subscription_period_unit",
+            label: "subscription_period_unit",
+            placeholder: "subscription_period_unit",
+            type: "hiddenObject",
+           
+            },
+            {
+              name: "subscription_period",
               label: "مدة الاشتراك",
               type: "number",
               placeholder: "أدخل مدة الاشتراك",
@@ -51,7 +90,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
                       useFormStore
                         .getState()
                         .setValues("bouquet-form", {
-                          duration_unit: e.target.value,
+                          subscription_period_unit: e.target.value,
                         });
                     }}
                   >
@@ -71,75 +110,87 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
                 </div>
               ),
             },
+           
             {
-              name: "duration_unit",
+              name: "trial_period_unit",
+              label: "trial_period_unit",
+              placeholder: "trial_period_unit",
               type: "hiddenObject",
-              label: "duration_unit",
-              defaultValue: "month",
+             
             },
             {
-              name: "category",
-              label: "مجالات الباقة",
-              type: "select",
-              placeholder: "اختر مجال الباقة",
-              required: true,
-              options: [
-                { value: "هندسي", label: "هندسي" },
-                { value: "إداري", label: "إداري" },
-                { value: "مالي", label: "مالي" },
-                { value: "تقني", label: "تقني" },
-                { value: "تسويقي", label: "تسويقي" },
-                { value: "قانوني", label: "قانوني" },
-                { value: "طبي", label: "طبي" },
-                { value: "تعليمي", label: "تعليمي" },
-              ],
-            },
-            {
-              name: "features_count",
-              label: "عدد الخدمات",
+              name: "trial_period",
+              label: "مدة الفترة التجريبية",
               type: "number",
-              placeholder: "عدد الخدمات المتاحة",
+              placeholder: "أدخل مدة الفترة التجريبية",
               required: true,
+              defaultValue: "12",
+              postfix: (
+                <div className="w-full h-full">
+                  <select
+                    className="rounded-lg p-2 bg-transparent border-0 outline-none"
+                    defaultValue="month"
+                    onChange={(e) => {
+                      useFormStore
+                        .getState()
+                        .setValues("bouquet-form", {
+                          trial_period_unit: e.target.value,
+                        });
+                    }}
+                  >
+                    <option value="day" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                      يوم
+                    </option>
+                    <option value="week" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                      أسبوع
+                    </option>
+                    <option value="month" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                      شهر
+                    </option>
+                    <option value="year" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                      سنة
+                    </option>
+                  </select>
+                </div>
+              ),
             },
-            {
-              name: "description",
-              label: "وصف الباقة",
-              type: "textarea",
-              placeholder: "وصف تفصيلي للباقة",
-              required: false,
+          
+          {
+            name: "company_fields",
+            label: "مجالات ظهور البرنامج",
+            type: "select",
+            isMulti: true,
+            placeholder: "اختر مجالات ظهور البرنامج",
+            dynamicOptions: {
+              url: `${baseURL}/company_fields?company_access_program_id=${id}`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
-            {
-              type: "checkboxGroup",
-              name: "features",
-              label: "",
-              optionsTitle: "الخدمات المتاحة",
-              isMulti: true,
-              fieldClassName:
-                "bg-background border border-border rounded-md p-2",
-              dynamicOptions: {
-                url: `${baseURL}/services`,
-                valueField: "id",
-                labelField: "name",
-                searchParam: "name",
-                paginationEnabled: true,
-                pageParam: "page",
-                limitParam: "per_page",
-                itemsPerPage: 10,
-                totalCountHeader: "X-Total-Count",
-              },
+          },
+           {
+            name: "countries",
+            label: "دول الظهور",
+            type: "select",
+            isMulti: true,
+            placeholder: "اختر دول الظهور",
+            dynamicOptions: {
+              url: `${baseURL}/countries?company_access_program_id=${id}`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
             },
-            {
-              name: "status",
-              label: "حالة الباقة",
-              type: "select",
-              placeholder: "اختر حالة الباقة",
-              required: true,
-              defaultValue: "active",
-              options: [
-                { value: "active", label: "نشط" },
-                { value: "inActive", label: "غير نشط" },
-              ],
-            },
+          },
           ],
         },
       ],
@@ -176,7 +227,45 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
         // - Trigger analytics events
         // - etc.
       },
-
+      onSubmit: async (formData: Record<string, unknown>) => {
+        // Log the form data
+        console.log("Form data received:", formData);
+        
+        try {
+          // Transform form data to match API structure
+          const requestBody = {
+            company_access_program_id: id,
+            name: formData.name as string,
+            price: Number(formData.price) || 0,
+            currency: formData.currency as string,
+            subscription_period: Number(formData.subscription_period) || 0,
+            subscription_period_unit: formData.subscription_period_unit as string,
+            trial_period: Number(formData.trial_period) || 0,
+            trial_period_unit: formData.trial_period_unit as string,
+            countries: Array.isArray(formData.countries) ? formData.countries as string[] : [],
+            company_fields: Array.isArray(formData.company_fields) ? formData.company_fields as string[] : [],
+            company_types: Array.isArray(formData.company_types) ? formData.company_types as string[] : []
+          };
+          
+          
+          // Make API call to packages endpoint
+          const response = await apiClient.post(`${baseURL}/packages`, requestBody);
+          
+          
+          return {
+            success: true,
+            message: "Package created successfully",
+            data: response.data
+          };
+        } catch (error) {
+          console.error("Failed to create package:", error);
+          return {
+            success: false,
+            message: "Failed to create package"
+          };
+        }
+      },
+      
       // Example onError handler
       onError: (values, error) => {
         console.log("Bouquet form submission failed with values:", values);
