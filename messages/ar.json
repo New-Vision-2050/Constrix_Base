@@ -313,7 +313,9 @@
         "passportNumber": "رقم جواز السفر",
         "issueDate": "تاريخ الانشاء",
         "expiryDate": "تاريخ الانتهاء",
-        "identityAttachment": "ارفاق الهوية"
+        "identityAttachment": "ارفاق الهوية",
+        "identityNumber": "رقم الهوية",
+        "entryDate": "تاريخ الدخول"
       },
       "PersonalDataForm": {
         "title": "بيانات شخصية",

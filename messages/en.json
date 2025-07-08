@@ -313,7 +313,9 @@
         "passportNumber": "Passport Number",
         "issueDate": "Issue Date",
         "expiryDate": "Expiry Date",
-        "identityAttachment": "Identity Attachment"
+        "identityAttachment": "Identity Attachment",
+        "identityNumber": "Identity Number",
+        "entryDate": "Entry Date"
       },
       "PersonalDataForm": {
         "title": "Personal Data",
