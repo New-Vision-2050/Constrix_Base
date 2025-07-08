@@ -264,6 +264,7 @@
           "cv": "CV"
         }
       },
+
       "IdentityDataForm": {
         "title": "Identity Data",
         "sectionTitle": "Identity Information",
@@ -313,7 +314,14 @@
         "invalidOtp": "Invalid verification code",
         "confirm": "Confirm",
         "resend": "Resend",
-        "changeSuccess": "Changed successfully"
+        "changeSuccess": "Changed successfully",
+        "alternativePhone": "Alternative Phone",
+        "landlineNumber": "Landline Number",
+        "enterValidEmail": "Please enter a valid email",
+        "enterValidPhone": "Please enter a valid phone number",
+        "formTitle": "Contact Information",
+        "save": "Save",
+        "reset": "Reset"
       },
       "CommonSections": {
         "noData": "No Data",
