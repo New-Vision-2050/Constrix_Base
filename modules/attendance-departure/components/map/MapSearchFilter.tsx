@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download, Search } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
+import { useTranslations } from "next-intl";
 
 const MapSearchFilter: React.FC = () => {
+  const t = useTranslations("AttendanceDepartureModule.MapSearchFilter");
   const { toggleView, searchText, setSearchText } = useAttendance();
   
   // معالجة تغيير قيمة البحث
@@ -18,7 +20,7 @@ const MapSearchFilter: React.FC = () => {
     <div className="flex items-center justify-between w-full h-[60px] bg-[#140F35] rounded-lg px-4 gap-2">
       <div className="flex-grow relative">
         <Input
-          placeholder="البحث"
+          placeholder={t("searchPlaceholder")}
           value={searchText}
           onChange={handleSearchChange}
           className="bg-[#21174A] text-white border-transparent h-[36px] rounded-md w-full placeholder:text-gray-400 focus:border-[#7453F0] focus:ring-[#7453F0] flex-grow"
@@ -33,11 +35,11 @@ const MapSearchFilter: React.FC = () => {
           size="sm"
           onClick={() => toggleView("table")}
         >
-          الجدول
+          {t("tableView")}
         </Button>
         <Button variant="outline" size="sm" disabled>
           <Download className="mr-2 h-4 w-4" />
-          تصدير
+          {t("export")}
         </Button>
       </div>
     </div>

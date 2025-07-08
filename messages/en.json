@@ -439,6 +439,11 @@
       "search": "Search",
       "clearFilters": "Clear Filters"
     },
+    "MapSearchFilter": {
+      "searchPlaceholder": "Search",
+      "tableView": "Table",
+      "export": "Export"
+    },
     "SearchFilter": {
       "title": "Search Filter",
       "branch": "Branch",

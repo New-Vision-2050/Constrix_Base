@@ -439,6 +439,11 @@
       "search": "بحث",
       "clearFilters": "مسح الفلاتر"
     },
+    "MapSearchFilter": {
+      "searchPlaceholder": "البحث",
+      "tableView": "الجدول",
+      "export": "تصدير"
+    },
     "SearchFilter": {
       "title": "فلتر البحث",
       "branch": "الفرع",
