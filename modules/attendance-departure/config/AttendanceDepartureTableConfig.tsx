@@ -151,6 +151,9 @@ export const getAttendanceDepartureTableConfig = () => {
           type: "date",
           placeholder: "تاريخ البداية",
         },
+        onChange: (value: any) => {
+          console.log('valuevaluevaluevaluevalue',value);
+        },
       },
       {
         key: "end_date",

@@ -10,7 +10,7 @@ type ConstraintList = Constraint[];
 type ResponseT = {
   code: string;
   message: string;
-  payload: ConstraintList[];
+  payload: Constraint[];
 };
 
 /**
@@ -20,5 +20,5 @@ type ResponseT = {
 export default async function getConstraints() {
   const res = await apiClient.get<ResponseT>("/attendance/constraints");
 
-  return res.data.payload?.[0];
+  return res.data.payload;
 }
