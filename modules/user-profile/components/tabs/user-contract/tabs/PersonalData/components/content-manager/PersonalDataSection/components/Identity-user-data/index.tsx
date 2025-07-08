@@ -2,15 +2,17 @@ import UserProfileConnectionDataEditForm from "./edit-mode";
 import UserProfileIdentityDataReview from "./preview-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import { useTranslations } from "next-intl";
 
 export default function IdentityDataSectionPersonalForm() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.tabs.CommonSections");
 
   return (
     <TabTemplate
-      title={"البيانات الهوية"}
+      title={t("identityData")}
       loading={userIdentityDataLoading}
       reviewMode={<UserProfileIdentityDataReview />}
       editMode={<UserProfileConnectionDataEditForm />}
@@ -19,8 +21,8 @@ export default function IdentityDataSectionPersonalForm() {
       }}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
+          { title: t("myRequests"), onClick: () => {} ,disabled:true},
+          { title: t("createRequest"), onClick: () => {},disabled:true },
         ],
       }}
     />

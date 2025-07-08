@@ -264,6 +264,19 @@
           "cv": "CV"
         }
       },
+      "IdentityDataForm": {
+        "title": "Identity Data",
+        "sectionTitle": "Identity Information",
+        "identityNumberRequired": "Identity number is required",
+        "identityNumberPatternStart": "Identity number must start with 1 or 2",
+        "identityNumberLength": "Identity number must be 10 digits",
+        "identityNumberDigitsOnly": "Identity number must contain only digits",
+        "entryDateRequired": "Issue date is required",
+        "expiryDateRequired": "Expiry date is required",
+        "submitButtonText": "Save",
+        "cancelButtonText": "Cancel",
+        "resetButtonText": "Reset"
+      },
       "PassportDataForm": {
         "title": "Passport Data",
         "passportNumber": "Passport Number",

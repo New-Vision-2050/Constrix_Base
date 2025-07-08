@@ -264,6 +264,19 @@
           "cv": "السيرة الذاتية"
         }
       },
+      "IdentityDataForm": {
+        "title": "بيانات الهوية",
+        "sectionTitle": "بيانات الهوية",
+        "identityNumberRequired": "رقم الهوية مطلوب",
+        "identityNumberPatternStart": "يجب أن يبدأ رقم الهوية بـ 1 أو 2",
+        "identityNumberLength": "يجب أن يتكون رقم الهوية من 10 أرقام",
+        "identityNumberDigitsOnly": "يجب أن يحتوي رقم الهوية على أرقام فقط",
+        "entryDateRequired": "تاريخ الإصدار مطلوب",
+        "expiryDateRequired": "تاريخ الانتهاء مطلوب",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء",
+        "resetButtonText": "إعادة تعيين"
+      },
       "PassportDataForm": {
         "title": "بيانات جواز السفر",
         "passportNumber": "رقم جواز السفر",
