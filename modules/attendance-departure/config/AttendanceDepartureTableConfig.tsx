@@ -150,9 +150,7 @@ export const getAttendanceDepartureTableConfig = () => {
         searchType: {
           type: "date",
           placeholder: "تاريخ البداية",
-        },
-        onChange: (value: any) => {
-          console.log('valuevaluevaluevaluevalue',value);
+          defaultValue: new Date(),
         },
       },
       {
@@ -160,6 +158,7 @@ export const getAttendanceDepartureTableConfig = () => {
         searchType: {
           type: "date",
           placeholder: "تاريخ النهاية",
+          defaultValue: new Date(),
         },
       },
     ],

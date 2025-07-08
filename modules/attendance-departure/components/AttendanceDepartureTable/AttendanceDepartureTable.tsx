@@ -1,13 +1,41 @@
 'use client'
-import React from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import TableBuilder from "@/modules/table/components/TableBuilder";
 import { getAttendanceDepartureTableConfig } from "../../config/AttendanceDepartureTableConfig";
 import { Button } from "@/components/ui/button";
 import { useAttendance } from "../../context/AttendanceContext";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 const AttendanceDepartureTable: React.FC = () => {
   // declare state & vars
-  const { toggleView } = useAttendance();
+  const { toggleView, setStartDate, setEndDate } = useAttendance();
+  const tableId = useMemo(() => getAttendanceDepartureTableConfig().tableId || 'default', []);
+  
+  // استخدام نهج مختلف للوصول إلى حالة العمود لتجنب الحلقة اللانهائية
+  const tables = useTableStore((state) => state.tables);
+  const columnSearchState = useMemo(() => {
+    const tableState = tables[tableId];
+    return tableState ? tableState.columnSearchState : {};
+  }, [tables, tableId]);
+
+  // عند تغيير حالة البحث، نقوم بتحديث الكونتكست
+  useEffect(() => {
+    if (columnSearchState) {
+      // تحديث تاريخ البداية إذا تغير
+      if (columnSearchState['start_date'] && typeof columnSearchState['start_date'] === 'string') {
+        const dateValue = columnSearchState['start_date'];
+        console.log('تم تحديث تاريخ البداية في الكونتكست:', dateValue);
+        setStartDate(new Date(dateValue));
+      }
+      
+      // تحديث تاريخ النهاية إذا تغير
+      if (columnSearchState['end_date'] && typeof columnSearchState['end_date'] === 'string') {
+        const dateValue = columnSearchState['end_date'];
+        console.log('تم تحديث تاريخ النهاية في الكونتكست:', dateValue);
+        setEndDate(new Date(dateValue));
+      }
+    }
+  }, [columnSearchState, setStartDate, setEndDate]);
 
   // render
   return (
