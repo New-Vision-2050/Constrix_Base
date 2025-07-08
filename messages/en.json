@@ -264,8 +264,26 @@
           "cv": "CV"
         }
       },
+      "PassportDataForm": {
+        "title": "Passport Data",
+        "passportNumber": "Passport Number",
+        "passportNumberPlaceholder": "Enter passport number",
+        "passportNumberRequired": "Passport number is required",
+        "passportNumberPattern": "Passport number must contain only letters and numbers (6-20 characters)",
+        "issueDate": "Issue Date",
+        "issueDatePlaceholder": "Select issue date",
+        "issueDateRequired": "Issue date is required",
+        "expiryDate": "Expiry Date",
+        "expiryDatePlaceholder": "Select expiry date",
+        "expiryDateRequired": "Expiry date is required",
+        "identityAttachment": "Passport Attachment",
+        "identityAttachmentPlaceholder": "Attach passport",
+        "submitButtonText": "Save",
+        "cancelButtonText": "Cancel",
+        "resetButtonText": "Reset"
+      },
       "ConnectionDataSection": {
-        "title": "Connection Data",
+        "title": "Contact Information",
         "changePhone": "Change Phone Number",
         "phoneNumber": "Phone Number",
         "phoneRequired": "Phone number is required",
@@ -391,24 +409,6 @@
         "swiftBic": "SWIFT Code",
         "swiftBicPlaceholder": "Enter SWIFT Code",
         "swiftBicInvalid": "Invalid SWIFT Code",
-        "submitButtonText": "Save",
-        "cancelButtonText": "Cancel",
-        "resetButtonText": "Reset"
-      },
-      "PassportDataForm": {
-        "title": "Passport Data",
-        "passportNumber": "Passport Number",
-        "passportNumberPlaceholder": "Enter passport number",
-        "passportNumberRequired": "Passport number is required",
-        "passportNumberPattern": "Passport number must be 6-20 letters or numbers",
-        "issueDate": "Issue Date",
-        "issueDatePlaceholder": "Select issue date",
-        "issueDateRequired": "Issue date is required",
-        "expiryDate": "Expiry Date",
-        "expiryDatePlaceholder": "Select expiry date",
-        "expiryDateRequired": "Expiry date is required",
-        "identityAttachment": "Identity Attachment",
-        "identityAttachmentPlaceholder": "Attach identity document",
         "submitButtonText": "Save",
         "cancelButtonText": "Cancel",
         "resetButtonText": "Reset"

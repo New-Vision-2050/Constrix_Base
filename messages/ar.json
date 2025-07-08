@@ -264,6 +264,24 @@
           "cv": "السيرة الذاتية"
         }
       },
+      "PassportDataForm": {
+        "title": "بيانات جواز السفر",
+        "passportNumber": "رقم جواز السفر",
+        "passportNumberPlaceholder": "أدخل رقم جواز السفر",
+        "passportNumberRequired": "رقم جواز السفر مطلوب",
+        "passportNumberPattern": "يجب أن يحتوي رقم جواز السفر على أحرف وأرقام فقط (6-20 حرف)",
+        "issueDate": "تاريخ الإصدار",
+        "issueDatePlaceholder": "اختر تاريخ الإصدار",
+        "issueDateRequired": "تاريخ الإصدار مطلوب",
+        "expiryDate": "تاريخ الانتهاء",
+        "expiryDatePlaceholder": "اختر تاريخ الانتهاء",
+        "expiryDateRequired": "تاريخ الانتهاء مطلوب",
+        "identityAttachment": "إرفاق جواز السفر",
+        "identityAttachmentPlaceholder": "إرفاق جواز السفر",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء",
+        "resetButtonText": "إعادة تعيين"
+      },
       "ConnectionDataSection": {
         "title": "بيانات الاتصال",
         "changePhone": "تغيير رقم الجوال",
@@ -390,24 +408,6 @@
         "swiftBic": "كود ال swift",
         "swiftBicPlaceholder": "اختر كود ال swift",
         "swiftBicInvalid": "كود SWIFT غير صالح",
-        "submitButtonText": "حفظ",
-        "cancelButtonText": "إلغاء",
-        "resetButtonText": "إعادة تعيين"
-      },
-      "PassportDataForm": {
-        "title": "بيانات جواز السفر",
-        "passportNumber": "رقم جواز السغر",
-        "passportNumberPlaceholder": "رقم جواز السغر",
-        "passportNumberRequired": "رقم الجواز مطلوب",
-        "passportNumberPattern": "رقم الجواز يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
-        "issueDate": "تاريخ الأستلام",
-        "issueDatePlaceholder": "تاريخ الأستلام",
-        "issueDateRequired": "تاريخ الأستلام مطلوب",
-        "expiryDate": "تاريخ الأنتهاء",
-        "expiryDatePlaceholder": "تاريخ الأنتهاء",
-        "expiryDateRequired": "تاريخ الأنتهاء مطلوب",
-        "identityAttachment": "ارفاق الهوية",
-        "identityAttachmentPlaceholder": "ارفاق الهوية",
         "submitButtonText": "حفظ",
         "cancelButtonText": "إلغاء",
         "resetButtonText": "إعادة تعيين"
