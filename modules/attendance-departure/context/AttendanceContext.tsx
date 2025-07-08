@@ -6,12 +6,17 @@ import React, {
   useState,
   ReactNode,
   useCallback,
+  useEffect,
 } from "react";
 import { EmployeeDetails } from "../types/employee";
 import { AttendanceStatusRecord } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
 import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
 import { AttendanceSummaryData } from "../api/attendanceSummary";
+import { SelectOption } from "@/types/select-option";
+import { useBranches } from "../hooks/useBranches";
+import { ManagementHierarchyItem, useManagementHierarchies } from "../hooks/useManagementHierarchies";
+import { useManagements } from "../hooks/useManagements";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -47,6 +52,18 @@ interface AttendanceContextType {
   setSelectedDepartment: (department: string) => void;
   selectedBranch: string;
   setSelectedBranch: (branch: string) => void;
+  
+  // Branch data from API
+  branches: ManagementHierarchyItem[]|undefined;
+  branchesLoading: boolean;
+  branchesError: Error | null;
+  refetchBranches: () => void;
+
+  // Management data from API
+  managements: ManagementHierarchyItem[]|undefined;
+  managementsLoading: boolean;
+  managementsError: Error | null;
+  refetchManagements: () => void;
   
   // Employee details dialog state
   isEmployeeDialogOpen: boolean;
@@ -173,8 +190,23 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
     end_date: endDate ? endDate.toISOString().split('T')[0] : undefined
   });
+  
+  // Get branches data from API
+  const {
+    data:branches,
+    isLoading: branchesLoading,
+    error: branchesError,
+    refetch: refetchBranches
+  } = useManagementHierarchies();
 
-  console.log('teamAttendance',teamAttendance)
+  const {
+    data:managements,
+    isLoading: managementsLoading,
+    error: managementsError,
+    refetch: refetchManagements
+  } = useManagements();
+
+  console.log('teamAttendancebranches',branches)
   
   // Employee details dialog state
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
@@ -249,6 +281,18 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     attendanceSummaryLoading,
     attendanceSummaryError,
     refetchAttendanceSummary,
+    
+    // Branches data from API
+    branches,
+    branchesLoading,
+    branchesError,
+    refetchBranches,
+    
+    // Management data from API
+    managements,
+    managementsLoading,
+    managementsError,
+    refetchManagements,
     
     // Date range for filtering
     startDate,
