@@ -4,7 +4,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 
 export const permissionsTableConfig = () => {
   return {
-    url: `${baseURL}/write-url`,
+    url: `${baseURL}/role_and_permissions/permissions`,
     tableId: "permissions-table", 
     columns: [
       {
@@ -18,22 +18,22 @@ export const permissionsTableConfig = () => {
         sortable: true,
       },
     {
-        key: "3",
+        key: "user_count",
         label: "عدد المستخدمين",
         sortable: true,
       },
       {
-        key: "is_active",
+        key: "status",
         label: "الحالة",
         sortable: true,
         render: (_: unknown, row:any) => (
           <TableStatusSwitcher
             id={row.id}
             label={"نشط"}
-            initialStatus={row.is_active == 1}
+            initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.put(`/write-url/${row.id}/status`, {
-                is_active: Number(isActive),
+              return await apiClient.patch(`/role_and_permissions/permissions/${row.id}/status`, {
+                status: Number(isActive),
               });
             }}
             confirmDescription={(isActive) =>
@@ -52,7 +52,7 @@ export const permissionsTableConfig = () => {
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     // deleteUrl: `${baseURL}/company-users`,

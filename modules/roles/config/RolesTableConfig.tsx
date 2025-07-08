@@ -3,7 +3,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 
 export const rolesTableConfig = () => {
   return {
-    url: `${baseURL}/write-url`,
+    url: `${baseURL}/role_and_permissions/roles`,
     tableId: "roles-table",
     columns: [
       {
@@ -12,17 +12,17 @@ export const rolesTableConfig = () => {
         sortable: true,
       },
       {
-        key: "1",
+        key: "programs_count",
         label: "عدد البرامج",
         sortable: true,
       },
       {
-        key: "2",
+        key: "permission_count",
         label: "عدد الصلاحيات",
         sortable: true,
       },
       {
-        key: "3",
+        key: "users_count",
         label: "عدد المستخدمين",
         sortable: true,
       },
@@ -34,10 +34,10 @@ export const rolesTableConfig = () => {
           <TableStatusSwitcher
             id={row.id}
             label={"نشط"}
-            initialStatus={row.is_active == 1}
+            initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.put(`/write-url/${row.id}/status`, {
-                is_active: Number(isActive),
+              return await apiClient.patch(`/role_and_permissions/roles/${row.id}/status`, {
+                status: Number(isActive),
               });
             }}
             confirmDescription={(isActive) =>
@@ -50,13 +50,13 @@ export const rolesTableConfig = () => {
     ],
     allSearchedFields: [
       {
-        key: "roleName",
+        key: "name",
         searchType: {
           type: "dropdown",
           placeholder: "اسم الدور",
           dynamicDropdown: {
-            url: `${baseURL}/write-url`,
-            valueField: "id",
+            url: `${baseURL}/role_and_permissions/roles`,
+            valueField: "name",
             labelField: "name",
             paginationEnabled: true,
             itemsPerPage: 5,
@@ -68,7 +68,7 @@ export const rolesTableConfig = () => {
         },
       },
       {
-        key: "employeeName",
+        key: "employee_name",
         searchType: {
           type: "text",
           placeholder: "اسم الموظف",
@@ -81,11 +81,11 @@ export const rolesTableConfig = () => {
           placeholder: "حالة الدور",
           dropdownOptions: [
             {
-              value: "active",
+              value: "1",
               label: "نشط",
             },
             {
-              value: "inactive",
+              value: "0",
               label: "غير نشط",
             },
           ],
@@ -100,7 +100,7 @@ export const rolesTableConfig = () => {
     enableSearch: true,
     enableColumnSearch: true,
     searchFields: ["name", "email"],
-    searchParamName: "q",
+    searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     // deleteUrl: `${baseURL}/company-users`,
