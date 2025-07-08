@@ -2,15 +2,17 @@ import MainUserConnectionInfoSectionPreview from "./preview-mode/MainUserConnect
 import MainUserConnectionInfoSectionEdit from "./edit-mode";
 import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import { useTranslations } from "next-intl";
 
 export default function MainUserConnectionInfoSection() {
   // declare and define component state and vars
   const { handleRefetchUserContactData, userContactDataLoading } =
     useConnectionDataCxt();
+  const t = useTranslations("UserProfile.tabs.CommonSections");
 
   return (
     <TabTemplate
-      title={"بيانات الاتصال"}
+      title={t("connectionData")}
       loading={userContactDataLoading}
       reviewMode={<MainUserConnectionInfoSectionPreview />}
       editMode={<MainUserConnectionInfoSectionEdit />}
@@ -19,8 +21,8 @@ export default function MainUserConnectionInfoSection() {
       }}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
+          { title: t("myRequests"), onClick: () => {} ,disabled:true},
+          { title: t("createRequest"), onClick: () => {},disabled:true },
         ],
       }}
     />

@@ -3,20 +3,22 @@ import RelativesList from "./RelativesList";
 import FormFieldSet from "../../../../../../components/FormFieldSet";
 import CreateRelativeDialog from "./CreateRelativeDialog";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function MaritalStatusRelativesSection() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("UserProfile.tabs.CommonSections");
 
   return (
     <FormFieldSet
-      title="الحالة الاجتماعية / الاقارب"
+      title={t("maritalStatusData")}
       secondTitle={
         <Button
           onClick={() => {
             setOpen(true);
           }}
         >
-          أضافة قريب
+          {t("addNewRelative")}
         </Button>
       }
     >

@@ -2,15 +2,17 @@ import UserAddressSectionPreviewMode from "./preview-mode";
 import UserAddressSectionEditMode from "./edit-mode";
 import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import { useTranslations } from "next-intl";
 
 export default function UserAddressSection() {
   // declare and define component state and vars
   const { handleRefetchUserContactData, userContactDataLoading } =
     useConnectionDataCxt();
+  const t = useTranslations("UserProfile.tabs.CommonSections");
 
   return (
     <TabTemplate
-      title={"العنوان"}
+      title={t("addressData")}
       loading={userContactDataLoading}
       reviewMode={<UserAddressSectionPreviewMode />}
       editMode={<UserAddressSectionEditMode />}
@@ -19,8 +21,8 @@ export default function UserAddressSection() {
       }}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
+          { title: t("myRequests"), onClick: () => {} ,disabled:true},
+          { title: t("createRequest"), onClick: () => {},disabled:true },
         ],
       }}
     />
