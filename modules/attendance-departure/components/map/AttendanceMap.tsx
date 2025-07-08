@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2, Loader2 } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
 import { AttendanceRecord } from "../../constants/static-data";
+import { useTranslations } from "next-intl";
 
 // Extended MapContainer props to include center prop explicitly
 interface ExtendedMapContainerProps extends MapContainerProps {
@@ -27,6 +28,8 @@ interface ExtendedMapContainerProps extends MapContainerProps {
 }
 
 const AttendanceMap: React.FC = () => {
+  const t = useTranslations('AttendanceDepartureModule.Map');
+  const tStatus = useTranslations('AttendanceDepartureModule.Map.employeeStatus');
   // Default map center (Riyadh)
   const defaultCenter: L.LatLngExpression = [24.7136, 46.6753];
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -141,13 +144,13 @@ const AttendanceMap: React.FC = () => {
           <ZoomControl position="topright" />
 
           <LayersControl position="topright">
-            <LayersControl.BaseLayer checked name="خريطة الشارع">
+            <LayersControl.BaseLayer checked name={t('layers.standard')}>
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
             </LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name="صور القمر الصناعي">
+            <LayersControl.BaseLayer name={t('layers.satellite')}>
               <TileLayer
                 url="https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
                 maxZoom={20}
@@ -155,7 +158,7 @@ const AttendanceMap: React.FC = () => {
                 attribution="&copy; Google Maps"
               />
             </LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name="خريطة القمر الصناعي">
+            <LayersControl.BaseLayer name={t('layers.satellite')}>
               <TileLayer
                 url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
                 maxZoom={20}
@@ -192,7 +195,7 @@ const AttendanceMap: React.FC = () => {
                 branch: record.professional_data?.branch || "-",
                 department: record.professional_data?.management || "-",
                 approver: record.applied_constraints?.[0]?.name || "-",
-                employeeStatus: record.is_clocked_in === 1 ? "نشط" : "غير نشط",
+                employeeStatus: record.is_clocked_in === 1 ? tStatus('active') : tStatus('inactive'),
                 // Map status to expected format
                 attendanceStatus:
                   record.is_late === 1
@@ -215,7 +218,7 @@ const AttendanceMap: React.FC = () => {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
               <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
               <span className="text-gray-700 font-medium">
-                جاري تحميل بيانات الموظفين...
+                {t('loading')}
               </span>
             </div>
           )}

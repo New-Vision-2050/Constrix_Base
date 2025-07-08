@@ -439,6 +439,47 @@
       "search": "Search",
       "clearFilters": "Clear Filters"
     },
+    "EmployeeDetailsSheet": {
+      "fields": {
+        "employeeName": "Employee Name",
+        "phone": "Mobile Number",
+        "department": "Department",
+        "email": "Email",
+        "branch": "Branch"
+      },
+      "personalInfo": {
+        "gender": "Gender",
+        "birthDate": "Birth Date",
+        "nationality": "Nationality"
+      },
+      "status": {
+        "attendanceStatus": "Attendance Status",
+        "employeeStatus": "Employee Status"
+      },
+      "times": {
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "morning": "AM",
+        "afternoon": "PM"
+      }
+    },
+    "Map": {
+      "layers": {
+        "standard": "Standard Map",
+        "satellite": "Satellite Map"
+      },
+      "loading": "Loading employee data...",
+      "employeeStatus": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "tooltip": {
+        "employee": "Employee:",
+        "branch": "Branch:",
+        "department": "Department:",
+        "lastSeen": "Last Seen:"
+      }
+    },
     "MapSearchFilter": {
       "searchPlaceholder": "Search",
       "tableView": "Table",

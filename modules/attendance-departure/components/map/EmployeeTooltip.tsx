@@ -1,12 +1,14 @@
 import React from 'react';
 import { Tooltip } from 'react-leaflet';
 import { AttendanceRecord } from '../../constants/static-data';
+import { useTranslations } from 'next-intl';
 
 interface EmployeeTooltipProps {
   employee: AttendanceRecord;
 }
 
 const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
+  const t = useTranslations('AttendanceDepartureModule.Map.tooltip');
   return (
     <Tooltip
       direction="right"
@@ -18,21 +20,19 @@ const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
         style={{ textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}
       >
         <p>
-          <span className="font-bold text-black">الموظف:</span> {employee.name}
+          <span className="font-bold text-black">{t('employee')}</span> {employee.name}
         </p>
         <p className="mt-1">
-          <span className="font-bold text-black">الفرع:</span> {employee.branch}
+          <span className="font-bold text-black">{t('branch')}</span> {employee.branch}
         </p>
         <p className="mt-1">
-          <span className="font-bold text-black">الإدارة:</span>{" "}
+          <span className="font-bold text-black">{t('department')}</span>{" "}
           {employee.department}
         </p>
         <div className="mt-3 pt-2 border-t border-gray-500/50">
           <div className="flex justify-between items-center">
             <span className="font-bold text-black">
-              آخر
-              <br />
-              ظهور:
+              {t('lastSeen')}
             </span>
             <span className="font-mono text-sm">
               {employee.date}

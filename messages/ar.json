@@ -439,6 +439,47 @@
       "search": "بحث",
       "clearFilters": "مسح الفلاتر"
     },
+    "EmployeeDetailsSheet": {
+      "fields": {
+        "employeeName": "اسم الموظف",
+        "phone": "رقم الجوال",
+        "department": "القسم",
+        "email": "البريد الالكتروني",
+        "branch": "الفرع"
+      },
+      "personalInfo": {
+        "gender": "الجنس",
+        "birthDate": "تاريخ الميلاد",
+        "nationality": "الجنسية"
+      },
+      "status": {
+        "attendanceStatus": "حالة الحضور",
+        "employeeStatus": "حالة الموظف"
+      },
+      "times": {
+        "checkIn": "الحضور",
+        "checkOut": "الانصراف",
+        "morning": "صباحاً",
+        "afternoon": "مساءاً"
+      }
+    },
+    "Map": {
+      "layers": {
+        "standard": "خريطة عادية",
+        "satellite": "خريطة القمر الصناعي"
+      },
+      "loading": "جاري تحميل بيانات الموظفين...",
+      "employeeStatus": {
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "tooltip": {
+        "employee": "الموظف:",
+        "branch": "الفرع:",
+        "department": "الإدارة:",
+        "lastSeen": "آخر ظهور:"
+      }
+    },
     "MapSearchFilter": {
       "searchPlaceholder": "البحث",
       "tableView": "الجدول",
