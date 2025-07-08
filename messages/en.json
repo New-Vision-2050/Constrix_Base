@@ -416,5 +416,13 @@
     "submitButtonText": "Save",
     "cancelButtonText": "Cancel",
     "resetButtonText": "Clear Form"
+  },
+  "AttendanceDepartureModule":{
+    "AttendanceDateSelector":{
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "search": "Search",
+      "clearFilters": "Clear Filters"
+    }
   }
 }

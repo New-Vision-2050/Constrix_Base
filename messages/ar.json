@@ -416,5 +416,13 @@
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
     "resetButtonText": "مسح النموذج"
+  },
+  "AttendanceDepartureModule":{
+    "AttendanceDateSelector":{
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "search": "بحث",
+      "clearFilters": "مسح الفلاتر"
+    }
   }
 }

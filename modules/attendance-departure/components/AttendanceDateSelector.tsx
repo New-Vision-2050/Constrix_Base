@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { CalendarIcon } from "lucide-react";
 import { Input } from "@/modules/table/components/ui/input";
 import { useAttendance } from "../context/AttendanceContext";
+import { useTranslations } from "next-intl";
 
 interface AttendanceDateSelectorProps {
   locale?: 'ar' | 'en'; // To specify the language
@@ -12,6 +13,7 @@ const AttendanceDateSelector: React.FC<AttendanceDateSelectorProps> = ({
   locale = "ar", // Default to Arabic
 }) => {
   const { startDate, setStartDate, endDate, setEndDate } = useAttendance();
+  const t = useTranslations("AttendanceDepartureModule.AttendanceDateSelector");
   
   // Estado local para las fechas en formato string
   const [startDateStr, setStartDateStr] = useState<string>("");
@@ -67,14 +69,14 @@ const AttendanceDateSelector: React.FC<AttendanceDateSelectorProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-4" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex flex-wrap items-center gap-4">
       {/* Selector de fecha inicial */}
-      <div className="relative" dir="rtl">
+      <div className="relative">
         <label
           htmlFor="start-date"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-right"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 "
         >
-          {locale === 'ar' ? "تاريخ البداية" : "Start Date"}
+          {t("startDate")}
         </label>
         <div className="relative">
           <Input
@@ -82,21 +84,19 @@ const AttendanceDateSelector: React.FC<AttendanceDateSelectorProps> = ({
             type="date"
             value={startDateStr}
             onChange={handleStartDateChange}
-            className="w-full text-right pl-10 pr-4"
-            style={{ direction: "rtl" }}
-            dir="rtl"
+            className="w-full  pl-10 pr-4"
           />
           <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         </div>
       </div>
 
       {/* Selector de fecha final */}
-      <div className="relative" dir="rtl">
+      <div className="relative">
         <label
           htmlFor="end-date"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-right"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 "
         >
-          {locale === 'ar' ? "تاريخ النهاية" : "End Date"}
+          {t("endDate")}
         </label>
         <div className="relative">
           <Input
@@ -104,9 +104,7 @@ const AttendanceDateSelector: React.FC<AttendanceDateSelectorProps> = ({
             type="date"
             value={endDateStr}
             onChange={handleEndDateChange}
-            className="w-full text-right pl-10 pr-4"
-            style={{ direction: "rtl" }}
-            dir="rtl"
+            className="w-full  pl-10 pr-4"
           />
           <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         </div>
