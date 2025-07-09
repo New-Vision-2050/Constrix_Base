@@ -1,6 +1,7 @@
 import MainLayout from "@/components/shared/layout/main-layout";
 import { cookies } from "next/headers";
 import React from "react";
+import { AbilityProviderWrapper } from "../AbilityProviderWrapper";
 
 export default async function RootLayout({
   children,
@@ -12,12 +13,14 @@ export default async function RootLayout({
   const company = companyCookie ? JSON.parse(companyCookie) : null;
 
   return (
-    <MainLayout
-      mainLogo={company?.logo}
-      name={company?.name}
-      isCentral={!!company?.is_central_company}
-    >
-      {children}
-    </MainLayout>
+    <AbilityProviderWrapper>
+      <MainLayout
+        mainLogo={company?.logo}
+        name={company?.name}
+        isCentral={!!company?.is_central_company}
+      >
+        {children}
+      </MainLayout>
+    </AbilityProviderWrapper>
   );
 }

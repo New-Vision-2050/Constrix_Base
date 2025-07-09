@@ -4,13 +4,13 @@ import { defineAbilityFor } from "@/lib/ability";
 import { useMemo } from "react";
 
 export const AbilityProvider = ({
-  role,
+  permissions,
   children,
 }: {
-  role: string;
+  permissions: string[];
   children: React.ReactNode;
 }) => {
-  const ability = useMemo(() => defineAbilityFor(role), [role]);
+  const ability = useMemo(() => defineAbilityFor(permissions), [permissions]);
   return (
     <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
   );
