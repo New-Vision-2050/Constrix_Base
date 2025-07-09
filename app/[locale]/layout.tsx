@@ -11,7 +11,6 @@ import { Toaster } from "@/modules/table/components/ui/toaster";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
-import { AbilityProvider } from "@/contexts/AbilityProvider";
 
 const theSans = localFont({
   src: [
@@ -64,7 +63,6 @@ export default async function RootLayout({
     return notFound();
   }
   const messages = await getMessages();
-  const role = "editor"; // Replace this with role from cookie/session/api
   
   return (
     <html
@@ -79,14 +77,12 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AbilityProvider role={role}>
             <NextIntlClientProvider messages={messages}>
               <main>
                 <ReactQueryProvider>{children}</ReactQueryProvider>
               </main>
               <Toaster />
             </NextIntlClientProvider>
-          </AbilityProvider>
         </ThemeProvider>
       </body>
     </html>
