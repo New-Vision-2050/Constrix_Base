@@ -1,9 +1,10 @@
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { useRouter } from "next/navigation";
+
 import { ROUTER } from "@/router";
 import { GetProgramFormConfig } from "@/modules/form-builder/configs/programFormConfig";
+import { FieldConfig } from "@/modules/form-builder";
 import TheStatus from "@/modules/programs/components/the-status";
 
 export interface ProgramTableRow {
@@ -16,9 +17,7 @@ export interface ProgramTableRow {
 }
 
 // Create a component that uses the translations
-export const programsConfig = () => {
-  const t = useTranslations("Companies");
-  const router = useRouter();
+export const programsConfig = (t: ReturnType<typeof useTranslations>, router: any, dynamicFields: FieldConfig[]) => {
 
   return {
     url: `${baseURL}/company_access_programs`,
@@ -123,10 +122,8 @@ export const programsConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    // deleteUrl: `${baseURL}/company_access_programs`,
-    // editUrl: `${baseURL}/company_access_programs`,
     executions:[],
-    formConfig: GetProgramFormConfig(t),
+    formConfig: GetProgramFormConfig(t, dynamicFields),
     executionConfig: {
       canEdit: true,
       canDelete: true,
