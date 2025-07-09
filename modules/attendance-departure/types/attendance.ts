@@ -19,7 +19,7 @@ type weeklyScheduleDays = {
   wednesday: weeklyScheduleDay;
 };
 
-type ConstraintConfig = {
+export type ConstraintConfig = {
   time_rules: {
     weekly_schedule: weeklyScheduleDays;
   };

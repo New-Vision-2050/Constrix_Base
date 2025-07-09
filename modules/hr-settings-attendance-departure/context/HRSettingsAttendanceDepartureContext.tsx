@@ -1,6 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  PropsWithChildren,
+} from "react";
 
 // Define available tabs
 type HRSettingsAttendanceDepartureTabType = "attendance-departure-setting-tab";
@@ -13,17 +18,20 @@ interface HRSettingsAttendanceDepartureContextType {
 }
 
 // Create the context
-const HRSettingsAttendanceDepartureContext = createContext<HRSettingsAttendanceDepartureContextType | undefined>(undefined);
+const HRSettingsAttendanceDepartureContext = createContext<
+  HRSettingsAttendanceDepartureContextType | undefined
+>(undefined);
 
 // Provider component
-interface HRSettingsAttendanceDepartureProviderProps {
-  children: ReactNode;
-}
-
-export const HRSettingsAttendanceDepartureProvider: React.FC<HRSettingsAttendanceDepartureProviderProps> = ({ children }) => {
+export const HRSettingsAttendanceDepartureProvider: React.FC<
+  PropsWithChildren
+> = ({ children }) => {
   // Tab state
-  const [activeTab, setActiveTab] = useState<HRSettingsAttendanceDepartureTabType>("attendance-departure-setting-tab");
-
+  const [activeTab, setActiveTab] =
+    useState<HRSettingsAttendanceDepartureTabType>(
+      "attendance-departure-setting-tab"
+    );
+    
   return (
     <HRSettingsAttendanceDepartureContext.Provider
       value={{
@@ -40,7 +48,9 @@ export const HRSettingsAttendanceDepartureProvider: React.FC<HRSettingsAttendanc
 export const useHRSettingsAttendanceDeparture = () => {
   const context = useContext(HRSettingsAttendanceDepartureContext);
   if (context === undefined) {
-    throw new Error("useHRSettingsAttendanceDeparture must be used within a HRSettingsAttendanceDepartureProvider");
+    throw new Error(
+      "useHRSettingsAttendanceDeparture must be used within a HRSettingsAttendanceDepartureProvider"
+    );
   }
   return context;
 };
