@@ -7,6 +7,7 @@ interface BranchLocationData {
   isDefault: boolean;
   latitude: string;
   longitude: string;
+  radius: string;
 }
 
 interface LocationDialogContextType {
@@ -36,9 +37,9 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
   };
   
   // Default coordinates for each branch
-  const defaultCoordinates: Record<string, { latitude: string; longitude: string }> = {
-    "riyadh": { latitude: "24.7136", longitude: "46.6753" },
-    "jeddah": { latitude: "21.4858", longitude: "39.1925" },
+  const defaultCoordinates: Record<string, { latitude: string; longitude: string; radius: string }> = {
+    "riyadh": { latitude: "24.7136", longitude: "46.6753", radius: "100" },
+    "jeddah": { latitude: "21.4858", longitude: "39.1925", radius: "100" },
   };
   
   // State for branch locations
@@ -69,12 +70,13 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
     }
     
     // Return default data for branch
-    const defaults = defaultCoordinates[branchId] || { latitude: "24.7136", longitude: "46.6753" };
+    const defaults = defaultCoordinates[branchId] || { latitude: "24.7136", longitude: "46.6753", radius: "100" };
     return {
       branchId,
       isDefault: true,
       latitude: defaults.latitude,
       longitude: defaults.longitude,
+      radius: defaults.radius,
     };
   };
 

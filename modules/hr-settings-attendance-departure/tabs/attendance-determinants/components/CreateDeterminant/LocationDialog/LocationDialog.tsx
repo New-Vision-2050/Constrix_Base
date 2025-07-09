@@ -40,12 +40,12 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
       if (isDefault) {
         // Reset to default coordinates when checking default location
         const defaultCoordinates = {
-          "riyadh": { latitude: "24.7136", longitude: "46.6753" },
-          "jeddah": { latitude: "21.4858", longitude: "39.1925" },
+          "riyadh": { latitude: "24.7136", longitude: "46.6753", radius: "100" },
+          "jeddah": { latitude: "21.4858", longitude: "39.1925", radius: "100" },
         };
         
         const defaults = defaultCoordinates[selectedBranch as keyof typeof defaultCoordinates] || 
-                        { latitude: "24.7136", longitude: "46.6753" };
+                        { latitude: "24.7136", longitude: "46.6753", radius: "100" };
         
         updateBranchLocation(selectedBranch, {
           isDefault: true,
@@ -59,11 +59,11 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   };
   
   // Handle coordinate changes
-  const handleCoordinateChange = (field: 'latitude' | 'longitude', value: string) => {
+  const handleCoordinateChange = (field: 'latitude' | 'longitude' | 'radius', value: string) => {
     if (selectedBranch) {
       updateBranchLocation(selectedBranch, { 
         [field]: value,
-        isDefault: false // Uncheck default when manually changing coordinates
+        isDefault: field !== 'radius' ? false : undefined // Uncheck default only when changing lat/lng
       });
     }
   };
@@ -119,8 +119,10 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
           <CoordinatesInput
             longitude={currentBranchData.longitude}
             latitude={currentBranchData.latitude}
+            radius={currentBranchData.radius}
             onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
             onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
+            onRadiusChange={(value) => handleCoordinateChange('radius', value)}
           />
           
           <MapComponent
