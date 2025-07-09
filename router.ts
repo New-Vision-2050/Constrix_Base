@@ -14,4 +14,5 @@ export const ROUTER = {
   Programs: "/programs",
   Bouquet: "/bouquet",
   BouquetById: (id: string) => `/bouquet/${id}`,
+  BouquetDetailsById: (id: string) => `/bouquetDetails/${id}`,
 };
