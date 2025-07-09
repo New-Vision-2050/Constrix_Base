@@ -27,7 +27,7 @@ interface LocationDialogProviderProps {
 
 export function LocationDialogProvider({ children }: LocationDialogProviderProps) {
   const { values } = useFormInstance("create-determinant-form", {});
-  const selectedBranches = values.branches || [];
+  const selectedBranches = values.branch_ids || [];
   
   // Available branches mapping with default coordinates
   const branchesMap: Record<string, string> = {

@@ -2,21 +2,22 @@ import { FormConfig } from "@/modules/form-builder";
 import { useEffect } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
+import { baseURL } from "@/config/axios-config";
 
 // Day names mapping
 const dayNames = {
   sunday: "الأحد",
-  monday: "الاثنين", 
+  monday: "الاثنين",
   tuesday: "الثلاثاء",
   wednesday: "الأربعاء",
   thursday: "الخميس",
   friday: "الجمعة",
-  saturday: "السبت"
+  saturday: "السبت",
 };
 
 // Function to create day-specific sections dynamically
 const createDaySections = (workingDays: string[]) => {
-  return workingDays.map(day => ({
+  return workingDays.map((day) => ({
     title: `إعدادات ${dayNames[day as keyof typeof dayNames]}`,
     fields: [
       {
@@ -77,7 +78,7 @@ export const createDeterminantFormConfig: FormConfig = {
       // When moving from step 0 (basic info) to step 1, create day sections
       if (prevStep === 0 && nextStep === 1 && values.working_days) {
         // This will trigger re-render with new sections
-        console.log('Creating sections for days:', values.working_days);
+        console.log("Creating sections for days:", values.working_days);
       }
     },
   },
@@ -87,7 +88,7 @@ export const createDeterminantFormConfig: FormConfig = {
       fields: [
         {
           type: "text",
-          name: "name",
+          name: "constraint_name",
           label: "اسم المحدد",
           placeholder: "فرع القاهرة",
           required: true,
@@ -100,7 +101,7 @@ export const createDeterminantFormConfig: FormConfig = {
         },
         {
           type: "select",
-          name: "system",
+          name: "constraint_type",
           label: "نظام المحدد",
           placeholder: "منتظم",
           options: [
@@ -117,33 +118,32 @@ export const createDeterminantFormConfig: FormConfig = {
           ],
         },
         {
+          type: "hiddenObject",
+          name: "is_active",
+          label: "is_active",
+          defaultValue: true,
+        },
+        {
           type: "select",
           isMulti: true,
-          name: "branches",
+          name: "branch_ids",
           label: "الفروع",
-          options: [
-            { value: "riyadh", label: "فرع الرياض" },
-            { value: "jeddah", label: "فرع جدة" },
-          ],
+          dynamicOptions: {
+            url: `${baseURL}/management_hierarchies/list?type=branch`,
+            valueField: "id",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
           required: true,
           validation: [
             {
               type: "required",
               message: "يجب اختيار فرع واحد على الأقل",
-            },
-          ],
-        },
-        {
-          type: "number",
-          name: "attendance_tolerance",
-          label: "مساحة الحضور",
-          placeholder: "200",
-          postfix: "متر",
-          required: true,
-          validation: [
-            {
-              type: "required",
-              message: "مساحة الحضور مطلوبة",
             },
           ],
         },
@@ -217,7 +217,6 @@ export const createDeterminantFormConfig: FormConfig = {
             { value: "friday", label: "الجمعة" },
             { value: "saturday", label: "السبت" },
           ],
-          defaultValue: ["sunday"],
           required: true,
           validation: [
             {
@@ -235,17 +234,16 @@ export const createDeterminantFormConfig: FormConfig = {
 };
 
 // Function to get form config with dynamic day sections
-export const getDynamicDeterminantFormConfig = (workingDays: string[] = ["sunday"]): FormConfig => {
+export const getDynamicDeterminantFormConfig = (
+  workingDays: string[] = ["sunday"]
+): FormConfig => {
   const baseConfig = { ...createDeterminantFormConfig };
-  
+
   // Add day sections based on selected working days
   const daySections = createDaySections(workingDays);
-  
+
   return {
     ...baseConfig,
-    sections: [
-      ...baseConfig.sections,
-      ...daySections,
-    ],
+    sections: [...baseConfig.sections, ...daySections],
   };
 };
