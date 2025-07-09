@@ -37,7 +37,9 @@ export interface CompanyField {
   name: string
 }
 // Create a component that uses the translations
-export const bouquetConfig = () => {
+export const 
+
+bouquetConfig = () => {
   const t = useTranslations("Bouquets");
   const router = useRouter();
 
@@ -52,7 +54,7 @@ export const bouquetConfig = () => {
         render: (_: unknown, row: BouquetTableRow) => (
           <div 
             className="flex gap-3 border-e-2 cursor-pointer"
-            onClick={() => router.push(ROUTER.BouquetById(row.id))}
+            onClick={() => router.push(`/bouquetDetails/${row.id}`)}
           >
             <div>
               <p className="font-medium">{row.name}</p>
