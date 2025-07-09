@@ -11,7 +11,6 @@ import { Toaster } from "@/modules/table/components/ui/toaster";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
-import { defineAbilityFor } from "@/lib/ability";
 import { AbilityProvider } from "@/contexts/AbilityProvider";
 
 const theSans = localFont({

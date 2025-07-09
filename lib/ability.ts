@@ -12,7 +12,7 @@ export type AppAbility = Ability<[Actions, Subjects]>;
 
 // Define ability for role
 export function defineAbilityFor(role: string): AppAbility {
-  const { can, cannot, build } = new AbilityBuilder<
+  const { can, build } = new AbilityBuilder<
     Ability<[Actions, Subjects]>
   >(Ability as AbilityClass<AppAbility>);
 
