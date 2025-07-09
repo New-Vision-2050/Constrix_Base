@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboardIcon, UserIcon } from "lucide-react";
+import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -28,6 +28,8 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
   mainLogo?: string;
 }
+
+
 
 function mergeProjectsAndMenu(projects: Project[], menu: Menu[],isSuperAdmin?:boolean) {
   return projects.map((project) => {
@@ -69,6 +71,20 @@ export function AppSidebar({
   const isRtl = locale === "ar";
   const path = usePathname();
   const pageName = "/" + path.split("/").at(-1);
+
+  const rolesObj = {
+    name: "الادوار",
+    url: ROUTER.ROLES,
+    icon: RollerCoasterIcon,
+    isActive: pageName === ROUTER.ROLES,
+  };
+
+    const permissionsObj = {
+    name: "الصلاحيات",
+    url: ROUTER.PERMISSIONS,
+    icon: LayoutDashboardIcon,
+    isActive: pageName === ROUTER.PERMISSIONS,
+  };
 
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
@@ -179,6 +195,8 @@ export function AppSidebar({
                 icon: InboxIcon,
                 isActive: pageName === ROUTER.SETTINGS,
               },
+              rolesObj,
+              permissionsObj,
             ]
           : [
               {
@@ -186,6 +204,8 @@ export function AppSidebar({
                 url: ROUTER.USER_PROFILE,
                 icon: UserIcon,
                 isActive: pageName === ROUTER.USER_PROFILE,
+                rolesObj,
+                permissionsObj,
               },
             ],
         isNotCentral: false,
@@ -197,32 +217,37 @@ export function AppSidebar({
         slug: SUPER_ENTITY_SLUG.SETTINGS,
         urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
         sub_entities: isSuperAdmin ? [
-          {
-            name: t("Sidebar.UserProfileSettings"),
-            url: ROUTER.USER_PROFILE,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.USER_PROFILE,
-          },
-          {
-            name: "اعداد ملف الشركة",
-            url: ROUTER.COMPANY_PROFILE,
-            icon: InboxIcon,
-            isActive: pageName === ROUTER.COMPANY_PROFILE,
-          },
-          {
-            name: t("Sidebar.SystemSettings"),
-            url: ROUTER.SETTINGS,
-            icon: InboxIcon,
-            isActive: pageName === ROUTER.SETTINGS,
-          },
-        ] : [
-          {
-            name: t("Sidebar.UserProfileSettings"),
-            url: ROUTER.USER_PROFILE,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.USER_PROFILE,
-          },
-        ],
+              {
+                name: t("Sidebar.UserProfileSettings"),
+                url: ROUTER.USER_PROFILE,
+                icon: UserIcon,
+                isActive: pageName === ROUTER.USER_PROFILE,
+              },
+              {
+                name: "اعداد ملف الشركة",
+                url: ROUTER.COMPANY_PROFILE,
+                icon: InboxIcon,
+                isActive: pageName === ROUTER.COMPANY_PROFILE,
+              },
+              {
+                name: t("Sidebar.SystemSettings"),
+                url: ROUTER.SETTINGS,
+                icon: InboxIcon,
+                isActive: pageName === ROUTER.SETTINGS,
+              },
+              rolesObj,
+              permissionsObj,
+            ]
+          : [
+              {
+                name: t("Sidebar.UserProfileSettings"),
+                url: ROUTER.USER_PROFILE,
+                icon: UserIcon,
+                isActive: pageName === ROUTER.USER_PROFILE,
+                rolesObj,
+                permissionsObj,
+              },
+            ],
         isNotCentral: true,
       },
     ];
