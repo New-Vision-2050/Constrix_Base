@@ -1,7 +1,10 @@
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { Edit } from "lucide-react";
 
-export const rolesTableConfig = () => {
+export const rolesTableConfig = ({handleOpenRolesSheet}:{
+  handleOpenRolesSheet:({ isEdit, selectedId }: { isEdit: boolean; selectedId?: string })=>void;
+}) => {
   return {
     url: `${baseURL}/role_and_permissions/roles`,
     tableId: "roles-table",
@@ -103,9 +106,18 @@ export const rolesTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    // deleteUrl: `${baseURL}/company-users`,
+     deleteUrl: `${baseURL}/role_and_permissions/roles`,
+      executions: [
+      {
+        label: "تعديل",
+        icon: <Edit className="w-4 h-4" />,
+        action: (row : {id:string}) => handleOpenRolesSheet({
+          isEdit:true,
+          selectedId:row.id
+        }),
+      }
+    ],
     executionConfig: {
-      canEdit: true,
       canDelete: true,
     },
   };

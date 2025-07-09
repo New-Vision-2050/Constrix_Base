@@ -418,5 +418,16 @@
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
     "resetButtonText": "مسح النموذج"
+  },
+  "RoleTypes": {
+    "all": "منح جميع الصلاحيات",
+    "update": "تعديل",
+    "import": "استيراد",
+    "export": "تصدير",
+    "list": "عرض",
+    "create": "إضافة",
+    "delete": "حذف",
+    "view": "تفاصيل",
+    "activate": "تنشيط"
   }
 }
