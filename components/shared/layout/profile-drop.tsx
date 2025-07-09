@@ -23,6 +23,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { useSidebarStore } from '@/store/useSidebarStore';
+import { usePermissionsStore } from '@/store/usePermissionsStore';
+import { queryClient } from '@/providers/react-query';
 // import { useLogout } from '@/modules/auth/store/mutations'
 
 interface menuItem {
@@ -79,8 +82,14 @@ const ProfileDrop = () => {
     label: t("Logout"),
     icon: <LogoutIcon />,
     func: () => {
-      deleteCookie("new-vision-token");
       router?.push("/");
+
+      useSidebarStore.getState().clearMenu()
+      usePermissionsStore.getState().clearPermissions()
+      useAuthStore.getState().clearUser()
+      queryClient.clear()
+      
+      deleteCookie("new-vision-token");
     },
   };
   // const { mutate: logoutMutation } = useLogout();
