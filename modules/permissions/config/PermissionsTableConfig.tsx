@@ -55,9 +55,9 @@ export const permissionsTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    // deleteUrl: `${baseURL}/company-users`,
+    deleteUrl: `${baseURL}/role_and_permissions/permissions`,
     executionConfig: {
-      canEdit: true,
+      canEdit: false,
       canDelete: true,
     },
   };
