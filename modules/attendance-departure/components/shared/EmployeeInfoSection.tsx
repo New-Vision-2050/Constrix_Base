@@ -1,0 +1,49 @@
+"use client";
+
+import React from "react";
+import { AttendanceStatusRecord } from "../../types/attendance";
+import { useTranslations } from "next-intl";
+
+interface EmployeeInfoSectionProps {
+  record: AttendanceStatusRecord;
+}
+
+/**
+ * Shared component for displaying employee information in different dialogs
+ */
+const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
+  record,
+}) => {
+  const t = useTranslations("AttendanceDepartureModule.shared.EmployeeInfoSection");
+  // Determine the color for attendance status
+  const getStatusColor = () => {
+    if (record.is_late === 0) {
+      return "text-green-500";
+    } else if (record.is_late === 1) {
+      return "text-yellow-400";
+    } else {
+      return "text-red-500";
+    }
+  };
+
+  return (
+    <>
+      <div className="flex flex-wrap justify-between items-center text-sm gap-3">
+        <div className="text-white">{t("branch")}: {record.company.name}</div>
+        <div className="text-white">{t("jobId")}: emp-101</div>
+        <div className="text-white">{t("department")}: {record.company.name}</div>
+        <div className="text-white">
+          {t("approver")}: {record?.applied_constraints?.[0]?.name || t("unspecified")}
+        </div>
+        <div className="text-white">
+          {t("attendanceStatus")}:
+          <span className={`font-bold ${getStatusColor()}`}>
+            {record.is_late === 0 ? t("status.present") : record.is_late === 1 ? t("status.late") : t("status.absent")}
+          </span>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default EmployeeInfoSection;
