@@ -554,5 +554,16 @@
         }
       }
     }
+  },
+  "RoleTypes": {
+    "all": "Grant all permissions",
+    "update": "Update",
+    "import": "Import",
+    "export": "Export",
+    "list": "List",
+    "create": "Create",
+    "delete": "Delete",
+    "view": "View",
+    "activate": "Activate"
   }
 }
