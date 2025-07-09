@@ -1,0 +1,251 @@
+import { FormConfig } from "@/modules/form-builder";
+import { useEffect } from "react";
+import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
+import LocationDialog from "./LocationDialog/LocationDialog";
+
+// Day names mapping
+const dayNames = {
+  sunday: "الأحد",
+  monday: "الاثنين", 
+  tuesday: "الثلاثاء",
+  wednesday: "الأربعاء",
+  thursday: "الخميس",
+  friday: "الجمعة",
+  saturday: "السبت"
+};
+
+// Function to create day-specific sections dynamically
+const createDaySections = (workingDays: string[]) => {
+  return workingDays.map(day => ({
+    title: `إعدادات ${dayNames[day as keyof typeof dayNames]}`,
+    fields: [
+      {
+        type: "text" as const,
+        name: `${day}_start_time`,
+        label: "وقت بداية العمل",
+        placeholder: "09:00",
+        required: true,
+        validation: [
+          {
+            type: "required" as const,
+            message: "وقت بداية العمل مطلوب",
+          },
+        ],
+      },
+      {
+        type: "text" as const,
+        name: `${day}_end_time`,
+        label: "وقت نهاية العمل",
+        placeholder: "17:00",
+        required: true,
+        validation: [
+          {
+            type: "required" as const,
+            message: "وقت نهاية العمل مطلوب",
+          },
+        ],
+      },
+      {
+        type: "text" as const,
+        name: `${day}_break_start`,
+        label: "بداية فترة الراحة (اختياري)",
+        placeholder: "12:00",
+      },
+      {
+        type: "text" as const,
+        name: `${day}_break_end`,
+        label: "نهاية فترة الراحة (اختياري)",
+        placeholder: "13:00",
+      },
+    ],
+  }));
+};
+
+export const createDeterminantFormConfig: FormConfig = {
+  formId: "create-determinant-form",
+  title: "إضافة محدد جديد",
+  wizard: true,
+  apiUrl: "hr-settings/attendance-determinants",
+  wizardOptions: {
+    // showStepIndicator: true,
+    // showStepTitles: true,
+    validateStepBeforeNext: true,
+    nextButtonText: "التالي",
+    prevButtonText: "السابق",
+    finishButtonText: "حفظ المحدد",
+    onStepChange: (prevStep, nextStep, values) => {
+      // When moving from step 0 (basic info) to step 1, create day sections
+      if (prevStep === 0 && nextStep === 1 && values.working_days) {
+        // This will trigger re-render with new sections
+        console.log('Creating sections for days:', values.working_days);
+      }
+    },
+  },
+  sections: [
+    {
+      title: "المعلومات الأساسية",
+      fields: [
+        {
+          type: "text",
+          name: "name",
+          label: "اسم المحدد",
+          placeholder: "فرع القاهرة",
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "اسم المحدد مطلوب",
+            },
+          ],
+        },
+        {
+          type: "select",
+          name: "system",
+          label: "نظام المحدد",
+          placeholder: "منتظم",
+          options: [
+            { value: "regular", label: "منتظم" },
+            { value: "flexible", label: "مرن" },
+            { value: "shift", label: "شيفت" },
+          ],
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "نظام المحدد مطلوب",
+            },
+          ],
+        },
+        {
+          type: "select",
+          isMulti: true,
+          name: "branches",
+          label: "الفروع",
+          options: [
+            { value: "riyadh", label: "فرع الرياض" },
+            { value: "jeddah", label: "فرع جدة" },
+          ],
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "يجب اختيار فرع واحد على الأقل",
+            },
+          ],
+        },
+        {
+          type: "number",
+          name: "attendance_tolerance",
+          label: "مساحة الحضور",
+          placeholder: "200",
+          postfix: "متر",
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "مساحة الحضور مطلوبة",
+            },
+          ],
+        },
+        {
+          type: "radio",
+          name: "location_type",
+          label: "نوع الموقع",
+          options: [
+            { value: "main", label: "موقع الفرع الافتراضي" },
+            { value: "custom", label: "تحديد موقع لكل فرع من الفروع" },
+          ],
+          defaultValue: "main",
+          required: true,
+        },
+        {
+          type: "hiddenObject",
+          name: "show_location_dialog",
+          label: "",
+          defaultValue: false,
+          render: (props: any) => {
+            const location_type = useFormStore
+              ?.getState()
+              .getValues("create-determinant-form").location_type;
+
+            const show_location_dialog = useFormStore
+              ?.getState()
+              .getValues("create-determinant-form").show_location_dialog;
+
+            const showDialog =
+              location_type === "custom" && show_location_dialog !== false;
+            // control dialog open state
+            useEffect(() => {
+              if (location_type === "custom") {
+                useFormStore
+                  ?.getState()
+                  .setValue(
+                    "create-determinant-form",
+                    "show_location_dialog",
+                    true
+                  );
+              }
+            }, [location_type]);
+
+            return (
+              <LocationDialog
+                isOpen={showDialog}
+                onClose={() => {
+                  useFormStore
+                    ?.getState()
+                    .setValue(
+                      "create-determinant-form",
+                      "show_location_dialog",
+                      false
+                    );
+                }}
+              />
+            );
+          },
+        },
+        {
+          type: "checkboxGroup",
+          name: "working_days",
+          label: "أيام الحضور",
+          isMulti: true,
+          options: [
+            { value: "sunday", label: "الأحد" },
+            { value: "monday", label: "الاثنين" },
+            { value: "tuesday", label: "الثلاثاء" },
+            { value: "wednesday", label: "الأربعاء" },
+            { value: "thursday", label: "الخميس" },
+            { value: "friday", label: "الجمعة" },
+            { value: "saturday", label: "السبت" },
+          ],
+          defaultValue: ["sunday"],
+          required: true,
+          validation: [
+            {
+              type: "required",
+              message: "يجب اختيار يوم واحد على الأقل",
+            },
+          ],
+        },
+      ],
+    },
+    // Day sections will be added dynamically based on working_days selection
+  ],
+  submitButtonText: "حفظ المحدد",
+  cancelButtonText: "إلغاء",
+};
+
+// Function to get form config with dynamic day sections
+export const getDynamicDeterminantFormConfig = (workingDays: string[] = ["sunday"]): FormConfig => {
+  const baseConfig = { ...createDeterminantFormConfig };
+  
+  // Add day sections based on selected working days
+  const daySections = createDaySections(workingDays);
+  
+  return {
+    ...baseConfig,
+    sections: [
+      ...baseConfig.sections,
+      ...daySections,
+    ],
+  };
+};

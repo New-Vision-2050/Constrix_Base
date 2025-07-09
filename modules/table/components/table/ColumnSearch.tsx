@@ -8,6 +8,7 @@ import {
 import DropdownSearch from "./DropdownSearch";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
+import { format } from "date-fns";
 
 interface ColumnSearchProps {
   columns: ColumnConfig[];
@@ -26,15 +27,68 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   const searchableColumns =
     allSearchedFields ?? columns.filter((col) => col.searchable);
 
-  // Store local state for text inputs to prevent immediate API calls
-  const [localInputValues, setLocalInputValues] = useState<ColumnSearchState>(
-    {}
-  );
+  // Initialize local state with current column search values
+  const [localInputValues, setLocalInputValues] = useState<Record<string, string | string[]>>({});
 
-  // Initialize local state with current search state
+  // Initialize default values for date fields and other fields with defaultValue
   useEffect(() => {
-    setLocalInputValues(columnSearchState);
-  }, []);
+    // Populate default values if provided
+    if (allSearchedFields && allSearchedFields.length > 0) {
+      const defaultValues: Record<string, string | string[]> = {};
+      
+      allSearchedFields.forEach(field => {
+        if (field.searchType?.defaultValue) {
+          if (field.searchType.type === 'date' && field.searchType.defaultValue instanceof Date) {
+            // Format date to YYYY-MM-DD
+            const date = field.searchType.defaultValue;
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            defaultValues[field.key] = `${year}-${month}-${day}`;
+          } else {
+            defaultValues[field.key] = field.searchType.defaultValue;
+          }
+        }
+      });
+      
+      // Only update if there are default values and they're not already set
+      if (Object.keys(defaultValues).length > 0) {
+        setLocalInputValues(prev => ({
+          ...prev,
+          ...defaultValues
+        }));
+        
+        // Apply default values to column search state
+        Object.entries(defaultValues).forEach(([key, value]) => {
+          onColumnSearch(key, value);
+        });
+      }
+    }
+  }, []); // Solo ejecutar en el montaje inicial
+
+  // Update local input values when columnSearchState changes
+  useEffect(() => {
+    // Create a map of local values from the global state
+    const newLocalValues: Record<string, string | string[]> = {};
+    
+    // Copy current values from columnSearchState
+    if (columnSearchState) {
+      Object.keys(columnSearchState).forEach((key) => {
+        newLocalValues[key] = columnSearchState[key];
+      });
+    }
+    
+    // Update local state, but don't override with empty values if we have local values
+    setLocalInputValues(prev => {
+      const merged = { ...prev };
+      Object.entries(newLocalValues).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          merged[key] = value;
+        }
+      });
+      return merged;
+    });
+  }, [columnSearchState]);
 
   // Create a debounced version of onColumnSearch
   const debouncedColumnSearch = useDebounce(
@@ -135,6 +189,30 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                     `Filter by ${column.label.toLowerCase()}`
                   }
                 />
+              );
+            
+            case "date":
+              return (
+                <div key={column.key} className="text-right" dir="rtl">
+                  <label
+                    htmlFor={`search-${column.key}`}
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right"
+                  >
+                    {column.label}
+                  </label>
+                  <Input
+                    id={`search-${column.key}`}
+                    type="date"
+                    placeholder={searchType.placeholder || `اختر ${column.label}`}
+                    value={typeof displayValue === 'string' ? displayValue : ''}
+                    onChange={(e) =>
+                      handleInputChange(column.key, e.target.value)
+                    }
+                    style={{ textAlign: 'right' }}
+                    className="w-full text-right"
+                    dir="rtl"
+                  />
+                </div>
               );
 
             case "text":
