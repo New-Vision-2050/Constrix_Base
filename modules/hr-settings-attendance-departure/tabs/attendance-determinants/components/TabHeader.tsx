@@ -6,11 +6,9 @@ import { useState, useEffect } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 
 export default function TabHeader() {
-  const { showAllDeterminants, activeDeterminant } = useAttendanceDeterminants();
+  const { activeConstraint } = useAttendanceDeterminants();
   const [isFormOpen, setIsFormOpen] = useState(false);
   
-  // Create a modified config that includes the event handlers
-  const baseConfig = createDeterminantFormConfig;
   const [formConfig, setFormConfig] = useState(() => {
     // Add onSheetOpenChange to the base config
     return {
@@ -52,7 +50,7 @@ export default function TabHeader() {
   return (
     <div className="flex items-center justify-between w-full mb-4">
       <h2 className="text-xl font-bold">
-        {showAllDeterminants ? "جميع المحددات" : activeDeterminant?.location}
+        {!activeConstraint ? "جميع المحددات" : activeConstraint?.constraint_name}
       </h2>
       <div className="flex gap-2">
         <SheetFormBuilder

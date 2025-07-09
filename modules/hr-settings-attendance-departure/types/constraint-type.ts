@@ -9,6 +9,7 @@ export type Constraint = {
   created_by: string;
   end_date: string;
   id: string;
+  name?:string;
   is_active: number;
   notes: string;
   priority: number;

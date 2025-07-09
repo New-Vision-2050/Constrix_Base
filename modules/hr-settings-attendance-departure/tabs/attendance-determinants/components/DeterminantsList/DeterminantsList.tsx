@@ -1,11 +1,10 @@
 import React from "react";
-import { AttendanceDeterminant } from "../../../../types/attendance-departure";
 import DeterminantItem from "./DeterminantItem/DeterminantItem";
 import { MapPin } from "lucide-react";
-import { useAttendanceDeterminants } from "../../context/AttendanceDeterminantsContext";
+import { Constraint } from "../../../../types/constraint-type";
 
 interface DeterminantsListProps {
-  determinants: AttendanceDeterminant[];
+  determinants: Constraint[];
   onClick: (id: string) => void;
 }
 
@@ -19,7 +18,7 @@ const DeterminantsList: React.FC<DeterminantsListProps> = ({ determinants, onCli
   return (
     <div className="bg-[#1A103C] rounded-lg overflow-hidden  mx-auto">
       <div 
-        className="flex items-center justify-between px-4 py-3 border-b border-purple-800/30 cursor-pointer hover:bg-[#2A204C] transition-colors"
+        className="flex items-center gap-3 px-4 py-3 border-b border-purple-800/30 cursor-pointer hover:bg-[#2A204C] transition-colors"
         onClick={() => onClick("all-determinants")}
       >
         <MapPin size={16} className="text-white" />

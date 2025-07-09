@@ -2,118 +2,67 @@ import React, {
   createContext,
   useContext,
   useState,
-  ReactNode,
   PropsWithChildren,
 } from "react";
-import { DETERMINANTS_LIST } from "../constants/determinants";
-import { AttendanceDeterminant } from "../../../types/attendance-departure";
 import { useConstraintsData } from "@/modules/hr-settings-attendance-departure/hooks/useConstraints";
+import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 
-// Definir la interfaz del contexto
+// Define the context interface
 interface AttendanceDeterminantsContextType {
-  determinants: AttendanceDeterminant[];
-  activeDeterminant: AttendanceDeterminant | null;
-  showAllDeterminants: boolean;
-  setActiveDeterminant: (determinant: AttendanceDeterminant | null) => void;
-  handleDeterminantClick: (id: string) => void;
-  toggleAllDeterminants: () => void;
-  updateDeterminant: (updatedDeterminant: AttendanceDeterminant) => void;
+  constraintsData: Constraint[] | undefined;
+  activeConstraint: Constraint | undefined;
+  constraintsLoading: boolean;
+  constraintsError: unknown;
+  setActiveConstraint: React.Dispatch<React.SetStateAction<Constraint | undefined>>;
+  handleConstraintClick: (id: string) => void;
+  refetchConstraints: () => void;
 }
 
-// Crear el contexto con un valor inicial
+// Create the context with an initial value
 const AttendanceDeterminantsContext = createContext<
   AttendanceDeterminantsContextType | undefined
 >(undefined);
 
-// Proveedor del contexto
+// Context provider
 export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  // Estado para los determinantes
-  const [determinants, setDeterminants] = useState(DETERMINANTS_LIST);
-  const [activeDeterminant, setActiveDeterminant] =
-    useState<AttendanceDeterminant | null>(
-      determinants.find((d) => d.active) || determinants[0]
-    );
-  const [showAllDeterminants, setShowAllDeterminants] = useState(false);
-
-  // Constraints
   const {
-    data: constraints,
+    data: constraintsData,
     isLoading: constraintsLoading,
     error: constraintsError,
     refetch: refetchConstraints,
   } = useConstraintsData();
+  
+  // State for active constraint
+  const [activeConstraint, setActiveConstraint] = useState<Constraint>();
 
-  // Manejar clic en un determinante
-  const handleDeterminantClick = (id: string) => {
-    // Caso especial para "todos los determinantes"
+  // Handle click on a constraint
+  const handleConstraintClick = (id: string) => {
+    // Special case for "all constraints" (show all when no active constraint)
     if (id === "all-determinants") {
-      setShowAllDeterminants(true);
-      setActiveDeterminant(null);
-
-      // Actualizar la lista de determinantes sin estado activo
-      setDeterminants((prevDeterminants) =>
-        prevDeterminants.map((det) => ({
-          ...det,
-          active: false,
-        }))
-      );
+      setActiveConstraint(undefined);
       return;
     }
 
-    // Encontrar el determinante seleccionado
-    const selectedDeterminant = determinants.find((d) => d.id === id);
-
-    if (selectedDeterminant) {
-      // Actualizar el determinante activo
-      setActiveDeterminant(selectedDeterminant);
-      setShowAllDeterminants(false);
-
-      // Actualizar la lista de determinantes con el nuevo estado activo
-      setDeterminants((prevDeterminants) =>
-        prevDeterminants.map((det) => ({
-          ...det,
-          active: det.id === id,
-        }))
-      );
+    // Find and set the selected constraint
+    if (constraintsData) {
+      const selectedConstraint = constraintsData.find((c) => c.id === id);
+      if (selectedConstraint) {
+        setActiveConstraint(selectedConstraint);
+      }
     }
   };
 
-  // Alternar entre mostrar todos los determinantes o el detalle
-  const toggleAllDeterminants = () => {
-    setShowAllDeterminants((prev) => !prev);
-    if (!showAllDeterminants) {
-      setActiveDeterminant(null);
-    } else if (determinants.length > 0) {
-      const activeDet = determinants.find((d) => d.active) || determinants[0];
-      setActiveDeterminant(activeDet);
-    }
-  };
-
-  // Actualizar un determinante específico
-  const updateDeterminant = (updatedDeterminant: AttendanceDeterminant) => {
-    setDeterminants((prevDeterminants) =>
-      prevDeterminants.map((det) =>
-        det.id === updatedDeterminant.id ? updatedDeterminant : det
-      )
-    );
-
-    // Si el determinante actualizado es el activo, actualizar también el estado activeDeterminant
-    if (activeDeterminant && activeDeterminant.id === updatedDeterminant.id) {
-      setActiveDeterminant(updatedDeterminant);
-    }
-  };
-
-  // Valor del contexto
+  // Context value to export
   const contextValue: AttendanceDeterminantsContextType = {
-    determinants,
-    activeDeterminant,
-    showAllDeterminants,
-    setActiveDeterminant,
-    handleDeterminantClick,
-    toggleAllDeterminants,
-    updateDeterminant,
+    constraintsData,
+    activeConstraint,
+    constraintsLoading,
+    constraintsError,
+    setActiveConstraint,
+    handleConstraintClick,
+    refetchConstraints,
   };
 
   return (
@@ -123,14 +72,13 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   );
 };
 
-// Hook personalizado para usar el contexto
-export const useAttendanceDeterminants =
-  (): AttendanceDeterminantsContextType => {
-    const context = useContext(AttendanceDeterminantsContext);
-    if (context === undefined) {
-      throw new Error(
-        "useAttendanceDeterminants debe usarse dentro de un AttendanceDeterminantsProvider"
-      );
-    }
-    return context;
-  };
+// Custom hook to use the context
+export const useAttendanceDeterminants = (): AttendanceDeterminantsContextType => {
+  const context = useContext(AttendanceDeterminantsContext);
+  if (context === undefined) {
+    throw new Error(
+      "useAttendanceDeterminants must be used within an AttendanceDeterminantsProvider"
+    );
+  }
+  return context;
+};

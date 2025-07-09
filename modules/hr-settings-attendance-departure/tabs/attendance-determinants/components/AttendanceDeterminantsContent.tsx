@@ -1,10 +1,9 @@
 import React from "react";
 import DeterminantsList from "./DeterminantsList/DeterminantsList";
-import { AttendanceDeterminant } from "../../../types/attendance-departure";
-import { useAttendanceDeterminants } from "../context/AttendanceDeterminantsContext";
+import { Constraint } from "../../../types/constraint-type";
 
 interface AttendanceDeterminantsContentProps {
-  determinants: AttendanceDeterminant[];
+  determinants: Constraint[];
   onDeterminantClick: (id: string) => void;
 }
 
