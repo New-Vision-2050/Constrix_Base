@@ -1,16 +1,15 @@
-
 import React, { useState, useEffect } from "react";
 import { TableBuilder } from "@/modules/table";
 import {
   SheetFormBuilder,
 } from "@/modules/form-builder";
 import { useTranslations } from "next-intl";
-import { bouquetConfig } from "@/modules/table/utils/configs/bouquetTableConfig";
 import { Button } from "@/components/ui/button";
 import { GetBouquetFormConfig } from "@/modules/form-builder/configs/bouquetFormConfig";
 import StatisticsCardHeader from "@/modules/organizational-structure/components/StatisticsCard/StatisticsCardHeader";
 import PersonStaticIcon from "@/public/icons/person-static";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { bouquetConfig } from "@/modules/table/utils/configs/bouquetTableConfig";
 
 // Interface for API response
 interface Root {
@@ -28,7 +27,7 @@ interface Payload {
 
 function EntryPointBouquets() {
   const t = useTranslations("Bouquets");
-  const config = bouquetConfig();
+  const config =  bouquetConfig();
   const [statisticsData, setStatisticsData] = useState<Payload | null>(null);
   const [statisticsLoading, setStatisticsLoading] = useState<boolean>(true);
 

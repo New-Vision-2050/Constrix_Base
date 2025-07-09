@@ -4,11 +4,31 @@ import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-m
 import {useTranslations} from "next-intl";
 import axios from "axios";
 
-// Define interfaces matching the user's API structure
-export interface Root {
+// Define interfaces matching the API response structure
+export interface ApiResponse {
   code: string;
   message: any;
   payload: Payload[];
+}
+
+// Define interfaces for the company access programs submission
+export interface Root {
+  name: string;
+  programs: Program[];
+  company_fields: string[];
+  company_types: string[];
+  countries: number[];
+}
+
+export interface Program {
+  id: string;
+  sub_entities: any[];
+  children: ApiChildren[];
+}
+
+export interface ApiChildren {
+  id: string;
+  sub_entities: any[];
 }
 
 export interface Payload {
@@ -17,7 +37,16 @@ export interface Payload {
   slug: string;
   is_active: number;
   sub_entities: SubEntity[];
-  children: any[];
+  children: Children[];
+}
+
+export interface Children {
+  id: string;
+  name: string;
+  slug: string;
+  is_active: number;
+  sub_entities: SubEntity[];
+  children?: Children[]; // Recursive children
 }
 
 export interface SubEntity {
@@ -76,57 +105,134 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
           ? response.data.payload 
           : [];
           
-      // Process each main program
-      programs.forEach((program: Payload) => {
-        // Check if the program has sub_entities (subprograms) and they are not empty
+      // Recursive function to process programs and their children
+      const processProgram = (program: Payload | Children, level: number = 0, parentPath: string = '') => {
+        const indent = '  '.repeat(level);
+        const programKey = parentPath ? `${parentPath}_child_${program.id}` : `program_${program.id}`;
+        const displayName = level > 0 ? `${indent}↳ ${program.name}` : program.name;
+        
+        // Collect all options for this program level
+        const allOptions: SubProgramOption[] = [];
+        
+        // Add sub_entities as options
         if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
-          // Filter out inactive or empty sub-entities if needed
           const activeSubEntities = program.sub_entities.filter((subEntity: SubEntity) => 
             subEntity.name && subEntity.name.trim() !== ''
           );
           
-          // Only create checkboxGroup if there are active sub-entities
-          if (activeSubEntities.length > 0) {
-            // Create subprogram options from active sub_entities
-            const subProgramOptions: SubProgramOption[] = activeSubEntities.map((subEntity: SubEntity) => ({
+          activeSubEntities.forEach((subEntity: SubEntity) => {
+            allOptions.push({
               id: subEntity.id,
               name: subEntity.name,
               value: subEntity.id,
               label: subEntity.name,
               parentId: program.id
-            }));
-            
-            // Create main program checkboxGroup with subprograms as options
-            generatedData.push({
-              type: "checkboxGroup" as const,
-              name: `program_${program.id}`,
-              label: program.name, // Main program name from Payload
-              optionsTitle: `${program.name}`,
-              isMulti: true,
-              options: subProgramOptions,
-              className: "font-bold text-xl border-b border-border pb-2 mb-4 mt-6",
-              onChange: (value: any, formState: any) => {
-                // Optional: Add any custom logic when subprograms are selected/deselected
-                console.log(`Selected subprograms for ${program.name}:`, value);
-                return value;
-              }
             });
-            
-            // Store program data in a hidden field for reference
-            generatedData.push({
-              type: "hiddenObject" as const,
-              name: `program_data_${program.id}`,
-              label: "",
-              defaultValue: {
-                programId: program.id,
-                programName: program.name,
-                programSlug: program.slug,
-                isActive: program.is_active,
-                subEntities: activeSubEntities
-              }
-            });
-          }
+          });
         }
+        
+        // Children programs are not added to main program options
+        // They will be processed separately as their own checkbox groups
+        
+        // Create checkbox group if there are options
+        if (allOptions.length > 0) {
+          generatedData.push({
+            type: "checkboxGroup" as const,
+            name: programKey,
+            label: displayName,
+            optionsTitle: displayName,
+            isMulti: true,
+            options: allOptions,
+            className: level === 0 
+              ? "font-bold text-xl border-b border-border pb-2 mb-4 mt-6"
+              : "font-semibold text-lg ml-4 border-l-2 border-gray-300 pl-4 mb-3 mt-3",
+            onChange: (value: any, formState: any) => {
+              console.log(`Selected options for ${program.name}:`, value);
+              return value;
+            }
+          });
+          
+          // Store program data
+          generatedData.push({
+            type: "hiddenObject" as const,
+            name: level === 0 ? `program_data_${program.id}` : `${programKey}_data`,
+            label: "",
+            defaultValue: {
+              programId: program.id,
+              programName: program.name,
+              programSlug: program.slug,
+              isActive: program.is_active,
+              subEntities: program.sub_entities || [],
+              children: program.children || [],
+              level: level,
+              parentPath: parentPath
+            }
+          });
+        }
+        
+        // Recursively process children programs
+        if (program.children && Array.isArray(program.children) && program.children.length > 0) {
+          program.children.forEach((child: Children) => {
+            // Check if child has sub_entities
+            if (child.sub_entities && Array.isArray(child.sub_entities) && child.sub_entities.length > 0) {
+              // Child has sub_entities, process normally
+              processProgram(child, level + 1, programKey);
+            } else {
+              // Child has no sub_entities, create a special checkbox group with only ↳
+              const childProgramKey = `${programKey}_child_${child.id}`;
+              const childDisplayName = `${' '.repeat((level + 1) * 2)}↳ ${child.name}`;
+              
+              generatedData.push({
+                type: "checkboxGroup" as const,
+                name: childProgramKey,
+                label: childDisplayName,
+                optionsTitle: childDisplayName,
+                isMulti: true,
+                options: [{
+                  id: 'empty',
+                  name: '↳',
+                  value: 'empty',
+                  label: '↳',
+                  parentId: child.id
+                } as SubProgramOption],
+                className: "font-semibold text-lg ml-4 border-l-2 border-gray-300 pl-4 mb-3 mt-3",
+                onChange: (value: any, formState: any) => {
+                  console.log(`Empty child program ${child.name} - no sub_entities`);
+                  return [];
+                }
+              });
+              
+              // Store child data
+              generatedData.push({
+                type: "hiddenObject" as const,
+                name: `${childProgramKey}_data`,
+                label: "",
+                defaultValue: {
+                  programId: child.id,
+                  programName: child.name,
+                  programSlug: child.slug,
+                  isActive: child.is_active,
+                  subEntities: [],
+                  children: child.children || [],
+                  level: level + 1,
+                  parentPath: programKey
+                }
+              });
+              
+              // Continue processing nested children if they exist
+              if (child.children && Array.isArray(child.children) && child.children.length > 0) {
+                child.children.forEach((nestedChild: Children) => {
+                  processProgram(nestedChild, level + 2, childProgramKey);
+                });
+              }
+            }
+          });
+        }
+      };
+      
+      // Process each main program recursively
+      programs.forEach((program: Payload) => {
+        processProgram(program, 0);
       });
       
       if (programs.length === 0) {
@@ -251,14 +357,124 @@ export async function GetProgramFormConfig(t: ReturnType<typeof useTranslations>
         toast.success("تم إضافة البرنامج بنجاح");
       }
     },
-    onSubmit:async (formData: Record<string, unknown>) => {
-      // Log the form data (to use the parameter)
+    onSubmit: async (formData: Record<string, unknown>) => {
       console.log("Form data received:", formData);
       
-      return {
-        success: true,
-        message: "Item added successfully",
-      };
+      try {
+        // Transform form data to match the Root interface
+        const transformedData: Root = {
+          name: formData.name as string,
+          programs: [],
+          company_fields: Array.isArray(formData.company_fields) 
+            ? (formData.company_fields as string[]) 
+            : [],
+          company_types: Array.isArray(formData.company_types) 
+            ? (formData.company_types as string[]) 
+            : [],
+          countries: Array.isArray(formData.country_id) 
+            ? (formData.country_id as number[]) 
+            : []
+        };
+
+        // Process dynamic program fields to build programs array recursively
+        const processedPrograms = new Map<string, Program>();
+        
+        // Helper function to collect all children (flattened structure)
+        const collectAllChildren = (parentKey: string, allFormData: Record<string, unknown>): ApiChildren[] => {
+          const children: ApiChildren[] = [];
+          console.log(`Collecting children for parent key: ${parentKey}`);
+          
+          // Collect direct children
+          Object.keys(allFormData).forEach(key => {
+            if (key.startsWith(`${parentKey}_child_`) && !key.includes('_data')) {
+              console.log(`Found child key: ${key}`);
+              const childId = key.replace(`${parentKey}_child_`, '');
+              const selectedOptions = (allFormData[key] as string[]) || [];
+              const childDataKey = `${key}_data`;
+              const childData = allFormData[childDataKey] as any;
+              
+              console.log(`Child ID: ${childId}`);
+              console.log(`Child selected options:`, selectedOptions);
+              console.log(`Child data key: ${childDataKey}`);
+              console.log(`Child data:`, childData);
+              
+              // Include child program even if it has no selected sub_entities
+              if (childData) {
+                const childProgram: ApiChildren = {
+                  id: childId,
+                  sub_entities: selectedOptions.filter(option => option !== 'empty') // Remove 'empty' placeholder
+                };
+                
+                console.log(`Adding child program:`, childProgram);
+                children.push(childProgram);
+                
+                // Recursively collect nested children and add them to the same flat array
+                const nestedChildren = collectAllChildren(key, allFormData);
+                children.push(...nestedChildren);
+              } else {
+                console.log(`No child data found for key: ${childDataKey}`);
+              }
+            }
+          });
+          
+          console.log(`Returning children for ${parentKey}:`, children);
+          return children;
+        };
+        
+        // Debug: Log all form data keys
+        console.log('=== FORM DATA KEYS ===');
+        Object.keys(formData).forEach(key => {
+          console.log(`Key: ${key}, Value:`, formData[key]);
+        });
+        console.log('=== END FORM DATA KEYS ===');
+        
+        // Process main programs first
+        Object.keys(formData).forEach(key => {
+          if (key.startsWith('program_') && !key.includes('_data') && !key.includes('_child_')) {
+            console.log(`Processing main program key: ${key}`);
+            const programId = key.replace('program_', '');
+            const selectedOptions = (formData[key] as string[]) || [];
+            const programDataKey = `program_data_${programId}`;
+            const programData = formData[programDataKey] as any;
+            
+            console.log(`Program ID: ${programId}`);
+            console.log(`Selected options:`, selectedOptions);
+            console.log(`Program data key: ${programDataKey}`);
+            console.log(`Program data:`, programData);
+
+            // Include program even if it has no selected sub_entities
+            if (programData) {
+              const program: Program = {
+                id: programId,
+                sub_entities: selectedOptions,
+                children: collectAllChildren(key, formData)
+              };
+              
+              console.log(`Adding program:`, program);
+              processedPrograms.set(programId, program);
+            } else {
+              console.log(`No program data found for key: ${programDataKey}`);
+            }
+          }
+        });
+        
+        // Convert to array
+        transformedData.programs = Array.from(processedPrograms.values());
+
+        console.log("Transformed data:", transformedData);
+
+        // Send to the specified endpoint
+        const response = await apiClient.post(`${baseURL}/company_access_programs`, transformedData);
+        
+        return {
+          success: true,
+          message: "تم إرسال البيانات بنجاح",
+          data: response.data
+        };
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        throw error;
+      }
     },
     // Comprehensive error handler
     onError: (values: any, error: any) => {
