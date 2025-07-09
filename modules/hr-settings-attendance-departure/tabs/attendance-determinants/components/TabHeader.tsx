@@ -7,8 +7,26 @@ import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 
 export default function TabHeader() {
   const { showAllDeterminants, activeDeterminant } = useAttendanceDeterminants();
-  const [formConfig, setFormConfig] = useState(createDeterminantFormConfig);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  
+  // Create a modified config that includes the event handlers
+  const baseConfig = createDeterminantFormConfig;
+  const [formConfig, setFormConfig] = useState(() => {
+    // Add onSheetOpenChange to the base config
+    return {
+      ...createDeterminantFormConfig,
+      onSheetOpenChange: (open: boolean) => {
+        setIsFormOpen(open);
+        if (open) {
+          // Reset to base config when opening
+          setFormConfig((prev) => ({
+            ...createDeterminantFormConfig,
+            onSheetOpenChange: prev.onSheetOpenChange
+          }));
+        }
+      }
+    };
+  });
 
   // Listen to form changes to update wizard sections dynamically
   useEffect(() => {
@@ -17,23 +35,19 @@ export default function TabHeader() {
     const interval = setInterval(() => {
       const formValues = useFormStore?.getState().getValues("create-determinant-form");
       if (formValues?.working_days && Array.isArray(formValues.working_days)) {
+        // Get the updated config
         const newConfig = getDynamicDeterminantFormConfig(formValues.working_days);
-        setFormConfig(newConfig);
+        
+        // Preserve the onSheetOpenChange from the current config
+        setFormConfig((prevConfig) => ({
+          ...newConfig,
+          onSheetOpenChange: prevConfig.onSheetOpenChange
+        }));
       }
     }, 500); // Check every 500ms
 
     return () => clearInterval(interval);
   }, [isFormOpen]);
-
-  const handleFormOpen = () => {
-    setIsFormOpen(true);
-    setFormConfig(createDeterminantFormConfig); // Reset to base config
-  };
-
-  const handleFormClose = () => {
-    setIsFormOpen(false);
-    setFormConfig(createDeterminantFormConfig); // Reset to base config
-  };
 
   return (
     <div className="flex items-center justify-between w-full mb-4">
@@ -44,8 +58,6 @@ export default function TabHeader() {
         <SheetFormBuilder
           config={formConfig}
           trigger={<Button>إنشاء محدد</Button>}
-          onOpen={handleFormOpen}
-          onClose={handleFormClose}
         />
       </div>
     </div>
