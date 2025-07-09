@@ -2,7 +2,7 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import React from "react";
 import GearIcon from "@/public/icons/gear";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import TheStatus from "@/modules/bouquet/components/the-status";
 import { GetBouquetFormConfig } from "@/modules/form-builder/configs/bouquetFormConfig";
@@ -42,9 +42,10 @@ export const
 bouquetConfig = () => {
   const t = useTranslations("Bouquets");
   const router = useRouter();
-
+  const params = useParams();
+  const id = params?.id 
   return {
-    url: `${baseURL}/packages`,
+    url: `${baseURL}/packages?company_access_program_id=${id}`,
     tableId: "bouquets-table",
     columns: [
       {
@@ -152,6 +153,8 @@ bouquetConfig = () => {
         allowSearchFieldSelection: true,
         deleteUrl: `${baseURL}/packages`,
         formConfig: GetBouquetFormConfig(t),
+        editUrl: `${baseURL}/company_access_programs`,
+        executions:[],
         executionConfig: {
           canEdit: true,
           canDelete: true,
