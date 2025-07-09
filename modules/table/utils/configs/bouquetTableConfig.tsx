@@ -151,9 +151,7 @@ bouquetConfig = () => {
         searchParamName: "q",
         searchFieldParamName: "fields",
         allowSearchFieldSelection: true,
-        deleteUrl: `${baseURL}/packages`,
         formConfig: GetBouquetFormConfig(t),
-        editUrl: `${baseURL}/company_access_programs`,
         executions:[],
         executionConfig: {
           canEdit: true,
