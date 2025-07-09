@@ -26,8 +26,14 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     }
   }, [selectedBranches, selectedBranch]);
   
-  // Get current branch location data
-  const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : null;
+  // Get current branch location data - always provide default values to avoid undefined
+  const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : {
+    branchId: "",
+    isDefault: false,
+    latitude: "24.7136", // Default to Riyadh coordinates
+    longitude: "46.6753",
+    radius: "100"
+  };
   
   // Handle branch change
   const handleBranchChange = (branchId: string) => {
@@ -109,31 +115,30 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
         onBranchChange={handleBranchChange}
       />
       
-      {currentBranchData && (
-        <>
-          <DefaultLocationCheckbox
-            isDefaultLocation={currentBranchData.isDefault}
-            onChange={handleDefaultLocationChange}
-          />
-          
-          <CoordinatesInput
-            longitude={currentBranchData.longitude}
-            latitude={currentBranchData.latitude}
-            radius={currentBranchData.radius}
-            onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
-            onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
-            onRadiusChange={(value) => handleCoordinateChange('radius', value)}
-          />
-          
-          <MapComponent
-            selectedBranch={selectedBranch}
-            isDefaultLocation={currentBranchData.isDefault}
-            latitude={currentBranchData.latitude}
-            longitude={currentBranchData.longitude}
-            onMapClick={handleMapClick}
-          />
-        </>
-      )}
+      {/* Always render the components but ensure we never pass undefined values */}
+      <>
+        <DefaultLocationCheckbox
+          isDefaultLocation={currentBranchData.isDefault}
+          onChange={handleDefaultLocationChange}
+        />
+        
+        <CoordinatesInput
+          longitude={currentBranchData.longitude || ""}
+          latitude={currentBranchData.latitude || ""}
+          radius={currentBranchData.radius || "100"}
+          onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
+          onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
+          onRadiusChange={(value) => handleCoordinateChange('radius', value)}
+        />
+        
+        <MapComponent
+          selectedBranch={selectedBranch || ""}
+          isDefaultLocation={!!currentBranchData.isDefault}
+          latitude={currentBranchData.latitude || "24.7136"}
+          longitude={currentBranchData.longitude || "46.6753"}
+          onMapClick={handleMapClick}
+        />
+      </>
       
       <SaveButton onSave={onClose} />
     </div>
