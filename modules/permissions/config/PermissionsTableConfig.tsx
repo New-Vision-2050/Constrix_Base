@@ -58,7 +58,7 @@ export const permissionsTableConfig = () => {
     deleteUrl: `${baseURL}/role_and_permissions/permissions`,
     executionConfig: {
       canEdit: false,
-      canDelete: true,
+      canDelete: false,
     },
   };
 };
