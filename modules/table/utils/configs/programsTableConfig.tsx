@@ -123,7 +123,9 @@ export const programsConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    deleteUrl: `${baseURL}/company_access_programs`,
+    // deleteUrl: `${baseURL}/company_access_programs`,
+    // editUrl: `${baseURL}/company_access_programs`,
+    executions:[],
     formConfig: GetProgramFormConfig(t),
     executionConfig: {
       canEdit: true,
