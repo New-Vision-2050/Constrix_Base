@@ -4,18 +4,18 @@ import PermissionsBouquet from "@/modules/bouquet/components/permissions";
 import React from "react";
 
 interface BouquetDetailsProps {
-  params: {
+  params: Promise<{
     id: string;
     locale: string;
-  };
+  }>;
 }
 
 export default function BouquetDetailsPage({ params }: BouquetDetailsProps) {
-  const { id } = params;
+  const resolvedParams = React.use(params);
 
   return (
     <>
-      <PermissionsBouquet packageId={id} />
+      <PermissionsBouquet packageId={resolvedParams.id} />
     </>
   );
 }
