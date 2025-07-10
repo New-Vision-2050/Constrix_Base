@@ -44,36 +44,44 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
   return {
     formId: "create-determinant-form",
-    title: getText("createDeterminant", "إضافة محدد جديد"),
+    title: getText("form.title", "إضافة محدد جديد"),
     wizard: true,
+    wizardOptions: {
+      showStepIndicator: true,
+      showStepTitles: true,
+      validateStepBeforeNext: true,
+      nextButtonText: getText("form.nextButtonText", "التالي"),
+      prevButtonText: getText("form.prevButtonText", "السابق"),
+      finishButtonText: getText("form.submitButtonText", "حفظ المحدد")
+    },
     apiUrl: `${baseURL}/attendance/constraints`,
     sections: [
       {
-        title: "المعلومات الأساسية",
+        title: getText("form.basicInfo", "المعلومات الأساسية"),
         fields: [
           {
             type: "text",
             name: "constraint_name",
-            label: "اسم المحدد",
-            placeholder: "فرع القاهرة",
+            label: getText("form.determinantName", "اسم المحدد"),
+            placeholder: getText("form.determinantNamePlaceholder", "فرع القاهرة"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "اسم المحدد مطلوب",
+                message: getText("form.determinantNameRequired", "اسم المحدد مطلوب"),
               },
               {
                 type: "pattern",
                 value: /^[\p{L}\p{N}\s]+$/u,
-                message: "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط",
+                message: getText("form.determinantNamePattern", "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط"),
               },
             ],
           },
           {
             type: "select",
             name: "constraint_type",
-            label: "نظام المحدد",
-            placeholder: "منتظم",
+            label: getText("form.systemType", "نظام المحدد"),
+            placeholder: getText("form.systemTypePlaceholder", "منتظم"),
             dynamicOptions: {
               url: `${baseURL}/attendance/constraints/types`,
               valueField: "code",
@@ -89,7 +97,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: "نظام المحدد مطلوب",
+                message: getText("form.systemTypeRequired", "نظام المحدد مطلوب"),
               },
             ],
           },
@@ -109,7 +117,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "select",
             isMulti: true,
             name: "branch_ids",
-            label: "الفروع",
+            label: getText("form.branches", "الفروع"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
@@ -125,17 +133,17 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: "يجب اختيار فرع واحد على الأقل",
+                message: getText("form.branchesRequired", "يجب اختيار فرع واحد على الأقل"),
               },
             ],
           },
           {
             type: "radio",
             name: "location_type",
-            label: "نوع الموقع",
+            label: getText("form.locationType", "نوع الموقع"),
             options: [
-              { value: "main", label: "موقع الفرع الافتراضي" },
-              { value: "custom", label: "تحديد موقع لكل فرع من الفروع" },
+              { value: "main", label: getText("form.mainLocation", "موقع الفرع الافتراضي") },
+              { value: "custom", label: getText("form.customLocation", "موقع مخصص لكل فرع") },
             ],
             defaultValue: "main",
             required: true,
@@ -193,7 +201,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           },
           {
             name: "weekly_schedule",
-            label: "أضافة يوم عمل",
+            label: getText("form.workingDays", "أيام العمل"),
             type: "dynamicRows",
             dynamicRowOptions: {
               enableDrag: true,
@@ -213,7 +221,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 },
                 {
                   name: "periods",
-                  label: "أضافة فترة عمل",
+                  label: getText("form.addPeriod", "إضافة فترة"),
                   type: "dynamicRows",
                   dynamicRowOptions: {
                     enableDrag: true,
@@ -221,34 +229,34 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                       {
                         type: "text",
                         name: "from",
-                        label: "بداية الفترة",
-                        placeholder: "09:00",
+                        label: getText("form.periodStart", "بداية الفترة"),
+                        placeholder: getText("form.periodStartPlaceholder", "09:00"),
                         validation: [
                           {
                             type: "required",
-                            message: "بداية الفترة مطلوبة",
+                            message: getText("form.periodStartRequired", "بداية الفترة مطلوبة"),
                           },
                           {
                             type: "pattern",
                             value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00",
+                            message: getText("form.timeFormatError", "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"),
                           },
                         ],
                       },
                       {
                         type: "text",
                         name: "to",
-                        label: "نهاية الفترة",
-                        placeholder: "17:00",
+                        label: getText("form.periodEnd", "نهاية الفترة"),
+                        placeholder: getText("form.periodEndPlaceholder", "17:00"),
                         validation: [
                           {
                             type: "required",
-                            message: "نهاية الفترة مطلوبة",
+                            message: getText("form.periodEndRequired", "نهاية الفترة مطلوبة"),
                           },
                           {
                             type: "pattern",
                             value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00",
+                            message: getText("form.timeFormatError", "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00"),
                           },
                         ],
                       },
@@ -494,7 +502,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         }
       );
     },
-    submitButtonText: getText("submitButtonText", "حفظ المحدد"),
-    cancelButtonText: getText("cancelButtonText", "إلغاء"),
+    submitButtonText: getText("form.submitButtonText", "حفظ المحدد"),
+    cancelButtonText: getText("form.cancelButtonText", "إلغاء"),
   };
 };

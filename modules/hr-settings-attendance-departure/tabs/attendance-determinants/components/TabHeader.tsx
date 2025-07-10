@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 
 export default function TabHeader() {
   const { activeConstraint, refetchConstraints, branchesData } = useAttendanceDeterminants();
-  // استخدام hook الترجمة
   const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants");
   
   return (
@@ -16,11 +15,7 @@ export default function TabHeader() {
       </h2>
       <div className="flex gap-2">
         <SheetFormBuilder
-          config={getDynamicDeterminantFormConfig({ 
-            refetchConstraints, 
-            branchesData,
-            t: (key: string) => t(key) // إرسال دالة الترجمة للفورم
-          })}
+          config={getDynamicDeterminantFormConfig({ refetchConstraints, branchesData, t })}
           trigger={<Button>{t('createDeterminant')}</Button>}
         />
       </div>
