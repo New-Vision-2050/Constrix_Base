@@ -8,6 +8,8 @@ import React from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
+import { can } from "@/hooks/useCan";
+import { Actions } from "@/lib/ability";
 
 // Define types for the company data
 interface CompanyData {
@@ -39,6 +41,8 @@ export interface UserTableRow {
 
 // Create a component that uses the translations
 export const UsersConfig = () => {
+  const permissions = can(["delete" , "update"], "users.user") as Record<Actions, boolean>;
+  
   const t = useTranslations("Companies");
 
   return {
@@ -201,8 +205,8 @@ export const UsersConfig = () => {
       },
     ],
     executionConfig: {
-      canEdit: false,
-      canDelete: true,
+      canEdit: permissions.update,
+      canDelete: permissions.delete,
     },
   };
 };
