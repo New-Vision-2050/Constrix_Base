@@ -341,6 +341,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
                           <th className="px-4 py-3 text-center text-sm font-medium">تصدير</th>
                           <th className="px-4 py-3 text-center text-sm font-medium">تنشيط</th>
                           <th className="px-4 py-3 text-center text-sm font-medium">قائمة</th>
+                          <th className="px-4 py-3 text-center text-sm font-medium">العدد</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -457,6 +458,9 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
                                       }}
                                     />
                                   </div>
+                                </td>
+                                <td className="px-4 py-4 text-center text-sm text-white font-medium">
+                                  -
                                 </td>
                               </tr>
                             </React.Fragment>
