@@ -244,39 +244,39 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       refetchConstraints();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      // التحقق من وجود أيام مكررة في جدول العمل
+      // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
         const weeklySchedule = formData.weekly_schedule as Array<any>;
         const days = weeklySchedule.map((item) => item.day);
 
-        // البحث عن الأيام المكررة
+        // Find duplicate days
         const uniqueDays = new Set(days);
         if (uniqueDays.size !== days.length) {
-          // إذا وجدت أيام مكررة، إرجاع خطأ
+          // If duplicate days are found, return an error
           return {
             success: false,
-            message: "تم اختيار هذا اليوم مسبقاً",
+            message: "This day has already been selected",
           };
         }
 
-        // تنسيق بيانات جدول العمل للإرسال
+        // Format schedule data for submission
         const formattedSchedule = weeklySchedule.map((dayItem) => {
-          // التعامل مع حالة dayItem.periods دائماً بأمان
+          // Handle dayItem.periods safely
           let periodsArray = [];
 
           try {
             if (dayItem.periods) {
               if (Array.isArray(dayItem.periods)) {
-                // إذا كانت مصفوفة
+                // If it's an array
                 periodsArray = dayItem.periods.map((period: any) => {
-                  // للتأكد من أن period هو كائن
+                  // Ensure period is an object
                   if (period && typeof period === "object") {
                     return {
                       from: String(period.from || ""),
                       to: String(period.to || ""),
                     };
                   } else {
-                    // إذا لم يكن period كائنًا
+                    // If period is not an object
                     return { from: "", to: "" };
                   }
                 });
@@ -304,18 +304,18 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           };
         });
 
-        // تحديث البيانات بالجدول المنسق
+        // Update data with formatted schedule
         formData.formatted_schedule = formattedSchedule;
       }
 
-      // تجهيز بيانات المواقع
+      // Preparing location data
       let branch_locations = [];
 
       if (Boolean(formData.location_type === "main" && props.branchesData)) {
-        // إذا تم اختيار المواقع الافتراضية، استخدم المواقع الافتراضية للفروع المحددة
+        // If default locations are selected, use the default locations for the selected branches
         const selectedBranches = formData.branch_ids || [];
 
-        // إنشاء مصفوفة مواقع الفروع باستخدام بيانات الفروع من props
+        // Create branch locations array using branch data from props
         branch_locations = Array.isArray(selectedBranches)
           ? selectedBranches.map((branchId) => {
               const branchData = props.branchesData?.find(
@@ -337,7 +337,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             })
           : [];
       } else {
-        // إذا تم اختيار المواقع المخصصة، استخدم القيم المخصصة المحددة
+        // If custom locations are selected, use the custom values
         branch_locations = JSON.parse(
           (formData.branch_locations as string) ?? "[]"
         );
@@ -363,23 +363,23 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             subtype: "multiple_periods",
             weekly_schedule: Object.keys(dayNames).reduce<Record<string, any>>(
               (acc, day) => {
-                // طباعة معلومات تصحيحية لفهم شكل البيانات
+                // Print debug information to understand the data structure
                 const daySchedules = Array.isArray(formData.formatted_schedule)
                   ? formData.formatted_schedule.filter(
                       (period: any) => period.day === day
                     )
                   : [];
 
-                // جمع ساعات العمل لليوم
+                // Collect working hours for the day
                 let dayPeriods: any[] = [];
 
-                // تجميع جميع فترات العمل لهذا اليوم
+                // Collect all working periods for this day
                 daySchedules.forEach((dayItem: any) => {
                   if (Array.isArray(dayItem.periods)) {
                     dayItem.periods.forEach((period: any) => {
-                      // التحقق من الحقول المطلوبة
+                      // Validate required fields
 
-                      // التحقق من الاسم الصحيح للحقل
+                      // Check for the correct field name
                       const startTime = period.from || "";
                       const endTime = period.to || "";
 
@@ -397,7 +397,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
                 dayPeriods.forEach((period) => {
                   try {
-                    // تحويل الأوقات إلى دقائق
+                    // Convert times to minutes
                     const [startHour, startMinute] = period.start_time
                       .split(":")
                       .map(Number);
@@ -405,18 +405,18 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                       .split(":")
                       .map(Number);
 
-                    // حساب الفرق بالدقائق
+                    // Calculate the difference in minutes
                     const startTotalMinutes =
                       startHour * 60 + (startMinute || 0);
                     const endTotalMinutes = endHour * 60 + (endMinute || 0);
                     let diffMinutes = endTotalMinutes - startTotalMinutes;
 
-                    // إذا كانت النهاية قبل البداية، نفترض أنها تعدى منتصف الليل
+                    // If the end time is before the start time, we assume it crosses midnight
                     if (diffMinutes < 0) {
-                      diffMinutes += 24 * 60; // إضافة 24 ساعة
+                      diffMinutes += 24 * 60; // Add 24 hours
                     }
 
-                    // تحويل الدقائق إلى ساعات
+                    // Convert minutes to hours
                     const hours = diffMinutes / 60;
                     totalWorkHours += hours;
                   } catch (e) {
@@ -424,10 +424,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   }
                 });
 
-                // تقريب إلى رقمين عشريين
+                // Round to two decimal places
                 totalWorkHours = Math.round(totalWorkHours * 100) / 100;
 
-                // إضافة اليوم إلى الكائن النهائي
+                // Add the day to the final object
                 acc[day] = {
                   enabled: dayPeriods.length > 0,
                   total_work_hours: totalWorkHours,
