@@ -195,8 +195,8 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       }));
     }
     
-    // Toggle permissionId in changedPermissionIds array
-    if (permissionId) {
+    // Add permissionId to changedPermissionIds array only when checked is true
+    if (permissionId && checked) {
       setChangedPermissionIds(prev => {
         const newIds = [...prev];
         const existingIndex = newIds.indexOf(permissionId);
@@ -204,9 +204,6 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
         if (existingIndex === -1) {
           // ID not in array, add it
           newIds.push(permissionId);
-        } else {
-          // ID exists in array, remove it
-          newIds.splice(existingIndex, 1);
         }
         
         return newIds;
@@ -214,26 +211,55 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
     }
   };
 
-  // Function to submit changed permission IDs to API
+  // Function to get all currently active permission IDs
+  const getAllActivePermissionIds = (): string[] => {
+    const activeIds: string[] = [];
+    
+    if (permissions && packagePermissions?.payload.permissions) {
+      Object.entries(permissions).forEach(([categoryKey, categoryData]) => {
+        if (categoryData && typeof categoryData === 'object') {
+          Object.entries(categoryData).forEach(([subKey, subItems]) => {
+            if (Array.isArray(subItems)) {
+              subItems.forEach((item: PermissionItem) => {
+                const switchType = getSwitchTypeFromPermissionType(item.type);
+                if (switchType) {
+                  const stateKey = `${categoryKey}.${subKey}.${switchType}`;
+                  if (activeStates[stateKey]) {
+                    activeIds.push(item.id);
+                  }
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+    
+    return activeIds;
+  };
+
+  // Function to submit all active permission IDs to API
    const submit = async () => {
     setSubmitting(true);
     try {
-      // Send only the changed permission IDs
-      if (changedPermissionIds.length === 0) {
-        toast.warning('No permissions have been changed');
+      // Get all currently active permission IDs
+      const activePermissionIds = getAllActivePermissionIds();
+      
+      if (activePermissionIds.length === 0) {
+        toast.warning('No permissions selected');
         setSubmitting(false);
         return;
       }
 
       const response = await apiClient.post(`/packages/${packageId}/assign-permissions`, {
-        permissions: changedPermissionIds
+        permissions: activePermissionIds
       });
 
       if (response.status === 200 || response.status === 201) {        
         try {
           toast.success('Permissions assigned successfully!');
           // Reset changed permissions after successful submission
-          setChangedPermissionIds([]);
+          activePermissionIds.length = 0;
           // Trigger useEffect to refresh data
           setRefreshTrigger(prev => prev + 1);
           
