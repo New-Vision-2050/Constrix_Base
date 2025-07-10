@@ -8,7 +8,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 // Day names mapping
 const dayNames = {
   sunday: "الأحد",
-  monday: "الاثنين",
+  monday: "الإثنين",
   tuesday: "الثلاثاء",
   wednesday: "الأربعاء",
   thursday: "الخميس",
@@ -19,6 +19,13 @@ const daysList = Object.entries(dayNames).map(([key, value]) => ({
   value: key,
   label: value,
 }));
+
+// الرسائل التي سيتم عرضها في النموذج
+const messages = {
+  addDay: "أضافة يوم عمل",
+  addPeriod: "أضافة فترة عمل",
+  duplicateDay: "تم اختيار هذا اليوم مسبقاً"
+};
 
 // Function to create day-specific sections dynamically
 const createDaySections = (workingDays: string[]) => {
@@ -280,7 +287,7 @@ export const createDeterminantFormConfig: FormConfig = {
         },
         {
           name: "weekly_schedule",
-          label: "جدول العمل",
+          label: "جدول العمل - أضافة يوم عمل",
           type: "dynamicRows",
           dynamicRowOptions: {
             enableDrag: true,
@@ -300,7 +307,7 @@ export const createDeterminantFormConfig: FormConfig = {
               },
               {
                 name: "periods",
-                label: "فترة العمل",
+                label: "فترة العمل - أضافة فترة عمل",
                 type: "dynamicRows",
                 dynamicRowOptions: {
                   enableDrag: true,
@@ -346,18 +353,50 @@ export const createDeterminantFormConfig: FormConfig = {
     // Day sections will be added dynamically based on working_days selection
   ],
   onSubmit: async (formData: Record<string, unknown>) => {
-    // prepare data for submission
+    // التحقق من وجود أيام مكررة في جدول العمل
+    if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
+      const weeklySchedule = formData.weekly_schedule as Array<any>;
+      const days = weeklySchedule.map((item) => item.day);
+      
+      // البحث عن الأيام المكررة
+      const uniqueDays = new Set(days);
+      if (uniqueDays.size !== days.length) {
+        // إذا وجدت أيام مكررة، إرجاع خطأ
+        return {
+          success: false,
+          message: messages.duplicateDay || "تم اختيار هذا اليوم مسبقاً",
+        };
+      }
+      
+      // تنسيق بيانات جدول العمل للإرسال
+      const formattedSchedule = weeklySchedule.map((dayItem) => {
+        return {
+          day: dayItem.day,
+          periods: Array.isArray(dayItem.periods) 
+            ? dayItem.periods.map((period: any) => ({
+                from: period.period_from,
+                to: period.period_to,
+              }))
+            : [],
+        };
+      });
+      
+      // تحديث البيانات بالجدول المنسق
+      formData.formatted_schedule = formattedSchedule;
+    }
+    
+    // تجهيز بيانات المواقع
     const branch_locations =
       formData.location_type === "custom"
         ? JSON.parse((formData.branch_locations as string) ?? "[]")
         : [];
+        
     const data = {
       constraint_name: formData.constraint_name,
       is_active: formData.is_active,
       constraint_type: formData.constraint_type,
       branch_ids: formData.branch_ids,
       branch_locations: branch_locations?.map((branch: any) => {
-        console.log("branch909", branch);
         return {
           branch_id: branch.branchId,
           name: branch.branchName,
@@ -367,9 +406,10 @@ export const createDeterminantFormConfig: FormConfig = {
           radius: Number(branch.radius ?? "0"),
         };
       }),
-      // "constraint_config"
+      weekly_schedule: formData.formatted_schedule || [],
     };
-    console.log("Form data received:", data, formData);
+    
+    console.log("Form data received:", data);
 
     return await defaultSubmitHandler(data, createDeterminantFormConfig, {
       url: `${baseURL}/attendance/constraints`,
