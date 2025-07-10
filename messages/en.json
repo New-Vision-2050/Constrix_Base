@@ -156,7 +156,9 @@
     "OrganizationalStructure": "Organizational Structure",
     "AttendanceDeparture": "Attendance and Departure",
     "HumanResources": "Human Resources",
-    "ProgramManagement": "Program Management"
+    "ProgramManagement": "Program Management",
+    "Powers": "Powers"
+
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
@@ -565,5 +567,13 @@
     "delete": "Delete",
     "view": "View",
     "activate": "Activate"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this program?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this program?"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this package?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this package?"
   }
 }

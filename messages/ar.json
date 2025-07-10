@@ -156,7 +156,8 @@
     "OrganizationalStructure": "الهيكل التنظيمي",
     "AttendanceDeparture": "الحضور والانصراف",
     "HumanResources": "الموارد البشرية",
-    "ProgramManagement": "ادارة البرامج"
+    "ProgramManagement": "ادارة البرامج"  ,
+    "Powers": "الصلاحيات"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -565,5 +566,13 @@
     "delete": "حذف",
     "view": "تفاصيل",
     "activate": "تنشيط"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط البرنامج؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط البرنامج؟"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
   }
 }
