@@ -58,7 +58,6 @@ const SidebarHeaderContent = ({
         <AvatarGroup
           fullName={user?.name ?? ""}
           alt={user?.name ?? ""}
-          src="https://github.com/shad\cn.png"
         />
         <p
           className={cn(

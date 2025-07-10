@@ -137,7 +137,6 @@ const ProfileDrop = () => {
         <AvatarGroup
           fullName={user?.name}
           alt={user?.name}
-          src="https://github.com/shad\cn.png"
         />
       )}
       <DropdownMenu dir="rtl" open={open}>
