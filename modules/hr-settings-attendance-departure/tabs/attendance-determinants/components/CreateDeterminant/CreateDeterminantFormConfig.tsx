@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 // Day names mapping
 const dayNames = {
@@ -279,31 +280,33 @@ export const createDeterminantFormConfig: FormConfig = {
   ],
   onSubmit: async (formData: Record<string, unknown>) => {
     // prepare data for submission
-    const branch_locations = formData.location_type === "custom" ? JSON.parse((formData.branch_locations as string)??"[]") : [];
+    const branch_locations =
+      formData.location_type === "custom"
+        ? JSON.parse((formData.branch_locations as string) ?? "[]")
+        : [];
     const data = {
       constraint_name: formData.constraint_name,
       is_active: formData.is_active,
       constraint_type: formData.constraint_type,
       branch_ids: formData.branch_ids,
-      branch_locations:branch_locations?.map((branch: any) => {
-        console.log("branch909",branch);
+      branch_locations: branch_locations?.map((branch: any) => {
+        console.log("branch909", branch);
         return {
           branch_id: branch.branchId,
           name: branch.branchName,
           address: "branch.address",
           latitude: branch.latitude,
           longitude: branch.longitude,
-          radius: branch.radius,
-        }
+          radius: Number(branch.radius ?? "0"),
+        };
       }),
       // "constraint_config"
     };
-    console.log("Form data received:",data, formData);
+    console.log("Form data received:", data, formData);
 
-    return {
-      success: true,
-      message: "Form submitted successfully",
-    };
+    return await defaultSubmitHandler(data, createDeterminantFormConfig, {
+      url: `${baseURL}/attendance/constraints`,
+    });
   },
   submitButtonText: "حفظ المحدد",
   cancelButtonText: "إلغاء",
