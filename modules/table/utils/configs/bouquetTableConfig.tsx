@@ -94,11 +94,10 @@ bouquetConfig = () => {
       {
         key: "status",
         label: "الحالة",
-        render: (_: unknown, row: BouquetTableRow) => (
-          <TheStatus theStatus={row.status ? "active" : "inActive"} id={row.id} />
+        render: (value: "active" | "inActive", row: BouquetTableRow) => (
+          <TheStatus theStatus={value} id={row.id} />
         ),
       },
-     
     ],
      allSearchedFields: [
           {

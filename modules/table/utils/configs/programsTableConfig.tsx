@@ -64,7 +64,7 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
         ),
       },
       {
-        key: "is_active",
+        key: "status",
         label: "الحالة",
         render: (value: "active" | "inActive", row: ProgramTableRow) => (
           <TheStatus theStatus={value} id={row.id} />
