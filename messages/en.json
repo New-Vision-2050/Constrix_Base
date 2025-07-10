@@ -1,4 +1,7 @@
 {
+  "Shared": {
+    "NotAuthorized": "Not authorized to view this content"
+  },
   "Main": {
     "NoResultsRound": "No results found",
     "Loading": "Loading data..."
