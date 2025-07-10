@@ -7,6 +7,7 @@ import React, {
 import { useConstraintsData } from "@/modules/hr-settings-attendance-departure/hooks/useConstraints";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import useBranchHierarchiesData from "@/modules/organizational-structure/components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure/hooks/useBranchHierarchiesData";
+import { useBranchiesData } from "../hooks/useBranchiesData";
 
 // Define the context interface
 interface AttendanceDeterminantsContextType {
@@ -37,7 +38,7 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     refetch: refetchConstraints,
   } = useConstraintsData();
 
-  const { data: branchesData } = useBranchHierarchiesData();
+  const { data: branchesData } = useBranchiesData();
 
   console.log("branchesData", branchesData);
 

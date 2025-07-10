@@ -24,6 +24,7 @@ export default function SaveButton({ onSave }: SaveButtonProps) {
         isDefaultLocation: branchData.isDefault,
         latitude: branchData.latitude,
         longitude: branchData.longitude,
+        radius: branchData.radius,
       };
     });
 

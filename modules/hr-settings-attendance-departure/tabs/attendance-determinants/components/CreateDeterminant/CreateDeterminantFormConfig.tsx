@@ -288,24 +288,14 @@ export const createDeterminantFormConfig: FormConfig = {
       branch_locations:branch_locations?.map((branch: any) => ({
         branch_id: branch.branchId,
         name: branch.branchName,
-        address: branch.address,
+        address: "branch.address",
         latitude: branch.latitude,
         longitude: branch.longitude,
         radius: branch.radius,
       })),
-      // [
-      //     {
-      //         "branch_id": "1",
-      //         "name": "فرع الرياض - المقر الرئيسي",
-      //         "address": "طريق الملك فهد، الرياض",
-      //         "latitude": 24.7136,
-      //         "longitude": 46.6753,
-      //         "radius": 300
-      //     }
-      // ],
       // "constraint_config"
     };
-    console.log("Form data received:", formData);
+    console.log("Form data received:",data, formData);
 
     return {
       success: true,
