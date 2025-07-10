@@ -2,15 +2,12 @@ import {FormConfig, useFormStore} from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
-import { useRouter } from "next/router";
-import { useParams } from "next/navigation";
+import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
-export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
-  // Get ID from URL parameters
-  const params = useParams();
-  const id = params?.id 
+// Create a config function that accepts id as a parameter instead of using hooks directly
+export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: string): FormConfig {
+  // id is now passed as a parameter instead of using useParams()
   
-
   
     return {
       formId: "bouquet-form",
@@ -235,7 +232,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
         
         try {
           // Transform form data to match API structure
-          const requestBody = {
+          const transformedData = {
             company_access_program_id: id,
             name: formData.name as string,
             price: Number(formData.price) || 0,
@@ -248,17 +245,10 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
             company_fields: Array.isArray(formData.company_fields) ? formData.company_fields as string[] : [],
             company_types: Array.isArray(formData.company_types) ? formData.company_types as string[] : []
           };
-          
-          
+                    
           // Make API call to packages endpoint
-          const response = await apiClient.post(`${baseURL}/packages`, requestBody);
           
-          
-          return {
-            success: true,
-            message: "Package created successfully",
-            data: response.data
-          };
+          return await defaultSubmitHandler(transformedData, GetBouquetFormConfig(t, id));
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
