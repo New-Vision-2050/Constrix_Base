@@ -127,6 +127,12 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             ],
             defaultValue: "main",
             required: true,
+            validation:[
+              {
+                type: "required",
+                message: "يجب اختيار نوع الموقع",
+              },
+            ],
           },
           {
             type: "hiddenObject",
