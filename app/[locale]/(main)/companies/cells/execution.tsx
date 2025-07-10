@@ -190,7 +190,7 @@ const Execution = ({
       </DropdownMenu>
 
       {/* Delete Confirmation Dialog */}
-      {formConfig && actionState.delete && (
+      {actionState.delete && (
         <DeleteConfirmationDialog
           deleteUrl={actionState.delete.url}
           onClose={() => handleCloseDialog("delete")}

@@ -9,10 +9,14 @@ export const ROUTER = {
   PROGRAM_SETTINGS: {
     USERS: "/users-settings",
   },
+  HR_SETTINGS: "/hr-settings",
   Organizational_Structure: "/organizational-structure",
   Powers: "/powers",
   Programs: "/programs",
   Bouquet: "/bouquet",
   BouquetById: (id: string) => `/bouquet/${id}`,
   BouquetDetailsById: (id: string) => `/bouquetDetails/${id}`,
+  ROLES:'/roles',
+  PERMISSIONS:"/permissions",
+  AttendanceDeparture: "/attendance-departure"
 };

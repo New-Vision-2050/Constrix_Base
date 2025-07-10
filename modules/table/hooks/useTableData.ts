@@ -89,7 +89,7 @@ export const useTableData = (
   useTableInitialization({
     formConfig: config?.formConfig,
     executions: config?.executions,
-    executionsConfig: config?.executionConfig,
+    executionsConfig: config?.executionConfig, // Pass executionConfig as executionsConfig
     configColumns,
     availableColumnKeys: config?.availableColumnKeys, // Pass the availableColumnKeys
     defaultVisibleColumnKeys: config?.defaultVisibleColumnKeys, // Pass the defaultVisibleColumnKeys

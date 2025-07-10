@@ -36,10 +36,6 @@ export const SingleExperienceFormConfig = ({
             placeholder: "المسمى الوظيفي",
             validation: [
               {
-                type: "required",
-                message: "المسمى الوظيفي مطلوب",
-              },
-              {
                     type: "pattern",
                     value: "^[a-zA-Z\u0600-\u06FF\\s]+$",
                     message: "يجب أن يحتوي فقط على أحرف",
@@ -55,12 +51,7 @@ export const SingleExperienceFormConfig = ({
               formId: `user-experiences-data-form-${experience?.id ?? ""}`,
               field: "training_to",
             },
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ البداية مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             label: "تاريخ الانتهاء",
@@ -77,12 +68,7 @@ export const SingleExperienceFormConfig = ({
             label: "اسم الشركة",
             type: "text",
             placeholder: "اسم الشركة",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الشركة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "about",

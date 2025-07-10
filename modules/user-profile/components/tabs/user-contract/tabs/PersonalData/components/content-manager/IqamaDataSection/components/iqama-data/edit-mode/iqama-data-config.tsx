@@ -27,10 +27,16 @@ export const IqamaDataFormConfig = () => {
             label: "رقم الاقامة",
             type: "text",
             placeholder: "رقم الاقامة",
+            required:true,
             validation: [
               {
                 type: "required",
                 message: "رقم الاقامة مطلوب",
+              },
+              {
+                type: "pattern",
+                value: "^[0-9]{10}$",
+                message: "رقم الإقامة يجب أن يتكون من 10 أرقام فقط",
               },
             ],
           },
@@ -42,6 +48,13 @@ export const IqamaDataFormConfig = () => {
               formId: `iqama-entry-data-form`,
               field: "entry_number_end_date",
             },
+            required:true,
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الاصدار مطلوب",
+              },
+            ],
             placeholder: "تاريخ الاصدار",
           },
           {
@@ -52,6 +65,13 @@ export const IqamaDataFormConfig = () => {
               formId: `iqama-entry-data-form`,
               field: "entry_number_start_date",
             },
+            required:true,
+            validation: [
+              {
+                type: "required",
+                message: "تاريخ الانتهاء مطلوب",
+              },
+            ],
             placeholder: "تاريخ الانتهاء",
           },
           {

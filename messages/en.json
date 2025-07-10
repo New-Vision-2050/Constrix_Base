@@ -151,8 +151,10 @@
     "DashboardSettings": "Dashboard",
     "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
+    "HRSettings": "Settings",
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
+    "AttendanceDeparture": "Attendance and Departure",
     "HumanResources": "Human Resources",
     "ProgramManagement": "Program Management",
     "Powers": "Powers"
@@ -376,7 +378,9 @@
           "title": "Structure Settings",
           "tabs": {
             "jobTitles": { "title": "Job Titles" },
-            "jobTypes": { "title": "Job Types" }
+            "jobTypes": { "title": "Job Types" },
+            "management": { "title": "Management" },
+            "departments": { "title": "Departments" }
           }
         }
       }
@@ -394,6 +398,8 @@
     "name": "Full Name",
     "namePlaceholder": "Enter full name",
     "nameRequired": "Name is required",
+    "nameThreeTerms": "Name must consist of exactly three terms (first, middle, and last name)",
+    "nameLettersOnly": "Name must contain only letters (no numbers or symbols)",
     "nickname": "Nickname",
     "nicknamePlaceholder": "Enter nickname",
     "nicknameRequired": "Nickname is required",
@@ -424,5 +430,150 @@
   "Bouquets": {
     "AreYouSureReactivate": "Are you sure you want to reactivate this package?",
     "AreYouSureDeactivate": "Are you sure you want to deactivate this package?"
+  },
+  "AttendanceDepartureModule":{
+    "shared": {
+      "EmployeeInfoSection": {
+        "branch": "Branch",
+        "jobId": "Job ID",
+        "department": "Department",
+        "approver": "Approver",
+        "attendanceStatus": "Attendance Status",
+        "unspecified": "Not specified",
+        "status": {
+          "present": "Present",
+          "late": "Late",
+          "absent": "Absent"
+        }
+      }
+    },
+    "AttendanceDateSelector":{
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "search": "Search",
+      "clearFilters": "Clear Filters"
+    },
+    "EmployeeDetailsSheet": {
+      "fields": {
+        "employeeName": "Employee Name",
+        "phone": "Mobile Number",
+        "department": "Department",
+        "email": "Email",
+        "branch": "Branch"
+      },
+      "personalInfo": {
+        "gender": "Gender",
+        "birthDate": "Birth Date",
+        "nationality": "Nationality"
+      },
+      "status": {
+        "attendanceStatus": "Attendance Status",
+        "employeeStatus": "Employee Status"
+      },
+      "times": {
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "morning": "AM",
+        "afternoon": "PM"
+      }
+    },
+    "Map": {
+      "layers": {
+        "standard": "Standard Map",
+        "satellite": "Satellite Map"
+      },
+      "loading": "Loading employee data...",
+      "employeeStatus": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "tooltip": {
+        "employee": "Employee:",
+        "branch": "Branch:",
+        "department": "Department:",
+        "lastSeen": "Last Seen:"
+      }
+    },
+    "MapSearchFilter": {
+      "searchPlaceholder": "Search",
+      "tableView": "Table",
+      "export": "Export"
+    },
+    "SearchFilter": {
+      "title": "Search Filter",
+      "branch": "Branch",
+      "all": "All",
+      "loadingBranches": "Loading branches...",
+      "department": "Department",
+      "approver": "Approver",
+      "loadingApprovers": "Loading approvers...",
+      "searchPlaceholder": "Name/Email/Mobile"
+    },
+    "StatisticsCards":{
+      "totalAttendance": "Total Attendance",
+      "totalAbsence": "Total Absences",
+      "totalDepartures": "Total Departures",
+      "totalHolidays": "Total Holiday Days"
+    },
+    "Table":{
+      "mapView": "Map View",
+      "columns": {
+        "name": "Name",
+        "date": "Date",
+        "jobCode": "Job ID",
+        "branch": "Branch",
+        "management": "Department",
+        "approver": "Approved By",
+        "employeeStatus": "Employee Status",
+        "attendanceStatus": "Attendance Status"
+      },
+      "filters": {
+        "searchPlaceholder": "Search",
+        "branchPlaceholder": "Branch",
+        "managementPlaceholder": "Department",
+        "constraintPlaceholder": "Constraint"
+      },
+      "deleteConfirm": "Confirm deletion of attendance record",
+      "status": {
+        "onTime": "On Time",
+        "late": "Late"
+      },
+      "dialogs": {
+        "approver": {
+          "title": "Attendance Approver Details",
+          "approverName": "Approver Name",
+          "approverSystem": "Approver System",
+          "unspecified": "Not specified",
+          "period": "Period",
+          "noWeeklySchedule": "No weekly schedule available",
+          "workHours": "Working hours:",
+          "days": {
+            "sunday": "Sunday",
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday"
+          }
+        },
+        "attendanceStatus": {
+          "title": "Attendance Status",
+          "attendance": "Check-in",
+          "departure": "Check-out"
+        }
+      }
+    }
+  },
+  "RoleTypes": {
+    "all": "Grant all permissions",
+    "update": "Update",
+    "import": "Import",
+    "export": "Export",
+    "list": "List",
+    "create": "Create",
+    "delete": "Delete",
+    "view": "View",
+    "activate": "Activate"
   }
 }

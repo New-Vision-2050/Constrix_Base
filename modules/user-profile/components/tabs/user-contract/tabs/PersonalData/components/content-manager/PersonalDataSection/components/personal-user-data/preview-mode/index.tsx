@@ -10,8 +10,8 @@ export default function UserProfilePersonalDataReview() {
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          required={true}
           label="الاسم ثلاثي"
+          required
           value={userPersonalData?.name ?? ""}
           valid={Boolean(userPersonalData?.name)}
         />
@@ -73,6 +73,7 @@ export default function UserProfilePersonalDataReview() {
       <div className="p-2 col-span-3">
         <PreviewTextField
           label="الجنسية"
+          required
           value={userPersonalData?.country ?? ""}
           valid={Boolean(userPersonalData?.country)}
         />

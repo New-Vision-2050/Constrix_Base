@@ -107,8 +107,9 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
 
         // Check if the target field is configured for multi-select
         // We need to check the field config in formValues to determine this
-        const targetFieldConfig = Object.values(formValues)
-          .find((val: any) => val?.name === field.syncWithField) as FieldConfig | undefined;
+        const targetFieldConfig = Object.values(formValues).find(
+          (val: any) => val?.name === field.syncWithField
+        ) as FieldConfig | undefined;
 
         // Default to multi-select if we can't determine
         const isTargetMulti = targetFieldConfig?.isMulti !== false;
@@ -117,15 +118,20 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
           // Ensure targetFieldValue is treated as an array
           const targetValueArray = Array.isArray(targetFieldValue)
             ? targetFieldValue
-            : (targetFieldValue ? [targetFieldValue] : []);
+            : targetFieldValue
+            ? [targetFieldValue]
+            : [];
 
           if (checked) {
             // Add the value to the target field if not already present
-            targetNewValue = [...targetValueArray, optionValue]
-              .filter((v, i, a) => a.indexOf(v) === i);
+            targetNewValue = [...targetValueArray, optionValue].filter(
+              (v, i, a) => a.indexOf(v) === i
+            );
           } else {
             // Remove the value from the target field
-            targetNewValue = targetValueArray.filter(val => val !== optionValue);
+            targetNewValue = targetValueArray.filter(
+              (val) => val !== optionValue
+            );
           }
         } else {
           // For single-select target fields
@@ -143,9 +149,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
 
   // Handle parent checkbox change
   const handleParentChange = (checked: boolean) => {
-    const newValue = checked
-      ? options.map((option) => option.value)
-      : [];
+    const newValue = checked ? options.map((option) => option.value) : [];
 
     // Update this field's value
     onChange(newValue);
@@ -162,8 +166,9 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
         const targetFieldValue = formValues[field.syncWithField];
 
         // Check if the target field is configured for multi-select
-        const targetFieldConfig = Object.values(formValues)
-          .find((val: any) => val?.name === field.syncWithField) as FieldConfig | undefined;
+        const targetFieldConfig = Object.values(formValues).find(
+          (val: any) => val?.name === field.syncWithField
+        ) as FieldConfig | undefined;
 
         // Default to multi-select if we can't determine
         const isTargetMulti = targetFieldConfig?.isMulti !== false;
@@ -172,18 +177,23 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
           // Ensure targetFieldValue is treated as an array
           const targetValueArray = Array.isArray(targetFieldValue)
             ? targetFieldValue
-            : (targetFieldValue ? [targetFieldValue] : []);
+            : targetFieldValue
+            ? [targetFieldValue]
+            : [];
 
           // For multi-select target fields
           if (checked) {
             // Add all options to the target field
-            const targetNewValue = [...targetValueArray, ...options.map(opt => opt.value)]
-              .filter((v, i, a) => a.indexOf(v) === i);
+            const targetNewValue = [
+              ...targetValueArray,
+              ...options.map((opt) => opt.value),
+            ].filter((v, i, a) => a.indexOf(v) === i);
             setFieldValue(field.syncWithField, targetNewValue);
           } else {
             // Remove all options from the target field
-            const targetNewValue = targetValueArray
-              .filter(val => !options.map(opt => opt.value).includes(val));
+            const targetNewValue = targetValueArray.filter(
+              (val) => !options.map((opt) => opt.value).includes(val)
+            );
             setFieldValue(field.syncWithField, targetNewValue);
           }
         }
@@ -201,122 +211,98 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
 
       // Only sync if the sync field has a value and it's different from current value
       // Make sure we don't trigger unnecessary updates
-      if (syncFieldValue !== undefined &&
-          JSON.stringify(syncFieldValue) !== JSON.stringify(value) &&
-          // Prevent infinite loops by checking if the value is actually different
-          // and not just empty arrays or similar edge cases
-          !(Array.isArray(syncFieldValue) && syncFieldValue.length === 0 &&
-            (Array.isArray(value) && value.length === 0 || value === undefined || value === null))
+      if (
+        syncFieldValue !== undefined &&
+        JSON.stringify(syncFieldValue) !== JSON.stringify(value) &&
+        // Prevent infinite loops by checking if the value is actually different
+        // and not just empty arrays or similar edge cases
+        !(
+          Array.isArray(syncFieldValue) &&
+          syncFieldValue.length === 0 &&
+          ((Array.isArray(value) && value.length === 0) ||
+            value === undefined ||
+            value === null)
+        )
       ) {
         onChange(syncFieldValue);
       }
     }
   }, [field.syncWithField, field.syncDirection, formValues, onChange, value]);
 
+  const optionsTitle = field.optionsTitle || field.label;
+
   return (
     <div className="flex flex-col space-y-2">
-      {!!field?.optionsTitle && (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <div className="w-full flex items-center justify-between">
-            <div className="flex items-center gap-x-2">
-              {field.isMulti && (
-                <Checkbox
-                  id={`${field?.optionsTitle}`}
-                  name={field.name}
-                  disabled={field.disabled || options.length === 0}
-                  className={cn(
-                    field.className,
-                    !!error && touched ? "border-destructive" : ""
-                  )}
-                  checked={allSelected}
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <div className="w-full flex items-center justify-between">
+          <div className="flex items-center gap-x-2">
+            {field.isMulti && (
+              <Checkbox
+                id={`${optionsTitle}`}
+                name={field.name}
+                disabled={field.disabled || options.length === 0}
+                className={cn(
+                  field.className,
+                  !!error && touched ? "border-destructive" : ""
+                )}
+                checked={allSelected}
+                onCheckedChange={handleParentChange}
+                onBlur={onBlur}
+              />
+            )}
+            <Label
+              htmlFor={`${optionsTitle}`}
+              className="text-sm font-normal"
+            >
+              {optionsTitle}
+            </Label>
+          </div>
+          <CollapsibleTrigger>
+            {isOpen ? (
+              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            )}{" "}
+          </CollapsibleTrigger>
+        </div>
 
-                  onCheckedChange={handleParentChange}
-                  onBlur={onBlur}
-                />
-              )}
+        <CollapsibleContent>
+          {loading && (
+            <div className="flex items-center text-muted-foreground text-sm mt-2">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading options...
+            </div>
+          )}
+
+          {options.map((option) => (
+            <div
+              key={option.value}
+              className="flex items-center gap-x-2 ps-6 mt-2"
+            >
+              <Checkbox
+                id={`${field.name}-${option.value}`}
+                name={field.name}
+                checked={selectedValues.includes(option.value)}
+                disabled={field.disabled}
+                className={cn(
+                  field.className,
+                  !!error && touched ? "border-destructive" : ""
+                )}
+                onCheckedChange={(checked) =>
+                  handleChange(option.value, !!checked)
+                }
+                onBlur={onBlur}
+              />
               <Label
-                htmlFor={`${field?.optionsTitle}`}
+                htmlFor={`${field.name}-${option.value}`}
                 className="text-sm font-normal"
               >
-                {field?.optionsTitle}
+                {option.label}
               </Label>
             </div>
-            <CollapsibleTrigger>
-              {isOpen ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              )}{" "}
-            </CollapsibleTrigger>
-          </div>
-
-          <CollapsibleContent>
-            {loading && (
-              <div className="flex items-center text-muted-foreground text-sm mt-2">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading options...
-              </div>
-            )}
-
-            {options.map((option) => (
-              <div key={option.value}>
-                <div className="flex items-center gap-x-2 ps-6 mt-2">
-                  <Checkbox
-                    id={`${field.name}-${option.value}`}
-                    name={field.name}
-                    checked={selectedValues.includes(option.value)}
-                    disabled={field.disabled}
-                    className={cn(
-                      field.className,
-                      !!error && touched ? "border-destructive" : ""
-                    )}
-                    onCheckedChange={(checked) =>
-                      handleChange(option.value, !!checked)
-                    }
-                    onBlur={onBlur}
-                  />
-                  <Label
-                    htmlFor={`${field.name}-${option.value}`}
-                    className="text-sm font-normal"
-                  >
-                    {option.label}
-                  </Label>
-                </div>
-                
-                {/* Nested features checkboxes */}
-                {option.features && option.features.length > 0 && (
-                  <div className="ml-10 mt-1">
-                    {option.features.map((feature: {id: string; name: string}) => (
-                      <div key={feature.id} className="flex items-center gap-x-2 mt-1">
-                        <Checkbox
-                          id={`${field.name}-${option.value}-feature-${feature.id}`}
-                          name={`${field.name}-features`}
-                          checked={selectedValues.includes(feature.id)}
-                          disabled={field.disabled || !selectedValues.includes(option.value)}
-                          className={cn(
-                            field.className,
-                            !!error && touched ? "border-destructive" : ""
-                          )}
-                          onCheckedChange={(checked) =>
-                            handleChange(feature.id, !!checked)
-                          }
-                          onBlur={onBlur}
-                        />
-                        <Label
-                          htmlFor={`${field.name}-${option.value}-feature-${feature.id}`}
-                          className="text-sm font-normal text-muted-foreground"
-                        >
-                          {feature.name}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
-      )}
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Error message */}
       {!!error && touched && (

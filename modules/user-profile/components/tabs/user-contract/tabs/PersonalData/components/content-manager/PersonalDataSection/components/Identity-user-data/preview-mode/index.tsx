@@ -12,6 +12,7 @@ export default function UserProfileIdentityDataReview() {
         <PreviewTextField
           valid={Boolean(userIdentityData?.identity)}
           label="رقم الهوية"
+          enableCopy
           value={userIdentityData?.identity ?? ""}
           required
         />

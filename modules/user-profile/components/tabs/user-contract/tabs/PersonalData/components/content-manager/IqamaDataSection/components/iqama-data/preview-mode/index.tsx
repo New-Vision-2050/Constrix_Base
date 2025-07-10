@@ -11,6 +11,8 @@ export default function UserIqamaDataPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="رقم الاقامة"
+          required
+          enableCopy
           value={userIdentityData?.entry_number ?? ""}
           valid={Boolean(userIdentityData?.entry_number)}
         />
@@ -19,6 +21,7 @@ export default function UserIqamaDataPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الاصدار"
+          required
           value={userIdentityData?.entry_number_start_date ?? ""}
           valid={Boolean(userIdentityData?.entry_number_start_date)}
           type="date"
@@ -28,6 +31,7 @@ export default function UserIqamaDataPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           label="تاريخ الانتهاء"
+          required
           value={userIdentityData?.entry_number_end_date ?? ""}
           valid={Boolean(userIdentityData?.entry_number_end_date)}
           type="date"

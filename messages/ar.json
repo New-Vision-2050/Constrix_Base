@@ -152,7 +152,9 @@
     "UserProfileSettings": "الملف الشخصي",
     "Welcome": "مرحبا",
     "CompanyName": "نيو فيجن",
+    "HRSettings": "اعدادات",
     "OrganizationalStructure": "الهيكل التنظيمي",
+    "AttendanceDeparture": "الحضور والانصراف",
     "HumanResources": "الموارد البشرية",
     "ProgramManagement": "ادارة البرامج"  ,
     "Powers": "الصلاحيات"
@@ -375,7 +377,9 @@
           "title": "أعدادات الهيكل",
           "tabs": {
             "jobTitles": { "title": "المسميات الوظيفية" },
-            "jobTypes": { "title": "أنواع الوظائف" }
+            "jobTypes": { "title": "أنواع الوظائف" },
+            "managements": { "title": "اعدادات الادارات" },
+            "departments": { "title": "اعدادات الاقسام" }
           }
         }
       }
@@ -393,6 +397,8 @@
     "name": "الاسم ثلاثي",
     "namePlaceholder": "ادخل الاسم الثلاثي",
     "nameRequired": "الاسم مطلوب",
+    "nameThreeTerms": "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+    "nameLettersOnly": "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
     "nickname": "اسم الشهرة",
     "nicknamePlaceholder": "ادخل اسم الشهرة",
     "nicknameRequired": "اسم الشهرة مطلوب",
@@ -423,5 +429,150 @@
   "Bouquets": {
     "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
     "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
+  },
+  "AttendanceDepartureModule":{
+    "shared": {
+      "EmployeeInfoSection": {
+        "branch": "الفرع",
+        "jobId": "الرقم الوظيفي",
+        "department": "الإدارة",
+        "approver": "المحدد",
+        "attendanceStatus": "حالة الحضور",
+        "unspecified": "غير محدد",
+        "status": {
+          "present": "حاضر",
+          "late": "متأخر",
+          "absent": "غائب"
+        }
+      }
+    },
+    "AttendanceDateSelector":{
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ الانتهاء",
+      "search": "بحث",
+      "clearFilters": "مسح الفلاتر"
+    },
+    "EmployeeDetailsSheet": {
+      "fields": {
+        "employeeName": "اسم الموظف",
+        "phone": "رقم الجوال",
+        "department": "القسم",
+        "email": "البريد الالكتروني",
+        "branch": "الفرع"
+      },
+      "personalInfo": {
+        "gender": "الجنس",
+        "birthDate": "تاريخ الميلاد",
+        "nationality": "الجنسية"
+      },
+      "status": {
+        "attendanceStatus": "حالة الحضور",
+        "employeeStatus": "حالة الموظف"
+      },
+      "times": {
+        "checkIn": "الحضور",
+        "checkOut": "الانصراف",
+        "morning": "صباحاً",
+        "afternoon": "مساءاً"
+      }
+    },
+    "Map": {
+      "layers": {
+        "standard": "خريطة عادية",
+        "satellite": "خريطة القمر الصناعي"
+      },
+      "loading": "جاري تحميل بيانات الموظفين...",
+      "employeeStatus": {
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "tooltip": {
+        "employee": "الموظف:",
+        "branch": "الفرع:",
+        "department": "الإدارة:",
+        "lastSeen": "آخر ظهور:"
+      }
+    },
+    "MapSearchFilter": {
+      "searchPlaceholder": "البحث",
+      "tableView": "الجدول",
+      "export": "تصدير"
+    },
+    "SearchFilter": {
+      "title": "فلتر البحث",
+      "branch": "الفرع",
+      "all": "الكل",
+      "loadingBranches": "جاري تحميل الفروع...",
+      "department": "الإدارة",
+      "approver": "المحدد المعتمد",
+      "loadingApprovers": "جاري تحميل المشرفين...",
+      "searchPlaceholder": "الاسم/البريد الالكتروني/رقم الجوال"
+    },
+    "StatisticsCards":{
+      "totalAttendance": "إجمالي عدد الحضور",
+      "totalAbsence": "إجمالي عدد الغياب",
+      "totalDepartures": "إجمالي عدد الانصراف",
+      "totalHolidays": "إجمالي أيام الإجازات"
+    },
+    "Table":{
+      "mapView": "الخريطة",
+      "columns": {
+        "name": "الاسم",
+        "date": "التاريخ",
+        "jobCode": "الرقم الوظيفي",
+        "branch": "الفرع",
+        "management": "الادارة",
+        "approver": "المحدد المعتمد",
+        "employeeStatus": "حالة الموظف",
+        "attendanceStatus": "حالة الحضور"
+      },
+      "filters": {
+        "searchPlaceholder": "بحث",
+        "branchPlaceholder": "الفرع",
+        "managementPlaceholder": "الادارة",
+        "constraintPlaceholder": "المحدد"
+      },
+      "deleteConfirm": "تأكيد حذف سجل الحضور والانصراف",
+      "status": {
+        "onTime": "في الوقت",
+        "late": "متأخر"
+      },
+      "dialogs": {
+        "approver": {
+          "title": "بيانات محدد الحضور",
+          "approverName": "اسم المحدد",
+          "approverSystem": "نظام المحدد",
+          "unspecified": "غير محدد",
+          "period": "الفترة",
+          "noWeeklySchedule": "لا يوجد جدول أسبوعي",
+          "workHours": "عدد ساعات العمل:",
+          "days": {
+            "sunday": "الأحد",
+            "monday": "الإثنين",
+            "tuesday": "الثلاثاء",
+            "wednesday": "الأربعاء",
+            "thursday": "الخميس",
+            "friday": "الجمعة",
+            "saturday": "السبت"
+          }
+        },
+        "attendanceStatus": {
+          "title": "حالة الحضور",
+          "attendance": "الحضور",
+          "departure": "الانصراف"
+        }
+      }
+    }
+  },
+  "RoleTypes": {
+    "all": "منح جميع الصلاحيات",
+    "update": "تعديل",
+    "import": "استيراد",
+    "export": "تصدير",
+    "list": "عرض",
+    "create": "إضافة",
+    "delete": "حذف",
+    "view": "تفاصيل",
+    "activate": "تنشيط"
   }
 }
