@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import { useConstraintsData } from "@/modules/hr-settings-attendance-departure/hooks/useConstraints";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
+import useBranchHierarchiesData from "@/modules/organizational-structure/components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure/hooks/useBranchHierarchiesData";
 
 // Define the context interface
 interface AttendanceDeterminantsContextType {
@@ -13,7 +14,9 @@ interface AttendanceDeterminantsContextType {
   activeConstraint: Constraint | undefined;
   constraintsLoading: boolean;
   constraintsError: unknown;
-  setActiveConstraint: React.Dispatch<React.SetStateAction<Constraint | undefined>>;
+  setActiveConstraint: React.Dispatch<
+    React.SetStateAction<Constraint | undefined>
+  >;
   handleConstraintClick: (id: string) => void;
   refetchConstraints: () => void;
 }
@@ -33,7 +36,11 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     error: constraintsError,
     refetch: refetchConstraints,
   } = useConstraintsData();
-  
+
+  const { data: branchesData } = useBranchHierarchiesData();
+
+  console.log("branchesData", branchesData);
+
   // State for active constraint
   const [activeConstraint, setActiveConstraint] = useState<Constraint>();
 
@@ -73,12 +80,13 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 };
 
 // Custom hook to use the context
-export const useAttendanceDeterminants = (): AttendanceDeterminantsContextType => {
-  const context = useContext(AttendanceDeterminantsContext);
-  if (context === undefined) {
-    throw new Error(
-      "useAttendanceDeterminants must be used within an AttendanceDeterminantsProvider"
-    );
-  }
-  return context;
-};
+export const useAttendanceDeterminants =
+  (): AttendanceDeterminantsContextType => {
+    const context = useContext(AttendanceDeterminantsContext);
+    if (context === undefined) {
+      throw new Error(
+        "useAttendanceDeterminants must be used within an AttendanceDeterminantsProvider"
+      );
+    }
+    return context;
+  };

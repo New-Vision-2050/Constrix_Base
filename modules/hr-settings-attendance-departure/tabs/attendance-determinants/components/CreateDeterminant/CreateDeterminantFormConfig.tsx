@@ -66,22 +66,58 @@ export const createDeterminantFormConfig: FormConfig = {
   formId: "create-determinant-form",
   title: "إضافة محدد جديد",
   wizard: true,
-  apiUrl: "hr-settings/attendance-determinants",
-  wizardOptions: {
-    // showStepIndicator: true,
-    // showStepTitles: true,
-    validateStepBeforeNext: true,
-    nextButtonText: "التالي",
-    prevButtonText: "السابق",
-    finishButtonText: "حفظ المحدد",
-    onStepChange: (prevStep, nextStep, values) => {
-      // When moving from step 0 (basic info) to step 1, create day sections
-      if (prevStep === 0 && nextStep === 1 && values.working_days) {
-        // This will trigger re-render with new sections
-        console.log("Creating sections for days:", values.working_days);
-      }
-    },
-  },
+  apiUrl: `${baseURL}/attendance/constraints`,
+  // wizardOptions: {
+  //   // showStepIndicator: true,
+  //   // showStepTitles: true,
+  //   validateStepBeforeNext: true,
+  //   nextButtonText: "التالي",
+  //   prevButtonText: "السابق",
+  //   finishButtonText: "حفظ المحدد",
+  //    // Enable submitting each step individually
+  //    submitEachStep: true,
+  //    submitButtonTextPerStep: "التالي",
+  //    // API URLs for each step
+  //    stepApiUrls: {
+  //      0: `${baseURL}/attendance/constraints`,
+  //      1: `${baseURL}/attendance/constraints`,
+  //    },
+  //    // API headers for each step
+  //    stepApiHeaders: {
+  //      0: {
+  //        "X-Location-API-Key": "location-api-key",
+  //      },
+  //      1: {
+  //        "X-User-API-Key": "user-api-key",
+  //      },
+  //    },
+  //   onStepChange: (prevStep, nextStep, values) => {
+  //     // When moving from step 0 (basic info) to step 1, create day sections
+  //     if (prevStep === 0 && nextStep === 1 && values.working_days) {
+  //       // This will trigger re-render with new sections
+  //       console.log("Creating sections for days:", values.working_days);
+  //     }
+  //   },
+  //   onStepSubmit: async (step, values) => {
+  //     console.log("Step submission", step, values);
+
+  //     // Result of the API call (for now simulated)
+  //     const result = {
+  //       success: true,
+  //       message: "Form submitted successfully",
+  //       data: values,
+  //     };
+
+  //     // If submission was successful, manually trigger navigation to next step
+  //     if (result.success) {
+  //       // Get a reference to the form hooks from somewhere else instead of modifying here
+  //       // The form builder's internal goToNextStep will be called by returning success
+  //       console.log("Step submission successful, form should advance");
+  //     }
+
+  //     return result;
+  //   },
+  // },
   sections: [
     {
       title: "المعلومات الأساسية",
@@ -104,11 +140,17 @@ export const createDeterminantFormConfig: FormConfig = {
           name: "constraint_type",
           label: "نظام المحدد",
           placeholder: "منتظم",
-          options: [
-            { value: "regular", label: "منتظم" },
-            { value: "flexible", label: "مرن" },
-            { value: "shift", label: "شيفت" },
-          ],
+          dynamicOptions: {
+            url: `${baseURL}/attendance/constraints/types`,
+            valueField: "code",
+            labelField: "name",
+            searchParam: "name",
+            paginationEnabled: true,
+            pageParam: "page",
+            limitParam: "per_page",
+            itemsPerPage: 10,
+            totalCountHeader: "X-Total-Count",
+          },
           required: true,
           validation: [
             {
@@ -122,6 +164,12 @@ export const createDeterminantFormConfig: FormConfig = {
           name: "is_active",
           label: "is_active",
           defaultValue: true,
+        },
+        {
+          type: "hiddenObject",
+          name: "branch_locations",
+          label: "branch_locations",
+          defaultValue: "[]",
         },
         {
           type: "select",
@@ -229,6 +277,41 @@ export const createDeterminantFormConfig: FormConfig = {
     },
     // Day sections will be added dynamically based on working_days selection
   ],
+  onSubmit: async (formData: Record<string, unknown>) => {
+    // prepare data for submission
+    const branch_locations = formData.location_type === "custom" ? JSON.parse((formData.branch_locations as string)??"[]") : [];
+    const data = {
+      constraint_name: formData.constraint_name,
+      is_active: formData.is_active,
+      constraint_type: formData.constraint_type,
+      branch_ids: formData.branch_ids,
+      branch_locations:branch_locations?.map((branch: any) => ({
+        branch_id: branch.branchId,
+        name: branch.branchName,
+        address: branch.address,
+        latitude: branch.latitude,
+        longitude: branch.longitude,
+        radius: branch.radius,
+      })),
+      // [
+      //     {
+      //         "branch_id": "1",
+      //         "name": "فرع الرياض - المقر الرئيسي",
+      //         "address": "طريق الملك فهد، الرياض",
+      //         "latitude": 24.7136,
+      //         "longitude": 46.6753,
+      //         "radius": 300
+      //     }
+      // ],
+      // "constraint_config"
+    };
+    console.log("Form data received:", formData);
+
+    return {
+      success: true,
+      message: "Form submitted successfully",
+    };
+  },
   submitButtonText: "حفظ المحدد",
   cancelButtonText: "إلغاء",
 };

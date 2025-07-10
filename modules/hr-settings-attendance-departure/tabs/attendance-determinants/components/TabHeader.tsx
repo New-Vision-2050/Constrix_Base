@@ -32,17 +32,36 @@ export default function TabHeader() {
 
     const interval = setInterval(() => {
       const formValues = useFormStore?.getState().getValues("create-determinant-form");
+      
       if (formValues?.working_days && Array.isArray(formValues.working_days)) {
         // Get the updated config
         const newConfig = getDynamicDeterminantFormConfig(formValues.working_days);
         
-        // Preserve the onSheetOpenChange from the current config
+        // Preserve the onSheetOpenChange and enhance wizardOptions
         setFormConfig((prevConfig) => ({
           ...newConfig,
-          onSheetOpenChange: prevConfig.onSheetOpenChange
+          onSheetOpenChange: prevConfig.onSheetOpenChange,
+          // Enhance wizardOptions to ensure step navigation works
+          wizardOptions: {
+            ...newConfig.wizardOptions,
+            // This callback will be executed when a step is successfully submitted
+            onStepSubmit: async (step: number, stepValues: any) => {
+              console.log("Step submitted:", step, stepValues);
+              
+              // Simulate API success and delay before navigating
+              return {
+                success: true,
+                message: "تم حفظ الخطوة بنجاح",
+                data: stepValues,
+              };
+              
+              // Note: The form-builder will handle navigation to the next step internally
+              // when the onStepSubmit handler returns success: true
+            },
+          },
         }));
       }
-    }, 500); // Check every 500ms
+    }, 300);
 
     return () => clearInterval(interval);
   }, [isFormOpen]);
