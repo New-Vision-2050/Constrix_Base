@@ -7,11 +7,10 @@ import { useParams } from "next/navigation";
 
 // Create a config function that accepts id as a parameter instead of using hooks directly
 export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: string): FormConfig {
-  // id is now passed as a parameter instead of using useParams()  // Get params from useParams() and safely extract id
+  // id is now passed as a parameter instead of using useParams()
   const params = useParams();
   const packageId = params && typeof params.id === 'string' ? params.id : '';
   console.log("packageId",packageId);
-  
   
     return {
       formId: "bouquet-form",
@@ -251,8 +250,26 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
           };
                     
           // Make API call to packages endpoint
+          // Create a minimal FormConfig object without recursive reference
+          const config: FormConfig = {
+            formId: "bouquet-form",
+            apiUrl: `${baseURL}/packages`,
+            laravelValidation: {
+              enabled: true,
+              errorsPath: "errors"
+            },
+            sections: [],  // Required by FormConfig type
+            submitButtonText: "",
+            cancelButtonText: "",
+            showReset: false,
+            resetButtonText: "",
+            showSubmitLoader: true,
+            resetOnSuccess: true,
+            showCancelButton: false,
+            showBackButton: false
+          };
           
-          return await defaultSubmitHandler(transformedData, GetBouquetFormConfig(t, id));
+          return await defaultSubmitHandler(transformedData, config);
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
