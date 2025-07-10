@@ -1,10 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useAttendanceDeterminants } from "../../context/AttendanceDeterminantsContext";
 
 // Day names mapping
 const dayNames = {
@@ -21,64 +20,13 @@ const daysList = Object.entries(dayNames).map(([key, value]) => ({
   label: value,
 }));
 
-// الرسائل التي سيتم عرضها في النموذج
-const messages = {
-  addDay: "أضافة يوم عمل",
-  addPeriod: "أضافة فترة عمل",
-  duplicateDay: "تم اختيار هذا اليوم مسبقاً",
-};
-
-// Function to create day-specific sections dynamically
-const createDaySections = (workingDays: string[]) => {
-  return workingDays.map((day) => ({
-    title: `إعدادات ${dayNames[day as keyof typeof dayNames]}`,
-    fields: [
-      {
-        type: "text" as const,
-        name: `${day}_start_time`,
-        label: "وقت بداية العمل",
-        placeholder: "09:00",
-        required: true,
-        validation: [
-          {
-            type: "required" as const,
-            message: "وقت بداية العمل مطلوب",
-          },
-        ],
-      },
-      {
-        type: "text" as const,
-        name: `${day}_end_time`,
-        label: "وقت نهاية العمل",
-        placeholder: "17:00",
-        required: true,
-        validation: [
-          {
-            type: "required" as const,
-            message: "وقت نهاية العمل مطلوب",
-          },
-        ],
-      },
-      {
-        type: "text" as const,
-        name: `${day}_break_start`,
-        label: "بداية فترة الراحة (اختياري)",
-        placeholder: "12:00",
-      },
-      {
-        type: "text" as const,
-        name: `${day}_break_end`,
-        label: "نهاية فترة الراحة (اختياري)",
-        placeholder: "13:00",
-      },
-    ],
-  }));
-};
-
 type PropsT = {
   refetchConstraints: () => void;
 };
-export const createDeterminantFormConfig = ({ refetchConstraints }: PropsT) => {
+// Function to get form config with dynamic day sections
+export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
+  const { refetchConstraints } = props;
+
   return {
     formId: "create-determinant-form",
     title: "إضافة محدد جديد",
@@ -353,10 +301,9 @@ export const createDeterminantFormConfig = ({ refetchConstraints }: PropsT) => {
       }
 
       // تجهيز بيانات المواقع
-      const branch_locations =
-        formData.location_type === "custom"
-          ? JSON.parse((formData.branch_locations as string) ?? "[]")
-          : [];
+      const branch_locations = JSON.parse(
+        (formData.branch_locations as string) ?? "[]"
+      );
 
       const data = {
         constraint_name: formData.constraint_name,
@@ -457,28 +404,15 @@ export const createDeterminantFormConfig = ({ refetchConstraints }: PropsT) => {
         },
       };
 
-      return await defaultSubmitHandler(data, createDeterminantFormConfig, {
-        url: `${baseURL}/attendance/constraints`,
-      });
+      return await defaultSubmitHandler(
+        data,
+        getDynamicDeterminantFormConfig({ refetchConstraints }),
+        {
+          url: `${baseURL}/attendance/constraints`,
+        }
+      );
     },
     submitButtonText: "حفظ المحدد",
     cancelButtonText: "إلغاء",
-  };
-};
-
-// Function to get form config with dynamic day sections
-export const getDynamicDeterminantFormConfig = (
-  workingDays: string[] = ["sunday"]
-): FormConfig => {
-  const { refetchConstraints } = useAttendanceDeterminants();
-  const _config = useMemo(() => createDeterminantFormConfig({ refetchConstraints }), []);
-  const baseConfig = { ..._config };
-
-  // Add day sections based on selected working days
-  const daySections = createDaySections(workingDays);
-
-  return {
-    ...baseConfig,
-    sections: [...baseConfig.sections, ...daySections],
   };
 };
