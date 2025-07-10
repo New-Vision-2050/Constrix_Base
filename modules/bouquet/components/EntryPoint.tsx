@@ -10,6 +10,7 @@ import StatisticsCardHeader from "@/modules/organizational-structure/components/
 import PersonStaticIcon from "@/public/icons/person-static";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { bouquetConfig } from "@/modules/table/utils/configs/bouquetTableConfig";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 // Interface for API response
 interface Root {
@@ -31,6 +32,21 @@ function EntryPointBouquets() {
   const [statisticsData, setStatisticsData] = useState<Payload | null>(null);
   const [statisticsLoading, setStatisticsLoading] = useState<boolean>(true);
 
+   const handleFormSuccess = (values: Record<string, unknown>) => {
+      // Import the store directly to avoid hooks in callbacks
+      const tableStore = useTableStore.getState();
+  
+      // Use the centralized reloadTable method from the TableStore
+      tableStore.reloadTable(config.tableId);
+  
+      // After a short delay, set loading back to false
+      setTimeout(() => {
+        tableStore.setLoading(config.tableId, false);
+      }, 100);
+  
+    
+  
+    };
   // Fetch statistics data
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -89,11 +105,9 @@ function EntryPointBouquets() {
         searchBarActions={
           <div className="flex items-center gap-3">
             <SheetFormBuilder
-              config={GetBouquetFormConfig(t)}
+              config={GetBouquetFormConfig(t, undefined)}
               trigger={<Button>اضافة باقة</Button>}
-              onSuccess={(values) => {
-                console.log("Form submitted successfully:", values);
-              }}
+              onSuccess={handleFormSuccess}
             />
           </div>
         }

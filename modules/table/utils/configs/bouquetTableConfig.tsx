@@ -151,7 +151,7 @@ bouquetConfig = () => {
         searchParamName: "q",
         searchFieldParamName: "fields",
         allowSearchFieldSelection: true,
-        formConfig: GetBouquetFormConfig(t),
+        formConfig: GetBouquetFormConfig(t, undefined),
         executions:[],
         executionConfig: {
           canEdit: true,
