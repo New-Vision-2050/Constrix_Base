@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { Toaster } from "@/modules/table/components/ui/toaster";
+import { Toaster as SonnerToaster } from 'sonner';
 import { ThemeProvider } from "@/providers/theme-provider";
 import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
@@ -82,6 +83,7 @@ export default async function RootLayout({
               <ReactQueryProvider>{children}</ReactQueryProvider>
             </main>
             <Toaster />
+            <SonnerToaster />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>
