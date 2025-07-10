@@ -1,5 +1,7 @@
-import React, { createContext, useContext, ReactNode, useState } from "react";
+import React, { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { useFormInstance } from "@/modules/form-builder/hooks/useFormStore";
+import { useAttendanceDeterminants } from "@/modules/hr-settings-attendance-departure/tabs/attendance-determinants/context/AttendanceDeterminantsContext";
+import { Branch } from "@/modules/user-profile/types/branch";
 
 // Branch location data interface
 interface BranchLocationData {
@@ -7,6 +9,7 @@ interface BranchLocationData {
   isDefault: boolean;
   latitude: string;
   longitude: string;
+  radius: string;
 }
 
 interface LocationDialogContextType {
@@ -27,19 +30,38 @@ interface LocationDialogProviderProps {
 
 export function LocationDialogProvider({ children }: LocationDialogProviderProps) {
   const { values } = useFormInstance("create-determinant-form", {});
-  const selectedBranches = values.branches || [];
+  const selectedBranches = values.branch_ids || [];
+  const { branchesData } = useAttendanceDeterminants();
   
-  // Available branches mapping with default coordinates
-  const branchesMap: Record<string, string> = {
-    "riyadh": "فرع الرياض",
-    "jeddah": "فرع جدة",
-  };
+  // State for branch mapping
+  const [branchesMap, setBranchesMap] = useState<Record<string, string>>({});
+  const [defaultCoordinates, setDefaultCoordinates] = useState<Record<string, { latitude: string; longitude: string; radius: string }>>({});
   
-  // Default coordinates for each branch
-  const defaultCoordinates: Record<string, { latitude: string; longitude: string }> = {
-    "riyadh": { latitude: "24.7136", longitude: "46.6753" },
-    "jeddah": { latitude: "21.4858", longitude: "39.1925" },
-  };
+  // Update branches data when branchesData changes
+  useEffect(() => {
+    if (branchesData && branchesData.length > 0) {
+      // Create dynamic branch mapping
+      const newBranchesMap: Record<string, string> = {};
+      const newDefaultCoordinates: Record<string, { latitude: string; longitude: string; radius: string }> = {};
+      
+      branchesData.forEach((branch: Branch) => {
+        if (branch.id) {
+          // Add to branch map
+          newBranchesMap[branch.id] = branch.name || `فرع ${branch.id}`;
+          
+          // Add coordinates with defaults if missing
+          newDefaultCoordinates[branch.id] = {
+            latitude: branch.latitude || "24.7136",
+            longitude: branch.longitude || "46.6753",
+            radius: "100" // Default radius since it's not in Branch type
+          };
+        }
+      });
+      
+      setBranchesMap(newBranchesMap);
+      setDefaultCoordinates(newDefaultCoordinates);
+    }
+  }, [branchesData]);
   
   // State for branch locations
   const [branchLocations, setBranchLocations] = useState<Record<string, BranchLocationData>>({});
@@ -69,12 +91,13 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
     }
     
     // Return default data for branch
-    const defaults = defaultCoordinates[branchId] || { latitude: "24.7136", longitude: "46.6753" };
+    const defaults = defaultCoordinates[branchId] || { latitude: "24.7136", longitude: "46.6753", radius: "100" };
     return {
       branchId,
       isDefault: true,
       latitude: defaults.latitude,
       longitude: defaults.longitude,
+      radius: defaults.radius,
     };
   };
 

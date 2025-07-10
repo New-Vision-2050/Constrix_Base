@@ -26,8 +26,14 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     }
   }, [selectedBranches, selectedBranch]);
   
-  // Get current branch location data
-  const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : null;
+  // Get current branch location data - always provide default values to avoid undefined
+  const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : {
+    branchId: "",
+    isDefault: false,
+    latitude: "", // سيتم تعبئتها من إحداثيات الفرع الفعلية
+    longitude: "",
+    radius: "100"
+  };
   
   // Handle branch change
   const handleBranchChange = (branchId: string) => {
@@ -38,19 +44,15 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   const handleDefaultLocationChange = (isDefault: boolean) => {
     if (selectedBranch) {
       if (isDefault) {
-        // Reset to default coordinates when checking default location
-        const defaultCoordinates = {
-          "riyadh": { latitude: "24.7136", longitude: "46.6753" },
-          "jeddah": { latitude: "21.4858", longitude: "39.1925" },
-        };
-        
-        const defaults = defaultCoordinates[selectedBranch as keyof typeof defaultCoordinates] || 
-                        { latitude: "24.7136", longitude: "46.6753" };
+        // استرجاع إحداثيات الفرع الفعلية من السياق
+        // هذه الإحداثيات تم الحصول عليها في LocationDialogContext من بيانات الفرع
+        // لذلك فهي تعكس الإحداثيات الفعلية للفرع وليست قيم افتراضية ثابتة
+        const branchLocation = getBranchLocation(selectedBranch);
         
         updateBranchLocation(selectedBranch, {
           isDefault: true,
-          latitude: defaults.latitude,
-          longitude: defaults.longitude,
+          latitude: branchLocation.latitude,
+          longitude: branchLocation.longitude,
         });
       } else {
         updateBranchLocation(selectedBranch, { isDefault: false });
@@ -59,12 +61,20 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   };
   
   // Handle coordinate changes
-  const handleCoordinateChange = (field: 'latitude' | 'longitude', value: string) => {
+  const handleCoordinateChange = (field: 'latitude' | 'longitude' | 'radius', value: string) => {
     if (selectedBranch) {
-      updateBranchLocation(selectedBranch, { 
-        [field]: value,
-        isDefault: false // Uncheck default when manually changing coordinates
-      });
+      // عندما يكون الحقل radius، لا نحتاج لتغيير خاصية isDefault
+      // عندما يكون الحقل latitude أو longitude، نضبط isDefault على false
+      if (field === 'radius') {
+        updateBranchLocation(selectedBranch, { 
+          [field]: value
+        });
+      } else {
+        updateBranchLocation(selectedBranch, { 
+          [field]: value,
+          isDefault: false // إلغاء تحديد الموقع الافتراضي عند تغيير الإحداثيات
+        });
+      }
     }
   };
   
@@ -109,29 +119,30 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
         onBranchChange={handleBranchChange}
       />
       
-      {currentBranchData && (
-        <>
-          <DefaultLocationCheckbox
-            isDefaultLocation={currentBranchData.isDefault}
-            onChange={handleDefaultLocationChange}
-          />
-          
-          <CoordinatesInput
-            longitude={currentBranchData.longitude}
-            latitude={currentBranchData.latitude}
-            onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
-            onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
-          />
-          
-          <MapComponent
-            selectedBranch={selectedBranch}
-            isDefaultLocation={currentBranchData.isDefault}
-            latitude={currentBranchData.latitude}
-            longitude={currentBranchData.longitude}
-            onMapClick={handleMapClick}
-          />
-        </>
-      )}
+      {/* Always render the components but ensure we never pass undefined values */}
+      <>
+        <DefaultLocationCheckbox
+          isDefaultLocation={currentBranchData.isDefault}
+          onChange={handleDefaultLocationChange}
+        />
+        
+        <CoordinatesInput
+          longitude={currentBranchData.longitude || ""}
+          latitude={currentBranchData.latitude || ""}
+          radius={currentBranchData.radius}
+          onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
+          onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
+          onRadiusChange={(value) => handleCoordinateChange('radius', value)}
+        />
+        
+        <MapComponent
+          selectedBranch={selectedBranch || ""}
+          isDefaultLocation={!!currentBranchData.isDefault}
+          latitude={currentBranchData.latitude || ""}
+          longitude={currentBranchData.longitude || ""}
+          onMapClick={handleMapClick}
+        />
+      </>
       
       <SaveButton onSave={onClose} />
     </div>

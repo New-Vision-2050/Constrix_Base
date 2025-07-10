@@ -1,9 +1,11 @@
 import React from "react";
 import { AttendanceDeterminant } from "../../../../../types/attendance-departure";
 import { Check, AlertCircle, MapPin, CheckCircle2Icon } from "lucide-react";
+import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
+import { useAttendanceDeterminants } from "../../../context/AttendanceDeterminantsContext";
 
 interface DeterminantItemProps {
-  determinant: AttendanceDeterminant;
+  determinant: Constraint;
   onClick?: (id: string) => void;
 }
 
@@ -14,6 +16,8 @@ const DeterminantItem: React.FC<DeterminantItemProps> = ({
   determinant,
   onClick,
 }) => {
+  const { activeConstraint } = useAttendanceDeterminants();
+  const isActive = activeConstraint?.id === determinant.id;
   const handleClick = () => {
     if (onClick) {
       onClick(determinant.id);
@@ -26,7 +30,7 @@ const DeterminantItem: React.FC<DeterminantItemProps> = ({
       className={`flex flex-row-reverse items-center justify-between py-4 border-b border-opacity-20 border-gray-600 last:border-b-0 cursor-pointer`}
     >
       <div className="flex items-center justify-center">
-        {determinant.status ? (
+        {determinant.is_active ? (
           <CheckCircle2Icon size={20} className="text-green-500" />
         ) : (
           <AlertCircle size={20} className="text-orange-500" />
@@ -36,17 +40,17 @@ const DeterminantItem: React.FC<DeterminantItemProps> = ({
         <div className="text-right">
           <div
             className={`text-sm ${
-              determinant.active ? "text-white font-bold" : "text-gray-400"
+              isActive ? "text-white font-bold" : "text-gray-400"
             }`}
           >
             محدد فرع
           </div>
           <div
             className={`text-sm ${
-              determinant.active ? "text-white" : "text-gray-500"
+              isActive ? "text-white" : "text-gray-500"
             }`}
           >
-            {determinant.location}
+            {determinant.constraint_name}
           </div>
         </div>
         <div className="flex items-center justify-center">

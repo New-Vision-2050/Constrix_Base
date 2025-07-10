@@ -420,7 +420,11 @@
     "countryRequired": "الجنسية مطلوبة",
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
-    "resetButtonText": "مسح النموذج"
+    "resetButtonText": "مسح النموذج",
+    "error": {
+      "loading": "خطأ في تحميل البيانات",
+      "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
+    }
   },
   "AttendanceDepartureModule":{
     "shared": {
@@ -553,6 +557,91 @@
           "attendance": "الحضور",
           "departure": "الانصراف"
         }
+      }
+    }
+  },
+  "hr-settings":{
+    "tabs": {
+      "attendance": "الحضور و الانصراف",
+      "recruitment": "التوظيف",
+      "service": "الخدمة",
+      "contractManagement": "ادارة عقد العمل"
+    },
+    "statistics": {
+      "totalAttendance": "إجمالي عدد الحضور",
+      "totalDeparture": "إجمالي عدد الانصراف",
+      "totalAbsence": "إجمالي عدد الغياب",
+      "vacations": "الإجازات"
+    }
+  },
+  "HRSettingsAttendanceDepartureModule": {
+    "attendanceDeterminantDetails": {
+      "determinantType": "نظام المحدد",
+      "systemNotFound": "نظام غير موجود",
+      "workHours": "عدد ساعات العمل",
+      "hours": "ساعات",
+      "workdays": "أيام العمل",
+      "branches": "الفروع",
+      "notes": "ملاحظات"
+    },
+    "tabs": {
+      "attendance": "الحضور",
+      "departure": "الانصراف",
+      "leaves": "الإجازات",
+      "vacations": "العطلات الرسمية"
+    },
+    "attendanceDeterminants": {
+      "title": "محددات الحضور",
+      "createDeterminant": "إنشاء محدد جديد",
+      "allDeterminants": "جميع المحددات",
+      "branchDeterminant": "محدد فرع",
+      "workHours": "عدد ساعات العمل",
+      "hours": "ساعات",
+      "systemNotFound": "نظام غير موجود",
+      "notes": "ملاحظات",
+      "submitButtonText": "حفظ المحدد",
+      "cancelButtonText": "إلغاء",
+      "form": {
+        "title": "إضافة محدد جديد",
+        "basicInfo": "المعلومات الأساسية",
+        "determinantName": "اسم المحدد",
+        "determinantNamePlaceholder": "فرع القاهرة",
+        "determinantNameRequired": "اسم المحدد مطلوب",
+        "determinantNamePattern": "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط",
+        "systemType": "نظام المحدد",
+        "systemTypePlaceholder": "منتظم",
+        "systemTypeRequired": "نظام المحدد مطلوب",
+        "branches": "الفروع",
+        "branchesRequired": "يجب اختيار فرع واحد على الأقل",
+        "locationType": "نوع الموقع",
+        "mainLocation": "موقع الفرع الافتراضي",
+        "customLocation": "موقع مخصص لكل فرع",
+        "workingHours": "ساعات العمل",
+        "workingDays": "أيام العمل",
+        "periodStart": "بداية الفترة",
+        "periodEnd": "نهاية الفترة",
+        "periodStartPlaceholder": "09:00",
+        "periodEndPlaceholder": "17:00",
+        "periodStartRequired": "بداية الفترة مطلوبة",
+        "periodEndRequired": "نهاية الفترة مطلوبة",
+        "timeFormatError": "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00",
+        "addPeriod": "إضافة فترة",
+        "deletePeriod": "حذف الفترة",
+        "submitButtonText": "حفظ المحدد",
+        "cancelButtonText": "إلغاء",
+        "nextButtonText": "التالي",
+        "prevButtonText": "السابق"
+      },
+      "determinantsList": {
+        "allDeterminants": "جميع المحددات"
+      },
+      "error": {
+        "loading": "خطأ في تحميل المحددات",
+        "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط"
       }
     }
   },

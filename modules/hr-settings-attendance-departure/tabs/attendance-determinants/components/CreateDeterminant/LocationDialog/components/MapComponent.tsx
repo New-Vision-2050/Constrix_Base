@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useRef } from "react";
 // @ts-ignore
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 // @ts-ignore
@@ -39,13 +39,20 @@ export default function MapComponent({
   longitude,
   onMapClick,
 }: MapComponentProps) {
+  // استخدام الإحداثيات المقدمة أو الافتراضية لمدينة الرياض فقط عند الحاجة
+  // مدينة الرياض كقيمة افتراضية فقط في حالة عدم وجود إحداثيات
+  const latStr = latitude || "24.7136"; // الرياض كقيمة افتراضية
+  const lngStr = longitude || "46.6753";
   
   // Convert coordinates to numbers
   const position = useMemo(() => {
-    const lat = parseFloat(latitude) || 24.7136;
-    const lng = parseFloat(longitude) || 46.6753;
+    const lat = parseFloat(latStr);
+    const lng = parseFloat(lngStr);
     return [lat, lng] as [number, number];
-  }, [latitude, longitude]);
+  }, [latStr, lngStr]);
+  
+  // Reference to the map instance
+  const mapRef = useRef(null);
   
   // Custom marker icon for selected location
   const customIcon = useMemo(() => {
@@ -83,6 +90,11 @@ export default function MapComponent({
           zoom={13}
           style={{ height: '100%', width: '100%' }}
           className="rounded-lg"
+          ref={mapRef}
+          // @ts-ignore - whenReady is available in react-leaflet
+          whenReady={(event: any) => {
+            mapRef.current = event.target;
+          }}
         >
           {/* @ts-ignore */}
           <TileLayer
@@ -91,7 +103,7 @@ export default function MapComponent({
           />
           
           {/* @ts-ignore */}
-          <Marker position={position} icon={customIcon} />
+          <Marker key={`${latStr}-${lngStr}`} position={position} icon={customIcon} />
           
           <MapClickHandler onMapClick={onMapClick} />
         </MapContainer>
