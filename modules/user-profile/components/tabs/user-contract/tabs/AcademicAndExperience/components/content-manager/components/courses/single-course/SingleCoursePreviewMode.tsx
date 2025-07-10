@@ -1,8 +1,10 @@
 import { Course } from "@/modules/user-profile/types/Course";
 import PreviewTextField from "../../../../../../components/previewTextField";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 
 type PropsT = { course: Course };
 export default function SingleCoursePreviewMode({ course }: PropsT) {
+  const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
@@ -60,6 +62,20 @@ export default function SingleCoursePreviewMode({ course }: PropsT) {
           value={course?.date_end}
           valid={Boolean(course?.date_end)}
           type="date"
+        />
+      </div>
+
+      <div className="p-2">
+        <PreviewTextField
+          mediaId={course?.file?.id}
+          fireAfterDeleteMedia={() => {
+            handleRefetchUserCourses();
+          }}
+          valid={Boolean(course?.file?.name)}
+          label="ارفاق الشهادة"
+          value={course?.file?.name ?? "---"}
+          type={course?.file?.type == "image" ? "image" : "pdf"}
+          fileUrl={course?.file?.url}
         />
       </div>
     </div>

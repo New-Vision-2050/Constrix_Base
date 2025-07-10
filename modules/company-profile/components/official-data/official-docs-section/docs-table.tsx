@@ -48,7 +48,8 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         <td className="py-3 px-3 border-b">{doc.description}</td>
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
-            {doc.document_number} <CopyButton text={doc.document_number} />
+            {doc.document_number ?? "-"} 
+            {doc.document_number && <CopyButton text={doc.document_number} /> }
           </div>
         </td>
         <td className="py-3 px-3 border-b">{doc.start_date}</td>
@@ -181,7 +182,8 @@ const DocsTable = ({
   id?: string;
 }) => {
   return (
-    <table className="w-full border-collapse">
+  <div className="max-h-[500px] overflow-auto">
+      <table className="w-full border-collapse">
       <thead>
         <tr>
           <td className="text-start p-3 border-b">نوع المستند</td>
@@ -201,6 +203,7 @@ const DocsTable = ({
         ))}
       </tbody>
     </table>
+  </div>
   );
 };
 

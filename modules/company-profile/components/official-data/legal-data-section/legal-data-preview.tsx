@@ -55,7 +55,7 @@ const LegalDataPreview = ({
   });
 
   return (
-    <div className="grid grid-cols-4 gap-x-3 gap-y-5">
+    <div className="grid grid-cols-4 gap-x-3 gap-y-5 max-h-[500px] overflow-auto">
       {previewData.flatMap((previewArray, arrayIndex) =>
         previewArray.map((preview, itemIndex) => (
           <div

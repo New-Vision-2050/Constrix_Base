@@ -156,7 +156,9 @@
     "OrganizationalStructure": "Organizational Structure",
     "AttendanceDeparture": "Attendance and Departure",
     "HumanResources": "Human Resources",
-    "ProgramManagement": "Program Management"
+    "ProgramManagement": "Program Management",
+    "Powers": "Powers"
+
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
@@ -376,7 +378,9 @@
           "title": "Structure Settings",
           "tabs": {
             "jobTitles": { "title": "Job Titles" },
-            "jobTypes": { "title": "Job Types" }
+            "jobTypes": { "title": "Job Types" },
+            "management": { "title": "Management" },
+            "departments": { "title": "Departments" }
           }
         }
       }
@@ -394,6 +398,8 @@
     "name": "Full Name",
     "namePlaceholder": "Enter full name",
     "nameRequired": "Name is required",
+    "nameThreeTerms": "Name must consist of exactly three terms (first, middle, and last name)",
+    "nameLettersOnly": "Name must contain only letters (no numbers or symbols)",
     "nickname": "Nickname",
     "nicknamePlaceholder": "Enter nickname",
     "nicknameRequired": "Nickname is required",
@@ -635,5 +641,24 @@
       "branches": "Branches",
       "notes": "Notes"
     }
+  },
+  "RoleTypes": {
+    "all": "Grant all permissions",
+    "update": "Update",
+    "import": "Import",
+    "export": "Export",
+    "list": "List",
+    "create": "Create",
+    "delete": "Delete",
+    "view": "View",
+    "activate": "Activate"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this program?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this program?"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this package?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this package?"
   }
 }

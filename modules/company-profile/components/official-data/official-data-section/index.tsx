@@ -52,7 +52,9 @@ const OfficialDataSection = ({
     <>
       <FormFieldSet
         title="البيانات الرسمية"
-        valid={Object.values(officialData).every((value) => !!value)}
+        valid={Object.values(officialData).every((value) => 
+          Array.isArray(value) ? value.length > 0 : Boolean(value)
+        )}
         secondTitle={
           <FieldSetSecondTitle
             mode={mode}

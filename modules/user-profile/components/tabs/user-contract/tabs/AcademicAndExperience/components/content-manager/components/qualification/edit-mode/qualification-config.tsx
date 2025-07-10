@@ -34,7 +34,6 @@ export const QualificationFormConfig = ({
             name: "country_id",
             label: "دولة التخرج",
             placeholder: "اختر دولة الشركة",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -46,19 +45,13 @@ export const QualificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل دولة الشركة",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
             name: "university_id",
             label: "الجامعة",
             placeholder: "اختر الجامعة",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/universities`,
               valueField: "id",
@@ -72,19 +65,13 @@ export const QualificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل الجامعة",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
             name: "academic_qualification_id",
             label: "المؤهل",
             placeholder: "اختر المؤهل",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/academic_qualifications`,
               valueField: "id",
@@ -96,19 +83,13 @@ export const QualificationFormConfig = ({
               itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل المؤهل",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
             name: "academic_specialization_id",
             label: "التخصص الأكاديمي",
             placeholder: "اختر التخصص الأكاديمي",
-            required: true,
             dynamicOptions: {
               url: `${baseURL}/academic_specializations`,
               valueField: "id",
@@ -122,25 +103,14 @@ export const QualificationFormConfig = ({
               dependsOn: "academic_qualification_id",
               filterParam: "academic_qualification_id",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل التخصص الأكاديمي",
-              },
-            ],
+            validation: [],
           },
           {
             type: "date",
             name: "graduation_date",
             label: "تاريخ الحصول على الشهادة",
             placeholder: "تاريخ الشهادة",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             type: "text",
@@ -148,10 +118,6 @@ export const QualificationFormConfig = ({
             label: "المعدلات الدراسية",
             placeholder: "المعدلات الدراسية",
             validation: [
-              {
-                type: "required",
-                message: "المعدلات الدراسية مطلوبة",
-              },
               {
                 type: "pattern",
                 value: "^[0-9]+(\\.[0-9]+)?$",
@@ -166,7 +132,7 @@ export const QualificationFormConfig = ({
                 type: "max",
                 value: 100,
                 message: "المعدلات الدراسية يجب أن لا تتجاوز 100",
-              }
+              },
             ],
           },
           {

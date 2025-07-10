@@ -18,7 +18,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
     apiUrl: `${baseURL}/management_hierarchies/create-branch`,
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", undefined, company_id],
+        queryKey: ["company-branches", company_id],
       });
     },
     title: "اضافة فرع جديد",
@@ -83,7 +83,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
@@ -107,7 +107,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
               dependsOn: "country_id",
               filterParam: "country_id",
@@ -133,7 +133,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
               dependsOn: "state_id",
               filterParam: "state_id",

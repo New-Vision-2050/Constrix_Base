@@ -7,10 +7,10 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useParams } from "next/navigation";
 
 export const NationalAddressFormConfig = (
-  companyAddress: CompanyAddress,
-  id?: string
+  companyAddress?: CompanyAddress,
+  id?: string,
+  company_id?:string
 ) => {
-  const { company_id }: { company_id: string | undefined } = useParams();
 
   const formId = `NationalAddressFormConfig-${id}-${company_id}`;
   const queryClient = useQueryClient();
@@ -34,8 +34,8 @@ export const NationalAddressFormConfig = (
             render: () => (
               <PickupMap
                 formId={formId}
-                lat={companyAddress.country_lat}
-                long={companyAddress.country_long}
+                lat={companyAddress?.country_lat}
+                long={companyAddress?.country_long}
                 containerClassName="col-span-2"
                 branchId={id}
                 companyId={company_id}
@@ -83,7 +83,7 @@ export const NationalAddressFormConfig = (
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
               dependsOn: "country_id",
               filterParam: "country_id",
@@ -108,7 +108,7 @@ export const NationalAddressFormConfig = (
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
               dependsOn: "state_id",
               filterParam: "state_id",
@@ -190,15 +190,15 @@ export const NationalAddressFormConfig = (
     initialValues: {
       country_id: companyAddress?.country_id ?? "",
       country_name: companyAddress?.country_name ?? "",
-      neighborhood_name: companyAddress.neighborhood_name ?? "",
-      city_id: companyAddress.city_id ?? "",
-      state_id: companyAddress.state_id ?? "",
-      building_number: companyAddress.building_number ?? "",
-      additional_phone: companyAddress.additional_phone ?? "",
-      postal_code: companyAddress.postal_code ?? "",
-      street_name: companyAddress.street_name ?? "",
-      longitude: companyAddress.country_long ?? "",
-      latitude: companyAddress.country_lat ?? "",
+      neighborhood_name: companyAddress?.neighborhood_name ?? "",
+      city_id: companyAddress?.city_id ?? "",
+      state_id: companyAddress?.state_id ?? "",
+      building_number: companyAddress?.building_number ?? "",
+      additional_phone: companyAddress?.additional_phone ?? "",
+      postal_code: companyAddress?.postal_code ?? "",
+      street_name: companyAddress?.street_name ?? "",
+      longitude: companyAddress?.country_long ?? "",
+      latitude: companyAddress?.country_lat ?? "",
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
@@ -229,14 +229,14 @@ export const NationalAddressFormConfig = (
             ...(company_id && { company_id }),
           },
         },
-        url: `${baseURL}/companies/company-profile/national-address/${companyAddress.id}`,
+        url: `${baseURL}/companies/company-profile/national-address/${companyAddress?.id}`,
         method: "PUT",
       });
     },
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["main-company-data", id, company_id],
+        queryKey: ["company-address", id, company_id],
       });
     },
   };

@@ -156,7 +156,8 @@
     "OrganizationalStructure": "الهيكل التنظيمي",
     "AttendanceDeparture": "الحضور والانصراف",
     "HumanResources": "الموارد البشرية",
-    "ProgramManagement": "ادارة البرامج"
+    "ProgramManagement": "ادارة البرامج"  ,
+    "Powers": "الصلاحيات"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -376,7 +377,9 @@
           "title": "أعدادات الهيكل",
           "tabs": {
             "jobTitles": { "title": "المسميات الوظيفية" },
-            "jobTypes": { "title": "أنواع الوظائف" }
+            "jobTypes": { "title": "أنواع الوظائف" },
+            "managements": { "title": "اعدادات الادارات" },
+            "departments": { "title": "اعدادات الاقسام" }
           }
         }
       }
@@ -394,6 +397,8 @@
     "name": "الاسم ثلاثي",
     "namePlaceholder": "ادخل الاسم الثلاثي",
     "nameRequired": "الاسم مطلوب",
+    "nameThreeTerms": "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+    "nameLettersOnly": "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
     "nickname": "اسم الشهرة",
     "nicknamePlaceholder": "ادخل اسم الشهرة",
     "nicknameRequired": "اسم الشهرة مطلوب",
@@ -639,5 +644,24 @@
         "inactive": "غير نشط"
       }
     }
+  },
+  "RoleTypes": {
+    "all": "منح جميع الصلاحيات",
+    "update": "تعديل",
+    "import": "استيراد",
+    "export": "تصدير",
+    "list": "عرض",
+    "create": "إضافة",
+    "delete": "حذف",
+    "view": "تفاصيل",
+    "activate": "تنشيط"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط البرنامج؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط البرنامج؟"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
   }
 }

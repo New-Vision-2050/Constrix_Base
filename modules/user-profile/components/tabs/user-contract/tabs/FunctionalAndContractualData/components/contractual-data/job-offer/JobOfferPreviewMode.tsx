@@ -14,7 +14,6 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
           label="رقم العرض"
           value={offer?.job_offer_number ?? ""}
           valid={Boolean(offer?.job_offer_number)}
-          required
         />
       </div>
 
@@ -24,7 +23,6 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
           value={offer?.date_send ?? ""}
           valid={Boolean(offer?.date_send)}
           type="date"
-          required
         />
       </div>
 
@@ -33,7 +31,6 @@ export default function JobOfferFormPreviewMode({ offer }: PropsT) {
           label="تاريخ الموافقة"
           value={offer?.date_accept ?? ""}
           valid={Boolean(offer?.date_accept)}
-          required
         />
       </div>
 

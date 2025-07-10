@@ -1,8 +1,11 @@
 import { Certification } from "@/modules/user-profile/types/Certification";
 import PreviewTextField from "../../../../../../components/previewTextField";
+import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 
 type PropsT = { certification: Certification };
 export default function UserCertificationPreview({ certification }: PropsT) {
+  const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
@@ -53,6 +56,20 @@ export default function UserCertificationPreview({ certification }: PropsT) {
           value={certification?.date_end ?? ""}
           valid={Boolean(certification?.date_end)}
           type="date"
+        />
+      </div>
+
+      <div className="p-2">
+        <PreviewTextField
+          mediaId={certification?.file?.id}
+          fireAfterDeleteMedia={() => {
+            handleRefetchUserCertifications();
+          }}
+          valid={Boolean(certification?.file?.name)}
+          label="ارفاق الشهادة"
+          value={certification?.file?.name ?? "---"}
+          type={certification?.file?.type == "image" ? "image" : "pdf"}
+          fileUrl={certification?.file?.url}
         />
       </div>
     </div>

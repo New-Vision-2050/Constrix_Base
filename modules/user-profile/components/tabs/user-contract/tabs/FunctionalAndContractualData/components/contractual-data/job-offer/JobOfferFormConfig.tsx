@@ -24,13 +24,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             label: "رقم العرض",
             type: "text",
             placeholder: "رقم العرض",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "رقم العرض مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             label: "تاريخ الارسال",
@@ -41,12 +35,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
               formId: `job-offer-data-form-${offer?.id}`,
               field: "date_accept",
             },
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الارسال مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             label: "تاريخ الموافقة",
@@ -57,12 +46,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
               formId: `job-offer-data-form-${offer?.id}`,
               field: "date_send",
             },
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الموافقة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             label: "ارفاق العرض",
