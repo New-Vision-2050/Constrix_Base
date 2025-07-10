@@ -551,6 +551,20 @@
       }
     }
   },
+  "hr-settings": {
+    "tabs": {
+      "attendance": "Attendance & Departure",
+      "recruitment": "Recruitment",
+      "service": "Service",
+      "contractManagement": "Contract Management"
+    },
+    "statistics": {
+      "totalAttendance": "Total Attendance",
+      "totalDeparture": "Total Departures",
+      "totalAbsence": "Total Absences",
+      "vacations": "Vacations"
+    }
+  },
   "HRSettingsAttendanceDepartureModule": {
     "tabs": {
       "attendance": "Attendance",

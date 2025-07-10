@@ -555,6 +555,20 @@
       }
     }
   },
+  "hr-settings":{
+    "tabs": {
+      "attendance": "الحضور و الانصراف",
+      "recruitment": "التوظيف",
+      "service": "الخدمة",
+      "contractManagement": "ادارة عقد العمل"
+    },
+    "statistics": {
+      "totalAttendance": "إجمالي عدد الحضور",
+      "totalDeparture": "إجمالي عدد الانصراف",
+      "totalAbsence": "إجمالي عدد الغياب",
+      "vacations": "الإجازات"
+    }
+  },
   "HRSettingsAttendanceDepartureModule": {
     "attendanceDeterminantDetails": {
       "determinantType": "نظام المحدد",
