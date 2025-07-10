@@ -22,6 +22,14 @@ const daysList = Object.entries(dayNames).map(([key, value]) => ({
 
 type PropsT = {
   refetchConstraints: () => void;
+  branchesData?: Array<{
+    id: string;
+    name: string;
+    code: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+  }>;
 };
 // Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
@@ -247,7 +255,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           // إذا وجدت أيام مكررة، إرجاع خطأ
           return {
             success: false,
-            message: messages.duplicateDay || "تم اختيار هذا اليوم مسبقاً",
+            message: "تم اختيار هذا اليوم مسبقاً",
           };
         }
 
@@ -301,9 +309,39 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       }
 
       // تجهيز بيانات المواقع
-      const branch_locations = JSON.parse(
-        (formData.branch_locations as string) ?? "[]"
-      );
+      let branch_locations = [];
+
+      if (Boolean(formData.location_type === "main" && props.branchesData)) {
+        // إذا تم اختيار المواقع الافتراضية، استخدم المواقع الافتراضية للفروع المحددة
+        const selectedBranches = formData.branch_ids || [];
+
+        // إنشاء مصفوفة مواقع الفروع باستخدام بيانات الفروع من props
+        branch_locations = Array.isArray(selectedBranches)
+          ? selectedBranches.map((branchId) => {
+              const branchData = props.branchesData?.find(
+                (branch) => branch.id == branchId
+              );
+              console.log('branchData',branchData)
+              console.log('branchId',branchId)
+              console.log('selectedBranches',selectedBranches)
+              console.log('branchDatabranchDatabranchData',branchData)
+              return {
+                branchId: branchId,
+                branchName: branchData?.name || "",
+                latitude: branchData?.latitude || 0,
+                longitude: branchData?.longitude || 0,
+                address: branchData?.address || "",
+                radius: "100",
+                isDefault: false,
+              };
+            })
+          : [];
+      } else {
+        // إذا تم اختيار المواقع المخصصة، استخدم القيم المخصصة المحددة
+        branch_locations = JSON.parse(
+          (formData.branch_locations as string) ?? "[]"
+        );
+      }
 
       const data = {
         constraint_name: formData.constraint_name,
@@ -317,7 +355,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             address: "branch.address",
             latitude: branch.latitude,
             longitude: branch.longitude,
-            radius: Number(branch.radius ?? "0"),
+            radius: Number(branch.radius ?? "1") <= 0 ? 1 : Number(branch.radius ?? "1"),
           };
         }),
         constraint_config: {

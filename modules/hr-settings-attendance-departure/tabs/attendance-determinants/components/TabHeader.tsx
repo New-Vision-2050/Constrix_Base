@@ -4,8 +4,9 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { getDynamicDeterminantFormConfig } from "./CreateDeterminant/CreateDeterminantFormConfig";
 
 export default function TabHeader() {
-  const { activeConstraint, refetchConstraints } = useAttendanceDeterminants();
+  const { activeConstraint, refetchConstraints, branchesData } = useAttendanceDeterminants();
 
+  console.log('branchesData-branchesData', branchesData)
   return (
     <div className="flex items-center justify-between w-full mb-4">
       <h2 className="text-xl font-bold">
@@ -13,7 +14,7 @@ export default function TabHeader() {
       </h2>
       <div className="flex gap-2">
         <SheetFormBuilder
-          config={getDynamicDeterminantFormConfig({ refetchConstraints })}
+          config={getDynamicDeterminantFormConfig({ refetchConstraints, branchesData })}
           trigger={<Button>إنشاء محدد</Button>}
         />
       </div>
