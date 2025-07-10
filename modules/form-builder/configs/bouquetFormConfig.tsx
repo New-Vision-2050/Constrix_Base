@@ -14,6 +14,8 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>): Form
   
     return {
       formId: "bouquet-form",
+      title: "اضافة برنامج",
+      apiUrl: `${baseURL}/packages`,
       laravelValidation: {
         enabled: true,
         errorsPath: "errors", // This is the default in Laravel
