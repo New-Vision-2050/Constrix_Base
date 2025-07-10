@@ -1,8 +1,9 @@
 import React from "react";
 import DeterminantItem from "./DeterminantItem/DeterminantItem";
 import { MapPin } from "lucide-react";
-import { Constraint } from "../../../../types/constraint-type";
+import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import { useAttendanceDeterminants } from "../../context/AttendanceDeterminantsContext";
+import { useTranslations } from "next-intl";
 
 interface DeterminantsListProps {
   determinants: Constraint[];
@@ -19,6 +20,8 @@ const DeterminantsList: React.FC<DeterminantsListProps> = ({
 }) => {
   const { activeConstraint } = useAttendanceDeterminants();
   const isActive = !Boolean(activeConstraint);
+  // استخدام hook الترجمة للوصول إلى مفاتيح الترجمة
+  const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants.determinantsList");
 
   return (
     <div className="bg-[#1A103C] rounded-lg overflow-hidden  mx-auto">
@@ -27,7 +30,7 @@ const DeterminantsList: React.FC<DeterminantsListProps> = ({
         onClick={() => onClick("all-determinants")}
       >
         <MapPin size={16} className={`${isActive ? "text-white" : "text-gray-400"}`} />
-        <div className={`${isActive ? "text-white" : "text-gray-400"} text-sm font-medium`}>جميع المحددات</div>
+        <div className={`${isActive ? "text-white" : "text-gray-400"} text-sm font-medium`}>{t('allDeterminants')}</div>
       </div>
       <div className="px-4">
         {determinants.map((determinant) => (

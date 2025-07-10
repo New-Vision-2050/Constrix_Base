@@ -582,6 +582,9 @@
       "notes": "ملاحظات",
       "submitButtonText": "حفظ المحدد",
       "cancelButtonText": "إلغاء",
+      "determinantsList": {
+        "allDeterminants": "جميع المحددات"
+      },
       "error": {
         "loading": "خطأ في تحميل المحددات",
         "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"

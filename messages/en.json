@@ -569,6 +569,9 @@
       "notes": "Notes",
       "submitButtonText": "Save Determinant",
       "cancelButtonText": "Cancel",
+      "determinantsList": {
+        "allDeterminants": "All Determinants"
+      },
       "error": {
         "loading": "Error in loading determinants",
         "tryAgain": "Please try again later"
