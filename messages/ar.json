@@ -415,7 +415,11 @@
     "countryRequired": "الجنسية مطلوبة",
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
-    "resetButtonText": "مسح النموذج"
+    "resetButtonText": "مسح النموذج",
+    "error": {
+      "loading": "خطأ في تحميل البيانات",
+      "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
+    }
   },
   "AttendanceDepartureModule":{
     "shared": {
@@ -548,6 +552,28 @@
           "attendance": "الحضور",
           "departure": "الانصراف"
         }
+      }
+    }
+  },
+  "HRSettingsAttendanceDepartureModule": {
+    "tabs": {
+      "attendance": "الحضور",
+      "departure": "الانصراف",
+      "leaves": "الإجازات",
+      "vacations": "العطلات الرسمية"
+    },
+    "attendanceDeterminants": {
+      "title": "محددات الحضور",
+      "createDeterminant": "إنشاء محدد جديد",
+      "allDeterminants": "جميع المحددات",
+      "branchDeterminant": "محدد فرع",
+      "error": {
+        "loading": "خطأ في تحميل المحددات",
+        "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط"
       }
     }
   }

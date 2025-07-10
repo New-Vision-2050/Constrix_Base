@@ -10,10 +10,14 @@ import {
 } from "./context/AttendanceDeterminantsContext";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { DeterminantSkeletonGrid } from "./components/DeterminantSkeleton";
+import { useTranslations } from "next-intl";
 
 // Componente contenedor que usa el contexto
 function AttendanceDeterminantsTabContent() {
-  // Usar el contexto para acceder a los estados y funciones
+  // استخدام دالة الترجمة
+  const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants");
+  
+  // استخدام السياق للوصول إلى الحالات والدوال
   const {
     constraintsData,
     activeConstraint,
@@ -29,8 +33,8 @@ function AttendanceDeterminantsTabContent() {
       ) : constraintsError ? (
         <div className="flex flex-col items-center justify-center h-full w-full">
           <AlertCircle className="text-red-500" />
-          <p className="ml-2 text-red-500">Error in loading determinants</p>
-          <p className="ml-2 text-red-500">Please try again later</p>
+          <p className="ml-2 text-red-500">{t('error.loading')}</p>
+          <p className="ml-2 text-red-500">{t('error.tryAgain')}</p>
         </div>
       ) : (
         <>

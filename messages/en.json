@@ -550,5 +550,27 @@
         }
       }
     }
+  },
+  "HRSettingsAttendanceDepartureModule": {
+    "tabs": {
+      "attendance": "Attendance",
+      "departure": "Departure",
+      "leaves": "Leaves",
+      "vacations": "Official Holidays"
+    },
+    "attendanceDeterminants": {
+      "title": "Attendance Determinants",
+      "createDeterminant": "Create New Determinant",
+      "allDeterminants": "All Determinants",
+      "branchDeterminant": "Branch Determinant",
+      "error": {
+        "loading": "Error in loading determinants",
+        "tryAgain": "Please try again later"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    }
   }
 }
