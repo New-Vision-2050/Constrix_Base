@@ -10,7 +10,6 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
   // id is now passed as a parameter instead of using useParams()
   const params = useParams();
   const packageId = params && typeof params.id === 'string' ? params.id : '';
-  console.log("packageId",packageId);
   
     return {
       formId: "bouquet-form",
@@ -236,17 +235,17 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
         try {
           // Transform form data to match API structure
           const transformedData = {
-            company_access_program_id: id,
+            company_access_program_id: packageId,
             name: formData.name as string,
-            price: Number(formData.price) || 0,
-            currency: formData.currency as string,
-            subscription_period: Number(formData.subscription_period) || 0,
-            subscription_period_unit: formData.subscription_period_unit as string,
-            trial_period: Number(formData.trial_period) || 0,
-            trial_period_unit: formData.trial_period_unit as string,
-            countries: Array.isArray(formData.countries) ? formData.countries as string[] : [],
-            company_fields: Array.isArray(formData.company_fields) ? formData.company_fields as string[] : [],
-            company_types: Array.isArray(formData.company_types) ? formData.company_types as string[] : []
+            price: Number(formData.price) ,
+            currency: (formData.currency as string) || 'EGP', // Default to EGP if not selected
+            subscription_period: Number(formData.subscription_period) ,
+            subscription_period_unit: (formData.subscription_period_unit as string) || 'month', // Default to month if not selected
+            trial_period: Number(formData.trial_period) ,
+            trial_period_unit: (formData.trial_period_unit as string) || 'month', // Default to month if not selected
+            countries: formData.countries as string[] ,
+            company_fields: formData.company_fields as string[] ,
+            company_types: formData.company_types as string[] 
           };
                     
           // Make API call to packages endpoint
