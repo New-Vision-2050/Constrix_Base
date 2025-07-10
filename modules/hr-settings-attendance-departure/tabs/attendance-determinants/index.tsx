@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   DeterminantDetails,
   AttendanceDeterminantsContent as ContentComponent,
@@ -9,6 +9,7 @@ import {
   AttendanceDeterminantsProvider,
 } from "./context/AttendanceDeterminantsContext";
 import { AlertCircle, Loader2 } from "lucide-react";
+import { DeterminantSkeletonGrid } from "./components/DeterminantSkeleton";
 
 // Componente contenedor que usa el contexto
 function AttendanceDeterminantsTabContent() {
@@ -24,13 +25,12 @@ function AttendanceDeterminantsTabContent() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[20%_80%] gap-2 md:gap-6 min-h-[calc(100vh-180px)] p-4">
       {constraintsLoading ? (
-        <div className="flex items-center justify-center h-full">
-          <Loader2 className="animate-spin" />
-        </div>
+        <DeterminantSkeletonGrid count={6} />
       ) : constraintsError ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full w-full">
           <AlertCircle className="text-red-500" />
-          <p className="ml-2 text-red-500">Error al cargar los determinantes</p>
+          <p className="ml-2 text-red-500">Error in loading determinants</p>
+          <p className="ml-2 text-red-500">Please try again later</p>
         </div>
       ) : (
         <>

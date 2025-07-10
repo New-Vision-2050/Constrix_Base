@@ -2,6 +2,7 @@ import React from "react";
 import { AttendanceDeterminant } from "../../../../../types/attendance-departure";
 import { Check, AlertCircle, MapPin, CheckCircle2Icon } from "lucide-react";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
+import { useAttendanceDeterminants } from "../../../context/AttendanceDeterminantsContext";
 
 interface DeterminantItemProps {
   determinant: Constraint;
@@ -15,6 +16,8 @@ const DeterminantItem: React.FC<DeterminantItemProps> = ({
   determinant,
   onClick,
 }) => {
+  const { activeConstraint } = useAttendanceDeterminants();
+  const isActive = activeConstraint?.id === determinant.id;
   const handleClick = () => {
     if (onClick) {
       onClick(determinant.id);
@@ -37,14 +40,14 @@ const DeterminantItem: React.FC<DeterminantItemProps> = ({
         <div className="text-right">
           <div
             className={`text-sm ${
-              determinant.is_active ? "text-white font-bold" : "text-gray-400"
+              isActive ? "text-white font-bold" : "text-gray-400"
             }`}
           >
             محدد فرع
           </div>
           <div
             className={`text-sm ${
-              determinant.is_active ? "text-white" : "text-gray-500"
+              isActive ? "text-white" : "text-gray-500"
             }`}
           >
             {determinant.constraint_name}
