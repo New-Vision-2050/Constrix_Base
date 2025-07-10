@@ -15,6 +15,10 @@ const dayNames = {
   friday: "الجمعة",
   saturday: "السبت",
 };
+const daysList = Object.entries(dayNames).map(([key, value]) => ({
+  value: key,
+  label: value,
+}));
 
 // Function to create day-specific sections dynamically
 const createDaySections = (workingDays: string[]) => {
@@ -273,6 +277,69 @@ export const createDeterminantFormConfig: FormConfig = {
               message: "يجب اختيار يوم واحد على الأقل",
             },
           ],
+        },
+        {
+          name: "weekly_schedule",
+          label: "جدول العمل",
+          type: "dynamicRows",
+          dynamicRowOptions: {
+            enableDrag: true,
+            rowFields: [
+              {
+                type: "select",
+                name: "day",
+                label: "اليوم",
+                placeholder: "اختر يوم",
+                options: daysList,
+                validation: [
+                  {
+                    type: "required",
+                    message: "اليوم مطلوب",
+                  },
+                ],
+              },
+              {
+                name: "periods",
+                label: "فترة العمل",
+                type: "dynamicRows",
+                dynamicRowOptions: {
+                  enableDrag: true,
+                  rowFields: [
+                    {
+                      type: "text",
+                      name: "period_from",
+                      label: "الفترة من",
+                      placeholder: "09:00",
+                      validation: [
+                        {
+                          type: "required",
+                          message: "الفترة من مطلوبة",
+                        },
+                      ],
+                    },
+                    {
+                      type: "text",
+                      name: "period_to",
+                      label: "الفترة إلى",
+                      placeholder: "17:00",
+                      validation: [
+                        {
+                          type: "required",
+                          message: "الفترة إلى مطلوبة",
+                        },
+                      ],
+                    },
+                  ],
+                  minRows: 1,
+                  maxRows: 5,
+                  columns: 1,
+                },
+              },
+            ],
+            minRows: 1,
+            maxRows: 5,
+            columns: 1,
+          },
         },
       ],
     },
