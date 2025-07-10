@@ -15,7 +15,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   // Days of the week in Arabic
   const daysOfWeek = [
     "الأربعاء",
-    "الاحد",
+    "الأحد",
     "الخميس",
     "الاثنين",
     "الجمعة",
@@ -42,6 +42,8 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   const activeDays = Object.entries(weeklySchedule)
     .filter(([_, config]) => config?.enabled)
     .map(([day]) => dayNameMap[day] || "");
+
+    console.log('activeDays',activeDays,'weeklySchedule',weeklySchedule,'daysOfWeek',daysOfWeek)
 
   // Calculate total working hours per week if available
   const calculateTotalHours = () => {

@@ -249,6 +249,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     onSuccess: () => {
       refetchConstraints();
     },
+    resetOnSuccess:true,
     onSubmit: async (formData: Record<string, unknown>) => {
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
@@ -271,7 +272,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           let periodsArray = [];
 
           try {
-            if (dayItem.periods) {
+            if (dayItem?.periods) {
               if (Array.isArray(dayItem.periods)) {
                 // If it's an array
                 periodsArray = dayItem.periods.map((period: any) => {
@@ -286,22 +287,18 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     return { from: "", to: "" };
                   }
                 });
-              } else if (
-                typeof dayItem.periods === "object" &&
-                dayItem.periods !== null
-              ) {
-                // إذا كانت كائن وليست مصفوفة
-                const period = dayItem.periods;
+              } else if (typeof dayItem.periods === "object") {
+                // Handle case where periods is an object
                 periodsArray = [
                   {
-                    from: String(period.from || ""),
-                    to: String(period.to || ""),
+                    from: String(dayItem.periods.from || ""),
+                    to: String(dayItem.periods.to || ""),
                   },
                 ];
               }
             }
-          } catch (error) {
-            console.error("Error processing periods:", error, dayItem);
+          } catch (e) {
+            console.error("Error formatting periods:", e, dayItem);
           }
 
           return {
@@ -380,24 +377,43 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 let dayPeriods: any[] = [];
 
                 // Collect all working periods for this day
-                daySchedules.forEach((dayItem: any) => {
-                  if (Array.isArray(dayItem.periods)) {
-                    dayItem.periods.forEach((period: any) => {
-                      // Validate required fields
+                // Ensure daySchedules is iterable
+                if (Array.isArray(daySchedules)) {
+                  daySchedules.forEach((dayItem: any) => {
+                    if (dayItem && dayItem.periods) {
+                      // Handle both array and non-array periods
+                      if (Array.isArray(dayItem.periods)) {
+                        dayItem.periods.forEach((period: any) => {
+                          // Validate required fields
+                          if (period && typeof period === 'object') {
+                            // Check for the correct field name
+                            const startTime = period.from || "";
+                            const endTime = period.to || "";
 
-                      // Check for the correct field name
-                      const startTime = period.from || "";
-                      const endTime = period.to || "";
-
-                      if (startTime && endTime) {
-                        dayPeriods.push({
-                          start_time: startTime,
-                          end_time: endTime,
+                            if (startTime && endTime) {
+                              dayPeriods.push({
+                                start_time: startTime,
+                                end_time: endTime,
+                              });
+                            }
+                          }
                         });
+                      } else if (typeof dayItem.periods === 'object' && dayItem.periods !== null) {
+                        // Handle object periods
+                        const period = dayItem.periods;
+                        const startTime = period.from || "";
+                        const endTime = period.to || "";
+
+                        if (startTime && endTime) {
+                          dayPeriods.push({
+                            start_time: startTime,
+                            end_time: endTime,
+                          });
+                        }
                       }
-                    });
-                  }
-                });
+                    }
+                  });
+                }
 
                 let totalWorkHours = 0;
 
