@@ -3,10 +3,14 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
+import { useParams } from "next/navigation";
 
 // Create a config function that accepts id as a parameter instead of using hooks directly
 export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: string): FormConfig {
-  // id is now passed as a parameter instead of using useParams()
+  // id is now passed as a parameter instead of using useParams()  // Get params from useParams() and safely extract id
+  const params = useParams();
+  const packageId = params && typeof params.id === 'string' ? params.id : '';
+  console.log("packageId",packageId);
   
   
     return {
@@ -161,7 +165,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             isMulti: true,
             placeholder: "اختر مجالات ظهور البرنامج",
             dynamicOptions: {
-              url: `${baseURL}/company_fields?company_access_program_id=${id}`,
+              url: `${baseURL}/company_fields?company_access_program_id=${packageId}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -179,7 +183,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             isMulti: true,
             placeholder: "اختر دول الظهور",
             dynamicOptions: {
-              url: `${baseURL}/countries?company_access_program_id=${id}`,
+              url: `${baseURL}/countries?company_access_program_id=${packageId}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
