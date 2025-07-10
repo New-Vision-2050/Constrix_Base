@@ -30,14 +30,21 @@ type PropsT = {
     latitude?: number;
     longitude?: number;
   }>;
+  // Función de traducción opcional
+  t?: (key: string) => string;
 };
 // Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
-  const { refetchConstraints } = props;
+  const { refetchConstraints, t } = props;
+  
+  // Función auxiliar para obtener textos traducidos o usar valores predeterminados
+  const getText = (key: string, defaultText: string) => {
+    return t ? t(key) : defaultText;
+  };
 
   return {
     formId: "create-determinant-form",
-    title: "إضافة محدد جديد",
+    title: getText("createDeterminant", "إضافة محدد جديد"),
     wizard: true,
     apiUrl: `${baseURL}/attendance/constraints`,
     sections: [
@@ -487,7 +494,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         }
       );
     },
-    submitButtonText: "حفظ المحدد",
-    cancelButtonText: "إلغاء",
+    submitButtonText: getText("submitButtonText", "حفظ المحدد"),
+    cancelButtonText: getText("cancelButtonText", "إلغاء"),
   };
 };

@@ -556,6 +556,15 @@
     }
   },
   "HRSettingsAttendanceDepartureModule": {
+    "attendanceDeterminantDetails": {
+      "determinantType": "نظام المحدد",
+      "systemNotFound": "نظام غير موجود",
+      "workHours": "عدد ساعات العمل",
+      "hours": "ساعات",
+      "workdays": "أيام العمل",
+      "branches": "الفروع",
+      "notes": "ملاحظات"
+    },
     "tabs": {
       "attendance": "الحضور",
       "departure": "الانصراف",
@@ -567,6 +576,12 @@
       "createDeterminant": "إنشاء محدد جديد",
       "allDeterminants": "جميع المحددات",
       "branchDeterminant": "محدد فرع",
+      "workHours": "عدد ساعات العمل",
+      "hours": "ساعات",
+      "systemNotFound": "نظام غير موجود",
+      "notes": "ملاحظات",
+      "submitButtonText": "حفظ المحدد",
+      "cancelButtonText": "إلغاء",
       "error": {
         "loading": "خطأ في تحميل المحددات",
         "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"

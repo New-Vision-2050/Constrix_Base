@@ -563,6 +563,12 @@
       "createDeterminant": "Create New Determinant",
       "allDeterminants": "All Determinants",
       "branchDeterminant": "Branch Determinant",
+      "workHours": "Work Hours",
+      "hours": "hours",
+      "systemNotFound": "System not found",
+      "notes": "Notes",
+      "submitButtonText": "Save Determinant",
+      "cancelButtonText": "Cancel",
       "error": {
         "loading": "Error in loading determinants",
         "tryAgain": "Please try again later"
@@ -571,6 +577,15 @@
         "active": "Active",
         "inactive": "Inactive"
       }
+    },
+    "attendanceDeterminantDetails":{
+      "determinantType": "Determinant System Type",
+      "systemNotFound": "System not found",
+      "workHours": "Working Hours",
+      "hours": "hours",
+      "workdays": "Working Days",
+      "branches": "Branches",
+      "notes": "Notes"
     }
   }
 }

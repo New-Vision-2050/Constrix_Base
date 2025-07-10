@@ -1,6 +1,7 @@
 import React from "react";
 import { Check } from "lucide-react";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
+import { useTranslations } from "next-intl";
 
 interface DeterminantDetailsProps {
   constraint: Constraint;
@@ -12,6 +13,8 @@ interface DeterminantDetailsProps {
 const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   constraint,
 }) => {
+  // استخدام hook الترجمة
+  const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminantDetails");
   // Days of the week in Arabic
   const daysOfWeek = [
     "الأربعاء",
@@ -75,20 +78,21 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
 
       {/* System type */}
       <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-        <div className="text-gray-400 text-[12px] mb-0.5">نظام المحدد</div>
+        <div className="text-gray-400 text-[12px] mb-0.5">{t('determinantType')}</div>
         <div className=" text-lg">
-          {constraint.constraint_type ?? "نظام غير موجود"}
+          {constraint.constraint_type ?? t('systemNotFound', { default: "نظام غير موجود" })}
         </div>
       </div>
 
       {/* Work hours */}
       <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-        <div className="text-gray-400 text-[12px] mb-0.5">عدد ساعات العمل</div>
-        <div className=" text-lg">{totalHours || 0} ساعات</div>
+        <div className="text-gray-400 text-[12px] mb-0.5">{t('workHours')}</div>
+        <div className=" text-lg">{totalHours || 0} {t('hours', { default: "ساعات" })}</div>
       </div>
 
       {/* Work days */}
       <div className="bg-[#161F3E] p-3 rounded-md mt-3">
+        <div className="text-gray-400 text-[12px] mb-0.5">{t('workdays')}</div>
         <div className="grid grid-cols-3 gap-x-8 gap-y-4 text-center">
           {daysOfWeek.map((day, index) => (
             <div
@@ -111,7 +115,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
       {/* Branches */}
       {branchNames.length > 0 && (
         <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-          <div className=" text-gray-400 mb-3">الفرع*</div>
+          <div className=" text-gray-400 mb-3">{t('branches')}</div>
           <div className="flex flex-row-reverse gap-3 justify-end">
             {branchNames.map((branch, index) => (
               <div
@@ -128,7 +132,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
       {/* Notes */}
       {constraint.notes && (
         <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-          <div className="text-gray-400 text-[12px] mb-0.5">ملاحظات</div>
+          <div className="text-gray-400 text-[12px] mb-0.5">{t('notes', { default: "ملاحظات" })}</div>
           <div className=" text-lg">{constraint.notes}</div>
         </div>
       )}
