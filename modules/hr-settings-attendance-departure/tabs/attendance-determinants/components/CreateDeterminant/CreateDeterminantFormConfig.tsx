@@ -24,7 +24,7 @@ const daysList = Object.entries(dayNames).map(([key, value]) => ({
 const messages = {
   addDay: "أضافة يوم عمل",
   addPeriod: "أضافة فترة عمل",
-  duplicateDay: "تم اختيار هذا اليوم مسبقاً"
+  duplicateDay: "تم اختيار هذا اليوم مسبقاً",
 };
 
 // Function to create day-specific sections dynamically
@@ -314,25 +314,25 @@ export const createDeterminantFormConfig: FormConfig = {
                   rowFields: [
                     {
                       type: "text",
-                      name: "period_from",
-                      label: "الفترة من",
+                      name: "start_time",
+                      label: "بداية الفترة",
                       placeholder: "09:00",
                       validation: [
                         {
                           type: "required",
-                          message: "الفترة من مطلوبة",
+                          message: "بداية الفترة مطلوبة",
                         },
                       ],
                     },
                     {
                       type: "text",
-                      name: "period_to",
-                      label: "الفترة إلى",
+                      name: "end_time",
+                      label: "نهاية الفترة",
                       placeholder: "17:00",
                       validation: [
                         {
                           type: "required",
-                          message: "الفترة إلى مطلوبة",
+                          message: "نهاية الفترة مطلوبة",
                         },
                       ],
                     },
@@ -357,7 +357,7 @@ export const createDeterminantFormConfig: FormConfig = {
     if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
       const weeklySchedule = formData.weekly_schedule as Array<any>;
       const days = weeklySchedule.map((item) => item.day);
-      
+
       // البحث عن الأيام المكررة
       const uniqueDays = new Set(days);
       if (uniqueDays.size !== days.length) {
@@ -367,30 +367,71 @@ export const createDeterminantFormConfig: FormConfig = {
           message: messages.duplicateDay || "تم اختيار هذا اليوم مسبقاً",
         };
       }
-      
+
       // تنسيق بيانات جدول العمل للإرسال
       const formattedSchedule = weeklySchedule.map((dayItem) => {
+        // التعامل مع حالة dayItem.periods دائماً بأمان
+        let periodsArray = [];
+
+        try {
+          if (dayItem.periods) {
+            // طباعة البيانات للأغراض التصحيحية
+            console.log(
+              "Processing periods:",
+              JSON.stringify(dayItem.periods, null, 2)
+            );
+
+            if (Array.isArray(dayItem.periods)) {
+              // إذا كانت مصفوفة
+              periodsArray = dayItem.periods.map((period: any) => {
+                // للتأكد من أن period هو كائن
+                if (period && typeof period === "object") {
+                  return {
+                    from: String(period.period_from || ""),
+                    to: String(period.period_to || ""),
+                  };
+                } else {
+                  // إذا لم يكن period كائنًا
+                  return { from: "", to: "" };
+                }
+              });
+            } else if (
+              typeof dayItem.periods === "object" &&
+              dayItem.periods !== null
+            ) {
+              // إذا كانت كائن وليست مصفوفة
+              const period = dayItem.periods;
+              periodsArray = [
+                {
+                  from: String(period.period_from || ""),
+                  to: String(period.period_to || ""),
+                },
+              ];
+            }
+          }
+        } catch (error) {
+          console.error("Error processing periods:", error, dayItem);
+        }
+
         return {
           day: dayItem.day,
-          periods: Array.isArray(dayItem.periods) 
-            ? dayItem.periods.map((period: any) => ({
-                from: period.period_from,
-                to: period.period_to,
-              }))
-            : [],
+          periods: periodsArray,
         };
       });
-      
+
       // تحديث البيانات بالجدول المنسق
       formData.formatted_schedule = formattedSchedule;
     }
-    
+
     // تجهيز بيانات المواقع
     const branch_locations =
       formData.location_type === "custom"
         ? JSON.parse((formData.branch_locations as string) ?? "[]")
         : [];
-        
+    const weeklySchedule = Object.values(
+      formData.formatted_schedule ?? "{}"
+    ).map((day) => day.day);
+
     const data = {
       constraint_name: formData.constraint_name,
       is_active: formData.is_active,
@@ -406,9 +447,25 @@ export const createDeterminantFormConfig: FormConfig = {
           radius: Number(branch.radius ?? "0"),
         };
       }),
+      constraint_config: {
+        time_rules: {
+          subtype: "multiple_periods",
+          weekly_schedule: Object.keys(dayNames).map((day) => {
+            return {
+              enabled: weeklySchedule.includes(day),
+              periods: Object.values(formData.formatted_schedule ?? "{}")
+                .filter((period) => period.day === day)
+                .map((period) => ({
+                  start_time: period.start_time,
+                  end_time: period.end_time,
+                })),
+            };
+          }),
+        },
+      },
       weekly_schedule: formData.formatted_schedule || [],
     };
-    
+
     console.log("Form data received:", data);
 
     return await defaultSubmitHandler(data, createDeterminantFormConfig, {
