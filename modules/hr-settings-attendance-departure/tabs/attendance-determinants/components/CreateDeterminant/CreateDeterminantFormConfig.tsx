@@ -55,6 +55,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 type: "required",
                 message: "اسم المحدد مطلوب",
               },
+              {
+                type: "pattern",
+                value: /^[\p{L}\p{N}\s]+$/u,
+                message: "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط",
+              },
             ],
           },
           {
@@ -216,6 +221,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             type: "required",
                             message: "بداية الفترة مطلوبة",
                           },
+                          {
+                            type: "pattern",
+                            value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+                            message: "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00",
+                          },
                         ],
                       },
                       {
@@ -227,6 +237,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                           {
                             type: "required",
                             message: "نهاية الفترة مطلوبة",
+                          },
+                          {
+                            type: "pattern",
+                            value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+                            message: "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00",
                           },
                         ],
                       },
