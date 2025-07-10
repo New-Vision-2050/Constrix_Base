@@ -39,8 +39,9 @@ export default function MapComponent({
   longitude,
   onMapClick,
 }: MapComponentProps) {
-  // Make sure latitude and longitude are always strings
-  const latStr = latitude || "24.7136";
+  // استخدام الإحداثيات المقدمة أو الافتراضية لمدينة الرياض فقط عند الحاجة
+  // مدينة الرياض كقيمة افتراضية فقط في حالة عدم وجود إحداثيات
+  const latStr = latitude || "24.7136"; // الرياض كقيمة افتراضية
   const lngStr = longitude || "46.6753";
   
   // Convert coordinates to numbers

@@ -15,6 +15,7 @@ interface AttendanceDeterminantsContextType {
   activeConstraint: Constraint | undefined;
   constraintsLoading: boolean;
   constraintsError: unknown;
+  branchesData: any[] | undefined; // Add branchesData property
   setActiveConstraint: React.Dispatch<
     React.SetStateAction<Constraint | undefined>
   >;
@@ -68,6 +69,7 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     activeConstraint,
     constraintsLoading,
     constraintsError,
+    branchesData, // Add branchesData to the context value
     setActiveConstraint,
     handleConstraintClick,
     refetchConstraints,

@@ -43,7 +43,7 @@ export default function CoordinatesInput({
         <label className="block text-white text-sm mb-2">مسافة الحضور (متر):</label>
         <input
           type="number"
-          value={radius}
+          value={Number(radius??'0')}
           onChange={(e) => onRadiusChange(e.target.value)}
           className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-pink-500 focus:outline-none"
           placeholder="100"

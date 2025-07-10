@@ -285,14 +285,17 @@ export const createDeterminantFormConfig: FormConfig = {
       is_active: formData.is_active,
       constraint_type: formData.constraint_type,
       branch_ids: formData.branch_ids,
-      branch_locations:branch_locations?.map((branch: any) => ({
-        branch_id: branch.branchId,
-        name: branch.branchName,
-        address: "branch.address",
-        latitude: branch.latitude,
-        longitude: branch.longitude,
-        radius: branch.radius,
-      })),
+      branch_locations:branch_locations?.map((branch: any) => {
+        console.log("branch909",branch);
+        return {
+          branch_id: branch.branchId,
+          name: branch.branchName,
+          address: "branch.address",
+          latitude: branch.latitude,
+          longitude: branch.longitude,
+          radius: branch.radius,
+        }
+      }),
       // "constraint_config"
     };
     console.log("Form data received:",data, formData);
