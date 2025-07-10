@@ -6,7 +6,6 @@ import { Switch } from "@/modules/table/components/ui/switch";
 import { apiClient } from "@/config/axios-config";
 import { toast } from 'sonner';
 import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
 
 // Types
 interface PermissionItem {
@@ -19,43 +18,149 @@ interface PermissionItem {
 type CategoryData = Record<string, PermissionItem[]>;
 type Payload = Record<string, CategoryData>;
 
+// Package permissions interfaces (dynamic structure)
+export interface Root {
+  payload: {
+    id: string;
+    name: string;
+    permissions: Permissions;
+  };
+}
+
+export interface Permissions {
+  [key: string]: CategoryPermissions;
+}
+
+export interface CategoryPermissions {
+  [subcategory: string]: PermissionWithStatus[];
+}
+
+
+export interface PermissionWithStatus {
+  id: string;
+  key: string;
+  type: string;
+  name: string;
+  is_active: boolean;
+}
+
 // Props interface
 interface PermissionsBouquetProps {
   packageId: string;
 }
 
+// Helper function to map permission type to switch type
+const getSwitchTypeFromPermissionType = (permissionType: string): string | null => {
+  const typeMap: Record<string, string> = {
+    'view': 'view',
+    'update': 'edit',
+    'delete': 'delete',
+    'create': 'create',
+    'export': 'export',
+    'activate': 'activate',
+    'list': 'list'
+  };
+  return typeMap[permissionType] || null;
+};
+
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const [permissions, setPermissions] = useState<Payload | null>(null);
+  const [packagePermissions, setPackagePermissions] = useState<Root | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
-  const params = useParams();
-  const id = params?.id 
-  // Fetch permissions from API
+  const [activeStates, setActiveStates] = useState<Record<string, boolean>>({});
+  const [changedPermissionIds, setChangedPermissionIds] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   useEffect(() => {
-    const fetchPermissions = async () => {
+    const fetchData = async () => {
       try {
-        const response = await apiClient.get('/role_and_permissions/permissions/lookup');
-        const payload = response.data?.payload;
+        const lookupResponse = await apiClient.get('/role_and_permissions/permissions/lookup');
+        const payload = lookupResponse.data?.payload;
         
         if (payload && typeof payload === 'object') {
           setPermissions(payload as Payload);
         } else {
-          console.warn('Invalid payload structure received from API');
           setPermissions(null);
         }
+
+        if (packageId) {
+          try {
+            const packageResponse = await apiClient.get(`/packages/${packageId}/permissions`);
+            const packageData = packageResponse.data;
+            
+            if (packageData) {
+              setPackagePermissions(packageData as Root);
+              
+              const newActiveStates: Record<string, boolean> = {};
+              
+              if (packageData.payload.permissions) {
+                Object.entries(packageData.payload.permissions).forEach(([categoryKey, categoryData]) => {
+                  console.log(`Category: ${categoryKey}`);
+                  if (categoryData && typeof categoryData === 'object') {
+                    Object.entries(categoryData).forEach(([subKey, subItems]) => {
+                      if (Array.isArray(subItems)) {
+                        subItems.forEach((item: any, index: number) => {
+                          
+                          
+                          const switchType = getSwitchTypeFromPermissionType(item.type);
+                          if (switchType) {
+                            const stateKey = `${categoryKey}.${subKey}.${switchType}`;
+                            newActiveStates[stateKey] = item.is_active === true;
+                          }
+                        });
+                      }
+                    });
+                  }
+                });
+              }
+              
+              setActiveStates(newActiveStates);
+              
+              const initialSwitchStates: Record<string, boolean> = {};
+                            
+              if (packageData.permissions && typeof packageData.permissions === 'object') {
+                Object.entries(packageData.permissions).forEach(([categoryKey, categoryData]) => {
+                if (categoryData && typeof categoryData === 'object') {
+                  Object.entries(categoryData).forEach(([subKey, subItems]) => {
+                    if (Array.isArray(subItems)) {
+                      subItems.forEach((item: PermissionWithStatus) => {
+                        const switchType = getSwitchTypeFromPermissionType(item.type);
+                        if (switchType) {
+                          const switchId = `${subKey}-${switchType}`;
+                          initialSwitchStates[switchId] = item.is_active;
+                        }
+                      });
+                    }
+                  });
+                }
+                });
+              }
+              
+              setSwitchStates(initialSwitchStates);
+            }
+          } catch (packageError) {
+            console.error('Package API Error:', packageError);
+            setPackagePermissions(null);
+          }
+        } else {
+          console.warn('No package ID found, cannot fetch package permissions');
+        }
       } catch (error) {
-        console.error('API Error:', error);
+        console.error('Lookup API Error:', error);
         setPermissions(null);
+        setPackagePermissions(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPermissions();
-  }, []);
+    fetchData();
+  }, [packageId, refreshTrigger]);
 
-  // Handle permission selection
+
   const handlePermissionChange = (permissionId: string, checked: boolean) => {
     setSelectedPermissions(prev => {
       const newSelected = new Set(prev);
@@ -64,84 +169,87 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
     });
   };
 
-  // Handle switch state changes
-  const handleSwitchChange = (switchId: string, checked: boolean) => {
+  const handleSwitchChange = (switchId: string, checked: boolean, permissionId?: string) => {
     setSwitchStates(prev => ({
       ...prev,
       [switchId]: checked
     }));
     
-    // Print all active permission keys whenever a switch changes
-    const updatedStates = {
-      ...switchStates,
-      [switchId]: checked
-    };
+    const [subKey, switchType] = switchId.split('-');
     
-    const activeKeys = getActivePermissionKeys(updatedStates);
-  };
-
-  // Function to get all active permission keys only
-  const getActivePermissionKeys = (states: Record<string, boolean> = switchStates) => {
-    const activeKeys: string[] = [];
+    let categoryKey = '';
     
-    if (!permissions) return activeKeys;
-    
-    // Map switch types to permission types
-    const switchTypeMap: Record<string, string> = {
-      'view': 'view',
-      'edit': 'update',
-      'delete': 'delete', 
-      'create': 'create',
-      'export': 'export',
-      'activate': 'activate',
-      'list': 'list'
-    };
-    
-    Object.entries(permissions).forEach(([categoryKey, categoryData]) => {
-      Object.entries(categoryData).forEach(([subKey, subItems]) => {
-        // Check each switch type for this subKey
-        Object.entries(switchTypeMap).forEach(([switchType, permissionType]) => {
-          const switchId = `${subKey}-${switchType}`;
-          if (states[switchId]) {
-            // Find the permission item with matching type
-            const matchingItem = subItems.find(item => item.type === permissionType);
-            if (matchingItem) {
-              activeKeys.push(matchingItem.id);
-            }
-          }
-        });
+    if (permissions) {
+      Object.entries(permissions).forEach(([catKey, catData]) => {
+        if (catData && typeof catData === 'object' && catData[subKey]) {
+          categoryKey = catKey;
+        }
       });
-    });
+    }
     
-    return activeKeys;
+    if (categoryKey) {
+      const activeStateKey = `${categoryKey}.${subKey}.${switchType}`;
+      setActiveStates(prev => ({
+        ...prev,
+        [activeStateKey]: checked
+      }));
+    }
+    
+    // Toggle permissionId in changedPermissionIds array
+    if (permissionId) {
+      setChangedPermissionIds(prev => {
+        const newIds = [...prev];
+        const existingIndex = newIds.indexOf(permissionId);
+        
+        if (existingIndex === -1) {
+          // ID not in array, add it
+          newIds.push(permissionId);
+        } else {
+          // ID exists in array, remove it
+          newIds.splice(existingIndex, 1);
+        }
+        
+        return newIds;
+      });
+    }
   };
 
-  // Function to submit active permissions to API
-  const submit = async () => {
+  // Function to submit changed permission IDs to API
+   const submit = async () => {
+    setSubmitting(true);
     try {
-      const activeKeys = getActivePermissionKeys();
-      
-      if (activeKeys.length === 0) {
-        toast.warning('No permissions selected');
+      // Send only the changed permission IDs
+      if (changedPermissionIds.length === 0) {
+        toast.warning('No permissions have been changed');
+        setSubmitting(false);
         return;
       }
 
-      const response = await apiClient.post(`/packages/${id}/assign-permissions`, {
-        permissions: activeKeys
+      const response = await apiClient.post(`/packages/${packageId}/assign-permissions`, {
+        permissions: changedPermissionIds
       });
 
-      if (response.status === 200 || response.status === 201) {
-        toast.success('Permissions assigned successfully!');
-        console.log('Permissions sent:', activeKeys);
+      if (response.status === 200 || response.status === 201) {        
+        try {
+          toast.success('Permissions assigned successfully!');
+          // Reset changed permissions after successful submission
+          setChangedPermissionIds([]);
+          // Trigger useEffect to refresh data
+          setRefreshTrigger(prev => prev + 1);
+          
+        } catch (e) {
+          console.error('Toast method 1 failed:', e);
+        }
       } else {
         throw new Error('Failed to assign permissions');
       }
     } catch (error) {
       console.error('Error assigning permissions:', error);
       toast.error('Failed to assign permissions. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
-
 
   // Loading state
   if (loading) {
@@ -166,19 +274,15 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       {/* One Accordion per payload key */}
       <Accordion type="multiple" className="w-full">
         {Object.entries(permissions).map(([categoryKey, categoryData]) => {
-          // Get all subcategory keys for this category
           const allSubKeys = Object.keys(categoryData);
           const allSelected = allSubKeys.every(subKey => selectedPermissions.has(subKey));
           
-          // Handler for select all checkbox
           const handleSelectAll = (checked: boolean) => {
             setSelectedPermissions(prev => {
               const newSelected = new Set(prev);
               if (checked) {
-                // Add all subcategories
                 allSubKeys.forEach(subKey => newSelected.add(subKey));
               } else {
-                // Remove all subcategories
                 allSubKeys.forEach(subKey => newSelected.delete(subKey));
               }
               return newSelected;
@@ -215,9 +319,6 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
                       </thead>
                       <tbody>
                         {Object.entries(categoryData).map(([subKey, subItems]) => {
-                          console.log('subItems:', subItems);
-                          
-                          // Check which permission types are available
                           const availableTypes = new Set(subItems.map(item => item.type));
                           const hasView = availableTypes.has('view');
                           const hasUpdate = availableTypes.has('update');
@@ -226,94 +327,114 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
                           const hasExport = availableTypes.has('export');
                           const hasActivate = availableTypes.has('activate');
                           const hasList = availableTypes.has('list');
-                          
                           return (
                             <React.Fragment key={subKey}>
                               <tr key={subKey}>
-                                  <td className="px-4 py-4 text-center">
-                                    <Checkbox
-                                      id={subKey}
-                                      checked={selectedPermissions.has(subKey)}
-                                      onCheckedChange={(checked) => handlePermissionChange(subKey, checked as boolean)}
-                                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                                <td className="px-4 py-4 text-center">
+                                  <Checkbox
+                                    id={subKey}
+                                    checked={selectedPermissions.has(subKey)}
+                                    onCheckedChange={(checked) => handlePermissionChange(subKey, checked as boolean)}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                                  />
+                                </td>
+                                <td className="px-4 py-4 text-right text-sm text-white font-medium">
+                                  {subKey}
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-view`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-view`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.view`] || false}
+                                      disabled={!hasView}
+                                      onCheckedChange={(checked) => {
+                                        const viewItem = subItems.find(item => item.type === 'view');
+                                        handleSwitchChange(`${subKey}-view`, checked, viewItem?.id);
+                                      }}
                                     />
-                                  </td>
-                                  <td className="px-4 py-4 text-right text-sm text-white font-medium">
-                                    {subKey}
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-view`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-view`}
-                                        checked={switchStates[`${subKey}-view`] || false}
-                                        disabled={!hasView}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-view`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-edit`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-edit`}
-                                        checked={switchStates[`${subKey}-edit`] || false}
-                                        disabled={!hasUpdate}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-edit`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-delete`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-delete`}
-                                        checked={switchStates[`${subKey}-delete`] || false}
-                                        disabled={!hasDelete}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-delete`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-create`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-create`}
-                                        checked={switchStates[`${subKey}-create`] || false}
-                                        disabled={!hasCreate}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-create`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-export`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-export`}
-                                        checked={switchStates[`${subKey}-export`] || false}
-                                        disabled={!hasExport}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-export`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-activate`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-activate`}
-                                        checked={switchStates[`${subKey}-activate`] || false}
-                                        disabled={!hasActivate}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-activate`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-list`] ? 'bg-sidebar' : ''}`}>
-                                    <div className="flex items-center justify-center">
-                                      <Switch
-                                        id={`${subKey}-list`}
-                                        checked={switchStates[`${subKey}-list`] || false}
-                                        disabled={!hasList}
-                                        onCheckedChange={(checked) => handleSwitchChange(`${subKey}-list`, checked)}
-                                      />
-                                    </div>
-                                  </td>
-                                </tr>
-                              </React.Fragment>
-                            );
+                                  </div>
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-edit`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-edit`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.edit`] || false}
+                                      disabled={!hasUpdate}
+                                      onCheckedChange={(checked) => {
+                                        const editItem = subItems.find(item => item.type === 'update');
+                                        handleSwitchChange(`${subKey}-edit`, checked, editItem?.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-delete`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-delete`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.delete`] || false}
+                                      disabled={!hasDelete}
+                                      onCheckedChange={(checked) => {
+                                        const deleteItem = subItems.find(item => item.type === 'delete');
+                                        handleSwitchChange(`${subKey}-delete`, checked, deleteItem?.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-create`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-create`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.create`] || false}
+                                      disabled={!hasCreate}
+                                      onCheckedChange={(checked) => {
+                                        const createItem = subItems.find(item => item.type === 'create');
+                                        handleSwitchChange(`${subKey}-create`, checked, createItem?.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-export`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-export`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.export`] || false}
+                                      disabled={!hasExport}
+                                      onCheckedChange={(checked) => {
+                                        const exportItem = subItems.find(item => item.type === 'export');
+                                        handleSwitchChange(`${subKey}-export`, checked, exportItem?.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-activate`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-activate`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.activate`] || false}
+                                      disabled={!hasActivate}
+                                      onCheckedChange={(checked) => {
+                                        const activateItem = subItems.find(item => item.type === 'activate');
+                                        handleSwitchChange(`${subKey}-activate`, checked, activateItem?.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-list`] ? 'bg-sidebar' : ''}`}>
+                                  <div className="flex items-center justify-center">
+                                    <Switch
+                                      id={`${subKey}-list`}
+                                      checked={activeStates[`${categoryKey}.${subKey}.list`] || false}
+                                      disabled={!hasList}
+                                      onCheckedChange={(checked) => {
+                                        const listItem = subItems.find(item => item.type === 'list');
+                                        handleSwitchChange(`${subKey}-list`, checked, listItem?.id);
+                                      }}
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            </React.Fragment>
+                          );
                         })}
                       </tbody>
                     </table>
@@ -329,8 +450,9 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       <div className="mt-6 flex justify-center">
         <Button
           onClick={submit}
+          disabled={submitting}
         >
-          Submit
+          {submitting ? 'Loading' : 'Submit'}
         </Button>
       </div> 
     </div>
