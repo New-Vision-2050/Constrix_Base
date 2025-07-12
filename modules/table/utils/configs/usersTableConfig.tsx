@@ -42,7 +42,7 @@ export interface UserTableRow {
 
 // Create a component that uses the translations
 export const UsersConfig = () => {
-  const permissions = can([PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE], PERMISSION_SUBJECTS.USER) as Record<Actions, boolean>;
+  const permissions = can([PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE , PERMISSION_ACTIONS.EXPORT], PERMISSION_SUBJECTS.USER) as Record<Actions, boolean>;
   
   const t = useTranslations("Companies");
 
@@ -208,5 +208,6 @@ export const UsersConfig = () => {
     executionConfig: {
       canDelete: permissions.DELETE,
     },
+    canExport: permissions.EXPORT,
   };
 };
