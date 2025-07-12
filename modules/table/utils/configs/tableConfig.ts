@@ -32,4 +32,5 @@ export interface TableConfig {
   tableTitle?: string;
   deleteConfirmMessage?: string;
   deleteUrl?:string;
+  canExport?: boolean; // New: Flag to enable/disable export functionality
 }

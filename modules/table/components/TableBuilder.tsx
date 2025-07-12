@@ -268,7 +268,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             actions={
               <div className="flex items-center gap-2">
                 {/* Add the ExportButton component */}
-                <ExportButton
+                {config?.canExport && <ExportButton
                   url={dataUrl}
                   apiParams={config?.apiParams}
                   selectedRows={selectedRows}
@@ -276,7 +276,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                   searchQuery={searchQuery}
                   searchFields={searchFields}
                   columnSearchState={columnSearchState}
-                />
+                />}
+            
                 {/* Include any custom actions passed from the parent */}
                 {searchBarActions}
               </div>
