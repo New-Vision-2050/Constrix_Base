@@ -192,7 +192,7 @@ export const UsersConfig = () => {
     allowSearchFieldSelection: true,
     // deleteUrl: `${baseURL}/company-users`,
     formConfig: GetCompanyUserFormConfig(t),
-    executions: [
+    executions: permissions.UPDATE ? [
       {
         label: "اكمال الملف الشخصي",
         icon: <GearIcon className="w-4 h-4" />,
@@ -204,9 +204,8 @@ export const UsersConfig = () => {
           };
         },
       },
-    ],
+    ] : [],
     executionConfig: {
-      canEdit: permissions.UPDATE,
       canDelete: permissions.DELETE,
     },
   };
