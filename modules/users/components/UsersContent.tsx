@@ -9,7 +9,7 @@ import { statisticsConfig } from "./statistics-config";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import { useTranslations } from "next-intl";
 import { can } from "@/hooks/useCan";
-import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/constants/permissions";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 const UsersContent = () => {
   const canCreate = can(PERMISSION_ACTIONS.CREATE, PERMISSION_SUBJECTS.USER) as boolean;

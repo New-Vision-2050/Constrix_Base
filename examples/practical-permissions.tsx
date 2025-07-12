@@ -2,7 +2,7 @@
 // Place this in your companies page component
 
 import { useCan } from '@/hooks/useCan';
-import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from '@/constants/permissions';
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from '@/modules/roles-and-permissions/permissions';
 
 export function CompaniesPagePermissions() {
   const { can } = useCan();

@@ -10,7 +10,7 @@ import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/company
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import { can } from "@/hooks/useCan";
 import { Actions } from "@/lib/ability";
-import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/constants/permissions";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 // Define types for the company data
 interface CompanyData {

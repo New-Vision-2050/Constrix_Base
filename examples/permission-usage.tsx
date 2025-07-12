@@ -1,7 +1,7 @@
 // Example usage of the new permission system in a React component
 
 import { useCan } from '@/hooks/useCan';
-import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from '@/constants/permissions';
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from '@/modules/roles-and-permissions/permissions';
 import { defineAbilityFor, Actions, Subjects } from '@/lib/ability';
 
 export function CompanyPageExample() {
