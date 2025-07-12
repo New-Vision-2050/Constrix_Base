@@ -63,16 +63,19 @@ export function can(action: Actions | Actions[], subject: Subjects | Subjects[])
 }
 
 /**
- * Usage:
+ * Usage examples with new permission format:
+ * 
  * // Using the hook:
  * const { can } = useCan();
- * const canRead = can('read', 'companies.company');
+ * const canUpdateUser = can('UPDATE', 'USER_PROFILE_DATA');
+ * const canListCompanies = can('LIST', 'COMPANY');
+ * const canCreateRole = can('CREATE', 'ROLE');
  * 
  * // Using direct can function:
  * import { can } from './useCan';
- * const canRead = can('read', 'companies.company');
+ * const canView = can('VIEW', 'COMPANY');
  * 
- * // Both support checking multiple actions/subjects:
- * const permissions = can(['create', 'update'], ['companies.company', 'users.user']);
- * console.log(permissions); // { 'create.companies.company': true, 'update.companies.company': false, ... }
+ * // Multiple checks:
+ * const permissions = can(['CREATE', 'UPDATE'], ['COMPANY', 'USER']);
+ * console.log(permissions); // { 'CREATE.COMPANY': true, 'UPDATE.COMPANY': false, ... }
  */

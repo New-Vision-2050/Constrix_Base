@@ -2,7 +2,7 @@
 
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
-import { permissionsTableConfig } from "@/modules/permissions/config/PermissionsTableConfig";
+import { permissionsTableConfig } from "@/modules/roles-and-permissions/config/PermissionsTableConfig";
 import { TableBuilder } from "@/modules/table";
 import React from "react";
 

@@ -6,8 +6,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import Roles from "@/modules/roles/components/Roles";
-import { allStaticPermissionTypes } from "@/modules/roles/constant";
+import Roles from "@/modules/roles-and-permissions/components/Roles";
+import { allStaticPermissionTypes } from "@/modules/roles-and-permissions/constant";
 import { useLocale } from "next-intl";
 import React from "react";
 import { PermissionsObject, RolePermissions } from "../type";

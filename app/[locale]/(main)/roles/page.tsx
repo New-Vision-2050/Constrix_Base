@@ -2,8 +2,8 @@
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { useModal } from "@/hooks/use-modal";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
-import RoleSheet from "@/modules/roles/components/RoleSheet";
-import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
+import RoleSheet from "@/modules/roles-and-permissions/components/RoleSheet";
+import { rolesTableConfig } from "@/modules/roles-and-permissions/config/RolesTableConfig";
 import { TableBuilder } from "@/modules/table";
 import React, { useCallback, useState } from "react";
 

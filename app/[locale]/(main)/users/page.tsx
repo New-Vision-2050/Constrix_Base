@@ -4,12 +4,13 @@ import { can } from "@/hooks/useCan";
 import CanSeeContent from "@/components/shared/CanSeeContent";
 import UsersContent from "@/modules/users/components/UsersContent";
 import { Actions } from "@/lib/ability";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/constants/permissions";
 
 const UsersPage = () => {
-  const permission = can(["list"], "users.user") as Record<Actions, boolean>;
-  
+  const canList = can(PERMISSION_ACTIONS.LIST, PERMISSION_SUBJECTS.USER) as boolean;
+
   return (
-    <CanSeeContent canSee={permission.list}>
+    <CanSeeContent canSee={canList}>
       <UsersContent />
     </CanSeeContent>
   );

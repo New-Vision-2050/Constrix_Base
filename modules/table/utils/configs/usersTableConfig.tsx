@@ -10,6 +10,7 @@ import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/company
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import { can } from "@/hooks/useCan";
 import { Actions } from "@/lib/ability";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/constants/permissions";
 
 // Define types for the company data
 interface CompanyData {
@@ -41,7 +42,7 @@ export interface UserTableRow {
 
 // Create a component that uses the translations
 export const UsersConfig = () => {
-  const permissions = can(["delete" , "update"], "users.user") as Record<Actions, boolean>;
+  const permissions = can([PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE], PERMISSION_SUBJECTS.USER) as Record<Actions, boolean>;
   
   const t = useTranslations("Companies");
 
@@ -205,8 +206,8 @@ export const UsersConfig = () => {
       },
     ],
     executionConfig: {
-      canEdit: permissions.update,
-      canDelete: permissions.delete,
+      canEdit: permissions.UPDATE,
+      canDelete: permissions.DELETE,
     },
   };
 };

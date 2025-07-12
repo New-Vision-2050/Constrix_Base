@@ -14,7 +14,7 @@ export function usePermissions() {
     queryKey: ["my-permissions"],
     queryFn: async () => {
       const res = await apiClient.get("/users/my-permissions");
-      return res.data.payload.map((perm: { name: string }) => perm.name);
+      return res.data.payload.map((perm: { key: string }) => perm.key);
     },
     enabled: hasHydrated && permissions.length === 0 && user !== null,
     staleTime: 1000 * 60 * 60 * 24,
@@ -25,7 +25,6 @@ export function usePermissions() {
       setPermissions(data);
     }
   }, [isSuccess, data, permissions.length, setPermissions]);
-
 
   return permissions.length > 0 ? permissions : data;
 }

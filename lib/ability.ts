@@ -1,8 +1,7 @@
 import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
-import { SubjectValues } from "@/modules/roles/subjects";
 
-export type Actions = "list" | "create" | "update" | "delete" | "export" | "view" | "activate";
-export type Subjects = SubjectValues;
+export type Actions = "LIST" | "CREATE" | "UPDATE" | "DELETE" | "EXPORT" | "VIEW" | "ACTIVATE";
+export type Subjects = string;
 export type AppAbility = Ability<[Actions, Subjects]>;
 
 export function defineAbilityFor(permissions: string[]): AppAbility {
@@ -11,12 +10,29 @@ export function defineAbilityFor(permissions: string[]): AppAbility {
   );
 
   permissions.forEach((perm) => {
-    const lastDot = perm.lastIndexOf(".");
-    if (lastDot === -1) return;
-    const subject = perm.slice(0, lastDot) as Subjects;
-    const action = perm.slice(lastDot + 1) as Actions;
+    // Split by underscore and extract action as last part
+    const parts = perm.split("_");
+    if (parts.length < 2) return;
+    
+    // Action is the last part
+    const action = parts[parts.length - 1] as Actions;
+    
+    // Subject is everything before the last part, keep as underscore format
+    const subjectParts = parts.slice(0, -1);
+    const subject = subjectParts.join("_");
+    
     can(action, subject);
   });
 
   return build();
+}
+
+// Helper function to convert permission key to readable format
+export function parsePermissionKey(key: string): { action: string; subject: string } {
+  const parts = key.split("_");
+  const action = parts[parts.length - 1];
+  const subjectParts = parts.slice(0, -1);
+  const subject = subjectParts.join("_");
+  
+  return { action, subject };
 }
