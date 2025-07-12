@@ -27,7 +27,7 @@ export function AbilityProviderWrapper({
         setLogo(LogoPlaceholder);
       }
     }
-  }, []);
+  }, [companyData]);
 
   const permissions = usePermissions();
   if (!permissions)
