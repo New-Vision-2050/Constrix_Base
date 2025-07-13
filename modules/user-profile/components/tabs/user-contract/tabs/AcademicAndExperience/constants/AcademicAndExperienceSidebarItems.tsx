@@ -19,6 +19,7 @@ export const AcademicAndExperienceSidebarItems = (
   const canViewQualification = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_QUALIFICATION);
   const canViewAboutMe = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_ABOUT_ME);
   const canViewExperience = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_EXPERIENCE);
+  const canViewCourses = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_COURSES);
 
   return [
     ...(canViewQualification ? [{
@@ -42,13 +43,13 @@ export const AcademicAndExperienceSidebarItems = (
     type: "experience",
     content: <UserExperiences />,
   }] : []),
-  {
-    id: "contract-tab-academic-experience-courses",
-    icon: <LandmarkIcon />,
-    type: "educational_course",
-    title: t("courses"),
-    content: <UserCourses />,
-  },
+    ...(canViewCourses ? [{
+      id: "contract-tab-academic-experience-courses",
+      icon: <LandmarkIcon />,
+      type: "educational_course",
+      title: t("courses"),
+      content: <UserCourses />,
+    }] : []),
   {
     id: "contract-tab-academic-experience-certificates",
     icon: <GraduationCapIcon />,
