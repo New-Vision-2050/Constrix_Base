@@ -2,8 +2,11 @@ import UserIqamaDataPreviewMode from "./preview-mode";
 import UserIqamaDataEditMode from "./edit-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export default function UserIqamaData() {
+  const canEdit = can(PERMISSION_ACTIONS.UPDATE , PERMISSION_SUBJECTS.PROFILE_RESIDENCE_INFO) as boolean;
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
@@ -23,6 +26,7 @@ export default function UserIqamaData() {
           { title: "أنشاء طلب", onClick: () => {},disabled:true },
         ],
       }}
+      canEdit={canEdit}
     />
   );
 }

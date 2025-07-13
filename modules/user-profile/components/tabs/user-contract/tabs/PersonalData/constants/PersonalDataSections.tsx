@@ -16,6 +16,13 @@ export const PersonalDataSections = (
   t: (key: string) => string
 ): UserProfileNestedTab[] =>{
     const canViewBankSection = can(PERMISSION_ACTIONS.VIEW , PERMISSION_SUBJECTS.PROFILE_BANK_INFO)
+    const iqamaPermissions = can(PERMISSION_ACTIONS.VIEW , [PERMISSION_SUBJECTS.PROFILE_BORDER_NUMBER , PERMISSION_SUBJECTS.PROFILE_RESIDENCE_INFO, PERMISSION_SUBJECTS.PROFILE_WORK_LICENSE]) as {
+      PROFILE_BORDER_NUMBER: boolean;
+      PROFILE_RESIDENCE_INFO: boolean;
+      PROFILE_WORK_LICENSE: boolean;
+    };  
+    const canViewIqamaSection = iqamaPermissions.PROFILE_BORDER_NUMBER || iqamaPermissions.PROFILE_RESIDENCE_INFO || iqamaPermissions.PROFILE_WORK_LICENSE;
+
   return   [
   {
     id: "contract-tab-personal-data-section",
@@ -42,13 +49,16 @@ export const PersonalDataSections = (
     icon: <PhoneIcon />,
     content: <ConnectionDataSection />,
   },
-  {
-    id: "contract-tab-iqama-data-section",
-    icon: <BackpackIcon />,
-    type: "identity_info",
-    title: t("iqamaData"),
-    content: <IqamaDataSection />,
-  },
+  ...(canViewIqamaSection
+    ? [{
+        id: "contract-tab-iqama-data-section",
+        icon: <BackpackIcon />,
+        type: "identity_info",
+        title: t("iqamaData"),
+        content: <IqamaDataSection />,
+      }]
+    : []
+  )
 ];
 }
   
