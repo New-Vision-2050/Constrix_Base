@@ -8,8 +8,8 @@ import CanSeeContent from "@/components/shared/CanSeeContent";
 
 export default function JobInformation() {
   const { professionalDataLoading } = useFunctionalContractualCxt();
-  const canView = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.EMPLOYMENT_INFO) as boolean;
-  const canUpdate = can(PERMISSION_ACTIONS.UPDATE, PERMISSION_SUBJECTS.EMPLOYMENT_INFO) as boolean;
+  const canView = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_EMPLOYMENT_INFO) as boolean;
+  const canUpdate = can(PERMISSION_ACTIONS.UPDATE, PERMISSION_SUBJECTS.PROFILE_EMPLOYMENT_INFO) as boolean;
 
   return (
     <CanSeeContent canSee={canView}>
