@@ -3,25 +3,37 @@ import { Button } from "@/components/ui/button";
 import QualificationsList from "./qualificationsList";
 import CreateQualificationDialog from "./CreateQualificationDialog";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 export default function UserQualificationData() {
   const [open, setOpen] = useState(false);
   const { userQualifications } = useUserAcademicTabsCxt();
 
+  const permissions = can([PERMISSION_ACTIONS.VIEW, PERMISSION_ACTIONS.CREATE], PERMISSION_SUBJECTS.PROFILE_QUALIFICATION) as {
+    VIEW: boolean;
+    CREATE: boolean;
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <p className="text-lg font-bold">المؤهل</p>
-        <Button
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          اضافة مؤهل
-        </Button>
+    <CanSeeContent canSee={permissions.VIEW}>
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <p className="text-lg font-bold">المؤهل</p>
+          {permissions.CREATE && (
+            <Button
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              اضافة مؤهل
+            </Button>
+          )}
+        </div>
+        {permissions.CREATE && <CreateQualificationDialog open={open} setOpen={setOpen} />}
+        <QualificationsList items={userQualifications} />
       </div>
-      <CreateQualificationDialog open={open} setOpen={setOpen} />
-      <QualificationsList items={userQualifications} />
-    </div>
+    </CanSeeContent>
   );
 }

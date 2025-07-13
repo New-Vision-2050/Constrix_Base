@@ -10,17 +10,22 @@ import UserCertifications from "../components/content-manager/components/certifi
 import UserCV from "../components/content-manager/components/user-cv";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useTranslations } from "next-intl";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export const AcademicAndExperienceSidebarItems = (
   t: (key: string) => string
-): UserProfileNestedTab[] => [
-  {
-    id: "contract-tab-academic-experience-qualification",
-    title: t("qualification"),
-    type: "qualification",
-    icon: <GraduationCapIcon />,
+): UserProfileNestedTab[] => {
+  const canViewQualification = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_QUALIFICATION);
+
+  return [
+    ...(canViewQualification ? [{
+      id: "contract-tab-academic-experience-qualification",
+      title: t("qualification"),
+      type: "qualification",
+      icon: <GraduationCapIcon />,
     content: <UserQualificationData />,
-  },
+  }] : []),
   {
     id: "contract-tab-academic-experience-brief",
     title: t("summary"),
@@ -56,7 +61,8 @@ export const AcademicAndExperienceSidebarItems = (
     title: t("cv"),
     content: <UserCV />,
   },
-];
+]
+};
 
 type PropsT = {
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;
