@@ -9,10 +9,14 @@ import BankingDataSection from "../components/content-manager/BankingDataSection
 import ConnectionDataSection from "../components/content-manager/connectionDataSection";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useTranslations } from "next-intl";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export const PersonalDataSections = (
   t: (key: string) => string
-): UserProfileNestedTab[] => [
+): UserProfileNestedTab[] =>{
+    const canViewBankSection = can(PERMISSION_ACTIONS.VIEW , PERMISSION_SUBJECTS.PROFILE_BANK_INFO)
+  return   [
   {
     id: "contract-tab-personal-data-section",
     title: t("personalData"),
@@ -20,13 +24,17 @@ export const PersonalDataSections = (
     type: "info_company_user",
     content: <PersonalDataSection />,
   },
-  {
-    id: "contract-tab-banking-data-section",
-    title: t("bankingData"),
-    type: "bank_account",
-    icon: <LandmarkIcon />,
-    content: <BankingDataSection />,
-  },
+  ...(canViewBankSection
+    ? [{
+        id: "contract-tab-banking-data-section",
+        title: t("bankingData"),
+        type: "bank_account",
+        icon: <LandmarkIcon />,
+        content: <BankingDataSection />,
+      }]
+    : []
+  )
+  ,
   {
     id: "contract-tab-connect-data-section",
     title: t("connectionData"),
@@ -42,6 +50,9 @@ export const PersonalDataSections = (
     content: <IqamaDataSection />,
   },
 ];
+}
+  
+
 
 type PropsT = {
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;

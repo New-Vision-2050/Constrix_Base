@@ -10,10 +10,14 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { DropdownItemT } from "@/components/shared/IconBtnDropdown";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 type PropsT = { bank: BankAccount };
 
 export default function BankSection({ bank }: PropsT) {
+  const canEdit = can(PERMISSION_ACTIONS.UPDATE, PERMISSION_SUBJECTS.PROFILE_BANK_INFO) as boolean;
+  const canDelete = can(PERMISSION_ACTIONS.DELETE, PERMISSION_SUBJECTS.PROFILE_BANK_INFO) as boolean;
   // declare and define component state & vars
   const [menuItems, setMenuItems] = useState<DropdownItemT[]>([]);
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -26,7 +30,7 @@ export default function BankSection({ bank }: PropsT) {
     if (!bankAccounts || !bankTypes) return;
     // set menu items based on bank accounts and types
     setMenuItems(() => {
-      if (!bankTypes || bankAccounts.length === 0) {
+      if ((!bankTypes || bankAccounts.length === 0) && canDelete) {
         return [
           {
             title: "حذف البنك",
@@ -45,13 +49,15 @@ export default function BankSection({ bank }: PropsT) {
             handleUpdateBankType(type.id);
           },
         })),
-        {
-          title: "حذف البنك",
-          onClick: () => {
-            if (bankAccounts.length === 1) handleOpen();
-            else setOpenDeleteDialog(true);
-          },
-        },
+        ...(true ? [
+          {
+            title: "حذف البنك",
+            onClick: () => {
+              if (bankAccounts.length === 1) handleOpen();
+              else setOpenDeleteDialog(true);
+            }
+          }
+        ] : []),
       ];
     });
   }, [bankAccounts, bankTypes]);
@@ -91,7 +97,11 @@ export default function BankSection({ bank }: PropsT) {
         settingsBtn={{
           items: menuItems,
         }}
+        canEdit={canEdit}
       />
+      
+      {canDelete && <>
+
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}
@@ -105,6 +115,9 @@ export default function BankSection({ bank }: PropsT) {
         onConfirm={handleDeleteBank}
         description={"هل أنت متأكد أنك تريد حذف هذا البنك؟"}
       />
+      </>
+      }
+
     </>
   );
 }
