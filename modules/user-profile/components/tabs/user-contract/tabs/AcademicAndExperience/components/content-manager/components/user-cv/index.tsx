@@ -6,22 +6,30 @@ import UploadCvDialog from "./UploadCvDialog";
 import { useState } from "react";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 export default function UserCV() {
   const [open, setOpen] = useState(false);
   const { userCV } = useUserAcademicTabsCxt();
+  const canUpdate = can(PERMISSION_ACTIONS.UPDATE, PERMISSION_SUBJECTS.PROFILE_CV) as boolean;
+  const canView = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_CV) as boolean;
 
   return (
-    <div className="flex flex-col gap-6">
+    <CanSeeContent canSee={canView}>
+      <div className="flex flex-col gap-6">
       <p className="text-lg font-bold text-gray-700">
         البيانات الوظيفية والتعاقدية
       </p>
       <FormFieldSet
         title={"السيرة الذاتية"}
         secondTitle={
-          <Button variant={"ghost"} onClick={() => setOpen(true)}>
-            <PencilLineIcon additionalClass="text-pink-600" />
-          </Button>
+          canUpdate && (
+            <Button variant={"ghost"} onClick={() => setOpen(true)}>
+              <PencilLineIcon additionalClass="text-pink-600" />
+            </Button>
+          )
         }
       >
         {userCV?.files ? (
@@ -33,7 +41,10 @@ export default function UserCV() {
           />
         )}
       </FormFieldSet>
-      <UploadCvDialog open={open} setOpen={setOpen} />
+      {canUpdate && (        
+        <UploadCvDialog open={open} setOpen={setOpen} />
+  )}
     </div>
+</CanSeeContent>
   );
 }
