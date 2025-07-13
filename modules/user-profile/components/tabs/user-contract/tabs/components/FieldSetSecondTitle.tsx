@@ -38,7 +38,7 @@ export default function FieldSetSecondTitle(props: PropsT) {
 
   return (
     <div className="flex items-center justify-center gap-1">
-      {!!settingsBtn && (
+      {!!settingsBtn && settingsBtn?.items.length > 0 && (
         <IconBtnDropdown
           icon={settingsBtn?.icon ?? <SettingsIcon />}
           items={settingsBtn?.items ?? []}
