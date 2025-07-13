@@ -7,12 +7,14 @@ import {
   REGISTRATION_FORMS_SLUGS,
   REGISTRATION_TABLES,
 } from "@/constants/registration-forms";
+import { can } from "@/hooks/useCan";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import {
   SheetFormBuilder,
   GetCompanyUserFormConfig,
   useSheetForm,
 } from "@/modules/form-builder";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 import { TableBuilder } from "@/modules/table";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
@@ -26,6 +28,8 @@ const UsersSubEntityTable = ({
 }: {
   programName: SuperEntitySlug;
 }) => {
+    const canCreate = can(PERMISSION_ACTIONS.CREATE, PERMISSION_SUBJECTS.USER) as boolean;
+  
   const t = useTranslations("Companies");
 
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
@@ -85,11 +89,12 @@ const UsersSubEntityTable = ({
         <TableBuilder
           config={tableConfig}
           searchBarActions={
-            <div className="flex items-center gap-3">
-              <SheetFormBuilder
-                config={{
-                  ...finalFormConfig(t, handleCloseForm),
-                  apiParams: {
+            canCreate && (
+              <div className="flex items-center gap-3">
+                <SheetFormBuilder
+                  config={{
+                    ...finalFormConfig(t, handleCloseForm),
+                    apiParams: {
                     sub_entity_id: sub_entity_id as string,
                   },
                   onSuccess: () => {
@@ -106,7 +111,7 @@ const UsersSubEntityTable = ({
                 }}
               />{" "}
             </div>
-          }
+          )}
         />
       )}
     </div>

@@ -8,6 +8,9 @@ import React from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import { Actions } from "@/lib/ability";
 
 // Define types for the company data
 interface CompanyData {
@@ -39,6 +42,8 @@ export interface UserTableRow {
 
 // Create a component that uses the translations
 export const UsersConfigV2 = () => {
+  const permissions = can([PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE , PERMISSION_ACTIONS.EXPORT], PERMISSION_SUBJECTS.USER) as Record<Actions, boolean>;
+  
   const t = useTranslations("Companies");
 
   return {
@@ -237,7 +242,7 @@ export const UsersConfigV2 = () => {
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
     formConfig: GetCompanyUserFormConfig(t),
-    executions: [
+    executions: permissions.UPDATE ? [
       {
         label: "اكمال الملف الشخصي",
         icon: <GearIcon className="w-4 h-4" />,
@@ -249,10 +254,10 @@ export const UsersConfigV2 = () => {
           };
         },
       },
-    ],
+    ] : [],
     executionConfig: {
-      canEdit: false,
-      canDelete: true,
+      canDelete: permissions.DELETE,
     },
+    canExport: permissions.EXPORT,
   };
 };
