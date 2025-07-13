@@ -18,6 +18,7 @@ export const AcademicAndExperienceSidebarItems = (
 ): UserProfileNestedTab[] => {
   const canViewQualification = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_QUALIFICATION);
   const canViewAboutMe = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_ABOUT_ME);
+  const canViewExperience = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.PROFILE_EXPERIENCE);
 
   return [
     ...(canViewQualification ? [{
@@ -34,13 +35,13 @@ export const AcademicAndExperienceSidebarItems = (
     icon: <BackpackIcon />,
     content: <ProfileBriefSummary />,
   }] : []),
-  {
+  ...(canViewExperience ? [{
     id: "contract-tab-academic-experience-old-experience",
     title: t("experiences"),
     icon: <BackpackIcon />,
     type: "experience",
     content: <UserExperiences />,
-  },
+  }] : []),
   {
     id: "contract-tab-academic-experience-courses",
     icon: <LandmarkIcon />,
