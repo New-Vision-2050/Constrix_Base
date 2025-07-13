@@ -151,8 +151,10 @@
     "DashboardSettings": "Dashboard",
     "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
+    "HRSettings": "Settings",
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
+    "AttendanceDeparture": "Attendance and Departure",
     "HumanResources": "Human Resources",
     "ProgramManagement": "Program Management"
   },
@@ -418,5 +420,224 @@
     "submitButtonText": "Save",
     "cancelButtonText": "Cancel",
     "resetButtonText": "Clear Form"
+  },
+  "AttendanceDepartureModule":{
+    "shared": {
+      "EmployeeInfoSection": {
+        "branch": "Branch",
+        "jobId": "Job ID",
+        "department": "Department",
+        "approver": "Approver",
+        "attendanceStatus": "Attendance Status",
+        "unspecified": "Not specified",
+        "status": {
+          "present": "Present",
+          "late": "Late",
+          "absent": "Absent"
+        }
+      }
+    },
+    "AttendanceDateSelector":{
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "search": "Search",
+      "clearFilters": "Clear Filters"
+    },
+    "EmployeeDetailsSheet": {
+      "fields": {
+        "employeeName": "Employee Name",
+        "phone": "Mobile Number",
+        "department": "Department",
+        "email": "Email",
+        "branch": "Branch"
+      },
+      "personalInfo": {
+        "gender": "Gender",
+        "birthDate": "Birth Date",
+        "nationality": "Nationality"
+      },
+      "status": {
+        "attendanceStatus": "Attendance Status",
+        "employeeStatus": "Employee Status"
+      },
+      "times": {
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "morning": "AM",
+        "afternoon": "PM"
+      }
+    },
+    "Map": {
+      "layers": {
+        "standard": "Standard Map",
+        "satellite": "Satellite Map"
+      },
+      "loading": "Loading employee data...",
+      "employeeStatus": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "tooltip": {
+        "employee": "Employee:",
+        "branch": "Branch:",
+        "department": "Department:",
+        "lastSeen": "Last Seen:"
+      }
+    },
+    "MapSearchFilter": {
+      "searchPlaceholder": "Search",
+      "tableView": "Table",
+      "export": "Export"
+    },
+    "SearchFilter": {
+      "title": "Search Filter",
+      "branch": "Branch",
+      "all": "All",
+      "loadingBranches": "Loading branches...",
+      "department": "Department",
+      "approver": "Approver",
+      "loadingApprovers": "Loading approvers...",
+      "searchPlaceholder": "Name/Email/Mobile"
+    },
+    "StatisticsCards":{
+      "totalAttendance": "Total Attendance",
+      "totalAbsence": "Total Absences",
+      "totalDepartures": "Total Departures",
+      "totalHolidays": "Total Holiday Days"
+    },
+    "Table":{
+      "mapView": "Map View",
+      "columns": {
+        "name": "Name",
+        "date": "Date",
+        "jobCode": "Job ID",
+        "branch": "Branch",
+        "management": "Department",
+        "approver": "Approved By",
+        "employeeStatus": "Employee Status",
+        "attendanceStatus": "Attendance Status"
+      },
+      "filters": {
+        "searchPlaceholder": "Search",
+        "branchPlaceholder": "Branch",
+        "managementPlaceholder": "Department",
+        "constraintPlaceholder": "Constraint"
+      },
+      "deleteConfirm": "Confirm deletion of attendance record",
+      "status": {
+        "onTime": "On Time",
+        "late": "Late"
+      },
+      "dialogs": {
+        "approver": {
+          "title": "Attendance Approver Details",
+          "approverName": "Approver Name",
+          "approverSystem": "Approver System",
+          "unspecified": "Not specified",
+          "period": "Period",
+          "noWeeklySchedule": "No weekly schedule available",
+          "workHours": "Working hours:",
+          "days": {
+            "sunday": "Sunday",
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday"
+          }
+        },
+        "attendanceStatus": {
+          "title": "Attendance Status",
+          "attendance": "Check-in",
+          "departure": "Check-out"
+        }
+      }
+    }
+  },
+  "hr-settings": {
+    "tabs": {
+      "attendance": "Attendance & Departure",
+      "recruitment": "Recruitment",
+      "service": "Service",
+      "contractManagement": "Contract Management"
+    },
+    "statistics": {
+      "totalAttendance": "Total Attendance",
+      "totalDeparture": "Total Departures",
+      "totalAbsence": "Total Absences",
+      "vacations": "Vacations"
+    }
+  },
+  "HRSettingsAttendanceDepartureModule": {
+    "tabs": {
+      "attendance": "Attendance",
+      "departure": "Departure",
+      "leaves": "Leaves",
+      "vacations": "Official Holidays"
+    },
+    "attendanceDeterminants": {
+      "title": "Attendance Determinants",
+      "createDeterminant": "Create New Determinant",
+      "allDeterminants": "All Determinants",
+      "branchDeterminant": "Branch Determinant",
+      "workHours": "Work Hours",
+      "hours": "hours",
+      "systemNotFound": "System not found",
+      "notes": "Notes",
+      "submitButtonText": "Save Determinant",
+      "cancelButtonText": "Cancel",
+      "form": {
+        "title": "Add New Determinant",
+        "basicInfo": "Basic Information",
+        "determinantName": "Determinant Name",
+        "determinantNamePlaceholder": "Cairo Branch",
+        "determinantNameRequired": "Determinant name is required",
+        "determinantNamePattern": "Determinant name must contain only letters and numbers",
+        "systemType": "System Type",
+        "systemTypePlaceholder": "Regular",
+        "systemTypeRequired": "System type is required",
+        "branches": "Branches",
+        "branchesRequired": "At least one branch must be selected",
+        "locationType": "Location Type",
+        "mainLocation": "Default branch location",
+        "customLocation": "Custom location for each branch",
+        "workingHours": "Working Hours",
+        "workingDays": "Working Days",
+        "periodStart": "Period Start",
+        "periodEnd": "Period End",
+        "periodStartPlaceholder": "09:00",
+        "periodEndPlaceholder": "17:00",
+        "periodStartRequired": "Period start time is required",
+        "periodEndRequired": "Period end time is required",
+        "timeFormatError": "Must enter valid time in format hours:minutes like 09:00",
+        "addPeriod": "Add Period",
+        "deletePeriod": "Delete Period",
+        "submitButtonText": "Save Determinant",
+        "cancelButtonText": "Cancel",
+        "nextButtonText": "Next",
+        "prevButtonText": "Previous"
+      },
+      "determinantsList": {
+        "allDeterminants": "All Determinants"
+      },
+      "error": {
+        "loading": "Error in loading determinants",
+        "tryAgain": "Please try again later"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "attendanceDeterminantDetails":{
+      "determinantType": "Determinant System Type",
+      "systemNotFound": "System not found",
+      "workHours": "Working Hours",
+      "hours": "hours",
+      "workdays": "Working Days",
+      "branches": "Branches",
+      "notes": "Notes"
+    }
   }
 }
