@@ -28,12 +28,13 @@ type PropsT = {
     icon?: JSX.Element;
     items: DropdownItemT[];
   };
+  canEdit?: boolean;
 };
 
 export default function FieldSetSecondTitle(props: PropsT) {
   const locale = useLocale();
   const isRTL = locale === "ar";
-  const { mode, handleEditClick, dropdownItems, settingsBtn } = props;
+  const { mode, handleEditClick, dropdownItems, settingsBtn, canEdit = true } = props;
 
   return (
     <div className="flex items-center justify-center gap-1">
@@ -59,13 +60,15 @@ export default function FieldSetSecondTitle(props: PropsT) {
           </DropdownMenuContent>
         </DropdownMenu>
       )}
+
+      {canEdit &&       
       <Button variant={"ghost"} onClick={handleEditClick}>
         {mode === "Preview" ? (
           <PencilLineIcon additionalClass="text-pink-600" />
         ) : (
           <EyeIcon />
         )}
-      </Button>
+      </Button> }
     </div>
   );
 }

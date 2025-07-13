@@ -14,6 +14,7 @@ type PropsT = {
     icon?: JSX.Element;
     items: DropdownItemT[];
   };
+  canEdit?: boolean;
 };
 
 export default function TabTemplate(props: PropsT) {
@@ -25,6 +26,7 @@ export default function TabTemplate(props: PropsT) {
     onChangeMode,
     settingsBtn,
     loading = false,
+    canEdit = true,
   } = props;
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
@@ -46,6 +48,7 @@ export default function TabTemplate(props: PropsT) {
           mode={mode}
           handleEditClick={handleEditClick}
           settingsBtn={settingsBtn}
+          canEdit={canEdit}
         />
       }
     >
@@ -54,7 +57,7 @@ export default function TabTemplate(props: PropsT) {
       ) : mode === "Preview" ? (
         reviewMode
       ) : (
-        editMode
+        <> { canEdit && editMode } </>
       )}
     </FormFieldSet>
   );
