@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   PropsWithChildren,
+  useEffect,
 } from "react";
 import { useConstraintsData } from "@/modules/hr-settings-attendance-departure/hooks/useConstraints";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
@@ -41,7 +42,18 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 
   const { data: branchesData } = useBranchiesData();
 
-  console.log("branchesData", branchesData);
+
+  // refresh active constraint when data updated
+  useEffect(() => {
+    if (constraintsData && activeConstraint) {
+      const updatedConstraint = constraintsData.find(
+        (c) => c.id === activeConstraint.id
+      );
+      if (updatedConstraint) {
+        setActiveConstraint(updatedConstraint);
+      }
+    }
+  }, [constraintsData]);
 
   // State for active constraint
   const [activeConstraint, setActiveConstraint] = useState<Constraint>();

@@ -20,7 +20,6 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   
   // Handle edit button click
   const handleEdit = () => {
-    console.log('Editing constraint:', constraint);
     // Close dropdown after clicking
     setShowDropdown(false);
     // Call onEdit prop if provided

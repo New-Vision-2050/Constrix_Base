@@ -39,8 +39,6 @@ type PropsT = {
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   const { refetchConstraints, t, editConstraint } = props;
 
-  console.log("Constraint being edited:", editConstraint);
-
   // Función auxiliar para obtener textos traducidos o usar valores predeterminados
   const getText = (key: string, defaultText: string) => {
     return t ? t(key) : defaultText;
@@ -54,10 +52,23 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       constraint_name: editConstraint?.constraint_name,
       constraint_type: editConstraint?.constraint_type,
       branch_locations: editConstraint?.branch_locations,
-      is_active: editConstraint?.is_active,
-      branch_ids: editConstraint?.branches?.map((branch) => branch.id) ?? [],
+      is_active: Boolean(editConstraint?.is_active),
+      branch_ids: editConstraint?.branch_locations?.map((branch) => Number(branch.branch_id)) ?? [],
       location_type: "main",
-      weekly_schedule:editConstraint?.config?.time_rules?.weekly_schedule,
+      weekly_schedule: Object.entries(
+        editConstraint?.config?.time_rules?.weekly_schedule || {}
+      )
+        ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
+        ?.map(([dayName, dayConfig]) => {
+          return {
+            day: dayName,
+            periods:
+              dayConfig?.periods?.map((period) => ({
+                from: period.start_time,
+                to: period.end_time,
+              })) ?? [],
+          };
+        }),
     },
     sections: [
       {
@@ -397,10 +408,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               const branchData = props.branchesData?.find(
                 (branch) => branch.id == branchId
               );
-              console.log("branchData", branchData);
-              console.log("branchId", branchId);
-              console.log("selectedBranches", selectedBranches);
-              console.log("branchDatabranchDatabranchData", branchData);
               return {
                 branchId: branchId,
                 branchName: branchData?.name || "",
@@ -547,7 +554,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         data,
         getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint }),
         {
-          url: `${baseURL}/attendance/constraints`,
+          url: Boolean(editConstraint) ? `${baseURL}/attendance/constraints/${editConstraint.id}` : `${baseURL}/attendance/constraints`,
+          method: Boolean(editConstraint) ? "PUT" : "POST",
         }
       );
     },
