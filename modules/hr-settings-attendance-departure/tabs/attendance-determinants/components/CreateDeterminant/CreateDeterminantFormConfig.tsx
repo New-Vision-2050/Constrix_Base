@@ -38,10 +38,9 @@ type PropsT = {
 // Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   const { refetchConstraints, t, editConstraint } = props;
-  
-  // Log the constraint being edited if it exists
-  console.log('Constraint being edited:', editConstraint);
-  
+
+  console.log("Constraint being edited:", editConstraint);
+
   // Función auxiliar para obtener textos traducidos o usar valores predeterminados
   const getText = (key: string, defaultText: string) => {
     return t ? t(key) : defaultText;
@@ -50,16 +49,16 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   return {
     formId: "create-determinant-form",
     title: getText("form.title", "إضافة محدد جديد"),
-    wizard: true,
-    wizardOptions: {
-      showStepIndicator: true,
-      showStepTitles: true,
-      validateStepBeforeNext: true,
-      nextButtonText: getText("form.nextButtonText", "التالي"),
-      prevButtonText: getText("form.prevButtonText", "السابق"),
-      finishButtonText: getText("form.submitButtonText", "حفظ المحدد")
-    },
     apiUrl: `${baseURL}/attendance/constraints`,
+    initialValues: {
+      constraint_name: editConstraint?.constraint_name,
+      constraint_type: editConstraint?.constraint_type,
+      branch_locations: editConstraint?.branch_locations,
+      is_active: editConstraint?.is_active,
+      branch_ids: editConstraint?.branches?.map((branch) => branch.id) ?? [],
+      location_type: "main",
+      weekly_schedule:editConstraint?.config?.time_rules?.weekly_schedule,
+    },
     sections: [
       {
         title: getText("form.basicInfo", "المعلومات الأساسية"),
@@ -68,17 +67,26 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "text",
             name: "constraint_name",
             label: getText("form.determinantName", "اسم المحدد"),
-            placeholder: getText("form.determinantNamePlaceholder", "فرع القاهرة"),
+            placeholder: getText(
+              "form.determinantNamePlaceholder",
+              "فرع القاهرة"
+            ),
             required: true,
             validation: [
               {
                 type: "required",
-                message: getText("form.determinantNameRequired", "اسم المحدد مطلوب"),
+                message: getText(
+                  "form.determinantNameRequired",
+                  "اسم المحدد مطلوب"
+                ),
               },
               {
                 type: "pattern",
                 value: /^[\p{L}\p{N}\s]+$/u,
-                message: getText("form.determinantNamePattern", "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط"),
+                message: getText(
+                  "form.determinantNamePattern",
+                  "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط"
+                ),
               },
             ],
           },
@@ -102,7 +110,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: getText("form.systemTypeRequired", "نظام المحدد مطلوب"),
+                message: getText(
+                  "form.systemTypeRequired",
+                  "نظام المحدد مطلوب"
+                ),
               },
             ],
           },
@@ -138,7 +149,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             validation: [
               {
                 type: "required",
-                message: getText("form.branchesRequired", "يجب اختيار فرع واحد على الأقل"),
+                message: getText(
+                  "form.branchesRequired",
+                  "يجب اختيار فرع واحد على الأقل"
+                ),
               },
             ],
           },
@@ -147,12 +161,18 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             name: "location_type",
             label: getText("form.locationType", "نوع الموقع"),
             options: [
-              { value: "main", label: getText("form.mainLocation", "موقع الفرع الافتراضي") },
-              { value: "custom", label: getText("form.customLocation", "موقع مخصص لكل فرع") },
+              {
+                value: "main",
+                label: getText("form.mainLocation", "موقع الفرع الافتراضي"),
+              },
+              {
+                value: "custom",
+                label: getText("form.customLocation", "موقع مخصص لكل فرع"),
+              },
             ],
             defaultValue: "main",
             required: true,
-            validation:[
+            validation: [
               {
                 type: "required",
                 message: "يجب اختيار نوع الموقع",
@@ -235,16 +255,25 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         type: "text",
                         name: "from",
                         label: getText("form.periodStart", "بداية الفترة"),
-                        placeholder: getText("form.periodStartPlaceholder", "09:00"),
+                        placeholder: getText(
+                          "form.periodStartPlaceholder",
+                          "09:00"
+                        ),
                         validation: [
                           {
                             type: "required",
-                            message: getText("form.periodStartRequired", "بداية الفترة مطلوبة"),
+                            message: getText(
+                              "form.periodStartRequired",
+                              "بداية الفترة مطلوبة"
+                            ),
                           },
                           {
                             type: "pattern",
                             value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: getText("form.timeFormatError", "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"),
+                            message: getText(
+                              "form.timeFormatError",
+                              "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"
+                            ),
                           },
                         ],
                       },
@@ -252,16 +281,25 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         type: "text",
                         name: "to",
                         label: getText("form.periodEnd", "نهاية الفترة"),
-                        placeholder: getText("form.periodEndPlaceholder", "17:00"),
+                        placeholder: getText(
+                          "form.periodEndPlaceholder",
+                          "17:00"
+                        ),
                         validation: [
                           {
                             type: "required",
-                            message: getText("form.periodEndRequired", "نهاية الفترة مطلوبة"),
+                            message: getText(
+                              "form.periodEndRequired",
+                              "نهاية الفترة مطلوبة"
+                            ),
                           },
                           {
                             type: "pattern",
                             value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: getText("form.timeFormatError", "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00"),
+                            message: getText(
+                              "form.timeFormatError",
+                              "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00"
+                            ),
                           },
                         ],
                       },
@@ -284,7 +322,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     onSuccess: () => {
       refetchConstraints();
     },
-    resetOnSuccess:true,
+    resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
@@ -359,10 +397,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               const branchData = props.branchesData?.find(
                 (branch) => branch.id == branchId
               );
-              console.log('branchData',branchData)
-              console.log('branchId',branchId)
-              console.log('selectedBranches',selectedBranches)
-              console.log('branchDatabranchDatabranchData',branchData)
+              console.log("branchData", branchData);
+              console.log("branchId", branchId);
+              console.log("selectedBranches", selectedBranches);
+              console.log("branchDatabranchDatabranchData", branchData);
               return {
                 branchId: branchId,
                 branchName: branchData?.name || "",
@@ -393,7 +431,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             address: "branch.address",
             latitude: branch.latitude,
             longitude: branch.longitude,
-            radius: Number(branch.radius ?? "1") <= 0 ? 1 : Number(branch.radius ?? "1"),
+            radius:
+              Number(branch.radius ?? "1") <= 0
+                ? 1
+                : Number(branch.radius ?? "1"),
           };
         }),
         constraint_config: {
@@ -420,7 +461,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                       if (Array.isArray(dayItem.periods)) {
                         dayItem.periods.forEach((period: any) => {
                           // Validate required fields
-                          if (period && typeof period === 'object') {
+                          if (period && typeof period === "object") {
                             // Check for the correct field name
                             const startTime = period.from || "";
                             const endTime = period.to || "";
@@ -433,7 +474,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             }
                           }
                         });
-                      } else if (typeof dayItem.periods === 'object' && dayItem.periods !== null) {
+                      } else if (
+                        typeof dayItem.periods === "object" &&
+                        dayItem.periods !== null
+                      ) {
                         // Handle object periods
                         const period = dayItem.periods;
                         const startTime = period.from || "";
