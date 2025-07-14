@@ -11,6 +11,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { EmployeeDetailsProps } from "../../types/employee";
 import EmployeeInfoField from "../../components/shared/EmployeeInfoField";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 // Employee details component
 interface EmployeeDetailsSheetProps extends EmployeeDetailsProps {}
@@ -21,6 +22,18 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
   employee
 }) => {
   const t = useTranslations('AttendanceDepartureModule.EmployeeDetailsSheet');
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const sheetBg = isDarkMode ? "#10152C" : "#ffffff";
+  const textColor = isDarkMode ? "text-white" : "text-gray-800";
+  const cardBg = isDarkMode ? "#161F3E" : "#f0f2f5";
+  const subtitleColor = isDarkMode ? "text-gray-400" : "text-gray-500";
+  
   if (!employee) return null;
 
   // Get initials from employee name
@@ -36,17 +49,17 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="left"
-        className="bg-[#10152C] text-white border-none shadow-none px-5 py-6 overflow-auto"
-        style={{ maxWidth: '320px', zIndex: 9999 }}
+        className={`${textColor} border-none shadow-none px-5 py-6 overflow-auto`}
+        style={{ maxWidth: '320px', zIndex: 9999, backgroundColor: sheetBg }}
       >
         <DialogTitle></DialogTitle>
         <div className="relative w-full">
-          <SheetClose className="absolute left-1 top-1 text-gray-400 hover:text-white">
+          <SheetClose className={`absolute left-1 top-1 ${subtitleColor} ${isDarkMode ? 'hover:text-white' : 'hover:text-gray-700'}`}>
             <X size={22} />
           </SheetClose>
           
           <div className="flex flex-col items-center mb-6 mt-2">
-            <div className="bg-gray-300 rounded-full w-16 h-16 flex items-center justify-center text-[#10152C] text-xl font-medium mb-3">
+            <div className={`${isDarkMode ? 'bg-gray-300 text-[#10152C]' : 'bg-gray-600 text-white'} rounded-full w-16 h-16 flex items-center justify-center text-xl font-medium mb-3`}>
               {getInitials(employee.name)}
             </div>
           </div>
@@ -60,22 +73,22 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
             
             {/* Gender, Birth Date and Nationality */}
             <div className="flex justify-between mb-3 mt-4">
-              <div className="bg-[#161F3E] p-2 rounded-md w-full text-center mx-1">
-                <div className="text-gray-400 text-[10px] mb-1">{t('personalInfo.gender')}</div>
+              <div className="p-2 rounded-md w-full text-center mx-1" style={{ backgroundColor: cardBg }}>
+                <div className={`${subtitleColor} text-[10px] mb-1`}>{t('personalInfo.gender')}</div>
                 <div>{employee.gender}</div>
               </div>
-              <div className="bg-[#161F3E] p-2 rounded-md w-full text-center mx-1">
-                <div className="text-gray-400 text-[10px] mb-1">{t('personalInfo.birthDate')}</div>
+              <div className="p-2 rounded-md w-full text-center mx-1" style={{ backgroundColor: cardBg }}>
+                <div className={`${subtitleColor} text-[10px] mb-1`}>{t('personalInfo.birthDate')}</div>
                 <div>{employee.birthDate}</div>
               </div>
-              <div className="bg-[#161F3E] p-2 rounded-md w-full text-center mx-1">
-                <div className="text-gray-400 text-[10px] mb-1">{t('personalInfo.nationality')}</div>
+              <div className="p-2 rounded-md w-full text-center mx-1" style={{ backgroundColor: cardBg }}>
+                <div className={`${subtitleColor} text-[10px] mb-1`}>{t('personalInfo.nationality')}</div>
                 <div>{employee.nationality}</div>
               </div>
             </div>
             
             {/* Attendance status and Employee status */}
-            <div className="bg-[#161F3E] p-3 rounded-md mb-3">
+            <div className="p-3 rounded-md mb-3" style={{ backgroundColor: cardBg }}>
               <EmployeeInfoField 
                 label={t('status.attendanceStatus')} 
                 value={employee.attendanceStatus} 
@@ -91,15 +104,15 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
             
             {/* Check-in and Check-out times */}
             {employee.checkInTime && (
-              <div className="bg-[#161F3E] p-3 rounded-md">
-                <div className="text-gray-400 text-[12px] mb-0.5">{t('times.checkIn')}</div>
+              <div className="p-3 rounded-md" style={{ backgroundColor: cardBg }}>
+                <div className={`${subtitleColor} text-[12px] mb-0.5`}>{t('times.checkIn')}</div>
                 <div className="text-right text-lg">{employee.checkInTime} {t('times.morning')}</div>
               </div>
             )}
             
             {employee.checkOutTime && (
-              <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-                <div className="text-gray-400 text-[12px] mb-0.5">{t('times.checkOut')}</div>
+              <div className="p-3 rounded-md mt-3" style={{ backgroundColor: cardBg }}>
+                <div className={`${subtitleColor} text-[12px] mb-0.5`}>{t('times.checkOut')}</div>
                 <div className="text-right text-lg">{employee.checkOutTime} {t('times.afternoon')}</div>
               </div>
             )}
