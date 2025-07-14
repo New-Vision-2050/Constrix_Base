@@ -10,24 +10,13 @@ import useAttendanceSummary from "@/modules/attendance-departure/hooks/useAttend
 const HRStatisticsCards: React.FC = () => {
   const t = useTranslations("hr-settings.statistics");
   
-  // Get current date for default date range (this month)
-  const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  
-  // Format dates to YYYY-MM-DD string format for API
-  const startDateStr = firstDayOfMonth.toISOString().split('T')[0];
-  const endDateStr = today.toISOString().split('T')[0];
-  
   // Get attendance summary data
   const {
     attendanceSummary,
     attendanceSummaryLoading,
     attendanceSummaryError,
     refetchAttendanceSummary
-  } = useAttendanceSummary({
-    start_date: startDateStr,
-    end_date: endDateStr
-  });
+  } = useAttendanceSummary();
   
   // Show loading state
   if (attendanceSummaryLoading) {
