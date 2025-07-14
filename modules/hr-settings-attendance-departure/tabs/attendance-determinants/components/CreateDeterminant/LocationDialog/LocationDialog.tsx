@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { LocationDialogProvider, useLocationDialog } from "./context/LocationDialogContext";
 import DialogHeader from "./components/DialogHeader";
 import BranchSelector from "./components/BranchSelector";
+import { useTheme } from "next-themes";
 import DefaultLocationCheckbox from "./components/DefaultLocationCheckbox";
 import CoordinatesInput from "./components/CoordinatesInput";
 import MapComponent from "./components/MapComponent";
@@ -16,6 +17,15 @@ interface LocationDialogProps {
 
 // Internal dialog content component
 function LocationDialogContent({ onClose }: { onClose: () => void }) {
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme-specific colors
+  const dialogBg = isDarkMode ? 'bg-[#2A1B3D]' : 'bg-white';
+  const dialogBorder = isDarkMode ? '' : 'border border-gray-200';
+  const overlayBg = isDarkMode ? 'bg-black bg-opacity-50' : 'bg-gray-700 bg-opacity-40';
   const { isLoading, hasBranches, selectedBranches, getBranchLocation, updateBranchLocation } = useLocationDialog();
   const [selectedBranch, setSelectedBranch] = useState("");
   
@@ -92,7 +102,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="bg-[#2A1B3D] rounded-lg p-6 w-full max-w-2xl mx-4">
+      <div className={`${dialogBg} ${dialogBorder} rounded-lg p-6 w-full max-w-2xl mx-4 shadow-lg`}>
         <DialogHeader onClose={onClose} />
         <LoadingState />
       </div>
@@ -102,7 +112,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   // Show no data state
   if (!hasBranches) {
     return (
-      <div className="bg-[#2A1B3D] rounded-lg p-6 w-full max-w-2xl mx-4">
+      <div className={`${dialogBg} ${dialogBorder} rounded-lg p-6 w-full max-w-2xl mx-4 shadow-lg`}>
         <DialogHeader onClose={onClose} />
         <NoDataState />
       </div>
@@ -111,7 +121,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
 
   // Show normal dialog content
   return (
-    <div className="bg-[#2A1B3D] rounded-lg p-6 w-full max-w-2xl mx-4">
+    <div className={`${dialogBg} ${dialogBorder} rounded-lg p-6 w-full max-w-2xl mx-4 shadow-lg`}>
       <DialogHeader onClose={onClose} />
       
       <BranchSelector
@@ -154,10 +164,18 @@ export default function LocationDialog({
   onClose,
 }: LocationDialogProps) {
   if (!isOpen) return null;
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme-specific overlay
+  const overlayBg = isDarkMode ? 'bg-black bg-opacity-50' : 'bg-gray-700 bg-opacity-40';
 
   return (
     <LocationDialogProvider>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className={`fixed inset-0 ${overlayBg} flex items-center justify-center z-50`}>
         <LocationDialogContent onClose={onClose} />
       </div>
     </LocationDialogProvider>
