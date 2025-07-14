@@ -574,7 +574,9 @@
       "totalAttendance": "إجمالي عدد الحضور",
       "totalDeparture": "إجمالي عدد الانصراف",
       "totalAbsence": "إجمالي عدد الغياب",
-      "vacations": "الإجازات"
+      "vacations": "الإجازات",
+      "loading": "جاري تحميل الإحصائيات...",
+      "error": "خطأ في تحميل الإحصائيات"
     }
   },
   "HRSettingsAttendanceDepartureModule": {

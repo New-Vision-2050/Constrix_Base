@@ -570,7 +570,9 @@
       "totalAttendance": "Total Attendance",
       "totalDeparture": "Total Departures",
       "totalAbsence": "Total Absences",
-      "vacations": "Vacations"
+      "vacations": "Vacations",
+      "loading": "Loading statistics...",
+      "error": "Error loading statistics"
     }
   },
   "HRSettingsAttendanceDepartureModule": {
