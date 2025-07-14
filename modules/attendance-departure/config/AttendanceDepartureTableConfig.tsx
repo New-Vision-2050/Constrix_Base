@@ -16,38 +16,29 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
         key: "user.name",
         label: t("columns.name"),
         sortable: true,
-        searchable: true,
-        render: (value: any, row: AttendanceStatusRecord) =>
-          row.user?.name || "-",
+        searchable: true
       },
       {
         key: "work_date",
         label: t("columns.date"),
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) => row.work_date,
       },
       {
         key: "professional_data.job_code",
         label: t("columns.jobCode"),
-        sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) =>
-          row.professional_data?.job_code || "-",
+        sortable: true
       },
       {
         key: "professional_data.branch",
         label: t("columns.branch"),
         sortable: true,
-        searchable: true,
-        render: (value: any, row: AttendanceStatusRecord) =>
-          row.professional_data?.branch || "-",
+        searchable: true
       },
       {
         key: "professional_data.management",
         label: t("columns.management"),
         sortable: true,
-        searchable: true,
-        render: (value: any, row: AttendanceStatusRecord) =>
-          row.professional_data?.management || "-",
+        searchable: true
       },
       // {
       //   key: "clock_in_time",

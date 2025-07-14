@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import getManagementHierarchies from '../api/getManagementHierarchies';
-import getManagements from '../api/getManagements';
+import getManagements from '../api/getMagements';
 
 
 /**
