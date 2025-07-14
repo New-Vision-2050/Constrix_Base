@@ -22,9 +22,6 @@ export const getTeamAttendance = async (params?: GetTeamAttendanceParams): Promi
   // Add query parameters if provided
   let url = "/attendance/team";
   if (params) {
-    // Log incoming parameters for debugging
-    console.log("Incoming params to getTeamAttendance:", JSON.stringify(params));
-
     // Create URLSearchParams object
     const queryParams = new URLSearchParams();
 
@@ -38,15 +35,10 @@ export const getTeamAttendance = async (params?: GetTeamAttendanceParams): Promi
       queryParams.append("end_date", params.end_date);
     }
     
-    // تعامل خاص مع قيمة search_text للتأكد من إضافتها حتى لو كانت سلسلة فارغة
-    console.log("Search text value before check:", params.search_text, "Type:", typeof params.search_text);
-    
-    // إضافة معلمة search_text بطريقة مضمونة
-    // نتحقق من وجود الخاصية نفسها في كائن params بغض النظر عن قيمتها
+    // التعامل مع قيمة search_text للتأكد من إضافتها حتى لو كانت سلسلة فارغة
     if ('search_text' in params) {
       if(params.search_text){
         const searchValue = params.search_text || ''; // حتى لو كانت قيمتها undefined أو null، نستخدم سلسلة فارغة
-        console.log("Adding search_text param with value:", searchValue);
         queryParams.append("user_search", searchValue);
       }
     } else {
@@ -66,14 +58,10 @@ export const getTeamAttendance = async (params?: GetTeamAttendanceParams): Promi
       queryParams.append("branch_id", params.branch);
     }
     
-    console.log("Final queryParams:", Array.from(queryParams.entries()));
-    
     const queryString = queryParams.toString();
     if (queryString) {
       url = `${url}?${queryString}`;
     }
-    
-    console.log("Final URL:", url);
   }
 
   const response = await apiClient.get(url);
