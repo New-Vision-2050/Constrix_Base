@@ -6,11 +6,17 @@ import { apiClient } from "@/config/axios-config";
 export interface AttendanceSummaryData {
   total_days: number;
   total_attendant: number;
+  total_attendant_percentage: number;
   total_absent_days: number;
+  total_absent_days_percentage: number;
   total_holiday_days: number;
+  total_holiday_days_percentage: number;
   total_departures: number;
+  total_departures_percentage: number;
   total_work_hours: number;
+  total_work_hours_percentage: number;
   total_overtime_hours: number;
+  total_overtime_hours_percentage: number;
   total_break_hours: number;
   late_days: number;
   early_departures: number;

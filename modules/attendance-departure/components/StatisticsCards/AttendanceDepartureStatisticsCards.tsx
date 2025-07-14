@@ -23,38 +23,34 @@ export default function AttendanceDepartureStatisticsCards() {
 
   // Calculate percentages
   const totalDays = attendanceSummary.total_days || 1; // Avoid division by zero
-  const attendancePercentage = Math.round((attendanceSummary.total_attendant / totalDays) * 100) || 0;
-  const absentPercentage = Math.round((attendanceSummary.total_absent_days / totalDays) * 100) || 0;
-  const departurePercentage = Math.round((attendanceSummary.total_departures / totalDays) * 100) || 0;
-  const holidayPercentage = Math.round((attendanceSummary.total_holiday_days / totalDays) * 100) || 0;
 
   // Dynamic card data based on attendance summary
   const cardsData = [
     {
       label: t("totalAttendance"),
       value: attendanceSummary.total_attendant,
-      percentage: attendancePercentage,
+      percentage: attendanceSummary.total_attendant_percentage,
       percentageColor: "#27C200",
       icon: <UserIcon size={24} color="#B39DDB" />,
     },
     {
       label: t("totalAbsence"),
       value: attendanceSummary.total_absent_days,
-      percentage: absentPercentage,
+      percentage: attendanceSummary.total_absent_days_percentage,
       percentageColor: "#FF2D2D",
       icon: <UsersIcon size={24} color="#B39DDB" />,
     },
     {
       label: t("totalDepartures"),
       value: attendanceSummary.total_departures,
-      percentage: departurePercentage,
+      percentage: attendanceSummary.total_departures_percentage,
       percentageColor: "#27C200",
       icon: <ActivityIcon size={24} color="#B39DDB" />,
     },
     {
       label: t("totalHolidays"),
       value: attendanceSummary.total_holiday_days,
-      percentage: holidayPercentage,
+      percentage: attendanceSummary.total_holiday_days_percentage,
       percentageColor: "#FF7A00",
       icon: <Calendar size={24} color="#6EC1E4" />,
     },
