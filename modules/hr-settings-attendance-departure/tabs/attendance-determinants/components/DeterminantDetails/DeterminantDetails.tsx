@@ -1,10 +1,11 @@
-import React from "react";
-import { Check } from "lucide-react";
+import React, { useState } from "react";
+import { Check, MoreVertical } from "lucide-react";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import { useTranslations } from "next-intl";
 
 interface DeterminantDetailsProps {
   constraint: Constraint;
+  onEdit?: (constraint: Constraint) => void;
 }
 
 /**
@@ -12,7 +13,21 @@ interface DeterminantDetailsProps {
  */
 const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   constraint,
+  onEdit,
 }) => {
+  // State for dropdown visibility
+  const [showDropdown, setShowDropdown] = useState(false);
+  
+  // Handle edit button click
+  const handleEdit = () => {
+    console.log('Editing constraint:', constraint);
+    // Close dropdown after clicking
+    setShowDropdown(false);
+    // Call onEdit prop if provided
+    if (onEdit) {
+      onEdit(constraint);
+    }
+  };
   // استخدام hook الترجمة
   const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminantDetails");
   // Days of the week in Arabic
@@ -46,8 +61,6 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
     .filter(([_, config]) => config?.enabled)
     .map(([day]) => dayNameMap[day] || "");
 
-    console.log('activeDays',activeDays,'weeklySchedule',weeklySchedule,'daysOfWeek',daysOfWeek)
-
   // Calculate total working hours per week if available
   const calculateTotalHours = () => {
     let total = 0;
@@ -71,9 +84,30 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
 
   return (
     <div className="bg-transparent border border-white text-white rounded-xl p-2 relative overflow-hidden">
-      {/* Title */}
-      <div className=" text-2xl font-bold mb-8 relative z-10">
-        {constraint.name || constraint.constraint_name}
+      {/* Title with dropdown menu */}
+      <div className="flex items-center justify-between mb-8 relative z-10">
+        <div className="text-2xl font-bold">
+          {constraint.name || constraint.constraint_name}
+        </div>
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="p-1 hover:bg-gray-700 rounded-full focus:outline-none"
+            aria-label="القائمة"
+          >
+            <MoreVertical size={20} className="text-gray-300" />
+          </button>
+          {showDropdown && (
+            <div className="absolute left-0 mt-2 w-32 bg-gray-800 rounded-md shadow-lg z-20">
+              <button
+                onClick={() => handleEdit()}
+                className="w-full text-right px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-md"
+              >
+                تعديل
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* System type */}

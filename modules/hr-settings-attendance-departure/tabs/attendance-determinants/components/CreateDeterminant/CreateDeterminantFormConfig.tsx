@@ -30,12 +30,17 @@ type PropsT = {
     latitude?: number;
     longitude?: number;
   }>;
-  // Función de traducción opcional
+  // Optional translation function
   t?: (key: string) => string;
+  // Optional constraint for editing mode
+  editConstraint?: any;
 };
 // Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
-  const { refetchConstraints, t } = props;
+  const { refetchConstraints, t, editConstraint } = props;
+  
+  // Log the constraint being edited if it exists
+  console.log('Constraint being edited:', editConstraint);
   
   // Función auxiliar para obtener textos traducidos o usar valores predeterminados
   const getText = (key: string, defaultText: string) => {
@@ -496,7 +501,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
       return await defaultSubmitHandler(
         data,
-        getDynamicDeterminantFormConfig({ refetchConstraints }),
+        getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint }),
         {
           url: `${baseURL}/attendance/constraints`,
         }
