@@ -426,6 +426,10 @@
     }
   },
   "AttendanceDepartureModule":{
+    "WorkdayPeriods": {
+      "numberOfPeriods": "عدد الفترات:",
+      "workingHours": "عدد ساعات العمل:"
+    },
     "shared": {
       "EmployeeInfoSection": {
         "branch": "الفرع",

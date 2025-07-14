@@ -422,6 +422,10 @@
     "resetButtonText": "Clear Form"
   },
   "AttendanceDepartureModule":{
+    "WorkdayPeriods": {
+      "numberOfPeriods": "Number of periods:",
+      "workingHours": "Working hours:"
+    },
     "shared": {
       "EmployeeInfoSection": {
         "branch": "Branch",

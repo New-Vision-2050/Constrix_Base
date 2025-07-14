@@ -1,5 +1,6 @@
 import React from "react";
 import PeriodField from "./PeriodField";
+import { useTranslations } from "next-intl";
 
 // Define a type for a period
 export interface PeriodType {
@@ -28,6 +29,8 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
   hours,
   readOnly = true
 }) => {
+  // استخدام hook الترجمة
+  const t = useTranslations("AttendanceDepartureModule.WorkdayPeriods");
   return (
     <div className="bg-[#0c0c1e] border border-gray-700 rounded-md p-4 mb-4">
       <div className="text-lg text-white font-medium border-b border-gray-700 pb-2 mb-3">
@@ -35,7 +38,7 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
       </div>
       
       <div className="text-xs text-gray-400 mb-3">
-        عدد الفترات: <span className="text-white font-medium">{periods.length}</span>
+        {t('numberOfPeriods', {default: 'عدد الفترات:'})} <span className="text-white font-medium">{periods.length}</span>
       </div>
       
       <div className="flex flex-col gap-4">
@@ -53,7 +56,7 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
       </div>
 
       <div className="text-xs text-gray-400 mb-3">
-      عدد ساعات العمل: <span className="text-pink-500 font-medium">{hours}</span>
+      {t('workingHours', {default: 'عدد ساعات العمل:'})} <span className="text-pink-500 font-medium">{hours}</span>
       </div>
     </div>
   );
