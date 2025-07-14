@@ -1,48 +1,16 @@
 "use client";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/modules/table/components/ui/switch";
+import { Accordion } from "@/components/ui/accordion";
 import { apiClient } from "@/config/axios-config";
 import { toast } from 'sonner';
-import { Button } from "@/components/ui/button";
-
-// Types
-interface PermissionItem {
-  id: string;
-  key: string;
-  name: string;
-  type: string;
-}
-
-type CategoryData = Record<string, PermissionItem[]>;
-type Payload = Record<string, CategoryData>;
-
-// Package permissions interfaces (dynamic structure)
-export interface Root {
-  payload: {
-    id: string;
-    name: string;
-    permissions: Permissions;
-  };
-}
-
-export interface Permissions {
-  [key: string]: CategoryPermissions;
-}
-
-export interface CategoryPermissions {
-  [subcategory: string]: PermissionWithStatus[];
-}
-
-
-export interface PermissionWithStatus {
-  id: string;
-  key: string;
-  type: string;
-  name: string;
-  is_active: boolean;
-}
+import PermissionCategory from "./PermissionCategory";
+import SubmitButton from "./SubmitButton";
+import { 
+  PermissionItem, 
+  PermissionWithStatus, 
+  PermissionsData, 
+  Root, 
+} from "./types";
 
 // Props interface
 interface PermissionsBouquetProps {
@@ -64,26 +32,25 @@ const getSwitchTypeFromPermissionType = (permissionType: string): string | null 
 };
 
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
-  const [permissions, setPermissions] = useState<Payload | null>(null);
+  const [permissions, setPermissions] = useState<PermissionsData | null>(null);
   const [packagePermissions, setPackagePermissions] = useState<Root | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
   const [activeStates, setActiveStates] = useState<Record<string, boolean>>({});
-  const [changedPermissionIds, setChangedPermissionIds] = useState<string[]>([]);
+  const [numberValues, setNumberValues] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const lookupResponse = await apiClient.get('/role_and_permissions/permissions/lookup');
-        const payload = lookupResponse.data?.payload;
+        const lookupResponse = await apiClient.get(`/role_and_permissions/permissions/lookup?package_id=${packageId}`);
+        const lookupPayload = lookupResponse.data?.payload;
         
-        if (payload && typeof payload === 'object') {
-          setPermissions(payload as Payload);
-        } else {
+        if (!lookupPayload || typeof lookupPayload !== 'object') {
           setPermissions(null);
+          return;
         }
 
         if (packageId) {
@@ -95,58 +62,127 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
               setPackagePermissions(packageData as Root);
               
               const newActiveStates: Record<string, boolean> = {};
+              const newNumberValues: Record<string, number> = {};
+              const newSwitchStates: Record<string, boolean> = {};
+              const mergedPermissions: PermissionsData = {};
               
-              if (packageData.payload.permissions) {
-                Object.entries(packageData.payload.permissions).forEach(([categoryKey, categoryData]) => {
-                  console.log(`Category: ${categoryKey}`);
-                  if (categoryData && typeof categoryData === 'object') {
-                    Object.entries(categoryData).forEach(([subKey, subItems]) => {
-                      if (Array.isArray(subItems)) {
-                        subItems.forEach((item: any, index: number) => {
-                          
-                          
-                          const switchType = getSwitchTypeFromPermissionType(item.type);
-                          if (switchType) {
-                            const stateKey = `${categoryKey}.${subKey}.${switchType}`;
-                            newActiveStates[stateKey] = item.is_active === true;
-                          }
-                        });
-                      }
-                    });
-                  }
-                });
-              }
-              
-              setActiveStates(newActiveStates);
-              
-              const initialSwitchStates: Record<string, boolean> = {};
-                            
-              if (packageData.permissions && typeof packageData.permissions === 'object') {
-                Object.entries(packageData.permissions).forEach(([categoryKey, categoryData]) => {
-                if (categoryData && typeof categoryData === 'object') {
-                  Object.entries(categoryData).forEach(([subKey, subItems]) => {
-                    if (Array.isArray(subItems)) {
-                      subItems.forEach((item: PermissionWithStatus) => {
-                        const switchType = getSwitchTypeFromPermissionType(item.type);
+              // Merge lookup data with package permissions data
+              Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
+                if (lookupCategoryData && typeof lookupCategoryData === 'object') {
+                  mergedPermissions[categoryKey] = {};
+                  
+                  Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
+                    if (Array.isArray(lookupItems)) {
+                      // Get corresponding package permissions for this category/subKey
+                      const packageCategoryData = packageData.payload?.permissions?.[categoryKey];
+                      const packageSubItems = packageCategoryData?.[subKey] || [];
+                      
+                      // Create merged items with is_active status
+                      const mergedItems: PermissionWithStatus[] = lookupItems.map((lookupItem: any) => {
+                        // Find corresponding package item
+                        const packageItem = Array.isArray(packageSubItems) 
+                          ? packageSubItems.find((pItem: any) => pItem.id === lookupItem.id)
+                          : null;
+                        
+                        const switchType = getSwitchTypeFromPermissionType(lookupItem.type);
                         if (switchType) {
+                          const stateKey = `${categoryKey}.${subKey}.${switchType}`;
                           const switchId = `${subKey}-${switchType}`;
-                          initialSwitchStates[switchId] = item.is_active;
+                          newActiveStates[stateKey] = packageItem?.is_active === true;
+                          newSwitchStates[switchId] = packageItem?.is_active === true;
                         }
+                        
+                        // Extract limit values for each subKey
+                        if (packageItem?.limit !== undefined && packageItem?.limit !== null) {
+                          newNumberValues[subKey] = packageItem.limit;
+                        }
+                        
+                        return {
+                          id: lookupItem.id,
+                          key: lookupItem.key,
+                          type: lookupItem.type,
+                          name: lookupItem.name,
+                          is_active: packageItem?.is_active || false,
+                          limit: packageItem?.limit
+                        };
                       });
+                      
+                      mergedPermissions[categoryKey][subKey] = mergedItems;
                     }
                   });
                 }
-                });
-              }
+              });
               
-              setSwitchStates(initialSwitchStates);
+              setPermissions(mergedPermissions);
+              setActiveStates(newActiveStates);
+              setNumberValues(newNumberValues);
+              setSwitchStates(newSwitchStates);
+            } else {
+              console.warn('No package data found');
+              // If no package data, create permissions structure with all is_active = false
+              const defaultPermissions: PermissionsData = {};
+              Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
+                if (lookupCategoryData && typeof lookupCategoryData === 'object') {
+                  defaultPermissions[categoryKey] = {};
+                  Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
+                    if (Array.isArray(lookupItems)) {
+                      defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
+                        id: item.id,
+                        key: item.key,
+                        type: item.type,
+                        name: item.name,
+                        is_active: false
+                      }));
+                    }
+                  });
+                }
+              });
+              setPermissions(defaultPermissions);
             }
           } catch (packageError) {
             console.error('Package API Error:', packageError);
             setPackagePermissions(null);
+            // Create default permissions structure on error
+            const defaultPermissions: PermissionsData = {};
+            Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
+              if (lookupCategoryData && typeof lookupCategoryData === 'object') {
+                defaultPermissions[categoryKey] = {};
+                Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
+                  if (Array.isArray(lookupItems)) {
+                    defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
+                      id: item.id,
+                      key: item.key,
+                      type: item.type,
+                      name: item.name,
+                      is_active: false
+                    }));
+                  }
+                });
+              }
+            });
+            setPermissions(defaultPermissions);
           }
         } else {
           console.warn('No package ID found, cannot fetch package permissions');
+          // Create default permissions structure without package ID
+          const defaultPermissions: PermissionsData = {};
+          Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
+            if (lookupCategoryData && typeof lookupCategoryData === 'object') {
+              defaultPermissions[categoryKey] = {};
+              Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
+                if (Array.isArray(lookupItems)) {
+                  defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
+                    id: item.id,
+                    key: item.key,
+                    type: item.type,
+                    name: item.name,
+                    is_active: false
+                  }));
+                }
+              });
+            }
+          });
+          setPermissions(defaultPermissions);
         }
       } catch (error) {
         console.error('Lookup API Error:', error);
@@ -195,20 +231,17 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       }));
     }
     
-    // Add permissionId to changedPermissionIds array only when checked is true
-    if (permissionId && checked) {
-      setChangedPermissionIds(prev => {
-        const newIds = [...prev];
-        const existingIndex = newIds.indexOf(permissionId);
-        
-        if (existingIndex === -1) {
-          // ID not in array, add it
-          newIds.push(permissionId);
-        }
-        
-        return newIds;
-      });
-    }
+
+  };
+  
+  const handleNumberChange = (permissionId: string, value: number) => {
+    // Update number values state
+    setNumberValues(prev => ({
+      ...prev,
+      [permissionId]: value
+    }));
+    
+
   };
 
   // Function to get all currently active permission IDs
@@ -251,8 +284,34 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
         return;
       }
 
+      // Create limits array with permission_id and number
+      const limits: Array<{ permission_id: string; number: number }> = [];
+      
+      // Map subKey to create permission IDs and their number values
+      if (permissions) {
+        Object.entries(permissions).forEach(([categoryKey, categoryData]) => {
+          if (categoryData && typeof categoryData === 'object') {
+            Object.entries(categoryData).forEach(([subKey, subItems]) => {
+              if (Array.isArray(subItems)) {
+                // Find the view permission for this subKey (as per memory requirements)
+                const viewItem = subItems.find(item => item.type === 'view');
+                
+                // If view permission exists and has a number value, add to limits
+                if (viewItem && numberValues[subKey] !== undefined && numberValues[subKey] > 0) {
+                  limits.push({
+                    permission_id: viewItem.id,
+                    number: numberValues[subKey]
+                  });
+                }
+              }
+            });
+          }
+        });
+      }
+      
       const response = await apiClient.post(`/packages/${packageId}/assign-permissions`, {
-        permissions: activePermissionIds
+        permissions: activePermissionIds,
+        limits: limits
       });
 
       if (response.status === 200 || response.status === 201) {        
@@ -300,191 +359,31 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       {/* One Accordion per payload key */}
       <Accordion type="multiple" className="w-full">
         {Object.entries(permissions).map(([categoryKey, categoryData]) => {
-          const allSubKeys = Object.keys(categoryData);
-          const allSelected = allSubKeys.every(subKey => selectedPermissions.has(subKey));
-          
-          const handleSelectAll = (checked: boolean) => {
-            setSelectedPermissions(prev => {
-              const newSelected = new Set(prev);
-              if (checked) {
-                allSubKeys.forEach(subKey => newSelected.add(subKey));
-              } else {
-                allSubKeys.forEach(subKey => newSelected.delete(subKey));
-              }
-              return newSelected;
-            });
-          };
+          if (!categoryData || Object.keys(categoryData).length === 0) {
+            return null;
+          }
 
           return (
-            <AccordionItem key={categoryKey} value={categoryKey}>
-              <AccordionTrigger className="text-right text-lg font-bold hover:no-underline">
-                {categoryKey.replace('-', ' ').toUpperCase()}
-              </AccordionTrigger>
-              <AccordionContent className="pt-4">
-                <div className="mt-4 p-4 rounded-lg">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full bg-transparent">
-                      <thead>
-                        <tr>
-                          <th className="px-4 py-3 text-center text-sm font-medium">
-                            <Checkbox 
-                              checked={allSelected}
-                              onCheckedChange={handleSelectAll}
-                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded" 
-                            /> 
-                          </th>
-                          <th className="px-4 py-3 text-right text-sm font-medium">الصلاحية</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">عرض</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">تعديل</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">حذف</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">إنشاء</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">تصدير</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">تنشيط</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">قائمة</th>
-                          <th className="px-4 py-3 text-center text-sm font-medium">العدد</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(categoryData).map(([subKey, subItems]) => {
-                          const availableTypes = new Set(subItems.map(item => item.type));
-                          const hasView = availableTypes.has('view');
-                          const hasUpdate = availableTypes.has('update');
-                          const hasDelete = availableTypes.has('delete');
-                          const hasCreate = availableTypes.has('create');
-                          const hasExport = availableTypes.has('export');
-                          const hasActivate = availableTypes.has('activate');
-                          const hasList = availableTypes.has('list');
-                          return (
-                            <React.Fragment key={subKey}>
-                              <tr key={subKey}>
-                                <td className="px-4 py-4 text-center">
-                                  <Checkbox
-                                    id={subKey}
-                                    checked={selectedPermissions.has(subKey)}
-                                    onCheckedChange={(checked) => handlePermissionChange(subKey, checked as boolean)}
-                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
-                                  />
-                                </td>
-                                <td className="px-4 py-4 text-right text-sm text-white font-medium">
-                                  {subKey}
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-view`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-view`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.view`] || false}
-                                      disabled={!hasView}
-                                      onCheckedChange={(checked) => {
-                                        const viewItem = subItems.find(item => item.type === 'view');
-                                        handleSwitchChange(`${subKey}-view`, checked, viewItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-edit`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-edit`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.edit`] || false}
-                                      disabled={!hasUpdate}
-                                      onCheckedChange={(checked) => {
-                                        const editItem = subItems.find(item => item.type === 'update');
-                                        handleSwitchChange(`${subKey}-edit`, checked, editItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-delete`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-delete`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.delete`] || false}
-                                      disabled={!hasDelete}
-                                      onCheckedChange={(checked) => {
-                                        const deleteItem = subItems.find(item => item.type === 'delete');
-                                        handleSwitchChange(`${subKey}-delete`, checked, deleteItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-create`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-create`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.create`] || false}
-                                      disabled={!hasCreate}
-                                      onCheckedChange={(checked) => {
-                                        const createItem = subItems.find(item => item.type === 'create');
-                                        handleSwitchChange(`${subKey}-create`, checked, createItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-export`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-export`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.export`] || false}
-                                      disabled={!hasExport}
-                                      onCheckedChange={(checked) => {
-                                        const exportItem = subItems.find(item => item.type === 'export');
-                                        handleSwitchChange(`${subKey}-export`, checked, exportItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-activate`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-activate`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.activate`] || false}
-                                      disabled={!hasActivate}
-                                      onCheckedChange={(checked) => {
-                                        const activateItem = subItems.find(item => item.type === 'activate');
-                                        handleSwitchChange(`${subKey}-activate`, checked, activateItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className={`px-4 py-4 text-center ${switchStates[`${subKey}-list`] ? 'bg-sidebar' : ''}`}>
-                                  <div className="flex items-center justify-center">
-                                    <Switch
-                                      id={`${subKey}-list`}
-                                      checked={activeStates[`${categoryKey}.${subKey}.list`] || false}
-                                      disabled={!hasList}
-                                      onCheckedChange={(checked) => {
-                                        const listItem = subItems.find(item => item.type === 'list');
-                                        handleSwitchChange(`${subKey}-list`, checked, listItem?.id);
-                                      }}
-                                    />
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 text-center text-sm text-white font-medium">
-                                  -
-                                </td>
-                              </tr>
-                            </React.Fragment>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <PermissionCategory
+              key={categoryKey}
+              categoryKey={categoryKey}
+              categoryData={categoryData}
+              selectedPermissions={selectedPermissions}
+              switchStates={switchStates}
+              activeStates={activeStates}
+              numberValues={numberValues}
+              onPermissionChange={handlePermissionChange}
+              onSwitchChange={handleSwitchChange}
+              onNumberChange={handleNumberChange}
+            />
           );
         })}
       </Accordion>
       
-      {/* Print Button */}
-      <div className="mt-6 flex justify-center">
-        <Button
-          onClick={submit}
-          disabled={submitting}
-        >
-          {submitting ? 'Loading' : 'Submit'}
-        </Button>
-      </div> 
+      <SubmitButton
+        onSubmit={submit}
+        submitting={submitting}
+      /> 
     </div>
   );
 }

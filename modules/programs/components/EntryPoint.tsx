@@ -95,7 +95,7 @@ export interface ProgramPayload {
 const generateDynamicFields = async (): Promise<FieldConfig[]> => {
   try {
     // Fetch data from API
-    const response = await apiClient.get(`${baseURL}/programs/sub_entities/select/list`);
+    const response = await apiClient.get(`${baseURL}/role_and_permissions/permissions/hierarchy/detailed`);
     console.log('API Response:', response.data);
     
     // Array to store generated fields
