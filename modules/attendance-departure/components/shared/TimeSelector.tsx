@@ -1,4 +1,5 @@
 import React from "react";
+import { useTheme } from "next-themes";
 
 interface TimeSelectorProps {
   label: string;
@@ -20,11 +21,25 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   onPeriodChange,
   readOnly = true
 }) => {
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const bgColor = isDarkMode ? "#101026" : "#f5f5f5";
+  const borderColor = isDarkMode ? "border-gray-700" : "border-gray-300";
+  const labelTextColor = isDarkMode ? "text-gray-400" : "text-gray-600";
+  const textColor = isDarkMode ? "text-white" : "text-gray-900";
+  const accentBgColor = isDarkMode ? "#E91E63" : "#D81B60";
   return (
     <div className="flex flex-col items-start gap-2">
-      <span className="text-xs mx-1">{label}</span>
+      <span className={`text-xs mx-1 ${labelTextColor}`}>{label}</span>
       <div className="flex">
-        <div className="bg-[#101026] border border-gray-700 rounded-r-md p-2 text-center w-12">
+        <div 
+          className={`border rounded-r-md p-2 text-center w-12 ${borderColor} ${textColor}`}
+          style={{ backgroundColor: bgColor }}
+        >
           {readOnly ? (
             value
           ) : (
@@ -32,12 +47,13 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
               type="text"
               value={value}
               onChange={(e) => onValueChange?.(e.target.value)}
-              className="bg-transparent w-full outline-none text-center"
+              className={`bg-transparent w-full outline-none text-center ${textColor}`}
             />
           )}
         </div>
         <div 
-          className="bg-[#E91E63] text-white p-2 rounded-l-md cursor-pointer"
+          className="text-white p-2 rounded-l-md cursor-pointer"
+          style={{ backgroundColor: accentBgColor }}
           onClick={() => !readOnly && onPeriodChange?.(period === "AM" ? "PM" : "AM")}
         >
           {period}

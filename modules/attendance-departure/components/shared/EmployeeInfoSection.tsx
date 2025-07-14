@@ -3,6 +3,7 @@
 import React from "react";
 import { AttendanceStatusRecord } from "../../types/attendance";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 interface EmployeeInfoSectionProps {
   record: AttendanceStatusRecord;
@@ -15,6 +16,14 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   record,
 }) => {
   const t = useTranslations("AttendanceDepartureModule.shared.EmployeeInfoSection");
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const textColor = isDarkMode ? "text-white" : "text-gray-800";
   // Determine the color for attendance status
   const getStatusColor = () => {
     if (record.is_late === 0) {
@@ -29,13 +38,13 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   return (
     <>
       <div className="flex flex-wrap justify-between items-center text-sm gap-3">
-        <div className="text-white">{t("branch")}: {record.company.name}</div>
-        <div className="text-white">{t("jobId")}: emp-101</div>
-        <div className="text-white">{t("department")}: {record.company.name}</div>
-        <div className="text-white">
+        <div className={textColor}>{t("branch")}: {record.company.name}</div>
+        <div className={textColor}>{t("jobId")}: emp-101</div>
+        <div className={textColor}>{t("department")}: {record.company.name}</div>
+        <div className={textColor}>
           {t("approver")}: {record?.applied_constraints?.[0]?.name || t("unspecified")}
         </div>
-        <div className="text-white">
+        <div className={textColor}>
           {t("attendanceStatus")}:
           <span className={`font-bold ${getStatusColor()}`}>
             {record.is_late === 0 ? t("status.present") : record.is_late === 1 ? t("status.late") : t("status.absent")}

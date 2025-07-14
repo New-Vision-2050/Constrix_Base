@@ -9,6 +9,7 @@ import WorkdayPeriods, {
 } from "../../components/shared/WorkdayPeriods";
 import { useAttendance } from "../../context/AttendanceContext";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 /**
  * Approver dialog component that appears when clicking on the approver cell in the table
@@ -17,7 +18,16 @@ const ApproverDialog: React.FC = () => {
   const { isApproverDialogOpen, selectedApproverRecord, closeApproverDialog } =
     useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.approver");
-  console.log('selectedApproverRecord',selectedApproverRecord?.applied_constraints?.[0]?.name,selectedApproverRecord);
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const accentColor = isDarkMode ? "#E91E63" : "#D81B60";
+  const containerBg = isDarkMode ? "bg-gray-800" : "bg-gray-100";
+  const textColor = isDarkMode ? "text-white" : "text-gray-800";
 
   if (!selectedApproverRecord) return null;
 
@@ -31,7 +41,7 @@ const ApproverDialog: React.FC = () => {
       <EmployeeInfoSection record={selectedApproverRecord} />
 
       {/* Data Input Fields */}
-      <div className="flex flex-col gap-4">
+      <div className={`flex flex-col gap-4 ${textColor}`}>
         <DisplayField
           label={t("approverName")}
           value={selectedApproverRecord?.applied_constraints?.[0]?.name}
@@ -85,7 +95,7 @@ const ApproverDialog: React.FC = () => {
           />
         )}
 
-        <div className="text-xs text-[#E91E63] text-left">
+        <div className="text-xs text-left" style={{ color: accentColor }}>
           {t("workHours")} 8 ساعات
         </div>
       </div>
