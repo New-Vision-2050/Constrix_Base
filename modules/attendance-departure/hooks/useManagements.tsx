@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import getManagementHierarchies from '../api/getManagementHierarchies';
-import getMagements from '../api/getMagements';
+import getManagements from '../api/getManagements';
 
 
 /**
@@ -12,7 +12,7 @@ export const useManagements = () => {
 
   return useQuery({
     queryKey,
-    queryFn: getMagements,
+    queryFn: getManagements,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
