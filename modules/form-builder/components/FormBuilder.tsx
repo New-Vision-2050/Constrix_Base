@@ -466,7 +466,7 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
         {!isStepBased && (
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || config.disableSubmitButton}
             className="bg-primary text-primary-foreground hover:bg-primary/90 grow"
             onClick={(e) => e.stopPropagation()}
           >

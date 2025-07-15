@@ -299,4 +299,5 @@ export interface FormConfig {
   wrapperClassName?: string;
   subWrapperClassName?:string
   subWrapperParentClassName?:string;
+  disableSubmitButton?:boolean
 }
