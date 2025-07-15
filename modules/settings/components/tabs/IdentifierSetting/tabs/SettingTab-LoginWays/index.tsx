@@ -19,7 +19,7 @@ export default function LoginWaysTab() {
   const tableStore = useTableStore.getState();
 
   return (
-    <CanSeeContent canSee={true}>
+    <CanSeeContent canSee={permissions.LIST}>
       <div className="space-y-7">
         <TableBuilder
           config={config}

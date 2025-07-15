@@ -12,17 +12,24 @@ import TrashIcon from "@/public/icons/trash";
 import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useModal } from "@/hooks/use-modal";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 const LoginIdentifierExecutionBtn = ({ id }: { id: string }) => {
+  const canDelete = can(PERMISSION_ACTIONS.DELETE, PERMISSION_SUBJECTS.IDENTIFIER) as boolean
   const [isOpen, handleOpen, handleClose] = useModal();
   const t = useTranslations();
 
   const menuItems = [
-    {
-      label: "حذف",
-      icon: <TrashIcon className="w-4 h-4 me-2" />,
-      func: handleOpen,
-    },
+    ...(canDelete
+      ? [
+          {
+            label: "حذف",
+            icon: <TrashIcon className="w-4 h-4 me-2" />,
+            func: handleOpen,
+          },
+        ]
+      : []),
   ];
 
   return (

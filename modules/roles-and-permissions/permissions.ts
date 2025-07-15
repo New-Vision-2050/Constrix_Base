@@ -71,7 +71,8 @@ export const PERMISSION_SUBJECTS = {
   ROLE: 'ROLE',
   PERMISSION: 'PERMISSION',
   DRIVER: 'DRIVER',
-  LOGIN_WAY: 'LOGIN_WAY'
+  LOGIN_WAY: 'LOGIN_WAY',
+  IDENTIFIER: 'IDENTIFIER'
 } as const;
 
 export type PermissionAction = typeof PERMISSION_ACTIONS[keyof typeof PERMISSION_ACTIONS];

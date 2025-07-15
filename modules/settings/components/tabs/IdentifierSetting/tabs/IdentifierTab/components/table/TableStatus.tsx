@@ -10,10 +10,11 @@ import { LoginIdentifier } from "@/modules/settings/types/LoginIdentifier";
 type PropsT = {
   identifier: LoginIdentifier;
   url: string;
+  canActivate?: boolean;
 };
 
 const TableStatus = (props: PropsT) => {
-  const { url, identifier } = props;
+  const { url, identifier, canActivate = true } = props;
   const t = useTranslations();
   const { reloadTable } = useTableInstance("login-identifier-table");
 
@@ -36,6 +37,7 @@ const TableStatus = (props: PropsT) => {
           id={`${identifier.id}-switcher`}
           checked={identifier.status == 1}
           onCheckedChange={handleChange}
+          disabled={!canActivate}
         />
       </div>
     </>

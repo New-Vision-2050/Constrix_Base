@@ -2,8 +2,19 @@ import { baseURL } from "@/config/axios-config";
 import { LoginIdentifier } from "@/modules/settings/types/LoginIdentifier";
 import LoginIdentifierExecutionBtn from "./ExecutionBtn";
 import TableStatus from "./TableStatus";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export const LoginIdentifierTableConfig = () => {
+  const permissions = can(
+    [PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE, PERMISSION_ACTIONS.ACTIVATE, PERMISSION_ACTIONS.EXPORT],
+    PERMISSION_SUBJECTS.IDENTIFIER
+  ) as {
+    UPDATE: boolean;
+    DELETE: boolean;
+    ACTIVATE: boolean;
+    EXPORT: boolean;
+  };
   return {
     url: `${baseURL}/settings/identifier`,
     tableId: "login-identifier-table",
@@ -33,16 +44,21 @@ export const LoginIdentifierTableConfig = () => {
           <TableStatus
             url={`settings/identifier/make-default/${row.id}`}
             identifier={row}
+            canActivate={permissions.ACTIVATE}
           />
         ),
       },
-      {
-        key: "id",
-        label: "الأجراء",
-        render: (_: unknown, row: LoginIdentifier) => (
-          <LoginIdentifierExecutionBtn id={row.id} />
-        ),
-      },
+      ...(permissions.UPDATE || permissions.DELETE
+        ? [
+            {
+              key: "id",
+              label: "الأجراء",
+              render: (_: unknown, row: LoginIdentifier) => (
+                <LoginIdentifierExecutionBtn id={row.id} />
+              ),
+            },
+          ]
+        : []),
     ],
     allSearchedFields: [],
     defaultSortColumn: "id",
@@ -56,5 +72,6 @@ export const LoginIdentifierTableConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    canExport: permissions.EXPORT,
   };
 };
