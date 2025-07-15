@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useMailProviderCxt } from "../context/MailProviderCxt";
 import { Driver } from "@/modules/settings/types/Driver";
 import Loader from "@/components/shared/loader/Loader";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 /**
  * Renders a list of mail provider buttons.
@@ -32,18 +34,27 @@ function MailProviderButton({
   provider: Driver;
   isActive: boolean;
 }) {
+      const canView = can(
+      PERMISSION_ACTIONS.VIEW,
+      PERMISSION_SUBJECTS.DRIVER
+    ) as boolean;
+  
   const { handleChangeActiveProvider } = useMailProviderCxt();
 
   return (
-    <Button
-      onClick={() => {
-        handleChangeActiveProvider(provider);
-      }}
-      className={`text-lg w-full my-2 bg-transparent font-bold flex items-center justify-between ${
-        isActive ? "bg-primary/90" : ""
-      }`}
-    >
-      <p>{provider.name}</p>
-    </Button>
+    <>
+      {canView && (
+        <Button
+          onClick={() => {
+            handleChangeActiveProvider(provider);
+          }}
+          className={`text-lg w-full my-2 bg-transparent font-bold flex items-center justify-between ${
+            isActive ? "bg-primary/90" : ""
+          }`}
+        >
+          <p>{provider.name}</p>
+        </Button>
+      )}
+    </>
   );
 }

@@ -1,8 +1,12 @@
 // Define the form configuration
 import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export const MailProviderConfig = (id: string) => {
+  const canUpdate = can(PERMISSION_ACTIONS.UPDATE, PERMISSION_SUBJECTS.DRIVER) as boolean;
+
   const MailFormConfig: FormConfig = {
     formId: "mail-provider-form",
     title: "",
@@ -80,6 +84,7 @@ export const MailProviderConfig = (id: string) => {
     resetOnSuccess: true,
     showCancelButton: false,
     showBackButton: false,
+    disableSubmitButton: canUpdate,
 
     // Example onSuccess handler
     onSuccess: (values, result) => {
