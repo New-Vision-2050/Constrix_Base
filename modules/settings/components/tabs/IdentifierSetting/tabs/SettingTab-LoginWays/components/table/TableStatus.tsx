@@ -10,10 +10,11 @@ import { useTableInstance } from "@/modules/table/store/useTableStore";
 type PropsT = {
   loginWay: LoginWay;
   url: string;
+  canActivate?: boolean;
 };
 
 const TableStatus = (props: PropsT) => {
-  const { url, loginWay } = props;
+  const { url, loginWay, canActivate = true } = props;
   const t = useTranslations();
   const { reloadTable } = useTableInstance("login-ways-table");
 
@@ -36,6 +37,7 @@ const TableStatus = (props: PropsT) => {
           id={`${loginWay.id}-switcher`}
           checked={loginWay.default == 1}
           onCheckedChange={handleChange}
+          disabled={!canActivate}
         />
       </div>
     </>

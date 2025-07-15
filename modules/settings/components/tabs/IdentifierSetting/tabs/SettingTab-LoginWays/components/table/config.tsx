@@ -4,9 +4,20 @@ import { LoginWay } from "@/modules/settings/types/LoginWay";
 import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import { loginWayFormConfig } from "@/modules/settings/components/tabs/IdentifierSetting/tabs/SettingTab-LoginWays/components/form/config";
 import { loginWayFormEditConfig } from "../form/editConfig";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 // Create a component that uses the translations
 export const LoginWaysConfig = () => {
+  const permissions = can(
+    [PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE, PERMISSION_ACTIONS.ACTIVATE, PERMISSION_ACTIONS.EXPORT],
+    PERMISSION_SUBJECTS.LOGIN_WAY
+  ) as {
+    UPDATE: boolean;
+    DELETE: boolean;
+    ACTIVATE: boolean;
+    EXPORT: boolean;
+  };
   return {
     url: `${baseURL}/settings/login-way`,
     tableId: "login-ways-table",
@@ -38,6 +49,7 @@ export const LoginWaysConfig = () => {
           <TableStatus
             loginWay={row}
             url={`/settings/login-way/make-default/${row.id}`}
+            canActivate={permissions.ACTIVATE}
           />
         ),
       }
@@ -50,8 +62,8 @@ export const LoginWaysConfig = () => {
     formConfig: loginWayFormEditConfig,
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: permissions.UPDATE,
+      canDelete: permissions.DELETE,
     },
     defaultItemsPerPage: 5,
     enableSearch: true,
@@ -60,5 +72,6 @@ export const LoginWaysConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    canExport: permissions.EXPORT,
   };
 };
