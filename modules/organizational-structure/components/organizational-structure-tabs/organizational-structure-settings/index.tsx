@@ -1,3 +1,5 @@
+"use client"
+
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { OrganizationalStructureSettingsTabs } from "@/modules/organizational-structure/constants/organizational-structure-settings";
 import { useTranslations } from "next-intl";
