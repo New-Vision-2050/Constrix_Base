@@ -40,7 +40,7 @@ const handleCloseRolesSheet = useCallback(
   const config = rolesTableConfig({handleOpenRolesSheet});
   
   return (
-    <CanSeeContent canSee={true}>
+    <CanSeeContent canSee={permissions.LIST}>
       <div className="px-8 space-y-7">
         <StatisticsRow config={statisticsConfig} />
         <TableBuilder
