@@ -5,8 +5,18 @@ import { TableBuilder } from '@/modules/table';
 import { SheetFormBuilder } from '@/modules/form-builder';
 import { Button } from '@/components/ui/button';
 import { OrgStructureManagementsSettingsFormConfig } from './form-config';
+import { can } from '@/hooks/useCan';
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from '@/modules/roles-and-permissions/permissions';
+import CanSeeContent from '@/components/shared/CanSeeContent';
 
 const OrgStructureManagementSetting = () => {
+        const permissions = can(
+          [PERMISSION_ACTIONS.LIST, PERMISSION_ACTIONS.CREATE],
+          PERMISSION_SUBJECTS.ORGANIZATION_MANAGEMENT
+        ) as {
+          LIST: boolean;
+          CREATE: boolean;
+        };
     const config = OrgStructureManagementsSettingsTableConfig();
 
     const handleFormSuccess = () => {
@@ -21,19 +31,23 @@ const OrgStructureManagementSetting = () => {
   
   
   return (
+    <CanSeeContent canSee={permissions.LIST}>
       <TableBuilder
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
-            <SheetFormBuilder
-              config={OrgStructureManagementsSettingsFormConfig}
-              trigger={<Button>اضافة ادارة</Button>}
-              onSuccess={handleFormSuccess}
-            /> 
+            {permissions.CREATE && (
+              <SheetFormBuilder
+                config={OrgStructureManagementsSettingsFormConfig}
+                trigger={<Button>اضافة ادارة</Button>}
+                onSuccess={handleFormSuccess}
+              />
+            )}
           </div>
         }
       />
-  )
+    </CanSeeContent>
+  );
 }
 
 export default OrgStructureManagementSetting

@@ -2,8 +2,20 @@ import { JobTitle } from "@/types/job-title";
 import { apiClient, baseURL } from "@/config/axios-config";
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { OrgStructureManagementsSettingsFormConfig } from "./form-config";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export const OrgStructureManagementsSettingsTableConfig = () => {
+     const permissions = can(
+        [PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE , PERMISSION_ACTIONS.ACTIVATE , PERMISSION_ACTIONS.EXPORT],
+        PERMISSION_SUBJECTS.ORGANIZATION_MANAGEMENT
+      ) as {
+        UPDATE: boolean;
+        DELETE: boolean;
+        ACTIVATE: boolean;
+        EXPORT: boolean;
+      };
+  
   return {
     url: `${baseURL}/management_hierarchies/non-copied`,
     tableId: "OrgStructureManagementsSettingsTableConfig", // Add tableId to the config
@@ -55,6 +67,7 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
               !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشظ"
             }
             showDatePicker={() => false}
+            canActivate={permissions.ACTIVATE}
           />
         ),
       },
@@ -73,8 +86,9 @@ export const OrgStructureManagementsSettingsTableConfig = () => {
     formConfig: OrgStructureManagementsSettingsFormConfig,
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: permissions.UPDATE,
+      canDelete: permissions.DELETE,
     },
+    canExport: permissions.EXPORT,
   };
 };
