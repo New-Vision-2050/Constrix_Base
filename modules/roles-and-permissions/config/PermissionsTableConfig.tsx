@@ -1,8 +1,12 @@
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "../permissions";
 
 
 export const permissionsTableConfig = () => {
+    const canActivate = can(PERMISSION_ACTIONS.ACTIVATE, PERMISSION_SUBJECTS.PERMISSION) as boolean;
+  
   return {
     url: `${baseURL}/role_and_permissions/permissions`,
     tableId: "permissions-table", 
@@ -40,6 +44,7 @@ export const permissionsTableConfig = () => {
               !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
             }
             showDatePicker={() => false}
+            canActivate={canActivate}
           />
         ),
       },
