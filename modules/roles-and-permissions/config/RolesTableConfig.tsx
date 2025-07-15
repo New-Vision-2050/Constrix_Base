@@ -1,10 +1,21 @@
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { can } from "@/hooks/useCan";
 import { Edit } from "lucide-react";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "../permissions";
 
 export const rolesTableConfig = ({handleOpenRolesSheet}:{
   handleOpenRolesSheet:({ isEdit, selectedId }: { isEdit: boolean; selectedId?: string })=>void;
 }) => {
+  const permission = can(
+    [PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE, PERMISSION_ACTIONS.ACTIVATE, PERMISSION_ACTIONS.EXPORT],
+    [PERMISSION_SUBJECTS.ROLE]
+  ) as {
+    UPDATE: boolean;
+    DELETE: boolean;
+    ACTIVATE: boolean;
+    EXPORT: boolean;
+  };
   return {
     url: `${baseURL}/role_and_permissions/roles`,
     tableId: "roles-table",
@@ -39,14 +50,18 @@ export const rolesTableConfig = ({handleOpenRolesSheet}:{
             label={"نشط"}
             initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.patch(`/role_and_permissions/roles/${row.id}/status`, {
-                status: Number(isActive),
-              });
+              return await apiClient.patch(
+                `/role_and_permissions/roles/${row.id}/status`,
+                {
+                  status: Number(isActive),
+                }
+              );
             }}
             confirmDescription={(isActive) =>
               !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
             }
             showDatePicker={() => false}
+            canActivate={permission.ACTIVATE}
           />
         ),
       },
@@ -106,19 +121,25 @@ export const rolesTableConfig = ({handleOpenRolesSheet}:{
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-     deleteUrl: `${baseURL}/role_and_permissions/roles`,
-      executions: [
-      {
-        label: "تعديل",
-        icon: <Edit className="w-4 h-4" />,
-        action: (row : {id:string}) => handleOpenRolesSheet({
-          isEdit:true,
-          selectedId:row.id
-        }),
-      }
+    deleteUrl: `${baseURL}/role_and_permissions/roles`,
+    executions: [
+      ...(permission.UPDATE
+        ? [
+            {
+              label: "تعديل",
+              icon: <Edit className="w-4 h-4" />,
+              action: (row: { id: string }) =>
+                handleOpenRolesSheet({
+                  isEdit: true,
+                  selectedId: row.id,
+                }),
+            },
+          ]
+        : []),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: permission.DELETE,
     },
+    canExport: permission.EXPORT,
   };
 };
