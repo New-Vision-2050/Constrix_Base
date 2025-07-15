@@ -8,6 +8,8 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 // Define types for the company data
 interface CompanyData {
@@ -23,6 +25,20 @@ interface CompanyData {
 
 // Create a component that uses the translations
 export const CompaniesConfig = () => {
+    const permission = can(
+      [
+        PERMISSION_ACTIONS.DELETE,
+        PERMISSION_ACTIONS.UPDATE,
+        PERMISSION_ACTIONS.ACTIVATE,
+        PERMISSION_ACTIONS.EXPORT,
+      ],
+      PERMISSION_SUBJECTS.COMPANY
+    ) as {
+      DELETE: boolean;
+      UPDATE: boolean;
+      ACTIVATE: boolean;
+      EXPORT: boolean;
+    };
   const t = useTranslations("Companies");
   const router = useRouter();
 
@@ -71,7 +87,7 @@ export const CompaniesConfig = () => {
         key: "is_active",
         label: t("Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
-          <TheStatus theStatus={value} id={row.id} />
+          <TheStatus theStatus={value} id={row.id} canActivate={permission.ACTIVATE} />
         ),
       },
     ],
@@ -133,17 +149,22 @@ export const CompaniesConfig = () => {
         icon: <EnterIcon className="w-4 h-4" />,
         action: () => console.log("Login as manager clicked"),
       },
-      {
-        label: "اكمال ملف الشركة",
-        icon: <GearIcon className="w-4 h-4" />,
-        action: (row: CompanyData) =>
-          router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
-      },
+      ...(permission.UPDATE
+        ? [
+            {
+              label: "اكمال ملف الشركة",
+              icon: <GearIcon className="w-4 h-4" />,
+              action: (row: CompanyData) =>
+                router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
+            },
+          ]
+        : []),
     ],
     executionConfig: {
       canEdit: false,
-      canDelete: true,
+      canDelete: permission.DELETE,
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
+    canExport: permission.EXPORT,
   };
 };

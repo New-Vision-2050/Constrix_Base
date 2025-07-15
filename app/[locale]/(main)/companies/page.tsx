@@ -13,8 +13,17 @@ import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
 import { useTranslations } from "next-intl";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const CompaniesPage = () => {
+
+  const permission = can([PERMISSION_ACTIONS.LIST, PERMISSION_ACTIONS.CREATE], PERMISSION_SUBJECTS.COMPANY) as {
+    LIST: boolean;
+    CREATE: boolean;
+  };
+  
   // Get the translated config using the component
   const t = useTranslations("Companies");
   const config = CompaniesConfig();
@@ -63,28 +72,34 @@ const CompaniesPage = () => {
   };
 
   return (
-    <div className="px-8 space-y-7">
-      <StatisticsRow config={statisticsConfig} />
+    <CanSeeContent canSee={permission.LIST}>
+      <div className="px-8 space-y-7">
+        <StatisticsRow config={statisticsConfig} />
 
-      <TableBuilder
-        config={config}
-        searchBarActions={
-          <div className="flex items-center gap-3">
-            <SheetFormBuilder
-              config={GetCompaniesFormConfig(t)}
-              trigger={<Button>{t("createCompany")}</Button>}
-              onSuccess={handleFormSuccess}
-            />{" "}
-            <CompanySaveDialog
-              open={isOpen}
-              handleOpen={handleOpen}
-              handleClose={handleClose}
-              number={companyNumber}
-            />
-          </div>
-        }
-      />
-    </div>
+        <TableBuilder
+          config={config}
+          searchBarActions={
+            <div className="flex items-center gap-3">
+              {permission.CREATE && (
+                <>
+                  <SheetFormBuilder
+                    config={GetCompaniesFormConfig(t)}
+                    trigger={<Button>{t("createCompany")}</Button>}
+                    onSuccess={handleFormSuccess}
+                  />{" "}
+                  <CompanySaveDialog
+                    open={isOpen}
+                    handleOpen={handleOpen}
+                    handleClose={handleClose}
+                    number={companyNumber}
+                  />
+                </>
+              )}
+            </div>
+          }
+        />
+      </div>
+    </CanSeeContent>
   );
 };
 

@@ -11,9 +11,11 @@ import { useToast } from "@/modules/table/hooks/use-toast";
 const TheStatus = ({
   theStatus,
   id,
+  canActivate = true
 }: {
   theStatus: "active" | "inActive";
   id: string;
+  canActivate?: boolean;
 }) => {
   const t = useTranslations();
   const [isActive, setIsActive] = useState(!!theStatus);
@@ -65,6 +67,7 @@ const TheStatus = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
+          disabled={!canActivate}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
