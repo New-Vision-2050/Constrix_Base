@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
 import { CompanyData } from "@/modules/company-profile/types/company";
 import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 type PropsT = {
   branchId: string | number;
@@ -24,6 +26,12 @@ type PropsT = {
 };
 
 const BranchManagementsStructure = (props: PropsT) => {
+  const permissions = can([PERMISSION_ACTIONS.CREATE , PERMISSION_ACTIONS.EXPORT, PERMISSION_ACTIONS.UPDATE , PERMISSION_ACTIONS.DELETE], PERMISSION_SUBJECTS.ORGANIZATION_MANAGEMENT) as {
+    CREATE: boolean;
+    EXPORT: boolean;
+    UPDATE: boolean;
+    DELETE: boolean;
+  };
   const { branchId , companyData, mainBranch } = props;
   const t = useTranslations("CompanyStructure.ManagementStructure");
   const [deletedId, setDeletedId] = useState("");
@@ -90,19 +98,19 @@ const BranchManagementsStructure = (props: PropsT) => {
 
   const DropDownMenu = (node: OrgChartNode): DropdownItemT[] => {
     return [
-      {
+      ...(permissions.UPDATE ? [{
         text: "تعديل",
         onClick: () => {
           onEditBtnClick?.(node);
           console.log("edit node");
         },
-      },
-      {
+      }] : []),
+      ...(permissions.DELETE ? [{
         text: "حذف",
         onClick: () => {
-          handleDeleteManagement?.(node.id);
+          handleDeleteManagement(node.id);
         },
-      },
+      }] : []),
     ];
   };
 
@@ -138,7 +146,8 @@ const BranchManagementsStructure = (props: PropsT) => {
 
   return (
     <main className="flex-grow md:max-w-[calc(100vw-580px)]">
-      {/* sheet form */}
+      {permissions.CREATE && <>
+        {/* sheet form */}
       <DialogFormBuilder
         isOpen={isOpen}
         config={cloneManagementConfig}
@@ -149,13 +158,18 @@ const BranchManagementsStructure = (props: PropsT) => {
         config={addManagementConfig}
         onOpenChange={(open) => (open ? openAddSheet() : closeAddSheet())}
       />
+      </>
+      }
       {/* confirm delete dialog */}
+      {permissions.DELETE && <>
       <ConfirmationDialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
         onConfirm={handleConfirm}
         description={t("confirmDelete")}
       />
+      </>
+      }  
 
       {isLoading && (
         <div className="flex justify-center items-center h-96">
@@ -172,11 +186,12 @@ const BranchManagementsStructure = (props: PropsT) => {
             // ignoreAddAtFirstNode={true}
             data={orgData?.[0] as OrgChartNode}
             onAddBtnClick={(node) => onAddBtnClick(node)}
+            canEdit={permissions.UPDATE}
             DropDownMenu={DropDownMenu}
             listModeDropDownMenu={listModeDropDownMenu}
             listViewAdditionalActions={
               <>
-                <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>
+              {permissions.CREATE && <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>}
               </>
             }
           />

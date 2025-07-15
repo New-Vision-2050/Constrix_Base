@@ -5,15 +5,21 @@ import { useCurrentCompany } from '@/modules/company-profile/components/shared/c
 import { useLocale } from 'next-intl'
 import BranchManagementsStructure
   from '@/modules/organizational-structure/components/company-management-structure/chart'
+import { can } from '@/hooks/useCan';
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from '@/modules/roles-and-permissions/permissions';
+import CanSeeContent from '@/components/shared/CanSeeContent';
 
 const CompanyManagementsStructureEntryPoint = () => {
+    const canView = can(PERMISSION_ACTIONS.VIEW, PERMISSION_SUBJECTS.ORGANIZATION_USERS) as boolean;
+  
   const locale = useLocale();
   const { data: companyData, isLoading: isCompanyLoading } = useCurrentCompany();
 
   const mainBranch = companyData?.payload?.branches[0]
 
   return (
-    <div>
+    <CanSeeContent canSee={canView}>
+      <div>
       {isCompanyLoading && (
         <div className="flex justify-center items-center h-96">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -65,6 +71,7 @@ const CompanyManagementsStructureEntryPoint = () => {
       </Tabs>)
       }
     </div>
+</CanSeeContent>
   );
 };
 

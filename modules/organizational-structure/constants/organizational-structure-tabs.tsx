@@ -11,12 +11,11 @@ import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-per
 
 export const OrganizationalStructureSubTabs = (t: (key: string) => string): SystemTab[] => {
 
-  const viewPermission = can(PERMISSION_ACTIONS.VIEW,[PERMISSION_SUBJECTS.ORGANIZATION_BRANCH , PERMISSION_SUBJECTS.ORGANIZATION_USERS]) as {
+  const viewPermission = can(PERMISSION_ACTIONS.VIEW,[PERMISSION_SUBJECTS.ORGANIZATION_BRANCH , PERMISSION_SUBJECTS.ORGANIZATION_USERS , PERMISSION_SUBJECTS.ORGANIZATION_MANAGEMENT]) as {
     ORGANIZATION_BRANCH: boolean;
     ORGANIZATION_USERS: boolean;
+    ORGANIZATION_MANAGEMENT: boolean;
   };
-
-  console.log("permissions", viewPermission);
 
   return [
     ...(viewPermission.ORGANIZATION_BRANCH ? [  {
@@ -32,11 +31,11 @@ export const OrganizationalStructureSubTabs = (t: (key: string) => string): Syst
     // content: <UsersStructureTab />,
     content: <EmployeesOrganizationStructure />,
   }] : []),
-  {
+  ...(viewPermission.ORGANIZATION_MANAGEMENT ? [{
     id: "organizational-structure-sub-tab-managements",
     title: t("managements.title"),
     icon: <BackpackIcon />,
     content: <CompanyManagementsStructure />,
-  },
-];
+  }] : []),
+  ]
 }

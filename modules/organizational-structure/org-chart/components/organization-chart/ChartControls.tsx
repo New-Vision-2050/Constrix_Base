@@ -19,6 +19,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useLocale, useTranslations } from "next-intl";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 interface ChartControlsProps {
   zoomLevel: number[];
@@ -57,6 +59,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
   onToggleFullScreen,
   additionalActions,
 }) => {
+  const canExport = can(PERMISSION_ACTIONS.EXPORT, PERMISSION_SUBJECTS.ORGANIZATION_MANAGEMENT);
   const locale = useLocale();
   const t = useTranslations("CompanyStructure.actions");
   return (
@@ -96,7 +99,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             {t("setAsParent")}
           </Button>
         )}
-        
+        {canExport && <>
         {viewMode === "tree" && onExportPDF && (
           <Button variant="outline" size="sm" onClick={onExportPDF}>
             <FileType className="h-4 w-4" />
@@ -109,6 +112,9 @@ const ChartControls: React.FC<ChartControlsProps> = ({
             {t("print")}
           </Button>
         )}
+        </>
+        }
+
         {viewMode === "tree" && onToggleFullScreen && (
           <Button
             variant="outline"

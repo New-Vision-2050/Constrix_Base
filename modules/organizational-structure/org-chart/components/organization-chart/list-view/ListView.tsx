@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { exportToCSV, prepareOrgDataForExport } from "../utils/exportUtils";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import { can } from "@/hooks/useCan";
 
 interface ListViewProps {
   data: OrgChartNode;
@@ -23,6 +25,7 @@ const ListView: React.FC<ListViewProps> = ({
   additionalActions,
   DropDownMenu,
 }) => {
+  const canExport = can(PERMISSION_ACTIONS.EXPORT, PERMISSION_SUBJECTS.ORGANIZATION_MANAGEMENT);
   const {
     expandedNodes,
     expandedDetails,
@@ -54,6 +57,7 @@ const ListView: React.FC<ListViewProps> = ({
           />
         </div>
         {/* {additionalActions && <div>{additionalActions}</div>} */}
+        {canExport &&   
         <Button
           variant="outline"
           size="sm"
@@ -63,6 +67,7 @@ const ListView: React.FC<ListViewProps> = ({
           <Download className="w-4 h-a mr-2 " />
           Export CSV
         </Button>
+        }
       </div>
 
       <div className="overflow-auto">
