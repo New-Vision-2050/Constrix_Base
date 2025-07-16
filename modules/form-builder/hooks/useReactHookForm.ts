@@ -353,7 +353,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
 
         // Call the onSubmit handler from config or use default handler
         const submitHandler = config.onSubmit || ((values) => defaultSubmitHandler(values, config));
-        const result = await submitHandler(finalValues as Record<string, any>);
+        const result = await submitHandler(finalValues as Record<string, any>, config);
 
         if (result.success) {
           setSubmitSuccess(true);
@@ -527,7 +527,7 @@ export function useReactHookForm<TFieldValues extends FieldValues = FieldValues>
         config.wizardOptions?.onStepSubmit ||
         ((step, values) => defaultStepSubmitHandler(step, values, config));
 
-      const result = await stepSubmitHandler(currentStep, values);
+      const result = await stepSubmitHandler(currentStep, values, config);
 
       // Store step response
       setStepResponses((prev) => ({

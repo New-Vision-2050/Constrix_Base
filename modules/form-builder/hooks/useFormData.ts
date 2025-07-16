@@ -131,7 +131,7 @@ export const useFormData = ({
     try {
       // Call the onSubmit handler from config
       if (config.onSubmit) {
-        const result = await config.onSubmit(values);
+        const result = await config.onSubmit(values, config);
         
         // Handle success
         if (result.success) {
