@@ -9,8 +9,16 @@ import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Branch } from "../../types/company";
 import { apiClient } from "@/config/axios-config";
 import { useParams } from "next/navigation";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const Branches = () => {
+    const canViewBranches = can(
+    PERMISSION_ACTIONS.VIEW,
+    PERMISSION_SUBJECTS.COMPANY_PROFILE_BRANCH
+  ) as boolean;
+
   const { company_id } = useParams();
 
   const locale = useLocale();
@@ -29,6 +37,7 @@ const Branches = () => {
 
       return response.data;
     },
+    enabled: canViewBranches,
   });
   const branches = data?.payload ?? [];
 
@@ -52,50 +61,52 @@ const Branches = () => {
   };
 
   return (
-    <div>
-      <Tabs
-        defaultValue="general"
-        className="w-full flex flex-col md:flex-row"
-        dir={isRtl ? "rtl" : "ltr"}
-      >
-        <TabsList
-          className="flex flex-col bg-sidebar p-2 w-36 h-full gap-4 rounded-lg justify-start"
+    <CanSeeContent canSee={canViewBranches}>
+      <div>
+        <Tabs
+          defaultValue="general"
+          className="w-full flex flex-col md:flex-row"
           dir={isRtl ? "rtl" : "ltr"}
         >
-          {tabs().map((tab) => (
-            <TabsTrigger
-              key={tab.value}
-              className="flex items-start justify-between w-full px-2 py-4 rounded-md data-[state=active]:bg-sidebar gap-2 whitespace-normal"
-              value={tab.value}
-              title={tab.label}
-            >
-              <div className="flex text-sm items-start text-start gap-2 grow">
-                <MapPin size={18} className="shrink-0" />
-                <p className="w-[60px] truncate whitespace-normal">
-                  {tab.label}
-                </p>
-              </div>
-              <CircleCheck
-                size={18}
-                className="text-green-500 shrink-0 me-auto"
-              />
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        <div className="flex-1">
-          {tabs().map((tab) => (
-            <TabsContent
-              key={tab.value}
-              value={tab.value}
-              dir={isRtl ? "rtl" : "ltr"}
-              className="h-full pr-6"
-            >
-              {tab.component}
-            </TabsContent>
-          ))}
-        </div>
-      </Tabs>
-    </div>
+          <TabsList
+            className="flex flex-col bg-sidebar p-2 w-36 h-full gap-4 rounded-lg justify-start"
+            dir={isRtl ? "rtl" : "ltr"}
+          >
+            {tabs().map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                className="flex items-start justify-between w-full px-2 py-4 rounded-md data-[state=active]:bg-sidebar gap-2 whitespace-normal"
+                value={tab.value}
+                title={tab.label}
+              >
+                <div className="flex text-sm items-start text-start gap-2 grow">
+                  <MapPin size={18} className="shrink-0" />
+                  <p className="w-[60px] truncate whitespace-normal">
+                    {tab.label}
+                  </p>
+                </div>
+                <CircleCheck
+                  size={18}
+                  className="text-green-500 shrink-0 me-auto"
+                />
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <div className="flex-1">
+            {tabs().map((tab) => (
+              <TabsContent
+                key={tab.value}
+                value={tab.value}
+                dir={isRtl ? "rtl" : "ltr"}
+                className="h-full pr-6"
+              >
+                {tab.component}
+              </TabsContent>
+            ))}
+          </div>
+        </Tabs>
+      </div>
+    </CanSeeContent>
   );
 };
 

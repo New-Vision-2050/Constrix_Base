@@ -36,6 +36,11 @@ export const useCurrentCompany = () => {
 };
 
 const CompanyHeader = () => {
+    const canViewBranches = can(
+    PERMISSION_ACTIONS.VIEW,
+    PERMISSION_SUBJECTS.COMPANY_PROFILE_BRANCH
+  ) as boolean;
+
   const { data, isPending, isSuccess } = useCurrentCompany();
 
   const createdAt = data?.payload?.created_at;
@@ -58,7 +63,7 @@ const CompanyHeader = () => {
             <div className="flex gap-2">
               <MapPin className="w-4 h-4 text-foreground/70" />
 
-              <Branches />
+              {canViewBranches && <Branches />}
             </div>
 
             <div className="flex items-center gap-2">

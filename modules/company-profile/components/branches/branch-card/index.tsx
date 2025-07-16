@@ -17,6 +17,8 @@ import { useModal } from "@/hooks/use-modal";
 import ChangeBranchDialog from "./change-branch-dialog";
 import { baseURL } from "@/config/axios-config";
 import { updateBranchFormConfig } from "../branches-info/update-branch-form-config";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 interface BranchCardProps {
   branch: Branch;
@@ -25,6 +27,8 @@ interface BranchCardProps {
 }
 
 const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
+  const canUpdateBranch = can(PERMISSION_ACTIONS.UPDATE, PERMISSION_SUBJECTS.COMPANY_PROFILE_BRANCH) as boolean;
+
   const [isOpen, handleOpen, handleClose] = useModal();
   const local = useLocale();
   const isRTL = local === "ar";
@@ -60,19 +64,21 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
           >
             {isMainBranch ? "رئيسي" : "فرعي"}
           </Badge>
-          <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
-            <DropdownMenuTrigger className="text-foreground">
-              <MoreVertical size={24} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={handleOpen}
-                className="text-start block"
-              >
-                تعديل
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {canUpdateBranch && (
+            <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
+              <DropdownMenuTrigger className="text-foreground">
+                <MoreVertical size={24} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={handleOpen}
+                  className="text-start block"
+                >
+                  تعديل
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
       <Card className="border bg-transparent rounded-lg overflow-hidden">
@@ -89,14 +95,17 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
           ))}
         </div>
       </Card>
-      <SheetFormBuilder
-        config={{
-          ...updateBranchFormConfig(branches, branch, isMainBranch),
-        }}
-        isOpen={isOpen}
-        onOpenChange={handleClose}
-      />
-      {isMultipleBranch && isMainBranch && (
+      {canUpdateBranch && (
+        <SheetFormBuilder
+          config={{
+            ...updateBranchFormConfig(branches, branch, isMainBranch),
+          }}
+          isOpen={isOpen}
+          onOpenChange={handleClose}
+        />
+      )}
+
+      {canUpdateBranch && isMultipleBranch && isMainBranch && (
         <ChangeBranchDialog branches={branches} branchId={branch.id} />
       )}
     </div>
