@@ -1,4 +1,4 @@
-name: AI Code Reviewer
+name: Code Review
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: AI Code Reviewer
+      - name: Code Check
         uses: New-Vision-2050/ai-codereviewer@main
         with:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }} # The GITHUB_TOKEN is there by default so you just need to keep it like it is and not necessarily need to add it as secret as it will throw an error. [More Details](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)

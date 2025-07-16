@@ -74,16 +74,15 @@ export function AppSidebar({
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
 
-  // grouped routes in sidebar
-  const settingsRoutesNames = [
-    ROUTER.SETTINGS,
-    ROUTER.DASHBOARD,
-    ROUTER.USER_PROFILE,
-    ROUTER.COMPANY_PROFILE,
-  ];
-
   // just users & companies & program management are not central
   const SidebarProjects = React.useMemo(() => {
+    // grouped routes in sidebar
+    const settingsRoutesNames = [
+      ROUTER.SETTINGS,
+      ROUTER.DASHBOARD,
+      ROUTER.USER_PROFILE,
+      ROUTER.COMPANY_PROFILE,
+    ];
     return [
       // companies
       {
