@@ -291,8 +291,8 @@ export function useSheetForm({
         // Call the onSubmit handler from config or use default handler
         const submitHandler =
           config.onSubmit ||
-          ((values) => defaultSubmitHandler(values, config, requestOptions));
-        const result = await submitHandler(finalValues);
+          ((values, formConfig) => defaultSubmitHandler(values, formConfig, requestOptions));
+        const result = await submitHandler(finalValues, config);
         if (result.success) {
           setSubmitSuccess(true);
 
@@ -602,9 +602,9 @@ export function useSheetForm({
       // Call the onStepSubmit handler or use the default handler
       const submitHandler =
         config.wizardOptions?.onStepSubmit ||
-        ((step, values) => defaultStepSubmitHandler(step, values, config));
+        ((step, values, formConfig) => defaultStepSubmitHandler(step, values, formConfig));
 
-      const result = await submitHandler(currentStep, values);
+      const result = await submitHandler(currentStep, values, config);
 
       // Store the response
       setStepResponses((prev) => ({
