@@ -11,8 +11,20 @@ import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { can } from "@/hooks/useCan";
+import {
+  PERMISSION_ACTIONS,
+  PERMISSION_SUBJECTS,
+} from "@/modules/roles-and-permissions/permissions";
+import { boolean } from "zod";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const OfficialData = ({ id }: { id?: string }) => {
+  const canViewOfficialData = can(
+    PERMISSION_ACTIONS.VIEW,
+    PERMISSION_SUBJECTS.COMPANY_PROFILE
+  ) as boolean;
+
   const { company_id } = useParams();
 
   const { data, isPending, isSuccess } = useQuery({
@@ -30,6 +42,7 @@ const OfficialData = ({ id }: { id?: string }) => {
 
       return response.data;
     },
+    enabled: canViewOfficialData,
   });
 
   const currentCompanyId = data?.payload?.id ?? "";
@@ -51,48 +64,47 @@ const OfficialData = ({ id }: { id?: string }) => {
   } = payload as CompanyData;
 
   return (
-    <div className="bg-sidebar p-5 rounded-md space-y-5">
-      {isPending && (
-        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Skeleton key={index} className="w-full h-10" />
-          ))}
-        </div>
-      )}
+    <CanSeeContent canSee={canViewOfficialData}>
+      <div className="bg-sidebar p-5 rounded-md space-y-5">
+        {isPending && (
+          <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Skeleton key={index} className="w-full h-10" />
+            ))}
+          </div>
+        )}
 
-      {isSuccess && (
-        <>
-          <OfficialDataSection
-            officialData={{
-              branch,
-              name,
-              name_en,
-              company_type,
-              country_name,
-              country_id,
-              company_field,
-              company_field_id,
-              phone,
-              email,
-              company_type_id,
-            }}
-            id={id}
-            currentCompanyId={currentCompanyId}
-          />
+        {isSuccess && (
+          <>
+            <OfficialDataSection
+              officialData={{
+                branch,
+                name,
+                name_en,
+                company_type,
+                country_name,
+                country_id,
+                company_field,
+                company_field_id,
+                phone,
+                email,
+                company_type_id,
+              }}
+              id={id}
+              currentCompanyId={currentCompanyId}
+            />
 
-          <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+            <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
 
-          <SupportData generalManager={general_manager} />
+            <SupportData generalManager={general_manager} />
 
-          <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+            <NationalAddress id={id} currentCompanyId={currentCompanyId} />
 
-          <OfficialDocsSection
-            id={id}
-            currentCompanyId={currentCompanyId}
-          />  
-        </>
-      )}
-    </div>
+            <OfficialDocsSection id={id} currentCompanyId={currentCompanyId} />
+          </>
+        )}
+      </div>
+    </CanSeeContent>
   );
 };
 
