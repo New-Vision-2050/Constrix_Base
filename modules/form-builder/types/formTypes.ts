@@ -122,7 +122,7 @@ export interface FieldConfig {
     | "dynamicRows"
     | "image"
     | "file";
-    
+
   fieldClassName?: string; // Class name for the field container
 
   // CheckboxGroup sync properties
