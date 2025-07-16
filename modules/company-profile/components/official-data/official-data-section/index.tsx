@@ -18,6 +18,9 @@ import { useLocale } from "next-intl";
 import MyRequests from "./my-requests";
 import { Button } from "@/components/ui/button";
 import { officialData } from "@/modules/company-profile/types/company";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const OfficialDataSection = ({
   officialData,
@@ -28,6 +31,11 @@ const OfficialDataSection = ({
   currentCompanyId: string;
   id?: string;
 }) => {
+  const permissions = can([PERMISSION_ACTIONS.VIEW, PERMISSION_ACTIONS.UPDATE] , PERMISSION_SUBJECTS.COMPANY_PROFILE_OFFICIAL_DATA) as {
+    VIEW: boolean;
+    UPDATE: boolean;
+  }
+  
   const local = useLocale();
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
@@ -52,55 +60,67 @@ const OfficialDataSection = ({
     <>
       <FormFieldSet
         title="البيانات الرسمية"
-        valid={Object.values(officialData).every((value) => 
+        valid={Object.values(officialData).every((value) =>
           Array.isArray(value) ? value.length > 0 : Boolean(value)
         )}
         secondTitle={
-          <FieldSetSecondTitle
-            mode={mode}
-            handleEditClick={handleEditClick}
-            dropdownItems={dropdownItems}
-          />
+          <>
+            {permissions.UPDATE && (
+              <>
+                <FieldSetSecondTitle
+                  mode={mode}
+                  handleEditClick={handleEditClick}
+                  dropdownItems={dropdownItems}
+                />
+              </>
+            )}
+          </>
         }
       >
         <br />
-        {mode === "Preview" ? (
-          <OfficialDataPreview officialData={officialData} />
-        ) : (
-          <OfficialDataForm
-            officialData={officialData}
-            id={id}
-            handleEditClick={handleEditClick}
-          />
-        )}
+        <CanSeeContent canSee={permissions.VIEW}>
+          {mode === "Preview" ? (
+            <OfficialDataPreview officialData={officialData} />
+          ) : (
+            <OfficialDataForm
+              officialData={officialData}
+              id={id}
+              handleEditClick={handleEditClick}
+            />
+          )}
+        </CanSeeContent>
       </FormFieldSet>
-      <SheetFormBuilder
-        config={ReqOfficialDataEdit({
-          officialData,
-          company_id: currentCompanyId,
-          id,
-        })}
-        isOpen={isOpenReqForm}
-        onOpenChange={handleCloseReqForm}
-      />
-      <Sheet open={isOpenMyReq} onOpenChange={handleCloseMyReq}>
-        <SheetContent
-          side={isRTL ? "left" : "right"}
-          className={`h-fit max-h-[100vh] overflow-scroll`}
-        >
-          <SheetHeader>
-            <SheetTitle>طلباتي</SheetTitle>
-          </SheetHeader>
-          <MyRequests
-            type="companyOfficialDataUpdate"
-            company_id={currentCompanyId}
-            branch_id={id}
+      {permissions.UPDATE && (
+        <>
+          <SheetFormBuilder
+            config={ReqOfficialDataEdit({
+              officialData,
+              company_id: currentCompanyId,
+              id,
+            })}
+            isOpen={isOpenReqForm}
+            onOpenChange={handleCloseReqForm}
           />
-          <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
-            الرجوع
-          </Button>
-        </SheetContent>
-      </Sheet>
+          <Sheet open={isOpenMyReq} onOpenChange={handleCloseMyReq}>
+            <SheetContent
+              side={isRTL ? "left" : "right"}
+              className={`h-fit max-h-[100vh] overflow-scroll`}
+            >
+              <SheetHeader>
+                <SheetTitle>طلباتي</SheetTitle>
+              </SheetHeader>
+              <MyRequests
+                type="companyOfficialDataUpdate"
+                company_id={currentCompanyId}
+                branch_id={id}
+              />
+              <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
+                الرجوع
+              </Button>
+            </SheetContent>
+          </Sheet>
+        </>
+      )}
     </>
   );
 };
