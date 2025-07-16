@@ -12,6 +12,9 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from "@/components/ui/skeleton";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const NationalAddress = ({
   id,
@@ -20,6 +23,11 @@ const NationalAddress = ({
   id?: string;
   currentCompanyId?: string
 }) => {
+  const permissions = can([PERMISSION_ACTIONS.VIEW, PERMISSION_ACTIONS.UPDATE] , PERMISSION_SUBJECTS.COMPANY_PROFILE_ADDRESS) as {
+    VIEW: boolean;
+    UPDATE: boolean;
+  }
+
   const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-address", id, currentCompanyId],
     queryFn: async () => {
@@ -35,6 +43,7 @@ const NationalAddress = ({
 
       return response.data;
     },
+    enabled: permissions.VIEW,
   });
 
   const companyAddress = data?.payload;
@@ -52,51 +61,59 @@ const NationalAddress = ({
 
   return (
     <>
-      {isPending && (
-        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton key={index} className="w-full h-10" />
-          ))}
-        </div>
-      )}
-
-      {isSuccess && (
-        <FormFieldSet
-          title="العنوان الوطني"
-          valid={!!companyAddress}
-          secondTitle={
-            <Button variant={"ghost"} onClick={handleEditClick}>
-              {mode === "Preview" ? (
-                <PencilLineIcon additionalClass="text-pink-600" />
-              ) : (
-                <EyeIcon />
-              )}
-            </Button>
-          }
-        >
-          {mode === "Preview" ? (
-            <>
-              {companyAddress ? (
-                <NationalAddressDataPreview companyAddress={companyAddress} />
-              ) : (
-                noAddressMessage
-              )}
-            </>
-          ) : (
-            <>
-              {companyAddress ? (
-                <NationalAddressForm 
-                  companyAddress={companyAddress} 
-                  id={id} 
-                  handleEditClick={handleEditClick}
-                  currentCompanyId={currentCompanyId}
-                />
-              ) : (
-                noAddressMessage
-              )}
-            </>
+      {permissions.VIEW && (
+        <>
+          {isPending && (
+            <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid grid-cols-2 gap-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <Skeleton key={index} className="w-full h-10" />
+              ))}
+            </div>
           )}
-        </FormFieldSet>
+
+          {isSuccess && (
+            <FormFieldSet
+              title="العنوان الوطني"
+              valid={!!companyAddress}
+              secondTitle={
+                permissions.UPDATE && (
+                  <Button variant={"ghost"} onClick={handleEditClick}>
+                    {mode === "Preview" ? (
+                      <PencilLineIcon additionalClass="text-pink-600" />
+                    ) : (
+                      <EyeIcon />
+                    )}
+                  </Button>
+                )
+              }
+            >
+              <CanSeeContent canSee={permissions.VIEW}>
+                {mode === "Preview" ? (
+                  <>
+                    {companyAddress ? (
+                      <NationalAddressDataPreview companyAddress={companyAddress} />
+                    ) : (
+                      noAddressMessage
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {permissions.UPDATE && companyAddress ? (
+                      <NationalAddressForm 
+                        companyAddress={companyAddress} 
+                        id={id} 
+                        handleEditClick={handleEditClick}
+                        currentCompanyId={currentCompanyId}
+                      />
+                    ) : (
+                      noAddressMessage
+                    )}
+                  </>
+                )}
+              </CanSeeContent>
+            </FormFieldSet>
+          )}
+        </>
       )}
     </>
   );
