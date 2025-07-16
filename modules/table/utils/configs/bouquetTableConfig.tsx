@@ -37,9 +37,7 @@ export interface CompanyField {
   name: string
 }
 // Create a component that uses the translations
-export const 
-
-bouquetConfig = () => {
+export const bouquetConfig = () => {
   const t = useTranslations("Bouquets");
   const router = useRouter();
   const params = useParams();
@@ -146,8 +144,8 @@ bouquetConfig = () => {
         defaultItemsPerPage: 5,
         enableSearch: true,
         enableColumnSearch: true,
-        searchFields: ["name", "email"],
-        searchParamName: "q",
+        searchFields: ["name", "company_field_id", "status"],
+        searchParamName: "name",
         searchFieldParamName: "fields",
         allowSearchFieldSelection: true,
         formConfig: GetBouquetFormConfig(t, undefined),

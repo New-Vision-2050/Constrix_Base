@@ -13,7 +13,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
   
     return {
       formId: "bouquet-form",
-      title: "اضافة برنامج",
+      title: "اضافة باقة",
       apiUrl: `${baseURL}/packages`,
       laravelValidation: {
         enabled: true,
@@ -257,7 +257,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
               enabled: true,
               errorsPath: "errors"
             },
-            sections: [],  // Required by FormConfig type
+            sections: [],  
             submitButtonText: "",
             cancelButtonText: "",
             showReset: false,
@@ -268,7 +268,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             showBackButton: false
           };
           
-          return await defaultSubmitHandler(transformedData, config);
+          return await defaultSubmitHandler(transformedData, this);
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
@@ -277,19 +277,10 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
           };
         }
       },
-      
-      // Example onError handler
       onError: (values, error) => {
         console.log("Bouquet form submission failed with values:", values);
-        console.log("Error details:", error);
-
-        // You can perform additional actions here, such as:
-        // - Show a custom error notification
-        // - Log the error to an analytics service
-        // - Attempt to recover from the error
-        // - etc.
+        console.log("Error details:", error)
       },
 
-      // No onSubmit handler needed - will use the default handler
     };
 }
