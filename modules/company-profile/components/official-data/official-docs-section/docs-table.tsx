@@ -28,9 +28,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import PDFIcon from "@/assets/icons/PDF.png";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 // Row component
 const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
+  const permissions = can([PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE], PERMISSION_SUBJECTS.COMPANY_PROFILE_OFFICIAL_DOCUMENT) as {
+      DELETE: boolean;
+      UPDATE: boolean;
+    }
+  
   const [isOpenDelete, handleOpenDelete, handleCloseDelete] = useModal();
   const [isOpenShow, handleOpenShow, handleCloseShow] = useModal();
 
@@ -48,8 +55,8 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         <td className="py-3 px-3 border-b">{doc.description}</td>
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
-            {doc.document_number ?? "-"} 
-            {doc.document_number && <CopyButton text={doc.document_number} /> }
+            {doc.document_number ?? "-"}
+            {doc.document_number && <CopyButton text={doc.document_number} />}
           </div>
         </td>
         <td className="py-3 px-3 border-b">{doc.start_date}</td>
@@ -119,46 +126,52 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         </td>
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
-            <SheetFormBuilder
-              config={updateDocsFormConfig(doc, id)}
-              trigger={
-                <button className="py-1 px-3 bg-[#72E128]/20 text-[#72E128] rounded-full">
-                  تحديث
-                </button>
-              }
-            />
+            {permissions.UPDATE && (
+              <SheetFormBuilder
+                config={updateDocsFormConfig(doc, id)}
+                trigger={
+                  <button className="py-1 px-3 bg-[#72E128]/20 text-[#72E128] rounded-full">
+                    تحديث
+                  </button>
+                }
+              />
+            )}
             {/* company_legal_data */}
-            <button
-              onClick={handleOpenDelete}
-              disabled={Boolean(doc?.company_legal_data)}
-            >
-              <Trash
-                className={`
+            {permissions.DELETE && (
+              <button
+                onClick={handleOpenDelete}
+                disabled={Boolean(doc?.company_legal_data)}
+              >
+                <Trash
+                  className={`
                 w-4 ${
                   !Boolean(doc?.company_legal_data)
                     ? "text-red-500"
                     : "text-gray-500"
                 }
                 `}
-              />
-            </button>
+                />
+              </button>
+            )}
           </div>
         </td>
       </tr>
 
       {/* Delete dialog specific to this row */}
-      <DeleteConfirmationDialog
-        deleteUrl={`${baseURL}/companies/company-profile/official-document/${
-          doc.id
-        }${!!id ? `?branch_id=${id}` : ""}`}
-        onClose={handleCloseDelete}
-        open={isOpenDelete}
-        onSuccess={() => {
-          queryClient.refetchQueries({
-            queryKey: ["main-company-data", id],
-          });
-        }}
-      />
+      {permissions.DELETE && (
+        <DeleteConfirmationDialog
+          deleteUrl={`${baseURL}/companies/company-profile/official-document/${
+            doc.id
+          }${!!id ? `?branch_id=${id}` : ""}`}
+          onClose={handleCloseDelete}
+          open={isOpenDelete}
+          onSuccess={() => {
+            queryClient.refetchQueries({
+              queryKey: ["main-company-data", id],
+            });
+          }}
+        />
+      )}
 
       {/* Show dialog specific to this row */}
       <Dialog open={isOpenShow} onOpenChange={handleCloseShow}>
@@ -181,6 +194,10 @@ const DocsTable = ({
   companyOfficialDocuments: CompanyDocument[];
   id?: string;
 }) => {
+    const permissions = can([PERMISSION_ACTIONS.UPDATE, PERMISSION_ACTIONS.DELETE], PERMISSION_SUBJECTS.COMPANY_PROFILE_OFFICIAL_DOCUMENT) as {
+      DELETE: boolean;
+      UPDATE: boolean;
+    };
   return (
   <div className="max-h-[500px] overflow-auto">
       <table className="w-full border-collapse">
@@ -194,7 +211,7 @@ const DocsTable = ({
           <td className="text-start p-3 border-b">تاريخ الاشعار</td>
           <td className="text-start p-3 border-b">المرفقات</td>
           <td className="text-start p-3 border-b">الاحداث</td>
-          <td className="text-start p-3 border-b">الاجراءات</td>
+          {(permissions.UPDATE || permissions.DELETE) && <td className="text-start p-3 border-b">الاجراءات</td>}
         </tr>
       </thead>
       <tbody>

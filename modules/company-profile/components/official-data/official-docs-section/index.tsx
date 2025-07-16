@@ -21,6 +21,9 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from "@/components/ui/skeleton";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
+import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const OfficialDocsSection = ({
   id,
@@ -29,8 +32,12 @@ const OfficialDocsSection = ({
   id?: string;
   currentCompanyId?: string;
 }) => {
+  const permissions = can([PERMISSION_ACTIONS.VIEW, PERMISSION_ACTIONS.CREATE], PERMISSION_SUBJECTS.COMPANY_PROFILE_OFFICIAL_DOCUMENT) as {
+    VIEW: boolean;
+    CREATE: boolean;
+  }
 
-      const { data, isPending, isSuccess } = useQuery({
+  const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-official-documents", id, currentCompanyId],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<CompanyDocument[]>>(
@@ -45,6 +52,7 @@ const OfficialDocsSection = ({
 
       return response.data;
     },
+    enabled: permissions.VIEW,
   });
 
   const companyOfficialDocuments = data?.payload ?? [];
@@ -55,73 +63,75 @@ const OfficialDocsSection = ({
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
   const [isOpenAddDoc, handleOpenAddDoc, handleCloseAddDoc] = useModal();
 
-  const dropdownItems = [
+  const dropdownItems = permissions.CREATE ? [
     {
       label: "اضافة مستند رسمي",
       onClick: handleOpenAddDoc,
     },
-  ];
+  ] : [];
 
   return (
     <>
-      {isPending && (
-        <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid gap-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Skeleton key={index} className="w-full h-10" />
-          ))}
-        </div>
-      )}
-
-      {isSuccess && (
-
-      <FormFieldSet
-        title="المستندات الرسمية"
-        valid={
-          !!companyOfficialDocuments && companyOfficialDocuments.length > 0
-        }
-        secondTitle={
-          <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost">
-                <SettingsIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {dropdownItems.map((item, index) => (
-                <DropdownMenuItem key={index} onClick={() => item.onClick()}>
-                  {item.label}
-                </DropdownMenuItem>
+      {permissions.VIEW && (
+        <>
+          {isPending && (
+            <div className="border border-gray-500 rounded-2xl p-6 shadow-sm grid gap-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="w-full h-10" />
               ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        }
-      >
-     
-            {!!companyOfficialDocuments &&
-            companyOfficialDocuments.length > 0 ? (
-              <DocsTable
-                companyOfficialDocuments={companyOfficialDocuments}
-                id={id}
-              />
-            ) : (
-              <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
-                <InfoIcon additionClass="text-orange-500 " />
-                <p className="text-center px-5">
-                  يجب اضافة مستند رسمي واحد على الاقل
-                </p>
-              </div>
-            )}
-  
-      </FormFieldSet>
+            </div>
+          )}
 
+          {isSuccess && (
+            <FormFieldSet
+              title="المستندات الرسمية"
+              valid={!!companyOfficialDocuments && companyOfficialDocuments.length > 0}
+              secondTitle={
+                permissions.CREATE && (
+                  <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost">
+                        <SettingsIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {dropdownItems.map((item, index) => (
+                        <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                          {item.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )
+              }
+            >
+              <CanSeeContent canSee={permissions.VIEW}>
+                {!!companyOfficialDocuments && companyOfficialDocuments.length > 0 ? (
+                  <DocsTable
+                    companyOfficialDocuments={companyOfficialDocuments}
+                    id={id}
+                  />
+                ) : (
+                  <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
+                    <InfoIcon additionClass="text-orange-500 " />
+                    <p className="text-center px-5">
+                      يجب اضافة مستند رسمي واحد على الاقل
+                    </p>
+                  </div>
+                )}
+              </CanSeeContent>
+            </FormFieldSet>
+          )}
+        </>
       )}
 
-
-      <SheetFormBuilder
-        config={AddDocFormConfig(id , currentCompanyId)}
-        isOpen={isOpenAddDoc}
-        onOpenChange={handleCloseAddDoc}
-      />
+      {permissions.CREATE && (
+        <SheetFormBuilder
+          config={AddDocFormConfig(id, currentCompanyId)}
+          isOpen={isOpenAddDoc}
+          onOpenChange={handleCloseAddDoc}
+        />
+      )}
     </>
   );
 };
