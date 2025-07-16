@@ -8,8 +8,15 @@ import { apiClient } from "@/config/axios-config";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCookie } from "cookies-next/client";
 import { useParams } from "next/navigation";
+import { can } from "@/hooks/useCan";
+import { PERMISSION_ACTIONS, PERMISSION_SUBJECTS } from "@/modules/roles-and-permissions/permissions";
 
 export const useCurrentCompany = () => {
+    const canViewOfficialData = can(
+    PERMISSION_ACTIONS.VIEW,
+    PERMISSION_SUBJECTS.COMPANY_PROFILE_OFFICIAL_DATA
+  ) as boolean;
+
   const { company_id }:{company_id:string} = useParams();
   return useQuery({
     queryKey: ["main-company-data", undefined, company_id],
@@ -24,6 +31,7 @@ export const useCurrentCompany = () => {
       );
       return response.data;
     },
+    enabled: canViewOfficialData,
   });
 };
 
