@@ -10,6 +10,7 @@ import WorkdayPeriods, {
 import { useAttendance } from "../../context/AttendanceContext";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { UN_SPECIFIED } from "../../constants/static-data";
 
 /**
  * Approver dialog component that appears when clicking on the approver cell in the table
@@ -28,6 +29,10 @@ const ApproverDialog: React.FC = () => {
   const containerBg = isDarkMode ? "bg-gray-800" : "bg-gray-100";
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
 
+
+  // constraint name
+  const constraintName = selectedApproverRecord?.applied_constraints?.[0]?.name ?? UN_SPECIFIED;
+
   if (!selectedApproverRecord) return null;
 
   return (
@@ -43,11 +48,11 @@ const ApproverDialog: React.FC = () => {
       <div className={`flex flex-col gap-4 ${textColor}`}>
         <DisplayField
           label={t("approverName")}
-          value={selectedApproverRecord?.applied_constraints?.[0]?.name}
+          value={constraintName}
           defaultValue={t("unspecified")}
         />
 
-        <DisplayField label={t("approverSystem")} value={selectedApproverRecord?.applied_constraints?.[0]?.name} />
+        <DisplayField label={t("approverSystem")} value={constraintName} />
 
         {/* Workday Periods */}
         {selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules?.weekly_schedule && 
