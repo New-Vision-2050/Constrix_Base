@@ -28,7 +28,7 @@ const getMarkerIcon = (status: string, isDarkMode: boolean = true) => {
     };
     const color = colorMap[status as keyof typeof colorMap] || "#6c757d";
 
-    const backgroundColor = isDarkMode ? "white" : "#f8fafc";
+    const backgroundColor = isDarkMode ? "#1e293b" : "white";
     const borderStyle = isDarkMode ? "dashed" : "solid";
     const shadowColor = isDarkMode ? "rgba(0,0,0,0.1)" : "rgba(0,0,0,0.15)";
     
