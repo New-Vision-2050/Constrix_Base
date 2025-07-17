@@ -14,9 +14,7 @@ import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
 // Employee details component
-interface EmployeeDetailsSheetProps extends EmployeeDetailsProps {}
-
-const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
+const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
   isOpen,
   onClose,
   employee
