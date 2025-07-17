@@ -9,9 +9,7 @@ interface ApproverBadgeProps {
   record: AttendanceStatusRecord;
 }
 
-/**
- * Component to display the approver name in the table and open the approver dialog when clicked
- */
+
 const ApproverBadge: React.FC<ApproverBadgeProps> = ({
   approver,
   record,
