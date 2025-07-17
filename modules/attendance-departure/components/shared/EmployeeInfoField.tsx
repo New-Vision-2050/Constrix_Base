@@ -19,12 +19,10 @@ const EmployeeInfoField: React.FC<EmployeeInfoFieldProps> = ({
   defaultValue = "-",
   className = "",
 }) => {
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   
-  // Theme specific colors
+
   const labelColor = isDarkMode ? "#FF3B8B" : "#D81B60";
   const valueColor = isDarkMode ? "text-white" : "text-gray-800";
   return (
