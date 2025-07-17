@@ -39,11 +39,10 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
   const handleSearchTextChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      console.log("Setting search text to:", newValue);
+      
       setSearchText(newValue);
       // Refetch data with a slight delay to allow for typing
       setTimeout(() => {
-        console.log("Refetching with search text:", newValue);
         refetchTeamAttendance();
       }, 500);
     },
@@ -53,10 +52,8 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
   // Handle select changes
   const handleApproverChange = useCallback(
     (value: string) => {
-      console.log("Setting approver to:", value);
       setSelectedApprover(value);
       setTimeout(() => {
-        console.log("Refetching after approver change:", value);
         refetchTeamAttendance();
       }, 0);
     },
@@ -65,10 +62,8 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
 
   const handleDepartmentChange = useCallback(
     (value: string) => {
-      console.log("Setting department to:", value);
       setSelectedDepartment(value);
       setTimeout(() => {
-        console.log("Refetching after department change:", value);
         refetchTeamAttendance();
       }, 0);
     },
@@ -77,17 +72,13 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
 
   const handleBranchChange = useCallback(
     (value: string) => {
-      console.log("Setting branch to:", value);
       setSelectedBranch(value);
       setTimeout(() => {
-        console.log("Refetching after branch change:", value);
         refetchTeamAttendance();
       }, 0);
     },
     [setSelectedBranch, refetchTeamAttendance]
   );
-
-  console.log("constraints", constraints);
 
   return (
     <div className="p-4 bg-[#140F35] rounded-lg mb-4">
