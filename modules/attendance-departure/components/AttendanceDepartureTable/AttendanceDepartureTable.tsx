@@ -13,23 +13,23 @@ const AttendanceDepartureTable: React.FC = () => {
   const t = useTranslations("AttendanceDepartureModule.Table");
   const tableId = useMemo(() => getAttendanceDepartureTableConfig(t).tableId || 'default', [t]);
   
-  // استخدام نهج مختلف للوصول إلى حالة العمود لتجنب الحلقة اللانهائية
+  // Using a different approach to access column state to avoid infinite loop
   const tables = useTableStore((state) => state.tables);
   const columnSearchState = useMemo(() => {
     const tableState = tables[tableId];
     return tableState ? tableState.columnSearchState : {};
   }, [tables, tableId]);
 
-  // عند تغيير حالة البحث، نقوم بتحديث الكونتكست
+  // When search state changes, update the context
   useEffect(() => {
     if (columnSearchState) {
-      // تحديث تاريخ البداية إذا تغير
+      // Update start date if changed
       if (columnSearchState['start_date'] && typeof columnSearchState['start_date'] === 'string') {
         const dateValue = columnSearchState['start_date'];
         setStartDate(new Date(dateValue));
       }
       
-      // تحديث تاريخ النهاية إذا تغير
+      // Update end date if changed
       if (columnSearchState['end_date'] && typeof columnSearchState['end_date'] === 'string') {
         const dateValue = columnSearchState['end_date'];
         setEndDate(new Date(dateValue));

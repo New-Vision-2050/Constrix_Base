@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// لم نعد بحاجة إلى البيانات الثابتة، نستخدم البيانات من API
+// We no longer need static data, we use data from API
 import { useAttendance } from "../context/AttendanceContext";
 import { useTranslations } from "next-intl";
 
@@ -26,7 +26,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
     selectedBranch,
     setSelectedBranch,
     refetchTeamAttendance,
-    // جلب بيانات الفروع والمشرفين من Context
+    // Fetch branches and supervisors data from Context
     branches,
     managements,
     constraints,
