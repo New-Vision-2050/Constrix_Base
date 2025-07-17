@@ -11,7 +11,7 @@ const AttendanceDepartureTable: React.FC = () => {
   // declare state & vars
   const { toggleView, setStartDate, setEndDate } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table");
-  const tableId = useMemo(() => getAttendanceDepartureTableConfig(t).tableId || 'default', []);
+  const tableId = useMemo(() => getAttendanceDepartureTableConfig(t).tableId || 'default', [t]);
   
   // استخدام نهج مختلف للوصول إلى حالة العمود لتجنب الحلقة اللانهائية
   const tables = useTableStore((state) => state.tables);
