@@ -20,12 +20,17 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
   let text = "";
   //is_late
   let _status = "";
-  if (record.is_late === 0) {
-    _status = "present";
-  } else if (record.is_late === 1) {
+  if (record.is_late === 1) {
     _status = "late";
-  } else {
+  } else if (record.is_absent === 1) {
     _status = "absent";
+  } else if (record.is_holiday === 1) {
+    _status = "holiday";
+  } else if (
+    record.status == "active" ||
+    record.status == "completed"
+  ) {
+    _status = "present";
   }
 
   // Map the backend status to display text
@@ -42,9 +47,9 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
       text = "متأخر";
       color = "text-yellow-400";
       break;
-    case "on_leave":
-      text = "في إجازة";
-      color = "text-blue-500";
+    case "holiday":
+      text = "اجازه";
+      color = "text-yellow-400";
       break;
     default:
       text = status || UN_SPECIFIED;
