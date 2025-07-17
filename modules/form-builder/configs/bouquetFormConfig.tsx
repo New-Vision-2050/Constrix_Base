@@ -228,13 +228,14 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
         // - Trigger analytics events
         // - etc.
       },
-      onSubmit: async (formData: Record<string, unknown>) => {
+      onSubmit: async (formData: Record<string, unknown>, formConfig: FormConfig) => {
         // Log the form data
         console.log("Form data received:", formData);
         
         try {
           // Transform form data to match API structure
           const transformedData = {
+            id:formData.id,
             company_access_program_id: packageId,
             name: formData.name as string,
             price: Number(formData.price) ,
@@ -267,8 +268,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             showCancelButton: false,
             showBackButton: false
           };
-          
-          return await defaultSubmitHandler(transformedData, this);
+          return await defaultSubmitHandler(transformedData, formConfig);
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
