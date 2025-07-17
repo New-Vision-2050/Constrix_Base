@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import getBranchesHierarchies from '../api/getBranchesHierarchies';
+import getHierarchies from '../api/getHierarchies';
 
 export interface ManagementHierarchyItem {
   id: string;
@@ -18,7 +18,7 @@ export const useBranchesHierarchies = () => {
 
   return useQuery({
     queryKey,
-    queryFn: getBranchesHierarchies,
+    queryFn: () => getHierarchies('branch'),
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
