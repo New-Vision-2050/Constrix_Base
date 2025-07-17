@@ -320,10 +320,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       if (response.status === 200 || response.status === 201) {        
         try {
           toast.success('Permissions assigned successfully!');
-          // Reset changed permissions after successful submission
-          activePermissionIds.length = 0;
-          // Trigger useEffect to refresh data
-          setRefreshTrigger(prev => prev + 1);
+            setRefreshTrigger(prev => prev + 1);
           
         } catch (e) {
           console.error('Toast method 1 failed:', e);

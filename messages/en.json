@@ -155,8 +155,8 @@
     "OrganizationalStructure": "Organizational Structure",
     "HumanResources": "Human Resources",
     "ProgramManagement": "Program Management",
-    "Powers": "Powers"
-    
+    "Powers": "Powers",
+    "PackagesAndPrograms": "Packages and Programs"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

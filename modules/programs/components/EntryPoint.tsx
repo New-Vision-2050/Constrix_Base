@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TableBuilder } from "@/modules/table";
+import TableSkeleton from "@/modules/table/components/TableSkeleton";
 import {
   SheetFormBuilder,
   FormConfig
@@ -91,156 +92,227 @@ export interface ProgramPayload {
     children: Children[];
 }
 
-// This function generates dynamic fields based on API data
+// Helper function to fetch programs data from API
+const fetchProgramsData = async (): Promise<ProgramPayload[]> => {
+  const response = await apiClient.get(`${baseURL}/role_and_permissions/permissions/hierarchy/detailed`);
+  
+  // Check HTTP status code
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
+  }
+  
+  // Check if response has data
+  if (!response.data) {
+    throw new Error('API response contains no data');
+  }
+  
+  // Process the response data
+  const programs = Array.isArray(response.data) 
+    ? response.data 
+    : (response.data?.payload && Array.isArray(response.data.payload)) 
+      ? response.data.payload 
+      : [];
+      
+  if (programs.length === 0) {
+    throw new Error('No programs data found in API response');
+  }
+  
+  return programs;
+};
+
+// Helper function to generate program key and display name
+const generateProgramIdentifiers = (program: ProgramPayload | Children, level: number, parentPath: string) => {
+  const indent = '  '.repeat(level);
+  const programKey = parentPath ? `${parentPath}_child_${program.id}` : `program_${program.id}`;
+  const displayName = level > 0 ? `${indent}↳ ${program.name}` : program.name;
+  
+  return { programKey, displayName };
+};
+
+// Helper function to extract sub-entity options from program
+const extractSubEntityOptions = (program: ProgramPayload | Children): SubProgramOption[] => {
+  const allOptions: SubProgramOption[] = [];
+  
+  if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
+    const activeSubEntities = program.sub_entities.filter((subEntity: SubEntity) => 
+      subEntity.name && subEntity.name.trim() !== ''
+    );
+    
+    activeSubEntities.forEach((subEntity: SubEntity) => {
+      allOptions.push({
+        id: subEntity.id,
+        name: subEntity.name,
+        value: subEntity.id,
+        label: subEntity.name,
+        parentId: program.id
+      });
+    });
+  }
+  
+  return allOptions;
+};
+
+// Helper function to create checkbox group field
+const createCheckboxGroupField = (
+  programKey: string, 
+  displayName: string, 
+  options: SubProgramOption[], 
+  level: number,
+  program: ProgramPayload | Children
+): FieldConfig => {
+  return {
+    type: "checkboxGroup" as const,
+    name: programKey,
+    label: displayName,
+    optionsTitle: displayName,
+    isMulti: true,
+    options: options,
+    className: level === 0 
+      ? "font-bold text-xl border-b border-border pb-2 mb-4 mt-6"
+      : "font-semibold text-lg ml-4 border-l-2 border-gray-300 pl-4 mb-3 mt-3",
+    onChange: (value: any, formState: any) => {
+      console.log(`Selected options for ${program.name}:`, value);
+      return value;
+    }
+  };
+};
+
+// Helper function to create hidden data field
+const createHiddenDataField = (
+  programKey: string, 
+  program: ProgramPayload | Children, 
+  level: number, 
+  parentPath: string
+): FieldConfig => {
+  return {
+    type: "hiddenObject" as const,
+    name: level === 0 ? `program_data_${program.id}` : `${programKey}_data`,
+    label: "",
+    defaultValue: {
+      programId: program.id,
+      programName: program.name,
+      programSlug: program.slug,
+      isActive: program.is_active,
+      subEntities: program.sub_entities || [],
+      children: program.children || [],
+      level: level,
+      parentPath: parentPath
+    }
+  };
+};
+
+// Helper function to create empty child program field
+const createEmptyChildField = (
+  child: Children, 
+  level: number, 
+  programKey: string
+): FieldConfig[] => {
+  const childProgramKey = `${programKey}_child_${child.id}`;
+  const childDisplayName = `${' '.repeat((level + 1) * 2)}↳ ${child.name}`;
+  
+  const checkboxField: FieldConfig = {
+    type: "checkboxGroup" as const,
+    name: childProgramKey,
+    label: childDisplayName,
+    optionsTitle: childDisplayName,
+    isMulti: true,
+    options: [{
+      id: 'empty',
+      name: '↳',
+      value: 'empty',
+      label: '↳',
+      parentId: child.id
+    } as SubProgramOption],
+    className: "font-semibold text-lg ml-4 border-l-2 border-gray-300 pl-4 mb-3 mt-3",
+    onChange: (value: any, formState: any) => {
+      console.log(`Empty child program ${child.name} - no sub_entities`);
+      return [];
+    }
+  };
+  
+  const hiddenField: FieldConfig = {
+    type: "hiddenObject" as const,
+    name: `${childProgramKey}_data`,
+    label: "",
+    defaultValue: {
+      programId: child.id,
+      programName: child.name,
+      programSlug: child.slug,
+      isActive: child.is_active,
+      subEntities: [],
+      children: child.children || [],
+      level: level + 1,
+      parentPath: programKey
+    }
+  };
+  
+  return [checkboxField, hiddenField];
+};
+
+// Helper function to process children programs
+const processChildrenPrograms = (
+  program: ProgramPayload | Children, 
+  level: number, 
+  programKey: string, 
+  generatedData: FieldConfig[],
+  processProgram: (program: ProgramPayload | Children, level: number, parentPath: string) => void
+): void => {
+  if (program.children && Array.isArray(program.children) && program.children.length > 0) {
+    program.children.forEach((child: Children) => {
+      // Check if child has sub_entities
+      if (child.sub_entities && Array.isArray(child.sub_entities) && child.sub_entities.length > 0) {
+        // Child has sub_entities, process normally
+        processProgram(child, level + 1, programKey);
+      } else {
+        // Child has no sub_entities, create special fields
+        const emptyChildFields = createEmptyChildField(child, level, programKey);
+        generatedData.push(...emptyChildFields);
+        
+        // Continue processing nested children if they exist
+        if (child.children && Array.isArray(child.children) && child.children.length > 0) {
+          const childProgramKey = `${programKey}_child_${child.id}`;
+          child.children.forEach((nestedChild: Children) => {
+            processProgram(nestedChild, level + 2, childProgramKey);
+          });
+        }
+      }
+    });
+  }
+};
+
+// Main function to generate dynamic fields based on API data
 const generateDynamicFields = async (): Promise<FieldConfig[]> => {
   try {
-    // Fetch data from API
-    const response = await apiClient.get(`${baseURL}/role_and_permissions/permissions/hierarchy/detailed`);
-    console.log('API Response:', response.data);
+    // Fetch programs data from API
+    const programs = await fetchProgramsData();
     
     // Array to store generated fields
     const generatedData: FieldConfig[] = [];
     
-    // Process the response data
-    const programs = Array.isArray(response.data) 
-      ? response.data 
-      : (response.data?.payload && Array.isArray(response.data.payload)) 
-        ? response.data.payload 
-        : [];
-        
     // Recursive function to process programs and their children
     const processProgram = (program: ProgramPayload | Children, level: number = 0, parentPath: string = '') => {
-      const indent = '  '.repeat(level);
-      const programKey = parentPath ? `${parentPath}_child_${program.id}` : `program_${program.id}`;
-      const displayName = level > 0 ? `${indent}↳ ${program.name}` : program.name;
+      // Generate program identifiers
+      const { programKey, displayName } = generateProgramIdentifiers(program, level, parentPath);
       
-      // Collect all options for this program level
-      const allOptions: SubProgramOption[] = [];
-      
-      // Add sub_entities as options
-      if (program.sub_entities && Array.isArray(program.sub_entities) && program.sub_entities.length > 0) {
-        const activeSubEntities = program.sub_entities.filter((subEntity: SubEntity) => 
-          subEntity.name && subEntity.name.trim() !== ''
-        );
-        
-        activeSubEntities.forEach((subEntity: SubEntity) => {
-          allOptions.push({
-            id: subEntity.id,
-            name: subEntity.name,
-            value: subEntity.id,
-            label: subEntity.name,
-            parentId: program.id
-          });
-        });
-      }
-      
-      // Children programs are not added to main program options
-      // They will be processed separately as their own checkbox groups
+      // Extract sub-entity options
+      const allOptions = extractSubEntityOptions(program);
       
       // Create checkbox group if there are options
       if (allOptions.length > 0) {
-        generatedData.push({
-          type: "checkboxGroup" as const,
-          name: programKey,
-          label: displayName,
-          optionsTitle: displayName,
-          isMulti: true,
-          options: allOptions,
-          className: level === 0 
-            ? "font-bold text-xl border-b border-border pb-2 mb-4 mt-6"
-            : "font-semibold text-lg ml-4 border-l-2 border-gray-300 pl-4 mb-3 mt-3",
-          onChange: (value: any, formState: any) => {
-            console.log(`Selected options for ${program.name}:`, value);
-            return value;
-          }
-        });
+        const checkboxField = createCheckboxGroupField(programKey, displayName, allOptions, level, program);
+        const hiddenField = createHiddenDataField(programKey, program, level, parentPath);
         
-        // Store program data
-        generatedData.push({
-          type: "hiddenObject" as const,
-          name: level === 0 ? `program_data_${program.id}` : `${programKey}_data`,
-          label: "",
-          defaultValue: {
-            programId: program.id,
-            programName: program.name,
-            programSlug: program.slug,
-            isActive: program.is_active,
-            subEntities: program.sub_entities || [],
-            children: program.children || [],
-            level: level,
-            parentPath: parentPath
-          }
-        });
+        generatedData.push(checkboxField, hiddenField);
       }
       
-      // Recursively process children programs
-      if (program.children && Array.isArray(program.children) && program.children.length > 0) {
-        program.children.forEach((child: Children) => {
-          // Check if child has sub_entities
-          if (child.sub_entities && Array.isArray(child.sub_entities) && child.sub_entities.length > 0) {
-            // Child has sub_entities, process normally
-            processProgram(child, level + 1, programKey);
-          } else {
-            // Child has no sub_entities, create a special checkbox group with only ↳
-            const childProgramKey = `${programKey}_child_${child.id}`;
-            const childDisplayName = `${' '.repeat((level + 1) * 2)}↳ ${child.name}`;
-            
-            generatedData.push({
-              type: "checkboxGroup" as const,
-              name: childProgramKey,
-              label: childDisplayName,
-              optionsTitle: childDisplayName,
-              isMulti: true,
-              options: [{
-                id: 'empty',
-                name: '↳',
-                value: 'empty',
-                label: '↳',
-                parentId: child.id
-              } as SubProgramOption],
-              className: "font-semibold text-lg ml-4 border-l-2 border-gray-300 pl-4 mb-3 mt-3",
-              onChange: (value: any, formState: any) => {
-                console.log(`Empty child program ${child.name} - no sub_entities`);
-                return [];
-              }
-            });
-            
-            // Store child data
-            generatedData.push({
-              type: "hiddenObject" as const,
-              name: `${childProgramKey}_data`,
-              label: "",
-              defaultValue: {
-                programId: child.id,
-                programName: child.name,
-                programSlug: child.slug,
-                isActive: child.is_active,
-                subEntities: [],
-                children: child.children || [],
-                level: level + 1,
-                parentPath: programKey
-              }
-            });
-            
-            // Continue processing nested children if they exist
-            if (child.children && Array.isArray(child.children) && child.children.length > 0) {
-              child.children.forEach((nestedChild: Children) => {
-                processProgram(nestedChild, level + 2, childProgramKey);
-              });
-            }
-          }
-        });
-      }
+      // Process children programs
+      processChildrenPrograms(program, level, programKey, generatedData, processProgram);
     };
     
     // Process each main program recursively
     programs.forEach((program: ProgramPayload) => {
       processProgram(program, 0);
     });
-    
-    if (programs.length === 0) {
-      console.error('Unexpected API response structure:', response.data);
-    }
     
     return generatedData;
   } catch (error) {
@@ -349,7 +421,7 @@ function EntryPointPrograms() {
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg">
+      <div>
         {config ? (
           <TableBuilder
             config={config}
@@ -370,7 +442,12 @@ function EntryPointPrograms() {
             }
           />
         ) : (
-          <div>Loading configuration...</div>
+          <TableSkeleton 
+            columns={6} 
+            rows={5} 
+            showLoader={true} 
+            loadingText="جاري تحميل إعدادات الجدول..."
+          />
         )}
       </div>
     </div>

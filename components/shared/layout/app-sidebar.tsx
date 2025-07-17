@@ -232,7 +232,7 @@ export function AppSidebar({
         urls: [ROUTER.Programs],
         sub_entities: [
           {
-            name: "الباقات والبرامج",
+            name: t("Sidebar.PackagesAndPrograms"),
             url: ROUTER.Programs,
             icon: UserIcon,
             isActive: pageName === ROUTER.Programs,
