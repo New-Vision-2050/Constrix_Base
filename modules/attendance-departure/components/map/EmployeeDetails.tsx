@@ -50,7 +50,9 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
         className={`${textColor} border-none shadow-none px-5 py-6 overflow-auto`}
         style={{ maxWidth: '320px', zIndex: 9999, backgroundColor: sheetBg }}
       >
-        <DialogTitle></DialogTitle>
+        {/* ! DialogTitle required in sheet,if removed case an error */}
+        <DialogTitle className="sr-only"></DialogTitle>
+
         <div className="relative w-full">
           <SheetClose className={`absolute left-1 top-1 ${subtitleColor} ${isDarkMode ? 'hover:text-white' : 'hover:text-gray-700'}`}>
             <X size={22} />
