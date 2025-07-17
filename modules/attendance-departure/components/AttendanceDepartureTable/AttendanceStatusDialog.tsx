@@ -19,13 +19,7 @@ const AttendanceStatusDialog: React.FC = () => {
   } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.attendanceStatus");
   
-  // Get current theme using resolvedTheme
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === 'dark';
-  
-  // Theme specific colors
-  const containerBg = isDarkMode ? "bg-gray-800" : "bg-gray-100";
-  const textColor = isDarkMode ? "text-white" : "text-gray-800";
+  // No need to manually determine theme colors when using Tailwind's dark mode
 
   if (!selectedAttendanceRecord) return null;
 
@@ -35,8 +29,8 @@ const AttendanceStatusDialog: React.FC = () => {
       onClose={closeAttendanceStatusDialog}
       title={t("title")}
     >
-      {/* Dialog content with theme-aware styling */}
-      <div className={`flex flex-col gap-4 ${textColor}`}>
+      {/* Dialog content with theme-aware styling using Tailwind's dark mode */}
+      <div className="flex flex-col gap-4 text-gray-800 dark:text-white">
         {/* Employee Information */}
         <EmployeeInfoSection record={selectedAttendanceRecord} />
         
