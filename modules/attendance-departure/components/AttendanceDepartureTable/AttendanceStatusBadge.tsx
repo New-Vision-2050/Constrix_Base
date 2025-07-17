@@ -19,7 +19,7 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
   let color = "";
   let text = "";
   //is_late
-  let _status = record.status;
+  let _status = "";
   if (record.is_late === 0) {
     _status = "present";
   } else if (record.is_late === 1) {
