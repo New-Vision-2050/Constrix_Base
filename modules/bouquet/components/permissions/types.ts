@@ -25,14 +25,14 @@ export type CategoryPermissions = {
 };
 
 // Main payload types
-export type Payload = Record<string, CategoryData>;
+export type CategoryPermissionsPayload = Record<string, CategoryData>;
 
 export type PermissionsData = {
   [categoryKey: string]: CategoryPermissions;
 };
 
 // Package permissions interfaces
-export interface Root {
+export interface PackagePermissionsRoot {
   payload: {
     id: string;
     name: string;
@@ -40,6 +40,6 @@ export interface Root {
   };
 }
 
-export interface Permissions {
+export interface PackagePermissions {
   [key: string]: CategoryPermissions;
 }

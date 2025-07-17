@@ -21,11 +21,11 @@ const TheStatus = ({
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
   const { toast } = useToast();
 
-  const handleConfirm = async (activationDate: string) => {
+  const handleConfirm = async () => {
     try {
       const response = await apiClient.put(`/packages/${id}/status`, {
         status: tempIsActive,
-      })  ;
+      });
 
       if (response.status === 200) {
         setIsActive(tempIsActive);
@@ -71,7 +71,6 @@ const TheStatus = ({
           open={showDialog}
           onClose={handleCancel}
           onConfirm={handleConfirm}
-          // title={isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
           description={!isActive ? t("Bouquets.AreYouSureReactivate") : t("Bouquets.AreYouSureDeactivate")}
         />
       </Dialog>

@@ -9,7 +9,8 @@ import {
   PermissionItem, 
   PermissionWithStatus, 
   PermissionsData, 
-  Root, 
+  PackagePermissionsRoot,
+  CategoryPermissionsPayload,
 } from "./types";
 
 // Props interface
@@ -34,7 +35,7 @@ const getSwitchTypeFromPermissionType = (permissionType: string): string | null 
 
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const [permissions, setPermissions] = useState<PermissionsData | null>(null);
-  const [packagePermissions, setPackagePermissions] = useState<Root | null>(null);
+  const [packagePermissions, setPackagePermissions] = useState<PackagePermissionsRoot | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
@@ -44,7 +45,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Helper function to create default permissions structure
-  const createDefaultPermissions = useCallback((lookupPayload: any): PermissionsData => {
+  const createDefaultPermissions = useCallback((lookupPayload: CategoryPermissionsPayload): PermissionsData => {
     const defaultPermissions: PermissionsData = {};
     Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
       if (lookupCategoryData && typeof lookupCategoryData === 'object') {
@@ -66,7 +67,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   }, []);
 
   // Helper function to merge lookup data with package permissions
-  const mergePermissionsData = useCallback((lookupPayload: any, packageData: any) => {
+  const mergePermissionsData = useCallback((lookupPayload: CategoryPermissionsPayload, packageData: any) => {
     const newActiveStates: Record<string, boolean> = {};
     const newNumberValues: Record<string, number> = {};
     const newSwitchStates: Record<string, boolean> = {};
@@ -145,7 +146,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
           const packageData = await fetchPackagePermissions();
           
           if (packageData) {
-            setPackagePermissions(packageData as Root);
+            setPackagePermissions(packageData as PackagePermissionsRoot);
             
             const { mergedPermissions, newActiveStates, newNumberValues, newSwitchStates } = 
               mergePermissionsData(lookupPayload, packageData);
@@ -189,37 +190,60 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
     });
   }, []);
 
+  // Helper function to find category key for a given subKey
+  const findCategoryKeyForSubKey = useCallback((subKey: string): string => {
+    if (!permissions) return '';
+    
+    for (const [catKey, catData] of Object.entries(permissions)) {
+      if (catData && typeof catData === 'object' && catData[subKey]) {
+        return catKey;
+      }
+    }
+    return '';
+  }, [permissions]);
+
+  // Helper function to generate active state key
+  const generateActiveStateKey = useCallback((switchId: string): string | null => {
+    const [subKey, switchType] = switchId.split('-');
+    const categoryKey = findCategoryKeyForSubKey(subKey);
+    
+    return categoryKey ? `${categoryKey}.${subKey}.${switchType}` : null;
+  }, [findCategoryKeyForSubKey]);
+
   const handleSwitchChange = useCallback((switchId: string, checked: boolean, permissionId?: string) => {
     setSwitchStates(prev => ({
       ...prev,
       [switchId]: checked
     }));
     
-    const [subKey, switchType] = switchId.split('-');
+    const activeStateKey = generateActiveStateKey(switchId);
     
-    let categoryKey = '';
-    
-    if (permissions) {
-      Object.entries(permissions).forEach(([catKey, catData]) => {
-        if (catData && typeof catData === 'object' && catData[subKey]) {
-          categoryKey = catKey;
-        }
-      });
-    }
-    
-    if (categoryKey) {
-      const activeStateKey = `${categoryKey}.${subKey}.${switchType}`;
+    if (activeStateKey) {
       setActiveStates(prev => ({
         ...prev,
         [activeStateKey]: checked
       }));
     }
-  }, [permissions]);
+  }, [generateActiveStateKey]);
   
   const handleNumberChange = useCallback((permissionId: string, value: number) => {
+    // Validate the input value
+    if (typeof value !== 'number' || isNaN(value)) {
+      console.warn(`Invalid number value for permission ${permissionId}:`, value);
+      return;
+    }
+    
+    // Ensure the value is not negative
+    const validatedValue = Math.max(0, Math.floor(value));
+    
+    // Log warning if value was adjusted
+    if (validatedValue !== value) {
+      console.warn(`Value for permission ${permissionId} was adjusted from ${value} to ${validatedValue}`);
+    }
+    
     setNumberValues(prev => ({
       ...prev,
-      [permissionId]: value
+      [permissionId]: validatedValue
     }));
   }, []);
 
@@ -272,13 +296,13 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
           if (categoryData && typeof categoryData === 'object') {
             Object.entries(categoryData).forEach(([subKey, subItems]) => {
               if (Array.isArray(subItems)) {
-                // Find the view permission for this subKey (as per memory requirements)
-                const viewItem = subItems.find(item => item.type === 'view');
+                // Find the create permission for this subKey
+                const createItem = subItems.find(item => item.type === 'create');
                 
-                // If view permission exists and has a number value, add to limits
-                if (viewItem && numberValues[subKey] !== undefined && numberValues[subKey] > 0) {
+                // If create permission exists and has a number value, add to limits
+                if (createItem && numberValues[subKey] !== undefined && numberValues[subKey] > 0) {
                   limits.push({
-                    permission_id: viewItem.id,
+                    permission_id: createItem.id,
                     number: numberValues[subKey]
                   });
                 }

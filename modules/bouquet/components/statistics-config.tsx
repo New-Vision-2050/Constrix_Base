@@ -7,9 +7,9 @@ import PersonStaticIcon from "@/public/icons/person-static";
 export const statisticsConfig = {
   url: `${baseURL}/companies/widget`,
   icons: [
-    <PersonStaticIcon key={1} />,
-    <CheckStatic key={2} />,
-    <ChartStaticIcon key={3} />,
-    <ArrowStaticIcon key={4} />,
+    <PersonStaticIcon key="person-icon" />,
+    <CheckStatic key="check-icon" />,
+    <ChartStaticIcon key="chart-icon" />,
+    <ArrowStaticIcon key="arrow-icon" />,
   ],
 };

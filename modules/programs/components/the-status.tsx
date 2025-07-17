@@ -71,7 +71,6 @@ console.log(isActive);
           open={showDialog}
           onClose={handleCancel}
           onConfirm={handleConfirm}
-          // title={isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
           description={!isActive ? t("Programs.AreYouSureReactivate") : t("Programs.AreYouSureDeactivate")}
         />
       </Dialog>

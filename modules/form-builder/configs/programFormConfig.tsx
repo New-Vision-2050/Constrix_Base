@@ -91,10 +91,6 @@ const safeToast = (): ToastInterface | undefined => {
 
 // Dynamic form configuration generator
 export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dynamicFields: FieldConfig[]):FormConfig {
-
-  
-  // Get dynamic fields
-  //  const dynamicFields = await generateDynamicFields();
   
   // Return the form configuration
   return {
