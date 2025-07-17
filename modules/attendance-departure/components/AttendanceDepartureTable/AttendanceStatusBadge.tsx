@@ -52,9 +52,12 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
       break;
   }
 
+  // Separated interactive styles from color styles
+  const interactiveStyles = "cursor-pointer hover:underline";
+
   return (
     <span
-      className={`font-bold cursor-pointer ${color} hover:underline`}
+      className={`font-bold ${interactiveStyles} ${color}`}
       onClick={() => openAttendanceStatusDialog(record)}
     >
       {text}
