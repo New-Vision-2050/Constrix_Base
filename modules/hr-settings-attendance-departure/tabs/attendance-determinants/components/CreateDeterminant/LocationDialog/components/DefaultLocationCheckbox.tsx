@@ -1,5 +1,9 @@
 import React from "react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
+
+// Checkbox styling as a utility class for better maintainability
+const checkboxStyles = "w-4 h-4 mr-2 text-pink-500 rounded focus:ring-pink-500 focus:ring-2 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600";
 
 interface DefaultLocationCheckboxProps {
   isDefaultLocation: boolean;
@@ -10,25 +14,18 @@ export default function DefaultLocationCheckbox({
   isDefaultLocation,
   onChange,
 }: DefaultLocationCheckboxProps) {
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
-  
-  // Theme-specific colors
-  const labelColor = isDarkMode ? 'text-white' : 'text-gray-700';
-  const checkboxBg = isDarkMode ? 'bg-gray-700' : 'bg-gray-100';
-  const checkboxBorder = isDarkMode ? 'border-gray-600' : 'border-gray-300';
+  const { resolvedTheme } = useTheme();
+  const t = useTranslations("location");
   return (
-    <div className="mb-6 flex justify-center">
-      <label className={`flex items-center ${labelColor} cursor-pointer`}>
+    <div className="mb-6 flex justify-center cursor-pointer">
+      <label className="flex items-center text-gray-700 dark:text-white">
         <input
           type="checkbox"
           checked={isDefaultLocation}
           onChange={(e) => onChange(e.target.checked)}
-          className={`mr-2 w-4 h-4 text-pink-500 ${checkboxBg} ${checkboxBorder} rounded focus:ring-pink-500 focus:ring-2`}
+          className={checkboxStyles}
         />
-        <span className="text-sm">موقع الفرع الافتراضي</span>
+        <span className="text-sm">{t("defaultBranchLocation")}</span>
       </label>
     </div>
   );

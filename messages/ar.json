@@ -1,4 +1,17 @@
 {
+  "location": {
+    "longitude": "خط الطول",
+    "latitude": "خط العرض",
+    "radius": "نصف قطر الحضور",
+    "meters": "متر",
+    "save": "حفظ",
+    "chooseLocationCoordinates": "اختر إحداثيات الموقع",
+    "defaultBranchLocation": "موقع الفرع الافتراضي",
+    "selectBranch": "اختر الفرع",
+    "loading": "جاري التحميل...",
+    "selectBranchesFirst": "اختر الفروع أولاً",
+    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها"
+  },
   "Main": {
     "NoResultsRound": "لم يتم العثور على نتائج",
     "Loading": "جاري تحميل البيانات..."

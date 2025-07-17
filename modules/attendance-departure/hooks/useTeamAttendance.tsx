@@ -34,19 +34,11 @@ export const useTeamAttendance = (props?: UseTeamAttendanceProps) => {
     branch === 'all' ? undefined : branch
   ];
 
-  // توضيح المعلمات التي يتم تمريرها للـ API
-  console.log("useTeamAttendance passing params to API:", { 
-    start_date, 
-    end_date, 
-    search_text, 
-    approver: approver === 'all' ? undefined : approver,
-    department: department === 'all' ? undefined : department,
-    branch: branch === 'all' ? undefined : branch 
-  });
+
 
   const { data, isLoading, error, refetch } = useQuery<AttendanceStatusRecord[]>({
     queryKey,
-    // تمرير جميع معلمات البحث بما في ذلك search_text
+    // Pass all search parameters including search_text
     queryFn: () => getTeamAttendance({ 
       start_date, 
       end_date,

@@ -3,6 +3,18 @@
 import React from "react";
 import { useTheme } from "next-themes";
 
+// Theme colors as constants for better maintainability
+const COLORS = {
+  DARK: {
+    LABEL: '#FF3B8B',
+    VALUE: 'text-white',
+  },
+  LIGHT: {
+    LABEL: '#D81B60',
+    VALUE: 'text-gray-800',
+  }
+};
+
 interface EmployeeInfoFieldProps {
   label: string;
   value?: string | number | null;
@@ -23,8 +35,8 @@ const EmployeeInfoField: React.FC<EmployeeInfoFieldProps> = ({
   const isDarkMode = resolvedTheme === 'dark';
   
 
-  const labelColor = isDarkMode ? "#FF3B8B" : "#D81B60";
-  const valueColor = isDarkMode ? "text-white" : "text-gray-800";
+  const labelColor = isDarkMode ? COLORS.DARK.LABEL : COLORS.LIGHT.LABEL;
+  const valueColor = isDarkMode ? COLORS.DARK.VALUE : COLORS.LIGHT.VALUE;
   return (
     <div className={`flex gap-3 items-center ${className}`}>
       <span className="font-medium" style={{ color: labelColor }}>{label}:</span>

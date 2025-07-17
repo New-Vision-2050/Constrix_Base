@@ -1,4 +1,17 @@
 {
+  "location": {
+    "longitude": "Longitude",
+    "latitude": "Latitude",
+    "radius": "Attendance Radius",
+    "meters": "meters",
+    "save": "Save",
+    "chooseLocationCoordinates": "Choose Location Coordinates",
+    "defaultBranchLocation": "Default Branch Location",
+    "selectBranch": "Select Branch",
+    "loading": "Loading...",
+    "selectBranchesFirst": "Select Branches First",
+    "selectBranchesInstructions": "You need to select branches from the form first to be able to set their locations"
+  },
   "Main": {
     "NoResultsRound": "No results found",
     "Loading": "Loading data..."
