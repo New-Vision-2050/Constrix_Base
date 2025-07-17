@@ -14,6 +14,7 @@ export interface ApiResponse {
 
 // Define interfaces for the company access programs submission
 export interface Root {
+  id: string;
   name: string;
   programs: Program[];
   company_fields: string[];
@@ -30,6 +31,7 @@ export interface Program {
 export interface ApiChildren {
   id: string;
   sub_entities: any[];
+  children?: ApiChildren[];
 }
 
 export interface Payload {
@@ -196,6 +198,10 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
     showCancelButton: false,
     showBackButton: false,
     editDataTransformer: (data: any) => {
+      // Transform array objects to just IDs for select fields
+      data.company_fields = data.company_fields?.map((item: any) => item.id);
+      data.company_types = data.company_types?.map((item: any) => item.id);
+      data.country_id = data.countries?.map((item: any) => item.id);
       return data;
     },
     // Success handler with proper error handling
@@ -208,12 +214,13 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
         toast.success("تم إضافة البرنامج بنجاح");
       }
     },
-    onSubmit: async (formData: Record<string, unknown>) => {
+    onSubmit: async (formData: Record<string, unknown>, formConfig: FormConfig) => {
       console.log("Form data received:", formData);
       
       try {
         // Transform form data to match the Root interface
         const transformedData: Root = {
+          id:formData.id as string,
           name: formData.name as string,
           programs: [],
           company_fields: Array.isArray(formData.company_fields) 
@@ -291,7 +298,7 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
         transformedData.programs = Array.from(processedPrograms.values());
 
         // Send to the specified endpoint
-       return await defaultSubmitHandler(transformedData,GetProgramFormConfig(t,dynamicFields));
+       return await defaultSubmitHandler(transformedData,formConfig);
       } catch (error) {
         console.error("Error submitting form:", error);
         throw error;
