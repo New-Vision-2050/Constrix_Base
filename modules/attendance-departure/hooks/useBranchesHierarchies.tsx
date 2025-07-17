@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import getManagementHierarchies from '../api/getManagementHierarchies';
+import getBranchesHierarchies from '../api/getBranchesHierarchies';
 
 export interface ManagementHierarchyItem {
   id: string;
@@ -13,12 +13,12 @@ export interface ManagementHierarchyItem {
  * Custom hook for fetching management hierarchies data (branches, departments) using React Query
  * @returns Object containing management hierarchies data, loading state, and error state
  */
-export const useManagementHierarchies = () => {
-  const queryKey = ['management-hierarchies'];
+export const useBranchesHierarchies = () => {
+  const queryKey = ['branches-management-hierarchies'];
 
   return useQuery({
     queryKey,
-    queryFn: getManagementHierarchies,
+    queryFn: getBranchesHierarchies,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

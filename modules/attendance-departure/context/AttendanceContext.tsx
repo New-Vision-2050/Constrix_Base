@@ -15,7 +15,7 @@ import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
 import { AttendanceSummaryData } from "../api/attendanceSummary";
 import { SelectOption } from "@/types/select-option";
 import { useBranches } from "../hooks/useBranches";
-import { ManagementHierarchyItem, useManagementHierarchies } from "../hooks/useManagementHierarchies";
+import { ManagementHierarchyItem, useBranchesHierarchies } from "../hooks/useBranchesHierarchies";
 import { useManagements } from "../hooks/useManagements";
 import { useConstraints } from "../hooks/useConstraints";
 import { Constraint } from "../api/getConstraints";
@@ -195,7 +195,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isLoading: branchesLoading,
     error: branchesError,
     refetch: refetchBranches
-  } = useManagementHierarchies();
+  } = useBranchesHierarchies();
 
   const {
     data:managements,
