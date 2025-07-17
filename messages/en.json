@@ -179,6 +179,15 @@
     "changeMail": "Change email",
     "changePassword": "Change password"
   },
+  "attendanceDeparture": {
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "holiday": "On Leave",
+      "unspecified": "Unspecified"
+    }
+  },
   "FormBuilder": {
     "Fields": {
       "Image": {

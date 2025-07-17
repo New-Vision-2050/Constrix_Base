@@ -179,6 +179,15 @@
     "changeMail": "تغيير البريد الالكتروني",
     "changePassword": "تغيير كلمة المرور"
   },
+  "attendanceDeparture": {
+    "status": {
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "holiday": "في إجازة",
+      "unspecified": "غير محدد"
+    }
+  },
   "FormBuilder": {
     "Fields": {
       "Image": {
