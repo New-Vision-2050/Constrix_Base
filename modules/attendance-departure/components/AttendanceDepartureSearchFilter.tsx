@@ -147,7 +147,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
               <SelectItem value="loading" disabled>{t("loadingApprovers")}</SelectItem>
             ) : (
               constraints?.map((constraint,index) => (
-                <SelectItem key={constraint.id+'-'+index} value={constraint.id}>
+                <SelectItem key={index} value={constraint.id}>
                   {constraint.constraint_name}
                 </SelectItem>
               ))
