@@ -26,14 +26,12 @@ const AttendanceDepartureTable: React.FC = () => {
       // تحديث تاريخ البداية إذا تغير
       if (columnSearchState['start_date'] && typeof columnSearchState['start_date'] === 'string') {
         const dateValue = columnSearchState['start_date'];
-        console.log('تم تحديث تاريخ البداية في الكونتكست:', dateValue);
         setStartDate(new Date(dateValue));
       }
       
       // تحديث تاريخ النهاية إذا تغير
       if (columnSearchState['end_date'] && typeof columnSearchState['end_date'] === 'string') {
         const dateValue = columnSearchState['end_date'];
-        console.log('تم تحديث تاريخ النهاية في الكونتكست:', dateValue);
         setEndDate(new Date(dateValue));
       }
     }
@@ -42,13 +40,13 @@ const AttendanceDepartureTable: React.FC = () => {
   // render
   return (
     <div className="mt-4">
-      <TableBuilder 
-      config={getAttendanceDepartureTableConfig(t)} 
-      searchBarActions={
-        <div className="flex items-center gap-3">
-          <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>
-        </div>
-      }
+      <TableBuilder
+        config={getAttendanceDepartureTableConfig(t)}
+        searchBarActions={
+          <div className="flex items-center gap-3">
+            <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>
+          </div>
+        }
       />
     </div>
   );
