@@ -19,10 +19,9 @@ const AttendanceStatusDialog: React.FC = () => {
   } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.attendanceStatus");
   
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  // Get current theme using resolvedTheme
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   
   // Theme specific colors
   const containerBg = isDarkMode ? "bg-gray-800" : "bg-gray-100";
