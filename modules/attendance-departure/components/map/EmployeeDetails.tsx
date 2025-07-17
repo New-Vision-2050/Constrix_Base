@@ -13,6 +13,9 @@ import EmployeeInfoField from "../../components/shared/EmployeeInfoField";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
+// Constants
+const SHEET_Z_INDEX = 9999; // High z-index to ensure sheet appears above other UI elements
+
 // Employee details component
 const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
   isOpen,
@@ -48,7 +51,7 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
       <SheetContent
         side="left"
         className={`${textColor} border-none shadow-none px-5 py-6 overflow-auto`}
-        style={{ maxWidth: '320px', zIndex: 9999, backgroundColor: sheetBg }}
+        style={{ maxWidth: '320px', zIndex: SHEET_Z_INDEX, backgroundColor: sheetBg }}
       >
         {/* ! DialogTitle required in sheet,if removed case an error */}
         <DialogTitle className="sr-only"></DialogTitle>
