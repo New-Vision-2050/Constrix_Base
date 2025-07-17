@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme } from "next-themes";
+import { UN_SPECIFIED } from "../../constants/static-data";
 
 interface DisplayFieldProps {
   label: string;
@@ -32,7 +33,7 @@ const DisplayField: React.FC<DisplayFieldProps> = ({
         className={`border rounded-md p-3 text-right ${borderColor} ${textColor}`}
         style={{ backgroundColor: bgColor }}
       >
-        {value || defaultValue || "غير محدد"}
+        {value || defaultValue || UN_SPECIFIED}
       </div>
     </div>
   );

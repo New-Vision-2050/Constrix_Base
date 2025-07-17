@@ -1,6 +1,7 @@
 import React from "react";
 import { useAttendance } from "../../context/AttendanceContext";
 import { AttendanceStatusRecord } from "../../types/attendance";
+import { UN_SPECIFIED } from "../../constants/static-data";
 
 interface AttendanceStatusBadgeProps {
   status: string; // This will now contain the status from the backend
@@ -46,7 +47,7 @@ const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
       color = "text-blue-500";
       break;
     default:
-      text = status || "غير محدد";
+      text = status || UN_SPECIFIED;
       color = "text-gray-400";
       break;
   }
