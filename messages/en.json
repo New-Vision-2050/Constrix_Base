@@ -498,6 +498,7 @@
       "branch": "Branch",
       "all": "All",
       "loadingBranches": "Loading branches...",
+      "loadingDepartments":"Loading managements...",
       "department": "Department",
       "approver": "Approver",
       "loadingApprovers": "Loading approvers...",

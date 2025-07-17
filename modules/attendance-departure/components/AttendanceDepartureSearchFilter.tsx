@@ -97,7 +97,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
             {/* عرض الفروع من الـ API مع عرض رسالة تحميل إذا كانت البيانات قيد التحميل */}
             {branchesLoading ? (
               <SelectItem value="loading" disabled>
-                جاري تحميل الفروع...
+                {t("loadingBranches")}
               </SelectItem>
             ) : (
               branches?.map((branch) => (
@@ -121,7 +121,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
             <SelectItem value="all">{t("all")}</SelectItem>
             {managementsLoading ? (
               <SelectItem value="loading" disabled>
-                جاري تحميل الفروع...
+                {t("loadingDepartments")}
               </SelectItem>
             ) : (
               managements?.map((management) => (
