@@ -19,10 +19,9 @@ const ApproverDialog: React.FC = () => {
     useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.approver");
   
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  // Get current theme using resolvedTheme
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   
   // Theme specific colors
   const accentColor = isDarkMode ? "#E91E63" : "#D81B60";
