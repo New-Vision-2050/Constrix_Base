@@ -9,7 +9,7 @@ type weeklyScheduleDay = {
   periods: PeriodType[];
 };
 
-type weeklyScheduleDays = {
+export type weeklyScheduleDays = {
   friday: weeklyScheduleDay;
   monday: weeklyScheduleDay;
   saturday: weeklyScheduleDay;

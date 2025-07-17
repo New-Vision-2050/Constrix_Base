@@ -91,9 +91,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
             // Use actual clock in/out times if available, otherwise use defaults
             checkInTime: employee.clock_in_time || (employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined),
             checkOutTime: employee.clock_out_time || (employee.attendanceStatus === 'present' ? '17:00' : undefined),
-            // Also set the new field names for compatibility with updated component
-            clock_in_time: employee.clock_in_time || (employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined),
-            clock_out_time: employee.clock_out_time || (employee.attendanceStatus === 'present' ? '17:00' : undefined),
+            // The updated component uses checkInTime and checkOutTime which are already set above
             avatarUrl: undefined // No default avatar
         };
         

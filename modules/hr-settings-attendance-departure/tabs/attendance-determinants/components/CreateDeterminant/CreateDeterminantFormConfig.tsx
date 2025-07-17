@@ -4,6 +4,7 @@ import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 
 // Day names mapping
 const dayNames = {
@@ -53,10 +54,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       constraint_type: editConstraint?.constraint_type,
       branch_locations: editConstraint?.branch_locations,
       is_active: Boolean(editConstraint?.is_active),
-      branch_ids: editConstraint?.branch_locations?.map((branch) => Number(branch.branch_id)) ?? [],
+      branch_ids: editConstraint?.branch_locations?.map((branch: { branch_id: string | number }) => Number(branch.branch_id)) ?? [],
       location_type: "main",
       weekly_schedule: Object.entries(
-        editConstraint?.config?.time_rules?.weekly_schedule || {}
+        (editConstraint?.config?.time_rules?.weekly_schedule as weeklyScheduleDays) || {}
       )
         ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
         ?.map(([dayName, dayConfig]) => {
