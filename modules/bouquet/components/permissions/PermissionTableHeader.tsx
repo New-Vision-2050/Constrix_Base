@@ -17,7 +17,6 @@ const PermissionTableHeader: React.FC<PermissionTableHeaderProps> = ({
           <Checkbox 
             checked={allSelected}
             onCheckedChange={onSelectAll}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded" 
           /> 
         </th>
         <th className="px-4 py-3 text-right text-sm font-medium">الصلاحية</th>

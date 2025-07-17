@@ -77,8 +77,6 @@ const Execution = ({
   deleteUrl?:string
 }) => {
   const t = useTranslations();
-  console.log("formConfig", formConfig);
-
   const defaultMenuItems = useMemo(() => {
     const items = [];
 
@@ -136,8 +134,6 @@ const Execution = ({
   const [actionState, setActionState] = useState<ActionState>(initialState);
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
-
-  console.log("actionState", actionState);
 
   const handleMenuItemClick = (
     action: string | ((row: { id: string; [key: string]: unknown }) => void)
