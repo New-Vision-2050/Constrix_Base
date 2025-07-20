@@ -38,9 +38,9 @@ export function defineAbilityFor(permissions: string[] = []): AppAbility {
 }
 
 // Helper function to convert permission key to readable format
-export function parsePermissionKey(key: string): { action: string; subject: string } {
+export function parsePermissionKey(key: string): { action: Actions; subject: string } {
   const parts = key.split("_");
-  const action = parts[parts.length - 1];
+  const action = parts[parts.length - 1] as Actions;
   const subjectParts = parts.slice(0, -1);
   const subject = subjectParts.join("_");
   
