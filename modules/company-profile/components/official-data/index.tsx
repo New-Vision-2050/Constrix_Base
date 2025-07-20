@@ -16,7 +16,6 @@ import {
   PERMISSION_ACTIONS,
   PERMISSION_SUBJECTS,
 } from "@/modules/roles-and-permissions/permissions";
-import { boolean } from "zod";
 import CanSeeContent from "@/components/shared/CanSeeContent";
 
 const OfficialData = ({ id }: { id?: string }) => {
