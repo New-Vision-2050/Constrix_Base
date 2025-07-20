@@ -60,7 +60,7 @@ export const OrgStructureSettingsJobTypesTableConfig = () => {
               });
             }}
             confirmDescription={(isActive) =>
-              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشظ"
+              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
             }
             showDatePicker={() => false}
             canActivate={permissions.ACTIVATE}
