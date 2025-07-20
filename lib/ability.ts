@@ -1,6 +1,7 @@
 import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
+import { PERMISSION_ACTIONS, PermissionAction } from "../modules/roles-and-permissions/permissions";
 
-export type Actions = "LIST" | "CREATE" | "UPDATE" | "DELETE" | "EXPORT" | "VIEW" | "ACTIVATE";
+export type Actions = PermissionAction;
 export type Subjects = string;
 export type AppAbility = Ability<[Actions, Subjects]>;
 
@@ -9,15 +10,22 @@ export function defineAbilityFor(permissions: string[] = []): AppAbility {
     Ability as AbilityClass<AppAbility>
   );
 
+  // Create a set of valid actions from PERMISSION_ACTIONS
+  const validActions = new Set<string>(Object.values(PERMISSION_ACTIONS));
+
   permissions.forEach((perm) => {
     // Split by underscore and extract action as last part
     const parts = perm.split("_");
     if (parts.length < 2) {
-      throw new Error(`Invalid permission format: "${perm}". Permission must be in format "SUBJECT_ACTION" (e.g., "USERS_CREATE")`);
+      console.error(`Invalid permission format: "${perm}". Permission must be in format "SUBJECT_ACTION" (e.g., "USERS_CREATE")`);
     }
     
     // Action is the last part
-    const action = parts[parts.length - 1] as Actions;
+    const actionPart = parts[parts.length - 1];
+    if (!validActions.has(actionPart)) {
+      console.error(`Invalid action "${actionPart}" in permission "${perm}". Valid actions are: ${Array.from(validActions).join(", ")}`);
+    }
+    const action = actionPart as Actions;
     
     // Subject is everything before the last part, keep as underscore format
     const subjectParts = parts.slice(0, -1);
