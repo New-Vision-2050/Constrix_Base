@@ -21,7 +21,7 @@ export function usePermissions() {
   });
 
   useEffect(() => {
-    if (isSuccess && data && permissions.length === 0) {
+    if (isSuccess && data) {
       setPermissions(data);
     }
   }, [isSuccess, data, permissions.length, setPermissions]);
