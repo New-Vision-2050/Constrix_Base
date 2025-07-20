@@ -56,9 +56,9 @@ export default function TabTemplate(props: PropsT) {
         <TabTemplateLoading />
       ) : mode === "Preview" ? (
         reviewMode
-      ) : (
-        <> { canEdit && editMode } </>
-      )}
+      ) : canEdit ? (
+        editMode
+      ) : null}
     </FormFieldSet>
   );
 }
