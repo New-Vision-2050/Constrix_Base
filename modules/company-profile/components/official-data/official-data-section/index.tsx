@@ -66,13 +66,11 @@ const OfficialDataSection = ({
         secondTitle={
           <>
             {permissions.UPDATE && (
-              <>
                 <FieldSetSecondTitle
                   mode={mode}
                   handleEditClick={handleEditClick}
                   dropdownItems={dropdownItems}
                 />
-              </>
             )}
           </>
         }
