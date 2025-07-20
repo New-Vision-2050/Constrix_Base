@@ -36,15 +36,17 @@ const OrgStructureDepartmentSetting = () => {
       <TableBuilder
         config={config}
         searchBarActions={
-          <div className="flex items-center gap-3">
+          <>
             {permissions.CREATE && (
-              <SheetFormBuilder
-                config={OrgStructureDepartmentsSettingsFormConfig}
-                trigger={<Button>اضافة قسم</Button>}
-                onSuccess={handleFormSuccess}
-              />
+              <div className="flex items-center gap-3">
+                <SheetFormBuilder
+                  config={OrgStructureDepartmentsSettingsFormConfig}
+                  trigger={<Button>اضافة قسم</Button>}
+                  onSuccess={handleFormSuccess}
+                />{" "}
+              </div>
             )}
-          </div>
+          </>
         }
       />
     </CanSeeContent>
