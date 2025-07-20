@@ -12,7 +12,9 @@ export function defineAbilityFor(permissions: string[] = []): AppAbility {
   permissions.forEach((perm) => {
     // Split by underscore and extract action as last part
     const parts = perm.split("_");
-    if (parts.length < 2) return;
+    if (parts.length < 2) {
+      throw new Error(`Invalid permission format: "${perm}". Permission must be in format "SUBJECT_ACTION" (e.g., "USERS_CREATE")`);
+    }
     
     // Action is the last part
     const action = parts[parts.length - 1] as Actions;
