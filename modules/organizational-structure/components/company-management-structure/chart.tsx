@@ -161,14 +161,13 @@ const BranchManagementsStructure = (props: PropsT) => {
       </>
       }
       {/* confirm delete dialog */}
-      {permissions.DELETE && <>
+      {permissions.DELETE &&
       <ConfirmationDialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}
         onConfirm={handleConfirm}
         description={t("confirmDelete")}
       />
-      </>
       }  
 
       {isLoading && (
