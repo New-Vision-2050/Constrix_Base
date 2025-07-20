@@ -4,7 +4,7 @@ export type Actions = "LIST" | "CREATE" | "UPDATE" | "DELETE" | "EXPORT" | "VIEW
 export type Subjects = string;
 export type AppAbility = Ability<[Actions, Subjects]>;
 
-export function defineAbilityFor(permissions: string[]): AppAbility {
+export function defineAbilityFor(permissions: string[] = []): AppAbility {
   const { can, build } = new AbilityBuilder<Ability<[Actions, Subjects]>>(
     Ability as AbilityClass<AppAbility>
   );
