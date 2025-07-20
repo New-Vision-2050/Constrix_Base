@@ -26,5 +26,5 @@ export function usePermissions() {
     }
   }, [isSuccess, data, permissions.length, setPermissions]);
 
-  return permissions.length > 0 ? permissions : data;
+  return permissions?.length > 0 ? permissions : data;
 }
