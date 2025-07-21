@@ -282,7 +282,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     enableDrag: true,
                     rowFields: [
                       {
-                        type: "text",
+                        type: "time",
                         name: "from",
                         label: getText("form.periodStart", "بداية الفترة"),
                         placeholder: getText(
@@ -297,18 +297,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                               "بداية الفترة مطلوبة"
                             ),
                           },
-                          {
-                            type: "pattern",
-                            value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: getText(
-                              "form.timeFormatError",
-                              "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"
-                            ),
-                          },
                         ],
                       },
                       {
-                        type: "text",
+                        type: "time",
                         name: "to",
                         label: getText("form.periodEnd", "نهاية الفترة"),
                         placeholder: getText(
@@ -321,14 +313,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             message: getText(
                               "form.periodEndRequired",
                               "نهاية الفترة مطلوبة"
-                            ),
-                          },
-                          {
-                            type: "pattern",
-                            value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: getText(
-                              "form.timeFormatError",
-                              "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00"
                             ),
                           },
                         ],

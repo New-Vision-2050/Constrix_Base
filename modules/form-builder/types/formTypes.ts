@@ -121,7 +121,8 @@ export interface FieldConfig {
     | "hiddenObject"
     | "dynamicRows"
     | "image"
-    | "file";
+    | "file"
+    | "time";
     
   fieldClassName?: string; // Class name for the field container
 
