@@ -65,8 +65,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       early_clock_in_rules_unit: editConstraint?.config?.early_clock_in_rules?.unit,
       lateness_rules_value: editConstraint?.config?.lateness_rules?.grace_period_minutes,
       lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
-      out_zone_rules_value: editConstraint?.config?.out_zone_rules?.approval_threshold_minutes,
-      out_zone_rules_unit: editConstraint?.config?.out_zone_rules?.unit,
+      out_zone_rules_value: editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold,
+      out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
       branch_ids:
         editConstraint?.branch_locations?.map(
@@ -467,7 +467,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               <div className="w-full h-full">
                 <select
                   className="rounded-lg p-2 bg-transparent"
-                  defaultValue={editConstraint?.config?.out_zone_rules?.unit ?? TimeUnits?.[0]?.id}
+                  defaultValue={editConstraint?.config?.radius_enforcement?.unit ?? TimeUnits?.[0]?.id}
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
                     formStore.setValues(`create-determinant-form`, {
@@ -632,6 +632,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           };
         }),
         constraint_config: {
+          radius_enforcement: {
+            end_shift_if_violated: true,
+            out_of_radius_time_threshold: formData.out_zone_rules_value,
+            unit: formData.out_zone_rules_unit ?? TimeUnits?.[0]?.id,
+          },
           time_rules: {
             subtype: "multiple_periods",
             weekly_schedule: Object.keys(dayNames).reduce<Record<string, any>>(
@@ -743,11 +748,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             prevent_lateness: true,
             grace_period_minutes: formData.lateness_rules_value,
             unit: formData.lateness_rules_unit ?? TimeUnits?.[0]?.id,
-          },
-          out_zone_rules: {
-            requires_approval: true,
-            approval_threshold_minutes: formData.out_zone_rules_value,
-            unit: formData.out_zone_rules_unit ?? TimeUnits?.[0]?.id,
           },
           type_attendance: {
             location:
