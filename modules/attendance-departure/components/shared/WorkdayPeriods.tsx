@@ -30,7 +30,7 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
   hours,
   readOnly = true
 }) => {
-  // استخدام hook الترجمة
+  // Use translation hook
   const t = useTranslations("AttendanceDepartureModule.WorkdayPeriods");
   
   // Get current theme

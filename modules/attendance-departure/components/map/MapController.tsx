@@ -23,11 +23,9 @@ const MapController: React.FC<MapControllerProps> = ({ isFullScreen, setMapRef }
 
   // Adjust map size when fullscreen state changes
   useEffect(() => {
-    // When the size changes, we adjust the map
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
-  }, [isFullScreen, map]);
+    // When the size changes, we adjust the map immediately
+    map.invalidateSize();
+  }, [isFullScreen, map, setMapRef]);
 
   return null;
 };

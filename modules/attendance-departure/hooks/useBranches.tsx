@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import getManagementHierarchies from '../api/getManagementHierarchies';
 import { SelectOption } from '@/types/select-option';
+import getHierarchies from '../api/getHierarchies';
 
 /**
  * Custom hook for fetching only branch data using React Query
@@ -11,7 +11,7 @@ export const useBranches = () => {
 
   const { data, isLoading, error, refetch } = useQuery<any[]>({
     queryKey,
-    queryFn: () => getManagementHierarchies(),
+    queryFn: () => getHierarchies(),
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

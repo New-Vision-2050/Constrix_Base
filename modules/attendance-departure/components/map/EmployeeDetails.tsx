@@ -13,10 +13,11 @@ import EmployeeInfoField from "../../components/shared/EmployeeInfoField";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
-// Employee details component
-interface EmployeeDetailsSheetProps extends EmployeeDetailsProps {}
+// Constants
+const SHEET_Z_INDEX = 9999; // High z-index to ensure sheet appears above other UI elements
 
-const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
+// Employee details component
+const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
   isOpen,
   onClose,
   employee
@@ -28,10 +29,8 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
   const currentTheme = theme === 'system' ? systemTheme : theme;
   const isDarkMode = currentTheme === 'dark';
   
-  // Theme specific colors
-  const sheetBg = isDarkMode ? "#10152C" : "#ffffff";
+  // Theme specific colors defined with Tailwind classes
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
-  const cardBg = isDarkMode ? "#161F3E" : "#f0f2f5";
   const subtitleColor = isDarkMode ? "text-gray-400" : "text-gray-500";
   
   if (!employee) return null;
@@ -49,10 +48,12 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent
         side="left"
-        className={`${textColor} border-none shadow-none px-5 py-6 overflow-auto`}
-        style={{ maxWidth: '320px', zIndex: 9999, backgroundColor: sheetBg }}
+        className={`${textColor} border-none shadow-none px-5 py-6 overflow-auto bg-white dark:bg-[#10152C] max-w-[320px]`}
+        style={{ zIndex: SHEET_Z_INDEX }}
       >
-        <DialogTitle></DialogTitle>
+        {/* ! DialogTitle required in sheet,if removed case an error */}
+        <DialogTitle className="sr-only"></DialogTitle>
+
         <div className="relative w-full">
           <SheetClose className={`absolute left-1 top-1 ${subtitleColor} ${isDarkMode ? 'hover:text-white' : 'hover:text-gray-700'}`}>
             <X size={22} />
@@ -73,22 +74,22 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
             
             {/* Gender, Birth Date and Nationality */}
             <div className="flex justify-between mb-3 mt-4">
-              <div className="p-2 rounded-md w-full text-center mx-1" style={{ backgroundColor: cardBg }}>
+              <div className="p-2 rounded-md w-full text-center mx-1 bg-[#f0f2f5] dark:bg-[#161F3E]">
                 <div className={`${subtitleColor} text-[10px] mb-1`}>{t('personalInfo.gender')}</div>
                 <div>{employee.gender}</div>
               </div>
-              <div className="p-2 rounded-md w-full text-center mx-1" style={{ backgroundColor: cardBg }}>
+              <div className="p-2 rounded-md w-full text-center mx-1 bg-[#f0f2f5] dark:bg-[#161F3E]">
                 <div className={`${subtitleColor} text-[10px] mb-1`}>{t('personalInfo.birthDate')}</div>
                 <div>{employee.birthDate}</div>
               </div>
-              <div className="p-2 rounded-md w-full text-center mx-1" style={{ backgroundColor: cardBg }}>
+              <div className="p-2 rounded-md w-full text-center mx-1 bg-[#f0f2f5] dark:bg-[#161F3E]">
                 <div className={`${subtitleColor} text-[10px] mb-1`}>{t('personalInfo.nationality')}</div>
                 <div>{employee.nationality}</div>
               </div>
             </div>
             
             {/* Attendance status and Employee status */}
-            <div className="p-3 rounded-md mb-3" style={{ backgroundColor: cardBg }}>
+            <div className="p-3 rounded-md mb-3 bg-[#f0f2f5] dark:bg-[#161F3E]">
               <EmployeeInfoField 
                 label={t('status.attendanceStatus')} 
                 value={employee.attendanceStatus} 
@@ -104,14 +105,14 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsSheetProps> = ({
             
             {/* Check-in and Check-out times */}
             {employee.checkInTime && (
-              <div className="p-3 rounded-md" style={{ backgroundColor: cardBg }}>
+              <div className="p-3 rounded-md bg-[#f0f2f5] dark:bg-[#161F3E]">
                 <div className={`${subtitleColor} text-[12px] mb-0.5`}>{t('times.checkIn')}</div>
                 <div className="text-right text-lg">{employee.checkInTime} {t('times.morning')}</div>
               </div>
             )}
             
             {employee.checkOutTime && (
-              <div className="p-3 rounded-md mt-3" style={{ backgroundColor: cardBg }}>
+              <div className="p-3 rounded-md mt-3 bg-[#f0f2f5] dark:bg-[#161F3E]">
                 <div className={`${subtitleColor} text-[12px] mb-0.5`}>{t('times.checkOut')}</div>
                 <div className="text-right text-lg">{employee.checkOutTime} {t('times.afternoon')}</div>
               </div>

@@ -5,6 +5,7 @@ import { ColumnConfig } from "@/modules/table/utils/tableConfig";
 import { AttendanceStatusRecord } from "../types/attendance";
 import React from "react";
 import { useTranslations } from "next-intl";
+import { UN_SPECIFIED } from "../constants/static-data";
 
 // Configuration function for the attendance departure table
 export const getAttendanceDepartureTableConfig = (t: (key: string) => string) => {
@@ -54,7 +55,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
           <ApproverBadge
-            approver={row?.applied_constraints?.[0]?.name ?? "غير محدد"}
+            approver={row?.applied_constraints?.[0]?.name ?? UN_SPECIFIED}
             record={row}
           />
         ),

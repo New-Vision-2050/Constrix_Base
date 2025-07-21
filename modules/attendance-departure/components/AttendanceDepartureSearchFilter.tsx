@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// لم نعد بحاجة إلى البيانات الثابتة، نستخدم البيانات من API
+// We no longer need static data, we use data from API
 import { useAttendance } from "../context/AttendanceContext";
 import { useTranslations } from "next-intl";
 
@@ -26,7 +26,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
     selectedBranch,
     setSelectedBranch,
     refetchTeamAttendance,
-    // جلب بيانات الفروع والمشرفين من Context
+    // Fetch branches and supervisors data from Context
     branches,
     managements,
     constraints,
@@ -39,11 +39,10 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
   const handleSearchTextChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      console.log("Setting search text to:", newValue);
+      
       setSearchText(newValue);
       // Refetch data with a slight delay to allow for typing
       setTimeout(() => {
-        console.log("Refetching with search text:", newValue);
         refetchTeamAttendance();
       }, 500);
     },
@@ -53,10 +52,8 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
   // Handle select changes
   const handleApproverChange = useCallback(
     (value: string) => {
-      console.log("Setting approver to:", value);
       setSelectedApprover(value);
       setTimeout(() => {
-        console.log("Refetching after approver change:", value);
         refetchTeamAttendance();
       }, 0);
     },
@@ -65,10 +62,8 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
 
   const handleDepartmentChange = useCallback(
     (value: string) => {
-      console.log("Setting department to:", value);
       setSelectedDepartment(value);
       setTimeout(() => {
-        console.log("Refetching after department change:", value);
         refetchTeamAttendance();
       }, 0);
     },
@@ -77,17 +72,13 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
 
   const handleBranchChange = useCallback(
     (value: string) => {
-      console.log("Setting branch to:", value);
       setSelectedBranch(value);
       setTimeout(() => {
-        console.log("Refetching after branch change:", value);
         refetchTeamAttendance();
       }, 0);
     },
     [setSelectedBranch, refetchTeamAttendance]
   );
-
-  console.log("constraints", constraints);
 
   return (
     <div className="p-4 bg-[#140F35] rounded-lg mb-4">
@@ -106,7 +97,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
             {/* عرض الفروع من الـ API مع عرض رسالة تحميل إذا كانت البيانات قيد التحميل */}
             {branchesLoading ? (
               <SelectItem value="loading" disabled>
-                جاري تحميل الفروع...
+                {t("loadingBranches")}
               </SelectItem>
             ) : (
               branches?.map((branch) => (
@@ -130,7 +121,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
             <SelectItem value="all">{t("all")}</SelectItem>
             {managementsLoading ? (
               <SelectItem value="loading" disabled>
-                جاري تحميل الفروع...
+                {t("loadingDepartments")}
               </SelectItem>
             ) : (
               managements?.map((management) => (
@@ -156,7 +147,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
               <SelectItem value="loading" disabled>{t("loadingApprovers")}</SelectItem>
             ) : (
               constraints?.map((constraint,index) => (
-                <SelectItem key={constraint.id+'-'+index} value={constraint.id}>
+                <SelectItem key={index} value={constraint.id}>
                   {constraint.constraint_name}
                 </SelectItem>
               ))

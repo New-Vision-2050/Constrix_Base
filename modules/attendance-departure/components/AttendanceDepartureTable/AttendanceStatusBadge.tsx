@@ -1,59 +1,70 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { useAttendance } from "../../context/AttendanceContext";
 import { AttendanceStatusRecord } from "../../types/attendance";
+import { UN_SPECIFIED } from "../../constants/static-data";
 
 interface AttendanceStatusBadgeProps {
-  status: string; // This will now contain the status from the backend
-  record: AttendanceStatusRecord; // The full attendance record
+  record: AttendanceStatusRecord;
+  status?: string;
 }
 
 /**
  * Component to display the attendance status in the table and open the attendance status dialog when clicked
  */
-const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({
-  status,
+export const AttendanceStatusBadge = ({
   record,
-}) => {
+  status,
+}: AttendanceStatusBadgeProps) => {
   const { openAttendanceStatusDialog } = useAttendance();
+  const t = useTranslations("attendanceDeparture.status");
   let color = "";
   let text = "";
   //is_late
-  let _status = record.status;
-  if (record.is_late === 0) {
-    _status = "present";
+  let _status = "";
+  if (record.is_absent === 1) {
+    _status = "absent";
+  } else if (record.is_holiday === 1) {
+    _status = "holiday";
   } else if (record.is_late === 1) {
     _status = "late";
-  } else {
-    _status = "absent";
+  } else if (
+    record.status === "active" ||
+    record.status === "completed"
+  ) {
+    _status = "present";
   }
 
   // Map the backend status to display text
   switch (_status) {
     case "present":
-      text = "حاضر";
+      text = t("present");
       color = "text-green-500";
       break;
     case "absent":
-      text = "غائب";
+      text = t("absent");
       color = "text-red-500";
       break;
     case "late":
-      text = "متأخر";
+      text = t("late");
       color = "text-yellow-400";
       break;
-    case "on_leave":
-      text = "في إجازة";
+    case "holiday":
+      text = t("holiday");
       color = "text-blue-500";
       break;
     default:
-      text = status || "غير محدد";
+      text = status || t("unspecified");
       color = "text-gray-400";
       break;
   }
 
+  // Separated interactive styles from color styles
+  const interactiveStyles = "cursor-pointer hover:underline";
+
   return (
     <span
-      className={`font-bold cursor-pointer ${color} hover:underline`}
+      className={`font-bold ${interactiveStyles} ${color}`}
       onClick={() => openAttendanceStatusDialog(record)}
     >
       {text}

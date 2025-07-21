@@ -22,3 +22,5 @@ export interface AttendanceRecord {
   clock_in_time: string;
   clock_out_time: string;
 }
+
+export const UN_SPECIFIED = "غير محدد";

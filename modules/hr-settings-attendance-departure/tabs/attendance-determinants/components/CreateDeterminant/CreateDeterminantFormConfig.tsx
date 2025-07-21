@@ -4,6 +4,8 @@ import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
+import { TimeUnits } from "../../constants/determinants";
 
 // Day names mapping
 const dayNames = {
@@ -44,6 +46,12 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     return t ? t(key) : defaultText;
   };
 
+  const _type_attendance = [];
+
+  if(Boolean(editConstraint?.config?.type_attendance?.location))_type_attendance.push("location");
+  if(Boolean(editConstraint?.config?.type_attendance?.fingerprint))_type_attendance.push("fingerprint");
+  
+
   return {
     formId: "create-determinant-form",
     title: getText("form.title", "إضافة محدد جديد"),
@@ -53,10 +61,21 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       constraint_type: editConstraint?.constraint_type,
       branch_locations: editConstraint?.branch_locations,
       is_active: Boolean(editConstraint?.is_active),
-      branch_ids: editConstraint?.branch_locations?.map((branch) => Number(branch.branch_id)) ?? [],
+      early_clock_in_rules_value: editConstraint?.config?.early_clock_in_rules?.grace_period_minutes,
+      early_clock_in_rules_unit: editConstraint?.config?.early_clock_in_rules?.unit,
+      lateness_rules_value: editConstraint?.config?.lateness_rules?.grace_period_minutes,
+      lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
+      out_zone_rules_value: editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold,
+      out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
+      type_attendance: _type_attendance,
+      branch_ids:
+        editConstraint?.branch_locations?.map(
+          (branch: { branch_id: string | number }) => Number(branch.branch_id)
+        ) ?? [],
       location_type: "main",
       weekly_schedule: Object.entries(
-        editConstraint?.config?.time_rules?.weekly_schedule || {}
+        (editConstraint?.config?.time_rules
+          ?.weekly_schedule as weeklyScheduleDays) || {}
       )
         ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
         ?.map(([dayName, dayConfig]) => {
@@ -263,7 +282,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     enableDrag: true,
                     rowFields: [
                       {
-                        type: "text",
+                        type: "time",
                         name: "from",
                         label: getText("form.periodStart", "بداية الفترة"),
                         placeholder: getText(
@@ -278,18 +297,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                               "بداية الفترة مطلوبة"
                             ),
                           },
-                          {
-                            type: "pattern",
-                            value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
-                            message: getText(
-                              "form.timeFormatError",
-                              "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"
-                            ),
-                          },
                         ],
                       },
                       {
-                        type: "text",
+                        type: "time",
                         name: "to",
                         label: getText("form.periodEnd", "نهاية الفترة"),
                         placeholder: getText(
@@ -305,11 +316,34 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             ),
                           },
                           {
-                            type: "pattern",
-                            value: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
+                            type: "custom",
+                            validator: (value: string, formValues: any) => {
+                              const fromTime = formValues.from || "";
+                              const toTime = value || "";
+                              
+                              // Skip validation if either time is not set
+                              if (!fromTime || !toTime) return true;
+                              
+                              // Convert times to comparable format (minutes since midnight)
+                              const fromParts = fromTime.split(":");
+                              const toParts = toTime.split(":");
+                              
+                              if (fromParts.length !== 2 || toParts.length !== 2) return true;
+                              
+                              const fromMinutes = 
+                                (parseInt(fromParts[0], 10) * 60) + parseInt(fromParts[1], 10);
+                              const toMinutes = 
+                                (parseInt(toParts[0], 10) * 60) + parseInt(toParts[1], 10);
+                              
+                              // Return true if valid (to time is greater than or equal to from time)
+                              return toMinutes >= fromMinutes;
+                            },
                             message: getText(
-                              "form.timeFormatError",
-                              "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 17:00"
+                              "form.periodEndMustBeAfterStart",
+                              "وقت النهاية يجب أن يكون بعد وقت البداية"
+                            ) || getText(
+                              "form.startTimeBeforeEndTime",
+                              "وقت البداية قبل وقت النهاية"
                             ),
                           },
                         ],
@@ -325,6 +359,159 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               maxRows: 5,
               columns: 1,
             },
+          },
+          {
+            name: "early_clock_in_rules_unit",
+            label: "early_clock_in_rules_unit",
+            placeholder: "early_clock_in_rules_unit",
+            type: "hiddenObject",
+            validation: [],
+          },
+          {
+            name: "early_clock_in_rules_value",
+            label: "السماح بالحضور لمدة (قبل العمل)",
+            type: "number",
+            placeholder: "السماح بالحضور لمدة (قبل العمل)",
+            postfix: (
+              <div className="w-full h-full">
+                <select
+                  className="rounded-lg p-2 bg-transparent"
+                  defaultValue={editConstraint?.config?.early_clock_in_rules?.unit ?? TimeUnits?.[0]?.id}
+                  onChange={(e) => {
+                    const formStore = useFormStore.getState();
+                    formStore.setValues(`create-determinant-form`, {
+                      early_clock_in_rules_unit: e.target.value,
+                    });
+                  }}
+                >
+                  {TimeUnits?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="bg-sidebar text-black dark:text-white"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ),
+            required: true,
+            validation: [
+              {
+                type: "pattern",
+                value: "^[0-9]+$",
+                message:
+                  "السماح بالحضور لمدة (قبل العمل) يجب أن تكون أرقام فقط",
+              },
+            ],
+          },
+          {
+            name: "lateness_rules_unit",
+            label: "lateness_rules_unit",
+            placeholder: "lateness_rules_unit",
+            type: "hiddenObject",
+            validation: [],
+          },
+          {
+            name: "lateness_rules_value",
+            label: "السماح بالتأخير لمدة",
+            type: "number",
+            placeholder: "السماح بالتأخير لمدة",
+            postfix: (
+              <div className="w-full h-full">
+                <select
+                  className="rounded-lg p-2 bg-transparent"
+                  defaultValue={editConstraint?.config?.lateness_rules?.unit ?? TimeUnits?.[0]?.id}
+                  onChange={(e) => {
+                    const formStore = useFormStore.getState();
+                    formStore.setValues(`create-determinant-form`, {
+                      lateness_rules_unit: e.target.value,
+                    });
+                  }}
+                >
+                  {TimeUnits?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="bg-sidebar text-black dark:text-white"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ),
+            required: true,
+            validation: [
+              {
+                type: "pattern",
+                value: "^[0-9]+$",
+                message: "السماح بالتأخير لمدة يجب أن تكون أرقام فقط",
+              },
+            ],
+          },
+          {
+            name: "out_zone_rules_unit",
+            label: "out_zone_rules_unit",
+            placeholder: "out_zone_rules_unit",
+            type: "hiddenObject",
+            validation: [],
+          },
+          {
+            name: "out_zone_rules_value",
+            label: "خارج المحدد لمدة",
+            type: "number",
+            placeholder: "خارج المحدد لمدة",
+            postfix: (
+              <div className="w-full h-full">
+                <select
+                  className="rounded-lg p-2 bg-transparent"
+                  defaultValue={editConstraint?.config?.radius_enforcement?.unit ?? TimeUnits?.[0]?.id}
+                  onChange={(e) => {
+                    const formStore = useFormStore.getState();
+                    formStore.setValues(`create-determinant-form`, {
+                      out_zone_rules_unit: e.target.value,
+                    });
+                  }}
+                >
+                  {TimeUnits?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="bg-sidebar text-black dark:text-white"
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ),
+            required: true,
+            validation: [
+              {
+                type: "pattern",
+                value: "^[0-9]+$",
+                message: "خارج المحدد لمدة يجب أن تكون أرقام فقط",
+              },
+            ],
+          },
+          {
+            type: "checkboxGroup",
+            name: "type_attendance",
+            label: "تسجيل الحضور و الانصراف من خلال",
+            isMulti: true,
+            options: [
+              { value: "location", label: "الموقع" },
+              { value: "fingerprint", label: "بصمة الوجة" },
+            ],
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "تسجيل الحضور و الانصراف من خلال يجب أن يختار",
+              },
+            ],
           },
         ],
       },
@@ -445,6 +632,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           };
         }),
         constraint_config: {
+          radius_enforcement: {
+            end_shift_if_violated: true,
+            out_of_radius_time_threshold: formData.out_zone_rules_value,
+            unit: formData.out_zone_rules_unit ?? TimeUnits?.[0]?.id,
+          },
           time_rules: {
             subtype: "multiple_periods",
             weekly_schedule: Object.keys(dayNames).reduce<Record<string, any>>(
@@ -547,14 +739,36 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               {} as Record<string, any>
             ),
           },
+          early_clock_in_rules: {
+            prevent_early_clock_in: true,
+            grace_period_minutes: formData.early_clock_in_rules_value,
+            unit: formData.early_clock_in_rules_unit ?? TimeUnits?.[0]?.id,
+          },
+          lateness_rules: {
+            prevent_lateness: true,
+            grace_period_minutes: formData.lateness_rules_value,
+            unit: formData.lateness_rules_unit ?? TimeUnits?.[0]?.id,
+          },
+          type_attendance: {
+            location:
+              (formData.type_attendance as Array<string>)?.indexOf("location") !==
+              -1,
+            fingerprint:
+              (formData.type_attendance as Array<string>)?.indexOf(
+                "fingerprint"
+              ) !== -1,
+          },
         },
+        
       };
 
       return await defaultSubmitHandler(
         data,
         getDynamicDeterminantFormConfig({ refetchConstraints, editConstraint }),
         {
-          url: Boolean(editConstraint) ? `${baseURL}/attendance/constraints/${editConstraint.id}` : `${baseURL}/attendance/constraints`,
+          url: Boolean(editConstraint)
+            ? `${baseURL}/attendance/constraints/${editConstraint.id}`
+            : `${baseURL}/attendance/constraints`,
           method: Boolean(editConstraint) ? "PUT" : "POST",
         }
       );

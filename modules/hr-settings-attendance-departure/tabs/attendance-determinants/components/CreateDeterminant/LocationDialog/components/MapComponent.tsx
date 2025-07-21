@@ -39,10 +39,12 @@ export default function MapComponent({
   longitude,
   onMapClick,
 }: MapComponentProps) {
-  // استخدام الإحداثيات المقدمة أو الافتراضية لمدينة الرياض فقط عند الحاجة
-  // مدينة الرياض كقيمة افتراضية فقط في حالة عدم وجود إحداثيات
-  const latStr = latitude || "24.7136"; // الرياض كقيمة افتراضية
-  const lngStr = longitude || "46.6753";
+  // Default coordinates for Riyadh city, used only when no coordinates are provided
+  const DEFAULT_RIYADH_LAT = "24.7136";
+  const DEFAULT_RIYADH_LNG = "46.6753";
+  
+  const latStr = latitude || DEFAULT_RIYADH_LAT;
+  const lngStr = longitude || DEFAULT_RIYADH_LNG;
   
   // Convert coordinates to numbers
   const position = useMemo(() => {
@@ -91,9 +93,9 @@ export default function MapComponent({
           style={{ height: '100%', width: '100%' }}
           className="rounded-lg"
           ref={mapRef}
-          // @ts-ignore - whenReady is available in react-leaflet
-          whenReady={(event: any) => {
-            mapRef.current = event.target;
+          // @ts-ignore - Using whenReady to get map instance - react-leaflet type defs can be inconsistent
+          whenReady={({ target }: { target: any }) => {
+            mapRef.current = target;
           }}
         >
           {/* @ts-ignore */}
@@ -103,7 +105,7 @@ export default function MapComponent({
           />
           
           {/* @ts-ignore */}
-          <Marker key={`${latStr}-${lngStr}`} position={position} icon={customIcon} />
+          <Marker key={position.toString()} position={position} icon={customIcon} />
           
           <MapClickHandler onMapClick={onMapClick} />
         </MapContainer>

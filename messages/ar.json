@@ -1,4 +1,17 @@
 {
+  "location": {
+    "longitude": "خط الطول",
+    "latitude": "خط العرض",
+    "radius": "نصف قطر الحضور",
+    "meters": "متر",
+    "save": "حفظ",
+    "chooseLocationCoordinates": "اختر إحداثيات الموقع",
+    "defaultBranchLocation": "موقع الفرع الافتراضي",
+    "selectBranch": "اختر الفرع",
+    "loading": "جاري التحميل...",
+    "selectBranchesFirst": "اختر الفروع أولاً",
+    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها"
+  },
   "Main": {
     "NoResultsRound": "لم يتم العثور على نتائج",
     "Loading": "جاري تحميل البيانات..."
@@ -166,6 +179,15 @@
     "profile": "حسابي",
     "changeMail": "تغيير البريد الالكتروني",
     "changePassword": "تغيير كلمة المرور"
+  },
+  "attendanceDeparture": {
+    "status": {
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "holiday": "في إجازة",
+      "unspecified": "غير محدد"
+    }
   },
   "FormBuilder": {
     "Fields": {
@@ -503,6 +525,7 @@
       "branch": "الفرع",
       "all": "الكل",
       "loadingBranches": "جاري تحميل الفروع...",
+      "loadingDepartments": "جاري تحميل الادارات...",
       "department": "الإدارة",
       "approver": "المحدد المعتمد",
       "loadingApprovers": "جاري تحميل المشرفين...",
@@ -631,6 +654,8 @@
         "periodStartRequired": "بداية الفترة مطلوبة",
         "periodEndRequired": "نهاية الفترة مطلوبة",
         "timeFormatError": "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00",
+        "periodEndMustBeAfterStart": "وقت النهاية يجب أن يكون بعد وقت البداية",
+        "startTimeBeforeEndTime": "وقت البداية قبل وقت النهاية",
         "addPeriod": "إضافة فترة",
         "deletePeriod": "حذف الفترة",
         "submitButtonText": "حفظ المحدد",

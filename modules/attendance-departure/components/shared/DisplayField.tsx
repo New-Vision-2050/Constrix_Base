@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme } from "next-themes";
+import { UN_SPECIFIED } from "../../constants/static-data";
 
 interface DisplayFieldProps {
   label: string;
@@ -15,12 +16,10 @@ const DisplayField: React.FC<DisplayFieldProps> = ({
   value, 
   defaultValue
 }) => {
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   
-  // Theme specific colors
+
   const labelColor = isDarkMode ? "text-gray-400" : "text-gray-600";
   const bgColor = isDarkMode ? "#101026" : "#f5f5f5";
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-300";
@@ -32,7 +31,7 @@ const DisplayField: React.FC<DisplayFieldProps> = ({
         className={`border rounded-md p-3 text-right ${borderColor} ${textColor}`}
         style={{ backgroundColor: bgColor }}
       >
-        {value || defaultValue || "غير محدد"}
+        {value || defaultValue || `${label} ${UN_SPECIFIED}`}
       </div>
     </div>
   );

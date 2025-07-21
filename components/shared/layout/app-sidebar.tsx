@@ -134,7 +134,6 @@ export function AppSidebar({
         ],
         isNotCentral: true,
       },
-      // human resources
       {
         name: t("Sidebar.HumanResources"),
         icon: LayoutDashboardIcon,

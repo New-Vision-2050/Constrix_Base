@@ -10,6 +10,15 @@ import WorkdayPeriods, {
 import { useAttendance } from "../../context/AttendanceContext";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { UN_SPECIFIED } from "../../constants/static-data";
+import { convertTo12HourFormat } from "../../utils/time-helpers";
+
+// Define the input period type structure
+interface InputPeriodType {
+  start_time: string;
+  end_time: string;
+  [key: string]: any; // Allow for any additional properties
+}
 
 /**
  * Approver dialog component that appears when clicking on the approver cell in the table
@@ -18,16 +27,42 @@ const ApproverDialog: React.FC = () => {
   const { isApproverDialogOpen, selectedApproverRecord, closeApproverDialog } =
     useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.approver");
-  
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
-  
+
+  // Get current theme using resolvedTheme
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
+
   // Theme specific colors
   const accentColor = isDarkMode ? "#E91E63" : "#D81B60";
   const containerBg = isDarkMode ? "bg-gray-800" : "bg-gray-100";
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
+
+  // constraint name
+  const constraintName =
+    selectedApproverRecord?.applied_constraints?.[0]?.name ?? UN_SPECIFIED;
+
+  // get work day periods
+  const getWorkDayPeriods = (periods: InputPeriodType[]): PeriodType[] => {
+    return periods.map((period, index) => {
+      // Use helper function for time conversion
+      const startFormat = convertTo12HourFormat(period.start_time);
+      const endFormat = convertTo12HourFormat(period.end_time);
+
+      const start12Hour = startFormat.hour;
+      const startPeriod = startFormat.period;
+      const end12Hour = endFormat.hour;
+      const endPeriod = endFormat.period;
+
+      return {
+        id: index + 1,
+        label: `${t("period")} ${index + 1}`,
+        fromValue: start12Hour.toString(),
+        fromPeriod: startPeriod,
+        toValue: end12Hour.toString(),
+        toPeriod: endPeriod,
+      };
+    });
+  };
 
   if (!selectedApproverRecord) return null;
 
@@ -44,50 +79,38 @@ const ApproverDialog: React.FC = () => {
       <div className={`flex flex-col gap-4 ${textColor}`}>
         <DisplayField
           label={t("approverName")}
-          value={selectedApproverRecord?.applied_constraints?.[0]?.name}
+          value={constraintName}
           defaultValue={t("unspecified")}
         />
 
-        <DisplayField label={t("approverSystem")} value={selectedApproverRecord?.applied_constraints?.[0]?.name} />
+        <DisplayField label={t("approverSystem")} value={constraintName} />
 
         {/* Workday Periods */}
-        {selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules?.weekly_schedule && 
-          Object.entries(selectedApproverRecord.applied_constraints[0].config.time_rules.weekly_schedule).map(([day, dayData]) => {
+        {selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules
+          ?.weekly_schedule &&
+          Object.entries(
+            selectedApproverRecord.applied_constraints[0].config.time_rules
+              .weekly_schedule
+          ).map(([day, dayData]) => {
             // Skip days that aren't enabled
-            if (!dayData.enabled || !dayData.periods || dayData.periods.length === 0) return null;
-            
+            if (
+              !dayData.enabled ||
+              !dayData.periods ||
+              dayData.periods.length === 0
+            )
+              return null;
+
             return (
               <WorkdayPeriods
                 key={day}
                 hours={dayData.total_work_hours}
                 title={t(`days.${day}`)}
-                periods={dayData.periods.map((period, index) => {
-                  // Extract hours and convert to 12-hour format for display
-                  const startTime = new Date(`2023-01-01T${period.start_time}`);
-                  const endTime = new Date(`2023-01-01T${period.end_time}`);
-                  
-                  const startHour = startTime.getHours();
-                  const startPeriod = startHour >= 12 ? "PM" : "AM";
-                  const start12Hour = startHour > 12 ? startHour - 12 : startHour === 0 ? 12 : startHour;
-                  
-                  const endHour = endTime.getHours();
-                  const endPeriod = endHour >= 12 ? "PM" : "AM";
-                  const end12Hour = endHour > 12 ? endHour - 12 : endHour === 0 ? 12 : endHour;
-                  
-                  return {
-                    id: index + 1,
-                    label: `${t("period")} ${index + 1}`,
-                    fromValue: start12Hour.toString(),
-                    fromPeriod: startPeriod,
-                    toValue: end12Hour.toString(),
-                    toPeriod: endPeriod,
-                  };
-                })}
+                periods={getWorkDayPeriods(dayData.periods??[])}
               />
             );
-          })
-        }
-        {!selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules?.weekly_schedule && (
+          })}
+        {!selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules
+          ?.weekly_schedule && (
           <WorkdayPeriods
             title={t("noWeeklySchedule")}
             periods={[]}

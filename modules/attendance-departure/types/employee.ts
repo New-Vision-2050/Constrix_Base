@@ -14,13 +14,11 @@ export interface EmployeeDetails {
   checkInTime?: string;
   checkOutTime?: string;
   avatarUrl?: string;
-  clock_in_time?: string;
-  clock_out_time?: string;
 }
 
 // Employee details component props interface
 export interface EmployeeDetailsProps {
   isOpen: boolean;
   onClose: (open: boolean) => void;
-  employee: EmployeeDetails | null;
+  employee?: EmployeeDetails | null;
 }

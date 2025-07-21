@@ -35,10 +35,10 @@ export const getTeamAttendance = async (params?: GetTeamAttendanceParams): Promi
       queryParams.append("end_date", params.end_date);
     }
     
-    // التعامل مع قيمة search_text للتأكد من إضافتها حتى لو كانت سلسلة فارغة
+    // Handle search_text value to ensure it's added even if it's an empty string
     if ('search_text' in params) {
       if(params.search_text){
-        const searchValue = params.search_text || ''; // حتى لو كانت قيمتها undefined أو null، نستخدم سلسلة فارغة
+        const searchValue = params.search_text || ''; // Even if the value is undefined or null, use an empty string
         queryParams.append("user_search", searchValue);
       }
     } else {

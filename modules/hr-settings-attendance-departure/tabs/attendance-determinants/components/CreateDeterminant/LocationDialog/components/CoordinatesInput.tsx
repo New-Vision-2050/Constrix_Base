@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 interface CoordinatesInputProps {
   longitude: string;
@@ -18,46 +19,40 @@ export default function CoordinatesInput({
   onLatitudeChange,
   onRadiusChange,
 }: CoordinatesInputProps) {
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const t = useTranslations("location");
   
-  // Theme-specific colors
-  const labelColor = isDarkMode ? 'text-white' : 'text-gray-700';
-  const inputBg = isDarkMode ? 'bg-gray-700' : 'bg-white';
-  const inputText = isDarkMode ? 'text-white' : 'text-gray-900';
-  const inputBorder = isDarkMode ? 'border-gray-600' : 'border-gray-300';
-  const placeholderColor = isDarkMode ? 'placeholder-gray-400' : 'placeholder-gray-500';
+  // Common input classes
+  const inputClasses = "w-full px-3 py-2 rounded-lg border focus:border-pink-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400";
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
       <div>
-        <label className={`block ${labelColor} text-sm mb-2`}>خط الطول:</label>
+        <label className="block text-gray-700 dark:text-white text-sm mb-2">{t("longitude")}:</label>
         <input
           type="text"
           value={longitude}
           onChange={(e) => onLongitudeChange(e.target.value)}
-          className={`w-full px-3 py-2 ${inputBg} ${inputText} rounded-lg border ${inputBorder} focus:border-pink-500 focus:outline-none ${placeholderColor}`}
-          placeholder="25.3253.486.4786.1"
+          className={inputClasses}
+          placeholder="46.6753"
         />
       </div>
       <div>
-        <label className={`block ${labelColor} text-sm mb-2`}>خط العرض:</label>
+        <label className="block text-gray-700 dark:text-white text-sm mb-2">{t("latitude")}:</label>
         <input
           type="text"
           value={latitude}
           onChange={(e) => onLatitudeChange(e.target.value)}
-          className={`w-full px-3 py-2 ${inputBg} ${inputText} rounded-lg border ${inputBorder} focus:border-pink-500 focus:outline-none ${placeholderColor}`}
-          placeholder="25.3253.486.4786.1"
+          className={inputClasses}
+          placeholder="24.7136"
         />
       </div>
       <div className="col-span-2">
-        <label className={`block ${labelColor} text-sm mb-2`}>مسافة الحضور (متر):</label>
+        <label className="block text-gray-700 dark:text-white text-sm mb-2">{t("radius")} ({t("meters")}):</label>
         <input
           type="number"
-          value={Number(radius??'0')}
+          value={parseInt(radius || '0', 10) || 0}
           onChange={(e) => onRadiusChange(e.target.value)}
-          className={`w-full px-3 py-2 ${inputBg} ${inputText} rounded-lg border ${inputBorder} focus:border-pink-500 focus:outline-none ${placeholderColor}`}
+          className={inputClasses}
           placeholder="100"
           min="0"
         />

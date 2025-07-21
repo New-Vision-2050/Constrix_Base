@@ -28,7 +28,7 @@ const getMarkerIcon = (status: string, isDarkMode: boolean = true) => {
     };
     const color = colorMap[status as keyof typeof colorMap] || "#6c757d";
 
-    const backgroundColor = isDarkMode ? "white" : "#f8fafc";
+    const backgroundColor = isDarkMode ? "#1e293b" : "white";
     const borderStyle = isDarkMode ? "dashed" : "solid";
     const shadowColor = isDarkMode ? "rgba(0,0,0,0.1)" : "rgba(0,0,0,0.15)";
     
@@ -91,9 +91,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
             // Use actual clock in/out times if available, otherwise use defaults
             checkInTime: employee.clock_in_time || (employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined),
             checkOutTime: employee.clock_out_time || (employee.attendanceStatus === 'present' ? '17:00' : undefined),
-            // Also set the new field names for compatibility with updated component
-            clock_in_time: employee.clock_in_time || (employee.attendanceStatus === 'present' || employee.attendanceStatus === 'late' ? '08:30' : undefined),
-            clock_out_time: employee.clock_out_time || (employee.attendanceStatus === 'present' ? '17:00' : undefined),
+            // The updated component uses checkInTime and checkOutTime which are already set above
             avatarUrl: undefined // No default avatar
         };
         

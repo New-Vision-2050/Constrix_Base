@@ -9,7 +9,7 @@ type weeklyScheduleDay = {
   periods: PeriodType[];
 };
 
-type weeklyScheduleDays = {
+export type weeklyScheduleDays = {
   friday: weeklyScheduleDay;
   monday: weeklyScheduleDay;
   saturday: weeklyScheduleDay;
@@ -55,6 +55,8 @@ export interface AttendanceStatusRecord {
   is_clocked_in: number;
   is_early_departure: number;
   is_late: number;
+  is_absent: number;
+  is_holiday: number;
   is_on_break: boolean;
   late_minutes: number;
   notes: string;

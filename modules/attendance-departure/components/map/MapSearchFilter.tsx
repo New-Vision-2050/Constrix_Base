@@ -12,12 +12,10 @@ const MapSearchFilter: React.FC = () => {
   const t = useTranslations("AttendanceDepartureModule.MapSearchFilter");
   const { toggleView, searchText, setSearchText } = useAttendance();
   
-  // Get current theme
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   
-  // Theme specific colors
+
   const containerBg = isDarkMode ? "#140F35" : "#f0f2f5";
   const inputBg = isDarkMode ? "#21174A" : "#ffffff";
   const inputBorderFocus = isDarkMode ? "#7453F0" : "#7453F0";
@@ -27,7 +25,7 @@ const MapSearchFilter: React.FC = () => {
   const outlineBtnBorder = isDarkMode ? "#2d3748" : "#d1d5db";
   const outlineBtnText = isDarkMode ? "#e2e8f0" : "#4b5563";
   
-  // معالجة تغيير قيمة البحث
+
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
   }, [setSearchText]);
@@ -35,7 +33,7 @@ const MapSearchFilter: React.FC = () => {
   return (
     <div 
       className="flex items-center justify-between w-full h-[60px] rounded-lg px-4 gap-2"
-      style={{ backgroundColor: `${containerBg} !important`}}
+      style={{ backgroundColor: containerBg }}
     >
       <div className="flex-grow relative">
         <Input
@@ -64,7 +62,7 @@ const MapSearchFilter: React.FC = () => {
           variant="outline" 
           size="sm" 
           disabled
-          className={isDarkMode ? "" : "border-gray-300 text-gray-600"}
+          className={`${isDarkMode ? '' : 'border-gray-300 text-gray-600'}`}
           style={{ 
             borderColor: outlineBtnBorder,
             color: outlineBtnText 

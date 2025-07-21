@@ -8,6 +8,7 @@ import CheckboxGroupField from "./fields/CheckboxGroupField";
 import RadioField from "./fields/RadioField";
 import MultiSelectField from "./fields/MultiSelectField";
 import DateField from "./fields/DateField";
+import TimeField from "./fields/TimeField";
 import SearchField from "./fields/SearchField";
 import PhoneField from "./fields/PhoneField";
 import HiddenObjectField from "./fields/HiddenObjectField";
@@ -334,6 +335,18 @@ const FormField: React.FC<FormFieldProps> = ({
             onChange={onChange}
             onBlur={onBlur}
             formId={formId}
+          />
+        );
+
+      case "time":
+        return (
+          <TimeField
+            field={field}
+            value={fieldValue || ""}
+            error={error}
+            touched={touched}
+            onChange={onChange}
+            onBlur={onBlur}
           />
         );
 

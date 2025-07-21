@@ -13,12 +13,11 @@ import { AttendanceStatusRecord } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
 import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
 import { AttendanceSummaryData } from "../api/attendanceSummary";
-import { SelectOption } from "@/types/select-option";
-import { useBranches } from "../hooks/useBranches";
-import { ManagementHierarchyItem, useManagementHierarchies } from "../hooks/useManagementHierarchies";
 import { useManagements } from "../hooks/useManagements";
 import { useConstraints } from "../hooks/useConstraints";
 import { Constraint } from "../api/getConstraints";
+import { ManagementHierarchyItem } from "../api/getHierarchies";
+import { useBranchesHierarchies } from "../hooks/useBranchesHierarchies";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -154,7 +153,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   }, []);
   
   // Get team attendance data for map display with date and search filtering
-  // إنشاء كائن المعلمات بدون search_text في البداية
+  // Create parameters object without search_text initially
   const searchParams: any = {
     // Format dates to YYYY-MM-DD string format for API
     start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
@@ -165,7 +164,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     branch: selectedBranch && selectedBranch !== 'all' ? selectedBranch : undefined
   };
   
-  // إضافة search_text بشكل منفصل للتأكد من أنه يضاف حتى لو كان فارغًا
+  // Add search_text separately to ensure it's added even if empty
   if (searchText !== undefined) {
     searchParams.search_text = searchText;
   }
@@ -195,7 +194,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isLoading: branchesLoading,
     error: branchesError,
     refetch: refetchBranches
-  } = useManagementHierarchies();
+  } = useBranchesHierarchies();
 
   const {
     data:managements,

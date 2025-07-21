@@ -1,4 +1,17 @@
 {
+  "location": {
+    "longitude": "Longitude",
+    "latitude": "Latitude",
+    "radius": "Attendance Radius",
+    "meters": "meters",
+    "save": "Save",
+    "chooseLocationCoordinates": "Choose Location Coordinates",
+    "defaultBranchLocation": "Default Branch Location",
+    "selectBranch": "Select Branch",
+    "loading": "Loading...",
+    "selectBranchesFirst": "Select Branches First",
+    "selectBranchesInstructions": "You need to select branches from the form first to be able to set their locations"
+  },
   "Main": {
     "NoResultsRound": "No results found",
     "Loading": "Loading data..."
@@ -167,6 +180,15 @@
     "profile": "My account",
     "changeMail": "Change email",
     "changePassword": "Change password"
+  },
+  "attendanceDeparture": {
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "holiday": "On Leave",
+      "unspecified": "Unspecified"
+    }
   },
   "FormBuilder": {
     "Fields": {
@@ -500,6 +522,7 @@
       "branch": "Branch",
       "all": "All",
       "loadingBranches": "Loading branches...",
+      "loadingDepartments":"Loading managements...",
       "department": "Department",
       "approver": "Approver",
       "loadingApprovers": "Loading approvers...",
@@ -619,6 +642,8 @@
         "periodStartRequired": "Period start time is required",
         "periodEndRequired": "Period end time is required",
         "timeFormatError": "Must enter valid time in format hours:minutes like 09:00",
+        "periodEndMustBeAfterStart": "End time must be after start time",
+        "startTimeBeforeEndTime": "Start time must be before end time",
         "addPeriod": "Add Period",
         "deletePeriod": "Delete Period",
         "submitButtonText": "Save Determinant",
