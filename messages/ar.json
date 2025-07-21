@@ -653,6 +653,8 @@
         "periodStartRequired": "بداية الفترة مطلوبة",
         "periodEndRequired": "نهاية الفترة مطلوبة",
         "timeFormatError": "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00",
+        "periodEndMustBeAfterStart": "وقت النهاية يجب أن يكون بعد وقت البداية",
+        "startTimeBeforeEndTime": "وقت البداية قبل وقت النهاية",
         "addPeriod": "إضافة فترة",
         "deletePeriod": "حذف الفترة",
         "submitButtonText": "حفظ المحدد",

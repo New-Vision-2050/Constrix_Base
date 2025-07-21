@@ -315,6 +315,37 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                               "نهاية الفترة مطلوبة"
                             ),
                           },
+                          {
+                            type: "custom",
+                            validator: (value: string, formValues: any) => {
+                              const fromTime = formValues.from || "";
+                              const toTime = value || "";
+                              
+                              // Skip validation if either time is not set
+                              if (!fromTime || !toTime) return true;
+                              
+                              // Convert times to comparable format (minutes since midnight)
+                              const fromParts = fromTime.split(":");
+                              const toParts = toTime.split(":");
+                              
+                              if (fromParts.length !== 2 || toParts.length !== 2) return true;
+                              
+                              const fromMinutes = 
+                                (parseInt(fromParts[0], 10) * 60) + parseInt(fromParts[1], 10);
+                              const toMinutes = 
+                                (parseInt(toParts[0], 10) * 60) + parseInt(toParts[1], 10);
+                              
+                              // Return true if valid (to time is greater than or equal to from time)
+                              return toMinutes >= fromMinutes;
+                            },
+                            message: getText(
+                              "form.periodEndMustBeAfterStart",
+                              "وقت النهاية يجب أن يكون بعد وقت البداية"
+                            ) || getText(
+                              "form.startTimeBeforeEndTime",
+                              "وقت البداية قبل وقت النهاية"
+                            ),
+                          },
                         ],
                       },
                     ],
