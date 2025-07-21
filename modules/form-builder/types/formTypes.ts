@@ -225,7 +225,8 @@ export interface WizardOptions {
 
   onStepSubmit?: (
     step: number,
-    values: Record<string, any>
+    values: Record<string, any>,
+    formConfig: FormConfig
   ) => Promise<{
     success: boolean;
     message?: string;
@@ -281,7 +282,7 @@ export interface FormConfig {
     enabled: boolean;
     errorsPath?: string; // Default is 'errors'
   };
-  onSubmit?: (values: Record<string, any>) => Promise<{
+  onSubmit?: (values: Record<string, any>, formConfig: FormConfig) => Promise<{
     success: boolean;
     message?: string;
     errors?: Record<string, string | string[]>;

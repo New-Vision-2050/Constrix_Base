@@ -1,6 +1,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import TimeSelector from "./TimeSelector";
+import { useTheme } from "next-themes";
 
 interface PeriodFieldProps {
   label: string;
@@ -36,10 +37,24 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
   // If URL contains /ar/ or starts with /ar, it's Arabic (RTL)
   const isLTR = pathname?.includes('/en/') || pathname?.startsWith('/en');
   const arrowDirection = isLTR ? '→' : '←';
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const bgColor = isDarkMode ? "#0c0c1e" : "#f8fafc";
+  const borderColor = isDarkMode ? "border-gray-700" : "border-gray-300";
+  const labelTextColor = isDarkMode ? "text-gray-400" : "text-gray-600";
+  const arrowColor = isDarkMode ? "#E91E63" : "#D81B60";
 
   return (
-    <div className="bg-[#0c0c1e] border border-gray-700 rounded-md p-3">
-      <div className="text-xs text-gray-400 mb-2 border-b border-gray-700 pb-2">{label}</div>
+    <div 
+      className={`border rounded-md p-3 ${borderColor}`}
+      style={{ backgroundColor: bgColor }}
+    >
+      <div className={`text-xs mb-2 border-b pb-2 ${labelTextColor} ${borderColor}`}>{label}</div>
       <div className="flex justify-around items-center">
         <TimeSelector
           label="من"
@@ -49,7 +64,7 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
           onPeriodChange={onFromPeriodChange}
           readOnly={readOnly}
         />
-        <div className="text-[#E91E63] font-bold">{arrowDirection}</div>
+        <div className="font-bold" style={{ color: arrowColor }}>{arrowDirection}</div>
         <TimeSelector
           label="إلى"
           value={toValue}

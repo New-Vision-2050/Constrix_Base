@@ -41,7 +41,7 @@ export default function UserProfilePersonalDataReview() {
       <div className="p-2">
         <PreviewTextField
           label="الجنس"
-          value={userPersonalData?.gender ?? ""}
+          value={userPersonalData?.gender == "male" ? "ذكر" : "انثى"}
           valid={Boolean(userPersonalData?.gender)}
           type="select"
         />

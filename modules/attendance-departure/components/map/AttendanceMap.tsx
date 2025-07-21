@@ -17,6 +17,7 @@ import { Maximize2, Minimize2, Loader2 } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
 import { AttendanceRecord } from "../../constants/static-data";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 // Extended MapContainer props to include center prop explicitly
 interface ExtendedMapContainerProps extends MapContainerProps {
@@ -30,6 +31,11 @@ interface ExtendedMapContainerProps extends MapContainerProps {
 const AttendanceMap: React.FC = () => {
   const t = useTranslations('AttendanceDepartureModule.Map');
   const tStatus = useTranslations('AttendanceDepartureModule.Map.employeeStatus');
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
   // Default map center (Riyadh)
   const defaultCenter: L.LatLngExpression = [24.7136, 46.6753];
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -215,9 +221,9 @@ const AttendanceMap: React.FC = () => {
 
           {/* Show loading spinner when data is loading */}
           {teamAttendanceLoading && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
+            <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-lg flex flex-col items-center`}>
               <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-              <span className="text-gray-700 font-medium">
+              <span className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                 {t('loading')}
               </span>
             </div>
@@ -229,13 +235,13 @@ const AttendanceMap: React.FC = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-3 left-3 z-[1000] bg-white shadow-md hover:bg-gray-100 w-8 h-8 p-0"
+        className={`absolute top-3 left-3 z-[1000] shadow-md w-8 h-8 p-0 ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'}`}
         onClick={toggleFullScreen}
       >
         {isFullScreen ? (
-          <Minimize2 size={18} className="text-black" />
+          <Minimize2 size={18} className={isDarkMode ? 'text-white' : 'text-black'} />
         ) : (
-          <Maximize2 size={18} className="text-black" />
+          <Maximize2 size={18} className={isDarkMode ? 'text-white' : 'text-black'} />
         )}
       </Button>
     </div>

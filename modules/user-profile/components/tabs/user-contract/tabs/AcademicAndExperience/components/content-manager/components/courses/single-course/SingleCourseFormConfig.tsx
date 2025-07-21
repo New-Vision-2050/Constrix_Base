@@ -160,14 +160,14 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
           ? `/user_educational_courses`
           : `/user_educational_courses/${course?.id}`;
 
-      const method = formType === "Edit" ? "POST" : "POST";
+      // const method = formType === "Edit" ? "PUT" : "POST";
 
       return await defaultSubmitHandler(
         serialize(body),
         singleCourseFormConfig,
         {
           url: url,
-          method: method,
+          method: "POST",
         }
       );
     },

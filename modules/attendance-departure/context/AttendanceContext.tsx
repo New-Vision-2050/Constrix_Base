@@ -138,27 +138,20 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   
   // Enhanced setters that also trigger refetch directly
   const updateSearchText = useCallback((text: string) => {
-    console.log("Context updating search text to:", text);
     setSearchText(text);
   }, []);
   
   const updateSelectedApprover = useCallback((value: string) => {
-    console.log("Context updating approver to:", value);
     setSelectedApprover(value);
   }, []);
   
   const updateSelectedDepartment = useCallback((value: string) => {
-    console.log("Context updating department to:", value);
     setSelectedDepartment(value);
   }, []);
   
   const updateSelectedBranch = useCallback((value: string) => {
-    console.log("Context updating branch to:", value);
     setSelectedBranch(value);
   }, []);
-  
-  // Debug search values
-  console.log("Context search values:", { searchText, selectedApprover, selectedDepartment, selectedBranch });
   
   // Get team attendance data for map display with date and search filtering
   // إنشاء كائن المعلمات بدون search_text في البداية
@@ -175,10 +168,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // إضافة search_text بشكل منفصل للتأكد من أنه يضاف حتى لو كان فارغًا
   if (searchText !== undefined) {
     searchParams.search_text = searchText;
-    console.log("Adding search_text to params explicitly:", searchText);
   }
-  
-  console.log("Search params for API:", searchParams);
   
   const {
     teamAttendance,
@@ -222,8 +212,6 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     refetch: refetchConstraints
   } = useConstraints();
 
-  console.log('teamAttendancebranches',branches)
-  
   // Employee details dialog state
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
   

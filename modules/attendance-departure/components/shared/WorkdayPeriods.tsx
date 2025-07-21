@@ -1,5 +1,7 @@
 import React from "react";
 import PeriodField from "./PeriodField";
+import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 // Define a type for a period
 export interface PeriodType {
@@ -28,14 +30,32 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
   hours,
   readOnly = true
 }) => {
+  // استخدام hook الترجمة
+  const t = useTranslations("AttendanceDepartureModule.WorkdayPeriods");
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const bgColor = isDarkMode ? "#0c0c1e" : "#f8fafc";
+  const borderColor = isDarkMode ? "border-gray-700" : "border-gray-300";
+  const titleTextColor = isDarkMode ? "text-white" : "text-gray-800";
+  const labelTextColor = isDarkMode ? "text-gray-400" : "text-gray-600";
+  const valueTextColor = isDarkMode ? "text-white" : "text-gray-900";
+  const accentColor = isDarkMode ? "text-pink-500" : "text-pink-600";
   return (
-    <div className="bg-[#0c0c1e] border border-gray-700 rounded-md p-4 mb-4">
-      <div className="text-lg text-white font-medium border-b border-gray-700 pb-2 mb-3">
+    <div 
+      className={`border rounded-md p-4 mb-4 ${borderColor}`}
+      style={{ backgroundColor: bgColor }}
+    >
+      <div className={`text-lg font-medium border-b pb-2 mb-3 ${titleTextColor} ${borderColor}`}>
         {title}
       </div>
       
-      <div className="text-xs text-gray-400 mb-3">
-        عدد الفترات: <span className="text-white font-medium">{periods.length}</span>
+      <div className={`text-xs mb-3 ${labelTextColor}`}>
+        {t('numberOfPeriods', {default: 'عدد الفترات:'})} <span className={`font-medium ${valueTextColor}`}>{periods.length}</span>
       </div>
       
       <div className="flex flex-col gap-4">
@@ -52,8 +72,8 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
         ))}
       </div>
 
-      <div className="text-xs text-gray-400 mb-3">
-      عدد ساعات العمل: <span className="text-pink-500 font-medium">{hours}</span>
+      <div className={`text-xs mb-3 ${labelTextColor}`}>
+      {t('workingHours', {default: 'عدد ساعات العمل:'})} <span className={`font-medium ${accentColor}`}>{hours}</span>
       </div>
     </div>
   );

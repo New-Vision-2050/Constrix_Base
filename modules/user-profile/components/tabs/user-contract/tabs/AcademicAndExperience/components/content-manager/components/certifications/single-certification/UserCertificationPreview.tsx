@@ -66,7 +66,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
             handleRefetchUserCertifications();
           }}
           valid={Boolean(certification?.file?.name)}
-          label="ارفاق الشهادة"
+          label="الشهادة"
           value={certification?.file?.name ?? "---"}
           type={certification?.file?.type == "image" ? "image" : "pdf"}
           fileUrl={certification?.file?.url}

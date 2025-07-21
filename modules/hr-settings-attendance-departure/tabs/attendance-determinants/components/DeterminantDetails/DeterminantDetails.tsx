@@ -1,10 +1,12 @@
-import React from "react";
-import { Check } from "lucide-react";
+import React, { useState } from "react";
+import { Check, MoreVertical } from "lucide-react";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 
 interface DeterminantDetailsProps {
   constraint: Constraint;
+  onEdit?: (constraint: Constraint) => void;
 }
 
 /**
@@ -12,9 +14,42 @@ interface DeterminantDetailsProps {
  */
 const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   constraint,
+  onEdit,
 }) => {
+  // State for dropdown visibility
+  const [showDropdown, setShowDropdown] = useState(false);
+  
+  // Handle edit button click
+  const handleEdit = () => {
+    // Close dropdown after clicking
+    setShowDropdown(false);
+    // Call onEdit prop if provided
+    if (onEdit) {
+      onEdit(constraint);
+    }
+  };
   // استخدام hook الترجمة
   const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminantDetails");
+  
+  // Get current theme
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
+  // Theme specific colors
+  const cardBg = isDarkMode ? 'bg-transparent' : 'bg-white';
+  const cardBorder = isDarkMode ? 'border-white' : 'border-gray-200';
+  const cardText = isDarkMode ? 'text-white' : 'text-gray-900';
+  const sectionBg = isDarkMode ? 'bg-[#161F3E]' : 'bg-gray-50';
+  const sectionTextLabel = isDarkMode ? 'text-gray-400' : 'text-gray-500';
+  const sectionTextContent = isDarkMode ? 'text-white' : 'text-gray-800';
+  const dropdownBg = isDarkMode ? 'bg-gray-800' : 'bg-white';
+  const dropdownHover = isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100';
+  const dropdownText = isDarkMode ? 'text-gray-200' : 'text-gray-700';
+  const iconBgHover = isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200';
+  const iconColor = isDarkMode ? 'text-gray-300' : 'text-gray-500';
+  const branchTagBg = isDarkMode ? 'bg-[#2A2045]' : 'bg-gray-200';
+  const branchTagHover = isDarkMode ? 'hover:bg-[#2A2045]/80' : 'hover:bg-gray-300';
   // Days of the week in Arabic
   const daysOfWeek = [
     "الأربعاء",
@@ -46,8 +81,6 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
     .filter(([_, config]) => config?.enabled)
     .map(([day]) => dayNameMap[day] || "");
 
-    console.log('activeDays',activeDays,'weeklySchedule',weeklySchedule,'daysOfWeek',daysOfWeek)
-
   // Calculate total working hours per week if available
   const calculateTotalHours = () => {
     let total = 0;
@@ -70,29 +103,50 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   const totalHours = calculateTotalHours();
 
   return (
-    <div className="bg-transparent border border-white text-white rounded-xl p-2 relative overflow-hidden">
-      {/* Title */}
-      <div className=" text-2xl font-bold mb-8 relative z-10">
-        {constraint.name || constraint.constraint_name}
+    <div className={`${cardBg} border ${cardBorder} ${cardText} rounded-xl p-2 relative overflow-hidden shadow-sm`}>
+      {/* Title with dropdown menu */}
+      <div className="flex items-center justify-between mb-8 relative z-10">
+        <div className="text-2xl font-bold">
+          {constraint.name || constraint.constraint_name}
+        </div>
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className={`p-1 ${iconBgHover} rounded-full focus:outline-none`}
+            aria-label="القائمة"
+          >
+            <MoreVertical size={20} className={iconColor} />
+          </button>
+          {showDropdown && (
+            <div className={`absolute left-0 mt-2 w-32 ${dropdownBg} rounded-md shadow-lg z-20 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <button
+                onClick={() => handleEdit()}
+                className={`w-full text-right px-4 py-2 text-sm ${dropdownText} ${dropdownHover} rounded-md`}
+              >
+                تعديل
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* System type */}
-      <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-        <div className="text-gray-400 text-[12px] mb-0.5">{t('determinantType')}</div>
-        <div className=" text-lg">
+      <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
+        <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>{t('determinantType')}</div>
+        <div className={`${sectionTextContent} text-lg`}>
           {constraint.constraint_type ?? t('systemNotFound', { default: "نظام غير موجود" })}
         </div>
       </div>
 
       {/* Work hours */}
-      <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-        <div className="text-gray-400 text-[12px] mb-0.5">{t('workHours')}</div>
-        <div className=" text-lg">{totalHours || 0} {t('hours', { default: "ساعات" })}</div>
+      <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
+        <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>{t('workHours')}</div>
+        <div className={`${sectionTextContent} text-lg`}>{totalHours || 0} {t('hours', { default: "ساعات" })}</div>
       </div>
 
       {/* Work days */}
-      <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-        <div className="text-gray-400 text-[12px] mb-0.5">{t('workdays')}</div>
+      <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
+        <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>{t('workdays')}</div>
         <div className="grid grid-cols-3 gap-x-8 gap-y-4 text-center">
           {daysOfWeek.map((day, index) => (
             <div
@@ -104,7 +158,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
                   <Check size={14} className="text-white" />
                 </div>
               ) : (
-                <div className="bg-gray-500 w-5 h-5 flex items-center justify-center rounded" />
+                <div className={`${isDarkMode ? 'bg-gray-500' : 'bg-gray-300'} w-5 h-5 flex items-center justify-center rounded`} />
               )}
               <div className="text-lg">{day}</div>
             </div>
@@ -114,13 +168,13 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
 
       {/* Branches */}
       {branchNames.length > 0 && (
-        <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-          <div className=" text-gray-400 mb-3">{t('branches')}</div>
+        <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
+          <div className={`${sectionTextLabel} mb-3`}>{t('branches')}</div>
           <div className="flex flex-row-reverse gap-3 justify-end">
             {branchNames.map((branch, index) => (
               <div
                 key={index}
-                className="bg-[#2A2045] hover:bg-[#2A2045]/80 transition-colors rounded-full px-6 py-2 text-white"
+                className={`${branchTagBg} ${branchTagHover} transition-colors rounded-full px-6 py-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}
               >
                 فرع {branch}
               </div>
@@ -131,9 +185,9 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
 
       {/* Notes */}
       {constraint.notes && (
-        <div className="bg-[#161F3E] p-3 rounded-md mt-3">
-          <div className="text-gray-400 text-[12px] mb-0.5">{t('notes', { default: "ملاحظات" })}</div>
-          <div className=" text-lg">{constraint.notes}</div>
+        <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
+          <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>{t('notes', { default: "ملاحظات" })}</div>
+          <div className={`${sectionTextContent} text-lg`}>{constraint.notes}</div>
         </div>
       )}
     </div>
