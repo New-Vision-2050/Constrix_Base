@@ -33,6 +33,8 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
   const selectedBranches = values.branch_ids || [];
   const { branchesData } = useAttendanceDeterminants();
   
+
+  
   // State for branch mapping
   const [branchesMap, setBranchesMap] = useState<Record<string, string>>({});
   const [defaultCoordinates, setDefaultCoordinates] = useState<Record<string, { latitude: string; longitude: string; radius: string }>>({});
@@ -71,6 +73,33 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
   
   // Check if branches are selected
   const hasBranches = selectedBranches && selectedBranches.length > 0;
+  
+  // Initialize branch locations from form values if in edit mode
+  useEffect(() => {
+    console.log('values.branch_locations',values.branch_locations)
+    if (values.branch_locations && Object.keys(values.branch_locations).length > 0) {
+      // Map the branch_locations data to our format
+      const existingLocations: Record<string, BranchLocationData> = {};
+      
+      Object.entries(values.branch_locations).forEach(([branchId, locationData]: [string, any]) => {
+        if (locationData) {
+          existingLocations[locationData.branch_id] = {
+            branchId: locationData.branch_id,
+            isDefault: locationData.is_default || false,
+            latitude: locationData.latitude?.toString() || "",
+            longitude: locationData.longitude?.toString() || "",
+            radius: locationData.radius?.toString() || "100"
+          };
+        }
+      });
+
+      console.log('values.branch_locations,existingLocations',existingLocations)
+      
+      if (Object.keys(existingLocations).length > 0) {
+        setBranchLocations(existingLocations);
+      }
+    }
+  }, [values.branch_locations]);
   
   // Update branch location data
   const updateBranchLocation = (branchId: string, data: Partial<BranchLocationData>) => {

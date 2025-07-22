@@ -40,9 +40,9 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : {
     branchId: "",
     isDefault: false,
-    latitude: "", // سيتم تعبئتها من إحداثيات الفرع الفعلية
+    latitude: "",
     longitude: "",
-    radius: "100"
+    radius: "1"
   };
   
   // Handle branch change
