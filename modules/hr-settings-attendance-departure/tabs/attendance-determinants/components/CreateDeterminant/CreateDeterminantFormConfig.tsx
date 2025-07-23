@@ -8,6 +8,9 @@ import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attenda
 import { TimeUnits } from "../../constants/determinants";
 import { Square, SquareCheck } from "lucide-react";
 
+// Default time threshold in minutes
+const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
+
 // Day names mapping
 const dayNames = {
   sunday: "الأحد",
@@ -65,15 +68,15 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       is_active: Boolean(editConstraint?.is_active),
       early_clock_in_rules_value:
         editConstraint?.config?.early_clock_in_rules?.grace_period_minutes ??
-        30,
+        DEFAULT_TIME_THRESHOLD_MINUTES,
       early_clock_in_rules_unit:
         editConstraint?.config?.early_clock_in_rules?.unit,
       lateness_rules_value:
-        editConstraint?.config?.lateness_rules?.grace_period_minutes ?? 30,
+        editConstraint?.config?.lateness_rules?.grace_period_minutes ?? DEFAULT_TIME_THRESHOLD_MINUTES,
       lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
       out_zone_rules_value:
         editConstraint?.config?.radius_enforcement
-          ?.out_of_radius_time_threshold ?? 30,
+          ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
       out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
       branch_ids:
@@ -367,14 +370,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                       {
                         name: "new_day",
                         type: "checkbox",
-                        label: getText("form.newDay", "اليوم الجديد"),
+                        label: getText("form.newDay", "اليوم التالي"),
                         defaultValue: false,
                         disabled: true,
                         render: (props: any) => {
                           const formValues = useFormStore
                             ?.getState()
                             .getValues("create-determinant-form");
-                          console.log("render values formValues:", formValues);
 
                           // Get the current period data
                           const weeklySchedule =
