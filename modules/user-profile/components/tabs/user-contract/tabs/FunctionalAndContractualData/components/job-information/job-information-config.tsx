@@ -161,6 +161,27 @@ export const JobFormConfig = () => {
               },
             ],
           },
+          {
+            name: "attendance_constraint_id",
+            label: "المحدد",
+            type: "select",
+            placeholder: "المحدد",
+            required: true,
+            dynamicOptions: {
+              url: `${baseURL}/attendance/constraints/list`,
+              valueField: "id",
+              labelField: "constraint_name",
+              searchParam: "constraint_name",
+              paginationEnabled: true,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "المحدد مطلوب",
+              },
+            ],
+          },
         ],
         columns: 2,
       },

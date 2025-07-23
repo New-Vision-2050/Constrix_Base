@@ -396,6 +396,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </select>
               </div>
             ),
+            defaultValue: editConstraint?.config?.early_clock_in_rules?.grace_period_minutes ?? 30,
             required: true,
             validation: [
               {
@@ -442,6 +443,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </select>
               </div>
             ),
+            defaultValue: editConstraint?.config?.lateness_rules?.grace_period_minutes ?? 30,
             required: true,
             validation: [
               {
@@ -487,6 +489,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </select>
               </div>
             ),
+            defaultValue: editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold ?? 30,
             required: true,
             validation: [
               {
