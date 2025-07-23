@@ -24,16 +24,15 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   const isDarkMode = currentTheme === 'dark';
 
   // employee attendance status
-  let _status = "", text = "", color = "";
-  if (record.is_absent === 1) {
+  let _status = "unspecified", text = "unspecified", color = "text-gray-400";
+  if (record.is_absent) {
     _status = "absent";
-  } else if (record.is_holiday === 1) {
+  } else if (record.is_holiday) {
     _status = "holiday";
-  } else if (record.is_late === 1) {
+  } else if (record.is_late) {
     _status = "late";
   } else if (
-    record.status === "active" ||
-    record.status === "completed"
+    ['active', 'completed'].includes(record.status)
   ) {
     _status = "present";
   }
@@ -66,9 +65,9 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
   // Determine the color for attendance status
   const getStatusColor = () => {
-    if (record.is_late === 0) {
+    if (!record.is_late) {
       return "text-green-500";
-    } else if (record.is_late === 1) {
+    } else if (record.is_late) {
       return "text-yellow-400";
     } else {
       return "text-red-500";
