@@ -42,7 +42,7 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
         <div className={textColor}>{t("jobId")}: emp-101</div>
         <div className={textColor}>{t("department")}: {record.company.name}</div>
         <div className={textColor}>
-          {t("approver")}: {record?.applied_constraints?.[0]?.name || t("unspecified")}
+          {t("approver")}: {record?.professional_data?.attendance_constraint?.constraint_name || t("unspecified")}
         </div>
         <div className={textColor}>
           {t("attendanceStatus")}:

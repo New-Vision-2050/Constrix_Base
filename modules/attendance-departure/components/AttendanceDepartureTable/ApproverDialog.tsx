@@ -39,7 +39,7 @@ const ApproverDialog: React.FC = () => {
 
   // constraint name
   const constraintName =
-    selectedApproverRecord?.applied_constraints?.[0]?.name ?? UN_SPECIFIED;
+    selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_name ?? UN_SPECIFIED;
 
   // get work day periods
   const getWorkDayPeriods = (periods: InputPeriodType[]): PeriodType[] => {
@@ -86,7 +86,7 @@ const ApproverDialog: React.FC = () => {
         <DisplayField label={t("approverSystem")} value={constraintName} />
 
         {/* Workday Periods */}
-        {selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules
+        {selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_config?.time_rules
           ?.weekly_schedule &&
           Object.entries(
             selectedApproverRecord.applied_constraints[0].config.time_rules
@@ -109,7 +109,7 @@ const ApproverDialog: React.FC = () => {
               />
             );
           })}
-        {!selectedApproverRecord?.applied_constraints?.[0]?.config?.time_rules
+        {!selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_config?.time_rules
           ?.weekly_schedule && (
           <WorkdayPeriods
             title={t("noWeeklySchedule")}

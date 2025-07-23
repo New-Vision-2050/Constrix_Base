@@ -27,8 +27,8 @@ export type ConstraintConfig = {
 
 type AppliedConstraint = {
   id: string;
-  name: string;
-  config: ConstraintConfig;
+  constraint_name: string;
+  constraint_config: ConstraintConfig;
 };
 
 // Attendance status record interface for attendance tables and dialogs
@@ -43,6 +43,7 @@ export interface AttendanceStatusRecord {
     branch: string;
     job_code: string;
     management: string;
+    attendance_constraint: AppliedConstraint;
   };
   clock_in_location: { latitude: number; longitude: number };
   clock_in_time: string;
