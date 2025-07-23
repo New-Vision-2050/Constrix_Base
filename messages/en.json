@@ -635,6 +635,7 @@
         "workingDays": "Working Days",
         "periodStart": "Period Start",
         "periodEnd": "Period End",
+        "newDay":"Next Day",
         "periodStartPlaceholder": "09:00",
         "periodEndPlaceholder": "17:00",
         "periodStartRequired": "Period start time is required",

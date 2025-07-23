@@ -6,6 +6,7 @@ import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 import { TimeUnits } from "../../constants/determinants";
+import { Square, SquareCheck } from "lucide-react";
 
 // Day names mapping
 const dayNames = {
@@ -48,9 +49,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
   const _type_attendance = [];
 
-  if(Boolean(editConstraint?.config?.type_attendance?.location))_type_attendance.push("location");
-  if(Boolean(editConstraint?.config?.type_attendance?.fingerprint))_type_attendance.push("fingerprint");
-  
+  if (Boolean(editConstraint?.config?.type_attendance?.location))
+    _type_attendance.push("location");
+  if (Boolean(editConstraint?.config?.type_attendance?.fingerprint))
+    _type_attendance.push("fingerprint");
 
   return {
     formId: "create-determinant-form",
@@ -61,11 +63,17 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       constraint_type: editConstraint?.constraint_type,
       branch_locations: editConstraint?.branch_locations,
       is_active: Boolean(editConstraint?.is_active),
-      early_clock_in_rules_value: editConstraint?.config?.early_clock_in_rules?.grace_period_minutes,
-      early_clock_in_rules_unit: editConstraint?.config?.early_clock_in_rules?.unit,
-      lateness_rules_value: editConstraint?.config?.lateness_rules?.grace_period_minutes,
+      early_clock_in_rules_value:
+        editConstraint?.config?.early_clock_in_rules?.grace_period_minutes ??
+        30,
+      early_clock_in_rules_unit:
+        editConstraint?.config?.early_clock_in_rules?.unit,
+      lateness_rules_value:
+        editConstraint?.config?.lateness_rules?.grace_period_minutes ?? 30,
       lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
-      out_zone_rules_value: editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold,
+      out_zone_rules_value:
+        editConstraint?.config?.radius_enforcement
+          ?.out_of_radius_time_threshold ?? 30,
       out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
       branch_ids:
@@ -320,33 +328,102 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             validator: (value: string, formValues: any) => {
                               const fromTime = formValues.from || "";
                               const toTime = value || "";
-                              
+
                               // Skip validation if either time is not set
                               if (!fromTime || !toTime) return true;
-                              
+
                               // Convert times to comparable format (minutes since midnight)
                               const fromParts = fromTime.split(":");
                               const toParts = toTime.split(":");
-                              
-                              if (fromParts.length !== 2 || toParts.length !== 2) return true;
-                              
-                              const fromMinutes = 
-                                (parseInt(fromParts[0], 10) * 60) + parseInt(fromParts[1], 10);
-                              const toMinutes = 
-                                (parseInt(toParts[0], 10) * 60) + parseInt(toParts[1], 10);
-                              
+
+                              if (
+                                fromParts.length !== 2 ||
+                                toParts.length !== 2
+                              )
+                                return true;
+
+                              const fromMinutes =
+                                parseInt(fromParts[0], 10) * 60 +
+                                parseInt(fromParts[1], 10);
+                              const toMinutes =
+                                parseInt(toParts[0], 10) * 60 +
+                                parseInt(toParts[1], 10);
+
                               // Return true if valid (to time is greater than or equal to from time)
                               return toMinutes >= fromMinutes;
                             },
-                            message: getText(
-                              "form.periodEndMustBeAfterStart",
-                              "وقت النهاية يجب أن يكون بعد وقت البداية"
-                            ) || getText(
-                              "form.startTimeBeforeEndTime",
-                              "وقت البداية قبل وقت النهاية"
-                            ),
+                            message:
+                              getText(
+                                "form.periodEndMustBeAfterStart",
+                                "وقت النهاية يجب أن يكون بعد وقت البداية"
+                              ) ||
+                              getText(
+                                "form.startTimeBeforeEndTime",
+                                "وقت البداية قبل وقت النهاية"
+                              ),
                           },
                         ],
+                      },
+                      {
+                        name: "new_day",
+                        type: "checkbox",
+                        label: getText("form.newDay", "اليوم الجديد"),
+                        defaultValue: false,
+                        disabled: true,
+                        render: (props: any) => {
+                          const formValues = useFormStore
+                            ?.getState()
+                            .getValues("create-determinant-form");
+                          console.log("render values formValues:", formValues);
+
+                          // Get the current period data
+                          const weeklySchedule =
+                            formValues.weekly_schedule || [];
+                          let newDayRequired = false;
+
+                          // Loop through all days
+                          for (const day of weeklySchedule) {
+                            if (day && day.periods) {
+                              // Check each period
+                              for (const period of day.periods) {
+                                if (period && period.from && period.to) {
+                                  // Convert times to minutes since midnight
+                                  const fromParts = period.from
+                                    .split(":")
+                                    .map(Number);
+                                  const toParts = period.to
+                                    .split(":")
+                                    .map(Number);
+
+                                  if (
+                                    fromParts.length === 2 &&
+                                    toParts.length === 2
+                                  ) {
+                                    const fromMinutes =
+                                      fromParts[0] * 60 + fromParts[1];
+                                    const toMinutes =
+                                      toParts[0] * 60 + toParts[1];
+
+                                    // If end time is earlier than start time, it crosses to next day
+                                    if (toMinutes < fromMinutes) {
+                                      newDayRequired = true;
+                                      break;
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            if (newDayRequired) break;
+                          }
+
+                          return (
+                            <div className="flex items-center font-thin gap-1">
+                              {newDayRequired ? <SquareCheck /> : <Square />}
+
+                              {getText("form.newDay", "اليوم التالي")}
+                            </div>
+                          );
+                        },
                       },
                     ],
                     minRows: 1,
@@ -376,7 +453,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               <div className="w-full h-full">
                 <select
                   className="rounded-lg p-2 bg-transparent"
-                  defaultValue={editConstraint?.config?.early_clock_in_rules?.unit ?? TimeUnits?.[0]?.id}
+                  defaultValue={
+                    editConstraint?.config?.early_clock_in_rules?.unit ??
+                    TimeUnits?.[0]?.id
+                  }
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
                     formStore.setValues(`create-determinant-form`, {
@@ -396,7 +476,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </select>
               </div>
             ),
-            defaultValue: editConstraint?.config?.early_clock_in_rules?.grace_period_minutes ?? 30,
+            defaultValue:
+              editConstraint?.config?.early_clock_in_rules
+                ?.grace_period_minutes ?? 30,
             required: true,
             validation: [
               {
@@ -423,7 +505,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               <div className="w-full h-full">
                 <select
                   className="rounded-lg p-2 bg-transparent"
-                  defaultValue={editConstraint?.config?.lateness_rules?.unit ?? TimeUnits?.[0]?.id}
+                  defaultValue={
+                    editConstraint?.config?.lateness_rules?.unit ??
+                    TimeUnits?.[0]?.id
+                  }
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
                     formStore.setValues(`create-determinant-form`, {
@@ -443,7 +528,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </select>
               </div>
             ),
-            defaultValue: editConstraint?.config?.lateness_rules?.grace_period_minutes ?? 30,
+            defaultValue:
+              editConstraint?.config?.lateness_rules?.grace_period_minutes ??
+              30,
             required: true,
             validation: [
               {
@@ -469,7 +556,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               <div className="w-full h-full">
                 <select
                   className="rounded-lg p-2 bg-transparent"
-                  defaultValue={editConstraint?.config?.radius_enforcement?.unit ?? TimeUnits?.[0]?.id}
+                  defaultValue={
+                    editConstraint?.config?.radius_enforcement?.unit ??
+                    TimeUnits?.[0]?.id
+                  }
                   onChange={(e) => {
                     const formStore = useFormStore.getState();
                     formStore.setValues(`create-determinant-form`, {
@@ -489,7 +579,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </select>
               </div>
             ),
-            defaultValue: editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold ?? 30,
+            defaultValue:
+              editConstraint?.config?.radius_enforcement
+                ?.out_of_radius_time_threshold ?? 30,
             required: true,
             validation: [
               {
@@ -754,15 +846,15 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           },
           type_attendance: {
             location:
-              (formData.type_attendance as Array<string>)?.indexOf("location") !==
-              -1,
+              (formData.type_attendance as Array<string>)?.indexOf(
+                "location"
+              ) !== -1,
             fingerprint:
               (formData.type_attendance as Array<string>)?.indexOf(
                 "fingerprint"
               ) !== -1,
           },
         },
-        
       };
 
       return await defaultSubmitHandler(

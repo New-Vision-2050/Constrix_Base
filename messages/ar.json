@@ -648,6 +648,7 @@
         "workingDays": "أيام العمل",
         "periodStart": "بداية الفترة",
         "periodEnd": "نهاية الفترة",
+        "newDay":"اليوم التالي",
         "periodStartPlaceholder": "09:00",
         "periodEndPlaceholder": "17:00",
         "periodStartRequired": "بداية الفترة مطلوبة",
