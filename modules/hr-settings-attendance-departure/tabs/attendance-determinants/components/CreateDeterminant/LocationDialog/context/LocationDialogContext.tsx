@@ -33,8 +33,6 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
   const selectedBranches = values.branch_ids || [];
   const { branchesData } = useAttendanceDeterminants();
   
-
-  
   // State for branch mapping
   const [branchesMap, setBranchesMap] = useState<Record<string, string>>({});
   const [defaultCoordinates, setDefaultCoordinates] = useState<Record<string, { latitude: string; longitude: string; radius: string }>>({});
