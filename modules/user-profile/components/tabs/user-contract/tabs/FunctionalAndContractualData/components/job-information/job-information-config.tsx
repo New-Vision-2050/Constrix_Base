@@ -193,6 +193,7 @@ export const JobFormConfig = () => {
       job_type_id: professionalData?.job_type?.id,
       job_title_id: professionalData?.job_title?.id,
       job_code: professionalData?.job_code,
+      attendance_constraint_id: professionalData?.attendance_constraint?.id,
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
