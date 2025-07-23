@@ -74,7 +74,6 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
   
   // Initialize branch locations from form values if in edit mode
   useEffect(() => {
-    console.log('values.branch_locations',values.branch_locations)
     if (values.branch_locations && Object.keys(values.branch_locations).length > 0) {
       // Map the branch_locations data to our format
       const existingLocations: Record<string, BranchLocationData> = {};
@@ -91,8 +90,6 @@ export function LocationDialogProvider({ children }: LocationDialogProviderProps
         }
       });
 
-      console.log('values.branch_locations,existingLocations',existingLocations)
-      
       if (Object.keys(existingLocations).length > 0) {
         setBranchLocations(existingLocations);
       }
