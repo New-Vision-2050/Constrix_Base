@@ -15,12 +15,52 @@ interface EmployeeInfoSectionProps {
 const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   record,
 }) => {
+  const statusT = useTranslations("attendanceDeparture.status");
   const t = useTranslations("AttendanceDepartureModule.shared.EmployeeInfoSection");
   
   // Get current theme
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
   const isDarkMode = currentTheme === 'dark';
+
+  // employee attendance status
+  let _status = "", text = "", color = "";
+  if (record.is_absent === 1) {
+    _status = "absent";
+  } else if (record.is_holiday === 1) {
+    _status = "holiday";
+  } else if (record.is_late === 1) {
+    _status = "late";
+  } else if (
+    record.status === "active" ||
+    record.status === "completed"
+  ) {
+    _status = "present";
+  }
+
+  // Map the backend status to display text
+  switch (_status) {
+    case "present":
+      text = statusT("present");
+      color = "text-green-500";
+      break;
+    case "absent":
+      text = statusT("absent");
+      color = "text-red-500";
+      break;
+    case "late":
+      text = statusT("late");
+      color = "text-yellow-400";
+      break;
+    case "holiday":
+      text = statusT("holiday");
+      color = "text-blue-500";
+      break;
+    default:
+      text = statusT("unspecified");
+      color = "text-gray-400";
+      break;
+  }
   
   // Theme specific colors
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
@@ -39,15 +79,15 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
     <>
       <div className="flex flex-wrap justify-between items-center text-sm gap-3">
         <div className={textColor}>{t("branch")}: {record.company.name}</div>
-        <div className={textColor}>{t("jobId")}: emp-101</div>
+        <div className={textColor}>{t("jobId")}: {record.professional_data?.job_code}</div>
         <div className={textColor}>{t("department")}: {record.company.name}</div>
         <div className={textColor}>
           {t("approver")}: {record?.professional_data?.attendance_constraint?.constraint_name || t("unspecified")}
         </div>
         <div className={textColor}>
           {t("attendanceStatus")}:
-          <span className={`font-bold ${getStatusColor()}`}>
-            {record.is_late === 0 ? t("status.present") : record.is_late === 1 ? t("status.late") : t("status.absent")}
+          <span className={`font-bold ${color}`}>
+            {text}
           </span>
         </div>
       </div>

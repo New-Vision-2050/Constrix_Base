@@ -28,6 +28,7 @@ export type ConstraintConfig = {
 type AppliedConstraint = {
   id: string;
   constraint_name: string;
+  constraint_type: string;
   constraint_config: ConstraintConfig;
 };
 
@@ -74,6 +75,8 @@ export interface AttendanceStatusRecord {
     birthdate: string;
     country: string;
     gender: string;
+    email: string;
+    phone: string;
   };
   work_date: string;
 }

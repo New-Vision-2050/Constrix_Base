@@ -41,6 +41,10 @@ const ApproverDialog: React.FC = () => {
   const constraintName =
     selectedApproverRecord?.professional_data?.attendance_constraint
       ?.constraint_name ?? UN_SPECIFIED;
+
+  const constraintType =
+    selectedApproverRecord?.professional_data?.attendance_constraint
+      ?.constraint_type ?? UN_SPECIFIED;
       
   // Calculate total working hours across all days
   const calculateTotalWorkingHours = (): number => {
@@ -91,8 +95,6 @@ const ApproverDialog: React.FC = () => {
 
   if (!selectedApproverRecord) return null;
 
-  console.log("selectedApproverRecord", selectedApproverRecord);
-
   return (
     <DialogContainer
       isOpen={isApproverDialogOpen}
@@ -110,7 +112,7 @@ const ApproverDialog: React.FC = () => {
           defaultValue={t("unspecified")}
         />
 
-        <DisplayField label={t("approverSystem")} value={constraintName} />
+        <DisplayField label={t("approverSystem")} value={constraintType} />
 
         {/* Workday Periods */}
         {selectedApproverRecord?.professional_data?.attendance_constraint

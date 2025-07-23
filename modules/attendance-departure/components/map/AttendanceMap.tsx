@@ -29,13 +29,15 @@ interface ExtendedMapContainerProps extends MapContainerProps {
 }
 
 const AttendanceMap: React.FC = () => {
-  const t = useTranslations('AttendanceDepartureModule.Map');
-  const tStatus = useTranslations('AttendanceDepartureModule.Map.employeeStatus');
-  
+  const t = useTranslations("AttendanceDepartureModule.Map");
+  const tStatus = useTranslations(
+    "AttendanceDepartureModule.Map.employeeStatus"
+  );
+
   // Get current theme
   const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDarkMode = currentTheme === "dark";
   // Default map center (Riyadh)
   const defaultCenter: L.LatLngExpression = [24.7136, 46.6753];
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -82,15 +84,17 @@ const AttendanceMap: React.FC = () => {
     };
   }, [isFullScreen]);
 
-  console.log('teamAttendance', teamAttendance)
-  
+  console.log("teamAttendance", teamAttendance);
+
   // Log each employee's location data
   teamAttendance.forEach((record, index) => {
-    console.log(`Employee ${index + 1}: ${record.user?.name || 'Unknown'}`, {
+    console.log(`Employee ${index + 1}: ${record.user?.name || "Unknown"}`, {
       has_location: !!record.clock_in_location,
       latitude: record.clock_in_location?.latitude,
       longitude: record.clock_in_location?.longitude,
-      will_use_default: !record.clock_in_location?.latitude || !record.clock_in_location?.longitude
+      will_use_default:
+        !record.clock_in_location?.latitude ||
+        !record.clock_in_location?.longitude,
     });
   });
 
@@ -150,13 +154,13 @@ const AttendanceMap: React.FC = () => {
           <ZoomControl position="topright" />
 
           <LayersControl position="topright">
-            <LayersControl.BaseLayer checked name={t('layers.standard')}>
+            <LayersControl.BaseLayer checked name={t("layers.standard")}>
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
             </LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name={t('layers.satellite')}>
+            <LayersControl.BaseLayer name={t("layers.satellite")}>
               <TileLayer
                 url="https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
                 maxZoom={20}
@@ -164,7 +168,7 @@ const AttendanceMap: React.FC = () => {
                 attribution="&copy; Google Maps"
               />
             </LayersControl.BaseLayer>
-            <LayersControl.BaseLayer name={t('layers.satellite')}>
+            <LayersControl.BaseLayer name={t("layers.satellite")}>
               <TileLayer
                 url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
                 maxZoom={20}
@@ -180,19 +184,25 @@ const AttendanceMap: React.FC = () => {
               // Create a small offset for employees with missing location data
               const defaultLat = 24.7136;
               const defaultLng = 46.6753;
-              const hasLocation = record.clock_in_location?.latitude && record.clock_in_location?.longitude;
-              
+              const hasLocation =
+                record.clock_in_location?.latitude &&
+                record.clock_in_location?.longitude;
+
               // If no location data, create a small offset based on employee ID to spread out markers
-              const idOffset = parseInt(record.user?.id || '0') % 50;
-              const latOffset = hasLocation ? 0 : (idOffset * 0.001); // Small offset based on ID
-              const lngOffset = hasLocation ? 0 : (idOffset * 0.002); // Slightly larger offset for longitude
-              
+              const idOffset = parseInt(record.user?.id || "0") % 50;
+              const latOffset = hasLocation ? 0 : idOffset * 0.001; // Small offset based on ID
+              const lngOffset = hasLocation ? 0 : idOffset * 0.002; // Slightly larger offset for longitude
+
               const employee: AttendanceRecord = {
                 id:
                   parseInt(record.user?.id) ||
                   Math.floor(Math.random() * 10000),
                 name: record.user?.name || "-",
                 user: record.user,
+                is_late: record.is_late,
+                is_absent: record.is_absent,
+                is_holiday: record.is_holiday,
+                status: record.status,
                 clock_in_time: record.clock_in_time || "-",
                 clock_out_time: record.clock_out_time || "-",
                 date:
@@ -200,8 +210,13 @@ const AttendanceMap: React.FC = () => {
                 employeeId: record.professional_data?.job_code || "",
                 branch: record.professional_data?.branch || "-",
                 department: record.professional_data?.management || "-",
-                approver: record.professional_data?.attendance_constraint?.constraint_name || "-",
-                employeeStatus: record.is_clocked_in === 1 ? tStatus('active') : tStatus('inactive'),
+                approver:
+                  record.professional_data?.attendance_constraint
+                    ?.constraint_name || "-",
+                employeeStatus:
+                  record.is_clocked_in === 1
+                    ? tStatus("active")
+                    : tStatus("inactive"),
                 // Map status to expected format
                 attendanceStatus:
                   record.is_late === 1
@@ -212,8 +227,12 @@ const AttendanceMap: React.FC = () => {
                     ? "excused"
                     : "present",
                 location: {
-                  lat: record.clock_in_location?.latitude || (defaultLat + latOffset),
-                  lng: record.clock_in_location?.longitude || (defaultLng + lngOffset),
+                  lat:
+                    record.clock_in_location?.latitude ||
+                    defaultLat + latOffset,
+                  lng:
+                    record.clock_in_location?.longitude ||
+                    defaultLng + lngOffset,
                 },
               };
               return <CustomMarker key={employee.id} employee={employee} />;
@@ -221,10 +240,18 @@ const AttendanceMap: React.FC = () => {
 
           {/* Show loading spinner when data is loading */}
           {teamAttendanceLoading && (
-            <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-lg flex flex-col items-center`}>
+            <div
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } p-4 rounded-lg shadow-lg flex flex-col items-center`}
+            >
               <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-              <span className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                {t('loading')}
+              <span
+                className={`font-medium ${
+                  isDarkMode ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
+                {t("loading")}
               </span>
             </div>
           )}
@@ -235,13 +262,23 @@ const AttendanceMap: React.FC = () => {
       <Button
         variant="ghost"
         size="icon"
-        className={`absolute top-3 left-3 z-[1000] shadow-md w-8 h-8 p-0 ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-gray-100'}`}
+        className={`absolute top-3 left-3 z-[1000] shadow-md w-8 h-8 p-0 ${
+          isDarkMode
+            ? "bg-gray-800 hover:bg-gray-700"
+            : "bg-white hover:bg-gray-100"
+        }`}
         onClick={toggleFullScreen}
       >
         {isFullScreen ? (
-          <Minimize2 size={18} className={isDarkMode ? 'text-white' : 'text-black'} />
+          <Minimize2
+            size={18}
+            className={isDarkMode ? "text-white" : "text-black"}
+          />
         ) : (
-          <Maximize2 size={18} className={isDarkMode ? 'text-white' : 'text-black'} />
+          <Maximize2
+            size={18}
+            className={isDarkMode ? "text-white" : "text-black"}
+          />
         )}
       </Button>
     </div>
