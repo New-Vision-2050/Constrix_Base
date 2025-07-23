@@ -367,66 +367,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                           },
                         ],
                       },
-                      {
-                        name: "new_day",
-                        type: "checkbox",
-                        label: getText("form.newDay", "اليوم التالي"),
-                        defaultValue: false,
-                        disabled: true,
-                        render: (props: any) => {
-                          const formValues = useFormStore
-                            ?.getState()
-                            .getValues("create-determinant-form");
 
-                          // Get the current period data
-                          const weeklySchedule =
-                            formValues.weekly_schedule || [];
-                          let newDayRequired = false;
-
-                          // Loop through all days
-                          for (const day of weeklySchedule) {
-                            if (day && day.periods) {
-                              // Check each period
-                              for (const period of day.periods) {
-                                if (period && period.from && period.to) {
-                                  // Convert times to minutes since midnight
-                                  const fromParts = period.from
-                                    .split(":")
-                                    .map(Number);
-                                  const toParts = period.to
-                                    .split(":")
-                                    .map(Number);
-
-                                  if (
-                                    fromParts.length === 2 &&
-                                    toParts.length === 2
-                                  ) {
-                                    const fromMinutes =
-                                      fromParts[0] * 60 + fromParts[1];
-                                    const toMinutes =
-                                      toParts[0] * 60 + toParts[1];
-
-                                    // If end time is earlier than start time, it crosses to next day
-                                    if (toMinutes < fromMinutes) {
-                                      newDayRequired = true;
-                                      break;
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                            if (newDayRequired) break;
-                          }
-
-                          return (
-                            <div className="flex items-center font-thin gap-1">
-                              {newDayRequired ? <SquareCheck /> : <Square />}
-
-                              {getText("form.newDay", "اليوم التالي")}
-                            </div>
-                          );
-                        },
-                      },
                     ],
                     minRows: 1,
                     maxRows: 5,

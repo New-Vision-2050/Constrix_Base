@@ -20,7 +20,6 @@ export const AttendanceStatusBadge = ({
   const t = useTranslations("attendanceDeparture.status");
   let color = "";
   let text = "";
-  //is_late
   let _status = "";
   if (record.is_absent === 1) {
     _status = "absent";

@@ -7,6 +7,10 @@ export interface AttendanceRecord {
   department: string;
   approver: string;
   employeeStatus: string;
+  is_late: number;
+  is_absent: number;
+  is_holiday: number;
+  status: string;
   attendanceStatus: "present" | "absent" | "late" | "excused";
   user: {
     id: string;
@@ -14,6 +18,8 @@ export interface AttendanceRecord {
     birthdate: string;
     country: string;
     gender: string;
+    email: string;
+    phone: string;
   };
   location: {
     lat: number;

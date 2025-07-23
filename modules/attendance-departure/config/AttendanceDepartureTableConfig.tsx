@@ -49,13 +49,13 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
       //     row.clock_in_time || "-",
       // },
       {
-        key: "approved_by_user",
+        key: "professional_data.attendance_constraint.constraint_name",
         label: t("columns.approver"),
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
           <ApproverBadge
-            approver={row?.applied_constraints?.[0]?.name ?? UN_SPECIFIED}
+            approver={row?.professional_data?.attendance_constraint?.constraint_name ?? UN_SPECIFIED}
             record={row}
           />
         ),
