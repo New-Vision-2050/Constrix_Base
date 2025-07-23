@@ -42,7 +42,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     isDefault: false,
     latitude: "",
     longitude: "",
-    radius: "1"
+    radius: "200"
   };
   
   // Handle branch change
