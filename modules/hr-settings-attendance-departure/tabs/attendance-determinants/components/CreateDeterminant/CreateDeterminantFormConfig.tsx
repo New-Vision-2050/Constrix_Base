@@ -72,11 +72,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       early_clock_in_rules_unit:
         editConstraint?.config?.early_clock_in_rules?.unit,
       lateness_rules_value:
-        editConstraint?.config?.lateness_rules?.grace_period_minutes ?? DEFAULT_TIME_THRESHOLD_MINUTES,
+        editConstraint?.config?.lateness_rules?.grace_period_minutes ??
+        DEFAULT_TIME_THRESHOLD_MINUTES,
       lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
       out_zone_rules_value:
-        editConstraint?.config?.radius_enforcement
-          ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
+      editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
       out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
       branch_ids:
