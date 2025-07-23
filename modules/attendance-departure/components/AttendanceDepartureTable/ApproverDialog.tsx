@@ -39,7 +39,32 @@ const ApproverDialog: React.FC = () => {
 
   // constraint name
   const constraintName =
-    selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_name ?? UN_SPECIFIED;
+    selectedApproverRecord?.professional_data?.attendance_constraint
+      ?.constraint_name ?? UN_SPECIFIED;
+      
+  // Calculate total working hours across all days
+  const calculateTotalWorkingHours = (): number => {
+    if (!selectedApproverRecord?.professional_data?.attendance_constraint
+        ?.constraint_config?.time_rules?.weekly_schedule) {
+      return 0;
+    }
+    
+    const weeklySchedule = selectedApproverRecord.professional_data.attendance_constraint
+      .constraint_config.time_rules.weekly_schedule;
+    
+    let totalHours = 0;
+    
+    // Sum up hours from all days
+    Object.values(weeklySchedule).forEach(dayData => {
+      if (dayData.enabled && dayData.total_work_hours) {
+        totalHours += dayData.total_work_hours;
+      }
+    });
+    
+    return parseFloat(totalHours.toFixed(2)); // Round to 2 decimal places
+  };
+  
+  const totalWorkHours = calculateTotalWorkingHours();
 
   // get work day periods
   const getWorkDayPeriods = (periods: InputPeriodType[]): PeriodType[] => {
@@ -66,6 +91,8 @@ const ApproverDialog: React.FC = () => {
 
   if (!selectedApproverRecord) return null;
 
+  console.log("selectedApproverRecord", selectedApproverRecord);
+
   return (
     <DialogContainer
       isOpen={isApproverDialogOpen}
@@ -86,11 +113,10 @@ const ApproverDialog: React.FC = () => {
         <DisplayField label={t("approverSystem")} value={constraintName} />
 
         {/* Workday Periods */}
-        {selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_config?.time_rules
-          ?.weekly_schedule &&
+        {selectedApproverRecord?.professional_data?.attendance_constraint
+          ?.constraint_config?.time_rules?.weekly_schedule &&
           Object.entries(
-            selectedApproverRecord.applied_constraints[0].config.time_rules
-              .weekly_schedule
+            selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_config?.time_rules?.weekly_schedule
           ).map(([day, dayData]) => {
             // Skip days that aren't enabled
             if (
@@ -105,12 +131,12 @@ const ApproverDialog: React.FC = () => {
                 key={day}
                 hours={dayData.total_work_hours}
                 title={t(`days.${day}`)}
-                periods={getWorkDayPeriods(dayData.periods??[])}
+                periods={getWorkDayPeriods(dayData.periods ?? [])}
               />
             );
           })}
-        {!selectedApproverRecord?.professional_data?.attendance_constraint?.constraint_config?.time_rules
-          ?.weekly_schedule && (
+        {!selectedApproverRecord?.professional_data?.attendance_constraint
+          ?.constraint_config?.time_rules?.weekly_schedule && (
           <WorkdayPeriods
             title={t("noWeeklySchedule")}
             periods={[]}
@@ -119,7 +145,7 @@ const ApproverDialog: React.FC = () => {
         )}
 
         <div className="text-xs text-left" style={{ color: accentColor }}>
-          {t("workHours")} 8 ساعات
+          {t("workHours")} {totalWorkHours}
         </div>
       </div>
     </DialogContainer>
