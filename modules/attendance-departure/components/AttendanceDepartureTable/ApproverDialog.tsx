@@ -56,16 +56,18 @@ const ApproverDialog: React.FC = () => {
     const weeklySchedule = selectedApproverRecord.professional_data.attendance_constraint
       .constraint_config.time_rules.weekly_schedule;
     
-    let totalHours = 0;
-    
-    // Sum up hours from all days
-    Object.values(weeklySchedule).forEach(dayData => {
+    // Use integer arithmetic (multiply by 100) to avoid floating point errors
+    const totalHoursInCents = Object.values(weeklySchedule).reduce((total, dayData) => {
       if (dayData.enabled && dayData.total_work_hours) {
-        totalHours += dayData.total_work_hours;
+        // Convert hours to integer (× 100) for precise calculation
+        const hoursInCents = Math.round(dayData.total_work_hours * 100);
+        return total + hoursInCents;
       }
-    });
+      return total;
+    }, 0);
     
-    return parseFloat(totalHours.toFixed(2)); // Round to 2 decimal places
+    // Convert back to hours with 2 decimal precision
+    return totalHoursInCents / 100;
   };
   
   const totalWorkHours = calculateTotalWorkingHours();
