@@ -495,7 +495,9 @@
         "checkIn": "الحضور",
         "checkOut": "الانصراف",
         "morning": "صباحاً",
-        "afternoon": "مساءاً"
+        "afternoon": "مساءاً",
+        "from": "من",
+        "to": "إلى"
       }
     },
     "Map": {
@@ -582,7 +584,12 @@
         "attendanceStatus": {
           "title": "حالة الحضور",
           "attendance": "الحضور",
-          "departure": "الانصراف"
+          "departure": "الانصراف",
+          "period": "الفترة",
+          "todaySchedule": "جدول اليوم",
+          "actualRecords": "السجلات الفعلية",
+          "actualHours": "عدد ساعات الحضور الفعلي",
+          "deductedHours": "عدد الساعات المستقطعة"
         }
       }
     }

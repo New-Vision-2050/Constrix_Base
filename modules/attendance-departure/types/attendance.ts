@@ -112,3 +112,9 @@ export interface ApproverBadgeProps {
   approver: string;
   record: AttendanceStatusRecord;
 }
+
+// Interface for work period data input format
+export interface InputPeriodType {
+  start_time: string;
+  end_time: string;
+}
