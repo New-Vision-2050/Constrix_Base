@@ -31,7 +31,7 @@ const DialogContainer: React.FC<DialogContainerProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className={`${textColor}`} 
+        className={`${textColor} !max-w-4xl w-full sm:w-[90%]`} 
         style={{ backgroundColor: bgColor }}
       >
         <DialogHeader>
