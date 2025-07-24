@@ -21,6 +21,7 @@ const dayNames = {
   friday: "الجمعة",
   saturday: "السبت",
 };
+
 const daysList = Object.entries(dayNames).map(([key, value]) => ({
   value: key,
   label: value,
@@ -76,7 +77,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         DEFAULT_TIME_THRESHOLD_MINUTES,
       lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
       out_zone_rules_value:
-      editConstraint?.config?.radius_enforcement?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
+        editConstraint?.config?.radius_enforcement
+          ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
       out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
       branch_ids:
@@ -367,7 +369,70 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                           },
                         ],
                       },
-
+                      {
+                        name: "period_seeting",
+                        label: "",
+                        type: "text",
+                        render: () => {
+                          return (
+                            <div>
+                              <p className="font-bold">إعدادات الفترة</p>
+                            </div>
+                          );
+                        },
+                      },
+                      {
+                        name: "early_clock_in_rules_value",
+                        label: "السماح بالحضور لمدة (قبل العمل)",
+                        type: "number",
+                        placeholder: "السماح بالحضور لمدة (قبل العمل)",
+                        required: true,
+                        validation: [
+                          {
+                            type: "pattern",
+                            value: "^[0-9]+$",
+                            message:
+                              "السماح بالحضور لمدة (قبل العمل) يجب أن تكون أرقام فقط",
+                          },
+                        ],
+                      },
+                      {
+                        name: "early_clock_in_rules_unit",
+                        label: "وحدة السماح بالحضور لمدة (قبل العمل)",
+                        placeholder: "وحدة السماح بالحضور لمدة (قبل العمل)",
+                        type: "select",
+                        options: TimeUnits?.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        })),
+                        validation: [],
+                      },
+                      {
+                        name: "lateness_rules_value",
+                        label: "السماح بالتأخير لمدة",
+                        type: "number",
+                        placeholder: "السماح بالتأخير لمدة",
+                        required: true,
+                        validation: [
+                          {
+                            type: "pattern",
+                            value: "^[0-9]+$",
+                            message:
+                              "السماح بالتأخير لمدة يجب أن تكون أرقام فقط",
+                          },
+                        ],
+                      },
+                      {
+                        name: "lateness_rules_unit",
+                        label: "السماح بالتأخير لمدة",
+                        placeholder: "السماح بالتأخير لمدة",
+                        type: "select",
+                        options: TimeUnits?.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        })),
+                        validation: [],
+                      },
                     ],
                     minRows: 1,
                     maxRows: 5,
@@ -381,107 +446,16 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             },
           },
           {
-            name: "early_clock_in_rules_unit",
-            label: "early_clock_in_rules_unit",
-            placeholder: "early_clock_in_rules_unit",
-            type: "hiddenObject",
-            validation: [],
-          },
-          {
-            name: "early_clock_in_rules_value",
-            label: "السماح بالحضور لمدة (قبل العمل)",
-            type: "number",
-            placeholder: "السماح بالحضور لمدة (قبل العمل)",
-            postfix: (
-              <div className="w-full h-full">
-                <select
-                  className="rounded-lg p-2 bg-transparent"
-                  defaultValue={
-                    editConstraint?.config?.early_clock_in_rules?.unit ??
-                    TimeUnits?.[0]?.id
-                  }
-                  onChange={(e) => {
-                    const formStore = useFormStore.getState();
-                    formStore.setValues(`create-determinant-form`, {
-                      early_clock_in_rules_unit: e.target.value,
-                    });
-                  }}
-                >
-                  {TimeUnits?.map((item) => (
-                    <option
-                      key={item.id}
-                      value={item.id}
-                      className="bg-sidebar text-black dark:text-white"
-                    >
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ),
-            defaultValue:
-              editConstraint?.config?.early_clock_in_rules
-                ?.grace_period_minutes ?? 30,
-            required: true,
-            validation: [
-              {
-                type: "pattern",
-                value: "^[0-9]+$",
-                message:
-                  "السماح بالحضور لمدة (قبل العمل) يجب أن تكون أرقام فقط",
-              },
-            ],
-          },
-          {
-            name: "lateness_rules_unit",
-            label: "lateness_rules_unit",
-            placeholder: "lateness_rules_unit",
-            type: "hiddenObject",
-            validation: [],
-          },
-          {
-            name: "lateness_rules_value",
-            label: "السماح بالتأخير لمدة",
-            type: "number",
-            placeholder: "السماح بالتأخير لمدة",
-            postfix: (
-              <div className="w-full h-full">
-                <select
-                  className="rounded-lg p-2 bg-transparent"
-                  defaultValue={
-                    editConstraint?.config?.lateness_rules?.unit ??
-                    TimeUnits?.[0]?.id
-                  }
-                  onChange={(e) => {
-                    const formStore = useFormStore.getState();
-                    formStore.setValues(`create-determinant-form`, {
-                      lateness_rules_unit: e.target.value,
-                    });
-                  }}
-                >
-                  {TimeUnits?.map((item) => (
-                    <option
-                      key={item.id}
-                      value={item.id}
-                      className="bg-sidebar text-black dark:text-white"
-                    >
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ),
-            defaultValue:
-              editConstraint?.config?.lateness_rules?.grace_period_minutes ??
-              30,
-            required: true,
-            validation: [
-              {
-                type: "pattern",
-                value: "^[0-9]+$",
-                message: "السماح بالتأخير لمدة يجب أن تكون أرقام فقط",
-              },
-            ],
+            name: "determinant_seeting",
+            label: "",
+            type: "text",
+            render: () => {
+              return (
+                <div>
+                  <p className="font-bold">إعدادات المحدد</p>
+                </div>
+              );
+            },
           },
           {
             name: "out_zone_rules_unit",
