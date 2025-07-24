@@ -169,7 +169,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
     executions: [],
     executionConfig: {
       canEdit: false,
-      canDelete: false,
+      canDelete: true,
     },
   };
 };

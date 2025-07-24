@@ -77,16 +77,16 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   return (
     <>
       <div className="flex flex-wrap justify-between items-center text-sm gap-3">
-        <div className={textColor}>{t("branch")}: {record.company.name}</div>
-        <div className={textColor}>{t("jobId")}: {record.professional_data?.job_code}</div>
-        <div className={textColor}>{t("department")}: {record.company.name}</div>
+        <div className={textColor}>{t("branch")}: {record.company?.name??"-"}</div>
+        <div className={textColor}>{t("jobId")}: {record.professional_data?.job_code??"-"}</div>
+        <div className={textColor}>{t("department")}: {record.company?.name??"-"}</div>
         <div className={textColor}>
-          {t("approver")}: {record?.professional_data?.attendance_constraint?.constraint_name || t("unspecified")}
+          {t("approver")}: {record?.professional_data?.attendance_constraint?.constraint_name??"-"}
         </div>
         <div className={textColor}>
           {t("attendanceStatus")}:
           <span className={`font-bold ${color}`}>
-            {text}
+            {text??"-"}
           </span>
         </div>
       </div>
