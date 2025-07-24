@@ -490,7 +490,9 @@
         "checkIn": "Check-in",
         "checkOut": "Check-out",
         "morning": "AM",
-        "afternoon": "PM"
+        "afternoon": "PM",
+        "from": "From",
+        "to": "To"
       }
     },
     "Map": {
@@ -577,7 +579,12 @@
         "attendanceStatus": {
           "title": "Attendance Status",
           "attendance": "Check-in",
-          "departure": "Check-out"
+          "departure": "Check-out",
+          "period": "Period",
+          "todaySchedule": "Today's Schedule",
+          "actualRecords": "Actual Records",
+          "actualHours": "Actual Hours Worked",
+          "deductedHours": "Deducted Hours"
         }
       }
     }

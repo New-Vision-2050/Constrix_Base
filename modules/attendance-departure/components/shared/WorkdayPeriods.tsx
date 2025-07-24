@@ -11,6 +11,8 @@ export interface PeriodType {
   fromPeriod: "AM" | "PM";
   toValue: string;
   toPeriod: "AM" | "PM";
+  actualHours?: number;  // Actual hours worked during this period
+  deductedHours?: number; // Hours deducted from this working period
 }
 
 interface WorkdayPeriodsProps {
@@ -67,6 +69,8 @@ const WorkdayPeriods: React.FC<WorkdayPeriodsProps> = ({
             fromPeriod={period.fromPeriod}
             toValue={period.toValue}
             toPeriod={period.toPeriod}
+            actualHours={period.actualHours}
+            deductedHours={period.deductedHours}
             readOnly={readOnly}
           />
         ))}

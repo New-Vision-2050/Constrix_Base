@@ -2,6 +2,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import TimeSelector from "./TimeSelector";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 
 interface PeriodFieldProps {
   label: string;
@@ -14,6 +15,8 @@ interface PeriodFieldProps {
   onToValueChange?: (value: string) => void;
   onToPeriodChange?: (period: "AM" | "PM") => void;
   readOnly?: boolean;
+  actualHours?: number; // Actual hours worked during this period
+  deductedHours?: number; // Hours deducted from this working period
 }
 
 /**
@@ -29,7 +32,9 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
   onFromPeriodChange,
   onToValueChange,
   onToPeriodChange,
-  readOnly = true
+  readOnly = true,
+  actualHours,
+  deductedHours
 }) => {
   const pathname = usePathname();
   
@@ -48,6 +53,10 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
   const borderColor = isDarkMode ? "border-gray-700" : "border-gray-300";
   const labelTextColor = isDarkMode ? "text-gray-400" : "text-gray-600";
   const arrowColor = isDarkMode ? "#E91E63" : "#D81B60";
+  
+  // Get translations
+  const t = useTranslations("AttendanceDepartureModule.Table.dialogs.attendanceStatus");
+  const tShared = useTranslations("AttendanceDepartureModule.EmployeeDetailsSheet.times");
 
   return (
     <div 
@@ -57,7 +66,7 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
       <div className={`text-xs mb-2 border-b pb-2 ${labelTextColor} ${borderColor}`}>{label}</div>
       <div className="flex justify-around items-center">
         <TimeSelector
-          label="من"
+          label={tShared("from")}
           value={fromValue}
           period={fromPeriod}
           onValueChange={onFromValueChange}
@@ -66,7 +75,7 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
         />
         <div className="font-bold" style={{ color: arrowColor }}>{arrowDirection}</div>
         <TimeSelector
-          label="إلى"
+          label={tShared("to")}
           value={toValue}
           period={toPeriod}
           onValueChange={onToValueChange}
@@ -74,6 +83,24 @@ const PeriodField: React.FC<PeriodFieldProps> = ({
           readOnly={readOnly}
         />
       </div>
+      
+      {/* Display actual and deducted hours information if available */}
+      {(actualHours !== undefined || deductedHours !== undefined) && (
+        <div className="mt-3 pt-2 border-t text-xs grid grid-cols-2 gap-2">
+          {actualHours !== undefined && (
+            <div>
+              <span className={labelTextColor}>{t("actualHours")}:</span> 
+              <span className="font-medium ml-1">{actualHours}</span>
+            </div>
+          )}
+          {deductedHours !== undefined && (
+            <div>
+              <span className={labelTextColor}>{t("deductedHours")}:</span> 
+              <span className="font-medium ml-1">{deductedHours}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
