@@ -566,6 +566,8 @@
           "period": "Period",
           "noWeeklySchedule": "No weekly schedule available",
           "workHours": "Working hours:",
+          "DateOfAttendance":"Date of Attendance",
+          "DateOfDeparture":"Date of Departure",
           "days": {
             "sunday": "Sunday",
             "monday": "Monday",

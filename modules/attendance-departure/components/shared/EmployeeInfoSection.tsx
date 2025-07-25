@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { AttendanceStatusRecord } from "../../types/attendance";
+import { AttendanceHistoryRecord } from "../../types/attendance";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
 interface EmployeeInfoSectionProps {
-  record: AttendanceStatusRecord;
+  record: AttendanceHistoryRecord;
 }
 
 /**
@@ -25,14 +25,18 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
 
   // employee attendance status
   let _status = "unspecified", text = "unspecified", color = "text-gray-400";
-  if (record.is_absent) {
-    _status = "absent";
-  } else if (record.is_holiday) {
-    _status = "holiday";
-  } else if (record.is_late) {
+  if (record?.is_late===1) {
     _status = "late";
   } else if (
-    ['active', 'completed'].includes(record.status)
+    record?.is_absent===1
+  ) {
+    _status = "absent";
+  } else if (
+    record?.is_holiday===1
+  ) {
+    _status = "holiday";
+  } else if (
+    record?.status==="completed"||record?.status==="active"&&(record?.is_absent&&record?.is_holiday&&record?.is_late) 
   ) {
     _status = "present";
   }
@@ -76,16 +80,16 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
 
   return (
     <>
-      <div className="flex flex-wrap justify-between items-center text-sm gap-3">
-        <div className={textColor}>{t("branch")}: {record.company?.name??"-"}</div>
-        <div className={textColor}>{t("jobId")}: {record.professional_data?.job_code??"-"}</div>
-        <div className={textColor}>{t("department")}: {record.company?.name??"-"}</div>
+      <div className="flex  justify-between items-center text-sm gap-2">
+        <div className={textColor}>{t("branch")} : {record?.professional_data?.branch??"-"}</div>
+        <div className={textColor}>{t("jobId")} : {record?.professional_data?.job_code??"-"}</div>
+        <div className={textColor}>{t("department")} : {record?.professional_data?.management??"-"}</div>
         <div className={textColor}>
-          {t("approver")}: {record?.professional_data?.attendance_constraint?.constraint_name??"-"}
+          {t("approver")} : {record?.professional_data?.attendance_constraint?.constraint_name??"-"}
         </div>
         <div className={textColor}>
-          {t("attendanceStatus")}:
-          <span className={`font-bold ${color}`}>
+          {t("attendanceStatus")} : 
+          <span className={`font-bold ${color} mx-1`}>
             {text??"-"}
           </span>
         </div>

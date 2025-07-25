@@ -4,8 +4,7 @@ import { UN_SPECIFIED } from "../../constants/static-data";
 
 interface DisplayFieldProps {
   label: string;
-  value: string;
-  defaultValue?: string;
+  value: string|number;
 }
 
 /**
@@ -14,7 +13,6 @@ interface DisplayFieldProps {
 const DisplayField: React.FC<DisplayFieldProps> = ({ 
   label, 
   value, 
-  defaultValue
 }) => {
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === 'dark';
@@ -31,7 +29,7 @@ const DisplayField: React.FC<DisplayFieldProps> = ({
         className={`border rounded-md p-3 text-right ${borderColor} ${textColor}`}
         style={{ backgroundColor: bgColor }}
       >
-        {value || defaultValue || `${label} ${UN_SPECIFIED}`}
+        {value || `${label} ${UN_SPECIFIED}`}
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import React, {
   useEffect,
 } from "react";
 import { EmployeeDetails } from "../types/employee";
-import { AttendanceStatusRecord } from "../types/attendance";
+import { AttendanceStatusRecord, AttendanceHistoryRecord } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
 import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
 import { AttendanceSummaryData } from "../api/attendanceSummary";
@@ -18,6 +18,7 @@ import { useConstraints } from "../hooks/useConstraints";
 import { Constraint } from "../api/getConstraints";
 import { ManagementHierarchyItem } from "../api/getHierarchies";
 import { useBranchesHierarchies } from "../hooks/useBranchesHierarchies";
+import { useAttendanceHistory } from "../hooks/useAttendanceHistory";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -91,10 +92,13 @@ interface AttendanceContextType {
   // Approver dialog state
   isApproverDialogOpen: boolean;
   setApproverDialogOpen: (isOpen: boolean) => void;
-  
-  // Selected approver record data
-  selectedApproverRecord: AttendanceStatusRecord | null;
-  setSelectedApproverRecord: (record: AttendanceStatusRecord | null) => void;
+    
+  // Attendance history data
+  attendanceHistory: AttendanceHistoryRecord[];
+  attendanceHistoryLoading: boolean;
+  attendanceHistoryError: Error | null;
+  fetchAttendanceHistory: (record: AttendanceStatusRecord) => Promise<void>;
+  refetchAttendanceHistory: () => void;
   
   // Functions to open and close the employee dialog
   openEmployeeDialog: (employee: EmployeeDetails) => void;
@@ -211,6 +215,16 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     refetch: refetchConstraints
   } = useConstraints();
 
+  // Attendance history hook
+  const {
+    attendanceHistory,
+    setAttendanceHistory,
+    loading: attendanceHistoryLoading,
+    error: attendanceHistoryError,
+    fetchAttendanceHistory,
+    refetch: refetchAttendanceHistory
+  } = useAttendanceHistory();
+
   // Employee details dialog state
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
   
@@ -226,9 +240,6 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Approver dialog state
   const [isApproverDialogOpen, setApproverDialogOpen] = useState(false);
   
-  // Selected approver record data
-  const [selectedApproverRecord, setSelectedApproverRecord] = useState<AttendanceStatusRecord | null>(null);
-
   // Toggle view function
   const toggleView = useCallback((view: "table" | "map") => setView(view), []);
   
@@ -258,14 +269,14 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   
   // Function to open the approver dialog
   const openApproverDialog = useCallback((record: AttendanceStatusRecord) => {
-    setSelectedApproverRecord(record);
+    fetchAttendanceHistory(record);
     setApproverDialogOpen(true);
   }, []);
   
   // Function to close the approver dialog
   const closeApproverDialog = useCallback(() => {
     setApproverDialogOpen(false);
-    setTimeout(() => setSelectedApproverRecord(null), 300); // Clear record data after dialog closes
+    setTimeout(() => setAttendanceHistory([]), 300); // Clear record data after dialog closes
   }, []);
 
   // The value that will be provided to consumers
@@ -339,9 +350,12 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isApproverDialogOpen,
     setApproverDialogOpen,
     
-    // Selected approver record
-    selectedApproverRecord,
-    setSelectedApproverRecord,
+    // Attendance history data
+    attendanceHistory,
+    attendanceHistoryLoading,
+    attendanceHistoryError,
+    fetchAttendanceHistory,
+    refetchAttendanceHistory,
     
     // Functions
     openEmployeeDialog,
