@@ -36,8 +36,8 @@ const AttendanceMap: React.FC = () => {
 
   // Get current theme
   const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDarkMode = currentTheme === "dark";
   // Default map center (Riyadh)
   const defaultCenter: L.LatLngExpression = [24.7136, 46.6753];
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -229,10 +229,12 @@ const AttendanceMap: React.FC = () => {
                 location: {
                   lat:
                     record.clock_in_location?.latitude ||
-                    defaultLat + latOffset,
+                    defaultLat + Number(latOffset) ||
+                    defaultLat,
                   lng:
                     record.clock_in_location?.longitude ||
-                    defaultLng + lngOffset,
+                    defaultLng + Number(lngOffset) ||
+                    defaultLng,
                 },
               };
               return <CustomMarker key={employee.id} employee={employee} />;
