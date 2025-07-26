@@ -88,14 +88,14 @@ const AttendanceMap: React.FC = () => {
 
   // Log each employee's location data
   teamAttendance.forEach((record, index) => {
-    console.log(`Employee ${index + 1}: ${record.user?.name || "Unknown"}`, {
-      has_location: !!record.clock_in_location,
-      latitude: record.clock_in_location?.latitude,
-      longitude: record.clock_in_location?.longitude,
-      will_use_default:
-        !record.clock_in_location?.latitude ||
-        !record.clock_in_location?.longitude,
-    });
+      console.log(`Employee ${index + 1}: ${record.user?.name || "Unknown"}`, {
+        has_location: !!record.latest_location,
+        latitude: record.latest_location?.latitude,
+        longitude: record.latest_location?.longitude,
+        will_use_default:
+          !record.latest_location?.latitude ||
+          !record.latest_location?.longitude,
+      });
   });
 
   return (
@@ -185,8 +185,8 @@ const AttendanceMap: React.FC = () => {
               const defaultLat = 24.7136;
               const defaultLng = 46.6753;
               const hasLocation =
-                record.clock_in_location?.latitude &&
-                record.clock_in_location?.longitude;
+                record.latest_location?.latitude &&
+                record.latest_location?.longitude;
 
               // If no location data, create a small offset based on employee ID to spread out markers
               const idOffset = parseInt(record.user?.id || "0") % 50;
@@ -228,11 +228,11 @@ const AttendanceMap: React.FC = () => {
                     : "present",
                 location: {
                   lat:
-                    record.clock_in_location?.latitude ||
+                    record.latest_location?.latitude ||
                     defaultLat + Number(latOffset) ||
                     defaultLat,
                   lng:
-                    record.clock_in_location?.longitude ||
+                    record.latest_location?.longitude ||
                     defaultLng + Number(lngOffset) ||
                     defaultLng,
                 },

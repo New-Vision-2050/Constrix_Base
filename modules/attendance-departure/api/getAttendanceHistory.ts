@@ -8,12 +8,14 @@ export interface AttendanceHistoryParams {
 }
 
 export const getAttendanceHistory = async (
-  record: AttendanceStatusRecord
+id: string,
+startDate: string,
+endDate: string
 ): Promise<AttendanceHistoryRoot> => {
   const searchParams = new URLSearchParams({
-    start_date: record.work_date,
-    end_date: record.work_date,
-    user_id: record.user.id,
+    start_date: startDate,
+    end_date: endDate,
+    user_id: id,
   });
 
   const response = await apiClient.get(`/attendance/history?${searchParams}`);

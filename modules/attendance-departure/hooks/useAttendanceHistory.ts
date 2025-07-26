@@ -6,7 +6,7 @@ interface UseAttendanceHistoryReturn {
   attendanceHistory: AttendanceHistoryRecord[];
   loading: boolean;
   error: Error | null;
-  fetchAttendanceHistory: (record: AttendanceStatusRecord) => Promise<void>;
+  fetchAttendanceHistory: (id: string, startDate: string, endDate: string) => Promise<void>;
   refetch: () => void;
   setAttendanceHistory: (history: AttendanceHistoryRecord[]) => void;
 }
@@ -19,13 +19,13 @@ export const useAttendanceHistory = (): UseAttendanceHistoryReturn => {
   const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [lastParams, setLastParams] = useState<AttendanceStatusRecord | null>(null);
-  const fetchAttendanceHistory = useCallback(async (record: AttendanceStatusRecord) => {
+  const [lastParams, setLastParams] = useState<{id: string, startDate: string, endDate: string} | null>(null);
+  const fetchAttendanceHistory = useCallback(async (id: string, startDate: string, endDate: string) => {
     try {
       setLoading(true);
       setError(null);
-      setLastParams(record);
-      const response = await getAttendanceHistory(record);
+      setLastParams({id, startDate, endDate});
+      const response = await getAttendanceHistory(id, startDate, endDate);
       setAttendanceHistory(response.payload);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch attendance history'));
@@ -37,9 +37,9 @@ export const useAttendanceHistory = (): UseAttendanceHistoryReturn => {
 
   const refetch = useCallback(() => {
     if (lastParams) {
-      fetchAttendanceHistory(lastParams);
+      fetchAttendanceHistory(lastParams.id, lastParams.startDate, lastParams.endDate);
     }
-  }, [lastParams, fetchAttendanceHistory]);
+  }, [lastParams]);
 
   return {
     attendanceHistory,

@@ -67,15 +67,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       constraint_type: editConstraint?.constraint_type,
       branch_locations: editConstraint?.branch_locations,
       is_active: Boolean(editConstraint?.is_active),
-      early_clock_in_rules_value:
-        editConstraint?.config?.early_clock_in_rules?.grace_period_minutes ??
-        DEFAULT_TIME_THRESHOLD_MINUTES,
-      early_clock_in_rules_unit:
-        editConstraint?.config?.early_clock_in_rules?.unit,
-      lateness_rules_value:
-        editConstraint?.config?.lateness_rules?.grace_period_minutes ??
-        DEFAULT_TIME_THRESHOLD_MINUTES,
-      lateness_rules_unit: editConstraint?.config?.lateness_rules?.unit,
+      early_period:
+        editConstraint?.config?.early_clock_in_rules?.early_period,
+      early_unit:
+        editConstraint?.config?.early_clock_in_rules?.early_unit,
+      lateness_period:
+        editConstraint?.config?.lateness_rules?.lateness_period,
+      lateness_unit: editConstraint?.config?.lateness_rules?.lateness_unit,
       out_zone_rules_value:
         editConstraint?.config?.radius_enforcement
           ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
@@ -98,6 +96,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               dayConfig?.periods?.map((period) => ({
                 from: period.start_time,
                 to: period.end_time,
+                early_period: (dayConfig as any)?.early_clock_in_rules?.early_period || DEFAULT_TIME_THRESHOLD_MINUTES,
+                early_unit: (dayConfig as any)?.early_clock_in_rules?.early_unit || 'minute',
+                lateness_period: (dayConfig as any)?.lateness_rules?.lateness_period || DEFAULT_TIME_THRESHOLD_MINUTES,
+                lateness_unit: (dayConfig as any)?.lateness_rules?.lateness_unit || 'minute',
               })) ?? [],
           };
         }),
@@ -382,7 +384,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         },
                       },
                       {
-                        name: "early_clock_in_rules_value",
+                        name: "early_period",
                         label: "السماح بالحضور لمدة (قبل العمل)",
                         type: "number",
                         placeholder: "السماح بالحضور لمدة (قبل العمل)",
@@ -397,7 +399,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         ],
                       },
                       {
-                        name: "early_clock_in_rules_unit",
+                        name: "early_unit",
                         label: "وحدة السماح بالحضور لمدة (قبل العمل)",
                         placeholder: "وحدة السماح بالحضور لمدة (قبل العمل)",
                         type: "select",
@@ -408,7 +410,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         validation: [],
                       },
                       {
-                        name: "lateness_rules_value",
+                        name: "lateness_period",
                         label: "السماح بالتأخير لمدة",
                         type: "number",
                         placeholder: "السماح بالتأخير لمدة",
@@ -423,9 +425,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         ],
                       },
                       {
-                        name: "lateness_rules_unit",
-                        label: "السماح بالتأخير لمدة",
-                        placeholder: "السماح بالتأخير لمدة",
+                        name: "lateness_unit",
+                        label: "وحدة السماح بالتأخير لمدة",
+                        placeholder: "وحدة السماح بالتأخير لمدة",
                         type: "select",
                         options: TimeUnits?.map((item) => ({
                           value: item.id,
@@ -534,6 +536,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     },
     resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
+console.log("formData",formData)
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
         const weeklySchedule = formData.weekly_schedule as Array<any>;
@@ -739,27 +742,39 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 // Round to two decimal places
                 totalWorkHours = Math.round(totalWorkHours * 100) / 100;
 
-                // Add the day to the final object
+                // Get the current day's schedule data for rules
+                const currentDaySchedule = Array.isArray(formData.weekly_schedule)
+                  ? formData.weekly_schedule.find((item: any) => item.day === day)
+                  : null;
+
+                // Get the first period's rules (if exists) or use defaults
+                const firstPeriod = currentDaySchedule?.periods?.[0] || {};
+                const earlyPeriod = Number(firstPeriod.early_period) || DEFAULT_TIME_THRESHOLD_MINUTES;
+                const earlyUnit = firstPeriod.early_unit || 'minute';
+                const latenessPeriod = Number(firstPeriod.lateness_period) || DEFAULT_TIME_THRESHOLD_MINUTES;
+                const latenessUnit = firstPeriod.lateness_unit || 'minute';
+
+                // Add the day to the final object with enhanced structure
                 acc[day] = {
                   enabled: dayPeriods.length > 0,
                   total_work_hours: totalWorkHours,
                   periods: dayPeriods,
+                  early_clock_in_rules: {
+                    prevent_early_clock_in: true,
+                    early_period: earlyPeriod,
+                    early_unit: earlyUnit,
+                  },
+                  lateness_rules: {
+                    prevent_lateness: true,
+                    lateness_period: latenessPeriod,
+                    lateness_unit: latenessUnit,
+                  },
                 };
 
                 return acc;
               },
               {} as Record<string, any>
             ),
-          },
-          early_clock_in_rules: {
-            prevent_early_clock_in: true,
-            grace_period_minutes: formData.early_clock_in_rules_value,
-            unit: formData.early_clock_in_rules_unit ?? TimeUnits?.[0]?.id,
-          },
-          lateness_rules: {
-            prevent_lateness: true,
-            grace_period_minutes: formData.lateness_rules_value,
-            unit: formData.lateness_rules_unit ?? TimeUnits?.[0]?.id,
           },
           type_attendance: {
             location:

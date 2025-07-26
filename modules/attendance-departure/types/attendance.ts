@@ -107,20 +107,23 @@ export interface ConstraintConfig {
   early_clock_in_rules: EarlyClockInRules
 }
 
-export interface TimeRules {
-  subtype: string
-  weekly_schedule: WeeklySchedule
-}
+export type TimeRules = {
+  subtype: 'multiple_periods' | string;
+  weekly_schedule: WeeklySchedule;
+  holidays: Holiday[];
+  overtime_rules: RuleWithApproval;
+  out_zone_rules: RuleWithApproval;
+};
 
-export interface WeeklySchedule {
-  friday: Friday
-  monday: Monday
-  sunday: Sunday
-  tuesday: Tuesday
-  saturday: Saturday
-  thursday: Thursday
-  wednesday: Wednesday
-}
+export type WeeklySchedule = {
+  sunday: DaySchedule;
+  monday: DaySchedule;
+  tuesday: DaySchedule;
+  wednesday: DaySchedule;
+  thursday: DaySchedule;
+  friday: DaySchedule;
+  saturday: DaySchedule;
+};
 
 export interface Friday {
   enabled: boolean
@@ -175,10 +178,10 @@ export interface LatenessRules {
   grace_period_minutes: string
 }
 
-export interface TypeAttendance {
-  location: boolean
-  fingerprint: boolean
-}
+export type TypeAttendance = {
+  location: boolean;
+  fingerprint: boolean;
+};
 
 export interface RadiusEnforcement {
   unit: string
@@ -235,7 +238,7 @@ export interface AttendanceStatusRecord {
     management: string;
     attendance_constraint: string;
   };
-  clock_in_location: { latitude: number; longitude: number };
+  latest_location: { latitude: number; longitude: number };
   clock_in_time: string;
   clock_out_location: { latitude: number; longitude: number };
   clock_out_time: string;
@@ -307,3 +310,31 @@ export interface InputPeriodType {
   start_time: string;
   end_time: string;
 }
+
+// Additional types for enhanced attendance determinants
+
+export type DaySchedule = {
+  enabled: boolean;
+  total_work_hours?: number;
+  periods: Period[];
+  early_clock_in_rules?: ClockRule;
+  lateness_rules?: ClockRule;
+};
+
+export type ClockRule = {
+  prevent_early_clock_in?: boolean;
+  prevent_lateness?: boolean;
+  grace_period_minutes: number;
+  unit: 'hour' | 'minute' | 'day';
+};
+
+export type RuleWithApproval = {
+  requires_approval: boolean;
+  approval_threshold_minutes: number;
+  unit: 'hour' | 'minute' | 'day';
+};
+
+export type Holiday = {
+  name: string;
+  date: string; // e.g., "2025-09-23"
+};

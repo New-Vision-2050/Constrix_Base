@@ -97,7 +97,7 @@ interface AttendanceContextType {
   attendanceHistory: AttendanceHistoryRecord[];
   attendanceHistoryLoading: boolean;
   attendanceHistoryError: Error | null;
-  fetchAttendanceHistory: (record: AttendanceStatusRecord) => Promise<void>;
+  fetchAttendanceHistory: (id: string, startDate: string, endDate: string) => Promise<void>;
   refetchAttendanceHistory: () => void;
   
   // Functions to open and close the employee dialog
@@ -269,7 +269,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   
   // Function to open the approver dialog
   const openApproverDialog = useCallback((record: AttendanceStatusRecord) => {
-    fetchAttendanceHistory(record);
+    fetchAttendanceHistory(record.user.id, record.work_date, record.work_date);
     setApproverDialogOpen(true);
   }, []);
   
