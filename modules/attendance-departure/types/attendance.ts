@@ -226,6 +226,7 @@ type AppliedConstraint = {
 
 // Attendance status record interface for attendance tables and dialogs
 export interface AttendanceStatusRecord {
+  attendance_constraint_id: string;
   applied_constraints: AppliedConstraint[];
   approved_at: string;
   approved_by: string;

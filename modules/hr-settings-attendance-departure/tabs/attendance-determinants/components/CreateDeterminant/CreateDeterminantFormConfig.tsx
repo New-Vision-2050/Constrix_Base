@@ -6,7 +6,6 @@ import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 import { TimeUnits } from "../../constants/determinants";
-import { Square, SquareCheck } from "lucide-react";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -64,7 +63,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     apiUrl: `${baseURL}/attendance/constraints`,
     initialValues: {
       constraint_name: editConstraint?.constraint_name,
-      constraint_type: editConstraint?.constraint_type,
+      constraint_type: editConstraint?.constraint_code,
       branch_locations: editConstraint?.branch_locations,
       is_active: Boolean(editConstraint?.is_active),
       early_period:
