@@ -248,6 +248,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             company_types: formData.company_types as string[] 
           };
           return await defaultSubmitHandler(transformedData, formConfig);
+
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
@@ -260,6 +261,5 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
         console.log("Bouquet form submission failed with values:", values);
         console.log("Error details:", error)
       },
-
     };
 }

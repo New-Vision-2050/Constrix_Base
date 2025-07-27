@@ -30,7 +30,7 @@ const permissionTypeMap = new Map<string, string>([
 ]);
 
 const getSwitchTypeFromPermissionType = (permissionType: string): string | null => {
-  return permissionTypeMap.get(permissionType) || null;
+
 };
 
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
@@ -211,6 +211,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   }, [findCategoryKeyForSubKey]);
 
   const handleSwitchChange = useCallback((switchId: string, checked: boolean, permissionId?: string) => {
+
     setSwitchStates(prev => ({
       ...prev,
       [switchId]: checked
@@ -246,6 +247,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       [permissionId]: validatedValue
     }));
   }, []);
+
 
   // Function to get all currently active permission IDs
   const getAllActivePermissionIds = (): string[] => {
@@ -321,7 +323,6 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
         try {
           toast.success('Permissions assigned successfully!');
             setRefreshTrigger(prev => prev + 1);
-          
         } catch (e) {
           console.error('Toast method 1 failed:', e);
         }

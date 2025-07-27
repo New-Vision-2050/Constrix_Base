@@ -58,6 +58,7 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
     }));
   }, [availableTypes]);
 
+
   // Helper function to render permission switch
   const renderPermissionSwitch = (permissionConfig: typeof permissionTypes[0]) => {
     const { type, displayType, hasPermission } = permissionConfig;

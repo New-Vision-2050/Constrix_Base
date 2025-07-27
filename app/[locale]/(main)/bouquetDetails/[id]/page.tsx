@@ -10,6 +10,7 @@ export default function BouquetDetailsPage() {
   return (
     <>
       <PermissionsBouquet packageId={id} />
+
     </>
   );
 }

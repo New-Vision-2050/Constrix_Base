@@ -13,6 +13,7 @@ const formatCategoryKey = (key: string): string => {
     .join(' ');
 };
 
+
 interface PermissionCategoryProps {
   categoryKey: string;
   categoryData: CategoryPermissions;
@@ -55,6 +56,7 @@ const PermissionCategory: React.FC<PermissionCategoryProps> = ({
       });
     };
   }, [allSubKeys, selectedPermissions, onPermissionChange]);
+
 
   return (
     <AccordionItem key={categoryKey} value={categoryKey}>
