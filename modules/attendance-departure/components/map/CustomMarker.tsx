@@ -79,6 +79,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
     // Convert MapEmployee type to EmployeeDetails using the new structure
     const employeeDetails: EmployeeDetails = {
       id: employee.attendance_id,
+      user_id: employee.user.id,
       name: employee.user.name,
       phone: employee.user.phone || "-",
       department: employee.user.department_name || "-",

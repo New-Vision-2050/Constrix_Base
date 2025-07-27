@@ -496,6 +496,17 @@
       }
     },
     "Map": {
+      "employeeDetails": {
+        "attendanceHistory": "Attendance History",
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "hours": "hrs",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "noAttendanceRecords": "No attendance records found",
+        "errorLoadingHistory": "Error loading attendance history"
+      },
       "layers": {
         "standard": "Standard Map",
         "satellite": "Satellite Map"
@@ -510,7 +521,8 @@
         "branch": "Branch:",
         "department": "Department:",
         "lastSeen": "Last Seen:",
-        "clockIn": "Clock In:"
+        "clockIn": "Clock In:",
+        "phone": "Phone"
       }
     },
     "MapSearchFilter": {

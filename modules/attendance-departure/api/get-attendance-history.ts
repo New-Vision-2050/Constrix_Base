@@ -10,12 +10,13 @@ type ResponseT = {
 
 export default async function getMapEmpAttendanceHistory(user_id: string) {
   const todayDate = new Date();
-  const todayDateString = todayDate.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  const url = `/attendance/history?user_id=${user_id}&&dateFrom=${todayDateString}&dateTo=${todayDateString}`;
+  
+  // Format date as yyyy-mm-dd
+  const year = todayDate.getFullYear();
+  const month = String(todayDate.getMonth() + 1).padStart(2, '0');
+  const day = String(todayDate.getDate()).padStart(2, '0');
+  const todayDateString = `${year}-${month}-${day}`;
+  const url = `/attendance/history?user_id=${user_id}&&start_date=${todayDateString}&end_date=${todayDateString}`;
   const res = await apiClient.get<ResponseT>(url);
 
   return res.data.payload;

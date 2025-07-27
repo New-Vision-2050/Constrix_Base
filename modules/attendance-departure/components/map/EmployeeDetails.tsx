@@ -8,6 +8,9 @@ import { EmployeeDetailsProps } from "../../types/employee";
 import EmployeeInfoField from "../../components/shared/EmployeeInfoField";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import useMapEmpAttendance from "../../hooks/useMapEmpAttendance";
+import AttendanceHistoryList from "./AttendanceHistoryList";
+import { AttendanceHistory } from "./types";
 
 // Constants
 const SHEET_Z_INDEX = 9999; // High z-index to ensure sheet appears above other UI elements
@@ -24,6 +27,13 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDarkMode = currentTheme === "dark";
+  
+  // Fetch attendance history for selected employee
+  const { 
+    data: attendanceHistory, 
+    isLoading, 
+    error 
+  } = useMapEmpAttendance(employee?.user_id || "");
 
   // Theme specific colors defined with Tailwind classes
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
@@ -154,6 +164,15 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
                 </div>
               </div>
             )}
+            
+            {/* Show attendance history */}
+            <div className="pt-4 mt-4 border-t dark:border-gray-700">
+              <AttendanceHistoryList
+                attendanceHistory={attendanceHistory}
+                isLoading={isLoading}
+                error={error}
+              />
+            </div>
           </div>
         </div>
       </SheetContent>

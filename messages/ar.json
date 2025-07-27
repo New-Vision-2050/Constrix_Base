@@ -502,6 +502,17 @@
       }
     },
     "Map": {
+      "employeeDetails": {
+        "attendanceHistory": "سجل الحضور",
+        "present": "حاضر",
+        "absent": "غائب",
+        "late": "متأخر",
+        "hours": "ساعات",
+        "checkIn": "تسجيل الدخول",
+        "checkOut": "تسجيل الخروج",
+        "noAttendanceRecords": "لا توجد سجلات حضور",
+        "errorLoadingHistory": "خطأ في تحميل سجل الحضور"
+      },
       "layers": {
         "standard": "خريطة عادية",
         "satellite": "خريطة القمر الصناعي"
@@ -516,7 +527,8 @@
         "branch": "الفرع:",
         "department": "الإدارة:",
         "lastSeen": "آخر ظهور:",
-        "clockIn": "وقت الدخول:"
+        "clockIn": "وقت الدخول:",
+        "phone": "الهاتف"
       }
     },
     "MapSearchFilter": {
