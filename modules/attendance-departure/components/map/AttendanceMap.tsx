@@ -13,9 +13,8 @@ import L from "leaflet";
 import CustomMarker from "./CustomMarker";
 import MapController from "./MapController";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2, Loader2 } from "lucide-react";
+import { Maximize2, Minimize2, Loader2, AlertCircle } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
-import { mapEmployeesData } from "../../constants/map-static-data";
 import { MapEmployee } from "./types";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -46,9 +45,10 @@ const AttendanceMap: React.FC = () => {
   const mapWrapperRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
-  // Using static data
-  const mapEmployees = mapEmployeesData;
-  const isLoading = false; // Can be changed later when using real data
+  // Using map tracking data from context
+  const { mapTrackingData, mapTrackingDataLoading, mapTrackingDataError, refetchMapTrackingData } = useAttendance();
+  const mapEmployees = mapTrackingData || [];
+  const isLoading = mapTrackingDataLoading;
 
   // Toggle full screen
   const toggleFullScreen = () => {
@@ -186,6 +186,29 @@ const AttendanceMap: React.FC = () => {
               >
                 {t("loading")}
               </span>
+            </div>
+          )}
+          
+          {mapTrackingDataError && !isLoading && (
+            <div
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } p-4 rounded-lg shadow-lg flex flex-col items-center`}
+            >
+              <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
+              <span
+                className={`font-medium ${
+                  isDarkMode ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
+                {t("errorLoading")}
+              </span>
+              <button
+                onClick={() => refetchMapTrackingData && refetchMapTrackingData()}
+                className="mt-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+              >
+                {t("retry")}
+              </button>
             </div>
           )}
         </MapContainer>
