@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/modules/table/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { PermissionWithStatus } from "./types";
+
+// Define permission type configuration structure
+type PermissionTypeConfig = {
+  type: string;
+  displayType: string;
+  hasPermission?: boolean; // This will be set dynamically in the component
+};
+
+// Base permission types configuration - moved outside component
+const BASE_PERMISSION_TYPES: PermissionTypeConfig[] = [
+  { type: 'view', displayType: 'view', hasPermission: false },
+  { type: 'update', displayType: 'edit', hasPermission: false },
+  { type: 'delete', displayType: 'delete', hasPermission: false },
+  { type: 'create', displayType: 'create', hasPermission: false },
+  { type: 'export', displayType: 'export', hasPermission: false },
+  { type: 'activate', displayType: 'activate', hasPermission: false },
+  { type: 'list', displayType: 'list', hasPermission: false }
+];
 
 interface PermissionRowProps {
   subKey: string;
@@ -29,18 +47,17 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
   onSwitchChange,
   onNumberChange
 }) => {
-  const availableTypes = new Set(subItems.map(item => item.type));
+  // Memoize the available types set to avoid recreating on every render
+  const availableTypes = useMemo(() => new Set(subItems.map(item => item.type)), [subItems]);
   
-  // Permission type configurations
-  const permissionTypes = [
-    { type: 'view', displayType: 'view', hasPermission: availableTypes.has('view') },
-    { type: 'update', displayType: 'edit', hasPermission: availableTypes.has('update') },
-    { type: 'delete', displayType: 'delete', hasPermission: availableTypes.has('delete') },
-    { type: 'create', displayType: 'create', hasPermission: availableTypes.has('create') },
-    { type: 'export', displayType: 'export', hasPermission: availableTypes.has('export') },
-    { type: 'activate', displayType: 'activate', hasPermission: availableTypes.has('activate') },
-    { type: 'list', displayType: 'list', hasPermission: availableTypes.has('list') }
-  ];
+  // Memoize the permission types with dynamic hasPermission values
+  const permissionTypes = useMemo(() => {
+    return BASE_PERMISSION_TYPES.map(type => ({
+      ...type,
+      hasPermission: availableTypes.has(type.type)
+    }));
+  }, [availableTypes]);
+
 
   // Helper function to render permission switch
   const renderPermissionSwitch = (permissionConfig: typeof permissionTypes[0]) => {
@@ -72,7 +89,6 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
           id={subKey}
           checked={selectedPermissions.has(subKey)}
           onCheckedChange={(checked) => onPermissionChange(subKey, checked as boolean)}
-          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
         />
       </td>
       <td className="px-4 py-4 text-right text-sm text-white font-medium">
@@ -81,8 +97,8 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
       {permissionTypes.map(renderPermissionSwitch)}
       <td className="px-4 py-4 text-center text-sm text-white font-medium">
         <Input
-          className="w-16 p-1 text-center bg-gray-700 border border-gray-600 rounded text-white"
-          value={numberValues[subKey] || 0}
+          className="w-16 p-1 text-center bg-sidebar border border-sidebar-border rounded"
+          value={numberValues[subKey] > 0 ? numberValues[subKey] : ''}
           onChange={(e) => onNumberChange(subKey, parseInt(e.target.value) || 0)}
           min="0"
           disabled={!activeStates[`${categoryKey}.${subKey}.create`]}

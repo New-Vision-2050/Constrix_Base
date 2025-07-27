@@ -9,7 +9,8 @@ import {
   PermissionItem, 
   PermissionWithStatus, 
   PermissionsData, 
-  Root, 
+  PackagePermissionsRoot,
+  CategoryPermissionsPayload,
 } from "./types";
 
 // Props interface
@@ -18,22 +19,23 @@ interface PermissionsBouquetProps {
 }
 
 // Helper function to map permission type to switch type
+const permissionTypeMap = new Map<string, string>([
+  ['view', 'view'],
+  ['update', 'edit'],
+  ['delete', 'delete'],
+  ['create', 'create'],
+  ['export', 'export'],
+  ['activate', 'activate'],
+  ['list', 'list']
+]);
+
 const getSwitchTypeFromPermissionType = (permissionType: string): string | null => {
-  const typeMap: Record<string, string> = {
-    'view': 'view',
-    'update': 'edit',
-    'delete': 'delete',
-    'create': 'create',
-    'export': 'export',
-    'activate': 'activate',
-    'list': 'list'
-  };
-  return typeMap[permissionType] || null;
+
 };
 
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const [permissions, setPermissions] = useState<PermissionsData | null>(null);
-  const [packagePermissions, setPackagePermissions] = useState<Root | null>(null);
+  const [packagePermissions, setPackagePermissions] = useState<PackagePermissionsRoot | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
@@ -42,207 +44,210 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const [submitting, setSubmitting] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const lookupResponse = await apiClient.get(`/role_and_permissions/permissions/lookup?package_id=${packageId}`);
-        const lookupPayload = lookupResponse.data?.payload;
-        
-        if (!lookupPayload || typeof lookupPayload !== 'object') {
-          setPermissions(null);
-          return;
-        }
-
-        if (packageId) {
-          try {
-            const packageResponse = await apiClient.get(`/packages/${packageId}/permissions`);
-            const packageData = packageResponse.data;
-            
-            if (packageData) {
-              setPackagePermissions(packageData as Root);
-              
-              const newActiveStates: Record<string, boolean> = {};
-              const newNumberValues: Record<string, number> = {};
-              const newSwitchStates: Record<string, boolean> = {};
-              const mergedPermissions: PermissionsData = {};
-              
-              // Merge lookup data with package permissions data
-              Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
-                if (lookupCategoryData && typeof lookupCategoryData === 'object') {
-                  mergedPermissions[categoryKey] = {};
-                  
-                  Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
-                    if (Array.isArray(lookupItems)) {
-                      // Get corresponding package permissions for this category/subKey
-                      const packageCategoryData = packageData.payload?.permissions?.[categoryKey];
-                      const packageSubItems = packageCategoryData?.[subKey] || [];
-                      
-                      // Create merged items with is_active status
-                      const mergedItems: PermissionWithStatus[] = lookupItems.map((lookupItem: any) => {
-                        // Find corresponding package item
-                        const packageItem = Array.isArray(packageSubItems) 
-                          ? packageSubItems.find((pItem: any) => pItem.id === lookupItem.id)
-                          : null;
-                        
-                        const switchType = getSwitchTypeFromPermissionType(lookupItem.type);
-                        if (switchType) {
-                          const stateKey = `${categoryKey}.${subKey}.${switchType}`;
-                          const switchId = `${subKey}-${switchType}`;
-                          newActiveStates[stateKey] = packageItem?.is_active === true;
-                          newSwitchStates[switchId] = packageItem?.is_active === true;
-                        }
-                        
-                        // Extract limit values for each subKey
-                        if (packageItem?.limit !== undefined && packageItem?.limit !== null) {
-                          newNumberValues[subKey] = packageItem.limit;
-                        }
-                        
-                        return {
-                          id: lookupItem.id,
-                          key: lookupItem.key,
-                          type: lookupItem.type,
-                          name: lookupItem.name,
-                          is_active: packageItem?.is_active || false,
-                          limit: packageItem?.limit
-                        };
-                      });
-                      
-                      mergedPermissions[categoryKey][subKey] = mergedItems;
-                    }
-                  });
-                }
-              });
-              
-              setPermissions(mergedPermissions);
-              setActiveStates(newActiveStates);
-              setNumberValues(newNumberValues);
-              setSwitchStates(newSwitchStates);
-            } else {
-              console.warn('No package data found');
-              // If no package data, create permissions structure with all is_active = false
-              const defaultPermissions: PermissionsData = {};
-              Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
-                if (lookupCategoryData && typeof lookupCategoryData === 'object') {
-                  defaultPermissions[categoryKey] = {};
-                  Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
-                    if (Array.isArray(lookupItems)) {
-                      defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
-                        id: item.id,
-                        key: item.key,
-                        type: item.type,
-                        name: item.name,
-                        is_active: false
-                      }));
-                    }
-                  });
-                }
-              });
-              setPermissions(defaultPermissions);
-            }
-          } catch (packageError) {
-            console.error('Package API Error:', packageError);
-            setPackagePermissions(null);
-            // Create default permissions structure on error
-            const defaultPermissions: PermissionsData = {};
-            Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
-              if (lookupCategoryData && typeof lookupCategoryData === 'object') {
-                defaultPermissions[categoryKey] = {};
-                Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
-                  if (Array.isArray(lookupItems)) {
-                    defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
-                      id: item.id,
-                      key: item.key,
-                      type: item.type,
-                      name: item.name,
-                      is_active: false
-                    }));
-                  }
-                });
-              }
-            });
-            setPermissions(defaultPermissions);
+  // Helper function to create default permissions structure
+  const createDefaultPermissions = useCallback((lookupPayload: CategoryPermissionsPayload): PermissionsData => {
+    const defaultPermissions: PermissionsData = {};
+    Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
+      if (lookupCategoryData && typeof lookupCategoryData === 'object') {
+        defaultPermissions[categoryKey] = {};
+        Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
+          if (Array.isArray(lookupItems)) {
+            defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
+              id: item.id,
+              key: item.key,
+              type: item.type,
+              name: item.name,
+              is_active: false
+            }));
           }
-        } else {
-          console.warn('No package ID found, cannot fetch package permissions');
-          // Create default permissions structure without package ID
-          const defaultPermissions: PermissionsData = {};
-          Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
-            if (lookupCategoryData && typeof lookupCategoryData === 'object') {
-              defaultPermissions[categoryKey] = {};
-              Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
-                if (Array.isArray(lookupItems)) {
-                  defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
-                    id: item.id,
-                    key: item.key,
-                    type: item.type,
-                    name: item.name,
-                    is_active: false
-                  }));
-                }
-              });
-            }
-          });
-          setPermissions(defaultPermissions);
-        }
-      } catch (error) {
-        console.error('Lookup API Error:', error);
-        setPermissions(null);
-        setPackagePermissions(null);
-      } finally {
-        setLoading(false);
+        });
       }
-    };
+    });
+    return defaultPermissions;
+  }, []);
 
+  // Helper function to merge lookup data with package permissions
+  const mergePermissionsData = useCallback((lookupPayload: CategoryPermissionsPayload, packageData: any) => {
+    const newActiveStates: Record<string, boolean> = {};
+    const newNumberValues: Record<string, number> = {};
+    const newSwitchStates: Record<string, boolean> = {};
+    const mergedPermissions: PermissionsData = {};
+    
+    Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
+      if (lookupCategoryData && typeof lookupCategoryData === 'object') {
+        mergedPermissions[categoryKey] = {};
+        
+        Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
+          if (Array.isArray(lookupItems)) {
+            const packageCategoryData = packageData.payload?.permissions?.[categoryKey];
+            const packageSubItems = packageCategoryData?.[subKey] || [];
+            
+            const mergedItems: PermissionWithStatus[] = lookupItems.map((lookupItem: any) => {
+              const packageItem = Array.isArray(packageSubItems) 
+                ? packageSubItems.find((pItem: any) => pItem.id === lookupItem.id)
+                : null;
+              
+              const switchType = getSwitchTypeFromPermissionType(lookupItem.type);
+              if (switchType) {
+                const stateKey = `${categoryKey}.${subKey}.${switchType}`;
+                const switchId = `${subKey}-${switchType}`;
+                newActiveStates[stateKey] = packageItem?.is_active === true;
+                newSwitchStates[switchId] = packageItem?.is_active === true;
+              }
+              
+              if (packageItem?.limit !== undefined && packageItem?.limit !== null) {
+                newNumberValues[subKey] = packageItem.limit;
+              }
+              
+              return {
+                id: lookupItem.id,
+                key: lookupItem.key,
+                type: lookupItem.type,
+                name: lookupItem.name,
+                is_active: packageItem?.is_active || false,
+                limit: packageItem?.limit
+              };
+            });
+            
+            mergedPermissions[categoryKey][subKey] = mergedItems;
+          }
+        });
+      }
+    });
+    
+    return { mergedPermissions, newActiveStates, newNumberValues, newSwitchStates };
+  }, []);
+
+  // Function to fetch lookup permissions
+  const fetchLookupPermissions = useCallback(async () => {
+    const response = await apiClient.get(`/role_and_permissions/permissions/lookup?package_id=${packageId}`);
+    return response.data?.payload;
+  }, [packageId]);
+
+  // Function to fetch package permissions
+  const fetchPackagePermissions = useCallback(async () => {
+    if (!packageId) return null;
+    const response = await apiClient.get(`/packages/${packageId}/permissions`);
+    return response.data;
+  }, [packageId]);
+
+  // Main data fetching function
+  const fetchData = useCallback(async () => {
+    try {
+      const lookupPayload = await fetchLookupPermissions();
+      
+      if (!lookupPayload || typeof lookupPayload !== 'object') {
+        setPermissions(null);
+        return;
+      }
+
+      if (packageId) {
+        try {
+          const packageData = await fetchPackagePermissions();
+          
+          if (packageData) {
+            setPackagePermissions(packageData as PackagePermissionsRoot);
+            
+            const { mergedPermissions, newActiveStates, newNumberValues, newSwitchStates } = 
+              mergePermissionsData(lookupPayload, packageData);
+            
+            setPermissions(mergedPermissions);
+            setActiveStates(newActiveStates);
+            setNumberValues(newNumberValues);
+            setSwitchStates(newSwitchStates);
+          } else {
+            console.warn('No package data found');
+            setPermissions(createDefaultPermissions(lookupPayload));
+          }
+        } catch (packageError) {
+          console.error('Package API Error:', packageError);
+          setPackagePermissions(null);
+          setPermissions(createDefaultPermissions(lookupPayload));
+        }
+      } else {
+        console.warn('No package ID found, cannot fetch package permissions');
+        setPermissions(createDefaultPermissions(lookupPayload));
+      }
+    } catch (error) {
+      console.error('Lookup API Error:', error);
+      setPermissions(null);
+      setPackagePermissions(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [packageId, fetchLookupPermissions, fetchPackagePermissions, mergePermissionsData, createDefaultPermissions]);
+
+  useEffect(() => {
     fetchData();
-  }, [packageId, refreshTrigger]);
+  }, [fetchData, refreshTrigger]);
 
 
-  const handlePermissionChange = (permissionId: string, checked: boolean) => {
+  const handlePermissionChange = useCallback((permissionId: string, checked: boolean) => {
     setSelectedPermissions(prev => {
       const newSelected = new Set(prev);
       checked ? newSelected.add(permissionId) : newSelected.delete(permissionId);
       return newSelected;
     });
-  };
+  }, []);
 
-  const handleSwitchChange = (switchId: string, checked: boolean, permissionId?: string) => {
+  // Helper function to find category key for a given subKey
+  const findCategoryKeyForSubKey = useCallback((subKey: string): string => {
+    if (!permissions) return '';
+    
+    for (const [catKey, catData] of Object.entries(permissions)) {
+      if (catData && typeof catData === 'object' && catData[subKey]) {
+        return catKey;
+      }
+    }
+    return '';
+  }, [permissions]);
+
+  // Helper function to generate active state key
+  const generateActiveStateKey = useCallback((switchId: string): string | null => {
+    const [subKey, switchType] = switchId.split('-');
+    const categoryKey = findCategoryKeyForSubKey(subKey);
+    
+    return categoryKey ? `${categoryKey}.${subKey}.${switchType}` : null;
+  }, [findCategoryKeyForSubKey]);
+
+  const handleSwitchChange = useCallback((switchId: string, checked: boolean, permissionId?: string) => {
+
     setSwitchStates(prev => ({
       ...prev,
       [switchId]: checked
     }));
     
-    const [subKey, switchType] = switchId.split('-');
+    const activeStateKey = generateActiveStateKey(switchId);
     
-    let categoryKey = '';
-    
-    if (permissions) {
-      Object.entries(permissions).forEach(([catKey, catData]) => {
-        if (catData && typeof catData === 'object' && catData[subKey]) {
-          categoryKey = catKey;
-        }
-      });
-    }
-    
-    if (categoryKey) {
-      const activeStateKey = `${categoryKey}.${subKey}.${switchType}`;
+    if (activeStateKey) {
       setActiveStates(prev => ({
         ...prev,
         [activeStateKey]: checked
       }));
     }
-    
-
-  };
+  }, [generateActiveStateKey]);
   
-  const handleNumberChange = (permissionId: string, value: number) => {
-    // Update number values state
+  const handleNumberChange = useCallback((permissionId: string, value: number) => {
+    // Validate the input value
+    if (typeof value !== 'number' || isNaN(value)) {
+      console.warn(`Invalid number value for permission ${permissionId}:`, value);
+      return;
+    }
+    
+    // Ensure the value is not negative
+    const validatedValue = Math.max(0, Math.floor(value));
+    
+    // Log warning if value was adjusted
+    if (validatedValue !== value) {
+      console.warn(`Value for permission ${permissionId} was adjusted from ${value} to ${validatedValue}`);
+    }
+    
     setNumberValues(prev => ({
       ...prev,
-      [permissionId]: value
+      [permissionId]: validatedValue
     }));
-    
+  }, []);
 
-  };
 
   // Function to get all currently active permission IDs
   const getAllActivePermissionIds = (): string[] => {
@@ -293,13 +298,13 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
           if (categoryData && typeof categoryData === 'object') {
             Object.entries(categoryData).forEach(([subKey, subItems]) => {
               if (Array.isArray(subItems)) {
-                // Find the view permission for this subKey (as per memory requirements)
-                const viewItem = subItems.find(item => item.type === 'view');
+                // Find the create permission for this subKey
+                const createItem = subItems.find(item => item.type === 'create');
                 
-                // If view permission exists and has a number value, add to limits
-                if (viewItem && numberValues[subKey] !== undefined && numberValues[subKey] > 0) {
+                // If create permission exists and has a number value, add to limits
+                if (createItem && numberValues[subKey] !== undefined && numberValues[subKey] > 0) {
                   limits.push({
-                    permission_id: viewItem.id,
+                    permission_id: createItem.id,
                     number: numberValues[subKey]
                   });
                 }
@@ -317,11 +322,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       if (response.status === 200 || response.status === 201) {        
         try {
           toast.success('Permissions assigned successfully!');
-          // Reset changed permissions after successful submission
-          activePermissionIds.length = 0;
-          // Trigger useEffect to refresh data
-          setRefreshTrigger(prev => prev + 1);
-          
+            setRefreshTrigger(prev => prev + 1);
         } catch (e) {
           console.error('Toast method 1 failed:', e);
         }

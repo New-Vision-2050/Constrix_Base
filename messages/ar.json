@@ -169,8 +169,9 @@
     "OrganizationalStructure": "الهيكل التنظيمي",
     "AttendanceDeparture": "الحضور والانصراف",
     "HumanResources": "الموارد البشرية",
-    "ProgramManagement": "ادارة البرامج"  ,
-    "Powers": "الصلاحيات"
+    "ProgramManagement": "ادارة البرامج",
+    "Powers": "الصلاحيات",
+    "PackagesAndPrograms": "الباقات والبرامج"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -442,6 +443,7 @@
     "countryRequired": "الجنسية مطلوبة",
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
+
     "resetButtonText": "مسح النموذج",
     "error": {
       "loading": "خطأ في تحميل البيانات",

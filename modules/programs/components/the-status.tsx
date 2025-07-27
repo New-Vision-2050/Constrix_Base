@@ -20,12 +20,11 @@ const TheStatus = ({
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
   const { toast } = useToast();
-console.log(isActive);
   const handleConfirm = async (activationDate: string) => {
     try {
       const response = await apiClient.put(`/company_access_programs/${id}/status`, {
         status: tempIsActive,
-      })  ;
+      });
 
       if (response.status === 200) {
         setIsActive(tempIsActive);
@@ -71,7 +70,6 @@ console.log(isActive);
           open={showDialog}
           onClose={handleCancel}
           onConfirm={handleConfirm}
-          // title={isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
           description={!isActive ? t("Programs.AreYouSureReactivate") : t("Programs.AreYouSureDeactivate")}
         />
       </Dialog>

@@ -77,8 +77,6 @@ const Execution = ({
   deleteUrl?:string
 }) => {
   const t = useTranslations();
-  console.log("formConfig", formConfig);
-
   const defaultMenuItems = useMemo(() => {
     const items = [];
 

@@ -1,21 +1,16 @@
 "use client";
 
 import PermissionsBouquet from "@/modules/bouquet/components/permissions";
-import React from "react";
+import { useParams } from "next/navigation";
 
-interface BouquetDetailsProps {
-  params: Promise<{
-    id: string;
-    locale: string;
-  }>;
-}
-
-export default function BouquetDetailsPage({ params }: BouquetDetailsProps) {
-  const resolvedParams = React.use(params);
+export default function BouquetDetailsPage() {
+  const params = useParams();
+  const id = params?.id as string;
 
   return (
     <>
-      <PermissionsBouquet packageId={resolvedParams.id} />
+      <PermissionsBouquet packageId={id} />
+
     </>
   );
 }

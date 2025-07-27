@@ -7,13 +7,12 @@ import { useParams } from "next/navigation";
 
 // Create a config function that accepts id as a parameter instead of using hooks directly
 export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: string): FormConfig {
-  // id is now passed as a parameter instead of using useParams()
   const params = useParams();
   const packageId = params && typeof params.id === 'string' ? params.id : '';
   
     return {
       formId: "bouquet-form",
-      title: "اضافة برنامج",
+      title: "اضافة باقة",
       apiUrl: `${baseURL}/packages`,
       laravelValidation: {
         enabled: true,
@@ -228,13 +227,14 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
         // - Trigger analytics events
         // - etc.
       },
-      onSubmit: async (formData: Record<string, unknown>) => {
+      onSubmit: async (formData: Record<string, unknown>, formConfig: FormConfig) => {
         // Log the form data
         console.log("Form data received:", formData);
         
         try {
           // Transform form data to match API structure
           const transformedData = {
+            id:formData.id,
             company_access_program_id: packageId,
             name: formData.name as string,
             price: Number(formData.price) ,
@@ -247,28 +247,8 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             company_fields: formData.company_fields as string[] ,
             company_types: formData.company_types as string[] 
           };
-                    
-          // Make API call to packages endpoint
-          // Create a minimal FormConfig object without recursive reference
-          const config: FormConfig = {
-            formId: "bouquet-form",
-            apiUrl: `${baseURL}/packages`,
-            laravelValidation: {
-              enabled: true,
-              errorsPath: "errors"
-            },
-            sections: [],  // Required by FormConfig type
-            submitButtonText: "",
-            cancelButtonText: "",
-            showReset: false,
-            resetButtonText: "",
-            showSubmitLoader: true,
-            resetOnSuccess: true,
-            showCancelButton: false,
-            showBackButton: false
-          };
-          
-          return await defaultSubmitHandler(transformedData, config);
+          return await defaultSubmitHandler(transformedData, formConfig);
+
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
@@ -277,19 +257,9 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
           };
         }
       },
-      
-      // Example onError handler
       onError: (values, error) => {
         console.log("Bouquet form submission failed with values:", values);
-        console.log("Error details:", error);
-
-        // You can perform additional actions here, such as:
-        // - Show a custom error notification
-        // - Log the error to an analytics service
-        // - Attempt to recover from the error
-        // - etc.
+        console.log("Error details:", error)
       },
-
-      // No onSubmit handler needed - will use the default handler
     };
 }
