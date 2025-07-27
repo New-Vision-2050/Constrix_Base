@@ -15,7 +15,8 @@ import MapController from "./MapController";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2, Loader2 } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
-import { AttendanceRecord } from "../../constants/static-data";
+import { mapEmployeesData } from "../../constants/map-static-data";
+import { MapEmployee } from "./types";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
@@ -45,8 +46,9 @@ const AttendanceMap: React.FC = () => {
   const mapWrapperRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
-  // Get team attendance data from context
-  const { teamAttendance, teamAttendanceLoading } = useAttendance();
+  // Using static data
+  const mapEmployees = mapEmployeesData;
+  const isLoading = false; // Can be changed later when using real data
 
   // Toggle full screen
   const toggleFullScreen = () => {
@@ -84,19 +86,7 @@ const AttendanceMap: React.FC = () => {
     };
   }, [isFullScreen]);
 
-  console.log("teamAttendance", teamAttendance);
-
-  // Log each employee's location data
-  teamAttendance.forEach((record, index) => {
-    console.log(`Employee ${index + 1}: ${record.user?.name || "Unknown"}`, {
-      has_location: !!record.clock_in_location,
-      latitude: record.clock_in_location?.latitude,
-      longitude: record.clock_in_location?.longitude,
-      will_use_default:
-        !record.clock_in_location?.latitude ||
-        !record.clock_in_location?.longitude,
-    });
-  });
+  console.log("mapEmployees", mapEmployees);
 
   return (
     <div className="relative" ref={mapWrapperRef}>
@@ -178,70 +168,11 @@ const AttendanceMap: React.FC = () => {
             </LayersControl.BaseLayer>
           </LayersControl>
 
-          {!teamAttendanceLoading &&
-            teamAttendance.map((record) => {
-              // Convert AttendanceStatusRecord to AttendanceRecord format expected by CustomMarker
-              // Create a small offset for employees with missing location data
-              const defaultLat = 24.7136;
-              const defaultLng = 46.6753;
-              const hasLocation =
-                record.clock_in_location?.latitude &&
-                record.clock_in_location?.longitude;
+          {mapEmployees.map((employee: MapEmployee) => {
+            return <CustomMarker key={employee.attendance_id} employee={employee} />;
+          })}
 
-              // If no location data, create a small offset based on employee ID to spread out markers
-              const idOffset = parseInt(record.user?.id || "0") % 50;
-              const latOffset = hasLocation ? 0 : idOffset * 0.001; // Small offset based on ID
-              const lngOffset = hasLocation ? 0 : idOffset * 0.002; // Slightly larger offset for longitude
-
-              const employee: AttendanceRecord = {
-                id:
-                  parseInt(record.user?.id) ||
-                  Math.floor(Math.random() * 10000),
-                name: record.user?.name || "-",
-                user: record.user,
-                is_late: record.is_late,
-                is_absent: record.is_absent,
-                is_holiday: record.is_holiday,
-                status: record.status,
-                clock_in_time: record.clock_in_time || "-",
-                clock_out_time: record.clock_out_time || "-",
-                date:
-                  record.work_date || new Date().toISOString().split("T")[0],
-                employeeId: record.professional_data?.job_code || "",
-                branch: record.professional_data?.branch || "-",
-                department: record.professional_data?.management || "-",
-                approver:
-                  record.professional_data?.attendance_constraint
-                    ?.constraint_name || "-",
-                employeeStatus:
-                  record.is_clocked_in === 1
-                    ? tStatus("active")
-                    : tStatus("inactive"),
-                // Map status to expected format
-                attendanceStatus:
-                  record.is_late === 1
-                    ? "late"
-                    : record.status === "absent"
-                    ? "absent"
-                    : record.status === "excused"
-                    ? "excused"
-                    : "present",
-                location: {
-                  lat:
-                    record.clock_in_location?.latitude ||
-                    defaultLat + Number(latOffset) ||
-                    defaultLat,
-                  lng:
-                    record.clock_in_location?.longitude ||
-                    defaultLng + Number(lngOffset) ||
-                    defaultLng,
-                },
-              };
-              return <CustomMarker key={employee.id} employee={employee} />;
-            })}
-
-          {/* Show loading spinner when data is loading */}
-          {teamAttendanceLoading && (
+          {isLoading && (
             <div
               className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
                 isDarkMode ? "bg-gray-800" : "bg-white"

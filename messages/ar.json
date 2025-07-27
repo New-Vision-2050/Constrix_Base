@@ -515,7 +515,8 @@
         "employee": "الموظف:",
         "branch": "الفرع:",
         "department": "الإدارة:",
-        "lastSeen": "آخر ظهور:"
+        "lastSeen": "آخر ظهور:",
+        "clockIn": "وقت الدخول:"
       }
     },
     "MapSearchFilter": {

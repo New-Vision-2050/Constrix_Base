@@ -509,7 +509,8 @@
         "employee": "Employee:",
         "branch": "Branch:",
         "department": "Department:",
-        "lastSeen": "Last Seen:"
+        "lastSeen": "Last Seen:",
+        "clockIn": "Clock In:"
       }
     },
     "MapSearchFilter": {
