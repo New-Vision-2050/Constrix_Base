@@ -466,7 +466,9 @@
         "status": {
           "present": "حاضر",
           "late": "متأخر",
-          "absent": "غائب"
+          "absent": "غائب",
+          "holiday": "في إجازة",
+          "unspecified": "غير محدد"
         }
       }
     },
@@ -573,6 +575,8 @@
           "period": "الفترة",
           "noWeeklySchedule": "لا يوجد جدول أسبوعي",
           "workHours": "عدد ساعات العمل:",
+          "DateOfAttendance":"تاريخ الحضور",
+          "DateOfDeparture":"تاريخ الانصراف",
           "days": {
             "sunday": "الأحد",
             "monday": "الإثنين",

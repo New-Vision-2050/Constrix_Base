@@ -49,23 +49,21 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
       //     row.clock_in_time || "-",
       // },
       {
-        key: "professional_data.attendance_constraint.constraint_name",
+        key: "professional_data.attendance_constraint",
         label: t("columns.approver"),
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
           <ApproverBadge
-            approver={row?.professional_data?.attendance_constraint?.constraint_name ?? UN_SPECIFIED}
+            approver={row?.status }
             record={row}
           />
         ),
       },
       {
-        key: "is_late",
+        key: "day_status",
         label: t("columns.employeeStatus"),
         sortable: true,
-        render: (value: any, row: AttendanceStatusRecord) =>
-          row.is_late ? t("status.late") : t("status.onTime"),
       },
       {
         key: "status",

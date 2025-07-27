@@ -5,6 +5,7 @@ export type Constraint = {
   config: ConstraintConfig;
   constraint_name: string;
   constraint_type: string;
+  constraint_code: string;
   created_at: string;
   created_by: string;
   end_date: string;

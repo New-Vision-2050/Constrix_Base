@@ -15,14 +15,14 @@ const ApproverBadge: React.FC<ApproverBadgeProps> = ({
   approver,
   record,
 }) => {
-  const { openApproverDialog } = useAttendance();
+  const { openAttendanceStatusDialog } = useAttendance();
 
   return (
     <span
-      className="font-medium cursor-pointer hover:underline text-blue-500 dark:text-blue-400"
-      onClick={() => openApproverDialog(record)}
+      className="font-medium cursor-pointer underline text-blue-500 dark:text-blue-400"
+      onClick={() => openAttendanceStatusDialog(record)}
     >
-      {record.professional_data?.attendance_constraint?.constraint_name || UN_SPECIFIED}
+      {record.professional_data?.attendance_constraint || UN_SPECIFIED}
     </span>
   );
 };
