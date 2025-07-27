@@ -22,7 +22,7 @@ export default function StatisticsCardHeader(props: PropsT) {
       </div>
       {/* title & description */}
       <div>
-        <p className="text-lg font-bold">{title}</p>
+        <p className="text-lg ">{title}</p>
         <p className="text-sm font-thin">
           <span className="text-lg font-bold">{number+' '}</span>
           {description}

@@ -154,7 +154,9 @@
     "CompanyName": "نيو فيجن",
     "OrganizationalStructure": "الهيكل التنظيمي",
     "HumanResources": "الموارد البشرية",
-    "ProgramManagement": "ادارة البرامج"
+    "ProgramManagement": "ادارة البرامج",
+    "Powers": "الصلاحيات",
+    "PackagesAndPrograms": "الباقات والبرامج"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -418,5 +420,13 @@
     "submitButtonText": "حفظ",
     "cancelButtonText": "إلغاء",
     "resetButtonText": "مسح النموذج"
+  },
+  "Programs": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط البرنامج؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط البرنامج؟"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
   }
 }

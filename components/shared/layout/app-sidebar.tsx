@@ -224,8 +224,25 @@ export function AppSidebar({
         ],
         isNotCentral: true,
       },
+      {
+        name: t("Sidebar.Powers"),
+        icon: SettingsIcon,
+        isActive: pageName === ROUTER.Powers,
+        slug: SUPER_ENTITY_SLUG.POWERS,
+        urls: [ROUTER.Programs],
+        sub_entities: [
+          {
+            name: t("Sidebar.PackagesAndPrograms"),
+            url: ROUTER.Programs,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.Programs,
+          },
+        ],
+        isNotCentral: true,
+      },
     ];
   }, [isSuperAdmin]);
+
 
   const projects = isCentral
     ? SidebarProjects.filter((ele) => ele.isNotCentral)
