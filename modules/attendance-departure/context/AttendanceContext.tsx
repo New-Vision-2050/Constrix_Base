@@ -197,6 +197,9 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     refetch: refetchMapTrackingData
   } = useMapTrackingData(searchParams);
 
+
+  
+
   // Get attendance summary data for statistics cards with date filtering
   const {
     attendanceSummary,
