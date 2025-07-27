@@ -505,7 +505,9 @@
         "checkIn": "Check-in",
         "checkOut": "Check-out",
         "noAttendanceRecords": "No attendance records found",
-        "errorLoadingHistory": "Error loading attendance history"
+        "errorLoadingHistory": "Error loading attendance history",
+        "totalActualHours": "Total actual hours",
+        "totalDeductedTime": "Total deducted time"
       },
       "layers": {
         "standard": "Standard Map",

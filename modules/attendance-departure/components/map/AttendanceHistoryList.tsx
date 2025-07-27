@@ -1,9 +1,10 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import { AttendanceHistory } from "./types";
+import { AttendanceHistory, AttendanceRecord } from "./types";
 import AttendanceHistoryItem from "./AttendanceHistoryItem";
-import { Loader2 } from "lucide-react";
+import { Loader2, Timer, Clock } from "lucide-react";
+import { formatMinutesToHoursAndMinutes } from "../../utils/timeUtils";
 
 interface AttendanceHistoryListProps {
   attendanceHistory: AttendanceHistory[] | undefined;
@@ -49,7 +50,7 @@ const AttendanceHistoryList: React.FC<AttendanceHistoryListProps> = ({
 
   return (
     <div className="mt-4">
-      <h3 className="text-base font-medium mb-3">{t("attendanceHistory")}</h3>
+      <h3 className="text-base font-medium mb-3 text-[#FF3B8B]">{t("attendanceHistory")}</h3>
       
       <div className="space-y-4">
         {attendanceHistory.map((history, index) => (
@@ -68,6 +69,36 @@ const AttendanceHistoryList: React.FC<AttendanceHistoryListProps> = ({
                   {records.map((record) => (
                     <AttendanceHistoryItem key={record.id} record={record} />
                   ))}
+                  
+                  {records.length > 0 && (
+                    <div className={`mt-3 pt-3 text-sm ${isDarkMode ? 'border-t border-gray-700' : 'border-t border-gray-200'}`}>
+                      <div className="flex justify-between mb-1">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4 text-blue-500" />
+                          <span>{t("totalActualHours")}:</span>
+                        </div>
+                        <span className="font-medium">
+                          {records[0].total_work_hours}
+                        </span>
+                      </div>
+                      
+                      {/* Show deducted time if employee is late or left early */}
+                      {(records[0].is_late || records[0].is_early_departure) && (
+                        <div className="flex justify-between text-red-500">
+                          <div className="flex items-center gap-1">
+                            <Timer className="w-4 h-4 text-red-500" />
+                            <span>{t("totalDeductedTime")}:</span>
+                          </div>
+                          <span className="font-medium">
+                            {formatMinutesToHoursAndMinutes(
+                              (records[0].is_late ? records[0].late_minutes : 0) + 
+                              (records[0].is_early_departure ? records[0].early_departure_minutes : 0)
+                            )}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

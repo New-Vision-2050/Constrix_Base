@@ -129,42 +129,6 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
               </div>
             </div>
 
-            {/* Attendance status and Employee status */}
-            <div className="p-3 rounded-md mb-3 bg-[#f0f2f5] dark:bg-[#161F3E]">
-              <EmployeeInfoField
-                label={t("status.attendanceStatus")}
-                value={employee.attendanceStatus}
-              />
-
-              {/* <EmployeeInfoField
-                label={t("status.employeeStatus")}
-                value={employee.employeeStatus}
-              /> */}
-            </div>
-
-            {/* Check-in and Check-out times */}
-            {employee.checkInTime && (
-              <div className="p-3 rounded-md bg-[#f0f2f5] dark:bg-[#161F3E]">
-                <div className={`${subtitleColor} text-[12px] mb-0.5`}>
-                  {t("times.checkIn")}
-                </div>
-                <div className="text-right text-lg">
-                  {employee.checkInTime} {t("times.morning")}
-                </div>
-              </div>
-            )}
-
-            {employee.checkOutTime && (
-              <div className="p-3 rounded-md mt-3 bg-[#f0f2f5] dark:bg-[#161F3E]">
-                <div className={`${subtitleColor} text-[12px] mb-0.5`}>
-                  {t("times.checkOut")}
-                </div>
-                <div className="text-right text-lg">
-                  {employee.checkOutTime} {t("times.afternoon")}
-                </div>
-              </div>
-            )}
-            
             {/* Show attendance history */}
             <div className="pt-4 mt-4 border-t dark:border-gray-700">
               <AttendanceHistoryList

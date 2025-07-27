@@ -511,7 +511,9 @@
         "checkIn": "تسجيل الدخول",
         "checkOut": "تسجيل الخروج",
         "noAttendanceRecords": "لا توجد سجلات حضور",
-        "errorLoadingHistory": "خطأ في تحميل سجل الحضور"
+        "errorLoadingHistory": "خطأ في تحميل سجل الحضور",
+        "totalActualHours": "إجمالي الساعات الفعلية",
+        "totalDeductedTime": "إجمالي الوقت المستقطع"
       },
       "layers": {
         "standard": "خريطة عادية",
