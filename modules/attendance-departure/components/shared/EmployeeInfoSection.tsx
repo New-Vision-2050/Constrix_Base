@@ -9,9 +9,7 @@ interface EmployeeInfoSectionProps {
   record: AttendanceHistoryRecord;
 }
 
-/**
- * Shared component for displaying employee information in different dialogs
- */
+
 const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   record,
 }) => {
@@ -25,7 +23,7 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
 
   // employee attendance status
   let _status = "unspecified", text = "unspecified", color = "text-gray-400";
-  if (record?.is_late===1) {
+  if (record?.is_late==1) {
     _status = "late";
   } else if (
     record?.is_absent===1

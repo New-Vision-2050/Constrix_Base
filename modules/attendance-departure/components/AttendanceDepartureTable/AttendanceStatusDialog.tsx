@@ -3,8 +3,6 @@
 import React from "react";
 import { useAttendance } from "../../context/AttendanceContext";
 import DialogContainer from "../shared/DialogContainer";
-import EmployeeInfoSection from "../shared/EmployeeInfoSection";
-import WorkdayPeriods from "../shared/WorkdayPeriods";
 import { useTranslations } from "next-intl";
 import { convertToPeriodType } from "../../utils/periods-helper";
 import { DUMMY_WORK_PERIODS } from "../../constants/dummy-data";

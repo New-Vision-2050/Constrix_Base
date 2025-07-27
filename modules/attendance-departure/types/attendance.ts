@@ -1,9 +1,14 @@
-// API Response interfaces for attendance/history endpoint
 export interface AttendanceHistoryRoot {
   code: string
   message: string
   pagination: Pagination
-  payload: AttendanceHistoryRecord[]
+  payload: AttendanceHistoryPayload[]
+}
+
+// Payload is an array of objects with dynamic keys representing time periods
+export interface AttendanceHistoryPayload {
+  [timeRange: string]: AttendanceHistoryRecord[] | number
+  total_hours: number
 }
 
 export interface Pagination {
@@ -17,6 +22,7 @@ export interface AttendanceHistoryRecord {
   id: string
   user_id: string
   company_id: string
+  timeRange?: string // Time range key from API payload (e.g., "2025-07-27 09:00 - 2025-07-27 02:00")
   clock_in_time: string
   clock_out_time?: string
   timezone: string

@@ -9,7 +9,7 @@ import React, {
   useEffect,
 } from "react";
 import { EmployeeDetails } from "../types/employee";
-import { AttendanceStatusRecord, AttendanceHistoryRecord } from "../types/attendance";
+import { AttendanceStatusRecord, AttendanceHistoryRecord, AttendanceHistoryPayload } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
 import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
 import { AttendanceSummaryData } from "../api/attendanceSummary";
@@ -91,7 +91,9 @@ interface AttendanceContextType {
   isApproverDialogOpen: boolean;
   setApproverDialogOpen: (isOpen: boolean) => void;
     
-  // Attendance history data
+  // Attendance history data - original payload structure with time range keys
+  attendanceHistoryPayload: AttendanceHistoryPayload[];
+  // Attendance history data - flattened array for backward compatibility
   attendanceHistory: AttendanceHistoryRecord[];
   attendanceHistoryLoading: boolean;
   attendanceHistoryError: Error | null;
@@ -222,8 +224,10 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
 
   // Attendance history hook
   const {
+    attendanceHistoryPayload,
     attendanceHistory,
     setAttendanceHistory,
+    setAttendanceHistoryPayload,
     loading: attendanceHistoryLoading,
     error: attendanceHistoryError,
     fetchAttendanceHistory,
@@ -358,7 +362,9 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isApproverDialogOpen,
     setApproverDialogOpen,
     
-    // Attendance history data
+    // Attendance history data - original payload structure
+    attendanceHistoryPayload,
+    // Attendance history data - flattened array
     attendanceHistory,
     attendanceHistoryLoading,
     attendanceHistoryError,
