@@ -389,18 +389,32 @@
         "organizational-structure-main-tab-1": {
           "title": "الهيكل التنظيمي",
           "tabs": {
-            "companyStructure": { "title": "بنية الشركة" },
-            "usersStructure": { "title": "هيكل الموظفين" },
-            "managements": { "title": "الادارات" }
+            "companyStructure": {
+              "title": "بنية الشركة"
+            },
+            "usersStructure": {
+              "title": "هيكل الموظفين"
+            },
+            "managements": {
+              "title": "الادارات"
+            }
           }
         },
         "organizational-structure-main-tab-2": {
           "title": "أعدادات الهيكل",
           "tabs": {
-            "jobTitles": { "title": "المسميات الوظيفية" },
-            "jobTypes": { "title": "أنواع الوظائف" },
-            "managements": { "title": "اعدادات الادارات" },
-            "departments": { "title": "اعدادات الاقسام" }
+            "jobTitles": {
+              "title": "المسميات الوظيفية"
+            },
+            "jobTypes": {
+              "title": "أنواع الوظائف"
+            },
+            "managements": {
+              "title": "اعدادات الادارات"
+            },
+            "departments": {
+              "title": "اعدادات الاقسام"
+            }
           }
         }
       }
@@ -447,7 +461,7 @@
       "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
     }
   },
-  "AttendanceDepartureModule":{
+  "AttendanceDepartureModule": {
     "WorkdayPeriods": {
       "numberOfPeriods": "عدد الفترات:",
       "workingHours": "عدد ساعات العمل:"
@@ -469,7 +483,7 @@
         }
       }
     },
-    "AttendanceDateSelector":{
+    "AttendanceDateSelector": {
       "startDate": "تاريخ البداية",
       "endDate": "تاريخ الانتهاء",
       "search": "بحث",
@@ -550,13 +564,13 @@
       "loadingApprovers": "جاري تحميل المشرفين...",
       "searchPlaceholder": "الاسم/البريد الالكتروني/رقم الجوال"
     },
-    "StatisticsCards":{
+    "StatisticsCards": {
       "totalAttendance": "إجمالي عدد الحضور",
       "totalAbsence": "إجمالي عدد الغياب",
       "totalDepartures": "إجمالي عدد الانصراف",
       "totalHolidays": "إجمالي أيام الإجازات"
     },
-    "Table":{
+    "Table": {
       "mapView": "الخريطة",
       "columns": {
         "name": "الاسم",
@@ -588,8 +602,8 @@
           "period": "الفترة",
           "noWeeklySchedule": "لا يوجد جدول أسبوعي",
           "workHours": "عدد ساعات العمل:",
-          "DateOfAttendance":"تاريخ الحضور",
-          "DateOfDeparture":"تاريخ الانصراف",
+          "DateOfAttendance": "تاريخ الحضور",
+          "DateOfDeparture": "تاريخ الانصراف",
           "days": {
             "sunday": "الأحد",
             "monday": "الإثنين",
@@ -613,7 +627,7 @@
       }
     }
   },
-  "hr-settings":{
+  "hr-settings": {
     "tabs": {
       "attendance": "الحضور و الانصراف",
       "recruitment": "التوظيف",
@@ -675,7 +689,7 @@
         "workingDays": "أيام العمل",
         "periodStart": "بداية الفترة",
         "periodEnd": "نهاية الفترة",
-        "newDay":"اليوم التالي",
+        "newDay": "اليوم التالي",
         "periodStartPlaceholder": "09:00",
         "periodEndPlaceholder": "17:00",
         "periodStartRequired": "بداية الفترة مطلوبة",
@@ -702,5 +716,13 @@
         "inactive": "غير نشط"
       }
     }
+  },
+  "Programs": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط البرنامج؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط البرنامج؟"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
+    "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
   }
 }

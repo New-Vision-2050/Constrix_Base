@@ -54,7 +54,7 @@
   },
   "ForgotPassword": {
     "Title": "Forgot Password",
-    "SetUpPassword":"Let's Set Up Your Password",
+    "SetUpPassword": "Let's Set Up Your Password",
     "EnterTemporaryPassword": "Enter the temporary password sent to your email",
     "Confirm": "Confirm",
     "BackToLogin": "Back to login"
@@ -389,18 +389,32 @@
         "organizational-structure-main-tab-1": {
           "title": "Organizational Structure",
           "tabs": {
-            "companyStructure": { "title": "Company Structure" },
-            "usersStructure": { "title": "Employee Structure" },
-            "managements": { "title": "Departments" }
+            "companyStructure": {
+              "title": "Company Structure"
+            },
+            "usersStructure": {
+              "title": "Employee Structure"
+            },
+            "managements": {
+              "title": "Departments"
+            }
           }
         },
         "organizational-structure-main-tab-2": {
           "title": "Structure Settings",
           "tabs": {
-            "jobTitles": { "title": "Job Titles" },
-            "jobTypes": { "title": "Job Types" },
-            "management": { "title": "Management" },
-            "departments": { "title": "Departments" }
+            "jobTitles": {
+              "title": "Job Titles"
+            },
+            "jobTypes": {
+              "title": "Job Types"
+            },
+            "management": {
+              "title": "Management"
+            },
+            "departments": {
+              "title": "Departments"
+            }
           }
         }
       }
@@ -443,7 +457,7 @@
     "cancelButtonText": "Cancel",
     "resetButtonText": "Clear Form"
   },
-  "AttendanceDepartureModule":{
+  "AttendanceDepartureModule": {
     "WorkdayPeriods": {
       "numberOfPeriods": "Number of periods:",
       "workingHours": "Working hours:"
@@ -463,7 +477,7 @@
         }
       }
     },
-    "AttendanceDateSelector":{
+    "AttendanceDateSelector": {
       "startDate": "Start Date",
       "endDate": "End Date",
       "search": "Search",
@@ -538,19 +552,19 @@
       "branch": "Branch",
       "all": "All",
       "loadingBranches": "Loading branches...",
-      "loadingDepartments":"Loading managements...",
+      "loadingDepartments": "Loading managements...",
       "department": "Department",
       "approver": "Approver",
       "loadingApprovers": "Loading approvers...",
       "searchPlaceholder": "Name/Email/Mobile"
     },
-    "StatisticsCards":{
+    "StatisticsCards": {
       "totalAttendance": "Total Attendance",
       "totalAbsence": "Total Absences",
       "totalDepartures": "Total Departures",
       "totalHolidays": "Total Holiday Days"
     },
-    "Table":{
+    "Table": {
       "mapView": "Map View",
       "columns": {
         "name": "Name",
@@ -582,8 +596,8 @@
           "period": "Period",
           "noWeeklySchedule": "No weekly schedule available",
           "workHours": "Working hours:",
-          "DateOfAttendance":"Date of Attendance",
-          "DateOfDeparture":"Date of Departure",
+          "DateOfAttendance": "Date of Attendance",
+          "DateOfDeparture": "Date of Departure",
           "days": {
             "sunday": "Sunday",
             "monday": "Monday",
@@ -660,7 +674,7 @@
         "workingDays": "Working Days",
         "periodStart": "Period Start",
         "periodEnd": "Period End",
-        "newDay":"Next Day",
+        "newDay": "Next Day",
         "periodStartPlaceholder": "09:00",
         "periodEndPlaceholder": "17:00",
         "periodStartRequired": "Period start time is required",
@@ -687,7 +701,7 @@
         "inactive": "Inactive"
       }
     },
-    "attendanceDeterminantDetails":{
+    "attendanceDeterminantDetails": {
       "determinantType": "Determinant System Type",
       "systemNotFound": "System not found",
       "workHours": "Working Hours",
@@ -696,5 +710,13 @@
       "branches": "Branches",
       "notes": "Notes"
     }
+  },
+  "Programs": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this program?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this program?"
+  },
+  "Bouquets": {
+    "AreYouSureReactivate": "Are you sure you want to reactivate this package?",
+    "AreYouSureDeactivate": "Are you sure you want to deactivate this package?"
   }
 }

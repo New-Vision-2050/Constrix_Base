@@ -77,7 +77,6 @@ const Execution = ({
   deleteUrl?:string
 }) => {
   const t = useTranslations();
-
   const defaultMenuItems = useMemo(() => {
     const items = [];
 
