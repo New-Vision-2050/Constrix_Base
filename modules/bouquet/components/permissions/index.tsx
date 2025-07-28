@@ -3,14 +3,14 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { apiClient } from "@/config/axios-config";
 import { toast } from 'sonner';
-import PermissionCategory from "./PermissionCategory";
+import MainAccordionCategory from "./MainAccordionCategory";
 import SubmitButton from "./SubmitButton";
 import { 
   PermissionItem, 
   PermissionWithStatus, 
-  PermissionsData, 
+  NestedPermissionsData,
+  NestedPermissionsRoot,
   PackagePermissionsRoot,
-  CategoryPermissionsPayload,
 } from "./types";
 
 // Props interface
@@ -34,7 +34,7 @@ return null
 };
 
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
-  const [permissions, setPermissions] = useState<PermissionsData | null>(null);
+  const [permissions, setPermissions] = useState<NestedPermissionsData | null>(null);
   const [packagePermissions, setPackagePermissions] = useState<PackagePermissionsRoot | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
@@ -44,15 +44,19 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const [submitting, setSubmitting] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Helper function to create default permissions structure
-  const createDefaultPermissions = useCallback((lookupPayload: CategoryPermissionsPayload): PermissionsData => {
-    const defaultPermissions: PermissionsData = {};
-    Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
-      if (lookupCategoryData && typeof lookupCategoryData === 'object') {
-        defaultPermissions[categoryKey] = {};
-        Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
-          if (Array.isArray(lookupItems)) {
-            defaultPermissions[categoryKey][subKey] = lookupItems.map((item: any) => ({
+  // Helper function to create default permissions structure for nested data
+  const createDefaultPermissions = useCallback((lookupPayload: NestedPermissionsData): NestedPermissionsData => {
+    const defaultPermissions: NestedPermissionsData = {};
+    
+    Object.entries(lookupPayload).forEach(([mainKey, mainData]) => {
+      defaultPermissions[mainKey] = {};
+      
+      Object.entries(mainData).forEach(([subKey, subData]) => {
+        defaultPermissions[mainKey][subKey] = {};
+        
+        Object.entries(subData).forEach(([categoryKey, categoryData]) => {
+          if (Array.isArray(categoryData)) {
+            (defaultPermissions[mainKey][subKey] as any)[categoryKey] = categoryData.map((item: any) => ({
               id: item.id,
               key: item.key,
               type: item.type,
@@ -61,42 +65,45 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
             }));
           }
         });
-      }
+      });
     });
+    
     return defaultPermissions;
   }, []);
 
-  // Helper function to merge lookup data with package permissions
-  const mergePermissionsData = useCallback((lookupPayload: CategoryPermissionsPayload, packageData: any) => {
+  // Helper function to merge lookup data with package permissions for nested structure
+  const mergePermissionsData = useCallback((lookupPayload: NestedPermissionsData, packageData: any) => {
     const newActiveStates: Record<string, boolean> = {};
     const newNumberValues: Record<string, number> = {};
     const newSwitchStates: Record<string, boolean> = {};
-    const mergedPermissions: PermissionsData = {};
+    const mergedPermissions: NestedPermissionsData = {};
     
-    Object.entries(lookupPayload).forEach(([categoryKey, lookupCategoryData]) => {
-      if (lookupCategoryData && typeof lookupCategoryData === 'object') {
-        mergedPermissions[categoryKey] = {};
+    Object.entries(lookupPayload).forEach(([mainKey, mainData]) => {
+      mergedPermissions[mainKey] = {};
+      
+      Object.entries(mainData).forEach(([subKey, subData]) => {
+        (mergedPermissions[mainKey] as any)[subKey] = {};
         
-        Object.entries(lookupCategoryData).forEach(([subKey, lookupItems]) => {
-          if (Array.isArray(lookupItems)) {
-            const packageCategoryData = packageData.payload?.permissions?.[categoryKey];
-            const packageSubItems = packageCategoryData?.[subKey] || [];
+        Object.entries(subData).forEach(([categoryKey, categoryData]) => {
+          if (Array.isArray(categoryData)) {
+            const packageMainData = packageData.payload?.permissions?.[mainKey];
+            const packageSubData = packageMainData?.[subKey];
+            const packageCategoryData = packageSubData?.[categoryKey] || [];
             
-            const mergedItems: PermissionWithStatus[] = lookupItems.map((lookupItem: any) => {
-              const packageItem = Array.isArray(packageSubItems) 
-                ? packageSubItems.find((pItem: any) => pItem.id === lookupItem.id)
+            const mergedItems: PermissionWithStatus[] = categoryData.map((lookupItem: any) => {
+              const packageItem = Array.isArray(packageCategoryData) 
+                ? packageCategoryData.find((pItem: any) => pItem.id === lookupItem.id)
                 : null;
               
-              const switchType = getSwitchTypeFromPermissionType(lookupItem.type);
-              if (switchType) {
-                const stateKey = `${categoryKey}.${subKey}.${switchType}`;
-                const switchId = `${subKey}-${switchType}`;
-                newActiveStates[stateKey] = packageItem?.is_active === true;
-                newSwitchStates[switchId] = packageItem?.is_active === true;
-              }
+              // Generate state keys for nested structure
+              const switchId = `${subKey}-${categoryKey}-${lookupItem.type}`;
+              const stateKey = `${mainKey}.${subKey}.${categoryKey}.${lookupItem.type}`;
+              
+              newActiveStates[stateKey] = packageItem?.is_active === true;
+              newSwitchStates[switchId] = packageItem?.is_active === true;
               
               if (packageItem?.limit !== undefined && packageItem?.limit !== null) {
-                newNumberValues[subKey] = packageItem.limit;
+                newNumberValues[`${subKey}-${categoryKey}`] = packageItem.limit;
               }
               
               return {
@@ -109,10 +116,10 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
               };
             });
             
-            mergedPermissions[categoryKey][subKey] = mergedItems;
+            (mergedPermissions[mainKey][subKey] as any)[categoryKey] = mergedItems;
           }
         });
-      }
+      });
     });
     
     return { mergedPermissions, newActiveStates, newNumberValues, newSwitchStates };
@@ -190,25 +197,26 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
     });
   }, []);
 
-  // Helper function to find category key for a given subKey
-  const findCategoryKeyForSubKey = useCallback((subKey: string): string => {
-    if (!permissions) return '';
-    
-    for (const [catKey, catData] of Object.entries(permissions)) {
-      if (catData && typeof catData === 'object' && catData[subKey]) {
-        return catKey;
+  // Helper function to generate active state key for nested structure
+  const generateActiveStateKey = useCallback((switchId: string): string | null => {
+    // switchId format: subKey-categoryKey-type
+    const parts = switchId.split('-');
+    if (parts.length >= 3) {
+      const subKey = parts[0];
+      const categoryKey = parts[1];
+      const type = parts.slice(2).join('-'); // Handle types with dashes
+      
+      // Find mainKey by searching through permissions
+      if (permissions) {
+        for (const [mainKey, mainData] of Object.entries(permissions)) {
+          if (mainData[subKey]?.[categoryKey]) {
+            return `${mainKey}.${subKey}.${categoryKey}.${type}`;
+          }
+        }
       }
     }
-    return '';
+    return null;
   }, [permissions]);
-
-  // Helper function to generate active state key
-  const generateActiveStateKey = useCallback((switchId: string): string | null => {
-    const [subKey, switchType] = switchId.split('-');
-    const categoryKey = findCategoryKeyForSubKey(subKey);
-    
-    return categoryKey ? `${categoryKey}.${subKey}.${switchType}` : null;
-  }, [findCategoryKeyForSubKey]);
 
   const handleSwitchChange = useCallback((switchId: string, checked: boolean, permissionId?: string) => {
 
@@ -249,27 +257,24 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   }, []);
 
 
-  // Function to get all currently active permission IDs
+  // Function to get all currently active permission IDs for nested structure
   const getAllActivePermissionIds = (): string[] => {
     const activeIds: string[] = [];
     
     if (permissions && packagePermissions?.payload.permissions) {
-      Object.entries(permissions).forEach(([categoryKey, categoryData]) => {
-        if (categoryData && typeof categoryData === 'object') {
-          Object.entries(categoryData).forEach(([subKey, subItems]) => {
-            if (Array.isArray(subItems)) {
-              subItems.forEach((item: PermissionItem) => {
-                const switchType = getSwitchTypeFromPermissionType(item.type);
-                if (switchType) {
-                  const stateKey = `${categoryKey}.${subKey}.${switchType}`;
-                  if (activeStates[stateKey]) {
-                    activeIds.push(item.id);
-                  }
+      Object.entries(permissions).forEach(([mainKey, mainData]) => {
+        Object.entries(mainData).forEach(([subKey, subData]) => {
+          Object.entries(subData).forEach(([categoryKey, categoryData]) => {
+            if (Array.isArray(categoryData)) {
+              categoryData.forEach((item: PermissionWithStatus) => {
+                const switchId = `${subKey}-${categoryKey}-${item.type}`;
+                if (switchStates[switchId]) {
+                  activeIds.push(item.id);
                 }
               });
             }
           });
-        }
+        });
       });
     }
     
@@ -289,28 +294,29 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
         return;
       }
 
-      // Create limits array with permission_id and number
+      // Create limits array with permission_id and number for nested structure
       const limits: Array<{ permission_id: string; number: number }> = [];
       
-      // Map subKey to create permission IDs and their number values
+      // Map nested structure to create permission IDs and their number values
       if (permissions) {
-        Object.entries(permissions).forEach(([categoryKey, categoryData]) => {
-          if (categoryData && typeof categoryData === 'object') {
-            Object.entries(categoryData).forEach(([subKey, subItems]) => {
-              if (Array.isArray(subItems)) {
-                // Find the create permission for this subKey
-                const createItem = subItems.find(item => item.type === 'create');
+        Object.entries(permissions).forEach(([mainKey, mainData]) => {
+          Object.entries(mainData).forEach(([subKey, subData]) => {
+            Object.entries(subData).forEach(([categoryKey, categoryData]) => {
+              if (Array.isArray(categoryData)) {
+                // Find the view permission for this category (as per memory requirements)
+                const viewItem = categoryData.find(item => item.type === 'view');
+                const numberKey = `${subKey}-${categoryKey}`;
                 
-                // If create permission exists and has a number value, add to limits
-                if (createItem && numberValues[subKey] !== undefined && numberValues[subKey] > 0) {
+                // If view permission exists and has a number value, add to limits
+                if (viewItem && numberValues[numberKey] !== undefined && numberValues[numberKey] > 0) {
                   limits.push({
-                    permission_id: createItem.id,
-                    number: numberValues[subKey]
+                    permission_id: viewItem.id,
+                    number: numberValues[numberKey]
                   });
                 }
               }
             });
-          }
+          });
         });
       }
       
@@ -357,18 +363,18 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
 
   return (
     <div className="w-full space-y-4">
-      {/* One Accordion per payload key */}
+      {/* Main accordion for nested structure */}
       <Accordion type="multiple" className="w-full">
-        {Object.entries(permissions).map(([categoryKey, categoryData]) => {
-          if (!categoryData || Object.keys(categoryData).length === 0) {
+        {Object.entries(permissions).map(([mainKey, mainData]) => {
+          if (!mainData || Object.keys(mainData).length === 0) {
             return null;
           }
 
           return (
-            <PermissionCategory
-              key={categoryKey}
-              categoryKey={categoryKey}
-              categoryData={categoryData}
+            <MainAccordionCategory
+              key={mainKey}
+              mainKey={mainKey}
+              mainData={mainData}
               selectedPermissions={selectedPermissions}
               switchStates={switchStates}
               activeStates={activeStates}
