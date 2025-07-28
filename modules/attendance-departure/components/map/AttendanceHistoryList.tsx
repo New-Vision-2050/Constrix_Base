@@ -7,6 +7,7 @@ import { Loader2, Timer, Clock, Calendar } from "lucide-react";
 import {
   formatMinutesToHoursAndMinutes,
   calculateHoursFromTimeRange,
+  calculateMinutesFromTimeRange
 } from "../../utils/timeUtils";
 
 interface AttendanceHistoryListProps {
@@ -69,12 +70,6 @@ const AttendanceHistoryList: React.FC<AttendanceHistoryListProps> = ({
                     }`}
                   >
                     <div>{timeRange}</div>
-                    {timeRange !== "total_hours" && (
-                      <div className="flex items-center text-blue-500">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {calculateHoursFromTimeRange(timeRange)}
-                      </div>
-                    )}
                   </div>
 
                   <div
@@ -100,36 +95,61 @@ const AttendanceHistoryList: React.FC<AttendanceHistoryListProps> = ({
                             : "border-t border-gray-200"
                         }`}
                       >
+                        {/* Show total scheduled hours from timeRange */}
+                        <div className="flex justify-between mb-1">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4 text-gray-500" />
+                            <span>{t("scheduledHours")}:</span>
+                          </div>
+                          <span className="font-medium">
+                            {calculateHoursFromTimeRange(timeRange)}
+                          </span>
+                        </div>
+
+                        {/* Show deducted time only if employee is actually late or left early and has deducted minutes */}
+                        {(() => {
+                          // Calculate deducted minutes
+                          const lateMinutes = records[0].is_late ? records[0].late_minutes : 0;
+                          const earlyDepartureMinutes = records[0].is_early_departure ? records[0].early_departure_minutes : 0;
+                          const totalDeductedMinutes = lateMinutes + earlyDepartureMinutes;
+                          
+                          // Only show if there are actually deducted minutes
+                          return totalDeductedMinutes > 0 ? (
+                            <div className="flex justify-between text-red-500 mb-1">
+                              <div className="flex items-center gap-1">
+                                <Timer className="w-4 h-4" />
+                                <span>{t("totalDeductedTime")}:</span>
+                              </div>
+                              <span className="font-medium">
+                                {formatMinutesToHoursAndMinutes(totalDeductedMinutes)}
+                              </span>
+                            </div>
+                          ) : null;
+                        })()}
+                        
+                        {/* Show actual hours worked (schedule - deducted time) */}
                         <div className="flex justify-between mb-1">
                           <div className="flex items-center gap-1">
                             <Clock className="w-4 h-4 text-blue-500" />
                             <span>{t("totalActualHours")}:</span>
                           </div>
                           <span className="font-medium">
-                            {records[0].total_work_hours}
+                            {(() => {
+                              // Calculate scheduled minutes from timeRange
+                              const scheduledMinutes = calculateMinutesFromTimeRange(timeRange);
+                              
+                              // Calculate deducted minutes - ONLY if the employee is actually marked as late or early departure
+                              const lateMinutes = records[0].is_late ? records[0].late_minutes : 0;
+                              const earlyDepartureMinutes = records[0].is_early_departure ? records[0].early_departure_minutes : 0;
+                              const deductedMinutes = lateMinutes + earlyDepartureMinutes;
+                              
+                              // Calculate actual minutes worked - if no deductions, actual = scheduled
+                              const actualMinutes = Math.max(0, scheduledMinutes - deductedMinutes);
+                              
+                              return formatMinutesToHoursAndMinutes(actualMinutes);
+                            })()}
                           </span>
                         </div>
-
-                        {/* Show deducted time if employee is late or left early */}
-                        {(records[0].is_late ||
-                          records[0].is_early_departure) && (
-                          <div className="flex justify-between text-red-500">
-                            <div className="flex items-center gap-1">
-                              <Timer className="w-4 h-4 text-red-500" />
-                              <span>{t("totalDeductedTime")}:</span>
-                            </div>
-                            <span className="font-medium">
-                              {formatMinutesToHoursAndMinutes(
-                                (records[0].is_late
-                                  ? records[0].late_minutes
-                                  : 0) +
-                                  (records[0].is_early_departure
-                                    ? records[0].early_departure_minutes
-                                    : 0)
-                              )}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>

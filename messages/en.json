@@ -506,6 +506,7 @@
         "checkOut": "Check-out",
         "noAttendanceRecords": "No attendance records found",
         "errorLoadingHistory": "Error loading attendance history",
+        "scheduledHours": "Scheduled Hours",
         "totalActualHours": "Total actual hours",
         "totalDeductedTime": "Total deducted time"
       },

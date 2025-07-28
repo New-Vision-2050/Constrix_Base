@@ -25,9 +25,43 @@ export const formatMinutesToHoursAndMinutes = (minutes: number): string => {
  * @returns Total hours and minutes in "2h 30m" format
  */
 export const calculateHoursFromTimeRange = (timeRangeString: string): string => {
+  const minutes = calculateMinutesFromTimeRange(timeRangeString);
+  return formatMinutesToHoursAndMinutes(minutes);
+};
+
+/**
+ * Parse a time string and return a Date object
+ * @param timeStr Time string in format "YYYY-MM-DD HH:MM"
+ * @returns Date object
+ */
+export const parseTimeString = (timeStr: string): Date => {
+  // Regular expression to match date and time: YYYY-MM-DD HH:MM
+  const match = timeStr.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}):(\d{2})$/);
+  
+  if (!match) {
+    throw new Error(`Invalid time format: ${timeStr}`);
+  }
+  
+  const [_, dateStr, hourStr, minuteStr] = match;
+  const hour = parseInt(hourStr, 10);
+  const minute = parseInt(minuteStr, 10);
+  
+  // Create date object
+  const date = new Date(dateStr);
+  date.setHours(hour, minute, 0, 0);
+  
+  return date;
+};
+
+/**
+ * Calculates the total minutes between two time points in a timeRange string
+ * @param timeRangeString The time range string to parse
+ * @returns Total minutes or -1 if invalid
+ */
+export const calculateMinutesFromTimeRange = (timeRangeString: string): number => {
   // Handle special case for "total_hours"
   if (timeRangeString === 'total_hours') {
-    return '';
+    return 0;
   }
   
   try {
@@ -36,28 +70,8 @@ export const calculateHoursFromTimeRange = (timeRangeString: string): string => 
     
     if (parts.length !== 2) {
       console.error('Invalid time range format:', timeRangeString);
-      return '-';
+      return -1;
     }
-
-    // Parse using regular expressions to handle potential format issues
-    const parseTimeString = (timeStr: string) => {
-      // Regular expression to match date and time: YYYY-MM-DD HH:MM
-      const match = timeStr.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}):(\d{2})$/);
-      
-      if (!match) {
-        throw new Error(`Invalid time format: ${timeStr}`);
-      }
-      
-      const [_, dateStr, hourStr, minuteStr] = match;
-      const hour = parseInt(hourStr, 10);
-      const minute = parseInt(minuteStr, 10);
-      
-      // Create date object
-      const date = new Date(dateStr);
-      date.setHours(hour, minute, 0, 0);
-      
-      return date;
-    };
     
     // Parse the start and end times
     const startDateTime = parseTimeString(parts[0]);
@@ -75,11 +89,9 @@ export const calculateHoursFromTimeRange = (timeRangeString: string): string => 
     }
     
     // Convert to minutes
-    const minutes = Math.floor(diffMs / 60000);
-    
-    return formatMinutesToHoursAndMinutes(minutes);
+    return Math.floor(diffMs / 60000);
   } catch (error) {
     console.error('Error parsing time range:', timeRangeString, error);
-    return '-';
+    return -1;
   }
 };

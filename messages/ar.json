@@ -512,6 +512,7 @@
         "checkOut": "تسجيل الخروج",
         "noAttendanceRecords": "لا توجد سجلات حضور",
         "errorLoadingHistory": "خطأ في تحميل سجل الحضور",
+        "scheduledHours": "ساعات الجدول",
         "totalActualHours": "إجمالي الساعات الفعلية",
         "totalDeductedTime": "إجمالي الوقت المستقطع"
       },
