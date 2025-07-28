@@ -7,7 +7,7 @@ import { Loader2, Timer, Clock, Calendar } from "lucide-react";
 import {
   formatMinutesToHoursAndMinutes,
   calculateHoursFromTimeRange,
-  calculateMinutesFromTimeRange
+  calculateMinutesFromTimeRange,
 } from "../../utils/timeUtils";
 
 interface AttendanceHistoryListProps {
@@ -109,24 +109,29 @@ const AttendanceHistoryList: React.FC<AttendanceHistoryListProps> = ({
                         {/* Show deducted time only if employee is actually late or left early and has deducted minutes */}
                         {(() => {
                           // Calculate deducted minutes
-                          const lateMinutes = records[0].is_late ? records[0].late_minutes : 0;
-                          const earlyDepartureMinutes = records[0].is_early_departure ? records[0].early_departure_minutes : 0;
-                          const totalDeductedMinutes = lateMinutes + earlyDepartureMinutes;
-                          
+                          const totalPeriodMinutes =
+                            calculateMinutesFromTimeRange(timeRange);
+                          const totalPeriodHours = totalPeriodMinutes / 60;
+                          const totalWorkHours = records.reduce(
+                            (total, record) => total + +record.total_work_hours,
+                            0
+                          );
+
                           // Only show if there are actually deducted minutes
-                          return totalDeductedMinutes > 0 ? (
+                          return totalWorkHours > 0 ? (
                             <div className="flex justify-between text-red-500 mb-1">
                               <div className="flex items-center gap-1">
                                 <Timer className="w-4 h-4" />
                                 <span>{t("totalDeductedTime")}:</span>
                               </div>
                               <span className="font-medium">
-                                {formatMinutesToHoursAndMinutes(totalDeductedMinutes)}
+                                {Number(totalPeriodHours) -
+                                  Number(totalWorkHours)}
                               </span>
                             </div>
                           ) : null;
                         })()}
-                        
+
                         {/* Show actual hours worked (schedule - deducted time) */}
                         <div className="flex justify-between mb-1">
                           <div className="flex items-center gap-1">
@@ -135,18 +140,12 @@ const AttendanceHistoryList: React.FC<AttendanceHistoryListProps> = ({
                           </div>
                           <span className="font-medium">
                             {(() => {
-                              // Calculate scheduled minutes from timeRange
-                              const scheduledMinutes = calculateMinutesFromTimeRange(timeRange);
-                              
-                              // Calculate deducted minutes - ONLY if the employee is actually marked as late or early departure
-                              const lateMinutes = records[0].is_late ? records[0].late_minutes : 0;
-                              const earlyDepartureMinutes = records[0].is_early_departure ? records[0].early_departure_minutes : 0;
-                              const deductedMinutes = lateMinutes + earlyDepartureMinutes;
-                              
-                              // Calculate actual minutes worked - if no deductions, actual = scheduled
-                              const actualMinutes = Math.max(0, scheduledMinutes - deductedMinutes);
-                              
-                              return formatMinutesToHoursAndMinutes(actualMinutes);
+                              const totalWorkHours = records.reduce(
+                                (total, record) =>
+                                  total + +record.total_work_hours,
+                                0
+                              );
+                              return totalWorkHours;
                             })()}
                           </span>
                         </div>
