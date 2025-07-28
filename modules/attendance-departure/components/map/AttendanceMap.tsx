@@ -86,8 +86,6 @@ const AttendanceMap: React.FC = () => {
     };
   }, [isFullScreen]);
 
-  console.log("mapEmployees", mapEmployees);
-
   return (
     <div className="relative" ref={mapWrapperRef}>
       <style>{`
