@@ -106,6 +106,7 @@ export interface AttendanceConstraint {
 }
 
 export interface ConstraintConfig {
+  default_location:boolean;
   time_rules: TimeRules
   lateness_rules: LatenessRules
   type_attendance: TypeAttendance

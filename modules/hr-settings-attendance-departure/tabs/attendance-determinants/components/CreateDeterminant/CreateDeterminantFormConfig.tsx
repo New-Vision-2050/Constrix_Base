@@ -82,7 +82,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         editConstraint?.branch_locations?.map(
           (branch: { branch_id: string | number }) => Number(branch.branch_id)
         ) ?? [],
-      location_type: "main",
+      location_type:Boolean(editConstraint?.config?.default_location) ? "main" : "custom",
       weekly_schedule: Object.entries(
         (editConstraint?.config?.time_rules
           ?.weekly_schedule as weeklyScheduleDays) || {}
@@ -535,7 +535,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     },
     resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
-console.log("formData",formData)
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
         const weeklySchedule = formData.weekly_schedule as Array<any>;
