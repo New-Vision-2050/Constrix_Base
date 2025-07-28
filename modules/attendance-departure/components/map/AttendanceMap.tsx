@@ -210,9 +210,7 @@ const AttendanceMap: React.FC = () => {
                 employeeId: record.professional_data?.job_code || "",
                 branch: record.professional_data?.branch || "-",
                 department: record.professional_data?.management || "-",
-                approver:
-                  record.professional_data?.attendance_constraint
-                    ?.constraint_name || "-",
+                approver:"-",
                 employeeStatus:
                   record.is_clocked_in === 1
                     ? tStatus("active")

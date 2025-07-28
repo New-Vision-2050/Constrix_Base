@@ -30,7 +30,7 @@ const permissionTypeMap = new Map<string, string>([
 ]);
 
 const getSwitchTypeFromPermissionType = (permissionType: string): string | null => {
-
+return null
 };
 
 function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
