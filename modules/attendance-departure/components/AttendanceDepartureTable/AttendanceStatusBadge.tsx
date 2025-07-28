@@ -16,7 +16,7 @@ export const AttendanceStatusBadge = ({
   record,
   status,
 }: AttendanceStatusBadgeProps) => {
-  const { openAttendanceStatusDialog } = useAttendance();
+  const { openApproverDialog } = useAttendance();
   const t = useTranslations("attendanceDeparture.status");
   let color = "";
   let text = "";
@@ -64,7 +64,7 @@ export const AttendanceStatusBadge = ({
   return (
     <span
       className={`font-bold ${interactiveStyles} ${color}`}
-      onClick={() => openAttendanceStatusDialog(record)}
+      onClick={() => openApproverDialog(record)}
     >
       {text}
     </span>

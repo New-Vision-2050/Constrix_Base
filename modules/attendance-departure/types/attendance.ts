@@ -1,9 +1,14 @@
-// API Response interfaces for attendance/history endpoint
 export interface AttendanceHistoryRoot {
   code: string
   message: string
   pagination: Pagination
-  payload: AttendanceHistoryRecord[]
+  payload: AttendanceHistoryPayload[]
+}
+
+// Payload is an array of objects with dynamic keys representing time periods
+export interface AttendanceHistoryPayload {
+  [timeRange: string]: AttendanceHistoryRecord[] | number
+  total_hours: number
 }
 
 export interface Pagination {
@@ -17,6 +22,7 @@ export interface AttendanceHistoryRecord {
   id: string
   user_id: string
   company_id: string
+  timeRange?: string // Time range key from API payload (e.g., "2025-07-27 09:00 - 2025-07-27 02:00")
   clock_in_time: string
   clock_out_time?: string
   timezone: string
@@ -107,20 +113,23 @@ export interface ConstraintConfig {
   early_clock_in_rules: EarlyClockInRules
 }
 
-export interface TimeRules {
-  subtype: string
-  weekly_schedule: WeeklySchedule
-}
+export type TimeRules = {
+  subtype: 'multiple_periods' | string;
+  weekly_schedule: WeeklySchedule;
+  holidays: Holiday[];
+  overtime_rules: RuleWithApproval;
+  out_zone_rules: RuleWithApproval;
+};
 
-export interface WeeklySchedule {
-  friday: Friday
-  monday: Monday
-  sunday: Sunday
-  tuesday: Tuesday
-  saturday: Saturday
-  thursday: Thursday
-  wednesday: Wednesday
-}
+export type WeeklySchedule = {
+  sunday: DaySchedule;
+  monday: DaySchedule;
+  tuesday: DaySchedule;
+  wednesday: DaySchedule;
+  thursday: DaySchedule;
+  friday: DaySchedule;
+  saturday: DaySchedule;
+};
 
 export interface Friday {
   enabled: boolean
@@ -175,10 +184,10 @@ export interface LatenessRules {
   grace_period_minutes: string
 }
 
-export interface TypeAttendance {
-  location: boolean
-  fingerprint: boolean
-}
+export type TypeAttendance = {
+  location: boolean;
+  fingerprint: boolean;
+};
 
 export interface RadiusEnforcement {
   unit: string
@@ -223,6 +232,7 @@ type AppliedConstraint = {
 
 // Attendance status record interface for attendance tables and dialogs
 export interface AttendanceStatusRecord {
+  attendance_constraint_id: string;
   applied_constraints: AppliedConstraint[];
   approved_at: string;
   approved_by: string;
@@ -235,7 +245,7 @@ export interface AttendanceStatusRecord {
     management: string;
     attendance_constraint: string;
   };
-  clock_in_location: { latitude: number; longitude: number };
+  latest_location: { latitude: number; longitude: number };
   clock_in_time: string;
   clock_out_location: { latitude: number; longitude: number };
   clock_out_time: string;
@@ -307,3 +317,31 @@ export interface InputPeriodType {
   start_time: string;
   end_time: string;
 }
+
+// Additional types for enhanced attendance determinants
+
+export type DaySchedule = {
+  enabled: boolean;
+  total_work_hours?: number;
+  periods: Period[];
+  early_clock_in_rules?: ClockRule;
+  lateness_rules?: ClockRule;
+};
+
+export type ClockRule = {
+  prevent_early_clock_in?: boolean;
+  prevent_lateness?: boolean;
+  grace_period_minutes: number;
+  unit: 'hour' | 'minute' | 'day';
+};
+
+export type RuleWithApproval = {
+  requires_approval: boolean;
+  approval_threshold_minutes: number;
+  unit: 'hour' | 'minute' | 'day';
+};
+
+export type Holiday = {
+  name: string;
+  date: string; // e.g., "2025-09-23"
+};

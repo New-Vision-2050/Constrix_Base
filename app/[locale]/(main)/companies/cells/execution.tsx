@@ -77,7 +77,6 @@ const Execution = ({
   deleteUrl?:string
 }) => {
   const t = useTranslations();
-
   const defaultMenuItems = useMemo(() => {
     const items = [];
 
@@ -136,6 +135,8 @@ const Execution = ({
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
 
+  console.log("actionState", actionState);
+
   const handleMenuItemClick = (
     action: string | ((row: { id: string; [key: string]: unknown }) => void)
   ) => {
@@ -187,7 +188,7 @@ const Execution = ({
       </DropdownMenu>
 
       {/* Delete Confirmation Dialog */}
-      {formConfig && actionState.delete && (
+      {actionState.delete && (
         <DeleteConfirmationDialog
           deleteUrl={actionState.delete.url}
           onClose={() => handleCloseDialog("delete")}

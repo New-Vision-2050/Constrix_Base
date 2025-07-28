@@ -60,7 +60,7 @@ interface CustomMarkerProps {
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
   // Use attendance context to open employee dialog
-  const { openEmployeeDialog } = useAttendance();
+  const { openEmployeeDialog ,attendanceHistory ,fetchAttendanceHistory } = useAttendance();
   const t = useTranslations("attendanceDeparture.status");
 
   // Get current theme
@@ -96,10 +96,10 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
       checkOutTime: undefined,
       avatarUrl: undefined, // No default avatar
     };
+    // fetchAttendanceHistory(employee.id.toString(), , employee.date);
 
     openEmployeeDialog(employeeDetails);
   };
-
   // Create marker position and properties for proper type handling
   const position: [number, number] = [
     employee.latest_location.latitude,

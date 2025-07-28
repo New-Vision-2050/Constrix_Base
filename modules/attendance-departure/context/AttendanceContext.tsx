@@ -9,7 +9,7 @@ import React, {
   useEffect,
 } from "react";
 import { EmployeeDetails } from "../types/employee";
-import { AttendanceStatusRecord, AttendanceHistoryRecord } from "../types/attendance";
+import { AttendanceStatusRecord, AttendanceHistoryRecord, AttendanceHistoryPayload } from "../types/attendance";
 import { useTeamAttendance } from "../hooks/useTeamAttendance";
 import { useAttendanceSummary } from "../hooks/useAttendanceSummary";
 import { AttendanceSummaryData } from "../api/attendanceSummary";
@@ -21,6 +21,8 @@ import { useBranchesHierarchies } from "../hooks/useBranchesHierarchies";
 import { useAttendanceHistory } from "../hooks/useAttendanceHistory";
 import { useMapTrackingData } from "../hooks/useMapTrackingData";
 import { MapEmployee } from "../components/map/types";
+import { useConstraintDetails } from "../hooks/useConstraintDetails";
+import { ConstraintDetails } from "../types/constraint";
 
 // Define the type of data in the context
 interface AttendanceContextType {
@@ -87,19 +89,17 @@ interface AttendanceContextType {
   isAttendanceStatusDialogOpen: boolean;
   setAttendanceStatusDialogOpen: (isOpen: boolean) => void;
   
-  // Selected attendance record data
-  selectedAttendanceRecord: AttendanceStatusRecord | null;
-  setSelectedAttendanceRecord: (record: AttendanceStatusRecord | null) => void;
-  
   // Approver dialog state
   isApproverDialogOpen: boolean;
   setApproverDialogOpen: (isOpen: boolean) => void;
     
-  // Attendance history data
+  // Attendance history data - original payload structure with time range keys
+  attendanceHistoryPayload: AttendanceHistoryPayload[];
+  // Attendance history data - flattened array for backward compatibility
   attendanceHistory: AttendanceHistoryRecord[];
   attendanceHistoryLoading: boolean;
   attendanceHistoryError: Error | null;
-  fetchAttendanceHistory: (record: AttendanceStatusRecord) => Promise<void>;
+  fetchAttendanceHistory: (id: string, startDate: string, endDate: string) => Promise<void>;
   refetchAttendanceHistory: () => void;
   
   // Functions to open and close the employee dialog
@@ -119,6 +119,13 @@ interface AttendanceContextType {
   mapTrackingDataLoading: boolean;
   mapTrackingDataError: Error | null;
   refetchMapTrackingData: () => void;
+  
+  // Constraint details data
+  constraintDetails: ConstraintDetails | null;
+  constraintDetailsLoading: boolean;
+  constraintDetailsError: Error | null;
+  fetchConstraintDetails: (id: string) => void;
+  refetchConstraintDetails: () => void;
 }
 
 // Create the context
@@ -237,13 +244,25 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
 
   // Attendance history hook
   const {
+    attendanceHistoryPayload,
     attendanceHistory,
     setAttendanceHistory,
+    setAttendanceHistoryPayload,
     loading: attendanceHistoryLoading,
     error: attendanceHistoryError,
     fetchAttendanceHistory,
     refetch: refetchAttendanceHistory
   } = useAttendanceHistory();
+
+  // Constraint details state and hook
+  const {
+    constraintDetails,
+    loading: constraintDetailsLoading,
+    error: constraintDetailsError,
+    fetchConstraintDetails,
+    refetch: refetchConstraintDetails,
+    setConstraintDetails
+  } = useConstraintDetails();
 
   // Employee details dialog state
   const [isEmployeeDialogOpen, setEmployeeDialogOpen] = useState(false);
@@ -254,9 +273,6 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Attendance status dialog state
   const [isAttendanceStatusDialogOpen, setAttendanceStatusDialogOpen] = useState(false);
   
-  // Selected attendance record data
-  const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState<AttendanceStatusRecord | null>(null);
-
   // Approver dialog state
   const [isApproverDialogOpen, setApproverDialogOpen] = useState(false);
   
@@ -277,19 +293,19 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   
   // Function to open the attendance status dialog
   const openAttendanceStatusDialog = useCallback((record: AttendanceStatusRecord) => {
-    setSelectedAttendanceRecord(record);
+    fetchConstraintDetails(record.attendance_constraint_id);
     setAttendanceStatusDialogOpen(true);
   }, []);
   
   // Function to close the attendance status dialog
   const closeAttendanceStatusDialog = useCallback(() => {
     setAttendanceStatusDialogOpen(false);
-    setTimeout(() => setSelectedAttendanceRecord(null), 300); // Clear record data after dialog closes
+    setTimeout(() => setConstraintDetails(null), 300); // Clear record data after dialog closes
   }, []);
   
   // Function to open the approver dialog
   const openApproverDialog = useCallback((record: AttendanceStatusRecord) => {
-    fetchAttendanceHistory(record);
+    fetchAttendanceHistory(record.user.id, record.work_date, record.work_date);
     setApproverDialogOpen(true);
   }, []);
   
@@ -362,21 +378,26 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     isAttendanceStatusDialogOpen,
     setAttendanceStatusDialogOpen,
     
-    // Selected attendance record
-    selectedAttendanceRecord,
-    setSelectedAttendanceRecord,
-    
     // Approver dialog
     isApproverDialogOpen,
     setApproverDialogOpen,
     
-    // Attendance history data
+    // Attendance history data - original payload structure
+    attendanceHistoryPayload,
+    // Attendance history data - flattened array
     attendanceHistory,
     attendanceHistoryLoading,
     attendanceHistoryError,
     fetchAttendanceHistory,
     refetchAttendanceHistory,
     
+    // Constraint details data
+    constraintDetails,
+    constraintDetailsLoading,
+    constraintDetailsError,
+    fetchConstraintDetails,
+    refetchConstraintDetails,
+
     // Functions
     openEmployeeDialog,
     closeEmployeeDialog,
