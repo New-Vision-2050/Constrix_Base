@@ -13,9 +13,9 @@ import L from "leaflet";
 import CustomMarker from "./CustomMarker";
 import MapController from "./MapController";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2, Loader2 } from "lucide-react";
+import { Maximize2, Minimize2, Loader2, AlertCircle } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
-import { AttendanceRecord } from "../../constants/static-data";
+import { MapEmployee } from "./types";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
@@ -45,8 +45,10 @@ const AttendanceMap: React.FC = () => {
   const mapWrapperRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
-  // Get team attendance data from context
-  const { teamAttendance, teamAttendanceLoading } = useAttendance();
+  // Using map tracking data from context
+  const { mapTrackingData, mapTrackingDataLoading, mapTrackingDataError, refetchMapTrackingData } = useAttendance();
+  const mapEmployees = mapTrackingData || [];
+  const isLoading = mapTrackingDataLoading;
 
   // Toggle full screen
   const toggleFullScreen = () => {
@@ -83,20 +85,6 @@ const AttendanceMap: React.FC = () => {
       }
     };
   }, [isFullScreen]);
-
-  console.log("teamAttendance", teamAttendance);
-
-  // Log each employee's location data
-  teamAttendance.forEach((record, index) => {
-      console.log(`Employee ${index + 1}: ${record.user?.name || "Unknown"}`, {
-        has_location: !!record.latest_location,
-        latitude: record.latest_location?.latitude,
-        longitude: record.latest_location?.longitude,
-        will_use_default:
-          !record.latest_location?.latitude ||
-          !record.latest_location?.longitude,
-      });
-  });
 
   return (
     <div className="relative" ref={mapWrapperRef}>
@@ -178,68 +166,11 @@ const AttendanceMap: React.FC = () => {
             </LayersControl.BaseLayer>
           </LayersControl>
 
-          {!teamAttendanceLoading &&
-            teamAttendance.map((record) => {
-              // Convert AttendanceStatusRecord to AttendanceRecord format expected by CustomMarker
-              // Create a small offset for employees with missing location data
-              const defaultLat = 24.7136;
-              const defaultLng = 46.6753;
-              const hasLocation =
-                record.latest_location?.latitude &&
-                record.latest_location?.longitude;
+          {mapEmployees.map((employee: MapEmployee) => {
+            return <CustomMarker key={employee.attendance_id} employee={employee} />;
+          })}
 
-              // If no location data, create a small offset based on employee ID to spread out markers
-              const idOffset = parseInt(record.user?.id || "0") % 50;
-              const latOffset = hasLocation ? 0 : idOffset * 0.001; // Small offset based on ID
-              const lngOffset = hasLocation ? 0 : idOffset * 0.002; // Slightly larger offset for longitude
-
-              const employee: AttendanceRecord = {
-                id:
-                  parseInt(record.user?.id) ||
-                  Math.floor(Math.random() * 10000),
-                name: record.user?.name || "-",
-                user: record.user,
-                is_late: record.is_late,
-                is_absent: record.is_absent,
-                is_holiday: record.is_holiday,
-                status: record.status,
-                clock_in_time: record.clock_in_time || "-",
-                clock_out_time: record.clock_out_time || "-",
-                date:
-                  record.work_date || new Date().toISOString().split("T")[0],
-                employeeId: record.professional_data?.job_code || "",
-                branch: record.professional_data?.branch || "-",
-                department: record.professional_data?.management || "-",
-                approver:"-",
-                employeeStatus:
-                  record.is_clocked_in === 1
-                    ? tStatus("active")
-                    : tStatus("inactive"),
-                // Map status to expected format
-                attendanceStatus:
-                  record.is_late === 1
-                    ? "late"
-                    : record.status === "absent"
-                    ? "absent"
-                    : record.status === "excused"
-                    ? "excused"
-                    : "present",
-                location: {
-                  lat:
-                    record.latest_location?.latitude ||
-                    defaultLat + Number(latOffset) ||
-                    defaultLat,
-                  lng:
-                    record.latest_location?.longitude ||
-                    defaultLng + Number(lngOffset) ||
-                    defaultLng,
-                },
-              };
-              return <CustomMarker key={employee.id} employee={employee} />;
-            })}
-
-          {/* Show loading spinner when data is loading */}
-          {teamAttendanceLoading && (
+          {isLoading && (
             <div
               className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
                 isDarkMode ? "bg-gray-800" : "bg-white"
@@ -253,6 +184,29 @@ const AttendanceMap: React.FC = () => {
               >
                 {t("loading")}
               </span>
+            </div>
+          )}
+          
+          {mapTrackingDataError && !isLoading && (
+            <div
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } p-4 rounded-lg shadow-lg flex flex-col items-center`}
+            >
+              <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
+              <span
+                className={`font-medium ${
+                  isDarkMode ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
+                {t("errorLoading")}
+              </span>
+              <button
+                onClick={() => refetchMapTrackingData && refetchMapTrackingData()}
+                className="mt-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+              >
+                {t("retry")}
+              </button>
             </div>
           )}
         </MapContainer>

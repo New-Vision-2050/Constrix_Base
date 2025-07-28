@@ -8,6 +8,9 @@ import { EmployeeDetailsProps } from "../../types/employee";
 import EmployeeInfoField from "../../components/shared/EmployeeInfoField";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import useMapEmpAttendance from "../../hooks/useMapEmpAttendance";
+import AttendanceHistoryList from "./AttendanceHistoryList";
+import { AttendanceHistory } from "./types";
 
 // Constants
 const SHEET_Z_INDEX = 9999; // High z-index to ensure sheet appears above other UI elements
@@ -24,6 +27,13 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDarkMode = currentTheme === "dark";
+  
+  // Fetch attendance history for selected employee
+  const { 
+    data: attendanceHistory, 
+    isLoading, 
+    error 
+  } = useMapEmpAttendance(employee?.user_id || "");
 
   // Theme specific colors defined with Tailwind classes
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
@@ -119,41 +129,14 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
               </div>
             </div>
 
-            {/* Attendance status and Employee status */}
-            <div className="p-3 rounded-md mb-3 bg-[#f0f2f5] dark:bg-[#161F3E]">
-              <EmployeeInfoField
-                label={t("status.attendanceStatus")}
-                value={employee.attendanceStatus}
+            {/* Show attendance history */}
+            <div className="pt-4 mt-4 border-t dark:border-gray-700">
+              <AttendanceHistoryList
+                attendanceHistory={attendanceHistory}
+                isLoading={isLoading}
+                error={error}
               />
-
-              {/* <EmployeeInfoField
-                label={t("status.employeeStatus")}
-                value={employee.employeeStatus}
-              /> */}
             </div>
-
-            {/* Check-in and Check-out times */}
-            {employee.checkInTime && (
-              <div className="p-3 rounded-md bg-[#f0f2f5] dark:bg-[#161F3E]">
-                <div className={`${subtitleColor} text-[12px] mb-0.5`}>
-                  {t("times.checkIn")}
-                </div>
-                <div className="text-right text-lg">
-                  {employee.checkInTime} {t("times.morning")}
-                </div>
-              </div>
-            )}
-
-            {employee.checkOutTime && (
-              <div className="p-3 rounded-md mt-3 bg-[#f0f2f5] dark:bg-[#161F3E]">
-                <div className={`${subtitleColor} text-[12px] mb-0.5`}>
-                  {t("times.checkOut")}
-                </div>
-                <div className="text-right text-lg">
-                  {employee.checkOutTime} {t("times.afternoon")}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </SheetContent>

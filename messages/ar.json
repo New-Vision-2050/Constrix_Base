@@ -505,6 +505,20 @@
       }
     },
     "Map": {
+      "employeeDetails": {
+        "attendanceHistory": "سجل الحضور",
+        "present": "حاضر",
+        "absent": "غائب",
+        "late": "متأخر",
+        "hours": "ساعات",
+        "checkIn": "تسجيل الدخول",
+        "checkOut": "تسجيل الخروج",
+        "noAttendanceRecords": "لا توجد سجلات حضور",
+        "errorLoadingHistory": "خطأ في تحميل سجل الحضور",
+        "scheduledHours": "ساعات الجدول",
+        "totalActualHours": "إجمالي الساعات الفعلية",
+        "totalDeductedTime": "إجمالي الوقت المستقطع"
+      },
       "layers": {
         "standard": "خريطة عادية",
         "satellite": "خريطة القمر الصناعي"
@@ -518,7 +532,9 @@
         "employee": "الموظف:",
         "branch": "الفرع:",
         "department": "الإدارة:",
-        "lastSeen": "آخر ظهور:"
+        "lastSeen": "آخر ظهور:",
+        "clockIn": "وقت الدخول:",
+        "phone": "الهاتف"
       }
     },
     "MapSearchFilter": {

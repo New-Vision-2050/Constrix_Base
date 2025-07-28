@@ -19,6 +19,8 @@ import { Constraint } from "../api/getConstraints";
 import { ManagementHierarchyItem } from "../api/getHierarchies";
 import { useBranchesHierarchies } from "../hooks/useBranchesHierarchies";
 import { useAttendanceHistory } from "../hooks/useAttendanceHistory";
+import { useMapTrackingData } from "../hooks/useMapTrackingData";
+import { MapEmployee } from "../components/map/types";
 import { useConstraintDetails } from "../hooks/useConstraintDetails";
 import { ConstraintDetails } from "../types/constraint";
 
@@ -111,6 +113,12 @@ interface AttendanceContextType {
   // Functions to open and close the approver dialog
   openApproverDialog: (record: AttendanceStatusRecord) => void;
   closeApproverDialog: () => void;
+
+  // Map tracking data
+  mapTrackingData: MapEmployee[];
+  mapTrackingDataLoading: boolean;
+  mapTrackingDataError: Error | null;
+  refetchMapTrackingData: () => void;
   
   // Constraint details data
   constraintDetails: ConstraintDetails | null;
@@ -186,6 +194,18 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     error: teamAttendanceError,
     refetch: refetchTeamAttendance
   } = useTeamAttendance(searchParams);
+
+
+  // Get team attendance data for map display with date and search filtering
+  const {
+    teamAttendance: mapTrackingData,
+    isLoading: mapTrackingDataLoading,
+    error: mapTrackingDataError,
+    refetch: refetchMapTrackingData
+  } = useMapTrackingData(searchParams);
+
+
+  
 
   // Get attendance summary data for statistics cards with date filtering
   const {
@@ -384,7 +404,13 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     openAttendanceStatusDialog,
     closeAttendanceStatusDialog,
     openApproverDialog,
-    closeApproverDialog
+    closeApproverDialog,
+
+    // Map tracking data
+    mapTrackingData,
+    mapTrackingDataLoading,
+    mapTrackingDataError,
+    refetchMapTrackingData
   };
 
   return (

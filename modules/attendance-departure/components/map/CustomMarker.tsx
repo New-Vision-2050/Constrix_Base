@@ -1,8 +1,8 @@
 import React from "react";
 import { Marker, MarkerProps } from "react-leaflet";
 import L from "leaflet";
-// Using type casting instead of module augmentation
-import { AttendanceRecord } from "../../constants/static-data";
+// Import the new type
+import { MapEmployee } from "./types";
 import EmployeeTooltip from "./EmployeeTooltip";
 import { useAttendance } from "../../context/AttendanceContext";
 import { EmployeeDetails } from "../../types/employee";
@@ -10,19 +10,11 @@ import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 
 const getMarkerIcon = (
-  record: AttendanceRecord,
+  employee: MapEmployee,
   isDarkMode: boolean = true
 ) => {
-  let _status = "";
-  if (record.is_absent === 1) {
-    _status = "absent";
-  } else if (record.is_holiday === 1) {
-    _status = "holiday";
-  } else if (record.is_late === 1) {
-    _status = "late";
-  } else if (record.status === "active" || record.status === "completed") {
-    _status = "present";
-  }
+  // We use a default status for displaying employees (can be modified later when status fields are available)
+  let _status = "present";
   const colorMap: { [key: string]: string } = {
     present: "#28a745", // green
     late: "#ffc107", // orange
@@ -63,7 +55,7 @@ const getMarkerIcon = (
 };
 
 interface CustomMarkerProps {
-  employee: AttendanceRecord;
+  employee: MapEmployee;
 }
 
 const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
@@ -76,60 +68,32 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDarkMode = currentTheme === "dark";
 
-  // Function to convert attendance statuses from English to Arabic
-  const mapAttendanceStatus = (record: AttendanceRecord): string => {
-    let _status = "";
-    if (record.is_absent === 1) {
-      _status = "absent";
-    } else if (record.is_holiday === 1) {
-      _status = "holiday";
-    } else if (record.is_late === 1) {
-      _status = "late";
-    } else if (record.status === "active" || record.status === "completed") {
-      _status = "present";
-    }
-
-    // Map the backend status to display text
-    switch (_status) {
-      case "present":
-        return t("present");
-      case "absent":
-        return t("absent");
-      case "late":
-        return t("late");
-      case "holiday":
-        return t("holiday");
-      default:
-        return t("unspecified");
-    }
+  // Function to get attendance status (simplified for now)
+  const mapAttendanceStatus = (): string => {
+    // Use default value for attendance status
+    return t("present");
   };
 
   // Convert employee data to match the new component
   const handleMarkerClick = () => {
-    // Convert AttendanceRecord type to EmployeeDetails
+    // Convert MapEmployee type to EmployeeDetails using the new structure
     const employeeDetails: EmployeeDetails = {
-      id: employee.id.toString(), // Convert number to string
-      name: employee.name,
-      phone: employee?.user?.phone || "-", // Use employee ID as phone number
-      department: employee.department || "-",
-      email: employee?.user?.email || "-", // Create default email
-      branch: employee.branch || "-",
-      gender: employee.user?.gender || "-", // Default value
-      birthDate: employee.user?.birthdate || "-", // Default value
-      nationality: employee.user?.country || "-", // Default value
-      attendanceStatus: mapAttendanceStatus(employee), // Convert attendance status
-      employeeStatus: employee.employeeStatus || "-",
-      // Use actual clock in/out times if available, otherwise use defaults
-      checkInTime:
-        employee.clock_in_time ||
-        (employee.attendanceStatus === "present" ||
-        employee.attendanceStatus === "late"
-          ? "08:30"
-          : undefined),
-      checkOutTime:
-        employee.clock_out_time ||
-        (employee.attendanceStatus === "present" ? "17:00" : undefined),
-      // The updated component uses checkInTime and checkOutTime which are already set above
+      id: employee.attendance_id,
+      user_id: employee.user.id,
+      name: employee.user.name,
+      phone: employee.user.phone || "-",
+      department: employee.user.department_name || "-",
+      email: employee.user.email || "-",
+      branch: employee.user.branch_name || "-",
+      gender: employee.user.gender || "-",
+      birthDate: employee.user.birthdate || "-",
+      nationality: "-", // Default value (still not available)
+      attendanceStatus: mapAttendanceStatus(), // Attendance status
+      employeeStatus: "Active", // Default value
+      // Use available check-in time
+      checkInTime: employee.clock_in_time || "08:30",
+      // Default value for check-out time
+      checkOutTime: undefined,
       avatarUrl: undefined, // No default avatar
     };
     // fetchAttendanceHistory(employee.id.toString(), , employee.date);
@@ -138,8 +102,8 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
   };
   // Create marker position and properties for proper type handling
   const position: [number, number] = [
-    employee.location.lat,
-    employee.location.lng,
+    employee.latest_location.latitude,
+    employee.latest_location.longitude,
   ];
   const markerIcon = getMarkerIcon(employee, isDarkMode);
 
@@ -153,7 +117,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
   };
 
   return (
-    <Marker key={employee.id} {...markerProps}>
+    <Marker key={employee.attendance_id} {...markerProps}>
       <EmployeeTooltip employee={employee} />
     </Marker>
   );

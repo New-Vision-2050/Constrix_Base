@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tooltip } from 'react-leaflet';
-import { AttendanceRecord } from '../../constants/static-data';
+import { MapEmployee } from './types';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 
@@ -15,7 +15,7 @@ const COLORS = {
 };
 
 interface EmployeeTooltipProps {
-  employee: AttendanceRecord;
+  employee: MapEmployee;
 }
 
 const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
@@ -42,22 +42,25 @@ const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
         }}
       >
         <p>
-          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('employee')}</span> {employee.name}
+          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('employee')}</span> {employee.user.name}
         </p>
         <p className="mt-1">
-          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('branch')}</span> {employee.branch}
+          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('branch')}</span> {employee.user.branch_name || '-'}
         </p>
         <p className="mt-1">
-          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('department')}</span>{" "}
-          {employee.department}
+          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('department')}</span> {employee.user.department_name || '-'}
+        </p>
+        <p className="mt-1">
+          <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>{t('clockIn')}</span>{" "}
+          {employee.clock_in_time}
         </p>
         <div className={`mt-3 pt-2 border-t ${borderColor}`}>
           <div className="flex justify-between items-center">
             <span className={`font-bold ${isDarkMode ? 'text-black' : 'text-gray-900'}`}>
               {t('lastSeen')}
             </span>
-            <time className="font-mono text-sm" dateTime={employee.date}>
-              {employee.date}
+            <time className="font-mono text-sm">
+              {employee.latest_location.timestamp.split(' ')[0]}
             </time>
           </div>
         </div>
