@@ -146,10 +146,10 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
           },
           {
             name: "company_fields",
-            label: "مجالات ظهور البرنامج",
+            label: " انشطة ظهور البرنامج",
             type: "select",
             isMulti: true,
-            placeholder: "اختر مجالات ظهور البرنامج",
+            placeholder: "اختر انشطة ظهور البرنامج",
             dynamicOptions: {
               url: `${baseURL}/company_fields`,
               valueField: "id",
@@ -197,6 +197,7 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
       data.company_fields = data.company_fields?.map((item: any) => item.id);
       data.company_types = data.company_types?.map((item: any) => item.id);
       data.country_id = data.countries?.map((item: any) => item.id);
+      
       return data;
     },
     // Success handler with proper error handling
