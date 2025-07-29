@@ -12,8 +12,9 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import CustomMarker from "./CustomMarker";
 import MapController from "./MapController";
+import MapMessageOverlay from "./MapMessageOverlay";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2, Loader2, AlertCircle } from "lucide-react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
 import { MapEmployee } from "./types";
 import { useTranslations } from "next-intl";
@@ -171,43 +172,18 @@ const AttendanceMap: React.FC = () => {
           })}
 
           {isLoading && (
-            <div
-              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
-                isDarkMode ? "bg-gray-800" : "bg-white"
-              } p-4 rounded-lg shadow-lg flex flex-col items-center`}
-            >
-              <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-              <span
-                className={`font-medium ${
-                  isDarkMode ? "text-gray-200" : "text-gray-700"
-                }`}
-              >
-                {t("loading")}
-              </span>
-            </div>
+            <MapMessageOverlay type="loading" />
           )}
           
           {mapTrackingDataError && !isLoading && (
-            <div
-              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] ${
-                isDarkMode ? "bg-gray-800" : "bg-white"
-              } p-4 rounded-lg shadow-lg flex flex-col items-center`}
-            >
-              <AlertCircle className="h-10 w-10 text-red-500 mb-2" />
-              <span
-                className={`font-medium ${
-                  isDarkMode ? "text-gray-200" : "text-gray-700"
-                }`}
-              >
-                {t("errorLoading")}
-              </span>
-              <button
-                onClick={() => refetchMapTrackingData && refetchMapTrackingData()}
-                className="mt-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
-              >
-                {t("retry")}
-              </button>
-            </div>
+            <MapMessageOverlay 
+              type="error" 
+              onRetry={() => refetchMapTrackingData && refetchMapTrackingData()} 
+            />
+          )}
+          
+          {!isLoading && !mapTrackingDataError && mapEmployees.length === 0 && (
+            <MapMessageOverlay type="noData" />
           )}
         </MapContainer>
       </div>

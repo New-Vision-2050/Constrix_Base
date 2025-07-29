@@ -505,6 +505,23 @@
       }
     },
     "Map": {
+      "errorLoading": "حدث خطأ أثناء التحميل",
+      "retry": "إعادة المحاولة",
+      "noAttendanceData": "لم يتم تسجيل حضور من قبل اي موظف بعد",
+      "layers": {
+        "standard": "خريطة قياسية",
+        "satellite": "صور الأقمار الصناعية",
+        "hybrid": "مختلطة"
+      },
+      "employeeStatus": {
+        "present": "حاضر",
+        "absent": "غائب",
+        "late": "متأخر",
+        "holiday": "في إجازة",
+        "unspecified": "غير محدد",
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
       "employeeDetails": {
         "attendanceHistory": "سجل الحضور",
         "present": "حاضر",
@@ -519,15 +536,8 @@
         "totalActualHours": "إجمالي الساعات الفعلية",
         "totalDeductedTime": "إجمالي الوقت المستقطع"
       },
-      "layers": {
-        "standard": "خريطة عادية",
-        "satellite": "خريطة القمر الصناعي"
-      },
       "loading": "جاري تحميل بيانات الموظفين...",
-      "employeeStatus": {
-        "active": "نشط",
-        "inactive": "غير نشط"
-      },
+      
       "tooltip": {
         "employee": "الموظف:",
         "branch": "الفرع:",
