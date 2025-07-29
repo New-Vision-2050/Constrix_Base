@@ -682,6 +682,7 @@
         "locationType": "Location Type",
         "mainLocation": "Default branch location",
         "customLocation": "Custom location for each branch",
+        "openMap":"Open Map",
         "workingHours": "Working Hours",
         "workingDays": "Working Days",
         "periodStart": "Period Start",

@@ -685,6 +685,7 @@
         "locationType": "نوع الموقع",
         "mainLocation": "موقع الفرع الافتراضي",
         "customLocation": "موقع مخصص لكل فرع",
+        "openMap":"فتح الخريطة",
         "workingHours": "ساعات العمل",
         "workingDays": "أيام العمل",
         "periodStart": "بداية الفترة",

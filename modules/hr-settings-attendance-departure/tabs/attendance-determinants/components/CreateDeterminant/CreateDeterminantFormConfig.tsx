@@ -6,6 +6,7 @@ import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 import { TimeUnits } from "../../constants/determinants";
+import { Button } from "@/components/ui/button";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -230,6 +231,30 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 message: "يجب اختيار نوع الموقع",
               },
             ],
+          },
+          {
+            type: "text",
+            label: "",
+            name: "open_map",
+            render: () => {
+              return (
+                <Button
+                  variant={"secondary"}
+                  onClick={() => {
+                    useFormStore
+                      ?.getState()
+                      .setValue(
+                        "create-determinant-form",
+                        "show_location_dialog",
+                        true
+                      );
+                  }}
+                >
+                  {getText("form.openMap", "فتح الخريطة")}
+                </Button>
+              );
+            },
+            condition: (values) => values.location_type === "custom",
           },
           {
             type: "hiddenObject",
