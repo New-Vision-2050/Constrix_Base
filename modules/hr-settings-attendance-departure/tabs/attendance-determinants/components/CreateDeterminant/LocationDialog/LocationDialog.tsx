@@ -9,6 +9,8 @@ import MapComponent from "./components/MapComponent";
 import SaveButton from "./components/SaveButton";
 import LoadingState from "./components/LoadingState";
 import NoDataState from "./components/NoDataState";
+import { Button } from "@/components/ui/button";
+import { Navigation } from "lucide-react";
 
 interface LocationDialogProps {
   isOpen: boolean;
@@ -28,74 +30,164 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   const overlayBg = isDarkMode ? 'bg-black bg-opacity-50' : 'bg-gray-700 bg-opacity-40';
   const { isLoading, hasBranches, selectedBranches, getBranchLocation, updateBranchLocation } = useLocationDialog();
   const [selectedBranch, setSelectedBranch] = useState("");
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   
   // Initialize selected branch when branches are available
   React.useEffect(() => {
     if (selectedBranches.length > 0 && !selectedBranch) {
-      setSelectedBranch(selectedBranches[0]);
+      const firstBranch = selectedBranches[0];
+      setSelectedBranch(firstBranch);
+      
+      // Also initialize currentBranchData with the first branch data
+      const branchData = getBranchLocation(firstBranch);
+      setCurrentBranchData(branchData);
     }
-  }, [selectedBranches, selectedBranch]);
+  }, [selectedBranches, selectedBranch, getBranchLocation]);
   
-  // Get current branch location data - always provide default values to avoid undefined
-  const currentBranchData = selectedBranch ? getBranchLocation(selectedBranch) : {
+  // State for current branch location data - avoid undefined values
+  const [currentBranchData, setCurrentBranchData] = useState({
     branchId: "",
     isDefault: false,
     latitude: "",
     longitude: "",
-    radius: "200"
-  };
+    radius: "200",
+  });
+
+  // Update currentBranchData when selected branch changes
+  React.useEffect(() => {
+    if (selectedBranch) {
+      const branchData = getBranchLocation(selectedBranch);
+      setCurrentBranchData(branchData);
+    }
+  }, [selectedBranch, getBranchLocation]);
   
   // Handle branch change
   const handleBranchChange = (branchId: string) => {
     setSelectedBranch(branchId);
+    // Data will be updated by the useEffect that watches selectedBranch
   };
   
   // Handle default location checkbox change
   const handleDefaultLocationChange = (isDefault: boolean) => {
     if (selectedBranch) {
       if (isDefault) {
-        // استرجاع إحداثيات الفرع الفعلية من السياق
-        // هذه الإحداثيات تم الحصول عليها في LocationDialogContext من بيانات الفرع
-        // لذلك فهي تعكس الإحداثيات الفعلية للفرع وليست قيم افتراضية ثابتة
         const branchLocation = getBranchLocation(selectedBranch);
         
-        updateBranchLocation(selectedBranch, {
+        // Update branch location in context
+        const updatedData = {
           isDefault: true,
+          radius: branchLocation.radius ?? "200",
           latitude: branchLocation.latitude,
           longitude: branchLocation.longitude,
+        };
+        
+        // Force refresh from context by querying again - this is important
+        // to ensure we're using the correct coordinates from the branch data
+        updateBranchLocation(selectedBranch, updatedData);
+        
+        // Update local state to immediately reflect in UI
+        setCurrentBranchData({
+          ...currentBranchData,
+          ...updatedData
         });
       } else {
+        // Update context
         updateBranchLocation(selectedBranch, { isDefault: false });
+        
+        // Update local state
+        setCurrentBranchData({
+          ...currentBranchData,
+          isDefault: false
+        });
       }
     }
   };
   
   // Handle coordinate changes
-  const handleCoordinateChange = (field: 'latitude' | 'longitude' | 'radius', value: string) => {
+  const handleCoordinateChange = (
+    field: "latitude" | "longitude" | "radius",
+    value: string
+  ) => {
     if (selectedBranch) {
       // عندما يكون الحقل radius، لا نحتاج لتغيير خاصية isDefault
       // عندما يكون الحقل latitude أو longitude، نضبط isDefault على false
-      if (field === 'radius') {
-        updateBranchLocation(selectedBranch, { 
-          [field]: value
-        });
-      } else {
-        updateBranchLocation(selectedBranch, { 
-          [field]: value,
-          isDefault: false // إلغاء تحديد الموقع الافتراضي عند تغيير الإحداثيات
-        });
+      let updateData: Partial<typeof currentBranchData> = { [field]: value };
+      
+      if (field !== "radius") {
+        // Only change isDefault for latitude/longitude changes
+        updateData.isDefault = false;
       }
+      
+      // Update in context
+      updateBranchLocation(selectedBranch, updateData);
+      
+      // Update local state to immediately reflect in UI
+      setCurrentBranchData({
+        ...currentBranchData,
+        ...updateData
+      });
     }
   };
   
   // Handle map click
   const handleMapClick = (latitude: string, longitude: string) => {
     if (selectedBranch) {
-      updateBranchLocation(selectedBranch, {
+      const updateData = {
         latitude,
         longitude,
-        isDefault: false // Uncheck default when selecting from map
+        isDefault: false, // Uncheck default when selecting from map
+      };
+      
+      // Update in context
+      updateBranchLocation(selectedBranch, updateData);
+      
+      // Update local state to immediately reflect in UI
+      setCurrentBranchData({
+        ...currentBranchData,
+        ...updateData
       });
+    }
+  };
+
+  // Handle get current location
+  const handleGetCurrentLocation = () => {
+    if (selectedBranch && navigator.geolocation) {
+      setIsGettingLocation(true);
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude.toString();
+          const longitude = position.coords.longitude.toString();
+          
+          const updateData = {
+            latitude,
+            longitude,
+            radius: "200",
+            isDefault: false, // Uncheck default when using current location
+          };
+          
+          // Update in context
+          updateBranchLocation(selectedBranch, updateData);
+          
+          // Update local state to immediately reflect in UI
+          setCurrentBranchData({
+            ...currentBranchData,
+            ...updateData
+          });
+          
+          setIsGettingLocation(false);
+        },
+        (error) => {
+          console.error("Error getting current location:", error);
+          setIsGettingLocation(false);
+          // Could show an error toast or message here
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
     }
   };
 
@@ -144,6 +236,18 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
           onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
           onRadiusChange={(value) => handleCoordinateChange('radius', value)}
         />
+        
+        <div className="mt-4 mb-4">
+          <Button
+            type="button"
+            onClick={handleGetCurrentLocation}
+            disabled={isGettingLocation}
+            className="w-full"
+          >
+            <Navigation className="w-4 h-4 ml-2" />
+            {isGettingLocation ? "جاري تحديد الموقع..." : "تحديد الموقع الحالي"}
+          </Button>
+        </div>
         
         <MapComponent
           selectedBranch={selectedBranch || ""}

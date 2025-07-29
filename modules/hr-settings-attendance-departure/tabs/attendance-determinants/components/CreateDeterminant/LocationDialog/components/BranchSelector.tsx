@@ -35,6 +35,7 @@ export default function BranchSelector({
         {branches.map((branch: Branch) => (
           <button
             key={branch.id}
+            type="button"
             onClick={() => onBranchChange(branch.id)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedBranch === branch.id

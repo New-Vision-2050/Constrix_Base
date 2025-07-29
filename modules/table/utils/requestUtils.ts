@@ -50,24 +50,25 @@ export const buildRequestUrl = (
   }
 
   // Add pagination parameters
-  newUrl.searchParams.append("page", currentPage.toString());
-  newUrl.searchParams.append("per_page", itemsPerPage.toString());
+  newUrl.searchParams.set("page", currentPage.toString());
+  newUrl.searchParams.set("per_page", itemsPerPage.toString());
 
   // Add sorting parameters
   if (sortColumn && sortDirection) {
-    newUrl.searchParams.append("sort", sortColumn);
-    newUrl.searchParams.append("order", sortDirection);
+    newUrl.searchParams.set("sort", sortColumn);
+    newUrl.searchParams.set("order", sortDirection);
   }
 
   // Add global search parameters
   if (searchQuery) {
     // Use the configured search parameter name or default to 'q'
     const searchParamName = searchConfig?.paramName || "q";
-    newUrl.searchParams.append(searchParamName, searchQuery);
+    // Use set instead of append to prevent double encoding issues with non-Latin text
+    newUrl.searchParams.set(searchParamName, searchQuery);
 
     // Add search fields if specified and a fieldParamName is provided
     if (searchFields?.length && searchConfig?.fieldParamName) {
-      newUrl.searchParams.append(
+      newUrl.searchParams.set(
         searchConfig.fieldParamName,
         searchFields.join(",")
       );
@@ -87,11 +88,13 @@ export const buildRequestUrl = (
         if (Array.isArray(searchValue)) {
           // For array values, join them with commas or add multiple parameters
           if (searchValue.length > 0) {
-        newUrl.searchParams.append(columnKey, searchValue.join(','));
+            // Use setParam instead of append to prevent double encoding
+            newUrl.searchParams.set(columnKey, searchValue.join(','));
           }
         } else {
-          // For string values, add as normal
-          newUrl.searchParams.append(columnKey, searchValue);
+          // For string values, add as normal but prevent double encoding
+          // Use direct parameter setting to ensure consistent encoding
+          newUrl.searchParams.set(columnKey, searchValue);
         }
       }
     });

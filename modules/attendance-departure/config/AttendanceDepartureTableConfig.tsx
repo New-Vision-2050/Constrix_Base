@@ -41,13 +41,6 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
         sortable: true,
         searchable: true
       },
-      // {
-      //   key: "clock_in_time",
-      //   label: "وقت الحضور",
-      //   sortable: true,
-      //   render: (value: any, row: AttendanceStatusRecord) =>
-      //     row.clock_in_time || "-",
-      // },
       {
         key: "professional_data.attendance_constraint",
         label: t("columns.approver"),

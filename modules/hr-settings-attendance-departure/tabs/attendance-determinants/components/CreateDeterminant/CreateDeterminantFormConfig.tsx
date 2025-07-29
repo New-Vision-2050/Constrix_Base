@@ -6,6 +6,7 @@ import { baseURL } from "@/config/axios-config";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 import { TimeUnits } from "../../constants/determinants";
+import { Button } from "@/components/ui/button";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -66,12 +67,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       constraint_type: editConstraint?.constraint_code,
       branch_locations: editConstraint?.branch_locations,
       is_active: Boolean(editConstraint?.is_active),
-      early_period:
-        editConstraint?.config?.early_clock_in_rules?.early_period,
-      early_unit:
-        editConstraint?.config?.early_clock_in_rules?.early_unit,
-      lateness_period:
-        editConstraint?.config?.lateness_rules?.lateness_period,
+      early_period: editConstraint?.config?.early_clock_in_rules?.early_period,
+      early_unit: editConstraint?.config?.early_clock_in_rules?.early_unit,
+      lateness_period: editConstraint?.config?.lateness_rules?.lateness_period,
       lateness_unit: editConstraint?.config?.lateness_rules?.lateness_unit,
       out_zone_rules_value:
         editConstraint?.config?.radius_enforcement
@@ -82,7 +80,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         editConstraint?.branch_locations?.map(
           (branch: { branch_id: string | number }) => Number(branch.branch_id)
         ) ?? [],
-      location_type: "main",
+      location_type: !editConstraint
+        ? "main"
+        : Boolean(editConstraint?.config?.default_location)
+        ? "main"
+        : "custom",
       weekly_schedule: Object.entries(
         (editConstraint?.config?.time_rules
           ?.weekly_schedule as weeklyScheduleDays) || {}
@@ -95,10 +97,17 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               dayConfig?.periods?.map((period) => ({
                 from: period.start_time,
                 to: period.end_time,
-                early_period: (dayConfig as any)?.early_clock_in_rules?.early_period || DEFAULT_TIME_THRESHOLD_MINUTES,
-                early_unit: (dayConfig as any)?.early_clock_in_rules?.early_unit || 'minute',
-                lateness_period: (dayConfig as any)?.lateness_rules?.lateness_period || DEFAULT_TIME_THRESHOLD_MINUTES,
-                lateness_unit: (dayConfig as any)?.lateness_rules?.lateness_unit || 'minute',
+                early_period:
+                  (dayConfig as any)?.early_clock_in_rules?.early_period ||
+                  DEFAULT_TIME_THRESHOLD_MINUTES,
+                early_unit:
+                  (dayConfig as any)?.early_clock_in_rules?.early_unit ||
+                  "minute",
+                lateness_period:
+                  (dayConfig as any)?.lateness_rules?.lateness_period ||
+                  DEFAULT_TIME_THRESHOLD_MINUTES,
+                lateness_unit:
+                  (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
               })) ?? [],
           };
         }),
@@ -222,6 +231,30 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 message: "يجب اختيار نوع الموقع",
               },
             ],
+          },
+          {
+            type: "text",
+            label: "",
+            name: "open_map",
+            render: () => {
+              return (
+                <Button
+                  variant={"secondary"}
+                  onClick={() => {
+                    useFormStore
+                      ?.getState()
+                      .setValue(
+                        "create-determinant-form",
+                        "show_location_dialog",
+                        true
+                      );
+                  }}
+                >
+                  {getText("form.openMap", "فتح الخريطة")}
+                </Button>
+              );
+            },
+            condition: (values) => values.location_type === "custom",
           },
           {
             type: "hiddenObject",
@@ -535,7 +568,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     },
     resetOnSuccess: true,
     onSubmit: async (formData: Record<string, unknown>) => {
-console.log("formData",formData)
       // Check for duplicate working days in the schedule
       if (formData.weekly_schedule && Array.isArray(formData.weekly_schedule)) {
         const weeklySchedule = formData.weekly_schedule as Array<any>;
@@ -646,6 +678,7 @@ console.log("formData",formData)
           };
         }),
         constraint_config: {
+          default_location: formData.location_type === "main",
           radius_enforcement: {
             end_shift_if_violated: true,
             out_of_radius_time_threshold: formData.out_zone_rules_value,
@@ -742,16 +775,24 @@ console.log("formData",formData)
                 totalWorkHours = Math.round(totalWorkHours * 100) / 100;
 
                 // Get the current day's schedule data for rules
-                const currentDaySchedule = Array.isArray(formData.weekly_schedule)
-                  ? formData.weekly_schedule.find((item: any) => item.day === day)
+                const currentDaySchedule = Array.isArray(
+                  formData.weekly_schedule
+                )
+                  ? formData.weekly_schedule.find(
+                      (item: any) => item.day === day
+                    )
                   : null;
 
                 // Get the first period's rules (if exists) or use defaults
                 const firstPeriod = currentDaySchedule?.periods?.[0] || {};
-                const earlyPeriod = Number(firstPeriod.early_period) || DEFAULT_TIME_THRESHOLD_MINUTES;
-                const earlyUnit = firstPeriod.early_unit || 'minute';
-                const latenessPeriod = Number(firstPeriod.lateness_period) || DEFAULT_TIME_THRESHOLD_MINUTES;
-                const latenessUnit = firstPeriod.lateness_unit || 'minute';
+                const earlyPeriod =
+                  Number(firstPeriod.early_period) ||
+                  DEFAULT_TIME_THRESHOLD_MINUTES;
+                const earlyUnit = firstPeriod.early_unit || "minute";
+                const latenessPeriod =
+                  Number(firstPeriod.lateness_period) ||
+                  DEFAULT_TIME_THRESHOLD_MINUTES;
+                const latenessUnit = firstPeriod.lateness_unit || "minute";
 
                 // Add the day to the final object with enhanced structure
                 acc[day] = {
