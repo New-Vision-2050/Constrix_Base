@@ -660,6 +660,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         }
       }
 
+
       const data = {
         constraint_name: formData.constraint_name,
         is_active: formData.is_active,
@@ -667,8 +668,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         branch_ids: formData.branch_ids,
         branch_locations: branch_locations?.map((branch: any) => {
           return {
-            branch_id: branch.branch_id,
-            name: branch.name,
+            branch_id: branch.branch_id || branch.branchId,
+            name: branch.name || branch.branchName,
             address: "branch.address",
             latitude: branch.latitude,
             longitude: branch.longitude,
