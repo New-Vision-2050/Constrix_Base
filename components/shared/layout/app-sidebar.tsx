@@ -160,7 +160,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.HR_SETTINGS,
           },
         ],
-        isNotCentral: false,
+        isNotCentral: true,
       },
       // program management
       {

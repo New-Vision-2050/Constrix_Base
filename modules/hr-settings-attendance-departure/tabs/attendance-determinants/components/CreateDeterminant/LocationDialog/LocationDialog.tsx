@@ -9,6 +9,8 @@ import MapComponent from "./components/MapComponent";
 import SaveButton from "./components/SaveButton";
 import LoadingState from "./components/LoadingState";
 import NoDataState from "./components/NoDataState";
+import { Button } from "@/components/ui/button";
+import { Navigation } from "lucide-react";
 
 interface LocationDialogProps {
   isOpen: boolean;
@@ -28,6 +30,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   const overlayBg = isDarkMode ? 'bg-black bg-opacity-50' : 'bg-gray-700 bg-opacity-40';
   const { isLoading, hasBranches, selectedBranches, getBranchLocation, updateBranchLocation } = useLocationDialog();
   const [selectedBranch, setSelectedBranch] = useState("");
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   
   // Initialize selected branch when branches are available
   React.useEffect(() => {
@@ -146,6 +149,48 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     }
   };
 
+  // Handle get current location
+  const handleGetCurrentLocation = () => {
+    if (selectedBranch && navigator.geolocation) {
+      setIsGettingLocation(true);
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude.toString();
+          const longitude = position.coords.longitude.toString();
+          
+          const updateData = {
+            latitude,
+            longitude,
+            radius: "200",
+            isDefault: false, // Uncheck default when using current location
+          };
+          
+          // Update in context
+          updateBranchLocation(selectedBranch, updateData);
+          
+          // Update local state to immediately reflect in UI
+          setCurrentBranchData({
+            ...currentBranchData,
+            ...updateData
+          });
+          
+          setIsGettingLocation(false);
+        },
+        (error) => {
+          console.error("Error getting current location:", error);
+          setIsGettingLocation(false);
+          // Could show an error toast or message here
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    }
+  };
+
   // Show loading state
   if (isLoading) {
     return (
@@ -191,6 +236,18 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
           onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
           onRadiusChange={(value) => handleCoordinateChange('radius', value)}
         />
+        
+        <div className="mt-4 mb-4">
+          <Button
+            type="button"
+            onClick={handleGetCurrentLocation}
+            disabled={isGettingLocation}
+            className="w-full"
+          >
+            <Navigation className="w-4 h-4 ml-2" />
+            {isGettingLocation ? "جاري تحديد الموقع..." : "تحديد الموقع الحالي"}
+          </Button>
+        </div>
         
         <MapComponent
           selectedBranch={selectedBranch || ""}
