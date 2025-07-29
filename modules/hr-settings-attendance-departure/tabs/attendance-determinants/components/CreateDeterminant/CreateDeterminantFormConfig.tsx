@@ -111,6 +111,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               })) ?? [],
           };
         }),
+      show_location_dialog: false,
     },
     sections: [
       {
@@ -272,18 +273,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
 
               const showDialog =
                 location_type === "custom" && show_location_dialog !== false;
-              // control dialog open state
-              useEffect(() => {
-                if (location_type === "custom") {
-                  useFormStore
-                    ?.getState()
-                    .setValue(
-                      "create-determinant-form",
-                      "show_location_dialog",
-                      true
-                    );
-                }
-              }, [location_type]);
 
               return (
                 <LocationDialog
@@ -654,9 +643,21 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           : [];
       } else {
         // If custom locations are selected, use the custom values
-        branch_locations = JSON.parse(
-          (formData.branch_locations as string) ?? "[]"
-        );
+        // Handle both string and object formats for branch_locations
+        if (typeof formData.branch_locations === 'string') {
+          // Parse from string format (used when setting via location dialog)
+          branch_locations = JSON.parse(formData.branch_locations || '[]');
+        } else if (Array.isArray(formData.branch_locations)) {
+          // Already in array format (common in edit mode)
+          branch_locations = formData.branch_locations;
+        } else {
+          // Fallback to empty array
+          if(editConstraint?.branch_locations){
+            branch_locations = editConstraint?.branch_locations;
+          }else{
+            branch_locations = [];
+          }
+        }
       }
 
       const data = {
@@ -666,8 +667,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         branch_ids: formData.branch_ids,
         branch_locations: branch_locations?.map((branch: any) => {
           return {
-            branch_id: branch.branchId,
-            name: branch.branchName,
+            branch_id: branch.branch_id,
+            name: branch.name,
             address: "branch.address",
             latitude: branch.latitude,
             longitude: branch.longitude,
