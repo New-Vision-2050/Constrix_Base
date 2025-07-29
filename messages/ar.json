@@ -550,7 +550,8 @@
     "MapSearchFilter": {
       "searchPlaceholder": "البحث",
       "tableView": "الجدول",
-      "export": "تصدير"
+      "export": "تصدير",
+      "refresh": "تحديث"
     },
     "SearchFilter": {
       "title": "فلتر البحث",

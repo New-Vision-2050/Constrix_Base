@@ -556,7 +556,8 @@
     "MapSearchFilter": {
       "searchPlaceholder": "Search",
       "tableView": "Table",
-      "export": "Export"
+      "export": "Export",
+      "refresh": "Refresh"
     },
     "SearchFilter": {
       "title": "Search Filter",

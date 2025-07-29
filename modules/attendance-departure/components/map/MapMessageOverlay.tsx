@@ -36,7 +36,7 @@ const MapMessageOverlay: React.FC<MapMessageOverlayProps> = ({
       showRetryButton = true;
       break;
     case "noData":
-      icon = <Info className="h-10 w-10 text-blue-500 mb-2" />;
+      icon = <Info className="h-10 w-10 text-red-500 mb-2" />;
       message = t("noAttendanceData");
       break;
   }
