@@ -79,7 +79,6 @@ function AttendanceDeterminantsTabContent() {
                     <div
                       key={determinant.id}
                       className="cursor-pointer transition-transform hover:scale-[1.02] min-[390px]"
-                      onClick={() => handleConstraintClick(determinant.id)}
                     >
                       <DeterminantDetails 
                         constraint={determinant} 
