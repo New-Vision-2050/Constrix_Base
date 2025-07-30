@@ -140,6 +140,8 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
+          minDate: new Date('1900-01-01'), // Set minDate to January 1, 1900
+          maxDateField: "end_date", // Set end_date field as the maximum date constraint
         },
       },
       {
@@ -149,6 +151,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
+          minDateField: "start_date", // Set start_date field as the minimum date constraint
         },
       },
     ],
