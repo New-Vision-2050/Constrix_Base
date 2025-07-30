@@ -70,13 +70,13 @@ const OfficialDataPreview = ({
     {
       valid: Boolean("متميز"),
       label: "البرنامج",
-      value: packages[0].name,
+      value: packages[0]?.name ?? "-",
       needRequest: true,
     },
     {
       valid: Boolean("متميز"),
       label: "الباقة",
-      value: company_access_programs[0].name,
+      value: company_access_programs[0]?.name ?? "-",
       needRequest: true,
     },
   ];
