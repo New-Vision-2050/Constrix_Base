@@ -162,34 +162,6 @@ export function AppSidebar({
         ],
         isNotCentral: false,
       },
-      {
-        name: t("Sidebar.HumanResources"),
-        icon: LayoutDashboardIcon,
-        urls: [ROUTER.Organizational_Structure],
-        isActive: pageName === ROUTER.Organizational_Structure,
-        slug: SUPER_ENTITY_SLUG.HRM,
-        sub_entities: [
-          {
-            name: t("Sidebar.OrganizationalStructure"),
-            url: ROUTER.Organizational_Structure,
-            icon: LayoutDashboardIcon,
-            isActive: pageName === ROUTER.Organizational_Structure,
-          },
-          {
-            name: t("Sidebar.AttendanceDeparture"),
-            url: ROUTER.AttendanceDeparture,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.AttendanceDeparture,
-          },
-          {
-            name: t("Sidebar.HRSettings"),
-            url: ROUTER.HR_SETTINGS,
-            icon: SettingsIcon,
-            isActive: pageName === ROUTER.HR_SETTINGS,
-          },
-        ],
-        isNotCentral: false,
-      },
       // program management
       {
         name: t("Sidebar.ProgramManagement"),
