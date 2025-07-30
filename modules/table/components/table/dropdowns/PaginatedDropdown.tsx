@@ -133,7 +133,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
   return (
     <div className="space-y-2">
-      {label && <div className="mb-2"><Label>{label}</Label></div>}
+      {label && <Label className="mb-2 block">{label}</Label>}
       <Popover
         open={isDisabled ? false : open}
         onOpenChange={isDisabled ? undefined : setOpen}

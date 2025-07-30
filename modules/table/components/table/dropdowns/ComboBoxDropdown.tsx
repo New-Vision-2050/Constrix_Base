@@ -69,7 +69,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
 
   return (
     <div className="space-y-2">
-      {label && <div className="mb-2"><Label htmlFor={`select-${columnKey}`}>{label}</Label></div>}
+      {label && <Label htmlFor={`select-${columnKey}`} className="mb-2 block">{label}</Label>}
       <Select
         id={`select-${columnKey}`}
         value={selectedOption}
