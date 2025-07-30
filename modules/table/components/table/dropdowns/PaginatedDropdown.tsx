@@ -18,6 +18,7 @@ import {
 import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
 import { useTranslations } from "next-intl";
+import { Label } from "@/modules/table/components/ui/label";
 
 interface PaginatedDropdownProps {
   columnKey: string;
@@ -131,7 +132,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
 
   return (
-    <div>
+    <div className="space-y-2">
+      {label && <Label className="mb-2 block">{label}</Label>}
       <Popover
         open={isDisabled ? false : open}
         onOpenChange={isDisabled ? undefined : setOpen}
