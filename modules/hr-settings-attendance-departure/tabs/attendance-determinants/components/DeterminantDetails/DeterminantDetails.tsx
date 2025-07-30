@@ -56,13 +56,13 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
     : "hover:bg-gray-300";
   // Days of the week in Arabic
   const daysOfWeek = [
+    "السبت",
     "الأحد",
     "الاثنين",
     "الثلاثاء",
     "الأربعاء",
     "الخميس",
     "الجمعة",
-    "السبت",
   ];
   // Get weekly schedule from constraint config if available
   const weeklySchedule = constraint.config?.time_rules?.weekly_schedule || {};
