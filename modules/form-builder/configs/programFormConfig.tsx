@@ -1,8 +1,6 @@
-import {FormConfig, useFormStore, FieldConfig} from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
-import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
+import {FormConfig, FieldConfig} from "@/modules/form-builder";
+import {  baseURL } from "@/config/axios-config";
 import {useTranslations} from "next-intl";
-import axios from "axios";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
 // Define interfaces matching the API response structure
@@ -49,7 +47,7 @@ export interface Children {
   slug: string;
   is_active: number;
   sub_entities: SubEntity[];
-  children?: Children[]; // Recursive children
+  children?: Children[];
 }
 
 export interface SubEntity {
@@ -62,18 +60,6 @@ export interface SubEntity {
   is_active: number;
   children: any[];
 }
-
-// Interface for checkbox options
-interface SubProgramOption {
-  id: string;
-  name: string;
-  value: string;
-  label: string;
-  parentId?: string;
-  [key: string]: any;
-}
-
-// Define a toast interface to handle the case where window.toast might not exist
 interface ToastInterface {
   success: (message: string) => void;
   error: (message: string) => void;
@@ -144,12 +130,13 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
               totalCountHeader: "X-Total-Count",
             },
           },
-          {
+        {
             name: "company_fields",
             label: " انشطة ظهور البرنامج",
             type: "select",
             isMulti: true,
             placeholder: "اختر انشطة ظهور البرنامج",
+            required: true,
             dynamicOptions: {
               url: `${baseURL}/company_fields`,
               valueField: "id",
@@ -158,9 +145,15 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 10,
+              itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "برجاء اختيار النشاط",
+              },
+            ],
           },
            {
             name: "country_id",
