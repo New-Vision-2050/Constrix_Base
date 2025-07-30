@@ -178,7 +178,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                 <DropdownSearch
                   key={column.key}
                   columnKey={column.key}
-                  label={column.label}
+                  label={(column as any).label || column.label}
                   value={stateValue}
                   onChange={(newValue) => handleDropdownChange(column.key, newValue)}
                   options={searchType.dropdownOptions}
@@ -194,12 +194,14 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             case "date":
               return (
                 <div key={column.key} className="text-right" dir="rtl">
-                  <label
-                    htmlFor={`search-${column.key}`}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right"
-                  >
-                    {column.label}
-                  </label>
+                  {column.label || (column as any).label ? (
+                    <label
+                      htmlFor={`search-${column.key}`}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right"
+                    >
+                      {(column as any).label || column.label}
+                    </label>
+                  ) : null}
                   <Input
                     id={`search-${column.key}`}
                     type="date"
@@ -219,12 +221,14 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             default:
               return (
                 <div key={column.key}>
-                  <label
-                    htmlFor={`search-${column.key}`}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {column.label}
-                  </label>
+                  {column.label || (column as any).label ? (
+                    <label
+                      htmlFor={`search-${column.key}`}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {(column as any).label || column.label}
+                    </label>
+                  ) : null}
                   <Input
                     id={`search-${column.key}`}
                     type="text"
