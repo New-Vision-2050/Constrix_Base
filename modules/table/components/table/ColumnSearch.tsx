@@ -247,7 +247,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                   {column.label || (column as any).label ? (
                     <label
                       htmlFor={`search-${column.key}`}
-                      className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right mb-2 block"
                     >
                       {(column as any).label || column.label}
                     </label>
@@ -276,7 +276,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                   {column.label || (column as any).label ? (
                     <label
                       htmlFor={`search-${column.key}`}
-                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
                     >
                       {(column as any).label || column.label}
                     </label>
