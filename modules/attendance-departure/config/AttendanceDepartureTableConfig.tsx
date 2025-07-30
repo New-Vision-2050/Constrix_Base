@@ -70,7 +70,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
     allSearchedFields: [
       {
         key: "search_text",
-        label: t("filters.searchText"), // مثال لحقل مع label
+        label: t("filters.searchText"),
         searchType: {
           type: "text",
           placeholder: t("filters.searchPlaceholder"),
@@ -140,8 +140,8 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
-          minDate: new Date('1900-01-01'), // Set minDate to January 1, 1900
-          maxDateField: "end_date", // Set end_date field as the maximum date constraint
+          minDate: new Date(1900, 0, 1),
+          maxDateField: "end_date"
         },
       },
       {
@@ -151,7 +151,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
-          minDateField: "start_date", // Set start_date field as the minimum date constraint
+          minDateField: "start_date"
         },
       },
     ],

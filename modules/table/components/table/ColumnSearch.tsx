@@ -178,7 +178,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                 <DropdownSearch
                   key={column.key}
                   columnKey={column.key}
-                  label={(column as any).label || column.label}
+                  label={column.label}
                   value={stateValue}
                   onChange={(newValue) => handleDropdownChange(column.key, newValue)}
                   options={searchType.dropdownOptions}
@@ -204,7 +204,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                 const maxFieldValue = columnSearchState[searchType.maxDateField];
                 if (typeof maxFieldValue === 'string') {
                   crossFieldConstraint = new Date(maxFieldValue);
-                  console.log(`Setting max constraint for ${column.key} based on ${searchType.maxDateField}: ${maxFieldValue}`);
+                  // Field constraint set
                 }
               }
               
@@ -213,7 +213,7 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                 const minFieldValue = columnSearchState[searchType.minDateField];
                 if (typeof minFieldValue === 'string') {
                   crossFieldConstraint = new Date(minFieldValue);
-                  console.log(`Setting min constraint for ${column.key} based on ${searchType.minDateField}: ${minFieldValue}`);
+                  // Field constraint set
                 }
               }
               
@@ -244,12 +244,12 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
 
               return (
                 <div key={column.key} className="text-right" dir="rtl">
-                  {column.label || (column as any).label ? (
+                  {column.label ? (
                     <label
                       htmlFor={`search-${column.key}`}
                       className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right mb-2 block"
                     >
-                      {(column as any).label || column.label}
+                      {column.label}
                     </label>
                   ) : null}
                   <Input
@@ -273,12 +273,12 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             default:
               return (
                 <div key={column.key}>
-                  {column.label || (column as any).label ? (
+                  {column.label ? (
                     <label
                       htmlFor={`search-${column.key}`}
                       className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
                     >
-                      {(column as any).label || column.label}
+                      {column.label}
                     </label>
                   ) : null}
                   <Input
