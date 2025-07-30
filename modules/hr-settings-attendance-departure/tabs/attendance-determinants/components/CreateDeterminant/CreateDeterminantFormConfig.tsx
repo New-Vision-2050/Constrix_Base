@@ -538,7 +538,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             isMulti: true,
             options: [
               { value: "location", label: "الموقع" },
-              { value: "fingerprint", label: "بصمة الوجة" },
+              // { value: "fingerprint", label: "بصمة الوجة" },
             ],
             required: true,
             validation: [
