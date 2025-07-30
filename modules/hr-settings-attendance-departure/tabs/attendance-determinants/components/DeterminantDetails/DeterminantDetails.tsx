@@ -191,18 +191,18 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
       </div>
 
       {/* Branches */}
-      {branchNames.length > 0 && (
+      {constraint.branch_locations.length > 0 && (
         <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
           <div className={`${sectionTextLabel} mb-3`}>{t("branches")}</div>
-          <div className="flex flex-row-reverse gap-3 justify-end">
-            {branchNames.map((branch, index) => (
+          <div className="flex flex-row-reverse gap-3 justify-end flex-wrap">
+            {constraint.branch_locations.map((branch, index) => (
               <div
                 key={index}
                 className={`${branchTagBg} ${branchTagHover} transition-colors rounded-full px-6 py-2 ${
                   isDarkMode ? "text-white" : "text-gray-800"
                 }`}
               >
-                فرع {branch}
+                فرع {branch.name}
               </div>
             ))}
           </div>
