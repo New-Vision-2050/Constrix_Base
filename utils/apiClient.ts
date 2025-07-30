@@ -25,6 +25,7 @@ export const useApiClient = () => {
   instance.interceptors.request.use(
     async (config) => {
       const nvToken = getCookie("new-vision-token");
+      console.log(nvToken);
       const currentHost = await getCurrentHost();
       if (currentHost) {
         config.headers["X-Domain"] = currentHost;
@@ -51,7 +52,7 @@ export const createApiRequestOptions = (
   controller?: AbortController
 ): RequestInit => {
   const token = getCookie("new-vision-token");
-
+  console.log(token);
   // Get domain if in browser environment
   const domain = typeof window !== "undefined" ? window.location.hostname : "";
 
