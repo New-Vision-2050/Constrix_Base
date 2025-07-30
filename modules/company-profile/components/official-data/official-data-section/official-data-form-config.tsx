@@ -132,9 +132,7 @@ console.log("officialData", officialData);
             dynamicOptions: {
               url: `${baseURL}/company_access_programs/list?company_field=${officialData?.company_field.map(
                 (item) => item.id
-              )}&country_id=${
-                officialData?.country_id
-              }`,
+              )}&country_id=${officialData?.country_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -145,11 +143,10 @@ console.log("officialData", officialData);
               totalCountHeader: "X-Total-Count",
               dependsOn: "company_type_id",
               filterParam: "company_type_id",
-
             },
           },
           {
-            name: "Package_id",
+            name: "packages",
             label: "الباقة",
             type: "select",
             placeholder: "الباقة",
@@ -164,7 +161,7 @@ console.log("officialData", officialData);
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
               dependsOn: "program_id",
-              filterParam: "company_access_programs",
+              filterParam: "company_access_program_id",
             },
           },
         ],
@@ -187,12 +184,12 @@ console.log("officialData", officialData);
         !!officialData?.company_access_programs &&
         officialData?.company_access_programs.length > 0
           ? officialData?.company_access_programs
-              .map((program) => program.name)
+              .map((program) => program.id)
               .join(" , ")
           : "",
-      Package_id:
+      packages:
         !!officialData?.packages && officialData?.packages.length > 0
-          ? officialData?.packages.map((pack) => pack.name).join(" , ")
+          ? officialData?.packages.map((pack) => pack.id)
           : "",
     },
     submitButtonText: "حفظ",
@@ -209,8 +206,8 @@ console.log("officialData", officialData);
 
     onSubmit: async (formData: Record<string, unknown>) => {
       const transformedValues = { ...formData };
-      if (transformedValues.Package_id) {
-        transformedValues.Package_id = [transformedValues.Package_id];
+      if (transformedValues.packages) {
+        transformedValues.packages = [transformedValues.packages];
       }
       return await defaultSubmitHandler(
         transformedValues,
