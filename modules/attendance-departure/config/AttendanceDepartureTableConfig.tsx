@@ -70,6 +70,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
     allSearchedFields: [
       {
         key: "search_text",
+        label: t("filters.searchText"),
         searchType: {
           type: "text",
           placeholder: t("filters.searchPlaceholder"),
@@ -77,6 +78,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
       },
       {
         key: "branch_id",
+        label: t("filters.branch"),
         searchType: {
           type: "dropdown",
           placeholder: t("filters.branchPlaceholder"),
@@ -95,6 +97,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
       },
       {
         key: "management_id",
+        label: t("filters.management"),
         searchType: {
           type: "dropdown",
           placeholder: t("filters.managementPlaceholder"),
@@ -113,6 +116,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
       },
       {
         key: "constraint_id",
+        label: t("filters.constraint"),
         searchType: {
           type: "dropdown",
           placeholder: t("filters.constraintPlaceholder"),
@@ -131,18 +135,23 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string) =>
       },
       {
         key: "start_date",
+        label: t("filters.startDate"),
         searchType: {
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
+          minDate: new Date(1900, 0, 1),
+          maxDateField: "end_date"
         },
       },
       {
         key: "end_date",
+        label: t("filters.endDate"),
         searchType: {
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
+          minDateField: "start_date"
         },
       },
     ],

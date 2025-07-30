@@ -192,14 +192,66 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
               );
             
             case "date":
+              // Parse date constraints for validation
+              const minDate = searchType.minDate ? new Date(searchType.minDate) : null;
+              const maxDate = searchType.maxDate ? new Date(searchType.maxDate) : null;
+              
+              // For cross-field validation using maxDateField and minDateField from config
+              let crossFieldConstraint: Date | null = null;
+              
+              // Check if there's a maxDateField property in the searchType
+              if (searchType.maxDateField && columnSearchState[searchType.maxDateField]) {
+                const maxFieldValue = columnSearchState[searchType.maxDateField];
+                if (typeof maxFieldValue === 'string') {
+                  crossFieldConstraint = new Date(maxFieldValue);
+                  // Field constraint set
+                }
+              }
+              
+              // Check if there's a minDateField property in the searchType
+              if (searchType.minDateField && columnSearchState[searchType.minDateField]) {
+                const minFieldValue = columnSearchState[searchType.minDateField];
+                if (typeof minFieldValue === 'string') {
+                  crossFieldConstraint = new Date(minFieldValue);
+                  // Field constraint set
+                }
+              }
+              
+              // Format dates for the min/max attributes
+              const formatDateForInput = (date: Date) => {
+                return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+              };
+
+              // Determine the effective min and max dates considering both fixed constraints and cross-field constraints
+              let effectiveMinDate = minDate;
+              let effectiveMaxDate = maxDate;
+              
+              if (column.key === 'start_date' && crossFieldConstraint) {
+                // For start_date, respect both maxDate and end_date (whichever is more restrictive)
+                if (maxDate && crossFieldConstraint > maxDate) {
+                  effectiveMaxDate = maxDate;
+                } else if (crossFieldConstraint) {
+                  effectiveMaxDate = crossFieldConstraint;
+                }
+              } else if (column.key === 'end_date' && crossFieldConstraint) {
+                // For end_date, respect both minDate and start_date (whichever is more restrictive)
+                if (minDate && crossFieldConstraint < minDate) {
+                  effectiveMinDate = minDate;
+                } else if (crossFieldConstraint) {
+                  effectiveMinDate = crossFieldConstraint;
+                }
+              }
+
               return (
                 <div key={column.key} className="text-right" dir="rtl">
-                  <label
-                    htmlFor={`search-${column.key}`}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right"
-                  >
-                    {column.label}
-                  </label>
+                  {column.label ? (
+                    <label
+                      htmlFor={`search-${column.key}`}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right mb-2 block"
+                    >
+                      {column.label}
+                    </label>
+                  ) : null}
                   <Input
                     id={`search-${column.key}`}
                     type="date"
@@ -211,6 +263,8 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                     style={{ textAlign: 'right' }}
                     className="w-full text-right"
                     dir="rtl"
+                    min={effectiveMinDate ? formatDateForInput(effectiveMinDate) : undefined}
+                    max={effectiveMaxDate ? formatDateForInput(effectiveMaxDate) : undefined}
                   />
                 </div>
               );
@@ -219,12 +273,14 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
             default:
               return (
                 <div key={column.key}>
-                  <label
-                    htmlFor={`search-${column.key}`}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {column.label}
-                  </label>
+                  {column.label ? (
+                    <label
+                      htmlFor={`search-${column.key}`}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+                    >
+                      {column.label}
+                    </label>
+                  ) : null}
                   <Input
                     id={`search-${column.key}`}
                     type="text"

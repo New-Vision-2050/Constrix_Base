@@ -592,7 +592,15 @@
         "searchPlaceholder": "Search",
         "branchPlaceholder": "Branch",
         "managementPlaceholder": "Department",
-        "constraintPlaceholder": "Constraint"
+        "constraintPlaceholder": "Constraint",
+        "searchText": "Search Text",
+        "searchEmployee": "Employee",
+        "employeeSearchPlaceholder": "Search employee...",
+        "branch": "Branch",
+        "management": "Management",
+        "constraint": "Constraint",
+        "startDate": "Start Date",
+        "endDate": "End Date"
       },
       "deleteConfirm": "Confirm deletion of attendance record",
       "status": {
@@ -682,7 +690,7 @@
         "locationType": "Location Type",
         "mainLocation": "Default branch location",
         "customLocation": "Custom location for each branch",
-        "openMap":"Open Map",
+        "openMap": "Open Map",
         "workingHours": "Working Hours",
         "workingDays": "Working Days",
         "periodStart": "Period Start",

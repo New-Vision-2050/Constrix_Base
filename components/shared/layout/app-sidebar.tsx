@@ -160,7 +160,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.HR_SETTINGS,
           },
         ],
-        isNotCentral: true,
+        isNotCentral: false,
       },
       {
         name: t("Sidebar.HumanResources"),
