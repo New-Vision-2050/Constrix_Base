@@ -68,15 +68,15 @@ const OfficialDataPreview = ({
       value: email ?? "",
     },
     {
-      valid: Boolean("متميز"),
+      valid: Boolean(company_access_programs),
       label: "البرنامج",
-      value: packages[0]?.name ?? "-",
+      value: company_access_programs[0]?.name ?? "",
       needRequest: true,
     },
     {
-      valid: Boolean("متميز"),
+      valid: Boolean(packages),
       label: "الباقة",
-      value: company_access_programs[0]?.name ?? "-",
+      value: packages[0]?.name ?? "",
       needRequest: true,
     },
   ];
