@@ -235,6 +235,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
           onLongitudeChange={(value) => handleCoordinateChange('longitude', value)}
           onLatitudeChange={(value) => handleCoordinateChange('latitude', value)}
           onRadiusChange={(value) => handleCoordinateChange('radius', value)}
+          disabled={currentBranchData.isDefault}
         />
         
         <div className="mt-4 mb-4">
