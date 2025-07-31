@@ -153,6 +153,7 @@ export interface Sunday {
 export interface Period {
   end_time: string;
   start_time: string;
+  total_work_hours: number;
 }
 
 export interface Tuesday {

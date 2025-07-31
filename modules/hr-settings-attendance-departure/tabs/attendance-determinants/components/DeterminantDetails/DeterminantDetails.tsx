@@ -91,15 +91,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
     let total = 0;
     Object.values(weeklySchedule).forEach((day) => {
       if (day?.enabled && day?.periods) {
-        day.periods.forEach((interval) => {
-          // Calculate hours between start and end time if they exist
-          if (interval.start_time && interval.end_time) {
-            const start = new Date(`2000-01-01T${interval.start_time}`);
-            const end = new Date(`2000-01-01T${interval.end_time}`);
-            const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-            total += diff;
-          }
-        });
+        total += day?.total_work_hours || 0;
       }
     });
     return Math.round(total);
