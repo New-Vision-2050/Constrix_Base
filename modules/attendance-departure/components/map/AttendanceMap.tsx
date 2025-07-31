@@ -87,6 +87,8 @@ const AttendanceMap: React.FC = () => {
     };
   }, [isFullScreen]);
 
+  console.log('mapEmployees', mapEmployees)
+
   return (
     <div className="relative" ref={mapWrapperRef}>
       <style>{`
@@ -167,8 +169,8 @@ const AttendanceMap: React.FC = () => {
             </LayersControl.BaseLayer>
           </LayersControl>
 
-          {mapEmployees.map((employee: MapEmployee) => {
-            return <CustomMarker key={employee.attendance_id} employee={employee} />;
+          {mapEmployees.map((employee: MapEmployee,index) => {
+            return <CustomMarker index={index} key={employee.attendance_id} employee={employee} />;
           })}
 
           {isLoading && (

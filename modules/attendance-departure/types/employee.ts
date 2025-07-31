@@ -4,6 +4,7 @@ export interface EmployeeDetails {
   name: string;
   phone: string;
   department: string;
+  management: string;
   email: string;
   branch: string;
   gender: string;

@@ -12,61 +12,54 @@ interface EmployeeInfoSectionProps {
   currentDialogName?: string;
 }
 
-
 const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   record,
   onApproverClick,
   currentDialogName,
 }) => {
   const statusT = useTranslations("attendanceDeparture.status");
-  const t = useTranslations("AttendanceDepartureModule.shared.EmployeeInfoSection");
-  
+  const t = useTranslations(
+    "AttendanceDepartureModule.shared.EmployeeInfoSection"
+  );
+
   // Get current theme
   const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
-  const isDarkMode = currentTheme === 'dark';
-  
+  const currentTheme = theme === "system" ? systemTheme : theme;
+  const isDarkMode = currentTheme === "dark";
+
   // Get attendance context functions
-  const { openApproverDialog, closeApproverDialog, closeEmployeeDialog, closeAttendanceStatusDialog } = useAttendance();
-  
+  const {
+    openApproverDialog,
+    closeApproverDialog,
+    closeEmployeeDialog,
+    closeAttendanceStatusDialog,
+  } = useAttendance();
+
   // Handle approver click
   const handleApproverClick = () => {
-    // If onApproverClick prop is provided, use it (for custom handling)
-    if (onApproverClick) {
-      onApproverClick();
-      return;
-    }
-    
-    // Otherwise use default behavior based on current dialog
-    if (record) {
-      // Close current dialog based on dialog name
-      if (currentDialogName === 'employee') {
-        closeEmployeeDialog();
-      } else if (currentDialogName === 'status') {
-        closeAttendanceStatusDialog();
-      }
-      
-      // Open the approver dialog with a slight delay to allow the current dialog to close
-      setTimeout(() => {
-        openApproverDialog(record);
-      }, 100);
-    }
+    // closeAttendanceStatusDialog();
+    // if (record) {
+    //   console.log("recordrecord", record);
+    //   closeApproverDialog();
+    // }
   };
 
   // employee attendance status
-  let _status = "unspecified", text = "unspecified", color = "text-gray-400";
-  if (record?.is_late==1) {
+  let _status = "unspecified",
+    text = "unspecified",
+    color = "text-gray-400";
+  if (record?.is_late == 1) {
     _status = "late";
-  } else if (
-    record?.is_absent===1
-  ) {
+  } else if (record?.is_absent === 1) {
     _status = "absent";
-  } else if (
-    record?.is_holiday===1
-  ) {
+  } else if (record?.is_holiday === 1) {
     _status = "holiday";
   } else if (
-    record?.status==="completed"||record?.status==="active"&&(record?.is_absent&&record?.is_holiday&&record?.is_late) 
+    record?.status === "completed" ||
+    (record?.status === "active" &&
+      record?.is_absent &&
+      record?.is_holiday &&
+      record?.is_late)
   ) {
     _status = "present";
   }
@@ -94,7 +87,7 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
       color = "text-gray-400";
       break;
   }
-  
+
   // Theme specific colors
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
   // Determine the color for attendance status
@@ -111,14 +104,22 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   return (
     <>
       <div className="flex  justify-between items-center text-sm gap-2">
-        <div className={textColor}>{t("branch")} : {record?.professional_data?.branch??"-"}</div>
-        <div className={textColor}>{t("jobId")} : {record?.professional_data?.job_code??"-"}</div>
-        <div className={textColor}>{t("department")} : {record?.professional_data?.management??"-"}</div>
         <div className={textColor}>
-          {t("approver")} : 
+          {t("branch")} : {record?.professional_data?.branch ?? "-"}
+        </div>
+        <div className={textColor}>
+          {t("jobId")} : {record?.professional_data?.job_code ?? "-"}
+        </div>
+        <div className={textColor}>
+          {t("department")} : {record?.professional_data?.management ?? "-"}
+        </div>
+        <div className={textColor}>
+          {t("approver")} :
           {record?.professional_data?.attendance_constraint?.constraint_name ? (
-            <span 
-              className={`cursor-pointer hover:underline text-blue-500 ${isDarkMode ? 'hover:text-blue-400' : 'hover:text-blue-600'}`}
+            <span
+              className={`cursor-pointer hover:underline text-blue-500 ${
+                isDarkMode ? "hover:text-blue-400" : "hover:text-blue-600"
+              }`}
               onClick={handleApproverClick}
               title={t("clickToViewApproverDetails")}
             >
@@ -129,10 +130,8 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
           )}
         </div>
         <div className={textColor}>
-          {t("attendanceStatus")} : 
-          <span className={`font-bold ${color} mx-1`}>
-            {text??"-"}
-          </span>
+          {t("attendanceStatus")} :
+          <span className={`font-bold ${color} mx-1`}>{text ?? "-"}</span>
         </div>
       </div>
     </>

@@ -497,6 +497,7 @@
         "employeeName": "اسم الموظف",
         "phone": "رقم الجوال",
         "department": "القسم",
+        "management": "الإدارة",
         "email": "البريد الالكتروني",
         "branch": "الفرع"
       },
@@ -616,7 +617,7 @@
       },
       "dialogs": {
         "approver": {
-          "title": "بيانات محدد الحضور",
+          "title": "حالة الحضور",
           "approverName": "اسم المحدد",
           "approverSystem": "نظام المحدد",
           "unspecified": "غير محدد",
@@ -647,7 +648,7 @@
           }
         },
         "attendanceStatus": {
-          "title": "حالة الحضور",
+          "title": "بيانات محدد الحضور",
           "attendance": "الحضور",
           "departure": "الانصراف",
           "period": "الفترة",

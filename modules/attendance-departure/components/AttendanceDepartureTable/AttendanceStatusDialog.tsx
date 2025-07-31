@@ -34,7 +34,7 @@ const AttendanceStatusDialog: React.FC = () => {
     <DialogContainer 
       isOpen={isAttendanceStatusDialogOpen} 
       onClose={closeAttendanceStatusDialog}
-      title="بيانات محدد الحضور"
+      title={t("title")}
     >
       {/* Dialog content with theme-aware styling using Tailwind's dark mode */}
       <div className="flex flex-col gap-6 text-foreground bg-background p-6 rounded-lg border border-border">
