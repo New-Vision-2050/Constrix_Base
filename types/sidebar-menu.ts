@@ -1,6 +1,6 @@
 import { ComponentType } from "react";
 
-type Entity = {
+export type Entity = {
   name: string;
   url?: string;
   icon?: string | ComponentType;

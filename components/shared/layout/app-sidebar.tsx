@@ -20,7 +20,8 @@ import InboxIcon from "@/public/icons/inbox-icon";
 import { SidebarProgramsList } from "./sidebar-programs";
 import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
-import { Project } from "@/types/sidebar-menu";
+import { Menu, Project } from "@/types/sidebar-menu";
+import type { Entity } from "@/types/sidebar-menu";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
@@ -31,15 +32,58 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 // TODO: Add the merge logic for the sidebar projects
 
+function mergeProjectsAndMenu(
+  projects: Project[],
+  menu: Menu[],
+  isSuperAdmin?: boolean
+): Project[] {
+  const formatted: Project[] = projects.map((project) => {
+    // check is setting project
+    if (project.slug === SUPER_ENTITY_SLUG.SETTINGS) {
+      if (!isSuperAdmin) {
+        return project;
+      }
+    }
+    const matchedMenu = menu.find((menuItem) => menuItem.slug === project.slug);
+
+    if (!matchedMenu) return project;
+
+    // Extract all menu fields except sub_entities
+    const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
+
+    // Transform MenuSubEntity to Entity by adding the show property
+    const transformedMenuSubEntities =
+      menuSubEntities?.map(
+        (menuSubEntity): Entity => ({
+          name: menuSubEntity.name,
+          icon: menuSubEntity.icon,
+          slug: menuSubEntity.slug,
+          origin_super_entity: menuSubEntity.origin_super_entity,
+          show: true, // Default to true, you can add custom logic here if needed
+        })
+      ) || [];
+
+    return {
+      ...project,
+      ...restMenuProps,
+      sub_entities: [
+        ...(project.sub_entities || []),
+        ...transformedMenuSubEntities,
+      ],
+    };
+  });
+  return formatted;
+}
+
 export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
-  const { isLoading } = useSidebarMenu();
+  const { menu, isLoading } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
   const path = usePathname();
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
-    { permissions, can, isCentralCompany } = p;
+    { can, isCentralCompany, isSuperAdmin } = p;
   console.log("permissions ", p);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
@@ -254,9 +298,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     ];
 
     return data;
-  }, [permissions, pageName, isCentralCompany]);
+  }, [pageName, isCentralCompany, can, t, p]);
 
   const projects = SidebarProjects.filter((project) => project.show);
+  const all = mergeProjectsAndMenu(projects, menu, isSuperAdmin);
 
   return (
     <Sidebar
@@ -271,7 +316,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         {isLoading && <div className="p-4 flex justify-center">Loading...</div>}
-        <SidebarProgramsList projects={projects} />
+        <SidebarProgramsList projects={all} />
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
