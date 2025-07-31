@@ -27,7 +27,7 @@ const handleCloseRolesSheet = useCallback(
     setSelectedId(undefined);
     handleClose();
   },
-  [handleOpen]
+  [handleClose]
 );
 
   const config = rolesTableConfig({handleOpenRolesSheet});

@@ -25,7 +25,8 @@ import type { Entity } from "@/types/sidebar-menu";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  isCentral: boolean;
   name?: string;
   mainLogo?: string;
 }
@@ -296,6 +297,12 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ),
       },
     ];
+  }, [isSuperAdmin, pageName, permissionsObj, rolesObj, t]);
+
+
+  const projects = isCentral
+    ? SidebarProjects.filter((ele) => ele.isNotCentral)
+    : SidebarProjects.filter((ele) => !ele.isNotCentral);
 
     return data;
   }, [pageName, isCentralCompany, can, t, p]);
