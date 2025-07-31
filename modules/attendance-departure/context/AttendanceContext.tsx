@@ -30,6 +30,9 @@ interface AttendanceContextType {
   view: "table" | "map";
   // toggle view function
   toggleView: (view: "table" | "map") => void;
+
+  // current record
+  currentRecord: AttendanceStatusRecord | null;
   
   // Team attendance data for map display
   teamAttendance: AttendanceStatusRecord[];
@@ -279,6 +282,8 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Toggle view function
   const toggleView = useCallback((view: "table" | "map") => setView(view), []);
   
+  // current record
+  const [currentRecord, setCurrentRecord] = useState<AttendanceStatusRecord | null>(null);
   // Function to open the employee dialog
   const openEmployeeDialog = useCallback((employee: EmployeeDetails) => {
     setSelectedEmployee(employee);
@@ -306,12 +311,14 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   // Function to open the approver dialog
   const openApproverDialog = useCallback((record: AttendanceStatusRecord) => {
     fetchAttendanceHistory(record.user.id, record.work_date, record.work_date);
+    setCurrentRecord(record);
     setApproverDialogOpen(true);
   }, []);
   
   // Function to close the approver dialog
   const closeApproverDialog = useCallback(() => {
     setApproverDialogOpen(false);
+    setCurrentRecord(null);
     setTimeout(() => setAttendanceHistory([]), 300); // Clear record data after dialog closes
   }, []);
 
@@ -319,6 +326,9 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   const value: AttendanceContextType = {
     view,
     toggleView: (newView: "table" | "map") => setView(newView),
+    
+    // current record
+    currentRecord,
     
     // Team attendance data
     teamAttendance,

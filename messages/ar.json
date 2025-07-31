@@ -574,7 +574,7 @@
       "department": "الإدارة",
       "approver": "المحدد المعتمد",
       "loadingApprovers": "جاري تحميل المشرفين...",
-      "searchPlaceholder": "الاسم/البريد الالكتروني/رقم الجوال"
+      "searchPlaceholder": "الاسم/الأيميل"
     },
     "StatisticsCards": {
       "totalAttendance": "إجمالي عدد الحضور",
@@ -624,6 +624,17 @@
           "workHours": "عدد ساعات العمل:",
           "DateOfAttendance": "تاريخ الحضور",
           "DateOfDeparture": "تاريخ الانصراف",
+          "from": "من",
+          "to": "إلى",
+          "loading": "جاري تحميل بيانات الحضور...",
+          "noRecords": "لا توجد سجلات حضور",
+          "noRecordsMessage": "لا توجد سجلات حضور لهذا الموظف في التاريخ المحدد",
+          "summary": "ملخص الحضور",
+          "totalAttendance": "إجمالي ساعات الحضور",
+          "totalDelay": "إجمالي ساعات التأخير",
+          "totalDeparture": "إجمالي ساعات الانصراف",
+          "attendance": "الحضور",
+          "departure": "الانصراف",
           "days": {
             "sunday": "الأحد",
             "monday": "الإثنين",
