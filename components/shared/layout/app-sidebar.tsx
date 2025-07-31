@@ -299,6 +299,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     ];
   }, [isSuperAdmin, pageName, permissionsObj, rolesObj, t]);
 
+  console.log("SidebarProjects", SidebarProjects);
 
   const projects = isCentral
     ? SidebarProjects.filter((ele) => ele.isNotCentral)
