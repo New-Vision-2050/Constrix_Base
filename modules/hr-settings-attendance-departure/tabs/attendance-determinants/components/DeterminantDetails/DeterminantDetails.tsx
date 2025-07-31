@@ -56,13 +56,13 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
     : "hover:bg-gray-300";
   // Days of the week in Arabic
   const daysOfWeek = [
+    "السبت",
     "الأحد",
     "الاثنين",
     "الثلاثاء",
     "الأربعاء",
     "الخميس",
     "الجمعة",
-    "السبت",
   ];
   // Get weekly schedule from constraint config if available
   const weeklySchedule = constraint.config?.time_rules?.weekly_schedule || {};
@@ -91,15 +91,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
     let total = 0;
     Object.values(weeklySchedule).forEach((day) => {
       if (day?.enabled && day?.periods) {
-        day.periods.forEach((interval) => {
-          // Calculate hours between start and end time if they exist
-          if (interval.start_time && interval.end_time) {
-            const start = new Date(`2000-01-01T${interval.start_time}`);
-            const end = new Date(`2000-01-01T${interval.end_time}`);
-            const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-            total += diff;
-          }
-        });
+        total += day?.total_work_hours || 0;
       }
     });
     return Math.round(total);
@@ -191,18 +183,18 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
       </div>
 
       {/* Branches */}
-      {branchNames.length > 0 && (
+      {constraint.branch_locations.length > 0 && (
         <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
           <div className={`${sectionTextLabel} mb-3`}>{t("branches")}</div>
-          <div className="flex flex-row-reverse gap-3 justify-end">
-            {branchNames.map((branch, index) => (
+          <div className="flex flex-row-reverse gap-3 justify-end flex-wrap">
+            {constraint.branch_locations.map((branch, index) => (
               <div
                 key={index}
                 className={`${branchTagBg} ${branchTagHover} transition-colors rounded-full px-6 py-2 ${
                   isDarkMode ? "text-white" : "text-gray-800"
                 }`}
               >
-                فرع {branch}
+                فرع {branch.name}
               </div>
             ))}
           </div>

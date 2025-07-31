@@ -81,86 +81,128 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
   );
 
   return (
-    <div className="p-4 bg-[#140F35] rounded-lg mb-4">
-      <h3 className="text-white mb-4 font-medium">{t("title")}</h3>
+    <div className="p-4 bg-[#140F35] dark:bg-[#140F35] rounded-lg mb-4">
+      <h3 className="text-black dark:text-white mb-4 font-medium">{t("title")}</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Select
-          dir="rtl"
-          value={selectedBranch}
-          onValueChange={handleBranchChange}
-        >
-          <SelectTrigger className="bg-transparent text-white border-gray-600 focus:border-purple-500">
-            <SelectValue placeholder={t("branch")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("all")}</SelectItem>
-            {/* عرض الفروع من الـ API مع عرض رسالة تحميل إذا كانت البيانات قيد التحميل */}
-            {branchesLoading ? (
-              <SelectItem value="loading" disabled>
-                {t("loadingBranches")}
-              </SelectItem>
-            ) : (
-              branches?.map((branch) => (
-                <SelectItem key={branch.id} value={branch.id}>
-                  {branch.name}
+        <div className="flex flex-col gap-1">
+          <label 
+            htmlFor="branch-select"
+            className="text-sm text-gray-700 dark:text-gray-300"
+          >
+            {t("branch")}
+          </label>
+          <Select
+            dir="rtl"
+            value={selectedBranch}
+            onValueChange={handleBranchChange}
+          >
+            <SelectTrigger 
+              id="branch-select" 
+              className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 focus:border-purple-500"
+            >
+              <SelectValue placeholder={t("branch")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("all")}</SelectItem>
+              {/* عرض الفروع من الـ API مع عرض رسالة تحميل إذا كانت البيانات قيد التحميل */}
+              {branchesLoading ? (
+                <SelectItem value="loading" disabled>
+                  {t("loadingBranches")}
                 </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
+              ) : (
+                branches?.map((branch) => (
+                  <SelectItem key={branch.id} value={branch.id}>
+                    {branch.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select
-          dir="rtl"
-          value={selectedDepartment}
-          onValueChange={handleDepartmentChange}
-        >
-          <SelectTrigger className="bg-transparent text-white border-gray-600 focus:border-purple-500">
-            <SelectValue placeholder={t("department")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("all")}</SelectItem>
-            {managementsLoading ? (
-              <SelectItem value="loading" disabled>
-                {t("loadingDepartments")}
-              </SelectItem>
-            ) : (
-              managements?.map((management) => (
-                <SelectItem key={management.id} value={management.id}>
-                  {management.name}
+        <div className="flex flex-col gap-1">
+          <label 
+            htmlFor="department-select"
+            className="text-sm text-gray-700 dark:text-gray-300"
+          >
+            {t("department")}
+          </label>
+          <Select
+            dir="rtl"
+            value={selectedDepartment}
+            onValueChange={handleDepartmentChange}
+          >
+            <SelectTrigger 
+              id="department-select" 
+              className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 focus:border-purple-500"
+            >
+              <SelectValue placeholder={t("department")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("all")}</SelectItem>
+              {managementsLoading ? (
+                <SelectItem value="loading" disabled>
+                  {t("loadingDepartments")}
                 </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
+              ) : (
+                managements?.map((management) => (
+                  <SelectItem key={management.id} value={management.id}>
+                    {management.name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select
-          dir="rtl"
-          value={selectedApprover}
-          onValueChange={handleApproverChange}
-        >
-          <SelectTrigger className="bg-transparent text-white border-gray-600 focus:border-purple-500">
-            <SelectValue placeholder={t("approver")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("all")}</SelectItem>
-            {constraintsLoading ? (
-              <SelectItem value="loading" disabled>{t("loadingApprovers")}</SelectItem>
-            ) : (
-              constraints?.map((constraint,index) => (
-                <SelectItem key={index} value={constraint.id}>
-                  {constraint.constraint_name}
-                </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col gap-1">
+          <label 
+            htmlFor="approver-select"
+            className="text-sm text-gray-700 dark:text-gray-300"
+          >
+            {t("approver")}
+          </label>
+          <Select
+            dir="rtl"
+            value={selectedApprover}
+            onValueChange={handleApproverChange}
+          >
+            <SelectTrigger 
+              id="approver-select" 
+              className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 focus:border-purple-500"
+            >
+              <SelectValue placeholder={t("approver")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("all")}</SelectItem>
+              {constraintsLoading ? (
+                <SelectItem value="loading" disabled>{t("loadingApprovers")}</SelectItem>
+              ) : (
+                constraints?.map((constraint,index) => (
+                  <SelectItem key={index} value={constraint.id}>
+                    {constraint.constraint_name}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Input
-          placeholder={t("searchPlaceholder")}
-          className="bg-transparent text-white border-gray-600 border-1 rounded-md w-full ring-1 h-full ring-gray-600 focus:ring-gray-400 focus:border-purple-500 placeholder:text-gray-400"
-          value={searchText}
-          onChange={handleSearchTextChange}
-        />
+        <div className="flex flex-col gap-1">
+          <label 
+            htmlFor="search-input"
+            className="text-sm text-gray-700 dark:text-gray-300"
+          >
+            {t("searchPlaceholder")}
+          </label>
+          <Input
+            id="search-input"
+            placeholder={t("searchPlaceholder")}
+            className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 border-1 rounded-md w-full ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-gray-400 focus:border-purple-500 placeholder:text-gray-400"
+            value={searchText}
+            onChange={handleSearchTextChange}
+          />
+        </div>
       </div>
     </div>
   );

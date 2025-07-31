@@ -9,6 +9,7 @@ interface CoordinatesInputProps {
   onLongitudeChange: (value: string) => void;
   onLatitudeChange: (value: string) => void;
   onRadiusChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 export default function CoordinatesInput({
@@ -18,6 +19,7 @@ export default function CoordinatesInput({
   onLongitudeChange,
   onLatitudeChange,
   onRadiusChange,
+  disabled = false,
 }: CoordinatesInputProps) {
   const { resolvedTheme } = useTheme();
   const t = useTranslations("location");
@@ -35,6 +37,7 @@ export default function CoordinatesInput({
           onChange={(e) => onLongitudeChange(e.target.value)}
           className={inputClasses}
           placeholder="46.6753"
+          disabled={disabled}
         />
       </div>
       <div>
@@ -45,6 +48,7 @@ export default function CoordinatesInput({
           onChange={(e) => onLatitudeChange(e.target.value)}
           className={inputClasses}
           placeholder="24.7136"
+          disabled={disabled}
         />
       </div>
       <div className="col-span-2">

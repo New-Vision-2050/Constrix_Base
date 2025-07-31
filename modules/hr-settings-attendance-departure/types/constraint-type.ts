@@ -2,6 +2,7 @@ import { ConstraintConfig } from "@/modules/attendance-departure/types/attendanc
 
 export type Constraint = {
   branches: { id: string; name: string }[];
+  branch_locations: { id: string; name: string }[];
   config: ConstraintConfig;
   constraint_name: string;
   constraint_type: string;
