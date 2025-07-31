@@ -4,14 +4,19 @@ import React from "react";
 import { AttendanceStatusRecord } from "../../types/attendance";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { useAttendance } from "../../context/AttendanceContext";
 
 interface EmployeeInfoSectionProps {
   record: AttendanceStatusRecord | null;
+  onApproverClick?: () => void;
+  currentDialogName?: string;
 }
 
 
 const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   record,
+  onApproverClick,
+  currentDialogName,
 }) => {
   const statusT = useTranslations("attendanceDeparture.status");
   const t = useTranslations("AttendanceDepartureModule.shared.EmployeeInfoSection");
@@ -20,6 +25,33 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === 'system' ? systemTheme : theme;
   const isDarkMode = currentTheme === 'dark';
+  
+  // Get attendance context functions
+  const { openApproverDialog, closeApproverDialog, closeEmployeeDialog, closeAttendanceStatusDialog } = useAttendance();
+  
+  // Handle approver click
+  const handleApproverClick = () => {
+    // If onApproverClick prop is provided, use it (for custom handling)
+    if (onApproverClick) {
+      onApproverClick();
+      return;
+    }
+    
+    // Otherwise use default behavior based on current dialog
+    if (record) {
+      // Close current dialog based on dialog name
+      if (currentDialogName === 'employee') {
+        closeEmployeeDialog();
+      } else if (currentDialogName === 'status') {
+        closeAttendanceStatusDialog();
+      }
+      
+      // Open the approver dialog with a slight delay to allow the current dialog to close
+      setTimeout(() => {
+        openApproverDialog(record);
+      }, 100);
+    }
+  };
 
   // employee attendance status
   let _status = "unspecified", text = "unspecified", color = "text-gray-400";
@@ -83,7 +115,18 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
         <div className={textColor}>{t("jobId")} : {record?.professional_data?.job_code??"-"}</div>
         <div className={textColor}>{t("department")} : {record?.professional_data?.management??"-"}</div>
         <div className={textColor}>
-          {t("approver")} : {record?.professional_data?.attendance_constraint?.constraint_name??"-"}
+          {t("approver")} : 
+          {record?.professional_data?.attendance_constraint?.constraint_name ? (
+            <span 
+              className={`cursor-pointer hover:underline text-blue-500 ${isDarkMode ? 'hover:text-blue-400' : 'hover:text-blue-600'}`}
+              onClick={handleApproverClick}
+              title={t("clickToViewApproverDetails")}
+            >
+              {record.professional_data.attendance_constraint.constraint_name}
+            </span>
+          ) : (
+            "-"
+          )}
         </div>
         <div className={textColor}>
           {t("attendanceStatus")} : 

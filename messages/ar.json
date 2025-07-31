@@ -474,6 +474,7 @@
         "jobId": "الرقم الوظيفي",
         "department": "الإدارة",
         "approver": "المحدد",
+        "clickToViewApproverDetails": "انقر لعرض تفاصيل المحدد",
         "attendanceStatus": "حالة الحضور",
         "unspecified": "غير محدد",
         "status": {

@@ -470,6 +470,7 @@
         "jobId": "Job ID",
         "department": "Department",
         "approver": "Approver",
+        "clickToViewApproverDetails": "Click to view approver details",
         "attendanceStatus": "Attendance Status",
         "unspecified": "Not specified",
         "status": {
