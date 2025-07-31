@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { AttendanceHistoryRecord } from "../../types/attendance";
+import { AttendanceStatusRecord } from "../../types/attendance";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 
 interface EmployeeInfoSectionProps {
-  record: AttendanceHistoryRecord;
+  record: AttendanceStatusRecord | null;
 }
 
 
@@ -67,9 +67,9 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
   const textColor = isDarkMode ? "text-white" : "text-gray-800";
   // Determine the color for attendance status
   const getStatusColor = () => {
-    if (!record.is_late) {
+    if (!record?.is_late) {
       return "text-green-500";
-    } else if (record.is_late) {
+    } else if (record?.is_late) {
       return "text-yellow-400";
     } else {
       return "text-red-500";
