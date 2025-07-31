@@ -11,19 +11,18 @@ import useCurrentAuthCompany from "@/hooks/use-auth-company";
 const AttendanceDepartureTable: React.FC = () => {
   // declare state & vars
   const { data: authCompanyData } = useCurrentAuthCompany();
-  // const companyCreatedAt = new Date(Boolean(authCompanyData?.payload?.created_at)?authCompanyData?.payload?.created_at);
+  
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  
+  const companyCreatedAt = authCompanyData?.payload?.created_at ? new Date(authCompanyData.payload.created_at) : oneYearAgo;
   const { toggleView, setStartDate, setEndDate } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table");
   const tableId = useMemo(
-    () => getAttendanceDepartureTableConfig(t).tableId || "default",
-    [t]
+    () => getAttendanceDepartureTableConfig(t,companyCreatedAt).tableId || "default",
+    [t,companyCreatedAt]
   );
 
-  // console.log(
-  //   "companyCreatedAt",
-  //   companyCreatedAt,
-  //   authCompanyData?.payload?.created_at
-  // );
   // Using a different approach to access column state to avoid infinite loop
   const tables = useTableStore((state) => state.tables);
   const columnSearchState = useMemo(() => {
@@ -58,7 +57,7 @@ const AttendanceDepartureTable: React.FC = () => {
   return (
     <div className="mt-4">
       <TableBuilder
-        config={getAttendanceDepartureTableConfig(t)}
+        config={getAttendanceDepartureTableConfig(t,companyCreatedAt)}
         searchBarActions={
           <div className="flex items-center gap-3">
             <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>
