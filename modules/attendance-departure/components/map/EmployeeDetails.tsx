@@ -91,8 +91,8 @@ const EmployeeDetailsSheet: React.FC<EmployeeDetailsProps> = ({
               value={employee.phone}
             />
             <EmployeeInfoField
-              label={t("fields.department")}
-              value={employee.department}
+              label={t("fields.management")}
+              value={employee.management}
             />
             <EmployeeInfoField
               label={t("fields.email")}
