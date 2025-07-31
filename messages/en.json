@@ -568,7 +568,7 @@
       "department": "Department",
       "approver": "Approver",
       "loadingApprovers": "Loading approvers...",
-      "searchPlaceholder": "Name/Email/Mobile"
+      "searchPlaceholder": "Name/Email"
     },
     "StatisticsCards": {
       "totalAttendance": "Total Attendance",

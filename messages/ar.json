@@ -574,7 +574,7 @@
       "department": "الإدارة",
       "approver": "المحدد المعتمد",
       "loadingApprovers": "جاري تحميل المشرفين...",
-      "searchPlaceholder": "الاسم/البريد الالكتروني/رقم الجوال"
+      "searchPlaceholder": "الاسم/الأيميل"
     },
     "StatisticsCards": {
       "totalAttendance": "إجمالي عدد الحضور",
