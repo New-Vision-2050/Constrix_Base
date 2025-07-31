@@ -30,8 +30,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   mainLogo?: string;
 }
 
-// TODO: Add the merge logic for the sidebar projects
-
 function mergeProjectsAndMenu(
   projects: Project[],
   menu: Menu[],
@@ -113,7 +111,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       isActive: pageName === ROUTER.PERMISSIONS,
       show: can(Object.values(PERMISSIONS.permission)),
     };
-    console.log("React.useMemo permissions", p);
     const data: Project[] = [
       // companies
       {
