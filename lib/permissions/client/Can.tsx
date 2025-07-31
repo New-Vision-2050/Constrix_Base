@@ -8,6 +8,7 @@ interface CanProps {
   check: CanCheckArguments;
   children: ReactNode;
   fallback?: ReactNode;
+  strict?: boolean; // Optional prop to enforce strict permission checking
 }
 
 /**
@@ -50,11 +51,11 @@ interface CanProps {
  * </Can>
  * ```
  */
-export const Can = ({ check, children, fallback = null }: CanProps) => {
-  const { can } = usePermissions();
+export const Can = ({ check, children, fallback = null, strict }: CanProps) => {
+  const { can, strictCan } = usePermissions();
 
   // Handle the different check formats to match the can function signature
-  const hasPermission = can(...check);
+  const hasPermission = strict ? strictCan(...check) : can(...check);
 
   return hasPermission ? <>{children}</> : <>{fallback}</>;
 };

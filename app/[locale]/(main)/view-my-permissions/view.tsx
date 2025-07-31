@@ -22,6 +22,7 @@ function View({ data }: { data: object }) {
       />
       <div className="text-sm text-muted-foreground mb-2">
         <Can
+          strict
           check={[permission]}
           fallback={
             <span className="text-red-500 text-lg font-bold">

@@ -16,6 +16,8 @@ type CreatePermissionKey<T extends string, A extends string> = `${T}_${A}`;
 
 // Type for when no actions are specified (returns all actions)
 type AllActionsResult<T extends string> = {
+  prefix: T;
+} & {
   [K in PermissionAction as `${Lowercase<K>}`]: CreatePermissionKey<T, K>;
 };
 
@@ -24,6 +26,8 @@ type SpecificActionsResult<
   T extends string,
   A extends readonly PermissionAction[]
 > = {
+  prefix: T;
+} & {
   [K in A[number] as `${Lowercase<K>}`]: CreatePermissionKey<T, K>;
 };
 
@@ -38,11 +42,16 @@ type SpecificActionsResult<
  * ```typescript
  * // Get specific permissions
  * const orgPerms = createPermissions("ORGANIZATION_MANAGEMENT", ["EXPORT", "VIEW"]);
- * // Returns: { export: "ORGANIZATION_MANAGEMENT_EXPORT", view: "ORGANIZATION_MANAGEMENT_VIEW" }
+ * // Returns: {
+ * //   prefix: "ORGANIZATION_MANAGEMENT",
+ * //   export: "ORGANIZATION_MANAGEMENT_EXPORT",
+ * //   view: "ORGANIZATION_MANAGEMENT_VIEW"
+ * // }
  *
  * // Get all permissions
  * const profilePerms = createPermissions("PROFILE_FAMILY_INFO");
  * // Returns: {
+ * //   prefix: "PROFILE_FAMILY_INFO",
  * //   export: "PROFILE_FAMILY_INFO_EXPORT",
  * //   update: "PROFILE_FAMILY_INFO_UPDATE",
  * //   list: "PROFILE_FAMILY_INFO_LIST",
@@ -68,7 +77,9 @@ export function createPermissions<T extends string>(
 ) {
   const actionsToUse = include || PERMISSION_ACTIONS;
 
-  const result: Record<string, string> = {};
+  const result: Record<string, string> = {
+    prefix: permissionName,
+  };
 
   for (const action of actionsToUse) {
     const key = action.toLowerCase();
