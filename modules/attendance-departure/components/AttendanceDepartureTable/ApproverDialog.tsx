@@ -94,7 +94,7 @@ const ApproverDialog: React.FC = () => {
       onClose={closeApproverDialog}
       title={t("title")}
     >
-      <EmployeeInfoSection record={currentRecord} />
+      <EmployeeInfoSection record={currentRecord} currentDialogName="approverDialog" />
       {isAbsent ? (
         <div className="flex justify-center items-center my-12">
           <div className="text-center py-8 px-6 bg-destructive/10 rounded-lg border border-destructive">
