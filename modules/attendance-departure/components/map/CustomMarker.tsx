@@ -56,9 +56,10 @@ const getMarkerIcon = (
 
 interface CustomMarkerProps {
   employee: MapEmployee;
+  index: number;
 }
 
-const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
+const CustomMarker: React.FC<CustomMarkerProps> = ({ employee,index }) => {
   // Use attendance context to open employee dialog
   const { openEmployeeDialog ,attendanceHistory ,fetchAttendanceHistory } = useAttendance();
   const t = useTranslations("attendanceDeparture.status");
@@ -79,6 +80,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
     // Convert MapEmployee type to EmployeeDetails using the new structure
     const employeeDetails: EmployeeDetails = {
       id: employee.attendance_id,
+      management: employee.user.management_name,
       user_id: employee.user.id,
       name: employee.user.name,
       phone: employee.user.phone || "-",
@@ -102,8 +104,8 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee }) => {
   };
   // Create marker position and properties for proper type handling
   const position: [number, number] = [
-    employee.latest_location.latitude,
-    employee.latest_location.longitude,
+    employee.latest_location.latitude + index * 0.0001,
+    employee.latest_location.longitude + index * 0.0001,
   ];
   const markerIcon = getMarkerIcon(employee, isDarkMode);
 

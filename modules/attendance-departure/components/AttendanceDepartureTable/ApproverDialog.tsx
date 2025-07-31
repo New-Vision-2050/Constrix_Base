@@ -88,6 +88,8 @@ const ApproverDialog: React.FC = () => {
   if (!attendanceHistoryPayload || attendanceHistoryPayload.length === 0)
     return null;
 
+  console.log('currentRecord', currentRecord)
+
   return (
     <DialogContainer
       isOpen={isApproverDialogOpen}

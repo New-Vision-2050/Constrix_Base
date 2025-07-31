@@ -490,6 +490,7 @@
       "fields": {
         "employeeName": "Employee Name",
         "phone": "Mobile Number",
+        "management": "Management",
         "department": "Department",
         "email": "Email",
         "branch": "Branch"
@@ -610,7 +611,7 @@
       },
       "dialogs": {
         "approver": {
-          "title": "Attendance Approver Details",
+          "title": "Attendance Status",
           "approverName": "Approver Name",
           "approverSystem": "Approver System",
           "unspecified": "Not specified",
@@ -641,7 +642,7 @@
           }
         },
         "attendanceStatus": {
-          "title": "Attendance Status",
+          "title": "Attendance Approver Details",
           "attendance": "Check-in",
           "departure": "Check-out",
           "period": "Period",
