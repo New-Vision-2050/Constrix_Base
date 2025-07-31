@@ -626,6 +626,7 @@
           "summary": "Attendance Summary",
           "totalAttendance": "Total Attendance Hours",
           "totalDelay": "Total Delay Hours",
+          "totalDeparture": "Total Departure Hours",
           "attendance": "Attendance",
           "departure": "Departure",
           "days": {

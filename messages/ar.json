@@ -632,6 +632,7 @@
           "summary": "ملخص الحضور",
           "totalAttendance": "إجمالي ساعات الحضور",
           "totalDelay": "إجمالي ساعات التأخير",
+          "totalDeparture": "إجمالي ساعات الانصراف",
           "attendance": "الحضور",
           "departure": "الانصراف",
           "days": {

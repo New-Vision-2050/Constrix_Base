@@ -171,6 +171,55 @@ const ApproverDialog: React.FC = () => {
                             </div>
                           )
                         )}
+                        
+                        {/* Period Summary - Calculate and display total hours for this period */}
+                        {(() => {
+                          // Calculate total attendance and departure hours for this period
+                          let periodTotalWorkHours = 0;
+                          let periodTotalDelayMinutes = 0;
+                          
+                          // Process records to calculate totals
+                          (records as AttendanceHistoryRecord[]).forEach((record) => {
+                            // Use total_work_hours directly from the record
+                            if (record.total_work_hours && typeof record.total_work_hours === 'number') {
+                              periodTotalWorkHours += +record.total_work_hours;
+                            }
+                            
+                            // Use late_minutes directly from the record
+                            if (record.late_minutes && typeof record.late_minutes === 'number') {
+                              periodTotalDelayMinutes += +record.late_minutes;
+                            }
+                          });
+                          
+                          // Convert delay minutes to hours for display
+                          const periodTotalDelayHours = (periodTotalDelayMinutes / 60);
+                          
+                          return (
+                            <div className="mt-4 pt-4 border-t border-border">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {/* Period Total Work Hours */}
+                                <div className="relative border border-border rounded-md px-3 py-2 text-center bg-background">
+                                  <span className="absolute -top-2 right-4 transform bg-background px-2 text-xs text-muted-foreground font-semibold">
+                                    {t("totalAttendance")}
+                                  </span>
+                                  <span className="text-md font-bold text-primary">
+                                    {periodTotalWorkHours.toFixed(2)}
+                                  </span>
+                                </div>
+                                
+                                {/* Period Total Delay Hours */}
+                                <div className="relative border border-border rounded-md px-3 py-2 text-center bg-background">
+                                  <span className="absolute -top-2 right-4 transform bg-background px-2 text-xs text-muted-foreground font-semibold">
+                                    {t("totalDelay")}
+                                  </span>
+                                  <span className="text-md font-bold text-destructive">
+                                    {periodTotalDelayHours.toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
