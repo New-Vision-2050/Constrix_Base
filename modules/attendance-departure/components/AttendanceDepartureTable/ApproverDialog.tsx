@@ -181,12 +181,12 @@ const ApproverDialog: React.FC = () => {
                           // Process records to calculate totals
                           (records as AttendanceHistoryRecord[]).forEach((record) => {
                             // Use total_work_hours directly from the record
-                            if (record.total_work_hours && typeof record.total_work_hours === 'number') {
+                            if (record.total_work_hours) {
                               periodTotalWorkHours += +record.total_work_hours;
                             }
                             
                             // Use late_minutes directly from the record
-                            if (record.late_minutes && typeof record.late_minutes === 'number') {
+                            if (record.late_minutes) {
                               periodTotalDelayMinutes += +record.late_minutes;
                             }
                           });
@@ -236,7 +236,7 @@ const ApproverDialog: React.FC = () => {
             // Process all payload items
             attendanceHistoryPayload.forEach((payloadItem) => {
               // Add total hours if available
-              if (typeof payloadItem.total_hours === "number") {
+              if (payloadItem.total_work_hours) {
                 totalAttendanceHours += +payloadItem.total_work_hours;
               }
 
@@ -248,10 +248,10 @@ const ApproverDialog: React.FC = () => {
                 )
                 .forEach(([_, records]) => {
                   (records as AttendanceHistoryRecord[]).forEach((record) => {
-                    if (
-                      record.late_minutes &&
-                      typeof record.late_minutes === "number"
-                    ) {
+                    if (record.total_work_hours) {
+                      totalAttendanceHours += +record.total_work_hours;
+                    }
+                    if (record.late_minutes) {
                       totalDelayMinutes += +record.late_minutes;
                     }
                   });
