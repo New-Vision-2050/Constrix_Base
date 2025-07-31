@@ -1,6 +1,7 @@
 "use client";
 
 import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Input } from "@/modules/table/components/ui/input";
 import JsonView from "@uiw/react-json-view";
 import { nordTheme } from "@uiw/react-json-view/nord";
@@ -8,6 +9,8 @@ import { useState } from "react";
 
 function View({ data }: { data: object }) {
   const [permission, setPermission] = useState("");
+
+  console.log("PERMISSION_NAMES", PERMISSIONS);
   return (
     <div className="rounded-xl p-4">
       <Input
