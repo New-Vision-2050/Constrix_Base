@@ -62,14 +62,14 @@ const ApproverDialog: React.FC = () => {
 
         return (
           <>
-            من
+            {t("from")}
             <span className="font-bold text-primary bg-primary/10 px-2 py-1 rounded mx-1">
               {fromDateTime.date}
             </span>
             <span className="font-semibold text-secondary-foreground bg-secondary px-2 py-1 rounded mx-1">
               {fromDateTime.time}
             </span>
-            إلى
+            {t("to")}
             <span className="font-bold text-primary bg-primary/10 px-2 py-1 rounded mx-1">
               {toDateTime.date}
             </span>
@@ -92,23 +92,24 @@ const ApproverDialog: React.FC = () => {
     <DialogContainer
       isOpen={isApproverDialogOpen}
       onClose={closeApproverDialog}
-      title={"حالة الحضور"}
+      title={t("title")}
     >
       <EmployeeInfoSection record={currentRecord} />
       {isAbsent ? (
         <div className="flex justify-center items-center my-12">
           <div className="text-center py-8 px-6 bg-destructive/10 rounded-lg border border-destructive">
             <h3 className="text-xl font-bold text-destructive mb-1">
-              لم يتم تسجيل الحضور
+              {t("noRecords")}
             </h3>
             <p className="text-muted-foreground">
-              لا توجد سجلات حضور لهذا الموظف في هذا اليوم
+              {t("noRecordsMessage")}
             </p>
           </div>
         </div>
       ) : attendanceHistoryLoading ? (
-        <div className="flex justify-center items-center">
-          <LoaderCircle />
+        <div className="flex justify-center items-center p-8">
+          <LoaderCircle className="mr-2 animate-spin" />
+          <span>{t("loading")}</span>
         </div>
       ) : (
         <>
@@ -125,7 +126,7 @@ const ApproverDialog: React.FC = () => {
                   <div key={timeRange} className="relative my-4">
                     <div className="relative border border-border rounded-lg px-4 py-5">
                       <span className="absolute -top-3 right-4 bg-background px-2 text-md">
-                        الفترة {timeRangeIndex + 1} :{" "}
+                        {t("period")} {timeRangeIndex + 1} :{" "}
                         {formatTimeRangeWithArabic(timeRange)}
                       </span>
 
@@ -142,7 +143,7 @@ const ApproverDialog: React.FC = () => {
                                 {/* Attendance */}
                                 <div className="relative border border-border rounded-md px-4 py-3 text-right bg-background">
                                   <span className="absolute -top-2 right-4 bg-background px-1 text-xs text-muted-foreground font-semibold">
-                                    الحضور
+                                    {t("attendance")}
                                   </span>
                                   <div className="flex flex-col gap-1">
                                     <span className="text-md font-semibold">
@@ -156,7 +157,7 @@ const ApproverDialog: React.FC = () => {
                                 {/* Departure */}
                                 <div className="relative border border-border rounded-md px-4 py-3 text-right bg-background">
                                   <span className="absolute -top-2 right-4 bg-background px-1 text-xs text-muted-foreground font-semibold">
-                                    الانصراف
+                                    {t("departure")}
                                   </span>
                                   <div className="flex flex-col gap-1">
                                     <span className="text-md font-semibold">
@@ -235,14 +236,14 @@ const ApproverDialog: React.FC = () => {
             return (
               <div className="mt-6 border border-primary rounded-lg p-4 bg-primary/5">
                 <h3 className="text-lg font-bold text-foreground mb-4 text-center">
-                  ملخص الحضور
+                  {t("summary")}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Total Attendance Hours */}
                   <div className="relative border border-border rounded-md px-4 py-3 text-center bg-background">
                     <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-background px-2 text-xs text-muted-foreground font-semibold">
-                      إجمالي ساعات الحضور
+                      {t("totalAttendance")}
                     </span>
                     <span className="text-lg font-bold text-primary">
                       {totalAttendanceHours.toFixed(2)}
@@ -252,7 +253,7 @@ const ApproverDialog: React.FC = () => {
                   {/* Total Delay Hours */}
                   <div className="relative border border-border rounded-md px-4 py-3 text-center bg-background">
                     <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-background px-2 text-xs text-muted-foreground font-semibold">
-                      إجمالي ساعات التأخير
+                      {t("totalDelay")}
                     </span>
                     <span className="text-lg font-bold text-destructive">
                       {totalDelayHours}
