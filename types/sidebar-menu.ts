@@ -1,12 +1,13 @@
 import { ComponentType } from "react";
 
-type Entity = {
+export type Entity = {
   name: string;
   url?: string;
   icon?: string | ComponentType;
   isActive?: boolean;
   slug?: string;
   origin_super_entity?: string;
+  show: boolean;
 };
 
 export type Attribute = {
@@ -59,6 +60,7 @@ export type Project = {
   icon?: string | ComponentType;
   isActive: boolean;
   sub_entities: Entity[];
+  show: boolean;
 };
 
 export type Menu = {

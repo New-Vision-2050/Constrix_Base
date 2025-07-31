@@ -6,7 +6,10 @@ import { createCan } from "../can";
 
 export const PermissionsContext = createContext<{
   permissions: Permission[];
+  isSuperAdmin: boolean;
+  isCentralCompany: boolean;
   can: ReturnType<typeof createCan>;
+  strictCan: ReturnType<typeof createCan>;
 } | null>(null);
 
 export const usePermissions = () => {
@@ -20,13 +23,23 @@ export const usePermissions = () => {
 function PermissionsProvider({
   children,
   permissions,
-}: PropsWithChildren<{ permissions?: Permission[] }>) {
-  const can = createCan(permissions || []);
+  isSuperAdmin = false,
+  isCentralCompany = false,
+}: PropsWithChildren<{
+  permissions?: Permission[];
+  isSuperAdmin?: boolean;
+  isCentralCompany?: boolean;
+}>) {
+  const can = createCan(isSuperAdmin ? "bypass" : permissions || []);
+  const strictCan = createCan(permissions || []);
   return (
     <PermissionsContext.Provider
       value={{
         permissions: permissions || [],
         can,
+        strictCan,
+        isSuperAdmin,
+        isCentralCompany,
       }}
     >
       {children}

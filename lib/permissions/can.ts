@@ -1,3 +1,4 @@
+import { isDevelopment } from "@/utils/is-development";
 import { Permission } from "./types/permission";
 
 type CheckForType = string | ((permissions: Permission[]) => boolean);
@@ -37,9 +38,16 @@ export type CanCheckArguments = (CheckForType | CheckForType[])[];
  * ```
  */
 export const createCan =
-  (permissions: Permission[]) =>
+  (permissions: Permission[] | "bypass") =>
   (...checkFor: CanCheckArguments): boolean => {
     function checkForItem(check: CheckForType): boolean {
+      // bypass all permissions if dev bypass is enabled
+      if (
+        permissions === "bypass" ||
+        (isDevelopment &&
+          process.env.NEXT_PUBLIC_DEV_BYPASS_ANY_PERMISSION === "true")
+      )
+        return true;
       switch (typeof check) {
         case "string":
           return permissions.some((p) => p.key === check);

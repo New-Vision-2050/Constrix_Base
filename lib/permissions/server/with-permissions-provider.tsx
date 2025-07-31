@@ -7,10 +7,15 @@ function withPermissionsProvider<P extends object>(
 ) {
   return async function DataProviderHOC(props: P) {
     // Use cached permissions function
-    const permissions = await getPermissions();
+    const { permissions, isSuperAdmin, isCentralCompany } =
+      await getPermissions();
 
     return (
-      <PermissionsProvider permissions={permissions}>
+      <PermissionsProvider
+        permissions={permissions}
+        isSuperAdmin={isSuperAdmin}
+        isCentralCompany={isCentralCompany}
+      >
         <WrappedComponent {...props} />
       </PermissionsProvider>
     );
