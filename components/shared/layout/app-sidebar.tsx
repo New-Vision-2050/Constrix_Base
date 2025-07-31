@@ -23,7 +23,7 @@ import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { Menu, Project } from "@/types/sidebar-menu";
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   isCentral: boolean;
   name?: string;
   mainLogo?: string;
@@ -279,7 +279,7 @@ export function AppSidebar({
         isNotCentral: true,
       },
     ];
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, pageName, permissionsObj, rolesObj, t]);
 
 
   const projects = isCentral
