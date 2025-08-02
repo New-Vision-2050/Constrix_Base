@@ -73,11 +73,9 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
               icon: menuSubEntity.icon,
               slug: menuSubEntity.slug,
               origin_super_entity: menuSubEntity.origin_super_entity,
-              show:
-                true ||
-                permissions.some((permission) =>
-                  permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
-                ), // Default to true, you can add custom logic here if needed
+              show: permissions.some((permission) =>
+                permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+              ), // Default to true, you can add custom logic here if needed
             })
           ) || [];
 
