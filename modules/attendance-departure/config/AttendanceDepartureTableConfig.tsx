@@ -103,7 +103,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
           type: "dropdown",
           placeholder: t("filters.managementPlaceholder"),
           dynamicDropdown: {
-            url: `${baseURL}/management_hierarchies/list`,
+            url: `${baseURL}/management_hierarchies/list?type=management`,
             valueField: "id",
             labelField: "name",
             searchParam: "name",
