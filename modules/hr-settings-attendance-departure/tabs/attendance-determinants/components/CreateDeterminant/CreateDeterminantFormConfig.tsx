@@ -58,9 +58,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   if (Boolean(editConstraint?.config?.type_attendance?.fingerprint))
     _type_attendance.push("fingerprint");
 
+  // Check if it's an edit mode
+  const isEdit = Boolean(editConstraint);
+  const title = isEdit ? getText("form.editTitle", "تعديل محدد") : getText("form.title", "إضافة محدد جديد");
+
   return {
     formId: "create-determinant-form",
-    title: getText("form.title", "إضافة محدد جديد"),
+    title,
     apiUrl: `${baseURL}/attendance/constraints`,
     initialValues: {
       constraint_name: editConstraint?.constraint_name,
