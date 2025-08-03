@@ -53,11 +53,6 @@ const DeterminantItem: React.FC<DeterminantItemProps> = ({
       <div className="flex flex-row-reverse items-center gap-2">
         <div className="text-right">
           <div
-            className={`text-sm ${isActive ? activeTextTitle : inactiveTextTitle}`}
-          >
-            محدد فرع
-          </div>
-          <div
             className={`text-sm ${isActive ? activeTextSubtitle : inactiveTextSubtitle}`}
           >
             {determinant.constraint_name}

@@ -58,9 +58,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   if (Boolean(editConstraint?.config?.type_attendance?.fingerprint))
     _type_attendance.push("fingerprint");
 
+  // Check if it's an edit mode
+  const isEdit = Boolean(editConstraint);
+  const title = isEdit ? getText("form.editTitle", "تعديل محدد") : getText("form.title", "إضافة محدد جديد");
+
   return {
     formId: "create-determinant-form",
-    title: getText("form.title", "إضافة محدد جديد"),
+    title,
     apiUrl: `${baseURL}/attendance/constraints`,
     initialValues: {
       constraint_name: editConstraint?.constraint_name,
@@ -122,8 +126,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             name: "constraint_name",
             label: getText("form.determinantName", "اسم المحدد"),
             placeholder: getText(
-              "form.determinantNamePlaceholder",
-              "فرع القاهرة"
+              "form.determinantName",
+              "اسم المحدد"
             ),
             required: true,
             validation: [
@@ -148,7 +152,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "select",
             name: "constraint_type",
             label: getText("form.systemType", "نظام المحدد"),
-            placeholder: getText("form.systemTypePlaceholder", "منتظم"),
+            placeholder: getText("form.systemType", "نظام المحدد"),
             dynamicOptions: {
               url: `${baseURL}/attendance/constraints/types`,
               valueField: "code",
@@ -188,6 +192,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             isMulti: true,
             name: "branch_ids",
             label: getText("form.branches", "الفروع"),
+            placeholder: getText("form.branches", "الفروع"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
