@@ -122,8 +122,8 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             name: "constraint_name",
             label: getText("form.determinantName", "اسم المحدد"),
             placeholder: getText(
-              "form.determinantNamePlaceholder",
-              "فرع القاهرة"
+              "form.determinantName",
+              "اسم المحدد"
             ),
             required: true,
             validation: [
@@ -148,7 +148,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "select",
             name: "constraint_type",
             label: getText("form.systemType", "نظام المحدد"),
-            placeholder: getText("form.systemTypePlaceholder", "منتظم"),
+            placeholder: getText("form.systemType", "نظام المحدد"),
             dynamicOptions: {
               url: `${baseURL}/attendance/constraints/types`,
               valueField: "code",
@@ -188,6 +188,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             isMulti: true,
             name: "branch_ids",
             label: getText("form.branches", "الفروع"),
+            placeholder: getText("form.branches", "الفروع"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
