@@ -3,19 +3,29 @@ import { Tab } from "@/types/Tab";
 import { DollarSign, Lock, MapPin, Send, User, Users } from "lucide-react";
 import OfficialData from "../official-data";
 import Branches from "../branches";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const CompanyProfile: Tab[] = [
   {
     label: "البيانات الرسمية",
     icon: <User size={18} />,
     value: "official-data",
-    component: <OfficialData />,
+    component: (
+      <Can check={[PERMISSIONS.companyProfile.officialData.prefix]}>
+        <OfficialData />
+      </Can>
+    ),
   },
   {
     label: "الفروع",
     icon: <MapPin size={18} />,
     value: "branches",
-    component: <Branches />,
+    component: (
+      <Can check={[PERMISSIONS.companyProfile.branch.prefix]}>
+        <Branches />
+      </Can>
+    ),
   },
 ];
 
