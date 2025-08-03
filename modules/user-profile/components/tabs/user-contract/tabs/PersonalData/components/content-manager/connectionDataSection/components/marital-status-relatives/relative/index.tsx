@@ -5,6 +5,8 @@ import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useState } from "react";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = {
   relative: Relative;
@@ -21,9 +23,15 @@ export default function RelativeData({ relative }: PropsT) {
         title={"الحالة الاجتماعية"}
         loading={userContactDataLoading}
         reviewMode={
-          <MaritalStatusRelativesSectionPreviewMode relative={relative} />
+          <Can check={[PERMISSIONS.profile.maritalStatus.view]}>
+            <MaritalStatusRelativesSectionPreviewMode relative={relative} />
+          </Can>
         }
-        editMode={<MaritalStatusRelativesSectionEditMode relative={relative} />}
+        editMode={
+          <Can check={[PERMISSIONS.profile.maritalStatus.update]}>
+            <MaritalStatusRelativesSectionEditMode relative={relative} />
+          </Can>
+        }
         settingsBtn={{
           items: [
             {

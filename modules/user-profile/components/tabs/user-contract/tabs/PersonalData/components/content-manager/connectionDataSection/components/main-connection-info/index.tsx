@@ -2,6 +2,8 @@ import MainUserConnectionInfoSectionPreview from "./preview-mode/MainUserConnect
 import MainUserConnectionInfoSectionEdit from "./edit-mode";
 import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function MainUserConnectionInfoSection() {
   // declare and define component state and vars
@@ -12,8 +14,16 @@ export default function MainUserConnectionInfoSection() {
     <TabTemplate
       title={"بيانات الاتصال"}
       loading={userContactDataLoading}
-      reviewMode={<MainUserConnectionInfoSectionPreview />}
-      editMode={<MainUserConnectionInfoSectionEdit />}
+      reviewMode={
+        <Can check={[PERMISSIONS.profile.contactInfo.view]}>
+          <MainUserConnectionInfoSectionPreview />
+        </Can>
+      }
+      editMode={
+        <Can check={[PERMISSIONS.profile.contactInfo.update]}>
+          <MainUserConnectionInfoSectionEdit />
+        </Can>
+      }
       onChangeMode={() => {
         handleRefetchUserContactData();
       }}
