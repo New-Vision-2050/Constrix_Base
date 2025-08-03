@@ -30,49 +30,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   mainLogo?: string;
 }
 
-function mergeProjectsAndMenu(
-  projects: Project[],
-  menu: Menu[],
-  isSuperAdmin?: boolean
-): Project[] {
-  const formatted: Project[] = projects.map((project) => {
-    // check is setting project
-    if (project.slug === SUPER_ENTITY_SLUG.SETTINGS) {
-      if (!isSuperAdmin) {
-        return project;
-      }
-    }
-    const matchedMenu = menu.find((menuItem) => menuItem.slug === project.slug);
-
-    if (!matchedMenu) return project;
-
-    // Extract all menu fields except sub_entities
-    const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
-
-    // Transform MenuSubEntity to Entity by adding the show property
-    const transformedMenuSubEntities =
-      menuSubEntities?.map(
-        (menuSubEntity): Entity => ({
-          name: menuSubEntity.name,
-          icon: menuSubEntity.icon,
-          slug: menuSubEntity.slug,
-          origin_super_entity: menuSubEntity.origin_super_entity,
-          show: true, // Default to true, you can add custom logic here if needed
-        })
-      ) || [];
-
-    return {
-      ...project,
-      ...restMenuProps,
-      sub_entities: [
-        ...(project.sub_entities || []),
-        ...transformedMenuSubEntities,
-      ],
-    };
-  });
-  return formatted;
-}
-
 export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const { menu, isLoading } = useSidebarMenu();
   const locale = useLocale();
@@ -81,12 +38,60 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const path = usePathname();
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
-    { can, isCentralCompany, isSuperAdmin } = p;
+    { can, isCentralCompany, isSuperAdmin, permissions } = p;
   console.log("permissions ", p);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
+  const mergeProjectsAndMenu = React.useCallback(
+    function (
+      projects: Project[],
+      menu: Menu[],
+      isSuperAdmin?: boolean
+    ): Project[] {
+      const formatted: Project[] = projects.map((project) => {
+        // check is setting project
+        if (project.slug === SUPER_ENTITY_SLUG.SETTINGS) {
+          if (!isSuperAdmin) {
+            return project;
+          }
+        }
+        const matchedMenu = menu.find(
+          (menuItem) => menuItem.slug === project.slug
+        );
 
+        if (!matchedMenu) return project;
+
+        // Extract all menu fields except sub_entities
+        const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
+
+        // Transform MenuSubEntity to Entity by adding the show property
+        const transformedMenuSubEntities =
+          menuSubEntities?.map(
+            (menuSubEntity): Entity => ({
+              name: menuSubEntity.name,
+              icon: menuSubEntity.icon,
+              slug: menuSubEntity.slug,
+              origin_super_entity: menuSubEntity.origin_super_entity,
+              show: permissions.some((permission) =>
+                permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+              ), // Default to true, you can add custom logic here if needed
+            })
+          ) || [];
+
+        return {
+          ...project,
+          ...restMenuProps,
+          sub_entities: [
+            ...(project.sub_entities || []),
+            ...transformedMenuSubEntities,
+          ],
+        };
+      });
+      return formatted;
+    },
+    [menu, can]
+  );
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
     // grouped routes in sidebar

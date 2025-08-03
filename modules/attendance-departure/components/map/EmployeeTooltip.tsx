@@ -61,6 +61,8 @@ const EmployeeTooltip: React.FC<EmployeeTooltipProps> = ({ employee }) => {
             </span>
             <time className="font-mono text-sm">
               {employee.latest_location.timestamp.split(' ')[0]}
+              <br />
+              {employee.latest_location.timestamp.split(' ')[1]}
             </time>
           </div>
         </div>

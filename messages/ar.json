@@ -705,6 +705,7 @@
       "cancelButtonText": "إلغاء",
       "form": {
         "title": "إضافة محدد جديد",
+        "editTitle": "تعديل محدد",
         "basicInfo": "المعلومات الأساسية",
         "determinantName": "اسم المحدد",
         "determinantNamePlaceholder": "فرع القاهرة",

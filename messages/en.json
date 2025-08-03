@@ -690,6 +690,7 @@
       "cancelButtonText": "Cancel",
       "form": {
         "title": "Add New Determinant",
+        "editTitle": "Edit Determinant",
         "basicInfo": "Basic Information",
         "determinantName": "Determinant Name",
         "determinantNamePlaceholder": "Cairo Branch",
