@@ -2,6 +2,8 @@ import UserIqamaWorkLicenseDataPreviewMode from "./preview-mode";
 import UserIqamaWorkLicenseDataEditMode from "./edit-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function UserIqamaWorkLicenseData() {
   // declare and define component state and vars
@@ -12,8 +14,16 @@ export default function UserIqamaWorkLicenseData() {
     <TabTemplate
       title={"بيانات رخصة العمل"}
       loading={userIdentityDataLoading}
-      reviewMode={<UserIqamaWorkLicenseDataPreviewMode />}
-      editMode={<UserIqamaWorkLicenseDataEditMode />}
+      reviewMode={
+        <Can check={[PERMISSIONS.profile.workLicense.view]}>
+          <UserIqamaWorkLicenseDataPreviewMode />
+        </Can>
+      }
+      editMode={
+        <Can check={[PERMISSIONS.profile.workLicense.update]}>
+          <UserIqamaWorkLicenseDataEditMode />
+        </Can>
+      }
       onChangeMode={() => {
         handleRefreshIdentityData();
       }}
