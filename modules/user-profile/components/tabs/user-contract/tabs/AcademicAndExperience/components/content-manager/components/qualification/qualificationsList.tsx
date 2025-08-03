@@ -4,6 +4,8 @@ import { Qualification } from "@/modules/user-profile/types/qualification";
 import SingleQualificationData from "./SingleQualificationData";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = {
   items: Qualification[] | undefined;
@@ -26,11 +28,13 @@ export default function QualificationsList({ items }: PropsT) {
       {userQualificationsLoading ? (
         <TabTemplateListLoading />
       ) : (
-        <RegularList<Qualification, "qualification">
-          sourceName="qualification"
-          ItemComponent={SingleQualificationData}
-          items={items ?? []}
-        />
+        <Can check={[PERMISSIONS.profile.qualification.view]}>
+          <RegularList<Qualification, "qualification">
+            sourceName="qualification"
+            ItemComponent={SingleQualificationData}
+            items={items ?? []}
+          />
+        </Can>
       )}
     </>
   );

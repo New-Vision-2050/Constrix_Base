@@ -5,6 +5,8 @@ import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useState } from "react";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = { experience: Experience };
 
@@ -13,14 +15,21 @@ export default function SingleExperience({ experience }: PropsT) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
 
-
   // return component ui
   return (
     <>
       <TabTemplate
         title={experience?.job_name ?? ""}
-        reviewMode={<SingleExperiencePreviewMode experience={experience} />}
-        editMode={<SingleExperienceEditMode experience={experience} />}
+        reviewMode={
+          <Can check={[PERMISSIONS.profile.experience.view]}>
+            <SingleExperiencePreviewMode experience={experience} />
+          </Can>
+        }
+        editMode={
+          <Can check={[PERMISSIONS.profile.experience.update]}>
+            <SingleExperienceEditMode experience={experience} />
+          </Can>
+        }
         settingsBtn={{
           items: [
             {
@@ -32,7 +41,7 @@ export default function SingleExperience({ experience }: PropsT) {
           ],
         }}
       />
-      
+
       <DeleteConfirmationDialog
         deleteUrl={`/user_experiences/${experience?.id}`}
         onClose={() => setDeleteDialog(false)}
