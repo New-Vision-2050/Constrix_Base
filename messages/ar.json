@@ -539,6 +539,7 @@
         "inactive": "غير نشط"
       },
       "employeeDetails": {
+        "unspecified": "غير محدد",
         "attendanceHistory": "سجل الحضور",
         "present": "حاضر",
         "absent": "غائب",

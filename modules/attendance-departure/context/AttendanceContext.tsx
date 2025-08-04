@@ -298,7 +298,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   
   // Function to open the attendance status dialog
   const openAttendanceStatusDialog = useCallback((record: AttendanceStatusRecord) => {
-    fetchConstraintDetails(record.attendance_constraint_id);
+    fetchConstraintDetails(record.id);
     setAttendanceStatusDialogOpen(true);
   }, []);
   

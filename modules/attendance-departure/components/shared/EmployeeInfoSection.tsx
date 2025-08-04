@@ -115,7 +115,7 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
         </div>
         <div className={textColor}>
           {t("approver")} :
-          {record?.professional_data?.attendance_constraint?.constraint_name ? (
+          {record?.attendance_constraint?.constraint_name ? (
             <span
               className={`cursor-pointer hover:underline text-blue-500 ${
                 isDarkMode ? "hover:text-blue-400" : "hover:text-blue-600"
@@ -123,7 +123,7 @@ const EmployeeInfoSection: React.FC<EmployeeInfoSectionProps> = ({
               onClick={handleApproverClick}
               title={t("clickToViewApproverDetails")}
             >
-              {record.professional_data.attendance_constraint.constraint_name}
+              {record?.attendance_constraint?.constraint_name}
             </span>
           ) : (
             "-"

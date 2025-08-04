@@ -234,6 +234,7 @@ type AppliedConstraint = {
 
 // Attendance status record interface for attendance tables and dialogs
 export interface AttendanceStatusRecord {
+  id: string;
   attendance_constraint_id: string;
   applied_constraints: AppliedConstraint[];
   approved_at: string;
@@ -241,6 +242,7 @@ export interface AttendanceStatusRecord {
   approved_by_user: string;
   break_duration_formatted: string;
   breaks: [];
+  attendance_constraint: AttendanceConstraint;
   professional_data: ProfessionalData;
   latest_location: { latitude: number; longitude: number };
   clock_in_time: string;
