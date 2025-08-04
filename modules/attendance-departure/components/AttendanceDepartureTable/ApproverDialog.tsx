@@ -18,7 +18,8 @@ const ApproverDialog: React.FC = () => {
   } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table.dialogs.approver");
 
-  const isAbsent = Boolean(currentRecord?.is_absent);
+  const isAbsent =
+    Boolean(currentRecord?.is_absent) || Boolean(currentRecord?.is_holiday);
 
   const formatTimeWithArabicAMPM = (dateTimeString: string | null) => {
     if (!dateTimeString) return t("unspecified");
@@ -88,7 +89,7 @@ const ApproverDialog: React.FC = () => {
   if (!attendanceHistoryPayload || attendanceHistoryPayload.length === 0)
     return null;
 
-  console.log('currentRecord', currentRecord)
+  console.log("currentRecord", currentRecord);
 
   return (
     <DialogContainer
@@ -96,16 +97,17 @@ const ApproverDialog: React.FC = () => {
       onClose={closeApproverDialog}
       title={t("title")}
     >
-      <EmployeeInfoSection record={currentRecord} currentDialogName="approverDialog" />
+      <EmployeeInfoSection
+        record={currentRecord}
+        currentDialogName="approverDialog"
+      />
       {isAbsent ? (
         <div className="flex justify-center items-center my-12">
           <div className="text-center py-8 px-6 bg-destructive/10 rounded-lg border border-destructive">
             <h3 className="text-xl font-bold text-destructive mb-1">
               {t("noRecords")}
             </h3>
-            <p className="text-muted-foreground">
-              {t("noRecordsMessage")}
-            </p>
+            <p className="text-muted-foreground">{t("noRecordsMessage")}</p>
           </div>
         </div>
       ) : attendanceHistoryLoading ? (
@@ -173,29 +175,33 @@ const ApproverDialog: React.FC = () => {
                             </div>
                           )
                         )}
-                        
+
                         {/* Period Summary - Calculate and display total hours for this period */}
                         {(() => {
                           // Calculate total attendance and departure hours for this period
                           let periodTotalWorkHours = 0;
                           let periodTotalDelayMinutes = 0;
-                          
+
                           // Process records to calculate totals
-                          (records as AttendanceHistoryRecord[]).forEach((record) => {
-                            // Use total_work_hours directly from the record
-                            if (record.total_work_hours) {
-                              periodTotalWorkHours += +record.total_work_hours;
+                          (records as AttendanceHistoryRecord[]).forEach(
+                            (record) => {
+                              // Use total_work_hours directly from the record
+                              if (record.total_work_hours) {
+                                periodTotalWorkHours +=
+                                  +record.total_work_hours;
+                              }
+
+                              // Use late_minutes directly from the record
+                              if (record.late_minutes) {
+                                periodTotalDelayMinutes += +record.late_minutes;
+                              }
                             }
-                            
-                            // Use late_minutes directly from the record
-                            if (record.late_minutes) {
-                              periodTotalDelayMinutes += +record.late_minutes;
-                            }
-                          });
-                          
+                          );
+
                           // Convert delay minutes to hours for display
-                          const periodTotalDelayHours = (periodTotalDelayMinutes / 60);
-                          
+                          const periodTotalDelayHours =
+                            periodTotalDelayMinutes / 60;
+
                           return (
                             <div className="mt-4 pt-4 border-t border-border">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -208,7 +214,7 @@ const ApproverDialog: React.FC = () => {
                                     {periodTotalWorkHours.toFixed(2)}
                                   </span>
                                 </div>
-                                
+
                                 {/* Period Total Delay Hours */}
                                 <div className="relative border border-border rounded-md px-3 py-2 text-center bg-background">
                                   <span className="absolute -top-2 right-4 transform bg-background px-2 text-xs text-muted-foreground font-semibold">

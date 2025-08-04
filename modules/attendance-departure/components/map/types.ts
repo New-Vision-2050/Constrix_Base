@@ -27,6 +27,10 @@ export interface MapEmployee {
   attendance_id: string;
   user: MapEmployeeUser;
   clock_in_time: string;
+  is_absent: number;
+  is_holiday: number;
+  is_late: number;
+  status: string;
   latest_location: MapLocation;
   tracking_path: MapLocation[];
 }

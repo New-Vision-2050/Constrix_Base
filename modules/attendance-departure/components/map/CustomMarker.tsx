@@ -9,12 +9,14 @@ import { EmployeeDetails } from "../../types/employee";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 
-const getMarkerIcon = (
-  employee: MapEmployee,
-  isDarkMode: boolean = true
-) => {
+const getMarkerIcon = (employee: MapEmployee, isDarkMode: boolean = true) => {
   // We use a default status for displaying employees (can be modified later when status fields are available)
   let _status = "present";
+  if (employee.is_absent) _status = "absent";
+  else if (employee.is_late) _status = "late";
+  else if (employee.is_holiday) _status = "holiday";
+  else if (employee.status === "active" || employee.status === "completed")
+    _status = "present";
   const colorMap: { [key: string]: string } = {
     present: "#28a745", // green
     late: "#ffc107", // orange
@@ -59,9 +61,10 @@ interface CustomMarkerProps {
   index: number;
 }
 
-const CustomMarker: React.FC<CustomMarkerProps> = ({ employee,index }) => {
+const CustomMarker: React.FC<CustomMarkerProps> = ({ employee, index }) => {
   // Use attendance context to open employee dialog
-  const { openEmployeeDialog ,attendanceHistory ,fetchAttendanceHistory } = useAttendance();
+  const { openEmployeeDialog, attendanceHistory, fetchAttendanceHistory } =
+    useAttendance();
   const t = useTranslations("attendanceDeparture.status");
 
   // Get current theme
