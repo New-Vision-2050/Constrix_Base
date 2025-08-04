@@ -21,6 +21,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from "@/components/ui/skeleton";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const OfficialDocsSection = ({
   id,
@@ -126,4 +128,4 @@ const OfficialDocsSection = ({
   );
 };
 
-export default OfficialDocsSection;
+export default withPermissions(OfficialDocsSection, [PERMISSIONS.companyProfile.officialDocument.view]) ;

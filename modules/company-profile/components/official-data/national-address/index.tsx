@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from "@/components/ui/skeleton";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const NationalAddress = ({
   id,
@@ -102,4 +104,4 @@ const NationalAddress = ({
   );
 };
 
-export default NationalAddress;
+export default withPermissions(NationalAddress, [PERMISSIONS.companyProfile.address.view]);
