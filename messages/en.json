@@ -527,6 +527,7 @@
         "inactive": "Inactive"
       },
       "employeeDetails": {
+        "unspecified": "Unspecified",
         "attendanceHistory": "Attendance History",
         "present": "Present",
         "absent": "Absent",
