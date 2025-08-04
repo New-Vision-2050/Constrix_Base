@@ -38,7 +38,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const path = usePathname();
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
-    { can, isCentralCompany, isSuperAdmin, permissions } = p;
+    { can, isCentralCompany, isSuperAdmin } = p;
   console.log("permissions ", p);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
@@ -73,8 +73,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
               icon: menuSubEntity.icon,
               slug: menuSubEntity.slug,
               origin_super_entity: menuSubEntity.origin_super_entity,
-              show: permissions.some((permission) =>
-                permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+              show: can((permissions) =>
+                permissions.some((permission) =>
+                  permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+                )
               ), // Default to true, you can add custom logic here if needed
             })
           ) || [];
