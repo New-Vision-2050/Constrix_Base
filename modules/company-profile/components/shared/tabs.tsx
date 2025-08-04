@@ -12,7 +12,7 @@ export const CompanyProfile: Tab[] = [
     icon: <User size={18} />,
     value: "official-data",
     component: (
-      <Can check={[PERMISSIONS.companyProfile.officialData.prefix]}>
+      <Can check={[PERMISSIONS.companyProfile.officialData.view]}>
         <OfficialData />
       </Can>
     ),

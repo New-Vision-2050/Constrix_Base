@@ -22,6 +22,8 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from '@/components/ui/skeleton';
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const LegalDataSection = ({
   currentCompanyId,
@@ -151,4 +153,4 @@ const LegalDataSection = ({
   );
 };
 
-export default LegalDataSection;
+export default withPermissions(LegalDataSection, [PERMISSIONS.companyProfile.legalData.view]);
