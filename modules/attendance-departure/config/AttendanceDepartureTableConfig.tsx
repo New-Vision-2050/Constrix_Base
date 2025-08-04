@@ -9,7 +9,7 @@ import { UN_SPECIFIED } from "../constants/static-data";
 
 // Configuration function for the attendance departure table
 export const getAttendanceDepartureTableConfig = (t: (key: string) => string,companyCreatedAt: Date) => {
-  console.log('companyCreatedAt',companyCreatedAt)
+  
   return {
     url: `${baseURL}/attendance/team`,
     tableId: "attendance-departure-table",

@@ -7,6 +7,8 @@ import { useAttendance } from "../../context/AttendanceContext";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useTranslations } from "next-intl";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const AttendanceDepartureTable: React.FC = () => {
   // declare state & vars
@@ -59,9 +61,11 @@ const AttendanceDepartureTable: React.FC = () => {
       <TableBuilder
         config={getAttendanceDepartureTableConfig(t,companyCreatedAt)}
         searchBarActions={
-          <div className="flex items-center gap-3">
-            <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>
-          </div>
+          <Can check={[PERMISSIONS.EMPLOYEE_ATTENDANCE.view]}>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>
+            </div>
+          </Can>
         }
       />
     </div>

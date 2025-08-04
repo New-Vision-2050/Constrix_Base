@@ -10,6 +10,9 @@ import AttendanceStatusDialog from "./components/AttendanceDepartureTable/Attend
 import ApproverDialog from "./components/AttendanceDepartureTable/ApproverDialog";
 import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
 import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 // Internal component that uses the context
 function AttendanceContent() {
@@ -18,43 +21,45 @@ function AttendanceContent() {
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      {/* Date selector */}
-      {/* {view === "map" && <AttendanceDateSelector />} */}
+      <Can check={[PERMISSIONS.EMPLOYEE_ATTENDANCE.view]}>
+        {/* Date selector */}
+        {/* {view === "map" && <AttendanceDateSelector />} */}
 
-      {/* Statistics cards */}
-      <AttendanceDepartureStatisticsCards />
+        {/* Statistics cards */}
+        <AttendanceDepartureStatisticsCards />
 
-      {/* Table or map */}
-      {view === "table" ? (
-        <AttendanceDepartureTable />
-      ) : (
-        <>
-          {/* Search filter */}
-          <AttendanceDepartureSearchFilter />
+        {/* Table or map */}
+        {view === "table" ? (
+          <AttendanceDepartureTable />
+        ) : (
+          <>
+            {/* Search filter */}
+            <AttendanceDepartureSearchFilter />
 
-          <MapSearchFilter />
-          <AttendanceMap />
-        </>
-      )}
+            <MapSearchFilter />
+            <AttendanceMap />
+          </>
+        )}
 
-      {/* Employee details sheet dialog */}
-      <EmployeeDetailsSheet
-        isOpen={isEmployeeDialogOpen}
-        onClose={closeEmployeeDialog}
-        employee={selectedEmployee}
-      />
+        {/* Employee details sheet dialog */}
+        <EmployeeDetailsSheet
+          isOpen={isEmployeeDialogOpen}
+          onClose={closeEmployeeDialog}
+          employee={selectedEmployee}
+        />
 
-      {/* Attendance status dialog */}
-      <AttendanceStatusDialog />
+        {/* Attendance status dialog */}
+        <AttendanceStatusDialog />
 
-      {/* Approver dialog */}
-      <ApproverDialog />
+        {/* Approver dialog */}
+        <ApproverDialog />
+      </Can>
     </div>
   );
 }
 
 // Main component that provides the context
-export default function AttendanceDepartureIndex() {
+function AttendanceDepartureIndex() {
   return (
     <AttendanceProvider>
       <div className="flex flex-col gap-4 container px-6">
@@ -63,3 +68,7 @@ export default function AttendanceDepartureIndex() {
     </AttendanceProvider>
   );
 }
+
+export default withPermissions(AttendanceDepartureIndex, [
+  PERMISSIONS.EMPLOYEE_ATTENDANCE.view,
+]);

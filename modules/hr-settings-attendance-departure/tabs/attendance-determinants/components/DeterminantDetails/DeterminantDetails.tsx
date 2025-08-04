@@ -3,6 +3,8 @@ import { Check, MoreVertical } from "lucide-react";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface DeterminantDetailsProps {
   constraint: Constraint;
@@ -16,6 +18,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
   constraint,
   onEdit,
 }) => {
+  const { can } = usePermissions();
   // State for dropdown visibility
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -116,20 +119,23 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
           >
             <MoreVertical size={20} className={iconColor} />
           </button>
-          {showDropdown && (
-            <div
-              className={`absolute left-0 mt-2 w-32 ${dropdownBg} rounded-md shadow-lg z-20 border ${
-                isDarkMode ? "border-gray-700" : "border-gray-200"
-              }`}
-            >
-              <button
-                onClick={() => handleEdit()}
-                className={`w-full text-right px-4 py-2 text-sm ${dropdownText} ${dropdownHover} rounded-md`}
+          {showDropdown &&
+            can(
+              Object.values(PERMISSIONS.EMPLOYEE_ATTENDANCE_CONSTRAINTS.update)
+            ) && (
+              <div
+                className={`absolute left-0 mt-2 w-32 ${dropdownBg} rounded-md shadow-lg z-20 border ${
+                  isDarkMode ? "border-gray-700" : "border-gray-200"
+                }`}
               >
-                تعديل
-              </button>
-            </div>
-          )}
+                <button
+                  onClick={() => handleEdit()}
+                  className={`w-full text-right px-4 py-2 text-sm ${dropdownText} ${dropdownHover} rounded-md`}
+                >
+                  تعديل
+                </button>
+              </div>
+            )}
         </div>
       </div>
 

@@ -60,4 +60,8 @@ export const PERMISSIONS = {
   country: create("COUNTRY"),
   driver: create("DRIVER"),
   identifier: create("IDENTIFIER"),
+
+  // Attendance
+  EMPLOYEE_ATTENDANCE: create("EMPLOYEE_ATTENDANCE"),
+  EMPLOYEE_ATTENDANCE_CONSTRAINTS: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
 };
