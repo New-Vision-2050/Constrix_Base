@@ -2,6 +2,8 @@ import UserProfilePassportDataReview from "./preview-mode";
 import UserProfilePassportDataEditForm from "./edit-mode";
 import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function PassportDataSectionPersonalForm() {
   // declare and define component state and vars
@@ -12,8 +14,16 @@ export default function PassportDataSectionPersonalForm() {
     <TabTemplate
       title="البيانات جواز السفر"
       loading={userIdentityDataLoading}
-      reviewMode={<UserProfilePassportDataReview />}
-      editMode={<UserProfilePassportDataEditForm />}
+      reviewMode={
+        <Can check={[PERMISSIONS.profile.passportInfo.view]}>
+          <UserProfilePassportDataReview />
+        </Can>
+      }
+      editMode={
+        <Can check={[PERMISSIONS.profile.passportInfo.update]}>
+          <UserProfilePassportDataEditForm />
+        </Can>
+      }
       onChangeMode={() => {
         handleRefreshIdentityData();
       }}

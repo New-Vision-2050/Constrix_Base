@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { DropdownItemT } from "@/components/shared/IconBtnDropdown";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = { bank: BankAccount };
 
@@ -32,7 +34,7 @@ export default function BankSection({ bank }: PropsT) {
             title: "حذف البنك",
             onClick: () => {
               if (bankAccounts.length === 1) handleOpen();
-              else setOpenDeleteDialog(true)
+              else setOpenDeleteDialog(true);
             },
           },
         ];
@@ -86,8 +88,16 @@ export default function BankSection({ bank }: PropsT) {
     <>
       <TabTemplate
         title={bank?.bank_name ?? "Bank Account"}
-        reviewMode={<UserProfileBankingDataReview bank={bank} />}
-        editMode={<BankingDataSectionEditMode bank={bank} />}
+        reviewMode={
+          <Can check={[PERMISSIONS.profile.bankInfo.view]}>
+            <UserProfileBankingDataReview bank={bank} />
+          </Can>
+        }
+        editMode={
+          <Can check={[PERMISSIONS.profile.bankInfo.update]}>
+            <BankingDataSectionEditMode bank={bank} />
+          </Can>
+        }
         settingsBtn={{
           items: menuItems,
         }}
