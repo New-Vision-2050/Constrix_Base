@@ -47,7 +47,7 @@ export default function MainLayout({
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
-        className="h-full w-full absolute -z-20"
+        className="h-screen w-full fixed top-0 left-0 -z-20"
         particleColor={isLight ? "#18003A" : "#ffffff"}
       />{" "}
       <SidebarProvider>
