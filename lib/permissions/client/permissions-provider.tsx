@@ -30,9 +30,7 @@ function PermissionsProvider({
   isSuperAdmin?: boolean;
   isCentralCompany?: boolean;
 }>) {
-  const can = createCan(
-    isSuperAdmin && isCentralCompany ? "bypass" : permissions || []
-  );
+  const can = createCan(isSuperAdmin ? "bypass" : permissions || []);
   const strictCan = createCan(permissions || []);
   return (
     <PermissionsContext.Provider
