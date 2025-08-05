@@ -220,10 +220,61 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
 
   const handleSwitchChange = useCallback((switchId: string, checked: boolean, permissionId?: string) => {
 
-    setSwitchStates(prev => ({
-      ...prev,
-      [switchId]: checked
-    }));
+    setSwitchStates(prev => {
+      const newSwitchStates = {
+        ...prev,
+        [switchId]: checked
+      };
+      
+      // Extract category info from switchId (format: subKey-categoryKey-type)
+      const switchParts = switchId.split('-');
+      if (switchParts.length >= 3) {
+        const subKey = switchParts[0];
+        const categoryKey = switchParts[1];
+        
+        // Find all permissions in this category to check their switch states
+        if (permissions) {
+          Object.entries(permissions).forEach(([mainKey, mainData]) => {
+            if (mainData[subKey]?.[categoryKey]) {
+              const categoryData = mainData[subKey][categoryKey];
+              if (Array.isArray(categoryData)) {
+                // Get all unique permission types in this category
+                const availableTypes = [...new Set(categoryData.map(item => item.type))];
+                
+                // Check if ALL switches in this category are active
+                const allSwitchesActive = availableTypes.every(type => {
+                  const checkSwitchId = `${subKey}-${categoryKey}-${type}`;
+                  return newSwitchStates[checkSwitchId] === true;
+                });
+                
+                // Update checkbox state based on switch states
+                if (allSwitchesActive) {
+                  // If all switches are active, check all permissions in this category
+                  categoryData.forEach(item => {
+                    setSelectedPermissions(prev => {
+                      const newSelected = new Set(prev);
+                      newSelected.add(item.id);
+                      return newSelected;
+                    });
+                  });
+                } else {
+                  // If not all switches are active, uncheck all permissions in this category
+                  categoryData.forEach(item => {
+                    setSelectedPermissions(prev => {
+                      const newSelected = new Set(prev);
+                      newSelected.delete(item.id);
+                      return newSelected;
+                    });
+                  });
+                }
+              }
+            }
+          });
+        }
+      }
+      
+      return newSwitchStates;
+    });
     
     const activeStateKey = generateActiveStateKey(switchId);
     
@@ -233,7 +284,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
         [activeStateKey]: checked
       }));
     }
-  }, [generateActiveStateKey]);
+  }, [generateActiveStateKey, permissions]);
   
   const handleNumberChange = useCallback((permissionId: string, value: number) => {
     // Validate the input value
@@ -257,7 +308,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   }, []);
 
 
-  // Function to get all currently active permission IDs for nested structure
+  // Function to get permission IDs only where switches are active
   const getAllActivePermissionIds = (): string[] => {
     const activeIds: string[] = [];
     
@@ -267,6 +318,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
           Object.entries(subData).forEach(([categoryKey, categoryData]) => {
             if (Array.isArray(categoryData)) {
               categoryData.forEach((item: PermissionWithStatus) => {
+                // Only collect permission IDs where switches are active
                 const switchId = `${subKey}-${categoryKey}-${item.type}`;
                 if (switchStates[switchId]) {
                   activeIds.push(item.id);
@@ -278,6 +330,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       });
     }
     
+    // Return empty array if no switches are active
     return activeIds;
   };
 
