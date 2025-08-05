@@ -144,6 +144,6 @@ export const CompaniesConfig = () => {
       canEdit: false,
       canDelete: true,
     },
-    deleteConfirmMessage: t("DeleteConfirmMessage"),
+    deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };
 };

@@ -135,8 +135,6 @@ const Execution = ({
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
 
-  console.log("actionState", actionState);
-
   const handleMenuItemClick = (
     action: string | ((row: { id: string; [key: string]: unknown }) => void)
   ) => {
