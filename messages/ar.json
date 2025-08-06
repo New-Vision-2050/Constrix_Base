@@ -1,4 +1,8 @@
 {
+  "common": {
+    "itemsPerPage": "عناصر في الصفحة",
+    "selectItemsPerPage": "اختر عدد العناصر في الصفحة"
+  },
   "location": {
     "longitude": "خط الطول",
     "latitude": "خط العرض",

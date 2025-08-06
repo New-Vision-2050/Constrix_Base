@@ -1,4 +1,8 @@
 {
+  "common": {
+    "itemsPerPage": "Items per page",
+    "selectItemsPerPage": "Select items per page"
+  },
   "location": {
     "longitude": "Longitude",
     "latitude": "Latitude",
