@@ -312,7 +312,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
   const getAllActivePermissionIds = (): string[] => {
     const activeIds: string[] = [];
     
-    if (permissions && packagePermissions?.payload.permissions) {
+    if (permissions) {
       Object.entries(permissions).forEach(([mainKey, mainData]) => {
         Object.entries(mainData).forEach(([subKey, subData]) => {
           Object.entries(subData).forEach(([categoryKey, categoryData]) => {
@@ -341,11 +341,7 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
       // Get all currently active permission IDs
       const activePermissionIds = getAllActivePermissionIds();
       
-      if (activePermissionIds.length === 0) {
-        toast.warning('No permissions selected');
-        setSubmitting(false);
-        return;
-      }
+      // Allow empty array to be sent to API to clear all permissions
 
       // Create limits array with permission_id and number for nested structure
       const limits: Array<{ permission_id: string; number: number }> = [];
@@ -357,13 +353,13 @@ function PermissionsBouquet({ packageId }: PermissionsBouquetProps) {
             Object.entries(subData).forEach(([categoryKey, categoryData]) => {
               if (Array.isArray(categoryData)) {
                 // Find the view permission for this category (as per memory requirements)
-                const viewItem = categoryData.find(item => item.type === 'view');
+                const createItem = categoryData.find(item => item.type === 'create');
                 const numberKey = `${subKey}-${categoryKey}`;
                 
                 // If view permission exists and has a number value, add to limits
-                if (viewItem && numberValues[numberKey] !== undefined && numberValues[numberKey] > 0) {
+                if (createItem && numberValues[numberKey] !== undefined && numberValues[numberKey] > 0) {
                   limits.push({
-                    permission_id: viewItem.id,
+                    permission_id: createItem.id,
                     number: numberValues[numberKey]
                   });
                 }
