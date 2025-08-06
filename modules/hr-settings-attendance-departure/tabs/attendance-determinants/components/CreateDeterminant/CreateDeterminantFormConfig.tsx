@@ -69,7 +69,6 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
   //latitude - longitude
   const latitude = editConstraint?.branch_locations?.[0]?.latitude;
   const longitude = editConstraint?.branch_locations?.[0]?.longitude;
-
   // is branch location empty
   const isBranchLocationEmpty = latitude == 0 && longitude == 0;
 
@@ -80,6 +79,12 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
     : Boolean(editConstraint?.config?.default_location)
     ? "main"
     : "custom";
+
+  // ------------- set default branch ids -------------
+  const _branch_ids =
+    editConstraint?.branch_locations?.map(
+      (branch: { branch_id: string | number }) => Number(branch.branch_id)
+    ) ?? [];
 
   // ------------- return form config -------------
   return {
@@ -100,10 +105,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
       out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
-      branch_ids:
-        editConstraint?.branch_locations?.map(
-          (branch: { branch_id: string | number }) => Number(branch.branch_id)
-        ) ?? [],
+      branch_ids: _branch_ids,
       location_type: _location_type,
       weekly_schedule: Object.entries(
         (editConstraint?.config?.time_rules
@@ -242,6 +244,17 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 label: getText("form.customLocation", "موقع مخصص لكل فرع"),
               },
             ],
+            onChange: (value) => {
+              if (value === "main" && isBranchLocationEmpty) {
+                useFormStore
+                  ?.getState()
+                  .setValue(
+                    "create-determinant-form",
+                    "show_location_dialog",
+                    true
+                  );
+              }
+            },
             defaultValue: "main",
             required: true,
             validation: [
@@ -290,7 +303,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 .getValues("create-determinant-form").show_location_dialog;
 
               const showDialog =
-                location_type === "custom" && show_location_dialog !== false;
+                (location_type === "custom" &&
+                  show_location_dialog !== false) ||
+                (location_type === "main" &&
+                  isBranchLocationEmpty &&
+                  show_location_dialog !== false);
 
               return (
                 <LocationDialog
@@ -654,7 +671,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 latitude: branchData?.latitude || 0,
                 longitude: branchData?.longitude || 0,
                 address: branchData?.address || "",
-                radius: "100",
+                radius: "1000",
                 isDefault: false,
               };
             })

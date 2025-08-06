@@ -58,7 +58,7 @@ export default function CoordinatesInput({
           value={parseInt(radius || '0', 10) || 0}
           onChange={(e) => onRadiusChange(e.target.value)}
           className={inputClasses}
-          placeholder="100"
+          placeholder="1000"
           min="0"
         />
       </div>
