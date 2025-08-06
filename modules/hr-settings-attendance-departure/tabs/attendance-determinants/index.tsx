@@ -73,17 +73,13 @@ function AttendanceDeterminantsTabContent() {
             <TabHeader title="" />
             {!Boolean(activeConstraint) ? (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className="flex flex-row items-center justify-between flex-wrap">
                   {constraintsData?.map((determinant) => (
-                    <div
+                    <DeterminantDetails
                       key={determinant.id}
-                      className="cursor-pointer transition-transform hover:scale-[1.02] min-[390px]"
-                    >
-                      <DeterminantDetails
-                        constraint={determinant}
-                        onEdit={handleEditConstraint}
-                      />
-                    </div>
+                      constraint={determinant}
+                      onEdit={handleEditConstraint}
+                    />
                   ))}
                 </div>
               </>
