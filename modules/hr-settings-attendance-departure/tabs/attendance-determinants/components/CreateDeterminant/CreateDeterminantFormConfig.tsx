@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
@@ -44,24 +44,44 @@ type PropsT = {
 };
 // Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
+  // Props
   const { refetchConstraints, t, editConstraint } = props;
 
-  // Función auxiliar para obtener textos traducidos o usar valores predeterminados
+  // Function to get text with default value
   const getText = (key: string, defaultText: string) => {
     return t ? t(key) : defaultText;
   };
 
+  // ------------- set default type attendance -------------
   const _type_attendance = [];
-
   if (Boolean(editConstraint?.config?.type_attendance?.location))
     _type_attendance.push("location");
   if (Boolean(editConstraint?.config?.type_attendance?.fingerprint))
     _type_attendance.push("fingerprint");
 
-  // Check if it's an edit mode
+  // ------------- set default title -------------
   const isEdit = Boolean(editConstraint);
-  const title = isEdit ? getText("form.editTitle", "تعديل محدد") : getText("form.title", "إضافة محدد جديد");
+  const title = isEdit
+    ? getText("form.editTitle", "تعديل محدد")
+    : getText("form.title", "إضافة محدد جديد");
 
+  // ------------- set default location type -------------
+  //latitude - longitude
+  const latitude = editConstraint?.branch_locations?.[0]?.latitude;
+  const longitude = editConstraint?.branch_locations?.[0]?.longitude;
+
+  // is branch location empty
+  const isBranchLocationEmpty = latitude == 0 && longitude == 0;
+
+  const _location_type = !editConstraint
+    ? "main"
+    : isBranchLocationEmpty
+    ? ""
+    : Boolean(editConstraint?.config?.default_location)
+    ? "main"
+    : "custom";
+
+  // ------------- return form config -------------
   return {
     formId: "create-determinant-form",
     title,
@@ -84,11 +104,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
         editConstraint?.branch_locations?.map(
           (branch: { branch_id: string | number }) => Number(branch.branch_id)
         ) ?? [],
-      location_type: !editConstraint
-        ? "main"
-        : Boolean(editConstraint?.config?.default_location)
-        ? "main"
-        : "custom",
+      location_type: _location_type,
       weekly_schedule: Object.entries(
         (editConstraint?.config?.time_rules
           ?.weekly_schedule as weeklyScheduleDays) || {}
@@ -125,10 +141,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "text",
             name: "constraint_name",
             label: getText("form.determinantName", "اسم المحدد"),
-            placeholder: getText(
-              "form.determinantName",
-              "اسم المحدد"
-            ),
+            placeholder: getText("form.determinantName", "اسم المحدد"),
             required: true,
             validation: [
               {
@@ -649,22 +662,21 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       } else {
         // If custom locations are selected, use the custom values
         // Handle both string and object formats for branch_locations
-        if (typeof formData.branch_locations === 'string') {
+        if (typeof formData.branch_locations === "string") {
           // Parse from string format (used when setting via location dialog)
-          branch_locations = JSON.parse(formData.branch_locations || '[]');
+          branch_locations = JSON.parse(formData.branch_locations || "[]");
         } else if (Array.isArray(formData.branch_locations)) {
           // Already in array format (common in edit mode)
           branch_locations = formData.branch_locations;
         } else {
           // Fallback to empty array
-          if(editConstraint?.branch_locations){
+          if (editConstraint?.branch_locations) {
             branch_locations = editConstraint?.branch_locations;
-          }else{
+          } else {
             branch_locations = [];
           }
         }
       }
-
 
       const data = {
         constraint_name: formData.constraint_name,
