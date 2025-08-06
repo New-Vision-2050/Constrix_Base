@@ -16,13 +16,13 @@ export const GetUserContractTabsList = (
   const showenTabs: string[] = [];
 
   // check permissions
-  if (can(Object.values(PERMISSIONS.profile.personalInfo.view)))
+  if (can(PERMISSIONS.profile.personalInfo.view))
     showenTabs.push("user-contract-tab-personal-data");
-  if (can(Object.values(PERMISSIONS.profile.education.view)))
+  if (can(PERMISSIONS.profile.education.view))
     showenTabs.push("user-contract-tab-academic-experience");
-  if (can(Object.values(PERMISSIONS.profile.employmentInfo.view)))
+  if (can(PERMISSIONS.profile.employmentInfo.view))
     showenTabs.push("user-contract-tab-job-contract");
-  if (can(Object.values(PERMISSIONS.profile.salaryInfo?.view)))
+  if (can(PERMISSIONS.profile.salaryInfo.view))
     showenTabs.push("user-contract-tab-financial");
 
   const tabs = [

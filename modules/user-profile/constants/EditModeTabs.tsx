@@ -18,14 +18,14 @@ export const useGetEditModeTabsList = (
       title: t("profile"),
       icon: <UserIcon />,
       content: <UserProfileTab />,
-      show: can(Object.values(PERMISSIONS.userProfile.data.view)),
+      show: can(PERMISSIONS.userProfile.data.view),
     },
     {
       id: "edit-mode-tabs-contract",
       title: t("contract"),
       icon: <Users />,
       content: <UserContractTab />,
-      show: can(Object.values(PERMISSIONS.userProfile.contact.view)),
+      show: can(PERMISSIONS.profile.contractWork.view),
     },
     {
       id: "edit-mode-tabs-attendance",

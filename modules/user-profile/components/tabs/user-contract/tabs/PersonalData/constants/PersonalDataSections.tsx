@@ -16,14 +16,14 @@ export const PersonalDataSections = (
   t: (key: string) => string
 ): UserProfileNestedTab[] => {
   // declare and define component state and vars
-  const shownTabs:string[] = [];
+  const shownTabs: string[] = [];
   const { can } = usePermissions();
 
-  if(can(Object.values(PERMISSIONS.profile.personalInfo.view)))
+  if (can(PERMISSIONS.profile.personalInfo.view))
     shownTabs.push("contract-tab-personal-data-section");
-  if(can(Object.values(PERMISSIONS.profile.bankInfo.view)))
+  if (can(PERMISSIONS.profile.bankInfo.view))
     shownTabs.push("contract-tab-banking-data-section");
-  if(can(Object.values(PERMISSIONS.profile.contactInfo.view)))
+  if (can(PERMISSIONS.profile.contactInfo.view))
     shownTabs.push("contract-tab-connect-data-section");
   // if(can(Object.values(PERMISSIONS.profile.identityInfo.view)))
   //   shownTabs.push("contract-tab-iqama-data-section");
