@@ -9,6 +9,15 @@ import { useConstraintsData } from "@/modules/hr-settings-attendance-departure/h
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import useBranchHierarchiesData from "@/modules/organizational-structure/components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure/hooks/useBranchHierarchiesData";
 import { useBranchiesData } from "../hooks/useBranchiesData";
+import { useConstraintsList } from "@/modules/hr-settings-attendance-departure/hooks/useConstraintsList";
+
+//
+type constraintsListType = {
+  payload: Constraint[];
+  pagination: {
+    last_page: number;
+  };
+};
 
 // Define the context interface
 interface AttendanceDeterminantsContextType {
@@ -22,6 +31,15 @@ interface AttendanceDeterminantsContextType {
   >;
   handleConstraintClick: (id: string) => void;
   refetchConstraints: () => void;
+  handlePageChange: (pageNumber: number) => void;
+  handleLimitChange: (limit: number) => void;
+  page: number;
+  limit: number;
+  // constraints list
+  constraintsList: constraintsListType| undefined;
+  constraintsListLoading: boolean;
+  constraintsListError: unknown;
+  refetchConstraintsList: () => void;
 }
 
 // Create the context with an initial value
@@ -33,20 +51,28 @@ const AttendanceDeterminantsContext = createContext<
 export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
+  const [limit, setLimit] = useState(2);
+  const [page, setPage] = useState(1);
   const {
     data: constraintsData,
     isLoading: constraintsLoading,
     error: constraintsError,
     refetch: refetchConstraints,
-  } = useConstraintsData();
+  } = useConstraintsData({});
+
+  const {
+    data: constraintsList,
+    isLoading: constraintsListLoading,
+    error: constraintsListError,
+    refetch: refetchConstraintsList,
+  } = useConstraintsList({ limit: limit, page: page });
 
   const { data: branchesData } = useBranchiesData();
-
 
   // refresh active constraint when data updated
   useEffect(() => {
     if (constraintsData && activeConstraint) {
-      const updatedConstraint = constraintsData.find(
+      const updatedConstraint = constraintsData.payload.find(
         (c) => c.id === activeConstraint.id
       );
       if (updatedConstraint) {
@@ -54,6 +80,16 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
       }
     }
   }, [constraintsData]);
+
+  // handle change page
+  const handlePageChange = (pageNumber: number) => {
+    setPage(pageNumber);
+  };
+
+  // handle change limit
+  const handleLimitChange = (limit: number) => {
+    setLimit(limit);
+  };
 
   // State for active constraint
   const [activeConstraint, setActiveConstraint] = useState<Constraint>();
@@ -68,7 +104,9 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 
     // Find and set the selected constraint
     if (constraintsData) {
-      const selectedConstraint = constraintsData.find((c) => c.id === id);
+      const selectedConstraint = constraintsData.payload.find(
+        (c) => c.id === id
+      );
       if (selectedConstraint) {
         setActiveConstraint(selectedConstraint);
       }
@@ -77,7 +115,7 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
 
   // Context value to export
   const contextValue: AttendanceDeterminantsContextType = {
-    constraintsData,
+    constraintsData: constraintsData?.payload,
     activeConstraint,
     constraintsLoading,
     constraintsError,
@@ -85,6 +123,15 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     setActiveConstraint,
     handleConstraintClick,
     refetchConstraints,
+    handlePageChange,
+    handleLimitChange,
+    page,
+    limit,
+    // constraints list
+    constraintsList,
+    constraintsListLoading,
+    constraintsListError,
+    refetchConstraintsList,
   };
 
   return (

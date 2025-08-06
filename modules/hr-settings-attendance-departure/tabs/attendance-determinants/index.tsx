@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   DeterminantDetails,
   AttendanceDeterminantsContent as ContentComponent,
@@ -13,6 +13,7 @@ import {
 import { AlertCircle, Loader2 } from "lucide-react";
 import { DeterminantSkeletonGrid } from "./components/DeterminantSkeleton";
 import { useTranslations } from "next-intl";
+import { Pagination } from "../../../../components/shared/Pagination";
 
 // Container component that uses the context
 function AttendanceDeterminantsTabContent() {
@@ -35,6 +36,14 @@ function AttendanceDeterminantsTabContent() {
     handleConstraintClick,
     branchesData,
     refetchConstraints,
+    handleLimitChange,
+    handlePageChange,
+    page,
+    limit,
+    // constraints list
+    constraintsList,
+    constraintsListLoading,
+    constraintsListError,
   } = useAttendanceDeterminants();
 
   // Function to handle editing a determinant
@@ -71,16 +80,35 @@ function AttendanceDeterminantsTabContent() {
           {/* Main content area */}
           <div className="px-4 py-2">
             <TabHeader title="" />
-            {!Boolean(activeConstraint) ? (
+            {constraintsListLoading ? (
+              <DeterminantSkeletonGrid count={2} />
+            ) : constraintsListError ? (
+              <div className="flex flex-col items-center justify-center h-full w-full">
+                <AlertCircle className="text-red-500" />
+                <p className="ml-2 text-red-500">{t("error.loading")}</p>
+                <p className="ml-2 text-red-500">{t("error.tryAgain")}</p>
+              </div>
+            ) : !Boolean(activeConstraint) ? (
               <>
                 <div className="flex flex-row items-center justify-between flex-wrap">
-                  {constraintsData?.map((determinant) => (
+                  {constraintsList?.payload?.map((determinant) => (
                     <DeterminantDetails
                       key={determinant.id}
                       constraint={determinant}
                       onEdit={handleEditConstraint}
                     />
                   ))}
+                </div>
+                {/* Pagination component */}
+                <div className="mt-8 flex justify-center w-full">
+                  <Pagination
+                    currentPage={page}
+                    totalPages={constraintsList?.pagination?.last_page ?? 1}
+                    onPageChange={handlePageChange}
+                    currentLimit={limit}
+                    limitOptions={[2, 5, 10, 25, 50]}
+                    onLimitChange={handleLimitChange}
+                  />
                 </div>
               </>
             ) : (
