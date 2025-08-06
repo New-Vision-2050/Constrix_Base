@@ -17,13 +17,15 @@ import { useTranslations } from "next-intl";
 // Container component that uses the context
 function AttendanceDeterminantsTabContent() {
   // Using translation function
-  const t = useTranslations("HRSettingsAttendanceDepartureModule.attendanceDeterminants");
-  
+  const t = useTranslations(
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants"
+  );
+
   // State to control the determinant being edited
   const [editingConstraint, setEditingConstraint] = useState<any>(null);
   // State to control form opening
   const [isFormOpen, setIsFormOpen] = useState(false);
-  
+
   // Using context to access states and functions
   const {
     constraintsData,
@@ -32,16 +34,15 @@ function AttendanceDeterminantsTabContent() {
     constraintsError,
     handleConstraintClick,
     branchesData,
-    refetchConstraints
+    refetchConstraints,
   } = useAttendanceDeterminants();
-  
+
   // Function to handle editing a determinant
   const handleEditConstraint = (constraint: any) => {
-    console.log('Editing determinant:', constraint);
     setEditingConstraint(constraint);
     setIsFormOpen(true);
   };
-  
+
   // Function to handle form closure
   const handleCloseForm = () => {
     setIsFormOpen(false);
@@ -50,24 +51,22 @@ function AttendanceDeterminantsTabContent() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[20%_80%] gap-2 md:gap-6 min-h-[calc(100vh-180px)] p-4">
+    <div className="grid grid-cols-1 md:grid-cols-[20%_80%] gap-2 md:gap-6 min-h-[calc(100vh-180px)]">
       {constraintsLoading ? (
         <DeterminantSkeletonGrid count={6} />
       ) : constraintsError ? (
         <div className="flex flex-col items-center justify-center h-full w-full">
           <AlertCircle className="text-red-500" />
-          <p className="ml-2 text-red-500">{t('error.loading')}</p>
-          <p className="ml-2 text-red-500">{t('error.tryAgain')}</p>
+          <p className="ml-2 text-red-500">{t("error.loading")}</p>
+          <p className="ml-2 text-red-500">{t("error.tryAgain")}</p>
         </div>
       ) : (
         <>
           {/* Sidebar with determinants list */}
-          <div className="px-2">
-            <ContentComponent
-              determinants={constraintsData ?? []}
-              onDeterminantClick={handleConstraintClick}
-            />
-          </div>
+          <ContentComponent
+            determinants={constraintsData ?? []}
+            onDeterminantClick={handleConstraintClick}
+          />
 
           {/* Main content area */}
           <div className="px-4 py-2">
@@ -80,8 +79,8 @@ function AttendanceDeterminantsTabContent() {
                       key={determinant.id}
                       className="cursor-pointer transition-transform hover:scale-[1.02] min-[390px]"
                     >
-                      <DeterminantDetails 
-                        constraint={determinant} 
+                      <DeterminantDetails
+                        constraint={determinant}
                         onEdit={handleEditConstraint}
                       />
                     </div>
@@ -90,8 +89,8 @@ function AttendanceDeterminantsTabContent() {
               </>
             ) : (
               activeConstraint && (
-                <DeterminantDetails 
-                  constraint={activeConstraint} 
+                <DeterminantDetails
+                  constraint={activeConstraint}
                   onEdit={handleEditConstraint}
                 />
               )
@@ -99,15 +98,15 @@ function AttendanceDeterminantsTabContent() {
           </div>
         </>
       )}
-      
+
       {/* Form for editing determinants */}
       {editingConstraint && (
         <SheetFormBuilder
-          config={getDynamicDeterminantFormConfig({ 
-            refetchConstraints, 
+          config={getDynamicDeterminantFormConfig({
+            refetchConstraints,
             branchesData,
             t,
-            editConstraint: editingConstraint
+            editConstraint: editingConstraint,
           })}
           isOpen={isFormOpen}
           onOpenChange={(open) => {
