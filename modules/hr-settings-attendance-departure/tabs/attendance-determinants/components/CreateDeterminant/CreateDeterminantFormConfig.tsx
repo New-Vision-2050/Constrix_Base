@@ -7,6 +7,8 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 import { TimeUnits } from "../../constants/determinants";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import AttendanceDaysDialog from "./AttendanceDaysDialog";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -318,6 +320,61 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                       .setValue(
                         "create-determinant-form",
                         "show_location_dialog",
+                        false
+                      );
+                  }}
+                />
+              );
+            },
+          },
+          // attendance days
+          {
+            name: "attendance_days",
+            type: "text",
+            label: "",
+            render: () => {
+              return (
+                <div className="flex items-center justify-between">
+                  <p className="text-white font-bold">
+                    {getText("form.addAttendanceDays", "أضافة ايام حضور")}
+                  </p>
+                  <Button
+                    onClick={() => {
+                      useFormStore
+                        ?.getState()
+                        .setValue(
+                          "create-determinant-form",
+                          "show_attendance_days_dialog",
+                          true
+                        );
+                    }}
+                  >
+                    <Plus />
+                  </Button>
+                </div>
+              );
+            },
+          },
+          // attendance days dialog
+          {
+            name: "show_attendance_days_dialog",
+            type: "text",
+            label: "",
+            render: () => {
+              const showDialog = useFormStore
+                ?.getState()
+                .getValues(
+                  "create-determinant-form"
+                ).show_attendance_days_dialog;
+              return (
+                <AttendanceDaysDialog
+                  isOpen={Boolean(showDialog)}
+                  onClose={() => {
+                    useFormStore
+                      ?.getState()
+                      .setValue(
+                        "create-determinant-form",
+                        "show_attendance_days_dialog",
                         false
                       );
                   }}
@@ -655,7 +712,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       // Preparing location data
       let branch_locations = [];
 
-      if (Boolean(formData.location_type === "main" && props.branchesData && !isBranchLocationEmpty)) {
+      if (
+        Boolean(
+          formData.location_type === "main" &&
+            props.branchesData &&
+            !isBranchLocationEmpty
+        )
+      ) {
         // If default locations are selected, use the default locations for the selected branches
         const selectedBranches = formData.branch_ids || [];
 

@@ -710,6 +710,7 @@
       "submitButtonText": "حفظ المحدد",
       "cancelButtonText": "إلغاء",
       "form": {
+        "addAttendanceDays": "أضافة أيام حضور",
         "title": "إضافة محدد جديد",
         "editTitle": "تعديل محدد",
         "basicInfo": "المعلومات الأساسية",

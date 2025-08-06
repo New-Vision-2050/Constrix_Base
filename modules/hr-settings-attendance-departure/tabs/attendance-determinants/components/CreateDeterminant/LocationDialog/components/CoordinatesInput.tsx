@@ -1,6 +1,7 @@
 import React from "react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
+import SearchableSelect from "../../../../../../../../components/shared/SearchableSelect";
 
 interface CoordinatesInputProps {
   longitude: string;
@@ -23,14 +24,16 @@ export default function CoordinatesInput({
 }: CoordinatesInputProps) {
   const { resolvedTheme } = useTheme();
   const t = useTranslations("location");
-  
-  
+
   // Common input classes
-  const inputClasses = "w-full px-3 py-2 rounded-lg border focus:border-pink-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400";
+  const inputClasses =
+    "w-full px-3 py-2 rounded-lg border focus:border-pink-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400";
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
       <div>
-        <label className="block text-gray-700 dark:text-white text-sm mb-2">{t("longitude")}:</label>
+        <label className="block text-gray-700 dark:text-white text-sm mb-2">
+          {t("longitude")}:
+        </label>
         <input
           type="number"
           value={longitude}
@@ -41,7 +44,9 @@ export default function CoordinatesInput({
         />
       </div>
       <div>
-        <label className="block text-gray-700 dark:text-white text-sm mb-2">{t("latitude")}:</label>
+        <label className="block text-gray-700 dark:text-white text-sm mb-2">
+          {t("latitude")}:
+        </label>
         <input
           type="number"
           value={latitude}
@@ -52,14 +57,39 @@ export default function CoordinatesInput({
         />
       </div>
       <div className="col-span-2">
-        <label className="block text-gray-700 dark:text-white text-sm mb-2">{t("radius")} ({t("meters")}):</label>
+        <label className="block text-gray-700 dark:text-white text-sm mb-2">
+          {t("radius")} ({t("meters")}):
+        </label>
         <input
           type="number"
-          value={parseInt(radius || '0', 10) || 0}
+          value={parseInt(radius || "0", 10) || 0}
           onChange={(e) => onRadiusChange(e.target.value)}
           className={inputClasses}
           placeholder="1000"
           min="0"
+        />
+      </div>
+
+      <div className="col-span-2">
+        <SearchableSelect
+          options={[
+            {
+              value: "1",
+              label: "Branch 1",
+            },
+            {
+              value: "2",
+              label: "Branch 2",
+            },
+            {
+              value: "3",
+              label: "Branch 3",
+            },
+          ]}
+          value={""}
+          onChange={(value) => {}}
+          // placeholder={t("selectBranch")}
+          // disabled={disabled}
         />
       </div>
     </div>
