@@ -655,7 +655,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       // Preparing location data
       let branch_locations = [];
 
-      if (Boolean(formData.location_type === "main" && props.branchesData)) {
+      if (Boolean(formData.location_type === "main" && props.branchesData && !isBranchLocationEmpty)) {
         // If default locations are selected, use the default locations for the selected branches
         const selectedBranches = formData.branch_ids || [];
 
