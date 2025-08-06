@@ -1,8 +1,8 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import AttendanceDaysDialogHeader from "./AttendanceDaysDialogHeader";
 import AttendanceDaysDialogDaySelector from "./AttendanceDaysDialogDaySelector";
-import { useState } from "react";
 import AttendanceDayPeriods from "./AttendanceDayPeriods";
+import { useAttendanceDayCxt } from "../context/AttendanceDayCxt";
 
 type PropsT = {
   isOpen: boolean;
@@ -11,7 +11,7 @@ type PropsT = {
 
 export default function SetAttendanceDaysDialog({ isOpen, onClose }: PropsT) {
   // State to store the selected day
-  const [selectedDay, setSelectedDay] = useState<string>("");
+  const { selectedDay, handleDayChange } = useAttendanceDayCxt();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -20,7 +20,7 @@ export default function SetAttendanceDaysDialog({ isOpen, onClose }: PropsT) {
         <div className="flex flex-col">
           <AttendanceDaysDialogDaySelector
             value={selectedDay}
-            onChange={(day) => setSelectedDay(day)}
+            onChange={(day) => handleDayChange(day)}
           />
           <AttendanceDayPeriods />
         </div>

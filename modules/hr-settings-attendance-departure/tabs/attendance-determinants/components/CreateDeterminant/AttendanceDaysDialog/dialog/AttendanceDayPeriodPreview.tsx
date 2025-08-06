@@ -1,15 +1,14 @@
 import { useTheme } from "next-themes";
 import { Clock, ArrowRight, CalendarCheck, ArrowLeft } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { AttendanceDayPeriodType, useAttendanceDayCxt } from "../context/AttendanceDayCxt";
 
 type PeriodDataProps = {
-  start_time?: string;
-  end_time?: string;
+  period: AttendanceDayPeriodType;
 };
 
 export default function AttendanceDayPeriodPreview({
-  start_time = "08:00",
-  end_time = "16:00",
+  period,
 }: PeriodDataProps) {
   const { resolvedTheme } = useTheme();
   const locale = useLocale();
@@ -17,6 +16,8 @@ export default function AttendanceDayPeriodPreview({
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
   );
+  const { start_time, end_time, index } = period;
+  const { handleRemoveDayPeriod } = useAttendanceDayCxt();
 
   // Calculate period duration
   const calculateDuration = () => {
@@ -85,7 +86,7 @@ export default function AttendanceDayPeriodPreview({
           <div className="flex items-center gap-3">
             <div className="flex flex-col items-center">
               <span className={labelClass}>{t("startTimeLabel")}</span>
-              <span className={timeClass}>{start_time}</span>
+              <span className={timeClass}>{period.start_time}</span>
             </div>
 
             {!isRtl ? (
@@ -104,7 +105,7 @@ export default function AttendanceDayPeriodPreview({
 
             <div className="flex flex-col items-center">
               <span className={labelClass}>{t("endTimeLabel")}</span>
-              <span className={timeClass}>{end_time}</span>
+              <span className={timeClass}>{period.end_time}</span>
             </div>
           </div>
         </div>

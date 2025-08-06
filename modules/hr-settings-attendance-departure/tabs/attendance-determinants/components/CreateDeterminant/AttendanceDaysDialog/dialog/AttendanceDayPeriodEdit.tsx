@@ -4,17 +4,16 @@ import { Clock } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AttendanceDayPeriodType } from '../context/AttendanceDayCxt';
 
 type PeriodEditProps = {
-  start_time?: string;
-  end_time?: string;
+  period: AttendanceDayPeriodType;
   onStartTimeChange?: (time: string) => void;
   onEndTimeChange?: (time: string) => void;
 };
 
 export default function AttendanceDayPeriodEdit({
-  start_time = "08:00",
-  end_time = "16:00",
+  period,
   onStartTimeChange,
   onEndTimeChange
 }: PeriodEditProps) {
@@ -63,7 +62,7 @@ export default function AttendanceDayPeriodEdit({
             <Input
               id="start-time"
               type="time"
-              value={start_time}
+              value={period.start_time}
               onChange={(e) => handleTimeChange('start', e.target.value)}
               className={`${resolvedTheme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white"}`}
               dir="ltr" // Time inputs are always LTR
@@ -81,7 +80,7 @@ export default function AttendanceDayPeriodEdit({
             <Input
               id="end-time"
               type="time"
-              value={end_time}
+              value={period.end_time}
               onChange={(e) => handleTimeChange('end', e.target.value)}
               className={`${resolvedTheme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white"}`}
               dir="ltr" // Time inputs are always LTR
