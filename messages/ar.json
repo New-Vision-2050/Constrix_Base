@@ -710,6 +710,23 @@
       "submitButtonText": "حفظ المحدد",
       "cancelButtonText": "إلغاء",
       "form": {
+        "AttendanceDaysDialog":{
+          "timePeriodLabel":"الفترة الزمنية",
+          "startTimeLabel":"البداية",
+          "endTimeLabel":"النهاية",
+          "durationLabel":"المدة",
+          "extendsToNextDay":"تمتد إلى اليوم التالي",
+          "hours":"ساعة",
+          "timeFormatError":"يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00",
+          "periodEndMustBeAfterStart":"وقت النهاية يجب أن يكون بعد وقت البداية",
+          "startTimeBeforeEndTime":"وقت البداية قبل وقت النهاية",
+          "addPeriod":"إضافة فترة",
+          "deletePeriod":"حذف الفترة",
+          "periodStartPlaceholder":"09:00",
+          "periodEndPlaceholder":"17:00",
+          "periodStartRequired":"بداية الفترة مطلوبة",
+          "periodEndRequired":"نهاية الفترة مطلوبة"
+        },
         "addAttendanceDays": "أضافة أيام حضور",
         "title": "إضافة محدد جديد",
         "editTitle": "تعديل محدد",

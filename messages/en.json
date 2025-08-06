@@ -683,7 +683,6 @@
       "vacations": "Official Holidays"
     },
     "attendanceDeterminants": {
-      "addAttendanceDays": "Add Attendance Days",
       "title": "Attendance Determinants",
       "createDeterminant": "Create New Determinant",
       "allDeterminants": "All Determinants",
@@ -695,6 +694,24 @@
       "submitButtonText": "Save Determinant",
       "cancelButtonText": "Cancel",
       "form": {
+        "AttendanceDaysDialog": {
+          "timePeriodLabel": "Time Period",
+          "startTimeLabel": "Start Time",
+          "endTimeLabel": "End Time",
+          "durationLabel": "Duration",
+          "extendsToNextDay": "Extends to next day",
+          "hours": "Hours",
+          "timeFormatError":"Must enter valid time in format hours:minutes like 09:00",
+          "periodEndMustBeAfterStart":"End time must be after start time",
+          "startTimeBeforeEndTime":"Start time must be before end time",
+          "addPeriod":"Add Period",
+          "deletePeriod":"Delete Period",
+          "periodStartPlaceholder":"09:00",
+          "periodEndPlaceholder":"17:00",
+          "periodStartRequired":"Period start time is required",
+          "periodEndRequired":"Period end time is required"
+        },
+        "addAttendanceDays": "Add Attendance Days",
         "title": "Add New Determinant",
         "editTitle": "Edit Determinant",
         "basicInfo": "Basic Information",
