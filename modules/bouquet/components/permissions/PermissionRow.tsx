@@ -89,13 +89,32 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
   const permissionId = item.id;
   const permissionName = item.name;
   
+  // Find the create permission item to get its limit value
+  const createItem = subItems.find(item => item.type === 'create');
+  const createLimitValue = createItem?.limit || 0;
+  
+  // Handle checkbox change to activate/deactivate all switches in this row
+  const handleCheckboxChange = (checked: boolean) => {
+    // First update the permission selection
+    onPermissionChange(permissionId, checked);
+    
+    // Then activate/deactivate all available switches in this row
+    permissionTypes.forEach(permissionConfig => {
+      if (permissionConfig.hasPermission) {
+        const switchId = `${subKey}-${categoryKey}-${permissionConfig.type}`;
+        const relatedItem = subItems.find(item => item.type === permissionConfig.type);
+        onSwitchChange(switchId, checked, relatedItem?.id);
+      }
+    });
+  };
+  
   return (
     <tr key={permissionId}>
       <td className="px-4 py-4 text-center">
         <Checkbox
           id={permissionId}
           checked={selectedPermissions.has(permissionId)}
-          onCheckedChange={(checked) => onPermissionChange(permissionId, checked as boolean)}
+          onCheckedChange={(checked) => handleCheckboxChange(checked as boolean)}
         />
       </td>
       <td className="px-4 py-4 text-right text-sm text-white font-medium">
@@ -104,8 +123,8 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
       {permissionTypes.map(renderPermissionSwitch)}
       <td className="px-4 py-4 text-center text-sm text-white font-medium">
         <Input
-          className="w-16 p-1 text-center bg-sidebar border border-sidebar-border rounded"
-          value={numberValues[`${subKey}-${categoryKey}`] > 0 ? numberValues[`${subKey}-${categoryKey}`] : ''}
+          className="w-16 p-1 text-center bg-sidebar border border-gray-100 rounded  disabled:bg-gray-700 disabled:text-gray-600"
+          value={numberValues[`${subKey}-${categoryKey}`] !== undefined ? (numberValues[`${subKey}-${categoryKey}`] > 0 ? numberValues[`${subKey}-${categoryKey}`] : '') : (createLimitValue > 0 ? createLimitValue : '')}
           onChange={(e) => onNumberChange(`${subKey}-${categoryKey}`, parseInt(e.target.value) || 0)}
           min="0"
           disabled={!switchStates[`${subKey}-${categoryKey}-create`]}
