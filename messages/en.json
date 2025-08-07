@@ -683,6 +683,9 @@
       "vacations": "Official Holidays"
     },
     "attendanceDeterminants": {
+      "selectDayFirst": "Please select a day first",
+      "periodEndRequired": "Period end time is required",
+      "periods": "Periods",
       "title": "Attendance Determinants",
       "createDeterminant": "Create New Determinant",
       "allDeterminants": "All Determinants",
@@ -695,6 +698,7 @@
       "cancelButtonText": "Cancel",
       "form": {
         "AttendanceDaysDialog": {
+          "periods":"Periods",
           "timePeriodLabel": "Time Period",
           "startTimeLabel": "Start Time",
           "endTimeLabel": "End Time",

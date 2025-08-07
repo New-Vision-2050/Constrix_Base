@@ -9,6 +9,7 @@ import { TimeUnits } from "../../constants/determinants";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AttendanceDaysDialog from "./AttendanceDaysDialog";
+import { ScheduleDisplay, WeeklyScheduleDays } from "./components/ScheduleDisplay";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -369,7 +370,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               console.log("show_attendance_days_weekly_schedule", _weekly_schedule);
 
               return(
-                <div>show days ya solam {_weekly_schedule?.length}</div>
+                <div className="py-2">
+                  {/* Use the ScheduleDisplay component */}
+                  <ScheduleDisplay weeklySchedule={_weekly_schedule as WeeklyScheduleDays} />
+                </div>
               )
             }
           },
