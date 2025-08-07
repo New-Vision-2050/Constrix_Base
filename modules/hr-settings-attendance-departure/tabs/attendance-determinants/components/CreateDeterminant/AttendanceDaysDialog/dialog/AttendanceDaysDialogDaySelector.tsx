@@ -21,7 +21,7 @@ const AttendanceDaysDialogDaySelector: React.FC<
 
   // Convert days to options format based on current locale
   const dayOptions: Option[] = DAYS_OF_WEEK.filter(
-    (day) => !usedDays.includes(day.value)
+    (day) => !usedDays?.includes(day.value)
   ).map((day) => ({
     value: day.value,
     label: isArabic ? day.labelAr : day.labelEn,

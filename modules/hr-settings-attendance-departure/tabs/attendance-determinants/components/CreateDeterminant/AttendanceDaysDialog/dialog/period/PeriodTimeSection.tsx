@@ -31,7 +31,7 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
   //   Theme
   const { resolvedTheme } = useTheme();
   //  constext
-  const { handleUpdateDayPeriod } = useAttendanceDayCxt();
+  const { handleUpdateDayPeriod, minEdge, maxEdge } = useAttendanceDayCxt();
   // Create MUI theme based on the current theme
   const muiTheme = useMemo(
     () =>
@@ -59,6 +59,7 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
     [resolvedTheme]
   );
 
+  console.log('minEdge, maxEdge',minEdge, maxEdge)
   // handle change periods edges
   const handleTimeChange = (
     type: "start" | "end",
@@ -96,6 +97,8 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
             <TimeInput
               value={period.start_time}
               error={false}
+              // minTime={maxEdge}
+              // maxTime={minEdge}
               maxTime={period.extends_to_next_day ? undefined : period.end_time}
               handleTimeChange={(newValue) => {
                 handleTimeChange("start", newValue);
@@ -111,6 +114,8 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
             <br />
             <TimeInput
               value={period.end_time}
+              // minTime={maxEdge}
+              // maxTime={minEdge}
               minTime={period.extends_to_next_day ? undefined : period.start_time}
               error={false}
               handleTimeChange={(newValue) => {

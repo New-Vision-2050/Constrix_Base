@@ -4,7 +4,7 @@ import { useFormStore } from "@/modules/form-builder";
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 //
 export type AttendanceDayPeriodType = {
@@ -27,6 +27,10 @@ type AttendanceDayCxtType = {
 
   // used days
   usedDays: string[];
+
+  // min and max edges
+  minEdge: string;
+  maxEdge: string;
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -51,16 +55,34 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   const [selectedDay, SetSelectedDay] = useState<string>("");
   const [dayPeriods, SetDayPeriods] = useState<AttendanceDayPeriodType[]>([]);
 
+  // the min edge of the day
+  const [minEdge, SetMinEdge] = useState<string>("");
+  // the max edge of the day
+  const [maxEdge, SetMaxEdge] = useState<string>("");
+
   // prepare schedule data
   const _weekly_schedule = useFormStore
     ?.getState()
     .getValue("create-determinant-form", "weekly_schedule");
 
+  const _openDialog = useFormStore
+    ?.getState()
+    .getValue("create-determinant-form", "show_attendance_days_dialog");
+
   const usedDays: string[] = useMemo(() => {
     return _weekly_schedule?.map((day: any) => day.day as string);
   }, [_weekly_schedule]);
 
-  console.log("_weekly_schedule_weekly_schedule", usedDays, _weekly_schedule);
+  useEffect(() => {
+    // reset selected day and day periods when dialog is closed
+    if (!_openDialog) {
+      SetSelectedDay("");
+      SetDayPeriods([]);
+      SetMinEdge("");
+      SetMaxEdge("");
+    }
+  }, [_openDialog]);
+
   // ** declare and define component helper methods
   const handleDayChange = useMemo(() => {
     return (day: string) => {
@@ -85,8 +107,41 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     const newDayPeriods = dayPeriods.filter((period) => period.index !== index);
     SetDayPeriods(newDayPeriods);
   };
+  // convert string to time in minutes
+  const convertStringToMinutes = (timeString: string) => {
+    const [hours, minutes] = timeString.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
   // handle update day period
   const handleUpdateDayPeriod = (_period: AttendanceDayPeriodType) => {
+    // update min and max edges
+    if (_period.start_time) {
+      if (Boolean(minEdge)) {
+        if (
+          convertStringToMinutes(_period.start_time) <
+          convertStringToMinutes(minEdge)
+        ) {
+          SetMinEdge(_period.start_time);
+        }
+      } else {
+        SetMinEdge(_period.start_time);
+      }
+    }
+    if (_period.end_time) {
+      if (Boolean(maxEdge)) {
+        if (
+          convertStringToMinutes(_period.end_time) >
+          convertStringToMinutes(maxEdge)
+        ) {
+          SetMaxEdge(_period.end_time);
+        }
+      } else {
+        SetMaxEdge(_period.end_time);
+      }
+    }
+
+    // update day periods
     SetDayPeriods(
       dayPeriods.map((period) =>
         period.index === _period.index ? _period : period
@@ -108,6 +163,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         handleUpdateDayPeriod,
         // used days
         usedDays,
+        // min and max edges
+        minEdge,
+        maxEdge,
       }}
     >
       {children}
