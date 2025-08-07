@@ -11,7 +11,10 @@
     "deploy:worker": "npm run build && wrangler deploy"
   },
   "dependencies": {
+    "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^4.1.2",
+    "@mui/material": "^7.3.1",
+    "@mui/x-date-pickers": "^8.9.2",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -54,6 +57,7 @@
     "cookies-next": "^5.1.0",
     "country-flag-icons": "^1.5.18",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.3.0",
     "framer-motion": "^12.4.7",
     "html2canvas": "^1.4.1",

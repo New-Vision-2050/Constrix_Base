@@ -3,6 +3,7 @@ import AttendanceDaysDialogHeader from "./AttendanceDaysDialogHeader";
 import AttendanceDaysDialogDaySelector from "./AttendanceDaysDialogDaySelector";
 import AttendanceDayPeriods from "./AttendanceDayPeriods";
 import { useAttendanceDayCxt } from "../context/AttendanceDayCxt";
+import SaveButton from "./SaveButton";
 
 type PropsT = {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export default function SetAttendanceDaysDialog({ isOpen, onClose }: PropsT) {
           />
           <AttendanceDayPeriods />
         </div>
+        <SaveButton />
       </DialogContent>
     </Dialog>
   );

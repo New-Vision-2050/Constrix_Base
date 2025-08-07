@@ -10,6 +10,7 @@ export type AttendanceDayPeriodType = {
   index: number;
   start_time: string;
   end_time: string;
+  extends_to_next_day?: boolean;
 };
 
 // declare context types

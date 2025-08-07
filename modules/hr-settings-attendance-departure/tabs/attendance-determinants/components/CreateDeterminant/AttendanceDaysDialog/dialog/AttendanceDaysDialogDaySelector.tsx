@@ -30,6 +30,7 @@ const AttendanceDaysDialogDaySelector: React.FC<AttendanceDaysDialogDaySelectorP
     <div className="mb-4">
       <SearchableSelect
         options={dayOptions}
+        defaultValue={dayOptions?.[0]?.value}
         value={value}
         onChange={(selectedValue) => onChange?.(selectedValue.toString())}
         label={label}

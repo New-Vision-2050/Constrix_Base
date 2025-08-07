@@ -20,12 +20,14 @@ interface SearchableSelectProps {
   label?: string;
   name?: string;
   error?: string;
+  defaultValue?: string | number;
 }
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
   options,
   value,
   onChange,
+  defaultValue,
   placeholder = 'اختر عنصر',
   searchPlaceholder = 'البحث...',
   noResultsText = 'لا توجد نتائج',
@@ -46,6 +48,8 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   
   // Find the selected option to display
   const selectedOption = options.find(opt => opt.value === value);
+  // Find default option if defaultValue is provided
+  const defaultValueOption = defaultValue ? options.find(opt => opt.value === defaultValue) : undefined;
   
   // Filter options based on search term
   const filteredOptions = searchTerm
@@ -88,7 +92,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
         <span className={`block truncate ${!selectedOption ? 'text-gray-400' : 'text-white'}`}>
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.label : (defaultValueOption?.label || placeholder)}
         </span>
         <svg 
           className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} 
