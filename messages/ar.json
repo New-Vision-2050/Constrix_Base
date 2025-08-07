@@ -765,6 +765,31 @@
     "view": "تفاصيل",
     "activate": "تنشيط"
   },
+  "CreateRole": {
+    "title": "إنشاء دور",
+    "editTitle": "تعديل الدور",
+    "roleName": "اسم الدور",
+    "roleNamePlaceholder": "أدخل اسم الدور",
+    "roleNameRequired": "اسم الدور مطلوب",
+    "roleNameMinLength": "يجب أن يكون اسم الدور على الأقل 3 أحرف",
+    "permissions": "الصلاحيات",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء تحديد الكل",
+    "permissionsRequired": "يجب تحديد صلاحية واحدة على الأقل",
+    "loading": "جاري التحميل...",
+    "creating": "جاري الإنشاء...",
+    "updating": "جاري التحديث...",
+    "createRole": "إنشاء الدور",
+    "updateRole": "تحديث الدور",
+    "reset": "إعادة تعيين",
+    "selectedCount": "محدد",
+    "roleCreatedSuccessfully": "تم إنشاء الدور بنجاح",
+    "roleUpdatedSuccessfully": "تم تحديث الدور بنجاح",
+    "errorCreatingRole": "خطأ في إنشاء الدور",
+    "errorUpdatingRole": "خطأ في تحديث الدور",
+    "errorLoadingRole": "خطأ في تحميل بيانات الدور",
+    "roleNotFound": "لم يتم العثور على الدور"
+  },
   "Programs": {
     "AreYouSureReactivate": "هل أنت متأكد من تنشيط البرنامج؟",
     "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط البرنامج؟"
