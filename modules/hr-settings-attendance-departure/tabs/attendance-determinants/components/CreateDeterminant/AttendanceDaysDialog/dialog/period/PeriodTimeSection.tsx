@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import "dayjs/locale/ar";
 import dayjs from "dayjs";
 import TimeInput from "./TimeInput";
+import NewInputTimeField from "./NewInputTimeField";
 
 // Props
 type PropsT = {
@@ -59,20 +60,15 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
     [resolvedTheme]
   );
 
-  console.log('minEdge, maxEdge',minEdge, maxEdge)
+  console.log("minEdge, maxEdge", minEdge, maxEdge);
   // handle change periods edges
-  const handleTimeChange = (
-    type: "start" | "end",
-    value: dayjs.Dayjs | null
-  ) => {
+  const handleTimeChange = (type: "start" | "end", value: string) => {
     let newStartTime = period.start_time;
     let newEndTime = period.end_time;
-    const timeString = value ? value.format("HH:mm") : "";
-
     if (type === "start") {
-      newStartTime = timeString;
+      newStartTime = value;
     } else if (type === "end") {
-      newEndTime = timeString;
+      newEndTime = value;
     }
 
     // Update period if validation passes
@@ -86,45 +82,38 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      <ThemeProvider theme={muiTheme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ar">
-          {/* Start Time */}
-          <div>
-            <Label htmlFor="start-time" className={labelClass}>
-              {t("startTimeLabel")}
-            </Label>
-            <br />
-            <TimeInput
-              value={period.start_time}
-              error={false}
-              // minTime={maxEdge}
-              // maxTime={minEdge}
-              maxTime={period.extends_to_next_day ? undefined : period.end_time}
-              handleTimeChange={(newValue) => {
-                handleTimeChange("start", newValue);
-              }}
-            />
-          </div>
+      {/* Start Time */}
+      <div>
+        <Label htmlFor="start-time" className={labelClass}>
+          {t("startTimeLabel")}
+        </Label>
+        <br />
+        <NewInputTimeField
+          period={period}
+          type="start"
+          value={period.start_time}
+          onChange={(val) => {
+            handleTimeChange("start", val);
+          }}
+        />
+      </div>
 
-          {/* End Time */}
-          <div>
-            <Label htmlFor="end-time" className={labelClass}>
-              {t("endTimeLabel")}
-            </Label>
-            <br />
-            <TimeInput
-              value={period.end_time}
-              // minTime={maxEdge}
-              // maxTime={minEdge}
-              minTime={period.extends_to_next_day ? undefined : period.start_time}
-              error={false}
-              handleTimeChange={(newValue) => {
-                handleTimeChange("end", newValue);
-              }}
-            />
-          </div>
-        </LocalizationProvider>
-      </ThemeProvider>
+      {/* End Time */}
+      <div>
+        <Label htmlFor="end-time" className={labelClass}>
+          {t("endTimeLabel")}
+        </Label>
+        <br />
+        <NewInputTimeField
+          period={period}
+          type="end"
+          value={period.end_time}
+          onChange={(val) => {
+            handleTimeChange("end", val);
+          }}
+          disabled={!period.start_time}
+        />
+      </div>
     </div>
   );
 }

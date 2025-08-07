@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 // import packages
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { InitialTimeHours, PeriodHour } from "../constants/time";
 
 //
 export type AttendanceDayPeriodType = {
@@ -31,6 +32,9 @@ type AttendanceDayCxtType = {
   // min and max edges
   minEdge: string;
   maxEdge: string;
+
+  // available hours
+  dayAvsilableHours: PeriodHour[];
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -52,6 +56,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // ** declare and define component state and variables
   const { children } = props;
   // ** handle side effects
+  const [dayAvsilableHours, setdayAvailableHours] = useState(InitialTimeHours);
   const [selectedDay, SetSelectedDay] = useState<string>("");
   const [dayPeriods, SetDayPeriods] = useState<AttendanceDayPeriodType[]>([]);
 
@@ -60,6 +65,27 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // the max edge of the day
   const [maxEdge, SetMaxEdge] = useState<string>("");
 
+  useEffect(() => {
+    const _n = dayPeriods.length;
+    let _timeHours = InitialTimeHours;
+    // make hours in periods not available
+    for (let i = 0; i < _n; i++) {
+      const _period = dayPeriods[i];
+      const _startHour = Number(_period.start_time.split(":")[0]);
+      const _endHour = Number(_period.end_time.split(":")[0]);
+      for (let j = _startHour; j <= _endHour; j++) {
+        _timeHours = _timeHours?.map((hour) => {
+          if (+hour.value == j) {
+            return { ...hour, available: false };
+          }
+          return hour;
+        });
+      }
+    }
+    console.log("_timeHours", _timeHours);
+    dayPeriods.forEach((period) => {});
+    setdayAvailableHours(_timeHours);
+  }, [dayPeriods]);
   // prepare schedule data
   const _weekly_schedule = useFormStore
     ?.getState()
@@ -166,6 +192,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         // min and max edges
         minEdge,
         maxEdge,
+        // available hours
+        dayAvsilableHours,
       }}
     >
       {children}
