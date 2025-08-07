@@ -52,7 +52,10 @@ function RoleDrawer({ open, onClose, roleId, onSuccess }: Props) {
   const extractPermissionKeys = (
     permissions: Record<
       string,
-      Record<string, Record<string, ROLE_Permission[]>>
+      Record<
+        string,
+        Record<string, (ROLE_Permission & { is_active: boolean })[]>
+      >
     >
   ): string[] => {
     const permissionKeys: string[] = [];
@@ -68,7 +71,7 @@ function RoleDrawer({ open, onClose, roleId, onSuccess }: Props) {
               Object.values(subCategoryValue).forEach((permissionGroup) => {
                 if (Array.isArray(permissionGroup)) {
                   permissionGroup.forEach((permission) => {
-                    if (permission.key) {
+                    if (permission.key && permission.is_active) {
                       permissionKeys.push(permission.key);
                     }
                   });

@@ -13,7 +13,10 @@ export interface ShowRoleResponse
     ROLE_Role & {
       permissions: Record<
         string,
-        Record<string, Record<string, ROLE_Permission[]>>
+        Record<
+          string,
+          Record<string, (ROLE_Permission & { is_active: boolean })[]>
+        >
       >;
     }
   > {}
