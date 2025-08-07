@@ -73,7 +73,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // handle update day period
   const handleUpdateDayPeriod = (_period: AttendanceDayPeriodType) => {
     SetDayPeriods(
-      dayPeriods.map((period, i) => (i === _period.index ? _period : period))
+      dayPeriods.map((period) => (period.index === _period.index ? _period : period))
     );
   };
 

@@ -4,6 +4,7 @@ import { useAttendanceDayCxt } from "../context/AttendanceDayCxt";
 
 export default function AttendanceDayPeriods() {
   const { dayPeriods, handleAddDayPeriod } = useAttendanceDayCxt();
+  console.log("dayPeriods", dayPeriods);
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center my-1">
