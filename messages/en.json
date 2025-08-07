@@ -1,4 +1,10 @@
 {
+  "breadcrumbs":{
+    "home": "Home",
+    "separator": "/",
+    "back": "Back",
+    "currentPage": "You are here"
+  },
   "location": {
     "longitude": "Longitude",
     "latitude": "Latitude",

@@ -1,4 +1,10 @@
 {
+  "breadcrumbs":{
+    "home": "الرئيسية",
+    "separator": "/",
+    "back": "رجوع",
+    "currentPage": "أنت هنا"
+  },
   "location": {
     "longitude": "خط الطول",
     "latitude": "خط العرض",
