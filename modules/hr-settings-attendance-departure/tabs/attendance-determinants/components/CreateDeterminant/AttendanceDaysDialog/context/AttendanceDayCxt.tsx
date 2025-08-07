@@ -1,4 +1,5 @@
 "use client";
+import { useFormStore } from "@/modules/form-builder";
 // types
 import type { ReactNode } from "react";
 
@@ -23,6 +24,9 @@ type AttendanceDayCxtType = {
   handleAddDayPeriod: () => void;
   handleRemoveDayPeriod: (index: number) => void;
   handleUpdateDayPeriod: (_period: AttendanceDayPeriodType) => void;
+
+  // used days
+  usedDays: string[];
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -47,6 +51,16 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   const [selectedDay, SetSelectedDay] = useState<string>("");
   const [dayPeriods, SetDayPeriods] = useState<AttendanceDayPeriodType[]>([]);
 
+  // prepare schedule data
+  const _weekly_schedule = useFormStore
+    ?.getState()
+    .getValue("create-determinant-form", "weekly_schedule");
+
+  const usedDays: string[] = useMemo(() => {
+    return _weekly_schedule?.map((day: any) => day.day as string);
+  }, [_weekly_schedule]);
+
+  console.log("_weekly_schedule_weekly_schedule", usedDays, _weekly_schedule);
   // ** declare and define component helper methods
   const handleDayChange = useMemo(() => {
     return (day: string) => {
@@ -74,7 +88,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // handle update day period
   const handleUpdateDayPeriod = (_period: AttendanceDayPeriodType) => {
     SetDayPeriods(
-      dayPeriods.map((period) => (period.index === _period.index ? _period : period))
+      dayPeriods.map((period) =>
+        period.index === _period.index ? _period : period
+      )
     );
   };
 
@@ -90,6 +106,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         handleAddDayPeriod,
         handleRemoveDayPeriod,
         handleUpdateDayPeriod,
+        // used days
+        usedDays,
       }}
     >
       {children}

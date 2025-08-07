@@ -88,6 +88,34 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       (branch: { branch_id: string | number }) => Number(branch.branch_id)
     ) ?? [];
 
+  // ------------- set used days -------------
+  const _weekly_schedule = Object.entries(
+    (editConstraint?.config?.time_rules
+      ?.weekly_schedule as weeklyScheduleDays) || {}
+  )
+    ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
+    ?.map(([dayName, dayConfig]) => {
+      return {
+        day: dayName,
+        periods:
+          dayConfig?.periods?.map((period) => ({
+            from: period.start_time,
+            to: period.end_time,
+            early_period:
+              (dayConfig as any)?.early_clock_in_rules?.early_period ||
+              DEFAULT_TIME_THRESHOLD_MINUTES,
+            early_unit:
+              (dayConfig as any)?.early_clock_in_rules?.early_unit ||
+              "minute",
+            lateness_period:
+              (dayConfig as any)?.lateness_rules?.lateness_period ||
+              DEFAULT_TIME_THRESHOLD_MINUTES,
+            lateness_unit:
+              (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
+          })) ?? [],
+      };
+    });
+
   // ------------- return form config -------------
   return {
     formId: "create-determinant-form",
@@ -109,32 +137,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       type_attendance: _type_attendance,
       branch_ids: _branch_ids,
       location_type: _location_type,
-      weekly_schedule: Object.entries(
-        (editConstraint?.config?.time_rules
-          ?.weekly_schedule as weeklyScheduleDays) || {}
-      )
-        ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
-        ?.map(([dayName, dayConfig]) => {
-          return {
-            day: dayName,
-            periods:
-              dayConfig?.periods?.map((period) => ({
-                from: period.start_time,
-                to: period.end_time,
-                early_period:
-                  (dayConfig as any)?.early_clock_in_rules?.early_period ||
-                  DEFAULT_TIME_THRESHOLD_MINUTES,
-                early_unit:
-                  (dayConfig as any)?.early_clock_in_rules?.early_unit ||
-                  "minute",
-                lateness_period:
-                  (dayConfig as any)?.lateness_rules?.lateness_period ||
-                  DEFAULT_TIME_THRESHOLD_MINUTES,
-                lateness_unit:
-                  (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
-              })) ?? [],
-          };
-        }),
+      weekly_schedule: _weekly_schedule,
       show_location_dialog: false,
     },
     sections: [
@@ -354,6 +357,21 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 </div>
               );
             },
+          },
+          {
+            name:"show_attendance_days",
+            type:"text",
+            label:"",
+            render:()=>{
+              const _weekly_schedule = useFormStore
+              ?.getState()
+              .getValue("create-determinant-form", "weekly_schedule");
+              console.log("show_attendance_days_weekly_schedule", _weekly_schedule);
+
+              return(
+                <div>show days ya solam {_weekly_schedule?.length}</div>
+              )
+            }
           },
           // attendance days dialog
           {

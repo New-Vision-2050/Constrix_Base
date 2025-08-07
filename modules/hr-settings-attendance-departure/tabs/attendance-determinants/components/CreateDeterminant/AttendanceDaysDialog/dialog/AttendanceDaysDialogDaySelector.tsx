@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useLocale } from 'next-intl';
-import SearchableSelect from '@/components/shared/SearchableSelect';
-import { DAYS_OF_WEEK } from '../constants/days';
-import { Option } from '@/components/shared/SearchableSelect';
+import React, { useState } from "react";
+import { useLocale } from "next-intl";
+import SearchableSelect from "@/components/shared/SearchableSelect";
+import { DAYS_OF_WEEK } from "../constants/days";
+import { Option } from "@/components/shared/SearchableSelect";
+import { useAttendanceDayCxt } from "../context/AttendanceDayCxt";
 
 type AttendanceDaysDialogDaySelectorProps = {
   onChange?: (day: string) => void;
@@ -11,19 +12,19 @@ type AttendanceDaysDialogDaySelectorProps = {
   placeholder?: string;
 };
 
-const AttendanceDaysDialogDaySelector: React.FC<AttendanceDaysDialogDaySelectorProps> = ({
-  onChange,
-  value = '',
-  label = 'اليوم',
-  placeholder = 'اختر اليوم'
-}) => {
+const AttendanceDaysDialogDaySelector: React.FC<
+  AttendanceDaysDialogDaySelectorProps
+> = ({ onChange, value = "", label = "اليوم", placeholder = "اختر اليوم" }) => {
   const locale = useLocale();
-  const isArabic = locale === 'ar';
-  
+  const isArabic = locale === "ar";
+  const { usedDays } = useAttendanceDayCxt();
+
   // Convert days to options format based on current locale
-  const dayOptions: Option[] = DAYS_OF_WEEK.map(day => ({
+  const dayOptions: Option[] = DAYS_OF_WEEK.filter(
+    (day) => !usedDays.includes(day.value)
+  ).map((day) => ({
     value: day.value,
-    label: isArabic ? day.labelAr : day.labelEn
+    label: isArabic ? day.labelAr : day.labelEn,
   }));
 
   return (
@@ -35,8 +36,8 @@ const AttendanceDaysDialogDaySelector: React.FC<AttendanceDaysDialogDaySelectorP
         onChange={(selectedValue) => onChange?.(selectedValue.toString())}
         label={label}
         placeholder={placeholder}
-        searchPlaceholder={isArabic ? 'البحث...' : 'Search...'}
-        noResultsText={isArabic ? 'لا توجد نتائج' : 'No results'}
+        searchPlaceholder={isArabic ? "البحث..." : "Search..."}
+        noResultsText={isArabic ? "لا توجد نتائج" : "No results"}
       />
     </div>
   );
