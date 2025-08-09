@@ -10,6 +10,7 @@ import {
 } from "../../context/AttendanceDayCxt";
 import PeriodTimeSection from "./PeriodTimeSection";
 import PeriodValidationsMsgs from "./PeriodValidationsMsgs";
+import PeriodSettingSection from "./PeriodSettingSection";
 
 type PeriodEditProps = {
   period: AttendanceDayPeriodType;
@@ -36,7 +37,9 @@ export default function AttendanceDayPeriodItem({ period }: PeriodEditProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-pink-500" />
-            <span className={labelClass}>{t("timePeriodLabel") + " #" + period.index}</span>
+            <span className={labelClass}>
+              {t("timePeriodLabel") + " #" + period.index}
+            </span>
           </div>
           <Trash2
             className="h-5 w-5 text-red-500 cursor-pointer"
@@ -48,6 +51,8 @@ export default function AttendanceDayPeriodItem({ period }: PeriodEditProps) {
 
         {/* Time inputs with MUI TimePicker */}
         <PeriodTimeSection t={t} period={period} labelClass={labelClass} />
+        {/* Settings */}
+        <PeriodSettingSection t={t} period={period} labelClass={labelClass} />
 
         {/* Validation notes */}
         <PeriodValidationsMsgs t={t} period={period} />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useLocale } from "next-intl";
 import SearchableSelect from "@/components/shared/SearchableSelect";
 import { DAYS_OF_WEEK } from "../constants/days";
@@ -20,18 +20,20 @@ const AttendanceDaysDialogDaySelector: React.FC<
   const { usedDays } = useAttendanceDayCxt();
 
   // Convert days to options format based on current locale
-  const dayOptions: Option[] = DAYS_OF_WEEK.filter(
-    (day) => !usedDays?.includes(day.value)
-  ).map((day) => ({
-    value: day.value,
-    label: isArabic ? day.labelAr : day.labelEn,
-  }));
+  const dayOptions: Option[] = useMemo(() => {
+    return DAYS_OF_WEEK.filter((day) => !usedDays?.includes(day.value)).map(
+      (day) => ({
+        value: day.value,
+        label: isArabic ? day.labelAr : day.labelEn,
+      })
+    );
+  }, [usedDays]);
 
   return (
     <div className="mb-4">
       <SearchableSelect
         options={dayOptions}
-        defaultValue={dayOptions?.[0]?.value}
+        defaultValue={value || dayOptions?.[0]?.value}
         value={value}
         onChange={(selectedValue) => onChange?.(selectedValue.toString())}
         label={label}

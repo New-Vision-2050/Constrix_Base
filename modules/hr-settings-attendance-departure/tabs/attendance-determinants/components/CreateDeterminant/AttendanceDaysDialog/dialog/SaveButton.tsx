@@ -10,6 +10,10 @@ export default function SaveButton() {
     const _periods = dayPeriods?.map((period) => ({
       from: period.start_time,
       to: period.end_time,
+      early_period: period.early_period,
+      early_unit: period.early_unit,
+      lateness_period: period.lateness_period,
+      lateness_unit: period.lateness_unit,
     }));
     // prepare day config
     const _dayConfig = {
@@ -17,9 +21,15 @@ export default function SaveButton() {
       periods: _periods,
     };
     // get current weekly schedule
-    const _weekly_schedule = useFormStore
+    let _weekly_schedule = useFormStore
       ?.getState()
       .getValue("create-determinant-form", "weekly_schedule");
+
+    if (!_weekly_schedule) _weekly_schedule = [];
+    // remove day if exist
+    _weekly_schedule = _weekly_schedule?.filter(
+      (day) => day.day !== selectedDay
+    );
     // update weekly schedule
     useFormStore?.getState().setValues("create-determinant-form", {
       weekly_schedule: [..._weekly_schedule, _dayConfig],

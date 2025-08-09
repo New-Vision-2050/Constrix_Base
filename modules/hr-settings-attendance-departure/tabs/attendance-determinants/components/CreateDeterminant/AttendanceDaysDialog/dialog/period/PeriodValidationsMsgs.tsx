@@ -18,7 +18,7 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
     // Convert times to comparable format (minutes since midnight)
     const convertTimeToMinutes = (timeString: string): number => {
       if (!timeString) return 0;
-      const [hours, minutes] = timeString.split(':').map(Number);
+      const [hours, minutes] = timeString?.split(':').map(Number);
       return hours * 60 + minutes;
     };
     

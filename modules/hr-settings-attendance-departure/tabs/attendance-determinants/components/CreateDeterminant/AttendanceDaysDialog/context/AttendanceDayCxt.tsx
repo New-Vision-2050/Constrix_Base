@@ -6,12 +6,17 @@ import type { ReactNode } from "react";
 // import packages
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { InitialTimeHours, PeriodHour } from "../constants/time";
+import { DAYS_OF_WEEK } from "../constants/days";
 
 //
 export type AttendanceDayPeriodType = {
   index: number;
   start_time: string;
   end_time: string;
+  early_period?: string;
+  early_unit?: string;
+  lateness_period?: string;
+  lateness_unit?: string;
   extends_to_next_day?: boolean;
 };
 
@@ -23,6 +28,7 @@ type AttendanceDayCxtType = {
   // day periods
   dayPeriods: AttendanceDayPeriodType[];
   handleAddDayPeriod: () => void;
+  handleEmptyDayPeriods: () => void;
   handleRemoveDayPeriod: (index: number) => void;
   handleUpdateDayPeriod: (_period: AttendanceDayPeriodType) => void;
 
@@ -35,6 +41,9 @@ type AttendanceDayCxtType = {
 
   // available hours
   dayAvsilableHours: PeriodHour[];
+
+  // is edit
+  isEdit: boolean;
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -59,7 +68,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   const [dayAvsilableHours, setdayAvailableHours] = useState(InitialTimeHours);
   const [selectedDay, SetSelectedDay] = useState<string>("");
   const [dayPeriods, SetDayPeriods] = useState<AttendanceDayPeriodType[]>([]);
-
+  // is edit
+  const [isEdit, setIsEdit] = useState(false);
   // the min edge of the day
   const [minEdge, SetMinEdge] = useState<string>("");
   // the max edge of the day
@@ -71,8 +81,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     // make hours in periods not available
     for (let i = 0; i < _n; i++) {
       const _period = dayPeriods[i];
-      const _startHour = Number(_period.start_time.split(":")[0]);
-      const _endHour = Number(_period.end_time.split(":")[0]);
+      const _startHour = Number(_period.start_time?.split(":")[0]);
+      const _endHour = Number(_period.end_time?.split(":")[0]);
       for (let j = _startHour; j <= _endHour; j++) {
         _timeHours = _timeHours?.map((hour) => {
           if (+hour.value == j) {
@@ -86,6 +96,13 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     dayPeriods.forEach((period) => {});
     setdayAvailableHours(_timeHours);
   }, [dayPeriods]);
+
+
+  // edited day
+  const _editedDay = useFormStore
+    ?.getState()
+    .getValue("create-determinant-form", "editedDay");
+
   // prepare schedule data
   const _weekly_schedule = useFormStore
     ?.getState()
@@ -96,8 +113,13 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     .getValue("create-determinant-form", "show_attendance_days_dialog");
 
   const usedDays: string[] = useMemo(() => {
+    if (_editedDay) {
+      return DAYS_OF_WEEK.filter((day) => day.value !== _editedDay.day).map(
+        (day) => day.value
+      );
+    }
     return _weekly_schedule?.map((day: any) => day.day as string);
-  }, [_weekly_schedule]);
+  }, [_weekly_schedule, _editedDay]);
 
   useEffect(() => {
     // reset selected day and day periods when dialog is closed
@@ -106,8 +128,31 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
       SetDayPeriods([]);
       SetMinEdge("");
       SetMaxEdge("");
+      setIsEdit(false);
+      useFormStore
+        ?.getState()
+        .setValue("create-determinant-form", "editedDay", null);
+    } else {
+      if (_editedDay) {
+        setIsEdit(true);
+        const _newPeriods = _editedDay.periods.map(
+          (period: any, index: number) => {
+            return {
+              index: index + 1,
+              start_time: period.from,
+              end_time: period.to,
+              early_period: period.early_period,
+              early_unit: period.early_unit,
+              lateness_period: period.lateness_period,
+              lateness_unit: period.lateness_unit,
+            };
+          }
+        );
+        SetSelectedDay(_editedDay.day);
+        SetDayPeriods(_newPeriods);
+      }
     }
-  }, [_openDialog]);
+  }, [_openDialog, _editedDay]);
 
   // ** declare and define component helper methods
   const handleDayChange = useMemo(() => {
@@ -135,7 +180,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   };
   // convert string to time in minutes
   const convertStringToMinutes = (timeString: string) => {
-    const [hours, minutes] = timeString.split(":").map(Number);
+    const [hours, minutes] = timeString?.split(":").map(Number);
     return hours * 60 + minutes;
   };
 
@@ -175,6 +220,12 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     );
   };
 
+  // handle empty day periods
+  const handleEmptyDayPeriods = () => {
+    setIsEdit(false);
+    SetDayPeriods([]);
+  };
+
   // ** return component ui
   return (
     <AttendanceDayCxt.Provider
@@ -184,6 +235,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         handleDayChange,
         // day periods
         dayPeriods,
+        handleEmptyDayPeriods,
         handleAddDayPeriod,
         handleRemoveDayPeriod,
         handleUpdateDayPeriod,
@@ -194,6 +246,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         maxEdge,
         // available hours
         dayAvsilableHours,
+        // is edit
+        isEdit,
       }}
     >
       {children}

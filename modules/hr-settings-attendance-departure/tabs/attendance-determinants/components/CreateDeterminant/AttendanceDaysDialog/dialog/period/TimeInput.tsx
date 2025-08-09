@@ -6,7 +6,7 @@ import { useLocale } from "next-intl";
 // Convert string time (HH:MM) to dayjs object
 const stringToTime = (timeStr: string | null): dayjs.Dayjs | null => {
   if (!timeStr) return null;
-  const [hours, minutes] = timeStr.split(":").map(Number);
+  const [hours, minutes] = timeStr?.split(":").map(Number);
   return dayjs().hour(hours).minute(minutes).second(0);
 };
 

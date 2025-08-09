@@ -23,44 +23,15 @@ type PropsT = {
 // Convert string time (HH:MM) to dayjs object
 const stringToTime = (timeStr: string | null): dayjs.Dayjs | null => {
   if (!timeStr) return null;
-  const [hours, minutes] = timeStr.split(":").map(Number);
+  const [hours, minutes] = timeStr?.split(":").map(Number);
   return dayjs().hour(hours).minute(minutes).second(0);
 };
 
 // Component
 export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
-  //   Theme
-  const { resolvedTheme } = useTheme();
   //  constext
-  const { handleUpdateDayPeriod, minEdge, maxEdge } = useAttendanceDayCxt();
-  // Create MUI theme based on the current theme
-  const muiTheme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: resolvedTheme === "dark" ? "dark" : "light",
-          primary: {
-            main: "#ec4899", // pink-500 to match the app's theme
-          },
-        },
-        components: {
-          MuiOutlinedInput: {
-            styleOverrides: {
-              root: {
-                "&.Mui-error": {
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#ef4444", // red-500
-                  },
-                },
-              },
-            },
-          },
-        },
-      }),
-    [resolvedTheme]
-  );
-
-  console.log("minEdge, maxEdge", minEdge, maxEdge);
+  const { handleUpdateDayPeriod } = useAttendanceDayCxt();
+ 
   // handle change periods edges
   const handleTimeChange = (type: "start" | "end", value: string) => {
     let newStartTime = period.start_time;
@@ -69,6 +40,11 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
       newStartTime = value;
     } else if (type === "end") {
       newEndTime = value;
+    }
+
+    // if type start and end exist and start > end reset end
+    if (type === "start" && newStartTime && newEndTime && newStartTime > newEndTime) {
+      newEndTime = "";
     }
 
     // Update period if validation passes

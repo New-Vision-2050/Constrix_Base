@@ -31,18 +31,19 @@ const NewInputTimeField = ({
   disabled = false,
 }: TimeFieldProps) => {
   // context
-  const { dayAvsilableHours, minEdge, maxEdge } = useAttendanceDayCxt();
-  const [selectedHour, setSelectedHour] = useState<string>("");
-  const [selectedMinute, setSelectedMinute] = useState<string>("");
-  const [key, setKey] = useState(true);
-
-  const changeKey = useMemo(() => setKey(false), []);
+  const { dayAvsilableHours, isEdit } = useAttendanceDayCxt();
+  const [selectedHour, setSelectedHour] = useState<string>(
+    value?.split(":")[0] || ""
+  );
+  const [selectedMinute, setSelectedMinute] = useState<string>(
+    value?.split(":")[1] || ""
+  );
 
   const _dayAvsilableHours = useMemo(() => {
     if (type !== "end" || !period.start_time) return dayAvsilableHours;
 
     let foundUnavailable = false;
-    const startHour = parseInt(period.start_time.split(":")[0]);
+    const startHour = parseInt(period.start_time?.split(":")[0]);
 
     return dayAvsilableHours?.map((hour) => {
       const currentHour = parseInt(hour.value);
@@ -74,6 +75,7 @@ const NewInputTimeField = ({
     <Select
       disabled={disabled}
       value={selectedHour}
+      defaultValue={value?.split(":")[0] || ""}
       onValueChange={(val) => setSelectedHour(val)}
     >
       <SelectTrigger className="w-[70px] bg-gray-800 border-gray-700">
@@ -121,14 +123,23 @@ const NewInputTimeField = ({
     </Select>
   );
 
+  if (!isEdit)
+    return (
+      <div className="flex flex-col space-y-1">
+        {label && <label className="text-sm text-gray-400">{label}</label>}
+        <div className="flex items-center space-x-1">
+          {hourSelect}
+          <span className="text-gray-400">:</span>
+          {minuteSelect}
+        </div>
+      </div>
+    );
+
+  // edit view
   return (
     <div className="flex flex-col space-y-1">
       {label && <label className="text-sm text-gray-400">{label}</label>}
-      <div className="flex items-center space-x-1">
-        {hourSelect}
-        <span className="text-gray-400">:</span>
-        {minuteSelect}
-      </div>
+      <div className="flex items-center space-x-1">{value}</div>
     </div>
   );
 };

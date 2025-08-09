@@ -1,8 +1,9 @@
 import React from "react";
 import { useTheme } from "next-themes";
-import { CalendarDays, Clock } from "lucide-react";
+import { CalendarDays, Clock, PenIcon, Trash2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { WeeklyScheduleDayConfig } from ".";
+import { useFormStore } from "@/modules/form-builder";
 
 // Types
 type PeriodType = {
@@ -13,7 +14,7 @@ type PeriodType = {
 };
 
 type DayPeriodProps = {
-  dayConfig: WeeklyScheduleDayConfig
+  dayConfig: WeeklyScheduleDayConfig;
 };
 
 const dayNames = {
@@ -29,13 +30,46 @@ const dayNames = {
 /**
  * Component for displaying a single day with its periods in the weekly schedule
  */
-export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
-  dayConfig,
-}) => {
+export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
   const { resolvedTheme } = useTheme();
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
   );
+
+  // handle edit day periods
+  const handleEditDayPeriods = () => {
+    useFormStore
+      ?.getState()
+      .setValue("create-determinant-form", "editedDay", dayConfig);
+    useFormStore
+      ?.getState()
+      .setValue("create-determinant-form", "show_attendance_days_dialog", true);
+  };
+
+  // handle delete day periods
+  const handleDeleteDayPeriods = () => {
+    // get weekly schedule
+    const _weeklySchedule = useFormStore
+      ?.getState()
+      .getValues("create-determinant-form").weekly_schedule;
+    // remove day from weekly schedule
+    const _weeklyScheduleWithoutDay = _weeklySchedule.filter(
+      (day) => day.day !== dayConfig.day
+    );
+    // update weekly schedule
+    useFormStore
+      ?.getState()
+      .setValues("create-determinant-form", {
+        weekly_schedule: _weeklyScheduleWithoutDay,
+      });
+    console.log("dayConfig _weeklyScheduleWithoutDay", _weeklyScheduleWithoutDay);
+    console.log("dayConfig _weeklySchedule", _weeklySchedule);
+    console.log("dayConfig", dayConfig);
+    // useFormStore
+    //   ?.getState()
+    //   .setValue("create-determinant-form", "show_attendance_days_dialog", true);
+  };
+
   // Common styles
   const sectionClass = `rounded-lg p-4 mb-3 ${
     resolvedTheme === "dark" ? "bg-gray-800" : "bg-gray-100"
@@ -50,9 +84,23 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({
   return (
     <div className={sectionClass}>
       {/* Day Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <CalendarDays className="h-5 w-5 text-blue-500" />
-        <span className="font-medium text-base">{dayNames[dayConfig.day as keyof typeof dayNames]}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 mb-3">
+          <CalendarDays className="h-5 w-5 text-blue-500" />
+          <span className="font-medium text-base">
+            {dayNames[dayConfig.day as keyof typeof dayNames]}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <PenIcon
+            onClick={handleEditDayPeriods}
+            className="h-5 w-5 text-pink-500 cursor-pointer"
+          />
+          <Trash2Icon
+            onClick={handleDeleteDayPeriods}
+            className="h-5 w-5 text-red-500 cursor-pointer"
+          />
+        </div>
       </div>
 
       {/* Periods List */}

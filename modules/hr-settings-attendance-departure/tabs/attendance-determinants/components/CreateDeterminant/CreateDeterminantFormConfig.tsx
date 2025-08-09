@@ -333,6 +333,12 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           },
           // attendance days
           {
+            name:"editedDay",
+            type:"hiddenObject",
+            label:"",
+            defaultValue:{},
+          },
+          {
             name: "attendance_days",
             type: "text",
             label: "",
@@ -689,10 +695,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   try {
                     // Convert times to minutes
                     const [startHour, startMinute] = period.start_time
-                      .split(":")
+                      ?.split(":")
                       .map(Number);
                     const [endHour, endMinute] = period.end_time
-                      .split(":")
+                      ?.split(":")
                       .map(Number);
 
                     // Calculate the difference in minutes
