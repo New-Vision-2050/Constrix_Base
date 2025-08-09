@@ -54,7 +54,7 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
       .getValues("create-determinant-form").weekly_schedule;
     // remove day from weekly schedule
     const _weeklyScheduleWithoutDay = _weeklySchedule.filter(
-      (day) => day.day !== dayConfig.day
+      (day: any) => day.day !== dayConfig.day
     );
     // update weekly schedule
     useFormStore

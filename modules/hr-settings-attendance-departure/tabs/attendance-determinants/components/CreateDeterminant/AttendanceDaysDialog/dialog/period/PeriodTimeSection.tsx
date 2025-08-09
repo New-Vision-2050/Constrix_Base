@@ -1,16 +1,8 @@
-import { ThemeProvider, createTheme } from "@mui/material/styles";
 import {
   AttendanceDayPeriodType,
   useAttendanceDayCxt,
 } from "../../context/AttendanceDayCxt";
-import { LocalizationProvider } from "@mui/x-date-pickers";
 import { Label } from "@/components/ui/label";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useTheme } from "next-themes";
-import { useMemo } from "react";
-import "dayjs/locale/ar";
-import dayjs from "dayjs";
-import TimeInput from "./TimeInput";
 import NewInputTimeField from "./NewInputTimeField";
 
 // Props
@@ -18,13 +10,6 @@ type PropsT = {
   t: (key: string) => string;
   period: AttendanceDayPeriodType;
   labelClass: string;
-};
-
-// Convert string time (HH:MM) to dayjs object
-const stringToTime = (timeStr: string | null): dayjs.Dayjs | null => {
-  if (!timeStr) return null;
-  const [hours, minutes] = timeStr?.split(":").map(Number);
-  return dayjs().hour(hours).minute(minutes).second(0);
 };
 
 // Component

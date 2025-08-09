@@ -28,7 +28,7 @@ export default function SaveButton() {
     if (!_weekly_schedule) _weekly_schedule = [];
     // remove day if exist
     _weekly_schedule = _weekly_schedule?.filter(
-      (day) => day.day !== selectedDay
+      (day: any) => day.day !== selectedDay
     );
     // update weekly schedule
     useFormStore?.getState().setValues("create-determinant-form", {
