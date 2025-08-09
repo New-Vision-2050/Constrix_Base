@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import SearchableSelect from "../../../../../../../../components/shared/SearchableSelect";
+import { useAttendanceDeterminants } from "../../../../context/AttendanceDeterminantsContext";
 
 interface CoordinatesInputProps {
   longitude: string;
@@ -24,6 +25,8 @@ export default function CoordinatesInput({
 }: CoordinatesInputProps) {
   const { resolvedTheme } = useTheme();
   const t = useTranslations("location");
+  const [cityLocation, setCityLocation] = useState("");
+  const { citiesData } = useAttendanceDeterminants();
 
   // Common input classes
   const inputClasses =
@@ -72,22 +75,17 @@ export default function CoordinatesInput({
 
       <div className="col-span-2">
         <SearchableSelect
-          options={[
-            {
-              value: "1",
-              label: "Branch 1",
-            },
-            {
-              value: "2",
-              label: "Branch 2",
-            },
-            {
-              value: "3",
-              label: "Branch 3",
-            },
-          ]}
-          value={""}
-          onChange={(value) => {}}
+          options={(citiesData || []).map((city) => ({
+            value: `${city.latitude},${city.longitude}`,
+            label: city.name,
+          }))}
+          value={cityLocation}
+          onChange={(value) => {
+            setCityLocation(value as string);
+            const [latitude, longitude] = (value as string)?.split(",");
+            onLatitudeChange(latitude);
+            onLongitudeChange(longitude);
+          }}
           // placeholder={t("selectBranch")}
           // disabled={disabled}
         />

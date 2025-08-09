@@ -10,6 +10,8 @@ import { Constraint } from "@/modules/hr-settings-attendance-departure/types/con
 import useBranchHierarchiesData from "@/modules/organizational-structure/components/organizational-structure-tabs/organizational-structure-tabs/components/company-structure/hooks/useBranchHierarchiesData";
 import { useBranchiesData } from "../hooks/useBranchiesData";
 import { useConstraintsList } from "@/modules/hr-settings-attendance-departure/hooks/useConstraintsList";
+import { useCitiesData } from "../hooks/useCities";
+import { City } from "../api/get-cities";
 
 //
 type constraintsListType = {
@@ -40,6 +42,9 @@ interface AttendanceDeterminantsContextType {
   constraintsListLoading: boolean;
   constraintsListError: unknown;
   refetchConstraintsList: () => void;
+
+  // cities data
+  citiesData: City[] | undefined;
 }
 
 // Create the context with an initial value
@@ -68,6 +73,11 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
   } = useConstraintsList({ limit: limit, page: page });
 
   const { data: branchesData } = useBranchiesData();
+
+  // cities data
+  const { data: citiesData } = useCitiesData();
+
+  console.log("citiesData", citiesData);
 
   // refresh active constraint when data updated
   useEffect(() => {
@@ -132,6 +142,8 @@ export const AttendanceDeterminantsProvider: React.FC<PropsWithChildren> = ({
     constraintsListLoading,
     constraintsListError,
     refetchConstraintsList,
+    // cities data
+    citiesData
   };
 
   return (
