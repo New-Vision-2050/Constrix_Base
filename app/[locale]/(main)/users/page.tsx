@@ -17,8 +17,8 @@ const UsersPage = () => {
   const t = useTranslations("Companies");
   return (
     <div className="px-8 space-y-7">
-      <Can check={[PERMISSIONS.user.view]}>
-        <StatisticsRow config={statisticsConfig} />{" "}
+      <StatisticsRow config={statisticsConfig} />{" "}
+      <Can check={[PERMISSIONS.user.list]}>
         <TableBuilder
           config={config}
           searchBarActions={
@@ -30,7 +30,7 @@ const UsersPage = () => {
                   onSuccess={(values) => {
                     console.log("Form submitted successfully:", values);
                   }}
-                />{" "}
+                />
               </Can>
             </div>
           }

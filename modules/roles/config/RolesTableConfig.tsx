@@ -1,5 +1,7 @@
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Edit } from "lucide-react";
 
 export const rolesTableConfig = ({
@@ -124,13 +126,13 @@ export const rolesTableConfig = ({
         icon: <Edit className="w-4 h-4" />,
         action: (row: { id: string }) =>
           handleOpenRolesSheet({
-            isEdit: true,
+            isEdit: usePermissions().can(PERMISSIONS.role.update),
             selectedId: row.id,
           }),
       },
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: usePermissions().can(PERMISSIONS.role.delete),
     },
   };
 };

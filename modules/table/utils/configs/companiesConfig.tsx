@@ -8,6 +8,8 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Define types for the company data
 interface CompanyData {
@@ -132,17 +134,19 @@ export const CompaniesConfig = () => {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: () => console.log("Login as manager clicked"),
+        disabled: !usePermissions().can(PERMISSIONS.company.update),
       },
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: CompanyData) =>
-          router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
+        router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
+        disabled: !usePermissions().can(PERMISSIONS.company.update),
       },
     ],
     executionConfig: {
       canEdit: false,
-      canDelete: true,
+      canDelete: usePermissions().can(PERMISSIONS.company.delete),
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"),
   };
