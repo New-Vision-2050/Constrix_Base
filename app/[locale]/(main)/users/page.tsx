@@ -18,7 +18,6 @@ const UsersPage = () => {
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
-      <Can check={[PERMISSIONS.user.list]}>
         <TableBuilder
           config={config}
           searchBarActions={
@@ -35,9 +34,8 @@ const UsersPage = () => {
             </div>
           }
         />
-      </Can>
     </div>
   );
 };
 
-export default withPermissions(UsersPage, [PERMISSIONS.user.view]);
+export default withPermissions(UsersPage, [PERMISSIONS.user.list]);

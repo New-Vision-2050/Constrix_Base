@@ -86,7 +86,7 @@ const Execution = ({
         label: t("Companies.Edit"),
         icon: <EditIcon className="w-4 h-4" />,
         action: "edit",
-        disabled: false,
+        disabled: true,
       });
     }
 
@@ -96,7 +96,7 @@ const Execution = ({
         icon: <TrashIcon className="w-4 h-4" />,
         action: "delete",
         color: "red-500",
-        disabled: false,
+        disabled: true,
       });
     }
 
@@ -137,8 +137,6 @@ const Execution = ({
   const [actionState, setActionState] = useState<ActionState>(initialState);
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
-
-  console.log("actionState", actionState);
 
   const handleMenuItemClick = (
     action: string | ((row: { id: string; [key: string]: unknown }) => void)
@@ -182,7 +180,7 @@ const Execution = ({
               key={index}
               onClick={() => handleMenuItemClick(item.action)}
               className={item.color ? `text-${item.color}` : ""}
-              disabled={item.disabled ?? false}
+              disabled={!item.disabled||false}
             >
               {item.icon && <span className="me-2">{item.icon}</span>}
               {item.label}

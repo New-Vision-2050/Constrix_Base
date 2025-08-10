@@ -33,6 +33,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
   const [isActive, setIsActive] = useState(initialStatus);
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive);
+  const { can } = usePermissions();
 
   // declare and define component helper methods
   const handleConfirm = async (activationDate?: string) => {
@@ -78,7 +79,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!usePermissions().can(PERMISSIONS.role.activate)}
+          disabled={!can(PERMISSIONS.permission.activate)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

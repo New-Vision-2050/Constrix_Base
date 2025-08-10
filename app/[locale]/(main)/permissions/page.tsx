@@ -2,6 +2,8 @@
 
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { baseURL } from "@/config/axios-config";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { permissionsTableConfig } from "@/modules/permissions/config/PermissionsTableConfig";
 import { TableBuilder } from "@/modules/table";
 import ArrowStaticIcon from "@/public/icons/arrow-static";
@@ -30,4 +32,4 @@ const AuthoritiesPage = () => {
   );
 };
 
-export default AuthoritiesPage;
+export default withPermissions(AuthoritiesPage, [PERMISSIONS.permission.list]);

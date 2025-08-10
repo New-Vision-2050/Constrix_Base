@@ -273,18 +273,14 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             icon: UserIcon,
             isActive: pageName === ROUTER.Programs,
             show: can(
-              Object.values(PERMISSIONS.permission).flatMap((p) =>
-                Object.values(p)
-              )
+              Object.values(PERMISSIONS.companyAccessProgram)
             ),
           },
         ],
         show:
           isCentralCompany &&
           can(
-            Object.values(PERMISSIONS.permission).flatMap((p) =>
-              Object.values(p)
-            )
+            Object.values(PERMISSIONS.companyAccessProgram)
           ),
       },
     ];
