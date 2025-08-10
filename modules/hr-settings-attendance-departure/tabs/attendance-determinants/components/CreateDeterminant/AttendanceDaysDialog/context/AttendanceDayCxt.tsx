@@ -86,10 +86,12 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     for (let i = 0; i < _n; i++) {
       const _period = dayPeriods[i];
       const _startHour = Number(_period.start_time?.split(":")[0]);
-      const _endHour = Number(_period.end_time?.split(":")[0]);
+      let _endHour = Number(_period.end_time?.split(":")[0]);
       if(_period.extends_to_next_day){
         _nextDayExist = true;
+        _endHour = 24;
       }
+
       // set min and max edges
       if(Boolean(_period.start_time)){
         const _startMinutes = convertStringToMinutes(_period.start_time);
@@ -106,7 +108,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         }
       }
 
-     
+      
       // make hours in periods not available
       for (let j = _startHour; j <= _endHour; j++) {
         _timeHours = _timeHours?.map((hour) => {

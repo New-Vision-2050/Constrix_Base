@@ -48,6 +48,10 @@ const NewInputTimeField = ({
     return dayAvsilableHours?.map((hour) => {
       const currentHour = parseInt(hour.value);
 
+      if (type === "end" && period?.extends_to_next_day) {
+        return { ...hour, available: true };
+      }
+
       if (!hour.available) {
         if (currentHour >= startHour) foundUnavailable = true;
         return hour;
