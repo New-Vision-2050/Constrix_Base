@@ -79,7 +79,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!can(PERMISSIONS.role.activate)}
+          disabled={!can(PERMISSIONS.permission.activate)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

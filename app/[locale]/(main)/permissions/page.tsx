@@ -1,6 +1,8 @@
 "use client";
 
 import StatisticsRow from "@/components/shared/layout/statistics-row";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import { permissionsTableConfig } from "@/modules/permissions/config/PermissionsTableConfig";
 import { TableBuilder } from "@/modules/table";
@@ -16,4 +18,4 @@ const AuthoritiesPage = () => {
   );
 };
 
-export default AuthoritiesPage;
+export default withPermissions(AuthoritiesPage, [PERMISSIONS.permission.list]);
