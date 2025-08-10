@@ -17,7 +17,6 @@ const UsersPage = () => {
   const t = useTranslations("Companies");
   return (
     <div className="px-8 space-y-7">
-      <Can check={[PERMISSIONS.user.view]}>
         <StatisticsRow config={statisticsConfig} />{" "}
         <TableBuilder
           config={config}
@@ -35,9 +34,8 @@ const UsersPage = () => {
             </div>
           }
         />
-      </Can>
     </div>
   );
 };
 
-export default withPermissions(UsersPage, [PERMISSIONS.user.view]);
+export default withPermissions(UsersPage, [PERMISSIONS.user.list]);

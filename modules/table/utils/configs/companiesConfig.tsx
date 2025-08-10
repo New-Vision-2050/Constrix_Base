@@ -136,14 +136,14 @@ export const CompaniesConfig = () => {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: () => console.log("Login as manager clicked"),
-        disabled: !can(PERMISSIONS.company.view),
+        disabled: can(PERMISSIONS.company.view),
       },
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: CompanyData) =>
         router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
-        disabled: !can(PERMISSIONS.company.view),
+        disabled: can(PERMISSIONS.company.view),
       },
     ],
     executionConfig: {

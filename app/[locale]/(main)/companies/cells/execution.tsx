@@ -96,7 +96,7 @@ const Execution = ({
         icon: <TrashIcon className="w-4 h-4" />,
         action: "delete",
         color: "red-500",
-        disabled: false,
+        disabled: true,
       });
     }
 
@@ -180,7 +180,7 @@ const Execution = ({
               key={index}
               onClick={() => handleMenuItemClick(item.action)}
               className={item.color ? `text-${item.color}` : ""}
-              disabled={item.disabled ?? false}
+              disabled={!item.disabled||false}
             >
               {item.icon && <span className="me-2">{item.icon}</span>}
               {item.label}
