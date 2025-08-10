@@ -12,7 +12,7 @@ import CheckStatic from "@/public/icons/check-static";
 import PersonStaticIcon from "@/public/icons/person-static";
 import React, { useCallback, useState } from "react";
 
-export const statisticsConfig = {
+const statisticsConfig = {
   url: `${baseURL}/role_and_permissions/roles/widgets`,
   icons: [
     <PersonStaticIcon key={1} />,

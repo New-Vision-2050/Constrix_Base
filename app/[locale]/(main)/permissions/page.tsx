@@ -10,7 +10,7 @@ import CheckStatic from "@/public/icons/check-static";
 import PersonStaticIcon from "@/public/icons/person-static";
 import React from "react";
 
-export const statisticsConfig = {
+const statisticsConfig = {
   url: `${baseURL}/role_and_permissions/permissions/widgets`,
   icons: [
     <PersonStaticIcon key={1} />,
