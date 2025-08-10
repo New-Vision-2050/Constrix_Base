@@ -176,7 +176,6 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
         ],
       },
     ],
-    // Dynamic fields are already loaded and included in the fields array
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
@@ -186,28 +185,55 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
     showCancelButton: false,
     showBackButton: false,
     editDataTransformer: (data: any) => {
-      // Transform array objects to just IDs for select fields
       data.company_fields = data.company_fields?.map((item: any) => item.id);
       data.company_types = data.company_types?.map((item: any) => item.id);
       data.country_id = data.countries?.map((item: any) => item.id);
+  
+      if (data.programs && Array.isArray(data.programs)) {
+        const processProgram = (program: any, level: number = 0, parentPath: string = '') => {
+          let programKey: string;
+          if (level === 0) {
+            programKey = `program_${program.id}`;
+          } else {
+            programKey = `${parentPath}_child_${program.id}`;
+          }
+          
+          if (program.sub_entities && Array.isArray(program.sub_entities)) {
+            const subEntityIds = program.sub_entities.map((item: any) => item.id || item);
+            data[programKey] = subEntityIds;
+          } else {
+            data[programKey] = [];
+          }
+          
+          const dataKey = level === 0 ? `program_data_${program.id}` : `${programKey}_data`;
+          data[dataKey] = program;
+          
+          if (program.children && Array.isArray(program.children)) {
+            program.children.forEach((child: any) => {
+              processProgram(child, level + 1, programKey);
+            });
+          }
+        };
+        
+        data.programs.forEach((program: any) => {
+          processProgram(program, 0);
+        });
+        
+        delete data.programs;
+      }
       
       return data;
     },
-    // Success handler with proper error handling
     onSuccess: (values: any, result: any) => {
       console.log("Form submitted successfully with values:", values);
 
-      // Show success notification
       const toast = safeToast();
       if (toast) {
         toast.success("تم إضافة البرنامج بنجاح");
       }
     },
     onSubmit: async (formData: Record<string, unknown>, formConfig: FormConfig) => {
-      console.log("Form data received:", formData);
-      
       try {
-        // Transform form data to match the Root interface
         const transformedData: Root = {
           id:formData.id as string,
           name: formData.name as string,
@@ -223,15 +249,12 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
             : []
         };
 
-        // Process dynamic program fields to build programs array recursively
         const processedPrograms = new Map<string, Program>();
         
-        // Helper function to collect all children (flattened structure)
         const collectAllChildren = (parentKey: string, allFormData: Record<string, unknown>): ApiChildren[] => {
           const children: ApiChildren[] = [];
           console.log(`Collecting children for parent key: ${parentKey}`);
           
-          // Collect direct children
           Object.keys(allFormData).forEach(key => {
             if (key.startsWith(`${parentKey}_child_`) && !key.includes('_data')) {
               console.log(`Found child key: ${key}`);
@@ -240,16 +263,14 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
               const childDataKey = `${key}_data`;
               const childData = allFormData[childDataKey] as any;
                          
-              // Include child program even if it has no selected sub_entities
               if (childData) {
                 const childProgram: ApiChildren = {
                   id: childId,
-                  sub_entities: selectedOptions.filter(option => option !== 'empty') // Remove 'empty' placeholder
+                  sub_entities: selectedOptions.filter(option => option !== 'empty')
                 };
                 
                 children.push(childProgram);
                 
-                // Recursively collect nested children and add them to the same flat array
                 const nestedChildren = collectAllChildren(key, allFormData);
                 children.push(...nestedChildren);
               } else {
@@ -269,7 +290,6 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
             const programDataKey = `program_data_${programId}`;
             const programData = formData[programDataKey] as any;
 
-            // Include program even if it has no selected sub_entities
             if (programData) {
               const program: Program = {
                 id: programId,
@@ -283,10 +303,8 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
           }
         });
         
-        // Convert to array
         transformedData.programs = Array.from(processedPrograms.values());
 
-        // Send to the specified endpoint
        return await defaultSubmitHandler(transformedData,formConfig);
       } catch (error) {
         console.error("Error submitting form:", error);
