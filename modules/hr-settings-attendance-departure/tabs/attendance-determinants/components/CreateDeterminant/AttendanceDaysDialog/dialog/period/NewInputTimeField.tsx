@@ -56,6 +56,8 @@ const NewInputTimeField = ({
     return dayAvsilableHours?.map((hour) => {
       const currentHour = parseInt(hour.value);
 
+      console.log('minEdgeInNextDay', minEdgeInNextDay)
+
       if (type === "end" && period?.extends_to_next_day) {
         if(minEdgeInNextDay){
           const _minEdgeInNextDay = convertStringToMinutes(minEdgeInNextDay);
