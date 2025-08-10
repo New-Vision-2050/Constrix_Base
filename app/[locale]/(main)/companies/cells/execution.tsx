@@ -86,7 +86,7 @@ const Execution = ({
         label: t("Companies.Edit"),
         icon: <EditIcon className="w-4 h-4" />,
         action: "edit",
-        disabled: false,
+        disabled: true,
       });
     }
 
