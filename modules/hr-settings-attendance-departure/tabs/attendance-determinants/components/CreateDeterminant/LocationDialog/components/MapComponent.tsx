@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 // @ts-ignore
 import L from "leaflet";
 import "./MapComponent.css";
+import MapSearchControl from "./MapSearchControl";
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -108,6 +109,14 @@ export default function MapComponent({
           <Marker key={position.toString()} position={position} icon={customIcon} />
           
           <MapClickHandler onMapClick={onMapClick} />
+          
+          <MapSearchControl
+            onLocationSelected={onMapClick}
+            position="topleft"
+            style="bar"
+            autoComplete={true}
+            autoClose={true}
+          />
         </MapContainer>
         
         {/* Default Location Badge */}
