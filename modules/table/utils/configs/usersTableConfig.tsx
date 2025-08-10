@@ -193,6 +193,7 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
+    enableExport: can(PERMISSIONS.user.export),
     // deleteUrl: `${baseURL}/company-users`,
     formConfig: GetCompanyUserFormConfig(t),
     executions: [
@@ -206,11 +207,12 @@ export const UsersConfig = () => {
             user: row,
           };
         },
+        disabled: can(PERMISSIONS.user.view)
       },
     ],
     executionConfig: {
       canEdit: false,
-      canDelete: can(Object.values(PERMISSIONS.user.delete)),
+      canDelete: can(PERMISSIONS.user.delete),
     },
   };
 };

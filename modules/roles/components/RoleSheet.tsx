@@ -14,6 +14,8 @@ import { PermissionsObject, RolePermissions } from "../type";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const RoleSheet = ({
   isEdit,
@@ -41,7 +43,8 @@ const RoleSheet = ({
 
   return (
     <>
-      <Button
+      <Can check={[PERMISSIONS.role.create]}>
+        <Button
         onClick={() => {
           handleOpen({ isEdit: false, selectedId: undefined });
         }}
@@ -49,6 +52,7 @@ const RoleSheet = ({
         {" "}
         إضافة دور
       </Button>
+      </Can>
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetContent
           side={isRTL ? "left" : "right"}

@@ -3,6 +3,9 @@ import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { Button } from "@/components/ui/button";
 import { baseURL } from "@/config/axios-config";
 import { useModal } from "@/hooks/use-modal";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
 import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
 import { TableBuilder, useTableReload } from "@/modules/table";
@@ -57,7 +60,9 @@ const RolesPages = () => {
         config={config}
         searchBarActions={
           <>
-            <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+            <Can check={[PERMISSIONS.role.create]}>
+              <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+            </Can>
 
             <UpdateRoleDrawer
               onClose={handleCloseRolesSheet}
@@ -72,4 +77,4 @@ const RolesPages = () => {
   );
 };
 
-export default RolesPages;
+export default withPermissions(RolesPages, [PERMISSIONS.role.list]);

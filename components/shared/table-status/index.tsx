@@ -6,6 +6,8 @@ import { Switch } from "@/modules/table/components/ui/switch";
 import { Dialog } from "@/components/ui/dialog";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface TableStatusSwitcherProps {
   id: string;
@@ -31,6 +33,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
   const [isActive, setIsActive] = useState(initialStatus);
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive);
+  const { can } = usePermissions();
 
   // declare and define component helper methods
   const handleConfirm = async (activationDate?: string) => {
@@ -76,6 +79,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
+          disabled={!can(PERMISSIONS.permission.activate)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

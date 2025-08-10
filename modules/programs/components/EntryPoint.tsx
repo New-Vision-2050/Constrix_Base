@@ -15,6 +15,10 @@ import StatisticsCardHeader from "@/modules/organizational-structure/components/
 import { apiClient, baseURL } from "@/config/axios-config";
 import { FieldConfig } from "@/modules/form-builder";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 // Define interfaces matching the API response structure
 export interface ApiResponse {
@@ -309,6 +313,7 @@ const generateDynamicFields = async (): Promise<FieldConfig[]> => {
 function EntryPointPrograms() {
   const t = useTranslations("Companies");
   const router = useRouter();
+  const { can } = usePermissions();
   const [config, setConfig] = useState<any>(null);
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -359,7 +364,15 @@ function EntryPointPrograms() {
         setLoading(true);
         const dynamicFields = await generateDynamicFields();
         const formConfig = GetProgramFormConfig(t, dynamicFields);
-        const tableConfig = programsConfig(t, router, dynamicFields);
+        const tableConfig = programsConfig(
+          t, 
+          router, 
+          dynamicFields, 
+          can(PERMISSIONS.companyAccessProgram.update), 
+          can(PERMISSIONS.companyAccessProgram.delete),
+          can(PERMISSIONS.companyAccessProgram.export),
+          can(PERMISSIONS.companyAccessProgram.view)
+        );
         setFormConfig(formConfig);
         setConfig(tableConfig);
         setError(null);
@@ -405,7 +418,8 @@ function EntryPointPrograms() {
             config={config}
             searchBarActions={
               <div className="flex items-center gap-3">
-                {loading ? (
+              <Can check={[PERMISSIONS.companyAccessProgram.create]}>
+                  {loading ? (
                   <Button disabled>جاري التحميل...</Button>
                 ) : error ? (
                   <Button variant="destructive" onClick={() => window.location.reload()}>إعادة المحاولة</Button>
@@ -416,6 +430,8 @@ function EntryPointPrograms() {
                      onSuccess={handleFormSuccess}
                   />
                 ) : null}
+
+              </Can>
               </div>
             }
           />
@@ -432,4 +448,4 @@ function EntryPointPrograms() {
   );
 }
 
-export default EntryPointPrograms;
+export default withPermissions(EntryPointPrograms, [PERMISSIONS.companyAccessProgram.list]);

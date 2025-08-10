@@ -6,6 +6,8 @@ import { ROUTER } from "@/router";
 import { GetProgramFormConfig } from "@/modules/form-builder/configs/programFormConfig";
 import { FieldConfig } from "@/modules/form-builder";
 import TheStatus from "@/modules/programs/components/the-status";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export interface ProgramTableRow {
   id: string;
@@ -16,8 +18,8 @@ export interface ProgramTableRow {
   is_active: "active" | "inActive";
 }
 
-export const programsConfig = (t: ReturnType<typeof useTranslations>, router: any, dynamicFields: FieldConfig[]) => {
-
+// Create a component that uses the translations
+export const programsConfig = (t: ReturnType<typeof useTranslations>, router: any, dynamicFields: FieldConfig[], canEdit: boolean, canDelete: boolean, canExport: boolean, canView: boolean) => {
   return {
     url: `${baseURL}/company_access_programs`,
     tableId: "program-systems-table", // Add tableId to the config
@@ -28,8 +30,8 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
         searchable: true,
         render: (_: unknown, row: ProgramTableRow) => (
           <div 
-            className="flex gap-3 border-e-2 cursor-pointer"
-            onClick={() => router.push(ROUTER.BouquetById(row.id))}
+            className={canView ? "flex gap-3 border-e-2 cursor-pointer" : "flex gap-3 border-e-2"}
+            onClick={() =>canView && router.push(ROUTER.BouquetById(row.id))}
           >
             <div>
               <p className="font-medium">{row.name}</p>
@@ -113,6 +115,7 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
     defaultItemsPerPage: 5,
     enableSearch: true,
     enableColumnSearch: true,
+    enableExport: canExport,
     searchFields: ["name", "company_field_id", "status"],
     searchParamName: "name",
     searchFieldParamName: "fields",
@@ -120,8 +123,8 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
     executions:[],
     formConfig: GetProgramFormConfig(t, dynamicFields),
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: canEdit,
+      canDelete: canDelete,
     },
   };
 };

@@ -1,5 +1,7 @@
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Edit } from "lucide-react";
 
 export const rolesTableConfig = ({
@@ -13,6 +15,7 @@ export const rolesTableConfig = ({
     selectedId?: string;
   }) => void;
 }) => {
+  const { can } = usePermissions();
   return {
     url: `${baseURL}/role_and_permissions/roles`,
     tableId: "roles-table",
@@ -113,6 +116,7 @@ export const rolesTableConfig = ({
     defaultItemsPerPage: 5,
     enableSearch: true,
     enableColumnSearch: true,
+    enableExport: can(PERMISSIONS.role.export),
     searchFields: ["name", "email"],
     searchParamName: "search",
     searchFieldParamName: "fields",
@@ -124,13 +128,14 @@ export const rolesTableConfig = ({
         icon: <Edit className="w-4 h-4" />,
         action: (row: { id: string }) =>
           handleOpenRolesSheet({
-            isEdit: true,
+            isEdit: usePermissions().can(PERMISSIONS.role.update),
             selectedId: row.id,
           }),
+        disabled: can(PERMISSIONS.role.update),
       },
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.role.delete),
     },
   };
 };

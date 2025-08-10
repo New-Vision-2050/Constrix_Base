@@ -29,6 +29,7 @@ export type MenuItem = {
   action: string | ((row: { id: string; [key: string]: unknown }) => void);
   color?: string;
   // Optional component property for custom dialogs
+  disabled?: boolean;
   dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
   dialogProps?:
     | DialogProps
@@ -77,14 +78,15 @@ const Execution = ({
   deleteUrl?:string
 }) => {
   const t = useTranslations();
-  const defaultMenuItems = useMemo(() => {
-    const items = [];
+  const defaultMenuItems = useMemo((): MenuItem[] => {
+    const items: MenuItem[] = [];
 
     if (showEdit) {
       items.push({
         label: t("Companies.Edit"),
         icon: <EditIcon className="w-4 h-4" />,
         action: "edit",
+        disabled: true,
       });
     }
 
@@ -94,6 +96,7 @@ const Execution = ({
         icon: <TrashIcon className="w-4 h-4" />,
         action: "delete",
         color: "red-500",
+        disabled: true,
       });
     }
 
@@ -134,8 +137,6 @@ const Execution = ({
   const [actionState, setActionState] = useState<ActionState>(initialState);
 
   const { reloadTable } = useTableInstance(tableName || "companies-table");
-
-  console.log("actionState", actionState);
 
   const handleMenuItemClick = (
     action: string | ((row: { id: string; [key: string]: unknown }) => void)
@@ -179,6 +180,7 @@ const Execution = ({
               key={index}
               onClick={() => handleMenuItemClick(item.action)}
               className={item.color ? `text-${item.color}` : ""}
+              disabled={!item.disabled||false}
             >
               {item.icon && <span className="me-2">{item.icon}</span>}
               {item.label}
