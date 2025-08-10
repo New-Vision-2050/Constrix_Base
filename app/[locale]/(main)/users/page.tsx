@@ -8,6 +8,8 @@ import { statisticsConfig } from "@/modules/users/components/statistics-config";
 import React from "react";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import {useTranslations} from "next-intl";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const UsersPage = () => {
   const config = UsersConfig();
@@ -15,20 +17,24 @@ const UsersPage = () => {
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
+      <Can check={[PERMISSIONS.user.list]}>
       <TableBuilder
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
+            <Can check={[PERMISSIONS.user.create]}>
             <SheetFormBuilder
               config={GetCompanyUserFormConfig(t)}
               trigger={<Button>إنشاء مستخدم</Button>}
               onSuccess={(values) => {
                 console.log("Form submitted successfully:", values);
               }}
-            />{" "}
+            />
+            </Can>
           </div>
         }
       />
+      </Can>
     </div>
   );
 };
