@@ -699,6 +699,7 @@
       "vacations": "العطلات الرسمية"
     },
     "attendanceDeterminants": {
+      "noScheduledDays": "لا يوجد أيام مجدولة",
       "selectDayFirst": "اختر يوماً أولاً",
       "periodEndRequired": "الوقت النهايي للفترة مطلوب",
       "periods": "الفترات",

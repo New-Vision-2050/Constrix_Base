@@ -683,6 +683,7 @@
       "vacations": "Official Holidays"
     },
     "attendanceDeterminants": {
+      "noScheduledDays": "No scheduled days",
       "selectDayFirst": "Please select a day first",
       "periodEndRequired": "Period end time is required",
       "periods": "Periods",

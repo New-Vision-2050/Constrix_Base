@@ -378,7 +378,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               return(
                 <div className="py-2">
                   {/* Use the ScheduleDisplay component */}
-                  <ScheduleDisplay weeklySchedule={_weekly_schedule as WeeklyScheduleDays} />
+                  <ScheduleDisplay t={getText} weeklySchedule={_weekly_schedule as WeeklyScheduleDays} />
                 </div>
               )
             }
