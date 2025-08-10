@@ -129,6 +129,7 @@ export const rolesTableConfig = ({
             isEdit: true,
             selectedId: row.id,
           }),
+        disabled: true,
       },
     ],
     executionConfig: {

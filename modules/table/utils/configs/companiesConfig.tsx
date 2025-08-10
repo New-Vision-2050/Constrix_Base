@@ -141,7 +141,7 @@ export const CompaniesConfig = () => {
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: CompanyData) =>
         router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
-        disabled: !usePermissions().can(PERMISSIONS.company.update),
+        disabled: !usePermissions().can(PERMISSIONS.company.view),
       },
     ],
     executionConfig: {

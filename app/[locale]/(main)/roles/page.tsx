@@ -2,6 +2,8 @@
 import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
 import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
@@ -43,7 +45,9 @@ const RolesPages = () => {
         config={config}
         searchBarActions={
           <>
-            <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+            <Can check={[PERMISSIONS.role.create]}>
+              <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+            </Can>
 
             <UpdateRoleDrawer
               onClose={handleCloseRolesSheet}
