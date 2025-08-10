@@ -22,7 +22,7 @@ const TheStatus = ({
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
   const { toast } = useToast();
-
+  const {can} = usePermissions();
   const handleConfirm = async (activationDate: string) => {
     try {
       const response = await apiClient.put(`/companies/${id}/activate`, {
@@ -67,7 +67,7 @@ const TheStatus = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={usePermissions().can(PERMISSIONS.company.activate)}
+          disabled={!can(PERMISSIONS.company.update)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

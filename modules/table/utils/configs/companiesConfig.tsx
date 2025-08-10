@@ -27,6 +27,7 @@ interface CompanyData {
 export const CompaniesConfig = () => {
   const t = useTranslations("Companies");
   const router = useRouter();
+  const {can} = usePermissions();
 
   return {
     url: `${baseURL}/companies`,
@@ -121,6 +122,7 @@ export const CompaniesConfig = () => {
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
+    enableExport: can(PERMISSIONS.company.export),
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
@@ -134,19 +136,19 @@ export const CompaniesConfig = () => {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: () => console.log("Login as manager clicked"),
-        disabled: !usePermissions().can(PERMISSIONS.company.update),
+        disabled: !can(PERMISSIONS.company.view),
       },
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: CompanyData) =>
         router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
-        disabled: !usePermissions().can(PERMISSIONS.company.view),
+        disabled: !can(PERMISSIONS.company.view),
       },
     ],
     executionConfig: {
       canEdit: false,
-      canDelete: usePermissions().can(PERMISSIONS.company.delete),
+      canDelete: can(PERMISSIONS.company.delete),
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };
