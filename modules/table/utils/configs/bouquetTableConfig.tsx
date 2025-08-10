@@ -86,7 +86,11 @@ export const bouquetConfig = () => {
         key: "company_fields",
         label: "مجالات الباقة",
         render: (_: unknown, row: BouquetTableRow) => (
-          <p className="font-medium">{row.company_fields.map((field) => field.name).join(", ")}</p>
+          <p className="font-medium">
+            {row.company_fields.length > 3
+              ? row.company_fields.slice(0, 3).map((field) => field.name).join(", ") + "..."
+              : row.company_fields.map((field) => field.name).join(", ")}
+          </p>
         ),
       },
       {

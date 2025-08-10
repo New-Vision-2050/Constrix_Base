@@ -16,7 +16,6 @@ export interface ProgramTableRow {
   is_active: "active" | "inActive";
 }
 
-// Create a component that uses the translations
 export const programsConfig = (t: ReturnType<typeof useTranslations>, router: any, dynamicFields: FieldConfig[]) => {
 
   return {
@@ -26,7 +25,6 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
       {
         key: "name",
         label: "اسم البرنامج",
-        // sortable: true,
         searchable: true,
         render: (_: unknown, row: ProgramTableRow) => (
           <div 
@@ -42,7 +40,6 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
       {
         key: "programs_count",
         label: "عدد البرامج",
-        // sortable: true,
         render: (_: unknown, row: ProgramTableRow) => (
           <p className="font-medium">{row.programs_count}</p>
         ),
@@ -50,7 +47,6 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
       {
         key: "packages_count",
         label: "عدد الباقات",
-        // sortable: true,
         render: (_: unknown, row: ProgramTableRow) => (
           <p className="font-medium">{row.packages_count}</p>
         ),
@@ -58,7 +54,6 @@ export const programsConfig = (t: ReturnType<typeof useTranslations>, router: an
       {
         key: "company_fields_count",
         label: "المجالات المرتبطة",
-        // sortable: true,
         render: (_: unknown, row: ProgramTableRow) => (
           <p className="font-medium">{row.company_fields_count}</p>
         ),
