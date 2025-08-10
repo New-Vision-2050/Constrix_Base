@@ -55,8 +55,14 @@ interface ServerCanProps {
  * </ServerCan>
  * ```
  */
-export const ServerCan = async ({ check, children, fallback = null, strict }: ServerCanProps) => {
-  const { permissions, isSuperAdmin, isCentralCompany } = await getPermissions();
+export const ServerCan = async ({
+  check,
+  children,
+  fallback = null,
+  strict,
+}: ServerCanProps) => {
+  const { permissions, isSuperAdmin, isCentralCompany } =
+    await getPermissions();
 
   // Create permission checker functions
   const can = createCan(permissions);

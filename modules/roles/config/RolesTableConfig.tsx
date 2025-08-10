@@ -4,8 +4,16 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Edit } from "lucide-react";
 
-export const rolesTableConfig = ({handleOpenRolesSheet}:{
-  handleOpenRolesSheet:({ isEdit, selectedId }: { isEdit: boolean; selectedId?: string })=>void;
+export const rolesTableConfig = ({
+  handleOpenRolesSheet,
+}: {
+  handleOpenRolesSheet: ({
+    isEdit,
+    selectedId,
+  }: {
+    isEdit: boolean;
+    selectedId?: string;
+  }) => void;
 }) => {
   return {
     url: `${baseURL}/role_and_permissions/roles`,
@@ -41,9 +49,12 @@ export const rolesTableConfig = ({handleOpenRolesSheet}:{
             label={"نشط"}
             initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.patch(`/role_and_permissions/roles/${row.id}/status`, {
-                status: Number(isActive),
-              });
+              return await apiClient.patch(
+                `/role_and_permissions/roles/${row.id}/status`,
+                {
+                  status: Number(isActive),
+                }
+              );
             }}
             confirmDescription={(isActive) =>
               !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
@@ -108,16 +119,17 @@ export const rolesTableConfig = ({handleOpenRolesSheet}:{
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-     deleteUrl: `${baseURL}/role_and_permissions/roles`,
-      executions: [
+    deleteUrl: `${baseURL}/role_and_permissions/roles`,
+    executions: [
       {
         label: "تعديل",
         icon: <Edit className="w-4 h-4" />,
-        action: (row : {id:string}) => handleOpenRolesSheet({
-          isEdit:usePermissions().can(PERMISSIONS.role.update),
-          selectedId:row.id
-        }),
-      }
+        action: (row: { id: string }) =>
+          handleOpenRolesSheet({
+            isEdit: true,
+            selectedId: row.id,
+          }),
+      },
     ],
     executionConfig: {
       canDelete: usePermissions().can(PERMISSIONS.role.delete),

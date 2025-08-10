@@ -1,44 +1,58 @@
 "use client";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
-import RoleSheet from "@/modules/roles/components/RoleSheet";
+import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
 import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
-import { TableBuilder } from "@/modules/table";
+import { TableBuilder, useTableReload } from "@/modules/table";
 import React, { useCallback, useState } from "react";
 
 const RolesPages = () => {
   const [isOpen, handleOpen, handleClose] = useModal();
-  const [isEdit , setIsEdit] = useState<boolean>(false)
-  const [selectedId, setSelectedId] = useState<string|undefined>(undefined)
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+  
+  // Get table reload function
+  const { reloadTable } = useTableReload("roles-table");
 
-const handleOpenRolesSheet = useCallback(
-  ({ isEdit, selectedId }: { isEdit: boolean; selectedId?: string }) => {
-    setIsEdit(isEdit);
-    setSelectedId(selectedId);
-    handleOpen();
-  },
-  [handleOpen]
-);
+  const handleOpenRolesSheet = useCallback(
+    ({ selectedId }: { selectedId?: string }) => {
+      setSelectedId(selectedId);
+      handleOpen();
+    },
+    [handleOpen]
+  );
 
-const handleCloseRolesSheet = useCallback(
-  () => {
-    setIsEdit(false);
+  const handleCloseRolesSheet = useCallback(() => {
     setSelectedId(undefined);
     handleClose();
-  },
-  [handleOpen]
-);
+  }, [handleClose]); // Fixed dependency - should be handleClose, not handleOpen
 
-  const config = rolesTableConfig({handleOpenRolesSheet});
-  
+  // Function to handle successful form submission
+  const handleFormSuccess = useCallback(() => {
+    handleCloseRolesSheet();
+    reloadTable(); // Reload the table data
+  }, [handleCloseRolesSheet, reloadTable]);
+
+  const config = rolesTableConfig({ handleOpenRolesSheet });
+
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />
       <TableBuilder
         config={config}
         searchBarActions={
-          <RoleSheet isEdit={isEdit} tableId={config.tableId} isOpen={isOpen} handleOpen={handleOpenRolesSheet} handleClose={handleCloseRolesSheet} selectedId={selectedId}/>
+          <>
+            <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+
+            <UpdateRoleDrawer
+              onClose={handleCloseRolesSheet}
+              open={isOpen}
+              roleId={selectedId}
+              onSuccess={handleFormSuccess} // Add success handler to reload table
+              
+            />
+          </>
         }
       />
     </div>

@@ -758,6 +758,31 @@
     "view": "View",
     "activate": "Activate"
   },
+  "CreateRole": {
+    "title": "Create Role",
+    "editTitle": "Edit Role",
+    "roleName": "Role Name",
+    "roleNamePlaceholder": "Enter role name",
+    "roleNameRequired": "Role name is required",
+    "roleNameMinLength": "Role name must be at least 3 characters",
+    "permissions": "Permissions",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "permissionsRequired": "At least one permission must be selected",
+    "loading": "Loading...",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "createRole": "Create Role",
+    "updateRole": "Update Role",
+    "reset": "Reset",
+    "selectedCount": "selected",
+    "roleCreatedSuccessfully": "Role created successfully",
+    "roleUpdatedSuccessfully": "Role updated successfully",
+    "errorCreatingRole": "Error creating role",
+    "errorUpdatingRole": "Error updating role",
+    "errorLoadingRole": "Error loading role data",
+    "roleNotFound": "Role not found"
+  },
   "Programs": {
     "AreYouSureReactivate": "Are you sure you want to reactivate this program?",
     "AreYouSureDeactivate": "Are you sure you want to deactivate this program?"

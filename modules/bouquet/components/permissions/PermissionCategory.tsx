@@ -48,6 +48,7 @@ const PermissionCategory: React.FC<PermissionCategoryProps> = ({
 
   const handleSelectAll = useMemo(() => {
     return (checked: boolean) => {
+      // Handle permission selection
       allPermissionIds.forEach(id => {
         if (checked && !selectedPermissions.has(id)) {
           onPermissionChange(id, true);
@@ -55,8 +56,15 @@ const PermissionCategory: React.FC<PermissionCategoryProps> = ({
           onPermissionChange(id, false);
         }
       });
+      
+      // Handle switch activation for all available permission types in this category
+      const availableTypes = [...new Set(categoryData.map(item => item.type))];
+      availableTypes.forEach(type => {
+        const switchId = `${subKey}-${categoryKey}-${type}`;
+        onSwitchChange(switchId, checked);
+      });
     };
-  }, [allPermissionIds, selectedPermissions, onPermissionChange]);
+  }, [allPermissionIds, selectedPermissions, onPermissionChange, onSwitchChange, categoryData, subKey, categoryKey]);
 
   return (
     <div className="mb-6">      

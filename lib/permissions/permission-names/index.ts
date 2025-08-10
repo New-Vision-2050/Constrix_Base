@@ -60,4 +60,5 @@ export const PERMISSIONS = {
   country: create("COUNTRY"),
   driver: create("DRIVER"),
   identifier: create("IDENTIFIER"),
+  subEntity: create("SUB_ENTITY"),
 };

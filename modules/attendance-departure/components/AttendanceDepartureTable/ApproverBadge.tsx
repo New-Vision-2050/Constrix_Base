@@ -22,9 +22,9 @@ const ApproverBadge: React.FC<ApproverBadgeProps> = ({
       className="font-medium cursor-pointer underline text-blue-500 dark:text-blue-400"
       onClick={() => openAttendanceStatusDialog(record)}
     >
-      {typeof record.professional_data?.attendance_constraint === 'string'
-        ? record.professional_data?.attendance_constraint || UN_SPECIFIED
-        : (record.professional_data?.attendance_constraint as any)?.constraint_name || UN_SPECIFIED}
+      {typeof record?.attendance_constraint === 'string'
+        ? record?.attendance_constraint || UN_SPECIFIED
+        : (record?.attendance_constraint as any)?.constraint_name || UN_SPECIFIED}
     </span>
   );
 };

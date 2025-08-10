@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import PermissionTableHeader from "./PermissionTableHeader";
 import PermissionRow from "./PermissionRow";
@@ -50,6 +50,7 @@ function SubAccordionCategory({
 
   const handleSelectAll = useMemo(() => {
     return (checked: boolean) => {
+      // Handle permission selection
       allPermissionIds.forEach(id => {
         if (checked && !selectedPermissions.has(id)) {
           onPermissionChange(id, true);
@@ -57,8 +58,47 @@ function SubAccordionCategory({
           onPermissionChange(id, false);
         }
       });
+      
+      // Handle switch activation for all categories and permission types
+      Object.entries(subData).forEach(([categoryKey, categoryValue]) => {
+        if (Array.isArray(categoryValue)) {
+          // Get all unique permission types in this category
+          const availableTypes = [...new Set(categoryValue.map(item => item.type))];
+          
+          // Activate/deactivate switches for all available permission types
+          availableTypes.forEach(type => {
+            const switchId = `${subKey}-${categoryKey}-${type}`;
+            onSwitchChange(switchId, checked);
+          });
+        }
+      });
     };
-  }, [allPermissionIds, selectedPermissions, onPermissionChange]);
+  }, [allPermissionIds, selectedPermissions, onPermissionChange, onSwitchChange, subData, subKey]);
+
+  // Auto-check permissions when all switches in a category are active
+  useEffect(() => {
+    Object.entries(subData).forEach(([categoryKey, categoryValue]) => {
+      if (Array.isArray(categoryValue)) {
+        // Get all unique permission types in this category
+        const availableTypes = [...new Set(categoryValue.map(item => item.type))];
+        
+        // Check if all switches for this category are active
+        const allSwitchesActive = availableTypes.every(type => {
+          const switchId = `${subKey}-${categoryKey}-${type}`;
+          return switchStates[switchId] === true;
+        });
+        
+        // If all switches are active, auto-check all permissions in this category
+        if (allSwitchesActive && availableTypes.length > 0) {
+          categoryValue.forEach(item => {
+            if (!selectedPermissions.has(item.id)) {
+              onPermissionChange(item.id, true);
+            }
+          });
+        }
+      }
+    });
+  }, [switchStates, subData, subKey, selectedPermissions, onPermissionChange]);
 
   return (
     <AccordionItem value={`${mainKey}-${subKey}`} className="border rounded-lg">

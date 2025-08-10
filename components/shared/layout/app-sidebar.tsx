@@ -38,7 +38,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const path = usePathname();
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
-    { can, isCentralCompany, isSuperAdmin, permissions } = p;
+    { can, isCentralCompany, isSuperAdmin } = p;
   console.log("permissions ", p);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
@@ -73,8 +73,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
               icon: menuSubEntity.icon,
               slug: menuSubEntity.slug,
               origin_super_entity: menuSubEntity.origin_super_entity,
-              show: permissions.some((permission) =>
-                permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+              show: can((permissions) =>
+                permissions.some((permission) =>
+                  permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+                )
               ), // Default to true, you can add custom logic here if needed
             })
           ) || [];
@@ -197,13 +199,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.PROGRAM_SETTINGS.USERS,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
-            show:
-              isCentralCompany &&
-              can(
-                Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-                  Object.values(p)
-                )
-              ),
+            show: isCentralCompany && can(Object.values(PERMISSIONS.subEntity)),
           },
         ],
         show:
@@ -232,39 +228,33 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.USER_PROFILE,
             icon: UserIcon,
             isActive: pageName === ROUTER.USER_PROFILE,
-            show:
-              !isCentralCompany &&
-              can(
-                Object.values(PERMISSIONS.userProfile).flatMap((p) =>
-                  Object.values(p)
-                )
-              ),
+            show: can(
+              Object.values(PERMISSIONS.userProfile).flatMap((p) =>
+                Object.values(p)
+              )
+            ),
           },
           {
             name: "اعداد ملف الشركة",
             url: ROUTER.COMPANY_PROFILE,
             icon: InboxIcon,
             isActive: pageName === ROUTER.COMPANY_PROFILE,
-            show:
-              !isCentralCompany &&
-              can(
-                Object.values(PERMISSIONS.companyProfile).flatMap((p) =>
-                  Object.values(p)
-                )
-              ),
+            show: can(
+              Object.values(PERMISSIONS.companyProfile).flatMap((p) =>
+                Object.values(p)
+              )
+            ),
           },
           {
             name: t("Sidebar.SystemSettings"),
             url: ROUTER.SETTINGS,
             icon: InboxIcon,
             isActive: pageName === ROUTER.SETTINGS,
-            show:
-              !isCentralCompany &&
-              can(
-                Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-                  Object.values(p)
-                )
-              ),
+            show: can(
+              Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
+                Object.values(p)
+              )
+            ),
           },
           rolesObj,
           permissionsObj,
@@ -298,7 +288,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ),
       },
     ];
-
     return data;
   }, [pageName, isCentralCompany, can, t, p]);
 
