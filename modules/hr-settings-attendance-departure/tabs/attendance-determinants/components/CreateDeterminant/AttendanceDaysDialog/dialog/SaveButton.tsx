@@ -7,14 +7,19 @@ export default function SaveButton() {
 
   const handleSave = () => {
     // prepare periods
-    const _periods = dayPeriods?.map((period) => ({
-      from: period.start_time,
-      to: period.end_time,
-      early_period: period.early_period,
-      early_unit: period.early_unit,
-      lateness_period: period.lateness_period,
-      lateness_unit: period.lateness_unit,
-    }));
+    const _periods = dayPeriods?.map((period) => {
+      const _end = period?.extends_to_next_day ? "24:00" : period.end_time;
+      return {
+        index: period.index,
+        from: period.start_time,
+        to: _end,
+        early_period: period.early_period,
+        early_unit: period.early_unit,
+        lateness_period: period.lateness_period,
+        lateness_unit: period.lateness_unit,
+        extends_to_next_day: period.extends_to_next_day,
+      };
+    });
     // prepare day config
     const _dayConfig = {
       day: selectedDay,

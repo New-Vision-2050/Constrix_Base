@@ -57,12 +57,13 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
       (day: any) => day.day !== dayConfig.day
     );
     // update weekly schedule
-    useFormStore
-      ?.getState()
-      .setValues("create-determinant-form", {
-        weekly_schedule: _weeklyScheduleWithoutDay,
-      });
-    console.log("dayConfig _weeklyScheduleWithoutDay", _weeklyScheduleWithoutDay);
+    useFormStore?.getState().setValues("create-determinant-form", {
+      weekly_schedule: _weeklyScheduleWithoutDay,
+    });
+    console.log(
+      "dayConfig _weeklyScheduleWithoutDay",
+      _weeklyScheduleWithoutDay
+    );
     console.log("dayConfig _weeklySchedule", _weeklySchedule);
     console.log("dayConfig", dayConfig);
     // useFormStore
@@ -108,11 +109,13 @@ export const ScheduleDayItem: React.FC<DayPeriodProps> = ({ dayConfig }) => {
         <span className={labelClass}>{t("periods")}</span>
         <div className="mt-2 space-y-2">
           {dayConfig?.periods?.map((period, index) => (
-            <div key={index} className={periodClass}>
-              <Clock className="h-4 w-4 text-pink-500 mr-2" />
-              <span>
-                {period.from} - {period.to}
-              </span>
+            <div key={index} className={`flex flex-col bg-gray-700 p-2 rounded-sm`}>
+              <div className={periodClass}>
+                <Clock className="h-4 w-4 text-pink-500 mr-2" />
+                <span>
+                  {period.from} - {period.to}
+                </span>
+              </div>
               {period.extends_to_next_day && (
                 <span className="ml-2 text-xs px-2 py-1 rounded-full bg-amber-500/30 text-amber-700 dark:text-amber-300">
                   {t("extendsToNextDay")}
