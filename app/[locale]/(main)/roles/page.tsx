@@ -3,6 +3,7 @@ import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { statisticsConfig } from "@/modules/companies/components/statistics-config";
 import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
@@ -63,4 +64,4 @@ const RolesPages = () => {
   );
 };
 
-export default RolesPages;
+export default withPermissions(RolesPages, [PERMISSIONS.role.list]);

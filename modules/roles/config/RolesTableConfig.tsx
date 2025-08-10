@@ -15,6 +15,7 @@ export const rolesTableConfig = ({
     selectedId?: string;
   }) => void;
 }) => {
+  const { can } = usePermissions();
   return {
     url: `${baseURL}/role_and_permissions/roles`,
     tableId: "roles-table",
@@ -115,6 +116,7 @@ export const rolesTableConfig = ({
     defaultItemsPerPage: 5,
     enableSearch: true,
     enableColumnSearch: true,
+    enableExport: can(PERMISSIONS.role.export),
     searchFields: ["name", "email"],
     searchParamName: "search",
     searchFieldParamName: "fields",
@@ -129,11 +131,11 @@ export const rolesTableConfig = ({
             isEdit: true,
             selectedId: row.id,
           }),
-        disabled: true,
+        disabled: can(PERMISSIONS.role.update),
       },
     ],
     executionConfig: {
-      canDelete: usePermissions().can(PERMISSIONS.role.delete),
+      canDelete: can(PERMISSIONS.role.delete),
     },
   };
 };
