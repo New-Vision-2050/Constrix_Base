@@ -29,6 +29,7 @@ export const PERMISSIONS = {
   },
   company: create("COMPANY"),
   companyAccessProgram: create("COMPANY_ACCESS_PROGRAM"),
+  package: create("PACKAGE"),
   companyProfile: {
     legalData: create("COMPANY_PROFILE_LEGAL_DATA"),
     officialDocument: create("COMPANY_PROFILE_OFFICIAL_DOCUMENT"),
