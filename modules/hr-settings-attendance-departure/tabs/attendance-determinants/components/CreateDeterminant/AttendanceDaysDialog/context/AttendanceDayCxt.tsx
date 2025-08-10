@@ -78,11 +78,36 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   useEffect(() => {
     const _n = dayPeriods.length;
     let _timeHours = InitialTimeHours;
+    // reset min and max edges
+    let _minEdge = "24:00";
+    let _maxEdge = "00:00";
+    let _nextDayExist = false;
     // make hours in periods not available
     for (let i = 0; i < _n; i++) {
       const _period = dayPeriods[i];
       const _startHour = Number(_period.start_time?.split(":")[0]);
       const _endHour = Number(_period.end_time?.split(":")[0]);
+      if(_period.extends_to_next_day){
+        _nextDayExist = true;
+      }
+      // set min and max edges
+      if(Boolean(_period.start_time)){
+        const _startMinutes = convertStringToMinutes(_period.start_time);
+        const _minEdgeMinutes = convertStringToMinutes(_minEdge);
+        if(_startMinutes < _minEdgeMinutes){
+          _minEdge = _period.start_time;
+        }
+      }
+      if(Boolean(_period.end_time)){
+        const _endMinutes = convertStringToMinutes(_period.end_time);
+        const _maxEdgeMinutes = convertStringToMinutes(_maxEdge);
+        if(_endMinutes > _maxEdgeMinutes){
+          _maxEdge = _period.end_time;
+        }
+      }
+
+     
+      // make hours in periods not available
       for (let j = _startHour; j <= _endHour; j++) {
         _timeHours = _timeHours?.map((hour) => {
           if (+hour.value == j) {
@@ -92,11 +117,13 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         });
       }
     }
-    console.log("_timeHours", _timeHours);
-    dayPeriods.forEach((period) => {});
+
+    if(!_nextDayExist){
+      SetMinEdge(_minEdge);
+      SetMaxEdge(_maxEdge);
+    }
     setdayAvailableHours(_timeHours);
   }, [dayPeriods]);
-
 
   // edited day
   const _editedDay = useFormStore
