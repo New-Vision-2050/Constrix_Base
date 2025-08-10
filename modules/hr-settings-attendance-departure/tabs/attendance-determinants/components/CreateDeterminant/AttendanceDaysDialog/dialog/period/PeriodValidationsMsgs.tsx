@@ -10,18 +10,18 @@ type PropsT = {
   period: AttendanceDayPeriodType;
 };
 
+// Convert times to comparable format (minutes since midnight)
+const convertTimeToMinutes = (timeString: string): number => {
+  if (!timeString) return 0;
+  const [hours, minutes] = timeString?.split(":")?.map(Number);
+  return hours * 60 + minutes;
+};
+
 export default function PeriodValidationsMsgs({ t, period }: PropsT) {
-  const { handleUpdateDayPeriod, maxEdge } = useAttendanceDayCxt();
+  const { handleUpdateDayPeriod, maxEdge,extendsToNextDayMsg } = useAttendanceDayCxt();
 
   // handle change
   const handleChange = (checked: boolean) => {
-    // Convert times to comparable format (minutes since midnight)
-    const convertTimeToMinutes = (timeString: string): number => {
-      if (!timeString) return 0;
-      const [hours, minutes] = timeString?.split(":").map(Number);
-      return hours * 60 + minutes;
-    };
-
     // Check if we're unchecking the box and end time is before start time
     const startMinutes = convertTimeToMinutes(period.start_time);
     const endMinutes = convertTimeToMinutes(period.end_time);
@@ -43,8 +43,6 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
     }
   };
 
-  console.log("maxEdge , period.end_time", maxEdge, period.end_time);
-
   return (
     <div className="text-xs mt-1 flex flex-col gap-2">
       <span className="italic text-gray-500">{t("timeFormatError")}</span>
@@ -65,9 +63,10 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
       )}
       {/* warning message if extends_to_next_day is checked and end_time is less than start_time */}
       {period.extends_to_next_day && (
-        <span className="italic text-gray-500">
-          {t("extendsToNextDayWarning")}
-        </span>
+        <div className="flex gap-1 flex-col">
+          <span className="italic text-gray-500">{t("extendsToNextDayWarning")}</span>
+          <span className="italic text-yellow-500">{extendsToNextDayMsg}</span>
+        </div>
       )}
     </div>
   );

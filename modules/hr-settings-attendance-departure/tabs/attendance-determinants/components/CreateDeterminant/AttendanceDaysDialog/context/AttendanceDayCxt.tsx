@@ -44,6 +44,12 @@ type AttendanceDayCxtType = {
 
   // is edit
   isEdit: boolean;
+
+  // extends to next day message
+  extendsToNextDayMsg: string;
+
+  // min edge in next day
+  minEdgeInNextDay: string;
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -74,6 +80,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   const [minEdge, SetMinEdge] = useState<string>("");
   // the max edge of the day
   const [maxEdge, SetMaxEdge] = useState<string>("");
+  // extends to next day message
+  const [extendsToNextDayMsg, SetExtendsToNextDayMsg] = useState<string>("");
+  const [minEdgeInNextDay, setMinEdgeInNextDay] = useState<string>("");
 
   useEffect(() => {
     const _n = dayPeriods.length;
@@ -87,28 +96,27 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
       const _period = dayPeriods[i];
       const _startHour = Number(_period.start_time?.split(":")[0]);
       let _endHour = Number(_period.end_time?.split(":")[0]);
-      if(_period.extends_to_next_day){
+      if (_period.extends_to_next_day) {
         _nextDayExist = true;
         _endHour = 24;
       }
 
       // set min and max edges
-      if(Boolean(_period.start_time)){
+      if (Boolean(_period.start_time)) {
         const _startMinutes = convertStringToMinutes(_period.start_time);
         const _minEdgeMinutes = convertStringToMinutes(_minEdge);
-        if(_startMinutes < _minEdgeMinutes){
+        if (_startMinutes < _minEdgeMinutes) {
           _minEdge = _period.start_time;
         }
       }
-      if(Boolean(_period.end_time)){
+      if (Boolean(_period.end_time)) {
         const _endMinutes = convertStringToMinutes(_period.end_time);
         const _maxEdgeMinutes = convertStringToMinutes(_maxEdge);
-        if(_endMinutes > _maxEdgeMinutes){
+        if (_endMinutes > _maxEdgeMinutes) {
           _maxEdge = _period.end_time;
         }
       }
 
-      
       // make hours in periods not available
       for (let j = _startHour; j <= _endHour; j++) {
         _timeHours = _timeHours?.map((hour) => {
@@ -120,11 +128,73 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
       }
     }
 
-    if(!_nextDayExist){
+    if (!_nextDayExist) {
       SetMinEdge(_minEdge);
       SetMaxEdge(_maxEdge);
     }
     setdayAvailableHours(_timeHours);
+  }, [dayPeriods]);
+
+  // handle extends to next day message
+  useEffect(() => {
+    // find period that extends to next day
+    const _period = dayPeriods?.find((period) => period?.extends_to_next_day);
+
+    if (_period) {
+      // day after _period day
+      const _periodDayIndex = DAYS_OF_WEEK.findIndex(
+        (day) => day.value == selectedDay
+      );
+      const _periodDay = DAYS_OF_WEEK[_periodDayIndex];
+      // next day name
+      const _nextDayName =
+        DAYS_OF_WEEK[(_periodDayIndex + 1) % DAYS_OF_WEEK.length];
+      // prepare message
+      const _message = `
+      لقد أمتدت الفترة الى اليوم التالي لتصبح :${_periodDay.labelAr} : [${_period.start_time} - 24:00] , ${_nextDayName.labelAr} : [00:00 - ${_period.end_time}]
+      `;
+      SetExtendsToNextDayMsg(_message);
+      // validation according next day config
+      const _weekly_schedule = useFormStore
+        ?.getState()
+        .getValue("create-determinant-form", "weekly_schedule");
+      const _nextDayConfig = _weekly_schedule?.find(
+        (day: any) => day.day == _nextDayName.value
+      );
+
+      if (_nextDayConfig) {
+        //validation is valid to add period? yes add else show error message
+        const _nextDayPeriods: AttendanceDayPeriodType[] =
+          _nextDayConfig.periods?.map((period: any) => {
+            return {
+              index: period.index,
+              start_time: period.from,
+              end_time: period.to,
+              early_period: period.early_period,
+              early_unit: period.early_unit,
+              lateness_period: period.lateness_period,
+              lateness_unit: period.lateness_unit,
+              extends_to_next_day: period.extends_to_next_day,
+            };
+          });
+        const _nextDayPeriodsCount = _nextDayPeriods.length;
+        // get minEdge in next day periods
+        let _nextDayPeriodsMinEdge = _nextDayPeriods?.[0]?.start_time;
+        for (let i = 0; i < _nextDayPeriodsCount; i++) {
+          const _nextDayPeriod = _nextDayPeriods[i];
+          const _nextDayPeriodMinEdge = convertStringToMinutes(
+            _nextDayPeriod.start_time
+          );
+          const _nextDayPeriodMaxEdge = convertStringToMinutes(
+            _nextDayPeriodsMinEdge
+          );
+          if (_nextDayPeriodMinEdge < _nextDayPeriodMaxEdge) {
+            _nextDayPeriodsMinEdge = _nextDayPeriod.start_time;
+          }
+        }
+        setMinEdgeInNextDay(_nextDayPeriodsMinEdge);
+      }
+    }
   }, [dayPeriods]);
 
   // edited day
@@ -209,7 +279,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   };
   // convert string to time in minutes
   const convertStringToMinutes = (timeString: string) => {
-    const [hours, minutes] = timeString?.split(":").map(Number);
+    if (!timeString) return 0;
+    const [hours, minutes] = timeString?.split(":")?.map(Number);
     return hours * 60 + minutes;
   };
 
@@ -277,6 +348,10 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         dayAvsilableHours,
         // is edit
         isEdit,
+        // extends to next day message
+        extendsToNextDayMsg,
+        // min edge in next day
+        minEdgeInNextDay,
       }}
     >
       {children}

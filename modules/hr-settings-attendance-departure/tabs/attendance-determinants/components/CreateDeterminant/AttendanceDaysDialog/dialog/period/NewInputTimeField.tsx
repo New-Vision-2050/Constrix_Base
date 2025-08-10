@@ -22,6 +22,14 @@ interface TimeFieldProps {
   disabled?: boolean;
 }
 
+
+// convert string to time in minutes
+const convertStringToMinutes = (timeString: string) => {
+  if (!timeString) return 0;
+  const [hours, minutes] = timeString?.split(":")?.map(Number);
+  return hours * 60 + minutes;
+};
+
 const NewInputTimeField = ({
   value,
   period,
@@ -31,7 +39,7 @@ const NewInputTimeField = ({
   disabled = false,
 }: TimeFieldProps) => {
   // context
-  const { dayAvsilableHours, isEdit } = useAttendanceDayCxt();
+  const { dayAvsilableHours, isEdit, minEdgeInNextDay } = useAttendanceDayCxt();
   const [selectedHour, setSelectedHour] = useState<string>(
     value?.split(":")[0] || ""
   );
@@ -49,6 +57,13 @@ const NewInputTimeField = ({
       const currentHour = parseInt(hour.value);
 
       if (type === "end" && period?.extends_to_next_day) {
+        if(minEdgeInNextDay){
+          const _minEdgeInNextDay = convertStringToMinutes(minEdgeInNextDay);
+          
+          if(Number(hour.value) > Number(_minEdgeInNextDay/60)){
+            return { ...hour, available: false };
+          }
+        }
         return { ...hour, available: true };
       }
 
