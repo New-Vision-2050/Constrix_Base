@@ -1,5 +1,5 @@
 {
-  "breadcrumbs":{
+  "breadcrumbs": {
     "home": "الرئيسية",
     "dashboard": "لوحة القيادة",
     "profile": "الملف الشخصي",
@@ -19,6 +19,7 @@
     "separator": "/",
     "back": "رجوع",
     "currentPage": "أنت هنا"
+  },
   "common": {
     "itemsPerPage": "عناصر في الصفحة",
     "selectItemsPerPage": "اختر عدد العناصر في الصفحة"

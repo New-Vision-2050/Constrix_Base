@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:no-lint": "ESLINT_NO_DEV_ERRORS=true next build",
     "start": "next start",
     "lint": "next lint",
     "preview:worker": "npm run build && wrangler dev",
