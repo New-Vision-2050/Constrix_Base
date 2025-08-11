@@ -19,6 +19,7 @@
     "separator": "/",
     "back": "Back",
     "currentPage": "You are here"
+  },
   "common": {
     "itemsPerPage": "Items per page",
     "selectItemsPerPage": "Select items per page"

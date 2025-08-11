@@ -19,6 +19,7 @@
     "separator": "/",
     "back": "رجوع",
     "currentPage": "أنت هنا"
+  },
   "common": {
     "itemsPerPage": "عناصر في الصفحة",
     "selectItemsPerPage": "اختر عدد العناصر في الصفحة"
