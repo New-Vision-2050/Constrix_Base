@@ -60,7 +60,6 @@ export type Project = {
   icon?: string | ComponentType;
   isActive: boolean;
   sub_entities: Entity[];
-  show: boolean;
 };
 
 export type Menu = {

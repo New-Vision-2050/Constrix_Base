@@ -24,6 +24,7 @@ import { Menu, Project } from "@/types/sidebar-menu";
 import type { Entity } from "@/types/sidebar-menu";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
@@ -74,8 +75,11 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
               slug: menuSubEntity.slug,
               origin_super_entity: menuSubEntity.origin_super_entity,
               show: can((permissions) =>
-                permissions.some((permission) =>
-                  permission.key.startsWith(`dynamic.${menuSubEntity.slug}`)
+                permissions.some(
+                  (permission) =>
+                    permission.key ===
+                    createPermissions(`DYNAMIC.${menuSubEntity.slug}`, ["LIST"])
+                      .list
                 )
               ), // Default to true, you can add custom logic here if needed
             })
@@ -92,7 +96,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       });
       return formatted;
     },
-    [menu, can]
+    [can]
   );
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
@@ -135,7 +139,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show: can(Object.values(PERMISSIONS.company)),
           },
         ],
-        show: isCentralCompany && can(Object.values(PERMISSIONS.company)),
       },
       // users
       {
@@ -153,7 +156,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show: can(Object.values(PERMISSIONS.user)),
           },
         ],
-        show: isCentralCompany && can(Object.values(PERMISSIONS.user)),
       },
       {
         name: t("Sidebar.HumanResources"),
@@ -161,28 +163,27 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.Organizational_Structure],
         isActive: pageName === ROUTER.Organizational_Structure,
         slug: SUPER_ENTITY_SLUG.HRM,
-        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.OrganizationalStructure"),
             url: ROUTER.Organizational_Structure,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.Organizational_Structure,
-            show: true,
+            show: !isCentralCompany,
           },
           {
             name: t("Sidebar.AttendanceDeparture"),
             url: ROUTER.AttendanceDeparture,
             icon: UserIcon,
             isActive: pageName === ROUTER.AttendanceDeparture,
-            show: true,
+            show: !isCentralCompany,
           },
           {
             name: t("Sidebar.HRSettings"),
             url: ROUTER.HR_SETTINGS,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.HR_SETTINGS,
-            show: true,
+            show: !isCentralCompany,
           },
         ],
       },
@@ -202,9 +203,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show: isCentralCompany && can(Object.values(PERMISSIONS.subEntity)),
           },
         ],
-        show:
-          isCentralCompany &&
-          can(Object.values(PERMISSIONS.companyAccessProgram)),
       },
       // settings
       {
@@ -213,15 +211,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
         urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
-        show: can([
-          ...Object.values(PERMISSIONS.userProfile).flatMap((p) =>
-            Object.values(p)
-          ),
-          ...Object.values(PERMISSIONS.companyProfile).flatMap((p) =>
-            Object.values(p)
-          ),
-          ...Object.values(PERMISSIONS.companyAccessProgram),
-        ]),
         sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
@@ -272,22 +261,17 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.Programs,
             icon: UserIcon,
             isActive: pageName === ROUTER.Programs,
-            show: can(
-              Object.values(PERMISSIONS.companyAccessProgram)
-            ),
+            show: can(Object.values(PERMISSIONS.companyAccessProgram)),
           },
         ],
-        show:
-          isCentralCompany &&
-          can(
-            Object.values(PERMISSIONS.companyAccessProgram)
-          ),
       },
     ];
     return data;
-  }, [pageName, isCentralCompany, can, t, p]);
+  }, [pageName, isCentralCompany, can, t]);
 
-  const projects = SidebarProjects.filter((project) => project.show);
+  const projects = SidebarProjects.filter((project) =>
+    project.sub_entities?.some((subEntity) => subEntity.show)
+  );
   const all = mergeProjectsAndMenu(projects, menu, isSuperAdmin);
 
   return (
