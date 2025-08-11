@@ -1,4 +1,8 @@
 {
+  "common": {
+    "itemsPerPage": "Items per page",
+    "selectItemsPerPage": "Select items per page"
+  },
   "location": {
     "longitude": "Longitude",
     "latitude": "Latitude",
@@ -679,6 +683,10 @@
       "vacations": "Official Holidays"
     },
     "attendanceDeterminants": {
+      "noScheduledDays": "No scheduled days",
+      "selectDayFirst": "Please select a day first",
+      "periodEndRequired": "Period end time is required",
+      "periods": "Periods",
       "title": "Attendance Determinants",
       "createDeterminant": "Create New Determinant",
       "allDeterminants": "All Determinants",
@@ -690,6 +698,33 @@
       "submitButtonText": "Save Determinant",
       "cancelButtonText": "Cancel",
       "form": {
+        "AttendanceDaysDialog": {
+          "periods":"Periods",
+          "timePeriodLabel": "Time Period",
+          "startTimeLabel": "Start Time",
+          "earlyPeriodLabel": "Early Period",
+          "latenessPeriodLabel": "Lateness Period",
+          "endTimeLabel": "End Time",
+          "durationLabel": "Duration",
+          "extendsToNextDay": "Extends to next day",
+          "extendsToNextDayWarning":"Please note that extends to next day is checked and end time may be less than start time without any validation",
+          "noPeriods": "No time periods found. Please click 'Add Period' to create a new period.",
+          "hours": "Hours",
+          "timeValidationError":"Time validation error",
+          "timeFormatError":"Must enter valid time in format hours:minutes like 09:00",
+          "periodEndMustBeAfterStart":"End time must be after start time",
+          "startTimeBeforeEndTime":"Start time must be before end time",
+          "addPeriod":"Add Period",
+          "editPeriods":"Edit Periods",
+          "selectDayFirst":"Select day first",
+          "deletePeriod":"Delete Period",
+          "periodStartPlaceholder":"09:00",
+          "periodEndPlaceholder":"17:00",
+          "periodStartRequired":"Period start time is required",
+          "periodEndRequired":"Period end time is required"
+        },
+        "addAttendanceDays": "Add Attendance Days",
+        "editAttendanceDay": "Edit Attendance Day",
         "title": "Add New Determinant",
         "editTitle": "Edit Determinant",
         "basicInfo": "Basic Information",
@@ -719,6 +754,7 @@
         "periodEndMustBeAfterStart": "End time must be after start time",
         "startTimeBeforeEndTime": "Start time must be before end time",
         "addPeriod": "Add Period",
+        "editPeriods": "Edit Periods",
         "deletePeriod": "Delete Period",
         "submitButtonText": "Save Determinant",
         "cancelButtonText": "Cancel",

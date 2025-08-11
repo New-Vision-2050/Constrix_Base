@@ -37,7 +37,7 @@ const DeterminantsList: React.FC<DeterminantsListProps> = ({
   const inactiveTextColor = isDarkMode ? 'text-gray-400' : 'text-gray-500';
 
   return (
-    <div className={`${containerBg} rounded-lg overflow-hidden mx-auto shadow-sm border ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`}>
+    <div className={`${containerBg} rounded-lg overflow-hidden shadow-sm border w-full ${isDarkMode ? 'border-purple-900/20' : 'border-gray-200'}`}>
       <div
         className={`flex items-center gap-3 px-4 py-3 border-b ${activeBorderColor} cursor-pointer ${itemHoverBg} transition-colors`}
         onClick={() => onClick("all-determinants")}

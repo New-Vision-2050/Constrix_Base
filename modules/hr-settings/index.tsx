@@ -8,7 +8,7 @@ import HRStatisticsCards from "./components/StatisticsCards/HRStatisticsCards";
 // The internal component that uses the context
 function HRSettingsContent() {
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full px-6">
       {/* Statistics cards */}
       <HRStatisticsCards />
       

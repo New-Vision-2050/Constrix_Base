@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useFormStore } from "@/modules/form-builder/hooks/useFormStore";
 import LocationDialog from "./LocationDialog/LocationDialog";
 import { baseURL } from "@/config/axios-config";
@@ -7,6 +7,12 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { weeklyScheduleDays } from "@/modules/attendance-departure/types/attendance";
 import { TimeUnits } from "../../constants/determinants";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import AttendanceDaysDialog from "./AttendanceDaysDialog";
+import {
+  ScheduleDisplay,
+  WeeklyScheduleDays,
+} from "./components/ScheduleDisplay";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -44,24 +50,77 @@ type PropsT = {
 };
 // Function to get form config with dynamic day sections
 export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
+  // Props
   const { refetchConstraints, t, editConstraint } = props;
 
-  // Función auxiliar para obtener textos traducidos o usar valores predeterminados
+  // Function to get text with default value
   const getText = (key: string, defaultText: string) => {
     return t ? t(key) : defaultText;
   };
 
+  // ------------- set default type attendance -------------
   const _type_attendance = [];
-
   if (Boolean(editConstraint?.config?.type_attendance?.location))
     _type_attendance.push("location");
   if (Boolean(editConstraint?.config?.type_attendance?.fingerprint))
     _type_attendance.push("fingerprint");
 
-  // Check if it's an edit mode
+  // ------------- set default title -------------
   const isEdit = Boolean(editConstraint);
-  const title = isEdit ? getText("form.editTitle", "تعديل محدد") : getText("form.title", "إضافة محدد جديد");
+  const title = isEdit
+    ? getText("form.editTitle", "تعديل محدد")
+    : getText("form.title", "إضافة محدد جديد");
 
+  // ------------- set default location type -------------
+  //latitude - longitude
+  const latitude = editConstraint?.branch_locations?.[0]?.latitude;
+  const longitude = editConstraint?.branch_locations?.[0]?.longitude;
+  // is branch location empty
+  const isBranchLocationEmpty = latitude == 0 && longitude == 0;
+
+  const _location_type = !editConstraint
+    ? "main"
+    : isBranchLocationEmpty
+    ? ""
+    : Boolean(editConstraint?.config?.default_location)
+    ? "main"
+    : "custom";
+
+  // ------------- set default branch ids -------------
+  const _branch_ids =
+    editConstraint?.branch_locations?.map(
+      (branch: { branch_id: string | number }) => Number(branch.branch_id)
+    ) ?? [];
+
+  // ------------- set used days -------------
+  const _weekly_schedule = Object.entries(
+    (editConstraint?.config?.time_rules
+      ?.weekly_schedule as weeklyScheduleDays) || {}
+  )
+    ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
+    ?.map(([dayName, dayConfig]) => {
+      return {
+        day: dayName,
+        periods:
+          dayConfig?.periods?.map((period) => ({
+            from: period.start_time,
+            to: period.end_time,
+            early_period:
+              (dayConfig as any)?.early_clock_in_rules?.early_period ||
+              DEFAULT_TIME_THRESHOLD_MINUTES,
+            early_unit:
+              (dayConfig as any)?.early_clock_in_rules?.early_unit || "minute",
+            lateness_period:
+              (dayConfig as any)?.lateness_rules?.lateness_period ||
+              DEFAULT_TIME_THRESHOLD_MINUTES,
+            lateness_unit:
+              (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
+            extends_to_next_day: Boolean(period?.extends_to_next_day) ? 1 : undefined,
+          })) ?? [],
+      };
+    });
+
+  // ------------- return form config -------------
   return {
     formId: "create-determinant-form",
     title,
@@ -80,41 +139,9 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           ?.out_of_radius_time_threshold ?? DEFAULT_TIME_THRESHOLD_MINUTES,
       out_zone_rules_unit: editConstraint?.config?.radius_enforcement?.unit,
       type_attendance: _type_attendance,
-      branch_ids:
-        editConstraint?.branch_locations?.map(
-          (branch: { branch_id: string | number }) => Number(branch.branch_id)
-        ) ?? [],
-      location_type: !editConstraint
-        ? "main"
-        : Boolean(editConstraint?.config?.default_location)
-        ? "main"
-        : "custom",
-      weekly_schedule: Object.entries(
-        (editConstraint?.config?.time_rules
-          ?.weekly_schedule as weeklyScheduleDays) || {}
-      )
-        ?.filter(([dayName, dayConfig]) => dayConfig.enabled)
-        ?.map(([dayName, dayConfig]) => {
-          return {
-            day: dayName,
-            periods:
-              dayConfig?.periods?.map((period) => ({
-                from: period.start_time,
-                to: period.end_time,
-                early_period:
-                  (dayConfig as any)?.early_clock_in_rules?.early_period ||
-                  DEFAULT_TIME_THRESHOLD_MINUTES,
-                early_unit:
-                  (dayConfig as any)?.early_clock_in_rules?.early_unit ||
-                  "minute",
-                lateness_period:
-                  (dayConfig as any)?.lateness_rules?.lateness_period ||
-                  DEFAULT_TIME_THRESHOLD_MINUTES,
-                lateness_unit:
-                  (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
-              })) ?? [],
-          };
-        }),
+      branch_ids: _branch_ids,
+      location_type: _location_type,
+      weekly_schedule: _weekly_schedule,
       show_location_dialog: false,
     },
     sections: [
@@ -125,10 +152,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             type: "text",
             name: "constraint_name",
             label: getText("form.determinantName", "اسم المحدد"),
-            placeholder: getText(
-              "form.determinantName",
-              "اسم المحدد"
-            ),
+            placeholder: getText("form.determinantName", "اسم المحدد"),
             required: true,
             validation: [
               {
@@ -229,6 +253,17 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 label: getText("form.customLocation", "موقع مخصص لكل فرع"),
               },
             ],
+            onChange: (value) => {
+              if (value === "main" && isBranchLocationEmpty) {
+                useFormStore
+                  ?.getState()
+                  .setValue(
+                    "create-determinant-form",
+                    "show_location_dialog",
+                    true
+                  );
+              }
+            },
             defaultValue: "main",
             required: true,
             validation: [
@@ -277,7 +312,11 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 .getValues("create-determinant-form").show_location_dialog;
 
               const showDialog =
-                location_type === "custom" && show_location_dialog !== false;
+                (location_type === "custom" &&
+                  show_location_dialog !== false) ||
+                (location_type === "main" &&
+                  isBranchLocationEmpty &&
+                  show_location_dialog !== false);
 
               return (
                 <LocationDialog
@@ -295,182 +334,89 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               );
             },
           },
+          // attendance days
           {
-            name: "weekly_schedule",
-            label: getText("form.workingDays", "أيام العمل"),
-            type: "dynamicRows",
-            dynamicRowOptions: {
-              enableDrag: true,
-              rowFields: [
-                {
-                  type: "select",
-                  name: "day",
-                  label: "اليوم",
-                  placeholder: "اختر يوم",
-                  options: daysList,
-                  validation: [
-                    {
-                      type: "required",
-                      message: "اليوم مطلوب",
-                    },
-                  ],
-                },
-                {
-                  name: "periods",
-                  label: getText("form.addPeriod", "إضافة فترة"),
-                  type: "dynamicRows",
-                  dynamicRowOptions: {
-                    enableDrag: true,
-                    rowFields: [
-                      {
-                        type: "time",
-                        name: "from",
-                        label: getText("form.periodStart", "بداية الفترة"),
-                        placeholder: getText(
-                          "form.periodStartPlaceholder",
-                          "09:00"
-                        ),
-                        validation: [
-                          {
-                            type: "required",
-                            message: getText(
-                              "form.periodStartRequired",
-                              "بداية الفترة مطلوبة"
-                            ),
-                          },
-                        ],
-                      },
-                      {
-                        type: "time",
-                        name: "to",
-                        label: getText("form.periodEnd", "نهاية الفترة"),
-                        placeholder: getText(
-                          "form.periodEndPlaceholder",
-                          "17:00"
-                        ),
-                        validation: [
-                          {
-                            type: "required",
-                            message: getText(
-                              "form.periodEndRequired",
-                              "نهاية الفترة مطلوبة"
-                            ),
-                          },
-                          {
-                            type: "custom",
-                            validator: (value: string, formValues: any) => {
-                              const fromTime = formValues.from || "";
-                              const toTime = value || "";
+            name: "editedDay",
+            type: "hiddenObject",
+            label: "",
+            defaultValue: {},
+          },
+          {
+            name: "attendance_days",
+            type: "text",
+            label: "",
+            render: () => {
+              return (
+                <div className="flex items-center justify-between">
+                  <p className="text-white font-bold">
+                    {getText("form.addAttendanceDays", "أضافة ايام حضور")}
+                  </p>
+                  <Button
+                    onClick={() => {
+                      useFormStore
+                        ?.getState()
+                        .setValue(
+                          "create-determinant-form",
+                          "show_attendance_days_dialog",
+                          true
+                        );
+                    }}
+                  >
+                    <Plus />
+                  </Button>
+                </div>
+              );
+            },
+          },
+          {
+            name: "show_attendance_days",
+            type: "text",
+            label: "",
+            render: () => {
+              const _weekly_schedule = useFormStore
+                ?.getState()
+                .getValue("create-determinant-form", "weekly_schedule");
+              console.log(
+                "show_attendance_days_weekly_schedule",
+                _weekly_schedule
+              );
 
-                              // Skip validation if either time is not set
-                              if (!fromTime || !toTime) return true;
-
-                              // Convert times to comparable format (minutes since midnight)
-                              const fromParts = fromTime.split(":");
-                              const toParts = toTime.split(":");
-
-                              if (
-                                fromParts.length !== 2 ||
-                                toParts.length !== 2
-                              )
-                                return true;
-
-                              const fromMinutes =
-                                parseInt(fromParts[0], 10) * 60 +
-                                parseInt(fromParts[1], 10);
-                              const toMinutes =
-                                parseInt(toParts[0], 10) * 60 +
-                                parseInt(toParts[1], 10);
-
-                              // Return true if valid (to time is greater than or equal to from time)
-                              return toMinutes >= fromMinutes;
-                            },
-                            message:
-                              getText(
-                                "form.periodEndMustBeAfterStart",
-                                "وقت النهاية يجب أن يكون بعد وقت البداية"
-                              ) ||
-                              getText(
-                                "form.startTimeBeforeEndTime",
-                                "وقت البداية قبل وقت النهاية"
-                              ),
-                          },
-                        ],
-                      },
-                      {
-                        name: "period_seeting",
-                        label: "",
-                        type: "text",
-                        render: () => {
-                          return (
-                            <div>
-                              <p className="font-bold">إعدادات الفترة</p>
-                            </div>
-                          );
-                        },
-                      },
-                      {
-                        name: "early_period",
-                        label: "السماح بالحضور لمدة (قبل العمل)",
-                        type: "number",
-                        placeholder: "السماح بالحضور لمدة (قبل العمل)",
-                        required: true,
-                        validation: [
-                          {
-                            type: "pattern",
-                            value: "^[0-9]+$",
-                            message:
-                              "السماح بالحضور لمدة (قبل العمل) يجب أن تكون أرقام فقط",
-                          },
-                        ],
-                      },
-                      {
-                        name: "early_unit",
-                        label: "وحدة السماح بالحضور لمدة (قبل العمل)",
-                        placeholder: "وحدة السماح بالحضور لمدة (قبل العمل)",
-                        type: "select",
-                        options: TimeUnits?.map((item) => ({
-                          value: item.id,
-                          label: item.name,
-                        })),
-                        validation: [],
-                      },
-                      {
-                        name: "lateness_period",
-                        label: "السماح بالتأخير لمدة",
-                        type: "number",
-                        placeholder: "السماح بالتأخير لمدة",
-                        required: true,
-                        validation: [
-                          {
-                            type: "pattern",
-                            value: "^[0-9]+$",
-                            message:
-                              "السماح بالتأخير لمدة يجب أن تكون أرقام فقط",
-                          },
-                        ],
-                      },
-                      {
-                        name: "lateness_unit",
-                        label: "وحدة السماح بالتأخير لمدة",
-                        placeholder: "وحدة السماح بالتأخير لمدة",
-                        type: "select",
-                        options: TimeUnits?.map((item) => ({
-                          value: item.id,
-                          label: item.name,
-                        })),
-                        validation: [],
-                      },
-                    ],
-                    minRows: 1,
-                    maxRows: 5,
-                    columns: 1,
-                  },
-                },
-              ],
-              minRows: 1,
-              maxRows: 5,
-              columns: 1,
+              return (
+                <div className="py-2">
+                  {/* Use the ScheduleDisplay component */}
+                  <ScheduleDisplay
+                    t={getText}
+                    weeklySchedule={_weekly_schedule as WeeklyScheduleDays}
+                  />
+                </div>
+              );
+            },
+          },
+          // attendance days dialog
+          {
+            name: "show_attendance_days_dialog",
+            type: "text",
+            label: "",
+            render: () => {
+              const showDialog = useFormStore
+                ?.getState()
+                .getValues(
+                  "create-determinant-form"
+                ).show_attendance_days_dialog;
+              return (
+                <AttendanceDaysDialog
+                  isOpen={Boolean(showDialog)}
+                  onClose={() => {
+                    useFormStore
+                      ?.getState()
+                      .setValue(
+                        "create-determinant-form",
+                        "show_attendance_days_dialog",
+                        false
+                      );
+                  }}
+                />
+              );
             },
           },
           {
@@ -592,6 +538,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     return {
                       from: String(period.from || ""),
                       to: String(period.to || ""),
+                      extends_to_next_day: Boolean(period.extends_to_next_day) ? 1 : undefined,
                     };
                   } else {
                     // If period is not an object
@@ -604,6 +551,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   {
                     from: String(dayItem.periods.from || ""),
                     to: String(dayItem.periods.to || ""),
+                    extends_to_next_day: Boolean(dayItem.periods.extends_to_next_day) ? 1 : undefined,
                   },
                 ];
               }
@@ -625,7 +573,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       // Preparing location data
       let branch_locations = [];
 
-      if (Boolean(formData.location_type === "main" && props.branchesData)) {
+      if (
+        Boolean(
+          formData.location_type === "main" &&
+            props.branchesData &&
+            !isBranchLocationEmpty
+        )
+      ) {
         // If default locations are selected, use the default locations for the selected branches
         const selectedBranches = formData.branch_ids || [];
 
@@ -641,7 +595,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                 latitude: branchData?.latitude || 0,
                 longitude: branchData?.longitude || 0,
                 address: branchData?.address || "",
-                radius: "100",
+                radius: "1000",
                 isDefault: false,
               };
             })
@@ -649,22 +603,21 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
       } else {
         // If custom locations are selected, use the custom values
         // Handle both string and object formats for branch_locations
-        if (typeof formData.branch_locations === 'string') {
+        if (typeof formData.branch_locations === "string") {
           // Parse from string format (used when setting via location dialog)
-          branch_locations = JSON.parse(formData.branch_locations || '[]');
+          branch_locations = JSON.parse(formData.branch_locations || "[]");
         } else if (Array.isArray(formData.branch_locations)) {
           // Already in array format (common in edit mode)
           branch_locations = formData.branch_locations;
         } else {
           // Fallback to empty array
-          if(editConstraint?.branch_locations){
+          if (editConstraint?.branch_locations) {
             branch_locations = editConstraint?.branch_locations;
-          }else{
+          } else {
             branch_locations = [];
           }
         }
       }
-
 
       const data = {
         constraint_name: formData.constraint_name,
@@ -718,11 +671,19 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             // Check for the correct field name
                             const startTime = period.from || "";
                             const endTime = period.to || "";
+                            const extends_to_next_day = Boolean(
+                              period.extends_to_next_day
+                            );
+                            console.log(
+                              "period.extends_to_next_day 100",
+                              period.extends_to_next_day
+                            );
 
                             if (startTime && endTime) {
                               dayPeriods.push({
                                 start_time: startTime,
                                 end_time: endTime,
+                                extends_to_next_day: extends_to_next_day,
                               });
                             }
                           }
@@ -735,11 +696,19 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         const period = dayItem.periods;
                         const startTime = period.from || "";
                         const endTime = period.to || "";
+                        const extends_to_next_day = Boolean(
+                          period.extends_to_next_day
+                        );
+                        console.log(
+                          "period.extends_to_next_day 101",
+                          period.extends_to_next_day
+                        );
 
                         if (startTime && endTime) {
                           dayPeriods.push({
                             start_time: startTime,
                             end_time: endTime,
+                            extends_to_next_day: extends_to_next_day,
                           });
                         }
                       }
@@ -753,10 +722,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   try {
                     // Convert times to minutes
                     const [startHour, startMinute] = period.start_time
-                      .split(":")
+                      ?.split(":")
                       .map(Number);
                     const [endHour, endMinute] = period.end_time
-                      .split(":")
+                      ?.split(":")
                       .map(Number);
 
                     // Calculate the difference in minutes

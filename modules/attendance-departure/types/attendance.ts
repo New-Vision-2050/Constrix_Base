@@ -207,6 +207,7 @@ export interface EarlyClockInRules {
 type PeriodType = {
   end_time: string;
   start_time: string;
+  extends_to_next_day?: number;
 };
 
 type weeklyScheduleDay = {
