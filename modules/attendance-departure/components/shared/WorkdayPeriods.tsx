@@ -13,6 +13,7 @@ export interface PeriodType {
   toPeriod: "AM" | "PM";
   actualHours?: number;  // Actual hours worked during this period
   deductedHours?: number; // Hours deducted from this working period
+  extends_to_next_day?: number; // period extends to next day ? 1 or 0
 }
 
 interface WorkdayPeriodsProps {

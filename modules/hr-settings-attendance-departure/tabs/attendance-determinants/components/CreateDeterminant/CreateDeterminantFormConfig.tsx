@@ -9,7 +9,10 @@ import { TimeUnits } from "../../constants/determinants";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import AttendanceDaysDialog from "./AttendanceDaysDialog";
-import { ScheduleDisplay, WeeklyScheduleDays } from "./components/ScheduleDisplay";
+import {
+  ScheduleDisplay,
+  WeeklyScheduleDays,
+} from "./components/ScheduleDisplay";
 
 // Default time threshold in minutes
 const DEFAULT_TIME_THRESHOLD_MINUTES = 30;
@@ -106,13 +109,13 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
               (dayConfig as any)?.early_clock_in_rules?.early_period ||
               DEFAULT_TIME_THRESHOLD_MINUTES,
             early_unit:
-              (dayConfig as any)?.early_clock_in_rules?.early_unit ||
-              "minute",
+              (dayConfig as any)?.early_clock_in_rules?.early_unit || "minute",
             lateness_period:
               (dayConfig as any)?.lateness_rules?.lateness_period ||
               DEFAULT_TIME_THRESHOLD_MINUTES,
             lateness_unit:
               (dayConfig as any)?.lateness_rules?.lateness_unit || "minute",
+            extends_to_next_day: Boolean(period?.extends_to_next_day) ? 1 : undefined,
           })) ?? [],
       };
     });
@@ -333,10 +336,10 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
           },
           // attendance days
           {
-            name:"editedDay",
-            type:"hiddenObject",
-            label:"",
-            defaultValue:{},
+            name: "editedDay",
+            type: "hiddenObject",
+            label: "",
+            defaultValue: {},
           },
           {
             name: "attendance_days",
@@ -366,22 +369,28 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
             },
           },
           {
-            name:"show_attendance_days",
-            type:"text",
-            label:"",
-            render:()=>{
+            name: "show_attendance_days",
+            type: "text",
+            label: "",
+            render: () => {
               const _weekly_schedule = useFormStore
-              ?.getState()
-              .getValue("create-determinant-form", "weekly_schedule");
-              console.log("show_attendance_days_weekly_schedule", _weekly_schedule);
+                ?.getState()
+                .getValue("create-determinant-form", "weekly_schedule");
+              console.log(
+                "show_attendance_days_weekly_schedule",
+                _weekly_schedule
+              );
 
-              return(
+              return (
                 <div className="py-2">
                   {/* Use the ScheduleDisplay component */}
-                  <ScheduleDisplay t={getText} weeklySchedule={_weekly_schedule as WeeklyScheduleDays} />
+                  <ScheduleDisplay
+                    t={getText}
+                    weeklySchedule={_weekly_schedule as WeeklyScheduleDays}
+                  />
                 </div>
-              )
-            }
+              );
+            },
           },
           // attendance days dialog
           {
@@ -529,6 +538,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                     return {
                       from: String(period.from || ""),
                       to: String(period.to || ""),
+                      extends_to_next_day: Boolean(period.extends_to_next_day) ? 1 : undefined,
                     };
                   } else {
                     // If period is not an object
@@ -541,6 +551,7 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                   {
                     from: String(dayItem.periods.from || ""),
                     to: String(dayItem.periods.to || ""),
+                    extends_to_next_day: Boolean(dayItem.periods.extends_to_next_day) ? 1 : undefined,
                   },
                 ];
               }
@@ -660,11 +671,19 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                             // Check for the correct field name
                             const startTime = period.from || "";
                             const endTime = period.to || "";
+                            const extends_to_next_day = Boolean(
+                              period.extends_to_next_day
+                            );
+                            console.log(
+                              "period.extends_to_next_day 100",
+                              period.extends_to_next_day
+                            );
 
                             if (startTime && endTime) {
                               dayPeriods.push({
                                 start_time: startTime,
                                 end_time: endTime,
+                                extends_to_next_day: extends_to_next_day,
                               });
                             }
                           }
@@ -677,11 +696,19 @@ export const getDynamicDeterminantFormConfig = (props: PropsT): FormConfig => {
                         const period = dayItem.periods;
                         const startTime = period.from || "";
                         const endTime = period.to || "";
+                        const extends_to_next_day = Boolean(
+                          period.extends_to_next_day
+                        );
+                        console.log(
+                          "period.extends_to_next_day 101",
+                          period.extends_to_next_day
+                        );
 
                         if (startTime && endTime) {
                           dayPeriods.push({
                             start_time: startTime,
                             end_time: endTime,
+                            extends_to_next_day: extends_to_next_day,
                           });
                         }
                       }

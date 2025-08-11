@@ -36,11 +36,13 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
       });
     } else {
       // Normal update
+      console.log("Normal update checked", checked,period);
       handleUpdateDayPeriod({
         ...period,
+        end_time: "00:00",
         extends_to_next_day: checked,
       });
-    }
+    } 
   };
 
   return (
