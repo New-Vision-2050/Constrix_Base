@@ -16,7 +16,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   const locale = useLocale();
   
   // Get routes map based on current language
-  const defaultRoutesMap = getRoutesMap(locale);
+  const defaultRoutesMap = getRoutesMap(locale, t => t);
   
   // Merge custom routes map with default one
   const routesMap = { ...defaultRoutesMap, ...(customRoutesMap || {}) };
@@ -42,8 +42,39 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       .join(" ");
   };
   
+  // Check if a segment looks like an ID (UUID, ObjectId, etc)
+  const isIdLikeSegment = (segment: string): boolean => {
+    // Match UUID pattern
+    const uuidPattern = /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i;
+    
+    // Match MongoDB ObjectId pattern (24 hex characters)
+    const objectIdPattern = /^[0-9a-f]{24}$/i;
+    
+    // Match generic numeric ID
+    const numericIdPattern = /^\d{4,}$/;
+    
+    return uuidPattern.test(segment) || 
+           objectIdPattern.test(segment) || 
+           numericIdPattern.test(segment) ||
+           // If segment contains mostly numbers and special characters, likely an ID
+           (segment.length > 8 && segment.replace(/[0-9\-_]/g, '').length < segment.length * 0.3);
+  };
+  
+  // Get label for ID segments from translation file
+  const getIdSegmentLabel = (): string => {
+    // Get the translation key for "details" from the breadcrumbs namespace
+    // We need to get this from the default routes map since it should be translated there
+    if (routesMap["details"]) {
+      const details = routesMap["details"];
+      return typeof details === 'string' ? details : details.label;
+    }
+    
+    // Fallback if translation key is missing
+    return locale === 'ar' ? 'التفاصيل' : 'Details';
+  };
+
   // Search in routes map for custom label for specified route
-  const getRouteInfo = (segment: string, fullPath: string): { label: string, customHref?: string } => {
+  const getRouteInfo = (segment: string, fullPath: string, index: number): { label: string, customHref?: string } => {
     // First look in the map for the full path
     if (routesMap[fullPath]) {
       const routeInfo = routesMap[fullPath];
@@ -64,6 +95,12 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       }
     }
     
+    // Check if this segment looks like an ID
+    if (isIdLikeSegment(segment)) {
+      // Use generic details label for any ID-like segment
+      return { label: getIdSegmentLabel() };
+    }
+    
     // If no custom label is found, use default
     return { label: transformLabel(segment) };
   };
@@ -82,7 +119,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         .join("/");
 
       // Get custom route information from the map
-      const { label, customHref } = getRouteInfo(segment, fullPathWithoutLocale);
+      const { label, customHref } = getRouteInfo(segment, fullPathWithoutLocale, index);
       
       // Build default link if no custom link is provided
       const defaultHref = `/${locale}${pathSegments
