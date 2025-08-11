@@ -17,6 +17,7 @@ interface TableStatusSwitcherProps {
   confirmDescription: (isActive: boolean) => string;
   showDatePicker?: (isActive: boolean) => boolean;
   onError?: (error: Error) => void;
+  disabled?: boolean;
 }
 
 const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
@@ -27,6 +28,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
   confirmDescription,
   showDatePicker = () => false,
   onError,
+  disabled,
 }) => {
   // declare and define component state and variables
   const { toast } = useToast();
@@ -79,7 +81,7 @@ const TableStatusSwitcher: React.FC<TableStatusSwitcherProps> = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!can(PERMISSIONS.permission.activate)}
+          disabled={disabled}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
