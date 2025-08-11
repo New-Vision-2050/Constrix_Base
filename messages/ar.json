@@ -1,6 +1,20 @@
 {
   "breadcrumbs":{
     "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "hr-settings": "إعدادات الموارد البشرية",
+    "attendance-determinants": "محددات الحضور",
+    "attendance-departure": "الحضور والانصراف",
+    "users": "المستخدمين",
+    "users/list": "قائمة المستخدمين",
+    "users/permissions": "صلاحيات المستخدمين",
+    "products": "المنتجات",
+    "products/categories": "تصنيفات المنتجات",
+    "reports": "التقارير",
+    "hr-settings/attendance-determinants": "إعدادات محددات الحضور",
+    "hr-settings/attendance-determinants/create": "إنشاء محدد حضور جديد",
     "separator": "/",
     "back": "رجوع",
     "currentPage": "أنت هنا"

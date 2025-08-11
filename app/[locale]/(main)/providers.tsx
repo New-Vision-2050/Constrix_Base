@@ -1,10 +1,10 @@
 "use client";
 
-import { BreadcrumbsProvider } from "@/lib/breadcrumbs";
 import { PropsWithChildren } from "react";
+import "nextjs-breadcrumbs/dist/index.css";
 
 function Providers({ children }: PropsWithChildren) {
-  return <BreadcrumbsProvider>{children}</BreadcrumbsProvider>;
+  return <>{children}</>;
 }
 
 export default Providers;

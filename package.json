@@ -65,6 +65,7 @@
     "next": "15.1.7",
     "next-intl": "^3.26.5",
     "next-themes": "^0.3.0",
+    "nextjs-breadcrumbs": "^1.1.9",
     "object-to-formdata": "^4.5.1",
     "react": "^18.2.0",
     "react-apexcharts": "^1.7.0",

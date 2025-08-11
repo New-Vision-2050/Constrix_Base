@@ -1,6 +1,20 @@
 {
   "breadcrumbs":{
     "home": "Home",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "hr-settings": "HR Settings",
+    "attendance-determinants": "Attendance Determinants",
+    "attendance-departure": "Attendance & Departure",
+    "users": "Users",
+    "users/list": "Users List",
+    "users/permissions": "User Permissions",
+    "products": "Products",
+    "products/categories": "Product Categories",
+    "reports": "Reports",
+    "hr-settings/attendance-determinants": "Attendance Determinants Settings",
+    "hr-settings/attendance-determinants/create": "Create New Determinant",
     "separator": "/",
     "back": "Back",
     "currentPage": "You are here"
