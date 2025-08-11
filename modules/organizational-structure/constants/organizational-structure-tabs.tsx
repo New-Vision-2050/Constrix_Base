@@ -6,13 +6,19 @@ import CompanyManagementsStructure from "@/modules/organizational-structure/comp
 import UsersStructureTab from "../components/organizational-structure-tabs/organizational-structure-tabs/components/employees-structure";
 import EmployeesOrganizationStructure
   from '@/modules/organizational-structure/components/employees-organization-structure'
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
-export const OrganizationalStructureSubTabs = (t: (key: string) => string): SystemTab[] => [
+export const OrganizationalStructureSubTabs = (t: (key: string) => string): SystemTab[] => {
+  const { can } = usePermissions();
+
+  const tabs : (SystemTab & { show: boolean })[]=[
   {
     id: "organizational-structure-sub-tab-company-structure",
     title: t("companyStructure.title"),
     icon: <LayoutDashboardIcon />,
     content: <CompanyOrganizationStructure />,
+    show: can(PERMISSIONS.organization.branch.view),
   },
   {
     id: "organizational-structure-sub-tab-employees",
@@ -20,11 +26,16 @@ export const OrganizationalStructureSubTabs = (t: (key: string) => string): Syst
     icon: <UserIcon />,
     // content: <UsersStructureTab />,
     content: <EmployeesOrganizationStructure />,
+    show: can(PERMISSIONS.organization.users.view),
   },
   {
     id: "organizational-structure-sub-tab-managements",
     title: t("managements.title"),
     icon: <BackpackIcon />,
     content: <CompanyManagementsStructure />,
+    show: can(PERMISSIONS.organization.management.view),
   },
-];
+  ]
+  
+  return tabs.filter((tab) => tab.show).map(({ show, ...rest }) => rest);
+};
