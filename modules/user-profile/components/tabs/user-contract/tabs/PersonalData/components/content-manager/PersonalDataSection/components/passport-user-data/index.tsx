@@ -10,34 +10,26 @@ export default function PassportDataSectionPersonalForm() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
-    const { can } = usePermissions();
+  const { can } = usePermissions();
 
   return (
-
-    <>
-    {
-      can(PERMISSIONS.profile.passportInfo.view)&&
+    <Can check={[PERMISSIONS.profile.passportInfo.view]}>
       <TabTemplate
-      title="البيانات جواز السفر"
-      loading={userIdentityDataLoading}
-      reviewMode={
-          <UserProfilePassportDataReview />
-      }
-      editMode={
-          <UserProfilePassportDataEditForm />
-      }
-      onChangeMode={() => {
-        handleRefreshIdentityData();
-      }}
-      settingsBtn={{
-        items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
-        ],
-        disabled: !can(PERMISSIONS.profile.passportInfo.update),
-      }}
-    />
-    }
-    </>
+        title="البيانات جواز السفر"
+        loading={userIdentityDataLoading}
+        reviewMode={<UserProfilePassportDataReview />}
+        editMode={<UserProfilePassportDataEditForm />}
+        onChangeMode={() => {
+          handleRefreshIdentityData();
+        }}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {}, disabled: true },
+            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+          ],
+          disabledEdit: !can(PERMISSIONS.profile.passportInfo.update),
+        }}
+      />
+    </Can>
   );
 }

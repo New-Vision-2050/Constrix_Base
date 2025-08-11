@@ -12,31 +12,24 @@ export default function ConnectionDataSectionPersonalForm() {
   // declare and define component state and vars
   const { userConnectionDataLoading } = usePersonalDataTabCxt();
   const { can } = usePermissions();
-  
+
   return (
-    <>
-    {
-      can(PERMISSIONS.profile.contactInfo.view)&&<ConnectionOTPCxtProvider>
-      <TabTemplate
-        title={"بيانات الاتصال"}
-        loading={userConnectionDataLoading}
-        reviewMode={
-            <UserProfileConnectionDataReview />
-        }
-        editMode={
-            <UserProfileConnectionDataEditForm2 />
-        }
-        settingsBtn={{
-          items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
-          ],
-          disabled: !can(PERMISSIONS.profile.contactInfo.update),
-        }}
-      />
-    </ConnectionOTPCxtProvider>
-    }
-    </>
-      
+    <Can check={[PERMISSIONS.profile.contactInfo.view]}>
+      <ConnectionOTPCxtProvider>
+        <TabTemplate
+          title={"بيانات الاتصال"}
+          loading={userConnectionDataLoading}
+          reviewMode={<UserProfileConnectionDataReview />}
+          editMode={<UserProfileConnectionDataEditForm2 />}
+          settingsBtn={{
+            items: [
+              { title: "طلباتي", onClick: () => {}, disabled: true },
+              { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            ],
+            disabledEdit: !can(PERMISSIONS.profile.contactInfo.update),
+          }}
+        />
+      </ConnectionOTPCxtProvider>
+    </Can>
   );
 }

@@ -4,35 +4,32 @@ import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function SocialDataSection() {
   // declare and define component state and vars
   const { handleRefetchUserSocialData, userSocialDataLoading } =
     useConnectionDataCxt();
+  const { can } = usePermissions();
 
   return (
-    <TabTemplate
-      title={"حسابات التواصل الاجتماعي"}
-      loading={userSocialDataLoading}
-      reviewMode={
-        <Can check={[PERMISSIONS.profile.socialMedia.view]}>
-          <SocialDataSectionPreviewMode />
-        </Can>
-      }
-      editMode={
-        <Can check={[PERMISSIONS.profile.socialMedia.update]}>
-          <SocialDataSectionEditMode />
-        </Can>
-      }
-      onChangeMode={() => {
-        handleRefetchUserSocialData();
-      }}
-      settingsBtn={{
-        items: [
-          { title: "طلباتي", onClick: () => {}, disabled: true },
-          { title: "أنشاء طلب", onClick: () => {}, disabled: true },
-        ],
-      }}
-    />
+    <Can check={[PERMISSIONS.profile.socialMedia.view]}>
+      <TabTemplate
+        title={"حسابات التواصل الاجتماعي"}
+        loading={userSocialDataLoading}
+        reviewMode={<SocialDataSectionPreviewMode />}
+        editMode={<SocialDataSectionEditMode />}
+        onChangeMode={() => {
+          handleRefetchUserSocialData();
+        }}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {}, disabled: true },
+            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+          ],
+          disabledEdit: !can([PERMISSIONS.profile.socialMedia.update]),
+        }}
+      />
+    </Can>
   );
 }

@@ -28,13 +28,11 @@ export default function QualificationsList({ items }: PropsT) {
       {userQualificationsLoading ? (
         <TabTemplateListLoading />
       ) : (
-        <Can check={[PERMISSIONS.profile.qualification.view]}>
-          <RegularList<Qualification, "qualification">
-            sourceName="qualification"
-            ItemComponent={SingleQualificationData}
-            items={items ?? []}
-          />
-        </Can>
+        <RegularList<Qualification, "qualification">
+          sourceName="qualification"
+          ItemComponent={SingleQualificationData}
+          items={items ?? []}
+        />
       )}
     </>
   );

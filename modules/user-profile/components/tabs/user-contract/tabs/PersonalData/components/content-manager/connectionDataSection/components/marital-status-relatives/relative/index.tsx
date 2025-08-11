@@ -7,6 +7,7 @@ import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDial
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 type PropsT = {
   relative: Relative;
@@ -16,22 +17,16 @@ export default function RelativeData({ relative }: PropsT) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserRelativesData, userContactDataLoading } =
     useConnectionDataCxt();
-
+  const { can } = usePermissions();
   return (
-    <>
+    <Can check={[PERMISSIONS.profile.maritalStatus.view]}>
       <TabTemplate
         title={"الحالة الاجتماعية"}
         loading={userContactDataLoading}
         reviewMode={
-          <Can check={[PERMISSIONS.profile.maritalStatus.view]}>
-            <MaritalStatusRelativesSectionPreviewMode relative={relative} />
-          </Can>
+          <MaritalStatusRelativesSectionPreviewMode relative={relative} />
         }
-        editMode={
-          <Can check={[PERMISSIONS.profile.maritalStatus.update]}>
-            <MaritalStatusRelativesSectionEditMode relative={relative} />
-          </Can>
-        }
+        editMode={<MaritalStatusRelativesSectionEditMode relative={relative} />}
         settingsBtn={{
           items: [
             {
@@ -39,8 +34,10 @@ export default function RelativeData({ relative }: PropsT) {
               onClick: () => {
                 setDeleteDialog(true);
               },
+              disabled: !can([PERMISSIONS.profile.maritalStatus.delete]),
             },
           ],
+          disabledEdit: !can([PERMISSIONS.profile.maritalStatus.update]),
         }}
       />
       <DeleteConfirmationDialog
@@ -52,6 +49,6 @@ export default function RelativeData({ relative }: PropsT) {
           setDeleteDialog(false);
         }}
       />
-    </>
+    </Can>
   );
 }

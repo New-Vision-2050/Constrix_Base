@@ -4,35 +4,32 @@ import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function MainUserConnectionInfoSection() {
   // declare and define component state and vars
+  const { can } = usePermissions();
   const { handleRefetchUserContactData, userContactDataLoading } =
     useConnectionDataCxt();
 
   return (
-    <TabTemplate
-      title={"بيانات الاتصال"}
-      loading={userContactDataLoading}
-      reviewMode={
-        <Can check={[PERMISSIONS.profile.contactInfo.view]}>
-          <MainUserConnectionInfoSectionPreview />
-        </Can>
-      }
-      editMode={
-        <Can check={[PERMISSIONS.profile.contactInfo.update]}>
-          <MainUserConnectionInfoSectionEdit />
-        </Can>
-      }
-      onChangeMode={() => {
-        handleRefetchUserContactData();
-      }}
-      settingsBtn={{
-        items: [
-          { title: "طلباتي", onClick: () => {} ,disabled:true},
-          { title: "أنشاء طلب", onClick: () => {},disabled:true },
-        ],
-      }}
-    />
+    <Can check={[PERMISSIONS.profile.contactInfo.view]}>
+      <TabTemplate
+        title={"بيانات الاتصال"}
+        loading={userContactDataLoading}
+        reviewMode={<MainUserConnectionInfoSectionPreview />}
+        editMode={<MainUserConnectionInfoSectionEdit />}
+        onChangeMode={() => {
+          handleRefetchUserContactData();
+        }}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {}, disabled: true },
+            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+          ],
+          disabledEdit: !can([PERMISSIONS.profile.contactInfo.update]),
+        }}
+      />
+    </Can>
   );
 }

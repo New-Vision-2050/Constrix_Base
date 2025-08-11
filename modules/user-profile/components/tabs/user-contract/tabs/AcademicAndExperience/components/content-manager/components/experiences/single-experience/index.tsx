@@ -7,6 +7,7 @@ import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDial
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 type PropsT = { experience: Experience };
 
@@ -14,33 +15,29 @@ export default function SingleExperience({ experience }: PropsT) {
   // declare and define component state and vars
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
+  const { can } = usePermissions();
 
   // return component ui
   return (
     <>
-      <TabTemplate
-        title={experience?.job_name ?? ""}
-        reviewMode={
-          <Can check={[PERMISSIONS.profile.experience.view]}>
-            <SingleExperiencePreviewMode experience={experience} />
-          </Can>
-        }
-        editMode={
-          <Can check={[PERMISSIONS.profile.experience.update]}>
-            <SingleExperienceEditMode experience={experience} />
-          </Can>
-        }
-        settingsBtn={{
-          items: [
-            {
-              title: "حذف",
-              onClick: () => {
-                setDeleteDialog(true);
+      <Can check={[PERMISSIONS.profile.experience.view]}>
+        <TabTemplate
+          title={experience?.job_name ?? ""}
+          reviewMode={<SingleExperiencePreviewMode experience={experience} />}
+          editMode={<SingleExperienceEditMode experience={experience} />}
+          settingsBtn={{
+            items: [
+              {
+                title: "حذف",
+                onClick: () => {
+                  setDeleteDialog(true);
+                },
+                disabled: !can([PERMISSIONS.profile.experience.delete]),
               },
-            },
-          ],
-        }}
-      />
+            ],
+          }}
+        />
+      </Can>
 
       <DeleteConfirmationDialog
         deleteUrl={`/user_experiences/${experience?.id}`}

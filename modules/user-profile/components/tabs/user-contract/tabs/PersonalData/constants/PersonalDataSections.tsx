@@ -14,7 +14,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { SystemTab } from "@/modules/settings/types/SystemTab";
 
 // Type that ensures icon is always present
-type PersonalDataTab = Omit<SystemTab, 'icon'> & {
+type PersonalDataTab = Omit<SystemTab, "icon"> & {
   icon: React.ReactNode;
   type?: string;
 };
@@ -22,7 +22,6 @@ type PersonalDataTab = Omit<SystemTab, 'icon'> & {
 export const PersonalDataSections = (
   t: (key: string) => string
 ): PersonalDataTab[] => {
-  
   // declare and define component state and vars
   const shownTabs: string[] = [];
   const { can } = usePermissions();
@@ -42,7 +41,7 @@ export const PersonalDataSections = (
       type: "bank_account",
       icon: <LandmarkIcon />,
       content: <BankingDataSection />,
-      show: true,
+      show: can(PERMISSIONS.profile.bankInfo.view),
     },
     {
       id: "contract-tab-connect-data-section",

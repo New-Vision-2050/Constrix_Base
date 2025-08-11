@@ -10,33 +10,26 @@ export default function PersonalDataSectionPersonalForm() {
   // declare and define component state and vars
   const { userPersonalDataLoading, handleRefreshPersonalData } =
     usePersonalDataTabCxt();
-    const { can } = usePermissions();
+  const { can } = usePermissions();
 
   return (
-     <>
-     {
-      can(PERMISSIONS.profile.personalInfo.view)&&<TabTemplate
-      title="البيانات الشخصية"
-      loading={userPersonalDataLoading}
-      reviewMode={
-          <UserProfilePersonalDataReview />
-      }
-      editMode={
-          <UserProfilePersonalDataEditForm />
-      }
-      onChangeMode={() => {
-        handleRefreshPersonalData();
-      }}
-      settingsBtn={{
-        items: [
-          { title: "طلباتي", onClick: () => {}},
-          { title: "أنشاء طلب", onClick: () => {}},
-        ],
-        disabled: !can(PERMISSIONS.profile.personalInfo.update),
-      }}
-    />
-     }
-     
-     </>
+    <Can check={[PERMISSIONS.profile.personalInfo.view]}>
+      <TabTemplate
+        title="البيانات الشخصية"
+        loading={userPersonalDataLoading}
+        reviewMode={<UserProfilePersonalDataReview />}
+        editMode={<UserProfilePersonalDataEditForm />}
+        onChangeMode={() => {
+          handleRefreshPersonalData();
+        }}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {} },
+            { title: "أنشاء طلب", onClick: () => {} },
+          ],
+          disabledEdit: !can(PERMISSIONS.profile.personalInfo.update),
+        }}
+      />
+    </Can>
   );
 }

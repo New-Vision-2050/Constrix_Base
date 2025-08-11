@@ -10,37 +10,34 @@ export default function IdentityDataSectionPersonalForm() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
-    const { can } = usePermissions();
+  const { can } = usePermissions();
 
   return (
-    <>
-    {
-      can(PERMISSIONS.userProfile.identity.view)&&<TabTemplate
-      title={"البيانات الهوية"}
-      loading={userIdentityDataLoading}
-      reviewMode={
-        // <Can check={[PERMISSIONS.profile.identityInfo.view]}>
-        <UserProfileIdentityDataReview />
-        // </Can>
-      }
-      editMode={
-        // <Can check={[PERMISSIONS.profile.identityInfo.update]}>
-        <UserProfileConnectionDataEditForm />
-        // </Can>
-      }
-      onChangeMode={() => {
-        handleRefreshIdentityData();
-      }}
-      settingsBtn={{
-        items: [
-          { title: "طلباتي", onClick: () => {}, disabled: true },
-          { title: "أنشاء طلب", onClick: () => {}, disabled: true },
-        ],
-        disabled: !can(PERMISSIONS.userProfile.identity.update),
-      }}
-    />
-    }
-    </>
-      
+    <Can check={[PERMISSIONS.userProfile.identity.view]}>
+      <TabTemplate
+        title={"البيانات الهوية"}
+        loading={userIdentityDataLoading}
+        reviewMode={
+          // <Can check={[PERMISSIONS.profile.identityInfo.view]}>
+          <UserProfileIdentityDataReview />
+          // </Can>
+        }
+        editMode={
+          // <Can check={[PERMISSIONS.profile.identityInfo.update]}>
+          <UserProfileConnectionDataEditForm />
+          // </Can>
+        }
+        onChangeMode={() => {
+          handleRefreshIdentityData();
+        }}
+        settingsBtn={{
+          items: [
+            { title: "طلباتي", onClick: () => {}, disabled: true },
+            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+          ],
+          disabledEdit: !can(PERMISSIONS.userProfile.identity.update),
+        }}
+      />
+    </Can>
   );
 }

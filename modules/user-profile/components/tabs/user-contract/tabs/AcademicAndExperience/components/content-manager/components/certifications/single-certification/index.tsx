@@ -7,6 +7,7 @@ import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDial
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 type PropsT = { certification: Certification };
 
@@ -14,35 +15,33 @@ export default function UserCertification({ certification }: PropsT) {
   // declare and define component state and vars
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
+  const { can } = usePermissions();
 
   // return component ui
   return (
     <>
-      <TabTemplate
-        title={certification?.accreditation_name ?? ""}
-        reviewMode={
-          <Can check={[PERMISSIONS.profile.certificates.view]}>
+      <Can check={[PERMISSIONS.profile.certificates.view]}>
+        <TabTemplate
+          title={certification?.accreditation_name ?? ""}
+          reviewMode={
             <UserCertificationPreview certification={certification} />
-          </Can>
-        }
-        editMode={
-          <Can check={[PERMISSIONS.profile.certificates.update]}>
-            <UserCertificationEdit certification={certification} />
-          </Can>
-        }
-        settingsBtn={{
-          items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
-            {
-              title: "حذف",
-              onClick: () => {
-                setDeleteDialog(true);
+          }
+          editMode={<UserCertificationEdit certification={certification} />}
+          settingsBtn={{
+            items: [
+              { title: "طلباتي", onClick: () => {}, disabled: true },
+              { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+              {
+                title: "حذف",
+                onClick: () => {
+                  setDeleteDialog(true);
+                },
+                disabled: !can([PERMISSIONS.profile.certificates.delete]),
               },
-            },
-          ],
-        }}
-      />
+            ],
+          }}
+        />
+      </Can>
 
       <DeleteConfirmationDialog
         deleteUrl={`/professional_certificates/${certification?.id}`}
