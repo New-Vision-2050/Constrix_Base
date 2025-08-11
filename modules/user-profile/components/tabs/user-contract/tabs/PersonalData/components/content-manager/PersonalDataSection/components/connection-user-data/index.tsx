@@ -6,33 +6,37 @@ import UserProfileConnectionDataEditForm2 from "./edit-mode-v2";
 import UserProfileConnectionDataReview from "./preview-mode";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function ConnectionDataSectionPersonalForm() {
   // declare and define component state and vars
   const { userConnectionDataLoading } = usePersonalDataTabCxt();
-
+  const { can } = usePermissions();
+  
   return (
-    <ConnectionOTPCxtProvider>
+    <>
+    {
+      can(PERMISSIONS.profile.contactInfo.view)&&<ConnectionOTPCxtProvider>
       <TabTemplate
         title={"بيانات الاتصال"}
         loading={userConnectionDataLoading}
         reviewMode={
-          <Can check={[PERMISSIONS.profile.contactInfo.view]}>
             <UserProfileConnectionDataReview />
-          </Can>
         }
         editMode={
-          <Can check={[PERMISSIONS.profile.contactInfo.update]}>
             <UserProfileConnectionDataEditForm2 />
-          </Can>
         }
         settingsBtn={{
           items: [
             { title: "طلباتي", onClick: () => {}, disabled: true },
             { title: "أنشاء طلب", onClick: () => {}, disabled: true },
           ],
+          disabled: !can(PERMISSIONS.profile.contactInfo.update),
         }}
       />
     </ConnectionOTPCxtProvider>
+    }
+    </>
+      
   );
 }

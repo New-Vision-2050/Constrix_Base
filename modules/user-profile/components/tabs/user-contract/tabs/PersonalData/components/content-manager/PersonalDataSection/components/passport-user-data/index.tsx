@@ -4,25 +4,27 @@ import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function PassportDataSectionPersonalForm() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
+    const { can } = usePermissions();
 
   return (
-    <TabTemplate
+
+    <>
+    {
+      can(PERMISSIONS.profile.passportInfo.view)&&
+      <TabTemplate
       title="البيانات جواز السفر"
       loading={userIdentityDataLoading}
       reviewMode={
-        <Can check={[PERMISSIONS.profile.passportInfo.view]}>
           <UserProfilePassportDataReview />
-        </Can>
       }
       editMode={
-        <Can check={[PERMISSIONS.profile.passportInfo.update]}>
           <UserProfilePassportDataEditForm />
-        </Can>
       }
       onChangeMode={() => {
         handleRefreshIdentityData();
@@ -32,7 +34,10 @@ export default function PassportDataSectionPersonalForm() {
           { title: "طلباتي", onClick: () => {} ,disabled:true},
           { title: "أنشاء طلب", onClick: () => {},disabled:true },
         ],
+        disabled: !can(PERMISSIONS.profile.passportInfo.update),
       }}
     />
+    }
+    </>
   );
 }

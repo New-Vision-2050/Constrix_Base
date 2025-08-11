@@ -11,30 +11,30 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { SystemTab } from "@/modules/settings/types/SystemTab";
+
+// Type that ensures icon is always present
+type PersonalDataTab = Omit<SystemTab, 'icon'> & {
+  icon: React.ReactNode;
+  type?: string;
+};
 
 export const PersonalDataSections = (
   t: (key: string) => string
-): UserProfileNestedTab[] => {
+): PersonalDataTab[] => {
+  
   // declare and define component state and vars
   const shownTabs: string[] = [];
   const { can } = usePermissions();
 
-  if (can(PERMISSIONS.profile.personalInfo.view))
-    shownTabs.push("contract-tab-personal-data-section");
-  if (can(PERMISSIONS.profile.bankInfo.view))
-    shownTabs.push("contract-tab-banking-data-section");
-  if (can(PERMISSIONS.profile.contactInfo.view))
-    shownTabs.push("contract-tab-connect-data-section");
-  // if(can(Object.values(PERMISSIONS.profile.identityInfo.view)))
-  //   shownTabs.push("contract-tab-iqama-data-section");
-
-  const tabs = [
+  const tabs: (PersonalDataTab & { show: boolean })[] = [
     {
       id: "contract-tab-personal-data-section",
       title: t("personalData"),
       icon: <UserIcon />,
       type: "info_company_user",
       content: <PersonalDataSection />,
+      show: true,
     },
     {
       id: "contract-tab-banking-data-section",
@@ -42,6 +42,7 @@ export const PersonalDataSections = (
       type: "bank_account",
       icon: <LandmarkIcon />,
       content: <BankingDataSection />,
+      show: true,
     },
     {
       id: "contract-tab-connect-data-section",
@@ -49,6 +50,7 @@ export const PersonalDataSections = (
       type: "contact_info",
       icon: <PhoneIcon />,
       content: <ConnectionDataSection />,
+      show: true,
     },
     {
       id: "contract-tab-iqama-data-section",
@@ -56,10 +58,11 @@ export const PersonalDataSections = (
       type: "identity_info",
       title: t("iqamaData"),
       content: <IqamaDataSection />,
+      show: true,
     },
   ];
 
-  return tabs.filter((ele) => shownTabs.includes(ele.id));
+  return tabs.filter((tab) => tab.show).map(({ show, ...rest }) => rest);
 };
 
 type PropsT = {

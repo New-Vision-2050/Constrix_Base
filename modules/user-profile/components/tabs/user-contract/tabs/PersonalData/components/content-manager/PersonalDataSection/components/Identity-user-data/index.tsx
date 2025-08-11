@@ -4,14 +4,18 @@ import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function IdentityDataSectionPersonalForm() {
   // declare and define component state and vars
   const { handleRefreshIdentityData, userIdentityDataLoading } =
     usePersonalDataTabCxt();
+    const { can } = usePermissions();
 
   return (
-    <TabTemplate
+    <>
+    {
+      can(PERMISSIONS.userProfile.identity.view)&&<TabTemplate
       title={"البيانات الهوية"}
       loading={userIdentityDataLoading}
       reviewMode={
@@ -32,7 +36,11 @@ export default function IdentityDataSectionPersonalForm() {
           { title: "طلباتي", onClick: () => {}, disabled: true },
           { title: "أنشاء طلب", onClick: () => {}, disabled: true },
         ],
+        disabled: !can(PERMISSIONS.userProfile.identity.update),
       }}
     />
+    }
+    </>
+      
   );
 }

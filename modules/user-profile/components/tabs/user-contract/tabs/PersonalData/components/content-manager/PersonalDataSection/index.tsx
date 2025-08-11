@@ -12,24 +12,16 @@ export default function PersonalDataSection() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Can check={[PERMISSIONS.profile.personalInfo.view]}>
         <PersonalDataSectionPersonalForm />
-      </Can>
 
-      <Can check={[PERMISSIONS.profile.contactInfo.view]}>
         <ConnectionDataSectionPersonalForm />
-      </Can>
 
-      {identity && (
-        <Can check={[PERMISSIONS.profile.personalInfo.view]}>
+      {!identity && (
           <IdentityDataSectionPersonalForm />
-        </Can>
       )}
 
       {!identity && (
-        <Can check={[PERMISSIONS.profile.passportInfo.view]}>
           <PassportDataSectionPersonalForm />
-        </Can>
       )}
     </div>
   );

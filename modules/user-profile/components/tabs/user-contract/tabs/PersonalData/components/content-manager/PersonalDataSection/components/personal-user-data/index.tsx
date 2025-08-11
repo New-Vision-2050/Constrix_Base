@@ -4,35 +4,39 @@ import { usePersonalDataTabCxt } from "../../../../../context/PersonalDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function PersonalDataSectionPersonalForm() {
   // declare and define component state and vars
   const { userPersonalDataLoading, handleRefreshPersonalData } =
     usePersonalDataTabCxt();
+    const { can } = usePermissions();
 
   return (
-    <TabTemplate
+     <>
+     {
+      can(PERMISSIONS.profile.personalInfo.view)&&<TabTemplate
       title="البيانات الشخصية"
       loading={userPersonalDataLoading}
       reviewMode={
-        <Can check={[PERMISSIONS.profile.personalInfo.view]}>
           <UserProfilePersonalDataReview />
-        </Can>
       }
       editMode={
-        <Can check={[PERMISSIONS.profile.personalInfo.update]}>
           <UserProfilePersonalDataEditForm />
-        </Can>
       }
       onChangeMode={() => {
         handleRefreshPersonalData();
       }}
       settingsBtn={{
         items: [
-          { title: "طلباتي", onClick: () => {}, disabled: true },
-          { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+          { title: "طلباتي", onClick: () => {}},
+          { title: "أنشاء طلب", onClick: () => {}},
         ],
+        disabled: !can(PERMISSIONS.profile.personalInfo.update),
       }}
     />
+     }
+     
+     </>
   );
 }
