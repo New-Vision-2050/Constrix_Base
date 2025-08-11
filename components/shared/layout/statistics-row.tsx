@@ -12,7 +12,7 @@ interface Config {
 
 const StatisticsRow = ({ config }: { config: Config }) => {
   const { data, isLoading, isSuccess } = useQuery({
-    queryKey: ["widgets"],
+    queryKey: ["widgets", config.url],
     queryFn: async () => {
       const response = await apiClient.get(config.url);
       return response.data;

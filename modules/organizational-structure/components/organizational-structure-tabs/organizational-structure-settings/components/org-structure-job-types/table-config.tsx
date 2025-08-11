@@ -2,8 +2,11 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { GetOrgStructureSettingsJobTypesFormConfig } from "./form-config";
 import { JobType } from "@/types/job-type";
 import TableStatusSwitcher from "@/components/shared/table-status";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const OrgStructureSettingsJobTypesTableConfig = () => {
+  const {can} = usePermissions()
   return {
     url: `${baseURL}/job_types`,
     tableId: "org-structure-job-types-table", // Add tableId to the config
@@ -51,6 +54,7 @@ export const OrgStructureSettingsJobTypesTableConfig = () => {
               !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشظ"
             }
             showDatePicker={() => false}
+            disabled={!can(PERMISSIONS.organization.jobType.activate)}
           />
         ),
       },
@@ -63,6 +67,7 @@ export const OrgStructureSettingsJobTypesTableConfig = () => {
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
+    enableExport: can(PERMISSIONS.organization.jobType.export),
     searchFields: ["name", "email"],
     searchParamName: "search",
     searchFieldParamName: "fields",
@@ -70,8 +75,8 @@ export const OrgStructureSettingsJobTypesTableConfig = () => {
     formConfig: GetOrgStructureSettingsJobTypesFormConfig(),
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: can(PERMISSIONS.organization.jobType.update),
+      canDelete: can(PERMISSIONS.organization.jobType.delete),
     },
   };
 };

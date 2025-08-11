@@ -11,6 +11,10 @@ import PersonStaticIcon from "@/public/icons/person-static";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { bouquetConfig } from "@/modules/table/utils/configs/bouquetTableConfig";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import Can from "@/lib/permissions/client/Can";
 
 // Interface for API response
 interface Root {
@@ -31,7 +35,7 @@ function EntryPointBouquets() {
   const config =  bouquetConfig();
   const [statisticsData, setStatisticsData] = useState<Payload | null>(null);
   const [statisticsLoading, setStatisticsLoading] = useState<boolean>(true);
-
+  const {can} = usePermissions();
    const handleFormSuccess = (values: Record<string, unknown>) => {
       // Import the store directly to avoid hooks in callbacks
       const tableStore = useTableStore.getState();
@@ -104,11 +108,13 @@ function EntryPointBouquets() {
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
+          <Can check={[PERMISSIONS.package.create]}>
             <SheetFormBuilder
               config={GetBouquetFormConfig(t, undefined)}
               trigger={<Button>اضافة باقة</Button>}
               onSuccess={handleFormSuccess}
-            />
+              />
+          </Can>
           </div>
         }
       />
@@ -116,4 +122,5 @@ function EntryPointBouquets() {
   );
 }
 
-export default EntryPointBouquets;
+export default withPermissions(EntryPointBouquets, [PERMISSIONS.package.list]);
+

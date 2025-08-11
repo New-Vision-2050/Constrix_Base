@@ -50,7 +50,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
     isDefault: false,
     latitude: "",
     longitude: "",
-    radius: "200",
+    radius: "1000",
   });
 
   // Update currentBranchData when selected branch changes
@@ -76,7 +76,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
         // Update branch location in context
         const updatedData = {
           isDefault: true,
-          radius: branchLocation.radius ?? "200",
+          radius: branchLocation.radius ?? "1000",
           latitude: branchLocation.latitude,
           longitude: branchLocation.longitude,
         };
@@ -162,7 +162,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
           const updateData = {
             latitude,
             longitude,
-            radius: "200",
+            radius: "1000",
             isDefault: false, // Uncheck default when using current location
           };
           

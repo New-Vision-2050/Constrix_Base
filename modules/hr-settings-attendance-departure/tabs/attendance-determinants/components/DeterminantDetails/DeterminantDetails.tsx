@@ -101,7 +101,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
 
   return (
     <div
-      className={`${cardBg} border ${cardBorder} ${cardText} rounded-xl p-2 relative overflow-hidden shadow-sm`}
+      className={`${cardBg} border ${cardBorder} ${cardText} rounded-xl p-2 relative overflow-hidden shadow-sm  w-[500px] m-2`}
     >
       {/* Title with dropdown menu */}
       <div className="flex items-center justify-between mb-8 relative z-10">
@@ -159,11 +159,11 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
         <div className={`${sectionTextLabel} text-[12px] mb-0.5`}>
           {t("workdays")}
         </div>
-        <div className="grid grid-cols-3 gap-x-8 gap-y-4 text-center">
+        <div className="flex flex-row flex-wrap">
           {daysOfWeek.map((day, index) => (
             <div
               key={index}
-              className="flex flex-row-reverse items-center justify-center gap-2"
+              className={`flex flex-row-reverse items-center justify-between w-[88px] mx-1`}
             >
               {activeDays.includes(day) ? (
                 <div className="bg-pink-500 w-5 h-5 flex items-center justify-center rounded">
@@ -186,11 +186,12 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
       {constraint.branch_locations.length > 0 && (
         <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>
           <div className={`${sectionTextLabel} mb-3`}>{t("branches")}</div>
-          <div className="flex flex-row-reverse gap-3 justify-end flex-wrap">
+          <div className="flex flex-row-reverse gap-2 justify-end overflow-hidden">
             {constraint.branch_locations.map((branch, index) => (
               <div
                 key={index}
-                className={`${branchTagBg} ${branchTagHover} transition-colors rounded-full px-6 py-2 ${
+                title={branch.name}
+                className={`${branchTagBg} ${branchTagHover} transition-colors rounded-full px-6 py-2 truncate max-w-full ${
                   isDarkMode ? "text-white" : "text-gray-800"
                 }`}
               >
@@ -200,7 +201,6 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
           </div>
         </div>
       )}
-
       {/* Notes */}
       {constraint.notes && (
         <div className={`${sectionBg} p-3 rounded-md mt-3 shadow-sm`}>

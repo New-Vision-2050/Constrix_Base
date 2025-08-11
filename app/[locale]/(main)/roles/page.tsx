@@ -1,48 +1,80 @@
 "use client";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { Button } from "@/components/ui/button";
+import { baseURL } from "@/config/axios-config";
 import { useModal } from "@/hooks/use-modal";
-import { statisticsConfig } from "@/modules/companies/components/statistics-config";
-import RoleSheet from "@/modules/roles/components/RoleSheet";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
 import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
-import { TableBuilder } from "@/modules/table";
+import { TableBuilder, useTableReload } from "@/modules/table";
+import ArrowStaticIcon from "@/public/icons/arrow-static";
+import ChartStaticIcon from "@/public/icons/chart-static";
+import CheckStatic from "@/public/icons/check-static";
+import PersonStaticIcon from "@/public/icons/person-static";
 import React, { useCallback, useState } from "react";
+
+const statisticsConfig = {
+  url: `${baseURL}/role_and_permissions/roles/widgets`,
+  icons: [
+    <PersonStaticIcon key={1} />,
+    <CheckStatic key={2} />,
+    <ChartStaticIcon key={3} />,
+    <ArrowStaticIcon key={4} />,
+  ],
+};
 
 const RolesPages = () => {
   const [isOpen, handleOpen, handleClose] = useModal();
-  const [isEdit , setIsEdit] = useState<boolean>(false)
-  const [selectedId, setSelectedId] = useState<string|undefined>(undefined)
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 
-const handleOpenRolesSheet = useCallback(
-  ({ isEdit, selectedId }: { isEdit: boolean; selectedId?: string }) => {
-    setIsEdit(isEdit);
-    setSelectedId(selectedId);
-    handleOpen();
-  },
-  [handleOpen]
-);
+  // Get table reload function
+  const { reloadTable } = useTableReload("roles-table");
 
-const handleCloseRolesSheet = useCallback(
-  () => {
-    setIsEdit(false);
+  const handleOpenRolesSheet = useCallback(
+    ({ selectedId }: { selectedId?: string }) => {
+      setSelectedId(selectedId);
+      handleOpen();
+    },
+    [handleOpen]
+  );
+
+  const handleCloseRolesSheet = useCallback(() => {
     setSelectedId(undefined);
     handleClose();
-  },
-  [handleOpen]
-);
+  }, [handleClose]); // Fixed dependency - should be handleClose, not handleOpen
 
-  const config = rolesTableConfig({handleOpenRolesSheet});
-  
+  // Function to handle successful form submission
+  const handleFormSuccess = useCallback(() => {
+    handleCloseRolesSheet();
+    reloadTable(); // Reload the table data
+  }, [handleCloseRolesSheet, reloadTable]);
+
+  const config = rolesTableConfig({ handleOpenRolesSheet });
+
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />
       <TableBuilder
         config={config}
         searchBarActions={
-          <RoleSheet isEdit={isEdit} tableId={config.tableId} isOpen={isOpen} handleOpen={handleOpenRolesSheet} handleClose={handleCloseRolesSheet} selectedId={selectedId}/>
+          <>
+            <Can check={[PERMISSIONS.role.create]}>
+              <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+            </Can>
+
+            <UpdateRoleDrawer
+              onClose={handleCloseRolesSheet}
+              open={isOpen}
+              roleId={selectedId}
+              onSuccess={handleFormSuccess} // Add success handler to reload table
+            />
+          </>
         }
       />
     </div>
   );
 };
 
-export default RolesPages;
+export default withPermissions(RolesPages, [PERMISSIONS.role.list]);

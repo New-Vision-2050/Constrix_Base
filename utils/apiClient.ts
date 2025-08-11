@@ -3,6 +3,7 @@ import axios from "axios";
 import { useLocale } from "next-intl";
 import { getCookie } from "cookies-next";
 import { getCurrentHost } from "./get-current-host";
+import { getClientHost } from "./get-client-host";
 
 /**
  * Creates an API client instance with the current locale
@@ -54,7 +55,7 @@ export const createApiRequestOptions = (
   const token = getCookie("new-vision-token");
   console.log(token);
   // Get domain if in browser environment
-  const domain = typeof window !== "undefined" ? window.location.hostname : "";
+  const domain = getClientHost() || "";
 
   return {
     signal: controller?.signal,

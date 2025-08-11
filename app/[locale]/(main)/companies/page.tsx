@@ -14,6 +14,9 @@ import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -68,15 +71,17 @@ const CompaniesPage = () => {
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />
 
-      <TableBuilder
+        <TableBuilder
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
-            <SheetFormBuilder
-              config={GetCompaniesFormConfig(t)}
-              trigger={<Button>{t("createCompany")}</Button>}
-              onSuccess={handleFormSuccess}
-            />{" "}
+            <Can check={[PERMISSIONS.company.create]}>
+              <SheetFormBuilder
+                config={GetCompaniesFormConfig(t)}
+                trigger={<Button>{t("createCompany")}</Button>}
+                onSuccess={handleFormSuccess}
+              />
+            </Can>
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}
@@ -90,4 +95,4 @@ const CompaniesPage = () => {
   );
 };
 
-export default CompaniesPage;
+export default withPermissions(CompaniesPage, [PERMISSIONS.company.list]);

@@ -18,6 +18,8 @@ import { useLocale } from "next-intl";
 import MyRequests from "./my-requests";
 import { Button } from "@/components/ui/button";
 import { officialData } from "@/modules/company-profile/types/company";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const OfficialDataSection = ({
   officialData,
@@ -52,15 +54,17 @@ const OfficialDataSection = ({
     <>
       <FormFieldSet
         title="البيانات الرسمية"
-        valid={Object.values(officialData).every((value) => 
+        valid={Object.values(officialData).every((value) =>
           Array.isArray(value) ? value.length > 0 : Boolean(value)
         )}
         secondTitle={
-          <FieldSetSecondTitle
-            mode={mode}
-            handleEditClick={handleEditClick}
-            dropdownItems={dropdownItems}
-          />
+          <Can check={[PERMISSIONS.companyProfile.officialData.update]}>
+            <FieldSetSecondTitle
+              mode={mode}
+              handleEditClick={handleEditClick}
+              dropdownItems={dropdownItems}
+            />
+          </Can>
         }
       >
         <br />

@@ -27,7 +27,7 @@ const AttendanceDeterminantsContent: React.FC<
   // Theme specific colors
   const containerBg = isDarkMode ? 'bg-gray-900/20' : 'bg-gray-50';
   return (
-    <div className={`p-4 flex flex-col items-center gap-4 ${containerBg} rounded-md`}>
+    <div className={`flex flex-col items-start ${containerBg} rounded-md`}>
       {/* قائمة المحددات */}
       <DeterminantsList
         determinants={determinants}
