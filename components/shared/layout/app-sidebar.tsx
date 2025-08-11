@@ -169,7 +169,16 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.Organizational_Structure,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.Organizational_Structure,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.organization.branch.list,
+                PERMISSIONS.organization.department.list,
+                PERMISSIONS.organization.jobTitle.list,
+                PERMISSIONS.organization.jobType.list,
+                PERMISSIONS.organization.management.list,
+                PERMISSIONS.organization.users.list,
+              ]),
           },
           {
             name: t("Sidebar.AttendanceDeparture"),

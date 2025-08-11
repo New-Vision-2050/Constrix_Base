@@ -29,13 +29,11 @@ export default function ExperiencesList() {
       {userExperiencesLoading ? (
         <TabTemplateListLoading />
       ) : (
-        <Can check={[PERMISSIONS.profile.experience.view]}>
         <RegularList<Experience, "experience">
           sourceName="experience"
           items={userExperiences ?? []}
           ItemComponent={SingleExperience}
         />
-        </Can>
       )}
     </>
   );

@@ -13,50 +13,44 @@ export const GetUserContractTabsList = (
 ): SystemTab[] => {
   // declare and define component state and variables
   const { can } = usePermissions();
-  const showenTabs: string[] = [];
 
-  // check permissions
-  if (can(PERMISSIONS.profile.personalInfo.view))
-    showenTabs.push("user-contract-tab-personal-data");
-  if (can(PERMISSIONS.profile.education.view))
-    showenTabs.push("user-contract-tab-academic-experience");
-  if (can(PERMISSIONS.profile.employmentInfo.view))
-    showenTabs.push("user-contract-tab-job-contract");
-  if (can(PERMISSIONS.profile.salaryInfo.view))
-    showenTabs.push("user-contract-tab-financial");
-
-  const tabs = [
+  const tabs : (SystemTab & { show: boolean })[]= [
     {
       id: "user-contract-tab-personal-data",
       title: t("personalTab"),
       icon: <UserIcon />,
       content: <PersonalDataTab />,
+      show: true,
     },
     {
       id: "user-contract-tab-academic-experience",
       title: t("academicAndExperience"),
       icon: <GraduationCap />,
       content: <AcademicAndExperience />,
+      show: true,
     },
     {
       id: "user-contract-tab-job-contract",
       title: t("employmentAndContractalData"),
       icon: <BackpackIcon />,
       content: <FunctionalAndContractualData />,
+      show: true,
     },
     {
       id: "user-contract-tab-financial",
       title: t("financialPrivileges"),
       icon: <CircleDollarSign />,
       content: <FinancialBenefits />,
+      show: true,
     },
     {
       id: "user-contract-tab-contract-management",
       title: t("contractManagement"),
       icon: <BackpackIcon />,
       content: <>ادارة العقد</>,
+      show: true,
     },
   ];
 
-  return tabs.filter((tab) => showenTabs.includes(tab.id));
+  return tabs.filter((tab) => tab.show).map(({ show, ...rest }) => rest);
 };

@@ -13,7 +13,7 @@ export default function MaritalStatusRelativesSection() {
     <FormFieldSet
       title="الحالة الاجتماعية / الاقارب"
       secondTitle={
-        <Can check={[PERMISSIONS.profile.maritalStatus.update]}>
+        <Can check={[PERMISSIONS.profile.maritalStatus.create]}>
           <Button
             onClick={() => {
               setOpen(true);
