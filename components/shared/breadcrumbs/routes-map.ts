@@ -27,7 +27,7 @@ export const getRoutesMap = (
   };
 
   const appRoutesMap: RoutesMap = {
-    // Main routes
+    // Main routes (example: dashboard)
     dashboard: {
       label: getText("dashboard", "الرئيسية"),
       href: `/${locale}/dashboard`,

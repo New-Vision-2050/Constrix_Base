@@ -1,18 +1,20 @@
 # Breadcrumbs Component
 
-مكون فتات الخبز (Breadcrumbs) المخصص لـ Next.js App Router مع دعم التخصيص والترجمة.
+Custom Breadcrumbs component for Next.js App Router with i18n support.
 
-## الميزات
+## Features
 
-* ✅ متوافق مع Next.js App Router
-* ✅ دعم للتعدد اللغوي (العربية والإنجليزية)
-* ✅ تحويل تلقائي لمسارات URL إلى عناوين مقروءة
-* ✅ دعم التخصيص باستخدام خريطة المسارات
-* ✅ دعم الاتجاه من اليمين إلى اليسار (RTL)
+* ✅ Compatible with Next.js App Router
+* ✅ Support for multilingual content (Arabic and English)
+* ✅ Automatic transformation of URL paths to readable labels
+* ✅ Customization support using routes map
+* ✅ Right-to-Left (RTL) direction support
+* ✅ ID detection and substitution with localized "Details" label
+* ✅ i18n integration with next-intl
 
-## طريقة الاستخدام
+## Usage
 
-### الاستخدام الأساسي
+### Basic Usage
 
 ```tsx
 import Breadcrumbs from "@/components/shared/breadcrumbs";
@@ -26,15 +28,16 @@ export default function MyPage() {
 }
 ```
 
-### التخصيص باستخدام خريطة المسارات
+### Customization using Routes Map and Translation
 
 ```tsx
 import Breadcrumbs, { getRoutesMap } from "@/components/shared/breadcrumbs";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function MyPage() {
   const locale = useLocale();
-  const routesMap = getRoutesMap(locale);
+  const t = useTranslations("breadcrumbs");
+  const routesMap = getRoutesMap(locale, t);
   
   return (
     <header>
@@ -44,19 +47,19 @@ export default function MyPage() {
 }
 ```
 
-### استخدام خريطة مسارات مخصصة
+### Using Custom Routes Map
 
 ```tsx
 import Breadcrumbs from "@/components/shared/breadcrumbs";
 import type { RoutesMap } from "@/components/shared/breadcrumbs";
 
 const customRoutesMap: RoutesMap = {
-  "dashboard": "لوحة التحكم",
+  "dashboard": "Dashboard",
   "settings": {
-    label: "الإعدادات",
+    label: "Settings",
     href: "/custom-settings-path"
   },
-  "users/profile": "الملف الشخصي"
+  "users/profile": "User Profile"
 };
 
 export default function MyPage() {
@@ -68,62 +71,86 @@ export default function MyPage() {
 }
 ```
 
-## الخيارات والخصائص
+## Options and Properties
 
-| الخاصية | النوع | الوصف |
+| Property | Type | Description |
 |----------|------|-------------|
-| `homeLabel` | `string` | النص المعروض للصفحة الرئيسية (اختياري) |
-| `className` | `string` | فئات CSS إضافية للمكون (اختياري) |
-| `routesMap` | `RoutesMap` | خريطة لتخصيص أسماء وروابط المسارات (اختياري) |
+| `homeLabel` | `string` | Text to display for the home page (optional) |
+| `className` | `string` | Additional CSS classes for the component (optional) |
+| `routesMap` | `RoutesMap` | Map to customize route names and links (optional) |
 
-## خريطة المسارات
+## Routes Map
 
-يدعم المكون ثلاثة أنواع من القيم في خريطة المسارات:
+The component supports three types of values in the routes map:
 
-1. **قيمة نصية بسيطة**: يتم استخدامها كعنوان للمسار.
+1. **Simple text value**: Used as a label for the route.
    ```tsx
-   { "dashboard": "لوحة التحكم" }
+   { "dashboard": "Dashboard" }
    ```
 
-2. **كائن مع عنوان**: يتم استخدام العنوان مع الحفاظ على الرابط الأصلي.
+2. **Object with label**: Uses the label while keeping the original link.
    ```tsx
-   { "settings": { label: "الإعدادات" } }
+   { "settings": { label: "Settings" } }
    ```
 
-3. **كائن مع عنوان ورابط**: يتم استخدام العنوان والرابط المخصص.
+3. **Object with label and href**: Uses both the custom label and custom link.
    ```tsx
-   { "users": { label: "المستخدمون", href: "/admin/all-users" } }
+   { "users": { label: "Users", href: "/admin/all-users" } }
    ```
 
-## استخدام خريطة المسارات حسب اللغة
+## Using Routes Map with Localization
 
-يوفر المكون وظيفة `getRoutesMap` للحصول على خريطة المسارات المناسبة للغة الحالية:
+The component provides a `getRoutesMap` function to get the appropriate routes map for the current language:
 
 ```tsx
 import { getRoutesMap } from "@/components/shared/breadcrumbs";
+import { useLocale, useTranslations } from "next-intl";
 
-// استخدام في مكون الصفحة
-const locale = useLocale();  // "ar" أو "en"
-const routesMap = getRoutesMap(locale);
+// Usage in a page component
+const locale = useLocale();  // "ar" or "en"
+const t = useTranslations("breadcrumbs");
+const routesMap = getRoutesMap(locale, t);
 ```
 
-## تخصيص خريطة المسارات
+## ID Handling
 
-يمكنك تعديل الخرائط الموجودة في ملف `routes-map.ts` أو إنشاء خرائط مخصصة خاصة بك:
+The breadcrumbs component automatically detects UUID and other ID-like segments in the path and replaces them with a generic "Details" label, localized based on the current language. This is handled using translation keys from your localization files:
+
+```json
+// en.json
+{
+  "breadcrumbs": {
+    "details": "Details",
+    // other breadcrumb translations...
+  }
+}
+
+// ar.json
+{
+  "breadcrumbs": {
+    "details": "التفاصيل",
+    // other breadcrumb translations...
+  }
+}
+```
+
+## Customizing Routes Map
+
+You can modify the existing maps in `routes-map.ts` or create your own custom maps:
 
 ```tsx
-// إنشاء خريطة مسارات مخصصة
+// Create a custom routes map
 const myCustomRoutesMap: RoutesMap = {
-  // مسارات بسيطة
-  "dashboard": "لوحة القيادة",
-  "reports": "التقارير",
+  // Simple routes
+  "dashboard": "Dashboard",
+  "reports": "Reports",
   
-  // مسارات متداخلة
-  "settings/users": "إدارة المستخدمين",
+  // Nested routes
+  "settings/users": "User Management",
   
-  // مسارات مع روابط مخصصة
+  // Routes with custom links
   "profile": { 
-    label: "الملف الشخصي", 
+    label: "My Profile", 
     href: "/me" 
   }
 };
