@@ -36,15 +36,15 @@ export const getRoutesMap = (
     settings: getText("settings", "الإعدادات"),
 
     // HR routes
-    "hr-settings": getText("hr-settings", "إعدادات الموارد البشرية"),
+    "hr-settings": {
+      label: getText("hr-settings", "إعدادات الموارد البشرية"),
+      href: `/${locale}/hr-settings`,
+    },
     "attendance-determinants": getText(
       "attendance-determinants",
       "إعدادات الحضور والانصراف"
     ),
-    "attendance-departure": getText(
-      "attendance-departure",
-      "الحضور والانصراف"
-    ),
+    "attendance-departure": getText("attendance-departure", "الحضور والانصراف"),
 
     // User routes
     users: getText("users", "المستخدمين"),

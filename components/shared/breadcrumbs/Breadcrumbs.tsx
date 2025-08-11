@@ -109,7 +109,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   const breadcrumbs = [
     {
       label: finalHomeLabel,
-      href: `/${locale}`,
+      href: `/user-profile`,
       isActive: pathSegments.length === 0,
     },
     ...pathSegments.map((segment, index) => {
