@@ -62,4 +62,7 @@ export const PERMISSIONS = {
   driver: create("DRIVER"),
   identifier: create("IDENTIFIER"),
   subEntity: create("SUB_ENTITY"),
+
+  // attendance settings
+  attendanceSettings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
 };

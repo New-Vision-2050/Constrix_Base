@@ -81,6 +81,14 @@ const NewInputTimeField = ({
     });
   }, [type, dayAvsilableHours, period.start_time]);
 
+  // reset end if period extends to next day
+  useEffect(() => {
+    if (period?.extends_to_next_day && type === "end") {
+      setSelectedHour("00");
+      setSelectedMinute("00");
+    }
+  }, [period?.extends_to_next_day, type]);
+
   // Cuando cambia la hora o el minuto, actualizar el valor
   useEffect(() => {
     if (selectedHour && selectedMinute) {
