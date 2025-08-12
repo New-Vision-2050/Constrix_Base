@@ -21,38 +21,36 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import Can from "@/lib/permissions/client/Can";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 const LegalDataSection = ({
   currentCompanyId,
   id,
 }: {
-  currentCompanyId:string,
+  currentCompanyId: string;
   id?: string;
 }) => {
-
-    const { data, isPending, isSuccess } = useQuery({
+  const { can } = usePermissions();
+  const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-legal-data", id, currentCompanyId],
     queryFn: async () => {
-      const response = await apiClient.get<ServerSuccessResponse<CompanyLegalData[]>>(
-        "/companies/company-profile/company-legal-data",
-        {
-          params: {
-            ...(id && { branch_id: id }),
-            ...(currentCompanyId && { company_id:currentCompanyId }),
-          },
-        }
-      );
+      const response = await apiClient.get<
+        ServerSuccessResponse<CompanyLegalData[]>
+      >("/companies/company-profile/company-legal-data", {
+        params: {
+          ...(id && { branch_id: id }),
+          ...(currentCompanyId && { company_id: currentCompanyId }),
+        },
+      });
 
       return response.data;
     },
   });
 
   const companyLegalData = data?.payload ?? [];
-
 
   const local = useLocale();
   const isRTL = local === "ar";
@@ -64,22 +62,6 @@ const LegalDataSection = ({
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
-
-  const dropdownItems = [
-    {
-      label: "طلباتي",
-      onClick: handleOpenMyReq,
-    },
-    {
-      label: "طلب تعديل البيانات القانونية",
-      onClick: handleOpenReqForm,
-    },
-    {
-      label: "اضافة بيان قانوني",
-      onClick: handleOpenMyForm,
-    },
-  ];
-
 
   return (
     <>
@@ -102,13 +84,29 @@ const LegalDataSection = ({
             )
           }
           secondTitle={
-            <Can check={[PERMISSIONS.companyProfile.legalData.update]}>
-              <FieldSetSecondTitle
-                mode={"Preview"}
-                handleEditClick={handleEditClick}
-                dropdownItems={dropdownItems}
-              />
-            </Can>
+            <FieldSetSecondTitle
+              mode={"Preview"}
+              handleEditClick={handleEditClick}
+              settingsBtn={{
+                items: [
+                  {
+                    title: "طلباتي",
+                    onClick: handleOpenMyReq,
+                  },
+                  {
+                    title: "طلب تعديل البيانات القانونية",
+                    onClick: handleOpenReqForm,
+                  },
+                  {
+                    title: "اضافة بيان قانوني",
+                    onClick: handleOpenMyForm,
+                  },
+                ],
+                disabledEdit: !can([
+                  PERMISSIONS.companyProfile.legalData.update,
+                ]),
+              }}
+            />
           }
         >
           {!!companyLegalData && companyLegalData.length > 0 ? (
@@ -170,4 +168,4 @@ const LegalDataSection = ({
   );
 };
 
-export default withPermissions(LegalDataSection, [PERMISSIONS.companyProfile.legalData.view]);
+export default LegalDataSection;

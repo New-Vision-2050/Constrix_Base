@@ -36,6 +36,7 @@ export const PERMISSIONS = {
     branch: create("COMPANY_PROFILE_BRANCH"),
     address: create("COMPANY_PROFILE_ADDRESS"),
     officialData: create("COMPANY_PROFILE_OFFICIAL_DATA"),
+    supportData: create("COMPANY_PROFILE_SUPPORT_DATA"),
   },
 
   organization: {
