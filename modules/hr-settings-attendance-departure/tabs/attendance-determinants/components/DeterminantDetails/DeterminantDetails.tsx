@@ -3,6 +3,8 @@ import { Check, MoreVertical } from "lucide-react";
 import { Constraint } from "@/modules/hr-settings-attendance-departure/types/constraint-type";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface DeterminantDetailsProps {
   constraint: Constraint;
@@ -122,12 +124,14 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
                 isDarkMode ? "border-gray-700" : "border-gray-200"
               }`}
             >
-              <button
-                onClick={() => handleEdit()}
-                className={`w-full text-right px-4 py-2 text-sm ${dropdownText} ${dropdownHover} rounded-md`}
-              >
-                تعديل
-              </button>
+              <Can check={[PERMISSIONS.attendance.settings.update]}>
+                <button
+                  onClick={() => handleEdit()}
+                  className={`w-full text-right px-4 py-2 text-sm ${dropdownText} ${dropdownHover} rounded-md`}
+                >
+                  تعديل
+                </button>
+              </Can>
             </div>
           )}
         </div>
