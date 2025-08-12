@@ -11,7 +11,7 @@ export default function JobInformation() {
   const { can } = usePermissions();
 
   return (
-    <Can check={[PERMISSIONS.profile.jobOffer.view]}>
+    <Can check={[PERMISSIONS.profile.employmentInfo.view]}>
       <div className="p-4 flex-grow flex flex-col gap-12">
         <p className="text-lg font-bold">البيانات الوظيفية</p>
         <TabTemplate
