@@ -11,10 +11,12 @@ import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const OfficialData = ({ id }: { id?: string }) => {
   const { company_id } = useParams();
-
+  console.log("idBranch", id);
   const { data, isPending, isSuccess } = useQuery({
     queryKey: ["main-company-data", id, company_id],
     queryFn: async () => {
@@ -49,7 +51,7 @@ const OfficialData = ({ id }: { id?: string }) => {
     company_type_id,
     general_manager,
     packages,
-    company_access_programs
+    company_access_programs,
   } = payload as CompanyData;
 
   return (
@@ -64,33 +66,80 @@ const OfficialData = ({ id }: { id?: string }) => {
 
       {isSuccess && (
         <>
-          <OfficialDataSection
-            officialData={{
-              branch,
-              name,
-              name_en,
-              company_type,
-              country_name,
-              country_id,
-              company_field,
-              company_field_id,
-              phone,
-              email,
-              company_type_id,
-              packages,
-              company_access_programs,
-            }}
-            id={id}
-            currentCompanyId={currentCompanyId}
-          />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.officialData.view]}>
+              <OfficialDataSection
+                officialData={{
+                  branch,
+                  name,
+                  name_en,
+                  company_type,
+                  country_name,
+                  country_id,
+                  company_field,
+                  company_field_id,
+                  phone,
+                  email,
+                  company_type_id,
+                  packages,
+                  company_access_programs,
+                }}
+                id={id}
+                currentCompanyId={currentCompanyId}
+              />
+            </Can>
+          ) : (
+            <OfficialDataSection
+              officialData={{
+                branch,
+                name,
+                name_en,
+                company_type,
+                country_name,
+                country_id,
+                company_field,
+                company_field_id,
+                phone,
+                email,
+                company_type_id,
+                packages,
+                company_access_programs,
+              }}
+              id={id}
+              currentCompanyId={currentCompanyId}
+            />
+          )}
 
-          <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.legalData.view]}>
+              <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+            </Can>
+          ) : (
+            <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+          )}
 
-          <SupportData generalManager={general_manager} />
+          <Can check={[PERMISSIONS.companyProfile.supportData.view]}>
+            <SupportData generalManager={general_manager} />
+          </Can>
 
-          <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.address.view]}>
+              <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+            </Can>
+          ) : (
+            <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+          )}
 
-          <OfficialDocsSection id={id} currentCompanyId={currentCompanyId} />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.officialDocument.view]}>
+              <OfficialDocsSection
+                id={id}
+                currentCompanyId={currentCompanyId}
+              />
+            </Can>
+          ) : (
+            <OfficialDocsSection id={id} currentCompanyId={currentCompanyId} />
+          )}
         </>
       )}
     </div>

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { officialData } from "@/modules/company-profile/types/company";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 const OfficialDataSection = ({
   officialData,
@@ -34,22 +35,14 @@ const OfficialDataSection = ({
   const isRTL = local === "ar";
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
+  const { can } = usePermissions();
+
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
 
-  const dropdownItems = [
-    {
-      label: "طلباتي",
-      onClick: handleOpenMyReq,
-    },
-    {
-      label: "طلب تعديل البيانات الرسمية",
-      onClick: handleOpenReqForm,
-    },
-  ];
   return (
     <>
       <FormFieldSet
@@ -58,13 +51,25 @@ const OfficialDataSection = ({
           Array.isArray(value) ? value.length > 0 : Boolean(value)
         )}
         secondTitle={
-          <Can check={[PERMISSIONS.companyProfile.officialData.update]}>
-            <FieldSetSecondTitle
-              mode={mode}
-              handleEditClick={handleEditClick}
-              dropdownItems={dropdownItems}
-            />
-          </Can>
+          <FieldSetSecondTitle
+            mode={mode}
+            handleEditClick={handleEditClick}
+            settingsBtn={{
+              items: [
+                {
+                  title: "طلباتي",
+                  onClick: handleOpenMyReq,
+                },
+                {
+                  title: "طلب تعديل البيانات الرسمية",
+                  onClick: handleOpenReqForm,
+                },
+              ],
+              disabledEdit: !can([
+                PERMISSIONS.companyProfile.officialData.update,
+              ]),
+            }}
+          />
         }
       >
         <br />
