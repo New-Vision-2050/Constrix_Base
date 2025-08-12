@@ -124,7 +124,7 @@ const DeterminantDetails: React.FC<DeterminantDetailsProps> = ({
                 isDarkMode ? "border-gray-700" : "border-gray-200"
               }`}
             >
-              <Can check={[PERMISSIONS.attendanceSettings.update]}>
+              <Can check={[PERMISSIONS.attendance.settings.update]}>
                 <button
                   onClick={() => handleEdit()}
                   className={`w-full text-right px-4 py-2 text-sm ${dropdownText} ${dropdownHover} rounded-md`}

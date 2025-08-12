@@ -62,7 +62,7 @@ function AttendanceDeterminantsTabContent() {
   };
 
   return (
-    <Can check={[PERMISSIONS.attendanceSettings.view]}>
+    <Can check={[PERMISSIONS.attendance.settings.view]}>
       <div className="grid grid-cols-1 md:grid-cols-[20%_80%] gap-2 md:gap-6 min-h-[calc(100vh-180px)]">
         {constraintsLoading ? (
           <DeterminantSkeletonGrid count={6} />

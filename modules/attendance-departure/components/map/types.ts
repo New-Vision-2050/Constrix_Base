@@ -17,6 +17,7 @@ export interface MapEmployeeUser {
   company_name: string;
   birthdate: string;
   gender: string;
+  country: string;
   branch_name: string;
   department_name: string;
   management_name: string;

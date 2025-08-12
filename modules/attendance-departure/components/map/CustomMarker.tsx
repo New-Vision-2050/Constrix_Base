@@ -92,7 +92,7 @@ const CustomMarker: React.FC<CustomMarkerProps> = ({ employee, index }) => {
       branch: employee.user.branch_name || "-",
       gender: employee.user.gender || "-",
       birthDate: employee.user.birthdate || "-",
-      nationality: "-", // Default value (still not available)
+      nationality: employee.user.country || "-", // Default value (still not available)
       attendanceStatus: mapAttendanceStatus(), // Attendance status
       employeeStatus: "Active", // Default value
       // Use available check-in time

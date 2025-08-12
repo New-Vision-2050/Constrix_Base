@@ -60,7 +60,7 @@ export default function AttendanceDepartureIndex() {
   return (
     <AttendanceProvider>
       <div className="flex flex-col gap-4 container px-6">
-        <Can check={[PERMISSIONS.attendanceDeparture.view]}>
+        <Can check={[PERMISSIONS.attendance.attendance_departure.view]}>
           <AttendanceContent />
         </Can>
       </div>

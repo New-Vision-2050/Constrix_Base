@@ -63,8 +63,9 @@ export const PERMISSIONS = {
   identifier: create("IDENTIFIER"),
   subEntity: create("SUB_ENTITY"),
 
-  // attendance settings
-  attendanceSettings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
-  // attendance departure
-  attendanceDeparture: create("EMPLOYEE_ATTENDANCE"),
+  // Attendance
+  attendance: {
+    settings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
+    attendance_departure: create("EMPLOYEE_ATTENDANCE"),
+  },
 };

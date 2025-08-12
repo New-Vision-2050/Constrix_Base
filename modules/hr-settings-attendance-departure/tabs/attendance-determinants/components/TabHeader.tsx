@@ -33,7 +33,7 @@ const TabHeader: React.FC<TabHeaderProps> = ({ title }) => {
           : activeConstraint?.constraint_name}
       </h2>
       <div className="flex gap-2">
-        <Can check={[PERMISSIONS.attendanceSettings.create]}>
+        <Can check={[PERMISSIONS.attendance.settings.create]}>
           <SheetFormBuilder
             config={getDynamicDeterminantFormConfig({
               refetchConstraints,
