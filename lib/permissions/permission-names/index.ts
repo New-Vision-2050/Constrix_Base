@@ -65,4 +65,6 @@ export const PERMISSIONS = {
 
   // attendance settings
   attendanceSettings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
+  // attendance departure
+  attendanceDeparture: create("EMPLOYEE_ATTENDANCE"),
 };

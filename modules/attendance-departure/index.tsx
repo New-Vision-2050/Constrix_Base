@@ -10,6 +10,8 @@ import AttendanceStatusDialog from "./components/AttendanceDepartureTable/Attend
 import ApproverDialog from "./components/AttendanceDepartureTable/ApproverDialog";
 import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
 import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Internal component that uses the context
 function AttendanceContent() {
@@ -58,7 +60,9 @@ export default function AttendanceDepartureIndex() {
   return (
     <AttendanceProvider>
       <div className="flex flex-col gap-4 container px-6">
-        <AttendanceContent />
+        <Can check={[PERMISSIONS.attendanceDeparture.view]}>
+          <AttendanceContent />
+        </Can>
       </div>
     </AttendanceProvider>
   );
