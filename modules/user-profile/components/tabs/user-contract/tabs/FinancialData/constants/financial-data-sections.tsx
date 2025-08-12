@@ -6,22 +6,17 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
-export const financialDataSections = (): UserProfileNestedTab[] =>{
-  const {can} = usePermissions();
-  const shownTabs:string[] = [];
+export const financialDataSections = (): UserProfileNestedTab[] => {
+  const { can } = usePermissions();
 
-  if(can(Object.values(PERMISSIONS.profile.salaryInfo)))
-    shownTabs.push("financial-data-salaries");
-  if(can(Object.values(PERMISSIONS.profile.privileges.view)))
-    shownTabs.push("financial-data-alternatives");
-
-  const tabs = [
+  const tabs: (UserProfileNestedTab & { show: boolean })[] = [
     {
       id: "financial-data-salaries",
       title: "الراتب",
       type: "user_salary",
       icon: <GraduationCapIcon />,
       content: <Salaries />,
+      show: can([PERMISSIONS.profile.salaryInfo.view]),
     },
     {
       id: "financial-data-alternatives",
@@ -29,10 +24,10 @@ export const financialDataSections = (): UserProfileNestedTab[] =>{
       type: "userPrivilege",
       icon: <GraduationCapIcon />,
       content: <PrivilegesAndAllowances />,
+      show: can([PERMISSIONS.profile.privileges.view]),
     },
-  ]
-
-  return tabs.filter(tab => shownTabs.includes(tab.id));
+  ];
+  return tabs.filter((tab) => tab.show).map(({ show, ...rest }) => rest);
 };
 
 type PropsT = {

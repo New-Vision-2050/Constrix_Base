@@ -33,7 +33,12 @@ export const PersonalDataSections = (
       icon: <UserIcon />,
       type: "info_company_user",
       content: <PersonalDataSection />,
-      show: true,
+      show: can([
+        PERMISSIONS.profile.personalInfo.view,
+        PERMISSIONS.profile.passportInfo.view,
+        PERMISSIONS.userProfile.contact.view,
+        PERMISSIONS.userProfile.identity.view,
+      ]),
     },
     {
       id: "contract-tab-banking-data-section",
@@ -49,7 +54,12 @@ export const PersonalDataSections = (
       type: "contact_info",
       icon: <PhoneIcon />,
       content: <ConnectionDataSection />,
-      show: true,
+      show: can([
+        PERMISSIONS.profile.contactInfo.view,
+        PERMISSIONS.profile.addressInfo.view,
+        PERMISSIONS.profile.maritalStatus.view,
+        PERMISSIONS.profile.socialMedia.view,
+      ]),
     },
     {
       id: "contract-tab-iqama-data-section",
@@ -57,7 +67,11 @@ export const PersonalDataSections = (
       type: "identity_info",
       title: t("iqamaData"),
       content: <IqamaDataSection />,
-      show: true,
+      show: can([
+        PERMISSIONS.profile.residenceInfo.view,
+        PERMISSIONS.profile.borderNumber.view,
+        PERMISSIONS.profile.workLicense.view,
+      ]),
     },
   ];
 
