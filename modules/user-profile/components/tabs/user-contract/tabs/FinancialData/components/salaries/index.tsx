@@ -5,36 +5,33 @@ import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function Salaries() {
   // declare and define helper state and variables
   const { userSalary, userSalaryLoading } = useFinancialDataCxt();
+  const { can } = usePermissions();
 
   // return component ui
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-2xl font-bold">الراتب</p>
+    <Can check={[PERMISSIONS.profile.salaryInfo.view]}>
+      <div className="flex flex-col gap-6">
+        <p className="text-2xl font-bold">الراتب</p>
 
-      <TabTemplate
-        title={"الراتب الاساسي"}
-        loading={userSalaryLoading}
-        reviewMode={
-          <Can check={[PERMISSIONS.profile.salaryInfo.view]}>
-            <SalaryPreviewMode salary={userSalary as Salary} />
-          </Can>
-        }
-        editMode={
-          <Can check={[PERMISSIONS.profile.salaryInfo.update]}>
-            <SalaryEditMode />
-          </Can>
-        }
-        settingsBtn={{
-          items: [
-            { title: "طلباتي", onClick: () => {}, disabled: true },
-            { title: "أنشاء طلب", onClick: () => {}, disabled: true },
-          ],
-        }}
-      />
-    </div>
+        <TabTemplate
+          title={"الراتب الاساسي"}
+          loading={userSalaryLoading}
+          reviewMode={<SalaryPreviewMode salary={userSalary as Salary} />}
+          editMode={<SalaryEditMode />}
+          settingsBtn={{
+            items: [
+              { title: "طلباتي", onClick: () => {}, disabled: true },
+              { title: "أنشاء طلب", onClick: () => {}, disabled: true },
+            ],
+            disabledEdit: !can([PERMISSIONS.profile.salaryInfo.update]),
+          }}
+        />
+      </div>
+    </Can>
   );
 }

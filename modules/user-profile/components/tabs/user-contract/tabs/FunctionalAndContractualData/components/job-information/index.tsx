@@ -4,27 +4,27 @@ import JobInformationEditMode from "./JobInformationEditMode";
 import JobInformationPreviewMode from "./JobInformationPreviewMode";
 import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export default function JobInformation() {
   const { professionalDataLoading } = useFunctionalContractualCxt();
-  return (
-    <div className="p-4 flex-grow flex flex-col gap-12">
-      <p className="text-lg font-bold">البيانات الوظيفية</p>
+  const { can } = usePermissions();
 
-      <TabTemplate
-        title={"بيانات التوظيف"}
-        loading={professionalDataLoading}
-        reviewMode={
-          <Can check={[PERMISSIONS.profile.jobOffer.view]}>
-            <JobInformationPreviewMode />
-          </Can>
-        }
-        editMode={
-          <Can check={[PERMISSIONS.profile.jobOffer.update]}>
-            <JobInformationEditMode />
-          </Can>
-        }
-      />
-    </div>
+  return (
+    <Can check={[PERMISSIONS.profile.jobOffer.view]}>
+      <div className="p-4 flex-grow flex flex-col gap-12">
+        <p className="text-lg font-bold">البيانات الوظيفية</p>
+        <TabTemplate
+          title={"بيانات التوظيف"}
+          loading={professionalDataLoading}
+          reviewMode={<JobInformationPreviewMode />}
+          editMode={<JobInformationEditMode />}
+          settingsBtn={{
+            items: [],
+            disabledEdit: !can([PERMISSIONS.profile.salaryInfo.update]),
+          }}
+        />
+      </div>
+    </Can>
   );
 }

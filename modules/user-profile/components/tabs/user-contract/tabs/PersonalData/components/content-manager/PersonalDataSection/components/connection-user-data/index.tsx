@@ -14,7 +14,7 @@ export default function ConnectionDataSectionPersonalForm() {
   const { can } = usePermissions();
 
   return (
-    <Can check={[PERMISSIONS.profile.contactInfo.view]}>
+    <Can check={[PERMISSIONS.userProfile.contact.view]}>
       <ConnectionOTPCxtProvider>
         <TabTemplate
           title={"بيانات الاتصال"}
@@ -26,7 +26,7 @@ export default function ConnectionDataSectionPersonalForm() {
               { title: "طلباتي", onClick: () => {}, disabled: true },
               { title: "أنشاء طلب", onClick: () => {}, disabled: true },
             ],
-            disabledEdit: !can(PERMISSIONS.profile.contactInfo.update),
+            disabledEdit: !can(PERMISSIONS.userProfile.contact.update),
           }}
         />
       </ConnectionOTPCxtProvider>
