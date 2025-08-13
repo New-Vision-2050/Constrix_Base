@@ -27,7 +27,6 @@ type PropsT = {
   settingsBtn?: {
     icon?: JSX.Element;
     items: DropdownItemT[];
-    disabledEdit?: boolean;
   };
 };
 
@@ -38,7 +37,7 @@ export default function FieldSetSecondTitle(props: PropsT) {
 
   return (
     <div className="flex items-center justify-center gap-1">
-      {!!settingsBtn && !settingsBtn?.disabledEdit && (
+      {!!settingsBtn && (
         <IconBtnDropdown
           icon={settingsBtn?.icon ?? <SettingsIcon />}
           items={settingsBtn?.items ?? []}
@@ -60,15 +59,13 @@ export default function FieldSetSecondTitle(props: PropsT) {
           </DropdownMenuContent>
         </DropdownMenu>
       )}
-      {!settingsBtn?.disabledEdit && (
-        <Button variant={"ghost"} onClick={handleEditClick}>
-          {mode === "Preview" ? (
-            <PencilLineIcon additionalClass="text-pink-600" />
-          ) : (
-            <EyeIcon />
-          )}
-        </Button>
-      )}
+      <Button variant={"ghost"} onClick={handleEditClick}>
+        {mode === "Preview" ? (
+          <PencilLineIcon additionalClass="text-pink-600" />
+        ) : (
+          <EyeIcon />
+        )}
+      </Button>
     </div>
   );
 }

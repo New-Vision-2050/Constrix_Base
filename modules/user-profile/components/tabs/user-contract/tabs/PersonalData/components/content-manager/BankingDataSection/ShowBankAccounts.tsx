@@ -4,8 +4,6 @@ import BankSection from "./bank-data";
 import { useUserBankingDataCxt } from "./context";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
-import Can from "@/lib/permissions/client/Can";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function ShowBankAccounts() {
   const { bankAccounts, bankAccountsLoading } = useUserBankingDataCxt();
@@ -25,13 +23,11 @@ export default function ShowBankAccounts() {
       {bankAccountsLoading ? (
         <TabTemplateListLoading />
       ) : (
-        <Can check={[PERMISSIONS.profile.bankInfo.view]}>
-          <RegularList<BankAccount, "bank">
-            sourceName="bank"
-            ItemComponent={BankSection}
-            items={bankAccounts ?? []}
-          />
-        </Can>
+        <RegularList<BankAccount, "bank">
+          sourceName="bank"
+          ItemComponent={BankSection}
+          items={bankAccounts ?? []}
+        />
       )}
     </>
   );

@@ -8,8 +8,6 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Define types for the company data
 interface CompanyData {
@@ -27,7 +25,6 @@ interface CompanyData {
 export const CompaniesConfig = () => {
   const t = useTranslations("Companies");
   const router = useRouter();
-  const {can} = usePermissions();
 
   return {
     url: `${baseURL}/companies`,
@@ -122,7 +119,6 @@ export const CompaniesConfig = () => {
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
-    enableExport: can(PERMISSIONS.company.export),
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
@@ -136,19 +132,17 @@ export const CompaniesConfig = () => {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
         action: () => console.log("Login as manager clicked"),
-        disabled: can(PERMISSIONS.company.view),
       },
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: CompanyData) =>
-        router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
-        disabled: can(PERMISSIONS.company.view),
+          router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
       },
     ],
     executionConfig: {
       canEdit: false,
-      canDelete: can(PERMISSIONS.company.delete),
+      canDelete: true,
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };

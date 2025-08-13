@@ -23,7 +23,6 @@ const BASE_PERMISSION_TYPES: PermissionTypeConfig[] = [
 ];
 
 interface PermissionRowProps {
-  mainKey: string;
   subKey: string;
   categoryKey: string;
   subItems: PermissionWithStatus[];
@@ -31,13 +30,12 @@ interface PermissionRowProps {
   switchStates: Record<string, boolean>;
   activeStates: Record<string, boolean>;
   numberValues: Record<string, number>;
-  onPermissionChange: (permissionId: string, checked: boolean) => void;
+  onPermissionChange: (subKey: string, checked: boolean) => void;
   onSwitchChange: (switchId: string, checked: boolean, permissionId?: string) => void;
-  onNumberChange: (subKey: string, value: number) => void;
+  onNumberChange: (permissionId: string, value: number) => void;
 }
 
 const PermissionRow: React.FC<PermissionRowProps> = ({
-  mainKey,
   subKey,
   categoryKey,
   subItems,
@@ -60,19 +58,18 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
     }));
   }, [availableTypes]);
 
-
   // Helper function to render permission switch
   const renderPermissionSwitch = (permissionConfig: typeof permissionTypes[0]) => {
     const { type, displayType, hasPermission } = permissionConfig;
-    const switchId = `${subKey}-${categoryKey}-${type}`;
-    const stateKey = `${mainKey}.${subKey}.${categoryKey}.${type}`;
+    const switchId = `${subKey}-${displayType}`;
+    const stateKey = `${categoryKey}.${subKey}.${displayType}`;
     
     return (
       <td key={displayType} className={`px-4 py-4 text-center ${switchStates[switchId] ? 'bg-sidebar' : ''}`}>
         <div className="flex items-center justify-center">
           <Switch
             id={switchId}
-            checked={switchStates[switchId] || false}
+            checked={activeStates[stateKey] || false}
             disabled={!hasPermission}
             onCheckedChange={(checked) => {
               const item = subItems.find(item => item.type === type);
@@ -84,50 +81,26 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
     );
   };
 
-  // Get the first item (since we're passing single item as array)
-  const item = subItems[0];
-  const permissionId = item.id;
-  const permissionName = item.name;
-  
-  // Find the create permission item to get its limit value
-  const createItem = subItems.find(item => item.type === 'create');
-  const createLimitValue = createItem?.limit || 0;
-  
-  // Handle checkbox change to activate/deactivate all switches in this row
-  const handleCheckboxChange = (checked: boolean) => {
-    // First update the permission selection
-    onPermissionChange(permissionId, checked);
-    
-    // Then activate/deactivate all available switches in this row
-    permissionTypes.forEach(permissionConfig => {
-      if (permissionConfig.hasPermission) {
-        const switchId = `${subKey}-${categoryKey}-${permissionConfig.type}`;
-        const relatedItem = subItems.find(item => item.type === permissionConfig.type);
-        onSwitchChange(switchId, checked, relatedItem?.id);
-      }
-    });
-  };
-  
   return (
-    <tr key={permissionId}>
+    <tr key={subKey}>
       <td className="px-4 py-4 text-center">
         <Checkbox
-          id={permissionId}
-          checked={selectedPermissions.has(permissionId)}
-          onCheckedChange={(checked) => handleCheckboxChange(checked as boolean)}
+          id={subKey}
+          checked={selectedPermissions.has(subKey)}
+          onCheckedChange={(checked) => onPermissionChange(subKey, checked as boolean)}
         />
       </td>
       <td className="px-4 py-4 text-right text-sm text-white font-medium">
-        {categoryKey}
+        {subKey}
       </td>
       {permissionTypes.map(renderPermissionSwitch)}
       <td className="px-4 py-4 text-center text-sm text-white font-medium">
         <Input
-          className="w-16 p-1 text-center bg-sidebar border border-gray-100 rounded  disabled:bg-gray-700 disabled:text-gray-600"
-          value={numberValues[`${subKey}-${categoryKey}`] !== undefined ? (numberValues[`${subKey}-${categoryKey}`] > 0 ? numberValues[`${subKey}-${categoryKey}`] : '') : (createLimitValue > 0 ? createLimitValue : '')}
-          onChange={(e) => onNumberChange(`${subKey}-${categoryKey}`, parseInt(e.target.value) || 0)}
+          className="w-16 p-1 text-center bg-sidebar border border-sidebar-border rounded"
+          value={numberValues[subKey] > 0 ? numberValues[subKey] : ''}
+          onChange={(e) => onNumberChange(subKey, parseInt(e.target.value) || 0)}
           min="0"
-          disabled={!switchStates[`${subKey}-${categoryKey}-create`]}
+          disabled={!activeStates[`${categoryKey}.${subKey}.create`]}
         />
       </td>
     </tr>

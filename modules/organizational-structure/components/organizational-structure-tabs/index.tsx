@@ -1,4 +1,3 @@
-"use client"
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { OrganizationalStructureMainTabs } from "../../constants/main-tabs";
 import { useTranslations } from "next-intl";

@@ -4,8 +4,6 @@ import SingleExperience from "./single-experience";
 import { Experience } from "@/modules/user-profile/types/experience";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
-import Can from "@/lib/permissions/client/Can";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function ExperiencesList() {
   const { userExperiences, userExperiencesLoading } = useUserAcademicTabsCxt();

@@ -19,7 +19,7 @@ export interface minMaxDate {
 }
 
 export interface FieldConfig {
-  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'email' | 'password' | 'number' | 'date' | 'search' | 'image' | 'time';
+  type: 'text' | 'textarea' | 'checkbox' | 'radio' | 'select' | 'email' | 'password' | 'number' | 'date' | 'search' | 'image';
   name: string;
   // Image field specific properties
   imageConfig?: {

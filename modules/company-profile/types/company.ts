@@ -116,18 +116,8 @@ export interface officialData {
   company_field_id: string;
   phone: string;
   email: string;
-  packages: Packages[];
-  company_access_programs : CompanyAccessProgramsType[];
 }
 
-export interface Packages {
-  id: string
-  name: string
-}
-export interface CompanyAccessProgramsType{
-  id: string
-  name: string
-}
 export interface CompanyData {
   id: string;
   name: string;
@@ -166,6 +156,4 @@ export interface CompanyData {
     id: string;
     name: string;
   }[];
-  packages: Packages[];
-  company_access_programs: CompanyAccessProgramsType[];
 }

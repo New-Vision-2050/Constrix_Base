@@ -21,28 +21,27 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from "@/components/ui/skeleton";
-import withPermissions from "@/lib/permissions/client/withPermissions";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import Can from "@/lib/permissions/client/Can";
 
 const OfficialDocsSection = ({
   id,
-  currentCompanyId,
+  currentCompanyId
 }: {
   id?: string;
   currentCompanyId?: string;
 }) => {
-  const { data, isPending, isSuccess } = useQuery({
+
+      const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-official-documents", id, currentCompanyId],
     queryFn: async () => {
-      const response = await apiClient.get<
-        ServerSuccessResponse<CompanyDocument[]>
-      >("/companies/company-profile/company-official-documents", {
-        params: {
-          ...(id && { branch_id: id }),
-          ...(currentCompanyId && { company_id: currentCompanyId }),
-        },
-      });
+      const response = await apiClient.get<ServerSuccessResponse<CompanyDocument[]>>(
+        "/companies/company-profile/company-official-documents",
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(currentCompanyId && { company_id:currentCompanyId }),
+          },
+        }
+      );
 
       return response.data;
     },
@@ -74,50 +73,52 @@ const OfficialDocsSection = ({
       )}
 
       {isSuccess && (
-        <FormFieldSet
-          title="المستندات الرسمية"
-          valid={
-            !!companyOfficialDocuments && companyOfficialDocuments.length > 0
-          }
-          secondTitle={
-            <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
-              <DropdownMenuTrigger asChild>
-                <Can
-                  check={[PERMISSIONS.companyProfile.officialDocument.update]}
-                >
-                  <Button variant="ghost">
-                    <SettingsIcon />
-                  </Button>
-                </Can>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {dropdownItems.map((item, index) => (
-                  <DropdownMenuItem key={index} onClick={() => item.onClick()}>
-                    {item.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          }
-        >
-          {!!companyOfficialDocuments && companyOfficialDocuments.length > 0 ? (
-            <DocsTable
-              companyOfficialDocuments={companyOfficialDocuments}
-              id={id}
-            />
-          ) : (
-            <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
-              <InfoIcon additionClass="text-orange-500 " />
-              <p className="text-center px-5">
-                يجب اضافة مستند رسمي واحد على الاقل
-              </p>
-            </div>
-          )}
-        </FormFieldSet>
+
+      <FormFieldSet
+        title="المستندات الرسمية"
+        valid={
+          !!companyOfficialDocuments && companyOfficialDocuments.length > 0
+        }
+        secondTitle={
+          <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost">
+                <SettingsIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {dropdownItems.map((item, index) => (
+                <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                  {item.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      >
+     
+            {!!companyOfficialDocuments &&
+            companyOfficialDocuments.length > 0 ? (
+              <DocsTable
+                companyOfficialDocuments={companyOfficialDocuments}
+                id={id}
+              />
+            ) : (
+              <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
+                <InfoIcon additionClass="text-orange-500 " />
+                <p className="text-center px-5">
+                  يجب اضافة مستند رسمي واحد على الاقل
+                </p>
+              </div>
+            )}
+  
+      </FormFieldSet>
+
       )}
 
+
       <SheetFormBuilder
-        config={AddDocFormConfig(id, currentCompanyId)}
+        config={AddDocFormConfig(id , currentCompanyId)}
         isOpen={isOpenAddDoc}
         onOpenChange={handleCloseAddDoc}
       />

@@ -8,8 +8,6 @@ import React from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 // Define types for the company data
 interface CompanyData {
@@ -41,7 +39,6 @@ export interface UserTableRow {
 
 // Create a component that uses the translations
 export const UsersConfig = () => {
-  const { can } = usePermissions();
   const t = useTranslations("Companies");
 
   return {
@@ -72,12 +69,7 @@ export const UsersConfig = () => {
           return (
             <div className="line-clamp-3">
               {companies.map((company) => (
-                <p
-                  key={company.id}
-                  className="line-clamp-1 h-5"
-                  dir={"ltr"}
-                  style={{ width: "fit-content" }}
-                >
+                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"} style={{width: "fit-content"}}>
                   {company?.phone || ""}
                 </p>
               ))}
@@ -193,7 +185,6 @@ export const UsersConfig = () => {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    enableExport: can(PERMISSIONS.user.export),
     // deleteUrl: `${baseURL}/company-users`,
     formConfig: GetCompanyUserFormConfig(t),
     executions: [
@@ -207,12 +198,11 @@ export const UsersConfig = () => {
             user: row,
           };
         },
-        disabled: can(PERMISSIONS.user.view)
       },
     ],
     executionConfig: {
       canEdit: false,
-      canDelete: can(PERMISSIONS.user.delete),
+      canDelete: true,
     },
   };
 };

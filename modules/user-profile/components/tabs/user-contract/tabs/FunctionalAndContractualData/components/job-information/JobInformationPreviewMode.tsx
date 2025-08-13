@@ -58,15 +58,6 @@ export default function JobInformationPreviewMode() {
           required
         />
       </div>
-
-      <div className="p-2">
-        <PreviewTextField
-          label="المحدد"
-          value={professionalData?.attendance_constraint?.constraint_name ?? ""}
-          valid={Boolean(professionalData?.attendance_constraint?.constraint_name)}
-          required
-        />
-      </div>
     </div>
   );
 }

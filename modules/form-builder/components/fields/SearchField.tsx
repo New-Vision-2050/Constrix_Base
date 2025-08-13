@@ -31,7 +31,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
       )}>
         <DropdownSearch
           columnKey={field.name}
-          label={''}
+          label={field.label}
           value={value}
           onChange={onChange}
           options={field.options}

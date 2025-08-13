@@ -6,9 +6,9 @@ import {
   getErrorMessage,
   showErrorToast,
   dispatchErrorEvent,
+  errorEvent,
 } from "@/utils/errorHandler";
 import { useSidebarStore } from "@/store/useSidebarStore";
-import { getCurrentHost } from "@/utils/get-current-host";
 
 export const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL +
@@ -22,9 +22,8 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const nvToken = getCookie("new-vision-token");
-    const currentHost = await getCurrentHost();
     if (nvToken) {
       config.headers.Authorization = `Bearer ${nvToken}`;
     }
@@ -37,7 +36,7 @@ apiClient.interceptors.request.use(
 
     // Add current domain to headers
     if (typeof window !== "undefined") {
-      config.headers["X-Domain"] = currentHost;
+      config.headers["X-Domain"] = window.location.hostname;
     }
 
     return config;

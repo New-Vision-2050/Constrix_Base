@@ -1,4 +1,3 @@
-"use client";
 import TabsGroup from "@/components/shared/TabsGroup";
 import CompanyHeader from "@/modules/company-profile/components/shared/company-header";
 import EmployeeCard from "@/modules/company-profile/components/shared/employee-card";
@@ -9,11 +8,7 @@ const CompanyProfileSec = () => {
     <div className="px-8 space-y-7">
       <CompanyHeader />
       <EmployeeCard />
-      <TabsGroup
-        tabs={CompanyTabs()}
-        defaultValue="company"
-        variant="primary"
-      />
+      <TabsGroup tabs={CompanyTabs} defaultValue="company" variant="primary" />
     </div>
   );
 };
