@@ -5,6 +5,7 @@ export { default as CheckboxGroupField } from './CheckboxGroupField';
 export { default as RadioField } from './RadioField';
 export { default as SelectField } from './SelectField';
 export { default as DateField } from './DateField';
+export { default as TimeField } from './TimeField';
 export { default as SearchField } from './SearchField';
 export { default as HiddenObjectField } from './HiddenObjectField';
 export { default as FieldHelperText } from './FieldHelperText';

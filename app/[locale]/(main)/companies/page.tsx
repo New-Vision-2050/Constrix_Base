@@ -13,6 +13,10 @@ import { useResetTableOnRouteChange } from "@/modules/table";
 import { useModal } from "@/hooks/use-modal";
 import CompanySaveDialog from "@/modules/companies/components/CompanySaveDialog";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 
 const CompaniesPage = () => {
   // Get the translated config using the component
@@ -24,7 +28,8 @@ const CompaniesPage = () => {
   // Use the reset hook to clear table state on route changes
   // The tableId is now defined in the config
   useResetTableOnRouteChange(config.tableId);
-
+  const permissions = usePermissions();
+  console.log("permissions", permissions);
   // Create a function that will get the reloadTable function when needed
   // This avoids the infinite update loop
   const handleFormSuccess = (values: Record<string, unknown>) => {
@@ -66,15 +71,17 @@ const CompaniesPage = () => {
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />
 
-      <TableBuilder
+        <TableBuilder
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
-            <SheetFormBuilder
-              config={GetCompaniesFormConfig(t)}
-              trigger={<Button>{t("createCompany")}</Button>}
-              onSuccess={handleFormSuccess}
-            />{" "}
+            <Can check={[PERMISSIONS.company.create]}>
+              <SheetFormBuilder
+                config={GetCompaniesFormConfig(t)}
+                trigger={<Button>{t("createCompany")}</Button>}
+                onSuccess={handleFormSuccess}
+              />
+            </Can>
             <CompanySaveDialog
               open={isOpen}
               handleOpen={handleOpen}
@@ -88,4 +95,4 @@ const CompaniesPage = () => {
   );
 };
 
-export default CompaniesPage;
+export default withPermissions(CompaniesPage, [PERMISSIONS.company.list]);

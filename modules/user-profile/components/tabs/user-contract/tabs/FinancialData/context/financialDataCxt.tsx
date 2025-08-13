@@ -57,7 +57,7 @@ export const FinancialDataCxtProvider = ({
   // ** declare and define component state and variables
   const { user } = useUserProfileCxt();
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    financialDataSections[0]
+    financialDataSections()?.[0]
   );
 
   // user salary data

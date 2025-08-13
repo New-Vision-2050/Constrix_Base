@@ -2,6 +2,8 @@ import { apiClient } from "@/config/axios-config";
 import axios from "axios";
 import { useLocale } from "next-intl";
 import { getCookie } from "cookies-next";
+import { getCurrentHost } from "./get-current-host";
+import { getClientHost } from "./get-client-host";
 
 /**
  * Creates an API client instance with the current locale
@@ -16,16 +18,19 @@ export const useApiClient = () => {
     headers: {
       ...apiClient.defaults.headers,
       "Accept-Language": locale,
-      "Lang": locale,
-      // Add domain header if in browser environment
-      ...(typeof window !== 'undefined' ? { "X-Domain": window.location.hostname } : {}),
+      Lang: locale,
     },
   });
 
   // Add the same interceptors as the main apiClient
   instance.interceptors.request.use(
-    (config) => {
+    async (config) => {
       const nvToken = getCookie("new-vision-token");
+      console.log(nvToken);
+      const currentHost = await getCurrentHost();
+      if (currentHost) {
+        config.headers["X-Domain"] = currentHost;
+      }
       if (nvToken) {
         config.headers.Authorization = `Bearer ${nvToken}`;
       }
@@ -48,9 +53,9 @@ export const createApiRequestOptions = (
   controller?: AbortController
 ): RequestInit => {
   const token = getCookie("new-vision-token");
-
+  console.log(token);
   // Get domain if in browser environment
-  const domain = typeof window !== 'undefined' ? window.location.hostname : '';
+  const domain = getClientHost() || "";
 
   return {
     signal: controller?.signal,
@@ -58,7 +63,7 @@ export const createApiRequestOptions = (
       Accept: "application/json",
       "Content-Type": "application/json",
       "Accept-Language": locale,
-      "Lang": locale,
+      Lang: locale,
       "X-Domain": domain,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },

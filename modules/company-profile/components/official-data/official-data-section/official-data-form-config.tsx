@@ -1,5 +1,5 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { officialData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
@@ -10,7 +10,7 @@ export const CompanyOfficialData = (
   id?: string
 ) => {
   const { company_id }: { company_id: string | undefined } = useParams();
-
+console.log("officialData", officialData);
   const queryClient = useQueryClient();
   const OfficialDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
@@ -125,11 +125,44 @@ export const CompanyOfficialData = (
             ],
           },
           {
-            name: "bucket",
+            name: "program_id",
+            label: "البرنامج",
+            type: "select",
+            placeholder: "البرنامج",
+            dynamicOptions: {
+              url: `${baseURL}/company_access_programs/list?company_field=${officialData?.company_field.map(
+                (item) => item.id
+              )}&country_id=${officialData?.country_id}`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "company_type_id",
+              filterParam: "company_type_id",
+            },
+          },
+          {
+            name: "packages",
             label: "الباقة",
-            type: "text",
+            type: "select",
             placeholder: "الباقة",
-            disabled: true,
+            dynamicOptions: {
+              url: `${baseURL}/packages/list`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              dependsOn: "program_id",
+              filterParam: "company_access_program_id",
+            },
           },
         ],
       },
@@ -147,6 +180,17 @@ export const CompanyOfficialData = (
       phone: officialData?.phone ?? "",
       email: officialData?.email ?? "",
       bucket: "متميز",
+      program_id:
+        !!officialData?.company_access_programs &&
+        officialData?.company_access_programs.length > 0
+          ? officialData?.company_access_programs
+              .map((program) => program.id)
+              .join(" , ")
+          : "",
+      packages:
+        !!officialData?.packages && officialData?.packages.length > 0
+          ? officialData?.packages.map((pack) => pack.id)
+          : "",
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
@@ -161,16 +205,24 @@ export const CompanyOfficialData = (
     },
 
     onSubmit: async (formData: Record<string, unknown>) => {
-      return await defaultSubmitHandler(formData, OfficialDataFormConfig, {
-        config: {
-          params: {
-            ...(id && { branch_id: id }),
-            ...(company_id && { company_id }),
+      const transformedValues = { ...formData };
+      if (transformedValues.packages) {
+        transformedValues.packages = [transformedValues.packages];
+      }
+      return await defaultSubmitHandler(
+        transformedValues,
+        OfficialDataFormConfig,
+        {
+          config: {
+            params: {
+              ...(id && { branch_id: id }),
+              ...(company_id && { company_id }),
+            },
           },
-        },
-        url: `${baseURL}/companies/company-profile/official-data`,
-        method: "PUT",
-      });
+          url: `${baseURL}/companies/company-profile/official-data`,
+          method: "PUT",
+        }
+      );
     },
 
     onSuccess: () => {

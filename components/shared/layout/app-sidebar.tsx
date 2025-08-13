@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboardIcon, UserIcon } from "lucide-react";
+import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -21,61 +21,85 @@ import { SidebarProgramsList } from "./sidebar-programs";
 import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { Menu, Project } from "@/types/sidebar-menu";
-import { useAuthStore } from "@/modules/auth/store/use-auth";
+import type { Entity } from "@/types/sidebar-menu";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  isCentral: boolean;
   name?: string;
   mainLogo?: string;
 }
 
-function mergeProjectsAndMenu(projects: Project[], menu: Menu[],isSuperAdmin?:boolean) {
-  return projects.map((project) => {
-    // check is setting project
-    if(project.slug === SUPER_ENTITY_SLUG.SETTINGS){
-      if(!isSuperAdmin){
-        return project;
-      }
-    }
-    const matchedMenu = menu.find((m) => m.slug === project.slug);
-
-    if (!matchedMenu) return project;
-
-    // Extract all menu fields except sub_entities
-    const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
-
-    return {
-      ...project,
-      ...restMenuProps,
-      sub_entities: [
-        ...(project.sub_entities || []),
-        ...(menuSubEntities || []),
-      ],
-    };
-  });
-}
-
-export function AppSidebar({
-  isCentral,
-  name,
-  mainLogo,
-  ...props
-}: AppSidebarProps) {
-  const userAuth = useAuthStore();
-  const isSuperAdmin = Boolean(userAuth.user?.is_super_admin);
+export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const { menu, isLoading } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
   const path = usePathname();
   const pageName = "/" + path.split("/").at(-1);
-
+  const p = usePermissions(),
+    { can, isCentralCompany, isSuperAdmin } = p;
+  console.log("permissions ", p);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
+  const mergeProjectsAndMenu = React.useCallback(
+    function (
+      projects: Project[],
+      menu: Menu[],
+      isSuperAdmin?: boolean
+    ): Project[] {
+      const formatted: Project[] = projects.map((project) => {
+        // check is setting project
+        if (project.slug === SUPER_ENTITY_SLUG.SETTINGS) {
+          if (!isSuperAdmin) {
+            return project;
+          }
+        }
+        const matchedMenu = menu.find(
+          (menuItem) => menuItem.slug === project.slug
+        );
 
+        if (!matchedMenu) return project;
+
+        // Extract all menu fields except sub_entities
+        const { sub_entities: menuSubEntities, ...restMenuProps } = matchedMenu;
+
+        // Transform MenuSubEntity to Entity by adding the show property
+        const transformedMenuSubEntities =
+          menuSubEntities?.map(
+            (menuSubEntity): Entity => ({
+              name: menuSubEntity.name,
+              icon: menuSubEntity.icon,
+              slug: menuSubEntity.slug,
+              origin_super_entity: menuSubEntity.origin_super_entity,
+              show: can((permissions) =>
+                permissions.some(
+                  (permission) =>
+                    permission.key ===
+                    createPermissions(`DYNAMIC.${menuSubEntity.slug}`, ["LIST"])
+                      .list
+                )
+              ), // Default to true, you can add custom logic here if needed
+            })
+          ) || [];
+
+        return {
+          ...project,
+          ...restMenuProps,
+          sub_entities: [
+            ...(project.sub_entities || []),
+            ...transformedMenuSubEntities,
+          ],
+        };
+      });
+      return formatted;
+    },
+    [can]
+  );
   // just users & companies & program management are not central
-  const SidebarProjects = React.useMemo(() => {
+  const SidebarProjects: Project[] = React.useMemo(() => {
     // grouped routes in sidebar
     const settingsRoutesNames = [
       ROUTER.SETTINGS,
@@ -83,7 +107,22 @@ export function AppSidebar({
       ROUTER.USER_PROFILE,
       ROUTER.COMPANY_PROFILE,
     ];
-    return [
+    const rolesObj = {
+      name: "الادوار",
+      url: ROUTER.ROLES,
+      icon: RollerCoasterIcon,
+      isActive: pageName === ROUTER.ROLES,
+      show: can(Object.values(PERMISSIONS.role)),
+    };
+
+    const permissionsObj = {
+      name: "الصلاحيات",
+      url: ROUTER.PERMISSIONS,
+      icon: LayoutDashboardIcon,
+      isActive: pageName === ROUTER.PERMISSIONS,
+      show: can(Object.values(PERMISSIONS.permission)),
+    };
+    const data: Project[] = [
       // companies
       {
         name: t("Sidebar.Companies"),
@@ -97,9 +136,9 @@ export function AppSidebar({
             url: ROUTER.COMPANIES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.COMPANIES,
+            show: can(Object.values(PERMISSIONS.company)),
           },
         ],
-        isNotCentral: true,
       },
       // users
       {
@@ -114,9 +153,9 @@ export function AppSidebar({
             url: ROUTER.USERS,
             icon: UserIcon,
             isActive: pageName === ROUTER.USERS,
+            show: can(Object.values(PERMISSIONS.user)),
           },
         ],
-        isNotCentral: true,
       },
       {
         name: t("Sidebar.HumanResources"),
@@ -130,9 +169,32 @@ export function AppSidebar({
             url: ROUTER.Organizational_Structure,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.Organizational_Structure,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.organization.branch.list,
+                PERMISSIONS.organization.department.list,
+                PERMISSIONS.organization.jobTitle.list,
+                PERMISSIONS.organization.jobType.list,
+                PERMISSIONS.organization.management.list,
+                PERMISSIONS.organization.users.list,
+              ]),
+          },
+          {
+            name: t("Sidebar.AttendanceDeparture"),
+            url: ROUTER.AttendanceDeparture,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.AttendanceDeparture,
+            show: !isCentralCompany,
+          },
+          {
+            name: t("Sidebar.HRSettings"),
+            url: ROUTER.HR_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.HR_SETTINGS,
+            show: !isCentralCompany,
           },
         ],
-        isNotCentral: false,
       },
       // program management
       {
@@ -147,9 +209,9 @@ export function AppSidebar({
             url: ROUTER.PROGRAM_SETTINGS.USERS,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+            show: isCentralCompany && can(Object.values(PERMISSIONS.subEntity)),
           },
         ],
-        isNotCentral: true,
       },
       // settings
       {
@@ -158,71 +220,43 @@ export function AppSidebar({
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
         urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
-        sub_entities: isSuperAdmin
-          ? [
-              {
-                name: t("Sidebar.UserProfileSettings"),
-                url: ROUTER.USER_PROFILE,
-                icon: UserIcon,
-                isActive: pageName === ROUTER.USER_PROFILE,
-              },
-              {
-                name: "اعداد ملف الشركة",
-                url: ROUTER.COMPANY_PROFILE,
-                icon: InboxIcon,
-                isActive: pageName === ROUTER.COMPANY_PROFILE,
-              },
-              {
-                name: t("Sidebar.SystemSettings"),
-                url: ROUTER.SETTINGS,
-                icon: InboxIcon,
-                isActive: pageName === ROUTER.SETTINGS,
-              },
-            ]
-          : [
-              {
-                name: t("Sidebar.UserProfileSettings"),
-                url: ROUTER.USER_PROFILE,
-                icon: UserIcon,
-                isActive: pageName === ROUTER.USER_PROFILE,
-              },
-            ],
-        isNotCentral: false,
-      },
-      {
-        name: t("Sidebar.Settings"),
-        icon: SettingsIcon,
-        isActive: settingsRoutesNames.indexOf(pageName) !== -1,
-        slug: SUPER_ENTITY_SLUG.SETTINGS,
-        urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
-        sub_entities: isSuperAdmin ? [
+        sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
             url: ROUTER.USER_PROFILE,
             icon: UserIcon,
             isActive: pageName === ROUTER.USER_PROFILE,
+            show: can(
+              Object.values(PERMISSIONS.userProfile).flatMap((p) =>
+                Object.values(p)
+              )
+            ),
           },
           {
             name: "اعداد ملف الشركة",
             url: ROUTER.COMPANY_PROFILE,
             icon: InboxIcon,
             isActive: pageName === ROUTER.COMPANY_PROFILE,
+            show: can(
+              Object.values(PERMISSIONS.companyProfile).flatMap((p) =>
+                Object.values(p)
+              )
+            ),
           },
           {
             name: t("Sidebar.SystemSettings"),
             url: ROUTER.SETTINGS,
             icon: InboxIcon,
             isActive: pageName === ROUTER.SETTINGS,
+            show: can(
+              Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
+                Object.values(p)
+              )
+            ),
           },
-        ] : [
-          {
-            name: t("Sidebar.UserProfileSettings"),
-            url: ROUTER.USER_PROFILE,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.USER_PROFILE,
-          },
+          rolesObj,
+          permissionsObj,
         ],
-        isNotCentral: true,
       },
       {
         name: t("Sidebar.Powers"),
@@ -236,21 +270,18 @@ export function AppSidebar({
             url: ROUTER.Programs,
             icon: UserIcon,
             isActive: pageName === ROUTER.Programs,
+            show: can(Object.values(PERMISSIONS.companyAccessProgram)),
           },
         ],
-        isNotCentral: true,
       },
     ];
-  }, [isSuperAdmin]);
+    return data;
+  }, [pageName, isCentralCompany, can, t]);
 
-
-  const projects = isCentral
-    ? SidebarProjects.filter((ele) => ele.isNotCentral)
-    : SidebarProjects.filter((ele) => !ele.isNotCentral);
-
-  // const all = !isCentral ? mergeProjectsAndMenu(projects, menu) : projects;
-
-  const all = mergeProjectsAndMenu(projects, menu,isSuperAdmin);
+  const projects = SidebarProjects.filter((project) =>
+    project.sub_entities?.some((subEntity) => subEntity.show)
+  );
+  const all = mergeProjectsAndMenu(projects, menu, isSuperAdmin);
 
   return (
     <Sidebar

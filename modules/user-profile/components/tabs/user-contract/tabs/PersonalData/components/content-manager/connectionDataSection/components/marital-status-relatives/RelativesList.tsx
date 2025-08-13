@@ -3,6 +3,8 @@ import { useConnectionDataCxt } from "../../context/ConnectionDataCxt";
 import RelativeData from "./relative";
 import { Relative } from "@/modules/user-profile/types/relative";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function RelativesList() {
   const { userRelativesData } = useConnectionDataCxt();
@@ -18,10 +20,12 @@ export default function RelativesList() {
 
   // render data
   return (
-    <RegularList<Relative, "relative">
-      sourceName="relative"
-      items={userRelativesData ?? []}
-      ItemComponent={RelativeData}
-    />
+    <Can check={[PERMISSIONS.profile.maritalStatus.view]}>
+      <RegularList<Relative, "relative">
+        sourceName="relative"
+        items={userRelativesData ?? []}
+        ItemComponent={RelativeData}
+      />
+    </Can>
   );
 }

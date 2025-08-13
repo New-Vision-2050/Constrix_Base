@@ -115,6 +115,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     config // Pass the entire config object
   );
 
+  const enableExport = config?.enableExport===undefined?true:config?.enableExport;
+
   // Initialize columns from config immediately if available
   // Use a ref to track if we've already set the columns
   const columnsInitializedRef = React.useRef(false);
@@ -272,7 +274,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                   url={dataUrl}
                   apiParams={config?.apiParams}
                   selectedRows={selectedRows}
-                  disabled={loading || !selectionEnabled || !data.length}
+                  disabled={loading || !selectionEnabled || !data.length || !enableExport}
                   searchQuery={searchQuery}
                   searchFields={searchFields}
                   columnSearchState={columnSearchState}
