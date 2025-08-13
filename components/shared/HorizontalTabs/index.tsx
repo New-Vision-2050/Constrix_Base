@@ -31,7 +31,7 @@ export default function HorizontalTabs({
       className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
       <TabsList
-        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-start`}
+        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-between`}
       >
         <TabsTriggerList
           onTabClick={onTabClick}

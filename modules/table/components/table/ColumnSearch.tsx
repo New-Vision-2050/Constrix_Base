@@ -8,6 +8,7 @@ import {
 import DropdownSearch from "./DropdownSearch";
 import { useDebounce } from "@/modules/table/hooks/useDebounce";
 import { useTranslations } from "next-intl";
+import { format } from "date-fns";
 
 interface ColumnSearchProps {
   columns: ColumnConfig[];
@@ -26,15 +27,68 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
   const searchableColumns =
     allSearchedFields ?? columns.filter((col) => col.searchable);
 
-  // Store local state for text inputs to prevent immediate API calls
-  const [localInputValues, setLocalInputValues] = useState<ColumnSearchState>(
-    {}
-  );
+  // Initialize local state with current column search values
+  const [localInputValues, setLocalInputValues] = useState<Record<string, string | string[]>>({});
 
-  // Initialize local state with current search state
+  // Initialize default values for date fields and other fields with defaultValue
   useEffect(() => {
-    setLocalInputValues(columnSearchState);
-  }, []);
+    // Populate default values if provided
+    if (allSearchedFields && allSearchedFields.length > 0) {
+      const defaultValues: Record<string, string | string[]> = {};
+      
+      allSearchedFields.forEach(field => {
+        if (field.searchType?.defaultValue) {
+          if (field.searchType.type === 'date' && field.searchType.defaultValue instanceof Date) {
+            // Format date to YYYY-MM-DD
+            const date = field.searchType.defaultValue;
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            defaultValues[field.key] = `${year}-${month}-${day}`;
+          } else {
+            defaultValues[field.key] = field.searchType.defaultValue;
+          }
+        }
+      });
+      
+      // Only update if there are default values and they're not already set
+      if (Object.keys(defaultValues).length > 0) {
+        setLocalInputValues(prev => ({
+          ...prev,
+          ...defaultValues
+        }));
+        
+        // Apply default values to column search state
+        Object.entries(defaultValues).forEach(([key, value]) => {
+          onColumnSearch(key, value);
+        });
+      }
+    }
+  }, []); // Solo ejecutar en el montaje inicial
+
+  // Update local input values when columnSearchState changes
+  useEffect(() => {
+    // Create a map of local values from the global state
+    const newLocalValues: Record<string, string | string[]> = {};
+    
+    // Copy current values from columnSearchState
+    if (columnSearchState) {
+      Object.keys(columnSearchState).forEach((key) => {
+        newLocalValues[key] = columnSearchState[key];
+      });
+    }
+    
+    // Update local state, but don't override with empty values if we have local values
+    setLocalInputValues(prev => {
+      const merged = { ...prev };
+      Object.entries(newLocalValues).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          merged[key] = value;
+        }
+      });
+      return merged;
+    });
+  }, [columnSearchState]);
 
   // Create a debounced version of onColumnSearch
   const debouncedColumnSearch = useDebounce(
@@ -136,17 +190,97 @@ const ColumnSearch: React.FC<ColumnSearchProps> = ({
                   }
                 />
               );
+            
+            case "date":
+              // Parse date constraints for validation
+              const minDate = searchType.minDate ? new Date(searchType.minDate) : null;
+              const maxDate = searchType.maxDate ? new Date(searchType.maxDate) : null;
+              
+              // For cross-field validation using maxDateField and minDateField from config
+              let crossFieldConstraint: Date | null = null;
+              
+              // Check if there's a maxDateField property in the searchType
+              if (searchType.maxDateField && columnSearchState[searchType.maxDateField]) {
+                const maxFieldValue = columnSearchState[searchType.maxDateField];
+                if (typeof maxFieldValue === 'string') {
+                  crossFieldConstraint = new Date(maxFieldValue);
+                  // Field constraint set
+                }
+              }
+              
+              // Check if there's a minDateField property in the searchType
+              if (searchType.minDateField && columnSearchState[searchType.minDateField]) {
+                const minFieldValue = columnSearchState[searchType.minDateField];
+                if (typeof minFieldValue === 'string') {
+                  crossFieldConstraint = new Date(minFieldValue);
+                  // Field constraint set
+                }
+              }
+              
+              // Format dates for the min/max attributes
+              const formatDateForInput = (date: Date) => {
+                return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+              };
+
+              // Determine the effective min and max dates considering both fixed constraints and cross-field constraints
+              let effectiveMinDate = minDate;
+              let effectiveMaxDate = maxDate;
+              
+              if (column.key === 'start_date' && crossFieldConstraint) {
+                // For start_date, respect both maxDate and end_date (whichever is more restrictive)
+                if (maxDate && crossFieldConstraint > maxDate) {
+                  effectiveMaxDate = maxDate;
+                } else if (crossFieldConstraint) {
+                  effectiveMaxDate = crossFieldConstraint;
+                }
+              } else if (column.key === 'end_date' && crossFieldConstraint) {
+                // For end_date, respect both minDate and start_date (whichever is more restrictive)
+                if (minDate && crossFieldConstraint < minDate) {
+                  effectiveMinDate = minDate;
+                } else if (crossFieldConstraint) {
+                  effectiveMinDate = crossFieldConstraint;
+                }
+              }
+
+              return (
+                <div key={column.key} className="text-right" dir="rtl">
+                  {column.label ? (
+                    <label
+                      htmlFor={`search-${column.key}`}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 w-full text-right mb-2 block"
+                    >
+                      {column.label}
+                    </label>
+                  ) : null}
+                  <Input
+                    id={`search-${column.key}`}
+                    type="date"
+                    placeholder={searchType.placeholder || `اختر ${column.label}`}
+                    value={typeof displayValue === 'string' ? displayValue : ''}
+                    onChange={(e) =>
+                      handleInputChange(column.key, e.target.value)
+                    }
+                    style={{ textAlign: 'right' }}
+                    className="w-full text-right"
+                    dir="rtl"
+                    min={effectiveMinDate ? formatDateForInput(effectiveMinDate) : undefined}
+                    max={effectiveMaxDate ? formatDateForInput(effectiveMaxDate) : undefined}
+                  />
+                </div>
+              );
 
             case "text":
             default:
               return (
                 <div key={column.key}>
-                  <label
-                    htmlFor={`search-${column.key}`}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {column.label}
-                  </label>
+                  {column.label ? (
+                    <label
+                      htmlFor={`search-${column.key}`}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+                    >
+                      {column.label}
+                    </label>
+                  ) : null}
                   <Input
                     id={`search-${column.key}`}
                     type="text"

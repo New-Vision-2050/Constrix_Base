@@ -16,6 +16,8 @@ const OfficialDataPreview = ({
     company_field,
     phone,
     email,
+    packages,
+    company_access_programs,
   } = officialData;
 
   const previewData = [
@@ -66,9 +68,15 @@ const OfficialDataPreview = ({
       value: email ?? "",
     },
     {
-      valid: Boolean("متميز"),
+      valid: Boolean(company_access_programs),
+      label: "البرنامج",
+      value: company_access_programs[0]?.name ?? "",
+      needRequest: true,
+    },
+    {
+      valid: Boolean(packages),
       label: "الباقة",
-      value: "متميز",
+      value: packages[0]?.name ?? "",
       needRequest: true,
     },
   ];

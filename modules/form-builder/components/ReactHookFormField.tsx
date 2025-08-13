@@ -9,6 +9,7 @@ import CheckboxGroupField from './fields/CheckboxGroupField';
 import RadioField from './fields/RadioField';
 import MultiSelectField from './fields/MultiSelectField';
 import DateField from './fields/DateField';
+import TimeField from './fields/TimeField';
 import SearchField from './fields/SearchField';
 import PhoneField from './fields/PhoneField';
 import HiddenObjectField from './fields/HiddenObjectField';
@@ -214,12 +215,23 @@ const ReactHookFormField: React.FC<ReactHookFormFieldProps> = ({
               return (
                 <DateField
                   field={field}
-                  value={fieldProps.value}
+                  value={fieldProps.value || ''}
                   error={error}
                   touched={touched}
                   onChange={fieldProps.onChange}
                   onBlur={fieldProps.onBlur}
-                  // disabled={fieldProps.disabled} - Removed as it's not in the component props
+                />
+              );
+
+            case 'time':
+              return (
+                <TimeField
+                  field={field}
+                  value={fieldProps.value || ''}
+                  error={error}
+                  touched={touched}
+                  onChange={fieldProps.onChange}
+                  onBlur={fieldProps.onBlur}
                 />
               );
 
