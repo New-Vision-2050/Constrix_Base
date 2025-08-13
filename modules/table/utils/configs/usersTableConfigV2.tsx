@@ -38,7 +38,11 @@ export interface UserTableRow {
 }
 
 // Create a component that uses the translations
-export const UsersConfigV2 = () => {
+export const UsersConfigV2 = (options?: {
+  canEdit: boolean;
+  canDelete: boolean;
+  canView: boolean;
+}) => {
   const t = useTranslations("Companies");
 
   return {
@@ -77,7 +81,12 @@ export const UsersConfigV2 = () => {
           return (
             <div className="line-clamp-3 flex flex-col items-start justify-start">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"} style={{width: "fit-content"}}>
+                <p
+                  key={company.id}
+                  className="line-clamp-1 h-5"
+                  dir={"ltr"}
+                  style={{ width: "fit-content" }}
+                >
                   {company?.phone || ""}
                 </p>
               ))}
@@ -243,6 +252,7 @@ export const UsersConfigV2 = () => {
         icon: <GearIcon className="w-4 h-4" />,
         action: "openDialog",
         dialogComponent: ChooseUserCompany, // Your custom dialog component
+        disabled: !(options?.canView || false),
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
@@ -251,8 +261,9 @@ export const UsersConfigV2 = () => {
       },
     ],
     executionConfig: {
-      canEdit: false,
-      canDelete: true,
+      canEdit: typeof options?.canEdit === "boolean" ? options?.canEdit : false,
+      canDelete:
+        typeof options?.canDelete === "boolean" ? options?.canDelete : true,
     },
   };
 };

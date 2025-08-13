@@ -9,7 +9,7 @@ export default function StatisticsCardHeader(props: PropsT) {
   const { title, icon, description, number } = props;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 bg-sidebar py-2">
       {/* icon */}
       <div
         className="w-10 h-10 rounded-lg flex items-center justify-center"

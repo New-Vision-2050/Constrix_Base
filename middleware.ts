@@ -3,18 +3,18 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { apiClient } from "./config/axios-config";
 import { endPoints } from "./modules/auth/constant/end-points";
+import { getCurrentHost } from "./utils/get-current-host";
 
 const intlMiddleware = createMiddleware(routing);
 
 const protectedCentralPages = ["/companies", "/users"];
 
 export async function middleware(req: NextRequest) {
-  const host = req.headers.get("host");
   const existingCompanyCookie = req.cookies.get("company-data")?.value;
 
   const nvToken = req.cookies.get("new-vision-token")?.value;
   const pathname = req.nextUrl.pathname;
-
+  const currentHost = await getCurrentHost();
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
 
   if (!nvToken && !isLoginPage) {
@@ -27,11 +27,11 @@ export async function middleware(req: NextRequest) {
   } else {
     res.cookies.set("NEXT_LOCALE", "ar");
   }
-  if ((!existingCompanyCookie && host) || isLoginPage) {
+  if ((!existingCompanyCookie && currentHost) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
         headers: {
-          "X-Domain": host,
+          "X-Domain": currentHost,
         },
       });
 

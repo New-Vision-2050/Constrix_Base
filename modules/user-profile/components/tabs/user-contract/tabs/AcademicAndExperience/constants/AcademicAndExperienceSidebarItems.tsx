@@ -10,54 +10,65 @@ import UserCertifications from "../components/content-manager/components/certifi
 import UserCV from "../components/content-manager/components/user-cv";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useTranslations } from "next-intl";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export const AcademicAndExperienceSidebarItems = (
   t: (key: string) => string
-): UserProfileNestedTab[] => [
-  {
-    id: "contract-tab-academic-experience-qualification",
-    title: t("qualification"),
-    type: "qualification",
-    icon: <GraduationCapIcon />,
-    content: <UserQualificationData />,
-  },
-  {
-    id: "contract-tab-academic-experience-brief",
-    title: t("summary"),
-    type: "user_about",
-    icon: <BackpackIcon />,
-    content: <ProfileBriefSummary />,
-  },
-  {
-    id: "contract-tab-academic-experience-old-experience",
-    title: t("experiences"),
-    icon: <BackpackIcon />,
-    type: "experience",
-    content: <UserExperiences />,
-  },
-  {
-    id: "contract-tab-academic-experience-courses",
-    icon: <LandmarkIcon />,
-    type: "educational_course",
-    title: t("courses"),
-    content: <UserCourses />,
-  },
-  {
-    id: "contract-tab-academic-experience-certificates",
-    icon: <GraduationCapIcon />,
-    title: t("certifications"),
-    type: "professional_certificate",
-    content: <UserCertifications />,
-  },
-  {
-    id: "contract-tab-academic-experience-cv",
-    icon: <BackpackIcon />,
-    type: "biography",
-    title: t("cv"),
-    content: <UserCV />,
-  },
-];
-
+): UserProfileNestedTab[] => {
+  const { can } = usePermissions();
+  const tabs: (UserProfileNestedTab & { show: boolean })[] = [
+    {
+      id: "contract-tab-academic-experience-qualification",
+      title: t("qualification"),
+      type: "qualification",
+      icon: <GraduationCapIcon />,
+      content: <UserQualificationData />,
+      show: can([PERMISSIONS.profile.qualification.view]),
+    },
+    {
+      id: "contract-tab-academic-experience-brief",
+      title: t("summary"),
+      type: "user_about",
+      icon: <BackpackIcon />,
+      content: <ProfileBriefSummary />,
+      show: can([PERMISSIONS.profile.aboutMe.view]),
+    },
+    {
+      id: "contract-tab-academic-experience-old-experience",
+      title: t("experiences"),
+      icon: <BackpackIcon />,
+      type: "experience",
+      content: <UserExperiences />,
+      show: can([PERMISSIONS.profile.experience.view]),
+    },
+    {
+      id: "contract-tab-academic-experience-courses",
+      icon: <LandmarkIcon />,
+      type: "educational_course",
+      title: t("courses"),
+      content: <UserCourses />,
+      show: can([PERMISSIONS.profile.courses.view]),
+    },
+    {
+      id: "contract-tab-academic-experience-certificates",
+      icon: <GraduationCapIcon />,
+      title: t("certifications"),
+      type: "professional_certificate",
+      content: <UserCertifications />,
+      show: can([PERMISSIONS.profile.certificates.view]),
+    },
+    {
+      id: "contract-tab-academic-experience-cv",
+      icon: <BackpackIcon />,
+      type: "biography",
+      title: t("cv"),
+      content: <UserCV />,
+      show: can([PERMISSIONS.profile.cv.view]),
+    },
+  ];
+  return tabs.filter((tab) => tab.show).map(({ show, ...rest }) => rest);
+};
 type PropsT = {
   handleChangeActiveSection: (section: UserProfileNestedTab) => void;
 };

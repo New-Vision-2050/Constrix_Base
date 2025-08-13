@@ -15,6 +15,10 @@ import StatisticsCardHeader from "@/modules/organizational-structure/components/
 import { apiClient, baseURL } from "@/config/axios-config";
 import { FieldConfig } from "@/modules/form-builder";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 // Define interfaces matching the API response structure
 export interface ApiResponse {
@@ -201,7 +205,6 @@ const createHiddenDataField = (
   };
 };
 
-// Helper function to create empty child program field
 const createEmptyChildField = (
   child: Children, 
   level: number, 
@@ -249,7 +252,6 @@ const createEmptyChildField = (
   return [checkboxField, hiddenField];
 };
 
-// Helper function to process children programs
 const processChildrenPrograms = (
   program: ProgramPayload | Children, 
   level: number, 
@@ -259,16 +261,12 @@ const processChildrenPrograms = (
 ): void => {
   if (program.children && Array.isArray(program.children) && program.children.length > 0) {
     program.children.forEach((child: Children) => {
-      // Check if child has sub_entities
       if (child.sub_entities && Array.isArray(child.sub_entities) && child.sub_entities.length > 0) {
-        // Child has sub_entities, process normally
         processProgram(child, level + 1, programKey);
       } else {
-        // Child has no sub_entities, create special fields
         const emptyChildFields = createEmptyChildField(child, level, programKey);
         generatedData.push(...emptyChildFields);
         
-        // Continue processing nested children if they exist
         if (child.children && Array.isArray(child.children) && child.children.length > 0) {
           const childProgramKey = `${programKey}_child_${child.id}`;
           child.children.forEach((nestedChild: Children) => {
@@ -280,24 +278,17 @@ const processChildrenPrograms = (
   }
 };
 
-// Main function to generate dynamic fields based on API data
 const generateDynamicFields = async (): Promise<FieldConfig[]> => {
   try {
-    // Fetch programs data from API
     const programs = await fetchProgramsData();
     
-    // Array to store generated fields
     const generatedData: FieldConfig[] = [];
     
-    // Recursive function to process programs and their children
     const processProgram = (program: ProgramPayload | Children, level: number = 0, parentPath: string = '') => {
-      // Generate program identifiers
       const { programKey, displayName } = generateProgramIdentifiers(program, level, parentPath);
       
-      // Extract sub-entity options
       const allOptions = extractSubEntityOptions(program);
       
-      // Create checkbox group if there are options
       if (allOptions.length > 0) {
         const checkboxField = createCheckboxGroupField(programKey, displayName, allOptions, level, program);
         const hiddenField = createHiddenDataField(programKey, program, level, parentPath);
@@ -305,11 +296,9 @@ const generateDynamicFields = async (): Promise<FieldConfig[]> => {
         generatedData.push(checkboxField, hiddenField);
       }
       
-      // Process children programs
       processChildrenPrograms(program, level, programKey, generatedData, processProgram);
     };
     
-    // Process each main program recursively
     programs.forEach((program: ProgramPayload) => {
       processProgram(program, 0);
     });
@@ -317,13 +306,14 @@ const generateDynamicFields = async (): Promise<FieldConfig[]> => {
     return generatedData;
   } catch (error) {
     console.error("Error fetching form fields:", error);
-    return []; // Return empty array if there's an error
+    return [];
   }
 };
 
 function EntryPointPrograms() {
   const t = useTranslations("Companies");
   const router = useRouter();
+  const { can } = usePermissions();
   const [config, setConfig] = useState<any>(null);
   const [formConfig, setFormConfig] = useState<FormConfig | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -332,13 +322,8 @@ function EntryPointPrograms() {
   const [statisticsLoading, setStatisticsLoading] = useState<boolean>(true);
 
   const handleFormSuccess = (values: Record<string, unknown>) => {
-    // Import the store directly to avoid hooks in callbacks
     const tableStore = useTableStore.getState();
-
-    // Use the centralized reloadTable method from the TableStore
     tableStore.reloadTable(config.tableId);
-
-    // After a short delay, set loading back to false
     setTimeout(() => {
       tableStore.setLoading(config.tableId, false);
     }, 100);
@@ -354,12 +339,11 @@ function EntryPointPrograms() {
         const response = await apiClient.get(`${baseURL}/company_access_programs/counts`);
         console.log('Statistics API Response:', response.data);
         
-        // Handle API response structure
         const data: { payload: StatisticsPayload } = response.data;
         setStatisticsData(data.payload);
       } catch (err) {
         console.error("Failed to fetch statistics:", err);
-        // Set default values on error
+        
         setStatisticsData({
           total_company_access_programs: 0,
           active_company_access_programs: 0,
@@ -380,7 +364,15 @@ function EntryPointPrograms() {
         setLoading(true);
         const dynamicFields = await generateDynamicFields();
         const formConfig = GetProgramFormConfig(t, dynamicFields);
-        const tableConfig = programsConfig(t, router, dynamicFields);
+        const tableConfig = programsConfig(
+          t, 
+          router, 
+          dynamicFields, 
+          can(PERMISSIONS.companyAccessProgram.update), 
+          can(PERMISSIONS.companyAccessProgram.delete),
+          can(PERMISSIONS.companyAccessProgram.export),
+          can(PERMISSIONS.companyAccessProgram.view)
+        );
         setFormConfig(formConfig);
         setConfig(tableConfig);
         setError(null);
@@ -397,7 +389,6 @@ function EntryPointPrograms() {
 
   return (
     <div className="px-8 space-y-7">
-      {/* Statistics Cards Group */}
       <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
         <StatisticsCardHeader 
           title="اجمالي عدد البرامج" 
@@ -427,7 +418,8 @@ function EntryPointPrograms() {
             config={config}
             searchBarActions={
               <div className="flex items-center gap-3">
-                {loading ? (
+              <Can check={[PERMISSIONS.companyAccessProgram.create]}>
+                  {loading ? (
                   <Button disabled>جاري التحميل...</Button>
                 ) : error ? (
                   <Button variant="destructive" onClick={() => window.location.reload()}>إعادة المحاولة</Button>
@@ -438,6 +430,8 @@ function EntryPointPrograms() {
                      onSuccess={handleFormSuccess}
                   />
                 ) : null}
+
+              </Can>
               </div>
             }
           />
@@ -454,4 +448,4 @@ function EntryPointPrograms() {
   );
 }
 
-export default EntryPointPrograms;
+export default withPermissions(EntryPointPrograms, [PERMISSIONS.companyAccessProgram.list]);
