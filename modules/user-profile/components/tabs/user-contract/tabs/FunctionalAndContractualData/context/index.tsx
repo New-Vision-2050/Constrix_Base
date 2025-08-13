@@ -67,7 +67,7 @@ export const FunctionalContractualCxtProvider = ({
   const { data: companyData } = useCurrentCompany();
   const company = useMemo(() => companyData?.payload, [companyData]);
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    FunctionalContractualList()[0]
+    FunctionalContractualList[0]
   );
 
   console.log("companyDatacompanyData", companyData);

@@ -16,42 +16,30 @@ export interface PermissionWithStatus {
   limit?: number;
 }
 
-// New nested structure types based on API response
-// Level 4: Individual permission items (arrays)
-export type CategoryPermissions = PermissionWithStatus[];
+// Category data from lookup API
+export type CategoryData = Record<string, PermissionItem[]>;
 
-// Level 3: Sub-categories (like "بيانات", "اتصال", "هوية")
-export type SubCategoryPermissions = Record<string, CategoryPermissions>;
+// Category permissions for package permissions
+export type CategoryPermissions = {
+  [subKey: string]: PermissionWithStatus[];
+};
 
-// Level 2: Sub-accordions (like "الملف الشخصي للمستخدم", "ملف الشركة")
-export type SubAccordionPermissions = Record<string, SubCategoryPermissions>;
+// Main payload types
+export type CategoryPermissionsPayload = Record<string, CategoryData>;
 
-// Level 1: Main accordion (like "الإعدادات")
-export type MainAccordionPermissions = Record<string, SubAccordionPermissions>;
-
-// Root structure
-export type NestedPermissionsData = Record<string, MainAccordionPermissions>;
-
-// API Response structure for lookup
-export interface NestedPermissionsRoot {
-  payload: NestedPermissionsData;
-}
+export type PermissionsData = {
+  [categoryKey: string]: CategoryPermissions;
+};
 
 // Package permissions interfaces
 export interface PackagePermissionsRoot {
   payload: {
     id: string;
     name: string;
-    permissions: NestedPermissionsData;
+    permissions: PermissionsData;
   };
 }
 
-// Legacy types for backward compatibility
-export type CategoryData = Record<string, PermissionItem[]>;
-export type CategoryPermissionsPayload = Record<string, CategoryData>;
-export type PermissionsData = {
-  [categoryKey: string]: Record<string, PermissionWithStatus[]>;
-};
 export interface PackagePermissions {
-  [key: string]: Record<string, PermissionWithStatus[]>;
+  [key: string]: CategoryPermissions;
 }

@@ -1,6 +1,8 @@
-import {FormConfig, FieldConfig} from "@/modules/form-builder";
-import {  baseURL } from "@/config/axios-config";
+import {FormConfig, useFormStore, FieldConfig} from "@/modules/form-builder";
+import { apiClient, baseURL } from "@/config/axios-config";
+import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
 import {useTranslations} from "next-intl";
+import axios from "axios";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
 // Define interfaces matching the API response structure
@@ -47,7 +49,7 @@ export interface Children {
   slug: string;
   is_active: number;
   sub_entities: SubEntity[];
-  children?: Children[];
+  children?: Children[]; // Recursive children
 }
 
 export interface SubEntity {
@@ -60,6 +62,18 @@ export interface SubEntity {
   is_active: number;
   children: any[];
 }
+
+// Interface for checkbox options
+interface SubProgramOption {
+  id: string;
+  name: string;
+  value: string;
+  label: string;
+  parentId?: string;
+  [key: string]: any;
+}
+
+// Define a toast interface to handle the case where window.toast might not exist
 interface ToastInterface {
   success: (message: string) => void;
   error: (message: string) => void;
@@ -77,6 +91,7 @@ const safeToast = (): ToastInterface | undefined => {
 
 // Dynamic form configuration generator
 export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dynamicFields: FieldConfig[]):FormConfig {
+  
   // Return the form configuration
   return {
     formId: "program-form",
@@ -130,13 +145,12 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
               totalCountHeader: "X-Total-Count",
             },
           },
-        {
+          {
             name: "company_fields",
-            label: " انشطة ظهور البرنامج",
+            label: "مجالات ظهور البرنامج",
             type: "select",
             isMulti: true,
-            placeholder: "اختر انشطة ظهور البرنامج",
-            required: true,
+            placeholder: "اختر مجالات ظهور البرنامج",
             dynamicOptions: {
               url: `${baseURL}/company_fields`,
               valueField: "id",
@@ -145,15 +159,9 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
-              itemsPerPage: 1000,
+              itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "برجاء اختيار النشاط",
-              },
-            ],
           },
            {
             name: "country_id",
@@ -176,6 +184,7 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
         ],
       },
     ],
+    // Dynamic fields are already loaded and included in the fields array
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,
@@ -185,55 +194,27 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
     showCancelButton: false,
     showBackButton: false,
     editDataTransformer: (data: any) => {
+      // Transform array objects to just IDs for select fields
       data.company_fields = data.company_fields?.map((item: any) => item.id);
       data.company_types = data.company_types?.map((item: any) => item.id);
       data.country_id = data.countries?.map((item: any) => item.id);
-  
-      if (data.programs && Array.isArray(data.programs)) {
-        const processProgram = (program: any, level: number = 0, parentPath: string = '') => {
-          let programKey: string;
-          if (level === 0) {
-            programKey = `program_${program.id}`;
-          } else {
-            programKey = `${parentPath}_child_${program.id}`;
-          }
-          
-          if (program.sub_entities && Array.isArray(program.sub_entities)) {
-            const subEntityIds = program.sub_entities.map((item: any) => item.id || item);
-            data[programKey] = subEntityIds;
-          } else {
-            data[programKey] = [];
-          }
-          
-          const dataKey = level === 0 ? `program_data_${program.id}` : `${programKey}_data`;
-          data[dataKey] = program;
-          
-          if (program.children && Array.isArray(program.children)) {
-            program.children.forEach((child: any) => {
-              processProgram(child, level + 1, programKey);
-            });
-          }
-        };
-        
-        data.programs.forEach((program: any) => {
-          processProgram(program, 0);
-        });
-        
-        delete data.programs;
-      }
-      
       return data;
     },
+    // Success handler with proper error handling
     onSuccess: (values: any, result: any) => {
       console.log("Form submitted successfully with values:", values);
 
+      // Show success notification
       const toast = safeToast();
       if (toast) {
         toast.success("تم إضافة البرنامج بنجاح");
       }
     },
     onSubmit: async (formData: Record<string, unknown>, formConfig: FormConfig) => {
+      console.log("Form data received:", formData);
+      
       try {
+        // Transform form data to match the Root interface
         const transformedData: Root = {
           id:formData.id as string,
           name: formData.name as string,
@@ -249,12 +230,15 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
             : []
         };
 
+        // Process dynamic program fields to build programs array recursively
         const processedPrograms = new Map<string, Program>();
         
+        // Helper function to collect all children (flattened structure)
         const collectAllChildren = (parentKey: string, allFormData: Record<string, unknown>): ApiChildren[] => {
           const children: ApiChildren[] = [];
           console.log(`Collecting children for parent key: ${parentKey}`);
           
+          // Collect direct children
           Object.keys(allFormData).forEach(key => {
             if (key.startsWith(`${parentKey}_child_`) && !key.includes('_data')) {
               console.log(`Found child key: ${key}`);
@@ -263,14 +247,16 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
               const childDataKey = `${key}_data`;
               const childData = allFormData[childDataKey] as any;
                          
+              // Include child program even if it has no selected sub_entities
               if (childData) {
                 const childProgram: ApiChildren = {
                   id: childId,
-                  sub_entities: selectedOptions.filter(option => option !== 'empty')
+                  sub_entities: selectedOptions.filter(option => option !== 'empty') // Remove 'empty' placeholder
                 };
                 
                 children.push(childProgram);
                 
+                // Recursively collect nested children and add them to the same flat array
                 const nestedChildren = collectAllChildren(key, allFormData);
                 children.push(...nestedChildren);
               } else {
@@ -290,6 +276,7 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
             const programDataKey = `program_data_${programId}`;
             const programData = formData[programDataKey] as any;
 
+            // Include program even if it has no selected sub_entities
             if (programData) {
               const program: Program = {
                 id: programId,
@@ -303,8 +290,10 @@ export  function GetProgramFormConfig(t: ReturnType<typeof useTranslations>, dyn
           }
         });
         
+        // Convert to array
         transformedData.programs = Array.from(processedPrograms.values());
 
+        // Send to the specified endpoint
        return await defaultSubmitHandler(transformedData,formConfig);
       } catch (error) {
         console.error("Error submitting form:", error);

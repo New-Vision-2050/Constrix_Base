@@ -4,8 +4,6 @@ import { Certification } from "@/modules/user-profile/types/Certification";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
-import Can from "@/lib/permissions/client/Can";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function UserCertificationsList() {
   const { userCertifications, userCertificationsLoading } =
@@ -30,13 +28,11 @@ export default function UserCertificationsList() {
       {userCertificationsLoading ? (
         <TabTemplateListLoading />
       ) : (
-        <Can check={[PERMISSIONS.profile.certificates.view]}>
-          <RegularList<Certification, "certification">
-            sourceName="certification"
-            items={userCertifications ?? []}
-            ItemComponent={UserCertification}
-          />
-        </Can>
+        <RegularList<Certification, "certification">
+          sourceName="certification"
+          items={userCertifications ?? []}
+          ItemComponent={UserCertification}
+        />
       )}
     </>
   );

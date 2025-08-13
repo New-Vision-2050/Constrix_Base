@@ -18,7 +18,6 @@ import {
 import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useDropdownSearch } from "@/modules/table/hooks/useDropdownSearch";
 import { useTranslations } from "next-intl";
-import { Label } from "@/modules/table/components/ui/label";
 
 interface PaginatedDropdownProps {
   columnKey: string;
@@ -51,14 +50,13 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { options, loading, error, dataFetched, fetchOptions, hasMore } =
-    useDropdownSearch({
-      searchTerm: searchValue,
-      dynamicConfig,
-      dependencies,
-      selectedValue: value,
-      isMulti,
-    });
+  const { options, loading, error, dataFetched, fetchOptions, hasMore } = useDropdownSearch({
+    searchTerm: searchValue,
+    dynamicConfig,
+    dependencies,
+    selectedValue: value,
+    isMulti
+  });
 
   // Set first option as default when options change and no value is selected
   useEffect(() => {
@@ -68,27 +66,22 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       options.length > 0 &&
       (!value || (isMulti && Array.isArray(value) && value.length === 0))
     ) {
-      onChange(isMulti ? [options[0].value] : options[0].value);
+            onChange(isMulti ? [options[0].value] : options[0].value);
     }
-  }, [options, value, setFirstAsDefault, isMulti, onChange, dataFetched]);
+  }, [options, value, setFirstAsDefault, isMulti, onChange,dataFetched]);
 
   // Find the label(s) for the current value(s)
   const getSelectedLabels = () => {
     if (isMulti && Array.isArray(value)) {
       // For multi-select, return comma-separated labels
-      return value
-        .map((val) => {
-          const option = options.find((opt) => {
-            return opt.value == val && typeof opt.value == 'string';
-          });
-          
-          return option ? option.label : val;
-        })
-        .join(", ");
+      return value.map(val => {
+        const option = options.find(opt => opt.value == val);
+        return option ? option.label : val;
+      }).join(', ');
     } else {
       // For single select
       const singleValue = value as string;
-      const option = options.find((option) => option.value === singleValue);
+      const option = options.find((option) => option.value == singleValue);
 
       // If we have a proper label, use it
       if (option) {
@@ -138,8 +131,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
 
 
   return (
-    <div className="space-y-2">
-      {label && <Label className="mb-2 block">{label}</Label>}
+    <div>
       <Popover
         open={isDisabled ? false : open}
         onOpenChange={isDisabled ? undefined : setOpen}
@@ -154,24 +146,20 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               disabled={isDisabled}
               className={cn(
                 "w-full justify-between bg-sidebar whitespace-normal",
-                (!value ||
-                  (isMulti && Array.isArray(value) && value.length === 0)) &&
-                  "text-muted-foreground",
+                (!value || (isMulti && Array.isArray(value) && value.length === 0)) && "text-muted-foreground",
                 isDisabled && "opacity-50 cursor-not-allowed"
               )}
               onKeyDown={handleKeyDown}
             >
               <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
-                {value &&
-                (!isMulti || (Array.isArray(value) && value.length > 0))
+                {(value && (!isMulti || (Array.isArray(value) && value.length > 0)))
                   ? selectedLabel
                   : placeholder}
               </div>
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          {(value && !isMulti) ||
-          (isMulti && Array.isArray(value) && value.length > 0) ? (
+          {(value && !isMulti) || (isMulti && Array.isArray(value) && value.length > 0) ? (
             <Button
               variant="ghost"
               size="icon"
@@ -215,18 +203,12 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               onWheel={(e) => e.stopPropagation()}
               ref={listRef}
               className="max-h-[200px] overflow-auto"
-              onScroll={(event) => {
+              onScroll={(event)=> {
                 const target = event.target as HTMLElement;
                 let total = target.scrollTop + target.clientHeight;
-                let content = target.querySelector(
-                  `[id='inner-list']`
-                ) as HTMLElement | null;
-                if (
-                  hasMore &&
-                  !loading &&
-                  total + 65 >= (content?.clientHeight || 0)
-                ) {
-                  fetchOptions(true);
+                let content = target.querySelector(`[id='inner-list']`) as HTMLElement | null;
+                if (hasMore && !loading && total + 65 >= (content?.clientHeight || 0)) {
+                  fetchOptions(true)
                 }
               }}
             >
@@ -246,17 +228,17 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   </div>
                 )}
               </CommandEmpty>
-              <CommandGroup id={"inner-list"}>
-                {options.map((option, index) => (
+              <CommandGroup id={'inner-list'}>
+                {options.map((option) => (
                   <CommandItem
-                    key={`${option.value}-${index}`}
+                    key={option.value}
                     value={option.value}
                     onSelect={() => {
                       if (isMulti) {
                         // For multi-select, toggle the selected value
                         const currentValues = Array.isArray(value) ? value : [];
                         const newValues = currentValues.includes(option.value)
-                          ? currentValues.filter((v) => v !== option.value)
+                          ? currentValues.filter(v => v !== option.value)
                           : [...currentValues, option.value];
                         onChange(newValues);
                         // Don't close the dropdown for multi-select
@@ -275,7 +257,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                           ? Array.isArray(value) && value.includes(option.value)
                             ? "opacity-100"
                             : "opacity-0"
-                          : value === option.value
+                          : value == option.value
                           ? "opacity-100"
                           : "opacity-0"
                       )}

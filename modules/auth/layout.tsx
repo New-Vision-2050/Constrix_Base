@@ -33,7 +33,7 @@ export default function AuthLayout({
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
-        className="h-screen w-full fixed top-0 left-0 inset-0"
+        className="fixed inset-0 w-full h-full"
         particleColor={isLight ? "#18003A" : "#ffffff"}
       />
 

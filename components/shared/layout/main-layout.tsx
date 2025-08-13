@@ -11,6 +11,7 @@ import { useSidebarStore } from "@/store/useSidebarStore";
 
 export default function MainLayout({
   children,
+  isCentral,
   mainLogo,
   name,
 }: Readonly<{
@@ -27,12 +28,10 @@ export default function MainLayout({
 
   // handle side effects - clear side-menu when page reload
   useEffect(() => {
-    if (typeof window !== "undefined" && "performance" in window) {
-      const entry = performance.getEntriesByType(
-        "navigation"
-      )[0] as PerformanceNavigationTiming;
+    if (typeof window !== 'undefined' && 'performance' in window) {
+      const entry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
       const navType = entry?.type;
-
+  
       if (navType === "reload") {
         useSidebarStore.getState().clearMenu();
       }
@@ -47,11 +46,11 @@ export default function MainLayout({
         minSize={0.6}
         maxSize={1.4}
         particleDensity={100}
-        className="h-screen w-full fixed top-0 left-0 -z-20"
+        className="h-full w-full absolute -z-20"
         particleColor={isLight ? "#18003A" : "#ffffff"}
       />{" "}
       <SidebarProvider>
-        <AppSidebar name={name} mainLogo={mainLogo} />
+        <AppSidebar name={name} mainLogo={mainLogo} isCentral={isCentral} />
         <SidebarInset className="bg-transparent md:overflow-hidden">
           <Header />
           {children}

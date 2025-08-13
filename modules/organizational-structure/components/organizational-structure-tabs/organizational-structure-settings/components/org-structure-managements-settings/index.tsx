@@ -5,8 +5,6 @@ import { TableBuilder } from '@/modules/table';
 import { SheetFormBuilder } from '@/modules/form-builder';
 import { Button } from '@/components/ui/button';
 import { OrgStructureManagementsSettingsFormConfig } from './form-config';
-import Can from '@/lib/permissions/client/Can';
-import { PERMISSIONS } from '@/lib/permissions/permission-names';
 
 const OrgStructureManagementSetting = () => {
     const config = OrgStructureManagementsSettingsTableConfig();
@@ -27,13 +25,11 @@ const OrgStructureManagementSetting = () => {
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
-            <Can check={[PERMISSIONS.organization.management.create]}>
-              <SheetFormBuilder
-                config={OrgStructureManagementsSettingsFormConfig}
-                trigger={<Button>اضافة ادارة</Button>}
-                onSuccess={handleFormSuccess}
-              />
-            </Can>
+            <SheetFormBuilder
+              config={OrgStructureManagementsSettingsFormConfig}
+              trigger={<Button>اضافة ادارة</Button>}
+              onSuccess={handleFormSuccess}
+            /> 
           </div>
         }
       />

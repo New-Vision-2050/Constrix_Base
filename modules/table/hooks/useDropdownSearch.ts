@@ -287,14 +287,9 @@ export const useDropdownSearch = ({
 
       let url = dynamicConfig.url;
       const params = new URLSearchParams();
-      
-      const searchParamFinal = (typeof dynamicConfig.searchParam === 'string' && dynamicConfig.searchParam.trim() !== '')
-      ? dynamicConfig.searchParam
-      : dynamicConfig.labelField;
-
       // Add search parameter if configured and search term exists
-      if (searchParamFinal && debouncedSearchTerm) {
-        params.append(searchParamFinal, debouncedSearchTerm);
+      if (dynamicConfig.searchParam && debouncedSearchTerm) {
+        params.append(dynamicConfig.searchParam, debouncedSearchTerm);
       }
 
       // Handle dependency parameters

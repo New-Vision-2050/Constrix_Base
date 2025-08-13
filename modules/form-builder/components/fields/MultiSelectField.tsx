@@ -134,11 +134,8 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   const fetchOptions = async (searchTerm: string) => {
     if (!field.dynamicOptions) return;
 
-    const { url, valueField, labelField, dependsOn, filterParam } = field.dynamicOptions;
-    // Use searchParam if it exists and has a value, otherwise use valueField
-    const searchParamFinal = (typeof field.dynamicOptions.searchParam === 'string' && field.dynamicOptions.searchParam.trim() !== '')
-      ? field.dynamicOptions.searchParam
-      : labelField;
+    const { url, valueField, labelField, dependsOn, filterParam, searchParam } =
+      field.dynamicOptions;
 
     // Skip if we have a dependency but no value for it
     if (dependsOn) {
@@ -178,8 +175,8 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       const params = new URLSearchParams();
 
       // Add search parameter if provided
-      if (searchParamFinal && searchTerm) {
-        params.append(searchParamFinal, searchTerm);
+      if (searchParam && searchTerm) {
+        params.append(searchParam, searchTerm);
       }
 
       // Add dependency filter if configured

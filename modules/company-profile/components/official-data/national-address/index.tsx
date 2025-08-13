@@ -12,28 +12,26 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Skeleton } from "@/components/ui/skeleton";
-import withPermissions from "@/lib/permissions/client/withPermissions";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import Can from "@/lib/permissions/client/Can";
 
 const NationalAddress = ({
   id,
-  currentCompanyId,
+  currentCompanyId
 }: {
   id?: string;
-  currentCompanyId?: string;
+  currentCompanyId?: string
 }) => {
   const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-address", id, currentCompanyId],
     queryFn: async () => {
-      const response = await apiClient.get<
-        ServerSuccessResponse<CompanyAddress>
-      >("/companies/company-profile/company-address", {
-        params: {
-          ...(id && { branch_id: id }),
-          ...(currentCompanyId && { company_id: currentCompanyId }),
-        },
-      });
+      const response = await apiClient.get<ServerSuccessResponse<CompanyAddress>>(
+        "/companies/company-profile/company-address",
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(currentCompanyId && { company_id: currentCompanyId }),
+          },
+        }
+      );
 
       return response.data;
     },
@@ -67,15 +65,13 @@ const NationalAddress = ({
           title="العنوان الوطني"
           valid={!!companyAddress}
           secondTitle={
-            <Can check={[PERMISSIONS.companyProfile.address.update]}>
-              <Button variant={"ghost"} onClick={handleEditClick}>
-                {mode === "Preview" ? (
-                  <PencilLineIcon additionalClass="text-pink-600" />
-                ) : (
-                  <EyeIcon />
-                )}
-              </Button>
-            </Can>
+            <Button variant={"ghost"} onClick={handleEditClick}>
+              {mode === "Preview" ? (
+                <PencilLineIcon additionalClass="text-pink-600" />
+              ) : (
+                <EyeIcon />
+              )}
+            </Button>
           }
         >
           {mode === "Preview" ? (
@@ -89,9 +85,9 @@ const NationalAddress = ({
           ) : (
             <>
               {companyAddress ? (
-                <NationalAddressForm
-                  companyAddress={companyAddress}
-                  id={id}
+                <NationalAddressForm 
+                  companyAddress={companyAddress} 
+                  id={id} 
                   handleEditClick={handleEditClick}
                   currentCompanyId={currentCompanyId}
                 />

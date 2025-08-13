@@ -7,8 +7,6 @@ import { Dialog } from "@/components/ui/dialog";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { apiClient } from "@/config/axios-config";
 import { useToast } from "@/modules/table/hooks/use-toast";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const TheStatus = ({
   theStatus,
@@ -22,7 +20,6 @@ const TheStatus = ({
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
   const { toast } = useToast();
-  const {can} = usePermissions();
 
   const handleConfirm = async () => {
     try {
@@ -67,7 +64,6 @@ const TheStatus = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!can(PERMISSIONS.package.update)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

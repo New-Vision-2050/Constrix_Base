@@ -4,8 +4,6 @@ import { Qualification } from "@/modules/user-profile/types/qualification";
 import SingleQualificationData from "./SingleQualificationData";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
-import Can from "@/lib/permissions/client/Can";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = {
   items: Qualification[] | undefined;

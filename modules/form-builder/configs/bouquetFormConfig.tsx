@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: string): FormConfig {
   const params = useParams();
   const packageId = params && typeof params.id === 'string' ? params.id : '';
+  
     return {
       formId: "bouquet-form",
       title: "اضافة باقة",
@@ -55,7 +56,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
                         });
                     }}
                   >
-                    <option value="SAR" className="bg-white text-black dark:bg-gray-800 dark:text-white">
+                    <option value="USD" className="bg-white text-black dark:bg-gray-800 dark:text-white">
                     ر.س
                     </option>
                     <option value="EGP" className="bg-white text-black dark:bg-gray-800 dark:text-white">
@@ -84,9 +85,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
                 <div className="w-full h-full">
                   <select
                     className="rounded-lg p-2 bg-transparent border-0 outline-none"
-                    defaultValue={
-                      useFormStore.getState().getValues("bouquet-form")?.subscription_period_unit
-                    }
+                    defaultValue="month"
                     onChange={(e) => {
                       useFormStore
                         .getState()
@@ -117,7 +116,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
               label: "trial_period_unit",
               placeholder: "trial_period_unit",
               type: "hiddenObject",
-
+             
             },
             {
               name: "trial_period",
@@ -130,6 +129,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
                 <div className="w-full h-full">
                   <select
                     className="rounded-lg p-2 bg-transparent border-0 outline-none"
+                    defaultValue="month"
                     onChange={(e) => {
                       useFormStore
                         .getState()
@@ -157,10 +157,10 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
           
           {
             name: "company_fields",
-            label: "انشطة ظهور البرنامج",
+            label: "مجالات ظهور البرنامج",
             type: "select",
             isMulti: true,
-            placeholder: "اختر انشطة ظهور البرنامج",
+            placeholder: "اختر مجالات ظهور البرنامج",
             dynamicOptions: {
               url: `${baseURL}/company_fields?company_access_program_id=${packageId}`,
               valueField: "id",
@@ -203,17 +203,17 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
       showCancelButton: false,
       showBackButton: false,
       editDataTransformer: (data) => {
-          data.name=data.name,
-          data.price=data.price,
-          data.subscription_period=data.subscription_period,
-          data.subscription_period_unit=data.subscription_period_unit,
-          data.trial_period=data.trial_period,
-          data.trial_period_unit=data.trial_period_unit,
-          data.countries=data.countries?.map((item: any) => item.id),
-          data.company_fields = data.company_fields?.map((item: any) => item.id);
-          data.company_types = data.company_types?.map((item: any) => item.id);
-        return data;
-          },
+        return {
+          name: data.name,
+          price: data.price,
+          duration: data.duration,
+          category: data.category,
+          features_count: data.features_count,
+          description: data.description,
+          features: data.features,
+          status: data.status,
+        };
+      },
 
       // Example onSuccess handler
       onSuccess: (values, result) => {
@@ -248,7 +248,6 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
             company_types: formData.company_types as string[] 
           };
           return await defaultSubmitHandler(transformedData, formConfig);
-
         } catch (error) {
           console.error("Failed to create package:", error);
           return {
@@ -261,5 +260,6 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
         console.log("Bouquet form submission failed with values:", values);
         console.log("Error details:", error)
       },
+
     };
 }

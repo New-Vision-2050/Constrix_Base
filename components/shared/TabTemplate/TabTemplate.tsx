@@ -13,7 +13,6 @@ type PropsT = {
   settingsBtn?: {
     icon?: JSX.Element;
     items: DropdownItemT[];
-    disabledEdit?: boolean;
   };
 };
 

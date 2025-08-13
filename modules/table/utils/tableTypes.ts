@@ -46,7 +46,6 @@ export interface SearchTypeConfig {
   dropdownOptions?: DropdownOption[]; // Static options
   dynamicDropdown?: DynamicDropdownConfig; // Dynamic options from API
   isMulti?: boolean;
-  defaultValue?: string | string[] | Date | number; // Valor predeterminado para el campo
 }
 
 export interface ColumnSearchConfig {

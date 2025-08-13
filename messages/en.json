@@ -1,42 +1,4 @@
 {
-  "breadcrumbs": {
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "profile": "Profile",
-    "settings": "Settings",
-    "hr-settings": "HR Settings",
-    "attendance-determinants": "Attendance Determinants",
-    "attendance-departure": "Attendance & Departure",
-    "users": "Users",
-    "users/list": "Users List",
-    "users/permissions": "User Permissions",
-    "products": "Products",
-    "products/categories": "Product Categories",
-    "reports": "Reports",
-    "hr-settings/attendance-determinants": "Attendance Determinants Settings",
-    "hr-settings/attendance-determinants/create": "Create New Determinant",
-    "details": "Details",
-    "separator": "/",
-    "back": "Back",
-    "currentPage": "You are here"
-  },
-  "common": {
-    "itemsPerPage": "Items per page",
-    "selectItemsPerPage": "Select items per page"
-  },
-  "location": {
-    "longitude": "Longitude",
-    "latitude": "Latitude",
-    "radius": "Attendance Radius",
-    "meters": "meters",
-    "save": "Save",
-    "chooseLocationCoordinates": "Choose Location Coordinates",
-    "defaultBranchLocation": "Default Branch Location",
-    "selectBranch": "Select Branch",
-    "loading": "Loading...",
-    "selectBranchesFirst": "Select Branches First",
-    "selectBranchesInstructions": "You need to select branches from the form first to be able to set their locations"
-  },
   "Main": {
     "NoResultsRound": "No results found",
     "Loading": "Loading data..."
@@ -79,7 +41,7 @@
   },
   "ForgotPassword": {
     "Title": "Forgot Password",
-    "SetUpPassword": "Let's Set Up Your Password",
+    "SetUpPassword":"Let's Set Up Your Password",
     "EnterTemporaryPassword": "Enter the temporary password sent to your email",
     "Confirm": "Confirm",
     "BackToLogin": "Back to login"
@@ -189,10 +151,8 @@
     "DashboardSettings": "Dashboard",
     "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
-    "HRSettings": "Settings",
     "CompanyName": "New Vision",
     "OrganizationalStructure": "Organizational Structure",
-    "AttendanceDeparture": "Attendance and Departure",
     "HumanResources": "Human Resources",
     "ProgramManagement": "Program Management",
     "Powers": "Powers",
@@ -205,15 +165,6 @@
     "profile": "My account",
     "changeMail": "Change email",
     "changePassword": "Change password"
-  },
-  "attendanceDeparture": {
-    "status": {
-      "present": "Present",
-      "absent": "Absent",
-      "late": "Late",
-      "holiday": "On Leave",
-      "unspecified": "Unspecified"
-    }
   },
   "FormBuilder": {
     "Fields": {
@@ -416,32 +367,18 @@
         "organizational-structure-main-tab-1": {
           "title": "Organizational Structure",
           "tabs": {
-            "companyStructure": {
-              "title": "Company Structure"
-            },
-            "usersStructure": {
-              "title": "Employee Structure"
-            },
-            "managements": {
-              "title": "Departments"
-            }
+            "companyStructure": { "title": "Company Structure" },
+            "usersStructure": { "title": "Employee Structure" },
+            "managements": { "title": "Departments" }
           }
         },
         "organizational-structure-main-tab-2": {
           "title": "Structure Settings",
           "tabs": {
-            "jobTitles": {
-              "title": "Job Titles"
-            },
-            "jobTypes": {
-              "title": "Job Types"
-            },
-            "management": {
-              "title": "Management"
-            },
-            "departments": {
-              "title": "Departments"
-            }
+            "jobTitles": { "title": "Job Titles" },
+            "jobTypes": { "title": "Job Types" },
+            "management": { "title": "Management" },
+            "departments": { "title": "Departments" }
           }
         }
       }
@@ -483,362 +420,6 @@
     "submitButtonText": "Save",
     "cancelButtonText": "Cancel",
     "resetButtonText": "Clear Form"
-  },
-  "AttendanceDepartureModule": {
-    "WorkdayPeriods": {
-      "numberOfPeriods": "Number of periods:",
-      "workingHours": "Working hours:"
-    },
-    "shared": {
-      "EmployeeInfoSection": {
-        "branch": "Branch",
-        "jobId": "Job ID",
-        "department": "Department",
-        "approver": "Approver",
-        "clickToViewApproverDetails": "Click to view approver details",
-        "attendanceStatus": "Attendance Status",
-        "unspecified": "Not specified",
-        "status": {
-          "present": "Present",
-          "late": "Late",
-          "absent": "Absent"
-        }
-      }
-    },
-    "AttendanceDateSelector": {
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "search": "Search",
-      "clearFilters": "Clear Filters"
-    },
-    "EmployeeDetailsSheet": {
-      "fields": {
-        "employeeName": "Employee Name",
-        "phone": "Mobile Number",
-        "management": "Management",
-        "department": "Department",
-        "email": "Email",
-        "branch": "Branch"
-      },
-      "personalInfo": {
-        "gender": "Gender",
-        "birthDate": "Birth Date",
-        "nationality": "Nationality"
-      },
-      "status": {
-        "attendanceStatus": "Attendance Status",
-        "employeeStatus": "Employee Status"
-      },
-      "times": {
-        "checkIn": "Check-in",
-        "checkOut": "Check-out",
-        "morning": "AM",
-        "afternoon": "PM",
-        "from": "From",
-        "to": "To"
-      }
-    },
-    "Map": {
-      "errorLoading": "Error loading data",
-      "retry": "Retry",
-      "noAttendanceData": "No attendance has been recorded by any employee yet",
-      "employeeStatus": {
-        "present": "Present",
-        "absent": "Absent",
-        "late": "Late",
-        "holiday": "On Leave",
-        "unspecified": "Unspecified",
-        "active": "Active",
-        "inactive": "Inactive"
-      },
-      "employeeDetails": {
-        "unspecified": "Unspecified",
-        "attendanceHistory": "Attendance History",
-        "present": "Present",
-        "absent": "Absent",
-        "late": "Late",
-        "hours": "hrs",
-        "checkIn": "Check-in",
-        "checkOut": "Check-out",
-        "noAttendanceRecords": "No attendance records found",
-        "errorLoadingHistory": "Error loading attendance history",
-        "scheduledHours": "Scheduled Hours",
-        "totalActualHours": "Total actual hours",
-        "totalDeductedTime": "Total deducted time"
-      },
-      "layers": {
-        "standard": "Standard Map",
-        "satellite": "Satellite Map",
-        "hybrid": "Hybrid"
-      },
-      "loading": "Loading employee data...",
-      "tooltip": {
-        "employee": "Employee:",
-        "branch": "Branch:",
-        "department": "Department:",
-        "lastSeen": "Last Seen:",
-        "clockIn": "Clock In:",
-        "phone": "Phone"
-      }
-    },
-    "MapSearchFilter": {
-      "searchPlaceholder": "Search",
-      "tableView": "Table",
-      "export": "Export",
-      "refresh": "Refresh"
-    },
-    "SearchFilter": {
-      "title": "Search Filter",
-      "branch": "Branch",
-      "all": "All",
-      "loadingBranches": "Loading branches...",
-      "loadingDepartments": "Loading managements...",
-      "department": "Department",
-      "approver": "Approver",
-      "loadingApprovers": "Loading approvers...",
-      "searchPlaceholder": "Name/Email"
-    },
-    "StatisticsCards": {
-      "totalAttendance": "Total Attendance",
-      "totalAbsence": "Total Absences",
-      "totalDepartures": "Total Departures",
-      "totalHolidays": "Total Holiday Days"
-    },
-    "Table": {
-      "mapView": "Map View",
-      "columns": {
-        "name": "Name",
-        "date": "Date",
-        "jobCode": "Job ID",
-        "branch": "Branch",
-        "management": "Department",
-        "approver": "Approved By",
-        "employeeStatus": "Employee Status",
-        "attendanceStatus": "Attendance Status"
-      },
-      "filters": {
-        "searchPlaceholder": "Search",
-        "branchPlaceholder": "Branch",
-        "managementPlaceholder": "Department",
-        "constraintPlaceholder": "Constraint",
-        "searchText": "Search Text",
-        "searchEmployee": "Employee",
-        "employeeSearchPlaceholder": "Search employee...",
-        "branch": "Branch",
-        "management": "Management",
-        "constraint": "Constraint",
-        "startDate": "Start Date",
-        "endDate": "End Date"
-      },
-      "deleteConfirm": "Confirm deletion of attendance record",
-      "status": {
-        "onTime": "On Time",
-        "late": "Late"
-      },
-      "dialogs": {
-        "approver": {
-          "title": "Attendance Status",
-          "approverName": "Approver Name",
-          "approverSystem": "Approver System",
-          "unspecified": "Not specified",
-          "period": "Period",
-          "noWeeklySchedule": "No weekly schedule available",
-          "workHours": "Working hours:",
-          "DateOfAttendance": "Date of Attendance",
-          "DateOfDeparture": "Date of Departure",
-          "from": "From",
-          "to": "To",
-          "loading": "Loading attendance data...",
-          "noRecords": "No Attendance Records",
-          "noRecordsMessage": "There are no attendance records for this employee on the selected date.",
-          "summary": "Attendance Summary",
-          "totalAttendance": "Total Attendance Hours",
-          "totalDelay": "Total Delay Hours",
-          "totalDeparture": "Total Departure Hours",
-          "attendance": "Attendance",
-          "departure": "Departure",
-          "days": {
-            "sunday": "Sunday",
-            "monday": "Monday",
-            "tuesday": "Tuesday",
-            "wednesday": "Wednesday",
-            "thursday": "Thursday",
-            "friday": "Friday",
-            "saturday": "Saturday"
-          }
-        },
-        "attendanceStatus": {
-          "title": "Attendance Approver Details",
-          "attendance": "Check-in",
-          "departure": "Check-out",
-          "period": "Period",
-          "todaySchedule": "Today's Schedule",
-          "actualRecords": "Actual Records",
-          "actualHours": "Actual Hours Worked",
-          "deductedHours": "Deducted Hours"
-        }
-      }
-    }
-  },
-  "hr-settings": {
-    "tabs": {
-      "attendance": "Attendance & Departure",
-      "recruitment": "Recruitment",
-      "service": "Service",
-      "contractManagement": "Contract Management"
-    },
-    "statistics": {
-      "totalAttendance": "Total Attendance",
-      "totalDeparture": "Total Departures",
-      "totalAbsence": "Total Absences",
-      "vacations": "Vacations",
-      "loading": "Loading statistics...",
-      "error": "Error loading statistics"
-    }
-  },
-  "HRSettingsAttendanceDepartureModule": {
-    "tabs": {
-      "attendance": "Attendance",
-      "departure": "Departure",
-      "leaves": "Leaves",
-      "vacations": "Official Holidays"
-    },
-    "attendanceDeterminants": {
-      "noScheduledDays": "No scheduled days",
-      "selectDayFirst": "Please select a day first",
-      "periodEndRequired": "Period end time is required",
-      "periods": "Periods",
-      "title": "Attendance Determinants",
-      "createDeterminant": "Create New Determinant",
-      "allDeterminants": "All Determinants",
-      "branchDeterminant": "Branch Determinant",
-      "workHours": "Work Hours",
-      "hours": "hours",
-      "systemNotFound": "System not found",
-      "notes": "Notes",
-      "submitButtonText": "Save Determinant",
-      "cancelButtonText": "Cancel",
-      "form": {
-        "AttendanceDaysDialog": {
-          "periods": "Periods",
-          "timePeriodLabel": "Time Period",
-          "startTimeLabel": "Start Time",
-          "earlyPeriodLabel": "Early Period",
-          "latenessPeriodLabel": "Lateness Period",
-          "endTimeLabel": "End Time",
-          "durationLabel": "Duration",
-          "extendsToNextDay": "Extends to next day",
-          "extendsToNextDayWarning": "Please note that extends to next day is checked and end time may be less than start time without any validation",
-          "noPeriods": "No time periods found. Please click 'Add Period' to create a new period.",
-          "hours": "Hours",
-          "timeValidationError": "Time validation error",
-          "timeFormatError": "Must enter valid time in format hours:minutes like 09:00",
-          "periodEndMustBeAfterStart": "End time must be after start time",
-          "startTimeBeforeEndTime": "Start time must be before end time",
-          "addPeriod": "Add Period",
-          "editPeriods": "Edit Periods",
-          "selectDayFirst": "Select day first",
-          "deletePeriod": "Delete Period",
-          "periodStartPlaceholder": "09:00",
-          "periodEndPlaceholder": "17:00",
-          "periodStartRequired": "Period start time is required",
-          "periodEndRequired": "Period end time is required"
-        },
-        "addAttendanceDays": "Add Attendance Days",
-        "editAttendanceDay": "Edit Attendance Day",
-        "title": "Add New Determinant",
-        "editTitle": "Edit Determinant",
-        "basicInfo": "Basic Information",
-        "determinantName": "Determinant Name",
-        "determinantNamePlaceholder": "Cairo Branch",
-        "determinantNameRequired": "Determinant name is required",
-        "determinantNamePattern": "Determinant name must contain only letters and numbers",
-        "systemType": "System Type",
-        "systemTypePlaceholder": "Regular",
-        "systemTypeRequired": "System type is required",
-        "branches": "Branches",
-        "branchesRequired": "At least one branch must be selected",
-        "locationType": "Location Type",
-        "mainLocation": "Default branch location",
-        "customLocation": "Custom location for each branch",
-        "openMap": "Open Map",
-        "workingHours": "Working Hours",
-        "workingDays": "Working Days",
-        "periodStart": "Period Start",
-        "periodEnd": "Period End",
-        "newDay": "Next Day",
-        "periodStartPlaceholder": "09:00",
-        "periodEndPlaceholder": "17:00",
-        "periodStartRequired": "Period start time is required",
-        "periodEndRequired": "Period end time is required",
-        "timeFormatError": "Must enter valid time in format hours:minutes like 09:00",
-        "periodEndMustBeAfterStart": "End time must be after start time",
-        "startTimeBeforeEndTime": "Start time must be before end time",
-        "addPeriod": "Add Period",
-        "editPeriods": "Edit Periods",
-        "deletePeriod": "Delete Period",
-        "submitButtonText": "Save Determinant",
-        "cancelButtonText": "Cancel",
-        "nextButtonText": "Next",
-        "prevButtonText": "Previous"
-      },
-      "determinantsList": {
-        "allDeterminants": "All Determinants"
-      },
-      "error": {
-        "loading": "Error in loading determinants",
-        "tryAgain": "Please try again later"
-      },
-      "status": {
-        "active": "Active",
-        "inactive": "Inactive"
-      }
-    },
-    "attendanceDeterminantDetails": {
-      "determinantType": "Determinant System Type",
-      "systemNotFound": "System not found",
-      "workHours": "Working Hours",
-      "hours": "hours",
-      "workdays": "Working Days",
-      "branches": "Branches",
-      "notes": "Notes"
-    }
-  },
-  "RoleTypes": {
-    "all": "Grant all permissions",
-    "update": "Update",
-    "import": "Import",
-    "export": "Export",
-    "list": "List",
-    "create": "Create",
-    "delete": "Delete",
-    "view": "View",
-    "activate": "Activate"
-  },
-  "CreateRole": {
-    "title": "Create Role",
-    "editTitle": "Edit Role",
-    "roleName": "Role Name",
-    "roleNamePlaceholder": "Enter role name",
-    "roleNameRequired": "Role name is required",
-    "roleNameMinLength": "Role name must be at least 3 characters",
-    "permissions": "Permissions",
-    "selectAll": "Select All",
-    "deselectAll": "Deselect All",
-    "permissionsRequired": "At least one permission must be selected",
-    "loading": "Loading...",
-    "creating": "Creating...",
-    "updating": "Updating...",
-    "createRole": "Create Role",
-    "updateRole": "Update Role",
-    "reset": "Reset",
-    "selectedCount": "selected",
-    "roleCreatedSuccessfully": "Role created successfully",
-    "roleUpdatedSuccessfully": "Role updated successfully",
-    "errorCreatingRole": "Error creating role",
-    "errorUpdatingRole": "Error updating role",
-    "errorLoadingRole": "Error loading role data",
-    "roleNotFound": "Role not found"
   },
   "Programs": {
     "AreYouSureReactivate": "Are you sure you want to reactivate this program?",

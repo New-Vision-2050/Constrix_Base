@@ -6,8 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import TheStatus from "@/modules/bouquet/components/the-status";
 import { GetBouquetFormConfig } from "@/modules/form-builder/configs/bouquetFormConfig";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Define types for the bouquet data
 interface BouquetData {
@@ -44,8 +42,6 @@ export const bouquetConfig = () => {
   const router = useRouter();
   const params = useParams();
   const id = params?.id 
-  const {can} = usePermissions();
-  
   return {
     url: `${baseURL}/packages?company_access_program_id=${id}`,
     tableId: "bouquets-table",
@@ -56,8 +52,8 @@ export const bouquetConfig = () => {
         searchable: true,
         render: (_: unknown, row: BouquetTableRow) => (
           <div 
-            className={can(PERMISSIONS.package.view) ? "flex gap-3 border-e-2 cursor-pointer" : "flex gap-3 border-e-2"}
-            onClick={() => can(PERMISSIONS.package.view) && router.push(`/bouquetDetails/${row.id}`)}
+            className="flex gap-3 border-e-2 cursor-pointer"
+            onClick={() => router.push(`/bouquetDetails/${row.id}`)}
           >
             <div>
               <p className="font-medium">{row.name}</p>
@@ -90,11 +86,7 @@ export const bouquetConfig = () => {
         key: "company_fields",
         label: "مجالات الباقة",
         render: (_: unknown, row: BouquetTableRow) => (
-          <p className="font-medium">
-            {row.company_fields.length > 3
-              ? row.company_fields.slice(0, 3).map((field) => field.name).join(", ") + "..."
-              : row.company_fields.map((field) => field.name).join(", ")}
-          </p>
+          <p className="font-medium">{row.company_fields.map((field) => field.name).join(", ")}</p>
         ),
       },
       {
@@ -152,7 +144,6 @@ export const bouquetConfig = () => {
         defaultItemsPerPage: 5,
         enableSearch: true,
         enableColumnSearch: true,
-        enableExport: can(PERMISSIONS.package.export),
         searchFields: ["name", "company_field_id", "status"],
         searchParamName: "name",
         searchFieldParamName: "fields",
@@ -160,8 +151,8 @@ export const bouquetConfig = () => {
         formConfig: GetBouquetFormConfig(t, undefined),
         executions:[],
         executionConfig: {
-          canEdit: can(PERMISSIONS.package.update),
-          canDelete: can(PERMISSIONS.package.delete),
+          canEdit: true,
+          canDelete: true,
     },
   };
 };

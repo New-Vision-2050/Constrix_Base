@@ -9,19 +9,13 @@ import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Branch } from "../../types/company";
 import { apiClient } from "@/config/axios-config";
 import { useParams } from "next/navigation";
-import Can from "@/lib/permissions/client/Can";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Tab } from "@/types/Tab";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 const Branches = () => {
   const { company_id } = useParams();
 
-  const { can } = usePermissions();
-
   const locale = useLocale();
   const isRtl = locale === "ar";
-  const { data, isPending, isSuccess } = useQuery({
+    const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-branches", company_id],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<Branch[]>>(
@@ -38,35 +32,24 @@ const Branches = () => {
   });
   const branches = data?.payload ?? [];
 
-  const dynamicBranchTabs =
-    branches.length > 0
-      ? branches.map((branch) => ({
-          label: branch.name,
-          value: branch.id,
-          component: <OfficialData id={branch.id} />,
-          disabled: !can([PERMISSIONS.companyProfile.branch.view]),
-          show: true,
-        }))
-      : [];
-
-  const tabs: (Tab & { show: boolean; disabled: boolean })[] = [
-    {
-      label: "معلومات الفروع",
-      value: "general",
-      component: (
-        <Can check={[PERMISSIONS.companyProfile.branch.list]}>
-          <BranchesInfo branches={branches} />
-        </Can>
-      ),
-      show: can([PERMISSIONS.companyProfile.branch.list]),
-      disabled: false,
-    },
-    ...dynamicBranchTabs,
-  ];
-
-  const filteredTabs = tabs
-    .filter((tab) => tab.show)
-    .map(({ show, ...rest }) => rest);
+  const tabs = () => {
+    const dynamicBranchTabs =
+      branches.length > 0
+        ? branches.map((branch) => ({
+            label: branch.name,
+            value: branch.id,
+            component: <OfficialData id={branch.id} />,
+          }))
+        : [];
+    return [
+      {
+        label: "معلومات الفروع",
+        value: "general",
+        component: <BranchesInfo branches={branches} />,
+      },
+      ...dynamicBranchTabs,
+    ];
+  };
 
   return (
     <div>
@@ -79,13 +62,12 @@ const Branches = () => {
           className="flex flex-col bg-sidebar p-2 w-36 h-full gap-4 rounded-lg justify-start"
           dir={isRtl ? "rtl" : "ltr"}
         >
-          {filteredTabs.map((tab) => (
+          {tabs().map((tab) => (
             <TabsTrigger
               key={tab.value}
               className="flex items-start justify-between w-full px-2 py-4 rounded-md data-[state=active]:bg-sidebar gap-2 whitespace-normal"
               value={tab.value}
               title={tab.label}
-              disabled={tab.disabled}
             >
               <div className="flex text-sm items-start text-start gap-2 grow">
                 <MapPin size={18} className="shrink-0" />
@@ -101,7 +83,7 @@ const Branches = () => {
           ))}
         </TabsList>
         <div className="flex-1">
-          {filteredTabs.map((tab) => (
+          {tabs().map((tab) => (
             <TabsContent
               key={tab.value}
               value={tab.value}

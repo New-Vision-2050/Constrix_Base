@@ -17,7 +17,6 @@ export interface TableConfig {
   enablePagination?: boolean;
   enableSearch?: boolean;
   enableRowSelection?: boolean; // Row selection is enabled by default, set to false to disable
-  enableExport?: boolean;
   dataMapper?: (data: any) => any[];
   // Search configuration options
   searchFields?: string[];

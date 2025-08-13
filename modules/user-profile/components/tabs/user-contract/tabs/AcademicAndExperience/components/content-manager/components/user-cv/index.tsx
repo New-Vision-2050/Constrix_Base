@@ -6,8 +6,6 @@ import UploadCvDialog from "./UploadCvDialog";
 import { useState } from "react";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
-import Can from "@/lib/permissions/client/Can";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function UserCV() {
   const [open, setOpen] = useState(false);
@@ -21,23 +19,19 @@ export default function UserCV() {
       <FormFieldSet
         title={"السيرة الذاتية"}
         secondTitle={
-          <Can check={[PERMISSIONS.profile.cv.update]}>
-            <Button variant={"ghost"} onClick={() => setOpen(true)}>
-              <PencilLineIcon additionalClass="text-pink-600" />
-            </Button>
-          </Can>
+          <Button variant={"ghost"} onClick={() => setOpen(true)}>
+            <PencilLineIcon additionalClass="text-pink-600" />
+          </Button>
         }
       >
-        <Can check={[PERMISSIONS.profile.cv.view]}>
-          {userCV?.files ? (
-            <PdfViewer src={userCV?.files?.url ?? ""} />
-          ) : (
-            <NoDataFounded
-              title="لا يوجد بيانات"
-              subTitle="لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية"
-            />
-          )}
-        </Can>
+        {userCV?.files ? (
+          <PdfViewer src={userCV?.files?.url ?? ""} />
+        ) : (
+          <NoDataFounded
+            title="لا يوجد بيانات"
+            subTitle="لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية"
+          />
+        )}
       </FormFieldSet>
       <UploadCvDialog open={open} setOpen={setOpen} />
     </div>

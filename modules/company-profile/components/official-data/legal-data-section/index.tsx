@@ -21,36 +21,35 @@ import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
-import { Skeleton } from "@/components/ui/skeleton";
-import withPermissions from "@/lib/permissions/client/withPermissions";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { Skeleton } from '@/components/ui/skeleton';
 
 const LegalDataSection = ({
   currentCompanyId,
   id,
 }: {
-  currentCompanyId: string;
+  currentCompanyId:string,
   id?: string;
 }) => {
-  const { can } = usePermissions();
-  const { data, isPending, isSuccess } = useQuery({
+
+    const { data, isPending, isSuccess } = useQuery({
     queryKey: ["company-legal-data", id, currentCompanyId],
     queryFn: async () => {
-      const response = await apiClient.get<
-        ServerSuccessResponse<CompanyLegalData[]>
-      >("/companies/company-profile/company-legal-data", {
-        params: {
-          ...(id && { branch_id: id }),
-          ...(currentCompanyId && { company_id: currentCompanyId }),
-        },
-      });
+      const response = await apiClient.get<ServerSuccessResponse<CompanyLegalData[]>>(
+        "/companies/company-profile/company-legal-data",
+        {
+          params: {
+            ...(id && { branch_id: id }),
+            ...(currentCompanyId && { company_id:currentCompanyId }),
+          },
+        }
+      );
 
       return response.data;
     },
   });
 
   const companyLegalData = data?.payload ?? [];
+
 
   const local = useLocale();
   const isRTL = local === "ar";
@@ -63,6 +62,22 @@ const LegalDataSection = ({
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
 
+  const dropdownItems = [
+    {
+      label: "طلباتي",
+      onClick: handleOpenMyReq,
+    },
+    {
+      label: "طلب تعديل البيانات القانونية",
+      onClick: handleOpenReqForm,
+    },
+    {
+      label: "اضافة بيان قانوني",
+      onClick: handleOpenMyForm,
+    },
+  ];
+
+
   return (
     <>
       {isPending && (
@@ -73,61 +88,37 @@ const LegalDataSection = ({
         </div>
       )}
 
-      {isSuccess && (
-        <FormFieldSet
-          title="البيانات القانونية"
-          valid={
-            !!companyLegalData &&
-            companyLegalData.length > 0 &&
-            companyLegalData.every((entry) =>
-              Object.values(entry).every((value) => !!value)
-            )
-          }
-          secondTitle={
-            <FieldSetSecondTitle
-              mode={"Preview"}
-              handleEditClick={handleEditClick}
-              settingsBtn={{
-                items: [
-                  {
-                    title: "طلباتي",
-                    onClick: handleOpenMyReq,
-                  },
-                  {
-                    title: "طلب تعديل البيانات القانونية",
-                    onClick: handleOpenReqForm,
-                  },
-                  {
-                    title: "اضافة بيان قانوني",
-                    onClick: handleOpenMyForm,
-                  },
-                ],
-                disabledEdit: !can([
-                  PERMISSIONS.companyProfile.legalData.update,
-                ]),
-              }}
-            />
-          }
-        >
-          {!!companyLegalData && companyLegalData.length > 0 ? (
-            <>
-              {mode === "Preview" ? (
-                <LegalDataPreview companyLegalData={companyLegalData} />
-              ) : (
-                <LegalDataForm
-                  companyLegalData={companyLegalData}
-                  id={id}
-                  handleEditClick={handleEditClick}
-                />
-              )}
-            </>
-          ) : (
-            <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
-              <InfoIcon additionClass="text-orange-500 " />
-              <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
-            </div>
-          )}
-        </FormFieldSet>
+      {isSuccess &&  (
+      <FormFieldSet
+        title="البيانات القانونية"
+        valid={
+          !!companyLegalData &&
+          companyLegalData.length > 0 &&
+          companyLegalData.every((entry) =>
+            Object.values(entry).every((value) => !!value)
+          )
+        }
+        secondTitle={
+          <FieldSetSecondTitle
+            mode={"Preview"}
+            handleEditClick={handleEditClick}
+            dropdownItems={dropdownItems}
+          />
+        }
+      >
+        {!!companyLegalData && companyLegalData.length > 0 ? <>
+        {mode === "Preview" ? (
+          <LegalDataPreview companyLegalData={companyLegalData} />
+        ) : (
+          <LegalDataForm companyLegalData={companyLegalData} id={id} handleEditClick={handleEditClick} />
+        )}
+        </> :    
+        <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
+          <InfoIcon additionClass="text-orange-500 " />
+          <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
+        </div>
+        }
+      </FormFieldSet>
       )}
 
       <Sheet open={isOpenMyReq} onOpenChange={handleCloseMyReq}>
@@ -138,32 +129,24 @@ const LegalDataSection = ({
           <SheetHeader>
             <SheetTitle>طلباتي</SheetTitle>
           </SheetHeader>
-          <MyRequests
-            type="companyLegalDataUpdate"
-            company_id={currentCompanyId}
-            branch_id={id}
-          />
+          <MyRequests type="companyLegalDataUpdate" company_id={currentCompanyId} branch_id={id}  />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
             الرجوع
           </Button>
         </SheetContent>
       </Sheet>
 
-      <SheetFormBuilder
-        config={LegalDataReqFormEditConfig({
-          companyLegalData,
-          company_id: currentCompanyId,
-          id,
-        })}
-        isOpen={isOpenReqForm}
-        onOpenChange={handleCloseReqForm}
-      />
+        <SheetFormBuilder
+          config={LegalDataReqFormEditConfig({companyLegalData, company_id:currentCompanyId,id})}
+          isOpen={isOpenReqForm}
+          onOpenChange={handleCloseReqForm}
+        />
 
-      <SheetFormBuilder
-        config={LegalDataAddReqFormEditConfig(id, currentCompanyId)}
-        isOpen={isOpenMyForm}
-        onOpenChange={handleCloseMyForm}
-      />
+        <SheetFormBuilder
+          config={LegalDataAddReqFormEditConfig(id ,currentCompanyId)}
+          isOpen={isOpenMyForm}
+          onOpenChange={handleCloseMyForm}
+        />
     </>
   );
 };
