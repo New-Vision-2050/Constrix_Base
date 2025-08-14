@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { baseURL } from "@/config/axios-config";
 import { useModal } from "@/hooks/use-modal";
 import Can from "@/lib/permissions/client/Can";
-import withPermissions from "@/lib/permissions/client/withPermissions";
+import { withPermissionsPage } from "@/lib/permissions/client/withPermissionsPage";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
 import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
@@ -77,4 +77,6 @@ const RolesPages = () => {
   );
 };
 
-export default withPermissions(RolesPages, [PERMISSIONS.role.list]);
+export default withPermissionsPage(RolesPages, [
+  Object.values(PERMISSIONS.role),
+]);

@@ -8,7 +8,7 @@ import { statisticsConfig } from "@/modules/users/components/statistics-config";
 import React from "react";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import { useTranslations } from "next-intl";
-import withPermissions from "@/lib/permissions/client/withPermissions";
+import { withPermissionsPage } from "@/lib/permissions/client/withPermissionsPage";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
 
@@ -18,24 +18,26 @@ const UsersPage = () => {
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />{" "}
-        <TableBuilder
-          config={config}
-          searchBarActions={
-            <div className="flex items-center gap-3">
-              <Can check={[PERMISSIONS.user.create]}>
-                <SheetFormBuilder
-                  config={GetCompanyUserFormConfig(t)}
-                  trigger={<Button>إنشاء مستخدم</Button>}
-                  onSuccess={(values) => {
-                    console.log("Form submitted successfully:", values);
-                  }}
-                />
-              </Can>
-            </div>
-          }
-        />
+      <TableBuilder
+        config={config}
+        searchBarActions={
+          <div className="flex items-center gap-3">
+            <Can check={[PERMISSIONS.user.create]}>
+              <SheetFormBuilder
+                config={GetCompanyUserFormConfig(t)}
+                trigger={<Button>إنشاء مستخدم</Button>}
+                onSuccess={(values) => {
+                  console.log("Form submitted successfully:", values);
+                }}
+              />
+            </Can>
+          </div>
+        }
+      />
     </div>
   );
 };
 
-export default withPermissions(UsersPage, [PERMISSIONS.user.list]);
+export default withPermissionsPage(UsersPage, [
+  Object.values(PERMISSIONS.user),
+]);
