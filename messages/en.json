@@ -114,6 +114,12 @@
       "UserNotFound": "This user is invalid",
       "GenericError": "An error occurred"
     },
+    "Authorization": {
+      "Title": "Access Denied",
+      "Message": "You don't have permission to access this page",
+      "GoBack": "Go Back",
+      "GoHome": "Go to Home"
+    },
     "Back": "Back"
   },
   "Validation": {

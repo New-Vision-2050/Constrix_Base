@@ -114,6 +114,12 @@
       "UserNotFound": "هذا المستخدم غير صحيح",
       "GenericError": "حدث خطأ"
     },
+    "Authorization": {
+      "Title": "تم رفض الوصول",
+      "Message": "ليس لديك صلاحية للوصول إلى هذه الصفحة",
+      "GoBack": "العودة",
+      "GoHome": "الذهاب إلى الرئيسية"
+    },
     "Back": "رجوع"
   },
   "Validation": {
