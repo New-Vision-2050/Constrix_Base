@@ -172,12 +172,12 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show:
               !isCentralCompany &&
               can([
-                PERMISSIONS.organization.branch.list,
-                PERMISSIONS.organization.department.list,
+                PERMISSIONS.organization.branch.view,
+                PERMISSIONS.organization.department.view,
                 PERMISSIONS.organization.jobTitle.list,
                 PERMISSIONS.organization.jobType.list,
-                PERMISSIONS.organization.management.list,
-                PERMISSIONS.organization.users.list,
+                PERMISSIONS.organization.management.view,
+                PERMISSIONS.organization.users.view,
               ]),
           },
           {
@@ -226,11 +226,14 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.USER_PROFILE,
             icon: UserIcon,
             isActive: pageName === ROUTER.USER_PROFILE,
-            show: can(
-              Object.values(PERMISSIONS.userProfile).flatMap((p) =>
+            show: can([
+              ...Object.values(PERMISSIONS.userProfile).flatMap((p) =>
                 Object.values(p)
-              )
-            ),
+              ),
+              ...Object.values(PERMISSIONS.profile).flatMap((p) =>
+                Object.values(p)
+              ),
+            ]),
           },
           {
             name: "اعداد ملف الشركة",
