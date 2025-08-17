@@ -7,7 +7,7 @@ import Can from "@/lib/permissions/client/Can";
 import { withPermissionsPage } from "@/lib/permissions/client/withPermissionsPage";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import UpdateRoleDrawer from "@/modules/roles/components/create-role/update-drawer";
-import { rolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
+import { useRolesTableConfig } from "@/modules/roles/config/RolesTableConfig";
 import { TableBuilder, useTableReload } from "@/modules/table";
 import ArrowStaticIcon from "@/public/icons/arrow-static";
 import ChartStaticIcon from "@/public/icons/chart-static";
@@ -51,7 +51,7 @@ const RolesPages = () => {
     reloadTable(); // Reload the table data
   }, [handleCloseRolesSheet, reloadTable]);
 
-  const config = rolesTableConfig({ handleOpenRolesSheet });
+  const config = useRolesTableConfig({ handleOpenRolesSheet });
 
   return (
     <div className="px-8 space-y-7">
