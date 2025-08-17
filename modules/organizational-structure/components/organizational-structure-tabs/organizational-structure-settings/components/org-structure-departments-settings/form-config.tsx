@@ -4,7 +4,7 @@ import { baseURL } from "@/config/axios-config";
 export const OrgStructureDepartmentsSettingsFormConfig: FormConfig = {
   formId: "OrgStructureDepartmentsSettingsFormConfig",
   title: "اضافة قسم",
-  apiUrl: `${baseURL}/management_hierarchies/create-department-with-relations`,
+  apiUrl: `${baseURL}/management_hierarchies/department-with-relations`,
   laravelValidation: {
     enabled: true,
     errorsPath: "errors",
