@@ -110,4 +110,11 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
   showSubmitLoader: true,
   resetOnSuccess: true,
   showCancelButton: false,
+  editDataTransformer: (data) => {
+    console.log("editDataTransformerManagement", data);
+    data.job_types = data.job_types?.map((item: any) => item.id);
+    data.job_titles = data.job_titles?.map((item: any) => item.id);
+    data.branches = data.branches?.map((item: any) => item.id);
+    return data;
+  },
 };
