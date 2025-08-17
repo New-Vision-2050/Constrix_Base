@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/modules/table/hooks/use-toast";
-import { useApiClient } from "@/utils/apiClient";
+import { baseApi } from "@/config/axios/instances/base";
 import { AxiosError } from "axios";
 
 interface ExportButtonProps {
@@ -35,7 +35,6 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   const t = useTranslations();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const apiClient = useApiClient();
 
   // Get the selected row IDs
   const selectedIds = Object.keys(selectedRows).filter(
@@ -58,7 +57,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({
       setLoading(true);
 
       // Make the API call with the selected row IDs and search parameters
-      const response = await apiClient.post(
+      const response = await baseApi.post(
         exportUrl,
         {
           ids: selectedIds,
