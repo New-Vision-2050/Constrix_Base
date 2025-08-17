@@ -86,7 +86,7 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
           },
         },
         {
-          name: "related_branches",
+          name: "branches",
           label: "الفروع",
           type: "select",
           isMulti: true,
@@ -111,10 +111,15 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
   resetOnSuccess: true,
   showCancelButton: false,
   editDataTransformer: (data) => {
-    data.job_types = data.job_types?.map((item: any) => item.id);
-    data.job_titles = data.job_titles?.map((item: any) => item.id);
-    data.related_branches = data.related_branches?.map((item: any) => item.id);
-    console.log("job_types", data.job_types);
-    return data;
+    console.log("editDataTransformerManagement", data);
+
+    return {
+      id: data.id,
+      name: data.name,
+      job_types: data.job_types?.map((item: any) => item.id),
+      job_titles: data.job_titles?.map((item: any) => item.id),
+      branches: data.related_branches?.map((item: any) => item.id),
+      parent_id: data.parent?.id,
+    };
   },
 };
