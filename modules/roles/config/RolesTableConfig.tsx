@@ -4,7 +4,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Edit } from "lucide-react";
 
-export const rolesTableConfig = ({
+export const useRolesTableConfig = ({
   handleOpenRolesSheet,
 }: {
   handleOpenRolesSheet: ({
@@ -128,7 +128,7 @@ export const rolesTableConfig = ({
         icon: <Edit className="w-4 h-4" />,
         action: (row: { id: string }) =>
           handleOpenRolesSheet({
-            isEdit: usePermissions().can(PERMISSIONS.role.update),
+            isEdit: can(PERMISSIONS.role.update),
             selectedId: row.id,
           }),
         disabled: can(PERMISSIONS.role.update),

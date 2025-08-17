@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import {
   SearchConfig,
   ColumnSearchState,
@@ -11,9 +10,8 @@ import {
 import {
   buildRequestUrl,
   setupRequestTimeout,
-  useCreateFetchOptions,
 } from "@/modules/table/utils/requestUtils";
-import { useLocale } from "next-intl";
+import { baseApi } from "@/config/axios/instances/base";
 
 type FetchDataBaseProps = {
   url: string;
@@ -50,10 +48,8 @@ type FetchDataProps = FetchDataBaseProps & FetchDataAdditionalProps;
 
 export const createTableFetcher = () => {
   let requestCounter = 0;
-  const useApiRequestOptions = useCreateFetchOptions();
-  const locale = useLocale();
 
-  const fetchData = useCallback(async (props: FetchDataProps) => {
+  const fetchData = async (props: FetchDataProps) => {
     const {
       url,
       apiParams,
@@ -116,8 +112,10 @@ export const createTableFetcher = () => {
         }
       });
 
-      const requestOptions = useApiRequestOptions(controller);
-      const response = await fetch(apiUrl.toString(), requestOptions);
+      // Use baseApi instead of fetch
+      const response = await baseApi.get(apiUrl.toString(), {
+        signal: controller.signal,
+      });
 
       clearTimeout(timeoutId);
 
@@ -132,13 +130,8 @@ export const createTableFetcher = () => {
         return;
       }
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch data: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const totalCount = response.headers.get("X-TOTAL-COUNT");
+      // Extract total count from Axios response headers
+      const totalCount = response.headers["x-total-count"];
       const totalItemsCount = totalCount ? parseInt(totalCount, 10) : 0;
 
       // Always process the response, even if the component is unmounted
@@ -148,7 +141,8 @@ export const createTableFetcher = () => {
       const calculatedTotalPages = Math.max(1, Math.ceil(totalItemsCount / itemsPerPage));
       setPagination(currentPage, calculatedTotalPages, itemsPerPage);
 
-      const result = await response.json();
+      // Get data from Axios response
+      const result = response.data;
       let tableData = processApiResponse(result);
 
       if (!isMountedRef.current) {
@@ -204,7 +198,7 @@ export const createTableFetcher = () => {
         );
       }
     }
-  }, []);
+  };
 
   return { fetchData };
 };

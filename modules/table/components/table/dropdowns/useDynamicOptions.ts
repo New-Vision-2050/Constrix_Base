@@ -5,7 +5,7 @@ import {
   getFetchUrl,
   extractDropdownOptions,
 } from "./DropdownUtils";
-import { useApiClient } from "@/utils/apiClient";
+import { baseApi } from "@/config/axios/instances/base";
 import axios, { AxiosError } from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -35,8 +35,6 @@ export const useDynamicOptions = ({
   const fetchTimeoutRef = useRef<number | null>(null);
   const urlRef = useRef<string>("");
   const processingFetchRef = useRef(false);
-  const apiClient = useApiClient();
-  const queryClient = useQueryClient();
 
   // Function to manually trigger a refresh of options
   const refresh = useCallback(() => {
@@ -58,7 +56,7 @@ export const useDynamicOptions = ({
         const controller = new AbortController();
         fetchControllerRef.current = controller;
 
-        const response = await apiClient.get(url, {
+        const response = await baseApi.get(url, {
           signal: controller.signal,
         });
 
@@ -114,7 +112,7 @@ export const useDynamicOptions = ({
         throw new Error("Failed to fetch dropdown options");
       }
     },
-    [dynamicConfig, apiClient]
+    [dynamicConfig]
   );
 
   // Effect to fetch options whenever dependencies or refresh counter changes
@@ -294,7 +292,7 @@ export const useDynamicOptions = ({
       // Ensure we reset the processing flag on cleanup
       processingFetchRef.current = false;
     };
-  }, [dynamicConfig, dependencies, fetchOptions, refreshCounter, apiClient]);
+  }, [dynamicConfig, dependencies, fetchOptions, refreshCounter]);
 
   return {
     options: Array.isArray(options) ? options : [],
