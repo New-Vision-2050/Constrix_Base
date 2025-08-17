@@ -114,7 +114,6 @@ export const OrgStructureManagementsSettingsFormConfig: FormConfig = {
     console.log("editDataTransformerManagement", data);
 
     return {
-      id: data.id,
       name: data.name,
       job_types: data.job_types?.map((item: any) => item.id),
       job_titles: data.job_titles?.map((item: any) => item.id),
