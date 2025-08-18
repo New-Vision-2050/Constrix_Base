@@ -825,16 +825,47 @@
       "publicLeaves": "الاجازات الرسمية"
     },
     "leavesPolicies": {
+      "title": "أنظمة الاجازات",
       "IsTheLeaveCarriedOver": "هل يتم ترحيل الاجازة؟",
       "leaveCarriedOver": "يتم ترحيل الاجازة",
       "leaveNotCarriedOver": "لا يتم ترحيل الاجازة",
       "halfDay": "نص يوم",
-      "totalDays":"عدد أيام الإجازة",
-      "dayType":"نوع الإجازة",
-      "isAllowHalfDay":"هل يسمح بالنصف يوم",
-      "allowed":"مسموح",
-      "notAllowed":"غير مسموح",
-      "noUpgradeCondition":"لا يوجد شرط ترقية"
+      "totalDays": "عدد أيام الإجازة",
+      "dayType": "نوع الإجازة",
+      "isAllowHalfDay": "هل يسمح بالنصف يوم",
+      "allowed": "مسموح",
+      "notAllowed": "غير مسموح",
+      "noUpgradeCondition": "لا يوجد شرط ترقية",
+      "addNewPolicy":"إنشاء نظام اجازة جديد",
+      "form": {
+        "title": "اضافة نظام اجازة جديد",
+        "editTitle": "تعديل نظام اجازة",
+        "name":"اسم نظام الاجازة",
+        "namePlaceholder":"اسم نظام الاجازة",
+        "nameRequired":"اسم نظام الاجازة مطلوب",
+        "namePattern":"اسم نظام الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+
+        "totalDays":"عدد أيام الإجازة",
+        "totalDaysPlaceholder":"عدد أيام الإجازة",
+        "totalDaysRequired":"عدد أيام الإجازة مطلوب",
+        "totalDaysPattern":"عدد أيام الإجازة يجب أن يكون رقمًا",
+
+        "type":"نوع الإجازة",
+        "typePlaceholder":"نوع الإجازة",
+        "typeRequired":"نوع الإجازة مطلوب",
+        
+
+        "dayType":"نوع الأيام",
+        "dayTypePlaceholder":"نوع الأيام",
+        "dayTypeRequired":"نوع الأيام مطلوب",
+
+        "isRolloverAllowed":"هل يسمح بترحيل الاجازة؟",
+
+        "isAllowHalfDay":"هل يسمح بالنصف يوم؟",
+
+        "submitButtonText":"حفظ",
+        "cancelButtonText":"إلغاء"
+      }
     }
   },
   "RoleTypes": {

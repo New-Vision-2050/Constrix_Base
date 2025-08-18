@@ -818,6 +818,7 @@
       "publicLeaves": "Public Leaves"
     },
     "leavesPolicies": {
+      "title": "Leave Policies",
       "IsTheLeaveCarriedOver": "Is the leave carried over?",
       "leaveCarriedOver": "Carried over",
       "leaveNotCarriedOver": "Not carried over",
@@ -827,7 +828,37 @@
       "isAllowHalfDay":"Is allow half day",
       "allowed":"Allowed",
       "notAllowed":"Not allowed",
-      "noUpgradeCondition":"No upgrade condition"
+      "noUpgradeCondition":"No upgrade condition",
+      "addNewPolicy":"Add New Policy",
+      "form": {
+        "title": "Add New Leave Policy",
+        "editTitle": "Edit Leave Policy",
+        "name":"Name",
+        "namePlaceholder":"Name",
+        "nameRequired":"Name is required",
+        "namePattern":"Name must contain only letters and numbers",
+
+        "totalDays":"Total days",
+        "totalDaysPlaceholder":"Total days",
+        "totalDaysRequired":"Total days is required",
+        "totalDaysPattern":"Total days must be a number",
+
+        "type":"Type",
+        "typePlaceholder":"Type",
+        "typeRequired":"Type is required",
+        
+
+        "dayType":"Day type",
+        "dayTypePlaceholder":"Day type",
+        "dayTypeRequired":"Day type is required",
+
+        "isRolloverAllowed":"Is rollover allowed?",
+
+        "isAllowHalfDay":"Is allow half day?",
+
+        "submitButtonText":"Save",
+        "cancelButtonText":"Cancel"
+      }
     }
   },
   "RoleTypes": {

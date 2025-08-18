@@ -31,7 +31,7 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
       className={`bg-transparent border border-gray-600 p-6 rounded-lg shadow-md ${className}`}
     >
       {/* Policy Title */}
-      <PolicyHeader title={policy?.name ?? "-"} />
+      <PolicyHeader title={policy?.name ?? "-"} policyId={policy.id} />
 
       {/* Policy Details */}
       <div className="space-y-4">
