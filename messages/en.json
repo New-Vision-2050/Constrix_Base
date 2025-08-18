@@ -690,6 +690,7 @@
     "tabs": {
       "attendance": "Attendance & Departure",
       "recruitment": "Recruitment",
+      "vacations": "Holidays and vacations",
       "service": "Service",
       "contractManagement": "Contract Management"
     },
@@ -808,6 +809,13 @@
       "workdays": "Working Days",
       "branches": "Branches",
       "notes": "Notes"
+    }
+  },
+  "HRSettingsVacations": {
+    "tabs": {
+      "leavesPolicies": "Leaves Policies",
+      "leavesTypes": "Leaves Types",
+      "publicLeaves": "Public Leaves"
     }
   },
   "RoleTypes": {

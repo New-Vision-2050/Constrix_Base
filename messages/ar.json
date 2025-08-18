@@ -696,6 +696,7 @@
   "hr-settings": {
     "tabs": {
       "attendance": "الحضور و الانصراف",
+      "vacations": "الإجازات و العطلات",
       "recruitment": "التوظيف",
       "service": "الخدمة",
       "contractManagement": "ادارة عقد العمل"
@@ -815,6 +816,13 @@
         "active": "نشط",
         "inactive": "غير نشط"
       }
+    }
+  },
+  "HRSettingsVacations": {
+    "tabs": {
+      "leavesPolicies": "أنظمة الاجازات",
+      "leavesTypes": "أنواع الاجازات",
+      "publicLeaves": "الاجازات الرسمية"
     }
   },
   "RoleTypes": {
