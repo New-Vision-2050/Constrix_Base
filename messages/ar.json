@@ -836,35 +836,49 @@
       "allowed": "مسموح",
       "notAllowed": "غير مسموح",
       "noUpgradeCondition": "لا يوجد شرط ترقية",
-      "addNewPolicy":"إنشاء نظام اجازة جديد",
+      "addNewPolicy": "إنشاء نظام اجازة جديد",
       "form": {
         "title": "اضافة نظام اجازة جديد",
         "editTitle": "تعديل نظام اجازة",
-        "name":"اسم نظام الاجازة",
-        "namePlaceholder":"اسم نظام الاجازة",
-        "nameRequired":"اسم نظام الاجازة مطلوب",
-        "namePattern":"اسم نظام الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+        "name": "اسم نظام الاجازة",
+        "namePlaceholder": "اسم نظام الاجازة",
+        "nameRequired": "اسم نظام الاجازة مطلوب",
+        "namePattern": "اسم نظام الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+        "totalDays": "عدد أيام الإجازة",
+        "totalDaysPlaceholder": "عدد أيام الإجازة",
+        "totalDaysRequired": "عدد أيام الإجازة مطلوب",
+        "totalDaysPattern": "عدد أيام الإجازة يجب أن يكون رقمًا",
+        "type": "نوع الإجازة",
+        "typePlaceholder": "نوع الإجازة",
+        "typeRequired": "نوع الإجازة مطلوب",
+        "dayType": "نوع الأيام",
+        "dayTypePlaceholder": "نوع الأيام",
+        "dayTypeRequired": "نوع الأيام مطلوب",
+        "isRolloverAllowed": "هل يسمح بترحيل الاجازة؟",
+        "isAllowHalfDay": "هل يسمح بالنصف يوم؟",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء"
+      }
+    },
+    "leavesTypes": {
+      "title": "أنواع الاجازات",
+      "table": {
+        "name": "اسم الاجازة",
+        "isPaid": "الاجازة مدفوعة",
+        "paid":"مدفوع",
+        "notPaid":"غير مدفوع",
+        "isDuduct_from_balance": "خصم من الرصيد",
+        "duduct":"خصم",
+        "notDuduct":"من دون خصم",
+        "conditions": "الشروط",
 
-        "totalDays":"عدد أيام الإجازة",
-        "totalDaysPlaceholder":"عدد أيام الإجازة",
-        "totalDaysRequired":"عدد أيام الإجازة مطلوب",
-        "totalDaysPattern":"عدد أيام الإجازة يجب أن يكون رقمًا",
 
-        "type":"نوع الإجازة",
-        "typePlaceholder":"نوع الإجازة",
-        "typeRequired":"نوع الإجازة مطلوب",
-        
+        "countryFilter":"الدولة",
+        "isPaidFilter":"الاجازة مدفوعة؟",
+        "isDuductFilter":"خصم من الرصيد؟",
 
-        "dayType":"نوع الأيام",
-        "dayTypePlaceholder":"نوع الأيام",
-        "dayTypeRequired":"نوع الأيام مطلوب",
 
-        "isRolloverAllowed":"هل يسمح بترحيل الاجازة؟",
-
-        "isAllowHalfDay":"هل يسمح بالنصف يوم؟",
-
-        "submitButtonText":"حفظ",
-        "cancelButtonText":"إلغاء"
+        "DeleteConfirmMessage":"هل أنت متأكد من حذف هذا النوع؟"
       }
     }
   },

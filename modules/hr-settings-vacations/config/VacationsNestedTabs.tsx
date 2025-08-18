@@ -3,6 +3,7 @@ import { SystemTab } from "@/modules/settings/types/SystemTab";
 import { CircleUser, Inbox } from "lucide-react";
 import { useTranslations } from "next-intl";
 import VacationPoliciesTab from "../components/tabs/VacationPolicies";
+import VacationTypes from "../components/tabs/VacationTypes";
 
 // Tabs config for HR settings - this will be used in HRSettingsTabs component
 const getHRSettingsVacationsTabs = (): SystemTab[] => {
@@ -19,7 +20,7 @@ const getHRSettingsVacationsTabs = (): SystemTab[] => {
       id: "hr-settings-vacations-leaves-types",
       title: t("leavesTypes"),
       icon: <Inbox />,
-      content: <>{t("leavesTypes")}</>,
+      content: <VacationTypes />,
     },
     {
       id: "hr-settings-vacations-public-leaves",
