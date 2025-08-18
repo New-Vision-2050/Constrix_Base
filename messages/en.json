@@ -816,6 +816,18 @@
       "leavesPolicies": "Leaves Policies",
       "leavesTypes": "Leaves Types",
       "publicLeaves": "Public Leaves"
+    },
+    "leavesPolicies": {
+      "IsTheLeaveCarriedOver": "Is the leave carried over?",
+      "leaveCarriedOver": "Carried over",
+      "leaveNotCarriedOver": "Not carried over",
+      "halfDay": "Half day",
+      "totalDays":"Total days",
+      "dayType":"Day type",
+      "isAllowHalfDay":"Is allow half day",
+      "allowed":"Allowed",
+      "notAllowed":"Not allowed",
+      "noUpgradeCondition":"No upgrade condition"
     }
   },
   "RoleTypes": {

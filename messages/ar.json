@@ -823,6 +823,18 @@
       "leavesPolicies": "أنظمة الاجازات",
       "leavesTypes": "أنواع الاجازات",
       "publicLeaves": "الاجازات الرسمية"
+    },
+    "leavesPolicies": {
+      "IsTheLeaveCarriedOver": "هل يتم ترحيل الاجازة؟",
+      "leaveCarriedOver": "يتم ترحيل الاجازة",
+      "leaveNotCarriedOver": "لا يتم ترحيل الاجازة",
+      "halfDay": "نص يوم",
+      "totalDays":"عدد أيام الإجازة",
+      "dayType":"نوع الإجازة",
+      "isAllowHalfDay":"هل يسمح بالنصف يوم",
+      "allowed":"مسموح",
+      "notAllowed":"غير مسموح",
+      "noUpgradeCondition":"لا يوجد شرط ترقية"
     }
   },
   "RoleTypes": {
