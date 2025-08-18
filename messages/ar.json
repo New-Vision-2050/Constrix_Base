@@ -878,7 +878,34 @@
         "isDuductFilter":"خصم من الرصيد؟",
 
 
-        "DeleteConfirmMessage":"هل أنت متأكد من حذف هذا النوع؟"
+        "DeleteConfirmMessage":"هل أنت متأكد من حذف هذا النوع؟",
+
+        "addVacationType":"اضافة نوع اجازة جديد",
+
+
+        "form":{
+          "title":"اضافة نوع اجازة جديد",
+          "name":"اسم نوع الاجازة",
+          "namePlaceholder":"اسم نوع الاجازة",
+          "nameRequired":"اسم نوع الاجازة مطلوب",
+          "namePattern":"اسم نوع الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+          
+          "isPaid":"الاجازة مدفوعة",
+          "isPaidPlaceholder":"الاجازة مدفوعة",
+          "isPaidRequired":"الاجازة مدفوعة",
+
+          "isDuduct":"خصم من الرصيد",
+          "isDuductPlaceholder":"خصم من الرصيد",
+          "isDuductRequired":"خصم من الرصيد",
+
+          "conditions":"الشروط",
+          "conditionsPlaceholder":"الشروط",
+          "conditionsRequired":"الشروط",
+
+          "submitButtonText":"حفظ",
+          "cancelButtonText":"إلغاء",
+          "resetButtonText":"مسح النموذج"
+        }
       }
     }
   },

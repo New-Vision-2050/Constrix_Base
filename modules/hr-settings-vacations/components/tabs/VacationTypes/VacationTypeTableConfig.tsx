@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { VacationType } from "@/modules/hr-settings-vacations/types/VacationType";
+import { getSetVacationTypeFormConfig } from "./SetVacationTypeForm";
 
 // Create a component that uses the translations
 export const getVacationTypeTableConfig = () => {
@@ -113,7 +114,7 @@ export const getVacationTypeTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    // formConfig: GetVacationTypeFormConfig(t),
+    formConfig: getSetVacationTypeFormConfig(t),
     executions: [],
     executionConfig: {
       canEdit: true,
