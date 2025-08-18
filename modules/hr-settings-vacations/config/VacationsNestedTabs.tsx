@@ -4,6 +4,7 @@ import { CircleUser, Inbox } from "lucide-react";
 import { useTranslations } from "next-intl";
 import VacationPoliciesTab from "../components/tabs/VacationPolicies";
 import VacationTypes from "../components/tabs/VacationTypes";
+import PublicVacations from "../components/tabs/PublicVacations";
 
 // Tabs config for HR settings - this will be used in HRSettingsTabs component
 const getHRSettingsVacationsTabs = (): SystemTab[] => {
@@ -26,7 +27,7 @@ const getHRSettingsVacationsTabs = (): SystemTab[] => {
       id: "hr-settings-vacations-public-leaves",
       title: t("publicLeaves"),
       icon: <CircleUser />,
-      content: <>{t("publicLeaves")}</>,
+      content: <PublicVacations />,
     },
   ];
 };

@@ -865,46 +865,76 @@
       "table": {
         "name": "اسم الاجازة",
         "isPaid": "الاجازة مدفوعة",
-        "paid":"مدفوع",
-        "notPaid":"غير مدفوع",
+        "paid": "مدفوع",
+        "notPaid": "غير مدفوع",
         "isDuduct_from_balance": "خصم من الرصيد",
-        "duduct":"خصم",
-        "notDuduct":"من دون خصم",
+        "duduct": "خصم",
+        "notDuduct": "من دون خصم",
         "conditions": "الشروط",
+        "countryFilter": "الدولة",
+        "isPaidFilter": "الاجازة مدفوعة؟",
+        "isDuductFilter": "خصم من الرصيد؟",
+        "DeleteConfirmMessage": "هل أنت متأكد من حذف هذا النوع؟",
+        "addVacationType": "اضافة نوع اجازة جديد",
+        "form": {
+          "title": "اضافة نوع اجازة جديد",
+          "name": "اسم نوع الاجازة",
+          "namePlaceholder": "اسم نوع الاجازة",
+          "nameRequired": "اسم نوع الاجازة مطلوب",
+          "namePattern": "اسم نوع الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+          "isPaid": "الاجازة مدفوعة",
+          "isPaidPlaceholder": "الاجازة مدفوعة",
+          "isPaidRequired": "الاجازة مدفوعة",
+          "isDuduct": "خصم من الرصيد",
+          "isDuductPlaceholder": "خصم من الرصيد",
+          "isDuductRequired": "خصم من الرصيد",
+          "conditions": "الشروط",
+          "conditionsPlaceholder": "الشروط",
+          "conditionsRequired": "الشروط",
+          "submitButtonText": "حفظ",
+          "cancelButtonText": "إلغاء",
+          "resetButtonText": "مسح النموذج"
+        }
+      }
+    },
+    "publicLeaves": {
+      "title": "الاجازات العامة",
+      "table": {
+        "name": "اسم الاجازة",
+        "country": "الدولة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "countryFilter": "الدولة",
+        "startDateFilter": "تاريخ البداية",
+        "endDateFilter": "تاريخ النهاية",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء",
+        "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الاجازة؟",
 
-
-        "countryFilter":"الدولة",
-        "isPaidFilter":"الاجازة مدفوعة؟",
-        "isDuductFilter":"خصم من الرصيد؟",
-
-
-        "DeleteConfirmMessage":"هل أنت متأكد من حذف هذا النوع؟",
-
-        "addVacationType":"اضافة نوع اجازة جديد",
-
+        "addPublicVacation": "اضافة اجازة رسمية",
 
         "form":{
-          "title":"اضافة نوع اجازة جديد",
-          "name":"اسم نوع الاجازة",
-          "namePlaceholder":"اسم نوع الاجازة",
-          "nameRequired":"اسم نوع الاجازة مطلوب",
-          "namePattern":"اسم نوع الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+          "title": "اضافة اجازة رسمية جديدة",
+          "editTitle": "تعديل اجازة رسمية",
+          "name": "اسم اجازة",
+          "namePlaceholder": "اسم اجازة",
+          "nameRequired": "اسم اجازة مطلوب",
           
-          "isPaid":"الاجازة مدفوعة",
-          "isPaidPlaceholder":"الاجازة مدفوعة",
-          "isPaidRequired":"الاجازة مدفوعة",
-
-          "isDuduct":"خصم من الرصيد",
-          "isDuductPlaceholder":"خصم من الرصيد",
-          "isDuductRequired":"خصم من الرصيد",
-
-          "conditions":"الشروط",
-          "conditionsPlaceholder":"الشروط",
-          "conditionsRequired":"الشروط",
-
-          "submitButtonText":"حفظ",
-          "cancelButtonText":"إلغاء",
-          "resetButtonText":"مسح النموذج"
+          "country": "الدولة",
+          "countryPlaceholder": "الدولة",
+          "countryRequired": "الدولة مطلوبة",
+          
+          "startDate": "تاريخ البداية",
+          "startDatePlaceholder": "تاريخ البداية",
+          "startDateRequired": "تاريخ البداية مطلوب",
+          
+          "endDate": "تاريخ النهاية",
+          "endDatePlaceholder": "تاريخ النهاية",
+          "endDateRequired": "تاريخ النهاية مطلوب",
+          
+          "submitButtonText": "حفظ",
+          "cancelButtonText": "إلغاء",
+          "resetButtonText": "مسح النموذج"
         }
       }
     }
