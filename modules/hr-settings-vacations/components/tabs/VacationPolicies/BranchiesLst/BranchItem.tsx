@@ -2,7 +2,7 @@
  * Branch item component - displays a single branch with selection state
  */
 import React from "react";
-import { Check, CircleCheckBig, MapPin } from "lucide-react";
+import { Check, CircleCheckBig, CircleDot, MapPin } from "lucide-react";
 
 interface BranchItemProps {
   /** Label text to display */
@@ -25,22 +25,24 @@ const BranchItem: React.FC<BranchItemProps> = ({
     <div
       className={`
         flex items-center justify-between p-3 rounded-lg cursor-pointer
-        ${isActive ? "bg-[#19103B]" : "bg-[#140F35] hover:bg-opacity-80"}
+        bg-[#19103B] hover:bg-opacity-80
       `}
       onClick={onClick}
     >
-      <div className="flex items-center gap-2">
-        <MapPin className="w-5 h-5 text-white" />
-        <span className="text-lg font-medium text-white">{label}</span>
+      <div
+        className={`flex items-center gap-2 ${
+          isActive ? "text-white" : "text-gray-500"
+        }`}
+      >
+        <MapPin className="w-5 h-5" />
+        <span className="text-lg font-normal">{label}</span>
       </div>
 
       {/* Check mark for selected branch */}
       <div
-        className={`w-6 h-6 rounded-full flex items-center justify-center ${
-          isActive ? "text-green-500" : "text-gray-700"
-        }`}
+        className={`w-6 h-6 rounded-full flex items-center justify-center text-white`}
       >
-        {isActive && <CircleCheckBig className="w-4 h-4" />}
+        {isActive && <CircleDot className="w-4 h-4" />}
       </div>
     </div>
   );

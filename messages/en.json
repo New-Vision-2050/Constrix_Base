@@ -830,6 +830,7 @@
       "notAllowed":"Not allowed",
       "noUpgradeCondition":"No upgrade condition",
       "addNewPolicy":"Add New Policy",
+      "allBranches":"All Branches",
       "loading": {
         "title": "Loading vacation policies",
         "description": "Please wait while we fetch the vacation policies data..."

@@ -835,6 +835,7 @@
       "isAllowHalfDay": "هل يسمح بالنصف يوم",
       "allowed": "مسموح",
       "notAllowed": "غير مسموح",
+      "allBranches": "جميع الفروع",
       "noUpgradeCondition": "لا يوجد شرط ترقية",
       "addNewPolicy": "إنشاء نظام اجازة جديد",
       "loading": {

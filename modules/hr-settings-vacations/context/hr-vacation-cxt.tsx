@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useVacationPolicies } from "../hooks/useVacationPolicies";
 import { VacationPolicie } from "../types/VacationPolicie";
+import { useBranches } from "@/modules/attendance-departure/hooks/useBranches";
+import { SelectOption } from "@/types/select-option";
 
 // Define context type
 interface HRVacationCxtType {
@@ -14,6 +16,10 @@ interface HRVacationCxtType {
   vacationsPolicies: VacationPolicie[];
   handleVPPageChange: (page: number) => void;
   handleVPLimitChange: (limit: number) => void;
+  // ** Branchies
+  branches: SelectOption[];
+  selectedBranchId: number | null;
+  handleBranchSelect: (branchId: number | null) => void;
 }
 
 // Create the context
@@ -37,6 +43,10 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
     page: VPPage,
   });
 
+  // ** Branchies
+  const { branches } = useBranches();
+  const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
+
   // TODO: declare and define methods
   const handleVPPageChange = (page: number) => {
     setVPPage(page);
@@ -44,6 +54,10 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
 
   const handleVPLimitChange = (limit: number) => {
     setVPLimit(limit);
+  };
+
+  const handleBranchSelect = (branchId: number | null) => {
+    setSelectedBranchId(branchId);
   };
 
   return (
@@ -57,6 +71,10 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
         vacationsPoliciesLoading,
         handleVPPageChange,
         handleVPLimitChange,
+        // ** Branchies
+        branches,
+        selectedBranchId,
+        handleBranchSelect,
       }}
     >
       {children}
