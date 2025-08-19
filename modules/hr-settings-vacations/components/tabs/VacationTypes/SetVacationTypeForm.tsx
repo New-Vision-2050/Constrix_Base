@@ -4,12 +4,13 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 
 export function getSetVacationTypeFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  onSuccessFn: () => void
 ): FormConfig {
   return {
     formId: "vacation-types-form",
     title: t("form.title"),
-    apiUrl: `${baseURL}/vacation-types-create-type`,
+    apiUrl: `${baseURL}/leave-types`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -31,12 +32,11 @@ export function getSetVacationTypeFormConfig(
               },
             ],
           },
-          // is_paid
+          // is_payed
           {
-            name: "is_paid",
+            name: "is_payed",
             label: t("form.isPaid"),
             type: "select",
-            isMulti: true,
             placeholder: t("form.isPaidPlaceholder"),
             required: true,
             options: [
@@ -50,12 +50,11 @@ export function getSetVacationTypeFormConfig(
               },
             ],
           },
-          // is_duduct_from_balance
+          // is_deduct_from_balance
           {
-            name: "is_duduct_from_balance",
+            name: "is_deduct_from_balance",
             label: t("form.isDuduct"),
             type: "select",
-            isMulti: true,
             placeholder: t("form.isDuductPlaceholder"),
             required: true,
             options: [
@@ -76,10 +75,19 @@ export function getSetVacationTypeFormConfig(
             type: "text",
             placeholder: t("form.conditionsPlaceholder"),
             required: true,
-          }
+          },
         ],
-      }
+      },
     ],
+    editDataTransformer: (data) => {
+      console.log("editDataTransformer", data);
+      data.is_deduct_from_balance = Boolean(data.is_deduct_from_balance)
+        ? "1"
+        : "0";
+      data.is_payed = Boolean(data.is_payed) ? "1" : "0";
+      return data;
+    },
+    onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
     showReset: false,

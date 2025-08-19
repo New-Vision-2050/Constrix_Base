@@ -11,7 +11,7 @@ export const getVacationTypeTableConfig = () => {
   const { can } = usePermissions();
 
   return {
-    url: `${baseURL}/vacation-types-url`,
+    url: `${baseURL}/leave-types`,
     tableId: "vacation-types-table",
     columns: [
       {
@@ -21,11 +21,11 @@ export const getVacationTypeTableConfig = () => {
         render: (_: unknown, row: VacationType) => row.name,
       },
       {
-        key: "is_paid",
+        key: "is_payed",
         label: t("isPaid"),
         sortable: true,
         render: (_: unknown, row: VacationType) => {
-          return row.is_paid ? t("paid") : t("notPaid");
+          return row.is_payed ? t("paid") : t("notPaid");
         },
       },
       {
@@ -33,7 +33,7 @@ export const getVacationTypeTableConfig = () => {
         label: t("isDuduct_from_balance"),
         searchable: true,
         render: (_: unknown, row: VacationType) => {
-          return row.is_duduct_from_balance ? t("duduct") : t("notDuduct");
+          return row.is_deduct_from_balance ? t("duduct") : t("notDuduct");
         },
       },
       {
@@ -42,66 +42,7 @@ export const getVacationTypeTableConfig = () => {
         sortable: true,
       }
     ],
-    allSearchedFields: [
-      {
-        key: "country_id",
-        searchType: {
-          type: "dropdown",
-          placeholder: t("countryFilter"),
-          dynamicDropdown: {
-            url: `${baseURL}/countries`,
-            valueField: "id",
-            labelField: "name",
-            paginationEnabled: true,
-            itemsPerPage: 10,
-            searchParam: "name",
-            pageParam: "page",
-            limitParam: "per_page",
-            totalCountHeader: "x-total-count",
-          },
-        },
-      },
-      {
-        key: "is_paid",
-        searchType: {
-          type: "dropdown",
-          isMulti: true,
-          placeholder: t("isPaidFilter"),
-          dynamicDropdown: {
-            url: `${baseURL}/vacation-types-url`,
-            valueField: "id",
-            isMulti: true,
-            labelField: "name",
-            paginationEnabled: true,
-            itemsPerPage: 20,
-            searchParam: "name",
-            pageParam: "page",
-            limitParam: "per_page",
-            totalCountHeader: "x-total-count",
-          },
-        },
-      },
-      {
-        key: "is_duduct_from_balance",
-        searchType: {
-          type: "dropdown",
-          isMulti: true,
-          placeholder: t("isDuductFilter"),
-          dynamicDropdown: {
-            url: `${baseURL}/vacation-types-url`,
-            valueField: "id",
-            isMulti: true,
-            labelField: "name",
-            paginationEnabled: true,
-            itemsPerPage: 20,
-            searchParam: "name",
-            pageParam: "page",
-            limitParam: "per_page",
-            totalCountHeader: "x-total-count",
-          },
-        },
-      },
-    ],
+    allSearchedFields: [],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
     enableSorting: true,
@@ -114,7 +55,7 @@ export const getVacationTypeTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: getSetVacationTypeFormConfig(t),
+    formConfig: getSetVacationTypeFormConfig(t, () => {}),
     executions: [],
     executionConfig: {
       canEdit: true,
