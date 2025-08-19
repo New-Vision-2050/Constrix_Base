@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { PublicVacation } from "@/modules/hr-settings-vacations/types/PublicVacation";
+import { getSetPublicVacationFormConfig } from "./SetPublicVacationFormConfig";
 
 // Create a component that uses the translations
 export const getPublicVacationTableConfig = () => {
@@ -10,7 +11,7 @@ export const getPublicVacationTableConfig = () => {
   const { can } = usePermissions();
 
   return {
-    url: `${baseURL}/public-vacations-url`,
+    url: `${baseURL}/public-holidays`,
     tableId: "public-vacations-table",
     columns: [
       {
@@ -20,17 +21,17 @@ export const getPublicVacationTableConfig = () => {
         render: (_: unknown, row: PublicVacation) => row.name,
       },
       {
-        key: "country_id",
+        key: "country.name",
         label: t("country"),
         sortable: true,
       },
       {
-        key: "start_date",
+        key: "date_start",
         label: t("startDate"),
         sortable: true,
       },
       {
-        key: "end_date",
+        key: "date_end",
         label: t("endDate"),
         sortable: true,
       }
@@ -55,14 +56,14 @@ export const getPublicVacationTableConfig = () => {
         },
       },
       {
-        key: "start_date",
+        key: "date_start",
         searchType: {
           type: "date",
           placeholder: t("startDateFilter")
         },
       },
       {
-        key: "end_date",
+        key: "date_end",
         searchType: {
           type: "date",
           placeholder: t("endDateFilter")
@@ -81,10 +82,10 @@ export const getPublicVacationTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    // formConfig: getSetVacationTypeFormConfig(t),
+    formConfig: getSetPublicVacationFormConfig(t),
     executions: [],
     executionConfig: {
-      canEdit: true,
+      canEdit: false,
       canDelete: true,
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message

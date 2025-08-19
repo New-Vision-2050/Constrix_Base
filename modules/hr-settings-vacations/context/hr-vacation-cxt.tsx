@@ -5,6 +5,7 @@ import { useVacationPolicies } from "../hooks/useVacationPolicies";
 import { VacationPolicie } from "../types/VacationPolicie";
 import { useBranches } from "@/modules/attendance-departure/hooks/useBranches";
 import { SelectOption } from "@/types/select-option";
+import { PublicVacation } from "../types/PublicVacation";
 
 // Define context type
 interface HRVacationCxtType {
@@ -31,6 +32,10 @@ interface HRVacationCxtType {
   openVPForm: boolean;
   handleOpenVPForm: () => void;
   handleCloseVPForm: () => void;
+
+  // ** Edit Public Vacation
+  editedPublicVacation: PublicVacation | undefined;
+  handleStoreEditPublicVacation: (policy: PublicVacation | undefined) => void;
 }
 
 // Create the context
@@ -58,6 +63,8 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
 
   const [openVPForm, setOpenVPForm] = useState(false);
 
+  const [editedPublicVacation, setEditedPublicVacation] = useState<PublicVacation>();
+
   // ** Branchies
   const { branches } = useBranches();
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
@@ -77,6 +84,10 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
 
   const handleStoreEditPolicy = (policy: VacationPolicie | undefined) => {
     setEditedPolicy(policy);
+  };
+
+  const handleStoreEditPublicVacation = (policy: PublicVacation | undefined) => {
+    setEditedPublicVacation(policy);
   };
 
   const handleBranchSelect = (branchId: number | null) => {
@@ -114,6 +125,9 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
         openVPForm,
         handleOpenVPForm,
         handleCloseVPForm,
+        // ** Edit Public Vacation
+        editedPublicVacation,
+        handleStoreEditPublicVacation,
       }}
     >
       {children}

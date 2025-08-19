@@ -2,14 +2,16 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export function getSetPublicVacationFormConfig(
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
+  onSuccessFn?: () => void
 ): FormConfig {
   return {
     formId: "public-vacations-form",
     title: t("form.title"),
-    apiUrl: `${baseURL}/public-vacations-create-type`,
+    apiUrl: `${baseURL}/public-holidays`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -58,11 +60,15 @@ export function getSetPublicVacationFormConfig(
           },
           // start_date
           {
-            name: "start_date",
+            name: "date_start",
             label: t("form.startDate"),
             type: "date",
             placeholder: t("form.startDatePlaceholder"),
             required: true,
+            maxDate: {
+              formId: "public-vacations-form",
+              field: "date_end",
+            },
             validation: [
               {
                 type: "required",
@@ -72,11 +78,15 @@ export function getSetPublicVacationFormConfig(
           },
           // end_date
           {
-            name: "end_date",
+            name: "date_end",
             label: t("form.endDate"),
             type: "date",
             placeholder: t("form.endDatePlaceholder"),
             required: true,
+            minDate: {
+              formId: "public-vacations-form",
+              field: "date_start",
+            },
             validation: [
               {
                 type: "required",
@@ -87,6 +97,16 @@ export function getSetPublicVacationFormConfig(
         ],
       }
     ],
+    onSubmit: async (formData: any) => {
+      const newFormData = {
+        ...formData,
+        date_start: new Date(formData.date_start).toISOString().split("T")[0],
+        date_end: new Date(formData.date_end).toISOString().split("T")[0],
+      };
+      // const url
+      return await defaultSubmitHandler(newFormData, getSetPublicVacationFormConfig(t));
+    },
+    onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
     showReset: false,

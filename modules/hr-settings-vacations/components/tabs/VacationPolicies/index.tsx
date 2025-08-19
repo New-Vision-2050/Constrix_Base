@@ -73,20 +73,21 @@ export default function VacationPoliciesTab() {
         )}
         {/* data state */}
         {vacationsPolicies.length > 0 && !vacationsPoliciesLoading && (
-          <VacationPolicieCardsList />
+          <>
+            <VacationPolicieCardsList />
+            {/* Pagination component */}
+            <div className="mt-8 flex justify-center w-full">
+              <Pagination
+                currentPage={VPPage}
+                totalPages={VPLastPage}
+                onPageChange={handleVPPageChange}
+                currentLimit={VPLimit}
+                limitOptions={[2, 5, 10, 25, 50]}
+                onLimitChange={handleVPLimitChange}
+              />
+            </div>
+          </>
         )}
-        {/* Pagination component */}
-        <div className="mt-8 flex justify-center w-full">
-          <Pagination
-            currentPage={VPPage}
-            totalPages={VPLastPage}
-            onPageChange={handleVPPageChange}
-            currentLimit={VPLimit}
-            limitOptions={[2, 5, 10, 25, 50]}
-            onLimitChange={handleVPLimitChange}
-          />
-        </div>
-        
       </div>
     </div>
   );
