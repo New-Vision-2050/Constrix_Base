@@ -31,7 +31,7 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
       className={`bg-transparent border border-gray-600 p-6 rounded-lg shadow-md ${className}`}
     >
       {/* Policy Title */}
-      <PolicyHeader title={policy?.name ?? "-"} policyId={policy.id} />
+      <PolicyHeader policy={policy} />
 
       {/* Policy Details */}
       <div className="space-y-4">
@@ -40,7 +40,7 @@ const VacationPolicieCard: React.FC<VacationPolicieCardProps> = ({
           value={policy.total_days.toString()}
         />
 
-        <PolicyDetail label={t("dayType")} value={policy.day_type} />
+        <PolicyDetail label={t("dayType")} value={policy.day_type === "calender" ? t("calender") : t("work_day")} />
 
         {/* Policy Toggles */}
         <PolicyToggle

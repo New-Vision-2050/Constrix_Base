@@ -831,13 +831,16 @@
       "leaveNotCarriedOver": "لا يتم ترحيل الاجازة",
       "halfDay": "نص يوم",
       "totalDays": "عدد أيام الإجازة",
-      "dayType": "نوع الإجازة",
+      "dayType": "نوع  أيام الإجازة",
       "isAllowHalfDay": "هل يسمح بالنصف يوم",
       "allowed": "مسموح",
       "notAllowed": "غير مسموح",
       "allBranches": "جميع الفروع",
       "noUpgradeCondition": "لا يوجد شرط ترقية",
       "addNewPolicy": "إنشاء نظام اجازة جديد",
+      "yearly":"سنوية",
+      "calender":"تقويم",
+      "work_day":"يوم عمل",
       "loading": {
         "title": "جاري تحميل أنظمة الإجازة",
         "description": "يرجى الانتظار بينما نقوم بتحميل بيانات أنظمة الإجازة..."
@@ -865,6 +868,8 @@
         "dayTypeRequired": "نوع الأيام مطلوب",
         "isRolloverAllowed": "هل يسمح بترحيل الاجازة؟",
         "isAllowHalfDay": "هل يسمح بالنصف يوم؟",
+        "upgradeCondition": "شرط الترقية",
+        "upgradeConditionPlaceholder": "شرط الترقية",
         "submitButtonText": "حفظ",
         "cancelButtonText": "إلغاء"
       }

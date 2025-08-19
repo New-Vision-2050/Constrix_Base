@@ -1,5 +1,7 @@
+import { Label } from "@/components/ui/label";
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
+import { DaysTypes } from "@/modules/hr-settings-vacations/constants/days-types";
 import { VacationPolicie } from "@/modules/hr-settings-vacations/types/VacationPolicie";
 
 type PropsT = {
@@ -25,10 +27,21 @@ export const getSetVacationPloicyConfig = (props: PropsT): FormConfig => {
 
   // ------------- return form config -------------
   return {
-    formId: "create-determinant-form",
+    formId: "create-vacation-policy-form",
     title,
-    apiUrl: `${baseURL}/leave-policy-create-url`,
-    initialValues: {},
+    apiUrl: `${baseURL}/leave-policies`,
+    editApiUrl: `${baseURL}/leave-policies/${editedPolicy?.id}`,
+    editApiMethod: "PUT",
+    isEditMode: isEdit,
+    initialValues: {
+      name: editedPolicy?.name || "",
+      total_days: editedPolicy?.total_days || "",
+      day_type: editedPolicy?.day_type || "",
+      is_rollover_allowed: editedPolicy?.is_rollover_allowed || true,
+      is_allow_half_day: editedPolicy?.is_allow_half_day || false,
+      upgrade_condition: editedPolicy?.upgrade_condition || "",
+      vacation_type: getText("yearly", "سنوية"),
+    },
     sections: [
       {
         fields: [
@@ -84,49 +97,47 @@ export const getSetVacationPloicyConfig = (props: PropsT): FormConfig => {
           },
           // vacation type
           {
-            type: "select",
-            name: "constraint_type",
+            type: "text",
+            name: "vacation_type",
             label: getText("form.type", "نوع الإجازة"),
             placeholder: getText("form.typePlaceholder", "نوع الإجازة"),
-            defaultValue: "yearly",
+            defaultValue: getText("yearly", "سنوية"),
             disabled: true,
-            dynamicOptions: {
-              url: `${baseURL}/vacation-policy-types-url`,
-              valueField: "code",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
             required: true,
-            validation: [
-              {
-                type: "required",
-                message: getText("form.typeRequired", "نوع الإجازة مطلوب"),
-              },
-            ],
+            render: () => {
+              return (
+                <div className="w-full">
+                  <Label htmlFor="vacation-type">
+                    {getText("form.type", "نوع الإجازة")}
+                  </Label>
+
+                  <input
+                    type="text"
+                    value={getText("yearly", "سنوية")}
+                    disabled
+                    className="w-full rounded-lg bg-[#140f34] dark:bg-[#1A103C] border border-gray-300 dark:border-gray-700 py-2 px-3 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    readOnly
+                  />
+                </div>
+              );
+            },
           },
           // day type
           {
             type: "select",
-            isMulti: true,
             name: "day_type",
             label: getText("form.dayType", "نوع الأيام"),
             placeholder: getText("form.dayTypePlaceholder", "نوع الأيام"),
-            dynamicOptions: {
-              url: `${baseURL}/vacation-policy-day-types-url`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
+            options: [
+              {
+                value: DaysTypes.calender,
+                label: getText("calender", "التقويم"),
+              },
+              {
+                value: DaysTypes.work_day,
+                label: getText("work_day", "يوم عمل"),
+              },
+            ],
             required: true,
             validation: [
               {
@@ -154,6 +165,17 @@ export const getSetVacationPloicyConfig = (props: PropsT): FormConfig => {
             defaultValue: false,
             required: true,
           },
+          // upgrade_condition
+          {
+            type: "text",
+            name: "upgrade_condition",
+            label: getText("form.upgradeCondition", "شرط الترقية"),
+            placeholder: getText(
+              "form.upgradeConditionPlaceholder",
+              "شرط الترقية"
+            ),
+            required: false,
+          },
         ],
       },
     ],
@@ -161,12 +183,6 @@ export const getSetVacationPloicyConfig = (props: PropsT): FormConfig => {
       onSuccessFn();
     },
     resetOnSuccess: true,
-    onSubmit: async (formData: Record<string, unknown>) => {
-      return {
-        success: true,
-        message: "تم حفظ المحدد بنجاح",
-      };
-    },
     submitButtonText: getText("form.submitButtonText", "حفظ المحدد"),
     cancelButtonText: getText("form.cancelButtonText", "إلغاء"),
   };

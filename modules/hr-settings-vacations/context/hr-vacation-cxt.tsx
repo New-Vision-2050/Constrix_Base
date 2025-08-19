@@ -16,10 +16,21 @@ interface HRVacationCxtType {
   vacationsPolicies: VacationPolicie[];
   handleVPPageChange: (page: number) => void;
   handleVPLimitChange: (limit: number) => void;
+  handleVPRefresh: () => void;
+
   // ** Branchies
   branches: SelectOption[];
   selectedBranchId: number | null;
   handleBranchSelect: (branchId: number | null) => void;
+
+  // ** Edit Policy
+  editedPolicy: VacationPolicie | undefined;
+  handleStoreEditPolicy: (policy: VacationPolicie | undefined) => void;
+
+  // ** Open Edit Form
+  openVPForm: boolean;
+  handleOpenVPForm: () => void;
+  handleCloseVPForm: () => void;
 }
 
 // Create the context
@@ -38,10 +49,14 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
   const {
     data: vacationsPoliciesResponse,
     isLoading: vacationsPoliciesLoading,
+    refetch: refetchVacationsPolicies,
   } = useVacationPolicies({
     limit: VPLimit,
     page: VPPage,
   });
+  const [editedPolicy, setEditedPolicy] = useState<VacationPolicie>();
+
+  const [openVPForm, setOpenVPForm] = useState(false);
 
   // ** Branchies
   const { branches } = useBranches();
@@ -56,8 +71,24 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
     setVPLimit(limit);
   };
 
+  const handleVPRefresh = () => {
+    refetchVacationsPolicies();
+  };
+
+  const handleStoreEditPolicy = (policy: VacationPolicie | undefined) => {
+    setEditedPolicy(policy);
+  };
+
   const handleBranchSelect = (branchId: number | null) => {
     setSelectedBranchId(branchId);
+  };
+
+  const handleOpenVPForm = () => {
+    setOpenVPForm(true);
+  };
+
+  const handleCloseVPForm = () => {
+    setOpenVPForm(false);
   };
 
   return (
@@ -71,10 +102,18 @@ export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
         vacationsPoliciesLoading,
         handleVPPageChange,
         handleVPLimitChange,
+        handleVPRefresh,
         // ** Branchies
         branches,
         selectedBranchId,
         handleBranchSelect,
+        // ** Edit Policy
+        editedPolicy,
+        handleStoreEditPolicy,
+        // ** Open Edit Form
+        openVPForm,
+        handleOpenVPForm,
+        handleCloseVPForm,
       }}
     >
       {children}

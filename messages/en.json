@@ -831,6 +831,9 @@
       "noUpgradeCondition":"No upgrade condition",
       "addNewPolicy":"Add New Policy",
       "allBranches":"All Branches",
+      "yearly":"Yearly",
+      "calender":"Calendar",
+      "work_day":"Work day",
       "loading": {
         "title": "Loading vacation policies",
         "description": "Please wait while we fetch the vacation policies data..."
@@ -864,6 +867,9 @@
         "isRolloverAllowed":"Is rollover allowed?",
 
         "isAllowHalfDay":"Is allow half day?",
+
+        "upgradeCondition":"Upgrade condition",
+        "upgradeConditionPlaceholder":"Upgrade condition",
 
         "submitButtonText":"Save",
         "cancelButtonText":"Cancel"
