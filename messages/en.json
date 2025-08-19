@@ -830,6 +830,14 @@
       "notAllowed":"Not allowed",
       "noUpgradeCondition":"No upgrade condition",
       "addNewPolicy":"Add New Policy",
+      "loading": {
+        "title": "Loading vacation policies",
+        "description": "Please wait while we fetch the vacation policies data..."
+      },
+      "noData": {
+        "title": "No vacation policies found",
+        "description": "There are no vacation policies available at the moment."
+      },
       "form": {
         "title": "Add New Leave Policy",
         "editTitle": "Edit Leave Policy",
