@@ -32,12 +32,12 @@ export default function VacationPoliciesTab() {
     <Can check={[PERMISSIONS.vacations.settings.leavePolicy.view]}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* First column takes 1 column (1/4 width) on tablet+ and full width on mobile */}
-        <div className="col-span-1 bg-[#140F35] rounded-lg p-4">
+        {/* <div className="col-span-1 bg-[#140F35] rounded-lg p-4">
           <BranchiesLst />
-        </div>
+        </div> */}
 
         {/* Second column takes 3 columns (3/4 width) on tablet+ and full width on mobile */}
-        <div className="col-span-1 md:col-span-3">
+        <div className="col-span-1 md:col-span-4">
           <VacationPoliciesHeader />
 
           {/* loading state */}
@@ -84,7 +84,7 @@ export default function VacationPoliciesTab() {
                   totalPages={VPLastPage}
                   onPageChange={handleVPPageChange}
                   currentLimit={VPLimit}
-                  limitOptions={[2, 5, 10, 25, 50]}
+                  limitOptions={[3, 5, 10, 25, 50]}
                   onLimitChange={handleVPLimitChange}
                 />
               </div>

@@ -49,7 +49,7 @@ interface PropsT {
 export const HRVacationCxtProvider: React.FC<PropsT> = ({ children }) => {
   // TODO: declare and define variables
   // TODO: vacations policies
-  const [VPLimit, setVPLimit] = useState(2);
+  const [VPLimit, setVPLimit] = useState(3);
   const [VPPage, setVPPage] = useState(1);
   const {
     data: vacationsPoliciesResponse,

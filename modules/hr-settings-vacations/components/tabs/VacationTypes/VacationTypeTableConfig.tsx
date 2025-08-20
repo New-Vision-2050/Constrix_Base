@@ -60,7 +60,26 @@ export const getVacationTypeTableConfig = () => {
         ),
       },
     ],
-    allSearchedFields: [],
+    allSearchedFields: [
+      {
+        key: "branch_id",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("branchesFilter"),
+          dynamicDropdown: {
+            url: `${baseURL}/management_hierarchies/list?type=branch`,
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 10,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
+      },
+    ],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
     enableSorting: true,

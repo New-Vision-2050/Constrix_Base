@@ -886,6 +886,7 @@
         "notDuduct": "من دون خصم",
         "conditions": "الشروط",
         "branches": "الفروع",
+        "branchesFilter": "الفروع",
         "countryFilter": "الدولة",
         "isPaidFilter": "الاجازة مدفوعة؟",
         "isDuductFilter": "خصم من الرصيد؟",
