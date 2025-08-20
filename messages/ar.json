@@ -696,6 +696,7 @@
   "hr-settings": {
     "tabs": {
       "attendance": "الحضور و الانصراف",
+      "vacations": "الإجازات و العطلات",
       "recruitment": "التوظيف",
       "service": "الخدمة",
       "contractManagement": "ادارة عقد العمل"
@@ -814,6 +815,146 @@
       "status": {
         "active": "نشط",
         "inactive": "غير نشط"
+      }
+    }
+  },
+  "HRSettingsVacations": {
+    "tabs": {
+      "leavesPolicies": "أنظمة الاجازات",
+      "leavesTypes": "أنواع الاجازات",
+      "publicLeaves": "الاجازات الرسمية"
+    },
+    "leavesPolicies": {
+      "title": "أنظمة الاجازات",
+      "IsTheLeaveCarriedOver": "هل يتم ترحيل الاجازة؟",
+      "leaveCarriedOver": "يتم ترحيل الاجازة",
+      "leaveNotCarriedOver": "لا يتم ترحيل الاجازة",
+      "halfDay": "نص يوم",
+      "totalDays": "عدد أيام الإجازة",
+      "dayType": "نوع  أيام الإجازة",
+      "isAllowHalfDay": "هل يسمح بالنصف يوم",
+      "allowed": "مسموح",
+      "notAllowed": "غير مسموح",
+      "allBranches": "جميع الفروع",
+      "noUpgradeCondition": "لا يوجد شرط ترقية",
+      "addNewPolicy": "إنشاء نظام اجازة جديد",
+      "yearly":"سنوية",
+      "calender":"تقويم",
+      "work_day":"يوم عمل",
+      "loading": {
+        "title": "جاري تحميل أنظمة الإجازة",
+        "description": "يرجى الانتظار بينما نقوم بتحميل بيانات أنظمة الإجازة..."
+      },
+      "noData": {
+        "title": "لا توجد أنظمة إجازة",
+        "description": "لا توجد أي أنظمة إجازة حاليا."
+      },
+      "form": {
+        "title": "اضافة نظام اجازة جديد",
+        "editTitle": "تعديل نظام اجازة",
+        "name": "اسم نظام الاجازة",
+        "namePlaceholder": "اسم نظام الاجازة",
+        "nameRequired": "اسم نظام الاجازة مطلوب",
+        "namePattern": "اسم نظام الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+        "totalDays": "عدد أيام الإجازة",
+        "totalDaysPlaceholder": "عدد أيام الإجازة",
+        "totalDaysRequired": "عدد أيام الإجازة مطلوب",
+        "totalDaysPattern": "عدد أيام الإجازة يجب أن يكون رقمًا",
+        "type": "نوع الإجازة",
+        "typePlaceholder": "نوع الإجازة",
+        "typeRequired": "نوع الإجازة مطلوب",
+        "dayType": "نوع الأيام",
+        "dayTypePlaceholder": "نوع الأيام",
+        "dayTypeRequired": "نوع الأيام مطلوب",
+        "isRolloverAllowed": "هل يسمح بترحيل الاجازة؟",
+        "isAllowHalfDay": "هل يسمح بالنصف يوم؟",
+        "upgradeCondition": "شرط الترقية",
+        "upgradeConditionPlaceholder": "شرط الترقية",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء"
+      }
+    },
+    "leavesTypes": {
+      "title": "أنواع الاجازات",
+      "table": {
+        "name": "اسم الاجازة",
+        "isPaid": "الاجازة مدفوعة",
+        "paid": "مدفوع",
+        "notPaid": "غير مدفوع",
+        "isDuduct_from_balance": "خصم من الرصيد",
+        "duduct": "خصم",
+        "notDuduct": "من دون خصم",
+        "conditions": "الشروط",
+        "branches": "الفروع",
+        "branchesFilter": "الفروع",
+        "countryFilter": "الدولة",
+        "isPaidFilter": "الاجازة مدفوعة؟",
+        "isDuductFilter": "خصم من الرصيد؟",
+        "DeleteConfirmMessage": "هل أنت متأكد من حذف هذا النوع؟",
+        "addVacationType": "اضافة نوع اجازة جديد",
+        "form": {
+          "title": "اضافة نوع اجازة جديد",
+          "name": "اسم نوع الاجازة",
+          "namePlaceholder": "اسم نوع الاجازة",
+          "nameRequired": "اسم نوع الاجازة مطلوب",
+          "namePattern": "اسم نوع الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+          "isPaid": "الاجازة مدفوعة",
+          "isPaidPlaceholder": "الاجازة مدفوعة",
+          "isPaidRequired": "الاجازة مدفوعة",
+          "isDuduct": "خصم من الرصيد",
+          "isDuductPlaceholder": "خصم من الرصيد",
+          "isDuductRequired": "خصم من الرصيد",
+          "conditions": "الشروط",
+          "conditionsPlaceholder": "الشروط",
+          "conditionsRequired": "الشروط",
+
+          "branches": "الفروع",
+          "branchesPlaceholder": "اختر الفروع",
+          "submitButtonText": "حفظ",
+          "cancelButtonText": "إلغاء",
+          "resetButtonText": "مسح النموذج"
+        }
+      }
+    },
+    "publicLeaves": {
+      "title": "الاجازات العامة",
+      "table": {
+        "name": "اسم الاجازة",
+        "country": "الدولة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "countryFilter": "الدولة",
+        "startDateFilter": "تاريخ البداية",
+        "endDateFilter": "تاريخ النهاية",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء",
+        "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الاجازة؟",
+
+        "addPublicVacation": "اضافة اجازة رسمية",
+
+        "form":{
+          "title": "اضافة اجازة رسمية جديدة",
+          "editTitle": "تعديل اجازة رسمية",
+          "name": "اسم اجازة",
+          "namePlaceholder": "اسم اجازة",
+          "nameRequired": "اسم اجازة مطلوب",
+          
+          "country": "الدولة",
+          "countryPlaceholder": "الدولة",
+          "countryRequired": "الدولة مطلوبة",
+          
+          "startDate": "تاريخ البداية",
+          "startDatePlaceholder": "تاريخ البداية",
+          "startDateRequired": "تاريخ البداية مطلوب",
+          
+          "endDate": "تاريخ النهاية",
+          "endDatePlaceholder": "تاريخ النهاية",
+          "endDateRequired": "تاريخ النهاية مطلوب",
+          
+          "submitButtonText": "حفظ",
+          "cancelButtonText": "إلغاء",
+          "resetButtonText": "مسح النموذج"
+        }
       }
     }
   },

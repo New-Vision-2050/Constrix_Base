@@ -10,6 +10,7 @@ type PropsT = {
   list: SystemTab[];
   onTabClick?: (tab: SystemTab) => void;
   bgStyleApproach?: boolean;
+  additionalClassiess?: string;
 };
 
 export default function HorizontalTabs({
@@ -17,6 +18,7 @@ export default function HorizontalTabs({
   onTabClick,
   defaultValue,
   bgStyleApproach,
+  additionalClassiess,
 }: PropsT) {
   // declare and define component state and variables.
   const locale = useLocale();
@@ -31,7 +33,7 @@ export default function HorizontalTabs({
       className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
       <TabsList
-        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-between`}
+        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-between ${additionalClassiess}`}
       >
         <TabsTriggerList
           onTabClick={onTabClick}
