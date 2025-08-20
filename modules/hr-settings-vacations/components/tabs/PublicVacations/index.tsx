@@ -5,6 +5,8 @@ import { getSetPublicVacationFormConfig } from "./SetPublicVacationFormConfig";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function PublicVacations() {
   const config = getPublicVacationTableConfig();
@@ -17,18 +19,20 @@ export default function PublicVacations() {
   };
 
   return (
-    <div>
+    <Can check={[PERMISSIONS.vacations.settings.publicHoliday.view]}>
       <TableBuilder
         config={config}
         searchBarActions={
           <div className="flex items-center gap-3">
-            <SheetFormBuilder
-              config={getSetPublicVacationFormConfig(t, handleOnSuccessFn)}
-              trigger={<Button>{t("addPublicVacation")}</Button>}
-            />
+            <Can check={[PERMISSIONS.vacations.settings.publicHoliday.create]}>
+              <SheetFormBuilder
+                config={getSetPublicVacationFormConfig(t, handleOnSuccessFn)}
+                trigger={<Button>{t("addPublicVacation")}</Button>}
+              />
+            </Can>
           </div>
         }
       />
-    </div>
+    </Can>
   );
 }

@@ -40,14 +40,32 @@ export const getVacationTypeTableConfig = () => {
         key: "conditions",
         label: t("conditions"),
         sortable: true,
-      }
+      },
+      {
+        key: "branches",
+        label: t("branches"),
+        sortable: true,
+        render: (_: unknown, row: VacationType) => (
+          <div className="flex flex-wrap gap-2">
+            {row.branches.map((branch) => (
+              <span
+                key={branch.id}
+                className="px-2 py-1 bg-gray-600 rounded text-xs"
+              >
+                {branch.name}
+              </span>
+            ))}
+            {row.branches.length === 0 && "—"}
+          </div>
+        ),
+      },
     ],
     allSearchedFields: [],
     defaultSortColumn: "id",
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
-    // enableExport: can(PERMISSIONS.company.export),
+    enableExport: can(PERMISSIONS.vacations.settings.leaveType.export),
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
@@ -58,8 +76,8 @@ export const getVacationTypeTableConfig = () => {
     formConfig: getSetVacationTypeFormConfig(t, () => {}),
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: can(PERMISSIONS.vacations.settings.leaveType.update),
+      canDelete: can(PERMISSIONS.vacations.settings.leaveType.delete),
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };

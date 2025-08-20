@@ -4,4 +4,5 @@ export interface VacationType {
     is_payed: boolean;
     is_deduct_from_balance: boolean;
     conditions: string;
+    branches: { id: number; name: string }[];
 }

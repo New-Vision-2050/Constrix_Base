@@ -85,8 +85,8 @@ export const getPublicVacationTableConfig = () => {
     formConfig: getSetPublicVacationFormConfig(t),
     executions: [],
     executionConfig: {
-      canEdit: false,
-      canDelete: true,
+      canEdit: can(PERMISSIONS.vacations.settings.publicHoliday.update),
+      canDelete: can(PERMISSIONS.vacations.settings.publicHoliday.delete),
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };

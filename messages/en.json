@@ -886,6 +886,7 @@
         "duduct":"Deduct",
         "notDuduct":"Not Deduct",
         "conditions": "Conditions",
+        "branches":"Branches",
 
 
         "countryFilter":"Country",
@@ -917,6 +918,9 @@
           "conditionsPlaceholder":"Conditions",
           "conditionsRequired":"Conditions",
 
+          "branches":"Branches",
+          "branchesPlaceholder":"Branches",
+          
           "submitButtonText":"Save",
           "cancelButtonText":"Cancel",
           "resetButtonText":"Clear"

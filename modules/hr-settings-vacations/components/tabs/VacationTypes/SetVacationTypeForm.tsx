@@ -76,6 +76,25 @@ export function getSetVacationTypeFormConfig(
             placeholder: t("form.conditionsPlaceholder"),
             required: true,
           },
+          // branch_ids
+          {
+            name: "branch_ids",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+          },
         ],
       },
     ],
@@ -85,6 +104,7 @@ export function getSetVacationTypeFormConfig(
         ? "1"
         : "0";
       data.is_payed = Boolean(data.is_payed) ? "1" : "0";
+      data.branch_ids = data.branches.map((branch: any) => branch.id.toString());
       return data;
     },
     onSuccess: onSuccessFn,

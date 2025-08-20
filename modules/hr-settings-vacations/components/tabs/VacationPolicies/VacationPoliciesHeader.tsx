@@ -4,6 +4,8 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import { getSetVacationPloicyConfig } from "./SetVacationPloicy/SetVacationPloicyConfig";
 import { Button } from "@/components/ui/button";
 import { useHRVacationCxt } from "@/modules/hr-settings-vacations/context/hr-vacation-cxt";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function VacationPoliciesHeader() {
   const t = useTranslations("HRSettingsVacations.leavesPolicies");
@@ -26,29 +28,31 @@ export default function VacationPoliciesHeader() {
     <div className="flex items-center justify-between mb-4">
       <h1 className="text-xl font-bold text-white">{t("title")}</h1>
       {/* add policy */}
-      <SheetFormBuilder
-        config={getSetVacationPloicyConfig({
-          onSuccessFn,
-          t,
-          editedPolicy,
-        })}
-        isOpen={openVPForm}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleCloseVPForm();
+      <Can check={[PERMISSIONS.vacations.settings.leavePolicy.create]}>
+        <SheetFormBuilder
+          config={getSetVacationPloicyConfig({
+            onSuccessFn,
+            t,
+            editedPolicy,
+          })}
+          isOpen={openVPForm}
+          onOpenChange={(open) => {
+            if (!open) {
+              handleCloseVPForm();
+            }
+          }}
+          trigger={
+            <Button
+              onClick={() => {
+                handleStoreEditPolicy(undefined);
+                handleOpenVPForm();
+              }}
+            >
+              {t("addNewPolicy")}
+            </Button>
           }
-        }}
-        trigger={
-          <Button
-            onClick={() => {
-              handleStoreEditPolicy(undefined);
-              handleOpenVPForm();
-            }}
-          >
-            {t("addNewPolicy")}
-          </Button>
-        }
-      />
+        />
+      </Can>
     </div>
   );
 }

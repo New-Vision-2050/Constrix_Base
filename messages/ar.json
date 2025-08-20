@@ -885,6 +885,7 @@
         "duduct": "خصم",
         "notDuduct": "من دون خصم",
         "conditions": "الشروط",
+        "branches": "الفروع",
         "countryFilter": "الدولة",
         "isPaidFilter": "الاجازة مدفوعة؟",
         "isDuductFilter": "خصم من الرصيد؟",
@@ -905,6 +906,9 @@
           "conditions": "الشروط",
           "conditionsPlaceholder": "الشروط",
           "conditionsRequired": "الشروط",
+
+          "branches": "الفروع",
+          "branchesPlaceholder": "اختر الفروع",
           "submitButtonText": "حفظ",
           "cancelButtonText": "إلغاء",
           "resetButtonText": "مسح النموذج"
