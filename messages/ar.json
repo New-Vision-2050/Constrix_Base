@@ -520,6 +520,57 @@
         "branchesFilter": "الفروع",
         "statusFilter": "حالة العميل"
       }
+    },
+    "form": {
+      "individualClient": "فرد",
+      "companyClient": "جهة",
+      "title": "إضافة عميل جديد",
+      "addClient": "إضافة عميل جديد",
+
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "ادخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+      "clientMailExist":"البريد الألكتروني مسجل كعميل فى الفرع الحالي بالفعل",
+      "mailExistAsEmployee":"البريد الألكتروني مسجل كموظف فى الفروع الأتية :",
+      "mailExistAsBroker":"البريد الألكتروني مسجل كوسيط فى الفروع الأتية :",
+      "mailExistAsClient":"البريد الألكتروني مسجل كعميل فى الفروع الأتية :",
+      "mailExistInSystem":"البريد الألكتروني مسجل بالفعل فى النظام",
+      "retrieveData":"استرجاع البيانات",
+
+      "phone": "الهاتف",
+      "phonePlaceholder": "ادخل رقم الهاتف",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "يرجى إدخال رقم هاتف صالح.",
+
+      "name": "الاسم",
+      "namePlaceholder": "ادخل الاسم",
+      "nameRequired": "الاسم مطلوب",
+      "nameThreeTerms": "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+      "nameLettersOnly": "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+      "nameMinLength": "الاسم يجب أن يحتوي على حرفين على الأقل.",
+      "arabicName": "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)",
+      
+
+      "identity": "الرقم الهوية ",
+      "identityPlaceholder": "ادخل الرقم الهوية ",
+      "identityRequired": "الرقم الهوية  مطلوب",
+      "identityPattern": "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+      "identityMinLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "identityMaxLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      
+      "branches": "الفرع",
+      "branchesPlaceholder": "اختر الفرع",
+
+      "broker": "الوسيط",
+      "brokerPlaceholder": "اختر الوسيط",
+
+      "correspondenceAddress":"عنوان المراسلات",
+      "correspondenceAddressPlaceholder":"ادخل عنوان المراسلات",
+
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج"
     }
   },
   "AttendanceDepartureModule": {

@@ -516,6 +516,15 @@
         "branchesFilter": "Branches",
         "statusFilter": "Status"
       }
+    },
+    "form": {
+      "individualClient": "Individual Client",
+      "companyClient": "Company Client",
+      "title": "Add New Client",
+      "addClient": "Add New Client",
+      "submitButtonText": "Add",
+      "cancelButtonText": "Cancel",
+      "resetButtonText": "Clear Form"
     }
   },
   "AttendanceDepartureModule": {

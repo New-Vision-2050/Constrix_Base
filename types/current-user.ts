@@ -3,4 +3,5 @@ export type CurrentUser = {
   id: string;
   name: string;
   phone: string;
+  branch_id: string;
 };

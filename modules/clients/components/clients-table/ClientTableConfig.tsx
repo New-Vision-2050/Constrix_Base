@@ -2,6 +2,9 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { Client } from "../../types/Client";
+import { Branch } from "@/modules/company-profile/types/company";
+import ClientTableStatus from "./ClientTableStatus";
 
 // Create a component that uses the translations
 export const getClientTableConfig = () => {
@@ -18,7 +21,7 @@ export const getClientTableConfig = () => {
         sortable: true,
       },
       {
-        key: "identity",
+        key: "residence",
         label: t("columns.identity"),
         sortable: true,
       },
@@ -35,12 +38,31 @@ export const getClientTableConfig = () => {
       {
         key: "branches",
         label: t("columns.branches"),
-        sortable: true,
+        render: (_: unknown, row: Client) => (
+          <div className="flex items-center gap-2 flex-wrap">
+            {row?.branches?.map((branch: Branch) => (
+              <span
+                key={branch.id}
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 whitespace-nowrap"
+              >
+                {branch.name}
+              </span>
+            ))}
+            {row?.branches?.length === 0 && "_"}
+          </div>
+        ),
       },
       {
-        key: "broker",
+        key: "broker_id",
         label: t("columns.broker"),
-        sortable: true,
+        render: (_: unknown, row: Client) =>
+          row?.broker_id ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-300 text-gray-800  whitespace-nowrap">
+              {row.broker.name}
+            </span>
+          ) : (
+            "_"
+          ),
       },
       {
         key: "projectsNumber",
@@ -50,6 +72,7 @@ export const getClientTableConfig = () => {
       {
         key: "status",
         label: t("columns.status"),
+        render: (_: unknown, row: Client) => <ClientTableStatus client={row} />,
       },
     ],
     allSearchedFields: [
