@@ -494,6 +494,34 @@
       "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
     }
   },
+  "ClientsModule": {
+    "StatisticsCards": {
+      "totalClients": "إجمالي عدد العملاء",
+      "activeClients": "العملاء النشطيين",
+      "inactiveClients": "العملاء المعلقين",
+      "totalClientsInLastMonth": "العملاء المضافين اخر شهر"
+    },
+    "table": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "DeleteConfirmMessage": "هل انت متأكد من حذف هذا العميل؟",
+      
+      "columns": {
+        "name": "اسم العميل",
+        "identity": "رقم الهوية",
+        "email": "البريد الالكتروني",
+        "phone": "رقم الجوال",
+        "broker": "الوسيط",
+        "status": "حالة العميل",
+        "branches": "الفروع",
+        "projectsNumber": "عدد المشاريع"
+      },
+      "filters": {
+        "branchesFilter": "الفروع",
+        "statusFilter": "حالة العميل"
+      }
+    }
+  },
   "AttendanceDepartureModule": {
     "WorkdayPeriods": {
       "numberOfPeriods": "عدد الفترات:",
@@ -838,9 +866,9 @@
       "allBranches": "جميع الفروع",
       "noUpgradeCondition": "لا يوجد شرط ترقية",
       "addNewPolicy": "إنشاء نظام اجازة جديد",
-      "yearly":"سنوية",
-      "calender":"تقويم",
-      "work_day":"يوم عمل",
+      "yearly": "سنوية",
+      "calender": "تقويم",
+      "work_day": "يوم عمل",
       "loading": {
         "title": "جاري تحميل أنظمة الإجازة",
         "description": "يرجى الانتظار بينما نقوم بتحميل بيانات أنظمة الإجازة..."
@@ -907,7 +935,6 @@
           "conditions": "الشروط",
           "conditionsPlaceholder": "الشروط",
           "conditionsRequired": "الشروط",
-
           "branches": "الفروع",
           "branchesPlaceholder": "اختر الفروع",
           "submitButtonText": "حفظ",
@@ -929,28 +956,22 @@
         "submitButtonText": "حفظ",
         "cancelButtonText": "إلغاء",
         "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الاجازة؟",
-
         "addPublicVacation": "اضافة اجازة رسمية",
-
-        "form":{
+        "form": {
           "title": "اضافة اجازة رسمية جديدة",
           "editTitle": "تعديل اجازة رسمية",
           "name": "اسم اجازة",
           "namePlaceholder": "اسم اجازة",
           "nameRequired": "اسم اجازة مطلوب",
-          
           "country": "الدولة",
           "countryPlaceholder": "الدولة",
           "countryRequired": "الدولة مطلوبة",
-          
           "startDate": "تاريخ البداية",
           "startDatePlaceholder": "تاريخ البداية",
           "startDateRequired": "تاريخ البداية مطلوب",
-          
           "endDate": "تاريخ النهاية",
           "endDatePlaceholder": "تاريخ النهاية",
           "endDateRequired": "تاريخ النهاية مطلوب",
-          
           "submitButtonText": "حفظ",
           "cancelButtonText": "إلغاء",
           "resetButtonText": "مسح النموذج"
