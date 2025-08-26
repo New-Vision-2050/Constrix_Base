@@ -2,10 +2,10 @@ import { Client } from "../../types/Client";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import ToggleControl from "./ToggleControl";
 import { useState } from "react";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import ToggleControl from "@/components/shared/ToggleControl";
 
 export default function ClientTableStatus({ client }: { client: Client }) {
   const { can } = usePermissions();
