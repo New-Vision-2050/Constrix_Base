@@ -91,6 +91,7 @@ export interface Branch {
   manager: Manager | null;
   user_count: string | number;
   department_count: string | number;
+  users_can_access: { id: string; name: string }[];
 }
 
 export interface Manager {
@@ -117,16 +118,16 @@ export interface officialData {
   phone: string;
   email: string;
   packages: Packages[];
-  company_access_programs : CompanyAccessProgramsType[];
+  company_access_programs: CompanyAccessProgramsType[];
 }
 
 export interface Packages {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
-export interface CompanyAccessProgramsType{
-  id: string
-  name: string
+export interface CompanyAccessProgramsType {
+  id: string;
+  name: string;
 }
 export interface CompanyData {
   id: string;

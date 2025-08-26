@@ -380,6 +380,15 @@
           "cv": "CV"
         }
       }
+    },
+    "branches": {
+      "assignUsersDialog": {
+        "title": "Branch Edit Permission",
+        "description": "Give users permission to edit this branch",
+        "cancel": "Cancel",
+        "assign": "Assign",
+        "searchUsers": "Search users"
+      }
     }
   },
   "CompanyStructure": {

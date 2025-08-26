@@ -254,7 +254,7 @@ export function getCreateIndividualClientFormConfig(
               },
             ],
           },
-          // identity
+          // identity --> residence
           {
             name: "residence",
             label: t("form.identity"),
