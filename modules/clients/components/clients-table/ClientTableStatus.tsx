@@ -38,8 +38,7 @@ export default function ClientTableStatus({ client }: { client: Client }) {
         label={t("Active")}
         checked={client.status == 1 ? true : false}
         onChange={handleChange}
-        disabled={loading}
-        // disabled={!can(PERMISSIONS.client.update)}
+        disabled={loading || !can(PERMISSIONS.clients.clientsPage.update)}
       />
     </>
   );

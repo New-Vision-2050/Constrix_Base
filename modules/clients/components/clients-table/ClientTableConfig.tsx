@@ -110,7 +110,7 @@ export const getClientTableConfig = () => {
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
-    // enableExport: can(PERMISSIONS.company.export),
+    enableExport: can(PERMISSIONS.clients.clientsPage.export),
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
@@ -121,8 +121,8 @@ export const getClientTableConfig = () => {
     // formConfig: getSetPublicVacationFormConfig(t),
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: can(PERMISSIONS.clients.clientsPage.update),
+      canDelete: can(PERMISSIONS.clients.clientsPage.delete),
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };
