@@ -202,7 +202,11 @@
     "HumanResources": "الموارد البشرية",
     "ProgramManagement": "ادارة البرامج",
     "Powers": "الصلاحيات",
-    "PackagesAndPrograms": "الباقات والبرامج"
+    "PackagesAndPrograms": "الباقات والبرامج",
+    "CRM": "علاقات العملاء",
+    "clients": "العملاء",
+    "brokers": "الوسطاء",
+    "CRMSettings": "اعدادات علاقات العملاء"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",

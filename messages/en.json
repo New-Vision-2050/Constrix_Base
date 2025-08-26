@@ -202,7 +202,11 @@
     "HumanResources": "Human Resources",
     "ProgramManagement": "Program Management",
     "Powers": "Powers",
-    "PackagesAndPrograms": "Packages and Programs"
+    "PackagesAndPrograms": "Packages and Programs",
+    "CRM": "CRM",
+    "clients": "Clients",
+    "brokers": "Brokers",
+    "CRMSettings": "CRM Settings"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

@@ -213,6 +213,23 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           },
         ],
       },
+      // CRM
+      {
+        name: t("Sidebar.CRM"),
+        slug: SUPER_ENTITY_SLUG.CRM,
+        icon: LayoutDashboardIcon,
+        urls: [ROUTER.CRM.clients],
+        isActive: pageName === ROUTER.CRM.clients,
+        sub_entities: [
+          {
+            name: t("Sidebar.clients"),
+            url: ROUTER.CRM.clients,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CRM.clients,
+            show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
+          }
+        ],
+      },
       // settings
       {
         name: t("Sidebar.Settings"),

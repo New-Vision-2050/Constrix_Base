@@ -19,4 +19,8 @@ export const ROUTER = {
   Bouquet: "/bouquet",
   BouquetById: (id: string) => `/bouquet/${id}`,
   BouquetDetailsById: (id: string) => `/bouquetDetails/${id}`,
+  CRM:{
+    clients:"/clients",
+    brokers:"/brokers",
+  }
 };
