@@ -1,6 +1,12 @@
 "use client";
 
 import TabsGroup from "@/components/shared/TabsGroup";
+import ProductDiscountView from "./views/product-discount";
+import OrderDiscountView from "./views/order-discount";
+import TimeDiscountView from "./views/time-discount";
+import DiscountCodesView from "./views/discount-codes";
+import PackageDiscountView from "./views/package-discount";
+import FreeDeliveryView from "./views/free-delivery";
 
 function ListDiscountsView() {
   return (
@@ -10,32 +16,32 @@ function ListDiscountsView() {
           {
             label: "تخفيض المنتج",
             value: "item-discount",
-            component: "Item Discount",
+            component: <ProductDiscountView />,
           },
           {
             label: "تخفيض بالطلب",
             value: "item-discount2",
-            component: "Item Discount",
+            component: <OrderDiscountView />,
           },
           {
             label: "تخفيض بالوقت",
             value: "item-discount3",
-            component: "Item Discount",
+            component: <TimeDiscountView />,
           },
           {
             label: "اكواد التخفيض",
             value: "item-discount4",
-            component: "Item Discount",
+            component: <DiscountCodesView />,
           },
           {
             label: "تخفيض بالباقة",
             value: "item-discount5",
-            component: "Item Discount",
+            component: <PackageDiscountView />,
           },
           {
             label: "توصيل مجاني",
             value: "item-discount6",
-            component: "Item Discount",
+            component: <FreeDeliveryView />,
           },
         ]}
         defaultValue="item-discount"
