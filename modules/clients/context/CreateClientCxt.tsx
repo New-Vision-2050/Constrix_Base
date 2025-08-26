@@ -15,6 +15,7 @@ interface CxtType {
   openCreateClientSheet: () => void;
   closeCreateClientSheet: () => void;
   branchId: string | undefined;
+  userId: string | undefined;
 }
 
 // Create the context
@@ -33,6 +34,9 @@ export const CreateClientCxtProvider: React.FC<PropsT> = ({ children }) => {
   const { data: userData } = useUserData();
   const branchId = useMemo(() => {
     return userData?.payload?.branch_id;
+  }, [userData]);
+  const userId = useMemo(() => {
+    return userData?.payload?.id;
   }, [userData]);
 
   // ** define helper functions
@@ -56,6 +60,8 @@ export const CreateClientCxtProvider: React.FC<PropsT> = ({ children }) => {
         closeCreateClientSheet,
         // branch id
         branchId,
+        // user id
+        userId,
       }}
     >
       {children}

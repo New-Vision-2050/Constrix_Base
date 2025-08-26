@@ -23,9 +23,10 @@ interface BranchCardProps {
   branch: Branch;
   branches: Branch[];
   className?: string;
+  handleBranchesRefetch: () => void;
 }
 
-const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
+const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: BranchCardProps) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const [isAssignUsersOpen, handleAssignUsersOpen, handleAssignUsersClose] =
     useModal();
@@ -134,9 +135,10 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
                 <AssignUsersToBranch
                   branchId={branch.id}
                   usersIds={branch.users_can_access.map((user) => user.id)}
+                  manager={branch.manager}
                   isOpen={isAssignUsersOpen}
-                  handleOpen={handleAssignUsersOpen}
                   handleClose={handleAssignUsersClose}
+                  handleBranchesRefetch={handleBranchesRefetch}
                 />
               </div>
             </div>
@@ -157,11 +159,11 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
   );
 };
 
-const BranchInfo = ({ branches }: { branches: Branch[] }) => {
+const BranchInfo = ({ branches,handleBranchesRefetch }: { branches: Branch[],handleBranchesRefetch: () => void }) => {
   return (
     <div className="bg-sidebar grid grid-cols-2">
       {branches.map((branch) => (
-        <BranchCard key={branch.id} branch={branch} branches={branches} />
+        <BranchCard key={branch.id} branch={branch} branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
       ))}
     </div>
   );

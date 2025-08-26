@@ -21,7 +21,12 @@ const Branches = () => {
 
   const locale = useLocale();
   const isRtl = locale === "ar";
-  const { data, isPending, isSuccess } = useQuery({
+  const {
+    data,
+    isPending,
+    isSuccess,
+    refetch: refetchBranches,
+  } = useQuery({
     queryKey: ["company-branches", company_id],
     queryFn: async () => {
       const response = await apiClient.get<ServerSuccessResponse<Branch[]>>(
@@ -37,6 +42,10 @@ const Branches = () => {
     },
   });
   const branches = data?.payload ?? [];
+
+  const handleBranchesRefetch = () => {
+    refetchBranches();
+  };
 
   const dynamicBranchTabs =
     branches.length > 0
@@ -55,7 +64,7 @@ const Branches = () => {
       value: "general",
       component: (
         <Can check={[PERMISSIONS.companyProfile.branch.list]}>
-          <BranchesInfo branches={branches} />
+          <BranchesInfo branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
         </Can>
       ),
       show: can([PERMISSIONS.companyProfile.branch.list]),

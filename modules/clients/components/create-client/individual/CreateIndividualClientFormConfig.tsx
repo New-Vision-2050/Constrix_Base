@@ -8,7 +8,8 @@ import { FormConfig, useFormStore } from "@/modules/form-builder";
 export function getCreateIndividualClientFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
-  currentEmpBranchId?: string
+  currentEmpBranchId?: string,
+  currentEmpId?: string
 ): FormConfig {
   const formId = "individual-client-form";
 
@@ -296,7 +297,7 @@ export function getCreateIndividualClientFormConfig(
             isMulti: true,
             placeholder: t("form.branchesPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

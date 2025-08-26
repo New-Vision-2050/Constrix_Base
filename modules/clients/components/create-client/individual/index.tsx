@@ -7,7 +7,7 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 
 export default function CreateIndividualClientForm() {
   const t = useTranslations("ClientsModule");
-  const { branchId: currentEmpBranchId, closeCreateClientSheet } =
+  const { branchId: currentEmpBranchId, userId: currentEmpId, closeCreateClientSheet } =
     useCreateClientCxt();
 
   const onSuccessFn = () => {
@@ -20,7 +20,8 @@ export default function CreateIndividualClientForm() {
   const _config = getCreateIndividualClientFormConfig(
     t,
     onSuccessFn,
-    currentEmpBranchId
+    currentEmpBranchId,
+    currentEmpId
   );
 
   // form builder vars
