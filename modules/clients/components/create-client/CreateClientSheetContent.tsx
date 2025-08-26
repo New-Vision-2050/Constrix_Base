@@ -1,6 +1,7 @@
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { useTranslations } from "next-intl";
 import CreateIndividualClientForm from "./individual";
+import CreateClientCompanyForm from "./company";
 
 export default function CreateClientSheetContent() {
   const t = useTranslations("ClientsModule.form");
@@ -13,7 +14,7 @@ export default function CreateClientSheetContent() {
     {
       id: "company-client",
       title: t("companyClient"),
-      content: <>companyClient</>,
+      content: <CreateClientCompanyForm />,
     },
   ];
 

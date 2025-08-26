@@ -571,7 +571,35 @@
       "correspondenceAddressPlaceholder": "ادخل عنوان المراسلات",
       "submitButtonText": "إضافة",
       "cancelButtonText": "إلغاء",
-      "resetButtonText": "مسح النموذج"
+      "resetButtonText": "مسح النموذج",
+
+      "companyClientFormTitle":"أنشاء جهة العميل",
+      "individualClientFormTitle":"أنشاء الفرد الممثل للجهة",
+
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+
+      "companyField": "النشاط",
+      "companyFieldPlaceholder": "اختر النشاط",
+      "companyFieldRequired": "النشاط مطلوب",
+
+      "commerceName": "اسم التجاري",
+      "commerceNamePlaceholder": "ادخل اسم التجاري",
+      "commerceNameRequired": "اسم التجاري مطلوب",
+
+      "shortName": "اسم المختصر",
+      "shortNamePlaceholder": "ادخل اسم المختصر",
+      "shortNameRequired": "اسم المختصر مطلوب",
+
+      "supportResponsible": "المسؤول عن الدعم",
+      "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
+      "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
+
+      "Validation": {
+        "arabicName": "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)",
+        "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
+      }
     }
   },
   "AttendanceDepartureModule": {
