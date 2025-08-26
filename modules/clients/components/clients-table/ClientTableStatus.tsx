@@ -1,17 +1,35 @@
-import { Label } from "@/components/ui/label";
 import { Client } from "../../types/Client";
 import { useTranslations } from "next-intl";
-import { Switch } from "@/components/ui/switch";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import ToggleControl from "./ToggleControl";
+import { useState } from "react";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { toast } from "sonner";
 
 export default function ClientTableStatus({ client }: { client: Client }) {
-  const t = useTranslations("Companies");
   const { can } = usePermissions();
+  const t = useTranslations("Companies");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (checked: boolean) => {
-    console.log(checked);
+  const handleChange = async (checked: boolean) => {
+    try {
+      setLoading(true);
+      await apiClient.post(
+        `${baseURL}/users/change-role-status`,
+        {
+          role_id: 2, //client
+          user_id: client.id,
+          status: checked ? 1 : 0,
+        }
+      );
+
+      toast.success("تم تغيير حالة العميل");
+    } catch (error) {
+      toast.error("حدث خطأ أثناء تغيير حالة العميل");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -20,7 +38,7 @@ export default function ClientTableStatus({ client }: { client: Client }) {
         label={t("Active")}
         checked={client.status == 1 ? true : false}
         onChange={handleChange}
-        disabled={false}
+        disabled={loading}
         // disabled={!can(PERMISSIONS.client.update)}
       />
     </>

@@ -301,6 +301,7 @@ export function getCreateIndividualClientFormConfig(
               valueField: "id",
               labelField: "name",
               searchParam: "name",
+              setFirstAsDefault: true,
               paginationEnabled: true,
               pageParam: "page",
               limitParam: "per_page",
