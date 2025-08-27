@@ -601,8 +601,110 @@
       "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
       "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
 
+      "companyBrokerFormTitle":"إنشاء وسيط شركة",
+      "individualBrokerFormTitle":"إنشاء وسيط فرد",
+
       "Validation": {
-        "arabicName": "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)",
+        "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+        "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
+      }
+    }
+  },
+  "BrokersModule": {
+    "StatisticsCards": {
+      "totalBrokers": "إجمالي الوسطاء",
+      "activeBrokers": "الوسطاء النشطين",
+      "inactiveBrokers": "الوسطاء غير النشطين",
+      "totalBrokersInLastMonth": "الوسطاء المضافين في الشهر الماضي"
+    },
+    "table": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "DeleteConfirmMessage": "هل أنت متأكد من رغبتك في حذف هذا الوسيط؟",
+      "columns": {
+        "name": "الاسم",
+        "identity": "رقم الهوية",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف",
+        "status": "الحالة",
+        "branches": "الفروع",
+        "clientsNumber": "عدد العملاء"
+      },
+      "filters": {
+        "branchesFilter": "الفروع",
+        "statusFilter": "الحالة"
+      }
+    },
+    "form": {
+      "individualBroker": "وسيط فرد",
+      "companyBroker": "وسيط شركة",
+      "title": "إضافة وسيط جديد",
+      "addBroker": "إضافة وسيط جديد",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج",
+      
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "الرجاء إدخال عنوان بريد إلكتروني صالح.",
+      "brokerMailExist": "البريد الإلكتروني مسجل بالفعل كوسيط في الفرع الحالي.",
+      "mailExistAsEmployee": "البريد الإلكتروني مسجل بالفعل كموظف في الفروع التالية :",
+      "mailExistAsBroker": "البريد الإلكتروني مسجل بالفعل كوسيط في الفروع التالية :",
+      "mailExistAsClient": "البريد الإلكتروني مسجل بالفعل كعميل في الفروع التالية :",
+      "mailExistInSystem": "البريد الإلكتروني مسجل بالفعل في النظام.",
+      "retrieveData": "استرجاع البيانات",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "أدخل رقم الهاتف",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "الرجاء إدخال رقم هاتف صالح.",
+      "name": "الاسم",
+      "namePlaceholder": "أدخل الاسم",
+      "nameRequired": "الاسم مطلوب",
+      "nameThreeTerms": "يجب أن يتكون الاسم من ثلاثة مقاطع بالضبط (الأول والأوسط والأخير)",
+      "nameLettersOnly": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      "nameMinLength": "يجب أن يحتوي الاسم على حرفين على الأقل.",
+      "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      "identity": "رقم الهوية",
+      "identityPlaceholder": "أدخل رقم الهوية",
+      "identityRequired": "رقم الهوية مطلوب",
+      "identityPattern": "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+      "identityMinLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "identityMaxLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "branches": "الفرع",
+      "branchesPlaceholder": "اختر الفرع",
+      "correspondenceAddress": "عنوان المراسلة",
+      "correspondenceAddressPlaceholder": "أدخل عنوان المراسلة",
+      
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+
+      "companyField": "مجال الشركة",
+      "companyFieldPlaceholder": "اختر مجال الشركة",
+      "companyFieldRequired": "مجال الشركة مطلوب",
+
+      "commerceName": "الاسم التجاري",
+      "commerceNamePlaceholder": "أدخل الاسم التجاري",
+      "commerceNameRequired": "الاسم التجاري مطلوب",
+
+      "shortName": "الاسم المختصر",
+      "shortNamePlaceholder": "أدخل الاسم المختصر",
+      "shortNameRequired": "الاسم المختصر مطلوب",
+
+      "commission": "العمولة",
+      "commissionPlaceholder": "أدخل نسبة العمولة",
+      "commissionRequired": "العمولة مطلوبة",
+
+      "companyBrokerFormTitle":"إنشاء وسيط شركة",
+      "individualBrokerFormTitle":"إنشاء وسيط فرد",
+
+      "supportResponsible": "المسؤول عن الدعم",
+      "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
+      "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
+
+      "Validation": {
+        "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
         "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
       }
     }

@@ -605,6 +605,105 @@
       }
     }
   },
+  "BrokersModule": {
+    "StatisticsCards": {
+      "totalBrokers": "Total Brokers",
+      "activeBrokers": "Active Brokers",
+      "inactiveBrokers": "Inactive Brokers",
+      "totalBrokersInLastMonth": "Brokers Added Last Month"
+    },
+    "table": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "DeleteConfirmMessage": "Are you sure you want to delete this broker?",
+      "columns": {
+        "name": "Name",
+        "identity": "Identity",
+        "email": "Email",
+        "phone": "Phone",
+        "status": "Status",
+        "branches": "Branches",
+        "clientsNumber": "Clients Number"
+      },
+      "filters": {
+        "branchesFilter": "Branches",
+        "statusFilter": "Status"
+      }
+    },
+    "form": {
+      "individualBroker": "Individual Broker",
+      "companyBroker": "Company Broker",
+      "title": "Add New Broker",
+      "addBroker": "Add New Broker",
+      "submitButtonText": "Add",
+      "cancelButtonText": "Cancel",
+      "resetButtonText": "Clear Form",
+      
+      "email": "Email",
+      "emailPlaceholder": "Enter email",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address.",
+      "brokerMailExist": "The email is already registered as a broker in the current branch.",
+      "mailExistAsEmployee": "The email is already registered as an employee in the following branches :",
+      "mailExistAsBroker": "The email is already registered as a broker in the following branches :",
+      "mailExistAsClient": "The email is already registered as a client in the following branches :",
+      "mailExistInSystem": "The email is already registered in the system.",
+      "retrieveData": "Retrieve Data",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter phone",
+      "phoneRequired": "Phone is required",
+      "phoneInvalid": "Please enter a valid phone number.",
+      "name": "Name",
+      "namePlaceholder": "Enter name",
+      "nameRequired": "Name is required",
+      "nameThreeTerms": "The name must contain exactly three terms (first, middle, and last name)",
+      "nameLettersOnly": "Name must contain only letters (no numbers or symbols)",
+      "nameMinLength": "Name must contain at least two letters.",
+      "arabicName": "The name must contain only letters (no numbers or symbols)",
+      "identity": "The identity number",
+      "identityPlaceholder": "Enter the identity number",
+      "identityRequired": "The identity number is required",
+      "identityPattern": "The identity number must consist of 10 numbers and start with the number 1 or 2",
+      "identityMinLength": "The identity number must consist of 10 numbers",
+      "identityMaxLength": "The identity number must consist of 10 numbers",
+      "branches": "Branch",
+      "branchesPlaceholder": "Select branch",
+      "correspondenceAddress": "Correspondence Address",
+      "correspondenceAddressPlaceholder": "Enter correspondence address",
+      
+      "country": "Country",
+      "countryPlaceholder": "Select Country",
+      "countryRequired": "Country is required",
+
+      "companyField": "Company Field",
+      "companyFieldPlaceholder": "Select Company Field",
+      "companyFieldRequired": "Company Field is required",
+
+      "commerceName": "Commercial Name",
+      "commerceNamePlaceholder": "Enter Commercial Name",
+      "commerceNameRequired": "Commercial Name is required",
+
+      "shortName": "Short Name",
+      "shortNamePlaceholder": "Enter Short Name",
+      "shortNameRequired": "Short Name is required",
+
+      "commission": "Commission",
+      "commissionPlaceholder": "Enter Commission",
+      "commissionRequired": "Commission is required",
+
+      "companyBrokerFormTitle":"Create Company Broker",
+      "individualBrokerFormTitle":"Create Individual Broker",
+
+      "supportResponsible": "Support Responsible",
+      "supportResponsiblePlaceholder": "Select Support Responsible",
+      "supportResponsibleRequired": "Support Responsible is required",
+
+      "Validation": {
+        "arabicName": "The name must contain only letters (no numbers or symbols)",
+        "englishName": "The short name must be in English and not contain symbols"
+      }
+    }
+  },
   "AttendanceDepartureModule": {
     "WorkdayPeriods": {
       "numberOfPeriods": "Number of periods:",
