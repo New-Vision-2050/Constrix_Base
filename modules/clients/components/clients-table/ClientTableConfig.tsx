@@ -5,11 +5,13 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Client } from "../../types/Client";
 import { Branch } from "@/modules/company-profile/types/company";
 import ClientTableStatus from "./ClientTableStatus";
+import { getCreateIndividualClientFormConfig } from "../create-client/individual/CreateIndividualClientFormConfig";
 
 // Create a component that uses the translations
 export const getClientTableConfig = () => {
   const { can } = usePermissions();
   const t = useTranslations("ClientsModule.table");
+  const tForm = useTranslations("ClientsModule");
 
   return {
     url: `${baseURL}/company-users/clients`,
@@ -19,6 +21,16 @@ export const getClientTableConfig = () => {
         key: "name",
         label: t("columns.name"),
         sortable: true,
+        render: (_: unknown, row: Client) => (
+          <div className="flex items-center gap-2 flex-wrap">
+            {row.name}
+            <span
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 whitespace-nowrap"
+            >
+              {row.type == 2 ? "ممثل لجهة" : "فرد"}
+            </span>
+          </div>
+        ),
       },
       {
         key: "residence",
@@ -99,10 +111,17 @@ export const getClientTableConfig = () => {
         searchType: {
           type: "dropdown",
           placeholder: t("filters.statusFilter"),
-          options: [
-            { value: "active", label: t("active") },
-            { value: "inactive", label: t("inactive") },
-          ],
+          dynamicDropdown: {
+            url: `app/api/crm/ststus-list`,
+            valueField: "id",
+            labelField: "label",
+            paginationEnabled: true,
+            itemsPerPage: 10,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
         },
       },
     ],
@@ -118,7 +137,7 @@ export const getClientTableConfig = () => {
     searchParamName: "search",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    // formConfig: getSetPublicVacationFormConfig(t),
+    formConfig: getCreateIndividualClientFormConfig(tForm, () => {}),
     executions: [],
     executionConfig: {
       canEdit: can(PERMISSIONS.clients.clientsPage.update),
