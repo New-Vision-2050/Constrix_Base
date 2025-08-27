@@ -166,6 +166,7 @@
     "CountryFilter": "دولة الشركة",
     "TypeFilter": "نوع الشركة",
     "Active": "نشط",
+    "Inactive": "غير نشط",
     "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
     "completeProfileData": "أستكمال بيانات",
     "PackageSettings": "اعدادات الباقة والبرامج",

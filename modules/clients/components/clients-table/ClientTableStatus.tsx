@@ -35,7 +35,8 @@ export default function ClientTableStatus({ client }: { client: Client }) {
   return (
     <>
       <ToggleControl
-        label={t("Active")}
+        activeLabel={t("Active")}
+        inactiveLabel={t("Inactive")}
         checked={client.status == 1 ? true : false}
         onChange={handleChange}
         disabled={loading || !can(PERMISSIONS.clients.clientsPage.update)}

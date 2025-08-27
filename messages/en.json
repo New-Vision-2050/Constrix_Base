@@ -166,6 +166,7 @@
     "CountryFilter": "Company Country",
     "TypeFilter": "Company Type",
     "Active": "Active",
+    "Inactive": "Inactive",
     "LoginAsManager": "Login as Company Manager (Edit)",
     "completeProfileData": "complete profile data",
     "PackageSettings": "Package and Program Settings",

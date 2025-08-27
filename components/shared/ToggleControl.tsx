@@ -1,25 +1,36 @@
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 
+
 export default function ToggleControl({
-  label,
+  activeLabel,
+  inactiveLabel,
   disabled,
   checked,
   onChange,
 }: {
-  label: string;
+  activeLabel: string;
+  inactiveLabel: string;
   disabled?: boolean;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) {
+  // checked state
+  const [checkedState, setCheckedState] = useState(checked);
+  
+  
   return (
     <div className="flex items-center gap-2">
       <Label htmlFor={`switcher-controller`} className="font-normal">
-        {label}
+        {checkedState ? activeLabel : inactiveLabel}
       </Label>
       <label className={`flex items-center ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}>
         <input
           defaultChecked={checked}
-          onChange={(e) => onChange(e.target.checked)}
+          onChange={(e) => {
+            setCheckedState(e.target.checked);
+            onChange(e.target.checked);
+          }}
           type="checkbox"
           className="sr-only peer"
           disabled={disabled}

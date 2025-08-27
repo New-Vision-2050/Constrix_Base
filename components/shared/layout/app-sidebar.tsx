@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon } from "lucide-react";
+import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon,Users } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -224,7 +224,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           {
             name: t("Sidebar.clients"),
             url: ROUTER.CRM.clients,
-            icon: LayoutDashboardIcon,
+            icon: Users,
             isActive: pageName === ROUTER.CRM.clients,
             show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
           }
