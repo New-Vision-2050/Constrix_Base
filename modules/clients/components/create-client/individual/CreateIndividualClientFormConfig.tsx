@@ -109,6 +109,10 @@ export function getCreateIndividualClientFormConfig(
                     useFormStore.getState().setValues(formId, {
                       user: JSON.stringify(_user),
                     });
+                    // reset preventRetriveUserData
+                    useFormStore.getState().setValues(formId, {
+                      preventRetriveUserData: true,
+                    });
 
                     /**
                      * roles

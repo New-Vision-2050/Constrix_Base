@@ -46,7 +46,7 @@ export function getCreateCompanyClientFormConfig(
               totalCountHeader: "X-Total-Count",
             },
             onChange: (newVal, values) => {
-              useFormStore.getState().setValue("companies-form", "local-time", {
+              useFormStore.getState().setValue(formId, "local-time", {
                 "country-id": newVal,
               });
             },
@@ -226,7 +226,14 @@ export function getCreateCompanyClientFormConfig(
             name: "type", //1 --> mean  individual client, 2 --> mean company client
             label: "",
             type: "hiddenObject",
-            defaultValue: "1",
+            defaultValue: "2",
+          },
+          // company id
+          {
+            name: "company_id",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: "",
           },
           // email
           {
@@ -403,7 +410,7 @@ export function getCreateCompanyClientFormConfig(
           },
           // name
           {
-            name: "name",
+            name: "clientName",
             label: t("form.name"),
             type: "text",
             placeholder: t("form.namePlaceholder"),
@@ -529,8 +536,8 @@ export function getCreateCompanyClientFormConfig(
       submitButtonTextPerStep: "التالي",
       // API URLs for each step
       stepApiUrls: {
-        0: `${baseURL}/companies`,
-        1: `${baseURL}/company-users`,
+        0: `${baseURL}/companies?is_client=1`,
+        1: `${baseURL}/company-users/clients`,
       },
       // API headers for each step
       stepApiHeaders: {
@@ -544,13 +551,22 @@ export function getCreateCompanyClientFormConfig(
       // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
       onStepSubmit: async (step, values) => {
         // Option to call default way to handle the step
+        let body = values;
+        console.log('Breakpoint101 step,values ::',step,values)
+        if (step === 1) {
+          body = {
+            ...values,
+            name: values.clientName,
+            company_id: values.company_id,
+          };
+        }
         const result = await defaultStepSubmitHandler(
           step,
-          values,
-          GetCompaniesFormConfig(t)
+          body,
+          getCreateCompanyClientFormConfig(t, onSuccessFn)
         );
         console.log("result before success", result);
-        useFormStore.getState().setValues("companies-form", {
+        useFormStore.getState().setValues(formId, {
           company_id: result?.data?.payload.id,
         });
         if (result.success) {
@@ -561,7 +577,7 @@ export function getCreateCompanyClientFormConfig(
               message: `Step ${step + 1} submitted successfully`,
               data: () => {
                 console.log("result after success", result);
-                useFormStore.getState().setValues("companies-form", {
+                useFormStore.getState().setValues(formId, {
                   company_id: result?.data?.payload.id,
                 });
                 return {

@@ -26,11 +26,14 @@ export default function InvalidClientMailDialog({ formId, btnText }: PropsT) {
   const preventRetriveUserData = formValues?.preventRetriveUserData;
   const messages = (dialogMessage as string).split(",") ?? [];
 
+  console.log("formValuesformValues", formValues);
+
   // handle retrieve user data
   const handleRetrieveUserData = async () => {
     try {
       useFormStore.getState().setValues(formId, {
         name: userData.name,
+        clientName: userData.name,
         phone: userData.phone,
         residence: userData.residence,
       });
