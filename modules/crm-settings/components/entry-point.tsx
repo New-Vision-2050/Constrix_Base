@@ -1,6 +1,7 @@
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { useTranslations } from "next-intl";
 import ClientsSettings from "../tabs/clients-settings";
+import { CRMSettingDataCxtProvider } from "../context/CRMSettingData";
 
 export default function CRMSettingsEntryPoint() {
   const t = useTranslations("CRMSettingsModule.tabs");
@@ -19,10 +20,13 @@ export default function CRMSettingsEntryPoint() {
 
   return (
     <div className="pt-4">
-      <HorizontalTabs
-        list={crmSettingsTabs}
-        additionalClassiess="justify-start"
-      />
+      <CRMSettingDataCxtProvider>
+        <HorizontalTabs
+          list={crmSettingsTabs}
+          bgStyleApproach={true}
+          additionalClassiess="justify-start"
+        />
+      </CRMSettingDataCxtProvider>
     </div>
   );
 }
