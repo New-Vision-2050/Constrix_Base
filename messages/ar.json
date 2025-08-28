@@ -166,6 +166,7 @@
     "CountryFilter": "دولة الشركة",
     "TypeFilter": "نوع الشركة",
     "Active": "نشط",
+    "Inactive": "غير نشط",
     "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
     "completeProfileData": "أستكمال بيانات",
     "PackageSettings": "اعدادات الباقة والبرامج",
@@ -202,7 +203,11 @@
     "HumanResources": "الموارد البشرية",
     "ProgramManagement": "ادارة البرامج",
     "Powers": "الصلاحيات",
-    "PackagesAndPrograms": "الباقات والبرامج"
+    "PackagesAndPrograms": "الباقات والبرامج",
+    "CRM": "علاقات العملاء",
+    "clients": "العملاء",
+    "brokers": "الوسطاء",
+    "CRMSettings": "اعدادات علاقات العملاء"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -379,6 +384,17 @@
           "certifications": "الشهادات المهنية",
           "cv": "السيرة الذاتية"
         }
+      },
+      "branches": {
+        "assignUsersDialog": {
+          "title": "صلاحية التعديل علي الفرع",
+          "description": "أعطاء المستخدمين صلاحية التعديل علي الفرع",
+          "cancel": "الغاء",
+          "assign": "تعيين",
+          "searchUsers": "البحث عن مستخدمين",
+          "managerNote": "مدير الشركة :",
+          "branchManager": "مدير الفرع :"
+        }
       }
     }
   },
@@ -492,6 +508,235 @@
     "error": {
       "loading": "خطأ في تحميل البيانات",
       "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
+    }
+  },
+  "ClientsModule": {
+    "StatisticsCards": {
+      "totalClients": "إجمالي عدد العملاء",
+      "activeClients": "العملاء النشطيين",
+      "inactiveClients": "العملاء المعلقين",
+      "totalClientsInLastMonth": "العملاء المضافين اخر شهر"
+    },
+    "table": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "DeleteConfirmMessage": "هل انت متأكد من حذف هذا العميل؟",
+      "columns": {
+        "name": "اسم العميل",
+        "identity": "رقم الهوية",
+        "email": "البريد الالكتروني",
+        "phone": "رقم الجوال",
+        "broker": "الوسيط",
+        "status": "حالة العميل",
+        "branches": "الفروع",
+        "projectsNumber": "عدد المشاريع"
+      },
+      "filters": {
+        "branchesFilter": "الفروع",
+        "statusFilter": "حالة العميل"
+      }
+    },
+    "form": {
+      "individualClient": "فرد",
+      "companyClient": "جهة",
+      "title": "إضافة عميل جديد",
+      "addClient": "إضافة عميل جديد",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "ادخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+      "clientMailExist": "البريد الألكتروني مسجل كعميل فى الفرع الحالي بالفعل",
+      "mailExistAsEmployee": "البريد الألكتروني مسجل كموظف فى الفروع الأتية :",
+      "mailExistAsBroker": "البريد الألكتروني مسجل كوسيط فى الفروع الأتية :",
+      "mailExistAsClient": "البريد الألكتروني مسجل كعميل فى الفروع الأتية :",
+      "mailExistInSystem": "البريد الألكتروني مسجل بالفعل فى النظام",
+      "retrieveData": "استرجاع البيانات",
+      "phone": "الهاتف",
+      "phonePlaceholder": "ادخل رقم الهاتف",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "يرجى إدخال رقم هاتف صالح.",
+      "name": "الاسم",
+      "namePlaceholder": "ادخل الاسم",
+      "nameRequired": "الاسم مطلوب",
+      "nameThreeTerms": "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+      "nameLettersOnly": "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+      "nameMinLength": "الاسم يجب أن يحتوي على حرفين على الأقل.",
+      "arabicName": "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)",
+      "identity": "الرقم الهوية ",
+      "identityPlaceholder": "ادخل الرقم الهوية ",
+      "identityRequired": "الرقم الهوية  مطلوب",
+      "identityPattern": "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+      "identityMinLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "identityMaxLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "branches": "الفرع",
+      "branchesPlaceholder": "اختر الفرع",
+      "broker": "الوسيط",
+      "brokerPlaceholder": "اختر الوسيط",
+      "correspondenceAddress": "عنوان المراسلات",
+      "correspondenceAddressPlaceholder": "ادخل عنوان المراسلات",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج",
+      "companyClientFormTitle": "أنشاء جهة العميل",
+      "individualClientFormTitle": "أنشاء الفرد الممثل للجهة",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "companyField": "النشاط",
+      "companyFieldPlaceholder": "اختر النشاط",
+      "companyFieldRequired": "النشاط مطلوب",
+      "commerceName": "اسم التجاري",
+      "commerceNamePlaceholder": "ادخل اسم التجاري",
+      "commerceNameRequired": "اسم التجاري مطلوب",
+      "shortName": "اسم المختصر",
+      "shortNamePlaceholder": "ادخل اسم المختصر",
+      "shortNameRequired": "اسم المختصر مطلوب",
+      "supportResponsible": "المسؤول عن الدعم",
+      "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
+      "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
+      "companyBrokerFormTitle": "إنشاء وسيط شركة",
+      "individualBrokerFormTitle": "إنشاء وسيط فرد",
+      "Validation": {
+        "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+        "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
+      }
+    },
+    "dialog": {
+      "triggerText": "اختر الموقع من الخريطة",
+      "title": "اختر احداثيات موقع العنوان الوطني",
+      "latitude": "خط العرض",
+      "latitudePlaceholder": "ادخل خط العرض",
+      "latitudeRequired": "خط العرض مطلوب",
+      "longitude": "خط الطول",
+      "longitudePlaceholder": "ادخل خط الطول",
+      "longitudeRequired": "خط الطول مطلوب",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "region": "المنطقة",
+      "regionPlaceholder": "اختر المنطقة",
+      "regionRequired": "المنطقة مطلوبة",
+      "city": "المدينة",
+      "cityPlaceholder": "اختر المدينة",
+      "cityRequired": "المدينة مطلوبة",
+      "neighborhood": "الحي",
+      "neighborhoodPlaceholder": "اختر الحي",
+      "neighborhoodRequired": "الحي مطلوب",
+      "buildingNumber": "رقم المبنى",
+      "buildingNumberPlaceholder": "ادخل رقم المبنى",
+      "buildingNumberRequired": "رقم المبنى مطلوب",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "ادخل رقم الهاتف",
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "postalCode": "الرمز البريدي",
+      "postalCodePlaceholder": "ادخل الرمز البريدي",
+      "postalCodeRequired": "الرمز البريدي مطلوب",
+      "street": "الشارع",
+      "streetPlaceholder": "ادخل الشارع",
+      "streetRequired": "الشارع مطلوب",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج"
+    }
+  },
+  "BrokersModule": {
+    "StatisticsCards": {
+      "totalBrokers": "إجمالي الوسطاء",
+      "activeBrokers": "الوسطاء النشطين",
+      "inactiveBrokers": "الوسطاء غير النشطين",
+      "totalBrokersInLastMonth": "الوسطاء المضافين في الشهر الماضي"
+    },
+    "table": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "DeleteConfirmMessage": "هل أنت متأكد من رغبتك في حذف هذا الوسيط؟",
+      "columns": {
+        "name": "الاسم",
+        "identity": "رقم الهوية",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف",
+        "status": "الحالة",
+        "branches": "الفروع",
+        "clientsNumber": "عدد العملاء"
+      },
+      "filters": {
+        "branchesFilter": "الفروع",
+        "statusFilter": "الحالة"
+      }
+    },
+    "form": {
+      "individualBroker": "وسيط فرد",
+      "companyBroker": "وسيط شركة",
+      "title": "إضافة وسيط جديد",
+      "addBroker": "إضافة وسيط جديد",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "الرجاء إدخال عنوان بريد إلكتروني صالح.",
+      "brokerMailExist": "البريد الإلكتروني مسجل بالفعل كوسيط في الفرع الحالي.",
+      "mailExistAsEmployee": "البريد الإلكتروني مسجل بالفعل كموظف في الفروع التالية :",
+      "mailExistAsBroker": "البريد الإلكتروني مسجل بالفعل كوسيط في الفروع التالية :",
+      "mailExistAsClient": "البريد الإلكتروني مسجل بالفعل كعميل في الفروع التالية :",
+      "mailExistInSystem": "البريد الإلكتروني مسجل بالفعل في النظام.",
+      "retrieveData": "استرجاع البيانات",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "أدخل رقم الهاتف",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "الرجاء إدخال رقم هاتف صالح.",
+      "name": "الاسم",
+      "namePlaceholder": "أدخل الاسم",
+      "nameRequired": "الاسم مطلوب",
+      "nameThreeTerms": "يجب أن يتكون الاسم من ثلاثة مقاطع بالضبط (الأول والأوسط والأخير)",
+      "nameLettersOnly": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      "nameMinLength": "يجب أن يحتوي الاسم على حرفين على الأقل.",
+      "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      "identity": "رقم الهوية",
+      "identityPlaceholder": "أدخل رقم الهوية",
+      "identityRequired": "رقم الهوية مطلوب",
+      "identityPattern": "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+      "identityMinLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "identityMaxLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "branches": "الفرع",
+      "branchesPlaceholder": "اختر الفرع",
+      "correspondenceAddress": "عنوان المراسلة",
+      "correspondenceAddressPlaceholder": "أدخل عنوان المراسلة",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "companyField": "مجال الشركة",
+      "companyFieldPlaceholder": "اختر مجال الشركة",
+      "companyFieldRequired": "مجال الشركة مطلوب",
+      "commerceName": "الاسم التجاري",
+      "commerceNamePlaceholder": "أدخل الاسم التجاري",
+      "commerceNameRequired": "الاسم التجاري مطلوب",
+      "shortName": "الاسم المختصر",
+      "shortNamePlaceholder": "أدخل الاسم المختصر",
+      "shortNameRequired": "الاسم المختصر مطلوب",
+      "commission": "العمولة",
+      "commissionPlaceholder": "أدخل نسبة العمولة",
+      "commissionRequired": "العمولة مطلوبة",
+      "companyBrokerFormTitle": "إنشاء وسيط شركة",
+      "individualBrokerFormTitle": "إنشاء وسيط فرد",
+      "supportResponsible": "المسؤول عن الدعم",
+      "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
+      "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
+      "Validation": {
+        "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+        "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
+      }
+    }
+  },
+  "CRMSettingsModule": {
+    "tabs": {
+      "clientsSettings": "إعدادات العملاء",
+      "clientsPermissions": "صلاحيات العملاء"
+    },
+    "ClientsSettings":{
+      "shareClientsData":"مشاركة بيانات العملاء بين الفروع",
+      "shareBrokersData":"مشاركة بيانات الوسطاء بين الفروع"
     }
   },
   "AttendanceDepartureModule": {
@@ -838,9 +1083,9 @@
       "allBranches": "جميع الفروع",
       "noUpgradeCondition": "لا يوجد شرط ترقية",
       "addNewPolicy": "إنشاء نظام اجازة جديد",
-      "yearly":"سنوية",
-      "calender":"تقويم",
-      "work_day":"يوم عمل",
+      "yearly": "سنوية",
+      "calender": "تقويم",
+      "work_day": "يوم عمل",
       "loading": {
         "title": "جاري تحميل أنظمة الإجازة",
         "description": "يرجى الانتظار بينما نقوم بتحميل بيانات أنظمة الإجازة..."
@@ -907,7 +1152,6 @@
           "conditions": "الشروط",
           "conditionsPlaceholder": "الشروط",
           "conditionsRequired": "الشروط",
-
           "branches": "الفروع",
           "branchesPlaceholder": "اختر الفروع",
           "submitButtonText": "حفظ",
@@ -929,28 +1173,22 @@
         "submitButtonText": "حفظ",
         "cancelButtonText": "إلغاء",
         "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الاجازة؟",
-
         "addPublicVacation": "اضافة اجازة رسمية",
-
-        "form":{
+        "form": {
           "title": "اضافة اجازة رسمية جديدة",
           "editTitle": "تعديل اجازة رسمية",
           "name": "اسم اجازة",
           "namePlaceholder": "اسم اجازة",
           "nameRequired": "اسم اجازة مطلوب",
-          
           "country": "الدولة",
           "countryPlaceholder": "الدولة",
           "countryRequired": "الدولة مطلوبة",
-          
           "startDate": "تاريخ البداية",
           "startDatePlaceholder": "تاريخ البداية",
           "startDateRequired": "تاريخ البداية مطلوب",
-          
           "endDate": "تاريخ النهاية",
           "endDatePlaceholder": "تاريخ النهاية",
           "endDateRequired": "تاريخ النهاية مطلوب",
-          
           "submitButtonText": "حفظ",
           "cancelButtonText": "إلغاء",
           "resetButtonText": "مسح النموذج"
