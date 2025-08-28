@@ -4,7 +4,6 @@ import AddOrderDiscountExample from "@/modules/stores/components/dialogs/add-ord
 import ProductsInDiscountExample from "@/modules/stores/components/dialogs/products-in-discount/example";
 import AddDiscountCouponExample from "@/modules/stores/components/dialogs/add-discount-coupon/example";
 import AddWarehouse2Example from "@/modules/stores/components/dialogs/add-warehouse-2/example";
-import StoresView from "@/modules/stores/client";
 
 export default function AdvancedRolePermissionsExamplePage() {
   return (
