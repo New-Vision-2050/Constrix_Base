@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon,Users } from "lucide-react";
+import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon,Users,Settings } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -227,7 +227,21 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             icon: Users,
             isActive: pageName === ROUTER.CRM.clients,
             show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
-          }
+          },
+          {
+            name: t("Sidebar.brokers"),
+            url: ROUTER.CRM.brokers,
+            icon: Users,
+            isActive: pageName === ROUTER.CRM.brokers,
+            show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
+          },
+          {
+            name: t("Sidebar.CRMSettings"),
+            url: ROUTER.CRM.settings,
+            icon: Settings,
+            isActive: pageName === ROUTER.CRM.settings,
+            show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
+          },
         ],
       },
       // settings

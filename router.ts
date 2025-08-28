@@ -22,5 +22,6 @@ export const ROUTER = {
   CRM:{
     clients:"/clients",
     brokers:"/brokers",
+    settings:"/crm-settings",
   }
 };
