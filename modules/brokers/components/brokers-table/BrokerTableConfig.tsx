@@ -110,8 +110,8 @@ export const getBrokerTableConfig = () => {
     formConfig: getCreateIndividualBrokerFormConfig(tForm, () => {}),
     executions: [],
     executionConfig: {
-      canEdit: can(PERMISSIONS.clients.clientsPage.update),
-      canDelete: can(PERMISSIONS.clients.clientsPage.delete),
+      canEdit: false,
+      canDelete: false,
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };

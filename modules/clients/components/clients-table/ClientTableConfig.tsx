@@ -122,8 +122,8 @@ export const getClientTableConfig = () => {
     formConfig: getCreateIndividualClientFormConfig(tForm, () => {}),
     executions: [],
     executionConfig: {
-      canEdit: can(PERMISSIONS.clients.clientsPage.update),
-      canDelete: can(PERMISSIONS.clients.clientsPage.delete),
+      canEdit: false,
+      canDelete: false,
     },
     deleteConfirmMessage: t("DeleteConfirmMessage"), // Custom delete confirmation message
   };

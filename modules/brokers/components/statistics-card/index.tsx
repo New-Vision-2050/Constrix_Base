@@ -31,29 +31,29 @@ export default function BrokersStatisticsCards() {
   const cardsData = [
     {
       label: t("totalBrokers"),
-      value: 125,
-      percentage: 18,
+      value: widgetsData?.[0]?.total || "0",
+      percentage: widgetsData?.[0]?.percentage || "0",
       percentageColor: "#27C200",
       icon: <UserIcon size={24} color="#B39DDB" />,
     },
     {
       label: t("totalBrokersInLastMonth"),
-      value: 125,
-      percentage: 18,
+      value: widgetsData?.[1]?.total || "0",
+      percentage: widgetsData?.[1]?.percentage || "0",
       percentageColor: "#FF2D2D",
       icon: <UsersIcon size={24} color="#B39DDB" />,
     },
     {
       label: t("activeBrokers"),
-      value: 125,
-      percentage: 18,
+      value: widgetsData?.[2]?.total || "0",
+      percentage: widgetsData?.[2]?.percentage || "0",
       percentageColor: "#27C200",
       icon: <ActivityIcon size={24} color="#B39DDB" />,
     },
     {
       label: t("inactiveBrokers"),
-      value: 125,
-      percentage: 18,
+      value: widgetsData?.[3]?.total || "0",
+      percentage: widgetsData?.[3]?.percentage || "0",
       percentageColor: "#FF7A00",
       icon: <Calendar size={24} color="#6EC1E4" />,
     },
@@ -66,7 +66,7 @@ export default function BrokersStatisticsCards() {
           key={index}
           label={card.label}
           value={card.value}
-          percentage={card.percentage}
+          percentage={+card.percentage}
           percentageColor={card.percentageColor}
           icon={card.icon}
         />
