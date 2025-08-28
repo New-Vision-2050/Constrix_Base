@@ -13,5 +13,5 @@ export const WarehousesApi = {
     baseApi.post("ecommerce/warehouses", params),
   update: (id: string, params: UpdateWarehouseParams) =>
     baseApi.put(`ecommerce/warehouses/${id}`, params),
-  delete: (id: string) => baseApi.put(`ecommerce/warehouses/${id}`),
+  delete: (id: string) => baseApi.delete(`ecommerce/warehouses/${id}`),
 };

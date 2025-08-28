@@ -4,22 +4,12 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import AddWarehouse2Dialog from "./index";
 
-interface Warehouse2Data {
-  warehouse_name: string;
-  virtual_location_enabled: boolean;
-  country: string;
-  city: string;
-  latitude: number;
-  longitude: number;
-  street: string;
-  location: string;
-}
-
 export default function AddWarehouse2Example() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSuccess = (data: Warehouse2Data) => {
-    console.log("Warehouse 2 created:", data);
+  const handleSuccess = () => {
+    console.log("Warehouse created successfully!");
+    // You might want to refresh data or show a success message here
   };
 
   return (
@@ -34,7 +24,7 @@ export default function AddWarehouse2Example() {
       </div>
 
       <AddWarehouse2Dialog
-        isOpen={isOpen}
+        open={isOpen}
         onClose={() => setIsOpen(false)}
         onSuccess={handleSuccess}
       />
