@@ -1,3 +1,5 @@
+import CRMSettingsView from "@/modules/crm-settings";
+
 export default function CRMSettings() {
-  return <div>CRMSettings</div>;
+  return <CRMSettingsView />;
 }

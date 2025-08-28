@@ -729,6 +729,16 @@
       }
     }
   },
+  "CRMSettingsModule": {
+    "tabs": {
+      "clientsSettings": "إعدادات العملاء",
+      "clientsPermissions": "صلاحيات العملاء"
+    },
+    "ClientsSettings":{
+      "shareClientsData":"مشاركة بيانات العملاء بين الفروع",
+      "shareBrokersData":"مشاركة بيانات الوسطاء بين الفروع"
+    }
+  },
   "AttendanceDepartureModule": {
     "WorkdayPeriods": {
       "numberOfPeriods": "عدد الفترات:",

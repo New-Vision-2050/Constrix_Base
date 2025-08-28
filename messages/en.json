@@ -540,7 +540,6 @@
       "submitButtonText": "Add",
       "cancelButtonText": "Cancel",
       "resetButtonText": "Clear Form",
-
       "email": "Email",
       "emailPlaceholder": "Enter email",
       "emailRequired": "Email is required",
@@ -574,31 +573,23 @@
       "brokerPlaceholder": "Select broker",
       "correspondenceAddress": "Correspondence Address",
       "correspondenceAddressPlaceholder": "Enter correspondence address",
-      
       "country": "Country",
       "countryPlaceholder": "Select Country",
       "countryRequired": "Country is required",
-
       "companyField": "Company Field",
       "companyFieldPlaceholder": "Select Company Field",
       "companyFieldRequired": "Company Field is required",
-
       "commerceName": "Commercial Name",
       "commerceNamePlaceholder": "Enter Commercial Name",
       "commerceNameRequired": "Commercial Name is required",
-
       "shortName": "Short Name",
       "shortNamePlaceholder": "Enter Short Name",
       "shortNameRequired": "Short Name is required",
-
       "supportResponsible": "Support Responsible",
       "supportResponsiblePlaceholder": "Select Support Responsible",
       "supportResponsibleRequired": "Support Responsible is required",
-
-      "companyClientFormTitle":"Create Company Client",
-      "individualClientFormTitle":"Create Individual Client",
-
-
+      "companyClientFormTitle": "Create Company Client",
+      "individualClientFormTitle": "Create Individual Client",
       "Validation": {
         "arabicName": "The name must contain only letters (no numbers or symbols)",
         "englishName": "The short name must be in English and not contain symbols"
@@ -675,7 +666,6 @@
       "submitButtonText": "Add",
       "cancelButtonText": "Cancel",
       "resetButtonText": "Clear Form",
-      
       "email": "Email",
       "emailPlaceholder": "Enter email",
       "emailRequired": "Email is required",
@@ -707,38 +697,40 @@
       "branchesPlaceholder": "Select branch",
       "correspondenceAddress": "Correspondence Address",
       "correspondenceAddressPlaceholder": "Enter correspondence address",
-      
       "country": "Country",
       "countryPlaceholder": "Select Country",
       "countryRequired": "Country is required",
-
       "companyField": "Company Field",
       "companyFieldPlaceholder": "Select Company Field",
       "companyFieldRequired": "Company Field is required",
-
       "commerceName": "Commercial Name",
       "commerceNamePlaceholder": "Enter Commercial Name",
       "commerceNameRequired": "Commercial Name is required",
-
       "shortName": "Short Name",
       "shortNamePlaceholder": "Enter Short Name",
       "shortNameRequired": "Short Name is required",
-
       "commission": "Commission",
       "commissionPlaceholder": "Enter Commission",
       "commissionRequired": "Commission is required",
-
-      "companyBrokerFormTitle":"Create Company Broker",
-      "individualBrokerFormTitle":"Create Individual Broker",
-
+      "companyBrokerFormTitle": "Create Company Broker",
+      "individualBrokerFormTitle": "Create Individual Broker",
       "supportResponsible": "Support Responsible",
       "supportResponsiblePlaceholder": "Select Support Responsible",
       "supportResponsibleRequired": "Support Responsible is required",
-
       "Validation": {
         "arabicName": "The name must contain only letters (no numbers or symbols)",
         "englishName": "The short name must be in English and not contain symbols"
       }
+    }
+  },
+  "CRMSettingsModule": {
+    "tabs": {
+      "clientsSettings": "Clients Settings",
+      "clientsPermissions": "Clients Permissions"
+    },
+    "ClientsSettings": {
+      "shareClientsData": "Share clients data between branches",
+      "shareBrokersData": "Share brokers data between branches"
     }
   },
   "AttendanceDepartureModule": {
