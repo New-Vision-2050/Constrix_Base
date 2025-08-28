@@ -481,7 +481,7 @@ export function getCreateCompanyBrokerFormConfig(
             isMulti: true,
             placeholder: t("form.branchesPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",

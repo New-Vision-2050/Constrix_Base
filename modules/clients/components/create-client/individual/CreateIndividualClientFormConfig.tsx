@@ -10,9 +10,13 @@ export function getCreateIndividualClientFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
   currentEmpBranchId?: string,
-  currentEmpId?: string
+  currentEmpId?: string,
+  isShareClient?: boolean,
+  companyBranchesIds?: string[]
 ): FormConfig {
   const formId = "individual-client-form";
+
+  console.log("isShareClient", isShareClient, companyBranchesIds);
 
   return {
     formId,
@@ -22,6 +26,9 @@ export function getCreateIndividualClientFormConfig(
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
     },
+    // initialValues: {
+    //   branch_ids: companyBranchesIds ?? [],
+    // },
     sections: [
       {
         fields: [
@@ -311,7 +318,7 @@ export function getCreateIndividualClientFormConfig(
             isMulti: true,
             placeholder: t("form.branchesPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -322,7 +329,7 @@ export function getCreateIndividualClientFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // disabled: true,
+            // disabled: isShareClient,
           },
           // broker
           {

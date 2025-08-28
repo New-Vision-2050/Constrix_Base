@@ -13,7 +13,9 @@ export function getCreateCompanyClientFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
   currentEmpBranchId?: string,
-  currentEmpId?: string
+  currentEmpId?: string,
+  isShareClient?: boolean,
+  companyBranchesIds?: string[]
 ): FormConfig {
   const formId = "company-client-form";
 
@@ -25,6 +27,9 @@ export function getCreateCompanyClientFormConfig(
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
     },
+    // initialValues: {
+    //   branch_ids: isShareClient ? companyBranchesIds : [currentEmpBranchId],
+    // },
     sections: [
       {
         title: t("form.companyClientFormTitle"),
@@ -491,7 +496,7 @@ export function getCreateCompanyClientFormConfig(
             isMulti: true,
             placeholder: t("form.branchesPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -502,7 +507,7 @@ export function getCreateCompanyClientFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // disabled: true,
+            // disabled: isShareClient,
           },
           // broker
           {
