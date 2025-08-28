@@ -5,7 +5,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useState } from "react";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
-import ToggleControl from "@/components/shared/ToggleControl";
+import ToggleControl from "@/modules/clients/components/ToggleControl";
 
 export default function BrokerTableStatus({ broker }: { broker: Broker }) {
   const { can } = usePermissions();
