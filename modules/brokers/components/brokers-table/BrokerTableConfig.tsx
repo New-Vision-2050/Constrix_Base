@@ -27,7 +27,7 @@ export const getBrokerTableConfig = () => {
             <span
               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 whitespace-nowrap"
             >
-              {row.type == 2 ? "ممثل لجهة" : "فرد"}
+              {row.type == 2 ? "ممثل لجهة" : "فرد"} {row.type == 2 && row.company_name}
             </span>
           </div>
         ),

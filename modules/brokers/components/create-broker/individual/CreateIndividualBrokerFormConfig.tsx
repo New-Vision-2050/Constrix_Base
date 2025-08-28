@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { baseURL } from "@/config/axios-config";
 import InvalidBrokerMailDialog from "./InvalidBrokerMailDialog";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
+import AddressDialog from "@/modules/clients/components/create-client/individual/AddressDialog";
 
 export function getCreateIndividualBrokerFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -258,6 +259,15 @@ export function getCreateIndividualBrokerFormConfig(
                 message: t("form.nameMinLength"),
               },
             ],
+          },
+          // address dialog
+          {
+            name: "addressDialog",
+            label: "",
+            type: "text",
+            render: () => {
+              return <AddressDialog formId={formId} />;
+            },
           },
           // identity --> residence
           {

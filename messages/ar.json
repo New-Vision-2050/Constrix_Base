@@ -388,12 +388,12 @@
       "branches": {
         "assignUsersDialog": {
           "title": "صلاحية التعديل علي الفرع",
-          "description":"أعطاء المستخدمين صلاحية التعديل علي الفرع",
-          "cancel":"الغاء",
-          "assign":"تعيين",
-          "searchUsers":"البحث عن مستخدمين",
-          "managerNote":"مدير الشركة :",
-          "branchManager":"مدير الفرع :"
+          "description": "أعطاء المستخدمين صلاحية التعديل علي الفرع",
+          "cancel": "الغاء",
+          "assign": "تعيين",
+          "searchUsers": "البحث عن مستخدمين",
+          "managerNote": "مدير الشركة :",
+          "branchManager": "مدير الفرع :"
         }
       }
     }
@@ -577,37 +577,66 @@
       "submitButtonText": "إضافة",
       "cancelButtonText": "إلغاء",
       "resetButtonText": "مسح النموذج",
-
-      "companyClientFormTitle":"أنشاء جهة العميل",
-      "individualClientFormTitle":"أنشاء الفرد الممثل للجهة",
-
+      "companyClientFormTitle": "أنشاء جهة العميل",
+      "individualClientFormTitle": "أنشاء الفرد الممثل للجهة",
       "country": "الدولة",
       "countryPlaceholder": "اختر الدولة",
       "countryRequired": "الدولة مطلوبة",
-
       "companyField": "النشاط",
       "companyFieldPlaceholder": "اختر النشاط",
       "companyFieldRequired": "النشاط مطلوب",
-
       "commerceName": "اسم التجاري",
       "commerceNamePlaceholder": "ادخل اسم التجاري",
       "commerceNameRequired": "اسم التجاري مطلوب",
-
       "shortName": "اسم المختصر",
       "shortNamePlaceholder": "ادخل اسم المختصر",
       "shortNameRequired": "اسم المختصر مطلوب",
-
       "supportResponsible": "المسؤول عن الدعم",
       "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
       "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
-
-      "companyBrokerFormTitle":"إنشاء وسيط شركة",
-      "individualBrokerFormTitle":"إنشاء وسيط فرد",
-
+      "companyBrokerFormTitle": "إنشاء وسيط شركة",
+      "individualBrokerFormTitle": "إنشاء وسيط فرد",
       "Validation": {
         "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
         "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
       }
+    },
+    "dialog": {
+      "triggerText": "اختر الموقع من الخريطة",
+      "title": "اختر احداثيات موقع العنوان الوطني",
+      "latitude": "خط العرض",
+      "latitudePlaceholder": "ادخل خط العرض",
+      "latitudeRequired": "خط العرض مطلوب",
+      "longitude": "خط الطول",
+      "longitudePlaceholder": "ادخل خط الطول",
+      "longitudeRequired": "خط الطول مطلوب",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "region": "المنطقة",
+      "regionPlaceholder": "اختر المنطقة",
+      "regionRequired": "المنطقة مطلوبة",
+      "city": "المدينة",
+      "cityPlaceholder": "اختر المدينة",
+      "cityRequired": "المدينة مطلوبة",
+      "neighborhood": "الحي",
+      "neighborhoodPlaceholder": "اختر الحي",
+      "neighborhoodRequired": "الحي مطلوب",
+      "buildingNumber": "رقم المبنى",
+      "buildingNumberPlaceholder": "ادخل رقم المبنى",
+      "buildingNumberRequired": "رقم المبنى مطلوب",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "ادخل رقم الهاتف",
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "postalCode": "الرمز البريدي",
+      "postalCodePlaceholder": "ادخل الرمز البريدي",
+      "postalCodeRequired": "الرمز البريدي مطلوب",
+      "street": "الشارع",
+      "streetPlaceholder": "ادخل الشارع",
+      "streetRequired": "الشارع مطلوب",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج"
     }
   },
   "BrokersModule": {
@@ -643,7 +672,6 @@
       "submitButtonText": "إضافة",
       "cancelButtonText": "إلغاء",
       "resetButtonText": "مسح النموذج",
-      
       "email": "البريد الإلكتروني",
       "emailPlaceholder": "أدخل البريد الإلكتروني",
       "emailRequired": "البريد الإلكتروني مطلوب",
@@ -675,34 +703,26 @@
       "branchesPlaceholder": "اختر الفرع",
       "correspondenceAddress": "عنوان المراسلة",
       "correspondenceAddressPlaceholder": "أدخل عنوان المراسلة",
-      
       "country": "الدولة",
       "countryPlaceholder": "اختر الدولة",
       "countryRequired": "الدولة مطلوبة",
-
       "companyField": "مجال الشركة",
       "companyFieldPlaceholder": "اختر مجال الشركة",
       "companyFieldRequired": "مجال الشركة مطلوب",
-
       "commerceName": "الاسم التجاري",
       "commerceNamePlaceholder": "أدخل الاسم التجاري",
       "commerceNameRequired": "الاسم التجاري مطلوب",
-
       "shortName": "الاسم المختصر",
       "shortNamePlaceholder": "أدخل الاسم المختصر",
       "shortNameRequired": "الاسم المختصر مطلوب",
-
       "commission": "العمولة",
       "commissionPlaceholder": "أدخل نسبة العمولة",
       "commissionRequired": "العمولة مطلوبة",
-
-      "companyBrokerFormTitle":"إنشاء وسيط شركة",
-      "individualBrokerFormTitle":"إنشاء وسيط فرد",
-
+      "companyBrokerFormTitle": "إنشاء وسيط شركة",
+      "individualBrokerFormTitle": "إنشاء وسيط فرد",
       "supportResponsible": "المسؤول عن الدعم",
       "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
       "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
-
       "Validation": {
         "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
         "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"

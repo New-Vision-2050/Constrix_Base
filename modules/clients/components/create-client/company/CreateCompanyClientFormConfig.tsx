@@ -7,6 +7,7 @@ import { TimeZoneCheckbox } from "@/modules/form-builder/components/TimeZoneChec
 import InvalidClientMailDialog from "../individual/InvalidClientMailDialog";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
+import AddressDialog from "../individual/AddressDialog";
 
 export function getCreateCompanyClientFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -439,6 +440,15 @@ export function getCreateCompanyClientFormConfig(
               },
             ],
           },
+          // address dialog
+          {
+            name: "addressDialog",
+            label: "",
+            type: "text",
+            render: () => {
+              return <AddressDialog formId={formId} />;
+            },
+          },
           // identity --> residence
           {
             name: "residence",
@@ -552,7 +562,7 @@ export function getCreateCompanyClientFormConfig(
       onStepSubmit: async (step, values) => {
         // Option to call default way to handle the step
         let body = values;
-        console.log('Breakpoint101 step,values ::',step,values)
+        console.log("Breakpoint101 step,values ::", step, values);
         if (step === 1) {
           body = {
             ...values,
