@@ -1018,6 +1018,15 @@
     "AreYouSureReactivate": "Are you sure you want to reactivate this package?",
     "AreYouSureDeactivate": "Are you sure you want to deactivate this package?"
   },
+  "brand": {
+    "plural": "Brands",
+    "singular": "Brand",
+    "addBrand": "Add Brand",
+    "brandName": "Brand Name",
+    "brandNameRequired": "Brand name is required",
+    "brandNameMinLength": "Brand name must be at least 2 characters",
+    "notFound": "No brands found"
+  },
   "warehouse": {
     "plural": "Warehouses",
     "singular": "Warehouse",
@@ -1070,6 +1079,9 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "default": "Default"
+    "default": "Default",
+    "description": "Description",
+    "arabic": "Arabic",
+    "english": "English"
   }
 }

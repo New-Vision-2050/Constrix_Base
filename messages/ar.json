@@ -1010,6 +1010,15 @@
     "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
     "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
   },
+  "brand": {
+    "plural": "العلامات التجارية",
+    "singular": "العلامة التجارية",
+    "addBrand": "اضافة علامة تجارية",
+    "brandName": "اسم العلامة التجارية",
+    "brandNameRequired": "اسم العلامة التجارية مطلوب",
+    "brandNameMinLength": "اسم العلامة التجارية يجب أن يكون على الأقل حرفين",
+    "notFound": "لم يتم العثور على علامات تجارية"
+  },
   "warehouse": {
     "plural": "المخازن",
     "singular": "المخزن",
@@ -1062,6 +1071,9 @@
     "back": "رجوع",
     "next": "التالي",
     "previous": "السابق",
-    "default": "افتراضي"
+    "default": "افتراضي",
+    "description": "الوصف",
+    "arabic": "عربي",
+    "english": "إنجليزي"
   }
 }

@@ -10,5 +10,5 @@ export const BrandsApi = {
     baseApi.post("ecommerce/brands", params),
   update: (id: string, params: UpdateBrandParams) =>
     baseApi.put(`ecommerce/brands/${id}`, params),
-  delete: (id: string) => baseApi.put(`ecommerce/brands/${id}`),
+  delete: (id: string) => baseApi.delete(`ecommerce/brands/${id}`),
 };
