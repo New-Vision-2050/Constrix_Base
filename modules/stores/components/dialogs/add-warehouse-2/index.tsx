@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -21,21 +22,22 @@ import PlacesPicker, {
 } from "@/components/headless/places-picker";
 import { WarehousesApi } from "@/services/api/ecommerce/warehouses";
 import { CreateWarehouseParams } from "@/services/api/ecommerce/warehouses/types/params";
-import { baseApi } from "@/config/axios/instances/base";
+import { getCountries } from "@/services/api/shared/countries";
+import { getCities } from "@/services/api/shared/cities";
 import { API_Country } from "@/types/api/shared/country";
 import { API_City } from "@/types/api/shared/city";
 
-const createWarehouse2Schema = () =>
+const createWarehouse2Schema = (t: (key: string) => string) =>
   z.object({
     name: z
       .string()
-      .min(1, "اسم المخزن مطلوب")
-      .min(2, "اسم المخزن يجب أن يكون على الأقل حرفين"),
+      .min(1, t("warehouse.warehouseNameRequired"))
+      .min(2, t("warehouse.warehouseNameMinLength")),
     is_default: z.boolean().default(false),
-    country_id: z.number().min(1, "الدولة مطلوبة"),
-    city_id: z.number().min(1, "المدينة مطلوبة"),
-    district: z.string().min(1, "المنطقة مطلوبة"),
-    street: z.string().min(1, "الشارع مطلوب"),
+    country_id: z.number().min(1, t("warehouse.countryRequired")),
+    city_id: z.number().min(1, t("warehouse.cityRequired")),
+    district: z.string().min(1, t("warehouse.districtRequired")),
+    street: z.string().min(1, t("warehouse.streetRequired")),
     latitude: z.number().min(-90).max(90),
     longitude: z.number().min(-180).max(180),
   });
@@ -54,10 +56,9 @@ export default function AddWarehouse2Dialog({
   onSuccess,
 }: AddWarehouse2DialogProps) {
   const isRtl = useIsRtl();
+  const t = useTranslations();
   const [countries, setCountries] = useState<API_Country[]>([]);
   const [cities, setCities] = useState<API_City[]>([]);
-  const [selectedLocation, setSelectedLocation] =
-    useState<GoogleMapPickerValue | null>(null);
 
   const {
     register,
@@ -67,7 +68,7 @@ export default function AddWarehouse2Dialog({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<Warehouse2FormData>({
-    resolver: zodResolver(createWarehouse2Schema()),
+    resolver: zodResolver(createWarehouse2Schema(t)),
     defaultValues: {
       name: "",
       is_default: false,
@@ -87,19 +88,11 @@ export default function AddWarehouse2Dialog({
     const loadData = async () => {
       try {
         // Load countries
-        const countriesResponse = await baseApi.get<{
-          code: string;
-          message: string;
-          payload: API_Country[];
-        }>("/countries");
+        const countriesResponse = await getCountries();
         setCountries(countriesResponse.data.payload || []);
 
         // Load cities
-        const citiesResponse = await baseApi.get<{
-          code: string;
-          message: string;
-          payload: API_City[];
-        }>("/countries/cities");
+        const citiesResponse = await getCities();
         setCities(citiesResponse.data.payload || []);
       } catch (error) {
         console.error("Error loading data:", error);
@@ -113,7 +106,6 @@ export default function AddWarehouse2Dialog({
 
   // Handle location selection from map
   const handleLocationPick = (location: GoogleMapPickerValue) => {
-    setSelectedLocation(location);
     if (location.lat && location.lng) {
       setValue("latitude", location.lat);
       setValue("longitude", location.lng);
@@ -168,7 +160,7 @@ export default function AddWarehouse2Dialog({
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            اضافة مخزن
+            {t("warehouse.addWarehouse")}
           </DialogTitle>
         </DialogHeader>
 
@@ -177,7 +169,7 @@ export default function AddWarehouse2Dialog({
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <Label htmlFor="name" className="text-sm text-gray-400">
-                  اسم المخزن
+                  {t("warehouse.warehouseName")}
                 </Label>
                 <Input
                   id="name"
@@ -204,7 +196,7 @@ export default function AddWarehouse2Dialog({
                   htmlFor="is_default"
                   className="text-sm font-medium cursor-pointer text-white"
                 >
-                  مخزن افتراضي
+                  {t("warehouse.isDefault")}
                 </Label>
               </div>
             </div>
@@ -217,7 +209,7 @@ export default function AddWarehouse2Dialog({
                       htmlFor="country_id"
                       className="text-sm text-gray-400"
                     >
-                      الدولة
+                      {t("location.country")}
                     </Label>
                     <select
                       id="country_id"
@@ -225,7 +217,7 @@ export default function AddWarehouse2Dialog({
                       className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
                       disabled={isSubmitting}
                     >
-                      <option value={0}>اختر الدولة</option>
+                      <option value={0}>{t("warehouse.selectCountry")}</option>
                       {countries.map((country) => (
                         <option key={country.id} value={Number(country.id)}>
                           {country.name}
@@ -241,7 +233,7 @@ export default function AddWarehouse2Dialog({
 
                   <div className="space-y-2">
                     <Label htmlFor="city_id" className="text-sm text-gray-400">
-                      المدينة
+                      {t("location.city")}
                     </Label>
                     <select
                       id="city_id"
@@ -249,7 +241,7 @@ export default function AddWarehouse2Dialog({
                       className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
                       disabled={isSubmitting}
                     >
-                      <option value={0}>اختر المدينة</option>
+                      <option value={0}>{t("warehouse.selectCity")}</option>
                       {cities.map((city) => (
                         <option key={city.id} value={Number(city.id)}>
                           {city.name}
@@ -267,7 +259,7 @@ export default function AddWarehouse2Dialog({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="latitude" className="text-sm text-gray-400">
-                      خط العرض
+                      {t("location.latitude")}
                     </Label>
                     <Input
                       id="latitude"
@@ -290,7 +282,7 @@ export default function AddWarehouse2Dialog({
                       htmlFor="longitude"
                       className="text-sm text-gray-400"
                     >
-                      خط الطول
+                      {t("location.longitude")}
                     </Label>
                     <Input
                       id="longitude"
@@ -312,7 +304,7 @@ export default function AddWarehouse2Dialog({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="street" className="text-sm text-gray-400">
-                      الشارع
+                      {t("warehouse.street")}
                     </Label>
                     <Input
                       id="street"
@@ -330,7 +322,7 @@ export default function AddWarehouse2Dialog({
 
                   <div className="space-y-2">
                     <Label htmlFor="district" className="text-sm text-gray-400">
-                      المنطقة
+                      {t("warehouse.district")}
                     </Label>
                     <Input
                       id="district"
@@ -349,7 +341,7 @@ export default function AddWarehouse2Dialog({
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-gray-400">خريطة الموقع</Label>
+              <Label className="text-sm text-gray-400">{t("warehouse.locationMap")}</Label>
               <div className="bg-gray-200 rounded-lg overflow-hidden">
                 <PlacesPicker
                   onPick={handleLocationPick}
@@ -369,7 +361,7 @@ export default function AddWarehouse2Dialog({
               disabled={isSubmitting}
               className="flex-1"
             >
-              الغاء
+              {t("warehouse.cancel")}
             </Button>
             <Button
               type="submit"
@@ -379,10 +371,10 @@ export default function AddWarehouse2Dialog({
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                  جاري الحفظ...
+                  {t("warehouse.saving")}
                 </span>
               ) : (
-                "حفظ"
+                t("warehouse.save")
               )}
             </Button>
           </div>

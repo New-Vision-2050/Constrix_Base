@@ -35,7 +35,15 @@
     "selectBranch": "اختر الفرع",
     "loading": "جاري التحميل...",
     "selectBranchesFirst": "اختر الفروع أولاً",
-    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها"
+    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها",
+    "city": "المدينة",
+    "state": "المنطقة",
+    "country": "الدولة",
+    "address": "العنوان",
+    "postalCode": "الرمز البريدي",
+    "map": "الخريطة",
+    "disctrict": "الحي",
+    "notFound": "لم يتم العثور على مواقع"
   },
   "Main": {
     "NoResultsRound": "لم يتم العثور على نتائج",
@@ -838,9 +846,9 @@
       "allBranches": "جميع الفروع",
       "noUpgradeCondition": "لا يوجد شرط ترقية",
       "addNewPolicy": "إنشاء نظام اجازة جديد",
-      "yearly":"سنوية",
-      "calender":"تقويم",
-      "work_day":"يوم عمل",
+      "yearly": "سنوية",
+      "calender": "تقويم",
+      "work_day": "يوم عمل",
       "loading": {
         "title": "جاري تحميل أنظمة الإجازة",
         "description": "يرجى الانتظار بينما نقوم بتحميل بيانات أنظمة الإجازة..."
@@ -932,25 +940,25 @@
 
         "addPublicVacation": "اضافة اجازة رسمية",
 
-        "form":{
+        "form": {
           "title": "اضافة اجازة رسمية جديدة",
           "editTitle": "تعديل اجازة رسمية",
           "name": "اسم اجازة",
           "namePlaceholder": "اسم اجازة",
           "nameRequired": "اسم اجازة مطلوب",
-          
+
           "country": "الدولة",
           "countryPlaceholder": "الدولة",
           "countryRequired": "الدولة مطلوبة",
-          
+
           "startDate": "تاريخ البداية",
           "startDatePlaceholder": "تاريخ البداية",
           "startDateRequired": "تاريخ البداية مطلوب",
-          
+
           "endDate": "تاريخ النهاية",
           "endDatePlaceholder": "تاريخ النهاية",
           "endDateRequired": "تاريخ النهاية مطلوب",
-          
+
           "submitButtonText": "حفظ",
           "cancelButtonText": "إلغاء",
           "resetButtonText": "مسح النموذج"
@@ -1001,5 +1009,59 @@
   "Bouquets": {
     "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
     "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
+  },
+  "warehouse": {
+    "plural": "المخازن",
+    "singular": "المخزن",
+    "addWarehouse": "اضافة مخزن",
+    "warehouseName": "اسم المخزن",
+    "isDefault": "مخزن افتراضي",
+    "district": "المنطقة",
+    "street": "الشارع",
+    "selectCountry": "اختر الدولة",
+    "selectCity": "اختر المدينة",
+    "locationMap": "خريطة الموقع",
+    "cancel": "الغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "warehouseNameRequired": "اسم المخزن مطلوب",
+    "warehouseNameMinLength": "اسم المخزن يجب أن يكون على الأقل حرفين",
+    "countryRequired": "الدولة مطلوبة",
+    "cityRequired": "المدينة مطلوبة",
+    "districtRequired": "المنطقة مطلوبة",
+    "streetRequired": "الشارع مطلوب",
+    "notFound": "لم يتم العثور على مخازن"
+  },
+  "labels": {
+    "optional": "(اختياري)",
+    "id": "الرقم التعريفي",
+    "name": "الاسم",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "createdAt": "تاريخ الإنشاء",
+    "actions": "الإجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "view": "عرض",
+    "add": "اضافة",
+    "create": "انشاء",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "search": "بحث",
+    "reset": "إعادة تعيين",
+    "loading": "جاري التحميل",
+    "noData": "لا توجد بيانات متاحة",
+    "yes": "نعم",
+    "no": "لا",
+    "select": "اختر",
+    "selectPlaceholder": "اختر خيار",
+    "submit": "إرسال",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "default": "افتراضي"
   }
 }
