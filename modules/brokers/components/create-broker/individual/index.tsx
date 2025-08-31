@@ -4,9 +4,11 @@ import { useTranslations } from "next-intl";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { useCreateBrokerCxt } from "@/modules/brokers/context/CreateBrokerCxt";
 import { useTableStore } from "@/modules/table/store/useTableStore";
+import { useBrokersDataCxt } from "@/modules/brokers/context/BrokersDataCxt";
 
 export default function CreateIndividualBrokerForm() {
   const t = useTranslations("BrokersModule");
+  const { sharedSettings } = useBrokersDataCxt();
   const { branchId: currentEmpBranchId, userId: currentEmpId, closeCreateBrokerSheet } =
     useCreateBrokerCxt();
 
@@ -20,6 +22,7 @@ export default function CreateIndividualBrokerForm() {
   const _config = getCreateIndividualBrokerFormConfig(
     t,
     onSuccessFn,
+    Boolean(sharedSettings?.is_share_broker == "1"),
     currentEmpBranchId,
     currentEmpId
   );

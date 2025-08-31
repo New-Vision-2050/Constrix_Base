@@ -9,6 +9,8 @@ import React, {
 } from "react";
 import { useWidgetsData } from "../hooks/useWidgetsData";
 import { WidgetT } from "../apis/get-broker-widgets";
+import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
+import { CRMSettingsT } from "@/modules/crm-settings/api/get-shared-settings";
 
 // Define context type
 interface CxtType {
@@ -16,6 +18,8 @@ interface CxtType {
   widgetsData: WidgetT[] | undefined;
   // widgets loading
   widgetsLoading: boolean;
+  // shared settings
+  sharedSettings: CRMSettingsT | undefined;
 }
 
 // Create the context
@@ -28,11 +32,12 @@ interface PropsT {
 
 export const BrokersDataCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
+  const { data: sharedSettings } = useCRMSharedSetting();
   const { data: widgetsData, isLoading: widgetsLoading } = useWidgetsData();
 
   // ** return provider
   return (
-    <Cxt.Provider value={{ widgetsData, widgetsLoading }}>
+    <Cxt.Provider value={{ widgetsData, widgetsLoading, sharedSettings }}>
       {children}
     </Cxt.Provider>
   );

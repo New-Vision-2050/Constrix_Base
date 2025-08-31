@@ -8,6 +8,7 @@ import InvalidClientMailDialog from "../individual/InvalidClientMailDialog";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
 import AddressDialog from "../individual/AddressDialog";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export function getCreateCompanyClientFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -490,6 +491,29 @@ export function getCreateCompanyClientFormConfig(
           },
           // branchs
           {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareClient,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: isShareClient,
+            condition: (values) => {
+              return !!isShareClient;
+            },
+          },
+          {
             name: "branch_ids",
             label: t("form.branches"),
             type: "select",
@@ -507,7 +531,10 @@ export function getCreateCompanyClientFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // disabled: isShareClient,
+            disabled: isShareClient,
+            condition: (values) => {
+              return !isShareClient;
+            },
           },
           // broker
           {
@@ -616,6 +643,17 @@ export function getCreateCompanyClientFormConfig(
     },
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(
+        {
+          ...formData,
+          branch_ids: isShareClient
+            ? formData.branch_ids_all
+            : formData.branch_ids,
+        },
+        getCreateCompanyClientFormConfig(t, onSuccessFn)
+      );
+    },
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
     showReset: false,

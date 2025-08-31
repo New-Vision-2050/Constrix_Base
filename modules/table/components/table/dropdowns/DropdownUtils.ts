@@ -11,6 +11,7 @@ export interface DynamicDropdownConfig {
     url: string;
     valueField: string;
     labelField: string;
+    selectAll?: boolean; // Whether to automatically select all options when field is multi-select
     dependsOn?: string | DependencyConfig[] | Record<string, { method: 'replace' | 'query', paramName?: string }>; // The field/column key this dropdown depends on
     // dependsOn can be:
     // 1. A string (for backward compatibility)

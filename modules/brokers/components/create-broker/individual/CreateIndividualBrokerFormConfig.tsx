@@ -5,10 +5,12 @@ import { baseURL } from "@/config/axios-config";
 import InvalidBrokerMailDialog from "./InvalidBrokerMailDialog";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import AddressDialog from "@/modules/clients/components/create-client/individual/AddressDialog";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export function getCreateIndividualBrokerFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
+  isShareBroker?: boolean,
   currentEmpBranchId?: string,
   currentEmpId?: string
 ): FormConfig {
@@ -305,6 +307,29 @@ export function getCreateIndividualBrokerFormConfig(
           },
           // branchs
           {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareBroker,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: isShareBroker,
+            condition: (values) => {
+              return !!isShareBroker;
+            },
+          },
+          {
             name: "branch_ids",
             label: t("form.branches"),
             type: "select",
@@ -322,7 +347,10 @@ export function getCreateIndividualBrokerFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // disabled: true,
+            disabled: isShareBroker,
+            condition: (values) => {
+              return !isShareBroker;
+            },
           },
           // chat mail
           {
@@ -336,6 +364,17 @@ export function getCreateIndividualBrokerFormConfig(
     ],
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(
+        {
+          ...formData,
+          branch_ids: isShareBroker
+            ? formData.branch_ids_all
+            : formData.branch_ids,
+        },
+        getCreateIndividualBrokerFormConfig(t, onSuccessFn)
+      );
+    },
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
     showReset: false,

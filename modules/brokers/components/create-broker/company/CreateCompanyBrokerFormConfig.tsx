@@ -11,6 +11,7 @@ import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companies
 export function getCreateCompanyBrokerFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
+  isShareBroker?: boolean,
   currentEmpBranchId?: string,
   currentEmpId?: string
 ): FormConfig {
@@ -475,6 +476,29 @@ export function getCreateCompanyBrokerFormConfig(
           },
           // branchs
           {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareBroker,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: isShareBroker,
+            condition: (values) => {
+              return !!isShareBroker;
+            },
+          },
+          {
             name: "branch_ids",
             label: t("form.branches"),
             type: "select",
@@ -492,7 +516,10 @@ export function getCreateCompanyBrokerFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // disabled: true,
+            disabled: isShareBroker,
+            condition: (values) => {
+              return !isShareBroker;
+            },
           },
           // chat mail
           {
@@ -539,6 +566,9 @@ export function getCreateCompanyBrokerFormConfig(
             ...values,
             name: values.brokerName,
             company_id: values.company_id,
+            branch_ids: isShareBroker
+              ? values.branch_ids_all
+              : values.branch_ids,
           };
         }
         const result = await defaultStepSubmitHandler(

@@ -4,6 +4,7 @@ import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { useCreateBrokerCxt } from "@/modules/brokers/context/CreateBrokerCxt";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { getCreateCompanyBrokerFormConfig } from "./CreateCompanyBrokerFormConfig";
+import { useBrokersDataCxt } from "@/modules/brokers/context/BrokersDataCxt";
 
 export default function CreateBrokerCompanyForm() {
   const t = useTranslations("BrokersModule");
@@ -12,6 +13,7 @@ export default function CreateBrokerCompanyForm() {
     userId: currentEmpId,
     closeCreateBrokerSheet,
   } = useCreateBrokerCxt();
+  const { sharedSettings } = useBrokersDataCxt();
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
@@ -23,6 +25,7 @@ export default function CreateBrokerCompanyForm() {
   const _config = getCreateCompanyBrokerFormConfig(
     t,
     onSuccessFn,
+    Boolean(sharedSettings?.is_share_broker == "1"),
     currentEmpBranchId,
     currentEmpId
   );
