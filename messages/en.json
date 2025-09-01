@@ -1049,6 +1049,19 @@
     "streetRequired": "Street is required",
     "notFound": "No warehouses found"
   },
+  "category": {
+    "plural": "Categories",
+    "singular": "Category",
+    "addCategory": "Add Category",
+    "categoryName": "Category Name",
+    "categoryDescription": "Category Description",
+    "categoryNameRequired": "Category name is required",
+    "categoryNameMinLength": "Category name must be at least 2 characters",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "notFound": "No categories found"
+  },
   "labels": {
     "optional": "(optional)",
     "id": "ID",

@@ -1041,6 +1041,19 @@
     "streetRequired": "الشارع مطلوب",
     "notFound": "لم يتم العثور على مخازن"
   },
+  "category": {
+    "plural": "الفئات",
+    "singular": "الفئة",
+    "addCategory": "اضافة فئة",
+    "categoryName": "اسم الفئة",
+    "categoryDescription": "وصف الفئة",
+    "categoryNameRequired": "اسم الفئة مطلوب",
+    "categoryNameMinLength": "اسم الفئة يجب أن يكون على الأقل حرفين",
+    "save": "حفظ",
+    "cancel": "الغاء",
+    "saving": "جاري الحفظ...",
+    "notFound": "لم يتم العثور على فئات"
+  },
   "labels": {
     "optional": "(اختياري)",
     "id": "الرقم التعريفي",
