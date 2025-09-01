@@ -16,9 +16,12 @@ import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 
 // Dynamically import the Execution component
-const Execution = dynamic(() => import("@/app/[locale]/(main)/companies/cells/execution"), {
-  ssr: false,
-});
+const Execution = dynamic(
+  () => import("@/app/[locale]/(main)/companies/cells/execution"),
+  {
+    ssr: false,
+  }
+);
 
 interface TableBuilderProps {
   url?: string;
@@ -36,7 +39,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   tableId: propTableId,
 }) => {
   // Get translations using the hook
-  const t = useTranslations('Table'); // Use 'Table' namespace for translations
+  const t = useTranslations("Table"); // Use 'Table' namespace for translations
 
   // Generate a random ID if not provided in config or props
   const tableId =
@@ -115,7 +118,8 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
     config // Pass the entire config object
   );
 
-  const enableExport = config?.enableExport===undefined?true:config?.enableExport;
+  const enableExport =
+    config?.enableExport === undefined ? true : config?.enableExport;
 
   // Initialize columns from config immediately if available
   // Use a ref to track if we've already set the columns
@@ -136,12 +140,11 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       config.columns.length > 0 &&
       columns.length === 0 // Only initialize if no columns are already set
     ) {
-
       // Check if action column should be added based on available actions
       const shouldAddActionColumn = Boolean(
-        (config as any)?.executions?.length > 0 ||
-        (config as any)?.executionConfig?.canEdit ||
-        (config as any)?.executionConfig?.canDelete
+        (config?.executions && config.executions.length > 0) ||
+          config?.executionConfig?.canEdit ||
+          config?.executionConfig?.canDelete
       );
 
       // Check if there's already an "id" column
@@ -153,20 +156,19 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       if (shouldAddActionColumn && !hasIdKey) {
         columnsWithActions.push({
           key: "id",
-          label: t('Actions'), // Get from translations
-          render: (_: unknown, row: any) => (
+          label: t("Actions"), // Get from translations
+          render: (_: unknown, row: { id: string; [key: string]: unknown }) =>
             React.createElement(Execution, {
               row,
-              formConfig: (config as any)?.formConfig,
-              executions: (config as any)?.executions,
+              formConfig: config?.formConfig,
+              executions: config?.executions,
               tableName: tableIdRef.current,
-              buttonLabel: t('Actions'), // Also translate the button label
-              showEdit: Boolean((config as any)?.executionConfig?.canEdit),
-              showDelete: Boolean((config as any)?.executionConfig?.canDelete),
-              deleteConfirmMessage: (config as any)?.deleteConfirmMessage,
-              deleteUrl: config?.deleteUrl
-            })
-          ),
+              buttonLabel: t("Actions"), // Also translate the button label
+              showEdit: Boolean(config?.executionConfig?.canEdit),
+              showDelete: Boolean(config?.executionConfig?.canDelete),
+              deleteConfirmMessage: config?.deleteConfirmMessage,
+              deleteUrl: config?.deleteUrl,
+            }),
         });
       }
 
@@ -179,7 +181,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
             (col.key === "id" && shouldAddActionColumn) // Only include action column if it should be added
         );
       }
-
 
       setColumns(filteredColumns);
 
@@ -200,7 +201,7 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
       columnsInitializedRef.current = true;
       configColumnsRef.current = filteredColumns;
     }
-        }, [columns.length, t]); // Add t to dependencies
+  }, [columns.length, t]); // Add t to dependencies
 
   const enableSorting = config?.enableSorting !== false;
   const enablePagination = config?.enablePagination !== false;
@@ -274,7 +275,12 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
                   url={dataUrl}
                   apiParams={config?.apiParams}
                   selectedRows={selectedRows}
-                  disabled={loading || !selectionEnabled || !data.length || !enableExport}
+                  disabled={
+                    loading ||
+                    !selectionEnabled ||
+                    !data.length ||
+                    !enableExport
+                  }
                   searchQuery={searchQuery}
                   searchFields={searchFields}
                   columnSearchState={columnSearchState}

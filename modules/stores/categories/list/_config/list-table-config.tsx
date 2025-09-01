@@ -25,5 +25,6 @@ export const useCategoriesListTableConfig: () => TableConfig = () => {
         sortable: true,
       },
     ],
+    executions: [],
   };
 };
