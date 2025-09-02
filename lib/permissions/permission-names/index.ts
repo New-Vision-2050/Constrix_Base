@@ -77,4 +77,8 @@ export const PERMISSIONS = {
       publicHoliday: create("PUBLIC_HOLIDAY"),
     },
   },
+  // clients
+  clients: {
+    clientsPage: create("CLIENTS"),
+  },
 };

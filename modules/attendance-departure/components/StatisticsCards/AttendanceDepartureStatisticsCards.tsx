@@ -1,7 +1,7 @@
-import StatisticsCard from "./AttendanceDepartureStatisticsCard";
 import { UserIcon, UsersIcon, ActivityIcon, TrendingUpIcon, Clock, Calendar } from "lucide-react";
 import { useAttendance } from "../../context/AttendanceContext";
 import { useTranslations } from "next-intl";
+import StatisticsCard from "@/components/shared/StatisticsCard";
 
 // Loading skeleton for cards
 const LoadingSkeleton = () => (
