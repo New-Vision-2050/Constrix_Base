@@ -1,11 +1,11 @@
 import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
+import { TableConfig } from "@/modules/table";
 
-
-export const permissionsTableConfig = () => {
+export const permissionsTableConfig: () => TableConfig = () => {
   return {
     url: `${baseURL}/role_and_permissions/permissions`,
-    tableId: "permissions-table", 
+    tableId: "permissions-table",
     columns: [
       {
         key: "name",
@@ -17,7 +17,7 @@ export const permissionsTableConfig = () => {
         label: "فئة الصلاحية",
         sortable: true,
       },
-    {
+      {
         key: "user_count",
         label: "عدد المستخدمين",
         sortable: true,
@@ -26,15 +26,18 @@ export const permissionsTableConfig = () => {
         key: "status",
         label: "الحالة",
         sortable: true,
-        render: (_: unknown, row:any) => (
+        render: (_: unknown, row: any) => (
           <TableStatusSwitcher
             id={row.id}
             label={"نشط"}
             initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
-              return await apiClient.patch(`/role_and_permissions/permissions/${row.id}/status`, {
-                status: Number(isActive),
-              });
+              return await apiClient.patch(
+                `/role_and_permissions/permissions/${row.id}/status`,
+                {
+                  status: Number(isActive),
+                }
+              );
             }}
             confirmDescription={(isActive) =>
               !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"

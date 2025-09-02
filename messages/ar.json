@@ -35,7 +35,15 @@
     "selectBranch": "اختر الفرع",
     "loading": "جاري التحميل...",
     "selectBranchesFirst": "اختر الفروع أولاً",
-    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها"
+    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها",
+    "city": "المدينة",
+    "state": "المنطقة",
+    "country": "الدولة",
+    "address": "العنوان",
+    "postalCode": "الرمز البريدي",
+    "map": "الخريطة",
+    "disctrict": "الحي",
+    "notFound": "لم يتم العثور على مواقع"
   },
   "Main": {
     "NoResultsRound": "لم يتم العثور على نتائج",
@@ -734,9 +742,9 @@
       "clientsSettings": "إعدادات العملاء",
       "clientsPermissions": "صلاحيات العملاء"
     },
-    "ClientsSettings":{
-      "shareClientsData":"مشاركة بيانات العملاء بين الفروع",
-      "shareBrokersData":"مشاركة بيانات الوسطاء بين الفروع"
+    "ClientsSettings": {
+      "shareClientsData": "مشاركة بيانات العملاء بين الفروع",
+      "shareBrokersData": "مشاركة بيانات الوسطاء بين الفروع"
     }
   },
   "AttendanceDepartureModule": {
@@ -1239,5 +1247,84 @@
   "Bouquets": {
     "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
     "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
+  },
+  "brand": {
+    "plural": "العلامات التجارية",
+    "singular": "العلامة التجارية",
+    "addBrand": "اضافة علامة تجارية",
+    "brandName": "اسم العلامة التجارية",
+    "brandNameRequired": "اسم العلامة التجارية مطلوب",
+    "brandNameMinLength": "اسم العلامة التجارية يجب أن يكون على الأقل حرفين",
+    "notFound": "لم يتم العثور على علامات تجارية"
+  },
+  "warehouse": {
+    "plural": "المخازن",
+    "singular": "المخزن",
+    "addWarehouse": "اضافة مخزن",
+    "warehouseName": "اسم المخزن",
+    "isDefault": "مخزن افتراضي",
+    "district": "المنطقة",
+    "street": "الشارع",
+    "selectCountry": "اختر الدولة",
+    "selectCity": "اختر المدينة",
+    "locationMap": "خريطة الموقع",
+    "cancel": "الغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "warehouseNameRequired": "اسم المخزن مطلوب",
+    "warehouseNameMinLength": "اسم المخزن يجب أن يكون على الأقل حرفين",
+    "countryRequired": "الدولة مطلوبة",
+    "cityRequired": "المدينة مطلوبة",
+    "districtRequired": "المنطقة مطلوبة",
+    "streetRequired": "الشارع مطلوب",
+    "notFound": "لم يتم العثور على مخازن"
+  },
+  "category": {
+    "plural": "الفئات",
+    "singular": "الفئة",
+    "addCategory": "اضافة فئة",
+    "categoryName": "اسم الفئة",
+    "categoryDescription": "وصف الفئة",
+    "categoryNameRequired": "اسم الفئة مطلوب",
+    "categoryNameMinLength": "اسم الفئة يجب أن يكون على الأقل حرفين",
+    "save": "حفظ",
+    "cancel": "الغاء",
+    "saving": "جاري الحفظ...",
+    "notFound": "لم يتم العثور على فئات"
+  },
+  "labels": {
+    "optional": "(اختياري)",
+    "id": "الرقم التعريفي",
+    "name": "الاسم",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "createdAt": "تاريخ الإنشاء",
+    "actions": "الإجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "view": "عرض",
+    "add": "اضافة",
+    "create": "انشاء",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "search": "بحث",
+    "reset": "إعادة تعيين",
+    "loading": "جاري التحميل",
+    "noData": "لا توجد بيانات متاحة",
+    "yes": "نعم",
+    "no": "لا",
+    "select": "اختر",
+    "selectPlaceholder": "اختر خيار",
+    "submit": "إرسال",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "default": "افتراضي",
+    "description": "الوصف",
+    "arabic": "عربي",
+    "english": "إنجليزي"
   }
 }
