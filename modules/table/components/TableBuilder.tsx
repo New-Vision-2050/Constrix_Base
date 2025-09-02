@@ -55,15 +55,6 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Use URL from config if direct URL not provided
   const dataUrl = url || (config ? config.url : "");
 
-  if (!dataUrl) {
-    return (
-      <ErrorMessage
-        message="No URL or configuration provided"
-        onRetry={onReset}
-      />
-    );
-  }
-
   // Extract search configuration from the config
   const searchConfig = {
     defaultFields: config?.searchFields,
@@ -157,18 +148,20 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
         columnsWithActions.push({
           key: "id",
           label: t("Actions"), // Get from translations
-          render: (_: unknown, row: { id: string; [key: string]: unknown }) =>
-            React.createElement(Execution, {
+          render: (_: unknown, row: { id: string; [key: string]: unknown }) => {
+            // Default Execution component
+            return React.createElement(Execution, {
               row,
               formConfig: config?.formConfig,
-              executions: config?.executions,
+              executions: config?.executions || [],
               tableName: tableIdRef.current,
               buttonLabel: t("Actions"), // Also translate the button label
               showEdit: Boolean(config?.executionConfig?.canEdit),
               showDelete: Boolean(config?.executionConfig?.canDelete),
               deleteConfirmMessage: config?.deleteConfirmMessage,
               deleteUrl: config?.deleteUrl,
-            }),
+            });
+          },
         });
       }
 
@@ -233,6 +226,15 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // if (error) {
   //   return <ErrorMessage message={error} onRetry={onReset} />;
   // }
+
+  if (!dataUrl) {
+    return (
+      <ErrorMessage
+        message="No URL or configuration provided"
+        onRetry={onReset}
+      />
+    );
+  }
 
   return (
     <AnimatePresence mode="wait">

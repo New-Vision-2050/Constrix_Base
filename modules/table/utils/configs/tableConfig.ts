@@ -13,6 +13,12 @@ export interface DialogProps {
   [key: string]: unknown;
 }
 
+// Define render function type for custom executions
+export type RenderFunctionType = (row: {
+  id: string;
+  [key: string]: unknown;
+}) => ReactNode;
+
 // Define types for menu items (executions)
 export type MenuItem = {
   label: string;
@@ -65,7 +71,7 @@ export interface TableConfig {
   deleteConfirmMessage?: string;
   deleteUrl?: string;
   // Execution configuration
-  executions?: MenuItem[];
+  executions?: (MenuItem | RenderFunctionType)[];
   executionConfig?: ExecutionConfig;
   formConfig?: FormConfig;
 }
