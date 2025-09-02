@@ -8,9 +8,13 @@ export const useBrandsListTableConfig: () => TableConfig = () => {
   return {
     tableId: "brands-list-table",
     url: `${baseURL}/ecommerce/brands`,
+    deleteUrl: `${baseURL}/ecommerce/brands`,
     columns: [
       { key: "name", label: t("labels.name"), sortable: true },
       { key: "description", label: t("labels.description"), sortable: true },
     ],
+    executionConfig: {
+      canDelete: true,
+    },
   };
 };

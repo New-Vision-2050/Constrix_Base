@@ -1,3 +1,5 @@
+import DeleteButton from "@/components/shared/delete-button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
@@ -9,6 +11,7 @@ export const useWarehousesListTablConfig: () => TableConfig = () => {
   return {
     tableId: "warehouses-list-table",
     url: `${baseURL}/ecommerce/warehouses`,
+    deleteUrl: `${baseURL}/ecommerce/warehouses`,
     columns: [
       { key: "name", label: t("labels.name"), sortable: true },
       {
@@ -31,5 +34,8 @@ export const useWarehousesListTablConfig: () => TableConfig = () => {
       { key: "longitude", label: t("location.longitude") },
       { key: "latitude", label: t("location.latitude") },
     ],
+    executionConfig: {
+      canDelete: true,
+    },
   };
 };

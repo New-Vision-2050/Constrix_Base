@@ -8,6 +8,7 @@ export const useCategoriesListTableConfig: () => TableConfig = () => {
   return {
     tableId: "categories-list-table",
     url: `${baseURL}/ecommerce/categories`,
+    deleteUrl: `${baseURL}/ecommerce/categories`,
     columns: [
       {
         key: "name",
@@ -26,5 +27,8 @@ export const useCategoriesListTableConfig: () => TableConfig = () => {
       },
     ],
     executions: [],
+    executionConfig: {
+      canDelete: true,
+    },
   };
 };
