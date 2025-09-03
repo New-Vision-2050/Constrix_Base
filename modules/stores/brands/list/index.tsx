@@ -6,29 +6,40 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddBrandDialog from "@/modules/stores/components/dialogs/add-brand";
 import { useTranslations } from "next-intl";
 import { useBrandsListTableConfig } from "./_config/list-table-config";
+import { useState } from "react";
 
 function ListBrandsView() {
-  const tableConfig = useBrandsListTableConfig();
+  const [editingBrandId, setEditingBrandId] = useState<string | null>(null);
+  const tableConfig = useBrandsListTableConfig({
+    onEdit: (id: string) => setEditingBrandId(id),
+  });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
   return (
-    <TableBuilder
-      config={tableConfig}
-      searchBarActions={
-        <>
-          <DialogTrigger
-            component={AddBrandDialog}
-            dialogProps={{ onSuccess: () => reloadTable() }}
-            render={({ onOpen }) => (
-              <Button onClick={onOpen}>
-                {t("labels.add")} {t("brand.singular")}
-              </Button>
-            )}
-          />
-        </>
-      }
-      tableId={tableConfig.tableId}
-    />
+    <>
+      <AddBrandDialog
+        open={Boolean(editingBrandId)}
+        onClose={() => setEditingBrandId(null)}
+        brandId={editingBrandId || undefined}
+      />
+      <TableBuilder
+        config={tableConfig}
+        searchBarActions={
+          <>
+            <DialogTrigger
+              component={AddBrandDialog}
+              dialogProps={{ onSuccess: () => reloadTable() }}
+              render={({ onOpen }) => (
+                <Button onClick={onOpen}>
+                  {t("labels.add")} {t("brand.singular")}
+                </Button>
+              )}
+            />
+          </>
+        }
+        tableId={tableConfig.tableId}
+      />
+    </>
   );
 }
 

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,10 @@ import PlacesPicker, {
   GoogleMapPickerValue,
 } from "@/components/headless/places-picker";
 import { WarehousesApi } from "@/services/api/ecommerce/warehouses";
-import { CreateWarehouseParams } from "@/services/api/ecommerce/warehouses/types/params";
+import {
+  CreateWarehouseParams,
+  UpdateWarehouseParams,
+} from "@/services/api/ecommerce/warehouses/types/params";
 import { getCountries } from "@/services/api/shared/countries";
 import { getCities } from "@/services/api/shared/cities";
 import { API_Country } from "@/types/api/shared/country";
@@ -34,8 +38,8 @@ const createWarehouse2Schema = (t: (key: string) => string) =>
       .min(1, t("warehouse.warehouseNameRequired"))
       .min(2, t("warehouse.warehouseNameMinLength")),
     is_default: z.boolean().default(false),
-    country_id: z.number().min(1, t("warehouse.countryRequired")),
-    city_id: z.number().min(1, t("warehouse.cityRequired")),
+    country_id: z.string().min(1, t("warehouse.countryRequired")),
+    city_id: z.string().min(1, t("warehouse.cityRequired")),
     district: z.string().min(1, t("warehouse.districtRequired")),
     street: z.string().min(1, t("warehouse.streetRequired")),
     latitude: z.number().min(-90).max(90),
@@ -48,17 +52,27 @@ interface AddWarehouse2DialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  warehouseId?: string; // Add warehouseId for edit mode
 }
 
 export default function AddWarehouse2Dialog({
   open,
   onClose,
   onSuccess,
+  warehouseId,
 }: AddWarehouse2DialogProps) {
   const isRtl = useIsRtl();
   const t = useTranslations();
   const [countries, setCountries] = useState<API_Country[]>([]);
   const [cities, setCities] = useState<API_City[]>([]);
+  const isEditMode = !!warehouseId;
+
+  // Fetch warehouse data when editing
+  const { data: warehouseData, isLoading: isFetching } = useQuery({
+    queryKey: ["warehouse", warehouseId],
+    queryFn: () => WarehousesApi.show(warehouseId!),
+    enabled: isEditMode && open,
+  });
 
   const {
     register,
@@ -66,14 +80,15 @@ export default function AddWarehouse2Dialog({
     watch,
     reset,
     setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<Warehouse2FormData>({
     resolver: zodResolver(createWarehouse2Schema(t)),
     defaultValues: {
       name: "",
       is_default: false,
-      country_id: 0,
-      city_id: 0,
+      country_id: "",
+      city_id: "",
       district: "",
       street: "",
       latitude: 0,
@@ -82,6 +97,30 @@ export default function AddWarehouse2Dialog({
   });
 
   const watchedIsDefault = watch("is_default");
+
+  // Populate form with warehouse data when editing
+  useEffect(() => {
+    if (isEditMode && warehouseData?.data?.payload) {
+      const warehouse = warehouseData.data.payload;
+
+      setValue("name", warehouse.name || "");
+      setValue("is_default", Boolean(warehouse.is_default));
+      // Note: country_id and city_id are not available in the show response
+      // They would need to be included in the API response for full edit functionality
+      setValue("district", warehouse.district || "");
+      setValue("street", warehouse.street || "");
+      setValue(
+        "latitude",
+        warehouse.latitude ? parseFloat(warehouse.latitude) : 0
+      );
+      setValue(
+        "longitude",
+        warehouse.longitude ? parseFloat(warehouse.longitude) : 0
+      );
+      if (warehouse?.country) setValue("country_id", warehouse?.country?.id);
+      if (warehouse?.city) setValue("city_id", warehouse?.city?.id);
+    }
+  }, [isEditMode, warehouseData, setValue]);
 
   // Load countries and cities on component mount
   useEffect(() => {
@@ -121,30 +160,50 @@ export default function AddWarehouse2Dialog({
 
   const onSubmit = async (data: Warehouse2FormData) => {
     try {
-      const createParams: CreateWarehouseParams = {
-        name: data.name,
-        is_default: data.is_default,
-        country_id: data.country_id,
-        city_id: data.city_id,
-        district: data.district,
-        street: data.street,
-        latitude: data.latitude,
-        longitude: data.longitude,
-      };
+      if (isEditMode && warehouseId) {
+        // Update existing warehouse
+        const updateParams: UpdateWarehouseParams = {
+          name: data.name,
+          is_default: data.is_default,
+          country_id: data.country_id,
+          city_id: data.city_id,
+          district: data.district,
+          street: data.street,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        };
 
-      await WarehousesApi.create(createParams);
+        await WarehousesApi.update(warehouseId, updateParams);
+      } else {
+        // Create new warehouse
+        const createParams: CreateWarehouseParams = {
+          name: data.name,
+          is_default: data.is_default,
+          country_id: data.country_id,
+          city_id: data.city_id,
+          district: data.district,
+          street: data.street,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        };
+
+        await WarehousesApi.create(createParams);
+      }
 
       onSuccess?.();
       reset();
       onClose();
     } catch (error) {
-      console.error("Error creating warehouse:", error);
+      console.error(
+        `Error ${isEditMode ? "updating" : "creating"} warehouse:`,
+        error
+      );
       // You might want to add toast notification here
     }
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !isFetching) {
       reset();
       onClose();
     }
@@ -160,7 +219,9 @@ export default function AddWarehouse2Dialog({
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {t("warehouse.addWarehouse")}
+            {isEditMode
+              ? t("warehouse.editWarehouse")
+              : t("warehouse.addWarehouse")}
           </DialogTitle>
         </DialogHeader>
 
@@ -176,7 +237,7 @@ export default function AddWarehouse2Dialog({
                   variant="secondary"
                   {...register("name")}
                   placeholder="مخزن بحري"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isFetching}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">
@@ -190,7 +251,7 @@ export default function AddWarehouse2Dialog({
                   id="is_default"
                   checked={watchedIsDefault}
                   onCheckedChange={(checked) => setValue("is_default", checked)}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isFetching}
                 />
                 <Label
                   htmlFor="is_default"
@@ -211,19 +272,28 @@ export default function AddWarehouse2Dialog({
                     >
                       {t("location.country")}
                     </Label>
-                    <select
-                      id="country_id"
-                      {...register("country_id", { valueAsNumber: true })}
-                      className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
-                      disabled={isSubmitting}
-                    >
-                      <option value={0}>{t("warehouse.selectCountry")}</option>
-                      {countries.map((country) => (
-                        <option key={country.id} value={Number(country.id)}>
-                          {country.name}
-                        </option>
-                      ))}
-                    </select>
+                    <Controller
+                      name="country_id"
+                      control={control}
+                      render={({ field }) => (
+                        <select
+                          id="country_id"
+                          className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
+                          disabled={isSubmitting || isFetching}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        >
+                          <option value="">
+                            {t("warehouse.selectCountry")}
+                          </option>
+                          {countries.map((country) => (
+                            <option key={country.id} value={country.id}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    />
                     {errors.country_id && (
                       <p className="text-red-500 text-sm">
                         {errors.country_id.message}
@@ -235,19 +305,26 @@ export default function AddWarehouse2Dialog({
                     <Label htmlFor="city_id" className="text-sm text-gray-400">
                       {t("location.city")}
                     </Label>
-                    <select
-                      id="city_id"
-                      {...register("city_id", { valueAsNumber: true })}
-                      className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
-                      disabled={isSubmitting}
-                    >
-                      <option value={0}>{t("warehouse.selectCity")}</option>
-                      {cities.map((city) => (
-                        <option key={city.id} value={Number(city.id)}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
+                    <Controller
+                      name="city_id"
+                      control={control}
+                      render={({ field }) => (
+                        <select
+                          id="city_id"
+                          className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
+                          disabled={isSubmitting || isFetching}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        >
+                          <option value="">{t("warehouse.selectCity")}</option>
+                          {cities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                              {city.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    />
                     {errors.city_id && (
                       <p className="text-red-500 text-sm">
                         {errors.city_id.message}
@@ -267,7 +344,7 @@ export default function AddWarehouse2Dialog({
                       type="number"
                       {...register("latitude", { valueAsNumber: true })}
                       placeholder="25.325348647861"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isFetching}
                       step="any"
                     />
                     {errors.latitude && (
@@ -290,7 +367,7 @@ export default function AddWarehouse2Dialog({
                       type="number"
                       {...register("longitude", { valueAsNumber: true })}
                       placeholder="55.296249647861"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isFetching}
                       step="any"
                     />
                     {errors.longitude && (
@@ -311,7 +388,7 @@ export default function AddWarehouse2Dialog({
                       variant="secondary"
                       {...register("street")}
                       placeholder="شارع الملك فهد"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isFetching}
                     />
                     {errors.street && (
                       <p className="text-red-500 text-sm">
@@ -329,7 +406,7 @@ export default function AddWarehouse2Dialog({
                       variant="secondary"
                       {...register("district")}
                       placeholder="الرياض"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isFetching}
                     />
                     {errors.district && (
                       <p className="text-red-500 text-sm">
@@ -341,7 +418,9 @@ export default function AddWarehouse2Dialog({
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-gray-400">{t("warehouse.locationMap")}</Label>
+              <Label className="text-sm text-gray-400">
+                {t("warehouse.locationMap")}
+              </Label>
               <div className="bg-gray-200 rounded-lg overflow-hidden">
                 <PlacesPicker
                   onPick={handleLocationPick}
@@ -358,17 +437,17 @@ export default function AddWarehouse2Dialog({
               type="button"
               variant="ghost"
               onClick={handleClose}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isFetching}
               className="flex-1"
             >
               {t("warehouse.cancel")}
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isFetching}
               className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              {isSubmitting ? (
+              {isSubmitting || isFetching ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
                   {t("warehouse.saving")}

@@ -1243,6 +1243,7 @@
     "plural": "Brands",
     "singular": "Brand",
     "addBrand": "Add Brand",
+    "editBrand": "Edit Brand",
     "brandName": "Brand Name",
     "brandNameRequired": "Brand name is required",
     "brandNameMinLength": "Brand name must be at least 2 characters",
