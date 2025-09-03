@@ -1,8 +1,8 @@
 export interface CreateWarehouseParams {
   name: string;
   is_default: boolean;
-  country_id: number;
-  city_id: number;
+  country_id: string | number;
+  city_id: string | number;
   district: string;
   street: string;
   latitude: number;
