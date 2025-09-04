@@ -1,6 +1,9 @@
 "use client";
 
 import useUserData from "@/hooks/use-user-data";
+import { useBranches } from "@/modules/attendance-departure/hooks/useBranches";
+import { CRMSettingsT } from "@/modules/crm-settings/api/get-shared-settings";
+import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import React, {
   createContext,
   useContext,
@@ -16,6 +19,8 @@ interface CxtType {
   closeCreateClientSheet: () => void;
   branchId: string | undefined;
   userId: string | undefined;
+  sharedSettings: CRMSettingsT | undefined;
+  companyBranchesIds: string[];
 }
 
 // Create the context
@@ -30,6 +35,12 @@ export const CreateClientCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
   // control open sheet
   const [openCreateClient, setOpenCreateClient] = useState(false);
+  // shared setting
+  const { data: sharedSettings } = useCRMSharedSetting();
+  const { branches } = useBranches();
+  const companyBranchesIds: string[] = useMemo(() => {
+    return branches?.map((branch: any) => branch.id.toString());
+  }, [branches]);
   // current user data
   const { data: userData } = useUserData();
   const branchId = useMemo(() => {
@@ -62,6 +73,10 @@ export const CreateClientCxtProvider: React.FC<PropsT> = ({ children }) => {
         branchId,
         // user id
         userId,
+        // shared setting
+        sharedSettings,
+        // company branches ids
+        companyBranchesIds,
       }}
     >
       {children}

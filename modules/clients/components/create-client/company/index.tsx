@@ -11,6 +11,8 @@ export default function CreateClientCompanyForm() {
     branchId: currentEmpBranchId,
     userId: currentEmpId,
     closeCreateClientSheet,
+    companyBranchesIds,
+    sharedSettings,
   } = useCreateClientCxt();
 
   const onSuccessFn = () => {
@@ -24,7 +26,9 @@ export default function CreateClientCompanyForm() {
     t,
     onSuccessFn,
     currentEmpBranchId,
-    currentEmpId
+    currentEmpId,
+    sharedSettings?.is_share_client == "1",
+    companyBranchesIds
   );
 
   // form builder vars

@@ -72,6 +72,20 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     }
   }, [options, value, setFirstAsDefault, isMulti, onChange, dataFetched]);
 
+  // Auto-select all options if selectAll is enabled
+  useEffect(() => {
+    if (
+      dynamicConfig?.selectAll &&
+      isMulti &&
+      dataFetched &&
+      options.length > 0 &&
+      (!value || (Array.isArray(value) && value.length === 0))
+    ) {
+      const allValues = options.map(option => option.value);
+      onChange(allValues);
+    }
+  }, [options, value, dynamicConfig?.selectAll, isMulti, onChange, dataFetched]);
+
   // Find the label(s) for the current value(s)
   const getSelectedLabels = () => {
     if (isMulti && Array.isArray(value)) {

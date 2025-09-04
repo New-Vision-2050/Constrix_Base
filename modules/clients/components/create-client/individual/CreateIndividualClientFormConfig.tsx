@@ -5,14 +5,19 @@ import { baseURL } from "@/config/axios-config";
 import InvalidClientMailDialog from "./InvalidClientMailDialog";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import AddressDialog from "./AddressDialog";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export function getCreateIndividualClientFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
   currentEmpBranchId?: string,
-  currentEmpId?: string
+  currentEmpId?: string,
+  isShareClient?: boolean,
+  companyBranchesIds?: string[]
 ): FormConfig {
   const formId = "individual-client-form";
+
+  console.log("isShareClient", isShareClient, companyBranchesIds);
 
   return {
     formId,
@@ -22,6 +27,9 @@ export function getCreateIndividualClientFormConfig(
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
     },
+    // initialValues: {
+    //   branch_ids: companyBranchesIds ?? [],
+    // },
     sections: [
       {
         fields: [
@@ -305,13 +313,36 @@ export function getCreateIndividualClientFormConfig(
           },
           // branchs
           {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareClient,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: isShareClient,
+            condition: (values) => {
+              return !!isShareClient;
+            },
+          },
+          {
             name: "branch_ids",
             label: t("form.branches"),
             type: "select",
             isMulti: true,
             placeholder: t("form.branchesPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -322,7 +353,10 @@ export function getCreateIndividualClientFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // disabled: true,
+            disabled: isShareClient,
+            condition: (values) => {
+              return !isShareClient;
+            },
           },
           // broker
           {
@@ -354,6 +388,17 @@ export function getCreateIndividualClientFormConfig(
     ],
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(
+        {
+          ...formData,
+          branch_ids: isShareClient
+            ? formData.branch_ids_all
+            : formData.branch_ids,
+        },
+        getCreateIndividualClientFormConfig(t, onSuccessFn)
+      );
+    },
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
     showReset: false,

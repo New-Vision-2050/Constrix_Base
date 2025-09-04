@@ -67,6 +67,7 @@ export interface DynamicDropdownConfig {
   valueField: string;
   labelField: string;
   setFirstAsDefault?: boolean; // Whether to automatically select the first option when no value is selected
+  selectAll?: boolean; // Whether to automatically select all options when field is multi-select
   dependsOn?:
     | string
     | DependencyConfig[]
