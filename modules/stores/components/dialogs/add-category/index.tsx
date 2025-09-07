@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { CategoriesApi } from "@/services/api/ecommerce/categories";
 import { CreateCategoryParams } from "@/services/api/ecommerce/categories/types/params";
-import { I18nField } from "@/types/common/args/I18nFIeld";
 
 import {
   Dialog,
@@ -23,13 +22,11 @@ import { Loader2 } from "lucide-react";
 
 const createCategorySchema = (t: (key: string) => string) =>
   z.object({
-    nameAr: z
+    name: z
       .string()
       .min(1, t("category.categoryNameRequired"))
       .min(2, t("category.categoryNameMinLength")),
-    nameEn: z.string().optional(),
-    descriptionAr: z.string().optional(),
-    descriptionEn: z.string().optional(),
+    description: z.string().optional(),
   });
 
 type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>;
@@ -56,31 +53,16 @@ export default function AddCategoryDialog({
   } = useForm<CategoryFormData>({
     resolver: zodResolver(createCategorySchema(t)),
     defaultValues: {
-      nameAr: "",
-      nameEn: "",
-      descriptionAr: "",
-      descriptionEn: "",
+      name: "",
+      description: "",
     },
   });
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      const name: I18nField = {
-        ar: data.nameAr,
-        en: data.nameEn || undefined,
-      };
-
-      const description: I18nField | undefined =
-        data.descriptionAr || data.descriptionEn
-          ? {
-              ar: data.descriptionAr || "",
-              en: data.descriptionEn || undefined,
-            }
-          : undefined;
-
       const createParams: CreateCategoryParams = {
-        name,
-        description,
+        name: data.name,
+        description: data.description || undefined,
       };
 
       await CategoriesApi.create(createParams);
@@ -117,68 +99,33 @@ export default function AddCategoryDialog({
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6">
-            {/* Arabic Name */}
+            {/* Name */}
             <div className="space-y-2">
-              <Label htmlFor="nameAr" className="text-sm text-gray-400">
-                {t("category.categoryName")} ({t("labels.arabic")}) *
+              <Label htmlFor="name" className="text-sm text-gray-400">
+                {t("category.categoryName")} *
               </Label>
               <Input
-                id="nameAr"
+                id="name"
                 variant="secondary"
-                {...register("nameAr")}
-                placeholder="أدخل اسم الفئة"
+                {...register("name")}
+                placeholder={t("category.categoryNamePlaceholder") ?? ""}
                 disabled={isSubmitting}
-                dir="rtl"
               />
-              {errors.nameAr && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.nameAr.message}
-                </p>
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
               )}
             </div>
 
-            {/* English Name */}
+            {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="nameEn" className="text-sm text-gray-400">
-                {t("category.categoryName")} ({t("labels.english")})
-              </Label>
-              <Input
-                id="nameEn"
-                variant="secondary"
-                {...register("nameEn")}
-                placeholder="Enter category name"
-                disabled={isSubmitting}
-                dir="ltr"
-              />
-            </div>
-
-            {/* Arabic Description */}
-            <div className="space-y-2">
-              <Label htmlFor="descriptionAr" className="text-sm text-gray-400">
-                {t("category.categoryDescription")} ({t("labels.arabic")})
+              <Label htmlFor="description" className="text-sm text-gray-400">
+                {t("category.categoryDescription")}
               </Label>
               <Textarea
-                id="descriptionAr"
-                {...register("descriptionAr")}
-                placeholder="أدخل وصف الفئة"
+                id="description"
+                {...register("description")}
+                placeholder={t("category.categoryDescriptionPlaceholder") ?? ""}
                 disabled={isSubmitting}
-                dir="rtl"
-                className="bg-sidebar border-gray-600 text-white resize-none"
-                rows={3}
-              />
-            </div>
-
-            {/* English Description */}
-            <div className="space-y-2">
-              <Label htmlFor="descriptionEn" className="text-sm text-gray-400">
-                {t("category.categoryDescription")} ({t("labels.english")})
-              </Label>
-              <Textarea
-                id="descriptionEn"
-                {...register("descriptionEn")}
-                placeholder="Enter category description"
-                disabled={isSubmitting}
-                dir="ltr"
                 className="bg-sidebar border-gray-600 text-white resize-none"
                 rows={3}
               />
