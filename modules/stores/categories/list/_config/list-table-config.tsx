@@ -1,8 +1,15 @@
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
 
-export const useCategoriesListTableConfig: () => TableConfig = () => {
+type Params = {
+  onEdit?: (id: string) => void;
+};
+
+export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
+  params
+) => {
   const t = useTranslations();
 
   return {
@@ -26,7 +33,13 @@ export const useCategoriesListTableConfig: () => TableConfig = () => {
         sortable: true,
       },
     ],
-    executions: [],
+    executions: [
+      (row) => (
+        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+          {t("labels.edit")}
+        </DropdownMenuItem>
+      ),
+    ],
     executionConfig: {
       canDelete: true,
     },

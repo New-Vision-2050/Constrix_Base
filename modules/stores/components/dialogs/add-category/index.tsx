@@ -1,12 +1,17 @@
 "use client";
 
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { CategoriesApi } from "@/services/api/ecommerce/categories";
-import { CreateCategoryParams } from "@/services/api/ecommerce/categories/types/params";
+import {
+  CreateCategoryParams,
+  UpdateCategoryParams,
+} from "@/services/api/ecommerce/categories/types/params";
 
 import {
   Dialog,
@@ -35,13 +40,16 @@ interface AddCategoryDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  categoryId?: string; // optional id for edit mode
 }
 
 export default function AddCategoryDialog({
   open,
   onClose,
   onSuccess,
+  categoryId,
 }: AddCategoryDialogProps) {
+  const isEditMode = !!categoryId;
   const isRtl = useIsRtl();
   const t = useTranslations();
 
@@ -49,6 +57,7 @@ export default function AddCategoryDialog({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(createCategorySchema(t)),
@@ -58,26 +67,55 @@ export default function AddCategoryDialog({
     },
   });
 
+  // Fetch category data when editing
+  const { data: categoryData, isLoading: isFetching } = useQuery({
+    queryKey: ["category", categoryId],
+    queryFn: () => CategoriesApi.show(categoryId!),
+    enabled: isEditMode && open,
+  });
+
+  // Populate form with category data when editing
+  React.useEffect(() => {
+    if (isEditMode && categoryData?.data?.payload) {
+      const category = categoryData.data.payload;
+
+      setValue("name", category.name || "");
+      setValue("description", category.description || "");
+    }
+  }, [isEditMode, categoryData, setValue]);
+
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      const createParams: CreateCategoryParams = {
-        name: data.name,
-        description: data.description || undefined,
-      };
+      if (isEditMode && categoryId) {
+        const updateParams: UpdateCategoryParams = {
+          name: data.name,
+          description: data.description || "",
+        };
 
-      await CategoriesApi.create(createParams);
+        await CategoriesApi.update(categoryId, updateParams);
+      } else {
+        const createParams: CreateCategoryParams = {
+          name: data.name,
+          description: data.description || undefined,
+        };
+
+        await CategoriesApi.create(createParams);
+      }
 
       onSuccess?.();
       reset();
       onClose();
     } catch (error) {
-      console.error("Error creating category:", error);
+      console.error(
+        `Error ${isEditMode ? "updating" : "creating"} category:`,
+        error
+      );
       // You might want to add toast notification here
     }
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !isFetching) {
       reset();
       onClose();
     }
@@ -112,7 +150,9 @@ export default function AddCategoryDialog({
                 disabled={isSubmitting}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
