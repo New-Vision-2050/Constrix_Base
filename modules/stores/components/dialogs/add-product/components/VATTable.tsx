@@ -1,24 +1,45 @@
 "use client";
 
 import React from "react";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Plus, MoreVertical } from "lucide-react";
+import { Input } from "@/modules/table/components/ui/input";
+import { Plus, Trash2 } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  FormField,
+  FormItem,
+  FormControl,
+} from "@/modules/table/components/ui/form";
+import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import type { CreateProductFormData } from "../schema";
 
-export default function VATTable() {
+interface VATTableProps {
+  form: UseFormReturn<CreateProductFormData>;
+}
+
+export default function VATTable({ form }: VATTableProps) {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "taxes",
+  });
+
+  const addTax = () => {
+    append({
+      country_id: 1,
+      tax_number: "",
+      tax_percentage: "0",
+      is_active: 1,
+    });
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <h3 className="text-foreground text-xl font-medium">
           إعدادات القيمة المضافة
         </h3>
-        <Button>
+        <Button type="button" onClick={addTax}>
           <Plus className="w-4 h-4 ml-2" />
           إضافة
         </Button>
@@ -27,9 +48,9 @@ export default function VATTable() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b ">
+            <tr className="border-b">
               <th className="text-right p-4 text-gray-400 font-medium">
-                الدولة
+                رقم الدولة
               </th>
               <th className="text-right p-4 text-gray-400 font-medium">
                 الرقم الضريبي
@@ -46,36 +67,102 @@ export default function VATTable() {
             </tr>
           </thead>
           <tbody>
-            {[1, 2].map((item) => (
-              <tr key={item} className="border-b">
-                <td className="p-4 text-foreground">مصر</td>
-                <td className="p-4 text-foreground">265-365-254</td>
-                <td className="p-4 text-foreground">14%</td>
+            {fields.map((field, index) => (
+              <tr key={field.id} className="border-b">
                 <td className="p-4">
-                  <Switch defaultChecked />
+                  <FormField
+                    control={form.control}
+                    name={`taxes.${index}.country_id`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="1"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormErrorMessage />
+                      </FormItem>
+                    )}
+                  />
                 </td>
                 <td className="p-4">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0 text-foreground"
-                      >
-                        <span className="sr-only">Open menu</span>
-                        <MoreVertical className="h-5 w-5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>عرض</DropdownMenuItem>
-                      <DropdownMenuItem>تعديل</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-500">
-                        حذف
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <FormField
+                    control={form.control}
+                    name={`taxes.${index}.tax_number`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="VAT12345" {...field} />
+                        </FormControl>
+                        <FormErrorMessage />
+                      </FormItem>
+                    )}
+                  />
+                </td>
+                <td className="p-4">
+                  <FormField
+                    control={form.control}
+                    name={`taxes.${index}.tax_percentage`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="5.00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormErrorMessage />
+                      </FormItem>
+                    )}
+                  />
+                </td>
+                <td className="p-4">
+                  <FormField
+                    control={form.control}
+                    name={`taxes.${index}.is_active`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Switch
+                            checked={field.value === 1}
+                            onCheckedChange={(checked) =>
+                              field.onChange(checked ? 1 : 0)
+                            }
+                          />
+                        </FormControl>
+                        <FormErrorMessage />
+                      </FormItem>
+                    )}
+                  />
+                </td>
+                <td className="p-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => remove(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </td>
               </tr>
             ))}
+            {fields.length === 0 && (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-gray-500">
+                  لا توجد ضرائب مضافة. انقر على &quot;إضافة&quot; لإضافة ضريبة
+                  جديدة.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

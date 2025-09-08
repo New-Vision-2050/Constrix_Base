@@ -1,10 +1,18 @@
 "use client";
 
 import React from "react";
+import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import type { CreateProductFormData } from "../schema";
 
-export default function ProductSettings() {
+interface ProductSettingsProps {
+  form: UseFormReturn<CreateProductFormData>;
+}
+
+export default function ProductSettings({ form }: ProductSettingsProps) {
+  console.log("Form:", form); // TODO: Remove this and integrate form
+
   return (
     <div className="flex items-center space-x-8 space-x-reverse">
       <div className="flex items-center space-x-3 space-x-reverse">

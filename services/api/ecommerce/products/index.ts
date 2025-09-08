@@ -1,14 +1,26 @@
 import { baseApi } from "@/config/axios/instances/base";
-import { ListCategoriesResponse, ShowCategoryResponse } from "./types/response";
+import {
+  ListProductsResponse,
+  ShowProductResponse,
+  CreateProductResponse,
+  UpdateProductResponse,
+} from "./types/response";
 import { CreateProductParams, UpdateProductParams } from "./types/params";
+import { serialize } from "object-to-formdata";
 
 export const ProductsApi = {
-  list: () => baseApi.get<ListCategoriesResponse>("ecommerce/products"),
+  list: () => baseApi.get<ListProductsResponse>("ecommerce/products"),
   show: (id: string) =>
-    baseApi.get<ShowCategoryResponse>(`ecommerce/products/${id}`),
+    baseApi.get<ShowProductResponse>(`ecommerce/products/${id}`),
   create: (params: CreateProductParams) =>
-    baseApi.post("ecommerce/products", params),
+    baseApi.post<CreateProductResponse>(
+      "ecommerce/products",
+      serialize(params, {
+        indices: true,
+        booleansAsIntegers: true,
+      })
+    ),
   update: (id: string, params: UpdateProductParams) =>
-    baseApi.put(`ecommerce/products/${id}`, params),
-  delete: (id: string) => baseApi.put(`ecommerce/products/${id}`),
+    baseApi.put<UpdateProductResponse>(`ecommerce/products/${id}`, params),
+  delete: (id: string) => baseApi.delete(`ecommerce/products/${id}`),
 };

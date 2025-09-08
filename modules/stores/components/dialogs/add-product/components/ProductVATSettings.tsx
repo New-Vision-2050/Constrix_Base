@@ -1,11 +1,18 @@
 "use client";
 
 import React from "react";
+import { UseFormReturn } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
+import type { CreateProductFormData } from "../schema";
 
-export default function ProductVATSettings() {
+interface ProductVATSettingsProps {
+  form: UseFormReturn<CreateProductFormData>;
+}
+
+export default function ProductVATSettings({ form }: ProductVATSettingsProps) {
+  console.log("Form:", form); // TODO: Remove this and integrate form
   return (
     <Card className="bg-sidebar p-6 space-y-4">
       <div className="flex items-center justify-between">
