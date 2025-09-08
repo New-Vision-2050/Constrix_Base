@@ -9,7 +9,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useIsRtl } from "@/hooks/use-is-rtl";
@@ -21,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SimpleSelect from "@/components/headless/select";
+import { Input } from "@/modules/table/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 interface AddProductDialogProps {
   open: boolean;
@@ -55,43 +56,50 @@ export default function AddProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent
-        className="max-w-7xl w-full bg-[#1A1625] border-0 p-0"
-        dir={isRtl ? "rtl" : "ltr"}
-      >
-        <DialogHeader className="p-6 border-b border-[#3c345a]">
-          <DialogTitle className="text-center text-xl font-semibold text-white">
+      <DialogContent className="max-w-7xl w-full" dir={isRtl ? "rtl" : "ltr"}>
+        <DialogHeader>
+          <DialogTitle className="text-center text-xl font-semibold text-foreground">
             إضافة منتج عادي
           </DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <X className="w-5 h-5 text-white" />
+            <X className="w-5 h-5 text-foreground" />
             <span className="sr-only">Close</span>
           </DialogClose>
         </DialogHeader>
 
-        <div className="p-8 space-y-8 max-h-[80vh] overflow-y-auto">
+        <div className="p-8 space-y-8">
           <div className="grid grid-cols-12 gap-8">
-            {/* Left Section */}
+            {/* Start Section */}
+            <div className="col-span-4">
+              <Card className="bg-sidebar p-6 text-center h-full flex flex-col justify-center items-center">
+                <h3 className="text-foreground text-lg font-medium mb-4">
+                  صورة المنتج
+                </h3>
+                <div className="w-32 h-32 bg-gray-500 rounded-lg flex flex-col items-center justify-center mb-4">
+                  <Upload className="w-10 h-10 text-gray-400" />
+                </div>
+                <p className="text-xs text-gray-500 mb-4">
+                  اقصى حجم للصورة: 2160 × 2160 - 3MB
+                  <br />
+                  .jpg, .png, .webp
+                </p>
+                <Button variant="outline">ارفق</Button>
+              </Card>
+            </div>
+            {/* End Section - Image Upload */}
             <div className="col-span-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <Label className="text-gray-400 text-sm mb-2 block">
                     اسم المنتج
                   </Label>
-                  <Input
-                    className="bg-[#2a233c] border-[#3c345a] text-white placeholder-gray-500 rounded-lg"
-                    placeholder="هاتف ايفون"
-                  />
+                  <Input placeholder="هاتف ايفون" />
                 </div>
                 <div>
                   <Label className="text-gray-400 text-sm mb-2 block">
                     سعر المنتج
                   </Label>
-                  <Input
-                    className="bg-[#2a233c] border-[#3c345a] text-white placeholder-gray-500 rounded-lg"
-                    placeholder="1600"
-                    type="number"
-                  />
+                  <Input placeholder="1600" type="number" />
                 </div>
               </div>
 
@@ -100,19 +108,13 @@ export default function AddProductDialog({
                   <Label className="text-gray-400 text-sm mb-2 block">
                     رمز المنتج
                   </Label>
-                  <Input
-                    className="bg-[#2a233c] border-[#3c345a] text-white placeholder-gray-500 rounded-lg"
-                    placeholder="16AAFF206"
-                  />
+                  <Input placeholder="16AAFF206" />
                 </div>
                 <div>
                   <Label className="text-gray-400 text-sm mb-2 block">
                     وصف المنتج
                   </Label>
-                  <Input
-                    className="bg-[#2a233c] border-[#3c345a] text-white placeholder-gray-500 rounded-lg"
-                    placeholder="وصف هذا المنتج الذي قد يكون سطرا أو يتجاوز ذلك بـ..."
-                  />
+                  <Input placeholder="وصف هذا المنتج الذي قد يكون سطرا أو يتجاوز ذلك بـ..." />
                 </div>
               </div>
 
@@ -124,11 +126,9 @@ export default function AddProductDialog({
                   <SimpleSelect
                     value={selectedStore}
                     onValueChange={setSelectedStore}
-                    options={[
-                      { label: "مخزن جدة", value: "jeddah_warehouse" }
-                    ]}
+                    options={[{ label: "مخزن جدة", value: "jeddah_warehouse" }]}
                     valueProps={{
-                      placeholder: "اختر المخزن"
+                      placeholder: "اختر المخزن",
                     }}
                   />
                 </div>
@@ -136,11 +136,7 @@ export default function AddProductDialog({
                   <Label className="text-gray-400 text-sm mb-2 block">
                     الكمية
                   </Label>
-                  <Input
-                    className="bg-[#2a233c] border-[#3c345a] text-white placeholder-gray-500 rounded-lg"
-                    placeholder="8000"
-                    type="number"
-                  />
+                  <Input placeholder="8000" type="number" />
                 </div>
                 <div>
                   <Label className="text-gray-400 text-sm mb-2 block">
@@ -149,11 +145,9 @@ export default function AddProductDialog({
                   <SimpleSelect
                     value={selectedMainCategory}
                     onValueChange={setSelectedMainCategory}
-                    options={[
-                      { label: "الكترونيات", value: "electronics" }
-                    ]}
+                    options={[{ label: "الكترونيات", value: "electronics" }]}
                     valueProps={{
-                      placeholder: "اختر التصنيف الرئيسي"
+                      placeholder: "اختر التصنيف الرئيسي",
                     }}
                   />
                 </div>
@@ -164,11 +158,9 @@ export default function AddProductDialog({
                   <SimpleSelect
                     value={selectedSubCategory}
                     onValueChange={setSelectedSubCategory}
-                    options={[
-                      { label: "أجهزة", value: "devices" }
-                    ]}
+                    options={[{ label: "أجهزة", value: "devices" }]}
                     valueProps={{
-                      placeholder: "اختر التصنيف الفرعي"
+                      placeholder: "اختر التصنيف الفرعي",
                     }}
                   />
                 </div>
@@ -177,50 +169,64 @@ export default function AddProductDialog({
               <div className="flex items-center space-x-8 space-x-reverse">
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Switch id="tax-switch" />
-                  <Label htmlFor="tax-switch" className="text-white">
+                  <Label htmlFor="tax-switch" className="text-foreground">
                     الضريبة
                   </Label>
                 </div>
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Switch id="shipping-switch" />
-                  <Label htmlFor="shipping-switch" className="text-white">
+                  <Label htmlFor="shipping-switch" className="text-foreground">
                     تتطلب شحن
                   </Label>
                 </div>
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Switch id="unlimited-qty-switch" />
-                  <Label htmlFor="unlimited-qty-switch" className="text-white">
+                  <Label
+                    htmlFor="unlimited-qty-switch"
+                    className="text-foreground"
+                  >
                     كمية غير محدودة
                   </Label>
                 </div>
               </div>
             </div>
-
-            {/* Right Section - Image Upload */}
-            <div className="col-span-4">
-              <div className="bg-[#2a233c] border border-[#3c345a] rounded-lg p-6 text-center h-full flex flex-col justify-center items-center">
-                <h3 className="text-white text-lg font-medium mb-4">
-                  صورة المنتج
-                </h3>
-                <div className="w-32 h-32 bg-[#1A1625] rounded-lg flex flex-col items-center justify-center mb-4">
-                  <Upload className="w-10 h-10 text-gray-400" />
-                </div>
-                <p className="text-xs text-gray-500 mb-4">
-                  اقصى حجم للصورة: 2160 × 2160 - 3MB
-                  <br />
-                  .jpg, .png, .webp
-                </p>
-                <Button variant="outline">ارفق</Button>
-              </div>
-            </div>
           </div>
 
           <div className="grid grid-cols-12 gap-8">
-            {/* Left Section - VAT Settings */}
+            {/* Start Section - VAT Settings */}
+            <div className="col-span-4 space-y-6">
+              <Card className=" bg-sidebar p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-foreground">
+                    المنتج معفى من الضريبة
+                  </Label>
+                  <Switch />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-foreground">
+                    السعر شامل ضريبة القيمة المضافة
+                  </Label>
+                  <Switch />
+                </div>
+              </Card>
+              <Card className=" bg-sidebar p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-foreground">
+                    عرض المنتج على المتجر
+                  </Label>
+                  <Switch defaultChecked />
+                </div>
+                <p className="text-gray-400 text-sm">
+                  في حالة عدم اختيارك عرض المنتج على المتجر سيتم حفظ المنتج في
+                  المنتجات ولن يتم اظهاره للمستخدم على المتجر الخاص بك
+                </p>
+              </Card>
+            </div>
+            {/* End Section - Toggles */}
             <div className="col-span-8 space-y-6">
               <div>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-white text-xl font-medium">
+                  <h3 className="text-foreground text-xl font-medium">
                     إعدادات القيمة المضافة
                   </h3>
                   <Button>
@@ -253,9 +259,9 @@ export default function AddProductDialog({
                     <tbody>
                       {[1, 2].map((item) => (
                         <tr key={item} className="border-b">
-                          <td className="p-4 text-white">مصر</td>
-                          <td className="p-4 text-white">265-365-254</td>
-                          <td className="p-4 text-white">14%</td>
+                          <td className="p-4 text-foreground">مصر</td>
+                          <td className="p-4 text-foreground">265-365-254</td>
+                          <td className="p-4 text-foreground">14%</td>
                           <td className="p-4">
                             <Switch defaultChecked />
                           </td>
@@ -264,7 +270,7 @@ export default function AddProductDialog({
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   variant="ghost"
-                                  className="h-8 w-8 p-0 text-white"
+                                  className="h-8 w-8 p-0 text-foreground"
                                 >
                                   <span className="sr-only">Open menu</span>
                                   <MoreVertical className="h-5 w-5" />
@@ -286,53 +292,12 @@ export default function AddProductDialog({
                 </div>
               </div>
             </div>
-
-            {/* Right Section - Toggles */}
-            <div className="col-span-4 space-y-6">
-              <div className="bg-[#2a233c] border border-[#3c345a] rounded-lg p-6 space-y-5">
-                <div className="flex items-center justify-between">
-                  <Label className="text-white">المنتج معفى من الضريبة</Label>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label className="text-white">
-                    السعر شامل ضريبة القيمة المضافة
-                  </Label>
-                  <Switch />
-                </div>
-              </div>
-              <div className="bg-[#2a233c] border border-[#3c345a] rounded-lg p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-white">عرض المنتج على المتجر</Label>
-                  <Switch defaultChecked />
-                </div>
-                <p className="text-gray-400 text-sm">
-                  في حالة عدم اختيارك عرض المنتج على المتجر سيتم حفظ المنتج في
-                  المنتجات ولن يتم اظهاره للمستخدم على المتجر الخاص بك
-                </p>
-              </div>
-            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-6">
-            <Button
-              variant="outline"
-              className="bg-[#2a233c] border-[#3c345a] text-gray-400 hover:bg-[#3c345a] hover:text-white rounded-lg py-6"
-            >
-              تحسين محركات البحث
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-[#2a233c] border-[#3c345a] text-gray-400 hover:bg-[#3c345a] hover:text-white rounded-lg py-6"
-            >
-              تفاصيل اضافية للمنتج
-            </Button>
-            <Button
-              variant="outline"
-              className="bg-[#2a233c] border-[#3c345a] text-gray-400 hover:bg-[#3c345a] hover:text-white rounded-lg py-6"
-            >
-              حقول مخصصة
-            </Button>
+            <Button variant="outline">تحسين محركات البحث</Button>
+            <Button variant="outline">تفاصيل اضافية للمنتج</Button>
+            <Button variant="outline">حقول مخصصة</Button>
           </div>
         </div>
 
@@ -340,7 +305,7 @@ export default function AddProductDialog({
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex-1 bg-[#E93A88] hover:bg-[#d0347a] text-white rounded-lg py-6"
+            className="flex-1 "
           >
             {isSubmitting ? "جاري الحفظ..." : "حفظ"}
           </Button>
@@ -348,7 +313,7 @@ export default function AddProductDialog({
             variant="outline"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="flex-1 bg-transparent border-[#3c345a] text-gray-400 hover:bg-[#2a233c] hover:text-white rounded-lg py-6"
+            className="flex-1 "
           >
             الغاء
           </Button>
