@@ -1,9 +1,11 @@
 import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { Badge } from "@/components/ui/badge";
+import { Edit } from "lucide-react";
 import React from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 // Product row type interface
 export interface ProductRow {
@@ -22,11 +24,35 @@ export interface ProductRow {
   };
 }
 
-export const useProductsListTableConfig: () => TableConfig = () => {
+export interface ProductsListTableConfigProps {
+  onEdit?: (id: string) => void;
+}
+
+export const useProductsListTableConfig: (
+  props?: ProductsListTableConfigProps
+) => TableConfig = (props) => {
   const t = useTranslations();
+  const { onEdit } = props || {};
+
   return {
     tableId: "products-list-table",
     url: `${baseURL}/ecommerce/products`,
+    deleteUrl: `${baseURL}/ecommerce/products`,
+
+    // Add row actions for edit and delete
+    executions: [
+      (row) => (
+        <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
+          <Edit className="w-4 h-4" />
+          {t("labels.edit")}
+        </DropdownMenuItem>
+      ),
+    ],
+
+    executionConfig: {
+      canDelete: true,
+    },
+
     columns: [
       {
         key: "main_image",

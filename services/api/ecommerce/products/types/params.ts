@@ -1,21 +1,21 @@
-export interface ProductTax {
+interface ProductTax {
   country_id: number;
   tax_number: string;
   tax_percentage: string;
   is_active: number;
 }
 
-export interface ProductDetail {
+interface ProductDetail {
   label: string;
   value: string;
 }
 
-export interface ProductCustomField {
+interface ProductCustomField {
   field_name: string;
   field_value: string;
 }
 
-export interface ProductSeo {
+interface ProductSeo {
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string;

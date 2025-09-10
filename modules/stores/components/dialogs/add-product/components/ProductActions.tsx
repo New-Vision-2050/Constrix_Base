@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 interface ProductActionsProps {
   onClose: () => void;
   isSubmitting: boolean;
+  isEditMode?: boolean;
 }
 
 export default function ProductActions({
   onClose,
   isSubmitting,
+  isEditMode = false,
 }: ProductActionsProps) {
   const t = useTranslations();
 
@@ -32,8 +34,16 @@ export default function ProductActions({
       <div className="flex gap-4 p-6 border-t border-[#3c345a]">
         <Button type="submit" disabled={isSubmitting} className="flex-1 ">
           {isSubmitting
-            ? t("product.dialog.add.actions.saving")
-            : t("product.dialog.add.actions.save")}
+            ? t(
+                isEditMode
+                  ? "product.dialog.edit.actions.updating"
+                  : "product.dialog.add.actions.saving"
+              )
+            : t(
+                isEditMode
+                  ? "product.dialog.edit.actions.update"
+                  : "product.dialog.add.actions.save"
+              )}
         </Button>
         <Button
           type="button"

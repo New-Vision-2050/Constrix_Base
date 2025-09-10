@@ -21,6 +21,6 @@ export const ProductsApi = {
       })
     ),
   update: (id: string, params: UpdateProductParams) =>
-    baseApi.put<UpdateProductResponse>(`ecommerce/products/${id}`, params),
+    baseApi.post<UpdateProductResponse>(`ecommerce/products/${id}`, params),
   delete: (id: string) => baseApi.delete(`ecommerce/products/${id}`),
 };

@@ -6,10 +6,13 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { useTranslations } from "next-intl";
 import { useProductsListTableConfig } from "./_config/list-table-config";
 import AddProductDialog from "../components/dialogs/add-product";
+import { useState } from "react";
 
 function ListProductsView() {
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+
   const tableConfig = useProductsListTableConfig({
-    onEdit: () => null,
+    onEdit: (id: string) => setEditingProductId(id),
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
@@ -32,6 +35,19 @@ function ListProductsView() {
         }
         tableId={tableConfig.tableId}
       />
+
+      {/* Edit Product Dialog */}
+      {editingProductId && (
+        <AddProductDialog
+          open={!!editingProductId}
+          onClose={() => setEditingProductId(null)}
+          onSuccess={() => {
+            setEditingProductId(null);
+            reloadTable();
+          }}
+          editingProductId={editingProductId}
+        />
+      )}
     </>
   );
 }
