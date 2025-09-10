@@ -142,32 +142,11 @@ export const useTableInitialization = ({
       }
     }
 
-    // Force a single fetch after initialization
-    // We use a longer timeout to ensure all state changes are applied
-    setTimeout(() => {
-      // Trigger a reload using the tableStore
-      const tableStore = useTableStore.getState();
-      if (tableStore.tables[tableId]) {
-        if (process.env.NODE_ENV === "development") {
-          console.log(`[TableInit] Triggering reload for table ${tableId}`);
-        }
-
-        // Set a flag to indicate this is an initialization reload
-        if (typeof window !== "undefined") {
-          (window as any).__tableInitReload = true;
-        }
-
-        // Trigger the reload
-        tableStore.reloadTable(tableId);
-
-        // Clear the flag after a short delay
-        setTimeout(() => {
-          if (typeof window !== "undefined") {
-            (window as any).__tableInitReload = false;
-          }
-        }, 200);
-      }
-    }, 300); // Increased timeout to ensure all state changes are applied
+    // Don't trigger an additional reload here as useTableFetchEffect will handle the initial fetch
+    // This prevents the double request issue
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[TableInit] Table ${tableId} initialized, letting useTableFetchEffect handle the initial fetch`);
+    }
   }, []);
 
   return { isInitialized: isInitializedRef.current };
