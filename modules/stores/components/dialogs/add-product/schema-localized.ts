@@ -8,7 +8,7 @@ export const createProductSchemas = (locale: string = "ar") => {
   // Zod schema for product tax
   const productTaxSchema = z.object({
     country_id: z
-      .number()
+      .string()
       .min(1, t("product.validation.taxes.country.required")),
     tax_number: z
       .string()
