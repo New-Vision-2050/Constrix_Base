@@ -215,7 +215,8 @@
     "CRM": "CRM",
     "clients": "Clients",
     "brokers": "Brokers",
-    "CRMSettings": "CRM Settings"
+    "CRMSettings": "CRM Settings",
+    "ecommerce": "E-commerce"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

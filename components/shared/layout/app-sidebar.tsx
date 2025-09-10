@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { LayoutDashboardIcon, RollerCoasterIcon, UserIcon,Users,Settings } from "lucide-react";
+import {
+  LayoutDashboardIcon,
+  RollerCoasterIcon,
+  UserIcon,
+  Users,
+  Settings,
+} from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
   Sidebar,
@@ -226,21 +232,27 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.clients,
             icon: Users,
             isActive: pageName === ROUTER.CRM.clients,
-            show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
+            show:
+              isCentralCompany &&
+              can(Object.values(PERMISSIONS.clients.clientsPage)),
           },
           {
             name: t("Sidebar.brokers"),
             url: ROUTER.CRM.brokers,
             icon: Users,
             isActive: pageName === ROUTER.CRM.brokers,
-            show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
+            show:
+              isCentralCompany &&
+              can(Object.values(PERMISSIONS.clients.clientsPage)),
           },
           {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show: isCentralCompany && can(Object.values(PERMISSIONS.clients.clientsPage)),
+            show:
+              isCentralCompany &&
+              can(Object.values(PERMISSIONS.clients.clientsPage)),
           },
         ],
       },
@@ -305,6 +317,41 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             icon: UserIcon,
             isActive: pageName === ROUTER.Programs,
             show: can(Object.values(PERMISSIONS.companyAccessProgram)),
+          },
+        ],
+      },
+      {
+        name: t("Sidebar.ecommerce"),
+        icon: SettingsIcon,
+        isActive: pageName === ROUTER.Products,
+        slug: SUPER_ENTITY_SLUG.STORES,
+        urls: [
+          "/Stores/categories",
+          "/stores/products",
+          "/stores/brands",
+          "/stores/warehouse",
+        ],
+        sub_entities: [
+          {
+            name: t("category.plural"),
+            url: "/stores/categories",
+            icon: UserIcon,
+            isActive: pageName === "/stores/categories",
+            show: true,
+          },
+          {
+            name: t("product.plural"),
+            url: "/stores/products",
+            icon: UserIcon,
+            isActive: pageName === "/stores/products",
+            show: true,
+          },
+          {
+            name: t("category.plural"),
+            url: "/stores/warehouse",
+            icon: UserIcon,
+            isActive: pageName === "/stores/warehouse",
+            show: true,
           },
         ],
       },
