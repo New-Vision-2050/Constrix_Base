@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/modules/table/components/ui/input";
 import SimpleSelect from "@/components/headless/select";
@@ -18,6 +19,7 @@ interface ProductInventoryInfoProps {
 export default function ProductInventoryInfo({
   form,
 }: ProductInventoryInfoProps) {
+  const t = useTranslations();
   const warehousesQuery = useQuery({
     queryKey: ["ProductInventoryInfo", "warehouses-list"],
     queryFn: async () => WarehousesApi.list(),
@@ -34,7 +36,9 @@ export default function ProductInventoryInfo({
   return (
     <div className="grid grid-cols-4 gap-6">
       <div>
-        <Label className="text-gray-400 text-sm mb-2 block">المخزن</Label>
+        <Label className="text-gray-400 text-sm mb-2 block">
+          {t("product.dialog.add.fields.warehouse.label")}
+        </Label>
         <Controller
           control={form.control}
           name="warehouse_id"
@@ -49,7 +53,7 @@ export default function ProductInventoryInfo({
                 })) || []
               }
               valueProps={{
-                placeholder: "اختر المخزن",
+                placeholder: t("product.dialog.add.fields.warehouse.label"),
               }}
             />
           )}
@@ -59,12 +63,14 @@ export default function ProductInventoryInfo({
         </ErrorTypography>
       </div>
       <div>
-        <Label className="text-gray-400 text-sm mb-2 block">الكمية</Label>
+        <Label className="text-gray-400 text-sm mb-2 block">
+          {t("product.dialog.add.fields.stock.label")}
+        </Label>
         <Input placeholder="8000" type="number" />
       </div>
       <div>
         <Label className="text-gray-400 text-sm mb-2 block">
-          التصنيف الرئيسي
+          {t("product.dialog.add.fields.category.label")}
         </Label>
         <Controller
           control={form.control}
@@ -80,7 +86,7 @@ export default function ProductInventoryInfo({
                 })) || []
               }
               valueProps={{
-                placeholder: "اختر التصنيف الرئيسي",
+                placeholder: t("product.dialog.add.fields.category.label"),
               }}
             />
           )}
@@ -91,7 +97,7 @@ export default function ProductInventoryInfo({
       </div>
       <div>
         <Label className="text-gray-400 text-sm mb-2 block">
-          التصنيف الفرعي
+          {t("product.dialog.add.fields.subCategory.label")}
         </Label>
         <Controller
           control={form.control}
@@ -107,7 +113,7 @@ export default function ProductInventoryInfo({
                 })) || []
               }
               valueProps={{
-                placeholder: "اختر التصنيف الفرعي",
+                placeholder: t("product.dialog.add.fields.subCategory.label"),
               }}
             />
           )}

@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Upload, X } from "lucide-react";
@@ -19,6 +20,7 @@ interface ProductImageUploadProps {
 }
 
 export default function ProductImageUpload({ form }: ProductImageUploadProps) {
+  const t = useTranslations();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -47,7 +49,9 @@ export default function ProductImageUpload({ form }: ProductImageUploadProps) {
 
   return (
     <Card className="bg-sidebar p-6 text-center h-full flex flex-col justify-center items-center">
-      <h3 className="text-foreground text-lg font-medium mb-4">صورة المنتج</h3>
+      <h3 className="text-foreground text-lg font-medium mb-4">
+        {t("product.dialog.add.fields.mainImage.label")}
+      </h3>
 
       <FormField
         control={form.control}
@@ -83,6 +87,7 @@ export default function ProductImageUpload({ form }: ProductImageUploadProps) {
                   size="sm"
                   className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
                   onClick={handleRemove}
+                  title={t("product.dialog.add.fields.mainImage.remove")}
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -99,14 +104,14 @@ export default function ProductImageUpload({ form }: ProductImageUploadProps) {
       />
 
       <p className="text-xs text-gray-500 mb-4">
-        اقصى حجم للصورة: 2160 × 2160 - 3MB
+        {t("product.dialog.add.fields.mainImage.dragText")}
         <br />
         .jpg, .png, .webp
       </p>
 
       {!preview && (
         <Button type="button" variant="outline" onClick={handleUpload}>
-          ارفق
+          {t("product.dialog.add.fields.mainImage.uploadText")}
         </Button>
       )}
     </Card>

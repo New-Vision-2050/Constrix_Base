@@ -2,6 +2,7 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/modules/table/components/ui/input";
 import {
@@ -17,6 +18,8 @@ interface ProductBasicInfoProps {
 }
 
 export default function ProductBasicInfo({ form }: ProductBasicInfoProps) {
+  const t = useTranslations();
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-6">
@@ -26,10 +29,13 @@ export default function ProductBasicInfo({ form }: ProductBasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <Label className="text-gray-400 text-sm mb-2 block">
-                اسم المنتج
+                {t("product.dialog.add.fields.name.label")}
               </Label>
               <FormControl>
-                <Input placeholder="هاتف ايفون" {...field} />
+                <Input
+                  placeholder={t("product.dialog.add.fields.name.placeholder")}
+                  {...field}
+                />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -41,10 +47,14 @@ export default function ProductBasicInfo({ form }: ProductBasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <Label className="text-gray-400 text-sm mb-2 block">
-                سعر المنتج
+                {t("product.dialog.add.fields.price.label")}
               </Label>
               <FormControl>
-                <Input placeholder="1600" type="number" {...field} />
+                <Input
+                  placeholder={t("product.dialog.add.fields.price.placeholder")}
+                  type="number"
+                  {...field}
+                />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -59,10 +69,13 @@ export default function ProductBasicInfo({ form }: ProductBasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <Label className="text-gray-400 text-sm mb-2 block">
-                رمز المنتج
+                {t("product.dialog.add.fields.sku.label")}
               </Label>
               <FormControl>
-                <Input placeholder="16AAFF206" {...field} />
+                <Input
+                  placeholder={t("product.dialog.add.fields.sku.placeholder")}
+                  {...field}
+                />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -74,11 +87,13 @@ export default function ProductBasicInfo({ form }: ProductBasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <Label className="text-gray-400 text-sm mb-2 block">
-                وصف المنتج
+                {t("product.dialog.add.fields.description.label")}
               </Label>
               <FormControl>
                 <Input
-                  placeholder="وصف هذا المنتج الذي قد يكون سطرا أو يتجاوز ذلك بـ..."
+                  placeholder={t(
+                    "product.dialog.add.fields.description.placeholder"
+                  )}
                   {...field}
                 />
               </FormControl>

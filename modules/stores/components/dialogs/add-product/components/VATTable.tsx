@@ -2,6 +2,7 @@
 
 import React from "react";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/modules/table/components/ui/input";
@@ -19,6 +20,7 @@ interface VATTableProps {
 }
 
 export default function VATTable({ form }: VATTableProps) {
+  const t = useTranslations();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "taxes",
@@ -37,11 +39,11 @@ export default function VATTable({ form }: VATTableProps) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-foreground text-xl font-medium">
-          إعدادات القيمة المضافة
+          {t("product.dialog.add.fields.taxes.vatSettings")}
         </h3>
         <Button type="button" onClick={addTax}>
           <Plus className="w-4 h-4 ml-2" />
-          إضافة
+          {t("labels.add")}
         </Button>
       </div>
 
@@ -50,19 +52,19 @@ export default function VATTable({ form }: VATTableProps) {
           <thead>
             <tr className="border-b">
               <th className="text-right p-4 text-gray-400 font-medium">
-                رقم الدولة
+                {t("product.dialog.add.fields.taxes.countryId")}
               </th>
               <th className="text-right p-4 text-gray-400 font-medium">
-                الرقم الضريبي
+                {t("product.dialog.add.fields.taxes.taxNumber")}
               </th>
               <th className="text-right p-4 text-gray-400 font-medium">
-                نسبة الضريبة
+                {t("product.dialog.add.fields.taxes.taxPercentage")}
               </th>
               <th className="text-right p-4 text-gray-400 font-medium">
-                تفعيل
+                {t("product.dialog.add.fields.taxes.isActive")}
               </th>
               <th className="text-right p-4 text-gray-400 font-medium">
-                إجراء
+                {t("labels.actions")}
               </th>
             </tr>
           </thead>
@@ -158,8 +160,7 @@ export default function VATTable({ form }: VATTableProps) {
             {fields.length === 0 && (
               <tr>
                 <td colSpan={5} className="p-8 text-center text-gray-500">
-                  لا توجد ضرائب مضافة. انقر على &quot;إضافة&quot; لإضافة ضريبة
-                  جديدة.
+                  {t("product.dialog.add.fields.taxes.noTaxes")}
                 </td>
               </tr>
             )}

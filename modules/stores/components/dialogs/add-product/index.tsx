@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,7 @@ export default function AddProductDialog({
   onClose,
   onSuccess,
 }: AddProductDialogProps) {
+  const t = useTranslations();
   const isRtl = useIsRtl();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -96,13 +98,13 @@ export default function AddProductDialog({
       const response = await ProductsApi.create(apiParams);
 
       if (response.data) {
-        toast.success("تم إنشاء المنتج بنجاح");
+        toast.success(t("product.dialog.add.success"));
         handleClose();
         onSuccess?.();
       }
     } catch (error: unknown) {
       console.error("Error creating product:", error);
-      toast.error("حدث خطأ أثناء إنشاء المنتج");
+      toast.error(t("product.dialog.add.error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -113,7 +115,7 @@ export default function AddProductDialog({
       <DialogContent className="max-w-7xl w-full" dir={isRtl ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-semibold text-foreground">
-            إضافة منتج عادي
+            {t("product.dialog.add.title")}
           </DialogTitle>
           <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <X className="w-5 h-5 text-foreground" />

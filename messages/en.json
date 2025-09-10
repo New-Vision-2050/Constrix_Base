@@ -1276,9 +1276,9 @@
     "singular": "Category",
     "addCategory": "Add Category",
     "categoryName": "Category Name",
-  "categoryNamePlaceholder": "Enter category name",
+    "categoryNamePlaceholder": "Enter category name",
     "categoryDescription": "Category Description",
-  "categoryDescriptionPlaceholder": "Enter category description",
+    "categoryDescriptionPlaceholder": "Enter category description",
     "categoryNameRequired": "Category name is required",
     "categoryNameMinLength": "Category name must be at least 2 characters",
     "save": "Save",
@@ -1319,6 +1319,184 @@
     "default": "Default",
     "description": "Description",
     "arabic": "Arabic",
-    "english": "English"
+    "english": "English",
+    "price": "Price",
+    "sku": "SKU",
+    "stock": "Stock",
+    "image": "Image",
+    "currency": "SAR"
+  },
+  "product": {
+    "singular": "Product",
+    "plural": "Products",
+    "dialog": {
+      "add": {
+        "title": "Add Regular Product",
+        "success": "Product created successfully",
+        "error": "An error occurred while creating the product",
+        "fields": {
+          "name": {
+            "label": "Product Name",
+            "placeholder": "iPhone"
+          },
+          "price": {
+            "label": "Product Price",
+            "placeholder": "1600"
+          },
+          "sku": {
+            "label": "Product Code",
+            "placeholder": "16AAFF206"
+          },
+          "description": {
+            "label": "Product Description",
+            "placeholder": "Description of this product which may be a line or exceed that with..."
+          },
+          "stock": {
+            "label": "Stock Quantity"
+          },
+          "warehouse": {
+            "label": "Warehouse"
+          },
+          "category": {
+            "label": "Category"
+          },
+          "brand": {
+            "label": "Brand"
+          },
+          "subCategory": {
+            "label": "Sub Category"
+          },
+          "type": {
+            "label": "Product Type",
+            "physical": "Physical",
+            "digital": "Digital"
+          },
+          "requiresShipping": {
+            "label": "Requires Shipping"
+          },
+          "unlimitedQuantity": {
+            "label": "Unlimited Quantity"
+          },
+          "isTaxable": {
+            "label": "Taxable"
+          },
+          "priceIncludesVat": {
+            "label": "Price Includes VAT"
+          },
+          "vatPercentage": {
+            "label": "VAT Percentage"
+          },
+          "vatSettings": {
+            "exemptFromTax": "Product is tax exempt"
+          },
+          "isVisible": {
+            "label": "Visible",
+            "description": "If you choose not to display the product in the store, the product will be saved in products and will not be shown to the user in your store"
+          },
+          "mainImage": {
+            "label": "Product Image",
+            "uploadText": "Upload Image",
+            "dragText": "Maximum image size: 2160 × 2160 - 3MB",
+            "remove": "Remove"
+          },
+          "otherImages": {
+            "label": "Other Images"
+          },
+          "taxes": {
+            "label": "Taxes",
+            "vatSettings": "VAT Settings",
+            "countryId": "Country ID",
+            "country": "Country",
+            "taxNumber": "Tax Number",
+            "taxPercentage": "Tax Percentage",
+            "isActive": "Active",
+            "noTaxes": "No taxes added. Click 'Add' to add a new tax."
+          },
+          "details": {
+            "label": "Product Details",
+            "labelField": "Label",
+            "valueField": "Value"
+          },
+          "customFields": {
+            "label": "Custom Fields",
+            "fieldName": "Field Name",
+            "fieldValue": "Field Value"
+          },
+          "seo": {
+            "label": "SEO Settings",
+            "metaTitle": "Meta Title",
+            "metaDescription": "Meta Description",
+            "metaKeywords": "Meta Keywords"
+          }
+        },
+        "actions": {
+          "seo": "Search Engine Optimization",
+          "additionalDetails": "Additional Product Details",
+          "customFields": "Custom Fields",
+          "save": "Save",
+          "saving": "Saving...",
+          "cancel": "Cancel"
+        }
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "Product name is required"
+      },
+      "description": {
+        "required": "Product description is required"
+      },
+      "price": {
+        "required": "Price must be a positive number"
+      },
+      "sku": {
+        "required": "Product code is required"
+      },
+      "stock": {
+        "negative": "Quantity cannot be negative"
+      },
+      "warehouse": {
+        "required": "Warehouse is required"
+      },
+      "category": {
+        "required": "Category is required"
+      },
+      "type": {
+        "invalid": "Product type must be physical or digital"
+      },
+      "vatPercentage": {
+        "range": "VAT percentage must be between 0 and 100"
+      },
+      "mainImage": {
+        "required": "Main image is required"
+      },
+      "taxes": {
+        "country": {
+          "required": "Country must be selected"
+        },
+        "taxNumber": {
+          "required": "Tax number is required"
+        },
+        "taxPercentage": {
+          "range": "Tax percentage must be between 0 and 100"
+        }
+      },
+      "details": {
+        "label": {
+          "required": "Label is required"
+        },
+        "value": {
+          "required": "Value is required"
+        }
+      },
+      "customFields": {
+        "fieldName": {
+          "required": "Field name is required"
+        },
+        "fieldValue": {
+          "required": "Field value is required"
+        }
+      }
+    }
   }
 }

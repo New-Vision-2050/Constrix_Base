@@ -1,28 +1,38 @@
 import { z } from "zod";
+import { getSchemaTranslation } from "./utils/schema-translations";
+
+// Helper function to get translation messages
+const t = (key: string) => getSchemaTranslation(key);
 
 // Zod schema for product tax
 export const productTaxSchema = z.object({
-  country_id: z.number().min(1, "يجب اختيار الدولة"),
-  tax_number: z.string().min(1, "رقم الضريبة مطلوب"),
+  country_id: z.number().min(1, t("product.validation.taxes.country.required")),
+  tax_number: z
+    .string()
+    .min(1, t("product.validation.taxes.taxNumber.required")),
   tax_percentage: z
     .string()
     .refine(
       (val) => !isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100,
-      "نسبة الضريبة يجب أن تكون بين 0 و 100"
+      t("product.validation.taxes.taxPercentage.range")
     ),
   is_active: z.number().min(0).max(1),
 });
 
 // Zod schema for product detail
 export const productDetailSchema = z.object({
-  label: z.string().min(1, "التسمية مطلوبة"),
-  value: z.string().min(1, "القيمة مطلوبة"),
+  label: z.string().min(1, t("product.validation.details.label.required")),
+  value: z.string().min(1, t("product.validation.details.value.required")),
 });
 
 // Zod schema for custom field
 export const productCustomFieldSchema = z.object({
-  field_name: z.string().min(1, "اسم الحقل مطلوب"),
-  field_value: z.string().min(1, "قيمة الحقل مطلوبة"),
+  field_name: z
+    .string()
+    .min(1, t("product.validation.customFields.fieldName.required")),
+  field_value: z
+    .string()
+    .min(1, t("product.validation.customFields.fieldValue.required")),
 });
 
 // Zod schema for SEO
@@ -36,17 +46,17 @@ export const productSeoSchema = z
 
 // Main product schema
 export const createProductSchema = z.object({
-  name: z.string().min(1, "اسم المنتج مطلوب"),
-  description: z.string().min(1, "وصف المنتج مطلوب"),
+  name: z.string().min(1, t("product.validation.name.required")),
+  description: z.string().min(1, t("product.validation.description.required")),
   price: z
     .string()
     .refine(
       (val) => !isNaN(Number(val)) && Number(val) > 0,
-      "السعر يجب أن يكون رقم موجب"
+      t("product.validation.price.required")
     ),
-  sku: z.string().min(1, "رمز المنتج مطلوب"),
-  stock: z.number().min(0, "الكمية لا يمكن أن تكون سالبة"),
-  warehouse_id: z.string().min(1, "المستودع مطلوب"),
+  sku: z.string().min(1, t("product.validation.sku.required")),
+  stock: z.number().min(0, t("product.validation.stock.negative")),
+  warehouse_id: z.string().min(1, t("product.validation.warehouse.required")),
   requires_shipping: z.number().min(0).max(1),
   unlimited_quantity: z.number().min(0).max(1),
   is_taxable: z.number().min(0).max(1),
@@ -55,20 +65,23 @@ export const createProductSchema = z.object({
     .string()
     .refine(
       (val) => !isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100,
-      "نسبة الضريبة يجب أن تكون بين 0 و 100"
+      t("product.validation.vatPercentage.range")
     ),
   is_visible: z.number().min(0).max(1),
-  category_id: z.string().min(1, "الفئة مطلوبة"),
+  category_id: z.string().min(1, t("product.validation.category.required")),
   brand_id: z.string().optional(),
   sub_category_id: z.string().optional(),
   type: z.enum(["physical", "digital"], {
-    errorMap: () => ({ message: "نوع المنتج يجب أن يكون مادي أو رقمي" }),
+    errorMap: () => ({ message: t("product.validation.type.invalid") }),
   }),
 
   // Files
   main_image: z
     .any()
-    .refine((file) => file instanceof File, "الصورة الرئيسية مطلوبة"),
+    .refine(
+      (file) => file instanceof File,
+      t("product.validation.mainImage.required")
+    ),
   other_images: z.array(z.any()).optional(),
 
   // Arrays

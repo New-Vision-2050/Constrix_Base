@@ -1285,9 +1285,9 @@
     "singular": "الفئة",
     "addCategory": "اضافة فئة",
     "categoryName": "اسم الفئة",
-  "categoryNamePlaceholder": "أدخل اسم الفئة",
+    "categoryNamePlaceholder": "أدخل اسم الفئة",
     "categoryDescription": "وصف الفئة",
-  "categoryDescriptionPlaceholder": "أدخل وصف الفئة",
+    "categoryDescriptionPlaceholder": "أدخل وصف الفئة",
     "categoryNameRequired": "اسم الفئة مطلوب",
     "categoryNameMinLength": "اسم الفئة يجب أن يكون على الأقل حرفين",
     "save": "حفظ",
@@ -1328,6 +1328,184 @@
     "default": "افتراضي",
     "description": "الوصف",
     "arabic": "عربي",
-    "english": "إنجليزي"
+    "english": "إنجليزي",
+    "price": "السعر",
+    "sku": "رقم المنتج",
+    "stock": "الكمية",
+    "image": "صورة",
+    "currency": "ريال"
+  },
+  "product": {
+    "singular": "منتج",
+    "plural": "منتجات",
+    "dialog": {
+      "add": {
+        "title": "إضافة منتج عادي",
+        "success": "تم إنشاء المنتج بنجاح",
+        "error": "حدث خطأ أثناء إنشاء المنتج",
+        "fields": {
+          "name": {
+            "label": "اسم المنتج",
+            "placeholder": "هاتف ايفون"
+          },
+          "price": {
+            "label": "سعر المنتج",
+            "placeholder": "1600"
+          },
+          "sku": {
+            "label": "رمز المنتج",
+            "placeholder": "16AAFF206"
+          },
+          "description": {
+            "label": "وصف المنتج",
+            "placeholder": "وصف هذا المنتج الذي قد يكون سطرا أو يتجاوز ذلك بـ..."
+          },
+          "stock": {
+            "label": "كمية المخزون"
+          },
+          "warehouse": {
+            "label": "المستودع"
+          },
+          "category": {
+            "label": "الفئة"
+          },
+          "brand": {
+            "label": "العلامة التجارية"
+          },
+          "subCategory": {
+            "label": "الفئة الفرعية"
+          },
+          "type": {
+            "label": "نوع المنتج",
+            "physical": "مادي",
+            "digital": "رقمي"
+          },
+          "requiresShipping": {
+            "label": "يتطلب الشحن"
+          },
+          "unlimitedQuantity": {
+            "label": "كمية غير محدودة"
+          },
+          "isTaxable": {
+            "label": "خاضع للضريبة"
+          },
+          "priceIncludesVat": {
+            "label": "السعر شامل الضريبة"
+          },
+          "vatPercentage": {
+            "label": "نسبة الضريبة"
+          },
+          "vatSettings": {
+            "exemptFromTax": "المنتج معفى من الضريبة"
+          },
+          "isVisible": {
+            "label": "عرض المنتج على المتجر",
+            "description": "في حالة عدم اختيارك عرض المنتج على المتجر سيتم حفظ المنتج في المنتجات ولن يتم اظهاره للمستخدم على المتجر الخاص بك"
+          },
+          "mainImage": {
+            "label": "صورة المنتج",
+            "uploadText": "رفع صورة",
+            "dragText": "اقصى حجم للصورة: 2160 × 2160 - 3MB",
+            "remove": "إزالة"
+          },
+          "otherImages": {
+            "label": "صور أخرى"
+          },
+          "taxes": {
+            "label": "الضرائب",
+            "vatSettings": "إعدادات القيمة المضافة",
+            "countryId": "رقم الدولة",
+            "country": "الدولة",
+            "taxNumber": "الرقم الضريبي",
+            "taxPercentage": "نسبة الضريبة",
+            "isActive": "تفعيل",
+            "noTaxes": "لا توجد ضرائب مضافة. انقر على \"إضافة\" لإضافة ضريبة جديدة."
+          },
+          "details": {
+            "label": "تفاصيل المنتج",
+            "labelField": "التسمية",
+            "valueField": "القيمة"
+          },
+          "customFields": {
+            "label": "حقول مخصصة",
+            "fieldName": "اسم الحقل",
+            "fieldValue": "قيمة الحقل"
+          },
+          "seo": {
+            "label": "إعدادات محركات البحث",
+            "metaTitle": "عنوان الميتا",
+            "metaDescription": "وصف الميتا",
+            "metaKeywords": "كلمات الميتا المفتاحية"
+          }
+        },
+        "actions": {
+          "seo": "تحسين محركات البحث",
+          "additionalDetails": "تفاصيل اضافية للمنتج",
+          "customFields": "حقول مخصصة",
+          "save": "حفظ",
+          "saving": "جاري الحفظ...",
+          "cancel": "الغاء"
+        }
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "اسم المنتج مطلوب"
+      },
+      "description": {
+        "required": "وصف المنتج مطلوب"
+      },
+      "price": {
+        "required": "السعر يجب أن يكون رقم موجب"
+      },
+      "sku": {
+        "required": "رمز المنتج مطلوب"
+      },
+      "stock": {
+        "negative": "الكمية لا يمكن أن تكون سالبة"
+      },
+      "warehouse": {
+        "required": "المستودع مطلوب"
+      },
+      "category": {
+        "required": "الفئة مطلوبة"
+      },
+      "type": {
+        "invalid": "نوع المنتج يجب أن يكون مادي أو رقمي"
+      },
+      "vatPercentage": {
+        "range": "نسبة الضريبة يجب أن تكون بين 0 و 100"
+      },
+      "mainImage": {
+        "required": "الصورة الرئيسية مطلوبة"
+      },
+      "taxes": {
+        "country": {
+          "required": "يجب اختيار الدولة"
+        },
+        "taxNumber": {
+          "required": "رقم الضريبة مطلوب"
+        },
+        "taxPercentage": {
+          "range": "نسبة الضريبة يجب أن تكون بين 0 و 100"
+        }
+      },
+      "details": {
+        "label": {
+          "required": "التسمية مطلوبة"
+        },
+        "value": {
+          "required": "القيمة مطلوبة"
+        }
+      },
+      "customFields": {
+        "fieldName": {
+          "required": "اسم الحقل مطلوب"
+        },
+        "fieldValue": {
+          "required": "قيمة الحقل مطلوبة"
+        }
+      }
+    }
   }
 }

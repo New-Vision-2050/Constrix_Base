@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 interface ProductActionsProps {
@@ -12,23 +13,27 @@ export default function ProductActions({
   onClose,
   isSubmitting,
 }: ProductActionsProps) {
+  const t = useTranslations();
+
   return (
     <>
       <div className="grid grid-cols-3 gap-6 p-8">
         <Button type="button" variant="outline">
-          تحسين محركات البحث
+          {t("product.dialog.add.actions.seo")}
         </Button>
         <Button type="button" variant="outline">
-          تفاصيل اضافية للمنتج
+          {t("product.dialog.add.actions.additionalDetails")}
         </Button>
         <Button type="button" variant="outline">
-          حقول مخصصة
+          {t("product.dialog.add.actions.customFields")}
         </Button>
       </div>
 
       <div className="flex gap-4 p-6 border-t border-[#3c345a]">
         <Button type="submit" disabled={isSubmitting} className="flex-1 ">
-          {isSubmitting ? "جاري الحفظ..." : "حفظ"}
+          {isSubmitting
+            ? t("product.dialog.add.actions.saving")
+            : t("product.dialog.add.actions.save")}
         </Button>
         <Button
           type="button"
@@ -37,7 +42,7 @@ export default function ProductActions({
           disabled={isSubmitting}
           className="flex-1 "
         >
-          الغاء
+          {t("product.dialog.add.actions.cancel")}
         </Button>
       </div>
     </>

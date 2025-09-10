@@ -2,6 +2,7 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import type { CreateProductFormData } from "../schema";
@@ -11,6 +12,7 @@ interface ProductSettingsProps {
 }
 
 export default function ProductSettings({ form }: ProductSettingsProps) {
+  const t = useTranslations();
   console.log("Form:", form); // TODO: Remove this and integrate form
 
   return (
@@ -18,19 +20,19 @@ export default function ProductSettings({ form }: ProductSettingsProps) {
       <div className="flex items-center space-x-3 space-x-reverse">
         <Switch id="tax-switch" />
         <Label htmlFor="tax-switch" className="text-foreground">
-          الضريبة
+          {t("product.dialog.add.fields.isTaxable.label")}
         </Label>
       </div>
       <div className="flex items-center space-x-3 space-x-reverse">
         <Switch id="shipping-switch" />
         <Label htmlFor="shipping-switch" className="text-foreground">
-          تتطلب شحن
+          {t("product.dialog.add.fields.requiresShipping.label")}
         </Label>
       </div>
       <div className="flex items-center space-x-3 space-x-reverse">
         <Switch id="unlimited-qty-switch" />
         <Label htmlFor="unlimited-qty-switch" className="text-foreground">
-          كمية غير محدودة
+          {t("product.dialog.add.fields.unlimitedQuantity.label")}
         </Label>
       </div>
     </div>
