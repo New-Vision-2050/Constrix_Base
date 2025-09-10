@@ -251,7 +251,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
             show:
-              isCentralCompany &&
+              !isCentralCompany &&
               can(Object.values(PERMISSIONS.clients.clientsPage)),
           },
         ],
