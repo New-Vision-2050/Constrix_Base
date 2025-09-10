@@ -3,7 +3,8 @@ import { ListCategoriesResponse, ShowCategoryResponse } from "./types/response";
 import { CreateCategoryParams, UpdateCategoryParams } from "./types/params";
 
 export const CategoriesApi = {
-  list: () => baseApi.get<ListCategoriesResponse>("ecommerce/categories"),
+  list: (params?: { parent_id?: string }) =>
+    baseApi.get<ListCategoriesResponse>("ecommerce/categories", { params }),
   show: (id: string) =>
     baseApi.get<ShowCategoryResponse>(`ecommerce/categories/${id}`),
   create: (params: CreateCategoryParams) =>

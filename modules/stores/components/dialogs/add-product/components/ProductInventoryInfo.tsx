@@ -19,6 +19,7 @@ interface ProductInventoryInfoProps {
 export default function ProductInventoryInfo({
   form,
 }: ProductInventoryInfoProps) {
+  const selectedCategoryId = form.watch("category_id");
   const t = useTranslations();
   const warehousesQuery = useQuery({
     queryKey: ["ProductInventoryInfo", "warehouses-list"],
@@ -29,8 +30,13 @@ export default function ProductInventoryInfo({
     queryFn: async () => CategoriesApi.list(),
   });
   const subCategoriesQuery = useQuery({
-    queryKey: ["ProductInventoryInfo", "subCategories-list"],
-    queryFn: async () => CategoriesApi.list(),
+    queryKey: [
+      "ProductInventoryInfo",
+      "subCategories-list",
+      selectedCategoryId,
+    ],
+    queryFn: async () => CategoriesApi.list({ parent_id: selectedCategoryId }),
+    enabled: !!selectedCategoryId,
   });
 
   return (

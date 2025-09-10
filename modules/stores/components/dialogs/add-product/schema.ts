@@ -6,7 +6,7 @@ const t = (key: string) => getSchemaTranslation(key);
 
 // Zod schema for product tax
 export const productTaxSchema = z.object({
-  country_id: z.number().min(1, t("product.validation.taxes.country.required")),
+  country_id: z.string().min(1, t("product.validation.taxes.country.required")),
   tax_number: z
     .string()
     .min(1, t("product.validation.taxes.taxNumber.required")),

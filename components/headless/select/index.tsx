@@ -9,7 +9,7 @@ import { useIsRtl } from "@/hooks/use-is-rtl";
 import { cn } from "@/lib/utils";
 import { ComponentProps, ReactNode } from "react";
 
-export interface SimpleSelectProps
+export interface SimpleSelectProps<T = string>
   extends Omit<
     ComponentProps<typeof Select>,
     "onValueChange" | "children" | "value"
@@ -18,12 +18,12 @@ export interface SimpleSelectProps
   valueProps?: Omit<ComponentProps<typeof SelectValue>, "children">;
   contentProps?: Omit<ComponentProps<typeof SelectContent>, "children">;
   itemProps?: Omit<ComponentProps<typeof SelectItem>, "children">;
-  options?: { label: ReactNode; value: string }[];
-  value?: string;
-  onValueChange?: (value: string) => void;
+  options?: { label: ReactNode; value: T }[];
+  value?: T;
+  onValueChange?: (value: T) => void;
 }
 
-function SimpleSelect({
+function SimpleSelect<T = string>({
   triggerProps,
   valueProps,
   contentProps,
@@ -32,14 +32,14 @@ function SimpleSelect({
   value,
   onValueChange,
   ...props
-}: SimpleSelectProps) {
+}: SimpleSelectProps<T>) {
   const isRtl = useIsRtl();
   return (
     <Select
       dir={isRtl ? "rtl" : "ltr"}
       {...props}
-      value={value}
-      onValueChange={onValueChange}
+      value={value as unknown as string}
+      onValueChange={onValueChange as unknown as (value: string) => void}
     >
       <SelectTrigger
         {...triggerProps}
@@ -49,7 +49,11 @@ function SimpleSelect({
       </SelectTrigger>
       <SelectContent {...contentProps}>
         {options?.map((option) => (
-          <SelectItem key={option.value} {...itemProps} value={option.value}>
+          <SelectItem
+            key={String(option.value)}
+            {...itemProps}
+            value={option.value as string}
+          >
             {option.label}
           </SelectItem>
         ))}

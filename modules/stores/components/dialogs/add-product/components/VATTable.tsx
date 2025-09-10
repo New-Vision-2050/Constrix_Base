@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { Controller, UseFormReturn, useFieldArray } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -14,6 +14,10 @@ import {
 } from "@/modules/table/components/ui/form";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import type { CreateProductFormData } from "../schema";
+import { useQuery } from "@tanstack/react-query";
+import { getCountries } from "@/services/api/shared/countries";
+import SimpleSelect from "@/components/headless/select";
+import ErrorTypography from "@/components/shared/ErrorTypography";
 
 interface VATTableProps {
   form: UseFormReturn<CreateProductFormData>;
@@ -25,10 +29,13 @@ export default function VATTable({ form }: VATTableProps) {
     control: form.control,
     name: "taxes",
   });
-
+  const countriesQuery = useQuery({
+    queryKey: ["VATTable", "countries-list"],
+    queryFn: async () => getCountries(),
+  });
   const addTax = () => {
     append({
-      country_id: 1,
+      country_id: "0",
       tax_number: "",
       tax_percentage: "0",
       is_active: 1,
@@ -72,25 +79,32 @@ export default function VATTable({ form }: VATTableProps) {
             {fields.map((field, index) => (
               <tr key={field.id} className="border-b">
                 <td className="p-4">
-                  <FormField
+                  <Controller
                     control={form.control}
                     name={`taxes.${index}.country_id`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="1"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormErrorMessage />
-                      </FormItem>
+                      <SimpleSelect
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                        options={
+                          countriesQuery.data?.data?.payload.map(
+                            (subCategory) => ({
+                              label: subCategory.name,
+                              value: subCategory.id,
+                            })
+                          ) || []
+                        }
+                        valueProps={{
+                          placeholder: t(
+                            "product.dialog.add.fields.subCategory.label"
+                          ),
+                        }}
+                      />
                     )}
                   />
+                  <ErrorTypography>
+                    {form.formState.errors.sub_category_id?.message}
+                  </ErrorTypography>
                 </td>
                 <td className="p-4">
                   <FormField
