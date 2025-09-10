@@ -12,8 +12,10 @@ function ListCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
     null
   );
+  const [addingChildTo, setAddingChildTo] = useState<string | null>(null);
   const tableConfig = useCategoriesListTableConfig({
     onEdit: (id: string) => setEditingCategoryId(id),
+    onAddChild: (id: string) => setAddingChildTo(id),
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
@@ -23,6 +25,13 @@ function ListCategoriesView() {
         open={Boolean(editingCategoryId)}
         onClose={() => setEditingCategoryId(null)}
         categoryId={editingCategoryId || undefined}
+        onSuccess={() => reloadTable()}
+      />
+      <AddCategoryDialog
+        open={Boolean(addingChildTo)}
+        onClose={() => setAddingChildTo(null)}
+        parentId={addingChildTo || undefined}
+        onSuccess={() => reloadTable()}
       />
       <TableBuilder
         config={tableConfig}

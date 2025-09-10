@@ -33,17 +33,7 @@ export default function ProductActions({
 
       <div className="flex gap-4 p-6 border-t border-[#3c345a]">
         <Button type="submit" disabled={isSubmitting} className="flex-1 ">
-          {isSubmitting
-            ? t(
-                isEditMode
-                  ? "product.dialog.edit.actions.updating"
-                  : "product.dialog.add.actions.saving"
-              )
-            : t(
-                isEditMode
-                  ? "product.dialog.edit.actions.update"
-                  : "product.dialog.add.actions.save"
-              )}
+          {t("labels.save")}
         </Button>
         <Button
           type="button"
@@ -52,7 +42,7 @@ export default function ProductActions({
           disabled={isSubmitting}
           className="flex-1 "
         >
-          {t("product.dialog.add.actions.cancel")}
+          {t("labels.cancel")}
         </Button>
       </div>
     </>

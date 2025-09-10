@@ -31,7 +31,7 @@ const createCategorySchema = (t: (key: string) => string) =>
       .string()
       .min(1, t("category.categoryNameRequired"))
       .min(2, t("category.categoryNameMinLength")),
-    description: z.string().optional(),
+    description: z.string().min(1, t("category.categoryDescriptionMinLength")),
   });
 
 type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>;
@@ -41,6 +41,7 @@ interface AddCategoryDialogProps {
   onClose: () => void;
   onSuccess?: () => void;
   categoryId?: string; // optional id for edit mode
+  parentId?: string; // optional id for adding child category
 }
 
 export default function AddCategoryDialog({
@@ -48,6 +49,7 @@ export default function AddCategoryDialog({
   onClose,
   onSuccess,
   categoryId,
+  parentId,
 }: AddCategoryDialogProps) {
   const isEditMode = !!categoryId;
   const isRtl = useIsRtl();
@@ -99,7 +101,7 @@ export default function AddCategoryDialog({
           description: data.description || undefined,
         };
 
-        await CategoriesApi.create(createParams);
+        await CategoriesApi.create({ ...createParams, parent_id: parentId });
       }
 
       onSuccess?.();
@@ -169,6 +171,11 @@ export default function AddCategoryDialog({
                 className="bg-sidebar border-gray-600 text-white resize-none"
                 rows={3}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description?.message}
+                </p>
+              )}
             </div>
           </div>
 

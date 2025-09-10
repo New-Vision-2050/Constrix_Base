@@ -1281,10 +1281,13 @@
     "categoryDescriptionPlaceholder": "Enter category description",
     "categoryNameRequired": "Category name is required",
     "categoryNameMinLength": "Category name must be at least 2 characters",
+    "categoryDescriptionMinLength": "Category description required",
     "save": "Save",
     "cancel": "Cancel",
     "saving": "Saving...",
-    "notFound": "No categories found"
+    "addChild": "Add Subcategory",
+    "notFound": "No categories found",
+    "parentCategory": "Parent Category"
   },
   "labels": {
     "optional": "(optional)",
