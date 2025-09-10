@@ -1,13 +1,17 @@
 "use client";
 
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { CategoriesApi } from "@/services/api/ecommerce/categories";
-import { CreateCategoryParams } from "@/services/api/ecommerce/categories/types/params";
-import { I18nField } from "@/types/common/args/I18nFIeld";
+import {
+  CreateCategoryParams,
+  UpdateCategoryParams,
+} from "@/services/api/ecommerce/categories/types/params";
 
 import {
   Dialog,
@@ -23,13 +27,11 @@ import { Loader2 } from "lucide-react";
 
 const createCategorySchema = (t: (key: string) => string) =>
   z.object({
-    nameAr: z
+    name: z
       .string()
       .min(1, t("category.categoryNameRequired"))
       .min(2, t("category.categoryNameMinLength")),
-    nameEn: z.string().optional(),
-    descriptionAr: z.string().optional(),
-    descriptionEn: z.string().optional(),
+    description: z.string().min(1, t("category.categoryDescriptionMinLength")),
   });
 
 type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>;
@@ -38,13 +40,18 @@ interface AddCategoryDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  categoryId?: string; // optional id for edit mode
+  parentId?: string; // optional id for adding child category
 }
 
 export default function AddCategoryDialog({
   open,
   onClose,
   onSuccess,
+  categoryId,
+  parentId,
 }: AddCategoryDialogProps) {
+  const isEditMode = !!categoryId;
   const isRtl = useIsRtl();
   const t = useTranslations();
 
@@ -52,50 +59,65 @@ export default function AddCategoryDialog({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(createCategorySchema(t)),
     defaultValues: {
-      nameAr: "",
-      nameEn: "",
-      descriptionAr: "",
-      descriptionEn: "",
+      name: "",
+      description: "",
     },
   });
 
+  // Fetch category data when editing
+  const { data: categoryData, isLoading: isFetching } = useQuery({
+    queryKey: ["category", categoryId],
+    queryFn: () => CategoriesApi.show(categoryId!),
+    enabled: isEditMode && open,
+  });
+
+  // Populate form with category data when editing
+  React.useEffect(() => {
+    if (isEditMode && categoryData?.data?.payload) {
+      const category = categoryData.data.payload;
+
+      setValue("name", category.name || "");
+      setValue("description", category.description || "");
+    }
+  }, [isEditMode, categoryData, setValue]);
+
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      const name: I18nField = {
-        ar: data.nameAr,
-        en: data.nameEn || undefined,
-      };
+      if (isEditMode && categoryId) {
+        const updateParams: UpdateCategoryParams = {
+          name: data.name,
+          description: data.description || "",
+        };
 
-      const description: I18nField | undefined =
-        data.descriptionAr || data.descriptionEn
-          ? {
-              ar: data.descriptionAr || "",
-              en: data.descriptionEn || undefined,
-            }
-          : undefined;
+        await CategoriesApi.update(categoryId, updateParams);
+      } else {
+        const createParams: CreateCategoryParams = {
+          name: data.name,
+          description: data.description || undefined,
+        };
 
-      const createParams: CreateCategoryParams = {
-        name,
-        description,
-      };
-
-      await CategoriesApi.create(createParams);
+        await CategoriesApi.create({ ...createParams, parent_id: parentId });
+      }
 
       onSuccess?.();
       reset();
       onClose();
     } catch (error) {
-      console.error("Error creating category:", error);
+      console.error(
+        `Error ${isEditMode ? "updating" : "creating"} category:`,
+        error
+      );
       // You might want to add toast notification here
     }
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !isFetching) {
       reset();
       onClose();
     }
@@ -117,71 +139,43 @@ export default function AddCategoryDialog({
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6">
-            {/* Arabic Name */}
+            {/* Name */}
             <div className="space-y-2">
-              <Label htmlFor="nameAr" className="text-sm text-gray-400">
-                {t("category.categoryName")} ({t("labels.arabic")}) *
+              <Label htmlFor="name" className="text-sm text-gray-400">
+                {t("category.categoryName")} *
               </Label>
               <Input
-                id="nameAr"
+                id="name"
                 variant="secondary"
-                {...register("nameAr")}
-                placeholder="أدخل اسم الفئة"
+                {...register("name")}
+                placeholder={t("category.categoryNamePlaceholder") ?? ""}
                 disabled={isSubmitting}
-                dir="rtl"
               />
-              {errors.nameAr && (
+              {errors.name && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.nameAr.message}
+                  {errors.name.message}
                 </p>
               )}
             </div>
 
-            {/* English Name */}
+            {/* Description */}
             <div className="space-y-2">
-              <Label htmlFor="nameEn" className="text-sm text-gray-400">
-                {t("category.categoryName")} ({t("labels.english")})
-              </Label>
-              <Input
-                id="nameEn"
-                variant="secondary"
-                {...register("nameEn")}
-                placeholder="Enter category name"
-                disabled={isSubmitting}
-                dir="ltr"
-              />
-            </div>
-
-            {/* Arabic Description */}
-            <div className="space-y-2">
-              <Label htmlFor="descriptionAr" className="text-sm text-gray-400">
-                {t("category.categoryDescription")} ({t("labels.arabic")})
+              <Label htmlFor="description" className="text-sm text-gray-400">
+                {t("category.categoryDescription")}
               </Label>
               <Textarea
-                id="descriptionAr"
-                {...register("descriptionAr")}
-                placeholder="أدخل وصف الفئة"
+                id="description"
+                {...register("description")}
+                placeholder={t("category.categoryDescriptionPlaceholder") ?? ""}
                 disabled={isSubmitting}
-                dir="rtl"
                 className="bg-sidebar border-gray-600 text-white resize-none"
                 rows={3}
               />
-            </div>
-
-            {/* English Description */}
-            <div className="space-y-2">
-              <Label htmlFor="descriptionEn" className="text-sm text-gray-400">
-                {t("category.categoryDescription")} ({t("labels.english")})
-              </Label>
-              <Textarea
-                id="descriptionEn"
-                {...register("descriptionEn")}
-                placeholder="Enter category description"
-                disabled={isSubmitting}
-                dir="ltr"
-                className="bg-sidebar border-gray-600 text-white resize-none"
-                rows={3}
-              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description?.message}
+                </p>
+              )}
             </div>
           </div>
 

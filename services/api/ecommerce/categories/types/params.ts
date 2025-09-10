@@ -1,8 +1,7 @@
-import { I18nField } from "@/types/common/args/I18nFIeld";
-
 export interface CreateCategoryParams {
-  name: I18nField;
-  description?: I18nField;
+  name: string;
+  description?: string;
+  parent_id?: string;
 }
 
 export interface UpdateCategoryParams extends Partial<CreateCategoryParams> {}

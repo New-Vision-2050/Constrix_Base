@@ -1,6 +1,7 @@
 export const ROUTER = {
   LOGIN: "/login",
   COMPANIES: "/companies",
+  Products: "/stores/product",
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",
@@ -11,17 +12,17 @@ export const ROUTER = {
   },
   HR_SETTINGS: "/hr-settings",
   Organizational_Structure: "/organizational-structure",
-  ROLES:'/roles',
-  PERMISSIONS:"/permissions",
+  ROLES: "/roles",
+  PERMISSIONS: "/permissions",
   AttendanceDeparture: "/attendance-departure",
   Powers: "/powers",
   Programs: "/programs",
   Bouquet: "/bouquet",
   BouquetById: (id: string) => `/bouquet/${id}`,
   BouquetDetailsById: (id: string) => `/bouquetDetails/${id}`,
-  CRM:{
-    clients:"/clients",
-    brokers:"/brokers",
-    settings:"/crm-settings",
-  }
+  CRM: {
+    clients: "/clients",
+    brokers: "/brokers",
+    settings: "/crm-settings",
+  },
 };
