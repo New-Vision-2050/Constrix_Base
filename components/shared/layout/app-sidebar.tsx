@@ -7,6 +7,9 @@ import {
   UserIcon,
   Users,
   Settings,
+  TagIcon,
+  Package2Icon,
+  WarehouseIcon,
 } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
@@ -335,21 +338,21 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           {
             name: t("category.plural"),
             url: "/stores/categories",
-            icon: UserIcon,
+            icon: TagIcon,
             isActive: pageName === "/stores/categories",
             show: true,
           },
           {
             name: t("product.plural"),
             url: "/stores/products",
-            icon: UserIcon,
+            icon: Package2Icon,
             isActive: pageName === "/stores/products",
             show: true,
           },
           {
-            name: t("category.plural"),
+            name: t("warehouse.plural"),
             url: "/stores/warehouse",
-            icon: UserIcon,
+            icon: WarehouseIcon,
             isActive: pageName === "/stores/warehouse",
             show: true,
           },

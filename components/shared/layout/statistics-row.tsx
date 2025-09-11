@@ -44,21 +44,25 @@ const StatisticsRow = ({ config }: { config: Config }) => {
                 isLoading && "h-6 mt-1 w-24 bg-popover rounded-md animate-pulse"
               )}
             >
-              <p className="text-2xl leading-none font-bold">{item.total}</p>
-              <span
-                dir="ltr"
-                className={`text-lg font-semibold ${
-                  isSuccess &&
-                  (item.percentage >= 0 ? "text-green-500" : "text-red-500")
-                }`}
-              >
-                {isSuccess && (
-                  <>
-                    ({item.percentage > 0 && "+"}
-                    {Math.round(item.percentage)}%)
-                  </>
-                )}
-              </span>
+              <p className="text-2xl leading-none font-bold">
+                {item.total || item.count || item.number || 0}
+              </p>
+              {!isNaN(item.percentage) && (
+                <span
+                  dir="ltr"
+                  className={`text-lg font-semibold ${
+                    isSuccess &&
+                    (item.percentage >= 0 ? "text-green-500" : "text-red-500")
+                  }`}
+                >
+                  {isSuccess && (
+                    <>
+                      ({item.percentage > 0 && "+"}
+                      {Math.round(item.percentage)}%)
+                    </>
+                  )}
+                </span>
+              )}
             </div>{" "}
           </div>
         </div>
