@@ -9,18 +9,17 @@ import AddProductDialog from "../components/dialogs/add-product";
 import { useState } from "react";
 import ArrowStaticIcon from "@/public/icons/arrow-static";
 import ChartStaticIcon from "@/public/icons/chart-static";
-import CheckStatic from "@/public/icons/check-static";
-import PersonStaticIcon from "@/public/icons/person-static";
 import { baseURL } from "@/config/axios-config";
 import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { LayersIcon, TrashIcon } from "lucide-react";
 
 const statisticsConfig = {
   url: `${baseURL}/ecommerce/products/statistics`,
   icons: [
-    <PersonStaticIcon key={1} />,
-    <CheckStatic key={2} />,
+    <LayersIcon key={1} />,
+    <ArrowStaticIcon key={2} />,
     <ChartStaticIcon key={3} />,
-    <ArrowStaticIcon key={4} />,
+    <TrashIcon key={4} />,
   ],
 };
 
