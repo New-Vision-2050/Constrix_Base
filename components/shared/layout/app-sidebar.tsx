@@ -224,7 +224,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         name: t("Sidebar.CRM"),
         slug: SUPER_ENTITY_SLUG.CRM,
         icon: LayoutDashboardIcon,
-        urls: [ROUTER.CRM.clients],
+        urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
         isActive: pageName === ROUTER.CRM.clients,
         sub_entities: [
           {
@@ -320,41 +320,42 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           },
         ],
       },
-      {
-        name: t("Sidebar.ecommerce"),
-        icon: SettingsIcon,
-        isActive: pageName === ROUTER.Products,
-        slug: SUPER_ENTITY_SLUG.STORES,
-        urls: [
-          "/Stores/categories",
-          "/stores/products",
-          "/stores/brands",
-          "/stores/warehouse",
-        ],
-        sub_entities: [
-          {
-            name: t("category.plural"),
-            url: "/stores/categories",
-            icon: UserIcon,
-            isActive: pageName === "/stores/categories",
-            show: true,
-          },
-          {
-            name: t("product.plural"),
-            url: "/stores/products",
-            icon: UserIcon,
-            isActive: pageName === "/stores/products",
-            show: true,
-          },
-          {
-            name: t("category.plural"),
-            url: "/stores/warehouse",
-            icon: UserIcon,
-            isActive: pageName === "/stores/warehouse",
-            show: true,
-          },
-        ],
-      },
+      // stores
+      // {
+      //   name: t("Sidebar.ecommerce"),
+      //   icon: SettingsIcon,
+      //   isActive: pageName === ROUTER.Products,
+      //   slug: SUPER_ENTITY_SLUG.STORES,
+      //   urls: [
+      //     "/Stores/categories",
+      //     "/stores/products",
+      //     "/stores/brands",
+      //     "/stores/warehouse",
+      //   ],
+      //   sub_entities: [
+      //     {
+      //       name: t("category.plural"),
+      //       url: "/stores/categories",
+      //       icon: UserIcon,
+      //       isActive: pageName === "/stores/categories",
+      //       show: true,
+      //     },
+      //     {
+      //       name: t("product.plural"),
+      //       url: "/stores/products",
+      //       icon: UserIcon,
+      //       isActive: pageName === "/stores/products",
+      //       show: true,
+      //     },
+      //     {
+      //       name: t("category.plural"),
+      //       url: "/stores/warehouse",
+      //       icon: UserIcon,
+      //       isActive: pageName === "/stores/warehouse",
+      //       show: true,
+      //     },
+      //   ],
+      // },
     ];
     return data;
   }, [pageName, isCentralCompany, can, t]);
