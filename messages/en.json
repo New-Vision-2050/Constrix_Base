@@ -35,7 +35,15 @@
     "selectBranch": "Select Branch",
     "loading": "Loading...",
     "selectBranchesFirst": "Select Branches First",
-    "selectBranchesInstructions": "You need to select branches from the form first to be able to set their locations"
+    "selectBranchesInstructions": "You need to select branches from the form first to be able to set their locations",
+    "city": "City",
+    "state": "State",
+    "country": "Country",
+    "address": "Address",
+    "postalCode": "Postal Code",
+    "map": "Map",
+    "disctrict": "District",
+    "notFound": "No locations found"
   },
   "Main": {
     "NoResultsRound": "No results found",
@@ -166,6 +174,7 @@
     "CountryFilter": "Company Country",
     "TypeFilter": "Company Type",
     "Active": "Active",
+    "Inactive": "Inactive",
     "LoginAsManager": "Login as Company Manager (Edit)",
     "completeProfileData": "complete profile data",
     "PackageSettings": "Package and Program Settings",
@@ -202,7 +211,12 @@
     "HumanResources": "Human Resources",
     "ProgramManagement": "Program Management",
     "Powers": "Powers",
-    "PackagesAndPrograms": "Packages and Programs"
+    "PackagesAndPrograms": "Packages and Programs",
+    "CRM": "CRM",
+    "clients": "Clients",
+    "brokers": "Brokers",
+    "CRMSettings": "CRM Settings",
+    "ecommerce": "E-commerce"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",
@@ -380,6 +394,17 @@
           "cv": "CV"
         }
       }
+    },
+    "branches": {
+      "assignUsersDialog": {
+        "title": "Branch Edit Permission",
+        "description": "Give users permission to edit this branch",
+        "cancel": "Cancel",
+        "assign": "Assign",
+        "searchUsers": "Search users",
+        "managerNote": "Company Manager",
+        "branchManager": "Branch Manager :"
+      }
     }
   },
   "CompanyStructure": {
@@ -489,6 +514,233 @@
     "submitButtonText": "Save",
     "cancelButtonText": "Cancel",
     "resetButtonText": "Clear Form"
+  },
+  "ClientsModule": {
+    "StatisticsCards": {
+      "totalClients": "Total Clients",
+      "activeClients": "Active Clients",
+      "inactiveClients": "Inactive Clients",
+      "totalClientsInLastMonth": "Clients Added Last Month"
+    },
+    "table": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "DeleteConfirmMessage": "Are you sure you want to delete this client?",
+      "columns": {
+        "name": "Name",
+        "identity": "Identity",
+        "email": "Email",
+        "phone": "Phone",
+        "broker": "Broker",
+        "status": "Status",
+        "branches": "Branches",
+        "projectsNumber": "Projects Number"
+      },
+      "filters": {
+        "branchesFilter": "Branches",
+        "statusFilter": "Status"
+      }
+    },
+    "form": {
+      "individualClient": "Individual Client",
+      "companyClient": "Company Client",
+      "title": "Add New Client",
+      "addClient": "Add New Client",
+      "submitButtonText": "Add",
+      "cancelButtonText": "Cancel",
+      "resetButtonText": "Clear Form",
+      "email": "Email",
+      "emailPlaceholder": "Enter email",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address.",
+      "clientMailExist": "The email is already registered as a client in the current branch.",
+      "mailExistAsEmployee": "The email is already registered as an employee in the following branches :",
+      "mailExistAsBroker": "The email is already registered as a broker in the following branches :",
+      "mailExistAsClient": "The email is already registered as a client in the following branches :",
+      "mailExistInSystem": "The email is already registered in the system.",
+      "retrieveData": "Retrieve Data",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter phone",
+      "phoneRequired": "Phone is required",
+      "phoneInvalid": "Please enter a valid phone number.",
+      "name": "Name",
+      "namePlaceholder": "Enter name",
+      "nameRequired": "Name is required",
+      "nameThreeTerms": "The name must contain exactly three terms (first, middle, and last name)",
+      "nameLettersOnly": "Name must contain only letters (no numbers or symbols)",
+      "nameMinLength": "Name must contain at least two letters.",
+      "arabicName": "The name must contain only letters (no numbers or symbols)",
+      "identity": "The identity number",
+      "identityPlaceholder": "Enter the identity number",
+      "identityRequired": "The identity number is required",
+      "identityPattern": "The identity number must consist of 10 numbers and start with the number 1 or 2",
+      "identityMinLength": "The identity number must consist of 10 numbers",
+      "identityMaxLength": "The identity number must consist of 10 numbers",
+      "branches": "Branch",
+      "branchesPlaceholder": "Select branch",
+      "broker": "Broker",
+      "brokerPlaceholder": "Select broker",
+      "correspondenceAddress": "Correspondence Address",
+      "correspondenceAddressPlaceholder": "Enter correspondence address",
+      "country": "Country",
+      "countryPlaceholder": "Select Country",
+      "countryRequired": "Country is required",
+      "companyField": "Company Field",
+      "companyFieldPlaceholder": "Select Company Field",
+      "companyFieldRequired": "Company Field is required",
+      "commerceName": "Commercial Name",
+      "commerceNamePlaceholder": "Enter Commercial Name",
+      "commerceNameRequired": "Commercial Name is required",
+      "shortName": "Short Name",
+      "shortNamePlaceholder": "Enter Short Name",
+      "shortNameRequired": "Short Name is required",
+      "supportResponsible": "Support Responsible",
+      "supportResponsiblePlaceholder": "Select Support Responsible",
+      "supportResponsibleRequired": "Support Responsible is required",
+      "companyClientFormTitle": "Create Company Client",
+      "individualClientFormTitle": "Create Individual Client",
+      "Validation": {
+        "arabicName": "The name must contain only letters (no numbers or symbols)",
+        "englishName": "The short name must be in English and not contain symbols"
+      }
+    },
+    "dialog": {
+      "triggerText": "Select location from map",
+      "title": "Select coordinates of the national address",
+      "latitude": "Latitude",
+      "latitudePlaceholder": "Enter latitude",
+      "latitudeRequired": "Latitude is required",
+      "longitude": "Longitude",
+      "longitudePlaceholder": "Enter longitude",
+      "longitudeRequired": "Longitude is required",
+      "country": "Country",
+      "countryPlaceholder": "Select Country",
+      "countryRequired": "Country is required",
+      "region": "Region",
+      "regionPlaceholder": "Select Region",
+      "regionRequired": "Region is required",
+      "city": "City",
+      "cityPlaceholder": "Select City",
+      "cityRequired": "City is required",
+      "neighborhood": "Neighborhood",
+      "neighborhoodPlaceholder": "Select Neighborhood",
+      "neighborhoodRequired": "Neighborhood is required",
+      "buildingNumber": "Building Number",
+      "buildingNumberPlaceholder": "Enter Building Number",
+      "buildingNumberRequired": "Building Number is required",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter Phone Number",
+      "phoneNumberRequired": "Phone Number is required",
+      "postalCode": "Postal Code",
+      "postalCodePlaceholder": "Enter Postal Code",
+      "postalCodeRequired": "Postal Code is required",
+      "street": "Street",
+      "streetPlaceholder": "Enter Street",
+      "streetRequired": "Street is required",
+      "submitButtonText": "Add",
+      "cancelButtonText": "Cancel",
+      "resetButtonText": "Clear Form"
+    }
+  },
+  "BrokersModule": {
+    "StatisticsCards": {
+      "totalBrokers": "Total Brokers",
+      "activeBrokers": "Active Brokers",
+      "inactiveBrokers": "Inactive Brokers",
+      "totalBrokersInLastMonth": "Brokers Added Last Month"
+    },
+    "table": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "DeleteConfirmMessage": "Are you sure you want to delete this broker?",
+      "columns": {
+        "name": "Name",
+        "identity": "Identity",
+        "email": "Email",
+        "phone": "Phone",
+        "status": "Status",
+        "branches": "Branches",
+        "clientsNumber": "Clients Number"
+      },
+      "filters": {
+        "branchesFilter": "Branches",
+        "statusFilter": "Status"
+      }
+    },
+    "form": {
+      "individualBroker": "Individual Broker",
+      "companyBroker": "Company Broker",
+      "title": "Add New Broker",
+      "addBroker": "Add New Broker",
+      "submitButtonText": "Add",
+      "cancelButtonText": "Cancel",
+      "resetButtonText": "Clear Form",
+      "email": "Email",
+      "emailPlaceholder": "Enter email",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address.",
+      "brokerMailExist": "The email is already registered as a broker in the current branch.",
+      "mailExistAsEmployee": "The email is already registered as an employee in the following branches :",
+      "mailExistAsBroker": "The email is already registered as a broker in the following branches :",
+      "mailExistAsClient": "The email is already registered as a client in the following branches :",
+      "mailExistInSystem": "The email is already registered in the system.",
+      "retrieveData": "Retrieve Data",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter phone",
+      "phoneRequired": "Phone is required",
+      "phoneInvalid": "Please enter a valid phone number.",
+      "name": "Name",
+      "namePlaceholder": "Enter name",
+      "nameRequired": "Name is required",
+      "nameThreeTerms": "The name must contain exactly three terms (first, middle, and last name)",
+      "nameLettersOnly": "Name must contain only letters (no numbers or symbols)",
+      "nameMinLength": "Name must contain at least two letters.",
+      "arabicName": "The name must contain only letters (no numbers or symbols)",
+      "identity": "The identity number",
+      "identityPlaceholder": "Enter the identity number",
+      "identityRequired": "The identity number is required",
+      "identityPattern": "The identity number must consist of 10 numbers and start with the number 1 or 2",
+      "identityMinLength": "The identity number must consist of 10 numbers",
+      "identityMaxLength": "The identity number must consist of 10 numbers",
+      "branches": "Branch",
+      "branchesPlaceholder": "Select branch",
+      "correspondenceAddress": "Correspondence Address",
+      "correspondenceAddressPlaceholder": "Enter correspondence address",
+      "country": "Country",
+      "countryPlaceholder": "Select Country",
+      "countryRequired": "Country is required",
+      "companyField": "Company Field",
+      "companyFieldPlaceholder": "Select Company Field",
+      "companyFieldRequired": "Company Field is required",
+      "commerceName": "Commercial Name",
+      "commerceNamePlaceholder": "Enter Commercial Name",
+      "commerceNameRequired": "Commercial Name is required",
+      "shortName": "Short Name",
+      "shortNamePlaceholder": "Enter Short Name",
+      "shortNameRequired": "Short Name is required",
+      "commission": "Commission",
+      "commissionPlaceholder": "Enter Commission",
+      "commissionRequired": "Commission is required",
+      "companyBrokerFormTitle": "Create Company Broker",
+      "individualBrokerFormTitle": "Create Individual Broker",
+      "supportResponsible": "Support Responsible",
+      "supportResponsiblePlaceholder": "Select Support Responsible",
+      "supportResponsibleRequired": "Support Responsible is required",
+      "Validation": {
+        "arabicName": "The name must contain only letters (no numbers or symbols)",
+        "englishName": "The short name must be in English and not contain symbols"
+      }
+    }
+  },
+  "CRMSettingsModule": {
+    "tabs": {
+      "clientsSettings": "Clients Settings",
+      "clientsPermissions": "Clients Permissions"
+    },
+    "ClientsSettings": {
+      "shareClientsData": "Share clients data between branches",
+      "shareBrokersData": "Share brokers data between branches"
+    }
   },
   "AttendanceDepartureModule": {
     "WorkdayPeriods": {
@@ -690,6 +942,7 @@
     "tabs": {
       "attendance": "Attendance & Departure",
       "recruitment": "Recruitment",
+      "vacations": "Holidays and vacations",
       "service": "Service",
       "contractManagement": "Contract Management"
     },
@@ -810,6 +1063,139 @@
       "notes": "Notes"
     }
   },
+  "HRSettingsVacations": {
+    "tabs": {
+      "leavesPolicies": "Leaves Policies",
+      "leavesTypes": "Leaves Types",
+      "publicLeaves": "Public Leaves"
+    },
+    "leavesPolicies": {
+      "title": "Leave Policies",
+      "IsTheLeaveCarriedOver": "Is the leave carried over?",
+      "leaveCarriedOver": "Carried over",
+      "leaveNotCarriedOver": "Not carried over",
+      "halfDay": "Half day",
+      "totalDays": "Total days",
+      "dayType": "Day type",
+      "isAllowHalfDay": "Is allow half day",
+      "allowed": "Allowed",
+      "notAllowed": "Not allowed",
+      "noUpgradeCondition": "No upgrade condition",
+      "addNewPolicy": "Add New Policy",
+      "allBranches": "All Branches",
+      "yearly": "Yearly",
+      "calender": "Calendar",
+      "work_day": "Work day",
+      "loading": {
+        "title": "Loading vacation policies",
+        "description": "Please wait while we fetch the vacation policies data..."
+      },
+      "noData": {
+        "title": "No vacation policies found",
+        "description": "There are no vacation policies available at the moment."
+      },
+      "form": {
+        "title": "Add New Leave Policy",
+        "editTitle": "Edit Leave Policy",
+        "name": "Name",
+        "namePlaceholder": "Name",
+        "nameRequired": "Name is required",
+        "namePattern": "Name must contain only letters and numbers",
+        "totalDays": "Total days",
+        "totalDaysPlaceholder": "Total days",
+        "totalDaysRequired": "Total days is required",
+        "totalDaysPattern": "Total days must be a number",
+        "type": "Type",
+        "typePlaceholder": "Type",
+        "typeRequired": "Type is required",
+        "dayType": "Day type",
+        "dayTypePlaceholder": "Day type",
+        "dayTypeRequired": "Day type is required",
+        "isRolloverAllowed": "Is rollover allowed?",
+        "isAllowHalfDay": "Is allow half day?",
+        "upgradeCondition": "Upgrade condition",
+        "upgradeConditionPlaceholder": "Upgrade condition",
+        "submitButtonText": "Save",
+        "cancelButtonText": "Cancel"
+      }
+    },
+    "leavesTypes": {
+      "title": "Set Vacation Type",
+      "table": {
+        "name": "Name",
+        "isPaid": "Paid",
+        "paid": "Paid",
+        "notPaid": "Not Paid",
+        "isDuduct_from_balance": "Deduct from balance",
+        "duduct": "Deduct",
+        "notDuduct": "Not Deduct",
+        "conditions": "Conditions",
+        "branches": "Branches",
+        "branchesFilter": "Branches",
+        "countryFilter": "Country",
+        "isPaidFilter": "Paid?",
+        "isDuductFilter": "Deduct from balance?",
+        "DeleteConfirmMessage": "Are you sure you want to delete this type?",
+        "addVacationType": "Add New Vacation Type",
+        "form": {
+          "title": "Add New Vacation Type",
+          "name": "Name",
+          "namePlaceholder": "Name",
+          "nameRequired": "Name is required",
+          "namePattern": "Name must contain only letters and numbers",
+          "isPaid": "Paid",
+          "isPaidPlaceholder": "Paid",
+          "isPaidRequired": "Paid",
+          "isDuduct": "Deduct from balance",
+          "isDuductPlaceholder": "Deduct from balance",
+          "isDuductRequired": "Deduct from balance",
+          "conditions": "Conditions",
+          "conditionsPlaceholder": "Conditions",
+          "conditionsRequired": "Conditions",
+          "branches": "Branches",
+          "branchesPlaceholder": "Branches",
+          "submitButtonText": "Save",
+          "cancelButtonText": "Cancel",
+          "resetButtonText": "Clear"
+        }
+      }
+    },
+    "publicLeaves": {
+      "title": "Public Leaves",
+      "table": {
+        "name": "Name",
+        "country": "Country",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "countryFilter": "Country",
+        "startDateFilter": "Start Date",
+        "endDateFilter": "End Date",
+        "submitButtonText": "Save",
+        "cancelButtonText": "Cancel",
+        "DeleteConfirmMessage": "Are you sure you want to delete this leave?",
+        "addPublicVacation": "Add Public Vacation",
+        "form": {
+          "title": "Add New Public Vacation",
+          "editTitle": "Edit Public Vacation",
+          "name": "Name",
+          "namePlaceholder": "Name",
+          "nameRequired": "Name is required",
+          "country": "Country",
+          "countryPlaceholder": "Country",
+          "countryRequired": "Country is required",
+          "startDate": "Start Date",
+          "startDatePlaceholder": "Start Date",
+          "startDateRequired": "Start Date is required",
+          "endDate": "End Date",
+          "endDatePlaceholder": "End Date",
+          "endDateRequired": "End Date is required",
+          "submitButtonText": "Save",
+          "cancelButtonText": "Cancel",
+          "resetButtonText": "Clear"
+        }
+      }
+    }
+  },
   "RoleTypes": {
     "all": "Grant all permissions",
     "update": "Update",
@@ -853,5 +1239,268 @@
   "Bouquets": {
     "AreYouSureReactivate": "Are you sure you want to reactivate this package?",
     "AreYouSureDeactivate": "Are you sure you want to deactivate this package?"
+  },
+  "brand": {
+    "plural": "Brands",
+    "singular": "Brand",
+    "addBrand": "Add Brand",
+    "editBrand": "Edit Brand",
+    "brandName": "Brand Name",
+    "brandNameRequired": "Brand name is required",
+    "brandNameMinLength": "Brand name must be at least 2 characters",
+    "notFound": "No brands found"
+  },
+  "warehouse": {
+    "plural": "Warehouses",
+    "singular": "Warehouse",
+    "addWarehouse": "Add Warehouse",
+    "warehouseName": "Warehouse Name",
+    "isDefault": "Default Warehouse",
+    "district": "District",
+    "street": "Street",
+    "selectCountry": "Select Country",
+    "selectCity": "Select City",
+    "locationMap": "Location Map",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "warehouseNameRequired": "Warehouse name is required",
+    "warehouseNameMinLength": "Warehouse name must be at least 2 characters",
+    "countryRequired": "Country is required",
+    "cityRequired": "City is required",
+    "districtRequired": "District is required",
+    "streetRequired": "Street is required",
+    "notFound": "No warehouses found"
+  },
+  "category": {
+    "plural": "Categories",
+    "singular": "Category",
+    "addCategory": "Add Category",
+    "categoryName": "Category Name",
+    "categoryNamePlaceholder": "Enter category name",
+    "categoryDescription": "Category Description",
+    "categoryDescriptionPlaceholder": "Enter category description",
+    "categoryNameRequired": "Category name is required",
+    "categoryNameMinLength": "Category name must be at least 2 characters",
+    "categoryDescriptionMinLength": "Category description required",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "addChild": "Add Subcategory",
+    "notFound": "No categories found",
+    "parentCategory": "Parent Category"
+  },
+  "labels": {
+    "optional": "(optional)",
+    "id": "ID",
+    "name": "Name",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "add": "Add",
+    "create": "Create",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search",
+    "reset": "Reset",
+    "loading": "Loading",
+    "noData": "No data available",
+    "yes": "Yes",
+    "no": "No",
+    "select": "Select",
+    "selectPlaceholder": "Select an option",
+    "submit": "Submit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "default": "Default",
+    "description": "Description",
+    "arabic": "Arabic",
+    "english": "English",
+    "price": "Price",
+    "sku": "SKU",
+    "stock": "Stock",
+    "image": "Image",
+    "currency": "SAR"
+  },
+  "product": {
+    "singular": "Product",
+    "plural": "Products",
+    "dialog": {
+      "add": {
+        "title": "Add Regular Product",
+        "success": "Product created successfully",
+        "error": "An error occurred while creating the product",
+        "fields": {
+          "name": {
+            "label": "Product Name",
+            "placeholder": "iPhone"
+          },
+          "price": {
+            "label": "Product Price",
+            "placeholder": "1600"
+          },
+          "sku": {
+            "label": "Product Code",
+            "placeholder": "16AAFF206"
+          },
+          "description": {
+            "label": "Product Description",
+            "placeholder": "Description of this product which may be a line or exceed that with..."
+          },
+          "stock": {
+            "label": "Stock Quantity"
+          },
+          "warehouse": {
+            "label": "Warehouse"
+          },
+          "category": {
+            "label": "Category"
+          },
+          "brand": {
+            "label": "Brand"
+          },
+          "subCategory": {
+            "label": "Sub Category"
+          },
+          "type": {
+            "label": "Product Type",
+            "physical": "Physical",
+            "digital": "Digital"
+          },
+          "requiresShipping": {
+            "label": "Requires Shipping"
+          },
+          "unlimitedQuantity": {
+            "label": "Unlimited Quantity"
+          },
+          "isTaxable": {
+            "label": "Taxable"
+          },
+          "priceIncludesVat": {
+            "label": "Price Includes VAT"
+          },
+          "vatPercentage": {
+            "label": "VAT Percentage"
+          },
+          "vatSettings": {
+            "exemptFromTax": "Product is tax exempt"
+          },
+          "isVisible": {
+            "label": "Visible",
+            "description": "If you choose not to display the product in the store, the product will be saved in products and will not be shown to the user in your store"
+          },
+          "mainImage": {
+            "label": "Product Image",
+            "uploadText": "Upload Image",
+            "dragText": "Maximum image size: 2160 × 2160 - 3MB",
+            "remove": "Remove"
+          },
+          "otherImages": {
+            "label": "Other Images"
+          },
+          "taxes": {
+            "label": "Taxes",
+            "vatSettings": "VAT Settings",
+            "countryId": "Country ID",
+            "country": "Country",
+            "taxNumber": "Tax Number",
+            "taxPercentage": "Tax Percentage",
+            "isActive": "Active",
+            "noTaxes": "No taxes added. Click 'Add' to add a new tax."
+          },
+          "details": {
+            "label": "Product Details",
+            "labelField": "Label",
+            "valueField": "Value"
+          },
+          "customFields": {
+            "label": "Custom Fields",
+            "fieldName": "Field Name",
+            "fieldValue": "Field Value"
+          },
+          "seo": {
+            "label": "SEO Settings",
+            "metaTitle": "Meta Title",
+            "metaDescription": "Meta Description",
+            "metaKeywords": "Meta Keywords"
+          }
+        },
+        "actions": {
+          "seo": "Search Engine Optimization",
+          "additionalDetails": "Additional Product Details",
+          "customFields": "Custom Fields",
+          "save": "Save",
+          "saving": "Saving...",
+          "cancel": "Cancel"
+        }
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "Product name is required"
+      },
+      "description": {
+        "required": "Product description is required"
+      },
+      "price": {
+        "required": "Price must be a positive number"
+      },
+      "sku": {
+        "required": "Product code is required"
+      },
+      "stock": {
+        "negative": "Quantity cannot be negative"
+      },
+      "warehouse": {
+        "required": "Warehouse is required"
+      },
+      "category": {
+        "required": "Category is required"
+      },
+      "type": {
+        "invalid": "Product type must be physical or digital"
+      },
+      "vatPercentage": {
+        "range": "VAT percentage must be between 0 and 100"
+      },
+      "mainImage": {
+        "required": "Main image is required"
+      },
+      "taxes": {
+        "country": {
+          "required": "Country must be selected"
+        },
+        "taxNumber": {
+          "required": "Tax number is required"
+        },
+        "taxPercentage": {
+          "range": "Tax percentage must be between 0 and 100"
+        }
+      },
+      "details": {
+        "label": {
+          "required": "Label is required"
+        },
+        "value": {
+          "required": "Value is required"
+        }
+      },
+      "customFields": {
+        "fieldName": {
+          "required": "Field name is required"
+        },
+        "fieldValue": {
+          "required": "Field value is required"
+        }
+      }
+    }
   }
 }

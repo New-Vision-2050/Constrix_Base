@@ -268,6 +268,14 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       }
 
       setOptions(mergedOptions);
+      console.log('Auto-select all options', field.dynamicOptions.selectAll)
+      console.log('Auto-select all mergedOptions', mergedOptions)
+
+      // Auto-select all options if selectAll is enabled and no current selection
+      if (field.dynamicOptions.selectAll && mergedOptions.length > 0) {
+        const allValues = mergedOptions.map(option => option.value);
+        onChange(allValues);
+      }
     } catch (error) {
       console.log("Error fetching options:", error);
     } finally {

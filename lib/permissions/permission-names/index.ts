@@ -69,4 +69,16 @@ export const PERMISSIONS = {
     settings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
     attendance_departure: create("EMPLOYEE_ATTENDANCE"),
   },
+  // vacations
+  vacations: {
+    settings: {
+      leaveType: create("LEAVE_TYPE"),
+      leavePolicy: create("LEAVE_POLICY"),
+      publicHoliday: create("PUBLIC_HOLIDAY"),
+    },
+  },
+  // clients
+  clients: {
+    clientsPage: create("CLIENTS"),
+  },
 };

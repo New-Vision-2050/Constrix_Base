@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { MapPin, MoreVertical } from "lucide-react";
+import { MapPin, MoreVertical, PencilIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
@@ -17,19 +17,25 @@ import { useModal } from "@/hooks/use-modal";
 import ChangeBranchDialog from "./change-branch-dialog";
 import { baseURL } from "@/config/axios-config";
 import { updateBranchFormConfig } from "../branches-info/update-branch-form-config";
+import AssignUsersToBranch from "./AssignUsersToBranch";
 
 interface BranchCardProps {
   branch: Branch;
   branches: Branch[];
   className?: string;
+  handleBranchesRefetch: () => void;
 }
 
-const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
+const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: BranchCardProps) => {
   const [isOpen, handleOpen, handleClose] = useModal();
+  const [isAssignUsersOpen, handleAssignUsersOpen, handleAssignUsersClose] =
+    useModal();
   const local = useLocale();
   const isRTL = local === "ar";
   const isMainBranch = branch.parent_id === null;
   const isMultipleBranch = branches.length > 1;
+
+  console.log("branchbranch", branch);
 
   const detailRows = [
     { label: "مدير الفرع", value: branch.manager?.name ?? "-" },
@@ -87,6 +93,56 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
               </div>
             </div>
           ))}
+          {/* Users Can Edit Branch (users can access) */}
+          <div className="flex group">
+            <div className="w-1/3 bg-background p-4 text-right font-medium">
+              المستخدمين
+            </div>
+            <div className="w-2/3 p-4 text-right border-b group-last:border-b-0">
+              <div className="flex items-center justify-between">
+                {/* Users */}
+                <div className="flex items-center gap-2 flex-wrap flex-grow">
+                  {/* manager */}
+                  <span
+                    className="inline-block px-2 py-1 text-xs font-semibold leading-none rounded-full whitespace-nowrap"
+                    style={{
+                      backgroundColor: "#F2F2F2",
+                      color: "#6c757d",
+                    }}
+                  >
+                    {branch.manager?.name}
+                  </span>
+                  {/* users */}
+                  {branch.users_can_access.map((user) => (
+                    <span
+                      key={user.id}
+                      className="inline-block px-2 py-1 text-xs font-semibold leading-none rounded-full whitespace-nowrap"
+                      style={{
+                        backgroundColor: "#F2F2F2",
+                        color: "#6c757d",
+                      }}
+                    >
+                      {user.name}
+                    </span>
+                  ))}
+                </div>
+                {/* Edit Icon */}
+                <PencilIcon
+                  size={20}
+                  onClick={handleAssignUsersOpen}
+                  className="text-primary cursor-pointer"
+                />
+                <AssignUsersToBranch
+                  branchId={branch.id}
+                  usersIds={branch.users_can_access.map((user) => user.id)}
+                  manager={branch.manager}
+                  isOpen={isAssignUsersOpen}
+                  handleClose={handleAssignUsersClose}
+                  handleBranchesRefetch={handleBranchesRefetch}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </Card>
       <SheetFormBuilder
@@ -103,11 +159,11 @@ const BranchCard = ({ branch, branches, className = "" }: BranchCardProps) => {
   );
 };
 
-const BranchInfo = ({ branches }: { branches: Branch[] }) => {
+const BranchInfo = ({ branches,handleBranchesRefetch }: { branches: Branch[],handleBranchesRefetch: () => void }) => {
   return (
     <div className="bg-sidebar grid grid-cols-2">
       {branches.map((branch) => (
-        <BranchCard key={branch.id} branch={branch} branches={branches} />
+        <BranchCard key={branch.id} branch={branch} branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
       ))}
     </div>
   );

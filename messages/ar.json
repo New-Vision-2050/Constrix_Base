@@ -35,7 +35,15 @@
     "selectBranch": "اختر الفرع",
     "loading": "جاري التحميل...",
     "selectBranchesFirst": "اختر الفروع أولاً",
-    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها"
+    "selectBranchesInstructions": "تحتاج إلى تحديد الفروع من النموذج أولاً لتتمكن من تحديد مواقعها",
+    "city": "المدينة",
+    "state": "المنطقة",
+    "country": "الدولة",
+    "address": "العنوان",
+    "postalCode": "الرمز البريدي",
+    "map": "الخريطة",
+    "disctrict": "الحي",
+    "notFound": "لم يتم العثور على مواقع"
   },
   "Main": {
     "NoResultsRound": "لم يتم العثور على نتائج",
@@ -166,6 +174,7 @@
     "CountryFilter": "دولة الشركة",
     "TypeFilter": "نوع الشركة",
     "Active": "نشط",
+    "Inactive": "غير نشط",
     "LoginAsManager": "الدخول كـ مدير شركة (تعديل)",
     "completeProfileData": "أستكمال بيانات",
     "PackageSettings": "اعدادات الباقة والبرامج",
@@ -202,7 +211,12 @@
     "HumanResources": "الموارد البشرية",
     "ProgramManagement": "ادارة البرامج",
     "Powers": "الصلاحيات",
-    "PackagesAndPrograms": "الباقات والبرامج"
+    "PackagesAndPrograms": "الباقات والبرامج",
+    "CRM": "علاقات العملاء",
+    "clients": "العملاء",
+    "brokers": "الوسطاء",
+    "ecommerce": "المتجر",
+    "CRMSettings": "اعدادات علاقات العملاء"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
@@ -379,6 +393,17 @@
           "certifications": "الشهادات المهنية",
           "cv": "السيرة الذاتية"
         }
+      },
+      "branches": {
+        "assignUsersDialog": {
+          "title": "صلاحية التعديل علي الفرع",
+          "description": "أعطاء المستخدمين صلاحية التعديل علي الفرع",
+          "cancel": "الغاء",
+          "assign": "تعيين",
+          "searchUsers": "البحث عن مستخدمين",
+          "managerNote": "مدير الشركة :",
+          "branchManager": "مدير الفرع :"
+        }
       }
     }
   },
@@ -492,6 +517,235 @@
     "error": {
       "loading": "خطأ في تحميل البيانات",
       "tryAgain": "يرجى المحاولة مرة أخرى لاحقا"
+    }
+  },
+  "ClientsModule": {
+    "StatisticsCards": {
+      "totalClients": "إجمالي عدد العملاء",
+      "activeClients": "العملاء النشطيين",
+      "inactiveClients": "العملاء المعلقين",
+      "totalClientsInLastMonth": "العملاء المضافين اخر شهر"
+    },
+    "table": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "DeleteConfirmMessage": "هل انت متأكد من حذف هذا العميل؟",
+      "columns": {
+        "name": "اسم العميل",
+        "identity": "رقم الهوية",
+        "email": "البريد الالكتروني",
+        "phone": "رقم الجوال",
+        "broker": "الوسيط",
+        "status": "حالة العميل",
+        "branches": "الفروع",
+        "projectsNumber": "عدد المشاريع"
+      },
+      "filters": {
+        "branchesFilter": "الفروع",
+        "statusFilter": "حالة العميل"
+      }
+    },
+    "form": {
+      "individualClient": "فرد",
+      "companyClient": "جهة",
+      "title": "إضافة عميل جديد",
+      "addClient": "إضافة عميل جديد",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "ادخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+      "clientMailExist": "البريد الألكتروني مسجل كعميل فى الفرع الحالي بالفعل",
+      "mailExistAsEmployee": "البريد الألكتروني مسجل كموظف فى الفروع الأتية :",
+      "mailExistAsBroker": "البريد الألكتروني مسجل كوسيط فى الفروع الأتية :",
+      "mailExistAsClient": "البريد الألكتروني مسجل كعميل فى الفروع الأتية :",
+      "mailExistInSystem": "البريد الألكتروني مسجل بالفعل فى النظام",
+      "retrieveData": "استرجاع البيانات",
+      "phone": "الهاتف",
+      "phonePlaceholder": "ادخل رقم الهاتف",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "يرجى إدخال رقم هاتف صالح.",
+      "name": "الاسم",
+      "namePlaceholder": "ادخل الاسم",
+      "nameRequired": "الاسم مطلوب",
+      "nameThreeTerms": "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+      "nameLettersOnly": "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+      "nameMinLength": "الاسم يجب أن يحتوي على حرفين على الأقل.",
+      "arabicName": "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)",
+      "identity": "الرقم الهوية ",
+      "identityPlaceholder": "ادخل الرقم الهوية ",
+      "identityRequired": "الرقم الهوية  مطلوب",
+      "identityPattern": "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+      "identityMinLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "identityMaxLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "branches": "الفرع",
+      "branchesPlaceholder": "اختر الفرع",
+      "broker": "الوسيط",
+      "brokerPlaceholder": "اختر الوسيط",
+      "correspondenceAddress": "عنوان المراسلات",
+      "correspondenceAddressPlaceholder": "ادخل عنوان المراسلات",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج",
+      "companyClientFormTitle": "أنشاء جهة العميل",
+      "individualClientFormTitle": "أنشاء الفرد الممثل للجهة",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "companyField": "النشاط",
+      "companyFieldPlaceholder": "اختر النشاط",
+      "companyFieldRequired": "النشاط مطلوب",
+      "commerceName": "اسم التجاري",
+      "commerceNamePlaceholder": "ادخل اسم التجاري",
+      "commerceNameRequired": "اسم التجاري مطلوب",
+      "shortName": "اسم المختصر",
+      "shortNamePlaceholder": "ادخل اسم المختصر",
+      "shortNameRequired": "اسم المختصر مطلوب",
+      "supportResponsible": "المسؤول عن الدعم",
+      "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
+      "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
+      "companyBrokerFormTitle": "إنشاء وسيط شركة",
+      "individualBrokerFormTitle": "إنشاء وسيط فرد",
+      "Validation": {
+        "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+        "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
+      }
+    },
+    "dialog": {
+      "triggerText": "اختر الموقع من الخريطة",
+      "title": "اختر احداثيات موقع العنوان الوطني",
+      "latitude": "خط العرض",
+      "latitudePlaceholder": "ادخل خط العرض",
+      "latitudeRequired": "خط العرض مطلوب",
+      "longitude": "خط الطول",
+      "longitudePlaceholder": "ادخل خط الطول",
+      "longitudeRequired": "خط الطول مطلوب",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "region": "المنطقة",
+      "regionPlaceholder": "اختر المنطقة",
+      "regionRequired": "المنطقة مطلوبة",
+      "city": "المدينة",
+      "cityPlaceholder": "اختر المدينة",
+      "cityRequired": "المدينة مطلوبة",
+      "neighborhood": "الحي",
+      "neighborhoodPlaceholder": "اختر الحي",
+      "neighborhoodRequired": "الحي مطلوب",
+      "buildingNumber": "رقم المبنى",
+      "buildingNumberPlaceholder": "ادخل رقم المبنى",
+      "buildingNumberRequired": "رقم المبنى مطلوب",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "ادخل رقم الهاتف",
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "postalCode": "الرمز البريدي",
+      "postalCodePlaceholder": "ادخل الرمز البريدي",
+      "postalCodeRequired": "الرمز البريدي مطلوب",
+      "street": "الشارع",
+      "streetPlaceholder": "ادخل الشارع",
+      "streetRequired": "الشارع مطلوب",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج"
+    }
+  },
+  "BrokersModule": {
+    "StatisticsCards": {
+      "totalBrokers": "إجمالي الوسطاء",
+      "activeBrokers": "الوسطاء النشطين",
+      "inactiveBrokers": "الوسطاء غير النشطين",
+      "totalBrokersInLastMonth": "الوسطاء المضافين في الشهر الماضي"
+    },
+    "table": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "DeleteConfirmMessage": "هل أنت متأكد من رغبتك في حذف هذا الوسيط؟",
+      "columns": {
+        "name": "الاسم",
+        "identity": "رقم الهوية",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف",
+        "status": "الحالة",
+        "branches": "الفروع",
+        "clientsNumber": "عدد العملاء"
+      },
+      "filters": {
+        "branchesFilter": "الفروع",
+        "statusFilter": "الحالة"
+      }
+    },
+    "form": {
+      "individualBroker": "وسيط فرد",
+      "companyBroker": "وسيط شركة",
+      "title": "إضافة وسيط جديد",
+      "addBroker": "إضافة وسيط جديد",
+      "submitButtonText": "إضافة",
+      "cancelButtonText": "إلغاء",
+      "resetButtonText": "مسح النموذج",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "الرجاء إدخال عنوان بريد إلكتروني صالح.",
+      "brokerMailExist": "البريد الإلكتروني مسجل بالفعل كوسيط في الفرع الحالي.",
+      "mailExistAsEmployee": "البريد الإلكتروني مسجل بالفعل كموظف في الفروع التالية :",
+      "mailExistAsBroker": "البريد الإلكتروني مسجل بالفعل كوسيط في الفروع التالية :",
+      "mailExistAsClient": "البريد الإلكتروني مسجل بالفعل كعميل في الفروع التالية :",
+      "mailExistInSystem": "البريد الإلكتروني مسجل بالفعل في النظام.",
+      "retrieveData": "استرجاع البيانات",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "أدخل رقم الهاتف",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "الرجاء إدخال رقم هاتف صالح.",
+      "name": "الاسم",
+      "namePlaceholder": "أدخل الاسم",
+      "nameRequired": "الاسم مطلوب",
+      "nameThreeTerms": "يجب أن يتكون الاسم من ثلاثة مقاطع بالضبط (الأول والأوسط والأخير)",
+      "nameLettersOnly": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      "nameMinLength": "يجب أن يحتوي الاسم على حرفين على الأقل.",
+      "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      "identity": "رقم الهوية",
+      "identityPlaceholder": "أدخل رقم الهوية",
+      "identityRequired": "رقم الهوية مطلوب",
+      "identityPattern": "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+      "identityMinLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "identityMaxLength": "رقم الهوية يجب أن يتكون من 10 أرقام",
+      "branches": "الفرع",
+      "branchesPlaceholder": "اختر الفرع",
+      "correspondenceAddress": "عنوان المراسلة",
+      "correspondenceAddressPlaceholder": "أدخل عنوان المراسلة",
+      "country": "الدولة",
+      "countryPlaceholder": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "companyField": "مجال الشركة",
+      "companyFieldPlaceholder": "اختر مجال الشركة",
+      "companyFieldRequired": "مجال الشركة مطلوب",
+      "commerceName": "الاسم التجاري",
+      "commerceNamePlaceholder": "أدخل الاسم التجاري",
+      "commerceNameRequired": "الاسم التجاري مطلوب",
+      "shortName": "الاسم المختصر",
+      "shortNamePlaceholder": "أدخل الاسم المختصر",
+      "shortNameRequired": "الاسم المختصر مطلوب",
+      "commission": "العمولة",
+      "commissionPlaceholder": "أدخل نسبة العمولة",
+      "commissionRequired": "العمولة مطلوبة",
+      "companyBrokerFormTitle": "إنشاء وسيط شركة",
+      "individualBrokerFormTitle": "إنشاء وسيط فرد",
+      "supportResponsible": "المسؤول عن الدعم",
+      "supportResponsiblePlaceholder": "اختر المسؤول عن الدعم",
+      "supportResponsibleRequired": "المسؤول عن الدعم مطلوب",
+      "Validation": {
+        "arabicName": "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+        "englishName": "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز"
+      }
+    }
+  },
+  "CRMSettingsModule": {
+    "tabs": {
+      "clientsSettings": "إعدادات العملاء",
+      "clientsPermissions": "صلاحيات العملاء"
+    },
+    "ClientsSettings": {
+      "shareClientsData": "مشاركة بيانات العملاء بين الفروع",
+      "shareBrokersData": "مشاركة بيانات الوسطاء بين الفروع"
     }
   },
   "AttendanceDepartureModule": {
@@ -696,6 +950,7 @@
   "hr-settings": {
     "tabs": {
       "attendance": "الحضور و الانصراف",
+      "vacations": "الإجازات و العطلات",
       "recruitment": "التوظيف",
       "service": "الخدمة",
       "contractManagement": "ادارة عقد العمل"
@@ -817,6 +1072,139 @@
       }
     }
   },
+  "HRSettingsVacations": {
+    "tabs": {
+      "leavesPolicies": "أنظمة الاجازات",
+      "leavesTypes": "أنواع الاجازات",
+      "publicLeaves": "الاجازات الرسمية"
+    },
+    "leavesPolicies": {
+      "title": "أنظمة الاجازات",
+      "IsTheLeaveCarriedOver": "هل يتم ترحيل الاجازة؟",
+      "leaveCarriedOver": "يتم ترحيل الاجازة",
+      "leaveNotCarriedOver": "لا يتم ترحيل الاجازة",
+      "halfDay": "نص يوم",
+      "totalDays": "عدد أيام الإجازة",
+      "dayType": "نوع  أيام الإجازة",
+      "isAllowHalfDay": "هل يسمح بالنصف يوم",
+      "allowed": "مسموح",
+      "notAllowed": "غير مسموح",
+      "allBranches": "جميع الفروع",
+      "noUpgradeCondition": "لا يوجد شرط ترقية",
+      "addNewPolicy": "إنشاء نظام اجازة جديد",
+      "yearly": "سنوية",
+      "calender": "تقويم",
+      "work_day": "يوم عمل",
+      "loading": {
+        "title": "جاري تحميل أنظمة الإجازة",
+        "description": "يرجى الانتظار بينما نقوم بتحميل بيانات أنظمة الإجازة..."
+      },
+      "noData": {
+        "title": "لا توجد أنظمة إجازة",
+        "description": "لا توجد أي أنظمة إجازة حاليا."
+      },
+      "form": {
+        "title": "اضافة نظام اجازة جديد",
+        "editTitle": "تعديل نظام اجازة",
+        "name": "اسم نظام الاجازة",
+        "namePlaceholder": "اسم نظام الاجازة",
+        "nameRequired": "اسم نظام الاجازة مطلوب",
+        "namePattern": "اسم نظام الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+        "totalDays": "عدد أيام الإجازة",
+        "totalDaysPlaceholder": "عدد أيام الإجازة",
+        "totalDaysRequired": "عدد أيام الإجازة مطلوب",
+        "totalDaysPattern": "عدد أيام الإجازة يجب أن يكون رقمًا",
+        "type": "نوع الإجازة",
+        "typePlaceholder": "نوع الإجازة",
+        "typeRequired": "نوع الإجازة مطلوب",
+        "dayType": "نوع الأيام",
+        "dayTypePlaceholder": "نوع الأيام",
+        "dayTypeRequired": "نوع الأيام مطلوب",
+        "isRolloverAllowed": "هل يسمح بترحيل الاجازة؟",
+        "isAllowHalfDay": "هل يسمح بالنصف يوم؟",
+        "upgradeCondition": "شرط الترقية",
+        "upgradeConditionPlaceholder": "شرط الترقية",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء"
+      }
+    },
+    "leavesTypes": {
+      "title": "أنواع الاجازات",
+      "table": {
+        "name": "اسم الاجازة",
+        "isPaid": "الاجازة مدفوعة",
+        "paid": "مدفوع",
+        "notPaid": "غير مدفوع",
+        "isDuduct_from_balance": "خصم من الرصيد",
+        "duduct": "خصم",
+        "notDuduct": "من دون خصم",
+        "conditions": "الشروط",
+        "branches": "الفروع",
+        "branchesFilter": "الفروع",
+        "countryFilter": "الدولة",
+        "isPaidFilter": "الاجازة مدفوعة؟",
+        "isDuductFilter": "خصم من الرصيد؟",
+        "DeleteConfirmMessage": "هل أنت متأكد من حذف هذا النوع؟",
+        "addVacationType": "اضافة نوع اجازة جديد",
+        "form": {
+          "title": "اضافة نوع اجازة جديد",
+          "name": "اسم نوع الاجازة",
+          "namePlaceholder": "اسم نوع الاجازة",
+          "nameRequired": "اسم نوع الاجازة مطلوب",
+          "namePattern": "اسم نوع الاجازة يجب أن يحتوي على حروف وأرقام فقط",
+          "isPaid": "الاجازة مدفوعة",
+          "isPaidPlaceholder": "الاجازة مدفوعة",
+          "isPaidRequired": "الاجازة مدفوعة",
+          "isDuduct": "خصم من الرصيد",
+          "isDuductPlaceholder": "خصم من الرصيد",
+          "isDuductRequired": "خصم من الرصيد",
+          "conditions": "الشروط",
+          "conditionsPlaceholder": "الشروط",
+          "conditionsRequired": "الشروط",
+          "branches": "الفروع",
+          "branchesPlaceholder": "اختر الفروع",
+          "submitButtonText": "حفظ",
+          "cancelButtonText": "إلغاء",
+          "resetButtonText": "مسح النموذج"
+        }
+      }
+    },
+    "publicLeaves": {
+      "title": "الاجازات العامة",
+      "table": {
+        "name": "اسم الاجازة",
+        "country": "الدولة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "countryFilter": "الدولة",
+        "startDateFilter": "تاريخ البداية",
+        "endDateFilter": "تاريخ النهاية",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء",
+        "DeleteConfirmMessage": "هل أنت متأكد من حذف هذه الاجازة؟",
+        "addPublicVacation": "اضافة اجازة رسمية",
+        "form": {
+          "title": "اضافة اجازة رسمية جديدة",
+          "editTitle": "تعديل اجازة رسمية",
+          "name": "اسم اجازة",
+          "namePlaceholder": "اسم اجازة",
+          "nameRequired": "اسم اجازة مطلوب",
+          "country": "الدولة",
+          "countryPlaceholder": "الدولة",
+          "countryRequired": "الدولة مطلوبة",
+          "startDate": "تاريخ البداية",
+          "startDatePlaceholder": "تاريخ البداية",
+          "startDateRequired": "تاريخ البداية مطلوب",
+          "endDate": "تاريخ النهاية",
+          "endDatePlaceholder": "تاريخ النهاية",
+          "endDateRequired": "تاريخ النهاية مطلوب",
+          "submitButtonText": "حفظ",
+          "cancelButtonText": "إلغاء",
+          "resetButtonText": "مسح النموذج"
+        }
+      }
+    }
+  },
   "RoleTypes": {
     "all": "منح جميع الصلاحيات",
     "update": "تعديل",
@@ -860,5 +1248,268 @@
   "Bouquets": {
     "AreYouSureReactivate": "هل أنت متأكد من تنشيط الباقة؟",
     "AreYouSureDeactivate": "هل أنت متأكد من الغاء تنشيط الباقة؟"
+  },
+  "brand": {
+    "plural": "العلامات التجارية",
+    "singular": "العلامة التجارية",
+    "addBrand": "اضافة علامة تجارية",
+    "editBrand": "تعديل العلامة التجارية",
+    "brandName": "اسم العلامة التجارية",
+    "brandNameRequired": "اسم العلامة التجارية مطلوب",
+    "brandNameMinLength": "اسم العلامة التجارية يجب أن يكون على الأقل حرفين",
+    "notFound": "لم يتم العثور على علامات تجارية"
+  },
+  "warehouse": {
+    "plural": "المخازن",
+    "singular": "المخزن",
+    "addWarehouse": "اضافة مخزن",
+    "warehouseName": "اسم المخزن",
+    "isDefault": "مخزن افتراضي",
+    "district": "المنطقة",
+    "street": "الشارع",
+    "selectCountry": "اختر الدولة",
+    "selectCity": "اختر المدينة",
+    "locationMap": "خريطة الموقع",
+    "cancel": "الغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "warehouseNameRequired": "اسم المخزن مطلوب",
+    "warehouseNameMinLength": "اسم المخزن يجب أن يكون على الأقل حرفين",
+    "countryRequired": "الدولة مطلوبة",
+    "cityRequired": "المدينة مطلوبة",
+    "districtRequired": "المنطقة مطلوبة",
+    "streetRequired": "الشارع مطلوب",
+    "notFound": "لم يتم العثور على مخازن"
+  },
+  "category": {
+    "plural": "التصنيفات",
+    "singular": "التصنيف",
+    "addCategory": "اضافة تصنيف",
+    "categoryName": "اسم التصنيف",
+    "categoryNamePlaceholder": "أدخل اسم التصنيف",
+    "categoryDescription": "وصف التصنيف",
+    "categoryDescriptionPlaceholder": "أدخل وصف التصنيف",
+    "categoryNameRequired": "اسم التصنيف مطلوب",
+    "categoryNameMinLength": "اسم التصنيف يجب أن يكون على الأقل حرفين",
+    "categoryDescriptionMinLength": "وصف التصنيف مطلوب",
+    "addChild": "اضافة تصنيف فرعي",
+    "save": "حفظ",
+    "cancel": "الغاء",
+    "saving": "جاري الحفظ...",
+    "notFound": "لم يتم العثور على تصنيفات",
+    "parentCategory": "التصنيف الرئيسي"
+  },
+  "labels": {
+    "optional": "(اختياري)",
+    "id": "الرقم التعريفي",
+    "name": "الاسم",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "createdAt": "تاريخ الإنشاء",
+    "actions": "الإجراءات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "view": "عرض",
+    "add": "اضافة",
+    "create": "انشاء",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "search": "بحث",
+    "reset": "إعادة تعيين",
+    "loading": "جاري التحميل",
+    "noData": "لا توجد بيانات متاحة",
+    "yes": "نعم",
+    "no": "لا",
+    "select": "اختر",
+    "selectPlaceholder": "اختر خيار",
+    "submit": "إرسال",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "default": "افتراضي",
+    "description": "الوصف",
+    "arabic": "عربي",
+    "english": "إنجليزي",
+    "price": "السعر",
+    "sku": "رقم المنتج",
+    "stock": "الكمية",
+    "image": "صورة",
+    "currency": "ريال"
+  },
+  "product": {
+    "singular": "منتج",
+    "plural": "منتجات",
+    "dialog": {
+      "add": {
+        "title": "إضافة منتج عادي",
+        "success": "تم إنشاء المنتج بنجاح",
+        "error": "حدث خطأ أثناء إنشاء المنتج",
+        "fields": {
+          "name": {
+            "label": "اسم المنتج",
+            "placeholder": "هاتف ايفون"
+          },
+          "price": {
+            "label": "سعر المنتج",
+            "placeholder": "1600"
+          },
+          "sku": {
+            "label": "رمز المنتج",
+            "placeholder": "16AAFF206"
+          },
+          "description": {
+            "label": "وصف المنتج",
+            "placeholder": "وصف هذا المنتج الذي قد يكون سطرا أو يتجاوز ذلك بـ..."
+          },
+          "stock": {
+            "label": "كمية المخزون"
+          },
+          "warehouse": {
+            "label": "المستودع"
+          },
+          "category": {
+            "label": "الفئة"
+          },
+          "brand": {
+            "label": "العلامة التجارية"
+          },
+          "subCategory": {
+            "label": "الفئة الفرعية"
+          },
+          "type": {
+            "label": "نوع المنتج",
+            "physical": "مادي",
+            "digital": "رقمي"
+          },
+          "requiresShipping": {
+            "label": "يتطلب الشحن"
+          },
+          "unlimitedQuantity": {
+            "label": "كمية غير محدودة"
+          },
+          "isTaxable": {
+            "label": "خاضع للضريبة"
+          },
+          "priceIncludesVat": {
+            "label": "السعر شامل الضريبة"
+          },
+          "vatPercentage": {
+            "label": "نسبة الضريبة"
+          },
+          "vatSettings": {
+            "exemptFromTax": "المنتج معفى من الضريبة"
+          },
+          "isVisible": {
+            "label": "عرض المنتج على المتجر",
+            "description": "في حالة عدم اختيارك عرض المنتج على المتجر سيتم حفظ المنتج في المنتجات ولن يتم اظهاره للمستخدم على المتجر الخاص بك"
+          },
+          "mainImage": {
+            "label": "صورة المنتج",
+            "uploadText": "رفع صورة",
+            "dragText": "اقصى حجم للصورة: 2160 × 2160 - 3MB",
+            "remove": "إزالة"
+          },
+          "otherImages": {
+            "label": "صور أخرى"
+          },
+          "taxes": {
+            "label": "الضرائب",
+            "vatSettings": "إعدادات القيمة المضافة",
+            "countryId": "رقم الدولة",
+            "country": "الدولة",
+            "taxNumber": "الرقم الضريبي",
+            "taxPercentage": "نسبة الضريبة",
+            "isActive": "تفعيل",
+            "noTaxes": "لا توجد ضرائب مضافة. انقر على \"إضافة\" لإضافة ضريبة جديدة."
+          },
+          "details": {
+            "label": "تفاصيل المنتج",
+            "labelField": "التسمية",
+            "valueField": "القيمة"
+          },
+          "customFields": {
+            "label": "حقول مخصصة",
+            "fieldName": "اسم الحقل",
+            "fieldValue": "قيمة الحقل"
+          },
+          "seo": {
+            "label": "إعدادات محركات البحث",
+            "metaTitle": "عنوان الميتا",
+            "metaDescription": "وصف الميتا",
+            "metaKeywords": "كلمات الميتا المفتاحية"
+          }
+        },
+        "actions": {
+          "seo": "تحسين محركات البحث",
+          "additionalDetails": "تفاصيل اضافية للمنتج",
+          "customFields": "حقول مخصصة",
+          "save": "حفظ",
+          "saving": "جاري الحفظ...",
+          "cancel": "الغاء"
+        }
+      }
+    },
+    "validation": {
+      "name": {
+        "required": "اسم المنتج مطلوب"
+      },
+      "description": {
+        "required": "وصف المنتج مطلوب"
+      },
+      "price": {
+        "required": "السعر يجب أن يكون رقم موجب"
+      },
+      "sku": {
+        "required": "رمز المنتج مطلوب"
+      },
+      "stock": {
+        "negative": "الكمية لا يمكن أن تكون سالبة"
+      },
+      "warehouse": {
+        "required": "المستودع مطلوب"
+      },
+      "category": {
+        "required": "الفئة مطلوبة"
+      },
+      "type": {
+        "invalid": "نوع المنتج يجب أن يكون مادي أو رقمي"
+      },
+      "vatPercentage": {
+        "range": "نسبة الضريبة يجب أن تكون بين 0 و 100"
+      },
+      "mainImage": {
+        "required": "الصورة الرئيسية مطلوبة"
+      },
+      "taxes": {
+        "country": {
+          "required": "يجب اختيار الدولة"
+        },
+        "taxNumber": {
+          "required": "رقم الضريبة مطلوب"
+        },
+        "taxPercentage": {
+          "range": "نسبة الضريبة يجب أن تكون بين 0 و 100"
+        }
+      },
+      "details": {
+        "label": {
+          "required": "التسمية مطلوبة"
+        },
+        "value": {
+          "required": "القيمة مطلوبة"
+        }
+      },
+      "customFields": {
+        "fieldName": {
+          "required": "اسم الحقل مطلوب"
+        },
+        "fieldValue": {
+          "required": "قيمة الحقل مطلوبة"
+        }
+      }
+    }
   }
 }

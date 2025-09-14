@@ -8,7 +8,7 @@ import { Branch } from "@/modules/company-profile/types/company";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
 
-const BranchesInfo = ({ branches }: { branches: Branch[] }) => {
+const BranchesInfo = ({ branches,handleBranchesRefetch }: { branches: Branch[],handleBranchesRefetch: () => void }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -20,7 +20,7 @@ const BranchesInfo = ({ branches }: { branches: Branch[] }) => {
           />
         </Can>
       </div>
-      <BranchInfo branches={branches} />
+      <BranchInfo branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
     </div>
   );
 };
