@@ -224,6 +224,7 @@
     "title": "اعدادات الموظف",
     "sendLink": "ارسال الرابط",
     "sendLinkSuccess": "تم ارسال الرابط بنجاح",
+    "employeeInOtherCompany": "الموظف ينتمي الى شركه اخرى",
     "sendLinkError": "حدث خطأ في ارسال الرابط"
   },
   "Header": {

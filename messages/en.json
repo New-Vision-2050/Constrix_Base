@@ -224,6 +224,7 @@
     "title": "User Settings",
     "sendLink": "Send Link",
     "sendLinkSuccess": "Link sent successfully",
+    "employeeInOtherCompany":"Employee is in another company",
     "sendLinkError": "Error sending link"
   },
   "Header": {

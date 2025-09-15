@@ -27,6 +27,14 @@ const UserSettingDialog: React.FC<PropsT> = ({ open, onClose, user }) => {
   const handleSendLink = async () => {
     try {
       setLoading(true);
+      // check if user has user_id
+      if (user.user_id == null) {
+        // employee in other company
+        toast.warning(t("employeeInOtherCompany"));
+        onClose();
+        return;
+      }
+
       // send link to user
       await apiClient.post(`${baseURL}/users/send-email-company-link`, {
         user_id: user.user_id ?? "user_id undefined",
