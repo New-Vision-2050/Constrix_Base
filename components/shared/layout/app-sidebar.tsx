@@ -234,27 +234,21 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.clients,
             icon: Users,
             isActive: pageName === ROUTER.CRM.clients,
-            show:
-              !isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.clientsPage.list)),
+            show: !isCentralCompany,
           },
           {
             name: t("Sidebar.brokers"),
             url: ROUTER.CRM.brokers,
             icon: Users,
             isActive: pageName === ROUTER.CRM.brokers,
-            show:
-              !isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.broker.list)),
+            show: !isCentralCompany,
           },
           {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show:
-              !isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.clientsPage.list)),
+            show: !isCentralCompany,
           },
         ],
       },
