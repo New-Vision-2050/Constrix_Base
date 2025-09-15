@@ -23,7 +23,7 @@ function isValidIconKey(key: string): key is IconKey {
 
 export default function ShowSubPrograms(props: PropsT) {
   const { open } = useSidebar();
-  const t = useTranslations("Sidebar");
+  const t = useTranslations();
   // declare and define component state and variables
   const { activeProject, activeUrl, handleSub_entitiesItemClick } = props;
 
@@ -39,7 +39,7 @@ export default function ShowSubPrograms(props: PropsT) {
           htmlFor="main-sidebar-item"
           className="block mb-2 px-2  text-gray-700"
         >
-          {t("SubPrograms")}
+          {t("Sidebar.subPrograms")}
         </label>
       </motion.div>
       {activeProject.sub_entities && (

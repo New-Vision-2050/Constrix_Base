@@ -17,14 +17,14 @@ export default function ShowMainProjects({
   projects,
   handleSub_entitiesItemClick,
 }: PropsT) {
-  const t = useTranslations("Sidebar");
+  const t = useTranslations();
   return (
     <div className="w-full">
       <label
         htmlFor="main-sidebar-item"
         className="block mb-2 px-2  text-gray-700"
       >
-        {t("mainPrograms")}
+        {t("Sidebar.mainPrograms")}
       </label>
       <MainProjectsList
         projects={projects}
