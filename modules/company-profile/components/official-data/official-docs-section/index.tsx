@@ -80,24 +80,24 @@ const OfficialDocsSection = ({
             !!companyOfficialDocuments && companyOfficialDocuments.length > 0
           }
           secondTitle={
-            <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
-              <DropdownMenuTrigger asChild>
-                <Can
-                  check={[PERMISSIONS.companyProfile.officialDocument.update]}
-                >
+            <Can
+              check={[PERMISSIONS.companyProfile.officialDocument.update]}
+            >
+              <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
+                <DropdownMenuTrigger asChild>
                   <Button variant="ghost">
                     <SettingsIcon />
                   </Button>
-                </Can>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {dropdownItems.map((item, index) => (
-                  <DropdownMenuItem key={index} onClick={() => item.onClick()}>
-                    {item.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {dropdownItems.map((item, index) => (
+                    <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </Can>
           }
         >
           {!!companyOfficialDocuments && companyOfficialDocuments.length > 0 ? (
