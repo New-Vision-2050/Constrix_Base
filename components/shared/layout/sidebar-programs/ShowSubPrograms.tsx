@@ -7,6 +7,7 @@ import React from "react";
 import Link from "next/link";
 import { Project } from "@/types/sidebar-menu";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   activeUrl: string;
@@ -22,6 +23,7 @@ function isValidIconKey(key: string): key is IconKey {
 
 export default function ShowSubPrograms(props: PropsT) {
   const { open } = useSidebar();
+  const t = useTranslations("Sidebar");
   // declare and define component state and variables
   const { activeProject, activeUrl, handleSub_entitiesItemClick } = props;
 
@@ -37,7 +39,7 @@ export default function ShowSubPrograms(props: PropsT) {
           htmlFor="main-sidebar-item"
           className="block mb-2 px-2  text-gray-700"
         >
-          البرامج الفرعية
+          {t("SubPrograms")}
         </label>
       </motion.div>
       {activeProject.sub_entities && (

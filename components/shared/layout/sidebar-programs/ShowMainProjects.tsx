@@ -2,6 +2,7 @@ import RegularList from "../../RegularList";
 import { SetStateAction } from "react";
 import { Project } from "@/types/sidebar-menu";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   projects: Project[];
@@ -16,13 +17,14 @@ export default function ShowMainProjects({
   projects,
   handleSub_entitiesItemClick,
 }: PropsT) {
+  const t = useTranslations("Sidebar");
   return (
     <div className="w-full">
       <label
         htmlFor="main-sidebar-item"
         className="block mb-2 px-2  text-gray-700"
       >
-        البرامج الرئيسية
+        {t("mainPrograms")}
       </label>
       <MainProjectsList
         projects={projects}
