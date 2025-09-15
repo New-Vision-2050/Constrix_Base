@@ -79,6 +79,7 @@ export const PERMISSIONS = {
   },
   // clients
   clients: {
-    clientsPage: create("CLIENTS"),
+    broker: create("BROKER"),
+    clientsPage: create("CLIENT"),
   },
 };

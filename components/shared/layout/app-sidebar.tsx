@@ -245,7 +245,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             isActive: pageName === ROUTER.CRM.brokers,
             show:
               !isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.clientsPage.list)),
+              can(Object.values(PERMISSIONS.clients.broker.list)),
           },
           {
             name: t("Sidebar.CRMSettings"),
