@@ -42,9 +42,9 @@ export default function ShowSubPrograms(props: PropsT) {
           {t("Sidebar.subPrograms")}
         </label>
       </motion.div>
-      {activeProject.sub_entities && (
+      {activeProject?.sub_entities && (
         <div className="ml-8 mt-1 space-y-1">
-          {activeProject.sub_entities
+          {activeProject?.sub_entities
             .filter((item) => item.show)
             .map((sub) => (
               <SidebarMenuButton
@@ -54,13 +54,13 @@ export default function ShowSubPrograms(props: PropsT) {
                 className={cn(sub.url === activeUrl && "text-primary")}
                 onClick={() =>
                   handleSub_entitiesItemClick(
-                    sub.url ? sub.url : `/${activeProject.slug}/${sub.slug}`
+                    sub.url ? sub.url : `/${activeProject?.slug}/${sub.slug}`
                   )
                 }
               >
                 <Link
                   href={
-                    sub.url ? sub.url : `/${activeProject.slug}/${sub.slug}`
+                    sub.url ? sub.url : `/${activeProject?.slug}/${sub.slug}`
                   }
                   className="pr-5 flex gap-5 items-center cursor-pointer"
                 >

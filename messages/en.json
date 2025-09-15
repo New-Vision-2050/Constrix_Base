@@ -220,6 +220,12 @@
     "CRMSettings": "CRM Settings",
     "ecommerce": "E-commerce"
   },
+  "UserSettingDialog": {
+    "title": "User Settings",
+    "sendLink": "Send Link",
+    "sendLinkSuccess": "Link sent successfully",
+    "sendLinkError": "Error sending link"
+  },
   "Header": {
     "MainSystemManagement": "Main System Management",
     "Logout": "Logout",

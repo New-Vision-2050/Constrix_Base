@@ -220,6 +220,12 @@
     "ecommerce": "المتجر",
     "CRMSettings": "اعدادات علاقات العملاء"
   },
+  "UserSettingDialog": {
+    "title": "اعدادات الموظف",
+    "sendLink": "ارسال الرابط",
+    "sendLinkSuccess": "تم ارسال الرابط بنجاح",
+    "sendLinkError": "حدث خطأ في ارسال الرابط"
+  },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",
     "Logout": "تسجيل الخروج",

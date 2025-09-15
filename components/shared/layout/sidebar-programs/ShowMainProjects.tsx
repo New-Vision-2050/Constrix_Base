@@ -68,7 +68,7 @@ const MainProjectsList = (props: MainProjectsListProps) => {
     <select
       id="main-sidebar-item"
       name="main-sidebar-item"
-      value={activeProject.name}
+      value={activeProject?.name}
       onChange={handleChange}
       className="block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold bg-[#2D174D] text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0"
     >

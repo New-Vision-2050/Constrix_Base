@@ -8,6 +8,7 @@ import React from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
+import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 
 // Define types for the company data
 interface CompanyData {
@@ -248,11 +249,12 @@ export const UsersConfigV2 = (options?: {
     formConfig: GetCompanyUserFormConfig(t),
     executions: [
       {
-        label: "اكمال الملف الشخصي",
+        // label: "اكمال الملف الشخصي",
+        label: "اعدادات الموظف",
         icon: <GearIcon className="w-4 h-4" />,
         action: "openDialog",
-        dialogComponent: ChooseUserCompany, // Your custom dialog component
-        disabled: !(options?.canView || false),
+        dialogComponent: UserSettingDialog, // Your custom dialog component
+        disabled: true,
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
