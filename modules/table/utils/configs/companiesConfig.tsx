@@ -17,6 +17,7 @@ interface CompanyData {
   name: string;
   user_name: string;
   email: string;
+  serial_no: string;
   general_manager_name: string;
   complete_data: 0 | 1; // 0 = pending, 1 = success
   is_active: "active" | "inActive";

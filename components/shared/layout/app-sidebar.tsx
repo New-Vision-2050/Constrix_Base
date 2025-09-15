@@ -46,7 +46,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
     { can, isCentralCompany, isSuperAdmin } = p;
-  console.log("permissions ", p);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
@@ -74,12 +73,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
 
         // Transform MenuSubEntity to Entity by adding the show property
         const transformedMenuSubEntities =
-          menuSubEntities?.map(
-            (menuSubEntity): Entity => ({
+          menuSubEntities?.map((menuSubEntity): Entity => {
+            return {
               name: menuSubEntity.name,
               icon: menuSubEntity.icon,
               slug: menuSubEntity.slug,
               origin_super_entity: menuSubEntity.origin_super_entity,
+              url: `/${project.slug}/${menuSubEntity.slug}`,
               show: can((permissions) =>
                 permissions.some(
                   (permission) =>
@@ -88,8 +88,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
                       .list
                 )
               ), // Default to true, you can add custom logic here if needed
-            })
-          ) || [];
+            };
+          }) || [];
 
         return {
           ...project,
@@ -142,7 +142,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.COMPANIES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.COMPANIES,
-            show: can(Object.values(PERMISSIONS.company)),
+            show:
+              isCentralCompany && can(Object.values(PERMISSIONS.company.list)),
           },
         ],
       },
@@ -159,10 +160,11 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.USERS,
             icon: UserIcon,
             isActive: pageName === ROUTER.USERS,
-            show: can(Object.values(PERMISSIONS.user)),
+            show: isCentralCompany && can(Object.values(PERMISSIONS.user.list)),
           },
         ],
       },
+      // human resources
       {
         name: t("Sidebar.HumanResources"),
         icon: LayoutDashboardIcon,
@@ -233,8 +235,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             icon: Users,
             isActive: pageName === ROUTER.CRM.clients,
             show:
-              isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.clientsPage)),
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.clients.clientsPage.list)),
           },
           {
             name: t("Sidebar.brokers"),
@@ -242,8 +244,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             icon: Users,
             isActive: pageName === ROUTER.CRM.brokers,
             show:
-              isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.clientsPage)),
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.clients.broker.list)),
           },
           {
             name: t("Sidebar.CRMSettings"),
@@ -252,7 +254,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             isActive: pageName === ROUTER.CRM.settings,
             show:
               !isCentralCompany &&
-              can(Object.values(PERMISSIONS.clients.clientsPage)),
+              can(Object.values(PERMISSIONS.clients.clientsPage.list)),
           },
         ],
       },
