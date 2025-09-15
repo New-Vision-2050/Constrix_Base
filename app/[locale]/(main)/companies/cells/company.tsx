@@ -5,11 +5,12 @@ import { AvatarGroup } from "@/components/shared/avatar-group";
 interface CompanyRow {
   name: string;
   user_name: string;
+  serial_no: string;
   [key: string]: unknown; // Allow for other properties
 }
 
 const Company = ({ row }: { row: CompanyRow }) => {
-  const { name, user_name } = row;
+  const { name, user_name, serial_no } = row;
   return (
     <div className="flex gap-3 border-e-2">
       <AvatarGroup
@@ -21,7 +22,7 @@ const Company = ({ row }: { row: CompanyRow }) => {
       <div>
         <p className="font-medium">{name}</p>
         <p dir="ltr" className="text-xs">
-          @{user_name}
+          @{serial_no}
         </p>
       </div>
     </div>

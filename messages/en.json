@@ -202,6 +202,8 @@
     "Settings": "Settings",
     "SystemSettings": "System Settings",
     "DashboardSettings": "Dashboard",
+    "subPrograms": "Sub Programs",
+    "mainPrograms": "Main Programs",
     "UserProfileSettings": "User Profile",
     "Welcome": "Hello",
     "HRSettings": "Settings",
@@ -217,6 +219,13 @@
     "brokers": "Brokers",
     "CRMSettings": "CRM Settings",
     "ecommerce": "E-commerce"
+  },
+  "UserSettingDialog": {
+    "title": "User Settings",
+    "sendLink": "Send Link",
+    "sendLinkSuccess": "Link sent successfully",
+    "employeeInOtherCompany":"Employee is in another company",
+    "sendLinkError": "Error sending link"
   },
   "Header": {
     "MainSystemManagement": "Main System Management",

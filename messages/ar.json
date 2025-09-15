@@ -201,6 +201,8 @@
     "UsersList": "عرض المستخدميين",
     "Settings": "اعدادات",
     "SystemSettings": "اعدادات البرامج",
+    "subPrograms": "البرامج الفرعية",
+    "mainPrograms": "البرامج الرئيسية",
     "DashboardSettings": "ملف الشركة",
     "UserProfileSettings": "الملف الشخصي",
     "Welcome": "مرحبا",
@@ -217,6 +219,13 @@
     "brokers": "الوسطاء",
     "ecommerce": "المتجر",
     "CRMSettings": "اعدادات علاقات العملاء"
+  },
+  "UserSettingDialog": {
+    "title": "اعدادات الموظف",
+    "sendLink": "ارسال الرابط",
+    "sendLinkSuccess": "تم ارسال الرابط بنجاح",
+    "employeeInOtherCompany": "الموظف ينتمي الى شركه اخرى",
+    "sendLinkError": "حدث خطأ في ارسال الرابط"
   },
   "Header": {
     "MainSystemManagement": "ادارة النظام الرئيسي",

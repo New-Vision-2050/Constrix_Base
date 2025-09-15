@@ -46,7 +46,7 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
           <select
             id="main-sidebar-item"
             name="main-sidebar-item"
-            value={activeProject.name}
+            value={activeProject?.name}
             onChange={(e) => {
               const selectedProject =
                 projects.find((project) => project.name === e.target.value) ||
@@ -71,9 +71,9 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
           >
             البرامج الفرعية
           </label>
-          {activeProject.submenu && (
+          {activeProject?.submenu && (
             <div className="ml-8 px-2 mt-1 space-y-1">
-              {activeProject.submenu.map((sub) => (
+              {activeProject?.submenu.map((sub) => (
                 <SidebarMenuButton
                   asChild
                   key={sub.name}
