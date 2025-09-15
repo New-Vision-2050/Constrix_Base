@@ -79,6 +79,6 @@ export const PERMISSIONS = {
   },
   // clients
   clients: {
-    clientsPage: create("CLIENTS"),
+    clientsPage: create("CLIENT"),
   },
 };
