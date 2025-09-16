@@ -128,6 +128,12 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       isActive: pageName === ROUTER.PERMISSIONS,
       show: can(Object.values(PERMISSIONS.permission)),
     };
+
+    console.log(
+      "Breakpoint101505",
+      PERMISSIONS.clients.clientsPage,
+      can([PERMISSIONS.clients.clientsPage.view])
+    );
     const data: Project[] = [
       // companies
       {
@@ -234,21 +240,21 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.clients,
             icon: Users,
             isActive: pageName === ROUTER.CRM.clients,
-            show: !isCentralCompany,
+            show: !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
           },
           {
             name: t("Sidebar.brokers"),
             url: ROUTER.CRM.brokers,
             icon: Users,
             isActive: pageName === ROUTER.CRM.brokers,
-            show: !isCentralCompany,
+            show: !isCentralCompany && can([PERMISSIONS.clients.broker.view]),
           },
           {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany,
+            show: !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
           },
         ],
       },
