@@ -277,12 +277,7 @@ export function getCreateIndividualBrokerFormConfig(
             label: t("form.identity"),
             type: "text",
             placeholder: t("form.identityPlaceholder"),
-            required: true,
             validation: [
-              {
-                type: "required",
-                message: t("form.identityRequired"),
-              },
               {
                 type: "pattern",
                 value: /^[12]\d{9}$/,

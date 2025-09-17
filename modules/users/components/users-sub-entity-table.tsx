@@ -1,32 +1,27 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { baseURL } from "@/config/axios-config";
-import { REGISTRATION_FORMS } from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import Can from "@/lib/permissions/client/Can";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
-import {
-  SheetFormBuilder,
-  GetCompanyUserFormConfig,
-  useSheetForm,
-} from "@/modules/form-builder";
 import { TableBuilder, TableConfig } from "@/modules/table";
-import { useTableStore } from "@/modules/table/store/useTableStore";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
-import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import UsersSubEntityForm from "./users-sub-entity-form";
+import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
+import { CreateClientCxtProvider } from "@/modules/clients/context/CreateClientCxt";
+import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
+import { CreateBrokerCxtProvider } from "@/modules/brokers/context/CreateBrokerCxt";
+import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config";
 
-const UsersSubEntityTable = ({
-  programName,
-}: {
+type PropsT = {
   programName: SuperEntitySlug;
-}) => {
-  const t = useTranslations("Companies");
+};
 
+const UsersSubEntityTable = ({ programName }: PropsT) => {
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
   const { slug }: { slug: string } = useParams();
   const { subEntity } = useGetSubEntity(programName, slug);
@@ -60,64 +55,42 @@ const UsersSubEntityTable = ({
     enableExport: can(entityPermissions.export),
   };
 
-  const finalFormConfig = useMemo(() => {
-    const registrationFromConfig = registrationFormSlug
-      ? REGISTRATION_FORMS[registrationFormSlug]
-      : GetCompanyUserFormConfig;
-
-    return Boolean(registrationFromConfig)
-      ? registrationFromConfig
-      : GetCompanyUserFormConfig;
-  }, [registrationFormSlug, slug]);
-
-  const { closeSheet } = useSheetForm({
-    config: finalFormConfig(t),
-  });
-
-  const handleCloseForm = () => {
-    closeSheet();
-    const tableStore = useTableStore.getState();
-    tableStore.reloadTable(TABLE_ID);
-    setTimeout(() => {
-      tableStore.setLoading(TABLE_ID, false);
-    }, 100);
-  };
-
   if (!can(entityPermissions.list)) {
     return null;
   }
 
   return (
     <div className="px-8 space-y-7">
+      <StatisticsRow
+        config={subEntityStatisticsConfig(
+          sub_entity_id ?? "",
+          registration_form_id ?? ""
+        )}
+      />{" "}
       {hasHydrated && !!subEntity && (
-        <TableBuilder
-          config={tableConfig}
-          searchBarActions={
-            <div className="flex items-center gap-3">
-              <Can check={[entityPermissions.create]}>
-                <SheetFormBuilder
-                  config={{
-                    ...finalFormConfig(t, handleCloseForm),
-                    apiParams: {
-                      sub_entity_id: sub_entity_id as string,
-                    },
-                    onSuccess: () => {
-                      const tableStore = useTableStore.getState();
-                      tableStore.reloadTable(TABLE_ID);
-                      setTimeout(() => {
-                        tableStore.setLoading(TABLE_ID, false);
-                      }, 100);
-                    },
-                  }}
-                  trigger={<Button>اضافة</Button>}
-                  onSuccess={(values) => {
-                    console.log("Form submitted successfully:", values);
-                  }}
+        <BrokersDataCxtProvider>
+          <CreateBrokerCxtProvider>
+            <ClientsDataCxtProvider>
+              <CreateClientCxtProvider>
+                <TableBuilder
+                  config={tableConfig}
+                  searchBarActions={
+                    <div className="flex items-center gap-3">
+                      <Can check={[entityPermissions.create]}>
+                        <UsersSubEntityForm
+                          tableId={TABLE_ID}
+                          sub_entity_id={sub_entity_id}
+                          slug={slug}
+                          registrationFormSlug={registrationFormSlug}
+                        />
+                      </Can>
+                    </div>
+                  }
                 />
-              </Can>
-            </div>
-          }
-        />
+              </CreateClientCxtProvider>
+            </ClientsDataCxtProvider>
+          </CreateBrokerCxtProvider>
+        </BrokersDataCxtProvider>
       )}
     </div>
   );
