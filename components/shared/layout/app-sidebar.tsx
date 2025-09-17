@@ -236,20 +236,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: pageName === ROUTER.CRM.clients,
         sub_entities: [
           {
-            name: t("Sidebar.clients"),
-            url: ROUTER.CRM.clients,
-            icon: Users,
-            isActive: pageName === ROUTER.CRM.clients,
-            show: !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
-          },
-          {
-            name: t("Sidebar.brokers"),
-            url: ROUTER.CRM.brokers,
-            icon: Users,
-            isActive: pageName === ROUTER.CRM.brokers,
-            show: !isCentralCompany && can([PERMISSIONS.clients.broker.view]),
-          },
-          {
             name: t("Sidebar.CRMSettings"),
             url: ROUTER.CRM.settings,
             icon: Settings,
