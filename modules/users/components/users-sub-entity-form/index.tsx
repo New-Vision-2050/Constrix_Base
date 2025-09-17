@@ -28,15 +28,6 @@ export default function UsersSubEntityForm({
   // declare and define component state and vars
   const t = useTranslations("Companies");
 
-  console.log('registrationFormSlug', registrationFormSlug)
-
-  /*
-  بكدة انشاء عميل جديد من العملاء اللى بيتم انشائهم من خلال 
-  الصفحة المنشئة من نموذج العملاء بتهندل اعدادات العملاء اللى فى علاقات العملاء
-
-  كذلك الحال فى الوسطاء
-  */
-
   // define final form config
   const finalFormConfig = useMemo(() => {
     const registrationFromConfig = registrationFormSlug

@@ -1,37 +1,28 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { baseURL } from "@/config/axios-config";
-import { REGISTRATION_FORMS } from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
 import Can from "@/lib/permissions/client/Can";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
-import {
-  SheetFormBuilder,
-  GetCompanyUserFormConfig,
-  useSheetForm,
-} from "@/modules/form-builder";
 import { TableBuilder, TableConfig } from "@/modules/table";
-import { useTableStore } from "@/modules/table/store/useTableStore";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
 import UsersSubEntityForm from "./users-sub-entity-form";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
 import { CreateClientCxtProvider } from "@/modules/clients/context/CreateClientCxt";
 import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
 import { CreateBrokerCxtProvider } from "@/modules/brokers/context/CreateBrokerCxt";
+import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config";
 
 type PropsT = {
   programName: SuperEntitySlug;
 };
 
 const UsersSubEntityTable = ({ programName }: PropsT) => {
-  const t = useTranslations("Companies");
-
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
   const { slug }: { slug: string } = useParams();
   const { subEntity } = useGetSubEntity(programName, slug);
@@ -71,9 +62,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
 
   return (
     <div className="px-8 space-y-7">
-      <h1>
-        Test101 {programName} - {registrationFormSlug}
-      </h1>
+      <StatisticsRow config={subEntityStatisticsConfig} />{" "}
       {hasHydrated && !!subEntity && (
         <BrokersDataCxtProvider>
           <CreateBrokerCxtProvider>
