@@ -19,12 +19,13 @@ import { useSidebarStore } from "@/store/useSidebarStore";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
+import UsersSubEntityForm from "./users-sub-entity-form";
 
-const UsersSubEntityTable = ({
-  programName,
-}: {
+type PropsT = {
   programName: SuperEntitySlug;
-}) => {
+};
+
+const UsersSubEntityTable = ({ programName }: PropsT) => {
   const t = useTranslations("Companies");
 
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
@@ -60,59 +61,26 @@ const UsersSubEntityTable = ({
     enableExport: can(entityPermissions.export),
   };
 
-  const finalFormConfig = useMemo(() => {
-    const registrationFromConfig = registrationFormSlug
-      ? REGISTRATION_FORMS[registrationFormSlug]
-      : GetCompanyUserFormConfig;
-
-    return Boolean(registrationFromConfig)
-      ? registrationFromConfig
-      : GetCompanyUserFormConfig;
-  }, [registrationFormSlug, slug]);
-
-  const { closeSheet } = useSheetForm({
-    config: finalFormConfig(t),
-  });
-
-  const handleCloseForm = () => {
-    closeSheet();
-    const tableStore = useTableStore.getState();
-    tableStore.reloadTable(TABLE_ID);
-    setTimeout(() => {
-      tableStore.setLoading(TABLE_ID, false);
-    }, 100);
-  };
-
   if (!can(entityPermissions.list)) {
     return null;
   }
 
   return (
     <div className="px-8 space-y-7">
+      <h1>
+        Test101 {programName} - {registrationFormSlug}
+      </h1>
       {hasHydrated && !!subEntity && (
         <TableBuilder
           config={tableConfig}
           searchBarActions={
             <div className="flex items-center gap-3">
               <Can check={[entityPermissions.create]}>
-                <SheetFormBuilder
-                  config={{
-                    ...finalFormConfig(t, handleCloseForm),
-                    apiParams: {
-                      sub_entity_id: sub_entity_id as string,
-                    },
-                    onSuccess: () => {
-                      const tableStore = useTableStore.getState();
-                      tableStore.reloadTable(TABLE_ID);
-                      setTimeout(() => {
-                        tableStore.setLoading(TABLE_ID, false);
-                      }, 100);
-                    },
-                  }}
-                  trigger={<Button>اضافة</Button>}
-                  onSuccess={(values) => {
-                    console.log("Form submitted successfully:", values);
-                  }}
+                <UsersSubEntityForm
+                  tableId={TABLE_ID}
+                  sub_entity_id={sub_entity_id}
+                  slug={slug}
+                  registrationFormSlug={registrationFormSlug}
                 />
               </Can>
             </div>
