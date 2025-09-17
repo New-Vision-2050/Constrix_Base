@@ -20,6 +20,10 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import UsersSubEntityForm from "./users-sub-entity-form";
+import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
+import { CreateClientCxtProvider } from "@/modules/clients/context/CreateClientCxt";
+import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
+import { CreateBrokerCxtProvider } from "@/modules/brokers/context/CreateBrokerCxt";
 
 type PropsT = {
   programName: SuperEntitySlug;
@@ -71,21 +75,29 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
         Test101 {programName} - {registrationFormSlug}
       </h1>
       {hasHydrated && !!subEntity && (
-        <TableBuilder
-          config={tableConfig}
-          searchBarActions={
-            <div className="flex items-center gap-3">
-              <Can check={[entityPermissions.create]}>
-                <UsersSubEntityForm
-                  tableId={TABLE_ID}
-                  sub_entity_id={sub_entity_id}
-                  slug={slug}
-                  registrationFormSlug={registrationFormSlug}
+        <BrokersDataCxtProvider>
+          <CreateBrokerCxtProvider>
+            <ClientsDataCxtProvider>
+              <CreateClientCxtProvider>
+                <TableBuilder
+                  config={tableConfig}
+                  searchBarActions={
+                    <div className="flex items-center gap-3">
+                      <Can check={[entityPermissions.create]}>
+                        <UsersSubEntityForm
+                          tableId={TABLE_ID}
+                          sub_entity_id={sub_entity_id}
+                          slug={slug}
+                          registrationFormSlug={registrationFormSlug}
+                        />
+                      </Can>
+                    </div>
+                  }
                 />
-              </Can>
-            </div>
-          }
-        />
+              </CreateClientCxtProvider>
+            </ClientsDataCxtProvider>
+          </CreateBrokerCxtProvider>
+        </BrokersDataCxtProvider>
       )}
     </div>
   );

@@ -8,6 +8,9 @@ import {
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
+import { ModelsTypes } from "./constants/ModelsTypes";
+import UsersSubEntityFormClientModel from "./client-model";
+import UsersSubEntityFormBrokerModel from "./broker-model";
 
 type PropsT = {
   tableId: string;
@@ -24,6 +27,15 @@ export default function UsersSubEntityForm({
 }: PropsT) {
   // declare and define component state and vars
   const t = useTranslations("Companies");
+
+  console.log('registrationFormSlug', registrationFormSlug)
+
+  /*
+  بكدة انشاء عميل جديد من العملاء اللى بيتم انشائهم من خلال 
+  الصفحة المنشئة من نموذج العملاء بتهندل اعدادات العملاء اللى فى علاقات العملاء
+
+  كذلك الحال فى الوسطاء
+  */
 
   // define final form config
   const finalFormConfig = useMemo(() => {
@@ -50,6 +62,16 @@ export default function UsersSubEntityForm({
       tableStore.setLoading(tableId, false);
     }, 100);
   };
+
+  // client model
+  if (registrationFormSlug === ModelsTypes.CLIENT) {
+    return <UsersSubEntityFormClientModel />;
+  }
+
+  // broker model
+  if (registrationFormSlug === ModelsTypes.BROKER) {
+    return <UsersSubEntityFormBrokerModel />;
+  }
 
   // define sheet form
   return (
