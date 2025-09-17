@@ -8,7 +8,6 @@ import { createPermissions } from "@/lib/permissions/permission-names/default-pe
 import { TableBuilder, TableConfig } from "@/modules/table";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
-import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import UsersSubEntityForm from "./users-sub-entity-form";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
@@ -62,7 +61,12 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
 
   return (
     <div className="px-8 space-y-7">
-      <StatisticsRow config={subEntityStatisticsConfig} />{" "}
+      <StatisticsRow
+        config={subEntityStatisticsConfig(
+          sub_entity_id ?? "",
+          registration_form_id ?? ""
+        )}
+      />{" "}
       {hasHydrated && !!subEntity && (
         <BrokersDataCxtProvider>
           <CreateBrokerCxtProvider>
