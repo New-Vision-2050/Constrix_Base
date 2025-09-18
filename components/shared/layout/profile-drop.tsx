@@ -91,9 +91,6 @@ const ProfileDrop = () => {
       fallback();
     }
   };
-  const switchMenu = () => {
-    setOpen(!open);
-  };
 
   useEffect(
     () => {
@@ -131,11 +128,10 @@ const ProfileDrop = () => {
           src="https://github.com/shad\cn.png"
         />
       )}
-      <DropdownMenu dir="rtl" open={open}>
+      <DropdownMenu dir="rtl" open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none"
-            onClick={switchMenu}
           >
             {user?.name}
             <ChevronDown />
