@@ -28,8 +28,11 @@ const StatisticsRow = ({ config }: { config: Config }) => {
           key={index}
           className="bg-sidebar gap-4 items-start w-full text-foreground py-6 px-5 rounded-lg flex shadow-md"
         >
+          {/* icon */}
           <div>{config.icons[index]}</div>
+
           <div className="flex flex-col">
+            {/* title */}
             <h3
               className={cn(
                 "text-xs ",
@@ -38,13 +41,16 @@ const StatisticsRow = ({ config }: { config: Config }) => {
             >
               {item?.title}
             </h3>
+            {/* total */}
             <div
               className={cn(
                 "flex gap-3 items-center mt-1",
                 isLoading && "h-6 mt-1 w-24 bg-popover rounded-md animate-pulse"
               )}
             >
+              {/* total */}
               <p className="text-2xl leading-none font-bold">{item.total}</p>
+              {/* percentage */}
               <span
                 dir="ltr"
                 className={`text-lg font-semibold ${
