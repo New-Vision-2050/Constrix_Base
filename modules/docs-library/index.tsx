@@ -1,7 +1,9 @@
+import DocsLibraryEntryPoint from "./components/entry-point/entry-point";
+
 export default function DocsLibraryModule() {
-    return (
-        <div>
-            <h1>Docs Library!!</h1>
-        </div>
-    );
+  return (
+    <div>
+      <DocsLibraryEntryPoint />
+    </div>
+  );
 }
