@@ -232,7 +232,14 @@
       "empsDocs": "المستندات الموظفين",
       "privateDocs": "المستندات الخاصة",
       "inboxDocs": "المستندات الواردة"
-    }
+    },
+    "searchFields": {
+      "search": "فلتر البحث",
+      "documentType": "نوع المستند",
+      "type": "النوع",
+      "endDate": "تاريخ النهاية"
+    },
+    "publicDocs": {}
   },
   "UserSettingDialog": {
     "title": "اعدادات الموظف",

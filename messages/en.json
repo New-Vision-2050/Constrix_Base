@@ -233,6 +233,12 @@
       "empsDocs": "Employee Docs",
       "privateDocs": "Private Docs",
       "inboxDocs": "Inbox Docs"
+    },
+    "searchFields": {
+      "search": "Search Filters",
+      "documentType": "Document Type",
+      "type": "Type",
+      "endDate": "End Date"
     }
   },
   "UserSettingDialog": {
