@@ -1,0 +1,71 @@
+import React from "react";
+import { cn } from "@/lib/utils";
+import SearchBar from "./SearchBar";
+import ViewModeToggle from "./ViewModeToggle";
+import { DocumentsHeaderProps } from "./types";
+import { Button } from "@/components/ui/button";
+import { ArrowDownNarrowWide, Download, PanelLeftOpen } from "lucide-react";
+
+/**
+ * DocumentsHeader component for document management interface
+ * Combines search bar, add button, and action buttons in a unified header
+ * Follows SOLID principles with single responsibility for header controls
+ */
+const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
+  searchValue,
+  onSearchChange,
+  onAddClick,
+  viewMode = "grid",
+  onViewModeChange,
+  className = "",
+  isLoading = false,
+}) => {
+  return (
+    <div
+      className={cn(
+        "flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4",
+        "bg-sidebar rounded-lg",
+        className
+      )}
+    >
+      {/* Left side: Search bar and Add button */}
+      <div className="flex items-center gap-3 flex-1 w-full sm:w-auto">
+        <SearchBar
+          value={searchValue}
+          onChange={onSearchChange}
+          disabled={isLoading}
+        />
+      </div>
+      {/* Right side: Action buttons and View Mode Toggle */}
+      <div className="flex items-center gap-3">
+        {/* Add button */}
+        <Button onClick={onAddClick}>إضافة</Button>
+        {/* Export button */}
+        <Button variant="outline" className="bg-sidebar h-10" size="sm">
+          <Download className="mr-2 h-4 w-4" />
+          تصدير
+        </Button>
+        {/* Sort button */}
+        <Button variant="outline" className="bg-sidebar h-10" size="sm">
+          <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+          ترتيب
+        </Button>
+        {/* View Mode Toggle */}
+        {onViewModeChange && (
+          <ViewModeToggle
+            viewMode={viewMode}
+            onViewModeChange={onViewModeChange}
+            disabled={isLoading}
+          />
+        )}
+        {/* Details button */}
+        <Button variant="outline" className="bg-sidebar h-10" size="sm">
+          <PanelLeftOpen className="mr-2 h-4 w-4" />
+          تفاصيل
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default DocumentsHeader;
