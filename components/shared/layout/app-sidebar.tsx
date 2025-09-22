@@ -7,6 +7,8 @@ import {
   UserIcon,
   Users,
   Settings,
+  FolderClosed,
+  LibraryBig,
 } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
@@ -240,7 +242,27 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
+            show:
+              !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
+          },
+        ],
+      },
+      // docs library
+      {
+        name: t("Sidebar.docs-library"),
+        slug: SUPER_ENTITY_SLUG.DOCS_LIBRARY,
+        icon: LibraryBig,
+        urls: [ROUTER.DOCS_LIBRARY],
+        isActive: pageName === ROUTER.DOCS_LIBRARY,
+        sub_entities: [
+          {
+            name: t("Sidebar.docs-library-docs"),
+            url: ROUTER.DOCS_LIBRARY,
+            icon: FolderClosed,
+            isActive: pageName === ROUTER.DOCS_LIBRARY,
+            show: true, // Temporary true in development phease
+            // this project will be in other companies like CRM
+            // show: !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
           },
         ],
       },

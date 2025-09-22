@@ -218,7 +218,12 @@
     "clients": "العملاء",
     "brokers": "الوسطاء",
     "ecommerce": "المتجر",
-    "CRMSettings": "اعدادات علاقات العملاء"
+    "CRMSettings": "اعدادات علاقات العملاء",
+    "docs-library": "مستندات والبيانات",
+    "docs-library-docs": "المستندات"
+  },
+  "docs-library": {
+    "title": "مكتبة المستندات"
   },
   "UserSettingDialog": {
     "title": "اعدادات الموظف",
