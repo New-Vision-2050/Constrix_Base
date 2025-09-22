@@ -16,7 +16,7 @@ interface ErrorStateProps {
  */
 const ErrorState: React.FC<ErrorStateProps> = ({ message, onRetry }) => {
   return (
-    <div className="bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6 text-center">
+    <div className="bg-sidebar w-[370px] min-h-[330px] m-2 rounded-2xl p-6 text-center">
       {/* Error icon */}
       <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
         <svg 

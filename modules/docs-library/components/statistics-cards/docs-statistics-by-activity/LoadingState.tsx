@@ -6,7 +6,7 @@ import React from 'react';
  */
 const LoadingState: React.FC = () => {
   return (
-    <div className="bg-sidebar w-[370px] min-h-[280px]  m-2 rounded-2xl p-6 animate-pulse">
+    <div className="bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6 animate-pulse">
       <div className="space-y-6">
         {/* First activity skeleton */}
         <div className="flex items-center justify-between">

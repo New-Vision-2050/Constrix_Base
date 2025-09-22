@@ -32,7 +32,7 @@ const ActivityStatisticsCard: React.FC<ActivityStatisticsCardProps> = ({
 
   return (
     <div
-      className={`bg-sidebar w-[370px] min-h-[280px]  m-2 rounded-2xl p-6 text-white ${className}`}
+      className={`bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6 text-white ${className}`}
     >
       <div className="space-y-6">
         {data.items.map((item, index) => (
