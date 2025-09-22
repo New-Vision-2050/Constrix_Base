@@ -8,6 +8,8 @@ export default function PublicDocsTabEntryPoint() {
     documentType: "",
   });
 
+  console.log('searchData',searchData)
+
   return (
     <>
       <SearchFields

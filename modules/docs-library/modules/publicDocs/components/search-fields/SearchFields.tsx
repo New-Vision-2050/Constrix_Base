@@ -20,10 +20,13 @@ const SearchFields: React.FC<SearchFieldsProps> = ({
 
   // Handle field changes while maintaining immutability
   const handleFieldChange = (field: keyof typeof data, value: string) => {
-    onChange({
+    console.log(`Field ${field} changed to:`, value);
+    const newData = {
       ...data,
       [field]: value,
-    });
+    };
+    console.log('New search data:', newData);
+    onChange(newData);
   };
 
   return (
