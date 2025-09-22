@@ -4,6 +4,7 @@ import DocumentItem from "./DocumentItem";
 import ExpirationBadge from "./ExpirationBadge";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
+import { useTranslations } from "next-intl";
 
 /**
  * ExpirationStatisticsCard component for displaying documents by expiration
@@ -16,6 +17,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
   error,
   className = "",
 }) => {
+  const t = useTranslations("docs-library.cards");
   // Handle loading state
   if (isLoading) {
     return <LoadingState />;
@@ -28,7 +30,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
 
   // Handle missing data
   if (!data || !data.documents || data.documents.length === 0) {
-    return <ErrorState message="لا توجد مستندات للعرض" />;
+    return <ErrorState message={t("noData")} />;
   }
 
   const { title, totalCount, countLabel, documents } = data;

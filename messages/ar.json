@@ -223,7 +223,16 @@
     "docs-library-docs": "المستندات"
   },
   "docs-library": {
-    "title": "مكتبة المستندات"
+    "title": "مكتبة المستندات",
+    "cards": {
+      "noData": "لا توجد بيانات للعرض"
+    },
+    "tabsTitles": {
+      "publicDocs": "المستندات العامة",
+      "empsDocs": "المستندات الموظفين",
+      "privateDocs": "المستندات الخاصة",
+      "inboxDocs": "المستندات الواردة"
+    }
   },
   "UserSettingDialog": {
     "title": "اعدادات الموظف",

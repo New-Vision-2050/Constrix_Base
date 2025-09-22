@@ -3,6 +3,7 @@ import { StatisticsCardProps } from "./types";
 import ComparisonSection from "./ComparisonSection";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
+import { useTranslations } from "next-intl";
 
 /**
  * StatisticsCard component for displaying document statistics
@@ -15,6 +16,7 @@ const CompanyDocsStatisticsCard: React.FC<StatisticsCardProps> = ({
   error,
   className = "",
 }) => {
+  const t = useTranslations("docs-library.cards");
   // Handle loading state
   if (isLoading) {
     return <LoadingState />;
@@ -27,7 +29,7 @@ const CompanyDocsStatisticsCard: React.FC<StatisticsCardProps> = ({
 
   // Handle missing data
   if (!data) {
-    return <ErrorState message="لا توجد بيانات للعرض" />;
+    return <ErrorState message={t("noData")} />;
   }
 
   const { title, mainValue, mainLabel, secondaryValue, comparison, icon } =

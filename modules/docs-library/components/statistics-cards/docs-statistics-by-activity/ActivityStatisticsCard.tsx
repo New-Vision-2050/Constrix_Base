@@ -3,6 +3,7 @@ import { ActivityStatisticsCardProps } from "./types";
 import CircularProgress from "./CircularProgress";
 import LoadingState from "./LoadingState";
 import ErrorState from "./ErrorState";
+import { useTranslations } from "next-intl";
 
 /**
  * ActivityStatisticsCard component for displaying document statistics by activity
@@ -15,6 +16,7 @@ const ActivityStatisticsCard: React.FC<ActivityStatisticsCardProps> = ({
   error,
   className = "",
 }) => {
+  const t = useTranslations("docs-library.cards");
   // Handle loading state
   if (isLoading) {
     return <LoadingState />;
@@ -27,7 +29,7 @@ const ActivityStatisticsCard: React.FC<ActivityStatisticsCardProps> = ({
 
   // Handle missing data
   if (!data || !data.items || data.items.length === 0) {
-    return <ErrorState message="لا توجد بيانات للعرض" />;
+    return <ErrorState message={t("noData")} />;
   }
 
   return (
