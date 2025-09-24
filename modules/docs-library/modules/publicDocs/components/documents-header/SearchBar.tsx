@@ -28,9 +28,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         disabled={disabled}
         className={cn(
           "w-full pl-10 pr-4 py-2 rounded-lg border",
-          "bg-gray-800 border-gray-700 text-white placeholder-gray-400",
+          "bg-transparent border-gray-700 text-white placeholder-gray-400",
           "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-          "hover:border-gray-600 transition-colors duration-200",
+          "transition-colors duration-200",
           disabled && "opacity-50 cursor-not-allowed"
         )}
       />

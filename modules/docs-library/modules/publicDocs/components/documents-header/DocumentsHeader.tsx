@@ -4,7 +4,14 @@ import SearchBar from "./SearchBar";
 import ViewModeToggle from "./ViewModeToggle";
 import { DocumentsHeaderProps } from "./types";
 import { Button } from "@/components/ui/button";
-import { ArrowDownNarrowWide, Download, PanelLeftOpen } from "lucide-react";
+import {
+  ArrowDownNarrowWide,
+  Download,
+  PanelLeftOpen,
+  Upload,
+  Folder,
+  FileText,
+} from "lucide-react";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-dir/DialogContent";
 import { DropdownButton } from "@/components/shared/dropdown-button";
@@ -60,10 +67,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           items={[
             {
               text: t("dir"),
+              icon: <Folder className="h-4 w-4" />,
               onClick: () => setOpenDirDialog(true),
             },
             {
               text: t("file"),
+              icon: <FileText className="h-4 w-4" />,
               onClick: () => setOpenFileDialog(true),
             },
           ]}
@@ -78,7 +87,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
             setOpenCopyMoveDialog(true);
           }}
         >
-          <Download className="mr-2 h-4 w-4" />
+          <Upload className="mr-2 h-4 w-4" />
           {t("export")}
         </Button>
         {/* Sort button */}
