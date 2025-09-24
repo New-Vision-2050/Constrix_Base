@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { DocumentsHeader, ViewMode } from "../../components/documents-header";
 import { SearchFields, SearchFormData } from "../../components/search-fields";
+import ModeViewsManager from "./ModeViewsManager";
 
 export default function PublicDocsTabEntryPoint() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchData, setSearchData] = useState<SearchFormData>({
     endDate: "",
     type: "",
@@ -37,6 +38,7 @@ export default function PublicDocsTabEntryPoint() {
         onViewModeChange={handleViewModeChange}
         isLoading={false}
       />
+      <ModeViewsManager viewMode={viewMode} />
     </div>
   );
 }
