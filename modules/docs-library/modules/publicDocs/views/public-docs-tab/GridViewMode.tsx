@@ -3,7 +3,7 @@ import GridItem from "./GridItem";
 
 export default function GridViewMode() {
   return (
-    <div className="w-full min-h-96 bg-sidebar rounded-lg p-4 flex flex-col justify-between">
+    <div className="min-h-96 bg-sidebar rounded-lg p-4 flex flex-col justify-between">
       {/* items */}
       <div className="flex flex-row items-center gap-6 flex-wrap flex-grow">
         {Array.from({ length: 9 }).map((_, index) => (
