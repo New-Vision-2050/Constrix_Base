@@ -260,7 +260,14 @@
         "sort": "Sort",
         "grid": "Grid",
         "list": "List",
-        "details": "Details"
+        "details": "Details",
+        "share": "Share",
+        "copy": "Copy Link",
+        "requestFile": "Request File",
+        "delete": "Delete",
+        "download": "Download",
+        "favorite": "Favorite",
+        "move": "Move"
       },
       "table": {
         "file_name": "File Name",

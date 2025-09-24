@@ -249,7 +249,14 @@
         "sort": "ترتيب",
         "grid": "شبكة",
         "list": "قائمة",
-        "details": "تفاصيل"
+        "details": "تفاصيل",
+        "share": "مشاركة",
+        "copy": "نسخ الرابط",
+        "requestFile": "طلب ملف",
+        "delete": "حذف",
+        "download": "تحميل",
+        "favorite": "المفضلة",
+        "move": "نقل"
       },
       "table":{
         "file_name":"الملف",
