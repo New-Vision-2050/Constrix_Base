@@ -7,10 +7,11 @@ import { ExpirationBadgeProps } from './types';
  */
 const ExpirationBadge: React.FC<ExpirationBadgeProps> = ({
   text,
-  variant = 'warning'
+  variant = 'primary'
 }) => {
   // Define variant styles
   const variantStyles = {
+    primary: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
     warning: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     danger: 'bg-red-500/20 text-red-400 border-red-500/30',
     info: 'bg-blue-500/20 text-blue-400 border-blue-500/30'

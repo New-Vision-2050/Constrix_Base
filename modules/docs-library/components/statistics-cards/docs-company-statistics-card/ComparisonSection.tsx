@@ -38,7 +38,7 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({
         {/* VS indicator with decorative lines */}
         <div className="flex flex-col items-center">
           {/* Top decorative line */}
-          <div className="w-px h-8 bg-gradient-to-t from-gray-700 to-transparent mb-2"></div>
+          <div className="w-px h-8 bg-gray-700 mb-2"></div>
           
           {/* VS circle */}
           <div className="bg-gray-600 rounded-full w-12 h-12 flex items-center justify-center">
@@ -46,7 +46,7 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({
           </div>
           
           {/* Bottom decorative line */}
-          <div className="w-px h-8 bg-gradient-to-b from-gray-700 to-transparent mt-2"></div>
+          <div className="w-px h-8 bg-gray-700 mt-2"></div>
         </div>
 
         {/* Right value section */}

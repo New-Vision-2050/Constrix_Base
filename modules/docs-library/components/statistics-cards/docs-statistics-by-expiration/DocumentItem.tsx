@@ -23,9 +23,9 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
   const { name, expirationDate, icon, badgeText, badgeVariant } = document;
 
   return (
-    <div className="flex items-center justify-between py-3 border-l-4 border-gray-600 pl-4">
+    <div className="flex items-center justify-between py-3  pl-4">
       {/* Document info section */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-grow items-center gap-3">
         {/* Document icon */}
         {icon && (
           <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
@@ -34,7 +34,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
         )}
         
         {/* Document details */}
-        <div className="text-right">
+        <div className="text-right flex flex-grow items-center justify-between">
           <h4 className="text-white font-medium text-sm">{name}</h4>
           <p className="text-gray-400 text-xs mt-1">{expirationDate}</p>
         </div>

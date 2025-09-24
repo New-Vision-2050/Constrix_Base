@@ -53,5 +53,5 @@ export interface ExpirationBadgeProps {
   /** Badge text */
   text: string;
   /** Badge variant */
-  variant?: 'warning' | 'danger' | 'info';
+  variant?: 'warning' | 'danger' | 'info' | 'primary';
 }

@@ -52,7 +52,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
           </div>
           {/* Badge for expires soon */}
           <div className="mb-4">
-            <ExpirationBadge text="تنتهي قريباً" variant="warning" />
+            <ExpirationBadge text="تنتهي قريباً" variant="primary" />
           </div>
         </div>
       </div>
