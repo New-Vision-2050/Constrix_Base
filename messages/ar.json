@@ -251,6 +251,16 @@
         "list": "قائمة",
         "details": "تفاصيل"
       },
+      "table":{
+        "file_name":"الملف",
+        "sorted_by":"تم التعديل بواسطة",
+        "file_size":"حجم الملف",
+        "docs_count":"عدد المستندات",
+        "file_type":"سمة الملف",
+        "last_activity":"اخر نشاط",
+        "status":"الحالة",
+        "settings":"الاعدادات"
+      },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
         "name": "اسم المجلد",

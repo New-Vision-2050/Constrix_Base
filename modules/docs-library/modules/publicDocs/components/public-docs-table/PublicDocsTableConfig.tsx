@@ -1,7 +1,9 @@
 import { baseURL } from "@/config/axios-config";
+import { useTranslations } from "next-intl";
 
 // Create a component that uses the translations
 export const getPublicDocsTableConfig = () => {
+  const t = useTranslations("docs-library.publicDocs.table")
 
   return {
     url: `${baseURL}/public-docs`,
@@ -9,42 +11,42 @@ export const getPublicDocsTableConfig = () => {
     columns: [
       {
         key: "file_name",
-        label: 'الملف',
+        label: t("file_name"),
         sortable: true,
       },
       {
         key: "sorted_by",
-        label: 'تم التعديل بواسطة',
+        label: t("sorted_by"),
         sortable: true,
       },
       {
         key: "file_size",
-        label: 'حجم الملف',
+        label: t("file_size"),
         sortable: true,
       },
       {
         key: "docs_count",
-        label: 'عدد المستندات',
+        label: t("docs_count"),
         sortable: true,
       },
       {
         key: "file_type",
-        label: 'سمة الملف',
+        label: t("file_type"),
         sortable: true,
       },
       {
         key: "last_activity",
-        label: 'اخر نشاط',
+        label: t("last_activity"),
         sortable: true,
       },
       {
         key: "status",
-        label: 'الحالة',
+        label: t("status"),
         sortable: true,
       },
       {
         key: "settings",
-        label: 'الاعدادات',
+        label: t("settings"),
         sortable: true,
       }
     ],
