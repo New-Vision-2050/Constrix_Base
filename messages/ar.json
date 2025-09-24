@@ -271,6 +271,17 @@
         "searchFolder": "بحث",
         "noResults": "لا توجد نتائج"
       },
+      "shareDialog": {
+        "title": "مشاركة",
+        "save": "حفظ",
+        "copy": "نسخ الرابط",
+        "cancel": "الغاء",
+        "selectFolder": "اختر مجلد",
+        "searchFolder": "بحث",
+        "noResults": "لا توجد نتائج",
+        "searchUsers": "بحث المستخدمين",
+        "notes":"الرجاء كتابة البريد الالكتروني الذي تود مشاركة الملفات معه"
+      },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
         "name": "اسم المجلد",

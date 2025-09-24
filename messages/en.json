@@ -221,7 +221,6 @@
     "ecommerce": "E-commerce",
     "docs-library": "Docs Library",
     "docs-library-docs": "Docs"
-
   },
   "docs-library": {
     "title": "Docs Library",
@@ -240,6 +239,17 @@
       "type": "Type",
       "endDate": "End Date"
     },
+    "shareDialog": {
+      "title": "Share",
+      "save": "Save",
+      "copy": "Copy Link",
+      "cancel": "Cancel",
+      "selectFolder": "Select Folder",
+      "searchFolder": "Search",
+      "noResults": "No Results",
+      "searchUsers": "Search Users",
+      "notes":"Please enter the email address of the user you want to share the files with"
+    },
     "publicDocs": {
       "header": {
         "search": "Search",
@@ -252,22 +262,22 @@
         "list": "List",
         "details": "Details"
       },
-      "table":{
-        "file_name":"File Name",
-        "sorted_by":"Sorted By",
-        "file_size":"File Size",
-        "docs_count":"Docs Count",
-        "file_type":"File Type",
-        "last_activity":"Last Activity",
-        "status":"Status",
-        "settings":"Settings"
+      "table": {
+        "file_name": "File Name",
+        "sorted_by": "Sorted By",
+        "file_size": "File Size",
+        "docs_count": "Docs Count",
+        "file_type": "File Type",
+        "last_activity": "Last Activity",
+        "status": "Status",
+        "settings": "Settings"
       },
       "copyMoveDialog": {
         "copyTitle": "Copy",
         "moveTitle": "Move",
         "save": "Save",
         "cancel": "Cancel",
-        "label":"To Directory",
+        "label": "To Directory",
         "selectFolder": "Select Folder",
         "searchFolder": "Search",
         "noResults": "No Results"
@@ -281,33 +291,33 @@
         "permission": "Permission",
         "public": "Public",
         "private": "Private",
-        "createdAt":"Created At",
-        "createdAtPlaceholder":"Enter Created At",
-        "endDate":"End Date",
-        "endDatePlaceholder":"Enter End Date",
+        "createdAt": "Created At",
+        "createdAtPlaceholder": "Enter Created At",
+        "endDate": "End Date",
+        "endDatePlaceholder": "Enter End Date",
         "users": "Users",
         "usersPlaceholder": "Select users",
-        "file":"Attach logo or icon",
+        "file": "Attach logo or icon",
         "submitButtonText": "Save",
         "cancelButtonText": "Cancel",
         "resetButtonText": "Reset"
       },
-      "createNewFileDialog":{
+      "createNewFileDialog": {
         "title": "Create New File",
         "name": "Name",
         "namePlaceholder": "Enter name",
         "password": "Password",
         "passwordPlaceholder": "Enter password",
         "permission": "Permission",
-        "createdAt":"Created At",
-        "createdAtPlaceholder":"Enter Created At",
-        "endDate":"End Date",
-        "endDatePlaceholder":"Enter End Date",
+        "createdAt": "Created At",
+        "createdAtPlaceholder": "Enter Created At",
+        "endDate": "End Date",
+        "endDatePlaceholder": "Enter End Date",
         "public": "Public",
         "private": "Private",
         "users": "Users",
         "usersPlaceholder": "Select users",
-        "file":"Attach logo or icon",
+        "file": "Attach logo or icon",
         "submitButtonText": "Save",
         "cancelButtonText": "Cancel",
         "resetButtonText": "Reset"
@@ -318,7 +328,7 @@
     "title": "User Settings",
     "sendLink": "Send Link",
     "sendLinkSuccess": "Link sent successfully",
-    "employeeInOtherCompany":"Employee is in another company",
+    "employeeInOtherCompany": "Employee is in another company",
     "sendLinkError": "Error sending link"
   },
   "Header": {
