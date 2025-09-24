@@ -53,14 +53,14 @@ const SearchDateField: React.FC<SearchDateFieldProps> = ({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal bg-gray-800 border-gray-700 text-white hover:bg-gray-700",
+            "w-full justify-start text-left font-normal bg-transparent border-gray-700 text-white",
             !date && "text-gray-400",
             className
           )}
           disabled={disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, 'PPP') : placeholder}
+          {date ? format(date, 'd/M/yyyy') : placeholder}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 bg-gray-800 border-gray-700" align="start">

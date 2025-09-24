@@ -45,7 +45,7 @@ const SearchSelectField: React.FC<SearchSelectFieldProps> = ({
     >
       <SelectTrigger 
         className={cn(
-          "w-full bg-gray-800 border-gray-700 text-white hover:bg-gray-700",
+          "w-full bg-transparent border-gray-700 text-white",
           !value && "text-gray-400",
           isRtl ? "text-right" : "text-left",
           className
