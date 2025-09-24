@@ -252,7 +252,10 @@
         "private": "Private",
         "users": "Users",
         "usersPlaceholder": "Select users",
-        "file":"Attach logo or icon"
+        "file":"Attach logo or icon",
+        "submitButtonText": "Save",
+        "cancelButtonText": "Cancel",
+        "resetButtonText": "Reset"
       }
     }
   },
