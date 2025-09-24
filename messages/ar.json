@@ -239,7 +239,24 @@
       "type": "النوع",
       "endDate": "تاريخ النهاية"
     },
-    "publicDocs": {}
+    "publicDocs": {
+      "createNewDirDialog": {
+        "title": "إنشاء مجلد جديد",
+        "name": "اسم المجلد",
+        "namePlaceholder": "ادخل اسم المجلد",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "ادخل كلمة المرور",
+        "permission": "الصلاحية",
+        "public": "عامة",
+        "private": "خاصة",
+        "users": "المستخدمين",
+        "usersPlaceholder": "اختر المستخدمين",
+        "file":"ارفاق شعار او ايقونة",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "الغاء",
+        "resetButtonText": "مسح"
+      }
+    }
   },
   "UserSettingDialog": {
     "title": "اعدادات الموظف",

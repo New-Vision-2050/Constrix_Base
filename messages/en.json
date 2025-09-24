@@ -239,6 +239,21 @@
       "documentType": "Document Type",
       "type": "Type",
       "endDate": "End Date"
+    },
+    "publicDocs": {
+      "createNewDirDialog": {
+        "title": "Create New Directory",
+        "name": "Name",
+        "namePlaceholder": "Enter name",
+        "password": "Password",
+        "passwordPlaceholder": "Enter password",
+        "permission": "Permission",
+        "public": "Public",
+        "private": "Private",
+        "users": "Users",
+        "usersPlaceholder": "Select users",
+        "file":"Attach logo or icon"
+      }
     }
   },
   "UserSettingDialog": {

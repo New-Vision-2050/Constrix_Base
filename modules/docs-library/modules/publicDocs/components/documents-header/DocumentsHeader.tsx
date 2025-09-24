@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import SearchBar from "./SearchBar";
 import ViewModeToggle from "./ViewModeToggle";
@@ -6,6 +6,7 @@ import { DocumentsHeaderProps } from "./types";
 import { Button } from "@/components/ui/button";
 import { ArrowDownNarrowWide, Download, PanelLeftOpen } from "lucide-react";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
+import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-dir/DialogContent";
 
 /**
  * DocumentsHeader component for document management interface
@@ -22,7 +23,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   isLoading = false,
 }) => {
   const { toggleShowItemDetials } = usePublicDocsCxt();
-
+  const [openDirDialog, setOpenDirDialog] = useState(false);
 
   return (
     <div
@@ -41,9 +42,9 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
         />
       </div>
       {/* Right side: Action buttons and View Mode Toggle */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         {/* Add button */}
-        <Button onClick={onAddClick}>إضافة</Button>
+        <Button onClick={()=>setOpenDirDialog(true)}>إضافة</Button>
         {/* Export button */}
         <Button variant="outline" className="bg-sidebar h-10" size="sm">
           <Download className="mr-2 h-4 w-4" />
@@ -63,11 +64,17 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           />
         )}
         {/* Details button */}
-        <Button onClick={toggleShowItemDetials} variant="outline" className="bg-sidebar h-10" size="sm">
+        <Button
+          onClick={toggleShowItemDetials}
+          variant="outline"
+          className="bg-sidebar h-10"
+          size="sm"
+        >
           <PanelLeftOpen className="mr-2 h-4 w-4" />
           تفاصيل
         </Button>
       </div>
+      <CreateNewDirDialogContent open={openDirDialog} onClose={() => setOpenDirDialog(false)} />
     </div>
   );
 };
