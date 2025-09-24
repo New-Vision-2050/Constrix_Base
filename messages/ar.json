@@ -261,6 +261,16 @@
         "status":"الحالة",
         "settings":"الاعدادات"
       },
+      "copyMoveDialog": {
+        "copyTitle": "نسخ الى",
+        "moveTitle": "نقل الى",
+        "save": "حفظ",
+        "label": "الى مجلد",
+        "cancel": "الغاء",
+        "selectFolder": "اختر مجلد",
+        "searchFolder": "بحث",
+        "noResults": "لا توجد نتائج"
+      },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
         "name": "اسم المجلد",

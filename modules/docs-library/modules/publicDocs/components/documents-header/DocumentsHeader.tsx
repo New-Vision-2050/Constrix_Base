@@ -10,6 +10,7 @@ import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-di
 import { DropdownButton } from "@/components/shared/dropdown-button";
 import CreateNewFileDialog from "../../views/public-docs-tab/create-new-file/CreateNewFileDialog";
 import { useTranslations } from "next-intl";
+import CopyMoveDialog from "../../views/public-docs-tab/copy-move-dialog";
 
 /**
  * DocumentsHeader component for document management interface
@@ -25,10 +26,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   className = "",
   isLoading = false,
 }) => {
-  const t = useTranslations("docs-library.publicDocs.header")
+  const t = useTranslations("docs-library.publicDocs.header");
   const { toggleShowItemDetials } = usePublicDocsCxt();
   const [openDirDialog, setOpenDirDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
+  const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
+  const [openCopyMoveDialog, setOpenCopyMoveDialog] = useState(false);
 
   return (
     <div
@@ -64,12 +67,28 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           ]}
         />
         {/* Export button */}
-        <Button variant="outline" className="bg-sidebar h-10" size="sm">
+        <Button
+          variant="outline"
+          className="bg-sidebar h-10"
+          size="sm"
+          onClick={() => {
+            setcpMvDialogType("copy");
+            setOpenCopyMoveDialog(true);
+          }}
+        >
           <Download className="mr-2 h-4 w-4" />
           {t("export")}
         </Button>
         {/* Sort button */}
-        <Button variant="outline" className="bg-sidebar h-10" size="sm">
+        <Button
+          variant="outline"
+          className="bg-sidebar h-10"
+          size="sm"
+          onClick={() => {
+            setcpMvDialogType("move");
+            setOpenCopyMoveDialog(true);
+          }}
+        >
           <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
           {t("sort")}
         </Button>
@@ -99,6 +118,11 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       <CreateNewFileDialog
         open={openFileDialog}
         onClose={() => setOpenFileDialog(false)}
+      />
+      <CopyMoveDialog
+        open={openCopyMoveDialog}
+        onClose={() => setOpenCopyMoveDialog(false)}
+        type={cpMvDialogType}
       />
     </div>
   );

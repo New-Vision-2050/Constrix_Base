@@ -262,6 +262,16 @@
         "status":"Status",
         "settings":"Settings"
       },
+      "copyMoveDialog": {
+        "copyTitle": "Copy",
+        "moveTitle": "Move",
+        "save": "Save",
+        "cancel": "Cancel",
+        "label":"To Directory",
+        "selectFolder": "Select Folder",
+        "searchFolder": "Search",
+        "noResults": "No Results"
+      },
       "createNewDirDialog": {
         "title": "Create New Directory",
         "name": "Name",
