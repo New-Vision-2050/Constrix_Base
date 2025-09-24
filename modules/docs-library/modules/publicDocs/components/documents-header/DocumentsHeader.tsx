@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownNarrowWide, Download, PanelLeftOpen } from "lucide-react";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-dir/DialogContent";
+import { DropdownButton } from "@/components/shared/dropdown-button";
+import CreateNewFileDialog from "../../views/public-docs-tab/create-new-file/CreateNewFileDialog";
 
 /**
  * DocumentsHeader component for document management interface
@@ -24,6 +26,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 }) => {
   const { toggleShowItemDetials } = usePublicDocsCxt();
   const [openDirDialog, setOpenDirDialog] = useState(false);
+  const [openFileDialog, setOpenFileDialog] = useState(false);
 
   return (
     <div
@@ -44,7 +47,19 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       {/* Right side: Action buttons and View Mode Toggle */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Add button */}
-        <Button onClick={()=>setOpenDirDialog(true)}>إضافة</Button>
+        <DropdownButton
+          triggerButton={<Button>إضافة</Button>}
+          items={[
+            {
+              text: "مجلد",
+              onClick: () => setOpenDirDialog(true),
+            },
+            {
+              text: "ملف",
+              onClick: () => setOpenFileDialog(true),
+            },
+          ]}
+        />
         {/* Export button */}
         <Button variant="outline" className="bg-sidebar h-10" size="sm">
           <Download className="mr-2 h-4 w-4" />
@@ -74,7 +89,14 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           تفاصيل
         </Button>
       </div>
-      <CreateNewDirDialogContent open={openDirDialog} onClose={() => setOpenDirDialog(false)} />
+      <CreateNewDirDialogContent
+        open={openDirDialog}
+        onClose={() => setOpenDirDialog(false)}
+      />
+      <CreateNewFileDialog
+        open={openFileDialog}
+        onClose={() => setOpenFileDialog(false)}
+      />
     </div>
   );
 };
