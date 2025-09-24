@@ -5,6 +5,7 @@ import ViewModeToggle from "./ViewModeToggle";
 import { DocumentsHeaderProps } from "./types";
 import { Button } from "@/components/ui/button";
 import { ArrowDownNarrowWide, Download, PanelLeftOpen } from "lucide-react";
+import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 
 /**
  * DocumentsHeader component for document management interface
@@ -20,6 +21,9 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   className = "",
   isLoading = false,
 }) => {
+  const { toggleShowItemDetials } = usePublicDocsCxt();
+
+
   return (
     <div
       className={cn(
@@ -59,7 +63,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           />
         )}
         {/* Details button */}
-        <Button variant="outline" className="bg-sidebar h-10" size="sm">
+        <Button onClick={toggleShowItemDetials} variant="outline" className="bg-sidebar h-10" size="sm">
           <PanelLeftOpen className="mr-2 h-4 w-4" />
           تفاصيل
         </Button>
