@@ -1,18 +1,18 @@
 import Image from "next/image";
 import Icon from "./Icon";
 import folderImg from "@/assets/icons/directory.png";
+import { usePublicDocsCxt } from "../../../../contexts/public-docs-cxt";
 
 interface ItemDetailsHeaderProps {
   title: string;
   subtitle?: string;
-  onClose?: () => void;
 }
 
 export default function ItemDetailsHeader({
   title,
   subtitle,
-  onClose,
 }: ItemDetailsHeaderProps) {
+  const { toggleShowItemDetials } = usePublicDocsCxt();
   return (
     <div className="flex items-center justify-between p-4 border-b border-gray-700">
       {/* Title and Icon */}
@@ -34,7 +34,7 @@ export default function ItemDetailsHeader({
         </button>
         {/* Close Icon */}
         <button
-          onClick={onClose}
+          onClick={toggleShowItemDetials}
           className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
           aria-label="Close"
         >
