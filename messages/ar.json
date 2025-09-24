@@ -240,6 +240,17 @@
       "endDate": "تاريخ النهاية"
     },
     "publicDocs": {
+      "header": {
+        "search": "بحث",
+        "add": "إضافة",
+        "file": "ملف",
+        "dir": "مجلد",
+        "export": "تصدير",
+        "sort": "ترتيب",
+        "grid": "شبكة",
+        "list": "قائمة",
+        "details": "تفاصيل"
+      },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
         "name": "اسم المجلد",
@@ -251,27 +262,27 @@
         "private": "خاصة",
         "users": "المستخدمين",
         "usersPlaceholder": "اختر المستخدمين",
-        "file":"ارفاق شعار او ايقونة",
+        "file": "ارفاق شعار او ايقونة",
         "submitButtonText": "حفظ",
         "cancelButtonText": "الغاء",
         "resetButtonText": "مسح"
       },
-      "createNewFileDialog":{
+      "createNewFileDialog": {
         "title": "إنشاء ملف جديد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
         "password": "كلمة المرور",
         "passwordPlaceholder": "ادخل كلمة المرور",
         "permission": "الصلاحية",
-        "createdAt":"تاريخ الانشاء",
-        "createdAtPlaceholder":"ادخل تاريخ الانشاء",
-        "endDate":"تاريخ الانتهاء",
-        "endDatePlaceholder":"ادخل تاريخ الانتهاء",
+        "createdAt": "تاريخ الانشاء",
+        "createdAtPlaceholder": "ادخل تاريخ الانشاء",
+        "endDate": "تاريخ الانتهاء",
+        "endDatePlaceholder": "ادخل تاريخ الانتهاء",
         "public": "عامة",
         "private": "خاصة",
         "users": "المستخدمين",
         "usersPlaceholder": "اختر المستخدمين",
-        "file":"ارفاق شعار او ايقونة",
+        "file": "ارفاق شعار او ايقونة",
         "submitButtonText": "حفظ",
         "cancelButtonText": "الغاء",
         "resetButtonText": "مسح"

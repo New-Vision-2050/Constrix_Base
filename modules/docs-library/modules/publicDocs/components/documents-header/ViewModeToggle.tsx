@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown, Grid3X3, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ViewModeToggleProps, ViewMode } from './types';
+import { useTranslations } from 'next-intl';
 
 /**
  * ViewModeToggle component for switching between grid and list view modes
@@ -14,6 +15,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
   disabled = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const t = useTranslations("docs-library.publicDocs.header")
 
   // Handle view mode selection
   const handleModeSelect = (mode: ViewMode) => {
@@ -62,7 +64,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             )}
           >
             <Grid3X3 className="h-4 w-4" />
-            <span>شبكة</span>
+            <span>{t("grid")}</span>
           </button>
           <button
             type="button"
@@ -74,7 +76,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             )}
           >
             <List className="h-4 w-4" />
-            <span>قائمة</span>
+            <span>{t("list")}</span>
           </button>
         </div>
       )}

@@ -9,6 +9,7 @@ import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-dir/DialogContent";
 import { DropdownButton } from "@/components/shared/dropdown-button";
 import CreateNewFileDialog from "../../views/public-docs-tab/create-new-file/CreateNewFileDialog";
+import { useTranslations } from "next-intl";
 
 /**
  * DocumentsHeader component for document management interface
@@ -24,6 +25,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   className = "",
   isLoading = false,
 }) => {
+  const t = useTranslations("docs-library.publicDocs.header")
   const { toggleShowItemDetials } = usePublicDocsCxt();
   const [openDirDialog, setOpenDirDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
@@ -42,20 +44,21 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           value={searchValue}
           onChange={onSearchChange}
           disabled={isLoading}
+          placeholder={t("search")}
         />
       </div>
       {/* Right side: Action buttons and View Mode Toggle */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Add button */}
         <DropdownButton
-          triggerButton={<Button>إضافة</Button>}
+          triggerButton={<Button>{t("add")}</Button>}
           items={[
             {
-              text: "مجلد",
+              text: t("dir"),
               onClick: () => setOpenDirDialog(true),
             },
             {
-              text: "ملف",
+              text: t("file"),
               onClick: () => setOpenFileDialog(true),
             },
           ]}
@@ -63,12 +66,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
         {/* Export button */}
         <Button variant="outline" className="bg-sidebar h-10" size="sm">
           <Download className="mr-2 h-4 w-4" />
-          تصدير
+          {t("export")}
         </Button>
         {/* Sort button */}
         <Button variant="outline" className="bg-sidebar h-10" size="sm">
           <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
-          ترتيب
+          {t("sort")}
         </Button>
         {/* View Mode Toggle */}
         {onViewModeChange && (
@@ -86,7 +89,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           size="sm"
         >
           <PanelLeftOpen className="mr-2 h-4 w-4" />
-          تفاصيل
+          {t("details")}
         </Button>
       </div>
       <CreateNewDirDialogContent

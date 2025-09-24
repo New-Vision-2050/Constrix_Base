@@ -241,6 +241,17 @@
       "endDate": "End Date"
     },
     "publicDocs": {
+      "header": {
+        "search": "Search",
+        "add": "Add",
+        "file": "File",
+        "dir": "Dir",
+        "export": "Export",
+        "sort": "Sort",
+        "grid": "Grid",
+        "list": "List",
+        "details": "Details"
+      },
       "createNewDirDialog": {
         "title": "Create New Directory",
         "name": "Name",
