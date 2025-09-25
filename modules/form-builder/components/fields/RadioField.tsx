@@ -3,6 +3,7 @@ import { RadioGroup, RadioGroupItem } from '@/modules/table/components/ui/radio-
 import { Label } from '@/modules/table/components/ui/label';
 import { FieldConfig } from '../../types/formTypes';
 import { cn } from '@/lib/utils';
+import { useLocale } from 'next-intl';
 
 interface RadioFieldProps {
   field: FieldConfig;
@@ -21,6 +22,10 @@ const RadioField: React.FC<RadioFieldProps> = ({
   onChange,
   onBlur,
 }) => {
+  // Get current locale for RTL support
+  const locale = useLocale();
+  const isRtl = locale === 'ar';
+
   // Memoize options to prevent unnecessary rerenders
   const options = useMemo(() => field.options || [], [field.options]);
 
@@ -38,7 +43,10 @@ const RadioField: React.FC<RadioFieldProps> = ({
         disabled={field.disabled}
       >
         {options.map((option) => (
-          <div key={option.value} className="flex items-center space-x-2">
+          <div key={option.value} className={cn(
+            "flex items-center gap-2",
+            isRtl ? "flex-row-reverse" : "flex-row"
+          )}>
             <RadioGroupItem
               id={`${field.name}-${option.value}`}
               value={option.value}

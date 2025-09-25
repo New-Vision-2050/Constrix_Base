@@ -25,4 +25,5 @@ export const ROUTER = {
     brokers: "/brokers",
     settings: "/crm-settings",
   },
+  DOCS_LIBRARY: "/docs-library",
 };

@@ -218,7 +218,114 @@
     "clients": "العملاء",
     "brokers": "الوسطاء",
     "ecommerce": "المتجر",
-    "CRMSettings": "اعدادات علاقات العملاء"
+    "CRMSettings": "اعدادات علاقات العملاء",
+    "docs-library": "مستندات والبيانات",
+    "docs-library-docs": "المستندات"
+  },
+  "docs-library": {
+    "title": "مكتبة المستندات",
+    "cards": {
+      "noData": "لا توجد بيانات للعرض"
+    },
+    "tabsTitles": {
+      "publicDocs": "المستندات العامة",
+      "empsDocs": "المستندات الموظفين",
+      "privateDocs": "المستندات الخاصة",
+      "inboxDocs": "المستندات الواردة"
+    },
+    "searchFields": {
+      "search": "فلتر البحث",
+      "documentType": "نوع المستند",
+      "type": "النوع",
+      "endDate": "تاريخ النهاية"
+    },
+    "publicDocs": {
+      "header": {
+        "search": "بحث",
+        "add": "إضافة",
+        "file": "ملف",
+        "dir": "مجلد",
+        "export": "تصدير",
+        "sort": "ترتيب",
+        "grid": "شبكة",
+        "list": "قائمة",
+        "details": "تفاصيل",
+        "share": "مشاركة",
+        "copy": "نسخ الرابط",
+        "requestFile": "طلب ملف",
+        "delete": "حذف",
+        "download": "تحميل",
+        "favorite": "المفضلة",
+        "move": "نقل"
+      },
+      "table":{
+        "file_name":"الملف",
+        "sorted_by":"تم التعديل بواسطة",
+        "file_size":"حجم الملف",
+        "docs_count":"عدد المستندات",
+        "file_type":"سمة الملف",
+        "last_activity":"اخر نشاط",
+        "status":"الحالة",
+        "settings":"الاعدادات"
+      },
+      "copyMoveDialog": {
+        "copyTitle": "نسخ الى",
+        "moveTitle": "نقل الى",
+        "save": "حفظ",
+        "label": "الى مجلد",
+        "cancel": "الغاء",
+        "selectFolder": "اختر مجلد",
+        "searchFolder": "بحث",
+        "noResults": "لا توجد نتائج"
+      },
+      "shareDialog": {
+        "title": "مشاركة",
+        "save": "حفظ",
+        "copy": "نسخ الرابط",
+        "cancel": "الغاء",
+        "selectFolder": "اختر مجلد",
+        "searchFolder": "بحث",
+        "noResults": "لا توجد نتائج",
+        "searchUsers": "بحث المستخدمين",
+        "notes":"الرجاء كتابة البريد الالكتروني الذي تود مشاركة الملفات معه"
+      },
+      "createNewDirDialog": {
+        "title": "إنشاء مجلد جديد",
+        "name": "اسم المجلد",
+        "namePlaceholder": "ادخل اسم المجلد",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "ادخل كلمة المرور",
+        "permission": "الصلاحية",
+        "public": "عامة",
+        "private": "خاصة",
+        "users": "المستخدمين",
+        "usersPlaceholder": "اختر المستخدمين",
+        "file": "ارفاق شعار او ايقونة",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "الغاء",
+        "resetButtonText": "مسح"
+      },
+      "createNewFileDialog": {
+        "title": "إنشاء ملف جديد",
+        "name": "اسم المجلد",
+        "namePlaceholder": "ادخل اسم المجلد",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "ادخل كلمة المرور",
+        "permission": "الصلاحية",
+        "createdAt": "تاريخ الانشاء",
+        "createdAtPlaceholder": "ادخل تاريخ الانشاء",
+        "endDate": "تاريخ الانتهاء",
+        "endDatePlaceholder": "ادخل تاريخ الانتهاء",
+        "public": "عامة",
+        "private": "خاصة",
+        "users": "المستخدمين",
+        "usersPlaceholder": "اختر المستخدمين",
+        "file": "ارفاق شعار او ايقونة",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "الغاء",
+        "resetButtonText": "مسح"
+      }
+    }
   },
   "UserSettingDialog": {
     "title": "اعدادات الموظف",

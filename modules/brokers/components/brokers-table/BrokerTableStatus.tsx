@@ -39,7 +39,7 @@ export default function BrokerTableStatus({ broker }: { broker: Broker }) {
         inactiveLabel={t("Inactive")}
         checked={broker.status == 1 ? true : false}
         onChange={handleChange}
-        disabled={loading || !can(PERMISSIONS.clients.clientsPage.update)}
+        disabled={loading || !can(PERMISSIONS.crm.clients.update)}
       />
     </>
   );

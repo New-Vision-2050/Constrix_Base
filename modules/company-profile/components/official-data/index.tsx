@@ -13,15 +13,49 @@ import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { getCookie } from "cookies-next";
+import { useState, useEffect } from "react";
 
 const OfficialData = ({ id }: { id?: string }) => {
   const { company_id } = useParams();
-  console.log("idBranch", id);
+  
+  // State to track cookie changes
+  const [cookieBranchId, setCookieBranchId] = useState<string | undefined>();
+
+  // Monitor cookie changes
+  useEffect(() => {
+    const checkCookieChanges = () => {
+      const currentCookieValue = getCookie("current-branch-id");
+      // Handle both sync and async cookie values
+      const cookieValue = typeof currentCookieValue === 'string' 
+        ? currentCookieValue 
+        : undefined;
+      
+      if (cookieValue !== cookieBranchId) {
+        setCookieBranchId(cookieValue);
+      }
+    };
+
+    // Initial check
+    checkCookieChanges();
+
+    // Check for cookie changes every 100ms
+    const interval = setInterval(checkCookieChanges, 100);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [cookieBranchId]);
+
+  console.log("cookieBranchId", cookieBranchId);
+
   const { data, isPending, isSuccess } = useQuery({
-    queryKey: ["main-company-data", id, company_id],
+    queryKey: ["main-company-data", id, company_id, cookieBranchId],
     queryFn: async () => {
+      const _url = Boolean(cookieBranchId)
+        ? "/companies/current-auth-company?branch_id=" + cookieBranchId
+        : "/companies/current-auth-company";
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
-        "/companies/current-auth-company",
+        _url,
         {
           params: {
             ...(id && { branch_id: id }),
