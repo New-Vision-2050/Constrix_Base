@@ -5,6 +5,7 @@ import { useCurrentCompany } from '@/modules/company-profile/components/shared/c
 import { useLocale } from 'next-intl'
 import BranchOrganizationStructure
   from '@/modules/organizational-structure/components/company-organization-structure/chart'
+import { truncateString } from '@/utils/truncate-string';
 
 const CompanyOrganizationStructure = () => {
 
@@ -39,7 +40,7 @@ const CompanyOrganizationStructure = () => {
               <div className="flex text-sm items-start text-start gap-2 grow">
                 <MapPin size={18} className="shrink-0" />
                 <p className="truncate">
-                  {tab.name}
+                  {truncateString(tab.name, 15)}
                 </p>
               </div>
               <CircleCheck
