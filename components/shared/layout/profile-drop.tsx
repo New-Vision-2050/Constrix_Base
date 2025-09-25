@@ -3,11 +3,12 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, UserIcon } from "lucide-react";
+import { CheckIcon, ChevronDown, UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteCookie, getCookie } from "cookies-next"; // Ensure you have this package installed
 import { useAuthStore } from "@/modules/auth/store/use-auth";
@@ -39,6 +40,7 @@ const ProfileDrop = () => {
   const cookieValue = getCookie("current-branch-obj");
   const branchObj = cookieValue ? JSON.parse(cookieValue as string) : null;
   const branchId = branchObj?.id;
+  const cookieBranchId = getCookie("current-branch-id");
 
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -104,6 +106,15 @@ const ProfileDrop = () => {
             ? index === data?.payload?.branches?.length - 1
             : undefined,
           func: () => {
+            // get branch id from cookie if it exists
+            const branchId = getCookie("current-branch-id");
+            // if branch id exists and it is the same as the current branch id, delete it
+            if (branchId && branchId == branch.id) {
+              deleteCookie("current-branch-id");
+            } else {
+              setCookie("current-branch-id", branch.id);
+            }
+            
             setCookie(
               "current-branch-obj",
               JSON.stringify({
@@ -130,9 +141,7 @@ const ProfileDrop = () => {
       )}
       <DropdownMenu dir="rtl" open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
-            className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none"
-          >
+          <Button className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none">
             {user?.name}
             <ChevronDown />
           </Button>
@@ -172,6 +181,9 @@ const ProfileDrop = () => {
                     >
                       {branch.icon}
                       {branch.label}
+                      {cookieBranchId == branch.id && (
+                        <CheckIcon className="bg-green-600" />
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuSubContent>
@@ -183,7 +195,7 @@ const ProfileDrop = () => {
           {logoutMenuItem && (
             <>
               <DropdownMenuItem
-              className='bg-sidebar'
+                className="bg-sidebar"
                 onClick={() => handleClose(logoutMenuItem.func)}
               >
                 {logoutMenuItem.icon}
