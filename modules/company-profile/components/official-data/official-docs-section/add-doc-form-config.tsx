@@ -26,7 +26,7 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
             label: "نوع المستند",
             placeholder: "نوع المستند",
             dynamicOptions: {
-              url: `${baseURL}/company_registration_types`,
+              url: `${baseURL}/document_types`,
               valueField: "id_type",
               labelField: "name",
               searchParam: "name",
@@ -44,16 +44,23 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
             ],
           },
           {
-            name: "description",
-            label: "الوصف",
+            name: "name",
+            label: "اسم المستند",
             type: "text",
-            placeholder: "ادخل الوصف",
+            placeholder: "ادخل اسم المستند",
+            required: true,
             validation: [
               {
                 type: "required",
                 message: "ادخل الوصف",
               },
             ],
+          },
+          {
+            name: "description",
+            label: "الوصف",
+            type: "text",
+            placeholder: "ادخل الوصف",
           },
           {
             name: "document_number",
