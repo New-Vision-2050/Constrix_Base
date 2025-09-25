@@ -254,7 +254,7 @@ export const UsersConfigV2 = (options?: {
         icon: <GearIcon className="w-4 h-4" />,
         action: "complete-profile",
         dialogComponent: ChooseUserCompany,
-        disabled: false,
+        disabled: options?.canEdit,
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
@@ -267,7 +267,7 @@ export const UsersConfigV2 = (options?: {
         icon: <GearIcon className="w-4 h-4" />,
         action: "user-settings",
         dialogComponent: UserSettingDialog,
-        disabled: false,
+        disabled: options?.canView,
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
