@@ -525,6 +525,16 @@
         "managerNote": "Company Manager",
         "branchManager": "Branch Manager :"
       }
+    },
+    "officialDocs": {
+      "docsSettingsDialog": {
+        "title": "Document Settings",
+        "addDoc": "Add Document",
+        "notifySettings": "Notification Settings",
+        "shareSettings": "Share Settings",
+        "cancel": "Cancel",
+        "save": "Save"
+      }
     }
   },
   "CompanyStructure": {

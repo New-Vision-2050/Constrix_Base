@@ -521,6 +521,16 @@
           "branchManager": "مدير الفرع :"
         }
       }
+    },
+    "officialDocs": {
+      "docsSettingsDialog": {
+        "title": "اعدادات المستند",
+        "addDoc": "اضافة مستند",
+        "notifySettings": "اعدادات الاشعارات",
+        "shareSettings": "اعدادات المشاركة",
+        "cancel": "الغاء",
+        "save": "حفظ"
+      }
     }
   },
   "CompanyStructure": {

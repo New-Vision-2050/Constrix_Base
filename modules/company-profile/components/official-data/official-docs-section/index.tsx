@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import DocsSettingsDialog from "./docs-settings-dialog";
 
 const OfficialDocsSection = ({
   id,
@@ -56,10 +57,16 @@ const OfficialDocsSection = ({
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
   const [isOpenAddDoc, handleOpenAddDoc, handleCloseAddDoc] = useModal();
 
+  const [isOpenSettings, handleOpenSettings, handleCloseSettings] = useModal();
+
   const dropdownItems = [
     {
       label: "اضافة مستند رسمي",
       onClick: handleOpenAddDoc,
+    },
+    {
+      label: "اعدادات المستندات",
+      onClick: handleOpenSettings,
     },
   ];
 
@@ -80,9 +87,7 @@ const OfficialDocsSection = ({
             !!companyOfficialDocuments && companyOfficialDocuments.length > 0
           }
           secondTitle={
-            <Can
-              check={[PERMISSIONS.companyProfile.officialDocument.update]}
-            >
+            <Can check={[PERMISSIONS.companyProfile.officialDocument.update]}>
               <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost">
@@ -91,7 +96,10 @@ const OfficialDocsSection = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {dropdownItems.map((item, index) => (
-                    <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                    <DropdownMenuItem
+                      key={index}
+                      onClick={() => item.onClick()}
+                    >
                       {item.label}
                     </DropdownMenuItem>
                   ))}
@@ -121,6 +129,7 @@ const OfficialDocsSection = ({
         isOpen={isOpenAddDoc}
         onOpenChange={handleCloseAddDoc}
       />
+      <DocsSettingsDialog open={isOpenSettings} onClose={handleCloseSettings} />
     </>
   );
 };
