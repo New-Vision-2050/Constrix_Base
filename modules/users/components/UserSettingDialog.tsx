@@ -11,24 +11,38 @@ import { UserTableRow } from "@/modules/table/utils/configs/usersTableConfig";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import useUserData from "@/hooks/use-user-data";
 
 interface PropsT {
   open: boolean;
   onClose: () => void;
   user: UserTableRow;
+  title?: string;
+  inCompany?: boolean;
 }
 
-const UserSettingDialog: React.FC<PropsT> = ({ open, onClose, user }) => {
+const UserSettingDialog: React.FC<PropsT> = ({
+  open,
+  onClose,
+  user,
+  title,
+  inCompany,
+}) => {
   // declare and define vars and state
+  const authUser = useUserData();
   const t = useTranslations("UserSettingDialog");
   const [loading, setLoading] = useState(false);
 
+  console.log("user4444", user);
   // declare and define functions
   const handleSendLink = async () => {
     try {
       setLoading(true);
+      let _user_id = user.user_id;
       // check if user has user_id
-      if (user.user_id == null) {
+      if (inCompany) {
+        _user_id = authUser?.data?.payload?.id ?? "";
+      } else if (user.user_id == null) {
         // employee in other company
         toast.warning(t("employeeInOtherCompany"));
         onClose();
@@ -37,7 +51,7 @@ const UserSettingDialog: React.FC<PropsT> = ({ open, onClose, user }) => {
 
       // send link to user
       await apiClient.post(`${baseURL}/users/send-email-company-link`, {
-        user_id: user.user_id ?? "user_id undefined",
+        user_id: _user_id ?? "user_id undefined",
       });
       //  show toast
       toast.success(t("sendLinkSuccess"));
@@ -63,7 +77,7 @@ const UserSettingDialog: React.FC<PropsT> = ({ open, onClose, user }) => {
             >
               ✕
             </button>
-            <p className="text-lg font-bold">{t("title")}</p>
+            <p className="text-lg font-bold">{title ?? t("title")}</p>
           </DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
