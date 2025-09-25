@@ -45,6 +45,7 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
             {doc.document_type}
           </div>
         </td>
+        <td className="py-3 px-3 border-b">{doc.name}</td>
         <td className="py-3 px-3 border-b">{doc.description}</td>
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
@@ -187,7 +188,8 @@ const DocsTable = ({
       <thead>
         <tr>
           <td className="text-start p-3 border-b">نوع المستند</td>
-          <td className="text-start p-3 border-b">الوصف</td>
+          <td className="text-start p-3 border-b">أسم المستند</td>
+          <td className="text-start p-3 border-b">وصف المستند</td>
           <td className="text-start p-3 border-b">رقم المستند</td>
           <td className="text-start p-3 border-b">تاريخ الاصدار</td>
           <td className="text-start p-3 border-b">تاريخ الانتهاء</td>
