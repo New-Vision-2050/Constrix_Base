@@ -12,7 +12,7 @@ export default function ClientsEntryPoint() {
   return (
     <ClientsDataCxtProvider>
       <CreateClientCxtProvider>
-        <Can check={[PERMISSIONS.clients.clientsPage.view]}>
+        <Can check={[PERMISSIONS.crm.clients.view]}>
           <div className="flex flex-col gap-4 p-5">
             <ClientsStatisticsCards />
 
@@ -20,7 +20,7 @@ export default function ClientsEntryPoint() {
               config={getClientTableConfig()}
               searchBarActions={
                 <div className="flex items-center gap-3">
-                  <Can check={[PERMISSIONS.clients.clientsPage.create]}>
+                  <Can check={[PERMISSIONS.crm.clients.create]}>
                     <CreateClientSheet />
                   </Can>
                 </div>

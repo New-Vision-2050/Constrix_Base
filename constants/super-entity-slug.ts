@@ -7,4 +7,5 @@ export const SUPER_ENTITY_SLUG = {
   POWERS: "powers",
   CRM: "crm",
   STORES: "stores",
+  DOCS_LIBRARY: "docs-library",
 };

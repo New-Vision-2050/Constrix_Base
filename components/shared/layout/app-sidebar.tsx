@@ -7,6 +7,8 @@ import {
   UserIcon,
   Users,
   Settings,
+  FolderClosed,
+  LibraryBig,
 } from "lucide-react";
 // import { NavCompanies } from "@/components/shared/layout/nav-companies";
 import {
@@ -131,8 +133,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
 
     console.log(
       "Breakpoint101505",
-      PERMISSIONS.clients.clientsPage,
-      can([PERMISSIONS.clients.clientsPage.view])
+      PERMISSIONS.crm.clients,
+      can([PERMISSIONS.crm.clients.view])
     );
     const data: Project[] = [
       // companies
@@ -240,7 +242,25 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.clients.clientsPage.view]),
+            show:
+              !isCentralCompany && can([PERMISSIONS.crm.clients.view]),
+          },
+        ],
+      },
+      // docs library
+      {
+        name: t("Sidebar.docs-library"),
+        slug: SUPER_ENTITY_SLUG.DOCS_LIBRARY,
+        icon: LibraryBig,
+        urls: [ROUTER.DOCS_LIBRARY],
+        isActive: pageName === ROUTER.DOCS_LIBRARY,
+        sub_entities: [
+          {
+            name: t("Sidebar.docs-library-docs"),
+            url: ROUTER.DOCS_LIBRARY,
+            icon: FolderClosed,
+            isActive: pageName === ROUTER.DOCS_LIBRARY,
+            show: !isCentralCompany,
           },
         ],
       },

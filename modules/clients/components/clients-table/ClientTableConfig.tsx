@@ -111,7 +111,7 @@ export const getClientTableConfig = () => {
     defaultSortDirection: "asc" as const,
     enableSorting: true,
     enablePagination: true,
-    enableExport: can(PERMISSIONS.clients.clientsPage.export),
+    enableExport: can(PERMISSIONS.crm.clients.export),
     defaultItemsPerPage: 10,
     enableSearch: true,
     enableColumnSearch: true,
