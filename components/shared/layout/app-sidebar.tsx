@@ -260,9 +260,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.DOCS_LIBRARY,
             icon: FolderClosed,
             isActive: pageName === ROUTER.DOCS_LIBRARY,
-            show: true, // Temporary true in development phease
-            // this project will be in other companies like CRM
-            // show: !isCentralCompany && can([PERMISSIONS.crm.clients.view]),
+            show: !isCentralCompany,
           },
         ],
       },
