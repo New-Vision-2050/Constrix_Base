@@ -34,6 +34,7 @@ export default function SettingsTypesBtns() {
             ? "default"
             : "outline"
         }
+        disabled={true}
         onClick={() =>
           handleChangeSettingsBtnType(SettingsBtnsTypes.ShareSettings)
         }
