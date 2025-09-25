@@ -249,12 +249,25 @@ export const UsersConfigV2 = (options?: {
     formConfig: GetCompanyUserFormConfig(t),
     executions: [
       {
-        // label: "اكمال الملف الشخصي",
+        id: "complete-profile",
+        label: "اكمال الملف الشخصي",
+        icon: <GearIcon className="w-4 h-4" />,
+        action: "complete-profile",
+        dialogComponent: ChooseUserCompany,
+        disabled: false,
+        dialogProps: (row: UserTableRow) => {
+          return {
+            user: row,
+          };
+        },
+      },
+      {
+        id: "user-settings",
         label: "اعدادات الموظف",
         icon: <GearIcon className="w-4 h-4" />,
-        action: "openDialog",
-        dialogComponent: UserSettingDialog, // Your custom dialog component
-        disabled: true,
+        action: "user-settings",
+        dialogComponent: UserSettingDialog,
+        disabled: false,
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
