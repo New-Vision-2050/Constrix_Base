@@ -16,7 +16,7 @@ import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
 import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
 import {
@@ -24,6 +24,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { truncateString } from "@/utils/truncate-string";
 // import { useLogout } from '@/modules/auth/store/mutations'
 
 interface menuItem {
@@ -47,6 +48,8 @@ const ProfileDrop = () => {
   const { data, isSuccess } = useCurrentCompany();
   const [open, setOpen] = useState<boolean>(false);
   const [branches, setBranches] = useState<menuItem[]>([]);
+
+  console.log("branchObj", branchObj);
 
   // main items without branches and logout
   const mainMenuItems: menuItem[] = [
@@ -114,7 +117,7 @@ const ProfileDrop = () => {
             } else {
               setCookie("current-branch-id", branch.id);
             }
-            
+
             setCookie(
               "current-branch-obj",
               JSON.stringify({
@@ -143,6 +146,9 @@ const ProfileDrop = () => {
         <DropdownMenuTrigger asChild>
           <Button className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none">
             {user?.name}
+            {branchObj?.name && (
+              <span className="text-xs text-gray-500">({truncateString(branchObj.name, 12)})</span>
+            )}
             <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
