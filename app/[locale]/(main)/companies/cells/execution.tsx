@@ -165,29 +165,17 @@ const Execution = ({
     if (typeof action === "function") {
       action(row);
     } else {
-      // Close all other dialogs first, then open the selected one
-      setActionState((prev) => {
-        const newState = { ...prev };
-        
-        // Close all dialogs first
-        Object.keys(newState).forEach(key => {
-          if (newState[key]) {
-            newState[key] = { ...newState[key], open: false };
-          }
-        });
-        
-        // Open only the selected dialog
-        newState[action] = {
-          ...newState[action],
+      setActionState((prev) => ({
+        ...prev,
+        [action]: {
+          ...prev[action],
           open: true,
           url:
             action === "delete"
               ? `${deleteUrl ? deleteUrl : formConfig?.apiUrl}/${row.id}`
-              : newState[action]?.url,
-        };
-        
-        return newState;
-      });
+              : prev[action]?.url,
+        },
+      }));
     }
   };
 
@@ -213,7 +201,7 @@ const Execution = ({
               key={index}
               onClick={() => handleMenuItemClick(item.action)}
               className={item.color ? `text-${item.color}` : ""}
-              disabled={item.disabled || false}
+              disabled={!item.disabled || false}
             >
               {item.icon && <span className="me-2">{item.icon}</span>}
               {item.label}
@@ -271,13 +259,11 @@ const Execution = ({
           return null;
         }
 
-        // Create unique key using action and row id to prevent conflicts
-        const uniqueKey = `dialog-${item.action}-${row.id}-${index}`;
 
         // Render the custom dialog component
         const DialogComponent = item.dialogComponent;
         return (
-          <div key={uniqueKey}>
+          <div key={`dialog-${index}`}>
             {typeof DialogComponent === "function" ? (
               <DialogComponent
                 {...(typeof item.dialogProps === "function"

@@ -46,8 +46,6 @@ const OfficialData = ({ id }: { id?: string }) => {
     return () => clearInterval(interval);
   }, [cookieBranchId]);
 
-  console.log("cookieBranchId", cookieBranchId);
-
   const { data, isPending, isSuccess } = useQuery({
     queryKey: ["main-company-data", id, company_id, cookieBranchId],
     queryFn: async () => {
