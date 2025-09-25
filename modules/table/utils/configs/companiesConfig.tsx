@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { ROUTER } from "@/router";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 
 // Define types for the company data
 interface CompanyData {
@@ -28,7 +29,7 @@ interface CompanyData {
 export const CompaniesConfig = () => {
   const t = useTranslations("Companies");
   const router = useRouter();
-  const {can} = usePermissions();
+  const { can } = usePermissions();
 
   return {
     url: `${baseURL}/companies`,
@@ -143,8 +144,22 @@ export const CompaniesConfig = () => {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
         action: (row: CompanyData) =>
-        router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
+          router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
         disabled: can(PERMISSIONS.company.view),
+      },
+      {
+        id: "send-link",
+        label: "ارسال رابط",
+        icon: <GearIcon className="w-4 h-4" />,
+        action: "send-link",
+        dialogComponent: UserSettingDialog,
+        disabled: can(PERMISSIONS.company.view),
+        dialogProps: (row: CompanyData) => {
+          return {
+            user: row,
+            inCompany: true,
+          };
+        },
       },
     ],
     executionConfig: {

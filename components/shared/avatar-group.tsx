@@ -24,9 +24,7 @@ export const AvatarGroup = ({
   return (
     <Avatar {...props}>
       {src ? <AvatarImage src={src} alt={alt || fullName || ""} /> : null}
-      <div className="flex flex-col items-center gap-2">
-        <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
-      </div>
+      <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
     </Avatar>
   );
 };

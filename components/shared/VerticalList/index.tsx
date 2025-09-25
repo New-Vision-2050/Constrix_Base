@@ -3,6 +3,7 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import InfoIcon from "@/public/icons/InfoIcon";
 import { useVerticalListCxt, VerticalListCxtProvider } from "./VerticalListCxt";
 import { CircleCheckIcon } from "lucide-react";
+import { truncateString } from "@/utils/truncate-string";
 type PropsT = {
   items: UserProfileNestedTab[];
   defaultValue?: UserProfileNestedTab;
@@ -42,7 +43,9 @@ const VerticalButton = ({ btn }: { btn: UserProfileNestedTab }) => {
       >
         <div className="flex gap-2">
           {btn.icon}
-          <p className="text-md font-semibold">{btn.title}</p>
+          <p className="text-md font-semibold">
+            {truncateString(btn.title, 15)}
+          </p>
         </div>
         {btn.ignoreValidation !== true && (
           <>

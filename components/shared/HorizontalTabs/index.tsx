@@ -24,6 +24,7 @@ export default function HorizontalTabs({
   const locale = useLocale();
   const isRtl = locale === "ar";
   const bgColor = bgStyleApproach ? "bg-sidebar" : "bg-transparent";
+  const justifyContent = list?.length > 3 ? "justify-between" : "justify-start gap-4";
   // declare and define component helper methods.
   // return component ui.
   return (
@@ -33,7 +34,7 @@ export default function HorizontalTabs({
       className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
       <TabsList
-        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center justify-between ${additionalClassiess}`}
+        className={`${bgColor} min-h-14 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center ${justifyContent} ${additionalClassiess}`}
       >
         <TabsTriggerList
           onTabClick={onTabClick}
