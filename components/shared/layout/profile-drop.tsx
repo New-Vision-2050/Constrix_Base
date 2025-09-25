@@ -3,11 +3,12 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, UserIcon } from "lucide-react";
+import { CheckIcon, ChevronDown, UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteCookie, getCookie } from "cookies-next"; // Ensure you have this package installed
 import { useAuthStore } from "@/modules/auth/store/use-auth";
@@ -15,7 +16,7 @@ import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
 import { useRouter } from "next/navigation";
 import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 import { setCookie } from "cookies-next";
 import CompanyIcon from "@/public/icons/company";
 import {
@@ -23,6 +24,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { truncateString } from "@/utils/truncate-string";
 // import { useLogout } from '@/modules/auth/store/mutations'
 
 interface menuItem {
@@ -39,12 +41,15 @@ const ProfileDrop = () => {
   const cookieValue = getCookie("current-branch-obj");
   const branchObj = cookieValue ? JSON.parse(cookieValue as string) : null;
   const branchId = branchObj?.id;
+  const cookieBranchId = getCookie("current-branch-id");
 
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const { data, isSuccess } = useCurrentCompany();
   const [open, setOpen] = useState<boolean>(false);
   const [branches, setBranches] = useState<menuItem[]>([]);
+
+  console.log("branchObj", branchObj);
 
   // main items without branches and logout
   const mainMenuItems: menuItem[] = [
@@ -104,6 +109,15 @@ const ProfileDrop = () => {
             ? index === data?.payload?.branches?.length - 1
             : undefined,
           func: () => {
+            // get branch id from cookie if it exists
+            const branchId = getCookie("current-branch-id");
+            // if branch id exists and it is the same as the current branch id, delete it
+            if (branchId && branchId == branch.id) {
+              deleteCookie("current-branch-id");
+            } else {
+              setCookie("current-branch-id", branch.id);
+            }
+
             setCookie(
               "current-branch-obj",
               JSON.stringify({
@@ -130,10 +144,11 @@ const ProfileDrop = () => {
       )}
       <DropdownMenu dir="rtl" open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
-          <Button
-            className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none"
-          >
+          <Button className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none">
             {user?.name}
+            {branchObj?.name && (
+              <span className="text-xs text-gray-500">({truncateString(branchObj.name, 12)})</span>
+            )}
             <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
@@ -172,6 +187,9 @@ const ProfileDrop = () => {
                     >
                       {branch.icon}
                       {branch.label}
+                      {cookieBranchId == branch.id && (
+                        <CheckIcon className="bg-green-600" />
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuSubContent>
@@ -183,7 +201,7 @@ const ProfileDrop = () => {
           {logoutMenuItem && (
             <>
               <DropdownMenuItem
-              className='bg-sidebar'
+                className="bg-sidebar"
                 onClick={() => handleClose(logoutMenuItem.func)}
               >
                 {logoutMenuItem.icon}
