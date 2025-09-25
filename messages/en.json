@@ -530,6 +530,7 @@
       "docsSettingsDialog": {
         "title": "Document Settings",
         "addDoc": "Add Document",
+        "docName": "Document Type Name",
         "notifySettings": "Notification Settings",
         "shareSettings": "Share Settings",
         "cancel": "Cancel",

@@ -4,10 +4,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useLocale, useTranslations } from "next-intl";
 import DocsSettingsContentManager from "./ContentManager";
 import { DocsSettingsCxtProvider } from "./DocsSettingsCxt";
@@ -44,13 +42,6 @@ export default function DocsSettingsDialog({ open, onClose }: PropsType) {
         <DocsSettingsCxtProvider>
           <DocsSettingsContentManager />
         </DocsSettingsCxtProvider>
-
-        <DialogFooter className="w-full flex items-center gap-4 justify-between">
-          <Button onClick={onClose}>{t("save")}</Button>
-          <Button variant="outline" onClick={onClose}>
-            {t("cancel")}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

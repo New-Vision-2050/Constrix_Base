@@ -528,6 +528,7 @@
         "addDoc": "اضافة مستند",
         "notifySettings": "اعدادات الاشعارات",
         "shareSettings": "اعدادات المشاركة",
+        "docName": "اسم نوع المستند",
         "cancel": "الغاء",
         "save": "حفظ"
       }
