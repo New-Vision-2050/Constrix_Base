@@ -83,5 +83,5 @@ export const PERMISSIONS = {
     clients: create("CLIENT"),
   },
   // docs library
-  library: {},
+  // library: {},
 };
