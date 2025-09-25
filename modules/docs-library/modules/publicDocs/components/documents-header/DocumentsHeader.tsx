@@ -25,6 +25,7 @@ import CreateNewFileDialog from "../../views/public-docs-tab/create-new-file/Cre
 import { useTranslations } from "next-intl";
 import CopyMoveDialog from "../../views/public-docs-tab/copy-move-dialog";
 import ShareDialog from "../../views/public-docs-tab/share-dialog";
+import useCurrentAuthCompany from "@/hooks/use-auth-company";
 
 /**
  * DocumentsHeader component for document management interface

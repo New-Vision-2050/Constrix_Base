@@ -77,9 +77,11 @@ export const PERMISSIONS = {
       publicHoliday: create("PUBLIC_HOLIDAY"),
     },
   },
-  // clients
-  clients: {
+  // CRM
+  crm: {
     broker: create("BROKER"),
-    clientsPage: create("CLIENT"),
+    clients: create("CLIENT"),
   },
+  // docs library
+  library: {},
 };

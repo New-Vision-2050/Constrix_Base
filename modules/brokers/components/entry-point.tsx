@@ -12,7 +12,7 @@ export default function BrokersEntryPoint() {
   return (
     <BrokersDataCxtProvider>
       <CreateBrokerCxtProvider>
-        <Can check={[PERMISSIONS.clients.clientsPage.view]}>
+        <Can check={[PERMISSIONS.crm.clients.view]}>
           <div className="flex flex-col gap-4 p-5">
             <BrokersStatisticsCards />
 
@@ -20,7 +20,7 @@ export default function BrokersEntryPoint() {
               config={getBrokerTableConfig()}
               searchBarActions={
                 <div className="flex items-center gap-3">
-                  <Can check={[PERMISSIONS.clients.clientsPage.create]}>
+                  <Can check={[PERMISSIONS.crm.clients.create]}>
                     <CreateBrokerSheet />
                   </Can>
                 </div>

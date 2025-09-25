@@ -39,7 +39,7 @@ export default function ClientTableStatus({ client }: { client: Client }) {
         inactiveLabel={t("Inactive")}
         checked={client.status == 1 ? true : false}
         onChange={handleChange}
-        disabled={loading || !can(PERMISSIONS.clients.clientsPage.update)}
+        disabled={loading || !can(PERMISSIONS.crm.clients.update)}
       />
     </>
   );
