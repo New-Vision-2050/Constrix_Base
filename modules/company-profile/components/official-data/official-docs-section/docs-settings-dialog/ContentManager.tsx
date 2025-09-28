@@ -1,6 +1,6 @@
 import SettingsTypesBtns from "./SettingsTypesBtns";
 import AddDocView from "./AddDocumentType/AddDocView";
-import NotifySettingsView from "./NotifySettingsView";
+import NotifySettingsView from "./NotifySettings/NotifySettingsView";
 import ShareSettingsView from "./ShareSettingsView";
 import { SettingsBtnsTypes, useDocsSettingsCxt } from "./context/DocsSettingsCxt";
 

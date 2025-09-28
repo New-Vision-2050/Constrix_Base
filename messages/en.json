@@ -544,6 +544,33 @@
           "title": "Failed to load document types",
           "description": "Please check your connection and try again.",
           "retry": "Retry"
+        },
+        "notifyLoadingCase": "Loading notification settings...",
+        "notifyErrorCase": {
+          "title": "Failed to load notification settings",
+          "description": "Please check your connection and try again.",
+          "retry": "Retry"
+        },
+        "form": {
+          "title": "Notification Settings",
+          "type": "Notification Type (Arabic)*",
+          "typePlaceholder": "Select notification type",
+          "email": "Email",
+          "emailPlaceholder": "Enter email",
+          "emailInvalid": "Email is invalid",
+          "sms": "SMS",
+          "both": "Both",
+          "phone": "Phone",
+          "phonePlaceholder": "Enter phone number",
+          "phoneInvalid": "Phone number is invalid",
+          "reminder_type": "Number of reminder repetitions",
+          "reminder_typePlaceholder": "Select number of reminder repetitions",
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "message": "Message",
+          "messagePlaceholder": "Enter message",
+          "submitButtonText": "Save Settings"
         }
       }
     }
