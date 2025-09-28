@@ -30,7 +30,7 @@ import {
 import PDFIcon from "@/assets/icons/PDF.png";
 
 // Row component
-const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
+const DocTableRow = ({ doc, id, onSuccess }: { doc: CompanyDocument; id?: string, onSuccess?: () => void }) => {
   const [isOpenDelete, handleOpenDelete, handleCloseDelete] = useModal();
   const [isOpenShow, handleOpenShow, handleCloseShow] = useModal();
 
@@ -121,7 +121,7 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
             <SheetFormBuilder
-              config={updateDocsFormConfig(doc, id)}
+              config={updateDocsFormConfig(doc, id, onSuccess)}
               trigger={
                 <button className="py-1 px-3 bg-[#72E128]/20 text-[#72E128] rounded-full">
                   تحديث
@@ -178,9 +178,11 @@ const DocTableRow = ({ doc, id }: { doc: CompanyDocument; id?: string }) => {
 const DocsTable = ({
   companyOfficialDocuments,
   id,
+  onSuccess,
 }: {
   companyOfficialDocuments: CompanyDocument[];
   id?: string;
+  onSuccess?: () => void;
 }) => {
   return (
   <div className="max-h-[500px] overflow-auto">
@@ -201,7 +203,7 @@ const DocsTable = ({
       </thead>
       <tbody>
         {companyOfficialDocuments.map((doc) => (
-          <DocTableRow key={doc.id} doc={doc} id={id} />
+          <DocTableRow key={doc.id} doc={doc} id={id} onSuccess={onSuccess} />
         ))}
       </tbody>
     </table>

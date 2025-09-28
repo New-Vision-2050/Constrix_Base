@@ -525,6 +525,27 @@
         "managerNote": "Company Manager",
         "branchManager": "Branch Manager :"
       }
+    },
+    "officialDocs": {
+      "docsSettingsDialog": {
+        "title": "Document Settings",
+        "addDoc": "Add Document",
+        "docName": "Document Type Name",
+        "notifySettings": "Notification Settings",
+        "shareSettings": "Share Settings",
+        "cancel": "Cancel",
+        "save": "Save",
+        "update": "Update",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "deleteConfirm": "Confirm Delete",
+        "deleteConfirmMessage": "Are you sure you want to delete this document type?",
+        "errorCase": {
+          "title": "Failed to load document types",
+          "description": "Please check your connection and try again.",
+          "retry": "Retry"
+        }
+      }
     }
   },
   "CompanyStructure": {
