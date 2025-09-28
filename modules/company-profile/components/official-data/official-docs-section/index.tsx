@@ -24,6 +24,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import DocsSettingsDialog from "./docs-settings-dialog";
+import { useOfficialDocsData } from "../useOfficialDocsData";
 
 const OfficialDocsSection = ({
   id,
@@ -32,23 +34,16 @@ const OfficialDocsSection = ({
   id?: string;
   currentCompanyId?: string;
 }) => {
-  const { data, isPending, isSuccess } = useQuery({
-    queryKey: ["company-official-documents", id, currentCompanyId],
-    queryFn: async () => {
-      const response = await apiClient.get<
-        ServerSuccessResponse<CompanyDocument[]>
-      >("/companies/company-profile/company-official-documents", {
-        params: {
-          ...(id && { branch_id: id }),
-          ...(currentCompanyId && { company_id: currentCompanyId }),
-        },
-      });
-
-      return response.data;
-    },
-  });
+  const { data, isPending, isSuccess, refetch } = useOfficialDocsData(
+    id,
+    currentCompanyId
+  );
 
   const companyOfficialDocuments = data?.payload ?? [];
+
+  const handleOfficialDocsRefetch = () => {
+    refetch();
+  };
 
   const locale = useLocale();
   const isRTL = locale === "ar";
@@ -56,10 +51,16 @@ const OfficialDocsSection = ({
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
   const [isOpenAddDoc, handleOpenAddDoc, handleCloseAddDoc] = useModal();
 
+  const [isOpenSettings, handleOpenSettings, handleCloseSettings] = useModal();
+
   const dropdownItems = [
     {
       label: "اضافة مستند رسمي",
       onClick: handleOpenAddDoc,
+    },
+    {
+      label: "اعدادات المستندات",
+      onClick: handleOpenSettings,
     },
   ];
 
@@ -80,9 +81,7 @@ const OfficialDocsSection = ({
             !!companyOfficialDocuments && companyOfficialDocuments.length > 0
           }
           secondTitle={
-            <Can
-              check={[PERMISSIONS.companyProfile.officialDocument.update]}
-            >
+            <Can check={[PERMISSIONS.companyProfile.officialDocument.update]}>
               <DropdownMenu dir={isRTL ? "rtl" : "ltr"}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost">
@@ -91,7 +90,10 @@ const OfficialDocsSection = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {dropdownItems.map((item, index) => (
-                    <DropdownMenuItem key={index} onClick={() => item.onClick()}>
+                    <DropdownMenuItem
+                      key={index}
+                      onClick={() => item.onClick()}
+                    >
                       {item.label}
                     </DropdownMenuItem>
                   ))}
@@ -104,6 +106,7 @@ const OfficialDocsSection = ({
             <DocsTable
               companyOfficialDocuments={companyOfficialDocuments}
               id={id}
+              onSuccess={handleOfficialDocsRefetch}
             />
           ) : (
             <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
@@ -121,6 +124,7 @@ const OfficialDocsSection = ({
         isOpen={isOpenAddDoc}
         onOpenChange={handleCloseAddDoc}
       />
+      <DocsSettingsDialog open={isOpenSettings} onClose={handleCloseSettings} />
     </>
   );
 };
