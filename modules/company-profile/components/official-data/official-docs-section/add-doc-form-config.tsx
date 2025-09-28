@@ -27,7 +27,7 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
             placeholder: "نوع المستند",
             dynamicOptions: {
               url: `${baseURL}/document_types`,
-              valueField: "id_type",
+              valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
