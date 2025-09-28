@@ -536,6 +536,10 @@
         "cancel": "Cancel",
         "save": "Save",
         "update": "Update",
+        "delete": "Delete",
+        "confirm": "Confirm",
+        "deleteConfirm": "Confirm Delete",
+        "deleteConfirmMessage": "Are you sure you want to delete this document type?",
         "errorCase": {
           "title": "Failed to load document types",
           "description": "Please check your connection and try again.",

@@ -532,6 +532,10 @@
         "cancel": "الغاء",
         "save": "حفظ",
         "update": "تعديل",
+        "delete": "حذف",
+        "confirm": "تأكيد",
+        "deleteConfirm": "تأكيد الحذف",
+        "deleteConfirmMessage": "تأكيد حذف نوع المستند",
         "errorCase": {
           "title": "فشل في تحميل أنواع المستندات",
           "description": "يرجى التحقق من اتصالك ومحاولة مرة أخرى.",

@@ -5,9 +5,11 @@ import InputDocName from "../InputDocName";
 import { Pencil, Trash, Loader2, AlertTriangle, X } from "lucide-react";
 import { useDocTypes } from "./useDocTypes";
 import { useCreateDocType } from "./useCreateDocType";
+import { useDeleteDocType } from "./useDeleteDocType";
 import { DocType } from "./api/get-doc-types";
 import LoadingCase from "./LoadingCase";
 import ErrorCase from "./ErrorCase";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 
 export default function AddDocView() {
   // ** declare and define helper variables
@@ -15,6 +17,8 @@ export default function AddDocView() {
   const [document, setDocument] = useState<DocType>();
   const { data: docTypes, isLoading, isError, refetch } = useDocTypes();
   const createDocTypeMutation = useCreateDocType();
+  const deleteDocTypeMutation = useDeleteDocType();
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const t = useTranslations("companyProfile.officialDocs.docsSettingsDialog");
 
@@ -35,9 +39,29 @@ export default function AddDocView() {
       });
     }
   };
+  
   // handle delete
   const handleDelete = (id: string) => {
-    // setDocs(docs.filter((doc) => doc.id !== id));
+    setDeleteConfirmId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirmId) {
+      deleteDocTypeMutation.mutate(deleteConfirmId, {
+        onSuccess: () => {
+          setDeleteConfirmId(null);
+          // Clear edit state if deleting the currently edited document
+          if (document?.id === deleteConfirmId) {
+            setDocument(undefined);
+            setDocumentName("");
+          }
+        },
+      });
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmId(null);
   };
 
   const handleRefetch = () => {
@@ -71,7 +95,7 @@ export default function AddDocView() {
         </Button>
         {document?.id && (
           <X
-            className="h-4 w-4 text-white mr-2 cursor-pointer"
+            className={`h-4 w-4 text-white mr-2 ${createDocTypeMutation.isPending?'cursor-not-allowed': 'cursor-pointer'}`}
             onClick={(e) => {
               e.stopPropagation();
               setDocument(undefined);
@@ -107,6 +131,14 @@ export default function AddDocView() {
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={Boolean(deleteConfirmId)}
+        onConfirm={confirmDelete}
+        onClose={cancelDelete}
+        title={t("deleteConfirmMessage")}
+      />
     </div>
   );
 }
