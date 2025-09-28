@@ -20,6 +20,7 @@ export function getNotifySettingsFormConfig(
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
     },
+    apiMethod: "PUT",
     initialValues: {
       type: notifySettings?.type || "",
       email: notifySettings?.email || "",
