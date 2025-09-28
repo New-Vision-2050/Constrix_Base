@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { SettingsBtnsTypes, useDocsSettingsCxt } from "./DocsSettingsCxt";
+import { SettingsBtnsTypes, useDocsSettingsCxt } from "./context/DocsSettingsCxt";
 
 export default function SettingsTypesBtns() {
   const { settingsBtnType, handleChangeSettingsBtnType } = useDocsSettingsCxt();

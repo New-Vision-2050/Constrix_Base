@@ -534,7 +534,13 @@
         "notifySettings": "Notification Settings",
         "shareSettings": "Share Settings",
         "cancel": "Cancel",
-        "save": "Save"
+        "save": "Save",
+        "update": "Update",
+        "errorCase": {
+          "title": "Failed to load document types",
+          "description": "Please check your connection and try again.",
+          "retry": "Retry"
+        }
       }
     }
   },

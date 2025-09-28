@@ -8,7 +8,7 @@ import {
 import { X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import DocsSettingsContentManager from "./ContentManager";
-import { DocsSettingsCxtProvider } from "./DocsSettingsCxt";
+import { DocsSettingsCxtProvider } from "./context/DocsSettingsCxt";
 
 type PropsType = {
   open: boolean;

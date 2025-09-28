@@ -258,15 +258,15 @@
         "favorite": "المفضلة",
         "move": "نقل"
       },
-      "table":{
-        "file_name":"الملف",
-        "sorted_by":"تم التعديل بواسطة",
-        "file_size":"حجم الملف",
-        "docs_count":"عدد المستندات",
-        "file_type":"سمة الملف",
-        "last_activity":"اخر نشاط",
-        "status":"الحالة",
-        "settings":"الاعدادات"
+      "table": {
+        "file_name": "الملف",
+        "sorted_by": "تم التعديل بواسطة",
+        "file_size": "حجم الملف",
+        "docs_count": "عدد المستندات",
+        "file_type": "سمة الملف",
+        "last_activity": "اخر نشاط",
+        "status": "الحالة",
+        "settings": "الاعدادات"
       },
       "copyMoveDialog": {
         "copyTitle": "نسخ الى",
@@ -287,7 +287,7 @@
         "searchFolder": "بحث",
         "noResults": "لا توجد نتائج",
         "searchUsers": "بحث المستخدمين",
-        "notes":"الرجاء كتابة البريد الالكتروني الذي تود مشاركة الملفات معه"
+        "notes": "الرجاء كتابة البريد الالكتروني الذي تود مشاركة الملفات معه"
       },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
@@ -530,7 +530,13 @@
         "shareSettings": "اعدادات المشاركة",
         "docName": "اسم نوع المستند",
         "cancel": "الغاء",
-        "save": "حفظ"
+        "save": "حفظ",
+        "update": "تعديل",
+        "errorCase": {
+          "title": "فشل في تحميل أنواع المستندات",
+          "description": "يرجى التحقق من اتصالك ومحاولة مرة أخرى.",
+          "retry": "إعادة المحاولة"
+        }
       }
     }
   },
