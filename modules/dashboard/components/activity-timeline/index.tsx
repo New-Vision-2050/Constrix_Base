@@ -1,79 +1,54 @@
 import UserProfileTableDataMainLayout from "../UserProfileTableDataMainLayout";
 import pdfImg from "@/assets/icons/PDF.png";
 import TimeLineItem from "./time-line-item";
+import ActivityTimelineLoadingSkeleton from "./loading-skeleton";
+import { UserActivityT } from "@/modules/user-profile/types/user-activity";
 
-export default function UserProfileActivityTimeline() {
+interface UserProfileActivityTimelineProps {
+  isLoading?: boolean;
+  activities?: UserActivityT[];
+}
+
+function timeAgo(updatedTime: Date, currentTime: Date) {
+  const diffInMinutes = Math.floor(
+    (currentTime.getTime() - updatedTime.getTime()) / 60000
+  );
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} دقيقة`;
+  } else if (diffInMinutes < 1440) {
+    return `${Math.floor(diffInMinutes / 60)} ساعة`;
+  } else {
+    return `${Math.floor(diffInMinutes / 1440)} يوم`;
+  }
+}
+
+export default function UserProfileActivityTimeline({
+  isLoading = false,
+  activities,
+}: UserProfileActivityTimelineProps) {
   return (
     <UserProfileTableDataMainLayout title="سجل الانشطة">
       <div>
-        {/* Timeline Item 1 */}
-        <TimeLineItem
-          title="تم دفع 12 فاتورة"
-          time="منذ 12 دقيقة"
-          description="تم دفع الفواتير للشركة."
-          pointBgColorClass="bg-pink-500"
-          descriptionContent={
-            <>
-              <img height={20} alt="invoice.pdf" src={pdfImg?.src} />
-              <span className="font-medium">invoices.pdf</span>
-            </>
-          }
-        />
-        {/* Timeline Item 2 */}
-        <TimeLineItem
-          title="تم اضافة مستخدم جديد الى الشركة"
-          time="منذ 12 دقيقة"
-          description="تم تحويل الفاتورة بنجاح"
-          pointBgColorClass="bg-green-500"
-          descriptionContent={
-            <>
-              <img height={20} alt="invoice.pdf" src={pdfImg?.src} />
-              <span className="font-medium">employee-data.pdf</span>
-            </>
-          }
-        />
+        {isLoading ? (
+          <ActivityTimelineLoadingSkeleton />
+        ) : (
+          <>
+            {activities?.map((activity, index) => {
+              const currentTime = new Date();
+              const updatedTime = new Date(activity.updated_at);
+              const _timeAgo = timeAgo(updatedTime, currentTime);
 
-        {/* Timeline Item 3 */}
-        <TimeLineItem
-          title="تم اضافة مستخدم جديد الى الشركة"
-          time="منذ 12 دقيقة"
-          description="تم تحويل الفاتورة بنجاح"
-          pointBgColorClass="bg-blue-500"
-          descriptionContent={
-            <>
-              <img height={20} alt="invoice.pdf" src={pdfImg?.src} />
-              <span className="font-medium">employee-data.pdf</span>
-            </>
-          }
-        />
-
-        {/* Timeline Item 4 */}
-        <TimeLineItem
-          title="تم اضافة مستخدم جديد الى الشركة"
-          time="منذ 12 دقيقة"
-          description="تم تحويل الفاتورة بنجاح"
-          pointBgColorClass="bg-yellow-500"
-          descriptionContent={
-            <>
-              <img height={20} alt="invoice.pdf" src={pdfImg?.src} />
-              <span className="font-medium">employee-data.pdf</span>
-            </>
-          }
-        />
-
-        {/* Timeline Item 5 */}
-        <TimeLineItem
-          title="تم اضافة مستخدم جديد الى الشركة"
-          time="منذ 12 دقيقة"
-          description="تم تحويل الفاتورة بنجاح"
-          pointBgColorClass="bg-red-500"
-          descriptionContent={
-            <>
-              <img height={20} alt="invoice.pdf" src={pdfImg?.src} />
-              <span className="font-medium">employee-data.pdf</span>
-            </>
-          }
-        />
+              return (
+                <TimeLineItem
+                  key={activity.id}
+                  title={activity.title}
+                  time={_timeAgo}
+                  event={activity.event}
+                />
+              );
+            })}
+          </>
+        )}
       </div>
     </UserProfileTableDataMainLayout>
   );

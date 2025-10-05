@@ -427,6 +427,12 @@
         }
       }
     },
+    "ActivityTimeline": {
+      "title": "User Activity Timeline",
+      "createdOperation": "Operation created",
+      "updatedOperation": "Operation updated",
+      "deletedOperation": "Operation deleted"
+    },
     "tabs": {
       "profile": "Profile",
       "contract": "Employment Contract",

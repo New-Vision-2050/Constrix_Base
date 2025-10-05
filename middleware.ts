@@ -54,7 +54,7 @@ export async function middleware(req: NextRequest) {
         !!company?.payload.is_central_company &&
         protectedCentralPages.includes(pathname)
       ) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+        return NextResponse.redirect(new URL("/user-profile", req.url));
       }
     } catch (error) {
       res.cookies.delete("company-data");
@@ -70,7 +70,7 @@ export async function middleware(req: NextRequest) {
     const isCentral = !!company?.is_central_company;
 
     if (!isCentral && protectedCentralPages.includes(pathname)) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/user-profile", req.url));
     }
   }
 

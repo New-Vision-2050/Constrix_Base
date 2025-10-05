@@ -423,6 +423,12 @@
         }
       }
     },
+    "ActivityTimeline": {
+      "title": "سجل الانشطة",
+      "createdOperation": "عملية انشاء",
+      "updatedOperation": "عملية تعديل",
+      "deletedOperation": "عملية حذف"
+    },
     "tabs": {
       "profile": "الملف الشخصي",
       "contract": "عقد العمل",
