@@ -7,6 +7,8 @@ import { UserActivityT } from "@/modules/user-profile/types/user-activity";
 interface UserProfileActivityTimelineProps {
   isLoading?: boolean;
   activities?: UserActivityT[];
+  enableRedirect?: boolean;
+  redirectUrl?: string;
 }
 
 function timeAgo(updatedTime: Date, currentTime: Date) {
@@ -25,9 +27,15 @@ function timeAgo(updatedTime: Date, currentTime: Date) {
 export default function UserProfileActivityTimeline({
   isLoading = false,
   activities,
+  enableRedirect,
+  redirectUrl,
 }: UserProfileActivityTimelineProps) {
   return (
-    <UserProfileTableDataMainLayout title="سجل الانشطة">
+    <UserProfileTableDataMainLayout
+      title="سجل الانشطة"
+      enableRedirect={enableRedirect}
+      redirectUrl={redirectUrl}
+    >
       <div>
         {isLoading ? (
           <ActivityTimelineLoadingSkeleton />

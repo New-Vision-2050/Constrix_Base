@@ -12,7 +12,12 @@ export default function UserProfileTab() {
       <UserProfileGridLayout
         left={
           <div className="flex flex-col gap-3">
-            <UserProfileActivityTimeline isLoading={isLoadingUserActivities} activities={userActivities} />
+            <UserProfileActivityTimeline
+              isLoading={isLoadingUserActivities}
+              activities={userActivities}
+              enableRedirect={true}
+              redirectUrl="/activities-logs"
+            />
             <div className="flex flex-col md:flex-row gap-2 justify-between">
               <div className="flex-grow p-8 w-full md:w-1/2">
                 <UpcomingMeetings />
