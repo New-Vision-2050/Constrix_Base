@@ -205,6 +205,7 @@
     "subPrograms": "Sub Programs",
     "mainPrograms": "Main Programs",
     "UserProfileSettings": "User Profile",
+    "ActivitiesLogs": "Activities Logs",
     "Welcome": "Hello",
     "HRSettings": "Settings",
     "CompanyName": "New Vision",
@@ -426,6 +427,12 @@
           "rule3": "Make sure the background is white."
         }
       }
+    },
+    "ActivityTimeline": {
+      "title": "User Activity Timeline",
+      "createdOperation": "Operation created",
+      "updatedOperation": "Operation updated",
+      "deletedOperation": "Operation deleted"
     },
     "tabs": {
       "profile": "Profile",

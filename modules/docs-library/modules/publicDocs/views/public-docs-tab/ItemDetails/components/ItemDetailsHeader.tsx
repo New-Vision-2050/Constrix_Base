@@ -21,7 +21,7 @@ export default function ItemDetailsHeader({
         <Image src={folderImg} alt="Folder" width={24} height={24} />
 
         <div className="text-right">
-          <h2 className="text-white font-medium text-lg">{title}</h2>
+          <h2 className="text-dark dark:text-white font-medium text-lg">{title}</h2>
           {subtitle && <p className="text-gray-400 text-sm">{subtitle}</p>}
         </div>
       </div>

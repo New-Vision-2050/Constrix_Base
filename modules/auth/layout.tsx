@@ -61,7 +61,7 @@ export default function AuthLayout({
                 alt={"logo placeholder"}
                 width={112}
                 height={47}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain rounded-full"
               />
             )}
           </div>

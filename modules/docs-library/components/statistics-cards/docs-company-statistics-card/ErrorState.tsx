@@ -41,7 +41,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({ message, onRetry }) => {
       {onRetry && (
         <button
           onClick={onRetry}
-          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm transition-colors duration-200"
+          className="px-4 py-2 bg-red-500 hover:bg-red-600  text-dark dark:text-white rounded-lg text-sm transition-colors duration-200"
         >
           إعادة المحاولة
         </button>

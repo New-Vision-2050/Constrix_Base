@@ -72,15 +72,15 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   }, []);
   
   // Base classes for consistent styling
-  const baseInputClasses = `block w-full px-4 py-2 bg-gray-800 border rounded-md text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent ${isRtl ? 'text-right' : 'text-left'}`;
-  const baseDropdownClasses = 'absolute z-[9999] w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto';
+  const baseInputClasses = `block w-full px-4 py-2 bg-white dark:bg-black border rounded-md text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent ${isRtl ? 'text-right' : 'text-left'}`;
+  const baseDropdownClasses = 'absolute z-[9999] w-full mt-1 bg-white dark:bg-black border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto';
   
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       {label && (
         <label 
           htmlFor={name} 
-          className={`block mb-2 text-sm font-medium ${isRtl ? 'text-right' : 'text-left'} ${error ? 'text-red-500' : 'text-white'}`}
+          className={`block mb-2 text-sm font-medium ${isRtl ? 'text-right' : 'text-left'} ${error ? 'text-red-500' : 'text-black dark:text-white'}`}
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -91,7 +91,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         className={`${baseInputClasses} ${disabled ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
-        <span className={`block truncate ${!selectedOption ? 'text-gray-400' : 'text-white'}`}>
+        <span className={`block truncate ${!selectedOption ? 'text-gray-400' : 'text-black dark:text-white'}`}>
           {selectedOption ? selectedOption.label : (defaultValueOption?.label || placeholder)}
         </span>
         <svg 
@@ -129,7 +129,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
               filteredOptions.map(option => (
                 <div
                   key={option.value}
-                  className={`px-4 py-2 cursor-pointer hover:bg-gray-700 ${option.value === value ? 'bg-pink-500 text-white' : 'text-gray-200'}`}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-700 ${option.value === value ? 'bg-pink-500 text-black dark:text-white' : 'text-black dark:text-white'}`}
                   onClick={() => {
                     onChange(option.value);
                     setIsOpen(false);

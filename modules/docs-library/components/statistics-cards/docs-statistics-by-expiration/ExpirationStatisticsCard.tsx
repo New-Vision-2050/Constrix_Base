@@ -37,7 +37,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
 
   return (
     <div
-      className={`bg-sidebar w-[370px] min-h-[330px] m-2 rounded-2xl p-6 text-white ${className}`}
+      className={`bg-sidebar w-[370px] min-h-[330px] m-2 rounded-2xl p-6  text-dark dark:text-white ${className}`}
     >
       {/* Header with title and count */}
       <div className="flex flex-col gap-2 mb-6">
@@ -48,7 +48,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
           {/* Count */}
           <div className="flex items-center gap-2 text-right">
             <span className="text-2xl font-bold">{totalCount}</span>
-            <span className="text-sm text-gray-300">{countLabel}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-300">{countLabel}</span>
           </div>
           {/* Badge for expires soon */}
           <div className="mb-4">

@@ -205,6 +205,7 @@
     "mainPrograms": "البرامج الرئيسية",
     "DashboardSettings": "ملف الشركة",
     "UserProfileSettings": "الملف الشخصي",
+    "ActivitiesLogs": "سجل الأنشطة",
     "Welcome": "مرحبا",
     "CompanyName": "نيو فيجن",
     "HRSettings": "اعدادات",
@@ -422,6 +423,12 @@
           "rule3": "تأكد من أن الخلفية بيضاء."
         }
       }
+    },
+    "ActivityTimeline": {
+      "title": "سجل الانشطة",
+      "createdOperation": "عملية انشاء",
+      "updatedOperation": "عملية تعديل",
+      "deletedOperation": "عملية حذف"
     },
     "tabs": {
       "profile": "الملف الشخصي",

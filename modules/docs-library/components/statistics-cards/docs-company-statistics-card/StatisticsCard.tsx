@@ -37,7 +37,7 @@ const CompanyDocsStatisticsCard: React.FC<StatisticsCardProps> = ({
 
   return (
     <div
-      className={`bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6 text-white shadow-lg ${className}`}
+      className={`bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6  text-dark dark:text-white shadow-lg ${className}`}
     >
       {/* Header with title and icon */}
       <div className="flex items-center gap-2 mb-2">
@@ -54,7 +54,7 @@ const CompanyDocsStatisticsCard: React.FC<StatisticsCardProps> = ({
         <div className="text-right mb-2 flex items-end gap-2">
           <div className="text-4xl font-bold mb-1">{mainValue}</div>
           {mainLabel && (
-            <div className="text-sm text-gray-300">{mainLabel}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-300">{mainLabel}</div>
           )}
         </div>
 

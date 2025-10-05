@@ -26,4 +26,5 @@ export const ROUTER = {
     settings: "/crm-settings",
   },
   DOCS_LIBRARY: "/docs-library",
+  ACTIVITIES_LOGS: "/activities-logs",
 };
