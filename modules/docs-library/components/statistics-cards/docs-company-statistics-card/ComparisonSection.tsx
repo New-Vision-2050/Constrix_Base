@@ -27,12 +27,12 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Values comparison with VS indicator */}
-      <div className="flex items-center justify-between text-white">
+      <div className="flex items-center justify-between  text-dark dark:text-white">
         {/* Left value section */}
         <div className="text-center">
-          <div className="text-sm text-gray-400 mb-1">{leftLabel}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-300 mb-1">{leftLabel}</div>
           <div className="text-3xl font-bold">{leftValue}</div>
-          <div className="text-sm text-gray-400">{unit}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-300">{unit}</div>
         </div>
 
         {/* VS indicator with decorative lines */}
@@ -51,9 +51,9 @@ const ComparisonSection: React.FC<ComparisonSectionProps> = ({
 
         {/* Right value section */}
         <div className="text-center">
-          <div className="text-sm text-gray-400 mb-1">{rightLabel}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-300 mb-1">{rightLabel}</div>
           <div className="text-3xl font-bold">{rightValue}</div>
-          <div className="text-sm text-gray-400">{unit}</div>
+          <div className="text-sm text-gray-500 dark:text-gray-300">{unit}</div>
         </div>
       </div>
 

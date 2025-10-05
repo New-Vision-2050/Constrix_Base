@@ -35,7 +35,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
         
         {/* Document details */}
         <div className="text-right flex flex-grow items-center justify-between">
-          <h4 className="text-white font-medium text-sm">{name}</h4>
+          <h4 className=" text-dark dark:text-white font-medium text-sm">{name}</h4>
           <p className="text-gray-400 text-xs mt-1">{expirationDate}</p>
         </div>
       </div>
