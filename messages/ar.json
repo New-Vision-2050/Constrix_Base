@@ -225,6 +225,26 @@
   },
   "docs-library": {
     "title": "مكتبة المستندات",
+    "statistics": {
+      "documentStats": {
+        "title": "عدد المستندات الشركة",
+        "mainLabel": "مستند",
+        "comparison": {
+          "leftLabel": "المساحة المتبقية",
+          "rightLabel": "المساحة المستهلكة"
+        }
+      },
+      "activityStats": {
+        "title": "المستندات السارية",
+        "description": "معدل المستندات السارية للشركة",
+        "title2": "المستندات المنتهية",
+        "description2": "معدل المستندات المنتهية للشركة"
+      },
+      "expirationStats": {
+        "title": "المستندات المقتربة على الانتهاء",
+        "countLabel": "عدد تحميلات المستند"
+      }
+    },
     "cards": {
       "noData": "لا توجد بيانات للعرض"
     },
@@ -458,6 +478,24 @@
           "cv": "السيرة الذاتية"
         }
       }
+    }
+  },
+  "activitiesLogs": {
+    "search": {
+      "title": "بحث",
+      "type": "نوع العملية",
+      "user": "المستخدم",
+      "timeFrom": "من التاريخ",
+      "timeTo": "الى التاريخ",
+      "reset": "إعادة تعيين"
+    },
+    "logs": {
+      "title": "سجل الانشطة",
+      "createdOperation": "عملية انشاء",
+      "updatedOperation": "عملية تعديل",
+      "deletedOperation": "عملية حذف",
+      "noActivities": "لا توجد أنشطة",
+      "noActivitiesDesc": "لم يتم العثور على أي أنشطة في الفترة المحددة. جرب تغيير معايير البحث."
     }
   },
   "companyProfile": {

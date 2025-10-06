@@ -13,6 +13,7 @@ export interface PaginationProps {
   currentLimit?: number;
   limitOptions?: number[];
   onLimitChange?: (limit: number) => void;
+  hidePagination?: boolean;
 }
 
 // Props for pagination button component

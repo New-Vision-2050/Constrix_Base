@@ -17,6 +17,7 @@ const Pagination: React.FC<PaginationProps> = ({
   currentLimit = 10,
   limitOptions = [5, 10, 25, 50, 100],
   onLimitChange,
+  hidePagination = false,
 }) => {
   // get locale
   const locale = useLocale();
@@ -63,7 +64,11 @@ const Pagination: React.FC<PaginationProps> = ({
     <div className={`flex items-center justify-between gap-1 ${className}`}>
       {/* Limit selector */}
       {onLimitChange && (
-        <div className={`flex items-center gap-2 text-sm absolute left-[3%] ${!isRtl ? "left-[85%]" : "left-[3%]"}`}>
+        <div
+          className={`flex items-center gap-2 text-sm absolute left-[3%] ${
+            !isRtl ? "left-[85%]" : "left-[3%]"
+          }`}
+        >
           <span className="text-gray-400">
             {t("itemsPerPage", { defaultValue: "عناصر في الصفحة" })}
           </span>
@@ -84,72 +89,77 @@ const Pagination: React.FC<PaginationProps> = ({
         </div>
       )}
 
-      <div className="flex items-center justify-center gap-1">
-        {/* Previous button */}
-        <PaginationButton
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          ariaLabel="Previous page"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      {/* Pagination */}
+      {!hidePagination ? (
+        <div className="flex items-center justify-center gap-1">
+          {/* Previous button */}
+          <PaginationButton
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            ariaLabel="Previous page"
           >
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </PaginationButton>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </PaginationButton>
 
-        {/* Page numbers */}
-        <div className="flex items-center space-x-1 mx-2">
-          {getPageNumbers().map((pageNumber, index) =>
-            pageNumber < 0 ? (
-              // Render ellipsis
-              <span
-                key={`ellipsis-${index}`}
-                className="w-10 text-center text-gray-400"
-              >
-                ...
-              </span>
-            ) : (
-              // Render page number
-              <PageNumber
-                key={`page-${pageNumber}`}
-                page={pageNumber}
-                isActive={pageNumber === currentPage}
-                onClick={() => onPageChange(pageNumber)}
-              />
-            )
-          )}
+          {/* Page numbers */}
+          <div className="flex items-center space-x-1 mx-2">
+            {getPageNumbers().map((pageNumber, index) =>
+              pageNumber < 0 ? (
+                // Render ellipsis
+                <span
+                  key={`ellipsis-${index}`}
+                  className="w-10 text-center text-gray-400"
+                >
+                  ...
+                </span>
+              ) : (
+                // Render page number
+                <PageNumber
+                  key={`page-${pageNumber}`}
+                  page={pageNumber}
+                  isActive={pageNumber === currentPage}
+                  onClick={() => onPageChange(pageNumber)}
+                />
+              )
+            )}
+          </div>
+
+          {/* Next button */}
+          <PaginationButton
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            ariaLabel="Next page"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </PaginationButton>
         </div>
-
-        {/* Next button */}
-        <PaginationButton
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          ariaLabel="Next page"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </PaginationButton>
-      </div>
+      ) : (
+        <div />
+      )}
     </div>
   );
 };
