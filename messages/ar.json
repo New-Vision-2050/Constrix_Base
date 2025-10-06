@@ -469,11 +469,13 @@
       "timeTo": "الى التاريخ",
       "reset": "إعادة تعيين"
     },
-    "logs":{
+    "logs": {
       "title": "سجل الانشطة",
       "createdOperation": "عملية انشاء",
       "updatedOperation": "عملية تعديل",
-      "deletedOperation": "عملية حذف"
+      "deletedOperation": "عملية حذف",
+      "noActivities": "لا توجد أنشطة",
+      "noActivitiesDesc": "لم يتم العثور على أي أنشطة في الفترة المحددة. جرب تغيير معايير البحث."
     }
   },
   "companyProfile": {

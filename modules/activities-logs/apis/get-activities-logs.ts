@@ -12,11 +12,15 @@ type ResponseT = {
   payload: ActivitiesLogsT;
 };
 
-export default async function getActivitiesLogs(limit?: number, searchFields?: SearchUserActivityLogT) {
+export default async function getActivitiesLogs(
+  limit?: number,
+  searchFields?: SearchUserActivityLogT
+) {
   const res = await apiClient.get<ResponseT>(`/audits/activity-log`, {
     params: {
       limit: limit ?? 10,
       ...searchFields,
+      type: searchFields?.type == "all" ? undefined : searchFields?.type,
     },
   });
 

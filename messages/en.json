@@ -249,7 +249,7 @@
       "searchFolder": "Search",
       "noResults": "No Results",
       "searchUsers": "Search Users",
-      "notes":"Please enter the email address of the user you want to share the files with"
+      "notes": "Please enter the email address of the user you want to share the files with"
     },
     "publicDocs": {
       "header": {
@@ -473,11 +473,13 @@
       "timeTo": "Date To",
       "reset": "Reset"
     },
-    "logs":{
+    "logs": {
       "title": "User Activity Timeline",
       "createdOperation": "Operation created",
       "updatedOperation": "Operation updated",
-      "deletedOperation": "Operation deleted"
+      "deletedOperation": "Operation deleted",
+      "noActivities": "No activities found",
+      "noActivitiesDesc": "No activities found for the selected date range. Try changing the search criteria."
     }
   },
   "companyProfile": {
