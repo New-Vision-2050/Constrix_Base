@@ -228,6 +228,26 @@
     "cards": {
       "noData": "No data to display"
     },
+    "statistics": {
+      "documentStats": {
+        "title": "Number of company documents",
+        "mainLabel": "Document",
+        "comparison": {
+          "leftLabel": "Remaining Space",
+          "rightLabel": "Used Space"
+        }
+      },
+      "activityStats": {
+        "title": "Active Documents",
+        "description": "Average active documents for the company",
+        "title2": "Expired Documents",
+        "description2": "Average expired documents for the company"
+      },
+      "expirationStats": {
+        "title": "Documents nearing expiration",
+        "countLabel": "Number of document downloads"
+      }
+    },
     "tabsTitles": {
       "publicDocs": "Public Docs",
       "empsDocs": "Employee Docs",
@@ -289,6 +309,17 @@
         "selectFolder": "Select Folder",
         "searchFolder": "Search",
         "noResults": "No Results"
+      },
+      "shareDialog": {
+        "title": "Share",
+        "save": "Save",
+        "copy": "Copy Link",
+        "cancel": "Cancel",
+        "selectFolder": "Select Folder",
+        "searchFolder": "Search",
+        "noResults": "No Results",
+        "searchUsers": "Search Users",
+        "notes": "Please enter the email address of the user you want to share the files with"
       },
       "createNewDirDialog": {
         "title": "Create New Directory",

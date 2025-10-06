@@ -225,6 +225,26 @@
   },
   "docs-library": {
     "title": "مكتبة المستندات",
+    "statistics": {
+      "documentStats": {
+        "title": "عدد المستندات الشركة",
+        "mainLabel": "مستند",
+        "comparison": {
+          "leftLabel": "المساحة المتبقية",
+          "rightLabel": "المساحة المستهلكة"
+        }
+      },
+      "activityStats": {
+        "title": "المستندات السارية",
+        "description": "معدل المستندات السارية للشركة",
+        "title2": "المستندات المنتهية",
+        "description2": "معدل المستندات المنتهية للشركة"
+      },
+      "expirationStats": {
+        "title": "المستندات المقتربة على الانتهاء",
+        "countLabel": "عدد تحميلات المستند"
+      }
+    },
     "cards": {
       "noData": "لا توجد بيانات للعرض"
     },
