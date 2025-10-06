@@ -1,9 +1,12 @@
 import ActivitiesLogsEntryPoint from "./components/entry-point";
+import { ActivitiesLogsCxtProvider } from "./context/ActivitiesLogsCxt";
 
 export default function ActivitiesLogsModule() {
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <ActivitiesLogsEntryPoint />
-    </div>
+    <ActivitiesLogsCxtProvider>
+      <div className="flex flex-col gap-4 p-6">
+        <ActivitiesLogsEntryPoint />
+      </div>
+    </ActivitiesLogsCxtProvider>
   );
 }

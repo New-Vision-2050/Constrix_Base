@@ -9,6 +9,8 @@ interface UserProfileActivityTimelineProps {
   activities?: UserActivityT[];
   enableRedirect?: boolean;
   redirectUrl?: string;
+  title?: string;
+  dayDate?: string;
 }
 
 function timeAgo(updatedTime: Date, currentTime: Date) {
@@ -29,10 +31,12 @@ export default function UserProfileActivityTimeline({
   activities,
   enableRedirect,
   redirectUrl,
+  title,
+  dayDate,
 }: UserProfileActivityTimelineProps) {
   return (
     <UserProfileTableDataMainLayout
-      title="سجل الانشطة"
+      title={title ?? "سجل الانشطة"}
       enableRedirect={enableRedirect}
       redirectUrl={redirectUrl}
     >
@@ -41,7 +45,21 @@ export default function UserProfileActivityTimeline({
           <ActivityTimelineLoadingSkeleton />
         ) : (
           <>
-            {activities?.map((activity, index) => {
+            {dayDate && (
+              <div className="flex gap-4 mb-6">
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 p-2 bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center border border-primary/30">
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  </div>
+                </div>
+                <div className="flex-grow">
+                  <div className="inline-block bg-primary text-white px-4 py-2 rounded-lg font-medium text-sm shadow-sm">
+                    {dayDate}
+                  </div>
+                </div>
+              </div>
+            )}
+            {activities?.map((activity) => {
               const currentTime = new Date();
               const updatedTime = new Date(activity.updated_at);
               const _timeAgo = timeAgo(updatedTime, currentTime);
