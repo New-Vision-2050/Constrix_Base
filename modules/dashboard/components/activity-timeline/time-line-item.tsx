@@ -8,13 +8,14 @@ type PropsT = {
   description?: string;
   descriptionContent?: React.ReactNode;
   event?: ActivityTimelineEvent;
+  isLastItem?: boolean;
 };
 
 export default function TimeLineItem(props: PropsT) {
   const t = useTranslations("UserProfile.ActivityTimeline");
   let pointBgColorClass = "bg-pink-500";
   let activityIcon = <PlusIcon className="w-4 h-4" />;
-  const { title, time, descriptionContent, event } = props;
+  const { title, time, descriptionContent, event, isLastItem = false } = props;
 
   const operationTitle = (event: ActivityTimelineEvent) => {
     switch (event) {
@@ -46,7 +47,7 @@ export default function TimeLineItem(props: PropsT) {
         >
           {activityIcon}
         </div>
-        <div className="w-px bg-gray-300 h-full"></div>
+        {!isLastItem && <div className="w-px bg-gray-300 dark:bg-gray-600 h-full"></div>}
       </div>
       <div className="flex-grow ">
         <div className="flex justify-between flex-wrap gap-4 mb-2">

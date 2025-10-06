@@ -5,18 +5,16 @@ import {
 } from "@/modules/docs-library/modules/publicDocs/components/search-fields";
 import { LOGS_TYPES_OPTIONS, LOGS_USERS_OPTIONS } from "./dummy-data";
 import { Button } from "@/components/ui/button";
+import {
+  SearchUserActivityLogT,
+  useActivitiesLogsCxt,
+} from "../context/ActivitiesLogsCxt";
 
-export interface SearchFormData {
-  type?: string;
-  userId?: string;
-  dateFrom?: string;
-  dateTo?: string;
-}
 export interface SearchFieldsProps {
   /** Search form data */
-  data: SearchFormData;
+  data: SearchUserActivityLogT;
   /** Form data change handler */
-  onChange: (data: SearchFormData) => void;
+  onChange: (data: SearchUserActivityLogT) => void;
   /** Custom className */
   className?: string;
   /** Loading state */
@@ -29,6 +27,18 @@ export default function ActivitiesLogsSearchFields({
   className = "",
   isLoading = false,
 }: SearchFieldsProps) {
+  const { usersList, currentUserId, isCurrentUserAdmin } =
+    useActivitiesLogsCxt();
+
+  const handleReset = () => {
+    onChange({
+      type: "",
+      user_id: "",
+      time_from: "",
+      time_to: "",
+    });
+  };
+
   // Handle field changes while maintaining immutability
   const handleFieldChange = (field: keyof typeof data, value: string) => {
     const newData = {
@@ -37,6 +47,7 @@ export default function ActivitiesLogsSearchFields({
     };
     onChange(newData);
   };
+
   return (
     <div className={`bg-sidebar rounded-lg p-4 ${className}`}>
       {/* Header */}
@@ -56,33 +67,42 @@ export default function ActivitiesLogsSearchFields({
 
         {/* User ID */}
         <SearchSelectField
-          value={data.userId}
-          onChange={(value) => handleFieldChange("userId", value)}
-          options={LOGS_USERS_OPTIONS}
+          value={!isCurrentUserAdmin ? currentUserId : data.user_id}
+          onChange={(value) => handleFieldChange("user_id", value)}
+          options={
+            usersList
+              ? usersList.map((user) => ({ value: user.id, label: user.name }))
+              : []
+          }
           placeholder={"أختر المستخدم"}
-          disabled={isLoading}
+          disabled={isLoading || !isCurrentUserAdmin}
         />
 
         {/* Date From */}
         <SearchDateField
-          value={data.dateFrom}
-          onChange={(value) => handleFieldChange("dateFrom", value)}
+          value={data.time_from}
+          onChange={(value) => handleFieldChange("time_from", value)}
           placeholder={"من التاريخ"}
           disabled={isLoading}
         />
 
         {/* Date To */}
         <SearchDateField
-          value={data.dateTo}
-          onChange={(value) => handleFieldChange("dateTo", value)}
+          value={data.time_to}
+          onChange={(value) => handleFieldChange("time_to", value)}
           placeholder={"الى التاريخ"}
           disabled={isLoading}
         />
       </div>
       {/* footer search and reset */}
       <div className="flex items-center justify-end mt-4 gap-4">
-        <Button variant="default">Search</Button>
-        <Button variant="outline">Reset</Button>
+        <Button
+          onClick={handleReset}
+          variant="outline"
+          className="bg-yellow-600"
+        >
+          Reset
+        </Button>
       </div>
     </div>
   );

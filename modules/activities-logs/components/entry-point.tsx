@@ -1,40 +1,35 @@
 "use client";
 import UserProfileActivityTimeline from "@/modules/dashboard/components/activity-timeline";
 import ActivitiesLogsSearchFields from "./SearchFields";
-import { LOGS_ACTIVITIES } from "./dummy-data";
 import { Pagination } from "@/components/shared/Pagination";
 import { useActivitiesLogsCxt } from "../context/ActivitiesLogsCxt";
 import ActivityTimelineLoadingSkeleton from "@/modules/dashboard/components/activity-timeline/loading-skeleton";
+import UserLogsTimeLine from "./UserLogsTimeLine";
 
 export default function ActivitiesLogsEntryPoint() {
-  const { activitiesLogs, activitiesLogsLoading, limit, handleLimitChange } =
-    useActivitiesLogsCxt();
+  const {
+    activitiesLogs,
+    activitiesLogsLoading,
+    limit,
+    handleLimitChange,
+    searchFields,
+    handleSearchFieldsChange,
+  } = useActivitiesLogsCxt();
+
   return (
     <>
       {/* search fields */}
       <ActivitiesLogsSearchFields
-        data={{}}
-        onChange={() => {}}
-        isLoading={activitiesLogsLoading}
+        data={searchFields}
+        onChange={handleSearchFieldsChange}
+        isLoading={false}
       />
 
       {/*  user profile activity timeline */}
-      {!activitiesLogsLoading && activitiesLogs ? (
-        Object.entries(activitiesLogs).map(([dayDate, activities]) => {
-          return (
-            <UserProfileActivityTimeline
-              isLoading={activitiesLogsLoading}
-              activities={activities}
-              dayDate={dayDate}
-            />
-          );
-        })
-      ) : (
-        <>
-          {/* handle loading state */}
-          <ActivityTimelineLoadingSkeleton />
-        </>
-      )}
+      <UserLogsTimeLine
+        isLoading={activitiesLogsLoading}
+        daysActivities={activitiesLogs}
+      />
 
       {/* Pagination component */}
       <div className="mt-8 flex justify-center w-full">
@@ -44,7 +39,7 @@ export default function ActivitiesLogsEntryPoint() {
           onPageChange={() => {}}
           currentLimit={limit}
           hidePagination={true}
-          limitOptions={[10, 25, 50, 100]}
+          limitOptions={[10, 25, 50, 100,500]}
           onLimitChange={handleLimitChange}
         />
       </div>
