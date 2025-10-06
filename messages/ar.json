@@ -460,6 +460,22 @@
       }
     }
   },
+  "activitiesLogs": {
+    "search": {
+      "title": "بحث",
+      "type": "نوع العملية",
+      "user": "المستخدم",
+      "timeFrom": "من التاريخ",
+      "timeTo": "الى التاريخ",
+      "reset": "إعادة تعيين"
+    },
+    "logs":{
+      "title": "سجل الانشطة",
+      "createdOperation": "عملية انشاء",
+      "updatedOperation": "عملية تعديل",
+      "deletedOperation": "عملية حذف"
+    }
+  },
   "companyProfile": {
     "header": {
       "placeholder": {

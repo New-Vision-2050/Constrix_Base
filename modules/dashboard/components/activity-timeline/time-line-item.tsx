@@ -12,7 +12,7 @@ type PropsT = {
 };
 
 export default function TimeLineItem(props: PropsT) {
-  const t = useTranslations("UserProfile.ActivityTimeline");
+  const t = useTranslations('activitiesLogs.logs')
   let pointBgColorClass = "bg-pink-500";
   let activityIcon = <PlusIcon className="w-4 h-4" />;
   const { title, time, descriptionContent, event, isLastItem = false } = props;

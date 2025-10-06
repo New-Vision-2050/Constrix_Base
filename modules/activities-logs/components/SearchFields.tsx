@@ -3,12 +3,13 @@ import {
   SearchDateField,
   SearchSelectField,
 } from "@/modules/docs-library/modules/publicDocs/components/search-fields";
-import { LOGS_TYPES_OPTIONS, LOGS_USERS_OPTIONS } from "./dummy-data";
+import { LOGS_TYPES_OPTIONS } from "./dummy-data";
 import { Button } from "@/components/ui/button";
 import {
   SearchUserActivityLogT,
   useActivitiesLogsCxt,
 } from "../context/ActivitiesLogsCxt";
+import { useLocale, useTranslations } from "next-intl";
 
 export interface SearchFieldsProps {
   /** Search form data */
@@ -27,6 +28,8 @@ export default function ActivitiesLogsSearchFields({
   className = "",
   isLoading = false,
 }: SearchFieldsProps) {
+  const lang = useLocale();
+  const t = useTranslations("activitiesLogs.search");
   const { usersList, currentUserId, isCurrentUserAdmin } =
     useActivitiesLogsCxt();
 
@@ -52,7 +55,7 @@ export default function ActivitiesLogsSearchFields({
     <div className={`bg-sidebar rounded-lg p-4 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">بحث</h2>
+        <h2 className="text-lg font-semibold">{t("title")}</h2>
       </div>
       {/* Search fields grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -60,8 +63,11 @@ export default function ActivitiesLogsSearchFields({
         <SearchSelectField
           value={data.type}
           onChange={(value) => handleFieldChange("type", value)}
-          options={LOGS_TYPES_OPTIONS}
-          placeholder={"أختر الحالة"}
+          options={LOGS_TYPES_OPTIONS?.map((option) => ({
+            value: option.value,
+            label: lang === "ar" ? option.label_ar : option.label,
+          }))}
+          placeholder={t("type")}
           disabled={isLoading}
         />
 
@@ -74,7 +80,7 @@ export default function ActivitiesLogsSearchFields({
               ? usersList.map((user) => ({ value: user.id, label: user.name }))
               : []
           }
-          placeholder={"أختر المستخدم"}
+          placeholder={t("user")}
           disabled={isLoading || !isCurrentUserAdmin}
         />
 
@@ -82,7 +88,7 @@ export default function ActivitiesLogsSearchFields({
         <SearchDateField
           value={data.time_from}
           onChange={(value) => handleFieldChange("time_from", value)}
-          placeholder={"من التاريخ"}
+          placeholder={t("timeFrom")}
           disabled={isLoading}
         />
 
@@ -90,7 +96,7 @@ export default function ActivitiesLogsSearchFields({
         <SearchDateField
           value={data.time_to}
           onChange={(value) => handleFieldChange("time_to", value)}
-          placeholder={"الى التاريخ"}
+          placeholder={t("timeTo")}
           disabled={isLoading}
         />
       </div>
@@ -101,7 +107,7 @@ export default function ActivitiesLogsSearchFields({
           variant="outline"
           className="bg-yellow-600"
         >
-          Reset
+          {t("reset")}
         </Button>
       </div>
     </div>

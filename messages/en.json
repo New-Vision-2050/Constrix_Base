@@ -464,6 +464,22 @@
       }
     }
   },
+  "activitiesLogs": {
+    "search": {
+      "title": "Search Filter",
+      "type": "Operation Type",
+      "user": "User",
+      "timeFrom": "Date From",
+      "timeTo": "Date To",
+      "reset": "Reset"
+    },
+    "logs":{
+      "title": "User Activity Timeline",
+      "createdOperation": "Operation created",
+      "updatedOperation": "Operation updated",
+      "deletedOperation": "Operation deleted"
+    }
+  },
   "companyProfile": {
     "header": {
       "placeholder": {

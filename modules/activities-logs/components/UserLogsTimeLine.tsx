@@ -3,6 +3,7 @@ import UserProfileTableDataMainLayout from "@/modules/dashboard/components/UserP
 import { ActivitiesLogsT } from "../apis/get-activities-logs";
 import TimeLineItem from "@/modules/dashboard/components/activity-timeline/time-line-item";
 import { ClockIcon, UserIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface UserLogsTimeLineProps {
   isLoading?: boolean;
@@ -26,8 +27,9 @@ export default function UserLogsTimeLine({
   isLoading = false,
   daysActivities,
 }: UserLogsTimeLineProps) {
+  const t = useTranslations('activitiesLogs.logs')
   return (
-    <UserProfileTableDataMainLayout title={"سجل الانشطة"}>
+    <UserProfileTableDataMainLayout title={t('title')}>
       <div>
         {isLoading ? (
           <ActivityTimelineLoadingSkeleton />
