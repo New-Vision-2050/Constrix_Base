@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 export default function DocsStatisticsCardsList() {
   // declare and define component vars
   const t = useTranslations("docs-library.statistics");
+  
   const documentStats: StatisticsCardData = {
     title: t("documentStats.title"),
     mainValue: 27,

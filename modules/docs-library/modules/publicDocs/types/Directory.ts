@@ -1,0 +1,18 @@
+export type Media = {
+  id: number;
+  url: string;
+  name: string;
+  mime_type: string;
+  type: string;
+  size: number;
+};
+
+export type DirectoryT = {
+  access_type: string;
+  created_at: string;
+  id: string;
+  name: string;
+  parent_id: string;
+  updated_at: string;
+  file:Media
+};

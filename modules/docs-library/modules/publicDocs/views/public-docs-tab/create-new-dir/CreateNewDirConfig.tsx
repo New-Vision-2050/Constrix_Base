@@ -12,7 +12,7 @@ export function getCreateNewDirConfig(
 
   return {
     formId,
-    apiUrl: `${baseURL}/public-docs/create-dir`,
+    apiUrl: `${baseURL}/folders`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -27,6 +27,13 @@ export function getCreateNewDirConfig(
             type: "text",
             placeholder: t("namePlaceholder"),
           },
+          // parent_id
+          {
+            name: "parent_id",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: null,
+          },
           // password
           {
             name: "password",
@@ -36,7 +43,7 @@ export function getCreateNewDirConfig(
           },
           // public or private
           {
-            name: "permission",
+            name: "access_type",
             label: t("permission"),
             type: "radio",
             options: [
@@ -52,13 +59,13 @@ export function getCreateNewDirConfig(
           },
           // users
           {
-            name: "users",
+            name: "user_ids",
             label: t("users"),
             type: "select",
             isMulti: true,
             placeholder: t("usersPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/company-users/users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -91,7 +98,10 @@ export function getCreateNewDirConfig(
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
     onSubmit: async (formData) => {
-      return await defaultSubmitHandler(formData, getCreateNewDirConfig(t, onSuccessFn));
+      return await defaultSubmitHandler(
+        formData,
+        getCreateNewDirConfig(t, onSuccessFn)
+      );
     },
     submitButtonText: t("submitButtonText"),
     cancelButtonText: t("cancelButtonText"),

@@ -1,12 +1,18 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode, useState } from "react";
+import useDocsData from "../hooks/useDocsData";
+import { GetDocsResT } from "../apis/get-docs";
 
 // Define context type
 interface CxtType {
   // show item details
   showItemDetials: boolean;
   toggleShowItemDetials: () => void;
+  // docs
+  docs: GetDocsResT | undefined;
+  isLoadingDocs: boolean;
+  refetchDocs: () => void;
 }
 
 // Create the context
@@ -20,6 +26,11 @@ interface PropsT {
 export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
   const [showItemDetials, setShowItemDetials] = useState(false);
+  const {
+    data: docs,
+    isLoading: isLoadingDocs,
+    refetch: refetchDocs,
+  } = useDocsData();
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -32,6 +43,10 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         showItemDetials,
         // toggle show item details
         toggleShowItemDetials,
+        // docs
+        docs,
+        isLoadingDocs,
+        refetchDocs,
       }}
     >
       {children}
