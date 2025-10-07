@@ -18,6 +18,10 @@ interface CxtType {
   // selectedDocument
   selectedDocument: DocumentT | undefined;
   storeSelectedDocument: (document: DocumentT | undefined) => void;
+
+  // branchId
+  branchId: string;
+  handleSetBranchId: (branchId: string) => void;
 }
 
 // Create the context
@@ -32,11 +36,14 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
+  const [branchId, setBranchId] = useState("all");
+
   const {
     data: docs,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
-  } = useDocsData();
+  } = useDocsData(branchId);
+  
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -44,6 +51,8 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   const storeSelectedDocument = (document: DocumentT | undefined) => {
     setSelectedDocument(document);
   };
+
+  const handleSetBranchId = (branchId: string) => setBranchId(branchId);
 
   // ** return provider
   return (
@@ -60,6 +69,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // selectedDocument
         selectedDocument,
         storeSelectedDocument,
+        // branchId
+        branchId,
+        handleSetBranchId,
       }}
     >
       {children}

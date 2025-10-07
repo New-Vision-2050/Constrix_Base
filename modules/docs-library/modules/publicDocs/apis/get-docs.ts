@@ -12,8 +12,12 @@ type ResponseT = {
   payload: GetDocsResT;
 };
 
-export default async function getDocs() {
-  const res = await apiClient.get<ResponseT>(`/folders/contents`);
+export default async function getDocs(branchId?: string) {
+  const res = await apiClient.get<ResponseT>(`/folders/contents`, {
+    params: {
+      branch_id: branchId == "all" ? undefined : branchId,
+    },
+  });
 
   return res.data.payload;
 }
