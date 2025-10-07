@@ -292,14 +292,14 @@
         "move": "Move"
       },
       "table": {
-        "file_name": "File Name",
-        "sorted_by": "Sorted By",
-        "file_size": "File Size",
-        "docs_count": "Docs Count",
-        "file_type": "File Type",
-        "last_activity": "Last Activity",
+        "doc_name": "Folder/File Name",
+        "sortedBy":"Sorted By",
+        "fileSize": "File Size",
+        "docsCount": "Docs Count",
+        "fileType": "File Type",
+        "lastActivity": "Last Activity",
         "status": "Status",
-        "settings": "Settings"
+        "actions": "Actions"
       },
       "copyMoveDialog": {
         "copyTitle": "Copy",

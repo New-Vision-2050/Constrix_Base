@@ -281,14 +281,14 @@
         "move": "نقل"
       },
       "table": {
-        "file_name": "الملف",
-        "sorted_by": "تم التعديل بواسطة",
-        "file_size": "حجم الملف",
-        "docs_count": "عدد المستندات",
-        "file_type": "سمة الملف",
-        "last_activity": "اخر نشاط",
+        "doc_name": "اسم المستند/المجلد",
+        "sortedBy":"تم التعديل بواسطة",
+        "fileSize": "حجم الملف",
+        "docsCount": "عدد المستندات",
+        "fileType": "سمة الملف",
+        "lastActivity": "اخر نشاط",
         "status": "الحالة",
-        "settings": "الاعدادات"
+        "actions": "الاجراء"
       },
       "copyMoveDialog": {
         "copyTitle": "نسخ الى",
