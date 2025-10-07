@@ -76,6 +76,7 @@ export function getCreateNewDirConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            condition: (values) => values.access_type === "private",
           },
           // attached file
           {

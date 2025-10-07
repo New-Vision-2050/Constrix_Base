@@ -3,6 +3,7 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
 import useDocsData from "../hooks/useDocsData";
 import { GetDocsResT } from "../apis/get-docs";
+import { DocumentT } from "../types/Directory";
 
 // Define context type
 interface CxtType {
@@ -13,6 +14,10 @@ interface CxtType {
   docs: GetDocsResT | undefined;
   isLoadingDocs: boolean;
   refetchDocs: () => void;
+
+  // selectedDocument
+  selectedDocument: DocumentT | undefined;
+  storeSelectedDocument: (document: DocumentT | undefined) => void;
 }
 
 // Create the context
@@ -25,6 +30,7 @@ interface PropsT {
 
 export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
+  const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
   const {
     data: docs,
@@ -34,6 +40,10 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
+
+  const storeSelectedDocument = (document: DocumentT | undefined) => {
+    setSelectedDocument(document);
+  };
 
   // ** return provider
   return (
@@ -47,6 +57,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         docs,
         isLoadingDocs,
         refetchDocs,
+        // selectedDocument
+        selectedDocument,
+        storeSelectedDocument,
       }}
     >
       {children}

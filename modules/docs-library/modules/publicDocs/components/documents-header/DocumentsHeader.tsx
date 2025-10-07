@@ -42,7 +42,6 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations("docs-library.publicDocs.header");
-  const { toggleShowItemDetials } = usePublicDocsCxt();
   const [openDirDialog, setOpenDirDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
   const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
@@ -115,7 +114,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           )}
           {/* Details button */}
           <Button
-            onClick={toggleShowItemDetials}
+            onClick={() => {}}
             variant="outline"
             className="bg-sidebar h-10"
             size="sm"

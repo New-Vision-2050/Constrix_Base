@@ -10,7 +10,7 @@ type ModeViewsManagerProps = {
 };
 
 export default function ModeViewsManager({ viewMode }: ModeViewsManagerProps) {
-  const { showItemDetials } = usePublicDocsCxt();
+  const { showItemDetials, selectedDocument } = usePublicDocsCxt();
   return (
     <div className="w-full min-h-96 bg-sidebar rounded-lg p-4 flex justify-between gap-4">
       <div className="flex-1 min-w-0">
@@ -20,7 +20,7 @@ export default function ModeViewsManager({ viewMode }: ModeViewsManagerProps) {
           <TableBuilder config={getPublicDocsTableConfig()} />
         )}
       </div>
-      {showItemDetials && (
+      {(showItemDetials || Boolean(selectedDocument)) && (
         <div className="w-[360px] flex-shrink-0">
           <ItemDetails />
         </div>
