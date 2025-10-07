@@ -7,12 +7,16 @@ export type Media = {
   size: number;
 };
 
-export type DirectoryT = {
+export type DocumentT = {
   access_type: string;
   created_at: string;
   id: string;
   name: string;
   parent_id: string;
   updated_at: string;
-  file:Media
+  file: Media;
+  end_date: string;
+  reference_number: string;
+  start_date: string;
+  users: any[];
 };

@@ -2,11 +2,19 @@ import { useSheetForm } from "@/modules/form-builder";
 import { useTranslations } from "next-intl";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { getCreateNewDirConfig } from "./CreateNewDirConfig";
+import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 
-export default function CreateNewDirForm() {
+interface PropsType {
+  onClose: () => void;
+}
+export default function CreateNewDirForm({ onClose }: PropsType) {
+  const { refetchDocs } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewDirDialog");
 
-  const onSuccessFn = () => {};
+  const onSuccessFn = () => {
+    onClose();
+    refetchDocs();
+  };
 
   const _config = getCreateNewDirConfig(t, onSuccessFn);
 

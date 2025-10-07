@@ -1,8 +1,8 @@
 import { apiClient } from "@/config/axios-config";
-import { DirectoryT } from "../types/Directory";
+import { DocumentT } from "../types/Directory";
 
 export type GetDocsResT = {
-  folders: DirectoryT[];
+  folders: DocumentT[];
   files: any[];
 };
 // API response type

@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
 
 export function getCreateNewFileFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -12,7 +13,7 @@ export function getCreateNewFileFormConfig(
 
   return {
     formId,
-    apiUrl: `${baseURL}/public-docs/create-file`,
+    apiUrl: `${baseURL}/files`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
@@ -26,6 +27,20 @@ export function getCreateNewFileFormConfig(
             label: t("name"),
             type: "text",
             placeholder: t("namePlaceholder"),
+          },
+          // reference_number
+          {
+            name: "reference_number",
+            label: t("reference_number"),
+            type: "text",
+            placeholder: t("reference_numberPlaceholder"),
+          },
+          // parent_id
+          {
+            name: "parent_id",
+            label: "parent_id",
+            type: "hiddenObject",
+            defaultValue: null,
           },
           // password
           {
@@ -50,7 +65,7 @@ export function getCreateNewFileFormConfig(
           },
           // public or private
           {
-            name: "permission",
+            name: "access_type",
             label: t("permission"),
             type: "radio",
             options: [
@@ -66,13 +81,13 @@ export function getCreateNewFileFormConfig(
           },
           // users
           {
-            name: "users",
+            name: "user_ids",
             label: t("users"),
             type: "select",
             isMulti: true,
             placeholder: t("usersPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/company-users/users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -106,7 +121,7 @@ export function getCreateNewFileFormConfig(
     onSuccess: onSuccessFn,
     onSubmit: async (formData) => {
       return await defaultSubmitHandler(
-        formData,
+        serialize(formData),
         getCreateNewFileFormConfig(t, onSuccessFn)
       );
     },

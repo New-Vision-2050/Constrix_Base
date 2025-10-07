@@ -345,6 +345,8 @@
         "title": "Create New File",
         "name": "Name",
         "namePlaceholder": "Enter name",
+        "reference_number": "Reference Number",
+        "reference_numberPlaceholder": "Enter Reference Number",
         "password": "Password",
         "passwordPlaceholder": "Enter password",
         "permission": "Permission",

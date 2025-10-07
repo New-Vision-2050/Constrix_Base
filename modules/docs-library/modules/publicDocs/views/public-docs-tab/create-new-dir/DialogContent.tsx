@@ -36,7 +36,7 @@ export default function CreateNewDirDialogContent({
             <span className="sr-only">Close</span>
           </DialogClose>
         </DialogHeader>
-        <CreateNewDirForm />
+        <CreateNewDirForm onClose={onClose} />
       </DialogContent>
     </Dialog>
   );

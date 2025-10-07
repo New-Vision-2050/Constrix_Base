@@ -20,15 +20,22 @@ export default function GridViewMode() {
     <div className="relative min-h-96 bg-sidebar rounded-lg p-4 flex flex-col justify-between">
       {/* items */}
       <div className="flex flex-row items-center gap-6 flex-wrap flex-grow">
-        {isLoadingDocs
-          ? // Show loading skeletons
-            Array.from({ length: 12 }).map((_, index) => (
-              <GridItemSkeleton key={`skeleton-${index}`} />
-            ))
-          : // Show actual grid items when loaded
-            docs?.folders?.map((folder) => (
-              <GridItem isDir folder={folder} key={folder.id} />
+        {isLoadingDocs ? (
+          // Show loading skeletons
+          Array.from({ length: 12 }).map((_, index) => (
+            <GridItemSkeleton key={`skeleton-${index}`} />
+          ))
+        ) : (
+          // Show actual grid items when loaded
+          <>
+            {docs?.folders?.map((folder) => (
+              <GridItem isDir document={folder} key={folder.id} />
             ))}
+            {docs?.files?.map((file) => (
+              <GridItem document={file} key={file.id} />
+            ))}
+          </>
+        )}
       </div>
 
       {/* Pagination component - disabled during loading */}

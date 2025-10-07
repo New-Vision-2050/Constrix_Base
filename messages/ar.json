@@ -330,6 +330,8 @@
         "title": "إنشاء ملف جديد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
+        "reference_number": "رقم المرجع",
+        "reference_numberPlaceholder": "ادخل رقم المرجع",
         "password": "كلمة المرور",
         "passwordPlaceholder": "ادخل كلمة المرور",
         "permission": "الصلاحية",

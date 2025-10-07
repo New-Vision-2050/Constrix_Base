@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
 
 export function getCreateNewDirConfig(
   t: ReturnType<typeof useTranslations>,
@@ -99,7 +100,7 @@ export function getCreateNewDirConfig(
     onSuccess: onSuccessFn,
     onSubmit: async (formData) => {
       return await defaultSubmitHandler(
-        formData,
+        serialize(formData),
         getCreateNewDirConfig(t, onSuccessFn)
       );
     },
