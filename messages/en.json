@@ -272,6 +272,7 @@
       "notes": "Please enter the email address of the user you want to share the files with"
     },
     "publicDocs": {
+      "allBranches":"All Branches",
       "header": {
         "search": "Search",
         "add": "Add",

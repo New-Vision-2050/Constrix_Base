@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DocumentsHeader, ViewMode } from "../../components/documents-header";
 import { SearchFields, SearchFormData } from "../../components/search-fields";
 import ModeViewsManager from "./ModeViewsManager";
+import AllBranchesBtnList from "./AllBranchesList";
 
 export default function PublicDocsTabEntryPoint() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +24,8 @@ export default function PublicDocsTabEntryPoint() {
     console.log("View mode changed to:", mode);
   };
 
+  const branchId = "all";
+
   return (
     <div className="space-y-4">
       <SearchFields
@@ -38,6 +41,7 @@ export default function PublicDocsTabEntryPoint() {
         onViewModeChange={handleViewModeChange}
         isLoading={false}
       />
+      <AllBranchesBtnList />
       <ModeViewsManager viewMode={viewMode} />
     </div>
   );

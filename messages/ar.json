@@ -261,6 +261,7 @@
       "endDate": "تاريخ النهاية"
     },
     "publicDocs": {
+      "allBranches":"جميع الفروع",
       "header": {
         "search": "بحث",
         "add": "إضافة",
