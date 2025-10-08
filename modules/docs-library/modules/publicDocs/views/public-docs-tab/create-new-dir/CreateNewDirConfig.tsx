@@ -3,19 +3,35 @@ import { useTranslations } from "next-intl";
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
+import { DocumentT } from "../../../types/Directory";
 
 export function getCreateNewDirConfig(
   t: ReturnType<typeof useTranslations>,
-  onSuccessFn: () => void
+  onSuccessFn: () => void,
+  editedDoc?: DocumentT,
+  parentId?: string
 ): FormConfig {
+  const isEdit = Boolean(editedDoc);
   const formId = "create-new-dir-form";
 
   return {
     formId,
-    apiUrl: `${baseURL}/public-docs/create-dir`,
+    apiUrl: isEdit
+      ? `${baseURL}/folders/${editedDoc?.id}`
+      : `${baseURL}/folders`,
+    isEditMode: isEdit,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
+    },
+    initialValues: {
+      name: editedDoc?.name ?? "",
+      parent_id: isEdit ? editedDoc?.parent_id : parentId,
+      // password: ,
+      access_type: editedDoc?.access_type ?? "public",
+      user_ids: editedDoc?.users?.map((usr) => usr.id) ?? [],
+      file: editedDoc?.file ?? null,
     },
     sections: [
       {
@@ -27,6 +43,13 @@ export function getCreateNewDirConfig(
             type: "text",
             placeholder: t("namePlaceholder"),
           },
+          // parent_id
+          {
+            name: "parent_id",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: null,
+          },
           // password
           {
             name: "password",
@@ -36,7 +59,7 @@ export function getCreateNewDirConfig(
           },
           // public or private
           {
-            name: "permission",
+            name: "access_type",
             label: t("permission"),
             type: "radio",
             options: [
@@ -52,13 +75,13 @@ export function getCreateNewDirConfig(
           },
           // users
           {
-            name: "users",
+            name: "user_ids",
             label: t("users"),
             type: "select",
             isMulti: true,
             placeholder: t("usersPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/company-users/users`,
+              url: `${baseURL}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -68,6 +91,7 @@ export function getCreateNewDirConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            condition: (values) => values.access_type === "private",
           },
           // attached file
           {
@@ -91,7 +115,15 @@ export function getCreateNewDirConfig(
     // editDataTransformer: (data) => {},
     onSuccess: onSuccessFn,
     onSubmit: async (formData) => {
-      return await defaultSubmitHandler(formData, getCreateNewDirConfig(t, onSuccessFn));
+      return await defaultSubmitHandler(
+        serialize(formData),
+        getCreateNewDirConfig(t, onSuccessFn),
+        {
+          url: isEdit
+            ? `${baseURL}/folders/${editedDoc?.id}`
+            : `${baseURL}/folders`,
+        }
+      );
     },
     submitButtonText: t("submitButtonText"),
     cancelButtonText: t("cancelButtonText"),

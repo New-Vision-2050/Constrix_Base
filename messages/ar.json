@@ -261,6 +261,7 @@
       "endDate": "تاريخ النهاية"
     },
     "publicDocs": {
+      "allBranches": "جميع الفروع",
       "header": {
         "search": "بحث",
         "add": "إضافة",
@@ -279,15 +280,45 @@
         "favorite": "المفضلة",
         "move": "نقل"
       },
+      "ActivityLogs": {
+        "title": "سجل النشاط",
+        "loading": "جاري تحميل سجل الأنشطة...",
+        "noActivities": "لا توجد أنشطة"
+      },
       "table": {
-        "file_name": "الملف",
-        "sorted_by": "تم التعديل بواسطة",
-        "file_size": "حجم الملف",
-        "docs_count": "عدد المستندات",
-        "file_type": "سمة الملف",
-        "last_activity": "اخر نشاط",
+        "doc_name": "اسم المستند/المجلد",
+        "sortedBy": "تم التعديل بواسطة",
+        "fileSize": "حجم الملف",
+        "docsCount": "عدد المستندات",
+        "fileType": "سمة الملف",
+        "lastActivity": "اخر نشاط",
         "status": "الحالة",
-        "settings": "الاعدادات"
+        "settings": "الاعدادات",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "actions": {
+          "title": "أجراء",
+          "view": "تفاصيل",
+          "hide": "أخفاء",
+          "delete": "حذف",
+          "download": "تحميل",
+          "favorite": "المفضلة",
+          "move": "نقل",
+          "share": "مشاركة",
+          "edit": "تعديل",
+          "deleteDir": "هل انت متاكد من حذف المجلد؟",
+          "deleteFile": "هل انت متاكد من حذف الملف؟",
+          "deleteSuccess": "عملية الحذف تمت بنجاح",
+          "deleteFailed": "فشلت عملية الحذف"
+        }
+      },
+      "directoryPasswordDialog": {
+        "title": "كلمة المرور",
+        "description": "هذا المجلد محمي بكلمة المرور. يرجى إدخال كلمة المرور للاستفادة منه.",
+        "passwordLabel": "كلمة المرور",
+        "passwordPlaceholder": "أدخل كلمة المرور",
+        "confirm": "تأكيد",
+        "cancel": "إلغاء"
       },
       "copyMoveDialog": {
         "copyTitle": "نسخ الى",
@@ -312,6 +343,7 @@
       },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
+        "editTitle": "تعديل مجلد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
         "password": "كلمة المرور",
@@ -330,6 +362,8 @@
         "title": "إنشاء ملف جديد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
+        "reference_number": "رقم المرجع",
+        "reference_numberPlaceholder": "ادخل رقم المرجع",
         "password": "كلمة المرور",
         "passwordPlaceholder": "ادخل كلمة المرور",
         "permission": "الصلاحية",

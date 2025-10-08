@@ -272,6 +272,7 @@
       "notes": "Please enter the email address of the user you want to share the files with"
     },
     "publicDocs": {
+      "allBranches": "All Branches",
       "header": {
         "search": "Search",
         "add": "Add",
@@ -290,15 +291,45 @@
         "favorite": "Favorite",
         "move": "Move"
       },
+      "ActivityLogs": {
+        "title": "Activity Logs",
+        "loading": "Loading activity logs...",
+        "noActivities": "No activities found"
+      },
       "table": {
-        "file_name": "File Name",
-        "sorted_by": "Sorted By",
-        "file_size": "File Size",
-        "docs_count": "Docs Count",
-        "file_type": "File Type",
-        "last_activity": "Last Activity",
+        "doc_name": "Folder/File Name",
+        "sortedBy": "Sorted By",
+        "fileSize": "File Size",
+        "docsCount": "Docs Count",
+        "fileType": "File Type",
+        "lastActivity": "Last Activity",
         "status": "Status",
-        "settings": "Settings"
+        "settings": "Settings",
+        "active": "Active",
+        "inactive": "Inactive",
+        "actions": {
+          "title": "Action",
+          "view": "Details",
+          "hide": "Hide",
+          "delete": "Delete",
+          "download": "Download",
+          "favorite": "Favorite",
+          "move": "Move",
+          "share": "Share",
+          "edit": "Edit",
+          "deleteDir": "Are you sure you want to delete this directory?",
+          "deleteFile": "Are you sure you want to delete this file?",
+          "deleteSuccess": "Delete Operation done successfully",
+          "deleteFailed": "Delete Operation failed"
+        }
+      },
+      "directoryPasswordDialog":{
+        "title":"Directory Password",
+        "description":"This directory is protected by a password. Please enter the password to access it.",
+        "passwordLabel":"Password",
+        "passwordPlaceholder":"Enter password",
+        "confirm":"Confirm",
+        "cancel":"Cancel"
       },
       "copyMoveDialog": {
         "copyTitle": "Copy",
@@ -323,6 +354,7 @@
       },
       "createNewDirDialog": {
         "title": "Create New Directory",
+        "editTitle": "Edit Directory",
         "name": "Name",
         "namePlaceholder": "Enter name",
         "password": "Password",
@@ -345,6 +377,8 @@
         "title": "Create New File",
         "name": "Name",
         "namePlaceholder": "Enter name",
+        "reference_number": "Reference Number",
+        "reference_numberPlaceholder": "Enter Reference Number",
         "password": "Password",
         "passwordPlaceholder": "Enter password",
         "permission": "Permission",

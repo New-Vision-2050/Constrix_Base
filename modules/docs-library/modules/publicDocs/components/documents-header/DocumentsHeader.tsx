@@ -42,9 +42,15 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations("docs-library.publicDocs.header");
-  const { toggleShowItemDetials } = usePublicDocsCxt();
-  const [openDirDialog, setOpenDirDialog] = useState(false);
-  const [openFileDialog, setOpenFileDialog] = useState(false);
+  const {
+    openDirDialog,
+    setOpenDirDialog,
+    openFileDialog,
+    setOpenFileDialog,
+    setEditedDoc,
+    selectedDocs,
+    storeSelectedDocument,
+  } = usePublicDocsCxt();
   const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
   const [openCopyMoveDialog, setOpenCopyMoveDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
@@ -77,12 +83,18 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {
                 text: t("dir"),
                 icon: <Folder className="h-4 w-4" />,
-                onClick: () => setOpenDirDialog(true),
+                onClick: () => {
+                  setEditedDoc(undefined);
+                  setOpenDirDialog(true);
+                },
               },
               {
                 text: t("file"),
                 icon: <FileText className="h-4 w-4" />,
-                onClick: () => setOpenFileDialog(true),
+                onClick: () => {
+                  setEditedDoc(undefined);
+                  setOpenFileDialog(true);
+                },
               },
             ]}
           />
@@ -115,10 +127,13 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           )}
           {/* Details button */}
           <Button
-            onClick={toggleShowItemDetials}
+            onClick={() => {
+              storeSelectedDocument(selectedDocs[0]);
+            }}
             variant="outline"
             className="bg-sidebar h-10"
             size="sm"
+            disabled={selectedDocs.length != 1}
           >
             <PanelLeftOpen className="mr-2 h-4 w-4" />
             {t("details")}

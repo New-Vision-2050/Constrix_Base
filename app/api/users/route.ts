@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     if (searchQuery) {
       filteredData = mockUsers.filter(user => 
         Object.values(user).some(value => 
-          value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+          value != null && value.toString().toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
     }
