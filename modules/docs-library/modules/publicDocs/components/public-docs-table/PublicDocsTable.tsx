@@ -1,4 +1,5 @@
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
+import DirectoryPasswordDialog from "./components/DirectoryPasswordDialog";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { TableHeader } from "./components/TableHeader";
 import { TableRow } from "./components/TableRow";
@@ -8,7 +9,8 @@ import { TableRow } from "./components/TableRow";
  * Displays documents in a structured table format
  */
 export const PublicDocsTable = () => {
-  const { docs, isLoadingDocs } = usePublicDocsCxt();
+  const { docs, isLoadingDocs, setOpenDirWithPassword, openDirWithPassword } =
+    usePublicDocsCxt();
 
   if (isLoadingDocs) {
     return <LoadingSpinner />;
@@ -38,6 +40,12 @@ export const PublicDocsTable = () => {
           No documents found
         </div>
       )}
+      <DirectoryPasswordDialog
+        open={openDirWithPassword}
+        onClose={() => {
+          setOpenDirWithPassword(false);
+        }}
+      />
     </div>
   );
 };

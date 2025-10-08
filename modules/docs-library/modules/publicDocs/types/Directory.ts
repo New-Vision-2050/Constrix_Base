@@ -23,5 +23,6 @@ export type DocumentT = {
   end_date: string;
   reference_number: string;
   start_date: string;
+  is_password?: number;
   users: any[];
 };

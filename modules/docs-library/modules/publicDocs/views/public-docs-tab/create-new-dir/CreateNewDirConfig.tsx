@@ -9,7 +9,8 @@ import { DocumentT } from "../../../types/Directory";
 export function getCreateNewDirConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
-  editedDoc?: DocumentT
+  editedDoc?: DocumentT,
+  parentId?: string
 ): FormConfig {
   const isEdit = Boolean(editedDoc);
   const formId = "create-new-dir-form";
@@ -26,7 +27,7 @@ export function getCreateNewDirConfig(
     },
     initialValues: {
       name: editedDoc?.name ?? "",
-      parent_id: editedDoc?.parent_id ?? null,
+      parent_id: isEdit ? editedDoc?.parent_id : parentId,
       // password: ,
       access_type: editedDoc?.access_type ?? "public",
       user_ids: editedDoc?.users?.map((usr) => usr.id) ?? [],

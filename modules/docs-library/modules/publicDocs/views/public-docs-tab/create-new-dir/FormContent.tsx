@@ -9,7 +9,7 @@ interface PropsType {
   onClose: () => void;
 }
 export default function CreateNewDirForm({ onClose }: PropsType) {
-  const { refetchDocs, editedDoc, setEditedDoc } = usePublicDocsCxt();
+  const { refetchDocs, editedDoc, parentId, setEditedDoc } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewDirDialog");
 
   const onSuccessFn = () => {
@@ -19,8 +19,8 @@ export default function CreateNewDirForm({ onClose }: PropsType) {
   };
 
   const _config = useMemo(
-    () => getCreateNewDirConfig(t, onSuccessFn, editedDoc),
-    [editedDoc]
+    () => getCreateNewDirConfig(t, onSuccessFn, editedDoc, parentId),
+    [editedDoc, parentId]
   );
 
   // form builder vars

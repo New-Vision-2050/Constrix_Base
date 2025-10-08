@@ -5,6 +5,7 @@ import { StatusBadge } from "./StatusBadge";
 import { ActionButtons } from "./ActionButtons";
 import ToggleControl from "@/modules/clients/components/ToggleControl";
 import { useTranslations } from "next-intl";
+import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 
 /**
  * Table row component for displaying document information
@@ -16,11 +17,25 @@ interface TableRowProps {
 }
 
 export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
+  const { setParentId, setTempParentId, setOpenDirWithPassword } =
+    usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
     const mb = size / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
+  };
+
+  const handleClick = () => {
+    console.log("isFolderisFolder", isFolder, document?.is_password);
+    if (isFolder) {
+      if (document?.is_password == 1) {
+        setOpenDirWithPassword(true);
+        setTempParentId(document.id);
+      } else {
+        setParentId(document.id);
+      }
+    }
   };
 
   return (
@@ -32,7 +47,14 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <FileIcon isFolder={isFolder} fileName={document.name} />
-          <span className="font-medium">{document.name}</span>
+          <span
+            onClick={handleClick}
+            className={`font-medium ${
+              isFolder && "hover:underline cursor-pointer"
+            }`}
+          >
+            {document.name}
+          </span>
         </div>
       </td>
 
@@ -63,7 +85,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        <ActionButtons document={document } />
+        <ActionButtons document={document} />
       </td>
     </tr>
   );

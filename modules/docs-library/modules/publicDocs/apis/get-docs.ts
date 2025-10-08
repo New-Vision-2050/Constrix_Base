@@ -12,10 +12,17 @@ type ResponseT = {
   payload: GetDocsResT;
 };
 
-export default async function getDocs(branchId?: string) {
+export default async function getDocs(
+  branchId?: string,
+  parentId?: string,
+  password?: string
+) {
   const res = await apiClient.get<ResponseT>(`/folders/contents`, {
     params: {
+      // folder parent id
+      parent_id: parentId,
       branch_id: branchId == "all" ? undefined : branchId,
+      password: password?.length ? password : undefined,
     },
   });
 

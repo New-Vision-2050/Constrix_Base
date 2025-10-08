@@ -9,7 +9,8 @@ import { DocumentT } from "../../../types/Directory";
 export function getCreateNewFileFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
-  editedDoc?: DocumentT
+  editedDoc?: DocumentT,
+  parentId?: string
 ): FormConfig {
   const isEdit = Boolean(editedDoc);
   const formId = "create-new-file-form";
@@ -25,7 +26,7 @@ export function getCreateNewFileFormConfig(
     initialValues: {
       name: editedDoc?.name ?? "",
       reference_number: editedDoc?.reference_number ?? "",
-      parent_id: editedDoc?.parent_id ?? null,
+      parent_id: isEdit ? editedDoc?.parent_id : parentId,
       // password: editedDoc?.password,
       start_date: editedDoc?.start_date,
       end_date: editedDoc?.end_date,

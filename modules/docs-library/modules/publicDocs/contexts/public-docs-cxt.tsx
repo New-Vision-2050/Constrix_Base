@@ -27,10 +27,27 @@ interface CxtType {
   setOpenDirDialog: React.Dispatch<React.SetStateAction<boolean>>;
   openFileDialog: boolean;
   setOpenFileDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openDirWithPassword: boolean;
+  setOpenDirWithPassword: React.Dispatch<React.SetStateAction<boolean>>;
 
   // edited doc
   editedDoc: DocumentT | undefined;
   setEditedDoc: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
+
+  // folder parent id
+  parentId: string | undefined;
+  setParentId: React.Dispatch<React.SetStateAction<string | undefined>>;
+
+  // deleted doc id
+  deletedDocId: string | undefined;
+  setDeletedDocId: React.Dispatch<React.SetStateAction<string | undefined>>;
+
+  // dir password
+  dirPassword: string | undefined;
+  setDirPassword: React.Dispatch<React.SetStateAction<string | undefined>>;
+  // tempParentId
+  tempParentId: string;
+  setTempParentId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Create the context
@@ -49,13 +66,23 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // dialogs control
   const [openDirDialog, setOpenDirDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
+  const [openDirWithPassword, setOpenDirWithPassword] = useState(false);
+  // deleted doc id
+  const [deletedDocId, setDeletedDocId] = useState<string>();
   // edited doc
   const [editedDoc, setEditedDoc] = useState<DocumentT | undefined>(undefined);
+  // parent id
+  const [parentId, setParentId] = useState<string>();
+  const [dirPassword, setDirPassword] = useState<string>();
+  const [tempParentId, setTempParentId] = useState("");
+
   const {
     data: docs,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
-  } = useDocsData(branchId);
+  } = useDocsData(branchId, parentId, dirPassword);
+
+  console.log("parentId,dirPassword", parentId, dirPassword);
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -89,9 +116,23 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         setOpenDirDialog,
         openFileDialog,
         setOpenFileDialog,
+        openDirWithPassword,
+        setOpenDirWithPassword,
         // edited doc
         editedDoc,
         setEditedDoc,
+        // folder parent id
+        parentId,
+        setParentId,
+        // deleted doc id
+        deletedDocId,
+        setDeletedDocId,
+        // dir password
+        dirPassword,
+        setDirPassword,
+        // temp parent id
+        tempParentId,
+        setTempParentId,
       }}
     >
       {children}

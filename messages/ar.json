@@ -312,6 +312,14 @@
           "deleteFailed": "فشلت عملية الحذف"
         }
       },
+      "directoryPasswordDialog": {
+        "title": "كلمة المرور",
+        "description": "هذا المجلد محمي بكلمة المرور. يرجى إدخال كلمة المرور للاستفادة منه.",
+        "passwordLabel": "كلمة المرور",
+        "passwordPlaceholder": "أدخل كلمة المرور",
+        "confirm": "تأكيد",
+        "cancel": "إلغاء"
+      },
       "copyMoveDialog": {
         "copyTitle": "نسخ الى",
         "moveTitle": "نقل الى",

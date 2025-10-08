@@ -323,6 +323,14 @@
           "deleteFailed": "Delete Operation failed"
         }
       },
+      "directoryPasswordDialog":{
+        "title":"Directory Password",
+        "description":"This directory is protected by a password. Please enter the password to access it.",
+        "passwordLabel":"Password",
+        "passwordPlaceholder":"Enter password",
+        "confirm":"Confirm",
+        "cancel":"Cancel"
+      },
       "copyMoveDialog": {
         "copyTitle": "Copy",
         "moveTitle": "Move",

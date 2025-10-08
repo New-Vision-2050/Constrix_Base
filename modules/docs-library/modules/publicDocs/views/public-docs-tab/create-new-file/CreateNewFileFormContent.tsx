@@ -9,7 +9,7 @@ type PropsT = {
   onClose: () => void;
 };
 export default function CreateNewFileFormContent({ onClose }: PropsT) {
-  const { refetchDocs, editedDoc } = usePublicDocsCxt();
+  const { refetchDocs, editedDoc, parentId } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewFileDialog");
 
   const onSuccessFn = () => {
@@ -18,8 +18,8 @@ export default function CreateNewFileFormContent({ onClose }: PropsT) {
   };
 
   const _config = useMemo(
-    () => getCreateNewFileFormConfig(t, onSuccessFn, editedDoc),
-    [editedDoc]
+    () => getCreateNewFileFormConfig(t, onSuccessFn, editedDoc, parentId),
+    [editedDoc, parentId]
   );
 
   // form builder vars
