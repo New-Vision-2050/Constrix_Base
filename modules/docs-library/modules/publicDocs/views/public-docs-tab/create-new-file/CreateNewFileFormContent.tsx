@@ -3,12 +3,13 @@ import { useTranslations } from "next-intl";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { getCreateNewFileFormConfig } from "./CreateNewFileFormConfig";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { useMemo } from "react";
 
 type PropsT = {
   onClose: () => void;
 };
 export default function CreateNewFileFormContent({ onClose }: PropsT) {
-  const { refetchDocs } = usePublicDocsCxt();
+  const { refetchDocs, editedDoc } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewFileDialog");
 
   const onSuccessFn = () => {
@@ -16,7 +17,10 @@ export default function CreateNewFileFormContent({ onClose }: PropsT) {
     refetchDocs();
   };
 
-  const _config = getCreateNewFileFormConfig(t, onSuccessFn);
+  const _config = useMemo(
+    () => getCreateNewFileFormConfig(t, onSuccessFn, editedDoc),
+    [editedDoc]
+  );
 
   // form builder vars
   const {

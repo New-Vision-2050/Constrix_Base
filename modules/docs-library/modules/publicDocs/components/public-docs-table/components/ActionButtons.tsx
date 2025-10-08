@@ -27,8 +27,10 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons = ({ document }: ActionButtonsProps) => {
+  const isDirectory = !Boolean(document.reference_number);
   const t = useTranslations("docs-library.publicDocs.table.actions");
-  const { setOpenDirDialog, setEditedDoc } = usePublicDocsCxt();
+  const { setOpenDirDialog, setOpenFileDialog, setEditedDoc } =
+    usePublicDocsCxt();
 
   const handleAction = (action: string) => {
     // TODO: Implement actual action handlers
@@ -41,7 +43,8 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         break;
       case "edit":
         setEditedDoc(document);
-        setOpenDirDialog(true);
+        if (isDirectory) setOpenDirDialog(true);
+        else setOpenFileDialog(true);
         break;
       case "delete":
         break;
