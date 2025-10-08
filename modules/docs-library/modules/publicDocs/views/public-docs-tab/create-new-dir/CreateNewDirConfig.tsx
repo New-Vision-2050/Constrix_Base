@@ -4,19 +4,33 @@ import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { serialize } from "object-to-formdata";
+import { DocumentT } from "../../../types/Directory";
 
 export function getCreateNewDirConfig(
   t: ReturnType<typeof useTranslations>,
-  onSuccessFn: () => void
+  onSuccessFn: () => void,
+  editedDoc?: DocumentT
 ): FormConfig {
+  const isEdit = Boolean(editedDoc);
   const formId = "create-new-dir-form";
 
   return {
     formId,
-    apiUrl: `${baseURL}/folders`,
+    apiUrl: isEdit
+      ? `${baseURL}/folders/${editedDoc?.id}`
+      : `${baseURL}/folders`,
+    isEditMode: isEdit,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
+    },
+    initialValues: {
+      name: editedDoc?.name ?? "",
+      parent_id: editedDoc?.parent_id ?? null,
+      // password: ,
+      access_type: editedDoc?.access_type ?? "public",
+      user_ids: editedDoc?.users?.map((usr) => usr.id) ?? [],
+      file: editedDoc?.file ?? null,
     },
     sections: [
       {
@@ -102,7 +116,12 @@ export function getCreateNewDirConfig(
     onSubmit: async (formData) => {
       return await defaultSubmitHandler(
         serialize(formData),
-        getCreateNewDirConfig(t, onSuccessFn)
+        getCreateNewDirConfig(t, onSuccessFn),
+        {
+          url: isEdit
+            ? `${baseURL}/folders/${editedDoc?.id}`
+            : `${baseURL}/folders`,
+        }
       );
     },
     submitButtonText: t("submitButtonText"),

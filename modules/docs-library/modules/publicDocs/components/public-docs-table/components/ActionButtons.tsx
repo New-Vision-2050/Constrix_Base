@@ -15,21 +15,39 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
+import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { DocumentT } from "../../../types/Directory";
 
 /**
  * Action buttons component
  * Provides document action menu with various operations
  */
 interface ActionButtonsProps {
-  documentId: string;
+  document: DocumentT;
 }
 
-export const ActionButtons = ({ documentId }: ActionButtonsProps) => {
+export const ActionButtons = ({ document }: ActionButtonsProps) => {
   const t = useTranslations("docs-library.publicDocs.table.actions");
+  const { setOpenDirDialog, setEditedDoc } = usePublicDocsCxt();
 
   const handleAction = (action: string) => {
-    console.log(`${action} action for document:`, documentId);
     // TODO: Implement actual action handlers
+    switch (action) {
+      case "view":
+        break;
+      case "download":
+        break;
+      case "share":
+        break;
+      case "edit":
+        setEditedDoc(document);
+        setOpenDirDialog(true);
+        break;
+      case "delete":
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -41,7 +59,7 @@ export const ActionButtons = ({ documentId }: ActionButtonsProps) => {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent  className="w-44">
+      <DropdownMenuContent className="w-44">
         <DropdownMenuItem
           onClick={() => handleAction("view")}
           className="flex items-center gap-2"

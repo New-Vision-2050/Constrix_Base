@@ -42,8 +42,13 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations("docs-library.publicDocs.header");
-  const [openDirDialog, setOpenDirDialog] = useState(false);
-  const [openFileDialog, setOpenFileDialog] = useState(false);
+  const {
+    openDirDialog,
+    setOpenDirDialog,
+    openFileDialog,
+    setOpenFileDialog,
+    setEditedDoc,
+  } = usePublicDocsCxt();
   const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
   const [openCopyMoveDialog, setOpenCopyMoveDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
@@ -76,12 +81,18 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {
                 text: t("dir"),
                 icon: <Folder className="h-4 w-4" />,
-                onClick: () => setOpenDirDialog(true),
+                onClick: () => {
+                  setEditedDoc(undefined);
+                  setOpenDirDialog(true);
+                },
               },
               {
                 text: t("file"),
                 icon: <FileText className="h-4 w-4" />,
-                onClick: () => setOpenFileDialog(true),
+                onClick: () => {
+                  setEditedDoc(undefined);
+                  setOpenFileDialog(true);
+                },
               },
             ]}
           />

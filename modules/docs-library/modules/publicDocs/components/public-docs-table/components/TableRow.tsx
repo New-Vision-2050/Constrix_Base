@@ -63,7 +63,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        <ActionButtons documentId={document.id} />
+        <ActionButtons document={document } />
       </td>
     </tr>
   );

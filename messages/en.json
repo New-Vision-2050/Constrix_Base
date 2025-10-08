@@ -341,6 +341,7 @@
       },
       "createNewDirDialog": {
         "title": "Create New Directory",
+        "editTitle":"Edit Directory",
         "name": "Name",
         "namePlaceholder": "Enter name",
         "password": "Password",

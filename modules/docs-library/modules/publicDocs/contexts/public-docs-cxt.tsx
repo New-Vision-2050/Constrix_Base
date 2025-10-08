@@ -22,6 +22,15 @@ interface CxtType {
   // branchId
   branchId: string;
   handleSetBranchId: (branchId: string) => void;
+  // dialogs control
+  openDirDialog: boolean;
+  setOpenDirDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  openFileDialog: boolean;
+  setOpenFileDialog: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // edited doc
+  editedDoc: DocumentT | undefined;
+  setEditedDoc: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
 }
 
 // Create the context
@@ -37,13 +46,16 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
   const [branchId, setBranchId] = useState("all");
-
+  // dialogs control
+  const [openDirDialog, setOpenDirDialog] = useState(false);
+  const [openFileDialog, setOpenFileDialog] = useState(false);
+  // edited doc
+  const [editedDoc, setEditedDoc] = useState<DocumentT | undefined>(undefined);
   const {
     data: docs,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
   } = useDocsData(branchId);
-  
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -72,6 +84,14 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // branchId
         branchId,
         handleSetBranchId,
+        // dialogs control
+        openDirDialog,
+        setOpenDirDialog,
+        openFileDialog,
+        setOpenFileDialog,
+        // edited doc
+        editedDoc,
+        setEditedDoc,
       }}
     >
       {children}

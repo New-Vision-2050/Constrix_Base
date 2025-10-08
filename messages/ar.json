@@ -330,6 +330,7 @@
       },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
+        "editTitle":"تعديل مجلد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
         "password": "كلمة المرور",
