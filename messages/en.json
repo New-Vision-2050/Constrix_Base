@@ -309,13 +309,18 @@
         "inactive": "Inactive",
         "actions": {
           "title": "Action",
-          "view": "View",
+          "view": "Details",
+          "hide": "Hide",
           "delete": "Delete",
           "download": "Download",
           "favorite": "Favorite",
           "move": "Move",
           "share": "Share",
-          "edit": "Edit"
+          "edit": "Edit",
+          "deleteDir": "Are you sure you want to delete this directory?",
+          "deleteFile": "Are you sure you want to delete this file?",
+          "deleteSuccess": "Delete Operation done successfully",
+          "deleteFailed": "Delete Operation failed"
         }
       },
       "copyMoveDialog": {
@@ -341,7 +346,7 @@
       },
       "createNewDirDialog": {
         "title": "Create New Directory",
-        "editTitle":"Edit Directory",
+        "editTitle": "Edit Directory",
         "name": "Name",
         "namePlaceholder": "Enter name",
         "password": "Password",

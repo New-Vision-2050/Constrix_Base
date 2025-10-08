@@ -298,13 +298,18 @@
         "inactive": "غير نشط",
         "actions": {
           "title": "أجراء",
-          "view":"عرض",
+          "view": "تفاصيل",
+          "hide": "أخفاء",
           "delete": "حذف",
           "download": "تحميل",
           "favorite": "المفضلة",
           "move": "نقل",
           "share": "مشاركة",
-          "edit": "تعديل"
+          "edit": "تعديل",
+          "deleteDir": "هل انت متاكد من حذف المجلد؟",
+          "deleteFile": "هل انت متاكد من حذف الملف؟",
+          "deleteSuccess": "عملية الحذف تمت بنجاح",
+          "deleteFailed": "فشلت عملية الحذف"
         }
       },
       "copyMoveDialog": {
@@ -330,7 +335,7 @@
       },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
-        "editTitle":"تعديل مجلد",
+        "editTitle": "تعديل مجلد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
         "password": "كلمة المرور",
