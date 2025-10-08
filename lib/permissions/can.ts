@@ -48,6 +48,12 @@ export const createCan =
           process.env.NEXT_PUBLIC_DEV_BYPASS_ANY_PERMISSION === "true")
       )
         return true;
+      
+      // Handle case where permissions is undefined or null
+      if (!permissions || !Array.isArray(permissions)) {
+        return false;
+      }
+      
       switch (typeof check) {
         case "string":
           return permissions.some((p) => p.key === check);
