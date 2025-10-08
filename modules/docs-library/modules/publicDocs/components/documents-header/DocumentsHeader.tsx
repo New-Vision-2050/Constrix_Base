@@ -48,6 +48,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     openFileDialog,
     setOpenFileDialog,
     setEditedDoc,
+    selectedDocs,
+    storeSelectedDocument,
   } = usePublicDocsCxt();
   const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
   const [openCopyMoveDialog, setOpenCopyMoveDialog] = useState(false);
@@ -125,10 +127,13 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
           )}
           {/* Details button */}
           <Button
-            onClick={() => {}}
+            onClick={() => {
+              storeSelectedDocument(selectedDocs[0]);
+            }}
             variant="outline"
             className="bg-sidebar h-10"
             size="sm"
+            disabled={selectedDocs.length != 1}
           >
             <PanelLeftOpen className="mr-2 h-4 w-4" />
             {t("details")}

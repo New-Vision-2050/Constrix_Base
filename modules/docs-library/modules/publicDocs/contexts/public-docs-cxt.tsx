@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode, useState } from "react";
 import useDocsData from "../hooks/useDocsData";
-import { GetDocsResT } from "../apis/get-docs";
+import { DocsResPaginatedT, GetDocsResT } from "../apis/get-docs";
 import { DocumentT } from "../types/Directory";
 
 // Define context type
@@ -12,6 +12,7 @@ interface CxtType {
   toggleShowItemDetials: () => void;
   // docs
   docs: GetDocsResT | undefined;
+  docsPagination: DocsResPaginatedT | undefined;
   isLoadingDocs: boolean;
   refetchDocs: () => void;
 
@@ -48,6 +49,16 @@ interface CxtType {
   // tempParentId
   tempParentId: string;
   setTempParentId: React.Dispatch<React.SetStateAction<string>>;
+  // selected docs
+  selectedDocs: DocumentT[];
+  toggleDocInSelectedDocs: (doc: DocumentT) => void;
+  clearSelectedDocs: () => void;
+
+  // pagination variables
+  limit: number;
+  setLimit: React.Dispatch<React.SetStateAction<number>>;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 // Create the context
@@ -75,14 +86,18 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   const [parentId, setParentId] = useState<string>();
   const [dirPassword, setDirPassword] = useState<string>();
   const [tempParentId, setTempParentId] = useState("");
+  // selected docs
+  const [selectedDocs, setSelectedDocs] = useState<DocumentT[]>([]);
+
+  // pagination variables
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
 
   const {
-    data: docs,
+    data: docsResponse,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
-  } = useDocsData(branchId, parentId, dirPassword);
-
-  console.log("parentId,dirPassword", parentId, dirPassword);
+  } = useDocsData(branchId, parentId, dirPassword, limit, page);
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -93,6 +108,18 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
 
   const handleSetBranchId = (branchId: string) => setBranchId(branchId);
 
+  const toggleDocInSelectedDocs = (doc: DocumentT) => {
+    const _doc = selectedDocs.find((d) => d.id === doc.id);
+
+    if (_doc) {
+      setSelectedDocs(selectedDocs.filter((d) => d.id !== _doc.id));
+    } else {
+      setSelectedDocs([...selectedDocs, doc]);
+    }
+  };
+
+  const clearSelectedDocs = () => setSelectedDocs([]);
+
   // ** return provider
   return (
     <Cxt.Provider
@@ -102,7 +129,8 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // toggle show item details
         toggleShowItemDetials,
         // docs
-        docs,
+        docs: docsResponse?.payload,
+        docsPagination: docsResponse?.pagination,
         isLoadingDocs,
         refetchDocs,
         // selectedDocument
@@ -133,6 +161,15 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // temp parent id
         tempParentId,
         setTempParentId,
+        // selected docs
+        selectedDocs,
+        toggleDocInSelectedDocs,
+        clearSelectedDocs,
+        // pagination variables
+        limit,
+        setLimit,
+        page,
+        setPage,
       }}
     >
       {children}

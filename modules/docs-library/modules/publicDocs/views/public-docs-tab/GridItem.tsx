@@ -16,7 +16,8 @@ export default function GridItem({
 }) {
   // declare and define component variables
   const date = new Date(document?.created_at);
-  const { storeSelectedDocument, selectedDocument } = usePublicDocsCxt();
+  const { storeSelectedDocument, selectedDocument, toggleDocInSelectedDocs } =
+    usePublicDocsCxt();
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
   // calc file size
   const fileSize = document?.file?.size;
@@ -67,7 +68,10 @@ export default function GridItem({
       <p className="text-center text-sm font-light">
         {fileSizeInMB.toFixed(2)} MB
       </p>
-      <Checkbox className="absolute top-2 right-2" />
+      <Checkbox
+        className="absolute top-2 right-2"
+        onCheckedChange={() => toggleDocInSelectedDocs(document)}
+      />
     </div>
   );
 }

@@ -14,7 +14,7 @@ const GridItemSkeleton = () => (
 );
 
 export default function GridViewMode() {
-  const { docs, isLoadingDocs } = usePublicDocsCxt();
+  const { docs, docsPagination, isLoadingDocs, limit, page, setLimit, setPage } = usePublicDocsCxt();
 
   return (
     <div className="relative min-h-96 bg-sidebar rounded-lg p-4 flex flex-col justify-between">
@@ -42,12 +42,12 @@ export default function GridViewMode() {
       <div className="mt-8 flex justify-center w-full">
         <div className={isLoadingDocs ? "opacity-50 pointer-events-none" : ""}>
           <Pagination
-            currentPage={1}
-            totalPages={5}
-            onPageChange={() => {}}
-            currentLimit={1}
-            limitOptions={[2, 5, 10, 25, 50]}
-            onLimitChange={() => {}}
+            currentPage={docsPagination?.current_page ?? 1}
+            totalPages={docsPagination?.last_page ?? 1}
+            onPageChange={(page) => setPage(page)}
+            currentLimit={docsPagination?.per_page ?? 10}
+            limitOptions={[10, 25, 50, 100]}
+            onLimitChange={(limit) => setLimit(limit)}
           />
         </div>
       </div>

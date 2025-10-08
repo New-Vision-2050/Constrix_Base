@@ -3,8 +3,10 @@ import { DocumentsHeader, ViewMode } from "../../components/documents-header";
 import { SearchFields, SearchFormData } from "../../components/search-fields";
 import ModeViewsManager from "./ModeViewsManager";
 import AllBranchesBtnList from "./AllBranchesList";
+import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 
 export default function PublicDocsTabEntryPoint() {
+  const { clearSelectedDocs, storeSelectedDocument } = usePublicDocsCxt();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [searchData, setSearchData] = useState<SearchFormData>({
@@ -20,8 +22,9 @@ export default function PublicDocsTabEntryPoint() {
 
   // Handle view mode change
   const handleViewModeChange = (mode: ViewMode) => {
+    storeSelectedDocument(undefined);
+    clearSelectedDocs();
     setViewMode(mode);
-    console.log("View mode changed to:", mode);
   };
 
   const branchId = "all";

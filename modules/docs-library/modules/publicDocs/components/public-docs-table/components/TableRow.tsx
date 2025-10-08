@@ -17,8 +17,12 @@ interface TableRowProps {
 }
 
 export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
-  const { setParentId, setTempParentId, setOpenDirWithPassword } =
-    usePublicDocsCxt();
+  const {
+    setParentId,
+    setTempParentId,
+    setOpenDirWithPassword,
+    toggleDocInSelectedDocs,
+  } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
@@ -27,7 +31,6 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
   };
 
   const handleClick = () => {
-    console.log("isFolderisFolder", isFolder, document?.is_password);
     if (isFolder) {
       if (document?.is_password == 1) {
         setOpenDirWithPassword(true);
@@ -41,7 +44,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
   return (
     <tr className="hover:bg-muted/30 transition-colors">
       <td className="px-4 py-3">
-        <Checkbox />
+        <Checkbox onCheckedChange={() => toggleDocInSelectedDocs(document)} />
       </td>
 
       <td className="px-4 py-3">
