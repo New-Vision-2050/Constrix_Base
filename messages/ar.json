@@ -261,7 +261,7 @@
       "endDate": "تاريخ النهاية"
     },
     "publicDocs": {
-      "allBranches":"جميع الفروع",
+      "allBranches": "جميع الفروع",
       "header": {
         "search": "بحث",
         "add": "إضافة",
@@ -280,9 +280,14 @@
         "favorite": "المفضلة",
         "move": "نقل"
       },
+      "ActivityLogs": {
+        "title": "سجل النشاط",
+        "loading": "جاري تحميل سجل الأنشطة...",
+        "noActivities":"لا توجد أنشطة"
+      },
       "table": {
         "doc_name": "اسم المستند/المجلد",
-        "sortedBy":"تم التعديل بواسطة",
+        "sortedBy": "تم التعديل بواسطة",
         "fileSize": "حجم الملف",
         "docsCount": "عدد المستندات",
         "fileType": "سمة الملف",

@@ -291,6 +291,11 @@
         "favorite": "Favorite",
         "move": "Move"
       },
+      "ActivityLogs": {
+        "title": "Activity Logs",
+        "loading": "Loading activity logs...",
+        "noActivities":"No activities found"
+      },
       "table": {
         "doc_name": "Folder/File Name",
         "sortedBy":"Sorted By",
