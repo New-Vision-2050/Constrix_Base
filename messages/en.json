@@ -272,7 +272,7 @@
       "notes": "Please enter the email address of the user you want to share the files with"
     },
     "publicDocs": {
-      "allBranches":"All Branches",
+      "allBranches": "All Branches",
       "header": {
         "search": "Search",
         "add": "Add",
@@ -294,17 +294,29 @@
       "ActivityLogs": {
         "title": "Activity Logs",
         "loading": "Loading activity logs...",
-        "noActivities":"No activities found"
+        "noActivities": "No activities found"
       },
       "table": {
         "doc_name": "Folder/File Name",
-        "sortedBy":"Sorted By",
+        "sortedBy": "Sorted By",
         "fileSize": "File Size",
         "docsCount": "Docs Count",
         "fileType": "File Type",
         "lastActivity": "Last Activity",
         "status": "Status",
-        "actions": "Actions"
+        "settings": "Settings",
+        "active": "Active",
+        "inactive": "Inactive",
+        "actions": {
+          "title": "Action",
+          "view": "View",
+          "delete": "Delete",
+          "download": "Download",
+          "favorite": "Favorite",
+          "move": "Move",
+          "share": "Share",
+          "edit": "Edit"
+        }
       },
       "copyMoveDialog": {
         "copyTitle": "Copy",

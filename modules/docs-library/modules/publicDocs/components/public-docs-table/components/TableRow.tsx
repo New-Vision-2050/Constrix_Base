@@ -3,6 +3,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileIcon } from "./FileIcon";
 import { StatusBadge } from "./StatusBadge";
 import { ActionButtons } from "./ActionButtons";
+import ToggleControl from "@/modules/clients/components/ToggleControl";
+import { useTranslations } from "next-intl";
 
 /**
  * Table row component for displaying document information
@@ -14,10 +16,7 @@ interface TableRowProps {
 }
 
 export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("ar-SA");
-  };
-
+  const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
     const mb = size / (1024 * 1024);
@@ -37,16 +36,30 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
         </div>
       </td>
 
-      <td className="px-4 py-3 text-muted-foreground">محمد خالد</td>
+      <td className="px-4 py-3 text-muted-foreground">
+        {document?.last_log?.user?.name ?? "-"}
+      </td>
 
       <td className="px-4 py-3 text-muted-foreground">
         {formatFileSize(document.file?.size)}
       </td>
 
-      <td className="px-4 py-3 text-center">-</td>
+      <td className="px-4 py-3 text-muted-foreground text-center">
+        {document?.files_count ?? "-"}
+      </td>
 
       <td className="px-4 py-3 text-muted-foreground text-sm">
-        {formatDate(document.created_at)}
+        {document?.last_log?.title ?? "-"}
+      </td>
+
+      <td className="px-4 py-3">
+        <ToggleControl
+          activeLabel={t("active")}
+          inactiveLabel={t("inactive")}
+          checked={document.status == 1 ? true : false}
+          onChange={(checked) => {}}
+          disabled={false}
+        />
       </td>
 
       <td className="px-4 py-3">

@@ -283,7 +283,7 @@
       "ActivityLogs": {
         "title": "سجل النشاط",
         "loading": "جاري تحميل سجل الأنشطة...",
-        "noActivities":"لا توجد أنشطة"
+        "noActivities": "لا توجد أنشطة"
       },
       "table": {
         "doc_name": "اسم المستند/المجلد",
@@ -293,7 +293,19 @@
         "fileType": "سمة الملف",
         "lastActivity": "اخر نشاط",
         "status": "الحالة",
-        "actions": "الاجراء"
+        "settings": "الاعدادات",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "actions": {
+          "title": "أجراء",
+          "view":"عرض",
+          "delete": "حذف",
+          "download": "تحميل",
+          "favorite": "المفضلة",
+          "move": "نقل",
+          "share": "مشاركة",
+          "edit": "تعديل"
+        }
       },
       "copyMoveDialog": {
         "copyTitle": "نسخ الى",

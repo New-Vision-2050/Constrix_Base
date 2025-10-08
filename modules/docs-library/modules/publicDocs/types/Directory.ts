@@ -1,3 +1,5 @@
+import { UserActivityT } from "@/modules/user-profile/types/user-activity";
+
 export type Media = {
   id: number;
   url: string;
@@ -15,6 +17,9 @@ export type DocumentT = {
   parent_id: string;
   updated_at: string;
   file: Media;
+  last_log: UserActivityT;
+  files_count: number;
+  status: number;
   end_date: string;
   reference_number: string;
   start_date: string;

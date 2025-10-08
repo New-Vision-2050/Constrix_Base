@@ -3,7 +3,7 @@ import { DocumentT } from "../types/Directory";
 
 export type GetDocsResT = {
   folders: DocumentT[];
-  files: any[];
+  files: DocumentT[];
 };
 // API response type
 type ResponseT = {

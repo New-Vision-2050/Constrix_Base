@@ -14,7 +14,8 @@ export const TableHeader = () => {
     { key: "fileSize", label: t("fileSize"), width: "w-24" },
     { key: "docsCount", label: t("docsCount"), width: "w-28" },
     { key: "lastActivity", label: t("lastActivity"), width: "w-36" },
-    { key: "actions", label: t("actions"), width: "w-20" },
+    { key: "status", label: t("status"), width: "w-36" },
+    { key: "actions", label: t("settings"), width: "w-20" },
   ];
 
   return (
