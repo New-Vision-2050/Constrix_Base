@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import InfoIcon from "@/public/icons/info";
 import { useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { apiClient } from "@/config/axios-config";
 
 interface PropsI {
   open: boolean;
@@ -22,15 +23,37 @@ interface PropsI {
 export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const t = useTranslations("docs-library.publicDocs.directoryPasswordDialog");
-  const { setDirPassword, setParentId, tempParentId } = usePublicDocsCxt();
+  const { branchId, setDirPassword, setParentId, tempParentId } =
+    usePublicDocsCxt();
 
+  const isPasswordRight = async () => {
+    try {
+      await apiClient.get(`/folders/contents`, {
+        params: {
+          // folder parent id
+          parent_id: tempParentId,
+          branch_id: branchId == "all" ? undefined : branchId,
+          password: password?.length ? password : undefined,
+        },
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
   const handleConfirm = async () => {
     if (!password.trim()) return;
 
     setIsLoading(true);
+    setErrorMsg("");
     try {
-      // TODO: Implement password verification API call
+      const check = await isPasswordRight();
+      if (!check) {
+        setErrorMsg("invalid password,try again");
+        return;
+      }
       React.startTransition(() => {
         setDirPassword(password);
         setParentId(tempParentId);
@@ -84,6 +107,7 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
                 disabled={isLoading}
               />
             </div>
+            {errorMsg && <p className="text-red-500">{errorMsg}</p>}
           </div>
         </DialogDescription>
         <DialogFooter className="!items-center !justify-center gap-3">
