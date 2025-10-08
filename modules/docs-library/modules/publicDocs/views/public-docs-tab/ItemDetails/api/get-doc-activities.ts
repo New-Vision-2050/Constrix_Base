@@ -8,8 +8,15 @@ type ResponseT = {
   payload: UserActivityT[];
 };
 
-export default async function getDocActivityLogs(docId?: string) {
-  const res = await apiClient.get<ResponseT>(`/folders/${docId}/audits`);
+export default async function getDocActivityLogs(
+  docId?: string,
+  type?: string
+) {
+  const res = await apiClient.get<ResponseT>(`/folders/${docId}/audits`, {
+    params: {
+      type,
+    },
+  });
 
   return res.data.payload;
 }

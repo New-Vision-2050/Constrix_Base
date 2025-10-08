@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import useDocActivityLogs from "./hooks/useDocActvityLogs";
 import TimeLineItem from "@/modules/dashboard/components/activity-timeline/time-line-item";
 import { ClockIcon, UserIcon } from "lucide-react";
+import { useMemo } from "react";
 
 function timeAgo(updatedTime: Date, currentTime: Date) {
   const diffInMinutes = Math.floor(
@@ -27,9 +28,14 @@ function timeAgo(updatedTime: Date, currentTime: Date) {
  */
 export default function ItemDetails() {
   const t = useTranslations("docs-library.publicDocs.ActivityLogs");
-  const { selectedDocument, storeSelectedDocument } = usePublicDocsCxt();
+  const { selectedDocument } = usePublicDocsCxt();
+  const isDirectory = useMemo(
+    () => !Boolean(selectedDocument?.reference_number),
+    [selectedDocument]
+  );
   const { data: itemLogs, isLoading } = useDocActivityLogs(
-    selectedDocument?.id ?? ""
+    selectedDocument?.id ?? "",
+    isDirectory ? "folder" : "file"
   );
 
   return (
