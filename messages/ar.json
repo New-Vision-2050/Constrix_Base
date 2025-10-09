@@ -273,7 +273,7 @@
         "list": "قائمة",
         "details": "تفاصيل",
         "share": "مشاركة",
-        "copy": "نسخ الرابط",
+        "copy": "نسخ",
         "requestFile": "طلب ملف",
         "delete": "حذف",
         "download": "تحميل",
@@ -328,7 +328,14 @@
         "cancel": "الغاء",
         "selectFolder": "اختر مجلد",
         "searchFolder": "بحث",
-        "noResults": "لا توجد نتائج"
+        "noResults": "لا توجد نتائج",
+        "loadingFolders": "جاري تحميل المجلدات...",
+        "errorLoadingFolders": "حدث خطأ في تحميل المجلدات",
+        "copying": "جاري النسخ...",
+        "moving": "جاري النقل...",
+        "copySuccess": "تم نسخ الملف بنجاح",
+        "moveSuccess": "تم نقل الملف بنجاح",
+        "moveCopeError": "حدث خطأ أثناء العملية"
       },
       "shareDialog": {
         "title": "مشاركة",

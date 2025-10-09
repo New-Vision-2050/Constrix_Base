@@ -4,6 +4,8 @@ import React, { createContext, useContext, ReactNode, useState } from "react";
 import useDocsData from "../hooks/useDocsData";
 import { DocsResPaginatedT, GetDocsResT } from "../apis/get-docs";
 import { DocumentT } from "../types/Directory";
+import useFoldersList from "../hooks/useFoldersList";
+import { SelectOption } from "@/types/select-option";
 
 // Define context type
 interface CxtType {
@@ -59,6 +61,11 @@ interface CxtType {
   setLimit: React.Dispatch<React.SetStateAction<number>>;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
+
+  // folders list
+  foldersList: SelectOption[] | undefined;
+  isLoadingFoldersList: boolean;
+  isErrorFoldersList: boolean;
 }
 
 // Create the context
@@ -98,6 +105,13 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
   } = useDocsData(branchId, parentId, dirPassword, limit, page);
+
+  // folders list
+  const {
+    data: foldersList,
+    isLoading: isLoadingFoldersList,
+    isError: isErrorFoldersList,
+  } = useFoldersList();
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -170,6 +184,10 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         setLimit,
         page,
         setPage,
+        // folders list
+        foldersList,
+        isLoadingFoldersList,
+        isErrorFoldersList,
       }}
     >
       {children}

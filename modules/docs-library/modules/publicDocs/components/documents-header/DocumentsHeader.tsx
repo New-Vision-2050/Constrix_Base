@@ -186,6 +186,10 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               setcpMvDialogType("copy");
               setOpenCopyMoveDialog(true);
             }}
+            disabled={
+              selectedDocs?.length != 1 ||
+              !Boolean(selectedDocs?.[0]?.reference_number)
+            }
           >
             <Copy className="mr-2 h-4 w-4" />
             {t("copy")}
@@ -219,6 +223,10 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               setcpMvDialogType("move");
               setOpenCopyMoveDialog(true);
             }}
+            disabled={
+              selectedDocs?.length != 1 ||
+              !Boolean(selectedDocs?.[0]?.reference_number)
+            }
           >
             <MoveRight className="mr-2 h-4 w-4" />
             {t("move")}

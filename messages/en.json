@@ -284,7 +284,7 @@
         "list": "List",
         "details": "Details",
         "share": "Share",
-        "copy": "Copy Link",
+        "copy": "Copy",
         "requestFile": "Request File",
         "delete": "Delete",
         "download": "Download",
@@ -339,7 +339,14 @@
         "label": "To Directory",
         "selectFolder": "Select Folder",
         "searchFolder": "Search",
-        "noResults": "No Results"
+        "noResults": "No Results",
+        "loadingFolders": "Loading folders...",
+        "errorLoadingFolders": "Error loading folders",
+        "copying": "Copying...",
+        "moving": "Moving...",
+        "copySuccess": "File copied successfully",
+        "moveSuccess": "File moved successfully",
+        "moveCopeError": "Error during operation"
       },
       "shareDialog": {
         "title": "Share",
