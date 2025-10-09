@@ -18,7 +18,7 @@ export const useGetEditModeTabsList = (
       title: t("profile"),
       icon: <UserIcon />,
       content: <UserProfileTab />,
-      show: true,
+      show: can(PERMISSIONS.profile.personalInfo.view),
     },
     {
       id: "edit-mode-tabs-contract",
