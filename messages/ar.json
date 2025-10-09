@@ -278,7 +278,11 @@
         "delete": "حذف",
         "download": "تحميل",
         "favorite": "المفضلة",
-        "move": "نقل"
+        "move": "نقل",
+        "deleteDir": "هل انت متاكد من حذف المجلد؟",
+        "deleteFile": "هل انت متاكد من حذف الملف؟",
+        "deleteSuccess": "عملية الحذف تمت بنجاح",
+        "deleteFailed": "فشلت عملية الحذف"
       },
       "ActivityLogs": {
         "title": "سجل النشاط",

@@ -289,7 +289,11 @@
         "delete": "Delete",
         "download": "Download",
         "favorite": "Favorite",
-        "move": "Move"
+        "move": "Move",
+        "deleteDir": "Are you sure you want to delete this directory?",
+        "deleteFile": "Are you sure you want to delete this file?",
+        "deleteSuccess": "Delete Operation done successfully",
+        "deleteFailed": "Delete Operation failed"
       },
       "ActivityLogs": {
         "title": "Activity Logs",
@@ -323,13 +327,13 @@
           "deleteFailed": "Delete Operation failed"
         }
       },
-      "directoryPasswordDialog":{
-        "title":"Directory Password",
-        "description":"This directory is protected by a password. Please enter the password to access it.",
-        "passwordLabel":"Password",
-        "passwordPlaceholder":"Enter password",
-        "confirm":"Confirm",
-        "cancel":"Cancel"
+      "directoryPasswordDialog": {
+        "title": "Directory Password",
+        "description": "This directory is protected by a password. Please enter the password to access it.",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter password",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
       },
       "copyMoveDialog": {
         "copyTitle": "Copy",
