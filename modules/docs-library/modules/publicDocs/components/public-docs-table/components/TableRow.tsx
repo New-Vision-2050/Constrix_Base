@@ -69,8 +69,8 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
 
       <td className="px-4 py-3 text-muted-foreground">
         {isFolder
-          ? `${document.size ?? 0} MB`
-          : formatFileSize(document?.file?.size)}
+          ? formatFileSize(document.size ?? 0)
+          : formatFileSize(document?.file?.size ?? 0)}
       </td>
 
       <td className="px-4 py-3 text-muted-foreground text-center">
