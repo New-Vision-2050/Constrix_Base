@@ -242,7 +242,8 @@
       },
       "expirationStats": {
         "title": "المستندات المقتربة على الانتهاء",
-        "countLabel": "عدد تحميلات المستند"
+        "countLabel": "عدد تحميلات المستند",
+        "badgeText": "تنتهي قريباً"
       }
     },
     "cards": {
@@ -273,12 +274,16 @@
         "list": "قائمة",
         "details": "تفاصيل",
         "share": "مشاركة",
-        "copy": "نسخ الرابط",
+        "copy": "نسخ",
         "requestFile": "طلب ملف",
         "delete": "حذف",
         "download": "تحميل",
         "favorite": "المفضلة",
-        "move": "نقل"
+        "move": "نقل",
+        "deleteDir": "هل انت متاكد من حذف المجلد؟",
+        "deleteFile": "هل انت متاكد من حذف الملف؟",
+        "deleteSuccess": "عملية الحذف تمت بنجاح",
+        "deleteFailed": "فشلت عملية الحذف"
       },
       "ActivityLogs": {
         "title": "سجل النشاط",
@@ -328,7 +333,14 @@
         "cancel": "الغاء",
         "selectFolder": "اختر مجلد",
         "searchFolder": "بحث",
-        "noResults": "لا توجد نتائج"
+        "noResults": "لا توجد نتائج",
+        "loadingFolders": "جاري تحميل المجلدات...",
+        "errorLoadingFolders": "حدث خطأ في تحميل المجلدات",
+        "copying": "جاري النسخ...",
+        "moving": "جاري النقل...",
+        "copySuccess": "تم نسخ الملف بنجاح",
+        "moveSuccess": "تم نقل الملف بنجاح",
+        "moveCopeError": "حدث خطأ أثناء العملية"
       },
       "shareDialog": {
         "title": "مشاركة",

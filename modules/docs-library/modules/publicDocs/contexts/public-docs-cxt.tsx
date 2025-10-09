@@ -4,6 +4,9 @@ import React, { createContext, useContext, ReactNode, useState } from "react";
 import useDocsData from "../hooks/useDocsData";
 import { DocsResPaginatedT, GetDocsResT } from "../apis/get-docs";
 import { DocumentT } from "../types/Directory";
+import useFoldersList from "../hooks/useFoldersList";
+import { SelectOption } from "@/types/select-option";
+import { SearchFormData } from "../components/search-fields";
 
 // Define context type
 interface CxtType {
@@ -59,6 +62,19 @@ interface CxtType {
   setLimit: React.Dispatch<React.SetStateAction<number>>;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
+
+  // folders list
+  foldersList: SelectOption[] | undefined;
+  isLoadingFoldersList: boolean;
+  isErrorFoldersList: boolean;
+
+  // search params
+  searchData: SearchFormData;
+  setSearchData: React.Dispatch<React.SetStateAction<SearchFormData>>;
+
+  // visited dir
+  visitedDirs: DocumentT[];
+  setVisitedDirs: React.Dispatch<React.SetStateAction<DocumentT[]>>;
 }
 
 // Create the context
@@ -89,6 +105,15 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // selected docs
   const [selectedDocs, setSelectedDocs] = useState<DocumentT[]>([]);
 
+  // visited dirs
+  const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
+
+  // search params
+  const [searchData, setSearchData] = useState<SearchFormData>({
+    endDate: "",
+    type: "",
+    documentType: "",
+  });
   // pagination variables
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
@@ -97,7 +122,14 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     data: docsResponse,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
-  } = useDocsData(branchId, parentId, dirPassword, limit, page);
+  } = useDocsData(branchId, parentId, dirPassword, limit, page, searchData);
+
+  // folders list
+  const {
+    data: foldersList,
+    isLoading: isLoadingFoldersList,
+    isError: isErrorFoldersList,
+  } = useFoldersList();
 
   //  toggle show item details
   const toggleShowItemDetials = () => setShowItemDetials(!showItemDetials);
@@ -170,6 +202,16 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         setLimit,
         page,
         setPage,
+        // folders list
+        foldersList,
+        isLoadingFoldersList,
+        isErrorFoldersList,
+        // search params
+        searchData,
+        setSearchData,
+        // visited dirs
+        visitedDirs,
+        setVisitedDirs,
       }}
     >
       {children}

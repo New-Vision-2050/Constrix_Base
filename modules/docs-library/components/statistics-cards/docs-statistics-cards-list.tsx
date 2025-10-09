@@ -10,68 +10,71 @@ import {
   ExpirationStatisticsData,
 } from "../statistics-cards/docs-statistics-by-expiration";
 import { useTranslations } from "next-intl";
+import { useDocsLibraryCxt } from "../../context/docs-library-cxt";
+import { useMemo } from "react";
 
 export default function DocsStatisticsCardsList() {
   // declare and define component vars
+  const { docsWidgets } = useDocsLibraryCxt();
   const t = useTranslations("docs-library.statistics");
-  
-  const documentStats: StatisticsCardData = {
-    title: t("documentStats.title"),
-    mainValue: 27,
-    mainLabel: t("documentStats.mainLabel"),
-    secondaryValue: "160 MB",
-    comparison: {
-      leftValue: 120,
-      leftLabel: t("documentStats.comparison.leftLabel"),
-      rightValue: 40,
-      rightLabel: t("documentStats.comparison.rightLabel"),
-      unit: "MB",
-    },
-    icon: <FileText className="w-6 h-6 text-blue-400" />,
-  };
 
-  const activityStats: ActivityStatisticsData = {
-    items: [
-      {
-        title: t("activityStats.title"),
-        percentage: 88,
-        description: t("activityStats.description"),
-        color: "#10B981",
-        icon: <FileText className="w-6 h-6 text-[#10B981]" />,
+  const documentStats: StatisticsCardData = useMemo(
+    () => ({
+      title: t("documentStats.title"),
+      mainValue: docsWidgets?.total_files_count ?? "-",
+      mainLabel: t("documentStats.mainLabel"),
+      secondaryValue: "160 MB",
+      comparison: {
+        leftValue: 120,
+        leftLabel: t("documentStats.comparison.leftLabel"),
+        rightValue: 40,
+        rightLabel: t("documentStats.comparison.rightLabel"),
+        unit: "MB",
       },
-      {
-        title: t("activityStats.title2"),
-        percentage: 60,
-        description: t("activityStats.description2"),
-        color: "#EC4899",
-        icon: <FileText className="w-6 h-6 text-[#EC4899]" />,
-      },
-    ],
-  };
+      icon: <FileText className="w-6 h-6 text-blue-400" />,
+    }),
+    [docsWidgets]
+  );
 
-  const expirationStats: ExpirationStatisticsData = {
-    title: t("expirationStats.title"),
-    totalCount: 14,
-    countLabel: t("expirationStats.countLabel"),
-    documents: [
-      {
-        id: "1",
-        name: "عقد_تحويل_21",
-        expirationDate: "20/04/2024",
-        icon: <FileText className="w-4 h-4  text-dark dark:text-white" />,
-        badgeText: "تنتهي قريباً",
-        badgeVariant: "warning",
-      },
-      {
-        id: "2",
-        name: "تحويلات_2",
-        expirationDate: "20/04/2024",
-        icon: <FileText className="w-4 h-4  text-dark dark:text-white" />,
-        badgeText: "تنتهي قريباً",
-        badgeVariant: "warning",
-      },
-    ],
-  };
+  const activityStats: ActivityStatisticsData = useMemo(
+    () => ({
+      items: [
+        {
+          title: t("activityStats.title"),
+          percentage: docsWidgets?.valid_files_percentage ?? 0,
+          description: t("activityStats.description"),
+          color: "#10B981",
+          icon: <FileText className="w-6 h-6 text-[#10B981]" />,
+        },
+        {
+          title: t("activityStats.title2"),
+          percentage: docsWidgets?.expired_files_percentage ?? 0,
+          description: t("activityStats.description2"),
+          color: "#EC4899",
+          icon: <FileText className="w-6 h-6 text-[#EC4899]" />,
+        },
+      ],
+    }),
+    [docsWidgets]
+  );
+
+  const expirationStats: ExpirationStatisticsData = useMemo(
+    () => ({
+      title: t("expirationStats.title"),
+      totalCount: docsWidgets?.almost_expired_files_count ?? 0,
+      countLabel: t("expirationStats.countLabel"),
+      documents:
+        docsWidgets?.almost_expired_files?.map((file) => ({
+          id: file.id.toString(),
+          name: file.name,
+          expirationDate: "static date",
+          icon: <FileText className="w-4 h-4  text-dark dark:text-white" />,
+          badgeText: t("expirationStats.badgeText"),
+          badgeVariant: "warning",
+        })) ?? [],
+    }),
+    [docsWidgets]
+  );
 
   // return component ui
   return (

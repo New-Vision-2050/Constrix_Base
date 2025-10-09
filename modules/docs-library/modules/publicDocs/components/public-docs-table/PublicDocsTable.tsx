@@ -13,8 +13,6 @@ export const PublicDocsTable = () => {
   const {
     docs,
     isLoadingDocs,
-    setOpenDirWithPassword,
-    openDirWithPassword,
     docsPagination,
     setPage,
     setLimit,
@@ -62,12 +60,6 @@ export const PublicDocsTable = () => {
           />
         </div>
       </div>
-      <DirectoryPasswordDialog
-        open={openDirWithPassword}
-        onClose={() => {
-          setOpenDirWithPassword(false);
-        }}
-      />
     </div>
   );
 };

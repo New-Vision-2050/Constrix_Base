@@ -18,6 +18,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
   className = "",
 }) => {
   const t = useTranslations("docs-library.cards");
+
   // Handle loading state
   if (isLoading) {
     return <LoadingState />;
@@ -29,7 +30,7 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
   }
 
   // Handle missing data
-  if (!data || !data.documents || data.documents.length === 0) {
+  if (!data) {
     return <ErrorState message={t("noData")} />;
   }
 
@@ -48,7 +49,9 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
           {/* Count */}
           <div className="flex items-center gap-2 text-right">
             <span className="text-2xl font-bold">{totalCount}</span>
-            <span className="text-sm text-gray-500 dark:text-gray-300">{countLabel}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-300">
+              {countLabel}
+            </span>
           </div>
           {/* Badge for expires soon */}
           <div className="mb-4">

@@ -45,7 +45,7 @@ export default function ItemDetails() {
 
       {/* Activity Content */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-6">
+        <div className="space-y-6 max-h-[360px] overflow-y-auto">
           {/* Activity Log Title */}
           <p className="text-base font-medium text-dark dark:text-white mb-6">
             {t("title")}

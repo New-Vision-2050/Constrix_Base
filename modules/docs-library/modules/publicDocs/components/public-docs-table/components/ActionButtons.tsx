@@ -57,8 +57,9 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
       refetchDocs();
-    } catch (error) {
-      toast.error(t("deleteFailed"));
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message;
+      toast.error(errorMsg || t("deleteFailed"));
     }
   };
 

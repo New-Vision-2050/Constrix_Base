@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { DocumentsHeader, ViewMode } from "../../components/documents-header";
-import { SearchFields, SearchFormData } from "../../components/search-fields";
+import { SearchFields } from "../../components/search-fields";
 import ModeViewsManager from "./ModeViewsManager";
 import AllBranchesBtnList from "./AllBranchesList";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
+import VisitedDirsList from "./VisitedDirsList";
 
 export default function PublicDocsTabEntryPoint() {
-  const { clearSelectedDocs, storeSelectedDocument } = usePublicDocsCxt();
-  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    clearSelectedDocs,
+    storeSelectedDocument,
+    searchData,
+    setSearchData,
+  } = usePublicDocsCxt();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const [searchData, setSearchData] = useState<SearchFormData>({
-    endDate: "",
-    type: "",
-    documentType: "",
-  });
 
   // Handle add button click
   const handleAddClick = () => {
@@ -27,8 +27,6 @@ export default function PublicDocsTabEntryPoint() {
     setViewMode(mode);
   };
 
-  const branchId = "all";
-
   return (
     <div className="space-y-4">
       <SearchFields
@@ -37,14 +35,17 @@ export default function PublicDocsTabEntryPoint() {
         isLoading={false}
       />
       <DocumentsHeader
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
+        searchValue={searchData?.search ?? ""}
+        onSearchChange={(str) => {
+          setSearchData((prev) => ({ ...prev, search: str }));
+        }}
         onAddClick={handleAddClick}
         viewMode={viewMode}
         onViewModeChange={handleViewModeChange}
         isLoading={false}
       />
       <AllBranchesBtnList />
+      <VisitedDirsList />
       <ModeViewsManager viewMode={viewMode} />
     </div>
   );

@@ -22,6 +22,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     setTempParentId,
     setOpenDirWithPassword,
     toggleDocInSelectedDocs,
+    setVisitedDirs,
   } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
@@ -38,6 +39,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       } else {
         setParentId(document.id);
       }
+      setVisitedDirs((prev) => [...prev, document]);
     }
   };
 
@@ -66,7 +68,9 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3 text-muted-foreground">
-        {formatFileSize(document.file?.size)}
+        {isFolder
+          ? formatFileSize(document.size ?? 0)
+          : formatFileSize(document?.file?.size ?? 0)}
       </td>
 
       <td className="px-4 py-3 text-muted-foreground text-center">

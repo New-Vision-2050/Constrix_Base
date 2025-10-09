@@ -132,11 +132,15 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       show: can(Object.values(PERMISSIONS.permission)),
     };
 
-    console.log(
-      "Breakpoint101505",
-      PERMISSIONS.crm.clients,
-      can([PERMISSIONS.crm.clients.view])
-    );
+    // console.log(
+    //   "Breakpoint101505cc",
+    //   can([
+    //     ...Object.values(PERMISSIONS.userProfile).flatMap((p) =>
+    //       Object.values(p)
+    //     ),
+    //     ...Object.values(PERMISSIONS.profile).flatMap((p) => Object.values(p)),
+    //   ])
+    // );
     const data: Project[] = [
       // companies
       {
@@ -243,8 +247,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show:
-              !isCentralCompany && can([PERMISSIONS.crm.clients.view]),
+            show: !isCentralCompany && can([PERMISSIONS.crm.clients.view]),
           },
         ],
       },

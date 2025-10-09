@@ -103,7 +103,7 @@ export function getCreateNewFileFormConfig(
             isMulti: true,
             placeholder: t("usersPlaceholder"),
             dynamicOptions: {
-              url: `${baseURL}/users`,
+              url: `${baseURL}/folders/${parentId}/users`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
