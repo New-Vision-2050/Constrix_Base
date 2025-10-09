@@ -19,7 +19,6 @@ const ExpirationStatisticsCard: React.FC<ExpirationStatisticsCardProps> = ({
 }) => {
   const t = useTranslations("docs-library.cards");
 
-  console.log("data10505", data);
   // Handle loading state
   if (isLoading) {
     return <LoadingState />;

@@ -63,14 +63,15 @@ export default function DocsStatisticsCardsList() {
       title: t("expirationStats.title"),
       totalCount: docsWidgets?.almost_expired_files_count ?? 0,
       countLabel: t("expirationStats.countLabel"),
-      documents: docsWidgets?.almost_expired_files?.map((file) => ({
-        id: file.id.toString(),
-        name: file.name,
-        expirationDate: "static date",
-        icon: <FileText className="w-4 h-4  text-dark dark:text-white" />,
-        badgeText: "تنتهي قريباً",
-        badgeVariant: "warning",
-      })) ?? [],
+      documents:
+        docsWidgets?.almost_expired_files?.map((file) => ({
+          id: file.id.toString(),
+          name: file.name,
+          expirationDate: "static date",
+          icon: <FileText className="w-4 h-4  text-dark dark:text-white" />,
+          badgeText: t("expirationStats.badgeText"),
+          badgeVariant: "warning",
+        })) ?? [],
     }),
     [docsWidgets]
   );

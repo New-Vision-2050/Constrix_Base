@@ -245,7 +245,8 @@
       },
       "expirationStats": {
         "title": "Documents nearing expiration",
-        "countLabel": "Number of document downloads"
+        "countLabel": "Number of document downloads",
+        "badgeText": "expiring soon"
       }
     },
     "tabsTitles": {
