@@ -30,6 +30,10 @@ export default function GridItem({
     storeSelectedDocument,
     selectedDocument,
     toggleDocInSelectedDocs,
+    setVisitedDirs,
+    setEditedDoc,
+    setOpenDirDialog,
+    setOpenFileDialog,
   } = usePublicDocsCxt();
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
   // calc file size
@@ -38,6 +42,17 @@ export default function GridItem({
   // image url
   let imageUrl = document?.file?.url;
   let fileType = document?.file?.type;
+
+  // Validate imageUrl - check if it's a valid URL
+  const isValidUrl = (url: string | undefined | null): boolean => {
+    if (!url) return false;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
   let imageIcon: StaticImageData;
   if (isDir) {
     imageIcon = DirIcon;
@@ -57,7 +72,7 @@ export default function GridItem({
     }
   }
   // check if file is pdf
-  const isPdf = fileType === "pdf" && Boolean(imageUrl);
+  const isPdf = fileType === "pdf" && isValidUrl(imageUrl);
 
   const isDocInDetails =
     selectedDocument && document.id == selectedDocument?.id;
@@ -78,7 +93,14 @@ export default function GridItem({
       } else {
         setParentId(document.id);
       }
+      setVisitedDirs((prev) => [...prev, document]);
     }
+  };
+
+  const handleEdit = () => {
+    setEditedDoc(document);
+    if (isDir) setOpenDirDialog(true);
+    else setOpenFileDialog(true);
   };
 
   return (
@@ -86,7 +108,12 @@ export default function GridItem({
       className={`w-[220px] rounded-lg p-4 flex flex-col items-center justify-between relative`}
     >
       {!isPdf && (
-        <Image src={imageUrl || imageIcon} alt="PDF" width={50} height={50} />
+        <Image
+          src={isValidUrl(imageUrl) ? imageUrl! : imageIcon}
+          alt="Document"
+          width={50}
+          height={50}
+        />
       )}
       {isPdf && <iframe src={imageUrl} width={50} height={50} />}
       <p className="text-center text-lg font-medium">{document?.name}</p>
@@ -134,7 +161,7 @@ export default function GridItem({
           {/* edit document */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Pencil className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors" />
+              <Pencil onClick={handleEdit} className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors" />
             </TooltipTrigger>
             <TooltipContent>
               <p>Edit Document</p>
