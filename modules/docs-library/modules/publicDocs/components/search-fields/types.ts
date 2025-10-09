@@ -8,6 +8,7 @@ export interface SearchFormData {
   type?: string;
   /** Document type filter */
   documentType?: string;
+  search?: string;
 }
 
 /**
