@@ -17,6 +17,7 @@ export type DocumentT = {
   parent_id: string;
   updated_at: string;
   file: Media;
+  size: number;
   last_log: UserActivityT;
   files_count: number;
   status: number;
