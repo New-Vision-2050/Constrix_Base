@@ -71,6 +71,10 @@ interface CxtType {
   // search params
   searchData: SearchFormData;
   setSearchData: React.Dispatch<React.SetStateAction<SearchFormData>>;
+
+  // visited dir
+  visitedDirs: DocumentT[];
+  setVisitedDirs: React.Dispatch<React.SetStateAction<DocumentT[]>>;
 }
 
 // Create the context
@@ -100,6 +104,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   const [tempParentId, setTempParentId] = useState("");
   // selected docs
   const [selectedDocs, setSelectedDocs] = useState<DocumentT[]>([]);
+
+  // visited dirs
+  const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
 
   // search params
   const [searchData, setSearchData] = useState<SearchFormData>({
@@ -202,6 +209,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // search params
         searchData,
         setSearchData,
+        // visited dirs
+        visitedDirs,
+        setVisitedDirs,
       }}
     >
       {children}

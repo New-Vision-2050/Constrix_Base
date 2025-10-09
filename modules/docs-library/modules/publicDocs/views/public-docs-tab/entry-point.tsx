@@ -4,6 +4,7 @@ import { SearchFields } from "../../components/search-fields";
 import ModeViewsManager from "./ModeViewsManager";
 import AllBranchesBtnList from "./AllBranchesList";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
+import VisitedDirsList from "./VisitedDirsList";
 
 export default function PublicDocsTabEntryPoint() {
   const {
@@ -35,8 +36,8 @@ export default function PublicDocsTabEntryPoint() {
       />
       <DocumentsHeader
         searchValue={searchData?.search ?? ""}
-        onSearchChange={(str)=>{
-          setSearchData(prev=>({...prev,search:str}))
+        onSearchChange={(str) => {
+          setSearchData((prev) => ({ ...prev, search: str }));
         }}
         onAddClick={handleAddClick}
         viewMode={viewMode}
@@ -44,6 +45,7 @@ export default function PublicDocsTabEntryPoint() {
         isLoading={false}
       />
       <AllBranchesBtnList />
+      <VisitedDirsList />
       <ModeViewsManager viewMode={viewMode} />
     </div>
   );
