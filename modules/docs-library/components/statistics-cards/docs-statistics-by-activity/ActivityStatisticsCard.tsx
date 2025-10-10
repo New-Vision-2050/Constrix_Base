@@ -34,7 +34,7 @@ const ActivityStatisticsCard: React.FC<ActivityStatisticsCardProps> = ({
 
   return (
     <div
-      className={`bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6 text-white ${className}`}
+      className={`bg-sidebar w-[370px] min-h-[330px]  m-2 rounded-2xl p-6  text-dark dark:text-white ${className}`}
     >
       <div className="space-y-6">
         {data.items.map((item, index) => (
@@ -56,7 +56,7 @@ const ActivityStatisticsCard: React.FC<ActivityStatisticsCardProps> = ({
                   {Math.round(item.percentage)}%
                 </h3>
 
-                <p className="text-gray-300 text-sm">{item.description}</p>
+                <p className="text-gray-500 dark:text-gray-300 text-sm">{item.description}</p>
               </div>
             </div>
           </div>

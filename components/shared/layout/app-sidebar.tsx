@@ -33,6 +33,7 @@ import type { Entity } from "@/types/sidebar-menu";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
+import ClipboardClockIcon from "@/public/icons/clipboard-clock";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
@@ -131,11 +132,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       show: can(Object.values(PERMISSIONS.permission)),
     };
 
-    console.log(
-      "Breakpoint101505",
-      PERMISSIONS.crm.clients,
-      can([PERMISSIONS.crm.clients.view])
-    );
     const data: Project[] = [
       // companies
       {
@@ -242,8 +238,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show:
-              !isCentralCompany && can([PERMISSIONS.crm.clients.view]),
+            show: !isCentralCompany && can([PERMISSIONS.crm.clients.view]),
           },
         ],
       },
@@ -308,10 +303,23 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
               )
             ),
           },
+          {
+            name: t("Sidebar.ActivitiesLogs"),
+            url: ROUTER.ACTIVITIES_LOGS,
+            icon: ClipboardClockIcon,
+            isActive: pageName === ROUTER.ACTIVITIES_LOGS,
+            show: true,
+            // show: can(
+            //   Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
+            //     Object.values(p)
+            //   )
+            // ),
+          },
           rolesObj,
           permissionsObj,
         ],
       },
+      // Powers
       {
         name: t("Sidebar.Powers"),
         icon: SettingsIcon,

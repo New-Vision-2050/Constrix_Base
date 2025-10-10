@@ -32,7 +32,7 @@ export default function CreateNewFileDialog({ open, onClose }: PropsType) {
             <span className="sr-only">Close</span>
           </DialogClose>
         </DialogHeader>
-        <CreateNewFileFormContent />
+        <CreateNewFileFormContent onClose={onClose} />
       </DialogContent>
     </Dialog>
   );

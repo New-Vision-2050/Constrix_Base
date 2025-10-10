@@ -23,7 +23,7 @@ export default function ActivityItemComponent({ item }: ActivityItemComponentPro
       {/* Activity Content */}
       <div className="flex-1 min-w-0">
         <div className="text-right">
-          <p className="text-white text-sm font-medium mb-1">
+          <p className="text-dark dark:text-white text-sm font-medium mb-1">
             {item.title}
           </p>
           

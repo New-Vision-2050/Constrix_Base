@@ -205,6 +205,7 @@
     "subPrograms": "Sub Programs",
     "mainPrograms": "Main Programs",
     "UserProfileSettings": "User Profile",
+    "ActivitiesLogs": "Activities Logs",
     "Welcome": "Hello",
     "HRSettings": "Settings",
     "CompanyName": "New Vision",
@@ -227,6 +228,27 @@
     "cards": {
       "noData": "No data to display"
     },
+    "statistics": {
+      "documentStats": {
+        "title": "Number of company documents",
+        "mainLabel": "Document",
+        "comparison": {
+          "leftLabel": "Remaining Space",
+          "rightLabel": "Used Space"
+        }
+      },
+      "activityStats": {
+        "title": "Active Documents",
+        "description": "Average active documents for the company",
+        "title2": "Expired Documents",
+        "description2": "Average expired documents for the company"
+      },
+      "expirationStats": {
+        "title": "Documents nearing expiration",
+        "countLabel": "Number of document downloads",
+        "badgeText": "expiring soon"
+      }
+    },
     "tabsTitles": {
       "publicDocs": "Public Docs",
       "empsDocs": "Employee Docs",
@@ -248,9 +270,10 @@
       "searchFolder": "Search",
       "noResults": "No Results",
       "searchUsers": "Search Users",
-      "notes":"Please enter the email address of the user you want to share the files with"
+      "notes": "Please enter the email address of the user you want to share the files with"
     },
     "publicDocs": {
+      "allBranches": "All Branches",
       "header": {
         "search": "Search",
         "add": "Add",
@@ -262,22 +285,56 @@
         "list": "List",
         "details": "Details",
         "share": "Share",
-        "copy": "Copy Link",
+        "copy": "Copy",
         "requestFile": "Request File",
         "delete": "Delete",
         "download": "Download",
         "favorite": "Favorite",
-        "move": "Move"
+        "move": "Move",
+        "deleteDir": "Are you sure you want to delete this directory?",
+        "deleteFile": "Are you sure you want to delete this file?",
+        "deleteSuccess": "Delete Operation done successfully",
+        "deleteFailed": "Delete Operation failed"
+      },
+      "ActivityLogs": {
+        "title": "Activity Logs",
+        "loading": "Loading activity logs...",
+        "noActivities": "No activities found"
       },
       "table": {
-        "file_name": "File Name",
-        "sorted_by": "Sorted By",
-        "file_size": "File Size",
-        "docs_count": "Docs Count",
-        "file_type": "File Type",
-        "last_activity": "Last Activity",
+        "doc_name": "Folder/File Name",
+        "sortedBy": "Sorted By",
+        "fileSize": "File Size",
+        "docsCount": "Docs Count",
+        "fileType": "File Type",
+        "lastActivity": "Last Activity",
         "status": "Status",
-        "settings": "Settings"
+        "settings": "Settings",
+        "active": "Active",
+        "inactive": "Inactive",
+        "actions": {
+          "title": "Action",
+          "view": "Details",
+          "hide": "Hide",
+          "delete": "Delete",
+          "download": "Download",
+          "favorite": "Favorite",
+          "move": "Move",
+          "share": "Share",
+          "edit": "Edit",
+          "deleteDir": "Are you sure you want to delete this directory?",
+          "deleteFile": "Are you sure you want to delete this file?",
+          "deleteSuccess": "Delete Operation done successfully",
+          "deleteFailed": "Delete Operation failed"
+        }
+      },
+      "directoryPasswordDialog": {
+        "title": "Directory Password",
+        "description": "This directory is protected by a password. Please enter the password to access it.",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter password",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
       },
       "copyMoveDialog": {
         "copyTitle": "Copy",
@@ -287,10 +344,29 @@
         "label": "To Directory",
         "selectFolder": "Select Folder",
         "searchFolder": "Search",
-        "noResults": "No Results"
+        "noResults": "No Results",
+        "loadingFolders": "Loading folders...",
+        "errorLoadingFolders": "Error loading folders",
+        "copying": "Copying...",
+        "moving": "Moving...",
+        "copySuccess": "File copied successfully",
+        "moveSuccess": "File moved successfully",
+        "moveCopeError": "Error during operation"
+      },
+      "shareDialog": {
+        "title": "Share",
+        "save": "Save",
+        "copy": "Copy Link",
+        "cancel": "Cancel",
+        "selectFolder": "Select Folder",
+        "searchFolder": "Search",
+        "noResults": "No Results",
+        "searchUsers": "Search Users",
+        "notes": "Please enter the email address of the user you want to share the files with"
       },
       "createNewDirDialog": {
         "title": "Create New Directory",
+        "editTitle": "Edit Directory",
         "name": "Name",
         "namePlaceholder": "Enter name",
         "password": "Password",
@@ -313,6 +389,8 @@
         "title": "Create New File",
         "name": "Name",
         "namePlaceholder": "Enter name",
+        "reference_number": "Reference Number",
+        "reference_numberPlaceholder": "Enter Reference Number",
         "password": "Password",
         "passwordPlaceholder": "Enter password",
         "permission": "Permission",
@@ -427,6 +505,12 @@
         }
       }
     },
+    "ActivityTimeline": {
+      "title": "User Activity Timeline",
+      "createdOperation": "Operation created",
+      "updatedOperation": "Operation updated",
+      "deletedOperation": "Operation deleted"
+    },
     "tabs": {
       "profile": "Profile",
       "contract": "Employment Contract",
@@ -455,6 +539,24 @@
           "cv": "CV"
         }
       }
+    }
+  },
+  "activitiesLogs": {
+    "search": {
+      "title": "Search Filter",
+      "type": "Operation Type",
+      "user": "User",
+      "timeFrom": "Date From",
+      "timeTo": "Date To",
+      "reset": "Reset"
+    },
+    "logs": {
+      "title": "User Activity Timeline",
+      "createdOperation": "Operation created",
+      "updatedOperation": "Operation updated",
+      "deletedOperation": "Operation deleted",
+      "noActivities": "No activities found",
+      "noActivitiesDesc": "No activities found for the selected date range. Try changing the search criteria."
     }
   },
   "companyProfile": {

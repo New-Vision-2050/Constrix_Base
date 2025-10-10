@@ -2,13 +2,25 @@ import { useSheetForm } from "@/modules/form-builder";
 import { useTranslations } from "next-intl";
 import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { getCreateNewFileFormConfig } from "./CreateNewFileFormConfig";
+import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { useMemo } from "react";
 
-export default function CreateNewFileFormContent() {
+type PropsT = {
+  onClose: () => void;
+};
+export default function CreateNewFileFormContent({ onClose }: PropsT) {
+  const { refetchDocs, editedDoc, parentId } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewFileDialog");
 
-  const onSuccessFn = () => {};
+  const onSuccessFn = () => {
+    onClose();
+    refetchDocs();
+  };
 
-  const _config = getCreateNewFileFormConfig(t, onSuccessFn);
+  const _config = useMemo(
+    () => getCreateNewFileFormConfig(t, onSuccessFn, editedDoc, parentId),
+    [editedDoc, parentId]
+  );
 
   // form builder vars
   const {

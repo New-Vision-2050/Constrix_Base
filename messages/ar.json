@@ -205,6 +205,7 @@
     "mainPrograms": "البرامج الرئيسية",
     "DashboardSettings": "ملف الشركة",
     "UserProfileSettings": "الملف الشخصي",
+    "ActivitiesLogs": "سجل الأنشطة",
     "Welcome": "مرحبا",
     "CompanyName": "نيو فيجن",
     "HRSettings": "اعدادات",
@@ -224,6 +225,27 @@
   },
   "docs-library": {
     "title": "مكتبة المستندات",
+    "statistics": {
+      "documentStats": {
+        "title": "عدد المستندات الشركة",
+        "mainLabel": "مستند",
+        "comparison": {
+          "leftLabel": "المساحة المتبقية",
+          "rightLabel": "المساحة المستهلكة"
+        }
+      },
+      "activityStats": {
+        "title": "المستندات السارية",
+        "description": "معدل المستندات السارية للشركة",
+        "title2": "المستندات المنتهية",
+        "description2": "معدل المستندات المنتهية للشركة"
+      },
+      "expirationStats": {
+        "title": "المستندات المقتربة على الانتهاء",
+        "countLabel": "عدد تحميلات المستند",
+        "badgeText": "تنتهي قريباً"
+      }
+    },
     "cards": {
       "noData": "لا توجد بيانات للعرض"
     },
@@ -240,6 +262,7 @@
       "endDate": "تاريخ النهاية"
     },
     "publicDocs": {
+      "allBranches": "جميع الفروع",
       "header": {
         "search": "بحث",
         "add": "إضافة",
@@ -251,22 +274,56 @@
         "list": "قائمة",
         "details": "تفاصيل",
         "share": "مشاركة",
-        "copy": "نسخ الرابط",
+        "copy": "نسخ",
         "requestFile": "طلب ملف",
         "delete": "حذف",
         "download": "تحميل",
         "favorite": "المفضلة",
-        "move": "نقل"
+        "move": "نقل",
+        "deleteDir": "هل انت متاكد من حذف المجلد؟",
+        "deleteFile": "هل انت متاكد من حذف الملف؟",
+        "deleteSuccess": "عملية الحذف تمت بنجاح",
+        "deleteFailed": "فشلت عملية الحذف"
+      },
+      "ActivityLogs": {
+        "title": "سجل النشاط",
+        "loading": "جاري تحميل سجل الأنشطة...",
+        "noActivities": "لا توجد أنشطة"
       },
       "table": {
-        "file_name": "الملف",
-        "sorted_by": "تم التعديل بواسطة",
-        "file_size": "حجم الملف",
-        "docs_count": "عدد المستندات",
-        "file_type": "سمة الملف",
-        "last_activity": "اخر نشاط",
+        "doc_name": "اسم المستند/المجلد",
+        "sortedBy": "تم التعديل بواسطة",
+        "fileSize": "حجم الملف",
+        "docsCount": "عدد المستندات",
+        "fileType": "سمة الملف",
+        "lastActivity": "اخر نشاط",
         "status": "الحالة",
-        "settings": "الاعدادات"
+        "settings": "الاعدادات",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "actions": {
+          "title": "أجراء",
+          "view": "تفاصيل",
+          "hide": "أخفاء",
+          "delete": "حذف",
+          "download": "تحميل",
+          "favorite": "المفضلة",
+          "move": "نقل",
+          "share": "مشاركة",
+          "edit": "تعديل",
+          "deleteDir": "هل انت متاكد من حذف المجلد؟",
+          "deleteFile": "هل انت متاكد من حذف الملف؟",
+          "deleteSuccess": "عملية الحذف تمت بنجاح",
+          "deleteFailed": "فشلت عملية الحذف"
+        }
+      },
+      "directoryPasswordDialog": {
+        "title": "كلمة المرور",
+        "description": "هذا المجلد محمي بكلمة المرور. يرجى إدخال كلمة المرور للاستفادة منه.",
+        "passwordLabel": "كلمة المرور",
+        "passwordPlaceholder": "أدخل كلمة المرور",
+        "confirm": "تأكيد",
+        "cancel": "إلغاء"
       },
       "copyMoveDialog": {
         "copyTitle": "نسخ الى",
@@ -276,7 +333,14 @@
         "cancel": "الغاء",
         "selectFolder": "اختر مجلد",
         "searchFolder": "بحث",
-        "noResults": "لا توجد نتائج"
+        "noResults": "لا توجد نتائج",
+        "loadingFolders": "جاري تحميل المجلدات...",
+        "errorLoadingFolders": "حدث خطأ في تحميل المجلدات",
+        "copying": "جاري النسخ...",
+        "moving": "جاري النقل...",
+        "copySuccess": "تم نسخ الملف بنجاح",
+        "moveSuccess": "تم نقل الملف بنجاح",
+        "moveCopeError": "حدث خطأ أثناء العملية"
       },
       "shareDialog": {
         "title": "مشاركة",
@@ -291,6 +355,7 @@
       },
       "createNewDirDialog": {
         "title": "إنشاء مجلد جديد",
+        "editTitle": "تعديل مجلد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
         "password": "كلمة المرور",
@@ -309,6 +374,8 @@
         "title": "إنشاء ملف جديد",
         "name": "اسم المجلد",
         "namePlaceholder": "ادخل اسم المجلد",
+        "reference_number": "رقم المرجع",
+        "reference_numberPlaceholder": "ادخل رقم المرجع",
         "password": "كلمة المرور",
         "passwordPlaceholder": "ادخل كلمة المرور",
         "permission": "الصلاحية",
@@ -423,6 +490,12 @@
         }
       }
     },
+    "ActivityTimeline": {
+      "title": "سجل الانشطة",
+      "createdOperation": "عملية انشاء",
+      "updatedOperation": "عملية تعديل",
+      "deletedOperation": "عملية حذف"
+    },
     "tabs": {
       "profile": "الملف الشخصي",
       "contract": "عقد العمل",
@@ -451,6 +524,24 @@
           "cv": "السيرة الذاتية"
         }
       }
+    }
+  },
+  "activitiesLogs": {
+    "search": {
+      "title": "بحث",
+      "type": "نوع العملية",
+      "user": "المستخدم",
+      "timeFrom": "من التاريخ",
+      "timeTo": "الى التاريخ",
+      "reset": "إعادة تعيين"
+    },
+    "logs": {
+      "title": "سجل الانشطة",
+      "createdOperation": "عملية انشاء",
+      "updatedOperation": "عملية تعديل",
+      "deletedOperation": "عملية حذف",
+      "noActivities": "لا توجد أنشطة",
+      "noActivitiesDesc": "لم يتم العثور على أي أنشطة في الفترة المحددة. جرب تغيير معايير البحث."
     }
   },
   "companyProfile": {
