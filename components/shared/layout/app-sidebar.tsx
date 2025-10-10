@@ -132,15 +132,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       show: can(Object.values(PERMISSIONS.permission)),
     };
 
-    // console.log(
-    //   "Breakpoint101505cc",
-    //   can([
-    //     ...Object.values(PERMISSIONS.userProfile).flatMap((p) =>
-    //       Object.values(p)
-    //     ),
-    //     ...Object.values(PERMISSIONS.profile).flatMap((p) => Object.values(p)),
-    //   ])
-    // );
     const data: Project[] = [
       // companies
       {
