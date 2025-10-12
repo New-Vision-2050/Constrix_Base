@@ -79,6 +79,7 @@ export const PERMISSIONS = {
   },
   // CRM
   crm: {
+    settings: create("CLIENT_SETTING"),
     broker: create("BROKER"),
     clients: create("CLIENT"),
   },
