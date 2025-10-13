@@ -30,7 +30,8 @@ export default async function getDocs(
   password?: string,
   limit?: number,
   page?: number,
-  searchData?: SearchFormData
+  searchData?: SearchFormData,
+  sort?: string
 ) {
   // Build params object with only defined values
   const params: Record<string, any> = {};
@@ -55,6 +56,7 @@ export default async function getDocs(
   if (searchData?.search?.length) {
     params.search = searchData.search;
   }
+  if (sort) params.sort = sort;
 
   const res = await apiClient.get<ResponseT>(`/folders/contents`, {
     params,

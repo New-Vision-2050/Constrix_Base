@@ -17,6 +17,7 @@ import {
   Trash,
   Star,
   MoveRight,
+  ArrowUpNarrowWide,
 } from "lucide-react";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-dir/DialogContent";
@@ -49,6 +50,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   const t = useTranslations("docs-library.publicDocs.header");
   const { can } = usePermissions();
   const {
+    sort,
+    setSort,
     openDirDialog,
     setOpenDirDialog,
     openFileDialog,
@@ -84,6 +87,32 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));
+    }
+  };
+
+
+  const handleExport = async () => {
+    try {
+      const _url = baseURL + `/files/export`;
+      const response = await apiClient.post(_url, {}, {
+        responseType: 'blob'
+      });
+
+      // Create blob URL and trigger download
+      const blob = new Blob([response.data]);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `documents-export-${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("تم تصدير المستندات بنجاح");
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message;
+      toast.error(errorMsg || "حدث خطأ أثناء تصدير المستندات");
     }
   };
 
@@ -152,14 +181,26 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               variant="outline"
               className="bg-sidebar h-10"
               size="sm"
+              onClick={handleExport}
               disabled={!can(PERMISSIONS.library.file.export)}
             >
               <Upload className="mr-2 h-4 w-4" />
               {t("export")}
             </Button>
             {/* Sort button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
-              <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              className="bg-sidebar h-10"
+              size="sm"
+              onClick={() => {
+                setSort(sort === "asc" ? "desc" : "asc");
+              }}
+            >
+              {sort === "asc" ? (
+                <ArrowUpNarrowWide className="mr-2 h-4 w-4" />
+              ) : (
+                <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+              )}
               {t("sort")}
             </Button>
             {/* View Mode Toggle */}
