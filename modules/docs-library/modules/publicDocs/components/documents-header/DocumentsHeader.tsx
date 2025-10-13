@@ -236,7 +236,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               onClick={() => {
                 setOpenDelete(true);
               }}
-              disabled={selectedDocs?.length != 1}
+              disabled={selectedDocs?.length != 1 || !Boolean(selectedDocs?.[0]?.can_delete)}
             >
               <Trash className="mr-2 h-4 w-4" />
               {t("delete")}

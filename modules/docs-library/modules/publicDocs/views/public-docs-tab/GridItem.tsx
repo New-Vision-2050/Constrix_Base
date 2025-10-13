@@ -184,30 +184,34 @@ export default function GridItem({
             )}
 
             {/* edit document */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Pencil
-                  onClick={handleEdit}
-                  className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors"
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit Document</p>
-              </TooltipContent>
-            </Tooltip>
+            {Boolean(document.can_edit) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Pencil
+                    onClick={handleEdit}
+                    className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Edit Document</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             {/* delete document */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Trash
-                  onClick={() => setOpenDelete(true)}
-                  className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Delete Document</p>
-              </TooltipContent>
-            </Tooltip>
+            {Boolean(document.can_delete) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Trash
+                    onClick={() => setOpenDelete(true)}
+                    className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete Document</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </TooltipProvider>
         <Checkbox
