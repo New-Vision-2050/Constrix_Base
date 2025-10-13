@@ -131,6 +131,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
 
           <DropdownMenuItem
             onClick={() => handleAction("edit")}
+            disabled={!Boolean(document.can_edit)}
             className="flex items-center gap-2"
           >
             <Edit className="h-4 w-4" />
@@ -139,6 +140,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
 
           <DropdownMenuItem
             onClick={() => handleAction("delete")}
+            disabled={!Boolean(document.can_delete)}
             className="flex items-center gap-2 text-destructive focus:text-destructive"
           >
             <Trash2 className="h-4 w-4" />
