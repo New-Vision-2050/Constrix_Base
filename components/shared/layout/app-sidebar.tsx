@@ -261,7 +261,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.DOCS_LIBRARY,
             icon: FolderClosed,
             isActive: pageName === ROUTER.DOCS_LIBRARY,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany &&
+              can([PERMISSIONS.library.file.view]) &&
+              can([PERMISSIONS.library.folder.view]),
           },
         ],
       },
@@ -314,12 +317,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.ACTIVITIES_LOGS,
             icon: ClipboardClockIcon,
             isActive: pageName === ROUTER.ACTIVITIES_LOGS,
-            show: true,
-            // show: can(
-            //   Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-            //     Object.values(p)
-            //   )
-            // ),
+            show: can([PERMISSIONS.activityLogs.list]),
           },
           rolesObj,
           permissionsObj,

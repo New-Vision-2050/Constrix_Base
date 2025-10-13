@@ -64,6 +64,8 @@ export const PERMISSIONS = {
   identifier: create("IDENTIFIER"),
   subEntity: create("SUB_ENTITY"),
 
+  activityLogs: create("LOG"),
+
   // Attendance
   attendance: {
     settings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
@@ -84,5 +86,8 @@ export const PERMISSIONS = {
     clients: create("CLIENT"),
   },
   // docs library
-  // library: {},
+  library: {
+    folder: create("FOLDER"),
+    file: create("FILE"),
+  },
 };
