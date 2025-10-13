@@ -312,6 +312,8 @@
         "settings": "Settings",
         "active": "Active",
         "inactive": "Inactive",
+        "statusChanged": "Status changed successfully",
+        "statusChangeFailed": "Failed to change status",
         "actions": {
           "title": "Action",
           "view": "Details",

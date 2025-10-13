@@ -184,7 +184,7 @@ export default function GridItem({
             )}
 
             {/* edit document */}
-            {Boolean(document.can_edit) && (
+            {Boolean(document.can_update) && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Pencil
