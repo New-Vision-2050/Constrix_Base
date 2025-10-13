@@ -301,6 +301,8 @@
         "settings": "الاعدادات",
         "active": "نشط",
         "inactive": "غير نشط",
+        "statusChanged": "تم تغيير الحالة بنجاح",
+        "statusChangeFailed": "فشل تغيير الحالة",
         "actions": {
           "title": "أجراء",
           "view": "تفاصيل",

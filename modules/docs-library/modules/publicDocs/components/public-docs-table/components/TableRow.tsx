@@ -6,6 +6,9 @@ import { ActionButtons } from "./ActionButtons";
 import ToggleControl from "@/modules/clients/components/ToggleControl";
 import { useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 
 /**
  * Table row component for displaying document information
@@ -42,6 +45,23 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       setVisitedDirs((prev) => [...prev, document]);
     }
   };
+
+  // Mutation for changing document status
+  const changeStatusMutation = useMutation({
+    mutationFn: async (checked: boolean) => {
+      const _url = baseURL + `/files/${document?.id}/change-status`;
+      return await apiClient.put(_url, {
+        status: checked ? 1 : 0,
+        type: isFolder ? "folder" : "file",
+      });
+    },
+    onSuccess: () => {
+      toast.success(t("statusChanged"));
+    },
+    onError: () => {
+      toast.error(t("statusChangeFailed"));
+    },
+  });
 
   return (
     <tr className="hover:bg-muted/30 transition-colors">
@@ -86,8 +106,10 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
           activeLabel={t("active")}
           inactiveLabel={t("inactive")}
           checked={document.status == 1 ? true : false}
-          onChange={(checked) => {}}
-          disabled={false}
+          onChange={(checked) => changeStatusMutation.mutate(checked)}
+          disabled={
+            changeStatusMutation.isPending || !Boolean(document.can_update)
+          }
         />
       </td>
 

@@ -131,7 +131,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
 
           <DropdownMenuItem
             onClick={() => handleAction("edit")}
-            disabled={!Boolean(document.can_edit)}
+            disabled={!Boolean(document.can_update)}
             className="flex items-center gap-2"
           >
             <Edit className="h-4 w-4" />
