@@ -10,7 +10,7 @@ export const CompanyOfficialData = (
   id?: string
 ) => {
   const { company_id }: { company_id: string | undefined } = useParams();
-console.log("officialData", officialData);
+  console.log("officialData", officialData);
   const queryClient = useQueryClient();
   const OfficialDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
@@ -207,7 +207,9 @@ console.log("officialData", officialData);
     onSubmit: async (formData: Record<string, unknown>) => {
       const transformedValues = { ...formData };
       if (transformedValues.packages) {
-        transformedValues.packages = [transformedValues.packages];
+        transformedValues.packages = Array.isArray(transformedValues.packages)
+          ? transformedValues.packages
+          : [transformedValues.packages];
       }
       return await defaultSubmitHandler(
         transformedValues,
