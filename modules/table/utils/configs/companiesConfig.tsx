@@ -11,6 +11,7 @@ import { ROUTER } from "@/router";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
+import fetchCompanyAdmin from "@/modules/companies/api/fetch-company-admin";
 
 // Define types for the company data
 interface CompanyData {
@@ -137,7 +138,14 @@ export const CompaniesConfig = () => {
       {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
-        action: () => console.log("Login as manager clicked"),
+        action: (e: any) => {
+          fetchCompanyAdmin(e.id).then((data) => {
+            const { url, token } = data;
+            if (url && token) {
+              router.push(`${url}/login/?token=${token}`);
+            }
+          });
+        },
         disabled: can(PERMISSIONS.company.view),
       },
       {
