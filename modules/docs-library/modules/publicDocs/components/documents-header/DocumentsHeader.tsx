@@ -29,6 +29,8 @@ import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * DocumentsHeader component for document management interface
@@ -45,6 +47,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations("docs-library.publicDocs.header");
+  const { can } = usePermissions();
   const {
     openDirDialog,
     setOpenDirDialog,
@@ -109,22 +112,30 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
             <DropdownButton
               triggerButton={<Button>{t("add")}</Button>}
               items={[
-                {
-                  text: t("dir"),
-                  icon: <Folder className="h-4 w-4" />,
-                  onClick: () => {
-                    setEditedDoc(undefined);
-                    setOpenDirDialog(true);
-                  },
-                },
-                {
-                  text: t("file"),
-                  icon: <FileText className="h-4 w-4" />,
-                  onClick: () => {
-                    setEditedDoc(undefined);
-                    setOpenFileDialog(true);
-                  },
-                },
+                ...(can(PERMISSIONS.library.folder.create)
+                  ? [
+                      {
+                        text: t("dir"),
+                        icon: <Folder className="h-4 w-4" />,
+                        onClick: () => {
+                          setEditedDoc(undefined);
+                          setOpenDirDialog(true);
+                        },
+                      },
+                    ]
+                  : []),
+                ...(can(PERMISSIONS.library.file.create)
+                  ? [
+                      {
+                        text: t("file"),
+                        icon: <FileText className="h-4 w-4" />,
+                        onClick: () => {
+                          setEditedDoc(undefined);
+                          setOpenFileDialog(true);
+                        },
+                      },
+                    ]
+                  : []),
               ]}
             />
             {/* more button */}
@@ -137,7 +148,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               <Ellipsis className="h-4 w-4" />
             </Button>
             {/* Export button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button
+              variant="outline"
+              className="bg-sidebar h-10"
+              size="sm"
+              disabled={!can(PERMISSIONS.library.file.export)}
+            >
               <Upload className="mr-2 h-4 w-4" />
               {t("export")}
             </Button>
@@ -217,7 +233,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               }}
               disabled={
                 selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.reference_number)
+                !Boolean(selectedDocs?.[0]?.reference_number) ||
+                !can(PERMISSIONS.library.file.update)
               }
             >
               <Copy className="mr-2 h-4 w-4" />
@@ -236,7 +253,11 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               onClick={() => {
                 setOpenDelete(true);
               }}
-              disabled={selectedDocs?.length != 1 || !Boolean(selectedDocs?.[0]?.can_delete)}
+              disabled={
+                selectedDocs?.length != 1 ||
+                !Boolean(selectedDocs?.[0]?.can_delete) ||
+                !can(PERMISSIONS.library.file.delete)
+              }
             >
               <Trash className="mr-2 h-4 w-4" />
               {t("delete")}
@@ -262,7 +283,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               }}
               disabled={
                 selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.reference_number)
+                !Boolean(selectedDocs?.[0]?.reference_number) ||
+                !can(PERMISSIONS.library.file.update)
               }
             >
               <MoveRight className="mr-2 h-4 w-4" />

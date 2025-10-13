@@ -261,7 +261,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.DOCS_LIBRARY,
             icon: FolderClosed,
             isActive: pageName === ROUTER.DOCS_LIBRARY,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany &&
+              can([PERMISSIONS.library.file.view]) &&
+              can([PERMISSIONS.library.folder.view]),
           },
         ],
       },
