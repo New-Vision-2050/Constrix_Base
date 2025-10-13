@@ -314,12 +314,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.ACTIVITIES_LOGS,
             icon: ClipboardClockIcon,
             isActive: pageName === ROUTER.ACTIVITIES_LOGS,
-            show: true,
-            // show: can(
-            //   Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-            //     Object.values(p)
-            //   )
-            // ),
+            show: can([PERMISSIONS.activityLogs.list]),
           },
           rolesObj,
           permissionsObj,
