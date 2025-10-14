@@ -25,6 +25,8 @@ export default function VisitedDirsList() {
     }
   };
 
+  console.log("visitedDirs", visitedDirs);
+
   return (
     <div className="flex items-center gap-1 p-2 bg-sidebar rounded-lg overflow-x-auto">
       {/* Home button */}
@@ -41,7 +43,10 @@ export default function VisitedDirsList() {
 
       {/* Breadcrumb items */}
       {visitedDirs.map((dir, index) => (
-        <div key={dir.id} className="flex items-center gap-1 shrink-0">
+        <div
+          key={`${dir.id}-${index}`}
+          className="flex items-center gap-1 shrink-0"
+        >
           {isRtl ? (
             <ChevronLeft className="h-4 w-4 text-muted-foreground" />
           ) : (

@@ -41,8 +41,8 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
         setTempParentId(document.id);
       } else {
         setParentId(document.id);
+        setVisitedDirs((prev) => [...prev, document]);
       }
-      setVisitedDirs((prev) => [...prev, document]);
     }
   };
 
