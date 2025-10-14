@@ -5,6 +5,7 @@ import ModeViewsManager from "./ModeViewsManager";
 import AllBranchesBtnList from "./AllBranchesList";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import VisitedDirsList from "./VisitedDirsList";
+import DocViewDialog from "./DocViewDialog";
 
 export default function PublicDocsTabEntryPoint() {
   const {
@@ -12,6 +13,8 @@ export default function PublicDocsTabEntryPoint() {
     storeSelectedDocument,
     searchData,
     setSearchData,
+    docToView,
+    setDocToView,
   } = usePublicDocsCxt();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
@@ -47,6 +50,7 @@ export default function PublicDocsTabEntryPoint() {
       <AllBranchesBtnList />
       <VisitedDirsList />
       <ModeViewsManager viewMode={viewMode} />
+      <DocViewDialog />
     </div>
   );
 }

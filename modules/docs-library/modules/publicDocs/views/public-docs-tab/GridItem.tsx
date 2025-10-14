@@ -6,7 +6,14 @@ import DirIcon from "@/assets/icons/directory.png";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DocumentT } from "../../types/Directory";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
-import { Eye, EyeOff, FolderOpen, Pencil, Trash } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  FolderOpen,
+  Pencil,
+  SquareMenu,
+  Trash,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -40,6 +47,7 @@ export default function GridItem({
     setOpenDirDialog,
     setOpenFileDialog,
     refetchDocs,
+    setDocToView,
   } = usePublicDocsCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
@@ -167,6 +175,20 @@ export default function GridItem({
                 <p>{isDocInDetails ? "Close Details" : "View Details"}</p>
               </TooltipContent>
             </Tooltip>
+            {/* more options */}
+            {!isDir && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <SquareMenu
+                    onClick={() => setDocToView(document)}
+                    className="w-5 h-5 text-blue-500 hover:text-blue-600 cursor-pointer transition-colors"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>More Options</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             {/* open directory */}
             {isDir && (

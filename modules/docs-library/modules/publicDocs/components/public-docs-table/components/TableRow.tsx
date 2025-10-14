@@ -26,6 +26,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     setOpenDirWithPassword,
     toggleDocInSelectedDocs,
     setVisitedDirs,
+    setDocToView,
   } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
@@ -41,8 +42,10 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
         setTempParentId(document.id);
       } else {
         setParentId(document.id);
+        setVisitedDirs((prev) => [...prev, document]);
       }
-      setVisitedDirs((prev) => [...prev, document]);
+    } else {
+      setDocToView(document);
     }
   };
 
@@ -74,9 +77,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
           <FileIcon isFolder={isFolder} fileName={document.name} />
           <span
             onClick={handleClick}
-            className={`font-medium ${
-              isFolder && "hover:underline cursor-pointer"
-            }`}
+            className={`font-medium hover:underline cursor-pointer`}
           >
             {document.name}
           </span>
