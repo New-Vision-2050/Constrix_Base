@@ -79,6 +79,10 @@ interface CxtType {
   // sort
   sort: string;
   setSort: React.Dispatch<React.SetStateAction<string>>;
+
+  // docToView
+  docToView: DocumentT | undefined;
+  setDocToView: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
 }
 
 // Create the context
@@ -112,6 +116,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // visited dirs
   const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
 
+  // docToView
+  const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
+
   // sort
   const [sort, setSort] = useState("desc");
 
@@ -129,7 +136,15 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     data: docsResponse,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
-  } = useDocsData(branchId, parentId, dirPassword, limit, page, searchData, sort);
+  } = useDocsData(
+    branchId,
+    parentId,
+    dirPassword,
+    limit,
+    page,
+    searchData,
+    sort
+  );
 
   // folders list
   const {
@@ -222,6 +237,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // sort
         sort,
         setSort,
+        // docToView
+        docToView,
+        setDocToView,
       }}
     >
       {children}
