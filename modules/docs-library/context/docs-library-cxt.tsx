@@ -7,6 +7,7 @@ import { DocsWidgetsT } from "../api/get-docs-widgets";
 // Define context type
 interface CxtType {
   docsWidgets: DocsWidgetsT | undefined;
+  handleRefetchDocsWidgets: () => void;
 }
 
 // Create the context
@@ -19,10 +20,18 @@ interface PropsT {
 
 export const DocsLibraryCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
-  const { data: docsWidgets } = useDocsWidgets();
+  const { data: docsWidgets, refetch: refetchDocsWidgets } = useDocsWidgets();
+
+  const handleRefetchDocsWidgets = () => {
+    refetchDocsWidgets();
+  };
 
   // ** return provider
-  return <Cxt.Provider value={{ docsWidgets }}>{children}</Cxt.Provider>;
+  return (
+    <Cxt.Provider value={{ docsWidgets, handleRefetchDocsWidgets }}>
+      {children}
+    </Cxt.Provider>
+  );
 };
 
 // Custom hook to use the context

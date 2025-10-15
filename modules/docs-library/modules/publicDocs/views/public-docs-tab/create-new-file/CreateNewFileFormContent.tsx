@@ -4,16 +4,19 @@ import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { getCreateNewFileFormConfig } from "./CreateNewFileFormConfig";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { useMemo } from "react";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 type PropsT = {
   onClose: () => void;
 };
 export default function CreateNewFileFormContent({ onClose }: PropsT) {
+  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
   const { refetchDocs, editedDoc, parentId } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewFileDialog");
 
   const onSuccessFn = () => {
     onClose();
+    handleRefetchDocsWidgets();
     refetchDocs();
   };
 
