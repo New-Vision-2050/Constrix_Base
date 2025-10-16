@@ -202,14 +202,17 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.AttendanceDeparture,
             icon: UserIcon,
             isActive: pageName === ROUTER.AttendanceDeparture,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany &&
+              can([PERMISSIONS.attendance.attendance_departure.view]),
           },
           {
             name: t("Sidebar.HRSettings"),
             url: ROUTER.HR_SETTINGS,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.HR_SETTINGS,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany && can([PERMISSIONS.attendance.settings.view]),
           },
         ],
       },
@@ -243,7 +246,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
+            show: !isCentralCompany && can([PERMISSIONS.crm.settings.list]),
           },
         ],
       },
