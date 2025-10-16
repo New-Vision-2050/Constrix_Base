@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import TableStatus from "./TableStatus";
 import { baseURL } from "@/config/axios-config";
 import { LoginWay } from "@/modules/settings/types/LoginWay";
@@ -7,6 +7,7 @@ import { loginWayFormConfig } from "@/modules/settings/components/tabs/Identifie
 import { loginWayFormEditConfig } from "../form/editConfig";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 // Create a component that uses the translations
 export const LoginWaysConfig = () => {
@@ -39,12 +40,14 @@ export const LoginWaysConfig = () => {
         key: "status",
         label: "الحالة",
         render: (value: "active" | "inActive", row: LoginWay) => (
-          <TableStatus
-            loginWay={row}
-            url={`/settings/login-way/make-default/${row.id}`}
-          />
+          <Can check={[PERMISSIONS.loginWay.activate]}>
+            <TableStatus
+              loginWay={row}
+              url={`/settings/login-way/make-default/${row.id}`}
+            />
+          </Can>
         ),
-      }
+      },
     ],
     allSearchedFields: [],
     defaultSortColumn: "id",
