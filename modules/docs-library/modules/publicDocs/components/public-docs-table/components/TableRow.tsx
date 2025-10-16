@@ -9,6 +9,8 @@ import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * Table row component for displaying document information
@@ -28,6 +30,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     setVisitedDirs,
     setDocToView,
   } = usePublicDocsCxt();
+  const { can } = usePermissions();
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
@@ -109,7 +112,10 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
           checked={document.status == 1 ? true : false}
           onChange={(checked) => changeStatusMutation.mutate(checked)}
           disabled={
-            changeStatusMutation.isPending || !Boolean(document.can_update)
+            changeStatusMutation.isPending ||
+            (isFolder
+              ? !can(PERMISSIONS.library.folder.activate)
+              : !can(PERMISSIONS.library.file.activate))
           }
         />
       </td>
