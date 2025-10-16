@@ -28,6 +28,7 @@ export default function ToggleControl({
         <input
           defaultChecked={checked}
           onChange={(e) => {
+            if (disabled) return;
             setCheckedState(e.target.checked);
             onChange(e.target.checked);
           }}
