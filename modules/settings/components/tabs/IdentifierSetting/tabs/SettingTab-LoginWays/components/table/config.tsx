@@ -1,12 +1,16 @@
+'use client';
 import TableStatus from "./TableStatus";
 import { baseURL } from "@/config/axios-config";
 import { LoginWay } from "@/modules/settings/types/LoginWay";
 import Execution from "@/app/[locale]/(main)/companies/cells/execution";
 import { loginWayFormConfig } from "@/modules/settings/components/tabs/IdentifierSetting/tabs/SettingTab-LoginWays/components/form/config";
 import { loginWayFormEditConfig } from "../form/editConfig";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Create a component that uses the translations
 export const LoginWaysConfig = () => {
+  const { can } = usePermissions();
   return {
     url: `${baseURL}/settings/login-way`,
     tableId: "login-ways-table",
@@ -50,8 +54,8 @@ export const LoginWaysConfig = () => {
     formConfig: loginWayFormEditConfig,
     executions: [],
     executionConfig: {
-      canEdit: true,
-      canDelete: true,
+      canEdit: can([PERMISSIONS.loginWay.update]),
+      canDelete: can([PERMISSIONS.loginWay.delete]),
     },
     defaultItemsPerPage: 5,
     enableSearch: true,

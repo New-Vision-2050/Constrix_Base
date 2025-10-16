@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
 import { CompanyData } from "@/modules/company-profile/types/company";
 import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = {
   branchId: string | number;
@@ -175,9 +177,9 @@ const BranchManagementsStructure = (props: PropsT) => {
             DropDownMenu={DropDownMenu}
             listModeDropDownMenu={listModeDropDownMenu}
             listViewAdditionalActions={
-              <>
+              <Can check={[PERMISSIONS.organization.management.create]}>
                 <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>
-              </>
+              </Can>
             }
           />
         </div>
