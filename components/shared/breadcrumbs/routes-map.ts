@@ -70,6 +70,25 @@ export const getRoutesMap = (
       "hr-settings/attendance-determinants/create",
       "إنشاء حضور جديد"
     ),
+    "activities-logs": getText("activities-logs", "سجل الأنشطة"),
+    bouquet: getText("bouquet", "الباقة"),
+    bouquetDetails: getText("bouquetDetails", "تفاصيل الباقة"),
+    companies: getText("companies", "الشركات"),
+    "company-profile": getText("company-profile", "ملف الشركة"),
+    "crm-settings": getText("crm-settings", "إعدادات CRM"),
+    "docs-library": getText("docs-library", "مكتبة المستندات"),
+    "human-resources": getText("human-resources", "الموارد البشرية"),
+    "organizational-structure": getText(
+      "organizational-structure",
+      "هيكل المنظمة"
+    ),
+    permissions: getText("permissions", "صلاحيات"),
+    programs: getText("programs", "البرامج"),
+    roles: getText("roles", "الصلاحيات"),
+    stores: getText("stores", "المخازن"),
+    "user-profile": getText("user-profile", "ملف المستخدم"),
+    "view-my-permissions": getText("view-my-permissions", "عرض صلاحياتي"),
+    "users-settings": getText("users-settings", "إعدادات المستخدم"),
   };
 
   return appRoutesMap;

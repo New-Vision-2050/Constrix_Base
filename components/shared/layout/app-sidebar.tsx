@@ -108,9 +108,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     [can]
   );
   console.log(
-    "isCentralCompany",
+    "isCentralCompanyisCentralCompany",
     isCentralCompany,
-    can([PERMISSIONS.library.folder.list])
+    PERMISSIONS.crm.settings,
+    can(PERMISSIONS.crm.settings.list)
   );
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
