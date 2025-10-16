@@ -111,7 +111,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     "isCentralCompanyisCentralCompany",
     isCentralCompany,
     PERMISSIONS.crm.settings,
-    can(PERMISSIONS.crm.settings.list)
+    can(PERMISSIONS.crm.settings.list),
+    can(PERMISSIONS.crm.settings.view)
   );
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
@@ -247,7 +248,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show: !isCentralCompany && can([PERMISSIONS.crm.settings.list]),
+            show:
+              !isCentralCompany &&
+              (can([PERMISSIONS.crm.settings.list]) ||
+                can([PERMISSIONS.crm.settings.view])),
           },
         ],
       },
