@@ -7,9 +7,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 export default function DocsLibraryModule() {
   return (
     <DocsLibraryCxtProvider>
-      <Can
-        check={[PERMISSIONS.library.file.view, PERMISSIONS.library.folder.view]}
-      >
+      <Can check={[PERMISSIONS.library.folder.list]}>
         <DocsLibraryEntryPoint />
       </Can>
     </DocsLibraryCxtProvider>
