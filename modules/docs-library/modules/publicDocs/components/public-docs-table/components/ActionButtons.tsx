@@ -75,6 +75,10 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         else storeSelectedDocument(document);
         break;
       case "download":
+        if (!isDirectory) {
+          const _url = document?.file?.url;
+          window.open(_url, "_blank");
+        }
         break;
       case "share":
         break;
@@ -99,7 +103,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
             variant="secondary"
             size="sm"
             className="p-2 hover:bg-muted"
-            disabled={!can(PERMISSIONS.library.file.update)}
+            // disabled={!can(PERMISSIONS.library.file.update)}
           >
             {t("title")}
             <MoreHorizontal className="h-4 w-4" />
@@ -107,6 +111,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-44">
+          {/* view document */}
           <DropdownMenuItem
             onClick={() => handleAction("view")}
             className="flex items-center gap-2"
@@ -119,14 +124,17 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
             {inDetails ? t("hide") : t("view")}
           </DropdownMenuItem>
 
+          {/* download document */}
           <DropdownMenuItem
             onClick={() => handleAction("download")}
             className="flex items-center gap-2"
+            disabled={!isDirectory}
           >
             <Download className="h-4 w-4" />
             {t("download")}
           </DropdownMenuItem>
 
+          {/* share document */}
           <DropdownMenuItem
             onClick={() => handleAction("share")}
             className="flex items-center gap-2"
@@ -137,18 +145,28 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
 
           <DropdownMenuSeparator />
 
+          {/* edit document */}
           <DropdownMenuItem
             onClick={() => handleAction("edit")}
-            disabled={!Boolean(document.can_update) || !can(PERMISSIONS.library.file.update)}
+            disabled={
+              !Boolean(document.can_update) ||
+              (isDirectory
+                ? !can(PERMISSIONS.library.folder.update)
+                : !can(PERMISSIONS.library.file.update))
+            }
             className="flex items-center gap-2"
           >
             <Edit className="h-4 w-4" />
             {t("edit")}
           </DropdownMenuItem>
 
+          {/* delete document */}
           <DropdownMenuItem
             onClick={() => handleAction("delete")}
-            disabled={!Boolean(document.can_delete) || !can(PERMISSIONS.library.file.delete)}
+            disabled={
+              !Boolean(document.can_delete) ||
+              !can(PERMISSIONS.library.file.delete)
+            }
             className="flex items-center gap-2 text-destructive focus:text-destructive"
           >
             <Trash2 className="h-4 w-4" />

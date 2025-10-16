@@ -25,6 +25,8 @@ import { useState } from "react";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function GridItem({
   document,
@@ -49,6 +51,7 @@ export default function GridItem({
     refetchDocs,
     setDocToView,
   } = usePublicDocsCxt();
+  const { can } = usePermissions();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -206,27 +209,33 @@ export default function GridItem({
             )}
 
             {/* edit document */}
-            {Boolean(document.can_update) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Pencil
-                    onClick={handleEdit}
-                    className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors"
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Edit Document</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
+            {Boolean(document.can_update) &&
+              (isDir
+                ? can(PERMISSIONS.library.folder.update)
+                : can(PERMISSIONS.library.file.update)) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Pencil
+                      onClick={handleEdit}
+                      className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit Document</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
 
             {/* delete document */}
-            {Boolean(document.can_delete) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Trash
-                    onClick={() => setOpenDelete(true)}
-                    className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
+            {Boolean(document.can_delete) &&
+              (isDir
+                ? can(PERMISSIONS.library.folder.delete)
+                : can(PERMISSIONS.library.file.delete)) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Trash
+                      onClick={() => setOpenDelete(true)}
+                      className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
                   />
                 </TooltipTrigger>
                 <TooltipContent>
