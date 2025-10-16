@@ -106,7 +106,14 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        <ToggleControl
+        {(isFolder
+          ? !can(PERMISSIONS.library.folder.activate)
+          : !can(PERMISSIONS.library.file.activate)) ? (
+          <div className="w-full h-full bg-muted/30">
+            {document.status == 1 ? t("active") : t("inactive")}
+          </div>
+        ) : (
+          <ToggleControl
           activeLabel={t("active")}
           inactiveLabel={t("inactive")}
           checked={document.status == 1 ? true : false}
@@ -118,6 +125,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
               : !can(PERMISSIONS.library.file.activate))
           }
         />
+        )}
       </td>
 
       <td className="px-4 py-3">
