@@ -248,9 +248,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.CRM.settings,
             icon: Settings,
             isActive: pageName === ROUTER.CRM.settings,
-            show:
-              !isCentralCompany &&
-              (can([PERMISSIONS.crm.settings.update])),
+            show: !isCentralCompany && can([PERMISSIONS.crm.settings.update]),
           },
         ],
       },
@@ -309,11 +307,11 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.SETTINGS,
             icon: InboxIcon,
             isActive: pageName === ROUTER.SETTINGS,
-            show: can(
-              Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-                Object.values(p)
-              )
-            ),
+            show: can([
+              PERMISSIONS.identifier.list,
+              PERMISSIONS.loginWay.list,
+              PERMISSIONS.driver.view,
+            ]),
           },
           {
             name: t("Sidebar.ActivitiesLogs"),
