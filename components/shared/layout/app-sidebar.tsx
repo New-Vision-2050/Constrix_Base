@@ -107,13 +107,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     },
     [can]
   );
-  console.log(
-    "isCentralCompanyisCentralCompany",
-    isCentralCompany,
-    PERMISSIONS.crm.settings,
-    can(PERMISSIONS.crm.settings.list),
-    can(PERMISSIONS.crm.settings.view)
-  );
+  // console.log(
+  //   "isCentralCompanyisCentralCompany",
+  //   isCentralCompany,
+  //   PERMISSIONS.crm.settings,
+  //   can(PERMISSIONS.crm.settings.list),
+  //   can(PERMISSIONS.crm.settings.view)
+  // );
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
     // grouped routes in sidebar
@@ -250,8 +250,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             isActive: pageName === ROUTER.CRM.settings,
             show:
               !isCentralCompany &&
-              (can([PERMISSIONS.crm.settings.list]) ||
-                can([PERMISSIONS.crm.settings.view])),
+              (can([PERMISSIONS.crm.settings.update])),
           },
         ],
       },
