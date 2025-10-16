@@ -106,25 +106,27 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        {(isFolder
-          ? !can(PERMISSIONS.library.folder.activate)
-          : !can(PERMISSIONS.library.file.activate)) ? (
+        {(
+          isFolder
+            ? !can(PERMISSIONS.library.folder.activate)
+            : !can(PERMISSIONS.library.file.activate)
+        ) ? (
           <div className="w-full h-full bg-muted/30">
             {document.status == 1 ? t("active") : t("inactive")}
           </div>
         ) : (
           <ToggleControl
-          activeLabel={t("active")}
-          inactiveLabel={t("inactive")}
-          checked={document.status == 1 ? true : false}
-          onChange={(checked) => changeStatusMutation.mutate(checked)}
-          disabled={
-            changeStatusMutation.isPending ||
-            (isFolder
-              ? !can(PERMISSIONS.library.folder.activate)
-              : !can(PERMISSIONS.library.file.activate))
-          }
-        />
+            activeLabel={t("active")}
+            inactiveLabel={t("inactive")}
+            checked={document.status == 1 ? true : false}
+            onChange={(checked) => changeStatusMutation.mutate(checked)}
+            disabled={
+              changeStatusMutation.isPending ||
+              (isFolder
+                ? !can(PERMISSIONS.library.folder.activate)
+                : !can(PERMISSIONS.library.file.activate))
+            }
+          />
         )}
       </td>
 
