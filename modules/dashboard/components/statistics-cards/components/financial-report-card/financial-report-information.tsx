@@ -1,4 +1,7 @@
+import { useTranslations } from "next-intl";
+
 export default function FinancialReportInformation() {
+  const t = useTranslations("UserProfile.header.statisticsCards");
   // declare and define helper vars
   const totalAmount = "4000 رس";
 
@@ -6,9 +9,9 @@ export default function FinancialReportInformation() {
     <div className="flex flex-col gap-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-          التقرير المالي
+          {t("financialReport")}
         </h3>
-        <p className="text-sm text-gray-500">المستحق الشهري</p>
+        <p className="text-sm text-gray-500">{t("monthlySalary")}</p>
       </div>
       <div>
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">

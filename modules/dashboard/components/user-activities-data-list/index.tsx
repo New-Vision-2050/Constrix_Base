@@ -1,6 +1,7 @@
 import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
 import SettingsIcon from "@/public/icons/settings";
+import { useTranslations } from "next-intl";
 
 type ActivityListItem = {
   text: string;
@@ -13,8 +14,9 @@ const items: ActivityListItem[] = [
 ];
 
 export default function UserActivitiesDataList() {
+  const t = useTranslations("UserProfile.activitiesData");
   return (
-    <UserInformationCardLayout title="الانشطة">
+    <UserInformationCardLayout title={t("title")}>
       <RegularList<ActivityListItem, "activityItem">
         sourceName="activityItem"
         items={items}

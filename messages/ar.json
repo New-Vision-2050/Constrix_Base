@@ -506,6 +506,16 @@
           "rule2": "اختر الحجم المناسب للصورة (مثل 1920x1080 بكسل).",
           "rule3": "تأكد من أن الخلفية بيضاء."
         }
+      },
+      "statisticsCards":{
+        "contractStatus": "حالة العقد",
+        "workingTime": "وقت الدوام",
+        "financialReport": "التقرير المالي",
+        "tasks": "المهام",
+        "contractStart": "بداية العقد",
+        "contractEnd": "نهاية العقد",
+        "weeklyReport": "تقرير الأسبوعي",
+        "monthlySalary":"المستحق الشهري"
       }
     },
     "ActivityTimeline": {
@@ -542,6 +552,46 @@
           "cv": "السيرة الذاتية"
         }
       }
+    },
+    "personalData": {
+      "title": "البيانات الشخصية",
+      "name": "الاسم",
+      "status": "حالة الموظف",
+      "jobTitle": "المهنة",
+      "jobRole": "الدور الوظيفي",
+      "phone": "التواصل",
+      "otherPhone": "الرقم الاضافي",
+      "email": "البريد الالكتروني",
+      "nationalAddress": "العنوان الوطني"
+    },
+    "professionalData": {
+      "title": "البيانات المهنية",
+      "branch": "الفرع",
+      "management": "الأدارة",
+      "department": "القسم",
+      "job_type": "نوع الوظيفة",
+      "job_title": "المسمى الوظيفي",
+      "job_code": "الرقم الوظيفي"
+    },
+    "bankingData": {
+      "title": "المعلومات البنكية",
+      "bank_name": "اسم البنك",
+      "account_number": "رقم الحساب",
+      "account_type": "نوع الحساب",
+      "account_holder": "حامل الحساب",
+      "currency_name": "العملة",
+      "iban": "IBAN"
+    },
+    "activitiesData": {
+      "title": "الانشطة"
+    },
+    "upcomingMeetings": {
+      "title": "الاجتماعات القادمة",
+      "showAll": "اظهار الكل"
+    },
+    "userTeams": {
+      "title": "فرق المستخدم",
+      "showAll": "اظهار الكل"
     }
   },
   "activitiesLogs": {

@@ -521,6 +521,16 @@
           "rule2": "Choose an appropriate image size (e.g., 1920x1080 pixels).",
           "rule3": "Make sure the background is white."
         }
+      },
+      "statisticsCards": {
+        "contractStatus": "Contract Status",
+        "workingTime": "Working Time",
+        "financialReport": "Financial Report",
+        "tasks": "Tasks",
+        "contractStart": "Contract Start",
+        "contractEnd": "Contract End",
+        "weeklyReport": "Weekly Report",
+        "monthlySalary": "Monthly due"
       }
     },
     "ActivityTimeline": {
@@ -557,6 +567,46 @@
           "cv": "CV"
         }
       }
+    },
+    "personalData": {
+      "title": "Personal Data",
+      "name": "Name",
+      "status": "Status",
+      "jobTitle": "Job Title",
+      "jobRole": "Job Role",
+      "phone": "Phone",
+      "otherPhone": "Other Phone",
+      "email": "Email",
+      "nationalAddress": "National Address"
+    },
+    "professionalData": {
+      "title": "Professional Data",
+      "branch": "Branch",
+      "management": "Management",
+      "department": "Department",
+      "job_type": "Job Type",
+      "job_title": "Job Title",
+      "job_code": "Job Code"
+    },
+    "bankingData": {
+      "title": "Banking Data",
+      "bank_name": "Bank Name",
+      "account_number": "Account Number",
+      "account_type": "Account Type",
+      "account_holder": "Account Holder",
+      "currency_name": "Currency Name",
+      "iban": "IBAN"
+    },
+    "activitiesData": {
+      "title": "Activities"
+    },
+    "upcomingMeetings": {
+      "title": "Upcoming Meetings",
+      "showAll": "Show All"
+    },
+    "userTeams": {
+      "title": "User Teams",
+      "showAll": "Show All"
     }
   },
   "activitiesLogs": {
