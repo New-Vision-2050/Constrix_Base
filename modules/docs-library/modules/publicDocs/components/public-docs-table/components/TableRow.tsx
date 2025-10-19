@@ -3,14 +3,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileIcon } from "./FileIcon";
 import { StatusBadge } from "./StatusBadge";
 import { ActionButtons } from "./ActionButtons";
-import ToggleControl from "@/modules/clients/components/ToggleControl";
 import { useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import StatusToggle from "./StatusToggle";
 
 /**
  * Table row component for displaying document information
@@ -30,7 +28,6 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     setVisitedDirs,
     setDocToView,
   } = usePublicDocsCxt();
-  const { can } = usePermissions();
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
@@ -106,30 +103,12 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        {document.status == 0 ? (
-          <div className="w-full h-full bg-muted/30">{t("inactive")}</div>
-        ) : (
-            isFolder
-              ? !can(PERMISSIONS.library.folder.activate)
-              : !can(PERMISSIONS.library.file.activate)
-          ) ? (
-          <div className="w-full h-full bg-muted/30">
-            {document.status == 1 ? t("active") : t("inactive")}
-          </div>
-        ) : (
-          <ToggleControl
-            activeLabel={t("active")}
-            inactiveLabel={t("inactive")}
-            checked={document.status == 1 ? true : false}
-            onChange={(checked) => changeStatusMutation.mutate(checked)}
-            disabled={
-              changeStatusMutation.isPending ||
-              (isFolder
-                ? !can(PERMISSIONS.library.folder.activate)
-                : !can(PERMISSIONS.library.file.activate))
-            }
-          />
-        )}
+        <StatusToggle
+          status={document.status}
+          isFolder={isFolder}
+          onStatusChange={(checked) => changeStatusMutation.mutate(checked)}
+          isPending={changeStatusMutation.isPending}
+        />
       </td>
 
       <td className="px-4 py-3">
