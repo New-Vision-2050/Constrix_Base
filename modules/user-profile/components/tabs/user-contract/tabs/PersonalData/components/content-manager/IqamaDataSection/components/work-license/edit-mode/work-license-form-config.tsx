@@ -4,15 +4,17 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const WorkLicenseFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.nestedTabs.licenseData");
 
   const workLicenseFormConfig: FormConfig = {
     formId: "ConnectionInformation-license-data-form",
-    title: "بيانات رخصة العمل",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -23,27 +25,27 @@ export const WorkLicenseFormConfig = () => {
         fields: [
           {
             name: "work_permit",
-            label: "رقم رخصة العمل",
+            label: t("licenseNumber"),
             type: "text",
             required:true,
-            placeholder: "رقم رخصة العمل",
+            placeholder: t("licenseNumber"),
              validation: [
               {
                 type: "required",
-                message: "رقم رخصة العمل مطلوب",
+                message: t("licenseNumberRequired"),
               },
               {
                 type: "pattern",
                 value: "^[0-9]{10}$",
-                message: "رقم رخصة العمل يجب أن يتكون من 10 أرقام فقط",
+                message: t("licenseNumberPattern"),
               },
             ],
           },
           {
             name: "work_permit_start_date",
-            label: "تاريخ الدخول",
+            label: t("licenseStartDate"),
             type: "date",
-            placeholder: "تاريخ الدخول",
+            placeholder: t("licenseStartDate"),
             maxDate: {
               formId: `ConnectionInformation-license-data-form`,
               field: "entry_number_end_date",
@@ -52,9 +54,9 @@ export const WorkLicenseFormConfig = () => {
           },
           {
             name: "work_permit_end_date",
-            label: "تاريخ الانتهاء",
+            label: t("licenseEndDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("licenseEndDate"),
             minDate: {
               formId: `ConnectionInformation-license-data-form`,
               field: "work_permit_start_date",
@@ -63,16 +65,16 @@ export const WorkLicenseFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "تاريخ الانتهاء مطلوب",
+                message: t("licenseEndDateRequired"),
               },
             ],
           },
           {
             name: "file_work_permit",
-            label: "ارفاق رخصة العمل",
+            label: t("licenseAttachment"),
             type: "file",
             isMulti: true,
-            placeholder: "ارفاق رخصة العمل",
+            placeholder: t("licenseAttachment"),
             fileConfig: {
               allowedFileTypes: [
                 "application/pdf", // pdf
@@ -91,8 +93,8 @@ export const WorkLicenseFormConfig = () => {
       work_permit_end_date: userIdentityData?.work_permit_end_date,
       file_work_permit: userIdentityData?.file_work_permit,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
