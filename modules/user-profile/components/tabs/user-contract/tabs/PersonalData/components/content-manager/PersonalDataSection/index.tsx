@@ -16,7 +16,7 @@ export default function PersonalDataSection() {
 
       <ConnectionDataSectionPersonalForm />
 
-      {true && <IdentityDataSectionPersonalForm />}
+      {identity && <IdentityDataSectionPersonalForm />}
 
       {!identity && <PassportDataSectionPersonalForm />}
     </div>

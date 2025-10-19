@@ -629,7 +629,10 @@
         "phoneInvalid": "Please enter a valid phone number",
         "emailRequired": "Email is required",
         "emailInvalid": "Please enter a valid email address",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "otherPhone": "Other Phone",
+        "landlineNumber": "Landline Number",
+        "save": "Save"
       },
       "passportData": {
         "title": "Passport Data",
@@ -706,6 +709,29 @@
         "noData": "No Data Found",
         "noDataSubTitle": "No Data Found",
         "submitButtonText": "Submit",
+        "cancelButtonText": "Cancel"
+      },
+      "addressData": {
+        "title": "Address",
+        "address": "Address",
+        "addressLabel": "The address of the employee's home/foreign address",
+        "addressPlaceholder": "Select Address",
+        "addressRequired": "Address is required",
+        "city": "City",
+        "cityPlaceholder": "Select City",
+        "cityRequired": "City is required",
+        "state": "State",
+        "statePlaceholder": "Select State",
+        "stateRequired": "State is required",
+        "country": "Country",
+        "countryPlaceholder": "Select Country",
+        "countryRequired": "Country is required",
+        "zipCode": "Zip Code",
+        "zipCodePlaceholder": "Select Zip Code",
+        "zipCodeRequired": "Zip Code is required",
+        "addressValidationMessage": "The address must contain only letters, numbers, and valid symbols",
+        "zipCodeValidationMessage": "The zip code must be 5 numbers only",
+        "submitButtonText": "Save",
         "cancelButtonText": "Cancel"
       }
     }

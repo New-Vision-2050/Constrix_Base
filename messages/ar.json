@@ -614,7 +614,10 @@
         "phoneInvalid": "برجاء أدخل رقم جوال صحيح",
         "emailRequired": "البريد الالكتروني مطلوب",
         "emailInvalid": "برجاء أدخل بريد الكتروني صحيح",
-        "cancel": "إلغاء"
+        "cancel": "إلغاء",
+        "otherPhone": "رقم جوال بديل",
+        "landlineNumber": "رقم الهاتف الأرضي",
+        "save": "حفظ"
       },
       "passportData": {
         "title": "بيانات جواز السفر",
@@ -645,7 +648,7 @@
         "save": "حفظ",
         "cancel": "إلغاء"
       },
-      "bankingData":{
+      "bankingData": {
         "title": "بيانات الحساب البنكي",
         "bankingData": "بيانات الحساب البنكي",
         "country": "الدولة",
@@ -688,6 +691,29 @@
         "noData": "لا توجد بيانات",
         "noDataSubTitle": "لا توجد بيانات",
         "submitButtonText": " حفظ",
+        "cancelButtonText": "إلغاء"
+      },
+      "addressData": {
+        "title": "العنوان",
+        "address": "العنوان",
+        "addressLabel": "العنوان السكني بمقر العمل/العنوان الوطنى) ",
+        "addressPlaceholder": "اختر العنوان",
+        "addressRequired": "العنوان مطلوب",
+        "city": "المدينة",
+        "cityPlaceholder": "اختر المدينة",
+        "cityRequired": "المدينة مطلوبة",
+        "state": "الولاية",
+        "statePlaceholder": "اختر الولاية",
+        "stateRequired": "الولاية مطلوبة",
+        "country": "الدولة",
+        "countryPlaceholder": "اختر الدولة",
+        "countryRequired": "الدولة مطلوبة",
+        "zipCode": "الرمز البريدي",
+        "zipCodePlaceholder": "اختر الرمز البريدي",
+        "zipCodeRequired": "الرمز البريدي مطلوب",
+        "addressValidationMessage": "يجب أن يحتوي العنوان على أحرف وأرقام ورموز صالحة فقط",
+        "zipCodeValidationMessage": "الرمز البريدي يجب أن يتكون من 5 أرقام فقط",
+        "submitButtonText": "حفظ",
         "cancelButtonText": "إلغاء"
       }
     }
