@@ -5,6 +5,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 import { MaritalStatusList } from "../../marital-status-enum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   relative?: Relative;
@@ -16,10 +17,11 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
   const formMode = !relative ? "Create" : "Edit";
+  const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
 
   const maritalStatusRelativesFormConfig: FormConfig = {
     formId: `ConnectionInformation-relatives-data-form-${relative?.id ?? ""}`,
-    title: "الحالة الاجتماعية / الاقارب",
+    title: t("title"),
     apiUrl: `${baseURL}/user_relatives`,
     laravelValidation: {
       enabled: true,
@@ -30,7 +32,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
         fields: [
           {
             name: "marital_status_id",
-            label: "الحالة الاجتماعية",
+            label: t("maritalStatus"),
             type: "select",
             options: MaritalStatusList,
             dynamicOptions: {
@@ -38,13 +40,13 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
               valueField: "id",
               labelField: "name",
             },
-            placeholder: "الحالة الاجتماعية",
+            placeholder: t("maritalStatus"),
           },
           {
             name: "name",
-            label: "اسم شخص في حالة الطواري",
+            label: t("name"),
             type: "text",
-            placeholder: "اسم شخص في حالة الطواري",
+            placeholder: t("name"),
             validation: [
               {
                 type: "custom",
@@ -54,15 +56,15 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
                   const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
                   return lettersOnlyRegex.test(value);
                 },
-                message: "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+                message: t("nameValidationMessage"),
               },
             ],
           },
           {
             name: "relationship",
-            label: "علاقة الشخص بحاله الطواري",
+            label: t("relationship"),
             type: "text",
-            placeholder: "علاقة الشخص بحاله الطواري",
+            placeholder: t("relationship"),
             validation: [
               {
                 type: "custom",
@@ -72,19 +74,19 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
                   const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
                   return lettersOnlyRegex.test(value);
                 },
-                message: "يجب أن تحتوي العلاقة على حروف فقط (بدون أرقام أو رموز)",
+                message: t("relationshipValidationMessage"),
               },
             ],
           },
           {
             name: "phone",
-            label: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
+            label: t("phone"),
             type: "phone",
-            placeholder: " رقم الهاتف الخاص بجهة اتصال في حالة الطوارئ",
+            placeholder: t("phone"),
             validation: [
               {
                 type: "phone",
-                message: "برجاء ادخال رقم هاتف صحيح",
+                message: t("phoneValidationMessage"),
               },
             ],
           },
@@ -97,8 +99,8 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       phone: relative?.phone,
       relationship: relative?.relationship,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

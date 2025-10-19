@@ -733,6 +733,21 @@
         "zipCodeValidationMessage": "The zip code must be 5 numbers only",
         "submitButtonText": "Save",
         "cancelButtonText": "Cancel"
+      },
+      "maritalStatusRelatives": {
+        "title": "Marital Status / Relatives",
+        "createRelative": "Add Relative",
+        "noData": "No Data Found",
+        "noDataSubTitle": "No Data Found",
+        "submitButtonText": "Save",
+        "cancelButtonText": "Cancel",
+        "maritalStatus": "Marital Status",
+        "nameValidationMessage": "The name must contain only letters (without numbers or symbols)",
+        "name": "Name",
+        "relationship": "Relationship",
+        "phone": "Phone",
+        "relationshipValidationMessage": "The relationship must contain only letters (without numbers or symbols)",
+        "phoneValidationMessage": "Please enter a valid phone number"
       }
     }
   },

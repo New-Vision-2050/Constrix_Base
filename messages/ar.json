@@ -715,6 +715,21 @@
         "zipCodeValidationMessage": "الرمز البريدي يجب أن يتكون من 5 أرقام فقط",
         "submitButtonText": "حفظ",
         "cancelButtonText": "إلغاء"
+      },
+      "maritalStatusRelatives": {
+        "title": "الحالة الاجتماعية / الاقارب",
+        "createRelative": "أضافة قريب",
+        "noData": "لا توجد بيانات",
+        "noDataSubTitle": "لا توجد بيانات",
+        "submitButtonText": "حفظ",
+        "cancelButtonText": "إلغاء",
+        "maritalStatus": "الحالة الاجتماعية",
+        "nameValidationMessage": "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+        "name": "الاسم",
+        "relationship": "العلاقة",
+        "phone": "رقم الهاتف",
+        "relationshipValidationMessage": "يجب أن تحتوي العلاقة على حروف فقط (بدون أرقام أو رموز)",
+        "phoneValidationMessage": "برجاء ادخال رقم هاتف صحيح"
       }
     }
   },

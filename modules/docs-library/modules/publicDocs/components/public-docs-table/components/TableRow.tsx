@@ -106,11 +106,13 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        {(
-          isFolder
-            ? !can(PERMISSIONS.library.folder.activate)
-            : !can(PERMISSIONS.library.file.activate)
-        ) ? (
+        {document.status == 0 ? (
+          <div className="w-full h-full bg-muted/30">{t("inactive")}</div>
+        ) : (
+            isFolder
+              ? !can(PERMISSIONS.library.folder.activate)
+              : !can(PERMISSIONS.library.file.activate)
+          ) ? (
           <div className="w-full h-full bg-muted/30">
             {document.status == 1 ? t("active") : t("inactive")}
           </div>
