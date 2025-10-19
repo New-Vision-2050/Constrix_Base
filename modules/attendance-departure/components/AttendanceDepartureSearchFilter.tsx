@@ -81,8 +81,8 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
   );
 
   return (
-    <div className="p-4 bg-[#140F35] dark:bg-[#140F35] rounded-lg mb-4">
-      <h3 className="text-black dark:text-white mb-4 font-medium">{t("title")}</h3>
+    <div className="p-4 bg-white dark:bg-[#140F35] border border-gray-200 dark:border-gray-700 rounded-lg mb-4 shadow-sm">
+      <h3 className="text-gray-900 dark:text-white mb-4 font-medium">{t("title")}</h3>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="flex flex-col gap-1">
           <label 
@@ -98,7 +98,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           >
             <SelectTrigger 
               id="branch-select" 
-              className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 focus:border-purple-500"
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800"
             >
               <SelectValue placeholder={t("branch")} />
             </SelectTrigger>
@@ -134,7 +134,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           >
             <SelectTrigger 
               id="department-select" 
-              className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 focus:border-purple-500"
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800"
             >
               <SelectValue placeholder={t("department")} />
             </SelectTrigger>
@@ -169,7 +169,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           >
             <SelectTrigger 
               id="approver-select" 
-              className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 focus:border-purple-500"
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800"
             >
               <SelectValue placeholder={t("approver")} />
             </SelectTrigger>
@@ -198,7 +198,7 @@ const AttendanceDepartureSearchFilter: React.FC = () => {
           <Input
             id="search-input"
             placeholder={t("searchPlaceholder")}
-            className="bg-white dark:bg-transparent text-black dark:text-white border-gray-300 dark:border-gray-600 border-1 rounded-md w-full ring-1 ring-gray-300 dark:ring-gray-600 focus:ring-gray-400 focus:border-purple-500 placeholder:text-gray-400"
+            className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 placeholder:text-gray-500 dark:placeholder:text-gray-400"
             value={searchText}
             onChange={handleSearchTextChange}
           />
