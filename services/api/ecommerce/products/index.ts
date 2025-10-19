@@ -9,12 +9,12 @@ import { CreateProductParams, UpdateProductParams } from "./types/params";
 import { serialize } from "object-to-formdata";
 
 export const ProductsApi = {
-  list: () => baseApi.get<ListProductsResponse>("ecommerce/products"),
+  list: () => baseApi.get<ListProductsResponse>("ecommerce/dashboard/products"),
   show: (id: string) =>
-    baseApi.get<ShowProductResponse>(`ecommerce/products/${id}`),
+    baseApi.get<ShowProductResponse>(`ecommerce/dashboard/products/${id}`),
   create: (params: CreateProductParams) =>
     baseApi.post<CreateProductResponse>(
-      "ecommerce/products",
+      "ecommerce/dashboard/products",
       serialize(params, {
         indices: true,
         booleansAsIntegers: true,
