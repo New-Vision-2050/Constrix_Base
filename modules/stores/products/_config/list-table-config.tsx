@@ -36,8 +36,8 @@ export const useProductsListTableConfig: (
 
   return {
     tableId: "products-list-table",
-    url: `${baseURL}/ecommerce/products`,
-    deleteUrl: `${baseURL}/ecommerce/products`,
+    url: `${baseURL}/ecommerce/dashboard/products`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/products`,
 
     // Add row actions for edit and delete
     executions: [

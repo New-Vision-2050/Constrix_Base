@@ -1614,7 +1614,7 @@
   },
   "product": {
     "singular": "منتج",
-    "plural": "منتجات",
+    "plural": "المنتجات",
     "dialog": {
       "add": {
         "title": "إضافة منتج عادي",
