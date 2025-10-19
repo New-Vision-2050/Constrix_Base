@@ -507,7 +507,7 @@
           "rule3": "تأكد من أن الخلفية بيضاء."
         }
       },
-      "statisticsCards":{
+      "statisticsCards": {
         "contractStatus": "حالة العقد",
         "workingTime": "وقت الدوام",
         "financialReport": "التقرير المالي",
@@ -515,7 +515,7 @@
         "contractStart": "بداية العقد",
         "contractEnd": "نهاية العقد",
         "weeklyReport": "تقرير الأسبوعي",
-        "monthlySalary":"المستحق الشهري"
+        "monthlySalary": "المستحق الشهري"
       }
     },
     "ActivityTimeline": {
@@ -592,6 +592,59 @@
     "userTeams": {
       "title": "فرق المستخدم",
       "showAll": "اظهار الكل"
+    },
+    "nestedTabs": {
+      "PeronalDataTab": {
+        "title": "البيانات الشخصية",
+        "name": "الاسم ثلاثي",
+        "nickname": "الاسم الشهرة",
+        "isDefault": "افتراضي",
+        "gender": "الجنس",
+        "birthDate": "تاريخ الميلاد",
+        "birthDateHijri": "تاريخ الميلاد (هجري)",
+        "nationality": "الجنسية"
+      },
+      "connectionData": {
+        "title": "بيانات الاتصال",
+        "phone": "رقم الجوال",
+        "email": "البريد الالكتروني",
+        "changePhone": "تغيير رقم الجوال",
+        "changeEmail": "تغيير البريد الالكتروني",
+        "phoneRequired": "رقم الجوال مطلوب",
+        "phoneInvalid": "برجاء أدخل رقم جوال صحيح",
+        "emailRequired": "البريد الالكتروني مطلوب",
+        "emailInvalid": "برجاء أدخل بريد الكتروني صحيح",
+        "cancel": "إلغاء"
+      },
+      "passportData": {
+        "title": "بيانات جواز السفر",
+        "passportNumber": "رقم جواز السفر",
+        "passportStartDate": "تاريخ الانشاء",
+        "passportEndDate": "تاريخ الانتهاء",
+        "passportFile": "ارفاق جواز السفر",
+        "passportNumberRequired": "رقم الجواز مطلوب",
+        "passportNumberPattern": "رقم الجواز يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+        "passportStartDateRequired": "تاريخ البدء مطلوب",
+        "passportEndDateRequired": "تاريخ الانتهاء مطلوب",
+        "save": "حفظ",
+        "cancel": "إلغاء"
+      },
+      "identityData": {
+        "title": "البيانات الهوية",
+        "nationalId": "رقم الهوية",
+        "identityStartDate": "تاريخ البدء",
+        "identityEndDate": "تاريخ الانتهاء",
+        "identityFile": "ارفاق الهوية",
+        "nationalIdMinLength": "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+        "nationalIdMaxLength": "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+        "nationalIdPattern": "رقم الهوية يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+        "attachment": "ارفاق",
+        "nationalIdRequired": "رقم الهوية مطلوب",
+        "identityStartDateRequired": "تاريخ البدء مطلوب",
+        "identityEndDateRequired": "تاريخ الانتهاء مطلوب",
+        "save": "حفظ",
+        "cancel": "إلغاء"
+      }
     }
   },
   "activitiesLogs": {

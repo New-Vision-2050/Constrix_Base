@@ -12,17 +12,13 @@ export default function PersonalDataSection() {
 
   return (
     <div className="flex flex-col gap-6">
-        <PersonalDataSectionPersonalForm />
+      <PersonalDataSectionPersonalForm />
 
-        <ConnectionDataSectionPersonalForm />
+      <ConnectionDataSectionPersonalForm />
 
-      {!identity && (
-          <IdentityDataSectionPersonalForm />
-      )}
+      {true && <IdentityDataSectionPersonalForm />}
 
-      {!identity && (
-          <PassportDataSectionPersonalForm />
-      )}
+      {!identity && <PassportDataSectionPersonalForm />}
     </div>
   );
 }

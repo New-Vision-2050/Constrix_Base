@@ -5,17 +5,19 @@ import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { useTranslations } from "next-intl";
 
 export default function PersonalDataSectionPersonalForm() {
   // declare and define component state and vars
   const { userPersonalDataLoading, handleRefreshPersonalData } =
     usePersonalDataTabCxt();
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.nestedTabs.PeronalDataTab");
 
   return (
     <Can check={[PERMISSIONS.profile.personalInfo.view]}>
       <TabTemplate
-        title="البيانات الشخصية"
+        title={t("title")}
         loading={userPersonalDataLoading}
         reviewMode={<UserProfilePersonalDataReview />}
         editMode={<UserProfilePersonalDataEditForm />}

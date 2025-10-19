@@ -607,6 +607,62 @@
     "userTeams": {
       "title": "User Teams",
       "showAll": "Show All"
+    },
+    "nestedTabs": {
+      "PeronalDataTab": {
+        "title": "Personal Data",
+        "name": "Full Name",
+        "nickname": "Nickname",
+        "isDefault": "Default",
+        "gender": "Gender",
+        "birthDate": "Birth Date",
+        "birthDateHijri": "Birth Date (Hijri)",
+        "nationality": "Nationality"
+      },
+      "connectionData": {
+        "title": "Contact Information",
+        "phone": "Phone",
+        "email": "Email",
+        "changePhone": "Change Phone",
+        "changeEmail": "Change Email",
+        "phoneRequired": "Phone is required",
+        "phoneInvalid": "Please enter a valid phone number",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email address",
+        "cancel": "Cancel"
+      },
+      "passportData": {
+        "title": "Passport Data",
+        "passportNumber": "Passport Number",
+        "passportStartDate": "Passport Start Date",
+        "passportEndDate": "Passport End Date",
+        "passportFile": "Passport File",
+        "passportNumberRequired": "Passport Number is required",
+        "passportNumberPattern": "Passport Number must be between 6 and 20 characters or numbers",
+        "passportStartDateRequired": "Passport Start Date is required",
+        "passportEndDateRequired": "Passport End Date is required",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "identityData": {
+        "title": "Identity Data",
+        "identityNumber": "Identity Number",
+        "identityStartDate": "Identity Start Date",
+        "identityEndDate": "Identity End Date",
+        "identityFile": "Identity File",
+        "nationalId": "National ID",
+        "nationalIdRequired": "National ID is required",
+        "nationalIdPattern": "National ID must be between 6 and 20 characters or numbers",
+        "attachment": "Attachment",
+        "nationalIdMinLength": "National ID must be between 6 and 20 characters or numbers",
+        "nationalIdMaxLength": "National ID must be between 6 and 20 characters or numbers",
+         "identityNumberRequired": "Identity Number is required",
+        "identityNumberPattern": "Identity Number must be between 6 and 20 characters or numbers",
+        "identityStartDateRequired": "Identity Start Date is required",
+        "identityEndDateRequired": "Identity End Date is required",
+        "save": "Save",
+        "cancel": "Cancel"
+      }
     }
   },
   "activitiesLogs": {
