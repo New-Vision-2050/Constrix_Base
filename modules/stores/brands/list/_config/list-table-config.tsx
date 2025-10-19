@@ -13,8 +13,8 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "brands-list-table",
-    url: `${baseURL}/ecommerce/brands`,
-    deleteUrl: `${baseURL}/ecommerce/brands`,
+    url: `${baseURL}/ecommerce/dashboard/brands`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/brands`,
     columns: [
       { key: "name", label: t("labels.name"), sortable: true },
       { key: "description", label: t("labels.description"), sortable: true },
