@@ -89,12 +89,12 @@ export default function AssignUsersToBranch(props: PropsT) {
       data
         ?.filter(
           (user) =>
-            user.id !== manager?.id &&
-            user.id !== authCompany?.payload?.owner_id
+            user?.id !== manager?.id &&
+            user?.id !== authCompany?.payload?.owner_id
         )
         ?.map((user) => ({
-          label: user.name,
-          value: user.id,
+          label: user?.name,
+          value: user?.id,
         })) || []
     );
   }, [data, manager, authCompany]);

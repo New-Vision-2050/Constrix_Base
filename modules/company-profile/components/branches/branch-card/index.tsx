@@ -32,7 +32,7 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
     useModal();
   const local = useLocale();
   const isRTL = local === "ar";
-  const isMainBranch = branch.parent_id === null;
+  const isMainBranch = branch?.parent_id === null;
   const isMultipleBranch = branches.length > 1;
 
   console.log("branchbranch", branch);
@@ -49,10 +49,10 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
     <div className={`w-full p-4 rounded-md ${className}`}>
       <div className="flex justify-between items-center mb-4">
         <div className="flex flex-col items-start">
-          <h2 className="text-2xl font-bold mb-1">{branch.name}</h2>
+          <h2 className="text-2xl font-bold mb-1">{branch?.name}</h2>
           <div className="flex items-center">
             <MapPin className="ml-1 text-pink-500" size={18} />
-            <span>{branch.country_name}</span>
+            <span>{branch?.country_name}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -113,16 +113,16 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
                     {branch.manager?.name}
                   </span>
                   {/* users */}
-                  {branch.users_can_access.map((user) => (
+                  {branch?.users_can_access?.map((user) => (
                     <span
-                      key={user.id}
+                      key={user?.id}
                       className="inline-block px-2 py-1 text-xs font-semibold leading-none rounded-full whitespace-nowrap"
                       style={{
                         backgroundColor: "#F2F2F2",
                         color: "#6c757d",
                       }}
                     >
-                      {user.name}
+                      {user?.name}
                     </span>
                   ))}
                 </div>
@@ -133,9 +133,9 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
                   className="text-primary cursor-pointer"
                 />
                 <AssignUsersToBranch
-                  branchId={branch.id}
-                  usersIds={branch.users_can_access.map((user) => user.id)}
-                  manager={branch.manager}
+                  branchId={branch?.id}
+                  usersIds={branch?.users_can_access?.map((user) => user?.id) || []}
+                  manager={branch?.manager}
                   isOpen={isAssignUsersOpen}
                   handleClose={handleAssignUsersClose}
                   handleBranchesRefetch={handleBranchesRefetch}
@@ -153,7 +153,7 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
         onOpenChange={handleClose}
       />
       {isMultipleBranch && isMainBranch && (
-        <ChangeBranchDialog branches={branches} branchId={branch.id} />
+        <ChangeBranchDialog branches={branches} branchId={branch?.id} />
       )}
     </div>
   );
@@ -162,8 +162,8 @@ const BranchCard = ({ branch, branches, className = "",handleBranchesRefetch }: 
 const BranchInfo = ({ branches,handleBranchesRefetch }: { branches: Branch[],handleBranchesRefetch: () => void }) => {
   return (
     <div className="bg-sidebar grid grid-cols-2">
-      {branches.map((branch) => (
-        <BranchCard key={branch.id} branch={branch} branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
+      {branches?.map((branch) => (
+        <BranchCard key={branch?.id} branch={branch} branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
       ))}
     </div>
   );

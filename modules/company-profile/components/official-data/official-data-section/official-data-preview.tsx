@@ -18,7 +18,7 @@ const OfficialDataPreview = ({
     email,
     packages,
     company_access_programs,
-  } = officialData;
+  } = officialData || {};
 
   const previewData = [
     {
@@ -50,10 +50,10 @@ const OfficialDataPreview = ({
       needRequest: true,
     },
     {
-      valid: Boolean(company_field) && company_field.length > 0,
+      valid: Boolean(company_field) && company_field?.length > 0,
       label: "مجال الشركة",
       value: Boolean(company_field)
-        ? company_field.map((field) => field.name).join(" , ")
+        ? company_field?.map((field) => field?.name).join(" , ")
         : "",
       needRequest: true,
     },
@@ -70,13 +70,13 @@ const OfficialDataPreview = ({
     {
       valid: Boolean(company_access_programs),
       label: "البرنامج",
-      value: company_access_programs[0]?.name ?? "",
+      value: company_access_programs?.[0]?.name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(packages),
       label: "الباقة",
-      value: packages[0]?.name ?? "",
+      value: packages?.[0]?.name ?? "",
       needRequest: true,
     },
   ];
