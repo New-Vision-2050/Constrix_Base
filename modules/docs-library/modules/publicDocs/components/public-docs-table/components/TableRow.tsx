@@ -9,6 +9,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import StatusToggle from "./StatusToggle";
+import { useMemo, useState } from "react";
 
 /**
  * Table row component for displaying document information
@@ -27,15 +28,24 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     toggleDocInSelectedDocs,
     setVisitedDirs,
     setDocToView,
+    selectedDocs,
   } = usePublicDocsCxt();
+  const [rowStatus, setRowStatus] = useState(document.status);
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
     const mb = size / (1024 * 1024);
-    return `${mb.toFixed(1)} MB`;
+    return `${mb.toFixed(2)} MB`;
   };
 
+  const isDocSelected = useMemo(() => {
+    return selectedDocs?.some((doc) => doc.id == document.id);
+  }, [selectedDocs, document]);
+
   const handleClick = () => {
+    if (rowStatus == 0) {
+      return;
+    }
     if (isFolder) {
       if (document?.is_password == 1) {
         setOpenDirWithPassword(true);
@@ -69,7 +79,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
   return (
     <tr className="hover:bg-muted/30 transition-colors">
       <td className="px-4 py-3">
-        <Checkbox onCheckedChange={() => toggleDocInSelectedDocs(document)} />
+        <Checkbox checked={isDocSelected} onCheckedChange={() => toggleDocInSelectedDocs(document)} />
       </td>
 
       <td className="px-4 py-3">
@@ -104,10 +114,11 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
 
       <td className="px-4 py-3">
         <StatusToggle
-          status={document.status}
           isFolder={isFolder}
           onStatusChange={(checked) => changeStatusMutation.mutate(checked)}
           isPending={changeStatusMutation.isPending}
+          rowStatus={rowStatus}
+          setRowStatus={setRowStatus}
         />
       </td>
 

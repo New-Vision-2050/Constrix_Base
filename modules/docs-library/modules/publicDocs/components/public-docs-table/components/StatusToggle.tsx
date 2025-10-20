@@ -5,28 +5,29 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { useState } from "react";
 
 interface StatusToggleProps {
-  status: number;
   isFolder: boolean;
   onStatusChange: (checked: boolean) => void;
   isPending?: boolean;
+  rowStatus: number;
+  setRowStatus: React.Dispatch<React.SetStateAction<number>>
 }
 
 export default function StatusToggle({
-  status,
   isFolder,
   onStatusChange,
   isPending = false,
+  rowStatus,
+  setRowStatus,
 }: StatusToggleProps) {
   const t = useTranslations("docs-library.publicDocs.table");
   const { can } = usePermissions();
-  const [rowStatus, setRowStatus] = useState(status);
 
   const hasPermission = isFolder
     ? can(PERMISSIONS.library.folder.activate)
     : can(PERMISSIONS.library.file.activate);
 
     
-  if (rowStatus === 0 || !hasPermission) {
+  if (!hasPermission) {
     return (
       <div className="w-full h-full bg-muted/30">
         {rowStatus === 1 ? t("active") : t("inactive")}
@@ -47,7 +48,7 @@ export default function StatusToggle({
           console.log(error);
         }
       }}
-      disabled={rowStatus === 0 || isPending || !hasPermission}
+      disabled={isPending || !hasPermission}
     />
   );
 }

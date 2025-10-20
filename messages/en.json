@@ -374,6 +374,8 @@
       "shareDialog": {
         "title": "Share",
         "save": "Save",
+        "sharedSuccessfully": "File shared successfully",
+        "sharedFailed": "Failed to share file",
         "copy": "Copy Link",
         "cancel": "Cancel",
         "selectFolder": "Select Folder",

@@ -7,6 +7,7 @@ import { DocumentT } from "../types/Directory";
 import useFoldersList from "../hooks/useFoldersList";
 import { SelectOption } from "@/types/select-option";
 import { SearchFormData } from "../components/search-fields";
+import useUsersData from "../hooks/useUsersData";
 
 // Define context type
 interface CxtType {
@@ -80,6 +81,9 @@ interface CxtType {
   sort: string;
   setSort: React.Dispatch<React.SetStateAction<string>>;
 
+  // users list
+  usersList: SelectOption[] | undefined;
+
   // docToView
   docToView: DocumentT | undefined;
   setDocToView: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
@@ -115,6 +119,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
 
   // visited dirs
   const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
+
+  // users list
+  const { data: usersList } = useUsersData();
 
   // docToView
   const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
@@ -240,6 +247,8 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // docToView
         docToView,
         setDocToView,
+        // users list
+        usersList,
       }}
     >
       {children}
