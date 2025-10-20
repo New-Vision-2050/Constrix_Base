@@ -1536,7 +1536,20 @@
     "brandName": "Brand Name",
     "brandNameRequired": "Brand name is required",
     "brandNameMinLength": "Brand name must be at least 2 characters",
-    "notFound": "No brands found"
+    "imageRequired": "Brand image is required",
+    "notFound": "No brands found",
+    "imageLabel": "Section Image",
+    "description": "Description",
+    "dragDropImage": "Drag and drop image here or",
+    "supportedFormats": ".jpg, .png, .webp",
+    "attachImage": "Attach",
+    "removeImage": "Remove Image",
+    "save": "Save",
+    "createSuccess": "Brand created successfully!",
+    "updateSuccess": "Brand updated successfully!",
+    "createError": "Failed to create brand. Please try again.",
+    "updateError": "Failed to update brand. Please try again.",
+    "validationError": "Validation error. Please check your inputs."
   },
   "warehouse": {
     "plural": "Warehouses",

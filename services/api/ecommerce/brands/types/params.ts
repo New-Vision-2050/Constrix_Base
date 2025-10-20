@@ -1,6 +1,9 @@
 export interface CreateBrandParams {
-  name: string;
-  description?: string;
+  "name[ar]"?: string;
+  "name[en]"?: string;
+  "description[ar]"?: string;
+  "description[en]"?: string;
+  brand_image: File;
 }
 
 export interface UpdateBrandParams extends Partial<CreateBrandParams> {}
