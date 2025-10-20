@@ -25,11 +25,18 @@ export const PublicDocsTable = () => {
         <table className="w-full">
           <TableHeader />
           <tbody className="divide-y divide-border">
-            {allDocuments.map((document) => (
+            {(docs?.folders || []).map((document) => (
               <TableRow
                 key={document.id}
                 document={document}
-                isFolder={!Boolean(document?.reference_number)}
+                isFolder={true}
+              />
+            ))}
+            {(docs?.files || []).map((document) => (
+              <TableRow
+                key={document.id}
+                document={document}
+                isFolder={false}
               />
             ))}
           </tbody>
