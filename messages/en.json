@@ -1729,6 +1729,11 @@
           "saving": "Saving...",
           "cancel": "Cancel"
         }
+      },
+      "edit": {
+        "title": "Edit Product",
+        "success": "Product edited successfully",
+        "error": "An error occurred while editing the product"
       }
     },
     "validation": {
