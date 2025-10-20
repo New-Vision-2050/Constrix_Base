@@ -6,14 +6,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Download, Ellipsis, Share2, Star, Trash, X } from "lucide-react";
+import {
+  Download,
+  Ellipsis,
+  Share2,
+  Star,
+  StarOff,
+  Trash,
+  X,
+} from "lucide-react";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 export default function DocViewDialog() {
+  const [loading, setLoading] = useState(false);
   const { docToView, setDocToView } = usePublicDocsCxt();
   const fileType = docToView?.file?.type;
   const isImg = fileType == "image";
+  const [isFavorite, setIsFavorite] = useState(Boolean(docToView?.is_favourite));
+
+  useEffect(() => {
+    setIsFavorite(Boolean(docToView?.is_favourite));
+  }, [docToView]);
 
   const handleShare = () => {
     console.log("Share");
@@ -23,11 +38,50 @@ export default function DocViewDialog() {
     console.log("Delete");
   };
 
+  const handleAddFavorite = async () => {
+    setLoading(true);
+    try {
+      const _url = baseURL + `/files/favourites`;
+      await apiClient.post(_url, {
+        ids: [docToView?.id],
+      });
+      setIsFavorite(true);
+      toast.success("تم إضافة المستند إلى المفضلة");
+    } catch (error) {
+      toast.error("حدث خطأ أثناء إضافة المستند إلى المفضلة");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveFavorite = async () => {
+    setLoading(true);
+    try {
+      const _url = baseURL + `/files/favourites`;
+      await apiClient.delete(_url, {
+        data: {
+          ids: [docToView?.id],
+        },
+      });
+      setIsFavorite(false);
+      toast.success("تم إزالة المستند من المفضلة");
+    } catch (error) {
+      toast.error("حدث خطأ أثناء إزالة المستند من المفضلة");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleFavorite = () => {
-    console.log("Favorite");
+    if (isFavorite) {
+      handleRemoveFavorite();
+    } else {
+      handleAddFavorite();
+    }
   };
 
   const handleDownload = async () => {
+    setLoading(true);
     try {
       const _url = baseURL + `/files/${docToView?.id}/download`;
       const response = await apiClient.get(_url, {
@@ -36,30 +90,37 @@ export default function DocViewDialog() {
 
       // Determine MIME type based on file type
       const getMimeType = (fileType: string, fileName: string) => {
-        const extension = fileName?.split('.').pop()?.toLowerCase();
-        
+        const extension = fileName?.split(".").pop()?.toLowerCase();
+
         switch (fileType) {
-          case 'image':
-            if (extension === 'png') return 'image/png';
-            if (extension === 'jpg' || extension === 'jpeg') return 'image/jpeg';
-            if (extension === 'gif') return 'image/gif';
-            if (extension === 'webp') return 'image/webp';
-            return 'image/*';
-          case 'pdf':
-            return 'application/pdf';
-          case 'document':
-            if (extension === 'doc' || extension === 'docx') return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            if (extension === 'xls' || extension === 'xlsx') return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            if (extension === 'ppt' || extension === 'pptx') return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-            if (extension === 'txt') return 'text/plain';
-            return 'application/octet-stream';
+          case "image":
+            if (extension === "png") return "image/png";
+            if (extension === "jpg" || extension === "jpeg")
+              return "image/jpeg";
+            if (extension === "gif") return "image/gif";
+            if (extension === "webp") return "image/webp";
+            return "image/*";
+          case "pdf":
+            return "application/pdf";
+          case "document":
+            if (extension === "doc" || extension === "docx")
+              return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            if (extension === "xls" || extension === "xlsx")
+              return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            if (extension === "ppt" || extension === "pptx")
+              return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+            if (extension === "txt") return "text/plain";
+            return "application/octet-stream";
           default:
-            return 'application/octet-stream';
+            return "application/octet-stream";
         }
       };
 
       // Create blob URL and trigger download with proper MIME type
-      const mimeType = getMimeType(docToView?.file?.type || '', docToView?.file?.url || '');
+      const mimeType = getMimeType(
+        docToView?.file?.type || "",
+        docToView?.file?.url || ""
+      );
       const blob = new Blob([response.data], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -73,6 +134,8 @@ export default function DocViewDialog() {
       toast.success("تم تحميل المستند بنجاح");
     } catch (error) {
       toast.error("حدث خطأ أثناء تحميل المستند");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,25 +154,29 @@ export default function DocViewDialog() {
           <DialogTitle className="text-center">{docToView?.name}</DialogTitle>
           {/* more buttons */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={() => setDocToView(undefined)}>
+            <Button disabled={loading} variant="ghost" onClick={() => setDocToView(undefined)}>
               <Ellipsis className="h-4 w-4" />
             </Button>
             {/* vertical seperator */}
             <div className="h-4 w-[1px] bg-sidebar"></div>
             {/* share button */}
-            <Button variant="ghost" onClick={handleShare}>
+            <Button disabled={loading} variant="ghost" onClick={handleShare}>
               <Share2 className="h-4 w-4" />
             </Button>
             {/* delete button */}
-            <Button variant="ghost" onClick={handleDelete}>
+            <Button disabled={loading} variant="ghost" onClick={handleDelete}>
               <Trash className="h-4 w-4" />
             </Button>
             {/* favorite button */}
-            <Button variant="ghost" onClick={handleFavorite}>
-              <Star className="h-4 w-4" />
+            <Button disabled={loading} variant="ghost" onClick={handleFavorite}>
+              {isFavorite ? (
+                <Star className="h-4 w-4 text-pink-600" />
+              ) : (
+                <StarOff className="h-4 w-4" />
+              )}
             </Button>
             {/* download button */}
-            <Button variant="ghost" onClick={handleDownload}>
+            <Button disabled={loading} variant="ghost" onClick={handleDownload}>
               <Download className="h-4 w-4" />
             </Button>
           </div>
