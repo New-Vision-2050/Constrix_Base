@@ -95,7 +95,9 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       const _url = baseURL + `/files/export`;
       const response = await apiClient.post(
         _url,
-        {},
+        {
+          ids: selectedDocs?.map((doc) => doc.id),
+        },
         {
           responseType: "blob",
         }
@@ -125,7 +127,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
   const handleDownload = async () => {
     try {
-      if (selectedDocs?.length === 0) {
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      if (files?.length === 0) {
         toast.error("يجب اختيار ملف");
         return;
       }
@@ -133,7 +136,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       const response = await apiClient.post(
         _url,
         {
-          ids: selectedDocs?.map((doc) => doc.id),
+          ids: files?.map((doc) => doc.id),
         },
         {
           responseType: "blob",
@@ -169,13 +172,14 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
   const handleFavorite = async () => {
     try {
-      if (selectedDocs?.length === 0) {
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      if (files?.length === 0) {
         toast.error("يجب اختيار ملف");
         return;
       }
       const _url = baseURL + `/files/favourites`;
       await apiClient.post(_url, {
-        ids: selectedDocs?.map((doc) => doc.id),
+        ids: files?.map((doc) => doc.id),
       });
       toast.success("تم إضافة المستندات إلى المفضلة");
     } catch (error) {
@@ -349,7 +353,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {t("copy")}
             </Button>
             {/* request file button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button disabled variant="outline" className="bg-sidebar h-10" size="sm">
               <FileText className="mr-2 h-4 w-4" />
               {t("requestFile")}
             </Button>
