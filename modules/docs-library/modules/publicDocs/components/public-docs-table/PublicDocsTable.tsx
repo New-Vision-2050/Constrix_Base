@@ -10,13 +10,8 @@ import { TableRow } from "./components/TableRow";
  * Displays documents in a structured table format
  */
 export const PublicDocsTable = () => {
-  const {
-    docs,
-    isLoadingDocs,
-    docsPagination,
-    setPage,
-    setLimit,
-  } = usePublicDocsCxt();
+  const { docs, isLoadingDocs, docsPagination, setPage, setLimit } =
+    usePublicDocsCxt();
 
   if (isLoadingDocs) {
     return <LoadingSpinner />;
@@ -34,7 +29,7 @@ export const PublicDocsTable = () => {
               <TableRow
                 key={document.id}
                 document={document}
-                isFolder={!document.reference_number}
+                isFolder={!Boolean(document?.reference_number)}
               />
             ))}
           </tbody>
