@@ -11,7 +11,7 @@ export interface BrandRow {
   status: number;
   num_products: number;
   num_requests: number;
-  main_image?: {
+  file?: {
     id: number;
     url: string;
     name: string;
@@ -39,9 +39,9 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
         render: (_: unknown, row: BrandRow) => (
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
-              {row.main_image?.url ? (
+              {row.file?.url ? (
                 <Image
-                  src={row.main_image.url}
+                  src={row.file.url}
                   alt={row.name}
                   fill
                   className="object-cover"
