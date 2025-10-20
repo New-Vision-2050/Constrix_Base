@@ -5,15 +5,15 @@ import { Button } from "@/components/ui/button";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddCategoryDialog from "@/modules/stores/components/dialogs/add-category";
 import { useTranslations } from "next-intl";
-import { useCategoriesListTableConfig } from "./_config/list-table-config";
 import { useState } from "react";
+import { useMainCategoryTableConfig } from "../../../_config/mainTableConfig";
 
 function ListCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
     null
   );
   const [addingChildTo, setAddingChildTo] = useState<string | null>(null);
-  const tableConfig = useCategoriesListTableConfig({
+  const tableConfig = useMainCategoryTableConfig({
     onEdit: (id: string) => setEditingCategoryId(id),
     onAddChild: (id: string) => setAddingChildTo(id),
   });
@@ -27,12 +27,6 @@ function ListCategoriesView() {
         categoryId={editingCategoryId || undefined}
         onSuccess={() => reloadTable()}
       />
-      <AddCategoryDialog
-        open={Boolean(addingChildTo)}
-        onClose={() => setAddingChildTo(null)}
-        parentId={addingChildTo || undefined}
-        onSuccess={() => reloadTable()}
-      />
       <TableBuilder
         config={tableConfig}
         searchBarActions={
@@ -41,9 +35,7 @@ function ListCategoriesView() {
               component={AddCategoryDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
               render={({ onOpen }) => (
-                <Button onClick={onOpen}>
-                  {t("labels.add")} {t("category.singular")}
-                </Button>
+                <Button onClick={onOpen}>اضافة قسم</Button>
               )}
             />
           </>
