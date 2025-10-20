@@ -3,4 +3,6 @@ export interface ECM_Category {
   name: string;
   description?: string;
   parent?: Pick<ECM_Category, "id" | "name"> | null;
+  image?: string;
+  priority?: number;
 }
