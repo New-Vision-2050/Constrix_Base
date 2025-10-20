@@ -424,6 +424,14 @@ export default function AddWarehouse2Dialog({
               <div className="bg-gray-200 rounded-lg overflow-hidden">
                 <PlacesPicker
                   onPick={handleLocationPick}
+                  initialPosition={
+                    watch("latitude") && watch("longitude")
+                      ? {
+                          lat: watch("latitude"),
+                          lng: watch("longitude"),
+                        }
+                      : null
+                  }
                   mapProps={{
                     mapContainerStyle: { width: "100%", height: "320px" },
                   }}

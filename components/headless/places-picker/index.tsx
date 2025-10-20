@@ -28,6 +28,7 @@ export type GoogleMapPickerValue = {
 type Props = {
   onPick: (value: GoogleMapPickerValue) => void;
   mapProps?: Partial<ComponentProps<typeof GoogleMap>>;
+  initialPosition?: { lat: number; lng: number } | null;
 };
 
 function extractAddressComponents(
@@ -50,13 +51,16 @@ function extractAddressComponents(
   return result;
 }
 
-const PlacesPicker: React.FC<Props> = ({ onPick, mapProps }) => {
+const PlacesPicker: React.FC<Props> = ({ onPick, mapProps, initialPosition }) => {
+  // Debug: Check if API key is loaded
+  console.log("Google Maps API Key exists:", !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+  
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     libraries,
   });
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
-    null
+    initialPosition || null
   );
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -107,13 +111,13 @@ const PlacesPicker: React.FC<Props> = ({ onPick, mapProps }) => {
       </Autocomplete>
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
-        center={marker || defaultCenter}
-        zoom={marker ? 16 : 10}
+        center={marker || initialPosition || defaultCenter}
+        zoom={marker || initialPosition ? 16 : 10}
         onClick={onMapClick}
         onLoad={setMap}
         {...mapProps}
       >
-        {marker && <Marker position={marker} />}
+        {marker && <Marker position={marker} draggable={false} />}
       </GoogleMap>
     </div>
   );
