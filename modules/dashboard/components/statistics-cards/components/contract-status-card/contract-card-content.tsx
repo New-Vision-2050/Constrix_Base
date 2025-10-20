@@ -2,6 +2,7 @@ import CalendarRangeIcon from "@/public/icons/calendar-range";
 import ContractStatusProgressBar from "./Card-Progress-Bar";
 import { ProfileWidgetContract } from "@/modules/user-profile/types/profile-widgets";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   contractData?: ProfileWidgetContract;
@@ -9,6 +10,7 @@ type PropsT = {
 
 export default function ContractStatusCardContent({ contractData }: PropsT) {
   // declare and define helper state and variables
+  const t = useTranslations("UserProfile.header.statisticsCards");
   const [passedPercentage, setPassedPercentage] = useState<number>();
 
   // handle side effects
@@ -39,8 +41,6 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
     ? (100 - (passedPercentage ?? 0))?.toFixed(1)
     : "-";
 
-  console.log("showPercentage", showPercentage);
-
   // declare and define
   return (
     <div className="flex flex-col gap-4 mt-4">
@@ -51,7 +51,7 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
             <div className="w-6 h-6 bg-pink-100 flex items-center justify-center rounded-md">
               <CalendarRangeIcon additionalClass="text-pink-500 w-[15px]" />
             </div>
-            <span className="text-sm">بداية العقد</span>
+            <span className="text-sm">{t("contractStart")}</span>
           </div>
           <span className="text-lg font-semibold ">
             {`${startPercentage} %`}
@@ -67,7 +67,7 @@ export default function ContractStatusCardContent({ contractData }: PropsT) {
         {/* End Date */}
         <div className="flex flex-col items-end">
           <div className="flex items-center gap-2">
-            <span className="text-sm">نهاية العقد</span>
+            <span className="text-sm">{t("contractEnd")}</span>
             <div className="w-6 h-6 bg-yellow-100 flex items-center justify-center rounded-md">
               <CalendarRangeIcon additionalClass="text-yellow-500 w-[15px]" />
             </div>

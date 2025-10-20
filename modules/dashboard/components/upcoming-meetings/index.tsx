@@ -1,6 +1,7 @@
 import RegularList from "@/components/shared/RegularList";
 import UserProfileTableDataMainLayout from "../UserProfileTableDataMainLayout";
 import SingleListItem, { ListItemType } from "./SingleListItem";
+import { useTranslations } from "next-intl";
 
 // dummy data
 const avatarSrc =
@@ -37,8 +38,9 @@ const items: ListItemType[] = [
 ];
 
 export default function UpcomingMeetings() {
+  const t = useTranslations("UserProfile.upcomingMeetings");
   return (
-    <UserProfileTableDataMainLayout title="الاجتماعات القادمة">
+    <UserProfileTableDataMainLayout title={t("title")}>
       <div className="flex gap-4 flex-col">
         <RegularList<ListItemType, "item">
           items={items}
@@ -47,7 +49,7 @@ export default function UpcomingMeetings() {
           ItemComponent={SingleListItem}
         />
         <div className="flex items-center justify-center p-2 w-full h-6">
-          <p className="text-semibold">اظهار الكل</p>
+          <p className="text-semibold">{t("showAll")}</p>
         </div>
       </div>
     </UserProfileTableDataMainLayout>

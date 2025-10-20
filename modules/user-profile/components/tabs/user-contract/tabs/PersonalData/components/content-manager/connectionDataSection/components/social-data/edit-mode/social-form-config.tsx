@@ -3,15 +3,17 @@ import { baseURL } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 
 export const SocialMediaSitesFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSocialData } = useConnectionDataCxt();
+  const t = useTranslations("UserProfile.nestedTabs.socialData");
 
   const socialMediaSitesFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "حسابات التواصل الاجتماعي",
+    title: t("title"),
     apiUrl: `${baseURL}/socials/${user?.user_id}`,
     laravelValidation: {
       enabled: true,
@@ -22,73 +24,73 @@ export const SocialMediaSitesFormConfig = () => {
         fields: [
           {
             name: "whatsapp",
-            label: "واتساب ",
+            label: t("whatsapp"),
             type: "phone",
-            placeholder: "واتساب ",
+            placeholder: t("whatsapp"),
             validation: [
               {
                 type: "phone",
-                message: "يرجى إدخال رقم جوال صحيح",
+                message: t("phoneValidationMessage"),
               },
             ],
           },
           {
             name: "facebook",
-            label: "فيسبوك ",
+            label: t("facebook"),
             type: "text",
             placeholder: "https://facebook.com/username",
             validation: [
               {
                 type: "url",
-                message: "يرجى إدخال رابط صحيح",
+                message: t("urlValidationMessage"),
               }
             ],
           },
           {
             name: "telegram",
-            label: "تيليجرام ",
+            label: t("telegram"),
             type: "phone",
-            placeholder: "تيليجرام ",
+            placeholder: t("telegram"),
             validation: [
               {
                 type: "phone",
-                message: "يرجى إدخال رقم جوال صحيح",
+                message: t("phoneValidationMessage"),
               },
             ],
           },
           {
             name: "instagram",
-            label: "انستقرام  ",
+            label: t("instagram"),
             type: "text",
             placeholder: "https://instagram.com/username",
             validation: [
               {
                 type: "url",
-                message: "يرجى إدخال رابط صحيح",
+                message: t("urlValidationMessage"),
               }
             ],
           },
           {
             name: "snapchat",
-            label: "سناب شات  ",
+            label: t("snapchat"),
             type: "text",
             placeholder: "https://snapchat.com/add/username",
             validation: [
               {
                 type: "url",
-                message: "يرجى إدخال رابط صحيح",
+                message: t("urlValidationMessage"),
               }
             ],
           },
           {
             name: "linkedin",
-            label: "لينك اند  ",
+            label: t("linkedin"),
             type: "text",
             placeholder: "https://linkedin.com/in/username",
             validation: [
               {
                 type: "url",
-                message: "يرجى إدخال رابط صحيح",
+                message: t("urlValidationMessage"),
               }
             ],
           },
@@ -104,8 +106,8 @@ export const SocialMediaSitesFormConfig = () => {
       telegram: userSocialData?.telegram,
       whatsapp: userSocialData?.whatsapp,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

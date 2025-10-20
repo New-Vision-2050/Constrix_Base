@@ -3,6 +3,8 @@ import { ConnnectionFormConfig } from "./ConnnectionFormConfig";
 import { EmailFormConfig } from "./EmailFormConfig";
 import { OTPVerifyDialog } from "../edit-mode/OTPVerify";
 import { useConnectionOTPCxt } from "../context/ConnectionOTPCxt";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 
 export default function UserProfileConnectionDataEditForm2() {
@@ -11,7 +13,7 @@ export default function UserProfileConnectionDataEditForm2() {
   const emailFormConfig = EmailFormConfig();
   
   return (
-    <>
+    <Can check={[PERMISSIONS.userProfile.contact.update]}>
       <OTPVerifyDialog
         identifier={phoneFormConfig.initialValues?.phone as string}
         open={openPhoneOtp}
@@ -26,6 +28,6 @@ export default function UserProfileConnectionDataEditForm2() {
         <FormContent config={phoneFormConfig} />
         <FormContent config={emailFormConfig} />
       </div>
-    </>
+    </Can>
   );
 }

@@ -75,7 +75,7 @@ export const GetUserContractTabsList = (
       title: t("contractManagement"),
       icon: <BackpackIcon />,
       content: <>ادارة العقد</>,
-      show: true,
+      show: false,
     },
   ];
 

@@ -1,9 +1,12 @@
+import { useTranslations } from "next-intl";
+
 export default function WorkingTimeCardInformation() {
+  const t = useTranslations("UserProfile.header.statisticsCards");
   return (
     <div className="flex flex-col justify-between gap-6">
       <div>
-        <h2 className="text-lg font-bold mb-1">وقت الدوام</h2>
-        <p className="text-md">تقرير أسبوعي</p>
+        <h2 className="text-lg font-bold mb-1">{t("workingTime")}</h2>
+        <p className="text-md">{t("weeklyReport")}</p>
       </div>
       <div>
         <h3 className="text-xl font-bold mb-2">

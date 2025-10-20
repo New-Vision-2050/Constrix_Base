@@ -5,15 +5,17 @@ import { serialize } from "object-to-formdata";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const IdentityDataFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.nestedTabs.identityData");
 
   const IdentityFormConfig: FormConfig = {
     formId: "Identity-data-form",
-    title: "بيانات الهوية",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/identity-data`,
     laravelValidation: {
       enabled: true,
@@ -21,50 +23,49 @@ export const IdentityDataFormConfig = () => {
     },
     sections: [
       {
-        title: "بيانات الهوية",
+        title: t("title"),
         fields: [
           {
             name: "identity",
-            label: "رقم الهوية",
+            label: t("nationalId"),
             type: "text",
-            placeholder: "رقم الهوية",
+            placeholder: t("nationalId"),
             validation: [
               {
                 type: "required",
-                message: "رقم الهوية مطلوب",
+                message: t("nationalIdRequired"),
               },
               {
                 type: "pattern",
                 value: /^[12]\d{9}$/,
-                message:
-                  "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+                message: t("nationalIdPattern"),
               },
               {
                 type: "minLength",
                 value: 10,
-                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+                message: t("nationalIdMinLength"),
               },
               {
                 type: "maxLength",
                 value: 10,
-                message: "رقم الهوية يجب أن يتكون من 10 أرقام",
+                message: t("nationalIdMaxLength"),
               },
               {
                 type: "pattern",
                 value: /^\d+$/,
-                message: "رقم الهوية يجب أن يحتوي على أرقام فقط",
+                message: t("nationalIdPattern"),
               },
             ],
           },
           {
-            label: "تاريخ الدخول",
+            label: t("identityStartDate"),
             type: "date",
             name: "identity_start_date",
-            placeholder: "تاريخ الدخول",
+            placeholder: t("identityStartDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الدخول مطلوب",
+                message: t("identityStartDateRequired"),
               },
             ],
             maxDate: {
@@ -73,14 +74,14 @@ export const IdentityDataFormConfig = () => {
             },
           },
           {
-            label: "تاريخ الانتهاء",
+            label: t("identityEndDate"),
             type: "date",
             name: "identity_end_date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("identityEndDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الأنتهاء مطلوب",
+                message: t("identityEndDateRequired"),
               },
             ],
             minDate: {
@@ -93,11 +94,11 @@ export const IdentityDataFormConfig = () => {
             },
           },
           {
-            label: "ارفاق الهوية",
+            label: t("attachment"),
             type: "file",
             isMulti: true,
             name: "file_identity",
-            placeholder: "رقم جواز السفر",
+            placeholder: t("attachment"),
             fileConfig: {
               allowedFileTypes: [
                 "application/pdf", // pdf
@@ -116,8 +117,8 @@ export const IdentityDataFormConfig = () => {
       identity_end_date: userIdentityData?.identity_end_date,
       file_identity: userIdentityData?.file_identity,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

@@ -22,8 +22,9 @@ export default function MainLayout({
   const locale = useLocale();
   const isRtl = locale === "ar";
 
-  const { theme } = useTheme();
-  const isLight = theme === "light";
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isLight = currentTheme === "light";
 
   // handle side effects - clear side-menu when page reload
   useEffect(() => {

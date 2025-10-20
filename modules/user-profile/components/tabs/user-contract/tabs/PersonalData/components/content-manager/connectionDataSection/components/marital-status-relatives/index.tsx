@@ -5,13 +5,15 @@ import CreateRelativeDialog from "./CreateRelativeDialog";
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useTranslations } from "next-intl";
 
 export default function MaritalStatusRelativesSection() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
 
   return (
     <FormFieldSet
-      title="الحالة الاجتماعية / الاقارب"
+      title={t("title")}
       secondTitle={
         <Can check={[PERMISSIONS.profile.maritalStatus.create]}>
           <Button
@@ -19,7 +21,7 @@ export default function MaritalStatusRelativesSection() {
               setOpen(true);
             }}
           >
-            أضافة قريب
+            {t("createRelative")}
           </Button>
         </Can>
       }

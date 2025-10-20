@@ -1,4 +1,4 @@
-import { createPermissions as create } from "./default-permissions";
+import { createPermissions as create, PERMISSION_ACTIONS } from "./default-permissions";
 
 export const PERMISSIONS = {
   user: create("USER"),
@@ -69,7 +69,10 @@ export const PERMISSIONS = {
   // Attendance
   attendance: {
     settings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
-    attendance_departure: create("EMPLOYEE_ATTENDANCE"),
+    attendance_departure: {
+      ...create("EMPLOYEE_ATTENDANCE"),
+      map: "EMPLOYEE_ATTENDANCE_MAP", // إضافة permission مخصص للخريطة
+    },
   },
   // vacations
   vacations: {

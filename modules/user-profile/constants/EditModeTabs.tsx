@@ -56,14 +56,14 @@ export const useGetEditModeTabsList = (
       title: t("attendance"),
       icon: <BackpackIcon />,
       content: <>سياسة الحضور</>,
-      show: true,
+      show: false,
     },
     {
       id: "edit-mode-tabs-logs",
       title: t("usersActions"),
       icon: <BackpackIcon />,
       content: <UserActionsTabs />,
-      show: true,
+      show: false,
     },
   ];
 
