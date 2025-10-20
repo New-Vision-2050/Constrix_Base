@@ -12,28 +12,46 @@ import {
 import { Copy, FolderSymlink, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { toast } from "sonner";
 
 type PropsType = {
   open: boolean;
   onClose: () => void;
 };
 
-const dummyOptions = [
-  { value: "1", label: "Option 1" },
-  { value: "2", label: "Option 2" },
-  { value: "3", label: "Option 3" },
-];
-
 export default function ShareDialog({ open, onClose }: PropsType) {
   // detect rtl
   const lang = useLocale();
   const isRtl = lang === "ar";
   // translate
+  const { usersList, selectedDocs } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.shareDialog");
+  const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const handleSelectionChange = (selectedValues: string[]) => {
     setSelectedIds(selectedValues);
+  };
+
+  const handleShare = async () => {
+    setLoading(true);
+    try {
+      const _url = baseURL + "/files/share";
+      await apiClient.post(_url, {
+        file_ids: selectedDocs
+          ?.filter((doc) => Boolean(doc.reference_number))
+          ?.map((doc) => doc.id),
+        user_ids: selectedIds,
+      });
+      toast.success(t("sharedSuccessfully"));
+      onClose();
+    } catch (error) {
+      toast.error(t("sharedFailed"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,7 +80,13 @@ export default function ShareDialog({ open, onClose }: PropsType) {
             </Button>
           </div>
           <SearchableMultiSelect
-            options={dummyOptions}
+            options={
+              usersList?.map((user) => ({
+                value: user.id,
+                label: user.name,
+              })) ?? []
+            }
+            disabled={loading}
             selectedValues={selectedIds}
             onChange={handleSelectionChange}
             className="w-full"
@@ -70,7 +94,7 @@ export default function ShareDialog({ open, onClose }: PropsType) {
           />
         </div>
         <DialogFooter className="w-full flex items-center gap-4 justify-between">
-          <Button onClick={onClose}>{t("save")}</Button>
+          <Button disabled={loading} onClick={handleShare}>{t("save")}</Button>
           <Button variant="outline" onClick={onClose}>
             {t("cancel")}
           </Button>

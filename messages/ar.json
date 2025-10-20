@@ -363,6 +363,8 @@
       "shareDialog": {
         "title": "مشاركة",
         "save": "حفظ",
+        "sharedSuccessfully": "تم مشاركة الملف بنجاح",
+        "sharedFailed": "فشل مشاركة الملف",
         "copy": "نسخ الرابط",
         "cancel": "الغاء",
         "selectFolder": "اختر مجلد",
