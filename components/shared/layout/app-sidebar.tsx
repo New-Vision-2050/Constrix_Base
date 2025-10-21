@@ -343,22 +343,23 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           },
         ],
       },
-      {
-        name: t("Sidebar.ecommerce"),
-        icon: SettingsIcon,
-        isActive: pageName === ROUTER.ECOMMERCE,
-        slug: SUPER_ENTITY_SLUG.ECOMMERCE,
-        urls: [ROUTER.ECOMMERCE],
-        sub_entities: [
-          {
-            name: t("product.plural"),
-            url: ROUTER.Products,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.Products,
-            show: true,
-          },
-        ],
-      },
+      // ecommerce
+      // {
+      //   name: t("Sidebar.ecommerce"),
+      //   icon: SettingsIcon,
+      //   isActive: pageName === ROUTER.ECOMMERCE,
+      //   slug: SUPER_ENTITY_SLUG.ECOMMERCE,
+      //   urls: [ROUTER.ECOMMERCE],
+      //   sub_entities: [
+      //     {
+      //       name: t("product.plural"),
+      //       url: ROUTER.Products,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.Products,
+      //       show: true,
+      //     },
+      //   ],
+      // },
       // stores
       // {
       //   name: t("Sidebar.ecommerce"),
