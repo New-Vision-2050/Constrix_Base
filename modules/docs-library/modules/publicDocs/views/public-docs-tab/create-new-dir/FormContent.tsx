@@ -14,7 +14,7 @@ export default function CreateNewDirForm({ onClose }: PropsType) {
     editedDoc,
     parentId,
     setEditedDoc,
-    handleRefetchUsersList,
+    handleRefetchFoldersList,
   } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewDirDialog");
 
@@ -22,7 +22,7 @@ export default function CreateNewDirForm({ onClose }: PropsType) {
     onClose();
     setEditedDoc(undefined);
     refetchDocs();
-    handleRefetchUsersList();
+    handleRefetchFoldersList();
   };
 
   const _config = useMemo(
