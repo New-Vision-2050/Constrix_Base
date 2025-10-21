@@ -360,6 +360,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       //     },
       //   ],
       // },
+        
       // stores
       // {
       //   name: t("Sidebar.ecommerce"),

@@ -3,17 +3,17 @@
 import { TableBuilder, useTableReload } from "@/modules/table";
 import { Button } from "@/components/ui/button";
 import DialogTrigger from "@/components/headless/dialog-trigger";
-import AddCategoryDialog from "@/modules/stores/components/dialogs/add-category";
 import { useTranslations } from "next-intl";
-import { useCategoriesListTableConfig } from "./_config/list-table-config";
 import { useState } from "react";
+import AddSubCategoryDialog from "@/modules/stores/components/dialogs/add-category/addSubCategory";
+import { useSubCategoryTableConfig } from "../../../_config/subTableConfig";
 
-function ListCategoriesView() {
+function SubCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
     null
   );
   const [addingChildTo, setAddingChildTo] = useState<string | null>(null);
-  const tableConfig = useCategoriesListTableConfig({
+  const tableConfig = useSubCategoryTableConfig({
     onEdit: (id: string) => setEditingCategoryId(id),
     onAddChild: (id: string) => setAddingChildTo(id),
   });
@@ -21,16 +21,10 @@ function ListCategoriesView() {
   const t = useTranslations();
   return (
     <>
-      <AddCategoryDialog
+      <AddSubCategoryDialog
         open={Boolean(editingCategoryId)}
         onClose={() => setEditingCategoryId(null)}
         categoryId={editingCategoryId || undefined}
-        onSuccess={() => reloadTable()}
-      />
-      <AddCategoryDialog
-        open={Boolean(addingChildTo)}
-        onClose={() => setAddingChildTo(null)}
-        parentId={addingChildTo || undefined}
         onSuccess={() => reloadTable()}
       />
       <TableBuilder
@@ -38,12 +32,10 @@ function ListCategoriesView() {
         searchBarActions={
           <>
             <DialogTrigger
-              component={AddCategoryDialog}
+              component={AddSubCategoryDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
               render={({ onOpen }) => (
-                <Button onClick={onOpen}>
-                  {t("labels.add")} {t("category.singular")}
-                </Button>
+                <Button onClick={onOpen}>اضافة قسم فرعي </Button>
               )}
             />
           </>
@@ -54,4 +46,4 @@ function ListCategoriesView() {
   );
 }
 
-export default ListCategoriesView;
+export default SubCategoriesView;
