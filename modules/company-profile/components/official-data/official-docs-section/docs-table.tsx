@@ -30,7 +30,15 @@ import {
 import PDFIcon from "@/assets/icons/PDF.png";
 
 // Row component
-const DocTableRow = ({ doc, id, onSuccess }: { doc: CompanyDocument; id?: string, onSuccess?: () => void }) => {
+const DocTableRow = ({
+  doc,
+  id,
+  onSuccess,
+}: {
+  doc: CompanyDocument;
+  id?: string;
+  onSuccess?: () => void;
+}) => {
   const [isOpenDelete, handleOpenDelete, handleCloseDelete] = useModal();
   const [isOpenShow, handleOpenShow, handleCloseShow] = useModal();
 
@@ -49,8 +57,8 @@ const DocTableRow = ({ doc, id, onSuccess }: { doc: CompanyDocument; id?: string
         <td className="py-3 px-3 border-b">{doc.description}</td>
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
-            {doc.document_number ?? "-"} 
-            {doc.document_number && <CopyButton text={doc.document_number} /> }
+            {doc.document_number ?? "-"}
+            {doc.document_number && <CopyButton text={doc.document_number} />}
           </div>
         </td>
         <td className="py-3 px-3 border-b">{doc.start_date}</td>
@@ -123,7 +131,17 @@ const DocTableRow = ({ doc, id, onSuccess }: { doc: CompanyDocument; id?: string
             <SheetFormBuilder
               config={updateDocsFormConfig(doc, id, onSuccess)}
               trigger={
-                <button className="py-1 px-3 bg-[#72E128]/20 text-[#72E128] rounded-full">
+                <button
+                  disabled={Boolean(doc?.company_legal_data)}
+                  className={`
+                py-1 px-3 bg-[#72E128]/20  rounded-full
+                ${
+                  Boolean(doc?.company_legal_data)
+                    ? "cursor-not-allowed text-gray-500"
+                    : "text-[#72E128]"
+                }
+                `}
+                >
                   تحديث
                 </button>
               }
@@ -185,29 +203,29 @@ const DocsTable = ({
   onSuccess?: () => void;
 }) => {
   return (
-  <div className="max-h-[500px] overflow-auto">
+    <div className="max-h-[500px] overflow-auto">
       <table className="w-full border-collapse">
-      <thead>
-        <tr>
-          <td className="text-start p-3 border-b">نوع المستند</td>
-          <td className="text-start p-3 border-b">أسم المستند</td>
-          <td className="text-start p-3 border-b">وصف المستند</td>
-          <td className="text-start p-3 border-b">رقم المستند</td>
-          <td className="text-start p-3 border-b">تاريخ الاصدار</td>
-          <td className="text-start p-3 border-b">تاريخ الانتهاء</td>
-          <td className="text-start p-3 border-b">تاريخ الاشعار</td>
-          <td className="text-start p-3 border-b">المرفقات</td>
-          <td className="text-start p-3 border-b">الاحداث</td>
-          <td className="text-start p-3 border-b">الاجراءات</td>
-        </tr>
-      </thead>
-      <tbody>
-        {companyOfficialDocuments.map((doc) => (
-          <DocTableRow key={doc.id} doc={doc} id={id} onSuccess={onSuccess} />
-        ))}
-      </tbody>
-    </table>
-  </div>
+        <thead>
+          <tr>
+            <td className="text-start p-3 border-b">نوع المستند</td>
+            <td className="text-start p-3 border-b">أسم المستند</td>
+            <td className="text-start p-3 border-b">وصف المستند</td>
+            <td className="text-start p-3 border-b">رقم المستند</td>
+            <td className="text-start p-3 border-b">تاريخ الاصدار</td>
+            <td className="text-start p-3 border-b">تاريخ الانتهاء</td>
+            <td className="text-start p-3 border-b">تاريخ الاشعار</td>
+            <td className="text-start p-3 border-b">المرفقات</td>
+            <td className="text-start p-3 border-b">الاحداث</td>
+            <td className="text-start p-3 border-b">الاجراءات</td>
+          </tr>
+        </thead>
+        <tbody>
+          {companyOfficialDocuments.map((doc) => (
+            <DocTableRow key={doc.id} doc={doc} id={id} onSuccess={onSuccess} />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
