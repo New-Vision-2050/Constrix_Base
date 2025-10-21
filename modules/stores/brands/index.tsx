@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddBrandDialog from "@/modules/stores/components/dialogs/add-brand";
 import { useTranslations } from "next-intl";
-import { useBrandsListTableConfig } from "./_config/list-table-config";
 import { useState } from "react";
+import { useBrandsListTableConfig } from "./_config/list-table-config";
 
-function ListBrandsView() {
+function BrandsView() {
   const [editingBrandId, setEditingBrandId] = useState<string | null>(null);
   const tableConfig = useBrandsListTableConfig({
     onEdit: (id: string) => setEditingBrandId(id),
@@ -43,4 +43,4 @@ function ListBrandsView() {
   );
 }
 
-export default ListBrandsView;
+export default BrandsView;

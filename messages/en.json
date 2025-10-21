@@ -1549,7 +1549,14 @@
     "updateSuccess": "Brand updated successfully!",
     "createError": "Failed to create brand. Please try again.",
     "updateError": "Failed to update brand. Please try again.",
-    "validationError": "Validation error. Please check your inputs."
+    "validationError": "Validation error. Please check your inputs.",
+    "totalProducts": "Total Products",
+    "totalRequests": "Total Requests",
+    "activatedSuccessfully": "Brand activated successfully",
+    "deactivatedSuccessfully": "Brand deactivated successfully",
+    "failedToUpdateStatus": "Failed to update status",
+    "areYouSureReactivate": "Are you sure you want to reactivate this brand?",
+    "areYouSureDeactivate": "Are you sure you want to deactivate this brand?"
   },
   "warehouse": {
     "plural": "Warehouses",

@@ -4,6 +4,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import TheStatus from "../component/the-status";
 
 export interface BrandRow {
   id: string;
@@ -59,22 +60,8 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
       {
         key: "status",
         label: "الحالة",
-        sortable: true,
-        render: (_: unknown, row: BrandRow) => (
-          <TableStatusSwitcher
-            id={row.id}
-            label={"نشط"}
-            initialStatus={row.status == 1}
-            confirmAction={async (isActive) => {
-              return await apiClient.patch(`/write-url/${row.id}/status`, {
-                status: Number(isActive),
-              });
-            }}
-            confirmDescription={(isActive) =>
-              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
-            }
-            showDatePicker={() => false}
-          />
+        render: (value: "active" | "inActive", row: BrandRow) => (
+          <TheStatus theStatus={value} id={row.id} />
         ),
       },
     ],
