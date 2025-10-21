@@ -68,6 +68,7 @@ interface CxtType {
   foldersList: SelectOption[] | undefined;
   isLoadingFoldersList: boolean;
   isErrorFoldersList: boolean;
+  handleRefetchFoldersList: () => void;
 
   // search params
   searchData: SearchFormData;
@@ -161,6 +162,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     data: foldersList,
     isLoading: isLoadingFoldersList,
     isError: isErrorFoldersList,
+    refetch: refetchFoldersList,
   } = useFoldersList();
 
   //  toggle show item details
@@ -183,6 +185,8 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   };
 
   const clearSelectedDocs = () => setSelectedDocs([]);
+
+  const handleRefetchFoldersList = () => refetchFoldersList();
 
   // ** return provider
   return (
@@ -238,6 +242,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         foldersList,
         isLoadingFoldersList,
         isErrorFoldersList,
+        handleRefetchFoldersList,
         // search params
         searchData,
         setSearchData,
