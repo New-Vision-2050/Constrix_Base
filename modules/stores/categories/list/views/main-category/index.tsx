@@ -8,14 +8,12 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMainCategoryTableConfig } from "../../../_config/mainTableConfig";
 
-function ListCategoriesView() {
+function MainCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
     null
   );
-  const [addingChildTo, setAddingChildTo] = useState<string | null>(null);
   const tableConfig = useMainCategoryTableConfig({
     onEdit: (id: string) => setEditingCategoryId(id),
-    onAddChild: (id: string) => setAddingChildTo(id),
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
@@ -46,4 +44,4 @@ function ListCategoriesView() {
   );
 }
 
-export default ListCategoriesView;
+export default MainCategoriesView;

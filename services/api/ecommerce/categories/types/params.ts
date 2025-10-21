@@ -4,7 +4,7 @@ export interface CreateCategoryParams {
   description?: string;
   parent_id?: string;
   priority?: number;
-  image?: File | null;
+  category_image?: File | null;
 }
 
 export interface UpdateCategoryParams {
@@ -13,5 +13,5 @@ export interface UpdateCategoryParams {
   description?: string;
   parent_id?: string;
   priority?: number;
-  image?: File | null;
+  category_image?: File | null;
 }

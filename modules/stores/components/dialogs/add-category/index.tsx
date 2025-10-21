@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
@@ -16,7 +16,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/modules/table/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Upload, X } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
@@ -44,7 +50,7 @@ const createCategorySchema = (t: (key: string) => string) =>
     priority: z
       .string()
       .min(1, t("category.priorityRequired") || "Priority is required"),
-    image: z
+    category_image: z
       .any()
       .nullable()
       .refine(
@@ -56,6 +62,15 @@ const createCategorySchema = (t: (key: string) => string) =>
   });
 
 type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>;
+
+// Priority options array
+const PRIORITY_OPTIONS = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+  { value: "5", label: "5" },
+];
 
 interface AddCategoryDialogProps {
   open: boolean;
@@ -91,14 +106,16 @@ export default function AddCategoryDialog({
     handleSubmit,
     reset,
     setValue,
+    control,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(createCategorySchema(t)),
     defaultValues: {
       name_ar: "",
       name_en: "",
-      priority: "1",
-      image: null,
+      priority: "",
+      category_image: null,
     },
   });
 
@@ -122,8 +139,8 @@ export default function AddCategoryDialog({
       setValue("priority", String(category.priority || 1));
 
       // Set image preview if exists
-      if (category.image) {
-        setImagePreview(category.image);
+      if (category.category_image) {
+        setImagePreview(category.category_image);
       }
     }
   }, [isEditMode, categoryData, setValue]);
@@ -136,7 +153,7 @@ export default function AddCategoryDialog({
           "name[ar]": data.name_ar,
           "name[en]": data.name_en,
           priority: Number(data.priority),
-          image: data.image,
+          category_image: data.category_image,
         };
 
         await CategoriesApi.update(categoryId, updateParams);
@@ -151,7 +168,7 @@ export default function AddCategoryDialog({
           "name[en]": data.name_en,
           parent_id: parentId,
           priority: Number(data.priority),
-          image: data.image,
+          category_image: data.category_image,
         };
 
         await CategoriesApi.create(createParams);
@@ -234,7 +251,7 @@ export default function AddCategoryDialog({
   };
 
   const handleFileSelect = (file: File) => {
-    setValue("image", file);
+    setValue("category_image", file);
     const reader = new FileReader();
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string);
@@ -247,7 +264,7 @@ export default function AddCategoryDialog({
   };
 
   const handleRemoveImage = () => {
-    setValue("image", null);
+    setValue("category_image", null);
     setImagePreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -390,18 +407,35 @@ export default function AddCategoryDialog({
                     )}
                   </div>
 
-                  {/* Priority Input */}
+                  {/* Priority Select */}
                   <div>
                     <Label htmlFor="priority" className="text-xs ">
                       الاولوية
                     </Label>
-                    <Input
-                      id="priority"
-                      variant="secondary"
-                      {...register("priority")}
-                      placeholder="2"
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1  text-white h-12"
+                    <Controller
+                      name="priority"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isSubmitting || isFetching}
+                        >
+                          <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+                            <SelectValue placeholder="اختر الأولوية" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PRIORITY_OPTIONS.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
                     {errors.priority && (
                       <p className="text-red-500 text-xs mt-1">
@@ -433,18 +467,35 @@ export default function AddCategoryDialog({
                     )}
                   </div>
 
-                  {/* Priority Input - Same as Arabic */}
+                  {/* Priority Select */}
                   <div>
                     <Label htmlFor="priority_en" className="text-xs ">
                       Priority
                     </Label>
-                    <Input
-                      id="priority_en"
-                      variant="secondary"
-                      {...register("priority")}
-                      placeholder="2"
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1 text-white h-12"
+                    <Controller
+                      name="priority"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={isSubmitting || isFetching}
+                        >
+                          <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+                            <SelectValue placeholder="Select priority" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PRIORITY_OPTIONS.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     />
                     {errors.priority && (
                       <p className="text-red-500 text-xs mt-1">

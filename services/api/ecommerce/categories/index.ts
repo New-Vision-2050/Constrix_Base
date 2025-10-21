@@ -3,7 +3,7 @@ import { ListCategoriesResponse, ShowCategoryResponse } from "./types/response";
 import { CreateCategoryParams, UpdateCategoryParams } from "./types/params";
 
 export const CategoriesApi = {
-  list: (params?: { parent_id?: string }) =>
+  list: (params?: { parent_id?: string; depth?: string }) =>
     baseApi.get<ListCategoriesResponse>("ecommerce/dashboard/categories", {
       params,
     }),
@@ -17,7 +17,8 @@ export const CategoriesApi = {
       formData.append("priority", params.priority.toString());
     if (params.parent_id) formData.append("parent_id", params.parent_id);
     if (params.description) formData.append("description", params.description);
-    if (params.image) formData.append("image", params.image);
+    if (params.category_image)
+      formData.append("category_image", params.category_image);
 
     return baseApi.post("ecommerce/dashboard/categories", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -31,7 +32,8 @@ export const CategoriesApi = {
       formData.append("priority", params.priority.toString());
     if (params.parent_id) formData.append("parent_id", params.parent_id);
     if (params.description) formData.append("description", params.description);
-    if (params.image) formData.append("image", params.image);
+    if (params.category_image)
+      formData.append("category_image", params.category_image);
 
     return baseApi.post(`ecommerce/dashboard/categories/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },

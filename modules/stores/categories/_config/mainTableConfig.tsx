@@ -9,8 +9,7 @@ import Image from "next/image";
 interface CategoryRow {
   id: string;
   name: string;
-  description: string;
-  parent: { name: string } | null;
+  priority: string;
   file?: {
     id: number;
     url: string;
@@ -33,10 +32,7 @@ export const useMainCategoryTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "categories-list-table",
-    url: `${baseURL}/ecommerce/dashboard/categories`,
-    apiParams: {
-      depth: "0",
-    },
+    url: `${baseURL}/ecommerce/dashboard/categories?depth=0`,
     deleteUrl: `${baseURL}/ecommerce/dashboard/categories`,
     columns: [
       {
@@ -64,7 +60,6 @@ export const useMainCategoryTableConfig: (params?: Params) => TableConfig = (
       {
         key: "priority",
         label: "أولوية",
-        render: (value) => value || "-",
       },
       {
         key: "is_active",

@@ -1,41 +1,69 @@
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
+import TheStatus from "@/modules/bouquet/components/the-status";
+import { TableConfig } from "@/modules/table";
+import { EditIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
 
-export const DiscountMockTabeConfig = () => {
+interface CategoryRow {
+  id: string;
+  name: string;
+  description: string;
+  parent: { name: string } | null;
+  file?: {
+    id: number;
+    url: string;
+    name: string;
+    mime_type: string;
+    type: string;
+  };
+  is_active: "active" | "inActive";
+}
+
+type Params = {
+  onEdit?: (id: string) => void;
+  onAddChild?: (id: string) => void;
+};
+
+export const useSubSubCategoryTableConfig: (params?: Params) => TableConfig = (
+  params
+) => {
+  const t = useTranslations();
+
   return {
-    url: `${baseURL}/role_and_permissions/permissions`,
-    tableId: "permissions-table",
+    tableId: "sub-sub-categories-list-table",
+    url: `${baseURL}/ecommerce/dashboard/categories?depth=2`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/categories`,
     columns: [
       {
         key: "name",
-        label: "اسم الصلاحية",
+        label: "القسم",
         sortable: true,
       },
       {
-        key: "2",
-        label: "فئة الصلاحية",
-        sortable: true,
+        key: "priority",
+        label: "أولوية",
+        render: (value) => value || "-",
       },
       {
-        key: "user_count",
-        label: "عدد المستخدمين",
-        sortable: true,
+        key: "is_active",
+        label: "الحالة",
+        render: (value: "active" | "inActive", row: CategoryRow) => (
+          <TheStatus theStatus={value} id={row.id} />
+        ),
       },
     ],
-    defaultSortColumn: "id",
-    defaultSortDirection: "asc" as const,
-    enableSorting: true,
-    enablePagination: true,
-    defaultItemsPerPage: 5,
-    enableSearch: true,
-    enableColumnSearch: true,
-    searchFields: ["name", "email"],
-    searchParamName: "search",
-    searchFieldParamName: "fields",
-    allowSearchFieldSelection: true,
-    deleteUrl: `${baseURL}/role_and_permissions/permissions`,
+    executions: [
+      (row) => (
+        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+          <EditIcon />
+          {t("labels.edit")}
+        </DropdownMenuItem>
+      ),
+    ],
     executionConfig: {
-      canEdit: false,
-      canDelete: false,
+      canDelete: true,
     },
   };
 };
