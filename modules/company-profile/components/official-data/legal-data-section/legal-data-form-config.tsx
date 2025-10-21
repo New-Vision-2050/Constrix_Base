@@ -1,4 +1,4 @@
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
@@ -65,7 +65,6 @@ export const LegalDataFormConfig = (
                       message: "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط",
                     },
                   ],
-                  
                 },
                 {
                   name: "start_date",
@@ -156,6 +155,21 @@ export const LegalDataFormConfig = (
               (file: any) => file instanceof File || file instanceof Blob
             )
           : [];
+
+        if (binaryFiles.length == 0 && backendFiles.length == 0) {
+          useFormStore
+            .getState()
+            .setError(
+              `company-official-data-form-${id}-${company_id}`,
+              "files",
+              "يجب إرفاق ملف"
+            );
+          return {
+            success: false,
+            message: "يجب إرفاق ملف",
+          };
+        }
+
         return {
           start_date: obj.start_date,
           end_date: obj.end_date,
