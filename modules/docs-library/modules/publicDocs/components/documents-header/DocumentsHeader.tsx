@@ -59,6 +59,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     setEditedDoc,
     selectedDocs,
     refetchDocs,
+    clearSelectedDocs,
     storeSelectedDocument,
   } = usePublicDocsCxt();
   const [openDelete, setOpenDelete] = useState(false);
@@ -413,6 +414,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       <ConfirmationDialog
         open={openDelete}
         onClose={() => {
+          clearSelectedDocs();
           setOpenDelete(false);
         }}
         onConfirm={handleDelete}
