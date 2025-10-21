@@ -1,8 +1,25 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
+import TheStatus from "@/modules/bouquet/components/the-status";
 import { TableConfig } from "@/modules/table";
 import { EditIcon, Settings2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
+
+interface CategoryRow {
+  id: string;
+  name: string;
+  description: string;
+  parent: { name: string } | null;
+  file?: {
+    id: number;
+    url: string;
+    name: string;
+    mime_type: string;
+    type: string;
+  };
+  is_active: "active" | "inActive";
+}
 
 type Params = {
   onEdit?: (id: string) => void;
@@ -24,19 +41,37 @@ export const useMainCategoryTableConfig: (params?: Params) => TableConfig = (
     columns: [
       {
         key: "name",
-        label: t("labels.name"),
+        label: "القسم",
         sortable: true,
+        render: (_: unknown, row: CategoryRow) => (
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
+              {row.file?.url ? (
+                <Image
+                  src={row.file.url}
+                  alt={row.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="text-gray-400 text-xs">{t("labels.image")}</div>
+              )}
+            </div>
+            <span className="font-medium">{row.name}</span>
+          </div>
+        ),
       },
       {
-        key: "description",
-        label: t("labels.description"),
+        key: "priority",
+        label: "أولوية",
         render: (value) => value || "-",
       },
       {
-        key: "parent",
-        label: t("category.parentCategory"),
-        sortable: true,
-        render: (value) => value?.name || "-",
+        key: "is_active",
+        label: "الحالة",
+        render: (value: "active" | "inActive", row: CategoryRow) => (
+          <TheStatus theStatus={value} id={row.id} />
+        ),
       },
     ],
     executions: [
@@ -44,12 +79,6 @@ export const useMainCategoryTableConfig: (params?: Params) => TableConfig = (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
           <EditIcon />
           {t("labels.edit")}
-        </DropdownMenuItem>
-      ),
-      (row) => (
-        <DropdownMenuItem onSelect={() => params?.onAddChild?.(row.id)}>
-          <Settings2Icon />
-          {t("category.addChild")}
         </DropdownMenuItem>
       ),
     ],
