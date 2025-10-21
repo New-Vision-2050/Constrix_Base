@@ -1,6 +1,6 @@
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyDocument } from "@/modules/company-profile/types/company";
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -92,6 +92,10 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string, onSucces
             minDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
+              shift: {
+                value: 8,
+                unit: "days",
+              },
             },
             validation: [
               {
@@ -99,6 +103,16 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string, onSucces
                 message: "ادخل تاريخ الانتهاء",
               },
             ],
+            onChange: (value) => {
+              const endDate = new Date(value);
+              endDate.setDate(endDate.getDate() - 7);
+              const notificationDate = endDate.toLocaleDateString("en-CA");
+              useFormStore
+                .getState()
+                .setValues(`updateDocsFormConfig-${doc.id}-${id}-${company_id}`, {
+                  notification_date: notificationDate,
+                });
+            },
           },
           {
             name: "notification_date",
@@ -113,6 +127,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string, onSucces
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "end_date",
             },
+            disabled: true,
             validation: [
               {
                 type: "required",
