@@ -2,6 +2,7 @@ export const ROUTER = {
   LOGIN: "/login",
   COMPANIES: "/companies",
   Products: "/stores/products",
+  Brands: "/stores/brands",
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",
