@@ -59,6 +59,25 @@ export default function ShareDialog({ open, onClose }: PropsType) {
     }
   };
 
+  const handleClickLink = () => {
+    try {
+      const files = selectedDocs?.filter((doc) =>
+        Boolean(doc.reference_number)
+      );
+      if (!files?.length) {
+        toast.error(t("noFilesSelected"));
+        return;
+      }
+      const copiedLink = `${window.location.origin}/en/shared-file/${files[0].id}`;
+      navigator.clipboard.writeText(copiedLink);
+      toast.success(t("linkCopiedSuccessfully"));
+    } catch (error) {
+      toast.error(t("linkCopiedFailed"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
@@ -79,7 +98,7 @@ export default function ShareDialog({ open, onClose }: PropsType) {
         <div className="flex flex-col items-start gap-4">
           <div className="flex items-center justify-between w-full">
             <p className="text-sm text-muted-foreground">{t("notes")}</p>
-            <Button variant="outline" disabled={true}>
+            <Button variant="outline" disabled={loading} onClick={handleClickLink}>
               <Copy className="mr-2 h-4 w-4" />
               {t("copy")}
             </Button>
