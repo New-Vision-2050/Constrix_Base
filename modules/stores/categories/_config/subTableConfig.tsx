@@ -1,10 +1,9 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
-import TheStatus from "@/modules/bouquet/components/the-status";
 import { TableConfig } from "@/modules/table";
 import { EditIcon, Settings2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import TheStatus from "../component/the-status";
 
 interface CategoryRow {
   id: string;

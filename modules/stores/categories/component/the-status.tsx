@@ -9,6 +9,7 @@ import { apiClient } from "@/config/axios-config";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { response } from "@/app/[locale]/(main)/users/data";
 
 const TheStatus = ({
   theStatus,
@@ -26,11 +27,8 @@ const TheStatus = ({
 
   const handleConfirm = async () => {
     try {
-      const response = await apiClient.put(
-        `/ecommerce/dashboard/categories/${id}/toggle-active`,
-        {
-          status: tempIsActive,
-        }
+      const response = await apiClient.patch(
+        `/ecommerce/dashboard/categories/${id}/toggle-active`
       );
 
       if (response.status === 200) {
@@ -39,20 +37,24 @@ const TheStatus = ({
         toast({
           title: t("category.success") || "Success",
           description: tempIsActive
-            ? t("category.activatedSuccessfully") || "Category activated successfully"
-            : t("category.deactivatedSuccessfully") || "Category deactivated successfully",
+            ? t("category.activatedSuccessfully") ||
+              "Category activated successfully"
+            : t("category.deactivatedSuccessfully") ||
+              "Category deactivated successfully",
         });
       } else {
         toast({
           title: t("category.error") || "Error",
-          description: t("category.failedToUpdateStatus") || "Failed to update status",
+          description:
+            t("category.failedToUpdateStatus") || "Failed to update status",
           variant: "destructive",
         });
       }
     } catch {
       toast({
         title: t("category.error") || "Error",
-        description: t("category.failedToUpdateStatus") || "Failed to update status",
+        description:
+          t("category.failedToUpdateStatus") || "Failed to update status",
         variant: "destructive",
       });
     }
@@ -88,8 +90,10 @@ const TheStatus = ({
           onConfirm={handleConfirm}
           description={
             !isActive
-              ? t("category.areYouSureReactivate") || "Are you sure you want to reactivate this category?"
-              : t("category.areYouSureDeactivate") || "Are you sure you want to deactivate this category?"
+              ? t("category.areYouSureReactivate") ||
+                "Are you sure you want to reactivate this category?"
+              : t("category.areYouSureDeactivate") ||
+                "Are you sure you want to deactivate this category?"
           }
         />
       </Dialog>
