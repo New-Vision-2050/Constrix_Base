@@ -97,7 +97,10 @@ export const AddDocFormConfig = (id?: string, company_id?: string) => {
             minDate: {
               formId: `AddDocFormConfig-${id}-${company_id}`,
               field: "start_date",
-              // addDays: 8,
+              shift: {
+                value: 8,
+                unit: "days",
+              },
             },
             validation: [
               {
