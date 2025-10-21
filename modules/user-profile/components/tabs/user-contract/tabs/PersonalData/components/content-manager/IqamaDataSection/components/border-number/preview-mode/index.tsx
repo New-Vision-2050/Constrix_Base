@@ -1,17 +1,19 @@
 import { checkString } from "@/utils/check-string";
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { useTranslations } from "next-intl";
 
 export default function UserIqamaBorderNumberPreviewMode() {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.nestedTabs.borderNumberData");
 
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          label="رقم الحدود"
+          label={t("borderNumber")}
           required
           enableCopy
           value={checkString(userIdentityData?.border_number as string)}
@@ -21,7 +23,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الدخول"
+          label={t("borderNumberStartDate")}
           value={checkString(
             userIdentityData?.border_number_start_date as string
           )}
@@ -33,7 +35,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           required
-          label="تاريخ الانتهاء"
+          label={t("borderNumberEndDate")}
           value={checkString(
             userIdentityData?.border_number_end_date as string
           )}
@@ -52,7 +54,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
                 handleRefreshIdentityData();
               }}
               valid={Boolean(media?.name)}
-              label="ارفاق رقم الحدود"
+              label={t("borderNumberAttachment")}
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
               fileUrl={media?.url}
@@ -63,7 +65,7 @@ export default function UserIqamaBorderNumberPreviewMode() {
         <div className="p-2">
           <PreviewTextField
             valid={false}
-            label="ارفاق رقم الحدود"
+            label={t("borderNumberAttachment")}
             value={"---"}
             type={"pdf"}
           />

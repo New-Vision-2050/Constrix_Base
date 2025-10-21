@@ -1,4 +1,4 @@
-import ListCategoriesView from "@/modules/stores/categories/list";
+import CategoriesView from "@/modules/stores/categories/list/view";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 function ListCategoriesPage() {
-  return <ListCategoriesView />;
+  return <CategoriesView />;
 }
 
 export default ListCategoriesPage;

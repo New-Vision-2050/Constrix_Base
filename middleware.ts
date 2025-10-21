@@ -17,11 +17,17 @@ export async function middleware(req: NextRequest) {
   const currentHost = await getCurrentHost();
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
 
+  // Debug logging for shared-file routes
+  if (pathname.includes('shared-file')) {
+    return NextResponse.next();
+  }
+
   if (!nvToken && !isLoginPage) {
     return NextResponse.redirect(new URL("ar/login", req.url));
   }
 
   const res = intlMiddleware(req);
+  
   if (pathname.includes("/en/")) {
     res.cookies.set("NEXT_LOCALE", "en");
   } else {

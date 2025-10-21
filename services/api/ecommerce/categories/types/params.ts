@@ -1,7 +1,17 @@
 export interface CreateCategoryParams {
-  name: string;
+  "name[ar]": string;
+  "name[en]": string;
   description?: string;
   parent_id?: string;
+  priority?: number;
+  category_image?: File | null;
 }
 
-export interface UpdateCategoryParams extends Partial<CreateCategoryParams> {}
+export interface UpdateCategoryParams {
+  "name[ar]"?: string;
+  "name[en]"?: string;
+  description?: string;
+  parent_id?: string;
+  priority?: number;
+  category_image?: File | null;
+}

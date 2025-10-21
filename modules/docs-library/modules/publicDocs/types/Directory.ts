@@ -25,6 +25,7 @@ export type DocumentT = {
   reference_number: string;
   start_date: string;
   is_password?: number;
+  is_favourite?: number;
   users: any[];
   can_update: boolean;
   can_delete: boolean; // 1 can delete 0 can't delete

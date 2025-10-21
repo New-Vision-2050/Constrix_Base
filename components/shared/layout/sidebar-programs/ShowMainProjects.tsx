@@ -3,6 +3,8 @@ import { SetStateAction } from "react";
 import { Project } from "@/types/sidebar-menu";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 type PropsT = {
   projects: Project[];
@@ -18,11 +20,18 @@ export default function ShowMainProjects({
   handleSub_entitiesItemClick,
 }: PropsT) {
   const t = useTranslations();
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+  
   return (
     <div className="w-full">
       <label
         htmlFor="main-sidebar-item"
-        className="block mb-2 px-2  text-gray-700"
+        className={cn(
+          "block mb-2 px-2",
+          isDarkMode ? "text-gray-300" : "text-gray-700"
+        )}
       >
         {t("Sidebar.mainPrograms")}
       </label>
@@ -53,6 +62,9 @@ const MainProjectsList = (props: MainProjectsListProps) => {
   } = props;
   // declare and define helper methods
   const router = useRouter();
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProject =
       projects.find((project) => project.name === e.target.value) ||
@@ -70,7 +82,12 @@ const MainProjectsList = (props: MainProjectsListProps) => {
       name="main-sidebar-item"
       value={activeProject?.name}
       onChange={handleChange}
-      className="block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold bg-[#2D174D] text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0"
+      className={cn(
+        "block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0",
+        isDarkMode 
+          ? "bg-[#2D174D] text-white" 
+          : "bg-white text-gray-900 border border-gray-300"
+      )}
     >
       <RegularList<Project, "item">
         sourceName="item"

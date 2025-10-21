@@ -32,6 +32,7 @@ export default function CopyMoveDialog({ open, onClose, type }: PropsType) {
     isLoadingFoldersList,
     selectedDocs,
     refetchDocs,
+    clearSelectedDocs
   } = usePublicDocsCxt();
   const [value, setValue] = useState(foldersList?.[0]?.name);
 
@@ -52,6 +53,7 @@ export default function CopyMoveDialog({ open, onClose, type }: PropsType) {
       folder_id: value,
       file_id: selectedDocs?.[0]?.id,
     });
+    clearSelectedDocs();
   };
 
   return (

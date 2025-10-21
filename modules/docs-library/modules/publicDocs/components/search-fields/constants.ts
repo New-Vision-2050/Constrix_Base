@@ -14,6 +14,7 @@ export const TYPE_OPTIONS: DropdownOption[] = [
  */
 export const DOCUMENT_TYPE_OPTIONS: DropdownOption[] = [
   { value: "all", label: "الكل" },
+  { value: "fav", label: "fav" },
   { value: "pdf", label: "pdf" },
   { value: "png", label: "png" },
   { value: "jpg", label: "jpg" },

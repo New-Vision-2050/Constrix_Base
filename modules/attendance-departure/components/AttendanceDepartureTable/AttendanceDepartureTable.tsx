@@ -7,6 +7,7 @@ import { useAttendance } from "../../context/AttendanceContext";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { useTranslations } from "next-intl";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 const AttendanceDepartureTable: React.FC = () => {
   // declare state & vars
@@ -18,9 +19,10 @@ const AttendanceDepartureTable: React.FC = () => {
   const companyCreatedAt = authCompanyData?.payload?.created_at ? new Date(authCompanyData.payload.created_at) : oneYearAgo;
   const { toggleView, setStartDate, setEndDate } = useAttendance();
   const t = useTranslations("AttendanceDepartureModule.Table");
+  const { can } = usePermissions();
   const tableId = useMemo(
-    () => getAttendanceDepartureTableConfig(t,companyCreatedAt).tableId || "default",
-    [t,companyCreatedAt]
+    () => getAttendanceDepartureTableConfig(t, companyCreatedAt, can).tableId || "default",
+    [t, companyCreatedAt, can]
   );
 
   // Using a different approach to access column state to avoid infinite loop
@@ -57,7 +59,7 @@ const AttendanceDepartureTable: React.FC = () => {
   return (
     <div className="mt-4">
       <TableBuilder
-        config={getAttendanceDepartureTableConfig(t,companyCreatedAt)}
+        config={getAttendanceDepartureTableConfig(t, companyCreatedAt, can)}
         searchBarActions={
           <div className="flex items-center gap-3">
             <Button onClick={() => toggleView("map")}>{t("mapView")}</Button>

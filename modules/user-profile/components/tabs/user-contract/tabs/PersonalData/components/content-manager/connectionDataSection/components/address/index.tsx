@@ -5,17 +5,19 @@ import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { useTranslations } from "next-intl";
 
 export default function UserAddressSection() {
   // declare and define component state and vars
   const { can } = usePermissions();
   const { handleRefetchUserContactData, userContactDataLoading } =
     useConnectionDataCxt();
+  const t = useTranslations("UserProfile.nestedTabs.addressData");
 
   return (
     <Can check={[PERMISSIONS.profile.addressInfo.view]}>
       <TabTemplate
-        title={"العنوان"}
+        title={t("title")}
         loading={userContactDataLoading}
         reviewMode={<UserAddressSectionPreviewMode />}
         editMode={<UserAddressSectionEditMode />}

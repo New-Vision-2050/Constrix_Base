@@ -102,10 +102,11 @@ export function getCreateNewDirConfig(
             fileConfig: {
               showThumbnails: true,
               allowedFileTypes: [
-                "application/pdf", // pdf
-                "application/msword", // doc
+                // "application/pdf", // pdf
+                // "application/msword", // doc
                 "image/jpeg", // jpeg & jpg
                 "image/png", // png
+                "image/jpg", // png
               ],
             },
           },
