@@ -6,6 +6,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -25,6 +26,7 @@ type ProjectItem = {
 
 export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
   const router = useRouter();
+  const t = useTranslations("Sidebar");
   const [activeUrl, setActiveUrl] = useState(projects?.[0]?.submenu?.[0]?.url);
   const [activeProject, setActiveProject] = useState<ProjectItem>(projects[0]);
 
@@ -41,7 +43,7 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
             htmlFor="main-sidebar-item"
             className="block mb-2 px-2  text-gray-700"
           >
-            البرامج الرئيسية
+            {t("mainPrograms")}HH
           </label>
           <select
             id="main-sidebar-item"
@@ -54,7 +56,7 @@ export function NavCompanies({ projects }: { projects: ProjectItem[] }) {
 
               setActiveProject(selectedProject);
             }}
-            className="block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold bg-[#2D174D] text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0"
+            className="block w-full h-[55px] px-2 py-[5px] text-[18px] font-semibold bg-sidebar text-white dark:bg-sidebar-dark dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 my-[10px] border-0"
           >
             {projects.map((item) => (
               <option value={item.name} key={item.name}>

@@ -1,4 +1,4 @@
-import { createPermissions as create } from "./default-permissions";
+import { createPermissions as create, PERMISSION_ACTIONS } from "./default-permissions";
 
 export const PERMISSIONS = {
   user: create("USER"),
@@ -64,10 +64,15 @@ export const PERMISSIONS = {
   identifier: create("IDENTIFIER"),
   subEntity: create("SUB_ENTITY"),
 
+  activityLogs: create("LOG"),
+
   // Attendance
   attendance: {
     settings: create("EMPLOYEE_ATTENDANCE_CONSTRAINTS"),
-    attendance_departure: create("EMPLOYEE_ATTENDANCE"),
+    attendance_departure: {
+      ...create("EMPLOYEE_ATTENDANCE"),
+      map: "EMPLOYEE_ATTENDANCE_MAP", // إضافة permission مخصص للخريطة
+    },
   },
   // vacations
   vacations: {
@@ -84,5 +89,8 @@ export const PERMISSIONS = {
     clients: create("CLIENT"),
   },
   // docs library
-  // library: {},
+  library: {
+    folder: create("FOLDER"),
+    file: create("FILE"),
+  },
 };

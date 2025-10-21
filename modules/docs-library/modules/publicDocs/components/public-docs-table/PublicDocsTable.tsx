@@ -10,13 +10,8 @@ import { TableRow } from "./components/TableRow";
  * Displays documents in a structured table format
  */
 export const PublicDocsTable = () => {
-  const {
-    docs,
-    isLoadingDocs,
-    docsPagination,
-    setPage,
-    setLimit,
-  } = usePublicDocsCxt();
+  const { docs, isLoadingDocs, docsPagination, setPage, setLimit } =
+    usePublicDocsCxt();
 
   if (isLoadingDocs) {
     return <LoadingSpinner />;
@@ -30,11 +25,18 @@ export const PublicDocsTable = () => {
         <table className="w-full">
           <TableHeader />
           <tbody className="divide-y divide-border">
-            {allDocuments.map((document) => (
+            {(docs?.folders || []).map((document) => (
               <TableRow
                 key={document.id}
                 document={document}
-                isFolder={!document.reference_number}
+                isFolder={true}
+              />
+            ))}
+            {(docs?.files || []).map((document) => (
+              <TableRow
+                key={document.id}
+                document={document}
+                isFolder={false}
               />
             ))}
           </tbody>

@@ -2,13 +2,15 @@ import RegularList from "@/components/shared/RegularList";
 import UserInformationCardLayout from "../UserInformationCardLayout";
 import { BankAccount } from "@/modules/user-profile/types/bank-account";
 import { checkString } from "@/utils/check-string";
+import { useTranslations } from "next-intl";
 
 const getBankingDataItems = (bank?: BankAccount): string[] => {
+  const t = useTranslations("UserProfile.bankingData");
   if (!bank) return [];
   return [
-    `اسم البنك: ${checkString(bank?.bank_name)}`,
-    `الحساب البنكي: ${checkString(bank?.iban)}`,
-    `عملة الحساب:  ${checkString(bank?.currency_name)}`,
+    `${t("bank_name")}: ${checkString(bank?.bank_name)}`,
+    `${t("iban")}: ${checkString(bank?.iban)}`,
+    `${t("currency_name")}:  ${checkString(bank?.currency_name)}`,
   ];
 };
 
@@ -17,8 +19,9 @@ export default function UserProfileBankingData({
 }: {
   bank?: BankAccount;
 }) {
+  const t = useTranslations("UserProfile.bankingData");
   return (
-    <UserInformationCardLayout title="البيانات البنكية">
+    <UserInformationCardLayout title={t("title")}>
       <RegularList<string, "ProfessionalItemData">
         sourceName="ProfessionalItemData"
         items={getBankingDataItems(bank)}

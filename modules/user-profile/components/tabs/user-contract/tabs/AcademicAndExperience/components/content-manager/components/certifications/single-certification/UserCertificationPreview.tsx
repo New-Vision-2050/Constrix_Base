@@ -1,16 +1,18 @@
 import { Certification } from "@/modules/user-profile/types/Certification";
 import PreviewTextField from "../../../../../../components/previewTextField";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
+import { useTranslations } from "next-intl";
 
 type PropsT = { certification: Certification };
 export default function UserCertificationPreview({ certification }: PropsT) {
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
+  const t = useTranslations("UserProfile.nestedTabs.certificationsData");
 
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="p-2">
         <PreviewTextField
-          label="اسم الجهة"
+          label={t("professionalBodie")}
           value={certification?.professional_bodie_name ?? ""}
           valid={Boolean(certification?.professional_bodie_name)}
           type="select"
@@ -19,7 +21,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="اسم الاعتماد"
+          label={t("accreditationName")}
           value={certification?.accreditation_name ?? ""}
           valid={Boolean(certification?.accreditation_name)}
         />
@@ -27,7 +29,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="رقم الاعتماد"
+          label={t("accreditationNumber")}
           value={certification?.accreditation_number ?? ""}
           valid={Boolean(certification?.accreditation_number)}
         />
@@ -35,7 +37,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="درجة الاعتماد"
+          label={t("accreditationDegree")}
           value={certification?.accreditation_degree ?? ""}
           valid={Boolean(certification?.accreditation_degree)}
         />
@@ -43,7 +45,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الحصول على الشهادة"
+          label={t("dateObtain")}
           value={certification?.date_obtain ?? ""}
           valid={Boolean(certification?.date_obtain)}
           type="date"
@@ -52,7 +54,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ انتهاء الشهادة"
+          label={t("dateEnd")}
           value={certification?.date_end ?? ""}
           valid={Boolean(certification?.date_end)}
           type="date"
@@ -66,7 +68,7 @@ export default function UserCertificationPreview({ certification }: PropsT) {
             handleRefetchUserCertifications();
           }}
           valid={Boolean(certification?.file?.name)}
-          label="الشهادة"
+          label={t("file")}
           value={certification?.file?.name ?? "---"}
           type={certification?.file?.type == "image" ? "image" : "pdf"}
           fileUrl={certification?.file?.url}

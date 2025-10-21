@@ -24,7 +24,13 @@ export default function ProductVisibilitySettings({
         <Label className="text-foreground">
           {t("product.dialog.add.fields.isVisible.label")}
         </Label>
-        <Switch defaultChecked />
+        <Switch
+          id="is-visible-switch"
+          checked={form.watch("is_visible") === 1}
+          onCheckedChange={(checked) =>
+            form.setValue("is_visible", checked ? 1 : 0)
+          }
+        />
       </div>
       <p className="text-gray-400 text-sm">
         {t("product.dialog.add.fields.isVisible.description")}

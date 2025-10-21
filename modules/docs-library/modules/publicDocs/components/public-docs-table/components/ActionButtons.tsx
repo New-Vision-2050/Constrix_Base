@@ -22,6 +22,9 @@ import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useState } from "react";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import ShareDialog from "../../../views/public-docs-tab/share-dialog";
 
 /**
  * Action buttons component
@@ -32,9 +35,11 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons = ({ document }: ActionButtonsProps) => {
+  const { can } = usePermissions();
   const isDirectory = !Boolean(document.reference_number);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const [openDelete, setOpenDelete] = useState(false);
+  const [openShareDialog, setOpenShareDialog] = useState(false);
   const {
     setOpenDirDialog,
     setOpenFileDialog,
@@ -72,8 +77,13 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         else storeSelectedDocument(document);
         break;
       case "download":
+        if (!isDirectory) {
+          const _url = document?.file?.url;
+          window.open(_url, "_blank");
+        }
         break;
       case "share":
+        setOpenShareDialog(true);
         break;
       case "edit":
         setEditedDoc(document);
@@ -92,13 +102,19 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="sm" className="p-2 hover:bg-muted">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="p-2 hover:bg-muted"
+            // disabled={!can(PERMISSIONS.library.file.update)}
+          >
             {t("title")}
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-44">
+          {/* view document */}
           <DropdownMenuItem
             onClick={() => handleAction("view")}
             className="flex items-center gap-2"
@@ -111,14 +127,17 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
             {inDetails ? t("hide") : t("view")}
           </DropdownMenuItem>
 
+          {/* download document */}
           <DropdownMenuItem
             onClick={() => handleAction("download")}
             className="flex items-center gap-2"
+            disabled={isDirectory}
           >
             <Download className="h-4 w-4" />
             {t("download")}
           </DropdownMenuItem>
 
+          {/* share document */}
           <DropdownMenuItem
             onClick={() => handleAction("share")}
             className="flex items-center gap-2"
@@ -129,16 +148,28 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
 
           <DropdownMenuSeparator />
 
+          {/* edit document */}
           <DropdownMenuItem
             onClick={() => handleAction("edit")}
+            disabled={
+              !Boolean(document.can_update) ||
+              (isDirectory
+                ? !can(PERMISSIONS.library.folder.update)
+                : !can(PERMISSIONS.library.file.update))
+            }
             className="flex items-center gap-2"
           >
             <Edit className="h-4 w-4" />
             {t("edit")}
           </DropdownMenuItem>
 
+          {/* delete document */}
           <DropdownMenuItem
             onClick={() => handleAction("delete")}
+            disabled={
+              !Boolean(document.can_delete) ||
+              !can(PERMISSIONS.library.file.delete)
+            }
             className="flex items-center gap-2 text-destructive focus:text-destructive"
           >
             <Trash2 className="h-4 w-4" />
@@ -154,6 +185,10 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         onConfirm={handleDelete}
         description={isDirectory ? t("deleteDir") : t("deleteFile")}
         showDatePicker={false}
+      />
+      <ShareDialog
+        open={openShareDialog}
+        onClose={() => setOpenShareDialog(false)}
       />
     </>
   );

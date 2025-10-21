@@ -7,6 +7,7 @@ import { DocumentT } from "../types/Directory";
 import useFoldersList from "../hooks/useFoldersList";
 import { SelectOption } from "@/types/select-option";
 import { SearchFormData } from "../components/search-fields";
+import useUsersData from "../hooks/useUsersData";
 
 // Define context type
 interface CxtType {
@@ -75,6 +76,17 @@ interface CxtType {
   // visited dir
   visitedDirs: DocumentT[];
   setVisitedDirs: React.Dispatch<React.SetStateAction<DocumentT[]>>;
+
+  // sort
+  sort: string;
+  setSort: React.Dispatch<React.SetStateAction<string>>;
+
+  // users list
+  usersList: SelectOption[] | undefined;
+
+  // docToView
+  docToView: DocumentT | undefined;
+  setDocToView: React.Dispatch<React.SetStateAction<DocumentT | undefined>>;
 }
 
 // Create the context
@@ -108,6 +120,15 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // visited dirs
   const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
 
+  // users list
+  const { data: usersList } = useUsersData();
+
+  // docToView
+  const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
+
+  // sort
+  const [sort, setSort] = useState("desc");
+
   // search params
   const [searchData, setSearchData] = useState<SearchFormData>({
     endDate: "",
@@ -122,7 +143,15 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     data: docsResponse,
     isLoading: isLoadingDocs,
     refetch: refetchDocs,
-  } = useDocsData(branchId, parentId, dirPassword, limit, page, searchData);
+  } = useDocsData(
+    branchId,
+    parentId,
+    dirPassword,
+    limit,
+    page,
+    searchData,
+    sort
+  );
 
   // folders list
   const {
@@ -212,6 +241,14 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
         // visited dirs
         visitedDirs,
         setVisitedDirs,
+        // sort
+        sort,
+        setSort,
+        // docToView
+        docToView,
+        setDocToView,
+        // users list
+        usersList,
       }}
     >
       {children}

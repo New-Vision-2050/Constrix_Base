@@ -6,7 +6,14 @@ import DirIcon from "@/assets/icons/directory.png";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DocumentT } from "../../types/Directory";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
-import { Eye, EyeOff, FolderOpen, Pencil, Trash } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  FolderOpen,
+  Pencil,
+  SquareMenu,
+  Trash,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -18,6 +25,8 @@ import { useState } from "react";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function GridItem({
   document,
@@ -40,7 +49,9 @@ export default function GridItem({
     setOpenDirDialog,
     setOpenFileDialog,
     refetchDocs,
+    setDocToView,
   } = usePublicDocsCxt();
+  const { can } = usePermissions();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -167,6 +178,20 @@ export default function GridItem({
                 <p>{isDocInDetails ? "Close Details" : "View Details"}</p>
               </TooltipContent>
             </Tooltip>
+            {/* more options */}
+            {!isDir && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <SquareMenu
+                    onClick={() => setDocToView(document)}
+                    className="w-5 h-5 text-blue-500 hover:text-blue-600 cursor-pointer transition-colors"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>More Options</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             {/* open directory */}
             {isDir && (
@@ -184,30 +209,40 @@ export default function GridItem({
             )}
 
             {/* edit document */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Pencil
-                  onClick={handleEdit}
-                  className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors"
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit Document</p>
-              </TooltipContent>
-            </Tooltip>
+            {Boolean(document.can_update) &&
+              (isDir
+                ? can(PERMISSIONS.library.folder.update)
+                : can(PERMISSIONS.library.file.update)) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Pencil
+                      onClick={handleEdit}
+                      className="w-5 h-5 text-orange-500 hover:text-orange-600 cursor-pointer transition-colors"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit Document</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
 
             {/* delete document */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Trash
-                  onClick={() => setOpenDelete(true)}
-                  className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Delete Document</p>
-              </TooltipContent>
-            </Tooltip>
+            {Boolean(document.can_delete) &&
+              (isDir
+                ? can(PERMISSIONS.library.folder.delete)
+                : can(PERMISSIONS.library.file.delete)) && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Trash
+                      onClick={() => setOpenDelete(true)}
+                      className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete Document</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </TooltipProvider>
         <Checkbox

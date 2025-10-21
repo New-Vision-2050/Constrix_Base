@@ -22,13 +22,25 @@ export default function ProductVATSettings({ form }: ProductVATSettingsProps) {
         <Label className="text-foreground">
           {t("product.dialog.add.fields.vatSettings.exemptFromTax")}
         </Label>
-        <Switch />
+        <Switch
+          id="exempt-from-tax-switch"
+          checked={form.watch("is_taxable") === 1}
+          onCheckedChange={(checked) =>
+            form.setValue("is_taxable", checked ? 1 : 0)
+          }
+        />
       </div>
       <div className="flex items-center justify-between">
         <Label className="text-foreground">
           {t("product.dialog.add.fields.priceIncludesVat.label")}
         </Label>
-        <Switch />
+        <Switch
+          id="price-includes-vat-switch"
+          checked={form.watch("price_includes_vat") === 1}
+          onCheckedChange={(checked) =>
+            form.setValue("price_includes_vat", checked ? 1 : 0)
+          }
+        />
       </div>
     </Card>
   );

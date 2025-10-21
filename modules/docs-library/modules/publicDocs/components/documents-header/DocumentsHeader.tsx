@@ -17,6 +17,7 @@ import {
   Trash,
   Star,
   MoveRight,
+  ArrowUpNarrowWide,
 } from "lucide-react";
 import { usePublicDocsCxt } from "../../contexts/public-docs-cxt";
 import CreateNewDirDialogContent from "../../views/public-docs-tab/create-new-dir/DialogContent";
@@ -29,6 +30,8 @@ import useCurrentAuthCompany from "@/hooks/use-auth-company";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * DocumentsHeader component for document management interface
@@ -45,7 +48,10 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations("docs-library.publicDocs.header");
+  const { can } = usePermissions();
   const {
+    sort,
+    setSort,
     openDirDialog,
     setOpenDirDialog,
     openFileDialog,
@@ -84,6 +90,103 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const _url = baseURL + `/files/export`;
+      const response = await apiClient.post(
+        _url,
+        {
+          ids: selectedDocs?.map((doc) => doc.id),
+        },
+        {
+          responseType: "blob",
+        }
+      );
+
+      // Create blob URL and trigger download for Excel file
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `documents-export-${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("تم تصدير المستندات بنجاح");
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message;
+      toast.error(errorMsg || "حدث خطأ أثناء تصدير المستندات");
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      if (files?.length === 0) {
+        toast.error("يجب اختيار ملف");
+        return;
+      }
+      const _url = baseURL + `/files/download`;
+      const response = await apiClient.post(
+        _url,
+        {
+          ids: files?.map((doc) => doc.id),
+        },
+        {
+          responseType: "blob",
+        }
+      );
+
+      // Create blob URL and trigger download for ZIP file
+      const blob = new Blob([response.data], {
+        type: "application/zip",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Generate appropriate filename for ZIP
+      const fileName =
+        selectedDocs?.length === 1
+          ? selectedDocs[0]?.name
+          : `documents-${new Date().toISOString().split("T")[0]}.zip`;
+
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("تم تحميل المستند بنجاح");
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message;
+      toast.error(errorMsg || "حدث خطأ أثناء تحميل المستند");
+    }
+  };
+
+  const handleFavorite = async () => {
+    try {
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      if (files?.length === 0) {
+        toast.error("يجب اختيار ملف");
+        return;
+      }
+      const _url = baseURL + `/files/favourites`;
+      await apiClient.post(_url, {
+        ids: files?.map((doc) => doc.id),
+      });
+      toast.success("تم إضافة المستندات إلى المفضلة");
+    } catch (error) {
+      toast.error("حدث خطأ أثناء إضافة المستندات إلى المفضلة");
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col gap-4 bg-sidebar">
@@ -109,22 +212,30 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
             <DropdownButton
               triggerButton={<Button>{t("add")}</Button>}
               items={[
-                {
-                  text: t("dir"),
-                  icon: <Folder className="h-4 w-4" />,
-                  onClick: () => {
-                    setEditedDoc(undefined);
-                    setOpenDirDialog(true);
-                  },
-                },
-                {
-                  text: t("file"),
-                  icon: <FileText className="h-4 w-4" />,
-                  onClick: () => {
-                    setEditedDoc(undefined);
-                    setOpenFileDialog(true);
-                  },
-                },
+                ...(can(PERMISSIONS.library.folder.create)
+                  ? [
+                      {
+                        text: t("dir"),
+                        icon: <Folder className="h-4 w-4" />,
+                        onClick: () => {
+                          setEditedDoc(undefined);
+                          setOpenDirDialog(true);
+                        },
+                      },
+                    ]
+                  : []),
+                ...(can(PERMISSIONS.library.file.create)
+                  ? [
+                      {
+                        text: t("file"),
+                        icon: <FileText className="h-4 w-4" />,
+                        onClick: () => {
+                          setEditedDoc(undefined);
+                          setOpenFileDialog(true);
+                        },
+                      },
+                    ]
+                  : []),
               ]}
             />
             {/* more button */}
@@ -137,13 +248,30 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               <Ellipsis className="h-4 w-4" />
             </Button>
             {/* Export button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button
+              variant="outline"
+              className="bg-sidebar h-10"
+              size="sm"
+              onClick={handleExport}
+              disabled={!can(PERMISSIONS.library.file.export)}
+            >
               <Upload className="mr-2 h-4 w-4" />
               {t("export")}
             </Button>
             {/* Sort button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
-              <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              className="bg-sidebar h-10"
+              size="sm"
+              onClick={() => {
+                setSort(sort === "asc" ? "desc" : "asc");
+              }}
+            >
+              {sort === "asc" ? (
+                <ArrowUpNarrowWide className="mr-2 h-4 w-4" />
+              ) : (
+                <ArrowDownNarrowWide className="mr-2 h-4 w-4" />
+              )}
               {t("sort")}
             </Button>
             {/* View Mode Toggle */}
@@ -217,14 +345,15 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               }}
               disabled={
                 selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.reference_number)
+                !Boolean(selectedDocs?.[0]?.reference_number) ||
+                !can(PERMISSIONS.library.file.update)
               }
             >
               <Copy className="mr-2 h-4 w-4" />
               {t("copy")}
             </Button>
             {/* request file button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button disabled variant="outline" className="bg-sidebar h-10" size="sm">
               <FileText className="mr-2 h-4 w-4" />
               {t("requestFile")}
             </Button>
@@ -236,18 +365,27 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               onClick={() => {
                 setOpenDelete(true);
               }}
-              disabled={selectedDocs?.length != 1}
+              disabled={
+                selectedDocs?.length != 1 ||
+                !Boolean(selectedDocs?.[0]?.can_delete) ||
+                !can(PERMISSIONS.library.file.delete)
+              }
             >
               <Trash className="mr-2 h-4 w-4" />
               {t("delete")}
             </Button>
             {/* download button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button
+              variant="outline"
+              onClick={handleDownload}
+              className="bg-sidebar h-10"
+              size="sm"
+            >
               <Download className="mr-2 h-4 w-4" />
               {t("download")}
             </Button>
             {/* favorite button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button variant="outline" onClick={handleFavorite} className="bg-sidebar h-10" size="sm">
               <Star className="mr-2 h-4 w-4" />
               {t("favorite")}
             </Button>
@@ -262,7 +400,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               }}
               disabled={
                 selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.reference_number)
+                !Boolean(selectedDocs?.[0]?.reference_number) ||
+                !can(PERMISSIONS.library.file.update)
               }
             >
               <MoveRight className="mr-2 h-4 w-4" />

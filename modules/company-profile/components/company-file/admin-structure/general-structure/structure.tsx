@@ -39,10 +39,10 @@ const Structure = () => {
 
   return (
     <div className="w-full h-full flex items-center justify-start flex-col gap-5 pt-5">
-      {/*  {levels.map((level) => (
-        <div key={level.id} className="flex items-start gap-5">
-          {level.branches.map((branch) => (
-            <div key={branch.id}>{branch.name}</div>
+      {/*  {levels?.map((level) => (
+        <div key={level?.id} className="flex items-start gap-5">
+          {level?.branches?.map((branch) => (
+            <div key={branch?.id}>{branch?.name}</div>
           ))}
         </div>
       ))}*/}

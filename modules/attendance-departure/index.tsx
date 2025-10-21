@@ -30,13 +30,13 @@ function AttendanceContent() {
       {view === "table" ? (
         <AttendanceDepartureTable />
       ) : (
-        <>
+        <Can check={[PERMISSIONS.attendance.attendance_departure.map]}>
           {/* Search filter */}
           <AttendanceDepartureSearchFilter />
 
           <MapSearchFilter />
           <AttendanceMap />
-        </>
+        </Can>
       )}
 
       {/* Employee details sheet dialog */}

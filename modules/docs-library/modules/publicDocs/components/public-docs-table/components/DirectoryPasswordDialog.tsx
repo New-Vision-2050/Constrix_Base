@@ -25,8 +25,14 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const t = useTranslations("docs-library.publicDocs.directoryPasswordDialog");
-  const { branchId, setDirPassword, setParentId, tempParentId } =
-    usePublicDocsCxt();
+  const {
+    branchId,
+    docs,
+    setDirPassword,
+    setParentId,
+    tempParentId,
+    setVisitedDirs,
+  } = usePublicDocsCxt();
 
   const isPasswordRight = async () => {
     try {
@@ -46,6 +52,10 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
   const handleConfirm = async () => {
     if (!password.trim()) return;
 
+    const document = docs?.folders?.find((doc) => doc.id == tempParentId);
+
+    if (!document) return;
+
     setIsLoading(true);
     setErrorMsg("");
     try {
@@ -54,6 +64,7 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
         setErrorMsg("invalid password,try again");
         return;
       }
+      setVisitedDirs((prev) => [...prev, document]);
       React.startTransition(() => {
         setDirPassword(password);
         setParentId(tempParentId);

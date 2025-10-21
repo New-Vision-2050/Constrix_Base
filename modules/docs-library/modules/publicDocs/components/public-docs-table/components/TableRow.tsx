@@ -3,9 +3,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileIcon } from "./FileIcon";
 import { StatusBadge } from "./StatusBadge";
 import { ActionButtons } from "./ActionButtons";
-import ToggleControl from "@/modules/clients/components/ToggleControl";
 import { useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
+import { apiClient, baseURL } from "@/config/axios-config";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import StatusToggle from "./StatusToggle";
+import { useMemo, useState } from "react";
 
 /**
  * Table row component for displaying document information
@@ -23,30 +27,59 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     setOpenDirWithPassword,
     toggleDocInSelectedDocs,
     setVisitedDirs,
+    setDocToView,
+    selectedDocs,
   } = usePublicDocsCxt();
+  const [rowStatus, setRowStatus] = useState(document.status);
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
     if (!size) return "-";
     const mb = size / (1024 * 1024);
-    return `${mb.toFixed(1)} MB`;
+    return `${mb.toFixed(2)} MB`;
   };
 
+  const isDocSelected = useMemo(() => {
+    return selectedDocs?.some((doc) => doc.id == document.id);
+  }, [selectedDocs, document]);
+
   const handleClick = () => {
+    if (rowStatus == 0) {
+      return;
+    }
     if (isFolder) {
       if (document?.is_password == 1) {
         setOpenDirWithPassword(true);
         setTempParentId(document.id);
       } else {
         setParentId(document.id);
+        setVisitedDirs((prev) => [...prev, document]);
       }
-      setVisitedDirs((prev) => [...prev, document]);
+    } else {
+      setDocToView(document);
     }
   };
+
+  // Mutation for changing document status
+  const changeStatusMutation = useMutation({
+    mutationFn: async (checked: boolean) => {
+      const _url = baseURL + `/files/${document?.id}/change-status`;
+      return await apiClient.put(_url, {
+        status: checked ? 1 : 0,
+        type: isFolder ? "folder" : "file",
+      });
+    },
+    onSuccess: () => {
+      toast.success(t("statusChanged"));
+    },
+    onError: () => {
+      toast.error(t("statusChangeFailed"));
+    },
+  });
 
   return (
     <tr className="hover:bg-muted/30 transition-colors">
       <td className="px-4 py-3">
-        <Checkbox onCheckedChange={() => toggleDocInSelectedDocs(document)} />
+        <Checkbox checked={isDocSelected} onCheckedChange={() => toggleDocInSelectedDocs(document)} />
       </td>
 
       <td className="px-4 py-3">
@@ -54,9 +87,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
           <FileIcon isFolder={isFolder} fileName={document.name} />
           <span
             onClick={handleClick}
-            className={`font-medium ${
-              isFolder && "hover:underline cursor-pointer"
-            }`}
+            className={`font-medium hover:underline cursor-pointer`}
           >
             {document.name}
           </span>
@@ -82,12 +113,12 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
       </td>
 
       <td className="px-4 py-3">
-        <ToggleControl
-          activeLabel={t("active")}
-          inactiveLabel={t("inactive")}
-          checked={document.status == 1 ? true : false}
-          onChange={(checked) => {}}
-          disabled={false}
+        <StatusToggle
+          isFolder={isFolder}
+          onStatusChange={(checked) => changeStatusMutation.mutate(checked)}
+          isPending={changeStatusMutation.isPending}
+          rowStatus={rowStatus}
+          setRowStatus={setRowStatus}
         />
       </td>
 

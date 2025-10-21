@@ -5,6 +5,7 @@ export const SUPER_ENTITY_SLUG = {
   HRM: "human-resources",
   PM: "program-management",
   POWERS: "powers",
+  ECOMMERCE: "ecommerce",
   CRM: "client-relations",
   STORES: "stores",
   DOCS_LIBRARY: "docs-library",

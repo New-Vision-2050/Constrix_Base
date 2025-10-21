@@ -107,12 +107,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     },
     [can]
   );
-  console.log(
-    "isCentralCompany",
-    isCentralCompany,
-    "can([PERMISSIONS.crm.settings.update])",
-    can([PERMISSIONS.crm.settings.update])
-  );
+  // console.log(
+  //   "isCentralCompanyisCentralCompany",
+  //   isCentralCompany,
+  //   PERMISSIONS.crm.settings,
+  //   can(PERMISSIONS.crm.settings.list),
+  //   can(PERMISSIONS.crm.settings.view)
+  // );
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
     // grouped routes in sidebar
@@ -203,14 +204,17 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.AttendanceDeparture,
             icon: UserIcon,
             isActive: pageName === ROUTER.AttendanceDeparture,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany &&
+              can([PERMISSIONS.attendance.attendance_departure.view]),
           },
           {
             name: t("Sidebar.HRSettings"),
             url: ROUTER.HR_SETTINGS,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.HR_SETTINGS,
-            show: !isCentralCompany,
+            show:
+              !isCentralCompany && can([PERMISSIONS.attendance.settings.view]),
           },
         ],
       },
@@ -261,7 +265,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.DOCS_LIBRARY,
             icon: FolderClosed,
             isActive: pageName === ROUTER.DOCS_LIBRARY,
-            show: !isCentralCompany,
+            show: !isCentralCompany && can([PERMISSIONS.library.folder.list]),
           },
         ],
       },
@@ -303,23 +307,18 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.SETTINGS,
             icon: InboxIcon,
             isActive: pageName === ROUTER.SETTINGS,
-            show: can(
-              Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-                Object.values(p)
-              )
-            ),
+            show: can([
+              PERMISSIONS.identifier.list,
+              PERMISSIONS.loginWay.list,
+              PERMISSIONS.driver.view,
+            ]),
           },
           {
             name: t("Sidebar.ActivitiesLogs"),
             url: ROUTER.ACTIVITIES_LOGS,
             icon: ClipboardClockIcon,
             isActive: pageName === ROUTER.ACTIVITIES_LOGS,
-            show: true,
-            // show: can(
-            //   Object.values(PERMISSIONS.companyAccessProgram).flatMap((p) =>
-            //     Object.values(p)
-            //   )
-            // ),
+            show: can([PERMISSIONS.activityLogs.list]),
           },
           rolesObj,
           permissionsObj,
@@ -341,6 +340,22 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show:
               isCentralCompany &&
               can(Object.values(PERMISSIONS.companyAccessProgram)),
+          },
+        ],
+      },
+      {
+        name: t("Sidebar.ecommerce"),
+        icon: SettingsIcon,
+        isActive: pageName === ROUTER.ECOMMERCE,
+        slug: SUPER_ENTITY_SLUG.ECOMMERCE,
+        urls: [ROUTER.ECOMMERCE],
+        sub_entities: [
+          {
+            name: t("product.plural"),
+            url: ROUTER.Products,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.Products,
+            show: true,
           },
         ],
       },
