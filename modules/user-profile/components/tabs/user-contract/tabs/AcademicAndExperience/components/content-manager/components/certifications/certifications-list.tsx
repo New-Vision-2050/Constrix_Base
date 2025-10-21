@@ -6,10 +6,12 @@ import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useTranslations } from "next-intl";
 
 export default function UserCertificationsList() {
   const { userCertifications, userCertificationsLoading } =
-    useUserAcademicTabsCxt();
+    useUserAcademicTabsCxt(); 
+  const t = useTranslations("UserProfile.nestedTabs.certificationsData");
 
   // handle there is no data found
   if (
@@ -19,8 +21,8 @@ export default function UserCertificationsList() {
   )
     return (
       <NoDataFounded
-        title="لا يوجد بيانات"
-        subTitle="لا يوجد بيانات تخص الشهادات التعليمية للمستخدم قم باضافة شهادة جديدة"
+        title={t("noData")}
+        subTitle={t("noDataSubTitle")}
       />
     );
 

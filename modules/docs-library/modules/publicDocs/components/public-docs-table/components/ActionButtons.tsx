@@ -24,6 +24,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import ShareDialog from "../../../views/public-docs-tab/share-dialog";
 
 /**
  * Action buttons component
@@ -38,6 +39,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
   const isDirectory = !Boolean(document.reference_number);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const [openDelete, setOpenDelete] = useState(false);
+  const [openShareDialog, setOpenShareDialog] = useState(false);
   const {
     setOpenDirDialog,
     setOpenFileDialog,
@@ -81,6 +83,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         }
         break;
       case "share":
+        setOpenShareDialog(true);
         break;
       case "edit":
         setEditedDoc(document);
@@ -182,6 +185,10 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         onConfirm={handleDelete}
         description={isDirectory ? t("deleteDir") : t("deleteFile")}
         showDatePicker={false}
+      />
+      <ShareDialog
+        open={openShareDialog}
+        onClose={() => setOpenShareDialog(false)}
       />
     </>
   );

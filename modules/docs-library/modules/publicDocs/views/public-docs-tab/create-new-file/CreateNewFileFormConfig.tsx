@@ -71,6 +71,10 @@ export function getCreateNewFileFormConfig(
             label: t("createdAt"),
             type: "date",
             placeholder: t("createdAtPlaceholder"),
+            maxDate: {
+              formId: formId,
+              field: "end_date",
+            },
           },
           // end date
           {
@@ -78,6 +82,10 @@ export function getCreateNewFileFormConfig(
             label: t("endDate"),
             type: "date",
             placeholder: t("endDatePlaceholder"),
+            minDate: {
+              formId: formId,
+              field: "start_date",
+            },
           },
           // public or private
           {

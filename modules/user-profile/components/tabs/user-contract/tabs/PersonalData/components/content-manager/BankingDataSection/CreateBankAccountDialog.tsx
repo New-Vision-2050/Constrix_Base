@@ -7,6 +7,7 @@ import {
 import FormContent from "@/modules/settings/components/tabs/ChatSettings/tabs/email-setting-tab/components/FormContent";
 import { SetStateAction } from "react";
 import { BankingDataFormConfig } from "./bank-data/edit-mode/config/BankingFormConfig";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   open: boolean;
@@ -16,13 +17,14 @@ type PropsT = {
 export default function CreateBankAccountDialog(props: PropsT) {
   // declare and define component state and variables
   const { open, setOpen } = props;
+  const t = useTranslations("UserProfile.nestedTabs.bankingData");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center">
-            اضافة حساب بنكي جديد
+            {t("title")}
           </DialogTitle>
         </DialogHeader>
         <FormContent

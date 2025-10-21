@@ -1,3 +1,5 @@
+
+'use client';
 import { baseURL } from "@/config/axios-config";
 import AttendanceStatusBadge from "../components/AttendanceDepartureTable/AttendanceStatusBadge";
 import ApproverBadge from "../components/AttendanceDepartureTable/ApproverBadge";
@@ -6,10 +8,14 @@ import { AttendanceStatusRecord } from "../types/attendance";
 import React from "react";
 import { useTranslations } from "next-intl";
 import { UN_SPECIFIED } from "../constants/static-data";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Configuration function for the attendance departure table
-export const getAttendanceDepartureTableConfig = (t: (key: string) => string,companyCreatedAt: Date) => {
-  console.log('companyCreatedAt',companyCreatedAt)
+export const getAttendanceDepartureTableConfig = (
+  t: (key: string) => string,
+  companyCreatedAt: Date,
+  can: (permission: string) => boolean 
+) => {
   return {
     url: `${baseURL}/attendance/team`,
     tableId: "attendance-departure-table",
@@ -18,7 +24,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
         key: "user.name",
         label: t("columns.name"),
         sortable: true,
-        searchable: true
+        searchable: true,
       },
       {
         key: "work_date",
@@ -28,19 +34,19 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
       {
         key: "professional_data.job_code",
         label: t("columns.jobCode"),
-        sortable: true
+        sortable: true,
       },
       {
         key: "professional_data.branch",
         label: t("columns.branch"),
         sortable: true,
-        searchable: true
+        searchable: true,
       },
       {
         key: "professional_data.management",
         label: t("columns.management"),
         sortable: true,
-        searchable: true
+        searchable: true,
       },
       {
         key: "professional_data.attendance_constraint",
@@ -48,10 +54,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
         sortable: true,
         searchable: true,
         render: (value: any, row: AttendanceStatusRecord) => (
-          <ApproverBadge
-            approver={row?.status }
-            record={row}
-          />
+          <ApproverBadge approver={row?.status} record={row} />
         ),
       },
       {
@@ -142,7 +145,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
           placeholder: t("columns.date"),
           defaultValue: new Date(),
           minDate: companyCreatedAt,
-          maxDateField: "end_date"
+          maxDateField: "end_date",
         },
       },
       {
@@ -152,7 +155,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
           type: "date",
           placeholder: t("columns.date"),
           defaultValue: new Date(),
-          minDateField: "start_date"
+          minDateField: "start_date",
         },
       },
     ],
@@ -170,7 +173,7 @@ export const getAttendanceDepartureTableConfig = (t: (key: string) => string,com
     executions: [],
     executionConfig: {
       canEdit: false,
-      canDelete: true,
+      canDelete: can(PERMISSIONS.attendance.attendance_departure.delete),
     },
   };
 };

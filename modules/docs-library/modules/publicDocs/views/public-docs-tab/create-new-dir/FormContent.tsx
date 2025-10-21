@@ -9,13 +9,20 @@ interface PropsType {
   onClose: () => void;
 }
 export default function CreateNewDirForm({ onClose }: PropsType) {
-  const { refetchDocs, editedDoc, parentId, setEditedDoc } = usePublicDocsCxt();
+  const {
+    refetchDocs,
+    editedDoc,
+    parentId,
+    setEditedDoc,
+    handleRefetchUsersList,
+  } = usePublicDocsCxt();
   const t = useTranslations("docs-library.publicDocs.createNewDirDialog");
 
   const onSuccessFn = () => {
     onClose();
     setEditedDoc(undefined);
     refetchDocs();
+    handleRefetchUsersList();
   };
 
   const _config = useMemo(

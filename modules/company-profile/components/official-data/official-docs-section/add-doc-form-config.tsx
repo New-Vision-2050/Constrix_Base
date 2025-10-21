@@ -1,12 +1,12 @@
 import { baseURL } from "@/config/axios-config";
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { serialize } from "object-to-formdata";
 import { RegistrationTypes } from "../legal-data-section/registration-types";
 
-export const AddDocFormConfig = (id?: string , company_id?:string) => {
+export const AddDocFormConfig = (id?: string, company_id?: string) => {
   const queryClient = useQueryClient();
 
   const AddDocFormConfig: FormConfig = {
@@ -97,6 +97,7 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
             minDate: {
               formId: `AddDocFormConfig-${id}-${company_id}`,
               field: "start_date",
+              // addDays: 8,
             },
             validation: [
               {
@@ -104,6 +105,16 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
                 message: "ادخل تاريخ الانتهاء",
               },
             ],
+            onChange: (value) => {
+              const endDate = new Date(value);
+              endDate.setDate(endDate.getDate() - 7);
+              const notificationDate = endDate.toLocaleDateString("en-CA");
+              useFormStore
+                .getState()
+                .setValues(`AddDocFormConfig-${id}-${company_id}`, {
+                  notification_date: notificationDate,
+                });
+            },
           },
           {
             name: "notification_date",
@@ -118,6 +129,7 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
               formId: `AddDocFormConfig-${id}-${company_id}`,
               field: "end_date",
             },
+            disabled: true,
             validation: [
               {
                 type: "required",
@@ -167,7 +179,9 @@ export const AddDocFormConfig = (id?: string , company_id?:string) => {
     onSubmit: async (formData) => {
       const sendForm = serialize({
         ...formData,
-        document_type_id:(formData.document_type_id as string)?.split("_")?.[0],
+        document_type_id: (formData.document_type_id as string)?.split(
+          "_"
+        )?.[0],
         start_date: new Date(formData.start_date).toLocaleDateString("en-CA"),
         end_date: new Date(formData.end_date).toLocaleDateString("en-CA"),
         notification_date: new Date(

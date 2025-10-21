@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 
@@ -27,13 +28,15 @@ const formatWhatsappDisplay = (phoneNumber: string | undefined): string => {
 
 export default function SocialDataSectionPreviewMode() {
   const { userSocialData } = useConnectionDataCxt();
+  const t = useTranslations("UserProfile.nestedTabs.socialData");
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userSocialData?.whatsapp)}
-          label="واتساب "
+          label={t("whatsapp")}
           value={formatWhatsappLink(userSocialData?.whatsapp)}
           displayText={formatWhatsappDisplay(userSocialData?.whatsapp)}
           type="link"
@@ -43,7 +46,7 @@ export default function SocialDataSectionPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userSocialData?.facebook)}
-          label="فيسبوك"
+          label={t("facebook")}
           value={userSocialData?.facebook ?? ""}
           type="link"
           openInNewTab={true}
@@ -52,14 +55,14 @@ export default function SocialDataSectionPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userSocialData?.telegram)}
-          label="تيليجرام"
+          label={t("telegram")}
           value={userSocialData?.telegram ?? ""}
         />
       </div>
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userSocialData?.instagram)}
-          label="انستقرام"
+          label={t("instagram")}
           value={userSocialData?.instagram ?? ""}
           type="link"
           openInNewTab={true}
@@ -68,7 +71,7 @@ export default function SocialDataSectionPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userSocialData?.snapchat)}
-          label="سناب شات"
+          label={t("snapchat")}
           value={userSocialData?.snapchat ?? ""}
           type="link"
           openInNewTab={true}
@@ -77,7 +80,7 @@ export default function SocialDataSectionPreviewMode() {
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userSocialData?.linkedin)}
-          label="لينك اند"
+          label={t("linkedin")}
           value={userSocialData?.linkedin ?? ""}
           type="link"
           openInNewTab={true}

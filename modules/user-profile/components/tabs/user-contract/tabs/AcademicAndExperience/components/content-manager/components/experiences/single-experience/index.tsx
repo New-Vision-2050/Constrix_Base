@@ -8,6 +8,7 @@ import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { useTranslations } from "next-intl";
 
 type PropsT = { experience: Experience };
 
@@ -16,6 +17,7 @@ export default function SingleExperience({ experience }: PropsT) {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.nestedTabs.academicExperience");
 
   // return component ui
   return (
@@ -28,7 +30,7 @@ export default function SingleExperience({ experience }: PropsT) {
           settingsBtn={{
             items: [
               {
-                title: "حذف",
+                title: t("delete"),
                 onClick: () => {
                   setDeleteDialog(true);
                 },

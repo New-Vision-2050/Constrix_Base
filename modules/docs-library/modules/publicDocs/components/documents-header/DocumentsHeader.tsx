@@ -59,6 +59,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     setEditedDoc,
     selectedDocs,
     refetchDocs,
+    clearSelectedDocs,
     storeSelectedDocument,
   } = usePublicDocsCxt();
   const [openDelete, setOpenDelete] = useState(false);
@@ -90,20 +91,29 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     }
   };
 
-
   const handleExport = async () => {
     try {
       const _url = baseURL + `/files/export`;
-      const response = await apiClient.post(_url, {}, {
-        responseType: 'blob'
-      });
+      const response = await apiClient.post(
+        _url,
+        {
+          ids: selectedDocs?.map((doc) => doc.id),
+        },
+        {
+          responseType: "blob",
+        }
+      );
 
-      // Create blob URL and trigger download
-      const blob = new Blob([response.data]);
+      // Create blob URL and trigger download for Excel file
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `documents-export-${new Date().toISOString().split('T')[0]}.zip`;
+      link.download = `documents-export-${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -113,6 +123,68 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || "حدث خطأ أثناء تصدير المستندات");
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      if (files?.length === 0) {
+        toast.error("يجب اختيار ملف");
+        return;
+      }
+      const _url = baseURL + `/files/download`;
+      const response = await apiClient.post(
+        _url,
+        {
+          ids: files?.map((doc) => doc.id),
+        },
+        {
+          responseType: "blob",
+        }
+      );
+
+      // Create blob URL and trigger download for ZIP file
+      const blob = new Blob([response.data], {
+        type: "application/zip",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Generate appropriate filename for ZIP
+      const fileName =
+        selectedDocs?.length === 1
+          ? selectedDocs[0]?.name
+          : `documents-${new Date().toISOString().split("T")[0]}.zip`;
+
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("تم تحميل المستند بنجاح");
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message;
+      toast.error(errorMsg || "حدث خطأ أثناء تحميل المستند");
+    }
+  };
+
+  const handleFavorite = async () => {
+    try {
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      if (files?.length === 0) {
+        toast.error("يجب اختيار ملف");
+        return;
+      }
+      const _url = baseURL + `/files/favourites`;
+      await apiClient.post(_url, {
+        ids: files?.map((doc) => doc.id),
+      });
+      toast.success("تم إضافة المستندات إلى المفضلة");
+    } catch (error) {
+      toast.error("حدث خطأ أثناء إضافة المستندات إلى المفضلة");
     }
   };
 
@@ -282,7 +354,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {t("copy")}
             </Button>
             {/* request file button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button disabled variant="outline" className="bg-sidebar h-10" size="sm">
               <FileText className="mr-2 h-4 w-4" />
               {t("requestFile")}
             </Button>
@@ -304,12 +376,17 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {t("delete")}
             </Button>
             {/* download button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button
+              variant="outline"
+              onClick={handleDownload}
+              className="bg-sidebar h-10"
+              size="sm"
+            >
               <Download className="mr-2 h-4 w-4" />
               {t("download")}
             </Button>
             {/* favorite button */}
-            <Button variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button variant="outline" onClick={handleFavorite} className="bg-sidebar h-10" size="sm">
               <Star className="mr-2 h-4 w-4" />
               {t("favorite")}
             </Button>
@@ -337,6 +414,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       <ConfirmationDialog
         open={openDelete}
         onClose={() => {
+          clearSelectedDocs();
           setOpenDelete(false);
         }}
         onConfirm={handleDelete}

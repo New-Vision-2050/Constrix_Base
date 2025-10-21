@@ -3,16 +3,18 @@ import { baseURL } from "@/config/axios-config";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const AddressFormConfig = () => {
   const { user, handleRefetchDataStatus, handleRefetchProfileData } =
     useUserProfileCxt();
   const { userContactData, handleRefetchUserContactData } =
     useConnectionDataCxt();
+    const t = useTranslations("UserProfile.nestedTabs.addressData");
 
   const addressFormConfig: FormConfig = {
     formId: "ConnectionInformation-address-data-form",
-    title: "العنوان",
+    title: t("title"),
     apiUrl: `${baseURL}/contactinfos/address/${user?.user_id}`,
     laravelValidation: {
       enabled: true,
@@ -23,9 +25,9 @@ export const AddressFormConfig = () => {
         fields: [
           {
             name: "address",
-            label: "العنوان السكني بمقر العمل/العنوان الوطنى)",
+            label: t("addressLabel"),
             type: "text",
-            placeholder: "العنوان السكني بمقر العمل / وصف دقيق عنوان وطنى) ",
+            placeholder: t("addressPlaceholder"),
             validation: [
               {
                 type: "custom",
@@ -35,20 +37,20 @@ export const AddressFormConfig = () => {
                   const validAddressRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z0-9\.,\-_#\/()&]+$/;
                   return validAddressRegex.test(value);
                 },
-                message: "يجب أن يحتوي العنوان على أحرف وأرقام ورموز صالحة فقط",
+                message: t("addressValidationMessage"),
               },
             ],
           },
           {
             name: "postal_code",
-            label: "العنوان البريدي",
+            label: t("zipCode"),
             type: "text",
-            placeholder: "العنوان البريدي",
+            placeholder: t("zipCodePlaceholder"),
             validation: [
               {
                 type: "pattern",
                 value: "^[0-9]{5}$",
-                message: "الرمز البريدي يجب أن يتكون من 5 أرقام فقط",
+                message: t("zipCodeValidationMessage"),
               },
             ],
           },
@@ -60,8 +62,8 @@ export const AddressFormConfig = () => {
       postal_code: userContactData?.postal_code,
       address: userContactData?.address,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

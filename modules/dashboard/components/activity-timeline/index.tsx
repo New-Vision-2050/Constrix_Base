@@ -3,6 +3,7 @@ import pdfImg from "@/assets/icons/PDF.png";
 import TimeLineItem from "./time-line-item";
 import ActivityTimelineLoadingSkeleton from "./loading-skeleton";
 import { UserActivityT } from "@/modules/user-profile/types/user-activity";
+import { useTranslations } from "next-intl";
 
 interface UserProfileActivityTimelineProps {
   isLoading?: boolean;
@@ -34,9 +35,10 @@ export default function UserProfileActivityTimeline({
   title,
   dayDate,
 }: UserProfileActivityTimelineProps) {
+  const t = useTranslations("UserProfile.ActivityTimeline");
   return (
     <UserProfileTableDataMainLayout
-      title={title ?? "سجل الانشطة"}
+      title={title ?? t("title")}
       enableRedirect={enableRedirect}
       redirectUrl={redirectUrl}
     >

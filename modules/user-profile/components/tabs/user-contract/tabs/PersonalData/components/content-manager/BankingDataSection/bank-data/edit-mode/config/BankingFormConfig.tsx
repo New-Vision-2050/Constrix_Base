@@ -4,6 +4,7 @@ import { BankAccount } from "@/modules/user-profile/types/bank-account";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { useUserBankingDataCxt } from "../../../context";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   bank?: BankAccount;
@@ -16,6 +17,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
   const { handleRefreshBankingData } = useUserBankingDataCxt();
   const { user, handleRefetchDataStatus, handleRefetchProfileData } =
     useUserProfileCxt();
+  const t = useTranslations("UserProfile.nestedTabs.bankingData");
 
   // form config
 
@@ -32,8 +34,8 @@ export const BankingDataFormConfig = (props: PropsT) => {
           {
             type: "select",
             name: "country_id",
-            label: "الدولة",
-            placeholder: "اختر الدولة",
+            label: t("country"),
+            placeholder: t("countryPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -49,15 +51,15 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: "ادخل الدولة",
+                message: t("countryRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "bank_id",
-            label: "البنك",
-            placeholder: "اختر البنك",
+            label: t("bank"),
+            placeholder: t("bankPlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/banks`,
               valueField: "id",
@@ -74,15 +76,15 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: "البنك مطلوب",
+                message: t("bankRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "type_id",
-            label: "نوع الحساب",
-            placeholder: "اختر نوع الحساب",
+            label: t("accountType"),
+            placeholder: t("accountTypePlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/bank_type_accounts`,
               valueField: "id",
@@ -95,15 +97,15 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: "نوع الحساب مطلوب",
+                message: t("accountTypeRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "currency_id",
-            label: "عملة الحساب",
-            placeholder: "اختر عملة الحساب",
+            label: t("currency"),
+            placeholder: t("currencyPlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/currencies`,
               valueField: "id",
@@ -119,65 +121,65 @@ export const BankingDataFormConfig = (props: PropsT) => {
             validation: [
               {
                 type: "required",
-                message: "عملة الحساب مطلوبة",
+                message: t("currencyRequired"),
               },
             ],
           },
           {
             type: "text",
             name: "iban",
-            label: "رمز ال iban",
-            placeholder: "اختر رمز ال iban",
+            label: t("iban"),
+            placeholder: t("ibanPlaceholder"),
             validation: [
               {
                 type: "pattern",
                 value: "^[A-Z]{2}[0-9A-Z]{13,32}$",
-                message: "رمز IBAN غير صالح",
-              }
+                message: t("ibanPattern"),
+              },
             ],
           },
           {
             type: "text",
             name: "user_name",
-            label: "اسم صاحب الحساب",
-            placeholder: "اختر اسم صاحب الحساب",
+            label: t("userName"),
+            placeholder: t("userNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "اسم صاحب الحساب مطلوب",
+                message: t("userNameRequired"),
               },
             ],
           },
           {
             type: "text",
             name: "account_number",
-            label: "رقم الحساب",
-            placeholder: "اختر رقم الحساب",
+            label: t("accountNumber"),
+            placeholder: t("accountNumberPlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "رقم الحساب مطلوب",
+                message: t("accountNumberRequired"),
               },
               {
                 type: "pattern",
                 value: "^[0-9]{8,32}$",
-                message: "رقم الحساب يجب أن يكون بين 8 و 32 رقمًا",
-              }
+                message: t("accountNumberPattern"),
+              },
             ],
           },
           {
             type: "text",
             name: "swift_bic",
-            label: "كود ال swift",
-            placeholder: "اختر كود ال swift",
+            label: t("swiftBic"),
+            placeholder: t("swiftBicPlaceholder"),
             validation: [
               {
                 type: "pattern",
                 value: "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-                message: "كود SWIFT غير صالح",
-              }
+                message: t("swiftBicPattern"),
+              },
             ],
           },
         ],
@@ -195,8 +197,8 @@ export const BankingDataFormConfig = (props: PropsT) => {
       type: bank?.type,
       user_name: bank?.user_name,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

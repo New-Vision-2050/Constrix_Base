@@ -3,14 +3,16 @@ import { baseURL } from "@/config/axios-config";
 import { useConnectionDataCxt } from "../../../context/ConnectionDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const ConnectionInformationFormConfig = () => {
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { userContactData } = useConnectionDataCxt();
+  const t = useTranslations("UserProfile.nestedTabs.connectionData");
 
   const _ConnectionInformationFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "بيانات الاتصال",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -21,49 +23,49 @@ export const ConnectionInformationFormConfig = () => {
         fields: [
           {
             name: "email",
-            label: "البريد الالكتروني",
+            label: t("email"),
             type: "text",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("email"),
             validation: [
               {
                 type: "email",
-                message: "يرجى إدخال بريد إلكتروني صحيح",
+                message: t("emailInvalid"),
               },
             ],
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("phone"),
             type: "phone",
-            placeholder: "رقم الجوال",
+            placeholder: t("phone"),
             validation: [
               {
                 type: "phone",
-                message: "يرجى إدخال رقم الجوال صحيح",
+                message: t("phoneInvalid"),
               },
             ],
           },
           {
             name: "other_phone",
-            label: "رقم   الجوال البديل",
+            label: t("otherPhone"),
             type: "phone",
-            placeholder: "رقم   الجوال البديل",
+            placeholder: t("otherPhone"),
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: t("phoneInvalid"),
               },
             ],
           },
           {
             name: "landline_number",
-            label: "رقم الهاتف الأرضي",
+            label: t("landlineNumber"),
             type: "phone",
-            placeholder: "رقم الهاتف الأرضي",
+            placeholder: t("landlineNumber"),
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: t("phoneInvalid"),
               },
             ],
           },
@@ -77,8 +79,8 @@ export const ConnectionInformationFormConfig = () => {
       other_phone: userContactData?.other_phone,
       landline_number: userContactData?.landline_number,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

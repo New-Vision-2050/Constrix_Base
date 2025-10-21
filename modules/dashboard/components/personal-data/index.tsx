@@ -4,26 +4,28 @@ import LoadingMenuData from "../LoadingMenuData";
 import { useEffect, useState } from "react";
 import { UserProfileData } from "@/modules/user-profile/types/user-profile-response";
 import { checkString } from "@/utils/check-string";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   user: UserProfileData | undefined;
   isLoading: boolean;
 };
 export default function UserProfilePersonalData({ user, isLoading }: PropsT) {
+  const t = useTranslations("UserProfile.personalData");
   const [items, setItems] = useState<string[]>([]);
 
   // handle side effects
   useEffect(() => {
     if (user) {
       const userItems = [
-        `الاسم: ${checkString(user.name)}`,
-        `حالة الموظف: ${checkString("--")}`,
-        `المهنة: ${checkString(user.job_title ?? "")}`,
-        `الدور الوظيفي: ${checkString(user.job_title ?? "")}`,
-        `التواصل: ${checkString(user.phone ?? "")}`,
-        `الرقم الاضافي: ${checkString(user.other_phone ?? "")}`,
-        `البريد الالكتروني: ${checkString(user.email)}`,
-        `العنوان الوطني: ${checkString(user.address ?? "")}`,
+        `${t("name")}: ${checkString(user.name)}`,
+        `${t("status")}: ${checkString("--")}`,
+        `${t("jobTitle")}: ${checkString(user.job_title ?? "")}`,
+        `${t("jobRole")}: ${checkString(user.job_title ?? "")}`,
+        `${t("phone")}: ${checkString(user.phone ?? "")}`,
+        `${t("otherPhone")}: ${checkString(user.other_phone ?? "")}`,
+        `${t("email")}: ${checkString(user.email)}`,
+        `${t("nationalAddress")}: ${checkString(user.address ?? "")}`,
       ];
       setItems(userItems);
     }
@@ -33,7 +35,7 @@ export default function UserProfilePersonalData({ user, isLoading }: PropsT) {
   if (isLoading) return <LoadingMenuData itemsNumber={5} />;
 
   return (
-    <UserInformationCardLayout title="بيانات الشخصية">
+    <UserInformationCardLayout title={t("title")}>
       <RegularList<string, "personalItemData">
         sourceName="personalItemData"
         items={items}
