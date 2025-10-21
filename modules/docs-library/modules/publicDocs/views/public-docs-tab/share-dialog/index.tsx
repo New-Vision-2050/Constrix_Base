@@ -39,10 +39,15 @@ export default function ShareDialog({ open, onClose }: PropsType) {
     setLoading(true);
     try {
       const _url = baseURL + "/files/share";
+      const files = selectedDocs?.filter((doc) =>
+        Boolean(doc.reference_number)
+      );
+      if (!files?.length) {
+        toast.error(t("noFilesSelected"));
+        return;
+      }
       await apiClient.post(_url, {
-        file_ids: selectedDocs
-          ?.filter((doc) => Boolean(doc.reference_number))
-          ?.map((doc) => doc.id),
+        file_ids: files?.map((doc) => doc.id),
         user_ids: selectedIds,
       });
       toast.success(t("sharedSuccessfully"));
@@ -74,7 +79,7 @@ export default function ShareDialog({ open, onClose }: PropsType) {
         <div className="flex flex-col items-start gap-4">
           <div className="flex items-center justify-between w-full">
             <p className="text-sm text-muted-foreground">{t("notes")}</p>
-            <Button variant="outline">
+            <Button variant="outline" disabled={true}>
               <Copy className="mr-2 h-4 w-4" />
               {t("copy")}
             </Button>
@@ -94,7 +99,9 @@ export default function ShareDialog({ open, onClose }: PropsType) {
           />
         </div>
         <DialogFooter className="w-full flex items-center gap-4 justify-between">
-          <Button disabled={loading} onClick={handleShare}>{t("save")}</Button>
+          <Button disabled={loading} onClick={handleShare}>
+            {t("save")}
+          </Button>
           <Button variant="outline" onClick={onClose}>
             {t("cancel")}
           </Button>

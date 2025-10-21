@@ -375,6 +375,7 @@
         "title": "Share",
         "save": "Save",
         "sharedSuccessfully": "File shared successfully",
+        "noFilesSelected": "No files selected",
         "sharedFailed": "Failed to share file",
         "copy": "Copy Link",
         "cancel": "Cancel",

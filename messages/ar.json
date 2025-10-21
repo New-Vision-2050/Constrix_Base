@@ -364,6 +364,7 @@
         "title": "مشاركة",
         "save": "حفظ",
         "sharedSuccessfully": "تم مشاركة الملف بنجاح",
+        "noFilesSelected": "لا توجد ملفات محددة",
         "sharedFailed": "فشل مشاركة الملف",
         "copy": "نسخ الرابط",
         "cancel": "الغاء",
