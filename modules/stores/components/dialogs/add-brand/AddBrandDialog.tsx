@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { BrandsApi } from "@/services/api/ecommerce/brands";
 import { toast } from "sonner";
@@ -26,6 +25,7 @@ import {
   CreateBrandParams,
   UpdateBrandParams,
 } from "@/services/api/ecommerce/brands/types/params";
+import ImageUpload from "@/components/shared/ImageUpload";
 
 const createBrandSchema = (t: (key: string) => string) =>
   z.object({
@@ -63,8 +63,6 @@ export default function AddBrandDialog({
   const t = useTranslations();
   const isEditMode = !!brandId;
   const [activeTab, setActiveTab] = useState("ar");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch brand data when editing
   const { data: brandData, isLoading: isFetching } = useQuery({
@@ -109,6 +107,8 @@ export default function AddBrandDialog({
       setValue("name_en", brand.name || "");
       setValue("description_ar", brand.description || "");
       setValue("description_en", brand.description || "");
+      // Set image URL for preview in edit mode
+      setValue("image", brand.brand_image || null);
     }
   }, [isEditMode, brandData, setValue]);
 
@@ -124,6 +124,11 @@ export default function AddBrandDialog({
           brand_image: data.image || undefined,
         };
 
+        // Only include image if it's a File object (new upload)
+        if (data.image && !(data.image instanceof File)) {
+          delete updateParams.brand_image;
+        }
+
         await BrandsApi.update(brandId, updateParams);
       } else {
         // Create new brand
@@ -131,7 +136,7 @@ export default function AddBrandDialog({
           toast.error(t("brand.imageRequired"));
           return;
         }
-        
+
         const createParams: CreateBrandParams = {
           "name[ar]": data.name_ar,
           "name[en]": data.name_en,
@@ -150,17 +155,13 @@ export default function AddBrandDialog({
       );
       onSuccess?.();
       reset();
-      setImagePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
       onClose();
     } catch (error: any) {
       console.error(
         `Error ${isEditMode ? "updating" : "creating"} brand:`,
         error
       );
-      
+
       // Handle 422 validation errors from server
       if (error?.response?.status === 422) {
         const validationErrors = error?.response?.data?.errors;
@@ -172,43 +173,24 @@ export default function AddBrandDialog({
           return;
         }
       }
-      
+
       toast.error(
         isEditMode
-          ? t("brand.updateError") || "Failed to update brand. Please try again."
-          : t("brand.createError") || "Failed to create brand. Please try again."
+          ? t("brand.updateError") ||
+              "Failed to update brand. Please try again."
+          : t("brand.createError") ||
+              "Failed to create brand. Please try again."
       );
     }
   };
 
-  const handleFileSelect = (file: File) => {
+  const handleImageChange = (file: File | null) => {
     setValue("image", file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleUpload = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleRemoveImage = () => {
-    setValue("image", null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   };
 
   const handleClose = () => {
     if (!isSubmitting && !isFetching) {
       reset();
-      setImagePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
       onClose();
     }
   };
@@ -231,70 +213,19 @@ export default function AddBrandDialog({
           <div className="grid grid-cols-2 gap-6">
             {/* Right Column - Image Upload */}
             <div className="flex flex-col items-center justify-center">
-              <div className="w-full">
-                <Label className="text-xs block text-center mb-2">
-                  {t("brand.imageLabel")}
-                </Label>
-                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 flex flex-col items-center justify-center hover:border-gray-500 transition-colors">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileSelect(file);
-                      }
-                    }}
-                    disabled={isSubmitting || isFetching}
-                  />
-
-                  {imagePreview ? (
-                    <div className="relative w-32 h-32 mb-4">
-                      <Image
-                        src={imagePreview}
-                        alt="Preview"
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
-                        onClick={handleRemoveImage}
-                        title={t("brand.removeImage")}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="w-32 h-32 bg-gray-700 rounded-lg flex flex-col items-center justify-center mb-4">
-                      <Upload className="w-10 h-10 " />
-                    </div>
-                  )}
-
-                  <p className="text-xs text-center mb-1">
-                    {t("brand.dragDropImage")}
-                  </p>
-                  <p className="text-xs text-gray-500 text-center mb-4">
-                    {t("brand.supportedFormats")}
-                  </p>
-                </div>
-
-                {!imagePreview && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full mt-4 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
-                    onClick={handleUpload}
-                    disabled={isSubmitting || isFetching}
-                  >
-                    {t("brand.attachImage")}
-                  </Button>
-                )}
-              </div>
+              <ImageUpload
+                label={t("brand.imageLabel")}
+                maxSize="3MB - الحجم الأقصى"
+                dimensions="2160 × 2160"
+                required={!isEditMode}
+                onChange={handleImageChange}
+                initialValue={
+                  isEditMode && brandData?.data?.payload?.brand_image
+                    ? brandData.data.payload.brand_image
+                    : undefined
+                }
+                minHeight="250px"
+              />
             </div>
             {/* Left Column - Form Fields */}
             <div className="space-y-4">
