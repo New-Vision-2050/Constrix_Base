@@ -118,14 +118,19 @@ export default function ProductInventoryFields({
         mapping[unit.id.toString()] = unit.name_ar || unit.name_en || unit.name;
       });
       setUnitIdToName(mapping);
-      
+
       // When editing, ensure the unit value is properly set
       const currentUnit = form.getValues("unit");
       if (currentUnit && !Object.values(mapping).includes(currentUnit)) {
         // If current unit value doesn't match any unit name, try to find it by ID
-        const unitById = units.find((u: any) => u.id.toString() === currentUnit);
+        const unitById = units.find(
+          (u: any) => u.id.toString() === currentUnit
+        );
         if (unitById) {
-          form.setValue("unit", unitById.name_ar || unitById.name_en || unitById.name);
+          form.setValue(
+            "unit",
+            unitById.name_ar || unitById.name_en || unitById.name
+          );
         }
       }
     }
@@ -169,7 +174,9 @@ export default function ProductInventoryFields({
                   <SelectTrigger>
                     <SelectValue
                       placeholder={
-                        isLoadingCategories ? t("placeholders.loading") : t("placeholders.selectCategory")
+                        isLoadingCategories
+                          ? t("placeholders.loading")
+                          : t("placeholders.selectCategory")
                       }
                     />
                   </SelectTrigger>
@@ -358,7 +365,9 @@ export default function ProductInventoryFields({
                       field.onChange(ids);
                     }}
                     placeholder={
-                      isLoadingCountries ? t("placeholders.loading") : t("placeholders.selectCountries")
+                      isLoadingCountries
+                        ? t("placeholders.loading")
+                        : t("placeholders.selectCountries")
                     }
                   />
                 </FormControl>
@@ -424,7 +433,9 @@ export default function ProductInventoryFields({
                     <SelectTrigger>
                       <SelectValue
                         placeholder={
-                          isLoadingUnits ? t("placeholders.loading") : t("placeholders.selectUnit")
+                          isLoadingUnits
+                            ? t("placeholders.loading")
+                            : t("placeholders.selectUnit")
                         }
                       />
                     </SelectTrigger>
@@ -488,7 +499,9 @@ export default function ProductInventoryFields({
                   <SelectTrigger>
                     <SelectValue
                       placeholder={
-                        isLoadingWarehouses ? t("placeholders.loading") : t("placeholders.selectWarehouse")
+                        isLoadingWarehouses
+                          ? t("placeholders.loading")
+                          : t("placeholders.selectWarehouse")
                       }
                     />
                   </SelectTrigger>
