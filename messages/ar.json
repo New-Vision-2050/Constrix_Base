@@ -1992,7 +1992,8 @@
     "sku": "رقم المنتج",
     "stock": "الكمية",
     "image": "صورة",
-    "currency": "ريال"
+    "currency": "ريال",
+    "type": "النوع"
   },
   "product": {
     "singular": "منتج",

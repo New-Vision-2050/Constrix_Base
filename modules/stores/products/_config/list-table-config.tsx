@@ -6,6 +6,7 @@ import React from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import TheStatus from "../add/components/the-status";
 
 // Product row type interface
 export interface ProductRow {
@@ -77,8 +78,8 @@ export const useProductsListTableConfig: (
         ),
       },
       {
-        key: "sku",
-        label: t("labels.sku"),
+        key: "type",
+        label: t("labels.type"),
         sortable: true,
         render: (value: string) => (
           <span className="text-gray-600">{value}</span>
@@ -104,19 +105,9 @@ export const useProductsListTableConfig: (
       },
       {
         key: "is_visible",
-        label: t("labels.status"),
-        sortable: true,
-        render: (value: number) => (
-          <Badge
-            className={
-              value === 1
-                ? "bg-green-100 text-green-800 hover:bg-green-200"
-                : "bg-red-100 text-red-800 hover:bg-red-200"
-            }
-            variant="outline"
-          >
-            {value === 1 ? t("labels.active") : t("labels.inactive")}
-          </Badge>
+        label: "الحالة",
+        render: (value: "active" | "inActive", row: ProductRow) => (
+          <TheStatus theStatus={value} id={row.id} />
         ),
       },
     ],

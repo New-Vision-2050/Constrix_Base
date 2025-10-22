@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/modules/table/components/ui/input";
 import {
   Select,
@@ -18,10 +17,13 @@ import {
   FormControl,
 } from "@/modules/table/components/ui/form";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import FormLabel from "@/components/shared/FormLabel";
 import MultiSelect from "@/components/shared/MultiSelect";
 import { CategoriesApi } from "@/services/api/ecommerce/categories";
 import { BrandsApi } from "@/services/api/ecommerce/brands";
 import { getCountries } from "@/services/api/shared/countries";
+import { WarehousesApi } from "@/services/api/ecommerce/warehouses";
+import { getUnits } from "@/services/api/shared/units";
 
 interface ProductInventoryFieldsProps {
   form: UseFormReturn<any>;
@@ -30,10 +32,13 @@ interface ProductInventoryFieldsProps {
 export default function ProductInventoryFields({
   form,
 }: ProductInventoryFieldsProps) {
-  const productType = form.watch("type-product");
+  const productType = form.watch("type");
   const isSerial = productType === "serial";
-  const selectedCategoryId = form.watch("category");
-  const selectedSubCategoryId = form.watch("sub_category");
+  const selectedCategoryId = form.watch("category_id");
+  const selectedSubCategoryId = form.watch("sub_category_id");
+  const [unitIdToName, setUnitIdToName] = useState<Record<string, string>>({});
+  const [prevCategoryId, setPrevCategoryId] = useState<string>("");
+  const [prevSubCategoryId, setPrevSubCategoryId] = useState<string>("");
 
   // Fetch main categories
   const { data: mainCategoriesData, isLoading: isLoadingCategories } = useQuery(
@@ -80,18 +85,56 @@ export default function ProductInventoryFields({
   });
 
   const countries = countriesData?.data?.payload || [];
-  const countryNames = countries.map((country: any) => country.name);
 
-  // Reset sub_category when main category changes
-  useEffect(() => {
-    form.setValue("sub_category", "");
-    form.setValue("sub__sub_category", "");
-  }, [selectedCategoryId, form]);
+  // Create a map of country ID to name for display
+  const countryIdToName: Record<string, string> = {};
+  countries.forEach((country: any) => {
+    countryIdToName[country.id] = country.name;
+  });
 
-  // Reset sub__sub_category when sub-category changes
+  // Fetch warehouses
+  const { data: warehousesData, isLoading: isLoadingWarehouses } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: () => WarehousesApi.list(),
+  });
+
+  const warehouses = warehousesData?.data?.payload || [];
+
+  // Fetch units
+  const { data: unitsData, isLoading: isLoadingUnits } = useQuery({
+    queryKey: ["units"],
+    queryFn: () => getUnits(),
+  });
+
+  const units = unitsData?.data?.payload || [];
+
+  // Create unit ID to name mapping
   useEffect(() => {
-    form.setValue("sub__sub_category", "");
-  }, [selectedSubCategoryId, form]);
+    if (units.length > 0) {
+      const mapping: Record<string, string> = {};
+      units.forEach((unit: any) => {
+        mapping[unit.id.toString()] = unit.name_ar || unit.name_en || unit.name;
+      });
+      setUnitIdToName(mapping);
+    }
+  }, [units]);
+
+  // Reset sub_category when main category changes (only on user interaction)
+  useEffect(() => {
+    if (prevCategoryId && selectedCategoryId !== prevCategoryId) {
+      form.setValue("sub_category_id", "");
+      form.setValue("sub_sub_category_id", "");
+    }
+    setPrevCategoryId(selectedCategoryId);
+  }, [selectedCategoryId, prevCategoryId, form]);
+
+  // Reset sub_sub_category when sub-category changes (only on user interaction)
+  useEffect(() => {
+    if (prevSubCategoryId && selectedSubCategoryId !== prevSubCategoryId) {
+      form.setValue("sub_sub_category_id", "");
+    }
+    setPrevSubCategoryId(selectedSubCategoryId);
+  }, [selectedSubCategoryId, prevSubCategoryId, form]);
 
   return (
     <div className="space-y-6">
@@ -100,13 +143,14 @@ export default function ProductInventoryFields({
         {/* القسم */}
         <FormField
           control={form.control}
-          name="category"
+          name="category_id"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">القسم</Label>
+              <FormLabel required>القسم</FormLabel>
               <Select
+                key={field.value}
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                value={field.value || undefined}
                 disabled={isLoadingCategories}
               >
                 <FormControl>
@@ -137,15 +181,14 @@ export default function ProductInventoryFields({
         {/* القسم الفرعي */}
         <FormField
           control={form.control}
-          name="sub_category"
+          name="sub_category_id"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">
-                قسم الفرعي
-              </Label>
+              <FormLabel>قسم الفرعي</FormLabel>
               <Select
+                key={field.value}
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                value={field.value || undefined}
                 disabled={!selectedCategoryId || isLoadingSubCategories}
               >
                 <FormControl>
@@ -186,15 +229,14 @@ export default function ProductInventoryFields({
         {/* القسم الفرعي الثاني */}
         <FormField
           control={form.control}
-          name="sub__sub_category"
+          name="sub_sub_category_id"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">
-                قسم فرعي فرعي
-              </Label>
+              <FormLabel>قسم فرعي فرعي</FormLabel>
               <Select
+                key={field.value}
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                value={field.value || undefined}
                 disabled={!selectedSubCategoryId || isLoadingSubSubCategories}
               >
                 <FormControl>
@@ -238,15 +280,14 @@ export default function ProductInventoryFields({
         {/* العلامة التجارية */}
         <FormField
           control={form.control}
-          name="brand"
+          name="brand_id"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">
-                العلامة التجارية
-              </Label>
+              <FormLabel>العلامة التجارية</FormLabel>
               <Select
+                key={field.value}
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                value={field.value || undefined}
                 disabled={isLoadingBrands}
               >
                 <FormControl>
@@ -276,38 +317,60 @@ export default function ProductInventoryFields({
         {/* الدولة - multi-select */}
         <FormField
           control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">الدولة</Label>
-              <FormControl>
-                <MultiSelect
-                  options={isLoadingCountries ? [] : countryNames}
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  placeholder={
-                    isLoadingCountries ? "جاري التحميل..." : "اختر الدول"
-                  }
-                />
-              </FormControl>
-              <FormErrorMessage />
-            </FormItem>
-          )}
+          name="country_ids"
+          render={({ field }) => {
+            // Convert IDs to names for display
+            const displayNames = (field.value || []).map(
+              (id: string) => countryIdToName[id] || id
+            );
+
+            return (
+              <FormItem>
+                <FormLabel>الدولة</FormLabel>
+                <FormControl>
+                  <MultiSelect
+                    options={
+                      isLoadingCountries
+                        ? []
+                        : countries.map((c: any) => c.name)
+                    }
+                    value={displayNames}
+                    onChange={(names) => {
+                      // Convert names back to IDs
+                      const ids = names.map((name) => {
+                        const country = countries.find(
+                          (c: any) => c.name === name
+                        );
+                        return country ? country.id.toString() : name;
+                      });
+                      field.onChange(ids);
+                    }}
+                    placeholder={
+                      isLoadingCountries ? "جاري التحميل..." : "اختر الدول"
+                    }
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            );
+          }}
         />
 
         {/* النوع */}
         <FormField
           control={form.control}
-          name="type-product"
+          name="type"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">
-                نوع المنتح
-              </Label>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel required>نوع المنتح</FormLabel>
+              <Select
+                key={field.value}
+                onValueChange={field.onChange}
+                value={field.value || undefined}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="عادي" />
+                    <SelectValue placeholder="اختر النوع" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -327,25 +390,39 @@ export default function ProductInventoryFields({
         {!isSerial && (
           <FormField
             control={form.control}
-            name="weight_unit"
+            name="unit"
             render={({ field }) => (
               <FormItem>
-                <Label className="text-gray-400 text-sm mb-2 block">
-                  الوحدة
-                </Label>
+                <FormLabel required>الوحدة</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => {
+                    // Store the unit name instead of ID
+                    const unitName = unitIdToName[value];
+                    field.onChange(unitName);
+                  }}
+                  value={
+                    // Find the ID from the name for display
+                    Object.keys(unitIdToName).find(
+                      (id) => unitIdToName[id] === field.value
+                    ) || field.value
+                  }
+                  disabled={isLoadingUnits}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="KG" />
+                      <SelectValue
+                        placeholder={
+                          isLoadingUnits ? "جاري التحميل..." : "اختر الوحدة"
+                        }
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="kg">KG</SelectItem>
-                    <SelectItem value="g">G</SelectItem>
-                    <SelectItem value="lb">LB</SelectItem>
+                    {units.map((unit: any) => (
+                      <SelectItem key={unit.id} value={unit.id.toString()}>
+                        {unit.name_ar || unit.name_en || unit.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormErrorMessage />
@@ -357,19 +434,24 @@ export default function ProductInventoryFields({
         {/* النوع */}
         <FormField
           control={form.control}
-          name="type"
+          name="gender"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">النوع</Label>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel required>النوع</FormLabel>
+              <Select
+                key={field.value}
+                onValueChange={field.onChange}
+                value={field.value || undefined}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="ذكر" />
+                    <SelectValue placeholder="اختر النوع" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="male">ذكر</SelectItem>
                   <SelectItem value="female">انثى</SelectItem>
+                  <SelectItem value="all">الكل</SelectItem>
                 </SelectContent>
               </Select>
               <FormErrorMessage />
@@ -380,19 +462,34 @@ export default function ProductInventoryFields({
         {/* المخزن */}
         <FormField
           control={form.control}
-          name="warehouse"
+          name="warehouse_id"
           render={({ field }) => (
             <FormItem>
-              <Label className="text-gray-400 text-sm mb-2 block">المخزن</Label>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel required>المخزن</FormLabel>
+              <Select
+                key={field.value}
+                onValueChange={field.onChange}
+                value={field.value || undefined}
+                disabled={isLoadingWarehouses}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="المخزن" />
+                    <SelectValue
+                      placeholder={
+                        isLoadingWarehouses ? "جاري التحميل..." : "اختر المخزن"
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="warehouse1">المخزن 1</SelectItem>
-                  <SelectItem value="warehouse2">المخزن 2</SelectItem>
+                  {warehouses.map((warehouse: any) => (
+                    <SelectItem
+                      key={warehouse.id}
+                      value={warehouse.id.toString()}
+                    >
+                      {warehouse.name_ar || warehouse.name_en || warehouse.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormErrorMessage />

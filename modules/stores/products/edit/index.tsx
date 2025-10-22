@@ -1,22 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { Form } from "@/modules/table/components/ui/form";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import ProductFormFields from "./components/ProductFormFields";
-import ProductInventoryFields from "./components/ProductInventoryFields";
-import ProductPricingFields from "./components/ProductPricingFields";
-import ProductImageUpload from "./components/ProductImageUpload";
-import ProductVideoUrl from "./components/ProductVideoUrl";
-import ProductSeoFields from "./components/ProductSeoFields";
+import ProductFormFields from "../add/components/ProductFormFields";
+import ProductInventoryFields from "../add/components/ProductInventoryFields";
+import ProductPricingFields from "../add/components/ProductPricingFields";
+import ProductImageUpload from "../add/components/ProductImageUpload";
+import ProductVideoUrl from "../add/components/ProductVideoUrl";
+import ProductSeoFields from "../add/components/ProductSeoFields";
 import { ProductsApi } from "@/services/api/ecommerce/products";
 import { useTableReload } from "@/modules/table/hooks/useTableReload";
 
@@ -40,6 +41,7 @@ const productSchema = z.object({
   country_ids: z.array(z.string()).optional(),
   type: z.string().min(1, { message: "نوع المنتج مطلوب" }),
   warehouse_id: z.string().min(1, { message: "معرف المستودع مطلوب" }),
+  weight: z.string().optional(),
   unit: z.string().min(1, { message: "وحدة القياس مطلوبة" }),
   price: z.string().min(1, { message: "حقل السعر مطلوب" }),
   currency: z.string().optional(),
@@ -87,7 +89,9 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-export default function AddProductView() {
+export default function EditProductView() {
+  const params = useParams();
+  const productId = params?.id as string;
   const t = useTranslations();
   const isRtl = useIsRtl();
   const router = useRouter();
@@ -95,6 +99,15 @@ export default function AddProductView() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState("ar");
   const { reloadTable } = useTableReload("products-list-table");
+
+  // Fetch product data
+  const { data: productData, isLoading: isLoadingProduct } = useQuery({
+    queryKey: ["product", productId],
+    queryFn: () => ProductsApi.show(productId),
+    enabled: !!productId,
+  });
+
+  const product = productData?.data?.payload;
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -112,6 +125,7 @@ export default function AddProductView() {
       country_ids: [],
       type: "",
       warehouse_id: "",
+      weight: "",
       unit: "",
       price: "",
       currency: "SAR",
@@ -141,6 +155,75 @@ export default function AddProductView() {
       meta_photo: null,
     },
   });
+
+  // Update form when product data is loaded
+  React.useEffect(() => {
+    if (product) {
+      // Map countries array to country_ids array
+      const countryIds =
+        product.countries?.map((country: any) => country.id?.toString()) || [];
+
+      form.reset({
+        name_ar: product.name_ar || "",
+        name_en: product.name_en || "",
+        description_ar: product.description_ar || "",
+        description_en: product.description_en || "",
+        sku: product.sku || "",
+        is_visible: product.is_visible === 1,
+        category_id: product.category_id ? String(product.category_id) : "",
+        sub_category_id: product.sub_category_id
+          ? String(product.sub_category_id)
+          : "",
+        sub_sub_category_id: product.sub_sub_category_id
+          ? String(product.sub_sub_category_id)
+          : "",
+        brand_id: product.brand_id ? String(product.brand_id) : "",
+        country_ids: countryIds,
+        type: product.type || "",
+        warehouse_id: product.warehouse_id ? String(product.warehouse_id) : "",
+        unit: product.unit || "",
+        price: product.price != null ? product.price.toString() : "",
+        currency: product.currency || "SAR",
+        gender: product.gender || "",
+
+        // Pricing fields
+        min_order_quantity:
+          product.min_order_quantity != null
+            ? product.min_order_quantity.toString()
+            : "",
+        stock: product.stock != null ? product.stock.toString() : "",
+        discount_type: product.discount_type || "percentage",
+        discount_value:
+          product.discount_value != null
+            ? product.discount_value.toString()
+            : "",
+        vat_percentage:
+          product.vat_percentage != null
+            ? product.vat_percentage.toString()
+            : "",
+        price_includes_vat: product.price_includes_vat === 1,
+        shipping_amount:
+          product.shipping_amount === true ||
+          product.shipping_amount === 1 ||
+          false,
+        shipping_included_in_price: product.shipping_included_in_price === true,
+
+        // Video URL
+        video_url: product.video_url || "",
+
+        // Image fields - extract URL from API response
+        main_photo: product.main_photo?.url || null,
+        other_photos:
+          product.other_photos?.map((photo: any) => photo.url) || [],
+
+        // SEO fields
+        meta_title: product.meta_title || "",
+        meta_description: product.meta_description || "",
+        meta_keywords: product.meta_keywords || "",
+        meta_photo: product.meta_photo?.url || null,
+      });
+    }
+  }, [product, form]);
 
   const onSubmit = async (data: ProductFormData) => {
     setIsSubmitting(true);
@@ -199,13 +282,16 @@ export default function AddProductView() {
 
       setUploadProgress(30);
 
-      // Call the API to create the product
-      const response = await ProductsApi.create(formattedData as any);
+      // Call the API to update the product
+      const response = await ProductsApi.update(
+        productId,
+        formattedData as any
+      );
 
       setUploadProgress(90);
 
       setUploadProgress(100);
-      toast.success("تم إضافة المنتج بنجاح!");
+      toast.success("تم تحديث المنتج بنجاح!");
 
       // Reload the products table
       reloadTable();
@@ -214,9 +300,9 @@ export default function AddProductView() {
         router.push("/stores/products");
       }, 500);
     } catch (error: any) {
-      console.error("Error creating product:", error);
+      console.error("Error updating product:", error);
       toast.error(
-        error?.response?.data?.message || "فشل في إضافة المنتج. حاول مرة أخرى."
+        error?.response?.data?.message || "فشل في تحديث المنتج. حاول مرة أخرى."
       );
     } finally {
       setIsSubmitting(false);
@@ -233,13 +319,69 @@ export default function AddProductView() {
     router.push("/stores/products");
   };
 
+  if (isLoadingProduct) {
+    return (
+      <div
+        className="w-full flex items-center justify-center min-h-[400px]"
+        dir="rtl"
+      >
+        <p className="text-white">جاري التحميل...</p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div
+        className="w-full flex items-center justify-center min-h-[400px]"
+        dir="rtl"
+      >
+        <div className="text-center">
+          <p className="text-white text-lg mb-4">المنتج غير موجود</p>
+          <Button onClick={() => router.push("/stores/products")}>
+            العودة إلى القائمة
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full" dir="rtl">
       <div className="max-w-8xl mx-auto p-6">
         {/* Page Header */}
-        <h2 className="text-white text-lg font-semibold mb-6">
-          إضافة منتج جديد
-        </h2>
+        <h2 className="text-white text-lg font-semibold mb-6">تعديل المنتج</h2>
+
+        {/* Upload Progress Bar */}
+        {isSubmitting && (
+          <div className="mb-6 bg-gradient-to-r from-sidebar to-sidebar/80 border border-primary/30 rounded-lg p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-white text-base font-medium">جاري تحديث البيانات...</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-primary text-2xl font-bold">
+                  {uploadProgress}%
+                </span>
+              </div>
+            </div>
+            <div className="relative w-full bg-gray-800/50 rounded-full h-3 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-primary via-primary/80 to-primary h-3 rounded-full transition-all duration-500 ease-out relative"
+                style={{ width: `${uploadProgress}%` }}
+              >
+                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+              </div>
+            </div>
+            <div className="mt-2 text-xs text-gray-400 text-center">
+              {uploadProgress < 30 && "جاري تجهيز البيانات..."}
+              {uploadProgress >= 30 && uploadProgress < 90 && "جاري رفع البيانات إلى الخادم..."}
+              {uploadProgress >= 90 && uploadProgress < 100 && "جاري إتمام العملية..."}
+              {uploadProgress === 100 && "تم التحديث بنجاح!"}
+            </div>
+          </div>
+        )}
 
         <Form {...form}>
           <form
@@ -315,36 +457,7 @@ export default function AddProductView() {
             <div className="bg-sidebar border border-[#3c345a] rounded-lg p-8">
               <ProductSeoFields form={form} />
             </div>
-            {/* Upload Progress Bar */}
-            {isSubmitting && (
-              <div className="mb-6 bg-gradient-to-r from-sidebar to-sidebar/80 border border-primary/30 rounded-lg p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                    <span className="text-white text-base font-medium">جاري رفع البيانات...</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-primary text-2xl font-bold">
-                      {uploadProgress}%
-                    </span>
-                  </div>
-                </div>
-                <div className="relative w-full bg-gray-800/50 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-primary via-primary/80 to-primary h-3 rounded-full transition-all duration-500 ease-out relative"
-                    style={{ width: `${uploadProgress}%` }}
-                  >
-                    <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                  </div>
-                </div>
-                <div className="mt-2 text-xs text-gray-400 text-center">
-                  {uploadProgress < 30 && "جاري تجهيز البيانات..."}
-                  {uploadProgress >= 30 && uploadProgress < 90 && "جاري رفع البيانات إلى الخادم..."}
-                  {uploadProgress >= 90 && uploadProgress < 100 && "جاري إتمام العملية..."}
-                  {uploadProgress === 100 && "تم الحفظ بنجاح!"}
-                </div>
-              </div>
-            )}
+
             {/* Action Buttons */}
             <div className="flex justify-end gap-4 mt-6">
               <Button
@@ -361,7 +474,7 @@ export default function AddProductView() {
                 disabled={isSubmitting}
                 className="px-6 bg-primary hover:bg-primary/90"
               >
-                {isSubmitting ? "جاري الحفظ..." : "حفظ المنتج"}
+                {isSubmitting ? "جاري الحفظ..." : "تحديث المنتج"}
               </Button>
             </div>
           </form>
