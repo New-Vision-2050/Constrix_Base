@@ -297,10 +297,35 @@ export default function EditProductView() {
 
       setUploadProgress(30);
 
+      // Filter out non-File image fields - only send binary File objects
+      const submitData: any = { ...formattedData };
+      
+      // Remove main_photo if it's not a File (it's a URL string or null)
+      if (!(submitData.main_photo instanceof File)) {
+        delete submitData.main_photo;
+      }
+      
+      // Filter other_photos to only include File objects
+      if (submitData.other_photos && Array.isArray(submitData.other_photos)) {
+        const binaryFiles = submitData.other_photos.filter((photo: any) => photo instanceof File);
+        if (binaryFiles.length === 0) {
+          delete submitData.other_photos;
+        } else {
+          submitData.other_photos = binaryFiles;
+        }
+      }
+      
+      // Remove meta_photo if it's not a File
+      if (!(submitData.meta_photo instanceof File)) {
+        delete submitData.meta_photo;
+      }
+
+      console.log("Submit data (binary files only):", submitData);
+
       // Call the API to update the product
       const response = await ProductsApi.update(
         productId,
-        formattedData as any
+        submitData
       );
 
       setUploadProgress(90);

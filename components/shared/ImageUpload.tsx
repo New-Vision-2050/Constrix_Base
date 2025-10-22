@@ -43,8 +43,10 @@ export default function ImageUpload({
   React.useEffect(() => {
     if (initialValue) {
       if (multiple && Array.isArray(initialValue)) {
-        setInitialPreviews(initialValue.filter(url => typeof url === 'string'));
-      } else if (!multiple && typeof initialValue === 'string') {
+        setInitialPreviews(
+          initialValue.filter((url) => typeof url === "string")
+        );
+      } else if (!multiple && typeof initialValue === "string") {
         setImagePreview(initialValue);
       }
     }
@@ -52,9 +54,17 @@ export default function ImageUpload({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (multiple) {
-      const files = Array.from(e.target.files || []);
-      setSelectedFiles(files);
-      onMultipleChange?.(files);
+      const newFiles = Array.from(e.target.files || []);
+      // Append new files to existing ones instead of replacing
+      const updatedFiles = [...selectedFiles, ...newFiles];
+      setSelectedFiles(updatedFiles);
+      onMultipleChange?.(updatedFiles);
+      // Clear initial previews when user starts uploading new files
+      if (newFiles.length > 0) {
+        setInitialPreviews([]);
+      }
+      // Reset input to allow selecting the same file again
+      e.target.value = "";
     } else {
       const file = e.target.files?.[0];
       if (file) {
@@ -82,6 +92,15 @@ export default function ImageUpload({
     const newFiles = selectedFiles.filter((_, i) => i !== index);
     setSelectedFiles(newFiles);
     onMultipleChange?.(newFiles);
+  };
+
+  const removeInitialImage = (index: number) => {
+    const newPreviews = initialPreviews.filter((_, i) => i !== index);
+    setInitialPreviews(newPreviews);
+    // If all initial images are removed, trigger onChange with empty array
+    if (newPreviews.length === 0) {
+      onMultipleChange?.([]);
+    }
   };
 
   return (
@@ -167,6 +186,14 @@ export default function ImageUpload({
                       صورة موجودة {index + 1}
                     </p>
                   </div>
+                  {/* Remove button */}
+                  <button
+                    type="button"
+                    onClick={() => removeInitialImage(index)}
+                    className="flex-shrink-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
             </div>
