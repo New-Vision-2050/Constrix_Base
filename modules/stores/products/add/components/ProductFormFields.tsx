@@ -12,6 +12,7 @@ import {
 } from "@/modules/table/components/ui/form";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import FormLabel from "@/components/shared/FormLabel";
+import { useTranslations } from "next-intl";
 
 interface ProductFormFieldsProps {
   form: UseFormReturn<any>;
@@ -22,6 +23,8 @@ export default function ProductFormFields({
   form,
   language,
 }: ProductFormFieldsProps) {
+  const t = useTranslations("product");
+  
   return (
     <>
       {/* Product Name */}
@@ -31,7 +34,7 @@ export default function ProductFormFields({
         render={({ field }) => (
           <FormItem>
             <FormLabel required>
-              {language === "ar" ? "اسم المنتج" : "Product Name"}
+              {t("fields.productName")}
             </FormLabel>
             <FormControl>
               <Input {...field} />
@@ -48,7 +51,7 @@ export default function ProductFormFields({
         render={({ field }) => (
           <FormItem>
             <FormLabel>
-              {language === "ar" ? "وصف المنتج" : "Product Description"}
+              {t("fields.productDescription")}
             </FormLabel>
             <FormControl>
               <Textarea {...field} className="bg-sidebar" />
@@ -68,7 +71,7 @@ export default function ProductFormFields({
             name="sku"
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>كود المنتج (السيريال)</FormLabel>
+                <FormLabel required>{t("fields.productCode")}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -83,7 +86,7 @@ export default function ProductFormFields({
             name="is_visible"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>الحالة</FormLabel>
+                <FormLabel>{t("fields.status")}</FormLabel>
                 <div className="flex items-center h-12 bg-sidebar border border-border rounded-md px-4">
                   <FormControl>
                     <Switch

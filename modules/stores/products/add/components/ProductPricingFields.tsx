@@ -18,6 +18,7 @@ import {
 } from "@/modules/table/components/ui/form";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import FormLabel from "@/components/shared/FormLabel";
+import { useTranslations } from "next-intl";
 
 interface ProductPricingFieldsProps {
   form: UseFormReturn<any>;
@@ -26,6 +27,8 @@ interface ProductPricingFieldsProps {
 export default function ProductPricingFields({
   form,
 }: ProductPricingFieldsProps) {
+  const t = useTranslations("product");
+  
   return (
     <div className="space-y-6">
       {/* First Row: السعر - الحد الادنى - كمية المخزون */}
@@ -36,7 +39,7 @@ export default function ProductPricingFields({
           name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>السعر الوحدة ($)</FormLabel>
+              <FormLabel required>{t("fields.unitPrice")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -56,7 +59,7 @@ export default function ProductPricingFields({
           name="min_order_quantity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>الحد الادنى لكمية الطلب</FormLabel>
+              <FormLabel required>{t("fields.minOrderQuantity")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -76,7 +79,7 @@ export default function ProductPricingFields({
           name="stock"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>كمية المخزون الحالية</FormLabel>
+              <FormLabel>{t("fields.currentStock")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -99,16 +102,16 @@ export default function ProductPricingFields({
           name="discount_type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>نوع الخصم</FormLabel>
+              <FormLabel required>{t("fields.discountType")}</FormLabel>
               <Select key={field.value} onValueChange={field.onChange} value={field.value || undefined}>
                 <FormControl>
                   <SelectTrigger className="h-12">
-                    <SelectValue placeholder="اختر نوع الخصم" />
+                    <SelectValue placeholder={t("placeholders.selectDiscountType")} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="flat">مستوى</SelectItem>
-                  <SelectItem value="percentage">نسبة مئوية</SelectItem>
+                  <SelectItem value="flat">{t("options.flat")}</SelectItem>
+                  <SelectItem value="percentage">{t("options.percentage")}</SelectItem>
                 </SelectContent>
               </Select>
               <FormErrorMessage />
@@ -122,7 +125,7 @@ export default function ProductPricingFields({
           name="discount_value"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>مبلغ الخصم ($)</FormLabel>
+              <FormLabel>{t("fields.discountAmount")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -142,7 +145,7 @@ export default function ProductPricingFields({
           name="vat_percentage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>مبلغ الضريبة (%)</FormLabel>
+              <FormLabel>{t("fields.taxAmount")}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -165,7 +168,7 @@ export default function ProductPricingFields({
           name="price_includes_vat"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>حساب تكلفة الشحن ($)</FormLabel>
+              <FormLabel>{t("fields.calculateShippingCost")}</FormLabel>
               <div className="flex items-center h-12 bg-sidebar border border-border rounded-md px-4">
                 <FormControl>
                   <Switch
@@ -186,7 +189,7 @@ export default function ProductPricingFields({
           name="shipping_amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>تكلفة الشحن ($)</FormLabel>
+              <FormLabel>{t("fields.shippingCost")}</FormLabel>
               <div className="flex items-center h-12 bg-sidebar border border-border rounded-md px-4">
                 <FormControl>
                   <Switch
@@ -207,7 +210,7 @@ export default function ProductPricingFields({
           name="shipping_included_in_price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>حساب تكلفة الشحن ($)</FormLabel>
+              <FormLabel>{t("fields.calculateShippingCost")}</FormLabel>
               <div className="flex items-center h-12 bg-sidebar border border-border rounded-md px-4">
                 <FormControl>
                   <Switch

@@ -16,7 +16,7 @@ export interface ProductRow {
   stock?: number;
   sku: string;
   is_visible: number;
-  main_image?: {
+  main_photo?: {
     id: number;
     url: string;
     name: string;
@@ -62,9 +62,9 @@ export const useProductsListTableConfig: (
         render: (_: unknown, row: ProductRow) => (
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
-              {row.main_image?.url ? (
+              {row.main_photo?.url ? (
                 <Image
-                  src={row.main_image.url}
+                  src={row.main_photo.url}
                   alt={row.name}
                   fill
                   className="object-cover"
@@ -105,7 +105,7 @@ export const useProductsListTableConfig: (
       },
       {
         key: "is_visible",
-        label: "الحالة",
+        label: t("product.fields.status"),
         render: (value: "active" | "inActive", row: ProductRow) => (
           <TheStatus theStatus={value} id={row.id} />
         ),

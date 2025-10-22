@@ -12,12 +12,15 @@ import {
 } from "@/modules/table/components/ui/form";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import { useTranslations } from "next-intl";
 
 interface ProductSeoFieldsProps {
   form: UseFormReturn<any>;
 }
 
 export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
+  const t = useTranslations("product");
+  
   const handleMetaPhotoChange = (file: File | null) => {
     form.setValue("meta_photo", file);
   };
@@ -36,7 +39,7 @@ export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
             name="meta_title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>عنوان ميتا</FormLabel>
+                <FormLabel>{t("fields.metaTitle")}</FormLabel>
                 <FormControl>
                   <Input {...field} type="text" placeholder="" />
                 </FormControl>
@@ -51,7 +54,7 @@ export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
             name="meta_description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>وصف ميتا</FormLabel>
+                <FormLabel>{t("fields.metaDescription")}</FormLabel>
                 <FormControl>
                   <Textarea
                     {...field}
@@ -70,7 +73,7 @@ export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
             name="meta_keywords"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>كلمات مفتاحية ميتا</FormLabel>
+                <FormLabel>{t("fields.metaKeywords")}</FormLabel>
                 <FormControl>
                   <Input {...field} type="text" placeholder="" />
                 </FormControl>
@@ -82,8 +85,8 @@ export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
         {/* SEO Image Upload */}
         <div className="col-span-3">
           <ImageUpload
-            label="صورة ميتا"
-            maxSize="الحجم الموصى به 3MB"
+            label={t("fields.metaPhoto")}
+            maxSize={t("seo.recommendedSize")}
             dimensions="3 MB × 5 MB"
             required={false}
             onChange={handleMetaPhotoChange}

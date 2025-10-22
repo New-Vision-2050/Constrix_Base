@@ -24,6 +24,7 @@ import { BrandsApi } from "@/services/api/ecommerce/brands";
 import { getCountries } from "@/services/api/shared/countries";
 import { WarehousesApi } from "@/services/api/ecommerce/warehouses";
 import { getUnits } from "@/services/api/shared/units";
+import { useTranslations } from "next-intl";
 
 interface ProductInventoryFieldsProps {
   form: UseFormReturn<any>;
@@ -32,6 +33,7 @@ interface ProductInventoryFieldsProps {
 export default function ProductInventoryFields({
   form,
 }: ProductInventoryFieldsProps) {
+  const t = useTranslations("product");
   const productType = form.watch("type");
   const isSerial = productType === "serial";
   const selectedCategoryId = form.watch("category_id");
@@ -146,7 +148,7 @@ export default function ProductInventoryFields({
           name="category_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>القسم</FormLabel>
+              <FormLabel required>{t("fields.category")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -157,7 +159,7 @@ export default function ProductInventoryFields({
                   <SelectTrigger>
                     <SelectValue
                       placeholder={
-                        isLoadingCategories ? "جاري التحميل..." : "اختر القسم"
+                        isLoadingCategories ? t("placeholders.loading") : t("placeholders.selectCategory")
                       }
                     />
                   </SelectTrigger>
@@ -184,7 +186,7 @@ export default function ProductInventoryFields({
           name="sub_category_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>قسم الفرعي</FormLabel>
+              <FormLabel>{t("fields.subCategory")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -196,10 +198,10 @@ export default function ProductInventoryFields({
                     <SelectValue
                       placeholder={
                         !selectedCategoryId
-                          ? "اختر القسم الرئيسي أولاً"
+                          ? t("placeholders.selectMainCategoryFirst")
                           : isLoadingSubCategories
-                          ? "جاري التحميل..."
-                          : "اختر القسم الفرعي"
+                          ? t("placeholders.loading")
+                          : t("placeholders.selectSubCategory")
                       }
                     />
                   </SelectTrigger>
@@ -207,7 +209,7 @@ export default function ProductInventoryFields({
                 <SelectContent>
                   {subCategories.length === 0 && selectedCategoryId ? (
                     <div className="px-2 py-1.5 text-sm text-gray-500">
-                      لا توجد أقسام فرعية
+                      {t("messages.noSubCategories")}
                     </div>
                   ) : (
                     subCategories.map((category: any) => (
@@ -232,7 +234,7 @@ export default function ProductInventoryFields({
           name="sub_sub_category_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>قسم فرعي فرعي</FormLabel>
+              <FormLabel>{t("fields.subSubCategory")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -244,10 +246,10 @@ export default function ProductInventoryFields({
                     <SelectValue
                       placeholder={
                         !selectedSubCategoryId
-                          ? "اختر القسم الفرعي أولاً"
+                          ? t("placeholders.selectSubCategoryFirst")
                           : isLoadingSubSubCategories
-                          ? "جاري التحميل..."
-                          : "اختر القسم الفرعي الفرعي"
+                          ? t("placeholders.loading")
+                          : t("placeholders.selectSubSubCategory")
                       }
                     />
                   </SelectTrigger>
@@ -255,7 +257,7 @@ export default function ProductInventoryFields({
                 <SelectContent>
                   {subSubCategories.length === 0 && selectedSubCategoryId ? (
                     <div className="px-2 py-1.5 text-sm text-gray-500">
-                      لا توجد أقسام فرعية فرعية
+                      {t("messages.noSubSubCategories")}
                     </div>
                   ) : (
                     subSubCategories.map((category: any) => (
@@ -283,7 +285,7 @@ export default function ProductInventoryFields({
           name="brand_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>العلامة التجارية</FormLabel>
+              <FormLabel>{t("fields.brand")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -295,8 +297,8 @@ export default function ProductInventoryFields({
                     <SelectValue
                       placeholder={
                         isLoadingBrands
-                          ? "جاري التحميل..."
-                          : "اختر العلامة التجارية"
+                          ? t("placeholders.loading")
+                          : t("placeholders.selectBrand")
                       }
                     />
                   </SelectTrigger>
@@ -326,7 +328,7 @@ export default function ProductInventoryFields({
 
             return (
               <FormItem>
-                <FormLabel>الدولة</FormLabel>
+                <FormLabel>{t("fields.country")}</FormLabel>
                 <FormControl>
                   <MultiSelect
                     options={
@@ -346,7 +348,7 @@ export default function ProductInventoryFields({
                       field.onChange(ids);
                     }}
                     placeholder={
-                      isLoadingCountries ? "جاري التحميل..." : "اختر الدول"
+                      isLoadingCountries ? t("placeholders.loading") : t("placeholders.selectCountries")
                     }
                   />
                 </FormControl>
@@ -362,7 +364,7 @@ export default function ProductInventoryFields({
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>نوع المنتح</FormLabel>
+              <FormLabel required>{t("fields.productType")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -370,12 +372,12 @@ export default function ProductInventoryFields({
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر النوع" />
+                    <SelectValue placeholder={t("placeholders.selectType")} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="normal">عادي</SelectItem>
-                  <SelectItem value="serial">رقمي</SelectItem>
+                  <SelectItem value="normal">{t("options.normal")}</SelectItem>
+                  <SelectItem value="serial">{t("options.serial")}</SelectItem>
                 </SelectContent>
               </Select>
               <FormErrorMessage />
@@ -393,7 +395,7 @@ export default function ProductInventoryFields({
             name="unit"
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>الوحدة</FormLabel>
+                <FormLabel required>{t("fields.unit")}</FormLabel>
                 <Select
                   onValueChange={(value) => {
                     // Store the unit name instead of ID
@@ -412,7 +414,7 @@ export default function ProductInventoryFields({
                     <SelectTrigger>
                       <SelectValue
                         placeholder={
-                          isLoadingUnits ? "جاري التحميل..." : "اختر الوحدة"
+                          isLoadingUnits ? t("placeholders.loading") : t("placeholders.selectUnit")
                         }
                       />
                     </SelectTrigger>
@@ -437,7 +439,7 @@ export default function ProductInventoryFields({
           name="gender"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>النوع</FormLabel>
+              <FormLabel required>{t("fields.gender")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -445,13 +447,13 @@ export default function ProductInventoryFields({
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر النوع" />
+                    <SelectValue placeholder={t("placeholders.selectType")} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="male">ذكر</SelectItem>
-                  <SelectItem value="female">انثى</SelectItem>
-                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="male">{t("options.male")}</SelectItem>
+                  <SelectItem value="female">{t("options.female")}</SelectItem>
+                  <SelectItem value="all">{t("options.all")}</SelectItem>
                 </SelectContent>
               </Select>
               <FormErrorMessage />
@@ -465,7 +467,7 @@ export default function ProductInventoryFields({
           name="warehouse_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>المخزن</FormLabel>
+              <FormLabel required>{t("fields.warehouse")}</FormLabel>
               <Select
                 key={field.value}
                 onValueChange={field.onChange}
@@ -476,7 +478,7 @@ export default function ProductInventoryFields({
                   <SelectTrigger>
                     <SelectValue
                       placeholder={
-                        isLoadingWarehouses ? "جاري التحميل..." : "اختر المخزن"
+                        isLoadingWarehouses ? t("placeholders.loading") : t("placeholders.selectWarehouse")
                       }
                     />
                   </SelectTrigger>

@@ -21,71 +21,84 @@ import { ProductsApi } from "@/services/api/ecommerce/products";
 import { useTableReload } from "@/modules/table/hooks/useTableReload";
 
 // Product schema matching API requirements
-const productSchema = z.object({
-  // Language-specific fields (using underscore instead of brackets for form state)
-  name_ar: z.string().min(1, { message: "الاسم باللغة العربية مطلوب" }),
-  name_en: z.string().min(1, { message: "الاسم باللغة الإنجليزية مطلوب" }),
-  description_ar: z.string().optional(),
-  description_en: z.string().optional(),
+const createProductSchema = (t: any) =>
+  z.object({
+    // Language-specific fields (using underscore instead of brackets for form state)
+    name_ar: z.string().min(1, { message: t("product.validation.nameAr") }),
+    name_en: z.string().min(1, { message: t("product.validation.nameEn") }),
+    description_ar: z.string().optional(),
+    description_en: z.string().optional(),
 
-  // Basic fields
-  sku: z.string().min(1, { message: "رمز المنتج مطلوب" }),
-  is_visible: z.boolean().default(true),
+    // Basic fields
+    sku: z.string().min(1, { message: t("product.validation.sku") }),
+    is_visible: z.boolean().default(true),
 
-  // Inventory fields
-  category_id: z.string().min(1, { message: "حقل الفئة الرئيسية مطلوب" }),
-  sub_category_id: z.string().optional(),
-  sub_sub_category_id: z.string().optional(),
-  brand_id: z.string().optional(),
-  country_ids: z.array(z.string()).optional(),
-  type: z.string().min(1, { message: "نوع المنتج مطلوب" }),
-  warehouse_id: z.string().min(1, { message: "معرف المستودع مطلوب" }),
-  unit: z.string().min(1, { message: "وحدة القياس مطلوبة" }),
-  price: z.string().min(1, { message: "حقل السعر مطلوب" }),
-  currency: z.string().optional(),
-  gender: z.string().min(1, { message: "الجنس المستهدف مطلوب" }),
+    // Inventory fields
+    category_id: z
+      .string()
+      .min(1, { message: t("product.validation.category") }),
+    sub_category_id: z.string().optional(),
+    sub_sub_category_id: z.string().optional(),
+    brand_id: z.string().optional(),
+    country_ids: z.array(z.string()).optional(),
+    type: z.string().min(1, { message: t("product.validation.type") }),
+    warehouse_id: z
+      .string()
+      .min(1, { message: t("product.validation.warehouse") }),
+    unit: z.string().min(1, { message: t("product.validation.unit") }),
+    price: z.string().min(1, { message: t("product.validation.price") }),
+    currency: z.string().optional(),
+    gender: z.string().min(1, { message: t("product.validation.gender") }),
 
-  // Pricing fields
-  min_order_quantity: z
-    .string()
-    .min(1, { message: "الحد الأدنى لكمية الطلب مطلوب" }),
-  stock: z.string().optional(),
-  discount_type: z.string().min(1, { message: "نوع الخصم مطلوب" }),
-  discount_value: z.string().optional().refine(
-    (val) => {
-      if (!val || val === "") return true;
-      const num = parseFloat(val);
-      return !isNaN(num) && num >= 0;
-    },
-    { message: "يجب أن تكون قيمة الخصم رقماً موجباً" }
-  ),
-  vat_percentage: z.string().optional().refine(
-    (val) => {
-      if (!val || val === "") return true;
-      const num = parseFloat(val);
-      return !isNaN(num) && num >= 0 && num <= 100;
-    },
-    { message: "يجب أن تكون نسبة ضريبة القيمة المضافة بين 0 و 100" }
-  ),
-  price_includes_vat: z.boolean().default(false),
-  shipping_amount: z.boolean().default(false),
-  shipping_included_in_price: z.boolean().default(false),
+    // Pricing fields
+    min_order_quantity: z
+      .string()
+      .min(1, { message: t("product.validation.minOrderQuantity") }),
+    stock: z.string().optional(),
+    discount_type: z
+      .string()
+      .min(1, { message: t("product.validation.discountType") }),
+    discount_value: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val === "") return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0;
+        },
+        { message: t("product.validation.discountValue") }
+      ),
+    vat_percentage: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val === "") return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 0 && num <= 100;
+        },
+        { message: t("product.validation.vatPercentage") }
+      ),
+    price_includes_vat: z.boolean().default(false),
+    shipping_amount: z.boolean().default(false),
+    shipping_included_in_price: z.boolean().default(false),
 
-  // Video URL
-  video_url: z.string().optional(),
+    // Video URL
+    video_url: z.string().optional(),
 
-  // Image fields
-  main_photo: z.any().optional(),
-  other_photos: z.array(z.any()).optional(),
+    // Image fields
+    main_photo: z.any().optional(),
+    other_photos: z.array(z.any()).optional(),
 
-  // SEO fields
-  meta_title: z.string().optional(),
-  meta_description: z.string().optional(),
-  meta_keywords: z.string().optional(),
-  meta_photo: z.any().optional(),
-});
+    // SEO fields
+    meta_title: z.string().optional(),
+    meta_description: z.string().optional(),
+    meta_keywords: z.string().optional(),
+    meta_photo: z.any().optional(),
+  });
 
-type ProductFormData = z.infer<typeof productSchema>;
+type ProductFormData = z.infer<ReturnType<typeof createProductSchema>>;
 
 export default function AddProductView() {
   const t = useTranslations();
@@ -95,6 +108,8 @@ export default function AddProductView() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState("ar");
   const { reloadTable } = useTableReload("products-list-table");
+
+  const productSchema = createProductSchema(t);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -321,7 +336,9 @@ export default function AddProductView() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                    <span className="text-white text-base font-medium">جاري رفع البيانات...</span>
+                    <span className="text-white text-base font-medium">
+                      جاري رفع البيانات...
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-primary text-2xl font-bold">
@@ -339,31 +356,35 @@ export default function AddProductView() {
                 </div>
                 <div className="mt-2 text-xs text-gray-400 text-center">
                   {uploadProgress < 30 && "جاري تجهيز البيانات..."}
-                  {uploadProgress >= 30 && uploadProgress < 90 && "جاري رفع البيانات إلى الخادم..."}
-                  {uploadProgress >= 90 && uploadProgress < 100 && "جاري إتمام العملية..."}
+                  {uploadProgress >= 30 &&
+                    uploadProgress < 90 &&
+                    "جاري رفع البيانات إلى الخادم..."}
+                  {uploadProgress >= 90 &&
+                    uploadProgress < 100 &&
+                    "جاري إتمام العملية..."}
                   {uploadProgress === 100 && "تم الحفظ بنجاح!"}
                 </div>
               </div>
             )}
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-4 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isSubmitting}
-                className="px-6"
-              >
-                إلغاء
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-6 bg-primary hover:bg-primary/90"
-              >
-                {isSubmitting ? "جاري الحفظ..." : "حفظ المنتج"}
-              </Button>
-            </div>
+            {/* Action Buttons - Hidden during submission */}
+            {!isSubmitting && (
+              <div className="flex justify-end gap-4 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  className="px-6"
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  type="submit"
+                  className="px-6 bg-primary hover:bg-primary/90"
+                >
+                  حفظ المنتج
+                </Button>
+              </div>
+            )}
           </form>
         </Form>
       </div>

@@ -10,12 +10,15 @@ import {
 } from "@/modules/table/components/ui/form";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import { useTranslations } from "next-intl";
 
 interface ProductVideoUrlProps {
   form: UseFormReturn<any>;
 }
 
 export default function ProductVideoUrl({ form }: ProductVideoUrlProps) {
+  const t = useTranslations("product");
+  
   return (
     <div className="space-y-4">
       <FormField
@@ -23,9 +26,9 @@ export default function ProductVideoUrl({ form }: ProductVideoUrlProps) {
         name="video_url"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>فيديو المنتج</FormLabel>
+            <FormLabel>{t("fields.productVideo")}</FormLabel>
             <FormControl>
-              <Input {...field} type="url" placeholder="example@youtube.com" />
+              <Input {...field} type="url" placeholder={t("placeholders.videoUrl")} />
             </FormControl>
             <FormErrorMessage />
           </FormItem>
