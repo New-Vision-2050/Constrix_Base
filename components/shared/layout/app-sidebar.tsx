@@ -365,6 +365,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             isActive: pageName === ROUTER.Brands,
             show: true,
           },
+          {
+            name: t("category.plural"),
+            url: ROUTER.Categories,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.Categories,
+            show: true,
+          },
         ],
       },
     ];
