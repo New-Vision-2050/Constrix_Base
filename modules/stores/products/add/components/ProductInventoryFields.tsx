@@ -118,8 +118,18 @@ export default function ProductInventoryFields({
         mapping[unit.id.toString()] = unit.name_ar || unit.name_en || unit.name;
       });
       setUnitIdToName(mapping);
+      
+      // When editing, ensure the unit value is properly set
+      const currentUnit = form.getValues("unit");
+      if (currentUnit && !Object.values(mapping).includes(currentUnit)) {
+        // If current unit value doesn't match any unit name, try to find it by ID
+        const unitById = units.find((u: any) => u.id.toString() === currentUnit);
+        if (unitById) {
+          form.setValue("unit", unitById.name_ar || unitById.name_en || unitById.name);
+        }
+      }
     }
-  }, [units]);
+  }, [units, form]);
 
   // Reset sub_category when main category changes (only on user interaction)
   useEffect(() => {
@@ -406,7 +416,7 @@ export default function ProductInventoryFields({
                     // Find the ID from the name for display
                     Object.keys(unitIdToName).find(
                       (id) => unitIdToName[id] === field.value
-                    ) || field.value
+                    ) || ""
                   }
                   disabled={isLoadingUnits}
                 >
