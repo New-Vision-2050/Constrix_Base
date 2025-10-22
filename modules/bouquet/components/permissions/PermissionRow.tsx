@@ -13,13 +13,13 @@ type PermissionTypeConfig = {
 
 // Base permission types configuration - moved outside component
 const BASE_PERMISSION_TYPES: PermissionTypeConfig[] = [
-  { type: 'view', displayType: 'view', hasPermission: false },
-  { type: 'update', displayType: 'edit', hasPermission: false },
-  { type: 'delete', displayType: 'delete', hasPermission: false },
-  { type: 'create', displayType: 'create', hasPermission: false },
-  { type: 'export', displayType: 'export', hasPermission: false },
-  { type: 'activate', displayType: 'activate', hasPermission: false },
-  { type: 'list', displayType: 'list', hasPermission: false }
+  { type: "view", displayType: "view", hasPermission: false },
+  { type: "update", displayType: "edit", hasPermission: false },
+  { type: "delete", displayType: "delete", hasPermission: false },
+  { type: "create", displayType: "create", hasPermission: false },
+  { type: "export", displayType: "export", hasPermission: false },
+  { type: "activate", displayType: "activate", hasPermission: false },
+  { type: "list", displayType: "list", hasPermission: false },
 ];
 
 interface PermissionRowProps {
@@ -32,7 +32,11 @@ interface PermissionRowProps {
   activeStates: Record<string, boolean>;
   numberValues: Record<string, number>;
   onPermissionChange: (permissionId: string, checked: boolean) => void;
-  onSwitchChange: (switchId: string, checked: boolean, permissionId?: string) => void;
+  onSwitchChange: (
+    switchId: string,
+    checked: boolean,
+    permissionId?: string
+  ) => void;
   onNumberChange: (subKey: string, value: number) => void;
 }
 
@@ -47,35 +51,46 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
   numberValues,
   onPermissionChange,
   onSwitchChange,
-  onNumberChange
+  onNumberChange,
 }) => {
   // Memoize the available types set to avoid recreating on every render
-  const availableTypes = useMemo(() => new Set(subItems.map(item => item.type)), [subItems]);
-  
+  const availableTypes = useMemo(
+    () => new Set(subItems.map((item) => item.type)),
+    [subItems]
+  );
+
   // Memoize the permission types with dynamic hasPermission values
   const permissionTypes = useMemo(() => {
-    return BASE_PERMISSION_TYPES.map(type => ({
+    return BASE_PERMISSION_TYPES.map((type) => ({
       ...type,
-      hasPermission: availableTypes.has(type.type)
+      hasPermission: availableTypes.has(type.type),
     }));
   }, [availableTypes]);
 
+  const createType = subItems?.find((item) => item.type === "create");
 
   // Helper function to render permission switch
-  const renderPermissionSwitch = (permissionConfig: typeof permissionTypes[0]) => {
+  const renderPermissionSwitch = (
+    permissionConfig: (typeof permissionTypes)[0]
+  ) => {
     const { type, displayType, hasPermission } = permissionConfig;
     const switchId = `${subKey}-${categoryKey}-${type}`;
     const stateKey = `${mainKey}.${subKey}.${categoryKey}.${type}`;
-    
+
     return (
-      <td key={displayType} className={`px-4 py-4 text-center ${switchStates[switchId] ? 'bg-sidebar' : ''}`}>
+      <td
+        key={displayType}
+        className={`px-4 py-4 text-center ${
+          switchStates[switchId] ? "bg-sidebar" : ""
+        }`}
+      >
         <div className="flex items-center justify-center">
           <Switch
             id={switchId}
             checked={switchStates[switchId] || false}
             disabled={!hasPermission}
             onCheckedChange={(checked) => {
-              const item = subItems.find(item => item.type === type);
+              const item = subItems.find((item) => item.type === type);
               onSwitchChange(switchId, checked, item?.id);
             }}
           />
@@ -88,33 +103,40 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
   const item = subItems[0];
   const permissionId = item.id;
   const permissionName = item.name;
-  
+
   // Find the create permission item to get its limit value
-  const createItem = subItems.find(item => item.type === 'create');
-  const createLimitValue = createItem?.limit || 0;
-  
+  const createItem = useMemo(
+    () => subItems.find((item) => item.type === "create"),
+    [subItems]
+  );
+  const createLimitValue = useMemo(() => createItem?.limit || 0, [createItem]);
+
   // Handle checkbox change to activate/deactivate all switches in this row
   const handleCheckboxChange = (checked: boolean) => {
     // First update the permission selection
     onPermissionChange(permissionId, checked);
-    
+
     // Then activate/deactivate all available switches in this row
-    permissionTypes.forEach(permissionConfig => {
+    permissionTypes.forEach((permissionConfig) => {
       if (permissionConfig.hasPermission) {
         const switchId = `${subKey}-${categoryKey}-${permissionConfig.type}`;
-        const relatedItem = subItems.find(item => item.type === permissionConfig.type);
+        const relatedItem = subItems.find(
+          (item) => item.type === permissionConfig.type
+        );
         onSwitchChange(switchId, checked, relatedItem?.id);
       }
     });
   };
-  
+
   return (
     <tr key={permissionId}>
       <td className="px-4 py-4 text-center">
         <Checkbox
           id={permissionId}
           checked={selectedPermissions.has(permissionId)}
-          onCheckedChange={(checked) => handleCheckboxChange(checked as boolean)}
+          onCheckedChange={(checked) =>
+            handleCheckboxChange(checked as boolean)
+          }
         />
       </td>
       <td className="px-4 py-4 text-right text-sm text-white font-medium">
@@ -124,10 +146,15 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
       <td className="px-4 py-4 text-center text-sm text-white font-medium">
         <Input
           className="w-16 p-1 text-center bg-sidebar border border-gray-100 rounded  disabled:bg-gray-700 disabled:text-gray-600"
-          value={numberValues[`${subKey}-${categoryKey}`] !== undefined ? (numberValues[`${subKey}-${categoryKey}`] > 0 ? numberValues[`${subKey}-${categoryKey}`] : '') : (createLimitValue > 0 ? createLimitValue : '')}
-          onChange={(e) => onNumberChange(`${subKey}-${categoryKey}`, parseInt(e.target.value) || 0)}
-          min="0"
+          defaultValue={createLimitValue > 0 ? createLimitValue : ""}
           disabled={!switchStates[`${subKey}-${categoryKey}-create`]}
+          onChange={(e) =>
+            onNumberChange(
+              `${subKey}-${categoryKey}`,
+              parseInt(e.target.value) || 0
+            )
+          }
+          min="0"
         />
       </td>
     </tr>
