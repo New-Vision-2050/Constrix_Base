@@ -141,13 +141,13 @@ export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
           </DropdownMenuItem>
 
           {/* share document */}
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             onClick={() => handleAction("share")}
             className="flex items-center gap-2"
           >
             <Share2 className="h-4 w-4" />
             {t("share")}
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
 
           <DropdownMenuSeparator />
 
