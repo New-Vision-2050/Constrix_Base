@@ -33,6 +33,7 @@
     "programs": "البرامج",
     "roles": "الصلاحيات",
     "stores": "المخازن",
+    "social-media": "وسائل التواصل الاجتماعي",
     "user-profile": "ملف المستخدم",
     "view-my-permissions": "عرض صلاحياتي"
   },
@@ -1814,6 +1815,24 @@
         }
       }
     }
+  },
+  "socialMedia": {
+    "plural": "وسائل التواصل الاجتماعي",
+    "singular": "وسيلة تواصل",
+    "platform": "وسيلة التواصل",
+    "link": "الرابط",
+    "status": "الحالة",
+    "edit": "تعديل وسيلة تواصل",
+    "create": "إضافة وسيلة تواصل",
+    "selectPlatform": "اختر وسيلة التواصل",
+    "linkRequired": "الرابط مطلوب",
+    "platformRequired": "وسيلة التواصل مطلوبة",
+    "createSuccess": "تم إنشاء وسيلة التواصل بنجاح",
+    "createError": "فشل إنشاء وسيلة التواصل",
+    "updateSuccess": "تم تحديث وسيلة التواصل بنجاح",
+    "updateError": "فشل تحديث وسيلة التواصل",
+    "deleteSuccess": "تم حذف وسيلة التواصل بنجاح",
+    "deleteError": "فشل حذف وسيلة التواصل"
   },
   "RoleTypes": {
     "all": "منح جميع الصلاحيات",

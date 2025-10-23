@@ -30,4 +30,5 @@ export const ROUTER = {
   },
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",
+  SOCIAL_MEDIA: "/stores/social-media",
 };
