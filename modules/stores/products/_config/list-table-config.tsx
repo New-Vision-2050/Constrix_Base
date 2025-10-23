@@ -6,6 +6,7 @@ import React from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import TheStatus from "../add/components/the-status";
 
 // Product row type interface
 export interface ProductRow {
@@ -15,7 +16,7 @@ export interface ProductRow {
   stock?: number;
   sku: string;
   is_visible: number;
-  main_image?: {
+  main_photo?: {
     id: number;
     url: string;
     name: string;
@@ -61,9 +62,9 @@ export const useProductsListTableConfig: (
         render: (_: unknown, row: ProductRow) => (
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
-              {row.main_image?.url ? (
+              {row.main_photo?.url ? (
                 <Image
-                  src={row.main_image.url}
+                  src={row.main_photo.url}
                   alt={row.name}
                   fill
                   className="object-cover"
@@ -77,8 +78,8 @@ export const useProductsListTableConfig: (
         ),
       },
       {
-        key: "sku",
-        label: t("labels.sku"),
+        key: "type",
+        label: t("labels.type"),
         sortable: true,
         render: (value: string) => (
           <span className="text-gray-600">{value}</span>
@@ -104,19 +105,9 @@ export const useProductsListTableConfig: (
       },
       {
         key: "is_visible",
-        label: t("labels.status"),
-        sortable: true,
-        render: (value: number) => (
-          <Badge
-            className={
-              value === 1
-                ? "bg-green-100 text-green-800 hover:bg-green-200"
-                : "bg-red-100 text-red-800 hover:bg-red-200"
-            }
-            variant="outline"
-          >
-            {value === 1 ? t("labels.active") : t("labels.inactive")}
-          </Badge>
+        label: t("product.fields.status"),
+        render: (value: "active" | "inActive", row: ProductRow) => (
+          <TheStatus theStatus={value} id={row.id} />
         ),
       },
     ],

@@ -11,6 +11,7 @@ Custom Breadcrumbs component for Next.js App Router with i18n support.
 * ✅ Right-to-Left (RTL) direction support
 * ✅ ID detection and substitution with localized "Details" label
 * ✅ i18n integration with next-intl
+* ✅ Super Entity Slug detection and automatic disabling
 
 ## Usage
 
@@ -155,3 +156,59 @@ const myCustomRoutesMap: RoutesMap = {
   }
 };
 ```
+
+## Disabled Segments Handling
+
+The breadcrumbs component automatically detects and disables navigation for segments that match:
+1. Values in `SUPER_ENTITY_SLUG` constants
+2. Custom segments defined in `disabled-list.ts`
+
+These segments will appear as disabled (non-clickable) text with reduced opacity.
+
+### Super Entity Slugs
+
+The following URL segments are automatically disabled:
+
+- `companies` - Company management
+- `users` - User management  
+- `settings` - System settings
+- `human-resources` - HR management
+- `program-management` - Program management
+- `powers` - Powers/Permissions
+- `ecommerce` - E-commerce
+- `client-relations` - CRM
+- `stores` - Store management
+- `library-docs` - Document library
+
+### Custom Disabled Segments
+
+You can add additional segments to be disabled by editing the `disabled-list.ts` file:
+
+```typescript
+// components/shared/breadcrumbs/disabled-list.ts
+export const DISABLED_BREADCRUMB_SEGMENTS: string[] = [
+  "analytics",    // Disable analytics pages
+  "reports",      // Disable reports pages  
+  "admin",        // Disable admin pages
+  "api",          // Disable API routes
+  "dashboard",    // Disable dashboard
+  // Add more segments as needed...
+];
+```
+
+### Visual Styling
+
+Disabled breadcrumb items have the following styling:
+- Gray color (`text-gray-400`)
+- Not-allowed cursor (`cursor-not-allowed`)
+- Reduced opacity (`opacity-60`)
+- No hover effects
+- Not clickable
+
+### Example
+
+For a URL like `/ar/companies/123/settings`, the breadcrumbs would display:
+- **الرئيسية** (clickable home link)
+- **الشركات** (disabled, gray text)
+- **التفاصيل** (clickable details link)
+- **الإعدادات** (disabled, gray text)

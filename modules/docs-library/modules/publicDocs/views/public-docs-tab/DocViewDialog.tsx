@@ -18,24 +18,46 @@ import {
 import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
+import { useTranslations } from "next-intl";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import ShareDialog from "./share-dialog";
 
 export default function DocViewDialog() {
   const [loading, setLoading] = useState(false);
-  const { docToView, setDocToView } = usePublicDocsCxt();
+  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openShareDialog, setOpenShareDialog] = useState(false);
+  const t = useTranslations("docs-library.publicDocs.table.actions");
+  const { docToView, setDocToView, refetchDocs } = usePublicDocsCxt();
   const fileType = docToView?.file?.type;
   const isImg = fileType == "image";
-  const [isFavorite, setIsFavorite] = useState(Boolean(docToView?.is_favourite));
+  const [isFavorite, setIsFavorite] = useState(
+    Boolean(docToView?.is_favourite)
+  );
 
   useEffect(() => {
     setIsFavorite(Boolean(docToView?.is_favourite));
   }, [docToView]);
 
   const handleShare = () => {
-    console.log("Share");
+    setOpenShareDialog(true);
   };
 
-  const handleDelete = () => {
-    console.log("Delete");
+  const handleDelete = async () => {
+    try {
+      setDocToView(undefined)
+      const _url = baseURL + `/files/${docToView?.id}`;
+      await apiClient.delete(_url);
+
+      toast.success(t("deleteSuccess"));
+      setOpenDelete(false);
+      refetchDocs();
+      handleRefetchDocsWidgets();
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || error?.message;
+      toast.error(errorMsg || t("deleteFailed"));
+    }
   };
 
   const handleAddFavorite = async () => {
@@ -140,64 +162,82 @@ export default function DocViewDialog() {
   };
 
   return (
-    <Dialog
-      open={Boolean(docToView)}
-      onOpenChange={() => setDocToView(undefined)}
-    >
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="bg-sidebar flex flex-row items-center justify-between">
-          {/* close button */}
-          <Button variant="ghost" onClick={() => setDocToView(undefined)}>
-            <X className="h-4 w-4" />
-          </Button>
-          {/* title */}
-          <DialogTitle className="text-center">{docToView?.name}</DialogTitle>
-          {/* more buttons */}
-          <div className="flex items-center gap-2">
-            <Button disabled={loading} variant="ghost" onClick={() => setDocToView(undefined)}>
-              <Ellipsis className="h-4 w-4" />
+    <>
+      <Dialog
+        open={Boolean(docToView)}
+        onOpenChange={() => setDocToView(undefined)}
+      >
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader className="bg-sidebar flex flex-row items-center justify-between">
+            {/* close button */}
+            <Button variant="ghost" onClick={() => setDocToView(undefined)}>
+              <X className="h-4 w-4" />
             </Button>
-            {/* vertical seperator */}
-            <div className="h-4 w-[1px] bg-sidebar"></div>
-            {/* share button */}
-            <Button disabled={loading} variant="ghost" onClick={handleShare}>
-              <Share2 className="h-4 w-4" />
-            </Button>
-            {/* delete button */}
-            <Button disabled={loading} variant="ghost" onClick={handleDelete}>
-              <Trash className="h-4 w-4" />
-            </Button>
-            {/* favorite button */}
-            <Button disabled={loading} variant="ghost" onClick={handleFavorite}>
-              {isFavorite ? (
-                <Star className="h-4 w-4 text-pink-600" />
-              ) : (
-                <StarOff className="h-4 w-4" />
-              )}
-            </Button>
-            {/* download button */}
-            <Button disabled={loading} variant="ghost" onClick={handleDownload}>
-              <Download className="h-4 w-4" />
-            </Button>
+            {/* title */}
+            <DialogTitle className="text-center">{docToView?.name}</DialogTitle>
+            {/* more buttons */}
+            <div className="flex items-center gap-2">
+              {/* share button */}
+              <Button disabled={loading} variant="ghost" onClick={handleShare}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+              {/* delete button */}
+              <Button disabled={loading} variant="ghost" onClick={() => setOpenDelete(true)}>
+                <Trash className="h-4 w-4" />
+              </Button>
+              {/* favorite button */}
+              <Button
+                disabled={loading}
+                variant="ghost"
+                onClick={handleFavorite}
+              >
+                {isFavorite ? (
+                  <Star className="h-4 w-4 text-pink-600" />
+                ) : (
+                  <StarOff className="h-4 w-4" />
+                )}
+              </Button>
+              {/* download button */}
+              <Button
+                disabled={loading}
+                variant="ghost"
+                onClick={handleDownload}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          </DialogHeader>
+          <div className="mt-4">
+            {isImg ? (
+              <img
+                src={docToView?.file?.url}
+                alt={docToView?.name}
+                width={"100%"}
+                height={"400px"}
+              />
+            ) : (
+              <iframe
+                src={docToView?.file?.url}
+                width={"100%"}
+                height={"400px"}
+              />
+            )}
           </div>
-        </DialogHeader>
-        <div className="mt-4">
-          {isImg ? (
-            <img
-              src={docToView?.file?.url}
-              alt={docToView?.name}
-              width={"100%"}
-              height={"400px"}
-            />
-          ) : (
-            <iframe
-              src={docToView?.file?.url}
-              width={"100%"}
-              height={"400px"}
-            />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      <ConfirmationDialog
+        open={openDelete}
+        onClose={() => {
+          setOpenDelete(false);
+        }}
+        onConfirm={handleDelete}
+        description={t("deleteFile")}
+        showDatePicker={false}
+      />
+      <ShareDialog
+        open={openShareDialog}
+        onClose={() => setOpenShareDialog(false)}
+      />
+    </>
   );
 }

@@ -28,4 +28,5 @@ export interface BreadcrumbItem {
   label: string;      // Text to display for the breadcrumb
   href: string;       // URL to navigate to when clicked
   isActive: boolean;  // Whether this is the active breadcrumb (current page)
+  isDisabled?: boolean; // Whether this breadcrumb should be disabled (not clickable)
 }

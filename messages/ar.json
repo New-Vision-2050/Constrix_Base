@@ -857,8 +857,8 @@
         "dateObtain": "تاريخ الحصول على الشهادة",
         "dateObtainPlaceholder": "تاريخ الحصول على الشهادة",
         "dateObtainValidation": "يجب أن يحتوي فقط على أحرف",
-        "file":"ارفق الشهادة",
-        "filePlaceholder":"ارفق الشهادة",
+        "file": "ارفق الشهادة",
+        "filePlaceholder": "ارفق الشهادة",
         "dateEnd": "تاريخ نهاية الشهادة",
         "dateEndPlaceholder": "تاريخ نهاية الشهادة",
         "dateEndValidation": "يجب أن يحتوي فقط على أحرف",
@@ -1880,7 +1880,14 @@
     "updateSuccess": "تم تحديث العلامة التجارية بنجاح!",
     "createError": "فشل إنشاء العلامة التجارية. يرجى المحاولة مرة أخرى.",
     "updateError": "فشل تحديث العلامة التجارية. يرجى المحاولة مرة أخرى.",
-    "validationError": "خطأ في التحقق من البيانات. يرجى التحقق من المدخلات."
+    "validationError": "خطأ في التحقق من البيانات. يرجى التحقق من المدخلات.",
+    "totalProducts": "مجموع المنتجات",
+    "totalRequests": "مجموع الطلبات",
+    "activatedSuccessfully": "تم تفعيل العلامة التجارية بنجاح",
+    "deactivatedSuccessfully": "تم إلغاء تفعيل العلامة التجارية بنجاح",
+    "failedToUpdateStatus": "فشل تحديث الحالة",
+    "areYouSureReactivate": "هل أنت متأكد من إعادة تفعيل هذه العلامة التجارية؟",
+    "areYouSureDeactivate": "هل أنت متأكد من إلغاء تفعيل هذه العلامة التجارية؟"
   },
   "warehouse": {
     "plural": "المخازن",
@@ -1992,12 +1999,93 @@
     "sku": "رقم المنتج",
     "stock": "الكمية",
     "image": "صورة",
-    "currency": "ريال"
+    "currency": "ريال",
+    "type": "النوع"
   },
   "product": {
     "singular": "منتج",
     "plural": "المنتجات",
+    "fields": {
+      "productName": "اسم المنتج",
+      "productDescription": "وصف المنتج",
+      "productCode": "كود المنتج (السيريال)",
+      "status": "الحالة",
+      "category": "القسم",
+      "subCategory": "قسم الفرعي",
+      "subSubCategory": "قسم فرعي فرعي",
+      "brand": "العلامة التجارية",
+      "country": "الدولة",
+      "productType": "نوع المنتح",
+      "unit": "الوحدة",
+      "gender": "النوع",
+      "warehouse": "المخزن",
+      "unitPrice": "السعر الوحدة ($)",
+      "minOrderQuantity": "الحد الادنى لكمية الطلب",
+      "currentStock": "كمية المخزون الحالية",
+      "discountType": "نوع الخصم",
+      "discountAmount": "مبلغ الخصم ($)",
+      "taxAmount": "مبلغ الضريبة (%)",
+      "calculateShippingCost": "حساب تكلفة الشحن ($)",
+      "shippingCost": "تكلفة الشحن ($)",
+      "metaTitle": "عنوان ميتا",
+      "metaDescription": "وصف ميتا",
+      "metaKeywords": "كلمات مفتاحية ميتا",
+      "metaPhoto": "صورة ميتا",
+      "productVideo": "فيديو المنتج"
+    },
+    "placeholders": {
+      "selectCategory": "اختر القسم",
+      "selectMainCategoryFirst": "اختر القسم الرئيسي أولاً",
+      "selectSubCategoryFirst": "اختر القسم الفرعي أولاً",
+      "selectSubCategory": "اختر القسم الفرعي",
+      "selectSubSubCategory": "اختر القسم الفرعي الفرعي",
+      "selectBrand": "اختر العلامة التجارية",
+      "selectCountries": "اختر الدول",
+      "selectType": "اختر النوع",
+      "selectUnit": "اختر الوحدة",
+      "selectWarehouse": "اختر المخزن",
+      "selectDiscountType": "اختر نوع الخصم",
+      "loading": "جاري التحميل...",
+      "videoUrl": "example@youtube.com"
+    },
+    "options": {
+      "normal": "عادي",
+      "serial": "رقمي",
+      "male": "ذكر",
+      "female": "انثى",
+      "all": "الكل",
+      "flat": "مستوى",
+      "percentage": "نسبة مئوية"
+    },
+    "messages": {
+      "noSubCategories": "لا توجد أقسام فرعية",
+      "noSubSubCategories": "لا توجد أقسام فرعية فرعية",
+      "notFound": "المنتج غير موجود",
+      "updating": "جاري تحديث البيانات...",
+      "preparing": "جاري تجهيز البيانات...",
+      "uploading": "جاري رفع البيانات إلى الخادم...",
+      "completing": "جاري إتمام العملية...",
+      "updateSuccess": "تم التحديث بنجاح!"
+    },
+    "actions": {
+      "backToList": "العودة إلى القائمة",
+      "updateProduct": "تحديث المنتج"
+    },
+    "sections": {
+      "generalSettings": "الاعداد العام",
+      "pricingAndOthers": "التسعير وغيرها",
+      "productImages": "صور المنتج",
+      "productVideo": "فيديو المنتج",
+      "seoSection": "قسم تحسين محركات البحث"
+    },
+    "seo": {
+      "recommendedSize": "الحجم الموصى به 3MB"
+    },
     "dialog": {
+      "actions": {
+        "cancel": "إلغاء",
+        "saving": "جاري الحفظ..."
+      },
       "add": {
         "title": "إضافة منتج عادي",
         "success": "تم إنشاء المنتج بنجاح",
@@ -2113,32 +2201,28 @@
       }
     },
     "validation": {
+      "nameAr": "الاسم باللغة العربية مطلوب",
+      "nameEn": "الاسم باللغة الإنجليزية مطلوب",
+      "sku": "رمز المنتج مطلوب",
+      "category": "حقل الفئة الرئيسية مطلوب",
+      "type": "نوع المنتج مطلوب",
+      "warehouse": "معرف المستودع مطلوب",
+      "unit": "وحدة القياس مطلوبة",
+      "price": "حقل السعر مطلوب",
+      "gender": "الجنس المستهدف مطلوب",
+      "minOrderQuantity": "الحد الأدنى لكمية الطلب مطلوب",
+      "discountType": "نوع الخصم مطلوب",
+      "discountValue": "يجب أن تكون قيمة الخصم رقماً موجباً",
+      "vatPercentage": "يجب أن تكون نسبة ضريبة القيمة المضافة بين 0 و 100",
+      "fillRequired": "يرجى ملء جميع الحقول المطلوبة بشكل صحيح",
       "name": {
         "required": "اسم المنتج مطلوب"
       },
       "description": {
         "required": "وصف المنتج مطلوب"
       },
-      "price": {
-        "required": "السعر يجب أن يكون رقم موجب"
-      },
-      "sku": {
-        "required": "رمز المنتج مطلوب"
-      },
       "stock": {
         "negative": "الكمية لا يمكن أن تكون سالبة"
-      },
-      "warehouse": {
-        "required": "المستودع مطلوب"
-      },
-      "category": {
-        "required": "الفئة مطلوبة"
-      },
-      "type": {
-        "invalid": "نوع المنتج يجب أن يكون مادي أو رقمي"
-      },
-      "vatPercentage": {
-        "range": "نسبة الضريبة يجب أن تكون بين 0 و 100"
       },
       "mainImage": {
         "required": "الصورة الرئيسية مطلوبة"
