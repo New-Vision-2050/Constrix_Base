@@ -377,6 +377,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              disableReactQuery: true,
+              enableServerSearch: false,
             },
             disabled: isShareClient,
             condition: (values) => {
@@ -400,6 +402,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              disableReactQuery: true, // تعطيل React Query caching
+              enableServerSearch: false, // تعطيل البحث من السيرفر
             },
             disabled: isShareClient,
             condition: (values) => {
