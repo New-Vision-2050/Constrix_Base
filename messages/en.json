@@ -876,8 +876,8 @@
         "dateObtain": "Date Obtain",
         "dateObtainPlaceholder": "Date Obtain",
         "dateObtainValidation": "Should contain only letters",
-        "file":"File",
-        "filePlaceholder":"File",
+        "file": "File",
+        "filePlaceholder": "File",
         "dateEnd": "Date End",
         "dateEndPlaceholder": "Date End",
         "dateEndValidation": "Should contain only letters",
@@ -2014,7 +2014,87 @@
   "product": {
     "singular": "Product",
     "plural": "Products",
+    "fields": {
+      "productName": "Product Name",
+      "productDescription": "Product Description",
+      "productCode": "Product Code (Serial)",
+      "status": "Status",
+      "category": "Category",
+      "subCategory": "Sub Category",
+      "subSubCategory": "Sub Sub Category",
+      "brand": "Brand",
+      "country": "Country",
+      "productType": "Product Type",
+      "unit": "Unit",
+      "gender": "Gender",
+      "warehouse": "Warehouse",
+      "unitPrice": "Unit Price ($)",
+      "minOrderQuantity": "Minimum Order Quantity",
+      "currentStock": "Current Stock Quantity",
+      "discountType": "Discount Type",
+      "discountAmount": "Discount Amount ($)",
+      "taxAmount": "Tax Amount (%)",
+      "calculateShippingCost": "Calculate Shipping Cost ($)",
+      "shippingCost": "Shipping Cost ($)",
+      "metaTitle": "Meta Title",
+      "metaDescription": "Meta Description",
+      "metaKeywords": "Meta Keywords",
+      "metaPhoto": "Meta Photo",
+      "productVideo": "Product Video"
+    },
+    "placeholders": {
+      "selectCategory": "Select Category",
+      "selectMainCategoryFirst": "Select Main Category First",
+      "selectSubCategoryFirst": "Select Sub Category First",
+      "selectSubCategory": "Select Sub Category",
+      "selectSubSubCategory": "Select Sub Sub Category",
+      "selectBrand": "Select Brand",
+      "selectCountries": "Select Countries",
+      "selectType": "Select Type",
+      "selectUnit": "Select Unit",
+      "selectWarehouse": "Select Warehouse",
+      "selectDiscountType": "Select Discount Type",
+      "loading": "Loading...",
+      "videoUrl": "example@youtube.com"
+    },
+    "options": {
+      "normal": "Normal",
+      "serial": "Serial",
+      "male": "Male",
+      "female": "Female",
+      "all": "All",
+      "flat": "Flat",
+      "percentage": "Percentage"
+    },
+    "messages": {
+      "noSubCategories": "No sub categories available",
+      "noSubSubCategories": "No sub sub categories available",
+      "notFound": "Product not found",
+      "updating": "Updating data...",
+      "preparing": "Preparing data...",
+      "uploading": "Uploading data to server...",
+      "completing": "Completing operation...",
+      "updateSuccess": "Updated successfully!"
+    },
+    "actions": {
+      "backToList": "Back to List",
+      "updateProduct": "Update Product"
+    },
+    "sections": {
+      "generalSettings": "General Settings",
+      "pricingAndOthers": "Pricing and Others",
+      "productImages": "Product Images",
+      "productVideo": "Product Video",
+      "seoSection": "SEO Section"
+    },
+    "seo": {
+      "recommendedSize": "Recommended size 3MB"
+    },
     "dialog": {
+      "actions": {
+        "cancel": "Cancel",
+        "saving": "Saving..."
+      },
       "add": {
         "title": "Add Regular Product",
         "success": "Product created successfully",
@@ -2130,32 +2210,28 @@
       }
     },
     "validation": {
+      "nameAr": "Arabic name is required",
+      "nameEn": "English name is required",
+      "sku": "Product code is required",
+      "category": "Main category field is required",
+      "type": "Product type is required",
+      "warehouse": "Warehouse ID is required",
+      "unit": "Unit of measurement is required",
+      "price": "Price field is required",
+      "gender": "Target gender is required",
+      "minOrderQuantity": "Minimum order quantity is required",
+      "discountType": "Discount type is required",
+      "discountValue": "Discount value must be a positive number",
+      "vatPercentage": "VAT percentage must be between 0 and 100",
+      "fillRequired": "Please fill all required fields correctly",
       "name": {
         "required": "Product name is required"
       },
       "description": {
         "required": "Product description is required"
       },
-      "price": {
-        "required": "Price must be a positive number"
-      },
-      "sku": {
-        "required": "Product code is required"
-      },
       "stock": {
         "negative": "Quantity cannot be negative"
-      },
-      "warehouse": {
-        "required": "Warehouse is required"
-      },
-      "category": {
-        "required": "Category is required"
-      },
-      "type": {
-        "invalid": "Product type must be physical or digital"
-      },
-      "vatPercentage": {
-        "range": "VAT percentage must be between 0 and 100"
       },
       "mainImage": {
         "required": "Main image is required"

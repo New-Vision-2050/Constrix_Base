@@ -24,10 +24,10 @@ const SelectTrigger = forwardRef<
     )}
     {...props}
   >
-    {children}
     <SelectPrimitive.Icon asChild>
       <ChevronDown className="h-4 w-4 opacity-50 transition  group-data-[state=open]:rotate-180" />
     </SelectPrimitive.Icon>
+    {children}
   </SelectPrimitive.Trigger>
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
