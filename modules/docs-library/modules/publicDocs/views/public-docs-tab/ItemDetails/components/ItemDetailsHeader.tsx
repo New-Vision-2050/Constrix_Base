@@ -27,7 +27,7 @@ export default function ItemDetailsHeader({
   let imageUrl = selectedDocument?.file?.url;
   let fileType = selectedDocument?.file?.type;
   let imageIcon: StaticImageData;
-  const isDir = !Boolean(selectedDocument?.reference_number);
+  const isDir = !Boolean(selectedDocument?.is_file);
   if (isDir) {
     imageIcon = DirIcon;
   } else {

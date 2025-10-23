@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import ShareDialog from "../../../views/public-docs-tab/share-dialog";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 /**
  * Action buttons component
@@ -32,14 +33,15 @@ import ShareDialog from "../../../views/public-docs-tab/share-dialog";
  */
 interface ActionButtonsProps {
   document: DocumentT;
+  isFolder?: boolean;
 }
 
-export const ActionButtons = ({ document }: ActionButtonsProps) => {
+export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
   const { can } = usePermissions();
-  const isDirectory = !Boolean(document.reference_number);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const [openDelete, setOpenDelete] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
+  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
   const {
     setOpenDirDialog,
     setOpenFileDialog,
@@ -56,12 +58,13 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
     try {
       const _url =
         baseURL +
-        (isDirectory ? `/folders/${document?.id}` : `/files/${document?.id}`);
+        (isFolder ? `/folders/${document?.id}` : `/files/${document?.id}`);
       await apiClient.delete(_url);
 
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
       refetchDocs();
+      if (!isFolder) handleRefetchDocsWidgets();
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));
@@ -77,7 +80,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         else storeSelectedDocument(document);
         break;
       case "download":
-        if (!isDirectory) {
+        if (!isFolder) {
           const _url = document?.file?.url;
           window.open(_url, "_blank");
         }
@@ -87,7 +90,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
         break;
       case "edit":
         setEditedDoc(document);
-        if (isDirectory) setOpenDirDialog(true);
+        if (isFolder) setOpenDirDialog(true);
         else setOpenFileDialog(true);
         break;
       case "delete":
@@ -131,7 +134,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
           <DropdownMenuItem
             onClick={() => handleAction("download")}
             className="flex items-center gap-2"
-            disabled={isDirectory}
+            disabled={isFolder}
           >
             <Download className="h-4 w-4" />
             {t("download")}
@@ -153,7 +156,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
             onClick={() => handleAction("edit")}
             disabled={
               !Boolean(document.can_update) ||
-              (isDirectory
+              (isFolder
                 ? !can(PERMISSIONS.library.folder.update)
                 : !can(PERMISSIONS.library.file.update))
             }
@@ -183,7 +186,7 @@ export const ActionButtons = ({ document }: ActionButtonsProps) => {
           setOpenDelete(false);
         }}
         onConfirm={handleDelete}
-        description={isDirectory ? t("deleteDir") : t("deleteFile")}
+        description={isFolder ? t("deleteDir") : t("deleteFile")}
         showDatePicker={false}
       />
       <ShareDialog

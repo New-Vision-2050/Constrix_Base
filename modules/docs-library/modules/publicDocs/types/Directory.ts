@@ -27,6 +27,7 @@ export type DocumentT = {
   is_password?: number;
   is_favourite?: number;
   users: any[];
+  is_file?: number;
   can_update: boolean;
   can_delete: boolean; // 1 can delete 0 can't delete
 };
