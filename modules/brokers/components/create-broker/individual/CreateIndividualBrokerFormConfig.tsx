@@ -27,6 +27,20 @@ export function getCreateIndividualBrokerFormConfig(
     sections: [
       {
         fields: [
+          // disabled fields
+          {
+            name: "emailisReceived",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
+          // new email
+          {
+            name: "newEmail",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
           //  dialog hidden message
           {
             name: "dialogMessage",
@@ -98,8 +112,20 @@ export function getCreateIndividualBrokerFormConfig(
 
                     if (!statusInCompany && !statusInAllCompanies) {
                       // not exist in system continue
+                      useFormStore.getState().setValues(formId, {
+                        emailisReceived: true,
+                      });
+                      useFormStore.getState().setValues(formId, {
+                        newEmail: true,
+                      });
                       return true;
                     }
+                    useFormStore.getState().setValues(formId, {
+                      emailisReceived: false,
+                    });
+                    useFormStore.getState().setValues(formId, {
+                      newEmail: false,
+                    });
                     const _user = {
                       userId: userId,
                       email: response.payload?.[0]?.email || "",
@@ -217,6 +243,35 @@ export function getCreateIndividualBrokerFormConfig(
               },
             ],
           },
+          /////=======> Disabled Fields
+          {
+            name: "phone",
+            label: t("form.phone"),
+            type: "phone",
+            disabled: true,
+            placeholder: t("form.phonePlaceholder"),
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "name",
+            label: t("form.name"),
+            type: "text",
+            placeholder: t("form.namePlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "residence",
+            label: t("form.identity"),
+            type: "text",
+            placeholder: t("form.identityPlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          //======================
           // phone
           {
             name: "phone",
@@ -230,6 +285,7 @@ export function getCreateIndividualBrokerFormConfig(
                 message: t("form.phoneInvalid"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // name
           {
@@ -261,6 +317,7 @@ export function getCreateIndividualBrokerFormConfig(
                 message: t("form.nameMinLength"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // address dialog
           {
@@ -270,6 +327,7 @@ export function getCreateIndividualBrokerFormConfig(
             render: () => {
               return <AddressDialog formId={formId} />;
             },
+            condition: (values) => values.emailisReceived == true,
           },
           // identity --> residence
           {
@@ -299,6 +357,7 @@ export function getCreateIndividualBrokerFormConfig(
                 message: t("form.identityPattern"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // branchs
           {
@@ -321,7 +380,7 @@ export function getCreateIndividualBrokerFormConfig(
             },
             disabled: isShareBroker,
             condition: (values) => {
-              return !!isShareBroker;
+              return !!isShareBroker && values.emailisReceived == true;
             },
           },
           {
@@ -344,7 +403,7 @@ export function getCreateIndividualBrokerFormConfig(
             },
             disabled: isShareBroker,
             condition: (values) => {
-              return !isShareBroker;
+              return !isShareBroker && values.emailisReceived == true;
             },
           },
           // chat mail
@@ -353,6 +412,58 @@ export function getCreateIndividualBrokerFormConfig(
             label: t("form.correspondenceAddress"),
             type: "text",
             placeholder: t("form.correspondenceAddressPlaceholder"),
+            condition: (values) => values.emailisReceived == true,
+          },
+          /////=======> Disabled Fields
+          {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareBroker,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "branch_ids",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              setFirstAsDefault: true,
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "chat_mail",
+            label: t("form.correspondenceAddress"),
+            type: "text",
+            placeholder: t("form.correspondenceAddressPlaceholder"),
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
           },
         ],
       },
