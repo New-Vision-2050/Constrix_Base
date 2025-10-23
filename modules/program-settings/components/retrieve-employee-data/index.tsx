@@ -36,6 +36,7 @@ export default function RetrieveEmployeeData(props: PropsT) {
     useFormStore.getState().setValues(formId, { first_name });
     useFormStore.getState().setValues(formId, { last_name });
     useFormStore.getState().setValues(formId, { country_id });
+    useFormStore.getState().setValues(formId, { mailReceived: true });
 
     // set error to null
     useFormStore.getState().setError(formId, "email", null);
