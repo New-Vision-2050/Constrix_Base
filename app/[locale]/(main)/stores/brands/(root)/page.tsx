@@ -1,4 +1,4 @@
-import ListBrandsView from "@/modules/stores/brands/list";
+import BrandsView from "@/modules/stores/brands";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 function ListBrandsPage() {
-  return <ListBrandsView />;
+  return <BrandsView />;
 }
 
 export default ListBrandsPage;
