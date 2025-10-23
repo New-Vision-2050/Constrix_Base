@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import type { BreadcrumbsProps, BreadcrumbItem } from "./types";
 import { getRoutesMap } from "./routes-map";
+import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
+import { isDisabledBreadcrumbSegment } from "./disabled-list";
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   homeLabel,
@@ -64,6 +66,12 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     );
   };
 
+  // Check if a segment should be disabled (super entity slug or in custom disabled list)
+  const isSegmentDisabled = (segment: string): boolean => {
+    const superEntityValues = Object.values(SUPER_ENTITY_SLUG);
+    return superEntityValues.includes(segment) || isDisabledBreadcrumbSegment(segment);
+  };
+  
   // Get label for ID segments from translation file
   const getIdSegmentLabel = (): string => {
     // Get the translation key for "details" from the breadcrumbs namespace
@@ -145,6 +153,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       label: finalHomeLabel,
       href: `/user-profile`,
       isActive: pathSegments.length === 0,
+      isDisabled: false, // Home is never disabled
     },
     ...pathSegments.map((segment, index) => {
       // Build the full path without locale
@@ -170,6 +179,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
         label, // Use custom label from getRouteInfo
         href,
         isActive: index === pathSegments.length - 1,
+        isDisabled: isSegmentDisabled(segment), // Disable if it's a super entity slug or in disabled list
       };
     }),
   ];
@@ -182,6 +192,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
             <li>
               {crumb.isActive ? (
                 <span className="text-pink-500 font-medium">{crumb.label}</span>
+              ) : crumb.isDisabled ? (
+                <span className="text-gray-400 cursor-not-allowed opacity-60">{crumb.label}</span>
               ) : (
                 <Link
                   href={crumb.href}
