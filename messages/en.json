@@ -876,8 +876,8 @@
         "dateObtain": "Date Obtain",
         "dateObtainPlaceholder": "Date Obtain",
         "dateObtainValidation": "Should contain only letters",
-        "file":"File",
-        "filePlaceholder":"File",
+        "file": "File",
+        "filePlaceholder": "File",
         "dateEnd": "Date End",
         "dateEndPlaceholder": "Date End",
         "dateEndValidation": "Should contain only letters",
@@ -1877,7 +1877,27 @@
     "brandName": "Brand Name",
     "brandNameRequired": "Brand name is required",
     "brandNameMinLength": "Brand name must be at least 2 characters",
-    "notFound": "No brands found"
+    "imageRequired": "Brand image is required",
+    "notFound": "No brands found",
+    "imageLabel": "Section Image",
+    "description": "Description",
+    "dragDropImage": "Drag and drop image here or",
+    "supportedFormats": ".jpg, .png, .webp",
+    "attachImage": "Attach",
+    "removeImage": "Remove Image",
+    "save": "Save",
+    "createSuccess": "Brand created successfully!",
+    "updateSuccess": "Brand updated successfully!",
+    "createError": "Failed to create brand. Please try again.",
+    "updateError": "Failed to update brand. Please try again.",
+    "validationError": "Validation error. Please check your inputs.",
+    "totalProducts": "Total Products",
+    "totalRequests": "Total Requests",
+    "activatedSuccessfully": "Brand activated successfully",
+    "deactivatedSuccessfully": "Brand deactivated successfully",
+    "failedToUpdateStatus": "Failed to update status",
+    "areYouSureReactivate": "Are you sure you want to reactivate this brand?",
+    "areYouSureDeactivate": "Are you sure you want to deactivate this brand?"
   },
   "warehouse": {
     "plural": "Warehouses",
@@ -1905,6 +1925,7 @@
     "plural": "Categories",
     "singular": "Category",
     "addCategory": "Add Category",
+    "editCategory": "Edit Category",
     "categoryName": "Category Name",
     "categoryNamePlaceholder": "Enter category name",
     "categoryDescription": "Category Description",
@@ -1912,12 +1933,43 @@
     "categoryNameRequired": "Category name is required",
     "categoryNameMinLength": "Category name must be at least 2 characters",
     "categoryDescriptionMinLength": "Category description required",
+    "priorityRequired": "Priority is required",
+    "imageRequired": "Image is required",
+    "imageLabel": "Category Image",
+    "dragDropImage": "Drag and drop image here",
+    "supportedFormats": "PNG, JPG, WEBP (MAX. 3MB)",
+    "attachImage": "Attach Image",
+    "removeImage": "Remove Image",
     "save": "Save",
     "cancel": "Cancel",
     "saving": "Saving...",
     "addChild": "Add Subcategory",
-    "notFound": "No categories found",
-    "parentCategory": "Parent Category"
+    "notFound": "Category not found. It may have been deleted",
+    "parentCategory": "Parent Category",
+    "createSuccess": "Category created successfully",
+    "updateSuccess": "Category updated successfully",
+    "createError": "Failed to create category. Please try again",
+    "updateError": "Failed to update category. Please try again",
+    "validationError": "Validation error",
+    "permissionDenied": "You don't have permission to perform this action",
+    "networkError": "Network error. Please check your connection",
+    "active": "Active",
+    "success": "Success",
+    "error": "Error",
+    "activatedSuccessfully": "Category activated successfully",
+    "deactivatedSuccessfully": "Category deactivated successfully",
+    "failedToUpdateStatus": "Failed to update status",
+    "areYouSureReactivate": "Are you sure you want to reactivate this category?",
+    "areYouSureDeactivate": "Are you sure you want to deactivate this category?",
+    "addSubCategory": "Add Sub Category",
+    "editSubCategory": "Edit Sub Category",
+    "addSubSubCategory": "Add Sub-Sub Category",
+    "editSubSubCategory": "Edit Sub-Sub Category",
+    "mainCategory": "Main Category",
+    "subCategory": "Sub Category",
+    "selectMainCategory": "Select main category",
+    "selectSubCategory": "Select sub category",
+    "fetchError": "Failed to load category data"
   },
   "labels": {
     "optional": "(optional)",
@@ -1962,7 +2014,87 @@
   "product": {
     "singular": "Product",
     "plural": "Products",
+    "fields": {
+      "productName": "Product Name",
+      "productDescription": "Product Description",
+      "productCode": "Product Code (Serial)",
+      "status": "Status",
+      "category": "Category",
+      "subCategory": "Sub Category",
+      "subSubCategory": "Sub Sub Category",
+      "brand": "Brand",
+      "country": "Country",
+      "productType": "Product Type",
+      "unit": "Unit",
+      "gender": "Gender",
+      "warehouse": "Warehouse",
+      "unitPrice": "Unit Price ($)",
+      "minOrderQuantity": "Minimum Order Quantity",
+      "currentStock": "Current Stock Quantity",
+      "discountType": "Discount Type",
+      "discountAmount": "Discount Amount ($)",
+      "taxAmount": "Tax Amount (%)",
+      "calculateShippingCost": "Calculate Shipping Cost ($)",
+      "shippingCost": "Shipping Cost ($)",
+      "metaTitle": "Meta Title",
+      "metaDescription": "Meta Description",
+      "metaKeywords": "Meta Keywords",
+      "metaPhoto": "Meta Photo",
+      "productVideo": "Product Video"
+    },
+    "placeholders": {
+      "selectCategory": "Select Category",
+      "selectMainCategoryFirst": "Select Main Category First",
+      "selectSubCategoryFirst": "Select Sub Category First",
+      "selectSubCategory": "Select Sub Category",
+      "selectSubSubCategory": "Select Sub Sub Category",
+      "selectBrand": "Select Brand",
+      "selectCountries": "Select Countries",
+      "selectType": "Select Type",
+      "selectUnit": "Select Unit",
+      "selectWarehouse": "Select Warehouse",
+      "selectDiscountType": "Select Discount Type",
+      "loading": "Loading...",
+      "videoUrl": "example@youtube.com"
+    },
+    "options": {
+      "normal": "Normal",
+      "serial": "Serial",
+      "male": "Male",
+      "female": "Female",
+      "all": "All",
+      "flat": "Flat",
+      "percentage": "Percentage"
+    },
+    "messages": {
+      "noSubCategories": "No sub categories available",
+      "noSubSubCategories": "No sub sub categories available",
+      "notFound": "Product not found",
+      "updating": "Updating data...",
+      "preparing": "Preparing data...",
+      "uploading": "Uploading data to server...",
+      "completing": "Completing operation...",
+      "updateSuccess": "Updated successfully!"
+    },
+    "actions": {
+      "backToList": "Back to List",
+      "updateProduct": "Update Product"
+    },
+    "sections": {
+      "generalSettings": "General Settings",
+      "pricingAndOthers": "Pricing and Others",
+      "productImages": "Product Images",
+      "productVideo": "Product Video",
+      "seoSection": "SEO Section"
+    },
+    "seo": {
+      "recommendedSize": "Recommended size 3MB"
+    },
     "dialog": {
+      "actions": {
+        "cancel": "Cancel",
+        "saving": "Saving..."
+      },
       "add": {
         "title": "Add Regular Product",
         "success": "Product created successfully",
@@ -2078,32 +2210,28 @@
       }
     },
     "validation": {
+      "nameAr": "Arabic name is required",
+      "nameEn": "English name is required",
+      "sku": "Product code is required",
+      "category": "Main category field is required",
+      "type": "Product type is required",
+      "warehouse": "Warehouse ID is required",
+      "unit": "Unit of measurement is required",
+      "price": "Price field is required",
+      "gender": "Target gender is required",
+      "minOrderQuantity": "Minimum order quantity is required",
+      "discountType": "Discount type is required",
+      "discountValue": "Discount value must be a positive number",
+      "vatPercentage": "VAT percentage must be between 0 and 100",
+      "fillRequired": "Please fill all required fields correctly",
       "name": {
         "required": "Product name is required"
       },
       "description": {
         "required": "Product description is required"
       },
-      "price": {
-        "required": "Price must be a positive number"
-      },
-      "sku": {
-        "required": "Product code is required"
-      },
       "stock": {
         "negative": "Quantity cannot be negative"
-      },
-      "warehouse": {
-        "required": "Warehouse is required"
-      },
-      "category": {
-        "required": "Category is required"
-      },
-      "type": {
-        "invalid": "Product type must be physical or digital"
-      },
-      "vatPercentage": {
-        "range": "VAT percentage must be between 0 and 100"
       },
       "mainImage": {
         "required": "Main image is required"

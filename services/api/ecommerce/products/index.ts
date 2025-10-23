@@ -23,7 +23,10 @@ export const ProductsApi = {
   update: (id: string, params: UpdateProductParams) =>
     baseApi.post<UpdateProductResponse>(
       `ecommerce/dashboard/products/${id}`,
-      params
+      serialize(params, {
+        indices: true,
+        booleansAsIntegers: true,
+      })
     ),
   delete: (id: string) => baseApi.delete(`ecommerce/dashboard/products/${id}`),
 };
