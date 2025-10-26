@@ -1,17 +1,23 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
+import TheStatus from "@/modules/bouquet/components/the-status";
 import { TableConfig } from "@/modules/table";
 import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface DealOfDayRow {
   id: string;
-  product_name: string;
-  discount_type: string;
+  name: {
+    ar: string;
+    en: string;
+  };
+  product_id: string;
+  product: {
+    name: string;
+  };
+  discount_type: "percentage" | "amount";
   discount_value: number;
-  start_date: string;
-  end_date: string;
-  is_active: boolean;
+  is_active: "active" | "inActive";
 }
 
 type Params = {
@@ -25,43 +31,25 @@ export const useDealOfDayTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "deal-of-day-list-table",
-    url: `${baseURL}/ecommerce/dashboard/deal-of-day`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/deal-of-day`,
+    url: `${baseURL}/ecommerce/dashboard/deal_days`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/deal_days`,
+    statusUrl: `${baseURL}/ecommerce/dashboard/deal_days`,
     columns: [
       {
-        key: "id",
-        label: "قسيمة",
+        key: "name",
+        label: "اسم الصفقة",
         sortable: true,
       },
       {
-        key: "discount_type",
-        label: "نوع القسيمة",
+        key: "product.name",
+        label: "المنتج",
       },
-      {
-        key: "discount_value",
-        label: "المبلغ",
-      },
-      {
-        key: "usage_limit",
-        label: "حد المستخدم",
-      },
-      {
-        key: "start_date",
-        label: "تاريخ الشهر",
-        render: (value: string, row: DealOfDayRow) => {
-          if (!value) return "-";
-          const startDate = new Date(value);
-          const endDate = new Date(row.end_date);
-          return `${startDate.toLocaleDateString("ar-EG")} - ${endDate.toLocaleDateString("ar-EG")}`;
-        },
-      },
+
       {
         key: "is_active",
-        label: "الحالة",
-        render: (value: boolean) => (
-          <span className={value ? "text-green-500" : "text-red-500"}>
-            {value ? "نشط" : "غير نشط"}
-          </span>
+        label: "نشط",
+        render: (value: "active" | "inActive", row: DealOfDayRow) => (
+          <TheStatus theStatus={value} id={row.id} />
         ),
       },
     ],
