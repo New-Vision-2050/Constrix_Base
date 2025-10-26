@@ -419,6 +419,9 @@ export function employeeFormConfig(
       const body = {
         ...formData,
         country_id: Boolean(formData?.country_id) ? formData?.country_id : null,
+        first_name: formData?.first_name || null,
+        last_name: formData?.last_name || null,
+        phone: formData?.phone || null
       };
 
       return await defaultSubmitHandler(body, employeeFormConfig(t));
