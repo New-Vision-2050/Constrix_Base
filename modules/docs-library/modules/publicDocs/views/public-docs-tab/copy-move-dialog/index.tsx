@@ -51,7 +51,7 @@ export default function CopyMoveDialog({ open, onClose, type }: PropsType) {
 
     copyMoveMutation.mutate({
       folder_id: value,
-      file_id: selectedDocs?.[0]?.id,
+      file_ids: selectedDocs?.map((doc) => doc.id),
     });
     clearSelectedDocs();
   };
