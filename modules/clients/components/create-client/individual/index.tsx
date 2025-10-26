@@ -5,7 +5,11 @@ import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { useCreateClientCxt } from "@/modules/clients/context/CreateClientCxt";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 
-export default function CreateIndividualClientForm() {
+export default function CreateIndividualClientForm({
+  sub_entity_id,
+}: {
+  sub_entity_id?: string;
+}) {
   const t = useTranslations("ClientsModule");
   const {
     branchId: currentEmpBranchId,
@@ -28,7 +32,8 @@ export default function CreateIndividualClientForm() {
     currentEmpBranchId,
     currentEmpId,
     sharedSettings?.is_share_client == "1",
-    companyBranchesIds
+    companyBranchesIds,
+    sub_entity_id,
   );
 
   // form builder vars

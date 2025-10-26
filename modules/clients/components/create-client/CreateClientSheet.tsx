@@ -15,7 +15,7 @@ import { useCreateClientCxt } from "../../context/CreateClientCxt";
 import { Button } from "@/components/ui/button";
 import CreateClientSheetContent from "./CreateClientSheetContent";
 
-const CreateClientSheet = () => {
+const CreateClientSheet = ({sub_entity_id}: {sub_entity_id?: string}) => {
   const locale = useLocale();
   const isRtl = locale === "ar";
   const sheetSide = isRtl ? "left" : "right";
@@ -46,7 +46,7 @@ const CreateClientSheet = () => {
               {t("title")}
             </SheetTitle>
           </SheetHeader>
-          <CreateClientSheetContent />
+          <CreateClientSheetContent sub_entity_id={sub_entity_id} />
           <SheetFooter />
         </SheetContent>
       </Sheet>

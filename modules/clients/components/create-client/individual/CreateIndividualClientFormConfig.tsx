@@ -13,7 +13,8 @@ export function getCreateIndividualClientFormConfig(
   currentEmpBranchId?: string,
   currentEmpId?: string,
   isShareClient?: boolean,
-  companyBranchesIds?: string[]
+  companyBranchesIds?: string[],
+  sub_entity_id?: string,
 ): FormConfig {
   const formId = "individual-client-form";
 
@@ -377,8 +378,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
-              disableReactQuery: true,
-              enableServerSearch: false,
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
             disabled: isShareClient,
             condition: (values) => {
@@ -402,8 +403,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
-              disableReactQuery: true, // تعطيل React Query caching
-              enableServerSearch: false, // تعطيل البحث من السيرفر
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
             disabled: isShareClient,
             condition: (values) => {
@@ -455,6 +456,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
             disabled: true,
             condition: (values) => values.emailisReceived == false,
@@ -476,6 +479,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
             disabled: true,
             condition: (values) => values.emailisReceived == false,
@@ -516,6 +521,7 @@ export function getCreateIndividualClientFormConfig(
       return await defaultSubmitHandler(
         {
           ...formData,
+          sub_entity_id,
           branch_ids: isShareClient
             ? formData.branch_ids_all
             : formData.branch_ids,

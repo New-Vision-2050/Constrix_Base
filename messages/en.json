@@ -2264,5 +2264,14 @@
         }
       }
     }
+  },
+  "terms": {
+    "plural": "Terms and Conditions",
+    "singular": "Term",
+    "save": "Save",
+    "saving": "Saving...",
+    "enterContent": "Enter content here...",
+    "updateSuccess": "Updated successfully",
+    "updateError": "Failed to update. Please try again."
   }
 }

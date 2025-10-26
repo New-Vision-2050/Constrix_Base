@@ -7,13 +7,15 @@ import { TimeZoneCheckbox } from "@/modules/form-builder/components/TimeZoneChec
 import InvalidBrokerMailDialog from "../individual/InvalidBrokerMailDialog";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { GetCompaniesFormConfig } from "@/modules/form-builder/configs/companiesFormConfig";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export function getCreateCompanyBrokerFormConfig(
   t: ReturnType<typeof useTranslations>,
   onSuccessFn: () => void,
   isShareBroker?: boolean,
   currentEmpBranchId?: string,
-  currentEmpId?: string
+  currentEmpId?: string,
+  sub_entity_id?: string
 ): FormConfig {
   const formId = "company-broker-form";
 
@@ -202,6 +204,20 @@ export function getCreateCompanyBrokerFormConfig(
       {
         title: t("form.individualBrokerFormTitle"),
         fields: [
+          // disabled fields
+          {
+            name: "emailisReceived",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
+          // new email
+          {
+            name: "newEmail",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
           //  dialog hidden message
           {
             name: "dialogMessage",
@@ -280,8 +296,20 @@ export function getCreateCompanyBrokerFormConfig(
 
                     if (!statusInCompany && !statusInAllCompanies) {
                       // not exist in system continue
+                      useFormStore.getState().setValues(formId, {
+                        emailisReceived: true,
+                      });
+                      useFormStore.getState().setValues(formId, {
+                        newEmail: true,
+                      });
                       return true;
                     }
+                    useFormStore.getState().setValues(formId, {
+                      emailisReceived: false,
+                    });
+                    useFormStore.getState().setValues(formId, {
+                      newEmail: false,
+                    });
                     const _user = {
                       userId: userId,
                       email: response.payload?.[0]?.email || "",
@@ -293,6 +321,10 @@ export function getCreateCompanyBrokerFormConfig(
                     // store user id
                     useFormStore.getState().setValues(formId, {
                       user: JSON.stringify(_user),
+                    });
+                    // reset preventRetriveUserData
+                    useFormStore.getState().setValues(formId, {
+                      preventRetriveUserData: true,
                     });
 
                     /**
@@ -395,6 +427,34 @@ export function getCreateCompanyBrokerFormConfig(
               },
             ],
           },
+          /////=======> Disabled Fields
+          {
+            name: "phone",
+            label: t("form.phone"),
+            type: "phone",
+            disabled: true,
+            placeholder: t("form.phonePlaceholder"),
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "brokerName",
+            label: t("form.name"),
+            type: "text",
+            placeholder: t("form.namePlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "residence",
+            label: t("form.identity"),
+            type: "text",
+            placeholder: t("form.identityPlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
           // phone
           {
             name: "phone",
@@ -408,6 +468,7 @@ export function getCreateCompanyBrokerFormConfig(
                 message: t("form.phoneInvalid"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // name
           {
@@ -439,6 +500,7 @@ export function getCreateCompanyBrokerFormConfig(
                 message: t("form.nameMinLength"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // identity --> residence
           {
@@ -468,6 +530,7 @@ export function getCreateCompanyBrokerFormConfig(
                 message: t("form.identityPattern"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // branchs
           {
@@ -490,7 +553,7 @@ export function getCreateCompanyBrokerFormConfig(
             },
             disabled: isShareBroker,
             condition: (values) => {
-              return !!isShareBroker;
+              return !!isShareBroker && values.emailisReceived == true;
             },
           },
           {
@@ -513,7 +576,7 @@ export function getCreateCompanyBrokerFormConfig(
             },
             disabled: isShareBroker,
             condition: (values) => {
-              return !isShareBroker;
+              return !isShareBroker && values.emailisReceived == true;
             },
           },
           // chat mail
@@ -522,6 +585,58 @@ export function getCreateCompanyBrokerFormConfig(
             label: t("form.correspondenceAddress"),
             type: "text",
             placeholder: t("form.correspondenceAddressPlaceholder"),
+            condition: (values) => values.emailisReceived == true,
+          },
+          /////=======> Disabled Fields
+          {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareBroker,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "branch_ids",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=3`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              setFirstAsDefault: true,
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "chat_mail",
+            label: t("form.correspondenceAddress"),
+            type: "text",
+            placeholder: t("form.correspondenceAddressPlaceholder"),
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
           },
         ],
       },
@@ -555,10 +670,11 @@ export function getCreateCompanyBrokerFormConfig(
       // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
       onStepSubmit: async (step, values) => {
         // Option to call default way to handle the step
-        let body = values;
+        let body = { ...values, sub_entity_id };
         if (step === 1) {
           body = {
             ...values,
+            sub_entity_id,
             name: values.brokerName,
             company_id: values.company_id,
             branch_ids: isShareBroker
@@ -568,7 +684,7 @@ export function getCreateCompanyBrokerFormConfig(
         }
         const result = await defaultStepSubmitHandler(
           step,
-          body,
+          { ...body, sub_entity_id },
           getCreateCompanyBrokerFormConfig(t, onSuccessFn)
         );
         useFormStore.getState().setValues(formId, {
@@ -604,6 +720,18 @@ export function getCreateCompanyBrokerFormConfig(
       },
     },
     // editDataTransformer: (data) => {},
+    onSubmit: async (formData) => {
+      return await defaultSubmitHandler(
+        {
+          ...formData,
+          sub_entity_id,
+          branch_ids: isShareBroker
+            ? formData.branch_ids_all
+            : formData.branch_ids,
+        },
+        getCreateCompanyBrokerFormConfig(t, onSuccessFn)
+      );
+    },
     onSuccess: onSuccessFn,
     submitButtonText: t("form.submitButtonText"),
     cancelButtonText: t("form.cancelButtonText"),
