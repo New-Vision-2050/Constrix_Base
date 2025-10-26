@@ -56,12 +56,12 @@ export default function UsersSubEntityForm({
 
   // client model
   if (registrationFormSlug === ModelsTypes.CLIENT) {
-    return <UsersSubEntityFormClientModel />;
+    return <UsersSubEntityFormClientModel sub_entity_id={sub_entity_id} />;
   }
 
   // broker model
   if (registrationFormSlug === ModelsTypes.BROKER) {
-    return <UsersSubEntityFormBrokerModel />;
+    return <UsersSubEntityFormBrokerModel  sub_entity_id={sub_entity_id} />;
   }
 
   // define sheet form
