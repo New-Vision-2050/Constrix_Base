@@ -1,17 +1,20 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
+import TheStatus from "@/modules/bouquet/components/the-status";
 import { TableConfig } from "@/modules/table";
 import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 interface OfferRow {
   id: string;
-  name: string;
-  discount_type: string;
-  discount_value: number;
+  title: string;
   start_date: string;
-  end_date: string;
-  is_active: boolean;
+  expire_date: string;
+  is_active: "active" | "inActive";
+  file?: {
+    url: string;
+  };
 }
 
 type Params = {
@@ -25,43 +28,44 @@ export const useOfferTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "offers-list-table",
-    url: `${baseURL}/ecommerce/dashboard/offers`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/offers`,
+    url: `${baseURL}/ecommerce/dashboard/flash_deals`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/flash_deals`,
     columns: [
       {
-        key: "id",
-        label: "قسيمة",
+        key: "title",
+        label: "العنوان",
         sortable: true,
-      },
-      {
-        key: "discount_type",
-        label: "نوع القسيمة",
-      },
-      {
-        key: "discount_value",
-        label: "المبلغ",
-      },
-      {
-        key: "usage_limit",
-        label: "حد المستخدم",
+        render: (_: unknown, row: OfferRow) => (
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
+              {row.file?.url ? (
+                <Image
+                  src={row.file.url}
+                  alt={row.title}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <span className="text-gray-400 text-xs">لا صورة</span>
+              )}
+            </div>
+            <span>{row.title}</span>
+          </div>
+        ),
       },
       {
         key: "start_date",
-        label: "تاريخ الشهر",
-        render: (value: string, row: OfferRow) => {
-          if (!value) return "-";
-          const startDate = new Date(value);
-          const endDate = new Date(row.end_date);
-          return `${startDate.toLocaleDateString("ar-EG")} - ${endDate.toLocaleDateString("ar-EG")}`;
-        },
+        label: "تاريخ البدء",
+      },
+      {
+        key: "expire_date",
+        label: "تاريخ الانتهاء",
       },
       {
         key: "is_active",
         label: "الحالة",
-        render: (value: boolean) => (
-          <span className={value ? "text-green-500" : "text-red-500"}>
-            {value ? "نشط" : "غير نشط"}
-          </span>
+        render: (value: "active" | "inActive", row: OfferRow) => (
+          <TheStatus theStatus={value} id={row.id} />
         ),
       },
     ],

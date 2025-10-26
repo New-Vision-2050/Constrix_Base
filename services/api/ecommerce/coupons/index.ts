@@ -18,13 +18,11 @@ export interface UpdateCouponParams extends Partial<CreateCouponParams> {}
 export const CouponsApi = {
   create: (params: CreateCouponParams) =>
     baseApi.post("ecommerce/dashboard/coupons", params),
-  
+
   update: (id: string, params: UpdateCouponParams) =>
     baseApi.put(`ecommerce/dashboard/coupons/${id}`, params),
-  
-  show: (id: string) =>
-    baseApi.get(`ecommerce/dashboard/coupons/${id}`),
-  
-  delete: (id: string) =>
-    baseApi.delete(`ecommerce/dashboard/coupons/${id}`),
+
+  show: (id: string) => baseApi.get(`ecommerce/dashboard/coupons/${id}`),
+
+  delete: (id: string) => baseApi.delete(`ecommerce/dashboard/coupons/${id}`),
 };

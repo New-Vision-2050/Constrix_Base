@@ -167,7 +167,7 @@ export default function CouponDialog({
     isFetchingCoupon || createMutation.isPending || updateMutation.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => !newOpen && handleClose()}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className={`max-w-4xl w-full bg-sidebar border-gray-700 ${
           isRtl ? "rtl" : "ltr"
