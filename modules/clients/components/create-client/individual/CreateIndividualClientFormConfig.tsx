@@ -13,7 +13,8 @@ export function getCreateIndividualClientFormConfig(
   currentEmpBranchId?: string,
   currentEmpId?: string,
   isShareClient?: boolean,
-  companyBranchesIds?: string[]
+  companyBranchesIds?: string[],
+  sub_entity_id?: string,
 ): FormConfig {
   const formId = "individual-client-form";
 
@@ -520,6 +521,7 @@ export function getCreateIndividualClientFormConfig(
       return await defaultSubmitHandler(
         {
           ...formData,
+          sub_entity_id,
           branch_ids: isShareClient
             ? formData.branch_ids_all
             : formData.branch_ids,
