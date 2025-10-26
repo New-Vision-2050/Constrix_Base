@@ -71,7 +71,6 @@ export const useCouponTableConfig: (params?: Params) => TableConfig = (
     ],
     executionConfig: {
       canDelete: true,
-      canEdit: true,
     },
   };
 };
