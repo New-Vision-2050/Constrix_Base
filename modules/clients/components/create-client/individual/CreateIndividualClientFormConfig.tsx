@@ -402,8 +402,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
-              disableReactQuery: true, // تعطيل React Query caching
-              enableServerSearch: false, // تعطيل البحث من السيرفر
+              disableReactQuery: true,
+              enableServerSearch: false,
             },
             disabled: isShareClient,
             condition: (values) => {
@@ -455,6 +455,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              disableReactQuery: true,
+              enableServerSearch: false,
             },
             disabled: true,
             condition: (values) => values.emailisReceived == false,
@@ -476,6 +478,8 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              disableReactQuery: true,
+              enableServerSearch: false,
             },
             disabled: true,
             condition: (values) => values.emailisReceived == false,
