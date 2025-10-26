@@ -1,3 +1,6 @@
 export interface UpdateTermsParams {
-  content: string;
+  description: {
+    ar: string;
+    en: string;
+  };
 }

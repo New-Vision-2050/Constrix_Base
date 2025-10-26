@@ -1,17 +1,20 @@
 export interface ECM_Terms {
   id: string;
   type: string;
-  content: string;
+  description: {
+    ar: string;
+    en: string;
+  };
   created_at?: string;
   updated_at?: string;
 }
 
 export type TermsType = 
-  | "privacy_policy"
   | "terms_conditions"
+  | "privacy_policy"
+  | "refund_policy"
   | "return_policy"
-  | "shipping_policy"
-  | "payment_policy"
   | "cancellation_policy"
-  | "usage_policy"
-  | "company_policy";
+  | "shipping_policy"
+  | "about_us"
+  | "company_reliability";

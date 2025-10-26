@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface RichTextEditorProps {
   value: string;
@@ -14,6 +14,11 @@ export default function RichTextEditor({
   placeholder,
 }: RichTextEditorProps) {
   const [content, setContent] = useState(value);
+
+  // Sync local state with prop value when it changes
+  useEffect(() => {
+    setContent(value);
+  }, [value]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
