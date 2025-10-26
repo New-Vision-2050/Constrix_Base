@@ -15,7 +15,11 @@ import { useCreateBrokerCxt } from "../../context/CreateBrokerCxt";
 import { Button } from "@/components/ui/button";
 import CreateBrokerSheetContent from "./CreateBrokerSheetContent";
 
-const CreateBrokerSheet = () => {
+const CreateBrokerSheet = ({
+  sub_entity_id,
+}: {
+  sub_entity_id?: string;
+}) => {
   const locale = useLocale();
   const isRtl = locale === "ar";
   const sheetSide = isRtl ? "left" : "right";
@@ -46,7 +50,7 @@ const CreateBrokerSheet = () => {
               {t("title")}
             </SheetTitle>
           </SheetHeader>
-          <CreateBrokerSheetContent />
+          <CreateBrokerSheetContent sub_entity_id={sub_entity_id} />
           <SheetFooter />
         </SheetContent>
       </Sheet>

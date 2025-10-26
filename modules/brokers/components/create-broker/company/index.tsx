@@ -6,7 +6,11 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 import { getCreateCompanyBrokerFormConfig } from "./CreateCompanyBrokerFormConfig";
 import { useBrokersDataCxt } from "@/modules/brokers/context/BrokersDataCxt";
 
-export default function CreateBrokerCompanyForm() {
+export default function CreateBrokerCompanyForm({
+  sub_entity_id,
+}: {
+  sub_entity_id?: string;
+}) {
   const t = useTranslations("BrokersModule");
   const {
     branchId: currentEmpBranchId,
@@ -27,7 +31,8 @@ export default function CreateBrokerCompanyForm() {
     onSuccessFn,
     Boolean(sharedSettings?.is_share_broker == "1"),
     currentEmpBranchId,
-    currentEmpId
+    currentEmpId,
+    sub_entity_id
   );
 
   // form builder vars
