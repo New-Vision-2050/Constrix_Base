@@ -36,17 +36,17 @@ export const useDealOfDayTableConfig: (params?: Params) => TableConfig = (
     columns: [
       {
         key: "name",
-        label: "اسم الصفقة",
+        label: t("dealOfDay.table.dealName"),
         sortable: true,
       },
       {
         key: "product.name",
-        label: "المنتج",
+        label: t("dealOfDay.table.product"),
       },
 
       {
         key: "is_active",
-        label: "نشط",
+        label: t("dealOfDay.table.active"),
         render: (value: "active" | "inActive", row: DealOfDayRow) => (
           <TheStatus theStatus={value} id={row.id} />
         ),

@@ -15,6 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import FormLabel from "@/components/shared/FormLabel";
+import LanguageTabs from "@/components/shared/LanguageTabs";
 import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
@@ -108,14 +110,14 @@ export default function OfferDialog({
     mutationFn: (data: OfferFormData) =>
       FlashDealsApi.create({ ...data, image: imageFile }),
     onSuccess: () => {
-      toast.success("تم إضافة العرض بنجاح");
+      toast.success(t("offer.createSuccess"));
       onSuccess?.();
       reset();
       setImageFile(null);
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "فشل في إضافة العرض");
+      toast.error(error?.response?.data?.message || t("offer.createError"));
     },
   });
 
@@ -124,14 +126,14 @@ export default function OfferDialog({
     mutationFn: (data: OfferFormData) =>
       FlashDealsApi.update(offerId!, { ...data, image: imageFile }),
     onSuccess: () => {
-      toast.success("تم تحديث العرض بنجاح");
+      toast.success(t("offer.updateSuccess"));
       onSuccess?.();
       reset();
       setImageFile(null);
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "فشل في تحديث العرض");
+      toast.error(error?.response?.data?.message || t("offer.updateError"));
     },
   });
 
@@ -165,7 +167,7 @@ export default function OfferDialog({
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {isEditMode ? "تعديل عرض جديدة" : "إضافة عرض جديدة"}
+            {isEditMode ? t("offer.edit") : t("offer.add")}
           </DialogTitle>
         </DialogHeader>
 
@@ -185,81 +187,56 @@ export default function OfferDialog({
             </div>
             {/* Left side - Form Fields */}
             <div className="space-y-4">
-              {/* Language Tabs */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("ar")}
-                  className={`px-4 py-2 rounded-md text-sm transition-colors ${
-                    activeTab === "ar"
-                      ? "text-white border-primary border-b-2"
-                      : " hover:text-white"
-                  }`}
-                >
-                  اللغة العربية (AR)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("en")}
-                  className={`px-4 py-2 rounded-md text-sm transition-colors ${
-                    activeTab === "en"
-                      ? "text-white border-primary border-b-2"
-                      : "hover:text-white"
-                  }`}
-                >
-                  اللغة الانجليزية (EN)
-                </button>
-              </div>
-
-              {/* Arabic Title */}
-              {activeTab === "ar" && (
-                <div>
-                  <Label htmlFor="name.ar" className="text-gray-400 text-sm">
-                    الرئيسية <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name.ar"
-                    placeholder="الرئيسية"
-                    variant="secondary"
-                    className="bg-sidebar border-white text-white h-12"
-                    {...register("name.ar")}
-                    disabled={isLoading}
-                  />
-                  {errors.name?.ar && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.name.ar.message}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* English Title */}
-              {activeTab === "en" && (
-                <div>
-                  <Label htmlFor="name.en" className="text-gray-400 text-sm">
-                    Title <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name.en"
-                    placeholder="Title"
-                    variant="secondary"
-                    className="bg-sidebar border-white text-white h-12"
-                    {...register("name.en")}
-                    disabled={isLoading}
-                  />
-                  {errors.name?.en && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.name.en.message}
-                    </p>
-                  )}
-                </div>
-              )}
+              <LanguageTabs
+                activeTab={activeTab}
+                onTabChange={(value) => setActiveTab(value as "ar" | "en")}
+                arabicContent={
+                  <div>
+                    <FormLabel htmlFor="name.ar" required>
+                      {t("offer.title")}
+                    </FormLabel>
+                    <Input
+                      id="name.ar"
+                      placeholder={t("offer.title")}
+                      variant="secondary"
+                      className="bg-sidebar border-white text-white h-12"
+                      {...register("name.ar")}
+                      disabled={isLoading}
+                    />
+                    {errors.name?.ar && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.name.ar.message}
+                      </p>
+                    )}
+                  </div>
+                }
+                englishContent={
+                  <div>
+                    <FormLabel htmlFor="name.en" required>
+                      {t("offer.title")}
+                    </FormLabel>
+                    <Input
+                      id="name.en"
+                      placeholder={t("offer.title")}
+                      variant="secondary"
+                      className="bg-sidebar border-white text-white h-12"
+                      {...register("name.en")}
+                      disabled={isLoading}
+                    />
+                    {errors.name?.en && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.name.en.message}
+                      </p>
+                    )}
+                  </div>
+                }
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="start_date" className="text-gray-400 text-sm">
-                    تاريخ البدء <span className="text-red-500">*</span>
-                  </Label>
+                  <FormLabel htmlFor="start_date" required>
+                    {t("offer.startDate")}
+                  </FormLabel>
                   <Input
                     id="start_date"
                     type="date"
@@ -276,9 +253,9 @@ export default function OfferDialog({
                 </div>
 
                 <div>
-                  <Label htmlFor="end_date" className="text-gray-400 text-sm">
-                    تاريخ الإنتهاء <span className="text-red-500">*</span>
-                  </Label>
+                  <FormLabel htmlFor="end_date" required>
+                    {t("offer.endDate")}
+                  </FormLabel>
                   <Input
                     id="end_date"
                     type="date"
@@ -306,7 +283,7 @@ export default function OfferDialog({
               variant="outline"
               className="px-12 py-2 bg-transparent border border-gray-600 text-white hover:bg-gray-800"
             >
-              إلغاء
+              {t("offer.cancel")}
             </Button>
             <Button
               type="submit"
@@ -314,7 +291,7 @@ export default function OfferDialog({
               className="px-12 py-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              حفظ
+              {t("offer.save")}
             </Button>
           </div>
         </form>

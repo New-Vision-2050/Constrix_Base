@@ -15,6 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import FormLabel from "@/components/shared/FormLabel";
+import LanguageTabs from "@/components/shared/LanguageTabs";
 import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
@@ -120,13 +122,13 @@ export default function DealOfDayDialog({
   const createMutation = useMutation({
     mutationFn: (data: DealFormData) => DealDaysApi.create(data),
     onSuccess: () => {
-      toast.success("تم إضافة صفقة اليوم بنجاح");
+      toast.success(t("dealOfDay.createSuccess"));
       onSuccess?.();
       reset();
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "فشل في إضافة صفقة اليوم");
+      toast.error(error?.response?.data?.message || t("dealOfDay.createError"));
     },
   });
 
@@ -134,13 +136,13 @@ export default function DealOfDayDialog({
   const updateMutation = useMutation({
     mutationFn: (data: DealFormData) => DealDaysApi.update(dealId!, data),
     onSuccess: () => {
-      toast.success("تم تحديث صفقة اليوم بنجاح");
+      toast.success(t("dealOfDay.updateSuccess"));
       onSuccess?.();
       reset();
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "فشل في تحديث صفقة اليوم");
+      toast.error(error?.response?.data?.message || t("dealOfDay.updateError"));
     },
   });
 
@@ -173,86 +175,61 @@ export default function DealOfDayDialog({
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {isEditMode ? "تعديل صفقة اليوم" : "إضافة صفقة اليوم"}
+            {isEditMode ? t("dealOfDay.edit") : t("dealOfDay.add")}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Language Tabs */}
-          <div className="flex gap-2 mb-4">
-            <button
-              type="button"
-              onClick={() => setActiveTab("ar")}
-              className={`px-4 py-2 rounded-md text-sm transition-colors ${
-                activeTab === "ar"
-                  ? "text-white border-primary border-b-2"
-                  : "hover:text-white"
-              }`}
-            >
-              اللغة العربية (AR)
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("en")}
-              className={`px-4 py-2 rounded-md text-sm transition-colors ${
-                activeTab === "en"
-                  ? "text-white border-primary border-b-2"
-                  : "hover:text-white"
-              }`}
-            >
-              اللغة الانجليزية (EN)
-            </button>
-          </div>
-
-          {/* Arabic Name */}
-          {activeTab === "ar" && (
-            <div>
-              <Label htmlFor="name.ar" className="text-gray-400 text-sm">
-                الرئيسية <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name.ar"
-                placeholder="الرئيسية"
-                variant="secondary"
-                className="bg-sidebar border-white text-white h-12"
-                {...register("name.ar")}
-                disabled={isLoading}
-              />
-              {errors.name?.ar && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.name.ar.message}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* English Name */}
-          {activeTab === "en" && (
-            <div>
-              <Label htmlFor="name.en" className="text-gray-400 text-sm">
-                Title <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name.en"
-                placeholder="Title"
-                variant="secondary"
-                className="bg-sidebar border-white text-white h-12"
-                {...register("name.en")}
-                disabled={isLoading}
-              />
-              {errors.name?.en && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.name.en.message}
-                </p>
-              )}
-            </div>
-          )}
+          <LanguageTabs
+            activeTab={activeTab}
+            onTabChange={(value) => setActiveTab(value as "ar" | "en")}
+            arabicContent={
+              <div>
+                <FormLabel htmlFor="name.ar" required>
+                  {t("dealOfDay.title")}
+                </FormLabel>
+                <Input
+                  id="name.ar"
+                  placeholder={t("dealOfDay.title")}
+                  variant="secondary"
+                  className="bg-sidebar border-white text-white h-12"
+                  {...register("name.ar")}
+                  disabled={isLoading}
+                />
+                {errors.name?.ar && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.name.ar.message}
+                  </p>
+                )}
+              </div>
+            }
+            englishContent={
+              <div>
+                <FormLabel htmlFor="name.en" required>
+                  {t("dealOfDay.title")}
+                </FormLabel>
+                <Input
+                  id="name.en"
+                  placeholder={t("dealOfDay.title")}
+                  variant="secondary"
+                  className="bg-sidebar border-white text-white h-12"
+                  {...register("name.en")}
+                  disabled={isLoading}
+                />
+                {errors.name?.en && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.name.en.message}
+                  </p>
+                )}
+              </div>
+            }
+          />
 
           {/* Product Dropdown */}
           <div>
-            <Label htmlFor="product_id" className="text-gray-400 text-sm">
-              المنتج <span className="text-red-500">*</span>
-            </Label>
+            <FormLabel htmlFor="product_id" required>
+              {t("dealOfDay.product")}
+            </FormLabel>
             <input type="hidden" {...register("product_id")} />
             <Select
               value={selectedProductId}
@@ -262,8 +239,15 @@ export default function DealOfDayDialog({
               }}
               disabled={isLoading}
             >
-              <SelectTrigger className="bg-sidebar border-white text-white h-12">
-                <SelectValue placeholder="اختر المنتج" />
+              <SelectTrigger 
+                className="bg-sidebar border-white text-white h-12"
+                showClear={!!selectedProductId}
+                onClear={() => {
+                  setSelectedProductId("");
+                  setValue("product_id", "", { shouldValidate: true });
+                }}
+              >
+                <SelectValue placeholder={t("dealOfDay.selectProduct")} />
               </SelectTrigger>
               <SelectContent className="bg-sidebar border-gray-700">
                 {products.map((product: any) => (
@@ -287,9 +271,9 @@ export default function DealOfDayDialog({
           <div className="grid grid-cols-2 gap-4">
             {/* Discount Type */}
             <div>
-              <Label htmlFor="discount_type" className="text-gray-400 text-sm">
-                نوع الخصم <span className="text-red-500">*</span>
-              </Label>
+              <FormLabel htmlFor="discount_type" required>
+                {t("dealOfDay.discountType")}
+              </FormLabel>
               <input type="hidden" {...register("discount_type")} />
               <Select
                 value={selectedDiscountType}
@@ -301,21 +285,28 @@ export default function DealOfDayDialog({
                 }}
                 disabled={isLoading}
               >
-                <SelectTrigger className="bg-sidebar border-white text-white h-12">
-                  <SelectValue placeholder="اختر نوع الخصم" />
+                <SelectTrigger 
+                  className="bg-sidebar border-white text-white h-12"
+                  showClear={!!selectedDiscountType}
+                  onClear={() => {
+                    setSelectedDiscountType("");
+                    setValue("discount_type", "percentage" as "percentage" | "amount", { shouldValidate: true });
+                  }}
+                >
+                  <SelectValue placeholder={t("dealOfDay.selectDiscountType")} />
                 </SelectTrigger>
                 <SelectContent className="bg-sidebar border-gray-700">
                   <SelectItem
                     value="percentage"
                     className="text-white hover:bg-gray-800"
                   >
-                    نسبة مئوية
+                    {t("dealOfDay.percentage")}
                   </SelectItem>
                   <SelectItem
                     value="amount"
                     className="text-white hover:bg-gray-800"
                   >
-                    مبلغ ثابت
+                    {t("dealOfDay.amount")}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -328,9 +319,9 @@ export default function DealOfDayDialog({
 
             {/* Discount Value */}
             <div>
-              <Label htmlFor="discount_value" className="text-gray-400 text-sm">
-                قيمة الخصم <span className="text-red-500">*</span>
-              </Label>
+              <FormLabel htmlFor="discount_value" required>
+                {t("dealOfDay.discountValue")}
+              </FormLabel>
               <Input
                 id="discount_value"
                 type="number"
@@ -356,7 +347,7 @@ export default function DealOfDayDialog({
               variant="outline"
               className="px-12 py-2 bg-transparent border border-gray-600 text-white hover:bg-gray-800"
             >
-              إلغاء
+              {t("dealOfDay.cancel")}
             </Button>
             <Button
               type="submit"
@@ -364,7 +355,7 @@ export default function DealOfDayDialog({
               className="px-12 py-2 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              حفظ
+              {t("dealOfDay.save")}
             </Button>
           </div>
         </form>

@@ -193,7 +193,7 @@ export default function ProductPricingFields({
           )}
         />
 
-        {/* حساب تكلفة الشحن ($) */}
+        {/* حساب تكلفة الشحن (SAR) */}
         <FormField
           control={form.control}
           name="shipping_included_in_price"
