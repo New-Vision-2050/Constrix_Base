@@ -237,7 +237,10 @@
     "CRMSettings": "CRM Settings",
     "ecommerce": "E-commerce",
     "docs-library": "Docs Library",
-    "docs-library-docs": "Docs"
+    "docs-library-docs": "Docs",
+    "Terms": "Terms & Conditions",
+    "Warehouse": "Warehouses",
+    "Discounts": "Discounts & Coupons"
   },
   "docs-library": {
     "title": "Docs Library",
