@@ -237,7 +237,11 @@
     "ecommerce": "المتجر",
     "CRMSettings": "اعدادات علاقات العملاء",
     "docs-library": "مستندات والبيانات",
-    "docs-library-docs": "المستندات"
+    "docs-library-docs": "المستندات",
+    "Terms": "الشروط والأحكام",
+    "Warehouse": "المخازن",
+    "Discounts": "الخصومات والكوبونات",
+    "Coupons": "الكوبونات"
   },
   "docs-library": {
     "title": "مكتبة المستندات",
