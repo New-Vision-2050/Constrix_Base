@@ -477,7 +477,7 @@ export const useDropdownSearch = ({
           throw new Error("Expected array response from API");
         }
 
-        
+
   if (dynamicConfig.paginationEnabled) {
         setHasMore(response.data.pagination?.last_page > response.data.pagination?.page)
       }
