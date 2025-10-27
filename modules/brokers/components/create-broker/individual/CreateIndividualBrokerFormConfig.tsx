@@ -12,7 +12,8 @@ export function getCreateIndividualBrokerFormConfig(
   onSuccessFn: () => void,
   isShareBroker?: boolean,
   currentEmpBranchId?: string,
-  currentEmpId?: string
+  currentEmpId?: string,
+  sub_entity_id?: string
 ): FormConfig {
   const formId = "individual-broker-form";
 
@@ -477,6 +478,7 @@ export function getCreateIndividualBrokerFormConfig(
           branch_ids: isShareBroker
             ? formData.branch_ids_all
             : formData.branch_ids,
+          sub_entity_id,
         },
         getCreateIndividualBrokerFormConfig(t, onSuccessFn)
       );

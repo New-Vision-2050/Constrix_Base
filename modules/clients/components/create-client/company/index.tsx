@@ -5,7 +5,11 @@ import { useCreateClientCxt } from "@/modules/clients/context/CreateClientCxt";
 import { useTableStore } from "@/modules/table/store/useTableStore";
 import { getCreateCompanyClientFormConfig } from "./CreateCompanyClientFormConfig";
 
-export default function CreateClientCompanyForm() {
+export default function CreateClientCompanyForm({
+  sub_entity_id,
+}: {
+  sub_entity_id?: string;
+}) {
   const t = useTranslations("ClientsModule");
   const {
     branchId: currentEmpBranchId,
@@ -28,7 +32,8 @@ export default function CreateClientCompanyForm() {
     currentEmpBranchId,
     currentEmpId,
     sharedSettings?.is_share_client == "1",
-    companyBranchesIds
+    companyBranchesIds,
+    sub_entity_id,
   );
 
   // form builder vars

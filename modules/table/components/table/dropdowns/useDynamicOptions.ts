@@ -104,8 +104,14 @@ export const useDynamicOptions = ({
           dynamicConfig?.labelField || "name"
         );
       } catch (err: any) {
-        if (axios.isAxiosError(err) && err.name === "AbortError") {
+        // Silently ignore canceled/aborted requests
+        if (axios.isAxiosError(err) && (err.name === "AbortError" || err.code === "ERR_CANCELED")) {
           console.log("Fetch aborted");
+          return [];
+        }
+        // Ignore cancel errors from AbortController
+        if (err.name === "CanceledError" || err.message?.includes("canceled")) {
+          console.log("Request canceled");
           return [];
         }
         console.log("Error fetching dropdown options:", err.message);
@@ -265,8 +271,18 @@ export const useDynamicOptions = ({
         })
         .catch((err) => {
           if (isMountedRef.current) {
-            setError(err instanceof Error ? err.message : "Unknown error");
-            console.log("Error fetching options:", err);
+            // Don't show error for canceled requests
+            const isCanceled = err?.name === "CanceledError" || 
+                              err?.name === "AbortError" || 
+                              err?.code === "ERR_CANCELED" ||
+                              err?.message?.includes("canceled");
+            
+            if (!isCanceled) {
+              setError(err instanceof Error ? err.message : "Unknown error");
+              console.log("Error fetching options:", err);
+            } else {
+              console.log("Request canceled, not showing error");
+            }
             // Initialize options as empty array when there's an error
             setOptions([]);
           }

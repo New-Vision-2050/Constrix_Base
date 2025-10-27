@@ -153,7 +153,14 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
 
   // Handle API errors
   useEffect(() => {
-    if (error) {
+    // Don't show toast for canceled requests
+    const isCanceledError = error && (
+      error.includes("canceled") || 
+      error.includes("aborted") ||
+      error.includes("abort")
+    );
+    
+    if (error && !isCanceledError) {
       toast({
         title: "Error loading options",
         description: `Failed to load options for ${label}: ${error}`,

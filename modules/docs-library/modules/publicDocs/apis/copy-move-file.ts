@@ -3,7 +3,7 @@ import { apiClient } from "@/config/axios-config";
 // API request type
 export type CopyMoveFileRequest = {
   folder_id: string;
-  file_id: string;
+  file_ids: string[];
 };
 
 // API response type

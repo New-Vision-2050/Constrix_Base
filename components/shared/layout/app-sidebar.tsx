@@ -344,36 +344,36 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         ],
       },
       // ecommerce
-      {
-        name: t("Sidebar.ecommerce"),
-        icon: SettingsIcon,
-        isActive: pageName === ROUTER.ECOMMERCE,
-        slug: SUPER_ENTITY_SLUG.ECOMMERCE,
-        urls: [ROUTER.ECOMMERCE],
-        sub_entities: [
-          {
-            name: t("product.plural"),
-            url: ROUTER.Products,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.Products,
-            show: true,
-          },
-          {
-            name: t("brand.plural"),
-            url: ROUTER.Brands,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.Brands,
-            show: true,
-          },
-          {
-            name: t("category.plural"),
-            url: ROUTER.Categories,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.Categories,
-            show: true,
-          },
-        ],
-      },
+      // {
+      //   name: t("Sidebar.ecommerce"),
+      //   icon: SettingsIcon,
+      //   isActive: pageName === ROUTER.ECOMMERCE,
+      //   slug: SUPER_ENTITY_SLUG.ECOMMERCE,
+      //   urls: [ROUTER.ECOMMERCE],
+      //   sub_entities: [
+      //     {
+      //       name: t("product.plural"),
+      //       url: ROUTER.Products,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.Products,
+      //       show: true,
+      //     },
+      //     {
+      //       name: t("brand.plural"),
+      //       url: ROUTER.Brands,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.Brands,
+      //       show: true,
+      //     },
+      //     {
+      //       name: t("category.plural"),
+      //       url: ROUTER.Categories,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.Categories,
+      //       show: true,
+      //     },
+      //   ],
+      // },
     ];
     return data;
   }, [pageName, isCentralCompany, can, t]);

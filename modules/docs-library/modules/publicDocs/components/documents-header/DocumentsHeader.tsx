@@ -131,9 +131,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
   const handleDownload = async () => {
     try {
-      const files = selectedDocs?.filter((doc) =>
-        Boolean(doc?.is_file)
-      );
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.is_file));
       if (files?.length === 0) {
         toast.error("يجب اختيار ملف");
         return;
@@ -178,9 +176,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
   const handleFavorite = async () => {
     try {
-      const files = selectedDocs?.filter((doc) =>
-        Boolean(doc?.is_file)
-      );
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.is_file));
       if (files?.length === 0) {
         toast.error("يجب اختيار ملف");
         return;
@@ -352,8 +348,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
                 setOpenCopyMoveDialog(true);
               }}
               disabled={
-                selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.is_file) ||
+                selectedDocs?.length == 0 ||
+                selectedDocs?.filter((doc) => !doc.is_file).length > 0 ||
                 !can(PERMISSIONS.library.file.update)
               }
             >
@@ -417,8 +413,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
                 setOpenCopyMoveDialog(true);
               }}
               disabled={
-                selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.is_file) ||
+                selectedDocs?.length == 0 ||
+                selectedDocs?.filter((doc) => !doc.is_file).length > 0 ||
                 !can(PERMISSIONS.library.file.update)
               }
             >

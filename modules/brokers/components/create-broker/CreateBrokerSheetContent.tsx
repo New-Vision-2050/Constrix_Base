@@ -3,18 +3,22 @@ import { useTranslations } from "next-intl";
 import CreateIndividualBrokerForm from "./individual";
 import CreateBrokerCompanyForm from "./company";
 
-export default function CreateBrokerSheetContent() {
+export default function CreateBrokerSheetContent({
+  sub_entity_id,
+}: {
+  sub_entity_id?: string;
+}) {
   const t = useTranslations("BrokersModule.form");
   const createBrokerTabs = [
     {
       id: "individual-broker",
       title: t("individualBroker"),
-      content: <CreateIndividualBrokerForm />,
+      content: <CreateIndividualBrokerForm sub_entity_id={sub_entity_id} />,
     },
     {
       id: "company-broker",
       title: t("companyBroker"),
-      content: <CreateBrokerCompanyForm />,
+      content: <CreateBrokerCompanyForm sub_entity_id={sub_entity_id} />,
     },
   ];
 
