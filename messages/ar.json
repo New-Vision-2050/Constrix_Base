@@ -985,7 +985,10 @@
         "delete": "حذف",
         "confirm": "تأكيد",
         "deleteConfirm": "تأكيد الحذف",
+        "deleteQuestion": "هل أنت متاكد من الحذف؟",
         "deleteConfirmMessage": "تأكيد حذف نوع المستند",
+        "deleteSuccess": "تم حذف بنجاح",
+        "deleteError": "فشل حذف",
         "errorCase": {
           "title": "فشل في تحميل أنواع المستندات",
           "description": "يرجى التحقق من اتصالك ومحاولة مرة أخرى.",
