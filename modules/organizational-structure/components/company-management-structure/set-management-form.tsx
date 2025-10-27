@@ -163,7 +163,7 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
       name: isEdit ? selectedNode?.name : undefined,
       description: isEdit ? selectedNode?.description : undefined,
       is_active: isEdit ? selectedNode?.status == 1 : undefined,
-      management_id: isEdit ? selectedNode?.parent_id : selectedNode?.id,
+      management_id: isEdit ? selectedNode?.parent_id?.toString() : selectedNode?.id?.toString(),
       manager_id: isUserCompanyOwner
         ? companyOwnerId
         : !isEdit
