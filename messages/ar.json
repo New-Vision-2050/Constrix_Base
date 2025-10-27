@@ -2256,7 +2256,21 @@
       }
     }
   },
-  "terms": {
+  "coupon": {
+    "singular": "قسيمة",
+    "plural": "قسائم",
+    "codeRequired": "كود القسيمة مطلوب",
+    "imageRequired": "صورة القسيمة مطلوبة",
+    "createSuccess": "تم إضافة القسيمة بنجاح",
+    "createError": "فشل في إضافة القسيمة",
+    "updateSuccess": "تم تحديث القسيمة بنجاح",
+    "updateError": "فشل في تحديث القسيمة",
+    "validationError": "خطأ في التحقق من البيانات",
+    "save": "حفظ",
+    "addCoupon": "إضافة قسيمة",
+    "editCoupon": "تعديل قسيمة"
+  },
+   "terms": {
     "plural": "الشروط والأحكام",
     "singular": "الشرط",
     "save": "حفظ",

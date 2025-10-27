@@ -2265,6 +2265,20 @@
       }
     }
   },
+  "coupon": {
+    "singular": "Coupon",
+    "plural": "Coupons",
+    "codeRequired": "Coupon code is required",
+    "imageRequired": "Coupon image is required",
+    "createSuccess": "Coupon created successfully",
+    "createError": "Failed to create coupon",
+    "updateSuccess": "Coupon updated successfully",
+    "updateError": "Failed to update coupon",
+    "validationError": "Validation error",
+    "save": "Save",
+    "addCoupon": "Add Coupon",
+    "editCoupon": "Edit Coupon"
+  },
   "terms": {
     "plural": "Terms and Conditions",
     "singular": "Term",
