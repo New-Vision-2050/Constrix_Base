@@ -44,7 +44,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel required>{t("fields.unitPrice")}</FormLabel>
               <FormControl>
-                <Input {...field} type="number" className="h-12" />
+                <Input {...field} type="number" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -59,7 +59,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel required>{t("fields.minOrderQuantity")}</FormLabel>
               <FormControl>
-                <Input {...field} type="number" className="h-12" />
+                <Input {...field} type="number" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -74,7 +74,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel>{t("fields.currentStock")}</FormLabel>
               <FormControl>
-                <Input {...field} type="number" className="h-12" />
+                <Input {...field} type="number" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -97,7 +97,10 @@ export default function ProductPricingFields({
                 value={field.value || undefined}
               >
                 <FormControl>
-                  <SelectTrigger className="h-12">
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={t("placeholders.selectDiscountType")}
                     />
@@ -129,7 +132,7 @@ export default function ProductPricingFields({
                   : t("fields.discountAmount")}
               </FormLabel>
               <FormControl>
-                <Input {...field} type="number" className="h-12" />
+                <Input {...field} type="number" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -144,7 +147,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel>{t("fields.taxAmount")}</FormLabel>
               <FormControl>
-                <Input {...field} type="number" className="h-12" />
+                <Input {...field} type="number" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -183,7 +186,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel>{t("fields.shippingCost")}</FormLabel>
               <FormControl>
-                <Input {...field} type="number" className="h-12" />
+                <Input {...field} type="number" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
