@@ -10,10 +10,14 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { DropdownItemT } from "@/components/shared/IconBtnDropdown";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 type PropsT = { bank: BankAccount };
 
 export default function BankSection({ bank }: PropsT) {
+  const { can } = usePermissions();
   // declare and define component state & vars
   const [menuItems, setMenuItems] = useState<DropdownItemT[]>([]);
   const [isOpen, handleOpen, handleClose] = useModal();
@@ -32,7 +36,7 @@ export default function BankSection({ bank }: PropsT) {
             title: "حذف البنك",
             onClick: () => {
               if (bankAccounts.length === 1) handleOpen();
-              else setOpenDeleteDialog(true)
+              else setOpenDeleteDialog(true);
             },
           },
         ];
@@ -84,14 +88,17 @@ export default function BankSection({ bank }: PropsT) {
   // return ui
   return (
     <>
-      <TabTemplate
-        title={bank?.bank_name ?? "Bank Account"}
-        reviewMode={<UserProfileBankingDataReview bank={bank} />}
-        editMode={<BankingDataSectionEditMode bank={bank} />}
-        settingsBtn={{
-          items: menuItems,
-        }}
-      />
+      <Can check={[PERMISSIONS.profile.bankInfo.view]}>
+        <TabTemplate
+          title={bank?.bank_name ?? "Bank Account"}
+          reviewMode={<UserProfileBankingDataReview bank={bank} />}
+          editMode={<BankingDataSectionEditMode bank={bank} />}
+          settingsBtn={{
+            items: menuItems,
+            disabledEdit: !can([PERMISSIONS.profile.bankInfo.update]),
+          }}
+        />
+      </Can>
       <ErrorDialog
         isOpen={isOpen}
         handleClose={handleClose}

@@ -4,6 +4,8 @@ import SingleCourse from "./single-course";
 import { Course } from "@/modules/user-profile/types/Course";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function UserCoursesList() {
   const { userCourses, userCoursesLoading } = useUserAcademicTabsCxt();
@@ -23,11 +25,13 @@ export default function UserCoursesList() {
       {userCoursesLoading ? (
         <TabTemplateListLoading />
       ) : (
-        <RegularList<Course, "course">
-          sourceName="course"
-          items={userCourses ?? []}
-          ItemComponent={SingleCourse}
-        />
+        <Can check={[PERMISSIONS.profile.courses.view]}>
+          <RegularList<Course, "course">
+            sourceName="course"
+            items={userCourses ?? []}
+            ItemComponent={SingleCourse}
+          />
+        </Can>
       )}
     </>
   );

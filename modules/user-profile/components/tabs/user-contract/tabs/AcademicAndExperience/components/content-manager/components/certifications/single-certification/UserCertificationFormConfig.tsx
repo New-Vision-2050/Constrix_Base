@@ -5,6 +5,8 @@ import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Certification } from "@/modules/user-profile/types/Certification";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   onSuccess?: () => void;
@@ -17,6 +19,7 @@ export const UserCertificationFormConfig = ({
 }: PropsT) => {
   // declare and define component state and variables
   const formType = certification ? "Edit" : "Create";
+  const t = useTranslations('UserProfile.nestedTabs.certificationsData');
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
 
@@ -33,9 +36,8 @@ export const UserCertificationFormConfig = ({
           {
             type: "select",
             name: "professional_bodie_id",
-            label: "الجهة",
-            placeholder: "اختر الجهة",
-            required: true,
+            label: t('professionalBodie'),
+            placeholder: t('professionalBodiePlaceholder'),
             dynamicOptions: {
               url: `${baseURL}/professional_bodies/user/${
                 user?.user_id
@@ -50,80 +52,65 @@ export const UserCertificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل الجهة",
-              },
-            ],
+            validation: [],
           },
           {
             name: "accreditation_name",
-            label: "اسم الاعتماد",
+            label: t('accreditationName'),
             type: "text",
-            placeholder: "اسم الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الاعتماد مطلوب",
-              },
-            ],
+            placeholder: t('accreditationNamePlaceholder'),
+            validation: [],
           },
           {
             name: "accreditation_number",
-            label: "رقم الاعتماد",
+            label: t('accreditationNumber'),
             type: "text",
-            placeholder: "رقم الاعتماد ",
-            validation: [
-              {
-                type: "required",
-                message: "رقم الاعتماد  مطلوب",
-              },
-            ],
+            placeholder: t('accreditationNumberPlaceholder'),
+            validation: [],
           },
           {
             name: "accreditation_degree",
-            label: "درجة الاعتماد",
+            label: t('accreditationDegree'),
             type: "text",
-            placeholder: "درجة الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "درجة الاعتماد مطلوب",
-              },
-            ],
+            placeholder: t('accreditationDegreePlaceholder'),
+            validation: [],
           },
           {
             name: "date_obtain",
-            label: "تاريخ الحصول على الشهادة",
+            label: t('dateObtain'),
             type: "date",
             maxDate: {
               formId: `user-certification-data-form-${certification?.id}`,
               field: "date_end",
             },
-            placeholder: "تاريخ الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-            ],
+            placeholder: t('dateObtainPlaceholder'),
+            validation: [],
           },
           {
             name: "date_end",
-            label: "تاريخ انتهاء الشهادة",
+            label: t('dateEnd'),
             type: "date",
             minDate: {
               formId: `user-certification-data-form-${certification?.id}`,
               field: "date_obtain",
             },
-            placeholder: "تاريخ انتهاء الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
-              },
-            ],
+            placeholder: t('dateEndPlaceholder'),
+            validation: [],
+          },
+          {
+            name: "file",
+            label: t('file'),
+            type: "file",
+            // isMulti: true,
+            fileConfig: {
+              showThumbnails: true,
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
+            placeholder: t('filePlaceholder'),
           },
         ],
         columns: 2,
@@ -136,9 +123,10 @@ export const UserCertificationFormConfig = ({
       accreditation_degree: certification?.accreditation_degree,
       date_obtain: certification?.date_obtain,
       date_end: certification?.date_end,
+      // Initialize file field empty if editing existing certification
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t('submitButtonText'),
+    cancelButtonText: t('cancelButtonText'),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
@@ -154,8 +142,17 @@ export const UserCertificationFormConfig = ({
       const dateObtain = new Date(formData?.date_obtain as string);
       const endDate = new Date(formData?.date_end as string);
 
+      // Create a copy of the form data
+      const formDataCopy = { ...formData };
+      
+      // Check if file is empty or not provided, and remove it if it's empty
+      if (!formDataCopy.file) {
+        delete formDataCopy.file;
+      }
+      
+      // Create the final body
       const body = {
-        ...formData,
+        ...formDataCopy,
         user_id: user?.user_id,
         date_obtain: formatDateYYYYMMDD(dateObtain),
         date_end: formatDateYYYYMMDD(endDate),
@@ -165,9 +162,10 @@ export const UserCertificationFormConfig = ({
           ? `professional_certificates/${certification?.id}`
           : `professional_certificates`;
 
-      const method = formType === "Edit" ? "PUT" : "POST";
+      const method = formType === "Edit" ? "POST" : "POST";
 
-      return await defaultSubmitHandler(body, userCertificationFormConfig, {
+      // Use serialize function to properly handle multipart/form-data for files
+      return await defaultSubmitHandler(serialize(body), userCertificationFormConfig, {
         url: url,
         method: method,
       });

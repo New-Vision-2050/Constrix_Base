@@ -4,6 +4,9 @@ import { Qualification } from "@/modules/user-profile/types/qualification";
 import SingleQualificationData from "./SingleQualificationData";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   items: Qualification[] | undefined;
@@ -11,12 +14,13 @@ type PropsT = {
 
 export default function QualificationsList({ items }: PropsT) {
   const { userQualificationsLoading } = useUserAcademicTabsCxt();
+  const t = useTranslations("UserProfile.nestedTabs.qualificationsData");
   // handle there is no data found
   if (!userQualificationsLoading && items && items.length === 0)
     return (
       <NoDataFounded
-        title="لا يوجد بيانات"
-        subTitle="لا يوجد بيانات تخص مؤهلات المستخدم قم باضافة مؤهل"
+        title={t("noData")}
+        subTitle={t("noDataSubTitle")}
       />
     );
 

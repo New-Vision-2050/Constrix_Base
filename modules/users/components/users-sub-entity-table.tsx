@@ -1,113 +1,96 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { baseURL } from "@/config/axios-config";
-import {
-  REGISTRATION_FORMS,
-  REGISTRATION_FORMS_SLUGS,
-  REGISTRATION_TABLES,
-} from "@/constants/registration-forms";
 import { SuperEntitySlug, useGetSubEntity } from "@/hooks/useGetSubEntity";
-import {
-  SheetFormBuilder,
-  GetCompanyUserFormConfig,
-  useSheetForm,
-} from "@/modules/form-builder";
-import { TableBuilder } from "@/modules/table";
-import { useTableStore } from "@/modules/table/store/useTableStore";
+import Can from "@/lib/permissions/client/Can";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
+import { TableBuilder, TableConfig } from "@/modules/table";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
-import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import UsersSubEntityForm from "./users-sub-entity-form";
+import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
+import { CreateClientCxtProvider } from "@/modules/clients/context/CreateClientCxt";
+import { BrokersDataCxtProvider } from "@/modules/brokers/context/BrokersDataCxt";
+import { CreateBrokerCxtProvider } from "@/modules/brokers/context/CreateBrokerCxt";
+import StatisticsRow from "@/components/shared/layout/statistics-row";
+import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config";
 
-const UsersSubEntityTable = ({
-  programName,
-}: {
+type PropsT = {
   programName: SuperEntitySlug;
-}) => {
-  const t = useTranslations("Companies");
+};
 
+const UsersSubEntityTable = ({ programName }: PropsT) => {
   const hasHydrated = useSidebarStore((s) => s.hasHydrated);
   const { slug }: { slug: string } = useParams();
   const { subEntity } = useGetSubEntity(programName, slug);
+  const { can } = usePermissions();
   const defaultAttr = subEntity?.default_attributes.map((item) => item.id);
   const optionalAttr = subEntity?.optional_attributes.map((item) => item.id);
   const TABLE_ID = `${subEntity?.slug}-users`;
   const sub_entity_id = subEntity?.id;
   const registration_form_id = subEntity?.registration_form?.id;
-
+  const entityPermissions = createPermissions(`DYNAMIC.${slug}`);
   const registrationFormSlug = subEntity?.registration_form?.slug;
 
-  const usersConfig = UsersConfigV2();
+  const usersConfig = UsersConfigV2({
+    canDelete: can(entityPermissions.delete),
+    canEdit: can(entityPermissions.update),
+    canView: can(entityPermissions.view),
+  });
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"
       ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
       : optionalAttr?.includes(field.name || field.key)
   );
 
-  const tableConfig = {
+  const tableConfig: TableConfig = {
     ...usersConfig,
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
     defaultVisibleColumnKeys: defaultAttr,
     availableColumnKeys: optionalAttr,
     tableId: TABLE_ID,
     allSearchedFields,
+    enableExport: can(entityPermissions.export),
   };
 
-  const finalFormConfig = useMemo(() => {
-    const registrationFromConfig = registrationFormSlug
-      ? REGISTRATION_FORMS[registrationFormSlug]
-      : GetCompanyUserFormConfig;
-
-
-    return Boolean(registrationFromConfig)
-      ? registrationFromConfig
-      : GetCompanyUserFormConfig;
-  }, [registrationFormSlug, slug]);
-
-  const { closeSheet } = useSheetForm({
-    config: finalFormConfig(t),
-  });
-
-  const handleCloseForm = () => {
-    closeSheet();
-    const tableStore = useTableStore.getState();
-    tableStore.reloadTable(TABLE_ID);
-    setTimeout(() => {
-      tableStore.setLoading(TABLE_ID, false);
-    }, 100);
-  };
+  if (!can(entityPermissions.list)) {
+    return null;
+  }
 
   return (
     <div className="px-8 space-y-7">
+      <StatisticsRow
+        config={subEntityStatisticsConfig(
+          sub_entity_id ?? "",
+          registration_form_id ?? ""
+        )}
+      />{" "}
       {hasHydrated && !!subEntity && (
-        <TableBuilder
-          config={tableConfig}
-          searchBarActions={
-            <div className="flex items-center gap-3">
-              <SheetFormBuilder
-                config={{
-                  ...finalFormConfig(t, handleCloseForm),
-                  apiParams: {
-                    sub_entity_id: sub_entity_id as string,
-                  },
-                  onSuccess: () => {
-                    const tableStore = useTableStore.getState();
-                    tableStore.reloadTable(TABLE_ID);
-                    setTimeout(() => {
-                      tableStore.setLoading(TABLE_ID, false);
-                    }, 100);
-                  },
-                }}
-                trigger={<Button>اضافة</Button>}
-                onSuccess={(values) => {
-                  console.log("Form submitted successfully:", values);
-                }}
-              />{" "}
-            </div>
-          }
-        />
+        <BrokersDataCxtProvider>
+          <CreateBrokerCxtProvider>
+            <ClientsDataCxtProvider>
+              <CreateClientCxtProvider>
+                <TableBuilder
+                  config={tableConfig}
+                  searchBarActions={
+                    <div className="flex items-center gap-3">
+                      <Can check={[entityPermissions.create]}>
+                        <UsersSubEntityForm
+                          tableId={TABLE_ID}
+                          sub_entity_id={sub_entity_id}
+                          slug={slug}
+                          registrationFormSlug={registrationFormSlug}
+                        />
+                      </Can>
+                    </div>
+                  }
+                />
+              </CreateClientCxtProvider>
+            </ClientsDataCxtProvider>
+          </CreateBrokerCxtProvider>
+        </BrokersDataCxtProvider>
       )}
     </div>
   );

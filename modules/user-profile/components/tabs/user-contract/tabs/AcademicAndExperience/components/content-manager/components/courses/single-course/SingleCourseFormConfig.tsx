@@ -4,6 +4,7 @@ import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { Course } from "@/modules/user-profile/types/Course";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { serialize } from "object-to-formdata";
 
 type PropsT = {
   course?: Course;
@@ -30,84 +31,57 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
             label: "اسم الشركة",
             type: "text",
             placeholder: "اسم الشركة",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الشركة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "authority",
             label: "الجهة",
             type: "text",
             placeholder: "الجهة",
-            validation: [
-              {
-                type: "required",
-                message: "الجهة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "name",
             label: "اسم الدورة التدريبية ",
             type: "text",
             placeholder: "اسم الدورة التدريبية ",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الدورة التدريبية  مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "institute",
             label: "جهة الاعتماد",
             type: "text",
             placeholder: "جهة الاعتماد",
-            validation: [
-              {
-                type: "required",
-                message: "جهة الاعتماد مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "certificate",
             label: "الشهادات الممنوحة",
             type: "text",
             placeholder: "الشهادات الممنوحة",
-            validation: [
-              {
-                type: "required",
-                message: "الشهادات الممنوحة مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
             name: "date_obtain",
             label: "تاريخ الحصول على الشهادة",
             type: "date",
             placeholder: "تاريخ الشهادة",
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-             
-            ],
+            validation: [],
+            maxDate: {
+              formId: `user-courses-data-form-${course?.id ?? ""}`,
+              field: "date_end",
+            },
           },
           {
             name: "date_end",
             label: "تاريخ انتهاء الشهادة",
             type: "date",
             placeholder: "تاريخ انتهاء الشهادة",
+            minDate: {
+              formId: `user-courses-data-form-${course?.id ?? ""}`,
+              field: "date_obtain",
+            },
             validation: [
-              {
-                type: "required",
-                message: "تاريخ انتهاء الشهادة مطلوب",
-              },
               {
                 type: "custom",
                 message:
@@ -118,6 +92,21 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
                 },
               },
             ],
+          },
+          {
+            name: "file",
+            label: "ارفاق الشهادة",
+            type: "file",
+            // isMulti: true,
+            fileConfig: {
+              showThumbnails: true,
+              allowedFileTypes: [
+                "application/pdf", // pdf
+                "image/jpeg", // jpeg & jpg
+                "image/png", // png
+              ],
+            },
+            placeholder: "ارفاق الشهادة",
           },
         ],
         columns: 2,
@@ -131,6 +120,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       certificate: course?.certificate,
       date_obtain: course?.date_obtain,
       date_end: course?.date_end,
+      file: course?.file,
     },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
@@ -149,23 +139,37 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       const dateObtain = new Date(formData?.date_obtain as string);
       const endDate = new Date(formData?.date_end as string);
 
+      // Create a copy of the form data
+      const formDataCopy = { ...formData };
+
+      // Check if file is empty or not provided, and remove it if it's empty
+      if (!formDataCopy.file) {
+        delete formDataCopy.file;
+      }
+
+      // Create the final body
       const body = {
-        ...formData,
+        ...formDataCopy,
         user_id: user?.user_id,
         date_obtain: formatDateYYYYMMDD(dateObtain),
         date_end: formatDateYYYYMMDD(endDate),
       };
+
       const url =
         formType === "Create"
           ? `/user_educational_courses`
           : `/user_educational_courses/${course?.id}`;
 
-      const method = formType === "Edit" ? "PUT" : "POST";
+      // const method = formType === "Edit" ? "PUT" : "POST";
 
-      return await defaultSubmitHandler(body, singleCourseFormConfig, {
-        url: url,
-        method: method,
-      });
+      return await defaultSubmitHandler(
+        serialize(body),
+        singleCourseFormConfig,
+        {
+          url: url,
+          method: "POST",
+        }
+      );
     },
   };
   return singleCourseFormConfig;

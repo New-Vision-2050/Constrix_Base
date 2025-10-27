@@ -41,8 +41,8 @@ interface FormState {
   initForm: (formId: string, initialValues?: Record<string, any>) => void;
   getValue: (formId: string, field: string) => any;
   getValues: (formId: string) => any;
-  setValue: (formId: string, field: string, value: any) => void;
-  setValues: (formId: string, values: Record<string, any>) => void;
+  setValue: (formId: string, field: string, value: any, clearError?: boolean) => void;
+  setValues: (formId: string, values: Record<string, any>, clearErrors?: boolean) => void;
   getError: (formId: string, field: string) => any;
   setError: (
     formId: string,
@@ -114,7 +114,7 @@ export const useFormStore = create<FormState>((set, get) => ({
     })),
 
   // Actions for specific form instances
-  setValue: (formId: string, field: string, value: any) => {
+  setValue: (formId: string, field: string, value: any, clearError: boolean = true) => {
     // Get the current state
     const state = get();
     const formState = state.forms[formId] || getDefaultFormState();
@@ -123,6 +123,8 @@ export const useFormStore = create<FormState>((set, get) => ({
     if (formState.values[field] === value) {
       return;
     }
+
+
 
     // Update the value
     set((state: FormState) => ({
@@ -134,6 +136,10 @@ export const useFormStore = create<FormState>((set, get) => ({
         },
       },
     }));
+      // Clear any error for this field before updating the value if clearError is true
+      if (clearError) {
+          state.setError(formId, field, null);
+      }
   },
 
   // Actions for specific form instances
@@ -156,10 +162,13 @@ export const useFormStore = create<FormState>((set, get) => ({
     return formState.errors[field];
   },
 
-  setValues: (formId: string, values: Record<string, any>) =>
-    set((state: FormState) => {
-      const formState = state.forms[formId] || getDefaultFormState();
+  setValues: (formId: string, values: Record<string, any>, clearErrors: boolean = true) => {
+    // Get current state
+    const state = get();
+    const formState = state.forms[formId] || getDefaultFormState();
 
+    // Update values
+    set((state: FormState) => {
       return {
         forms: {
           ...state.forms,
@@ -169,7 +178,15 @@ export const useFormStore = create<FormState>((set, get) => ({
           },
         },
       };
-    }),
+    });
+
+      // Clear errors for all fields being updated if clearErrors is true
+      if (clearErrors) {
+          Object.keys(values).forEach(field => {
+              state.setError(formId, field, null);
+          });
+      }
+  },
 
   setError: (
     formId: string,
@@ -635,8 +652,8 @@ export const useFormInstance = (
 
   // Get the actions for this form
   const setValue = useCallback(
-    (field: string, value: any) => {
-      useFormStore.getState().setValue(formId, field, value);
+    (field: string, value: any, clearError: boolean = true) => {
+      useFormStore.getState().setValue(formId, field, value, clearError);
     },
     [formId]
   );
@@ -649,8 +666,8 @@ export const useFormInstance = (
   );
 
   const setValues = useCallback(
-    (values: Record<string, any>) => {
-      useFormStore.getState().setValues(formId, values);
+    (values: Record<string, any>, clearErrors: boolean = true) => {
+      useFormStore.getState().setValues(formId, values, clearErrors);
     },
     [formId]
   );

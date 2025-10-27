@@ -4,9 +4,13 @@ import SingleExperience from "./single-experience";
 import { Experience } from "@/modules/user-profile/types/experience";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import TabTemplateListLoading from "@/modules/user-profile/components/TabTemplateListLoading";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useTranslations } from "next-intl";
 
 export default function ExperiencesList() {
   const { userExperiences, userExperiencesLoading } = useUserAcademicTabsCxt();
+  const t = useTranslations('UserProfile.nestedTabs.academicExperience');
 
   // handle there is no data found
   if (
@@ -16,8 +20,8 @@ export default function ExperiencesList() {
   )
     return (
       <NoDataFounded
-        title="لا يوجد بيانات"
-        subTitle="لا يوجد بيانات تخص الخبرات السابقة للمستخدم قم باضافة خبرة مسبقة"
+        title={t('noData')}
+        subTitle={t('noDataSubTitle')}
       />
     );
 

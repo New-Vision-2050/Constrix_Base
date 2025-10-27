@@ -5,18 +5,22 @@ import BranchInfo from "../branch-card";
 import { SheetFormBuilder } from "@/modules/form-builder";
 import { addNewBranchFormConfig } from "./add-new-branch-form-config";
 import { Branch } from "@/modules/company-profile/types/company";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
-const BranchesInfo = ({ branches }: { branches: Branch[] }) => {
+const BranchesInfo = ({ branches,handleBranchesRefetch }: { branches: Branch[],handleBranchesRefetch: () => void }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl">الفروع</h3>
-        <SheetFormBuilder
-          config={addNewBranchFormConfig(branches)}
-          trigger={<Button>اضافة فرع</Button>}
-        />{" "}
+        <Can check={[PERMISSIONS.companyProfile.branch.create]}>
+          <SheetFormBuilder
+            config={addNewBranchFormConfig(branches)}
+            trigger={<Button>اضافة فرع</Button>}
+          />
+        </Can>
       </div>
-      <BranchInfo branches={branches} />
+      <BranchInfo branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
     </div>
   );
 };

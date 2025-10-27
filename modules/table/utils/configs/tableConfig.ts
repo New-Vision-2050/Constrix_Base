@@ -1,6 +1,43 @@
 import { ReactNode } from "react";
 import { ColumnSearchConfig } from "../tableTypes";
 import { ColumnConfig } from "./columnConfig";
+import { FormConfig } from "@/modules/form-builder/types/formTypes";
+
+// Define types for dialog props
+export interface DialogProps {
+  open?: boolean;
+  onClose?: () => void;
+  onSuccess?: () => void;
+  title?: string;
+  shouldReloadTable?: boolean;
+  [key: string]: unknown;
+}
+
+// Define render function type for custom executions
+export type RenderFunctionType = (row: {
+  id: string;
+  [key: string]: unknown;
+}) => ReactNode;
+
+// Define types for menu items (executions)
+export type MenuItem = {
+  label: string;
+  icon?: ReactNode;
+  action: string | ((row: { id: string; [key: string]: unknown }) => void);
+  color?: string;
+  disabled?: boolean;
+  dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
+  dialogProps?:
+    | DialogProps
+    | ((row: { id: string; [key: string]: unknown }) => DialogProps);
+  position?: "before" | "after";
+};
+
+// Define execution configuration
+export interface ExecutionConfig {
+  canEdit?: boolean;
+  canDelete?: boolean;
+}
 
 export interface TableConfig {
   url: string;
@@ -17,7 +54,8 @@ export interface TableConfig {
   enablePagination?: boolean;
   enableSearch?: boolean;
   enableRowSelection?: boolean; // Row selection is enabled by default, set to false to disable
-  dataMapper?: (data: any) => any[];
+  enableExport?: boolean;
+  dataMapper?: (data: unknown) => unknown[];
   // Search configuration options
   searchFields?: string[];
   searchParamName?: string;
@@ -27,9 +65,13 @@ export interface TableConfig {
   enableColumnSearch?: boolean;
   columnSearchConfig?: ColumnSearchConfig;
   // Additional search fields for advanced filtering
-  allSearchedFields?: any[];
+  allSearchedFields?: Record<string, unknown>[];
   hideSearchField?: boolean;
   tableTitle?: string;
   deleteConfirmMessage?: string;
-  deleteUrl?:string;
+  deleteUrl?: string;
+  // Execution configuration
+  executions?: (MenuItem | RenderFunctionType)[];
+  executionConfig?: ExecutionConfig;
+  formConfig?: FormConfig;
 }

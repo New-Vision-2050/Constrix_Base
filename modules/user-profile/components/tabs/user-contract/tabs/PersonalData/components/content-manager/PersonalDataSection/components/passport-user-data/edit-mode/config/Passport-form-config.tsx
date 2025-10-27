@@ -4,15 +4,17 @@ import { usePersonalDataTabCxt } from "../../../../../../../context/PersonalData
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const PassportDataFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { handleRefetchDataStatus, user } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.nestedTabs.passportData");
 
   const PassportFormConfig: FormConfig = {
     formId: "Passport-data-form",
-    title: "بيانات جواز السفر",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -23,26 +25,26 @@ export const PassportDataFormConfig = () => {
         fields: [
           {
             name: "passport",
-            label: "رقم جواز السغر",
+            label: t("passportNumber"),
             type: "text",
-            placeholder: "رقم جواز السغر",
+            placeholder: t("passportNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم الجواز مطلوب",
+                message: t("passportNumberRequired"),
               },
               {
                 type: "pattern",
                 value: /^[A-Za-z0-9]{6,20}$/,
-                message: "رقم الجواز يجب أن يكون من 6 إلى 20 حرفًا أو رقمًا",
+                message: t("passportNumberPattern"),
               }
             ],
           },
           {
-            label: "تاريخ الأستلام",
+            label: t("passportStartDate"),
             type: "date",
             name: "passport_start_date",
-            placeholder: "تاريخ الأستلام",
+            placeholder: t("passportStartDate"),
             maxDate: {
               formId: `Passport-data-form`,
               field: "passport_end_date",
@@ -50,32 +52,32 @@ export const PassportDataFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "تاريخ الأستلام مطلوب",
+                message: t("passportStartDateRequired"),
               },
             ],
           },
           {
-            label: "تاريخ الأنتهاء",
+            label: t("passportEndDate"),
             type: "date",
             name: "passport_end_date",
             minDate: {
               formId: `Passport-data-form`,
               field: "passport_start_date",
             },
-            placeholder: "تاريخ الأنتهاء",
+            placeholder: t("passportEndDate"),
             validation: [
               {
                 type: "required",
-                message: "تاريخ الأنتهاء مطلوب",
+                message: t("passportEndDateRequired"),
               },
             ],
           },
           {
-            label: "ارفاق الهوية",
+            label: t("passportFile"),
             type: "file",
             isMulti: true,
             name: "file_passport",
-            placeholder: "ارفاق الهوية",
+            placeholder: t("passportFile"),
             fileConfig: {
               allowedFileTypes: [
                 "application/pdf", // pdf
@@ -94,8 +96,8 @@ export const PassportDataFormConfig = () => {
       passport_end_date: userIdentityData?.passport_end_date,
       file_passport: userIdentityData?.file_passport,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

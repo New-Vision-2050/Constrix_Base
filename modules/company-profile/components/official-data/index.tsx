@@ -11,15 +11,49 @@ import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { getCookie } from "cookies-next";
+import { useState, useEffect } from "react";
 
 const OfficialData = ({ id }: { id?: string }) => {
   const { company_id } = useParams();
+  
+  // State to track cookie changes
+  const [cookieBranchId, setCookieBranchId] = useState<string | undefined>();
+
+  // Monitor cookie changes
+  useEffect(() => {
+    const checkCookieChanges = () => {
+      const currentCookieValue = getCookie("current-branch-id");
+      // Handle both sync and async cookie values
+      const cookieValue = typeof currentCookieValue === 'string' 
+        ? currentCookieValue 
+        : undefined;
+      
+      if (cookieValue !== cookieBranchId) {
+        setCookieBranchId(cookieValue);
+      }
+    };
+
+    // Initial check
+    checkCookieChanges();
+
+    // Check for cookie changes every 100ms
+    const interval = setInterval(checkCookieChanges, 100);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [cookieBranchId]);
 
   const { data, isPending, isSuccess } = useQuery({
-    queryKey: ["main-company-data", id, company_id],
+    queryKey: ["main-company-data", id, company_id, cookieBranchId],
     queryFn: async () => {
+      const _url = Boolean(cookieBranchId)
+        ? "/companies/current-auth-company?branch_id=" + cookieBranchId
+        : "/companies/current-auth-company";
       const response = await apiClient.get<ServerSuccessResponse<CompanyData>>(
-        "/companies/current-auth-company",
+        _url,
         {
           params: {
             ...(id && { branch_id: id }),
@@ -48,6 +82,8 @@ const OfficialData = ({ id }: { id?: string }) => {
     email,
     company_type_id,
     general_manager,
+    packages,
+    company_access_programs,
   } = payload as CompanyData;
 
   return (
@@ -62,34 +98,80 @@ const OfficialData = ({ id }: { id?: string }) => {
 
       {isSuccess && (
         <>
-          <OfficialDataSection
-            officialData={{
-              branch,
-              name,
-              name_en,
-              company_type,
-              country_name,
-              country_id,
-              company_field,
-              company_field_id,
-              phone,
-              email,
-              company_type_id,
-            }}
-            id={id}
-            currentCompanyId={currentCompanyId}
-          />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.officialData.view]}>
+              <OfficialDataSection
+                officialData={{
+                  branch,
+                  name,
+                  name_en,
+                  company_type,
+                  country_name,
+                  country_id,
+                  company_field,
+                  company_field_id,
+                  phone,
+                  email,
+                  company_type_id,
+                  packages,
+                  company_access_programs,
+                }}
+                id={id}
+                currentCompanyId={currentCompanyId}
+              />
+            </Can>
+          ) : (
+            <OfficialDataSection
+              officialData={{
+                branch,
+                name,
+                name_en,
+                company_type,
+                country_name,
+                country_id,
+                company_field,
+                company_field_id,
+                phone,
+                email,
+                company_type_id,
+                packages,
+                company_access_programs,
+              }}
+              id={id}
+              currentCompanyId={currentCompanyId}
+            />
+          )}
 
-          <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.legalData.view]}>
+              <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+            </Can>
+          ) : (
+            <LegalDataSection id={id} currentCompanyId={currentCompanyId} />
+          )}
 
-          <SupportData generalManager={general_manager} />
+          <Can check={[PERMISSIONS.companyProfile.supportData.view]}>
+            <SupportData generalManager={general_manager} />
+          </Can>
 
-          <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.address.view]}>
+              <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+            </Can>
+          ) : (
+            <NationalAddress id={id} currentCompanyId={currentCompanyId} />
+          )}
 
-          <OfficialDocsSection
-            id={id}
-            currentCompanyId={currentCompanyId}
-          />  
+          {!id ? (
+            <Can check={[PERMISSIONS.companyProfile.officialDocument.view]}>
+              <OfficialDocsSection
+                id={id}
+                currentCompanyId={currentCompanyId}
+              />
+            </Can>
+          ) : (
+            <OfficialDocsSection id={id} currentCompanyId={currentCompanyId} />
+          )}
         </>
       )}
     </div>

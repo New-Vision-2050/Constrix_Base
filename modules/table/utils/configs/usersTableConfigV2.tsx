@@ -8,6 +8,7 @@ import React from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
+import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 
 // Define types for the company data
 interface CompanyData {
@@ -38,7 +39,11 @@ export interface UserTableRow {
 }
 
 // Create a component that uses the translations
-export const UsersConfigV2 = () => {
+export const UsersConfigV2 = (options?: {
+  canEdit: boolean;
+  canDelete: boolean;
+  canView: boolean;
+}) => {
   const t = useTranslations("Companies");
 
   return {
@@ -77,7 +82,12 @@ export const UsersConfigV2 = () => {
           return (
             <div className="line-clamp-3 flex flex-col items-start justify-start">
               {companies.map((company) => (
-                <p key={company.id} className="line-clamp-1 h-5" dir={"ltr"} style={{width: "fit-content"}}>
+                <p
+                  key={company.id}
+                  className="line-clamp-1 h-5"
+                  dir={"ltr"}
+                  style={{ width: "fit-content" }}
+                >
                   {company?.phone || ""}
                 </p>
               ))}
@@ -239,10 +249,25 @@ export const UsersConfigV2 = () => {
     formConfig: GetCompanyUserFormConfig(t),
     executions: [
       {
+        id: "complete-profile",
         label: "اكمال الملف الشخصي",
         icon: <GearIcon className="w-4 h-4" />,
-        action: "openDialog",
-        dialogComponent: ChooseUserCompany, // Your custom dialog component
+        action: "complete-profile",
+        dialogComponent: ChooseUserCompany,
+        disabled: options?.canEdit,
+        dialogProps: (row: UserTableRow) => {
+          return {
+            user: row,
+          };
+        },
+      },
+      {
+        id: "user-settings",
+        label: "اعدادات الموظف",
+        icon: <GearIcon className="w-4 h-4" />,
+        action: "user-settings",
+        dialogComponent: UserSettingDialog,
+        disabled: options?.canView,
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
@@ -251,8 +276,9 @@ export const UsersConfigV2 = () => {
       },
     ],
     executionConfig: {
-      canEdit: false,
-      canDelete: true,
+      canEdit: typeof options?.canEdit === "boolean" ? options?.canEdit : false,
+      canDelete:
+        typeof options?.canDelete === "boolean" ? options?.canDelete : true,
     },
   };
 };

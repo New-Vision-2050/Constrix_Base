@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 import { processApiResponse } from "@/modules/table/utils/dataUtils";
-import { apiClient } from "@/config/axios-config";
+import { baseApi } from "@/config/axios/instances/base";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { DropdownOption, DynamicDropdownConfig } from "@/modules/form-builder";
 
@@ -41,8 +41,8 @@ export const useDropdownSearch = ({
   const isMountedRef = useRef(true);
   const initialFetchDoneRef = useRef(false);
 
-  // Create a debounced search term
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+  // Create a debounced search term with longer delay to reduce cancelation
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   // Fetch label for initial value if needed
   useEffect(() => {
@@ -104,13 +104,13 @@ export const useDropdownSearch = ({
         let response;
         if (dynamicConfig.disableReactQuery) {
           // Use direct API call without React Query
-          response = await apiClient.get(url);
+          response = await baseApi.get(url);
         } else {
           // Use React Query
           response = await queryClient.fetchQuery({
             queryKey: ["initialLabel", url],
             queryFn: async () => {
-              const response = await apiClient.get(url);
+              const response = await baseApi.get(url);
               return response;
             },
             staleTime: 1000 * 60 * 5,
@@ -450,13 +450,13 @@ export const useDropdownSearch = ({
         let response;
       if (dynamicConfig.disableReactQuery) {
         // Use direct API call without React Query
-        response = await apiClient.get(url, { signal: controller.signal });
+        response = await baseApi.get(url, { signal: controller.signal });
       } else {
         // Use React Query
         response = await queryClient.fetchQuery({
           queryKey: ["data", url],
           queryFn: async () => {
-            const response = await apiClient.get(url);
+            const response = await baseApi.get(url);
             return response;
           },
           staleTime: 1000 * 60 * 5,
@@ -558,13 +558,15 @@ export const useDropdownSearch = ({
         );
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
-          console.log("Request aborted");
+          // تم إلغاء الطلب - هذا أمر طبيعي عند البحث السريع
+          console.log("Request aborted - this is normal during fast typing");
           return;
         }
 
         if (isMountedRef.current) {
           const errorMessage =
             err instanceof Error ? err.message : "Unknown error";
+          console.warn("Dropdown search error:", errorMessage);
           setError(errorMessage);
         }
       } finally {

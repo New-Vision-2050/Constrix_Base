@@ -4,16 +4,18 @@ import { serialize } from "object-to-formdata";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const BorderNumberFormConfig = () => {
   const { user } = useUserProfileCxt();
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.nestedTabs.borderNumberData");
 
   const borderNumberFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
-    title: "بيانات رقم الحدود - الدخول",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -24,39 +26,53 @@ export const BorderNumberFormConfig = () => {
         fields: [
           {
             name: "border_number",
-            label: "رقم الحدود",
+            label: t("borderNumber"),
             type: "text",
-            placeholder: "رقم الحدود",
+            placeholder: t("borderNumberPlaceholder"),
+            required: true,
             validation: [
               {
                 type: "required",
-                message: "رقم الحدود مطلوب",
+                message: t("borderNumberRequired"),
+              },
+              {
+                type: "pattern",
+                value: "^[0-9]{10}$",
+                message: t("borderNumberPattern"),
               },
             ],
           },
           {
             name: "border_number_start_date",
-            label: "تاريخ الدخول",
+            label: t("borderNumberStartDate"),
             type: "date",
-            placeholder: "تاريخ الدخول",
+            placeholder: t("borderNumberStartDate"),
             maxDate: {
               formId: `ConnectionInformation-data-form`,
               field: "border_number_end_date",
             },
+            validation: [],
           },
           {
             name: "border_number_end_date",
-            label: "تاريخ الانتهاء",
+            label: t("borderNumberEndDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("borderNumberEndDate"),
             minDate: {
               formId: `ConnectionInformation-data-form`,
               field: "border_number_start_date",
             },
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: t("borderNumberEndDateRequired"),
+              },
+            ],
           },
           {
             name: "file_border_number",
-            label: "ارفاق رقم الحدود",
+            label: t("borderNumberAttachment"),
             type: "file",
             isMulti: true,
             fileConfig: {
@@ -66,7 +82,7 @@ export const BorderNumberFormConfig = () => {
                 "image/png", // png
               ],
             },
-            placeholder: "ارفاق رقم الحدود",
+            placeholder: t("borderNumberAttachment"),
           },
         ],
         columns: 2,
@@ -78,8 +94,8 @@ export const BorderNumberFormConfig = () => {
       border_number: userIdentityData?.border_number,
       file_border_number: userIdentityData?.file_border_number,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

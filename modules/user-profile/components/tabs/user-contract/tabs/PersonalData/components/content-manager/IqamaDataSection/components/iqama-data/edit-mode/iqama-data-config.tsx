@@ -4,16 +4,18 @@ import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt
 import { serialize } from "object-to-formdata";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 export const IqamaDataFormConfig = () => {
   const { user } = useUserProfileCxt();
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
+  const t = useTranslations("UserProfile.nestedTabs.iqamaData");
 
   const iqamaDataFormConfig: FormConfig = {
     formId: "iqama-entry-data-form",
-    title: "بيانات الاقامة",
+    title: t("title"),
     apiUrl: `${baseURL}/company-users/contact-info`,
     laravelValidation: {
       enabled: true,
@@ -24,39 +26,59 @@ export const IqamaDataFormConfig = () => {
         fields: [
           {
             name: "entry_number",
-            label: "رقم الاقامة",
+            label: t("iqamaNumber"),
             type: "text",
-            placeholder: "رقم الاقامة",
+            placeholder: t("iqamaNumber"),
+            required:true,
             validation: [
               {
                 type: "required",
-                message: "رقم الاقامة مطلوب",
+                message: t("iqamaNumberRequired"),
+              },
+              {
+                type: "pattern",
+                value: "^[0-9]{10}$",
+                message: t("iqamaNumberPattern"),
               },
             ],
           },
           {
             name: "entry_number_start_date",
-            label: "تاريخ الاصدار",
+            label: t("iqamaStartDate"),
             type: "date",
             maxDate: {
               formId: `iqama-entry-data-form`,
               field: "entry_number_end_date",
             },
-            placeholder: "تاريخ الاصدار",
+            required:true,
+            validation: [
+              {
+                type: "required",
+                message: t("iqamaStartDateRequired"),
+              },
+            ],
+            placeholder: t("iqamaStartDate"),
           },
           {
             name: "entry_number_end_date",
-            label: "تاريخ الانتهاء",
+            label: t("iqamaEndDate"),
             type: "date",
             minDate: {
               formId: `iqama-entry-data-form`,
               field: "entry_number_start_date",
             },
-            placeholder: "تاريخ الانتهاء",
+            required:true,
+            validation: [
+              {
+                type: "required",
+                message: t("iqamaEndDateRequired"),
+              },
+            ],
+            placeholder: t("iqamaEndDate"),
           },
           {
             name: "file_entry_number",
-            label: "ارفاق رقم الاقامة",
+            label: t("iqamaAttachment"),
             type: "file",
             isMulti: true,
             fileConfig: {
@@ -66,7 +88,7 @@ export const IqamaDataFormConfig = () => {
                 "image/png", // png
               ],
             },
-            placeholder: "ارفاق رقم الاقامة",
+            placeholder: t("iqamaAttachment"),
           },
         ],
         columns: 2,
@@ -78,8 +100,8 @@ export const IqamaDataFormConfig = () => {
       entry_number_end_date: userIdentityData?.entry_number_end_date,
       file_entry_number: userIdentityData?.file_entry_number,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("submitButtonText"),
+    cancelButtonText: t("cancelButtonText"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

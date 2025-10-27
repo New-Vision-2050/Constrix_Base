@@ -15,6 +15,8 @@ import { ProfileWidgetData } from "../types/profile-widgets";
 import useUserPersonalData from "../components/tabs/user-contract/tabs/PersonalData/hooks/useUserPersonalData";
 import { PersonalUserDataSectionT } from "../components/tabs/user-contract/tabs/PersonalData/api/get-personal-data";
 import useUserProfileData from "../hooks/useUserProfileData";
+import useUserActivitiesData from "../hooks/useUserActivities";
+import { UserActivityT } from "../types/user-activity";
 
 // declare context types
 type UserProfileCxtType = {
@@ -43,6 +45,10 @@ type UserProfileCxtType = {
 
   // company id
   companyId: string | null;
+
+  // user activities
+  userActivities: UserActivityT[] | undefined;
+  isLoadingUserActivities: boolean;
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
@@ -76,6 +82,8 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
     isLoading,
     refetch: refetchProfileData,
   } = useUserProfileData(userId !== null ? userId : undefined);
+  const { data: userActivities, isLoading: isLoadingUserActivities } =
+    useUserActivitiesData(userId !== null ? userId : undefined);
   const { data: userDataStatus, refetch: refetchDataStatus } =
     useProfileDataStatus((userId || _user?.user_id) ?? "");
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
@@ -159,6 +167,10 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
 
         // company id
         companyId,
+
+        // user activities
+        userActivities,
+        isLoadingUserActivities,
       }}
     >
       {children}

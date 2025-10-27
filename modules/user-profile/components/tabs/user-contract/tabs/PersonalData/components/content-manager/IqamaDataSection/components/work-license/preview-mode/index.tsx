@@ -1,16 +1,20 @@
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { useTranslations } from "next-intl";
 
 export default function UserIqamaWorkLicenseDataPreviewMode() {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.nestedTabs.licenseData");
 
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          label="رقم رخصة العمل"
+          required
+          label={t("licenseNumber")}
+          enableCopy
           value={userIdentityData?.work_permit ?? ""}
           valid={Boolean(userIdentityData?.work_permit)}
         />
@@ -18,7 +22,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الدخول"
+          label={t("licenseStartDate")}
           value={userIdentityData?.work_permit_start_date ?? ""}
           valid={Boolean(userIdentityData?.work_permit_start_date)}
           type="date"
@@ -27,7 +31,8 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الانتهاء"
+          required
+          label={t("licenseEndDate")}
           value={userIdentityData?.work_permit_end_date ?? ""}
           valid={Boolean(userIdentityData?.work_permit_end_date)}
           type="date"
@@ -44,7 +49,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
                 handleRefreshIdentityData();
               }}
               valid={Boolean(media?.name)}
-              label="ارفاق الهوية"
+              label={t("licenseAttachment")}
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
               fileUrl={media?.url}
@@ -55,7 +60,7 @@ export default function UserIqamaWorkLicenseDataPreviewMode() {
         <div className="p-2">
           <PreviewTextField
             valid={false}
-            label="ارفاق الهوية"
+            label={t("licenseAttachment")}
             value={"---"}
             type={"pdf"}
           />

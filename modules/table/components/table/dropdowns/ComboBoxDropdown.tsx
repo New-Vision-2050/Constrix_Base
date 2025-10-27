@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Select from "react-select";
 import { useDropdownState } from "./hooks/useDropdownState";
 import { useDependencyMessage } from "./DropdownUtils";
@@ -60,6 +60,19 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
     label: opt.label,
   }));
 
+  // Auto-select all options if selectAll is enabled
+  useEffect(() => {
+    if (
+      dynamicConfig?.selectAll &&
+      isMulti &&
+      options.length > 0 &&
+      (!localValue || (Array.isArray(localValue) && localValue.length === 0))
+    ) {
+      const allValues = options.map(option => option.value);
+      handleSelect(allValues);
+    }
+  }, [options, localValue, dynamicConfig?.selectAll, isMulti, handleSelect]);
+
   // Find current value option(s)
   const selectedOption = isMulti
     ? selectOptions.filter((opt) =>
@@ -69,6 +82,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
 
   return (
     <div className="space-y-2">
+      {label && <Label htmlFor={`select-${columnKey}`} className="mb-2 block">{label}</Label>}
       <Select
         id={`select-${columnKey}`}
         value={selectedOption}

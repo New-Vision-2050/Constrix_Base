@@ -12,6 +12,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           value={bank?.country_name ?? ""}
           valid={Boolean(bank?.country_name)}
           type="select"
+          required
         />
       </div>
       <div className="p-2">
@@ -19,6 +20,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           label="اسم البنك"
           value={bank?.bank_name ?? ""}
           valid={Boolean(bank?.bank_name)}
+          required
         />
       </div>
       <div className="p-2">
@@ -26,6 +28,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           label="الاسم الكامل لصاحب الحساب البنكي"
           value={bank?.user_name ?? ""}
           valid={Boolean(bank?.user_name)}
+          required
         />
       </div>
       <div className="p-2">
@@ -33,6 +36,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           label="نوع الحساب البنكي"
           value={bank?.bank_type_account?.name ?? ""}
           valid={Boolean(bank?.bank_type_account?.name)}
+          required
         />
       </div>
       <div className="p-2">
@@ -40,6 +44,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           label="عملة الحساب"
           value={bank?.currency_name ?? ""}
           valid={Boolean(bank?.currency_name)}
+          required
         />
       </div>
       <div className="p-2">
@@ -47,6 +52,7 @@ export default function UserProfileBankingDataReview({ bank }: PropsT) {
           label="رقم الحساب البنكي"
           value={bank?.account_number ?? ""}
           valid={Boolean(bank?.account_number)}
+          required
         />
       </div>
       <div className="p-2">

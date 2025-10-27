@@ -36,6 +36,7 @@ interface ChartControlsProps {
   onPrint: () => void;
   isFullScreen?: boolean;
   onToggleFullScreen?: () => void;
+  additionalActions?: React.ReactNode;
 }
 
 const ChartControls: React.FC<ChartControlsProps> = ({
@@ -54,6 +55,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
   listView,
   isFullScreen = false,
   onToggleFullScreen,
+  additionalActions,
 }) => {
   const locale = useLocale();
   const t = useTranslations("CompanyStructure.actions");
@@ -87,6 +89,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
       </div>
 
       <div className="flex items-center gap-3">
+        {viewMode === "list" && additionalActions}
         {selectedNode && (
           <Button variant="secondary" size="sm" onClick={onMakeParent}>
             <UserPlus className="h-4 w-4" />

@@ -11,39 +11,39 @@ const LegalDataPreview = ({
 }) => {
   console.log({ companyLegalData });
 
-  const previewData = companyLegalData.map((obj) => {
+  const previewData = companyLegalData?.map((obj) => {
     return [
       {
-        valid: Boolean(obj.registration_type),
+        valid: Boolean(obj?.registration_type),
         label: "نوع التسجل",
-        value: obj.registration_type,
+        value: obj?.registration_type,
         needRequest: true,
         containerClassName: "col-span-4",
       },
       {
-        valid: Boolean(obj.registration_number),
+        valid: Boolean(obj?.registration_number),
         label: " رقم السجل التجاري / رقم الـ 700",
         needRequest: true,
-        value: obj.registration_number,
+        value: obj?.registration_number,
         containerClassName: "col-span-2",
       },
       {
-        valid: Boolean(obj.start_date),
+        valid: Boolean(obj?.start_date),
         label: "تاريخ الإصدار",
         type: "date" as PreviewTextFieldType,
-        value: new Date(obj.start_date).toLocaleDateString("en-GB"),
+        value: obj?.start_date ? new Date(obj.start_date).toLocaleDateString("en-GB") : "",
       },
       {
-        valid: Boolean(obj.end_date),
+        valid: Boolean(obj?.end_date),
         label: "تاريخ الانتهاء",
-        value: new Date(obj.end_date).toLocaleDateString("en-GB"),
+        value: obj?.end_date ? new Date(obj.end_date).toLocaleDateString("en-GB") : "",
         render: () => (
           <div className="flex items-stretch gap-3">
             <FieldPreview
               valid={true}
               label="تاريخ الانتهاء"
               type="date"
-              value={new Date(obj.end_date).toLocaleDateString("en-GB")}
+              value={obj?.end_date ? new Date(obj.end_date).toLocaleDateString("en-GB") : ""}
             />
             <div className="border shrink-0 border-dashed  flex items-center justify-center w-9 h-11 rounded-md">
               <FilePlus className="w-4 text-[#18CB5F] shrink-0" />
@@ -56,8 +56,8 @@ const LegalDataPreview = ({
 
   return (
     <div className="grid grid-cols-4 gap-x-3 gap-y-5 max-h-[500px] overflow-auto">
-      {previewData.flatMap((previewArray, arrayIndex) =>
-        previewArray.map((preview, itemIndex) => (
+      {previewData?.flatMap((previewArray, arrayIndex) =>
+        previewArray?.map((preview, itemIndex) => (
           <div
             key={`${arrayIndex}-${itemIndex}-${preview.label}`}
             className={preview?.containerClassName}

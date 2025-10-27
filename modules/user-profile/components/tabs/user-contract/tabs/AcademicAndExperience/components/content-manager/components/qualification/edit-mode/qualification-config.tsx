@@ -5,6 +5,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { serialize } from "object-to-formdata";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   qualification?: Qualification;
@@ -17,6 +18,7 @@ export const QualificationFormConfig = ({
   // declare and define helper state and variables
   const formType = qualification ? "Edit" : "Create";
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
+  const t = useTranslations("UserProfile.nestedTabs.qualificationsData");
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
 
   // form config
@@ -32,9 +34,8 @@ export const QualificationFormConfig = ({
           {
             type: "select",
             name: "country_id",
-            label: "دولة التخرج",
-            placeholder: "اختر دولة الشركة",
-            required: true,
+            label: t("country"),
+            placeholder: t("selectCountry"),
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -46,19 +47,13 @@ export const QualificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل دولة الشركة",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
             name: "university_id",
-            label: "الجامعة",
-            placeholder: "اختر الجامعة",
-            required: true,
+            label: t("university"),
+            placeholder: t("selectUniversity"),
             dynamicOptions: {
               url: `${baseURL}/universities`,
               valueField: "id",
@@ -72,19 +67,13 @@ export const QualificationFormConfig = ({
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل الجامعة",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
             name: "academic_qualification_id",
-            label: "المؤهل",
-            placeholder: "اختر المؤهل",
-            required: true,
+            label: t("academicQualification"),
+            placeholder: t("selectAcademicQualification"),
             dynamicOptions: {
               url: `${baseURL}/academic_qualifications`,
               valueField: "id",
@@ -96,19 +85,13 @@ export const QualificationFormConfig = ({
               itemsPerPage: 1000,
               totalCountHeader: "X-Total-Count",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل المؤهل",
-              },
-            ],
+            validation: [],
           },
           {
             type: "select",
             name: "academic_specialization_id",
-            label: "التخصص الأكاديمي",
-            placeholder: "اختر التخصص الأكاديمي",
-            required: true,
+            label: t("academicSpecialization"),
+            placeholder: t("selectAcademicSpecialization"),
             dynamicOptions: {
               url: `${baseURL}/academic_specializations`,
               valueField: "id",
@@ -122,59 +105,44 @@ export const QualificationFormConfig = ({
               dependsOn: "academic_qualification_id",
               filterParam: "academic_qualification_id",
             },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل التخصص الأكاديمي",
-              },
-            ],
+            validation: [],
           },
           {
             type: "date",
             name: "graduation_date",
-            label: "تاريخ الحصول على الشهادة",
-            placeholder: "تاريخ الشهادة",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ الشهادة مطلوب",
-              },
-            ],
+            label: t("graduationDate"),
+            placeholder: t("graduationDate"),
+            validation: [],
           },
           {
             type: "text",
             name: "study_rate",
-            label: "المعدلات الدراسية",
-            placeholder: "المعدلات الدراسية",
+            label: t("studyRate"),
+            placeholder: t("studyRate"),
             validation: [
-              {
-                type: "required",
-                message: "المعدلات الدراسية مطلوبة",
-              },
               {
                 type: "pattern",
                 value: "^[0-9]+(\\.[0-9]+)?$",
-                message: "المعدلات الدراسية يجب أن تكون أرقام فقط",
+                message: t("studyRateValidation"),
               },
               {
                 type: "min",
                 value: 0,
-                message: "المعدلات الدراسية يجب أن تكون أكبر من أو تساوي 0",
+                message: t("studyRateValidation"),
               },
               {
                 type: "max",
                 value: 100,
-                message: "المعدلات الدراسية يجب أن لا تتجاوز 100",
-              }
+                message: t("studyRateValidation"),
+              },
             ],
           },
           {
             type: "file",
             name: "file", //field name
             isMulti: true,
-            label: "ارفاق شهادة",
-            placeholder: "ارفاق شهادة",
+            label: t("attachDocument"),
+            placeholder: t("attachDocument"),
             gridArea: 2,
             fileConfig: {
               allowedFileTypes: ["application/pdf", "image/jpeg", "image/png"],
@@ -194,8 +162,8 @@ export const QualificationFormConfig = ({
       study_rate: qualification?.study_rate,
       file: qualification?.files,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

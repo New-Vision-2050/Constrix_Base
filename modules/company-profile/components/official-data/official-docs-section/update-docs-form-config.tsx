@@ -1,12 +1,12 @@
 import { apiClient, baseURL } from "@/config/axios-config";
 import { CompanyDocument } from "@/modules/company-profile/types/company";
-import { FormConfig } from "@/modules/form-builder";
+import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { serialize } from "object-to-formdata";
 
-export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
+export const updateDocsFormConfig = (doc: CompanyDocument, id?: string, onSuccess?: () => void) => {
   const { company_id }: { company_id: string | undefined } = useParams();
   const queryClient = useQueryClient();
 
@@ -26,7 +26,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             label: "نوع المستند",
             placeholder: "نوع المستند",
             dynamicOptions: {
-              url: `${baseURL}/company_registration_types`,
+              url: `${baseURL}/document_types`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -36,12 +36,25 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
-            // validation: [
-            //   {
-            //     type: "required",
-            //     message: "ادخل نوع المستند",
-            //   },
-            // ],
+            validation: [
+              {
+                type: "required",
+                message: "ادخل نوع المستند",
+              },
+            ],
+          },
+          {
+            name: "name",
+            label: "اسم المستند",
+            type: "text",
+            placeholder: "ادخل اسم المستند",
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "ادخل الوصف",
+              },
+            ],
           },
           {
             name: "description",
@@ -79,6 +92,10 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
             minDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
+              shift: {
+                value: 8,
+                unit: "days",
+              },
             },
             validation: [
               {
@@ -86,6 +103,16 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
                 message: "ادخل تاريخ الانتهاء",
               },
             ],
+            onChange: (value) => {
+              const endDate = new Date(value);
+              endDate.setDate(endDate.getDate() - 7);
+              const notificationDate = endDate.toLocaleDateString("en-CA");
+              useFormStore
+                .getState()
+                .setValues(`updateDocsFormConfig-${doc.id}-${id}-${company_id}`, {
+                  notification_date: notificationDate,
+                });
+            },
           },
           {
             name: "notification_date",
@@ -100,6 +127,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "end_date",
             },
+            disabled: true,
             validation: [
               {
                 type: "required",
@@ -187,9 +215,7 @@ export const updateDocsFormConfig = (doc: CompanyDocument, id?: string) => {
     },
 
     onSuccess: () => {
-      queryClient.refetchQueries({
-        queryKey: ["main-company-data", id, company_id],
-      });
+      onSuccess?.();
     },
   };
   return updateDocsFormConfig;

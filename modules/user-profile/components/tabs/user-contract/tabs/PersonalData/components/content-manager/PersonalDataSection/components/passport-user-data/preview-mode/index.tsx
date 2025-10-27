@@ -1,9 +1,11 @@
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { useTranslations } from "next-intl";
 
 export default function UserProfilePassportDataReview() {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.nestedTabs.passportData");
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -11,15 +13,16 @@ export default function UserProfilePassportDataReview() {
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userIdentityData?.passport)}
-          label="رقم جواز السفر"
+          label={t("passportNumber")}
           value={userIdentityData?.passport ?? ""}
           required
+          enableCopy
         />
       </div>
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userIdentityData?.passport_start_date)}
-          label="تاريخ الانشاء"
+          label={t("passportStartDate")}
           value={userIdentityData?.passport_start_date ?? ""}
           required
           type="date"
@@ -30,7 +33,7 @@ export default function UserProfilePassportDataReview() {
       <div className="p-2">
         <PreviewTextField
           valid={Boolean(userIdentityData?.passport_end_date)}
-          label="تاريخ الانتهاء"
+          label={t("passportEndDate")}
           value={userIdentityData?.passport_end_date ?? ""}
           type="date"
           required
@@ -46,7 +49,7 @@ export default function UserProfilePassportDataReview() {
                 handleRefreshIdentityData();
               }}
               valid={Boolean(media?.name)}
-              label="ارفاق الهوية"
+              label={t("passportFile")}
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
               fileUrl={media?.url}
@@ -57,7 +60,7 @@ export default function UserProfilePassportDataReview() {
         <div className="p-2">
           <PreviewTextField
             valid={false}
-            label="ارفاق الهوية"
+            label={t("passportFile")}
             value={"---"}
             type={"pdf"}
           />

@@ -29,6 +29,10 @@ export interface ValidationRule {
 export interface DropdownOption {
   value: string;
   label: string;
+  features?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 export interface DynamicRowOptions {
@@ -63,6 +67,7 @@ export interface DynamicDropdownConfig {
   valueField: string;
   labelField: string;
   setFirstAsDefault?: boolean; // Whether to automatically select the first option when no value is selected
+  selectAll?: boolean; // Whether to automatically select all options when field is multi-select
   dependsOn?:
     | string
     | DependencyConfig[]
@@ -121,7 +126,8 @@ export interface FieldConfig {
     | "hiddenObject"
     | "dynamicRows"
     | "image"
-    | "file";
+    | "file"
+    | "time";
     
   fieldClassName?: string; // Class name for the field container
 
@@ -221,7 +227,8 @@ export interface WizardOptions {
 
   onStepSubmit?: (
     step: number,
-    values: Record<string, any>
+    values: Record<string, any>,
+    formConfig: FormConfig
   ) => Promise<{
     success: boolean;
     message?: string;
@@ -277,7 +284,7 @@ export interface FormConfig {
     enabled: boolean;
     errorsPath?: string; // Default is 'errors'
   };
-  onSubmit?: (values: Record<string, any>) => Promise<{
+  onSubmit?: (values: Record<string, any>, formConfig: FormConfig) => Promise<{
     success: boolean;
     message?: string;
     errors?: Record<string, string | string[]>;

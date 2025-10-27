@@ -4,6 +4,7 @@ import { Experience } from "@/modules/user-profile/types/experience";
 import { useUserAcademicTabsCxt } from "../../UserAcademicTabsCxt";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   experience?: Experience;
@@ -18,6 +19,7 @@ export const SingleExperienceFormConfig = ({
   const formType = experience ? "Edit" : "Create";
   const { user, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
+  const t = useTranslations('UserProfile.nestedTabs.academicExperience'); 
 
   //  form config
   const singleExperienceFormConfig: FormConfig = {
@@ -31,42 +33,33 @@ export const SingleExperienceFormConfig = ({
         fields: [
           {
             name: "job_name",
-            label: "المسمى الوظيفي",
+            label: t('jobName'),
             type: "text",
-            placeholder: "المسمى الوظيفي",
+            placeholder: t('jobName'),
             validation: [
-              {
-                type: "required",
-                message: "المسمى الوظيفي مطلوب",
-              },
               {
                     type: "pattern",
                     value: "^[a-zA-Z\u0600-\u06FF\\s]+$",
-                    message: "يجب أن يحتوي فقط على أحرف",
+                    message: t('jobNameValidation'),
               }
             ],
           },
           {
-            label: "تاريخ البداية",
+            label: t('startDate'),
             type: "date",
             name: "training_from",
-            placeholder: "تاريخ البداية",
+            placeholder: t('startDate'),
             maxDate: {
               formId: `user-experiences-data-form-${experience?.id ?? ""}`,
               field: "training_to",
             },
-            validation: [
-              {
-                type: "required",
-                message: "تاريخ البداية مطلوب",
-              },
-            ],
+            validation: [],
           },
           {
-            label: "تاريخ الانتهاء",
+            label: t('endDate'),
             type: "date",
             name: "training_to",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t('endDate'),
             minDate: {
               formId: `user-experiences-data-form-${experience?.id ?? ""}`,
               field: "training_from",
@@ -74,21 +67,16 @@ export const SingleExperienceFormConfig = ({
           },
           {
             name: "company_name",
-            label: "اسم الشركة",
+            label: t('companyName'),
             type: "text",
-            placeholder: "اسم الشركة",
-            validation: [
-              {
-                type: "required",
-                message: "اسم الشركة مطلوب",
-              },
-            ],
+            placeholder: t('companyName'),
+            validation: [],
           },
           {
             name: "about",
-            label: "نبذه عن المشاريع والاعمال",
+            label: t('about'),
             type: "textarea",
-            placeholder: "نبذه عن المشاريع والاعمال",
+            placeholder: t('about'),
           },
         ],
         columns: 2,
@@ -101,8 +89,8 @@ export const SingleExperienceFormConfig = ({
       company_name: experience?.company_name,
       about: experience?.about,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t('save'),
+    cancelButtonText: t('cancel'),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

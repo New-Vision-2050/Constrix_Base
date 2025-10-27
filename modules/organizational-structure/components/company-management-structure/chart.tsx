@@ -5,6 +5,7 @@ import { OrgChartNode } from "@/types/organization";
 import { SheetFormBuilder, useSheetForm } from "@/modules/form-builder";
 import useManagementsTreeData from "@/modules/organizational-structure/hooks/useManagementsTreeData";
 import OrganizationChart from "@/modules/organizational-structure/org-chart/components/organization-chart";
+import { CloneManagement } from "./clone-management";
 import { GetOrgStructureManagementFormConfig } from "./set-management-form";
 import { useManagementsStructureCxt } from "./ManagementsStructureCxt";
 import { apiClient } from "@/config/axios-config";
@@ -13,13 +14,19 @@ import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { DropdownItemT } from "@/components/shared/dropdown-button";
+import { CompanyData } from "@/modules/company-profile/types/company";
+import DialogFormBuilder from "@/modules/form-builder/components/DialogFormBuilder";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = {
   branchId: string | number;
+  companyData?: CompanyData
+  mainBranch?: {id:string ; name:string}
 };
 
 const BranchManagementsStructure = (props: PropsT) => {
-  const { branchId } = props;
+  const { branchId , companyData, mainBranch } = props;
   const t = useTranslations("CompanyStructure.ManagementStructure");
   const [deletedId, setDeletedId] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -30,7 +37,21 @@ const BranchManagementsStructure = (props: PropsT) => {
     companyOwnerId,
     handleStoreSelectedNode,
   } = useManagementsStructureCxt();
-  const config = useMemo(() => {
+
+  const cloneManagementConfig = useMemo(() => {
+    return CloneManagement({
+      isEdit,
+      onClose,
+      branchId,
+      selectedNode,
+      isUserCompanyOwner,
+      companyOwnerId,
+      companyData
+    });
+  }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
+
+
+  const addManagementConfig = useMemo(() => {
     return GetOrgStructureManagementFormConfig({
       isEdit,
       onClose,
@@ -38,9 +59,14 @@ const BranchManagementsStructure = (props: PropsT) => {
       selectedNode,
       isUserCompanyOwner,
       companyOwnerId,
+      mainBranch
     });
   }, [isUserCompanyOwner, companyOwnerId, selectedNode, branchId, isEdit]);
-  const { openSheet, isOpen, closeSheet } = useSheetForm({ config });
+
+
+  const { openSheet, isOpen, closeSheet } = useSheetForm({ config:cloneManagementConfig });
+  const { openSheet: openAddSheet, isOpen: isAddSheetOpen, closeSheet: closeAddSheet } = useSheetForm({ config:addManagementConfig });
+
   const {
     data: orgData,
     isLoading,
@@ -115,10 +141,15 @@ const BranchManagementsStructure = (props: PropsT) => {
   return (
     <main className="flex-grow md:max-w-[calc(100vw-580px)]">
       {/* sheet form */}
-      <SheetFormBuilder
+      <DialogFormBuilder
         isOpen={isOpen}
-        config={config}
+        config={cloneManagementConfig}
         onOpenChange={(open) => (open ? openSheet() : closeSheet())}
+      />
+      <SheetFormBuilder
+        isOpen={isAddSheetOpen}
+        config={addManagementConfig}
+        onOpenChange={(open) => (open ? openAddSheet() : closeAddSheet())}
       />
       {/* confirm delete dialog */}
       <ConfirmationDialog
@@ -140,14 +171,15 @@ const BranchManagementsStructure = (props: PropsT) => {
       {!isLoading && !error && orgData && orgData?.length > 0 && (
         <div className="overflow-hidden">
           <OrganizationChart
+            // ignoreAddAtFirstNode={true}
             data={orgData?.[0] as OrgChartNode}
             onAddBtnClick={(node) => onAddBtnClick(node)}
             DropDownMenu={DropDownMenu}
             listModeDropDownMenu={listModeDropDownMenu}
             listViewAdditionalActions={
-              <>
-                <Button onClick={() => openSheet()}>اضافة ادارة</Button>
-              </>
+              <Can check={[PERMISSIONS.organization.management.create]}>
+                <Button onClick={() => openAddSheet()}>اضافة ادارة</Button>
+              </Can>
             }
           />
         </div>

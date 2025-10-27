@@ -1,16 +1,20 @@
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
+import { useTranslations } from "next-intl";
 
 export default function UserIqamaDataPreviewMode() {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
+  const t = useTranslations("UserProfile.nestedTabs.iqamaData");
 
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* First row */}
       <div className="p-2">
         <PreviewTextField
-          label="رقم الاقامة"
+          label={t("iqamaNumber")}
+          required
+          enableCopy
           value={userIdentityData?.entry_number ?? ""}
           valid={Boolean(userIdentityData?.entry_number)}
         />
@@ -18,7 +22,8 @@ export default function UserIqamaDataPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الاصدار"
+          label={t("iqamaStartDate")}
+          required
           value={userIdentityData?.entry_number_start_date ?? ""}
           valid={Boolean(userIdentityData?.entry_number_start_date)}
           type="date"
@@ -27,7 +32,8 @@ export default function UserIqamaDataPreviewMode() {
 
       <div className="p-2">
         <PreviewTextField
-          label="تاريخ الانتهاء"
+          label={t("iqamaEndDate")}
+          required
           value={userIdentityData?.entry_number_end_date ?? ""}
           valid={Boolean(userIdentityData?.entry_number_end_date)}
           type="date"
@@ -44,7 +50,7 @@ export default function UserIqamaDataPreviewMode() {
                 handleRefreshIdentityData();
               }}
               valid={Boolean(media?.name)}
-              label="ارفاق الهوية"
+              label={t("iqamaAttachment")}
               value={media?.name ?? "---"}
               type={media?.type == "image" ? "image" : "pdf"}
               fileUrl={media?.url}
@@ -55,7 +61,7 @@ export default function UserIqamaDataPreviewMode() {
         <div className="p-2">
           <PreviewTextField
             valid={false}
-            label="ارفاق الهوية"
+            label={t("iqamaAttachment")}
             value={"---"}
             type={"pdf"}
           />

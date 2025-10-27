@@ -3,35 +3,41 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { apiClient } from "./config/axios-config";
 import { endPoints } from "./modules/auth/constant/end-points";
+import { getCurrentHost } from "./utils/get-current-host";
 
 const intlMiddleware = createMiddleware(routing);
 
 const protectedCentralPages = ["/companies", "/users"];
 
 export async function middleware(req: NextRequest) {
-  const host = req.headers.get("host");
   const existingCompanyCookie = req.cookies.get("company-data")?.value;
 
   const nvToken = req.cookies.get("new-vision-token")?.value;
   const pathname = req.nextUrl.pathname;
-
+  const currentHost = await getCurrentHost();
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
+
+  // Debug logging for shared-file routes
+  if (pathname.includes('shared-file')) {
+    return NextResponse.next();
+  }
 
   if (!nvToken && !isLoginPage) {
     return NextResponse.redirect(new URL("ar/login", req.url));
   }
 
   const res = intlMiddleware(req);
+  
   if (pathname.includes("/en/")) {
     res.cookies.set("NEXT_LOCALE", "en");
   } else {
     res.cookies.set("NEXT_LOCALE", "ar");
   }
-  if ((!existingCompanyCookie && host) || isLoginPage) {
+  if ((!existingCompanyCookie && currentHost) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
         headers: {
-          "X-Domain": host,
+          "X-Domain": currentHost,
         },
       });
 
@@ -54,7 +60,7 @@ export async function middleware(req: NextRequest) {
         !!company?.payload.is_central_company &&
         protectedCentralPages.includes(pathname)
       ) {
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+        return NextResponse.redirect(new URL("/user-profile", req.url));
       }
     } catch (error) {
       res.cookies.delete("company-data");
@@ -70,7 +76,7 @@ export async function middleware(req: NextRequest) {
     const isCentral = !!company?.is_central_company;
 
     if (!isCentral && protectedCentralPages.includes(pathname)) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/user-profile", req.url));
     }
   }
 

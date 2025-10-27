@@ -83,7 +83,15 @@ export const useTableFetchEffect = ({
     // But allow it if it's a force refetch or initialization reload
     if (currentParamsSignature === lastFetchParams && !_forceRefetch && !isInitReload) {
       if (process.env.NODE_ENV === 'development') {
-        console.log("[TableFetch] Skipping duplicate fetch");
+        console.log("[TableFetch] Skipping duplicate fetch - same parameters");
+      }
+      return;
+    }
+
+    // Additional check: if a fetch is already in progress with the same parameters, skip
+    if (fetchInProgress && currentParamsSignature === lastFetchParams) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log("[TableFetch] Skipping duplicate fetch - already in progress");
       }
       return;
     }
@@ -99,8 +107,29 @@ export const useTableFetchEffect = ({
       debounceTimeout = null;
     }
 
-    // Set a new debounce timeout
+    // Set a new debounce timeout with longer delay to better prevent race conditions
     debounceTimeout = setTimeout(() => {
+      // Double-check if parameters are still the same after debounce
+      const latestParamsSignature = JSON.stringify({
+        url,
+        currentPage,
+        itemsPerPage,
+        sortColumn,
+        sortDirection,
+        searchQuery,
+        searchFields,
+        columnSearchState,
+        _forceRefetch
+      });
+
+      // If parameters changed during debounce, skip this fetch
+      if (latestParamsSignature !== currentParamsSignature) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log("[TableFetch] Parameters changed during debounce, skipping fetch");
+        }
+        return;
+      }
+
       // Update the last fetch params
       lastFetchParams = currentParamsSignature;
 
@@ -108,12 +137,11 @@ export const useTableFetchEffect = ({
       if (process.env.NODE_ENV === 'development') {
         console.log(`[TableFetch] Fetching data for ${url} (page ${currentPage})`);
         console.log(`[TableFetch] Params: ${currentParamsSignature}`);
-        console.trace('[TableFetch] Fetch call stack');
       }
 
       // Proceed with the fetch
       performFetch();
-    }, 150); // Increased debounce time to better batch changes
+    }, 200); // Increased debounce time to better prevent race conditions
 
     // Function to perform the actual fetch
     function performFetch() {
@@ -125,9 +153,9 @@ export const useTableFetchEffect = ({
         return;
       }
 
-      // Check if we've fetched too recently (within 300ms)
+      // Check if we've fetched too recently (within 500ms to prevent rapid successive calls)
       const now = Date.now();
-      if (now - lastFetchTime < 300 && !_forceRefetch) {
+      if (now - lastFetchTime < 500 && !_forceRefetch) {
         if (process.env.NODE_ENV === 'development') {
           console.log("[TableFetch] Fetch too recent, skipping");
         }
@@ -189,7 +217,7 @@ export const useTableFetchEffect = ({
           if (process.env.NODE_ENV === 'development') {
             console.log("[TableFetch] Fetch completed, cleared in-progress flag");
           }
-        }, 300);
+        }, 500);
       };
 
       // Call the wrapped fetchData function

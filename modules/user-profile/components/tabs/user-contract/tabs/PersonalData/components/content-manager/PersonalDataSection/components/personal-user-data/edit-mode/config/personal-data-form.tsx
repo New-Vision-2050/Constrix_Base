@@ -10,7 +10,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useTranslations } from "next-intl";
 
 export const PersonalDataFormConfig = () => {
-  const  t = useTranslations();
+  const t = useTranslations();
   const { user } = useUserProfileCxt();
   const { userPersonalData } = usePersonalDataTabCxt();
   const {
@@ -35,10 +35,37 @@ export const PersonalDataFormConfig = () => {
             label: t("PersonalDataForm.name"),
             type: "text",
             placeholder: t("PersonalDataForm.namePlaceholder"),
+            required: true,
             validation: [
               {
                 type: "required",
                 message: t("PersonalDataForm.nameRequired"),
+              },
+              {
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty (handled by required validation)
+                  const nameTerms = value
+                    .trim()
+                    .split(/\s+/)
+                    .filter((term) => term.length > 0);
+                  return nameTerms.length === 3;
+                },
+                message:
+                  t("PersonalDataForm.nameThreeTerms") ||
+                  "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+              },
+              {
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty (handled by required validation)
+                  // Regex to match only Arabic and English letters and spaces
+                  const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
+                  return lettersOnlyRegex.test(value);
+                },
+                message:
+                  t("PersonalDataForm.nameLettersOnly") ||
+                  "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
               },
             ],
           },
@@ -49,8 +76,16 @@ export const PersonalDataFormConfig = () => {
             placeholder: t("PersonalDataForm.nicknamePlaceholder"),
             validation: [
               {
-                type: "required",
-                message: t("PersonalDataForm.nicknameRequired"),
+                type: "custom",
+                validator: (value: string) => {
+                  if (!value) return true; // Skip if empty
+                  // Check if the value contains only letters (Arabic or English) and spaces
+                  const lettersOnlyRegex = /^[\u0600-\u06FF\s\u0020a-zA-Z]+$/;
+                  return lettersOnlyRegex.test(value);
+                },
+                message:
+                  t("PersonalDataForm.nameLettersOnly") ||
+                  "يجب أن يحتوي اللقب على حروف فقط (بدون أرقام أو رموز)",
               },
             ],
           },
@@ -63,12 +98,7 @@ export const PersonalDataFormConfig = () => {
               { label: t("PersonalDataForm.genderMale"), value: "male" },
               { label: t("PersonalDataForm.genderFemale"), value: "female" },
             ],
-            validation: [
-              {
-                type: "required",
-                message: t("PersonalDataForm.genderRequired"),
-              },
-            ],
+            validation: [],
           },
           {
             name: "is_default",
@@ -90,12 +120,7 @@ export const PersonalDataFormConfig = () => {
                   getHijriDate(newValue)
                 );
             },
-            validation: [
-              {
-                type: "required",
-                message: t("PersonalDataForm.birthdateGregorianRequired"),
-              },
-            ],
+            validation: [],
           },
           {
             name: "birthdate_hijri",
@@ -112,12 +137,7 @@ export const PersonalDataFormConfig = () => {
                   convertHijriDate(newValue)
                 );
             },
-            validation: [
-              {
-                type: "required",
-                message: t("PersonalDataForm.birthdateHijriRequired"),
-              },
-            ],
+            validation: [],
           },
           {
             name: "country_id",

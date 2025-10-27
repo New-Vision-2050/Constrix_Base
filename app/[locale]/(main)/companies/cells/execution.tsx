@@ -9,7 +9,7 @@ import { ChevronDown, EditIcon, TrashIcon } from "lucide-react";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useTableInstance } from "@/modules/table/store/useTableStore";
 import { FormConfig, SheetFormBuilder } from "@/modules/form-builder";
-import { useState, ReactNode, useMemo } from "react";
+import React, { useState, ReactNode, useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 // Define types for dialog props
@@ -29,12 +29,19 @@ export type MenuItem = {
   action: string | ((row: { id: string; [key: string]: unknown }) => void);
   color?: string;
   // Optional component property for custom dialogs
+  disabled?: boolean;
   dialogComponent?: ReactNode | ((props: DialogProps) => ReactNode);
   dialogProps?:
     | DialogProps
     | ((row: { id: string; [key: string]: unknown }) => DialogProps);
   position?: "before" | "after";
 };
+
+// Define render function type for custom executions
+export type RenderFunctionType = (row: {
+  id: string;
+  [key: string]: unknown;
+}) => ReactNode;
 
 // Define possible action types
 export type ActionState = {
@@ -63,10 +70,10 @@ const Execution = ({
   showEdit = true,
   showDelete = true,
   deleteConfirmMessage,
-  deleteUrl
+  deleteUrl,
 }: {
   row: { id: string; [key: string]: unknown };
-  executions?: MenuItem[];
+  executions?: (MenuItem | RenderFunctionType)[];
   formConfig?: FormConfig;
   buttonLabel?: string;
   tableName?: string;
@@ -74,18 +81,18 @@ const Execution = ({
   showEdit?: boolean;
   showDelete?: boolean;
   deleteConfirmMessage?: string;
-  deleteUrl?:string
+  deleteUrl?: string;
 }) => {
   const t = useTranslations();
-
-  const defaultMenuItems = useMemo(() => {
-    const items = [];
+  const defaultMenuItems = useMemo((): MenuItem[] => {
+    const items: MenuItem[] = [];
 
     if (showEdit) {
       items.push({
         label: t("Companies.Edit"),
         icon: <EditIcon className="w-4 h-4" />,
         action: "edit",
+        disabled: true,
       });
     }
 
@@ -95,6 +102,7 @@ const Execution = ({
         icon: <TrashIcon className="w-4 h-4" />,
         action: "delete",
         color: "red-500",
+        disabled: true,
       });
     }
 
@@ -102,11 +110,26 @@ const Execution = ({
   }, [t, showEdit, showDelete]);
 
   const menuItems = useMemo(() => {
-    const beforeItems = executions.filter((item) => item.position !== "after");
-    const afterItems = executions.filter((item) => item.position === "after");
+    // Filter only MenuItem objects for the dropdown
+    const menuItemsOnly = executions.filter(
+      (item): item is MenuItem => typeof item !== "function"
+    );
+    const beforeItems = menuItemsOnly.filter(
+      (item) => item.position !== "after"
+    );
+    const afterItems = menuItemsOnly.filter(
+      (item) => item.position === "after"
+    );
 
     return [...beforeItems, ...defaultMenuItems, ...afterItems];
   }, [executions, defaultMenuItems]);
+
+  // Get render functions separately
+  const renderFunctions = useMemo(() => {
+    return executions.filter(
+      (item): item is RenderFunctionType => typeof item === "function"
+    );
+  }, [executions]);
 
   const initialState: ActionState = {
     delete: { open: false, url: "" },
@@ -178,16 +201,23 @@ const Execution = ({
               key={index}
               onClick={() => handleMenuItemClick(item.action)}
               className={item.color ? `text-${item.color}` : ""}
+              disabled={!item.disabled || false}
             >
               {item.icon && <span className="me-2">{item.icon}</span>}
               {item.label}
             </DropdownMenuItem>
           ))}
+          {/* Render custom render functions as dropdown items */}
+          {renderFunctions.map((renderFn, index) => (
+            <React.Fragment key={`render-${index}`}>
+              {renderFn(row)}
+            </React.Fragment>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
 
       {/* Delete Confirmation Dialog */}
-      {formConfig && actionState.delete && (
+      {actionState.delete && (
         <DeleteConfirmationDialog
           deleteUrl={actionState.delete.url}
           onClose={() => handleCloseDialog("delete")}
@@ -228,6 +258,7 @@ const Execution = ({
         if (!dialogState || !item.dialogComponent) {
           return null;
         }
+
 
         // Render the custom dialog component
         const DialogComponent = item.dialogComponent;

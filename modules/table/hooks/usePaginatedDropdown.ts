@@ -4,7 +4,7 @@ import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { extractDropdownOptions } from "@/modules/table/components/table/dropdowns/DropdownUtils";
 import { useFetchTracking, buildPaginatedUrl } from "./useFetchTracking";
 import { useDebounce } from "./useDebounce";
-import { apiClient } from "@/config/axios-config";
+import { baseApi } from "@/config/axios/instances/base";
 import { processApiResponse } from "@/modules/table/utils/dataUtils";
 
 interface UsePaginatedDropdownProps {
@@ -94,7 +94,7 @@ export const usePaginatedDropdown = ({
 
         const controller = setupAbortController();
 
-        const response = await apiClient.get(url, {
+        const response = await baseApi.get(url, {
           signal: controller.signal,
         });
 

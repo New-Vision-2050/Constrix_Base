@@ -1,5 +1,5 @@
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
-import { getEditModeTabsList } from "../../constants/EditModeTabs";
+import { useGetEditModeTabsList } from "../../constants/EditModeTabs";
 import { useTranslations } from "next-intl";
 import { useUserProfileCxt } from "../../context/user-profile-cxt";
 
@@ -15,7 +15,7 @@ export default function UserProfileTabs() {
       onTabClick={(tab) => {
         setTab1(tab.id);
       }}
-      list={getEditModeTabsList(t)}
+      list={useGetEditModeTabsList(t)}
       defaultValue={tab1 !== null ? tab1 : undefined}
     />
   );

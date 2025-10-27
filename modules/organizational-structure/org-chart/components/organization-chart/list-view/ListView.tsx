@@ -53,7 +53,7 @@ const ListView: React.FC<ListViewProps> = ({
             onSearchChange={setSearchTerm}
           />
         </div>
-        {additionalActions && <div>{additionalActions}</div>}
+        {/* {additionalActions && <div>{additionalActions}</div>} */}
         <Button
           variant="outline"
           size="sm"

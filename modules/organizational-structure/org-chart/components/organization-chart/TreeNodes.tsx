@@ -15,6 +15,7 @@ interface TreeNodesProps {
   reOrganize?: { concatKey: string, concatValue: string | number | undefined }
   isEmployees?: boolean
   isDeputy?: boolean
+  ignoreAddAtFirstNode?: boolean
 }
 
 const TreeNodes = ({
@@ -25,7 +26,8 @@ const TreeNodes = ({
                      DropDownMenu,
                      reOrganize,
                      isEmployees,
-                     isDeputy
+                     isDeputy,
+                     ignoreAddAtFirstNode
                    }: TreeNodesProps) => {
   const locale = useLocale()
   return (
@@ -69,7 +71,11 @@ const TreeNodes = ({
                   DropDownMenu={DropDownMenu}
                 />
               }
-              <OrgChartAddButton node={node} onAddBtnClick={onAddBtnClick}/>
+              <OrgChartAddButton 
+                node={node} 
+                onAddBtnClick={onAddBtnClick}
+                ignoreAddAtFirstNode={ignoreAddAtFirstNode}
+              />
             </>
           }
         </div>
@@ -114,6 +120,7 @@ const TreeNodes = ({
           onAddBtnClick={onAddBtnClick}
           reOrganize={reOrganize}
           isEmployees={isEmployees}
+          ignoreAddAtFirstNode={ignoreAddAtFirstNode}
         />
       ))}
     </TreeNode>
