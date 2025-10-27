@@ -14,11 +14,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/modules/table/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+} from "@/modules/table/components/ui/form";
 import { Loader2 } from "lucide-react";
 import ImageUpload from "@/components/shared/ImageUpload";
+import FormLabel from "@/components/shared/FormLabel";
+import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import LanguageTabs from "@/components/shared/LanguageTabs";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { BrandsApi } from "@/services/api/ecommerce/brands";
 import { toast } from "sonner";
@@ -29,10 +36,20 @@ import {
 
 const createBrandSchema = (t: (key: string) => string) =>
   z.object({
-    name_ar: z.string().optional(),
-    name_en: z.string().optional(),
-    description_ar: z.string().optional(),
-    description_en: z.string().optional(),
+    name_ar: z
+      .string()
+      .min(1, { message: t("brand.brandNameRequired") || "Brand name in Arabic is required" })
+      .min(2, { message: t("brand.brandNameMinLength") || "Brand name must be at least 2 characters" }),
+    name_en: z
+      .string()
+      .min(1, { message: t("brand.brandNameRequired") || "Brand name in English is required" })
+      .min(2, { message: t("brand.brandNameMinLength") || "Brand name must be at least 2 characters" }),
+    description_ar: z
+      .string()
+      .min(1, { message: t("brand.descriptionRequired") || "Description in Arabic is required" }),
+    description_en: z
+      .string()
+      .min(1, { message: t("brand.descriptionRequired") || "Description in English is required" }),
     image: z
       .any()
       .nullable()
@@ -71,13 +88,7 @@ export default function AddBrandDialog({
     enabled: isEditMode && open,
   });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<BrandFormData>({
+  const form = useForm<BrandFormData>({
     resolver: zodResolver(createBrandSchema(t)),
     defaultValues: {
       name_ar: "",
@@ -87,6 +98,14 @@ export default function AddBrandDialog({
       image: null,
     },
   });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = form;
 
   // Show toast for validation errors
   useEffect(() => {
@@ -218,135 +237,138 @@ export default function AddBrandDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-2 gap-6">
-            {/* Right Column - Image Upload */}
-            <div className="flex flex-col  w-full">
-              <ImageUpload
-                label={t("brand.imageLabel")}
-                maxSize="5MB - الحجم الأقصى"
-                dimensions="1920 × 1080"
-                required={!isEditMode}
-                onChange={(file) => setValue("image", file)}
-                initialValue={brandData?.data?.payload?.file?.url}
-                minHeight="250px"
-              />
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid grid-cols-2 gap-6">
+              {/* Right Column - Image Upload */}
+              <div className="flex flex-col  w-full">
+                <ImageUpload
+                  label={t("brand.imageLabel")}
+                  maxSize="5MB - الحجم الأقصى"
+                  dimensions="1920 × 1080"
+                  required={!isEditMode}
+                  onChange={(file) => setValue("image", file)}
+                  initialValue={brandData?.data?.payload?.file?.url}
+                  minHeight="250px"
+                />
+              </div>
+              {/* Left Column - Form Fields */}
+              <div className="space-y-4">
+                <LanguageTabs
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  arabicContent={
+                    <>
+                      {/* Brand Name Arabic */}
+                      <FormField
+                        control={control}
+                        name="name_ar"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs" required>
+                              {t("brand.brandName")}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                variant="secondary"
+                                disabled={isSubmitting || isFetching}
+                                className="mt-1"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormErrorMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Description Arabic */}
+                      <FormField
+                        control={control}
+                        name="description_ar"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs" required>
+                              {t("brand.description")}
+                            </FormLabel>
+                            <FormControl>
+                              <Textarea
+                                disabled={isSubmitting || isFetching}
+                                rows={2}
+                                className="mt-1 resize-none"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormErrorMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  }
+                  englishContent={
+                    <>
+                      {/* Brand Name English */}
+                      <FormField
+                        control={control}
+                        name="name_en"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs" required>
+                              {t("brand.brandName")}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                variant="secondary"
+                                disabled={isSubmitting || isFetching}
+                                className="mt-1"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormErrorMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Description English */}
+                      <FormField
+                        control={control}
+                        name="description_en"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs" required>
+                              {t("brand.description")}
+                            </FormLabel>
+                            <FormControl>
+                              <Textarea
+                                disabled={isSubmitting || isFetching}
+                                rows={2}
+                                className="mt-1 resize-none"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormErrorMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  }
+                />
+              </div>
             </div>
-            {/* Left Column - Form Fields */}
-            <div className="space-y-4">
-              <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-                dir="rtl"
+
+            <div className="mt-6">
+              <Button
+                type="submit"
+                disabled={isSubmitting || isFetching}
+                className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
               >
-                <TabsList className="grid w-full grid-cols-2 mb-4 bg-sidebar">
-                  <TabsTrigger value="ar" className="text-sm ">
-                    اللغة العربية (AR)
-                  </TabsTrigger>
-                  <TabsTrigger value="en" className="text-sm">
-                    اللغة الإنجليزية (EN)
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Arabic Tab */}
-                <TabsContent value="ar" className="space-y-4">
-                  {/* Brand Name Arabic */}
-                  <div>
-                    <Label htmlFor="name_ar" className="text-xs">
-                      {t("brand.brandName")}
-                    </Label>
-                    <Input
-                      id="name_ar"
-                      variant="secondary"
-                      {...register("name_ar")}
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1"
-                    />
-                    {errors.name_ar && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.name_ar.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Description Arabic */}
-                  <div>
-                    <Label htmlFor="description_ar" className="text-xs">
-                      {t("brand.description")}
-                    </Label>
-                    <Textarea
-                      id="description_ar"
-                      {...register("description_ar")}
-                      disabled={isSubmitting || isFetching}
-                      rows={2}
-                      className="mt-1 resize-none"
-                    />
-                    {errors.description_ar && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.description_ar.message}
-                      </p>
-                    )}
-                  </div>
-                </TabsContent>
-
-                {/* English Tab */}
-                <TabsContent value="en" className="space-y-4">
-                  {/* Brand Name English */}
-                  <div>
-                    <Label htmlFor="name_en" className="text-xs ">
-                      {t("brand.brandName")}
-                    </Label>
-                    <Input
-                      id="name_en"
-                      variant="secondary"
-                      {...register("name_en")}
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1"
-                    />
-                    {errors.name_en && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.name_en.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Description English */}
-                  <div>
-                    <Label htmlFor="description_en" className="text-xs ">
-                      {t("brand.description")}
-                    </Label>
-                    <Textarea
-                      id="description_en"
-                      {...register("description_en")}
-                      disabled={isSubmitting || isFetching}
-                      rows={2}
-                      className="mt-1 resize-none"
-                    />
-                    {errors.description_en && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.description_en.message}
-                      </p>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
+                {(isSubmitting || isFetching) && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {t("brand.save")}
+              </Button>
             </div>
-          </div>
-
-          <div className="mt-6">
-            <Button
-              type="submit"
-              disabled={isSubmitting || isFetching}
-              className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
-            >
-              {(isSubmitting || isFetching) && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {t("brand.save")}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
