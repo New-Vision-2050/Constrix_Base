@@ -9,6 +9,8 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
+import { Trash2 } from "lucide-react";
+import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
 
 // Define types for the company data
 interface CompanyData {
@@ -43,6 +45,7 @@ export const UsersConfigV2 = (options?: {
   canEdit: boolean;
   canDelete: boolean;
   canView: boolean;
+  registrationFormSlug?: string;
 }) => {
   const t = useTranslations("Companies");
 
@@ -257,7 +260,7 @@ export const UsersConfigV2 = (options?: {
         disabled: options?.canEdit,
         dialogProps: (row: UserTableRow) => {
           return {
-            user: row,
+            user: row
           };
         },
       },
@@ -274,11 +277,25 @@ export const UsersConfigV2 = (options?: {
           };
         },
       },
+      {
+        id: "delete-user",
+        label: "حذف",
+        action: "delete-user",
+        icon: <Trash2 className="w-4 h-4 text-red-500" />,
+        dialogComponent: DeleteSpecificRowDialog,
+        disabled: Boolean(options?.canDelete),
+        dialogProps: (row: UserTableRow) => {
+          return {
+            user: row,
+            registrationFormSlug: options?.registrationFormSlug,
+          };
+        },
+      },
     ],
     executionConfig: {
       canEdit: typeof options?.canEdit === "boolean" ? options?.canEdit : false,
-      canDelete:
-        typeof options?.canDelete === "boolean" ? options?.canDelete : true,
+      canDelete: false,
+      // typeof options?.canDelete === "boolean" ? options?.canDelete : true,
     },
   };
 };
