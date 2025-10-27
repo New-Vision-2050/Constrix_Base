@@ -28,7 +28,10 @@ export default function ProductPricingFields({
   form,
 }: ProductPricingFieldsProps) {
   const t = useTranslations("product");
-  
+
+  // Watch discount_type to dynamically change the label
+  const discountType = form.watch("discount_type");
+
   return (
     <div className="space-y-6">
       {/* First Row: السعر - الحد الادنى - كمية المخزون */}
@@ -41,12 +44,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel required>{t("fields.unitPrice")}</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  placeholder="320"
-                  className="h-12"
-                />
+                <Input {...field} type="number" className="h-12" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -61,12 +59,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel required>{t("fields.minOrderQuantity")}</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  placeholder="1"
-                  className="h-12"
-                />
+                <Input {...field} type="number" className="h-12" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -81,12 +74,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel>{t("fields.currentStock")}</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  placeholder="0"
-                  className="h-12"
-                />
+                <Input {...field} type="number" className="h-12" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -94,24 +82,32 @@ export default function ProductPricingFields({
         />
       </div>
 
-      {/* Second Row: نوع الحجم - مبلغ الحجم - مبلغ الضريبة */}
+      {/* Second Row: نوع الخصم- مبلغ الخصم - مبلغ الضريبة */}
       <div className="grid grid-cols-3 gap-6">
-        {/* نوع الحجم */}
+        {/* نوع الخصم*/}
         <FormField
           control={form.control}
           name="discount_type"
           render={({ field }) => (
             <FormItem>
               <FormLabel required>{t("fields.discountType")}</FormLabel>
-              <Select key={field.value} onValueChange={field.onChange} value={field.value || undefined}>
+              <Select
+                key={field.value}
+                onValueChange={field.onChange}
+                value={field.value || undefined}
+              >
                 <FormControl>
                   <SelectTrigger className="h-12">
-                    <SelectValue placeholder={t("placeholders.selectDiscountType")} />
+                    <SelectValue
+                      placeholder={t("placeholders.selectDiscountType")}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="flat">{t("options.flat")}</SelectItem>
-                  <SelectItem value="percentage">{t("options.percentage")}</SelectItem>
+                  <SelectItem value="amount">{t("options.amount")}</SelectItem>
+                  <SelectItem value="percentage">
+                    {t("options.percentage")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormErrorMessage />
@@ -119,20 +115,21 @@ export default function ProductPricingFields({
           )}
         />
 
-        {/* مبلغ الحجم ($) */}
+        {/* مبلغ الخصم - Dynamic label based on discount type */}
         <FormField
           control={form.control}
           name="discount_value"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("fields.discountAmount")}</FormLabel>
+              <FormLabel>
+                {discountType === "amount"
+                  ? `${t("fields.discountAmount")} (SAR)`
+                  : discountType === "percentage"
+                  ? `${t("fields.discountAmount")} (%)`
+                  : t("fields.discountAmount")}
+              </FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  placeholder="0"
-                  className="h-12"
-                />
+                <Input {...field} type="number" className="h-12" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -147,12 +144,7 @@ export default function ProductPricingFields({
             <FormItem>
               <FormLabel>{t("fields.taxAmount")}</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  placeholder="0"
-                  className="h-12"
-                />
+                <Input {...field} type="number" className="h-12" />
               </FormControl>
               <FormErrorMessage />
             </FormItem>
@@ -168,7 +160,7 @@ export default function ProductPricingFields({
           name="price_includes_vat"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("fields.calculateShippingCost")}</FormLabel>
+              <FormLabel>{t("fields.priceIncludesVat")}</FormLabel>
               <div className="flex items-center h-12 bg-sidebar border border-border rounded-md px-4">
                 <FormControl>
                   <Switch
@@ -183,22 +175,16 @@ export default function ProductPricingFields({
           )}
         />
 
-        {/* تكلفة الشحن ($) */}
+        {/* تكلفة الشحن */}
         <FormField
           control={form.control}
           name="shipping_amount"
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("fields.shippingCost")}</FormLabel>
-              <div className="flex items-center h-12 bg-sidebar border border-border rounded-md px-4">
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="data-[state=checked]:bg-primary"
-                  />
-                </FormControl>
-              </div>
+              <FormControl>
+                <Input {...field} type="number" className="h-12" />
+              </FormControl>
               <FormErrorMessage />
             </FormItem>
           )}

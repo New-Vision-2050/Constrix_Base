@@ -20,7 +20,7 @@ interface ProductSeoFieldsProps {
 
 export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
   const t = useTranslations("product");
-  
+
   const handleMetaPhotoChange = (file: File | null) => {
     form.setValue("meta_photo", file);
   };
@@ -90,8 +90,10 @@ export default function ProductSeoFields({ form }: ProductSeoFieldsProps) {
             dimensions="3 MB × 5 MB"
             required={false}
             onChange={handleMetaPhotoChange}
-            initialValue={typeof metaPhotoValue === 'string' ? metaPhotoValue : undefined}
-            minHeight="200px"
+            initialValue={
+              typeof metaPhotoValue === "string" ? metaPhotoValue : undefined
+            }
+            minHeight="280px"
           />
         </div>
       </div>

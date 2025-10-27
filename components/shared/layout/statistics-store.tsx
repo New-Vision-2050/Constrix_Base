@@ -22,7 +22,7 @@ const StatisticsStoreRow = ({ config }: { config: Config }) => {
   const payload = data?.payload || [{}, {}, {}, {}];
 
   return (
-    <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
+    <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 mb-6">
       {payload.map((item: any, index: number) => (
         <div
           key={index}
