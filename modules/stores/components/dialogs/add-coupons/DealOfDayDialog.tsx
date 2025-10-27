@@ -60,7 +60,8 @@ export default function DealOfDayDialog({
 
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"ar" | "en">("ar");
-  const [selectedDiscountType, setSelectedDiscountType] = useState<string>("percentage");
+  const [selectedDiscountType, setSelectedDiscountType] =
+    useState<string>("percentage");
 
   // Fetch products list
   const { data: productsData } = useQuery({
@@ -213,7 +214,7 @@ export default function DealOfDayDialog({
                 id="name.ar"
                 placeholder="الرئيسية"
                 variant="secondary"
-                className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                className="bg-sidebar border-white text-white h-12"
                 {...register("name.ar")}
                 disabled={isLoading}
               />
@@ -235,7 +236,7 @@ export default function DealOfDayDialog({
                 id="name.en"
                 placeholder="Title"
                 variant="secondary"
-                className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                className="bg-sidebar border-white text-white h-12"
                 {...register("name.en")}
                 disabled={isLoading}
               />
@@ -261,7 +262,7 @@ export default function DealOfDayDialog({
               }}
               disabled={isLoading}
             >
-              <SelectTrigger className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+              <SelectTrigger className="bg-sidebar border-white text-white h-12">
                 <SelectValue placeholder="اختر المنتج" />
               </SelectTrigger>
               <SelectContent className="bg-sidebar border-gray-700">
@@ -277,7 +278,9 @@ export default function DealOfDayDialog({
               </SelectContent>
             </Select>
             {errors.product_id && (
-              <p className="text-red-500 text-xs mt-1">{errors.product_id.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.product_id.message}
+              </p>
             )}
           </div>
 
@@ -292,24 +295,34 @@ export default function DealOfDayDialog({
                 value={selectedDiscountType}
                 onValueChange={(value) => {
                   setSelectedDiscountType(value);
-                  setValue("discount_type", value as "percentage" | "amount", { shouldValidate: true });
+                  setValue("discount_type", value as "percentage" | "amount", {
+                    shouldValidate: true,
+                  });
                 }}
                 disabled={isLoading}
               >
-                <SelectTrigger className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+                <SelectTrigger className="bg-sidebar border-white text-white h-12">
                   <SelectValue placeholder="اختر نوع الخصم" />
                 </SelectTrigger>
                 <SelectContent className="bg-sidebar border-gray-700">
-                  <SelectItem value="percentage" className="text-white hover:bg-gray-800">
+                  <SelectItem
+                    value="percentage"
+                    className="text-white hover:bg-gray-800"
+                  >
                     نسبة مئوية
                   </SelectItem>
-                  <SelectItem value="amount" className="text-white hover:bg-gray-800">
+                  <SelectItem
+                    value="amount"
+                    className="text-white hover:bg-gray-800"
+                  >
                     مبلغ ثابت
                   </SelectItem>
                 </SelectContent>
               </Select>
               {errors.discount_type && (
-                <p className="text-red-500 text-xs mt-1">{errors.discount_type.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.discount_type.message}
+                </p>
               )}
             </div>
 
@@ -322,12 +335,14 @@ export default function DealOfDayDialog({
                 id="discount_value"
                 type="number"
                 variant="secondary"
-                className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                className="bg-sidebar border-white text-white h-12"
                 {...register("discount_value", { valueAsNumber: true })}
                 disabled={isLoading}
               />
               {errors.discount_value && (
-                <p className="text-red-500 text-xs mt-1">{errors.discount_value.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.discount_value.message}
+                </p>
               )}
             </div>
           </div>

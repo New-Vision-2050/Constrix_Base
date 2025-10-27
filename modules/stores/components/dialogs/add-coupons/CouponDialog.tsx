@@ -196,7 +196,7 @@ export default function CouponDialog({
                     onValueChange={field.onChange}
                     disabled={isLoading}
                   >
-                    <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+                    <SelectTrigger className="mt-1 bg-sidebar border-white text-white h-12">
                       <SelectValue placeholder="اختر نوع القسيمة" />
                     </SelectTrigger>
                     <SelectContent>
@@ -270,7 +270,7 @@ export default function CouponDialog({
                     onValueChange={(value) => field.onChange(parseInt(value))}
                     disabled={isLoading}
                   >
-                    <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+                    <SelectTrigger className="mt-1 bg-sidebar border-white text-white h-12">
                       <SelectValue placeholder="حد المميل" />
                     </SelectTrigger>
                     <SelectContent>
@@ -296,7 +296,7 @@ export default function CouponDialog({
                     onValueChange={field.onChange}
                     disabled={isLoading}
                   >
-                    <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+                    <SelectTrigger className="mt-1 bg-sidebar border-white text-white h-12">
                       <SelectValue placeholder="اختر نوع الخصم" />
                     </SelectTrigger>
                     <SelectContent>

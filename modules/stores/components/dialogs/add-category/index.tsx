@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LanguageTabs from "@/components/shared/LanguageTabs";
 import { Loader2, Upload, X } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { CategoriesApi } from "@/services/api/ecommerce/categories";
@@ -370,141 +370,158 @@ export default function AddCategoryDialog({
             </div>
             {/* Left Column - Form Fields */}
             <div className="space-y-4">
-              <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-                dir="rtl"
-              >
-                <TabsList className="grid w-full grid-cols-2 mb-4 bg-sidebar">
-                  <TabsTrigger value="ar" className="text-sm ">
-                    اللغة العربية (AR)
-                  </TabsTrigger>
-                  <TabsTrigger value="en" className="text-sm">
-                    اللغة الإنجليزية (EN)
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Arabic Tab */}
-                <TabsContent value="ar" className="space-y-4">
-                  {/* Category Name Arabic */}
-                  <div>
-                    <Label htmlFor="name_ar" className="text-xs ">
-                      اسم القسم بالعربية
-                    </Label>
-                    <Input
-                      id="name_ar"
-                      variant="secondary"
-                      {...register("name_ar")}
-                      placeholder="أدخل اسم القسم"
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
-                    />
-                    {errors.name_ar && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.name_ar.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Priority Select */}
-                  <div>
-                    <Label htmlFor="priority" className="text-xs ">
-                      الاولوية
-                    </Label>
+              <LanguageTabs
+                activeTab={activeTab}
+                onTabChange={(value) => setActiveTab(value as "ar" | "en")}
+                arabicContent={
+                  <>
+                    {/* Category Name Arabic */}
                     <Controller
-                      name="priority"
                       control={control}
+                      name="name_ar"
                       render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={isSubmitting || isFetching}
-                        >
-                          <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
-                            <SelectValue placeholder="اختر الأولوية" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {PRIORITY_OPTIONS.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div>
+                          <Label htmlFor="name_ar" className="text-xs ">
+                            {t("category.categoryNameAr")}
+                          </Label>
+                          <Input
+                            {...field}
+                            id="name_ar"
+                            variant="secondary"
+                            placeholder={t(
+                              "category.categoryNamePlaceholderAr"
+                            )}
+                            disabled={isSubmitting || isFetching}
+                            className="mt-1 bg-sidebar border-white text-white h-12"
+                          />
+                          {errors.name_ar && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.name_ar.message}
+                            </p>
+                          )}
+                        </div>
                       )}
                     />
-                    {errors.priority && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.priority.message}
-                      </p>
-                    )}
-                  </div>
-                </TabsContent>
 
-                {/* English Tab */}
-                <TabsContent value="en" className="space-y-4">
-                  {/* Category Name English */}
-                  <div>
-                    <Label htmlFor="name_en" className="text-xs ">
-                      Category Name in English
-                    </Label>
-                    <Input
-                      id="name_en"
-                      variant="secondary"
-                      {...register("name_en")}
-                      placeholder="Enter category name"
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1  text-white h-12"
-                    />
-                    {errors.name_en && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.name_en.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Priority Select */}
-                  <div>
-                    <Label htmlFor="priority_en" className="text-xs ">
-                      Priority
-                    </Label>
+                    {/* Priority Select */}
+                    <div>
+                      <Label htmlFor="priority" className="text-xs ">
+                        {t("category.priority")}
+                      </Label>
+                      <Controller
+                        name="priority"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={isSubmitting || isFetching}
+                          >
+                            <SelectTrigger
+                              className="mt-1 bg-sidebar  text-white h-12"
+                              showClear={!!field.value}
+                              onClear={() => field.onChange("")}
+                            >
+                              <SelectValue
+                                placeholder={t("category.priority")}
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PRIORITY_OPTIONS.map((option) => (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.priority && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.priority.message}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                }
+                englishContent={
+                  <>
+                    {/* Category Name English */}
                     <Controller
-                      name="priority"
                       control={control}
+                      name="name_en"
                       render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          disabled={isSubmitting || isFetching}
-                        >
-                          <SelectTrigger className="mt-1 bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
-                            <SelectValue placeholder="Select priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {PRIORITY_OPTIONS.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div>
+                          <Label htmlFor="name_en" className="text-xs ">
+                            {t("category.categoryNameEn")}
+                          </Label>
+                          <Input
+                            {...field}
+                            id="name_en"
+                            variant="secondary"
+                            placeholder={t(
+                              "category.categoryNamePlaceholderEn"
+                            )}
+                            disabled={isSubmitting || isFetching}
+                            className="mt-1 bg-sidebar border-white text-white h-12"
+                          />
+                          {errors.name_en && (
+                            <p className="text-red-500 text-xs mt-1">
+                              {errors.name_en.message}
+                            </p>
+                          )}
+                        </div>
                       )}
                     />
-                    {errors.priority && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.priority.message}
-                      </p>
-                    )}
-                  </div>
-                </TabsContent>
-              </Tabs>
+
+                    {/* Priority Select */}
+                    <div>
+                      <Label htmlFor="priority_en" className="text-xs ">
+                        {t("category.priority")}
+                      </Label>
+                      <Controller
+                        name="priority"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={isSubmitting || isFetching}
+                          >
+                            <SelectTrigger
+                              className="mt-1 bg-sidebar text-white h-12"
+                              showClear={!!field.value}
+                              onClear={() => field.onChange("")}
+                            >
+                              <SelectValue
+                                placeholder={t("category.priority")}
+                              />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PRIORITY_OPTIONS.map((option) => (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {errors.priority && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.priority.message}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                }
+              />
             </div>
           </div>
 

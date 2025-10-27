@@ -38,7 +38,9 @@ const createFeaturedDealSchema = (t: (key: string) => string) =>
     min_discount_value: z.number().min(0, "الحد الأدنى لقيمة الخصم مطلوب"),
   });
 
-type FeaturedDealFormData = z.infer<ReturnType<typeof createFeaturedDealSchema>>;
+type FeaturedDealFormData = z.infer<
+  ReturnType<typeof createFeaturedDealSchema>
+>;
 
 interface FeaturedDealDialogProps {
   open: boolean;
@@ -59,7 +61,8 @@ export default function FeaturedDealDialog({
 
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"ar" | "en">("ar");
-  const [selectedDiscountType, setSelectedDiscountType] = useState<string>("percentage");
+  const [selectedDiscountType, setSelectedDiscountType] =
+    useState<string>("percentage");
 
   // Fetch products list
   const { data: productsData } = useQuery({
@@ -101,7 +104,9 @@ export default function FeaturedDealDialog({
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "فشل في إضافة الصفقة المميزة");
+      toast.error(
+        error?.response?.data?.message || "فشل في إضافة الصفقة المميزة"
+      );
     },
   });
 
@@ -118,7 +123,9 @@ export default function FeaturedDealDialog({
       onClose();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "فشل في تحديث الصفقة المميزة");
+      toast.error(
+        error?.response?.data?.message || "فشل في تحديث الصفقة المميزة"
+      );
     },
   });
 
@@ -184,13 +191,14 @@ export default function FeaturedDealDialog({
           {/* Title Field */}
           <div>
             <Label htmlFor="title" className="text-gray-400 text-sm">
-              {activeTab === "ar" ? "العنوان" : "Title"} <span className="text-red-500">*</span>
+              {activeTab === "ar" ? "العنوان" : "Title"}{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
               placeholder={activeTab === "ar" ? "الرئيسية" : "Main Title"}
               variant="secondary"
-              className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+              className="bg-sidebar border-white text-white h-12"
               {...register("title")}
               disabled={isLoading}
             />
@@ -211,12 +219,14 @@ export default function FeaturedDealDialog({
                 id="start_date"
                 type="date"
                 variant="secondary"
-                className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                className="bg-sidebar border-white text-white h-12"
                 {...register("start_date")}
                 disabled={isLoading}
               />
               {errors.start_date && (
-                <p className="text-red-500 text-xs mt-1">{errors.start_date.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.start_date.message}
+                </p>
               )}
             </div>
 
@@ -228,12 +238,14 @@ export default function FeaturedDealDialog({
                 id="end_date"
                 type="date"
                 variant="secondary"
-                className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                className="bg-sidebar border-white text-white h-12"
                 {...register("end_date")}
                 disabled={isLoading}
               />
               {errors.end_date && (
-                <p className="text-red-500 text-xs mt-1">{errors.end_date.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.end_date.message}
+                </p>
               )}
             </div>
           </div>
@@ -248,24 +260,34 @@ export default function FeaturedDealDialog({
               value={selectedDiscountType}
               onValueChange={(value) => {
                 setSelectedDiscountType(value);
-                setValue("discount_type", value as "percentage" | "amount", { shouldValidate: true });
+                setValue("discount_type", value as "percentage" | "amount", {
+                  shouldValidate: true,
+                });
               }}
               disabled={isLoading}
             >
-              <SelectTrigger className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12">
+              <SelectTrigger className="bg-sidebar border-white text-white h-12">
                 <SelectValue placeholder="نسبة" />
               </SelectTrigger>
               <SelectContent className="bg-sidebar border-gray-700">
-                <SelectItem value="percentage" className="text-white hover:bg-gray-800">
+                <SelectItem
+                  value="percentage"
+                  className="text-white hover:bg-gray-800"
+                >
                   نسبة مئوية
                 </SelectItem>
-                <SelectItem value="amount" className="text-white hover:bg-gray-800">
+                <SelectItem
+                  value="amount"
+                  className="text-white hover:bg-gray-800"
+                >
                   مبلغ ثابت
                 </SelectItem>
               </SelectContent>
             </Select>
             {errors.discount_type && (
-              <p className="text-red-500 text-xs mt-1">{errors.discount_type.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.discount_type.message}
+              </p>
             )}
           </div>
 
@@ -278,30 +300,37 @@ export default function FeaturedDealDialog({
               id="discount_value"
               type="number"
               variant="secondary"
-              className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+              className="bg-sidebar border-white text-white h-12"
               {...register("discount_value", { valueAsNumber: true })}
               disabled={isLoading}
             />
             {errors.discount_value && (
-              <p className="text-red-500 text-xs mt-1">{errors.discount_value.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.discount_value.message}
+              </p>
             )}
           </div>
 
           {/* Min Discount Value */}
           <div>
-            <Label htmlFor="min_discount_value" className="text-gray-400 text-sm">
+            <Label
+              htmlFor="min_discount_value"
+              className="text-gray-400 text-sm"
+            >
               الحد الأدنى لقيمة الخصم <span className="text-red-500">*</span>
             </Label>
             <Input
               id="min_discount_value"
               type="number"
               variant="secondary"
-              className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+              className="bg-sidebar border-white text-white h-12"
               {...register("min_discount_value", { valueAsNumber: true })}
               disabled={isLoading}
             />
             {errors.min_discount_value && (
-              <p className="text-red-500 text-xs mt-1">{errors.min_discount_value.message}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.min_discount_value.message}
+              </p>
             )}
           </div>
 

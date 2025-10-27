@@ -221,7 +221,7 @@ export default function OfferDialog({
                     id="name.ar"
                     placeholder="الرئيسية"
                     variant="secondary"
-                    className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                    className="bg-sidebar border-white text-white h-12"
                     {...register("name.ar")}
                     disabled={isLoading}
                   />
@@ -243,7 +243,7 @@ export default function OfferDialog({
                     id="name.en"
                     placeholder="Title"
                     variant="secondary"
-                    className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                    className="bg-sidebar border-white text-white h-12"
                     {...register("name.en")}
                     disabled={isLoading}
                   />
@@ -266,7 +266,7 @@ export default function OfferDialog({
                     variant="secondary"
                     {...register("start_date")}
                     disabled={isLoading}
-                    className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                    className="bg-sidebar border-white text-white h-12"
                   />
                   {errors.start_date && (
                     <p className="text-red-500 text-xs mt-1">
@@ -276,10 +276,7 @@ export default function OfferDialog({
                 </div>
 
                 <div>
-                  <Label
-                    htmlFor="end_date"
-                    className="text-gray-400 text-sm"
-                  >
+                  <Label htmlFor="end_date" className="text-gray-400 text-sm">
                     تاريخ الإنتهاء <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -288,7 +285,7 @@ export default function OfferDialog({
                     variant="secondary"
                     {...register("end_date")}
                     disabled={isLoading}
-                    className="bg-[#0a1628]/50 border-[#1e3a5f] text-white h-12"
+                    className="bg-sidebar border-white text-white h-12"
                   />
                   {errors.end_date && (
                     <p className="text-red-500 text-xs mt-1">

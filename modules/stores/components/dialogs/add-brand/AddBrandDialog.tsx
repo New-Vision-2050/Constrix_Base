@@ -38,18 +38,39 @@ const createBrandSchema = (t: (key: string) => string) =>
   z.object({
     name_ar: z
       .string()
-      .min(1, { message: t("brand.brandNameRequired") || "Brand name in Arabic is required" })
-      .min(2, { message: t("brand.brandNameMinLength") || "Brand name must be at least 2 characters" }),
+      .min(1, {
+        message:
+          t("brand.brandNameRequired") || "Brand name in Arabic is required",
+      })
+      .min(2, {
+        message:
+          t("brand.brandNameMinLength") ||
+          "Brand name must be at least 2 characters",
+      }),
     name_en: z
       .string()
-      .min(1, { message: t("brand.brandNameRequired") || "Brand name in English is required" })
-      .min(2, { message: t("brand.brandNameMinLength") || "Brand name must be at least 2 characters" }),
+      .min(1, {
+        message:
+          t("brand.brandNameRequired") || "Brand name in English is required",
+      })
+      .min(2, {
+        message:
+          t("brand.brandNameMinLength") ||
+          "Brand name must be at least 2 characters",
+      }),
     description_ar: z
       .string()
-      .min(1, { message: t("brand.descriptionRequired") || "Description in Arabic is required" }),
+      .min(1, {
+        message:
+          t("brand.descriptionRequired") || "Description in Arabic is required",
+      }),
     description_en: z
       .string()
-      .min(1, { message: t("brand.descriptionRequired") || "Description in English is required" }),
+      .min(1, {
+        message:
+          t("brand.descriptionRequired") ||
+          "Description in English is required",
+      }),
     image: z
       .any()
       .nullable()
