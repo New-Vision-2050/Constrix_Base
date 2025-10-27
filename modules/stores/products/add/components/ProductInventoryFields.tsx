@@ -171,7 +171,10 @@ export default function ProductInventoryFields({
                 disabled={isLoadingCategories}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value} // Show X when value exists
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={
                         isLoadingCategories
