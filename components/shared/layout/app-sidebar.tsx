@@ -389,13 +389,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show: true,
           },
           {
-            name: t("Sidebar.Discounts"),
-            url: ROUTER.Discounts,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.Discounts,
-            show: true,
-          },
-          {
             name: t("Sidebar.Coupons"),
             url: ROUTER.Coupons,
             icon: UserIcon,
