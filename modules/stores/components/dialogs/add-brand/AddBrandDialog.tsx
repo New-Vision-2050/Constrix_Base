@@ -132,12 +132,12 @@ export default function AddBrandDialog({
         shouldTouch: true,
         shouldValidate: true,
       });
-      setValue("description_ar", brand.description || "", {
+      setValue("description_ar", brand.description_ar || "", {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,
       });
-      setValue("description_en", brand.description || "", {
+      setValue("description_en", brand.description_en || "", {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,

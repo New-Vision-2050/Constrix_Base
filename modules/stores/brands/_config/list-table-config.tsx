@@ -34,7 +34,6 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
   return {
     tableId: "brands-list-table",
     url: `${baseURL}/ecommerce/dashboard/brands`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/brands`,
     columns: [
       {
         key: "name",
@@ -78,6 +77,7 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
+    deleteUrl: `${baseURL}/ecommerce/dashboard/brands`,
     searchParamName: "search",
   };
 };

@@ -7,6 +7,8 @@ import AddBrandDialog from "@/modules/stores/components/dialogs/add-brand";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useBrandsListTableConfig } from "./_config/list-table-config";
+import { statisticsConfig } from "./component/statistics-config";
+import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 
 function BrandsView() {
   const [editingBrandId, setEditingBrandId] = useState<string | null>(null);
@@ -17,6 +19,8 @@ function BrandsView() {
   const t = useTranslations();
   return (
     <>
+      <StatisticsStoreRow config={statisticsConfig} />
+
       <AddBrandDialog
         open={Boolean(editingBrandId)}
         onClose={() => setEditingBrandId(null)}
