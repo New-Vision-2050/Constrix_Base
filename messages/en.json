@@ -240,7 +240,8 @@
     "docs-library-docs": "Docs",
     "Terms": "Terms & Conditions",
     "Warehouse": "Warehouses",
-    "Discounts": "Discounts & Coupons"
+    "Discounts": "Discounts & Coupons",
+    "Coupons": "Coupons"
   },
   "docs-library": {
     "title": "Docs Library",

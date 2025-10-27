@@ -354,6 +354,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.Terms,
           ROUTER.warehouse,
           ROUTER.Discounts,
+          ROUTER.Coupons,
         ].includes(pageName),
         slug: SUPER_ENTITY_SLUG.ECOMMERCE,
         urls: [
@@ -363,6 +364,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.Terms,
           ROUTER.warehouse,
           ROUTER.Discounts,
+          ROUTER.Coupons,
         ],
         sub_entities: [
           {
@@ -391,6 +393,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.Discounts,
             icon: UserIcon,
             isActive: pageName === ROUTER.Discounts,
+            show: true,
+          },
+          {
+            name: t("Sidebar.Coupons"),
+            url: ROUTER.Coupons,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.Coupons,
             show: true,
           },
           {

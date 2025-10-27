@@ -7,6 +7,7 @@ export const ROUTER = {
   Terms: "/stores/terms",
   warehouse: "/stores/warehouse",
   Discounts: "/stores/discounts",
+  Coupons: "/stores/coupons",
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",
