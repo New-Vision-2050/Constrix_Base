@@ -9,7 +9,7 @@ import TheStatus from "../component/the-status";
 export interface BrandRow {
   id: string;
   name: string;
-  status: number;
+  is_active: number;
   num_products: number;
   num_requests: number;
   file?: {
@@ -58,7 +58,7 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
       { key: "num_products", label: "مجموع المنتجات", sortable: true },
       { key: "num_requests", label: "مجموع الطلبات", sortable: true },
       {
-        key: "status",
+        key: "is_active",
         label: "الحالة",
         render: (value: "active" | "inActive", row: BrandRow) => (
           <TheStatus theStatus={value} id={row.id} />
@@ -75,5 +75,6 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
+    searchParamName: "name",
   };
 };

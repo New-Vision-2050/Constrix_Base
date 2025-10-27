@@ -36,7 +36,7 @@ export const BrandsApi = {
     if (descEn) formData.append("description[en]", descEn);
     if (params.brand_image) formData.append("brand_image", params.brand_image);
 
-    return baseApi.put(`ecommerce/dashboard/brands/${id}`, formData, {
+    return baseApi.post(`ecommerce/dashboard/brands/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },

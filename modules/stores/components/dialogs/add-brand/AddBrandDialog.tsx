@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import ImageUpload from "@/components/shared/ImageUpload";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { BrandsApi } from "@/services/api/ecommerce/brands";
 import { toast } from "sonner";
@@ -25,7 +26,6 @@ import {
   CreateBrandParams,
   UpdateBrandParams,
 } from "@/services/api/ecommerce/brands/types/params";
-import ImageUpload from "@/components/shared/ImageUpload";
 
 const createBrandSchema = (t: (key: string) => string) =>
   z.object({
@@ -103,14 +103,28 @@ export default function AddBrandDialog({
     if (isEditMode && brandData?.data?.payload) {
       const brand = brandData.data.payload;
 
-      setValue("name_ar", brand.name || "");
-      setValue("name_en", brand.name || "");
-      setValue("description_ar", brand.description || "");
-      setValue("description_en", brand.description || "");
-      // Set image URL for preview in edit mode
-      setValue("image", brand.brand_image || null);
+      setValue("name_ar", brand.name_ar || "", {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("name_en", brand.name_en || "", {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("description_ar", brand.description || "", {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setValue("description_en", brand.description || "", {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
     }
-  }, [isEditMode, brandData, setValue]);
+  }, [isEditMode, brandData, open, setValue]);
 
   const onSubmit = async (data: BrandFormData) => {
     try {
@@ -121,12 +135,11 @@ export default function AddBrandDialog({
           "name[en]": data.name_en,
           "description[ar]": data.description_ar || "",
           "description[en]": data.description_en || "",
-          brand_image: data.image || undefined,
         };
 
         // Only include image if it's a File object (new upload)
-        if (data.image && !(data.image instanceof File)) {
-          delete updateParams.brand_image;
+        if (data.image instanceof File) {
+          updateParams.brand_image = data.image;
         }
 
         await BrandsApi.update(brandId, updateParams);
@@ -184,10 +197,6 @@ export default function AddBrandDialog({
     }
   };
 
-  const handleImageChange = (file: File | null) => {
-    setValue("image", file);
-  };
-
   const handleClose = () => {
     if (!isSubmitting && !isFetching) {
       reset();
@@ -212,18 +221,14 @@ export default function AddBrandDialog({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-6">
             {/* Right Column - Image Upload */}
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col  w-full">
               <ImageUpload
                 label={t("brand.imageLabel")}
-                maxSize="3MB - الحجم الأقصى"
-                dimensions="2160 × 2160"
+                maxSize="5MB - الحجم الأقصى"
+                dimensions="1920 × 1080"
                 required={!isEditMode}
-                onChange={handleImageChange}
-                initialValue={
-                  isEditMode && brandData?.data?.payload?.brand_image
-                    ? brandData.data.payload.brand_image
-                    : undefined
-                }
+                onChange={(file) => setValue("image", file)}
+                initialValue={brandData?.data?.payload?.file?.url}
                 minHeight="250px"
               />
             </div>
