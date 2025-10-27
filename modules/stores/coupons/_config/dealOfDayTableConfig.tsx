@@ -33,7 +33,6 @@ export const useDealOfDayTableConfig: (params?: Params) => TableConfig = (
     tableId: "deal-of-day-list-table",
     url: `${baseURL}/ecommerce/dashboard/deal_days`,
     deleteUrl: `${baseURL}/ecommerce/dashboard/deal_days`,
-    statusUrl: `${baseURL}/ecommerce/dashboard/deal_days`,
     columns: [
       {
         key: "name",

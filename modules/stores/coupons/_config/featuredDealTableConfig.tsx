@@ -25,8 +25,8 @@ export const useFeaturedDealTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "featured-deal-list-table",
-    url: `${baseURL}/ecommerce/dashboard/featured-deals`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/featured-deals`,
+    url: `${baseURL}/ecommerce/dashboard/feature_deals`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/feature_deals`,
     columns: [
       {
         key: "id",
@@ -52,7 +52,9 @@ export const useFeaturedDealTableConfig: (params?: Params) => TableConfig = (
           if (!value) return "-";
           const startDate = new Date(value);
           const endDate = new Date(row.end_date);
-          return `${startDate.toLocaleDateString("ar-EG")} - ${endDate.toLocaleDateString("ar-EG")}`;
+          return `${startDate.toLocaleDateString(
+            "ar-EG"
+          )} - ${endDate.toLocaleDateString("ar-EG")}`;
         },
       },
       {
