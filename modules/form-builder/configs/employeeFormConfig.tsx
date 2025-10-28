@@ -3,6 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
 import RetrieveEmployeeData from "@/modules/program-settings/components/retrieve-employee-data";
+import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
 export function employeeFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -413,6 +414,18 @@ export function employeeFormConfig(
         ],
       },
     ],
+    onSubmit: async (formData) => {
+      console.log("formData10111", formData);
+      const body = {
+        ...formData,
+        country_id: Boolean(formData?.country_id) ? formData?.country_id : null,
+        first_name: formData?.first_name || null,
+        last_name: formData?.last_name || null,
+        phone: formData?.phone || null
+      };
+
+      return await defaultSubmitHandler(body, employeeFormConfig(t));
+    },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,

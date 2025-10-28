@@ -33,7 +33,6 @@ const UserSettingDialog: React.FC<PropsT> = ({
   const t = useTranslations("UserSettingDialog");
   const [loading, setLoading] = useState(false);
 
-  console.log("user4444", user);
   // declare and define functions
   const handleSendLink = async () => {
     try {

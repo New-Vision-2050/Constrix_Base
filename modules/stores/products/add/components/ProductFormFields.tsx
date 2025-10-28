@@ -24,7 +24,7 @@ export default function ProductFormFields({
   language,
 }: ProductFormFieldsProps) {
   const t = useTranslations("product");
-  
+
   return (
     <>
       {/* Product Name */}
@@ -33,9 +33,7 @@ export default function ProductFormFields({
         name={language === "ar" ? "name_ar" : "name_en"}
         render={({ field }) => (
           <FormItem>
-            <FormLabel required>
-              {t("fields.productName")}
-            </FormLabel>
+            <FormLabel required>{t("fields.productName")}</FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -50,9 +48,7 @@ export default function ProductFormFields({
         name={language === "ar" ? "description_ar" : "description_en"}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>
-              {t("fields.productDescription")}
-            </FormLabel>
+            <FormLabel required>{t("fields.productDescription")}</FormLabel>
             <FormControl>
               <Textarea {...field} className="bg-sidebar" />
             </FormControl>

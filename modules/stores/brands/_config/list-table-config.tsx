@@ -2,14 +2,16 @@ import TableStatusSwitcher from "@/components/shared/table-status";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import TheStatus from "../component/the-status";
 
 export interface BrandRow {
   id: string;
   name: string;
-  status: number;
+  name_ar?: string;
+  name_en?: string;
+  is_active: number;
   num_products: number;
   num_requests: number;
   file?: {
@@ -27,15 +29,15 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
   const t = useTranslations();
+  const locale = useLocale();
 
   return {
     tableId: "brands-list-table",
     url: `${baseURL}/ecommerce/dashboard/brands`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/brands`,
     columns: [
       {
         key: "name",
-        label: "اسم العلامة التجارية",
+        label: t("brand.brandName"),
         sortable: true,
         render: (_: unknown, row: BrandRow) => (
           <div className="flex items-center gap-3">
@@ -55,11 +57,11 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
           </div>
         ),
       },
-      { key: "num_products", label: "مجموع المنتجات", sortable: true },
-      { key: "num_requests", label: "مجموع الطلبات", sortable: true },
+      { key: "num_products", label: t("brand.totalProducts"), sortable: true },
+      { key: "num_requests", label: t("brand.totalRequests"), sortable: true },
       {
-        key: "status",
-        label: "الحالة",
+        key: "is_active",
+        label: t("labels.status"),
         render: (value: "active" | "inActive", row: BrandRow) => (
           <TheStatus theStatus={value} id={row.id} />
         ),
@@ -75,5 +77,7 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
+    deleteUrl: `${baseURL}/ecommerce/dashboard/brands`,
+    searchParamName: "search",
   };
 };

@@ -19,12 +19,6 @@ export const useWarehousesListTablConfig: (params?: Params) => TableConfig = (
     columns: [
       { key: "name", label: t("labels.name"), sortable: true },
       {
-        key: "is_default",
-        label: t("labels.default"),
-        sortable: true,
-        render: (value) => <Switch checked={Boolean(value)} />,
-      },
-      {
         key: "country",
         label: t("location.country"),
         render: (value) => value?.name,
@@ -37,6 +31,11 @@ export const useWarehousesListTablConfig: (params?: Params) => TableConfig = (
       { key: "district", label: t("location.disctrict") },
       { key: "longitude", label: t("location.longitude") },
       { key: "latitude", label: t("location.latitude") },
+      {
+        key: "is_default",
+        label: t("labels.default"),
+        render: (value) => <Switch checked={Boolean(value)} />,
+      },
     ],
     executions: [
       (row) => (
