@@ -53,7 +53,7 @@ export default function GridItem({
     setDocToView,
   } = usePublicDocsCxt();
   const { can } = usePermissions();
-  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
+  const { handleRefetchDocsWidgets, handleChangeParentId } = useDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -113,6 +113,7 @@ export default function GridItem({
         setTempParentId(document.id);
       } else {
         setParentId(document.id);
+        handleChangeParentId(document.id);
       }
       setVisitedDirs((prev) => [...prev, document]);
     }

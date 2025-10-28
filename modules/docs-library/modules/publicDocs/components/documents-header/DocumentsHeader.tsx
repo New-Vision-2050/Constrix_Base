@@ -75,6 +75,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     [selectedDocs]
   );
 
+  console.log('electedDocs', selectedDocs)
+
   const handleDelete = async () => {
     try {
       const _url =

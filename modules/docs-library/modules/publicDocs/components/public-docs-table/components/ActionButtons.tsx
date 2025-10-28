@@ -49,6 +49,7 @@ export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
     refetchDocs,
     selectedDocument,
     storeSelectedDocument,
+    clearSelectedDocs
   } = usePublicDocsCxt();
 
   // check current doc in details
@@ -63,6 +64,7 @@ export const ActionButtons = ({ document, isFolder }: ActionButtonsProps) => {
 
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
+      clearSelectedDocs();
       refetchDocs();
       if (!isFolder) handleRefetchDocsWidgets();
     } catch (error: any) {

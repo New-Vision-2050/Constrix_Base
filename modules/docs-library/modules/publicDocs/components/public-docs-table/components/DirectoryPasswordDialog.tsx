@@ -14,6 +14,7 @@ import InfoIcon from "@/public/icons/info";
 import { useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { apiClient } from "@/config/axios-config";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 interface PropsI {
   open: boolean;
@@ -24,6 +25,7 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const { handleChangeParentId } = useDocsLibraryCxt();
   const t = useTranslations("docs-library.publicDocs.directoryPasswordDialog");
   const {
     branchId,
@@ -44,6 +46,7 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
           password: password?.length ? password : undefined,
         },
       });
+      handleChangeParentId(tempParentId);
       return true;
     } catch (error) {
       return false;
