@@ -4,3 +4,4 @@ export { NewArrivalsDialog } from "./NewArrivalsDialog";
 export { ContactDialog } from "./ContactDialog";
 export { AboutUsDialog } from "./AboutUsDialog";
 export { BranchDialog } from "./BranchDialog";
+export { NewFeatureDialog } from "./NewFeatureDialog";

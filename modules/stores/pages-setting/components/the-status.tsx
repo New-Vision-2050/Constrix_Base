@@ -17,7 +17,7 @@ const TheStatus = ({
 }: {
   theStatus: "active" | "inActive";
   id: string;
-  type?: "main" | "discounts" | "new-arrivals" | "contact" | "about-us";
+  type?: "main" | "discounts" | "new-arrivals" | "contact" | "about-us" | "new-features";
 }) => {
   const t = useTranslations();
   const [isActive, setIsActive] = useState(!!theStatus);

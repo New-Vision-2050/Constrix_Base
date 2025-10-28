@@ -2299,6 +2299,7 @@
   "pagesSettings": {
     "table": {
       "image": "الصورة",
+      "title": "العنوان",
       "url": "الرابط",
       "status": "الحالة",
       "noImage": "لا توجد صورة"
