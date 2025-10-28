@@ -10,36 +10,43 @@ import { useDiscountsTableConfig } from "../../../_config/discountsTableConfig";
 
 function DiscountsView() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
+  const t = useTranslations("pagesSettings");
+
   const tableConfig = useDiscountsTableConfig({
     onEdit: (id: string) => setEditingPageId(id),
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
-  const t = useTranslations();
 
   return (
-    <>
+    <div className="w-full" dir="rtl">
       <DiscountsDialog
         open={Boolean(editingPageId)}
         onClose={() => setEditingPageId(null)}
         pageId={editingPageId || undefined}
         onSuccess={() => reloadTable()}
       />
-      <TableBuilder
-        config={tableConfig}
-        searchBarActions={
-          <>
-            <DialogTrigger
-              component={DiscountsDialog}
-              dialogProps={{ onSuccess: () => reloadTable() }}
-              render={({ onOpen }) => (
-                <Button onClick={onOpen}>اضافة لافتة</Button>
-              )}
-            />
-          </>
-        }
-        tableId={tableConfig.tableId}
-      />
-    </>
+
+      <div className="max-w-8xl mx-auto">
+        {/* Table Section */}
+        <TableBuilder
+          config={tableConfig}
+          searchBarActions={
+            <>
+              <DialogTrigger
+                component={DiscountsDialog}
+                dialogProps={{
+                  onSuccess: () => reloadTable(),
+                }}
+                render={({ onOpen }) => (
+                  <Button onClick={onOpen}>{t("actions.addBanner")}</Button>
+                )}
+              />
+            </>
+          }
+          tableId={tableConfig.tableId}
+        />
+      </div>
+    </div>
   );
 }
 

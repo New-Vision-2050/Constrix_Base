@@ -13,25 +13,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/modules/table/components/ui/input";
 import FormLabel from "@/components/shared/FormLabel";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2, Upload } from "lucide-react";
-import { useIsRtl } from "@/hooks/use-is-rtl";
+import { Loader2 } from "lucide-react";
+import ImageUpload from "@/components/shared/ImageUpload";
+import { Textarea } from "@/modules/table/components/ui/textarea";
 import { toast } from "sonner";
 import { apiClient } from "@/config/axios-config";
 
 const createPageSchema = (t: (key: string) => string) =>
   z.object({
-    name: z.string().min(1, "الاسم مطلوب"),
-    type: z.string().min(1, "النوع مطلوب"),
-    image: z.any().optional(),
+    type: z.string().optional(),
+    url: z
+      .string()
+      .optional()
+      .refine((val) => !val || val === "" || /^https?:\/\/.+/.test(val), {
+        message: "يجب أن يكون الرابط صحيح",
+      }),
+    banner_image: z.any().optional(),
+    title: z
+      .string()
+      .min(1, { message: t("pagesSettings.validation.titleRequired") }),
+    description: z
+      .string()
+      .min(1, { message: t("pagesSettings.validation.descriptionRequired") }),
   });
 
 type PageFormData = z.infer<ReturnType<typeof createPageSchema>>;
@@ -49,33 +54,27 @@ export function DiscountsDialog({
   onSuccess,
   pageId,
 }: DiscountsDialogProps) {
-  const isRtl = useIsRtl();
   const t = useTranslations();
   const isEditMode = !!pageId;
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const { data: pageData, isLoading: isFetching } = useQuery({
-    queryKey: ["page-discounts", pageId],
-    queryFn: () =>
-      apiClient.get(`/ecommerce/dashboard/pages/discounts/${pageId}`),
+    queryKey: ["banner", pageId],
+    queryFn: () => apiClient.get(`/ecommerce/dashboard/banners/${pageId}`),
     enabled: isEditMode && open,
   });
 
+  const form = useForm<PageFormData>({
+    resolver: zodResolver(createPageSchema(t)),
+    defaultValues: { type: "discount", url: "", title: "", description: "" },
+  });
+
   const {
-    register,
     handleSubmit,
     reset,
-    setValue,
-    watch,
     formState: { errors, isSubmitting },
-  } = useForm<PageFormData>({
-    resolver: zodResolver(createPageSchema(t)),
-    defaultValues: {
-      name: "",
-      type: "الخصومات",
-    },
-  });
+  } = form;
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
@@ -88,7 +87,7 @@ export function DiscountsDialog({
 
   useEffect(() => {
     if (!open) {
-      reset({ name: "", type: "الخصومات" });
+      reset({ type: "discount", url: "", title: "", description: "" });
       setImagePreview(null);
       setImageFile(null);
     }
@@ -96,19 +95,20 @@ export function DiscountsDialog({
 
   useEffect(() => {
     if (isEditMode && pageData?.data?.payload && open) {
-      const page = pageData.data.payload;
+      const banner = pageData.data.payload;
       reset({
-        name: page.name || "",
-        type: page.type || "الخصومات",
+        type: "discount",
+        url: banner.url || "",
+        title: banner.title || "",
+        description: banner.description || "",
       });
-      if (page.image) {
-        setImagePreview(page.image);
+      if (banner.banner_image) {
+        setImagePreview(banner.banner_image);
       }
     }
   }, [isEditMode, pageData, open, reset]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleImageChange = (file: File | null) => {
     if (file) {
       setImageFile(file);
       const reader = new FileReader();
@@ -116,47 +116,48 @@ export function DiscountsDialog({
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      setImageFile(null);
+      setImagePreview(null);
     }
   };
 
   const onSubmit = async (data: PageFormData) => {
     try {
       const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("type", data.type);
-      if (imageFile) {
-        formData.append("image", imageFile);
-      }
+      formData.append("type", "discount");
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      if (data.url) formData.append("url", data.url);
+      if (imageFile) formData.append("banner_image", imageFile);
 
-      if (isEditMode && pageId) {
-        await apiClient.put(
-          `/ecommerce/dashboard/pages/discounts/${pageId}`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-      } else {
-        await apiClient.post("/ecommerce/dashboard/pages/discounts", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      }
+      const url =
+        isEditMode && pageId
+          ? `/ecommerce/dashboard/banners/${pageId}`
+          : "/ecommerce/dashboard/banners";
+      await apiClient.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       toast.success(
-        isEditMode ? "تم تحديث الصفحة بنجاح" : "تم إنشاء الصفحة بنجاح"
+        t(`pagesSettings.messages.${isEditMode ? "update" : "create"}Success`)
       );
       onSuccess?.();
       reset();
       onClose();
     } catch (error: any) {
-      if (error?.response?.status === 422) {
-        const validationErrors = error?.response?.data?.errors;
-        if (validationErrors) {
-          const firstErrorKey = Object.keys(validationErrors)[0];
-          const firstErrorMessage = validationErrors[firstErrorKey][0];
-          toast.error(firstErrorMessage);
-          return;
+      const validationErrors = error?.response?.data?.errors;
+      if (error?.response?.status === 422 && validationErrors) {
+        const firstError = Object.values(validationErrors)[0];
+        if (Array.isArray(firstError) && firstError.length > 0) {
+          toast.error(firstError[0] as string);
         }
+        return;
       }
-      toast.error(isEditMode ? "فشل تحديث الصفحة" : "فشل إنشاء الصفحة");
+
+      toast.error(
+        t(`pagesSettings.messages.${isEditMode ? "update" : "create"}Error`)
+      );
     }
   };
 
@@ -169,90 +170,71 @@ export function DiscountsDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent
-        className={`max-w-md w-full bg-sidebar border-gray-700 ${
-          isRtl ? "rtl" : "ltr"
-        }`}
-        dir={isRtl ? "rtl" : "ltr"}
-      >
+      <DialogContent className="max-w-4xl w-full bg-sidebar border-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {isEditMode ? "تعديل صفحة" : "اضافة لقة جديدة"}
+            {t(`pagesSettings.actions.${isEditMode ? "edit" : "add"}Banner`)}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <FormLabel required className="text-xs text-gray-400">
-              نوع الصفحة
-            </FormLabel>
-            <Select
-              value={watch("type")}
-              onValueChange={(value) => setValue("type", value)}
-              disabled={isSubmitting || isFetching}
-            >
-              <SelectTrigger className="mt-1 bg-gray-900 border-gray-700 text-white">
-                <SelectValue placeholder="اختر النوع" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="الخصومات">الخصومات</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <FormLabel className="text-xs text-gray-400">صورة صفحة الرئيسية</FormLabel>
-            <div className="mt-2 flex flex-col items-center justify-center border-2 border-dashed border-gray-700 rounded-lg p-6 bg-gray-900/50">
-              {imagePreview ? (
-                <div className="relative w-full">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-32 object-cover rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImagePreview(null);
-                      setImageFile(null);
-                    }}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
-                  >
-                    ×
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-400 mb-1">2160 × 2160</p>
-                  <p className="text-xs text-gray-500 mb-3">3MB - الحجم الأقصى</p>
-                  <label className="cursor-pointer">
-                    <span className="px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg text-sm">
-                      ارفاق
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                      disabled={isSubmitting || isFetching}
-                    />
-                  </label>
-                </>
-              )}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="col-span-1">
+              <ImageUpload
+                label={t("pagesSettings.fields.bannerImage")}
+                maxSize="3MB - الحجم الأقصى"
+                dimensions="2160 × 2160"
+                onChange={handleImageChange}
+                initialValue={imagePreview}
+                minHeight="180px"
+              />
             </div>
-          </div>
 
-          <div>
-            <FormLabel required className="text-xs text-gray-400">
-              اسم الصفحة
-            </FormLabel>
-            <Input
-              {...register("name")}
-              disabled={isSubmitting || isFetching}
-              placeholder="اسم الصفحة"
-              className="mt-1 bg-gray-900 border-gray-700 text-white"
-            />
+            <div className="col-span-1">
+              <div className="space-y-4">
+                <div>
+                  <FormLabel required>
+                    {t("pagesSettings.fields.bannerTitle")}
+                  </FormLabel>
+                  <Input
+                    {...form.register("title")}
+                    className="bg-sidebar text-white"
+                  />
+                  {errors.title && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.title.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <FormLabel>{t("pagesSettings.fields.bannerUrl")}</FormLabel>
+                  <Input
+                    {...form.register("url")}
+                    disabled={isSubmitting || isFetching}
+                    className="bg-sidebar text-white"
+                  />
+                  {errors.url && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.url.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <FormLabel required>
+                    {t("pagesSettings.fields.bannerDescription")}
+                  </FormLabel>
+                  <Textarea
+                    {...form.register("description")}
+                    className="bg-sidebar text-white min-h-[100px]"
+                  />
+                  {errors.description && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.description.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
 
           <Button
@@ -263,7 +245,11 @@ export function DiscountsDialog({
             {(isSubmitting || isFetching) && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            حفظ
+            {t(
+              `pagesSettings.actions.${
+                isSubmitting || isFetching ? "saving" : "save"
+              }`
+            )}
           </Button>
         </form>
       </DialogContent>
