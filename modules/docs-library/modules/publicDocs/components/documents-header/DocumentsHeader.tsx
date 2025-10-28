@@ -75,8 +75,6 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     [selectedDocs]
   );
 
-  console.log('electedDocs', selectedDocs)
-
   const handleDelete = async () => {
     try {
       const _url =
@@ -88,6 +86,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
+      clearSelectedDocs();
       refetchDocs();
       if (!isDirectory) handleRefetchDocsWidgets();
     } catch (error: any) {
@@ -336,6 +335,10 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               onClick={() => {
                 setOpenShareDialog(true);
               }}
+              disabled={
+                selectedDocs?.length == 0 ||
+                selectedDocs?.filter((doc) => !doc.is_file).length > 0
+              }
             >
               <Share2 className="mr-2 h-4 w-4" />
               {t("share")}
@@ -429,7 +432,6 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       <ConfirmationDialog
         open={openDelete}
         onClose={() => {
-          clearSelectedDocs();
           setOpenDelete(false);
         }}
         onConfirm={handleDelete}
