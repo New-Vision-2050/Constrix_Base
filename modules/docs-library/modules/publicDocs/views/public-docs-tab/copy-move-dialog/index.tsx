@@ -40,6 +40,7 @@ export default function CopyMoveDialog({ open, onClose, type }: PropsType) {
   const copyMoveMutation = useCopyMoveFile({
     type,
     onSuccess: () => {
+      clearSelectedDocs(); 
       onClose();
       if (type == "move") refetchDocs();
     },
@@ -53,7 +54,6 @@ export default function CopyMoveDialog({ open, onClose, type }: PropsType) {
       folder_id: value,
       file_ids: selectedDocs?.map((doc) => doc.id),
     });
-    clearSelectedDocs();
   };
 
   return (

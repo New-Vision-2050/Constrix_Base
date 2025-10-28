@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, ReactNode, useContext } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 import useDocsWidgets from "../hooks/useDocsWidgets";
 import { DocsWidgetsT } from "../api/get-docs-widgets";
 
@@ -8,6 +8,7 @@ import { DocsWidgetsT } from "../api/get-docs-widgets";
 interface CxtType {
   docsWidgets: DocsWidgetsT | undefined;
   handleRefetchDocsWidgets: () => void;
+  handleChangeParentId: (parentId: string) => void;
 }
 
 // Create the context
@@ -20,15 +21,22 @@ interface PropsT {
 
 export const DocsLibraryCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
-  const { data: docsWidgets, refetch: refetchDocsWidgets } = useDocsWidgets();
+  const [parentId, setParentId] = useState("");
+  const { data: docsWidgets, refetch: refetchDocsWidgets } =
+    useDocsWidgets(parentId);
 
   const handleRefetchDocsWidgets = () => {
     refetchDocsWidgets();
   };
+  const handleChangeParentId = (parentId: string) => {
+    setParentId(parentId);
+  };
 
   // ** return provider
   return (
-    <Cxt.Provider value={{ docsWidgets, handleRefetchDocsWidgets }}>
+    <Cxt.Provider
+      value={{ docsWidgets, handleRefetchDocsWidgets, handleChangeParentId }}
+    >
       {children}
     </Cxt.Provider>
   );

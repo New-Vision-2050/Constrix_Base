@@ -3,23 +3,26 @@ import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLocale } from "next-intl";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 export default function VisitedDirsList() {
   const lang = useLocale();
   const isRtl = lang === "ar";
   const { visitedDirs, setParentId, setVisitedDirs } = usePublicDocsCxt();
+  const { handleChangeParentId } = useDocsLibraryCxt();
 
   // Handle navigation to a specific directory
   const handleNavigateToDir = (targetIndex: number) => {
     if (targetIndex === -1) {
       // Navigate to root (Home)
       setParentId(undefined);
+      handleChangeParentId('');
       setVisitedDirs([]);
     } else {
       // Navigate to specific directory
       const targetDir = visitedDirs[targetIndex];
       setParentId(targetDir.id);
-
+      handleChangeParentId(targetDir.id);
       // Remove all directories after the target index
       setVisitedDirs((prev) => prev.slice(0, targetIndex + 1));
     }
