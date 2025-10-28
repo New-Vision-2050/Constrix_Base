@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import InfoIcon from "@/public/icons/info";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePublicDocsCxt } from "../../../contexts/public-docs-cxt";
 import { apiClient } from "@/config/axios-config";
 import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
@@ -22,6 +22,7 @@ interface PropsI {
 }
 
 export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
+  const lang = useLocale();
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -64,7 +65,9 @@ export default function DirectoryPasswordDialog({ open, onClose }: PropsI) {
     try {
       const check = await isPasswordRight();
       if (!check) {
-        setErrorMsg("invalid password,try again");
+        setErrorMsg(
+          lang == "ar" ? "كلمة المرور غير صحيحة" : "invalid password,try again"
+        );
         return;
       }
       setVisitedDirs((prev) => [...prev, document]);
