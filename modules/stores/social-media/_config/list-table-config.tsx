@@ -5,12 +5,16 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
+import TheStatus from "../components/the-status";
 
 // Social Media row type interface
 export interface SocialMediaRow {
   id: string;
-  platform: string;
-  link: string;
+  social_icon: {
+    id: string;
+    name: string;
+  };
+  url: string;
   is_active: boolean;
 }
 
@@ -27,10 +31,36 @@ export const useSocialMediaListTableConfig: (
 
   return {
     tableId: "social-media-list-table",
-    url: `${baseURL}/ecommerce/dashboard/products`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/social-media`,
-
-    // Add row actions for edit
+    url: `${baseURL}/ecommerce/dashboard/social_media`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/social_media`,
+    columns: [
+      {
+        key: "social_icon.name",
+        label: t("socialMedia.platform"),
+        sortable: true,
+        render: (value: string, row: SocialMediaRow) => (
+          <span className="font-medium capitalize">
+            {row.social_icon?.name || value || "-"}
+          </span>
+        ),
+      },
+      {
+        key: "url",
+        label: t("socialMedia.link"),
+        sortable: false,
+      },
+      {
+        key: "is_active",
+        label: t("socialMedia.status"),
+        sortable: false,
+        render: (value: "active" | "inActive", row: SocialMediaRow) => (
+          <TheStatus theStatus={value} id={row.id} />
+        ),
+      },
+    ],
+    executionConfig: {
+      canDelete: true,
+    },
     executions: [
       (row) => (
         <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
@@ -39,39 +69,6 @@ export const useSocialMediaListTableConfig: (
         </DropdownMenuItem>
       ),
     ],
-
-    executionConfig: {
-      canDelete: false,
-    },
-
-    columns: [
-      {
-        key: "platform",
-        label: t("socialMedia.platform"),
-        sortable: true,
-        render: (value: string) => (
-          <span className="font-medium capitalize">{value}</span>
-        ),
-      },
-      {
-        key: "link",
-        label: t("socialMedia.link"),
-        sortable: false,
-        render: (value: string) => (
-          <span className="text-gray-400">{value}</span>
-        ),
-      },
-      {
-        key: "is_active",
-        label: t("socialMedia.status"),
-        sortable: false,
-        render: (value: boolean, row: SocialMediaRow) => (
-          <Switch
-            checked={value}
-            onCheckedChange={() => onToggle?.(row.id, !value)}
-          />
-        ),
-      },
-    ],
+    searchParamName: "search",
   };
 };

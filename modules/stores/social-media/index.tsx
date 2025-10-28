@@ -8,7 +8,7 @@ import { useSocialMediaListTableConfig } from "./_config/list-table-config";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { SocialMediaApi } from "@/services/api/ecommerce/social-media";
 import { toast } from "sonner";
-import AddSocialMediaDialog from "./components/AddSocialMediaDialog";
+import AddSocialMediaDialog from "../components/dialogs/add-social-media";
 
 function ListSocialMediaView() {
   const t = useTranslations();

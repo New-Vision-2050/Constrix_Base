@@ -2265,5 +2265,31 @@
         }
       }
     }
+  },
+  "socialMedia": {
+    "plural": "Social Media",
+    "singular": "Social Media",
+    "platform": "Platform",
+    "link": "Link",
+    "status": "Status",
+    "active": "Active",
+    "edit": "Edit Social Media",
+    "create": "Add Social Media",
+    "selectPlatform": "Select Platform",
+    "linkRequired": "Link is required",
+    "platformRequired": "Platform is required",
+    "createSuccess": "Social media created successfully",
+    "createError": "Failed to create social media",
+    "updateSuccess": "Social media updated successfully",
+    "updateError": "Failed to update social media",
+    "deleteSuccess": "Social media deleted successfully",
+    "deleteError": "Failed to delete social media",
+    "success": "Success",
+    "error": "Error",
+    "activatedSuccessfully": "Social media activated successfully",
+    "deactivatedSuccessfully": "Social media deactivated successfully",
+    "failedToUpdateStatus": "Failed to update status",
+    "areYouSureReactivate": "Are you sure you want to reactivate this social media?",
+    "areYouSureDeactivate": "Are you sure you want to deactivate this social media?"
   }
 }

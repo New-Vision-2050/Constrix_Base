@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FormLabel from "@/components/shared/FormLabel";
 import {
   Select,
   SelectContent,
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { SocialMediaApi } from "@/services/api/ecommerce/social-media";
 import { toast } from "sonner";
@@ -34,13 +33,11 @@ import {
 
 const createSocialMediaSchema = (t: (key: string) => string) =>
   z.object({
-    platform: z.string().min(1, t("socialMedia.platformRequired")),
-    link: z.string().min(1, t("socialMedia.linkRequired")),
+    social_icons_id: z.string().min(1, t("socialMedia.platformRequired")),
+    url: z.string().min(1, t("socialMedia.linkRequired")),
   });
 
-type SocialMediaFormData = z.infer<
-  ReturnType<typeof createSocialMediaSchema>
->;
+type SocialMediaFormData = z.infer<ReturnType<typeof createSocialMediaSchema>>;
 
 interface AddSocialMediaDialogProps {
   open: boolean;
@@ -59,6 +56,13 @@ export default function AddSocialMediaDialog({
   const t = useTranslations();
   const isEditMode = !!socialMediaId;
 
+  // Fetch available social icons/platforms
+  const { data: platformsData, isLoading: isLoadingPlatforms } = useQuery({
+    queryKey: ["social-icons-list"],
+    queryFn: () => SocialMediaApi.list(),
+    enabled: open,
+  });
+
   // Fetch social media data when editing
   const { data: socialMediaData, isLoading: isFetching } = useQuery({
     queryKey: ["social-media", socialMediaId],
@@ -76,8 +80,8 @@ export default function AddSocialMediaDialog({
   } = useForm<SocialMediaFormData>({
     resolver: zodResolver(createSocialMediaSchema(t)),
     defaultValues: {
-      platform: "",
-      link: "",
+      social_icons_id: "",
+      url: "",
     },
   });
 
@@ -91,42 +95,46 @@ export default function AddSocialMediaDialog({
     }
   }, [errors]);
 
+  // Reset form when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      reset({
+        social_icons_id: "",
+        url: "",
+      });
+    }
+  }, [open, reset]);
+
   // Populate form with social media data when editing
   useEffect(() => {
-    if (isEditMode && socialMediaData?.data?.payload) {
+    if (isEditMode && socialMediaData?.data?.payload && open) {
       const socialMedia = socialMediaData.data.payload;
 
-      setValue("platform", socialMedia.platform || "");
-      setValue("link", socialMedia.link || "");
+      reset({
+        social_icons_id: socialMedia.social_icons_id || "",
+        url: socialMedia.url || "",
+      });
     }
-  }, [isEditMode, socialMediaData, setValue]);
+  }, [isEditMode, socialMediaData, open, reset]);
 
-  const platforms = [
-    { value: "facebook", label_ar: "فيسبوك", label_en: "Facebook" },
-    { value: "instagram", label_ar: "إنستغرام", label_en: "Instagram" },
-    { value: "twitter", label_ar: "تويتر", label_en: "Twitter" },
-    { value: "linkedin", label_ar: "لينكد إن", label_en: "LinkedIn" },
-    { value: "youtube", label_ar: "يوتيوب", label_en: "YouTube" },
-    { value: "tiktok", label_ar: "تيك توك", label_en: "TikTok" },
-    { value: "snapchat", label_ar: "سناب شات", label_en: "Snapchat" },
-    { value: "whatsapp", label_ar: "واتساب", label_en: "WhatsApp" },
-  ];
+  // Get platforms from API response (these are social icons)
+  const platforms: any[] = platformsData?.data?.payload || [];
 
   const onSubmit = async (data: SocialMediaFormData) => {
     try {
       if (isEditMode && socialMediaId) {
         // Update existing social media
-        const updateParams: any = {
-          platform: data.platform,
-          link: data.link,
+        const updateParams: UpdateSocialMediaParams = {
+          social_icons_id: data.social_icons_id,
+          url: data.url,
         };
 
         await SocialMediaApi.update(socialMediaId, updateParams);
       } else {
         // Create new social media
-        const createParams: any = {
-          platform: data.platform,
-          link: data.link,
+        const createParams: CreateSocialMediaParams = {
+          social_icons_id: data.social_icons_id,
+          url: data.url,
         };
 
         await SocialMediaApi.create(createParams);
@@ -158,9 +166,7 @@ export default function AddSocialMediaDialog({
       }
 
       toast.error(
-        isEditMode
-          ? t("socialMedia.updateError")
-          : t("socialMedia.createError")
+        isEditMode ? t("socialMedia.updateError") : t("socialMedia.createError")
       );
     }
   };
@@ -182,9 +188,7 @@ export default function AddSocialMediaDialog({
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {isEditMode
-              ? t("socialMedia.edit")
-              : t("socialMedia.create")}
+            {isEditMode ? t("socialMedia.edit") : t("socialMedia.create")}
           </DialogTitle>
         </DialogHeader>
 
@@ -192,50 +196,50 @@ export default function AddSocialMediaDialog({
           <div className="space-y-4">
             {/* Platform */}
             <div>
-              <Label htmlFor="platform" className="text-xs">
-                {t("socialMedia.platform")} *
-              </Label>
-              <Select
-                value={watch("platform")}
-                onValueChange={(value) => setValue("platform", value)}
-                disabled={isSubmitting || isFetching}
-              >
-                <SelectTrigger className="mt-1 bg-gray-900 border-gray-700 text-white">
-                  <SelectValue
-                    placeholder={t("socialMedia.selectPlatform")}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {platforms.map((platform) => (
-                    <SelectItem key={platform.value} value={platform.value}>
-                      {isRtl ? platform.label_ar : platform.label_en}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.platform && (
+              <FormLabel required className="text-xs">
+                {t("socialMedia.platform")}
+              </FormLabel>
+              <div className="relative">
+                <Select
+                  value={watch("social_icons_id")}
+                  onValueChange={(value) => setValue("social_icons_id", value)}
+                  disabled={isSubmitting || isFetching || isLoadingPlatforms}
+                >
+                  <SelectTrigger className="mt-1 bg-gray-900 border-gray-700 text-white">
+                    <SelectValue placeholder={t("socialMedia.selectPlatform")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {platforms.map((platform) => (
+                      <SelectItem key={platform.id} value={platform.id}>
+                        {platform.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              {errors.social_icons_id && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.platform.message}
+                  {errors.social_icons_id.message}
                 </p>
               )}
+              </div>
             </div>
 
             {/* Link */}
             <div>
-              <Label htmlFor="link" className="text-xs">
-                {t("socialMedia.link")} *
-              </Label>
+              <FormLabel required className="text-xs">
+                {t("socialMedia.link")}
+              </FormLabel>
               <Input
-                id="link"
+                id="url"
                 variant="secondary"
-                {...register("link")}
+                {...register("url")}
                 disabled={isSubmitting || isFetching}
-                placeholder="example.com"
+                placeholder="https://example.com"
                 className="mt-1"
               />
-              {errors.link && (
+              {errors.url && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.link.message}
+                  {errors.url.message}
                 </p>
               )}
             </div>

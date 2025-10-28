@@ -14,17 +14,29 @@ import {
 
 export const SocialMediaApi = {
   list: (params?: ListSocialMediaParams) =>
-    baseApi.get<ListSocialMediaResponse>("ecommerce/dashboard/social-media", { params }),
-  
+    baseApi.get<ListSocialMediaResponse>("/social_icons", {
+      params,
+    }),
+
   show: (id: string) =>
-    baseApi.get<ShowSocialMediaResponse>(`ecommerce/dashboard/social-media/${id}`),
-  
+    baseApi.get<ShowSocialMediaResponse>(
+      `ecommerce/dashboard/social_media/${id}`
+    ),
+
   create: (params: CreateSocialMediaParams) =>
-    baseApi.post<CreateSocialMediaResponse>("ecommerce/dashboard/social-media", params),
-  
+    baseApi.post<CreateSocialMediaResponse>(
+      "ecommerce/dashboard/social_media",
+      params
+    ),
+
   update: (id: string, params: UpdateSocialMediaParams) =>
-    baseApi.put<UpdateSocialMediaResponse>(`ecommerce/dashboard/social-media/${id}`, params),
-  
+    baseApi.put<UpdateSocialMediaResponse>(
+      `ecommerce/dashboard/social_media/${id}`,
+      params
+    ),
+
   delete: (id: string) =>
-    baseApi.delete<DeleteSocialMediaResponse>(`ecommerce/dashboard/social-media/${id}`),
+    baseApi.delete<DeleteSocialMediaResponse>(
+      `ecommerce/dashboard/social_media/${id}`
+    ),
 };

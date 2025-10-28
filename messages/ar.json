@@ -1822,6 +1822,7 @@
     "platform": "وسيلة التواصل",
     "link": "الرابط",
     "status": "الحالة",
+    "active": "نشط",
     "edit": "تعديل وسيلة تواصل",
     "create": "إضافة وسيلة تواصل",
     "selectPlatform": "اختر وسيلة التواصل",
@@ -1832,7 +1833,14 @@
     "updateSuccess": "تم تحديث وسيلة التواصل بنجاح",
     "updateError": "فشل تحديث وسيلة التواصل",
     "deleteSuccess": "تم حذف وسيلة التواصل بنجاح",
-    "deleteError": "فشل حذف وسيلة التواصل"
+    "deleteError": "فشل حذف وسيلة التواصل",
+    "success": "نجح",
+    "error": "خطأ",
+    "activatedSuccessfully": "تم تفعيل وسيلة التواصل بنجاح",
+    "deactivatedSuccessfully": "تم تعطيل وسيلة التواصل بنجاح",
+    "failedToUpdateStatus": "فشل تحديث حالة وسيلة التواصل",
+    "areYouSureReactivate": "هل أنت متأكد من تفعيل وسيلة التواصل؟",
+    "areYouSureDeactivate": "هل أنت متأكد من تعطيل وسيلة التواصل؟"
   },
   "RoleTypes": {
     "all": "منح جميع الصلاحيات",

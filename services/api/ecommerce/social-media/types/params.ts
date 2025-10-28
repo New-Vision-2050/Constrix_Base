@@ -1,12 +1,12 @@
 export interface CreateSocialMediaParams {
-  platform: string;
-  link: string;
+  social_icons_id: string;
+  url: string;
   is_active?: boolean;
 }
 
 export interface UpdateSocialMediaParams {
-  platform?: string;
-  link?: string;
+  social_icons_id?: string;
+  url?: string;
   is_active?: boolean;
 }
 
