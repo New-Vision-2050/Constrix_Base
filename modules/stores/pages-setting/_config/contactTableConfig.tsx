@@ -7,9 +7,11 @@ import { useTranslations } from "next-intl";
 
 interface ContactRow {
   id: string;
-  name: string;
-  type: string;
-  image: string;
+  url: string;
+  image?: {
+    url: string;
+  };
+  title: string;
   is_active: boolean;
 }
 
@@ -20,37 +22,32 @@ type Params = {
 export const useContactTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
-  const t = useTranslations();
+  const t = useTranslations("pagesSettings");
+  const tCommon = useTranslations("labels");
 
   return {
     tableId: "contact-page-list-table",
-    url: `${baseURL}/ecommerce/dashboard/pages/contact`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/pages/contact`,
+    url: `${baseURL}/ecommerce/dashboard/banners?type=contact_us`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/banners`,
     columns: [
       {
-        key: "name",
-        label: "الاسم",
-        sortable: true,
+        key: "title",
+        label: t("table.image"),
+        sortable: false,
       },
       {
-        key: "type",
-        label: "النوع",
-        sortable: true,
-      },
-      {
-        key: "image",
-        label: "الصورة",
-        render: (value: string) => (
-          <img
-            src={value}
-            alt="Page"
-            className="w-12 h-12 object-cover rounded"
-          />
+        key: "url",
+        label: t("table.url"),
+        sortable: false,
+        render: (_: unknown, row: ContactRow) => (
+          <span className="text-sm truncate max-w-xs block">
+            {row.url || "-"}
+          </span>
         ),
       },
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("table.status"),
         render: (value: "active" | "inActive", row: ContactRow) => (
           <TheStatus theStatus={value} id={row.id} type="contact" />
         ),
@@ -60,7 +57,7 @@ export const useContactTableConfig: (params?: Params) => TableConfig = (
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
           <EditIcon />
-          {t("labels.edit")}
+          {tCommon("edit")}
         </DropdownMenuItem>
       ),
     ],
