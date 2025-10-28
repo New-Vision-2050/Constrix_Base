@@ -2410,6 +2410,7 @@
     "enterContent": "Enter content here...",
     "updateSuccess": "Updated successfully",
     "updateError": "Failed to update. Please try again."
+  },
   "socialMedia": {
     "plural": "Social Media",
     "singular": "Social Media",
