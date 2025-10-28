@@ -6,10 +6,11 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { useState } from "react";
 import { useMainPageTableConfig } from "../../../_config/mainPageTableConfig";
 import { MainPageDialog } from "@/modules/stores/components/dialogs/add-page-setting";
-import MainPageFormSection from "./components/MainPageFormSection";
+import { useTranslations } from "next-intl";
 
 function MainPageView() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
+  const t = useTranslations("pagesSettings");
 
   const tableConfig = useMainPageTableConfig({
     onEdit: (id: string) => setEditingPageId(id),
@@ -33,18 +34,17 @@ function MainPageView() {
             <>
               <DialogTrigger
                 component={MainPageDialog}
-                dialogProps={{ onSuccess: () => reloadTable() }}
+                dialogProps={{
+                  onSuccess: () => reloadTable()
+                }}
                 render={({ onOpen }) => (
-                  <Button onClick={onOpen}>اضافة لافتة</Button>
+                  <Button onClick={onOpen}>{t("actions.addBanner")}</Button>
                 )}
               />
             </>
           }
           tableId={tableConfig.tableId}
         />
-
-        {/* Form Section */}
-        <MainPageFormSection onSuccess={() => reloadTable()} />
       </div>
     </div>
   );

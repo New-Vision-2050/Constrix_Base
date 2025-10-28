@@ -8,10 +8,13 @@ import Image from "next/image";
 
 interface MainPageRow {
   id: string;
-  name: string;
-  type: string;
-  image: string;
+  url: string;
+  image?: {
+    url: string;
+  };
+  title: string;
   is_active: boolean;
+  setting_page_id: string;
 }
 
 type Params = {
@@ -21,44 +24,33 @@ type Params = {
 export const useMainPageTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
-  const t = useTranslations();
+  const t = useTranslations("pagesSettings");
+  const tCommon = useTranslations("labels");
 
   return {
     tableId: "main-page-list-table",
-    url: `${baseURL}/ecommerce/dashboard/pages/main`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/pages/main`,
+    url: `${baseURL}/ecommerce/dashboard/banners?type=home`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/banners`,
     columns: [
       {
-        key: "name",
-        label: "الاسم",
-        sortable: true,
-        render: (_: unknown, row: MainPageRow) => (
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
-              {row.image ? (
-                <Image
-                  src={row.image}
-                  alt={row.name}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <span className="text-gray-400 text-xs">لا صورة</span>
-              )}
-            </div>
-            <span>{row.name}</span>
-          </div>
-        ),
+        key: "title",
+        label: t("table.image"),
+        sortable: false,
       },
       {
-        key: "type",
-        label: "النوع",
-        sortable: true,
+        key: "url",
+        label: t("table.url"),
+        sortable: false,
+        render: (_: unknown, row: MainPageRow) => (
+          <span className="text-sm truncate max-w-xs block">
+            {row.url || "-"}
+          </span>
+        ),
       },
 
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("table.status"),
         render: (value: "active" | "inActive", row: MainPageRow) => (
           <TheStatus theStatus={value} id={row.id} type="main" />
         ),
@@ -68,7 +60,7 @@ export const useMainPageTableConfig: (params?: Params) => TableConfig = (
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
           <EditIcon />
-          {t("labels.edit")}
+          {tCommon("edit")}
         </DropdownMenuItem>
       ),
     ],
