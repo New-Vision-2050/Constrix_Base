@@ -43,7 +43,7 @@ export function CloneManagement(props: PropsT): FormConfig {
             type: "select",
             placeholder: "الادارة تابعة إلى",
             required: true,
-            disabled: true,
+            // disabled: true,
             dynamicOptions: {
                 url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
@@ -150,7 +150,7 @@ export function CloneManagement(props: PropsT): FormConfig {
       },
     ],
     initialValues: {
-        target_parent_id: selectedNode?.id,
+        target_parent_id: selectedNode?.id?.toString(),
     },
     onSubmit: async (formData) => {
       const method = isEdit ? "PUT" : "POST";

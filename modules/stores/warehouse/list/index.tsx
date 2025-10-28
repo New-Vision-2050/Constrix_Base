@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddWarehouse2Dialog from "@/modules/stores/components/dialogs/add-warehouse-2";
 import { useTranslations } from "next-intl";
-import { useWarehousesListTablConfig } from "./_config/list-table-config";
+import { useWarehousesListTablConfig } from "../_config/list-table-config";
 import { useState } from "react";
+import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
+import { statisticsConfig } from "../component/statistics-config";
 
 function ListWarehousesView() {
   const [editingWarehouseId, setEditingWarehouseId] = useState<string | null>(
@@ -19,6 +21,7 @@ function ListWarehousesView() {
   const t = useTranslations();
   return (
     <>
+      <StatisticsStoreRow config={statisticsConfig} />
       <AddWarehouse2Dialog
         open={Boolean(editingWarehouseId)}
         onClose={() => setEditingWarehouseId(null)}

@@ -41,7 +41,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
-  const { menu, isLoading } = useSidebarMenu();
+  const { menu, isLoading, data } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
@@ -107,13 +107,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     },
     [can]
   );
-  // console.log(
-  //   "isCentralCompanyisCentralCompany",
-  //   isCentralCompany,
-  //   PERMISSIONS.crm.settings,
-  //   can(PERMISSIONS.crm.settings.list),
-  //   can(PERMISSIONS.crm.settings.view)
-  // );
+
   // just users & companies & program management are not central
   const SidebarProjects: Project[] = React.useMemo(() => {
     // grouped routes in sidebar
@@ -347,9 +341,25 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       // {
       //   name: t("Sidebar.ecommerce"),
       //   icon: SettingsIcon,
-      //   isActive: pageName === ROUTER.ECOMMERCE,
+      //   isActive: [
+      //     ROUTER.Products,
+      //     ROUTER.Brands,
+      //     ROUTER.Categories,
+      //     ROUTER.Terms,
+      //     ROUTER.warehouse,
+      //     ROUTER.Discounts,
+      //     ROUTER.Coupons,
+      //   ].includes(pageName),
       //   slug: SUPER_ENTITY_SLUG.ECOMMERCE,
-      //   urls: [ROUTER.ECOMMERCE],
+      //   urls: [
+      //     ROUTER.Products,
+      //     ROUTER.Brands,
+      //     ROUTER.Categories,
+      //     ROUTER.Terms,
+      //     ROUTER.warehouse,
+      //     ROUTER.Discounts,
+      //     ROUTER.Coupons,
+      //   ],
       //   sub_entities: [
       //     {
       //       name: t("product.plural"),
@@ -372,6 +382,27 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       //       isActive: pageName === ROUTER.Categories,
       //       show: true,
       //     },
+      //     {
+      //       name: t("Sidebar.Coupons"),
+      //       url: ROUTER.Coupons,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.Coupons,
+      //       show: true,
+      //     },
+      //     {
+      //       name: t("Sidebar.Terms"),
+      //       url: ROUTER.Terms,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.Terms,
+      //       show: true,
+      //     },
+      //     {
+      //       name: t("Sidebar.Warehouse"),
+      //       url: ROUTER.warehouse,
+      //       icon: UserIcon,
+      //       isActive: pageName === ROUTER.warehouse,
+      //       show: true,
+      //     },
       //   ],
       // },
     ];
@@ -381,7 +412,12 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const projects = SidebarProjects.filter((project) =>
     project.sub_entities?.some((subEntity) => subEntity.show)
   );
-  const all = mergeProjectsAndMenu(projects, menu, isSuperAdmin);
+
+  const all = React.useMemo(() => {
+    if (isLoading) return [];
+    if (!Boolean(data)) return [];
+    return mergeProjectsAndMenu(projects, data, isSuperAdmin);
+  }, [projects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
 
   return (
     <Sidebar
@@ -395,8 +431,10 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         <SidebarHeaderContent name={name} mainLogo={mainLogo} />
       </SidebarHeader>
       <SidebarContent>
-        {isLoading && <div className="p-4 flex justify-center">Loading...</div>}
-        <SidebarProgramsList projects={all} />
+        {(isLoading || !Boolean(data)) && (
+          <div className="p-4 flex justify-center">Loading...</div>
+        )}
+        {all.length && !isLoading && <SidebarProgramsList projects={all} />}
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>

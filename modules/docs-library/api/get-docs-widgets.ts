@@ -22,8 +22,12 @@ type ResponseT = {
   data: DocsWidgetsT;
 };
 
-export default async function getDocsWidgets() {
-  const res = await apiClient.get<ResponseT>(`/files/widgets`);
+export default async function getDocsWidgets(parentId?: string) {
+  let params = {};
+  if (parentId?.length) {
+    params = { parent_id: parentId };
+  }
+  const res = await apiClient.get<ResponseT>(`/files/widgets`, { params: params });
 
   return res.data.data;
 }

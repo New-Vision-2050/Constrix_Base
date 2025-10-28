@@ -22,13 +22,13 @@ const TheStatus = ({
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
   const { toast } = useToast();
-  const {can} = usePermissions();
+  const { can } = usePermissions();
 
   const handleConfirm = async () => {
     try {
-      const response = await apiClient.put(`/ecommerce/dashboard/brands/${id}/status`, {
-        status: tempIsActive ? 1 : 0,
-      });
+      const response = await apiClient.patch(
+        `/ecommerce/dashboard/brands/${id}/toggle-active`
+      );
 
       if (response.status === 200) {
         setIsActive(tempIsActive);
@@ -81,7 +81,11 @@ const TheStatus = ({
           open={showDialog}
           onClose={handleCancel}
           onConfirm={handleConfirm}
-          description={!isActive ? t("brand.areYouSureReactivate") : t("brand.areYouSureDeactivate")}
+          description={
+            !isActive
+              ? t("brand.areYouSureReactivate")
+              : t("brand.areYouSureDeactivate")
+          }
         />
       </Dialog>
     </>

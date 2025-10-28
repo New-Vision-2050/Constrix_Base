@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import StatusToggle from "./StatusToggle";
 import { useMemo, useState } from "react";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 /**
  * Table row component for displaying document information
@@ -30,6 +31,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
     setDocToView,
     selectedDocs,
   } = usePublicDocsCxt();
+  const { handleChangeParentId } = useDocsLibraryCxt();
   const [rowStatus, setRowStatus] = useState(document.status);
   const t = useTranslations("docs-library.publicDocs.table");
   const formatFileSize = (size?: number) => {
@@ -52,6 +54,7 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
         setTempParentId(document.id);
       } else {
         setParentId(document.id);
+        handleChangeParentId(document.id);
         setVisitedDirs((prev) => [...prev, document]);
       }
     } else {
@@ -79,7 +82,10 @@ export const TableRow = ({ document, isFolder = false }: TableRowProps) => {
   return (
     <tr className="hover:bg-muted/30 transition-colors">
       <td className="px-4 py-3">
-        <Checkbox checked={isDocSelected} onCheckedChange={() => toggleDocInSelectedDocs(document)} />
+        <Checkbox
+          checked={isDocSelected}
+          onCheckedChange={() => toggleDocInSelectedDocs(document)}
+        />
       </td>
 
       <td className="px-4 py-3">

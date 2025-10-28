@@ -42,13 +42,27 @@ const ExportButton: React.FC<ExportButtonProps> = ({
   );
   const hasSelectedRows = selectedIds.length > 0;
 
-  // Construct the export URL by appending "/export" to the base URL
-  let exportUrl = `${url.endsWith("/") ? url.slice(0, -1) : url}/export`;
-
+  // Construct the export URL by inserting "/export" before query parameters
+  let exportUrl = url;
+  
+  // Check if URL has query parameters
+  const urlParts = url.split('?');
+  const baseUrl = urlParts[0].endsWith("/") ? urlParts[0].slice(0, -1) : urlParts[0];
+  const existingParams = urlParts[1] || '';
+  
+  // Build the export URL with /export before query params
+  exportUrl = `${baseUrl}/export`;
+  
+  // Append existing query parameters from the URL
+  if (existingParams) {
+    exportUrl += `?${existingParams}`;
+  }
+  
+  // Append additional apiParams if provided
   if (apiParams) {
     const params = new URLSearchParams(apiParams);
     if (params.toString()) {
-      exportUrl += `?${params.toString()}`;
+      exportUrl += existingParams ? `&${params.toString()}` : `?${params.toString()}`;
     }
   }
 
