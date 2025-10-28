@@ -22,7 +22,8 @@ import { apiClient } from "@/config/axios-config";
 
 const createFeatureSchema = (t: (key: string) => string) =>
   z.object({
-    name: z.string().min(1, { message: "الاسم مطلوب" }),
+    type: z.string().optional(),
+    title: z.string().min(1, { message: "العنوان مطلوب" }),
     description: z.string().min(1, { message: "الوصف مطلوب" }),
   });
 
@@ -45,15 +46,16 @@ export function NewFeatureDialog({
   const isEditMode = !!featureId;
 
   const { data: featureData, isLoading: isFetching } = useQuery({
-    queryKey: ["new-feature", featureId],
-    queryFn: () => apiClient.get(`/ecommerce/dashboard/new-features/${featureId}`),
+    queryKey: ["feature", featureId],
+    queryFn: () => apiClient.get(`/ecommerce/dashboard/features/${featureId}`),
     enabled: isEditMode && open,
   });
 
   const form = useForm<FeatureFormData>({
     resolver: zodResolver(createFeatureSchema(t)),
     defaultValues: {
-      name: "",
+      type: "contact_us",
+      title: "",
       description: "",
     },
   });
@@ -76,7 +78,8 @@ export function NewFeatureDialog({
   useEffect(() => {
     if (!open) {
       reset({
-        name: "",
+        type: "contact_us",
+        title: "",
         description: "",
       });
     }
@@ -86,7 +89,8 @@ export function NewFeatureDialog({
     if (isEditMode && featureData?.data?.payload && open) {
       const feature = featureData.data.payload;
       reset({
-        name: feature.name || "",
+        type: feature.type || "contact_us",
+        title: feature.title || "",
         description: feature.description || "",
       });
     }
@@ -94,12 +98,18 @@ export function NewFeatureDialog({
 
   const onSubmit = async (data: FeatureFormData) => {
     try {
+      const payload = {
+        type: "contact_us",
+        title: data.title,
+        description: data.description,
+      };
+
       const url =
         isEditMode && featureId
-          ? `/ecommerce/dashboard/new-features/${featureId}`
-          : "/ecommerce/dashboard/new-features";
-      
-      await apiClient.post(url, data);
+          ? `/ecommerce/dashboard/features/${featureId}`
+          : "/ecommerce/dashboard/features";
+
+      await apiClient.post(url, payload);
 
       toast.success(
         isEditMode ? "تم تحديث الميزة بنجاح" : "تم إنشاء الميزة بنجاح"
@@ -117,9 +127,7 @@ export function NewFeatureDialog({
         return;
       }
 
-      toast.error(
-        isEditMode ? "فشل في تحديث الميزة" : "فشل في إنشاء الميزة"
-      );
+      toast.error(isEditMode ? "فشل في تحديث الميزة" : "فشل في إنشاء الميزة");
     }
   };
 
@@ -141,15 +149,15 @@ export function NewFeatureDialog({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <FormLabel required>الاسم</FormLabel>
+            <FormLabel required>العنوان</FormLabel>
             <Input
-              {...form.register("name")}
+              {...form.register("title")}
               className="bg-sidebar text-white"
-              placeholder="اسم الميزة"
+              placeholder="عنوان الميزة"
             />
-            {errors.name && (
+            {errors.title && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.name.message}
+                {errors.title.message}
               </p>
             )}
           </div>
@@ -159,7 +167,6 @@ export function NewFeatureDialog({
             <Textarea
               {...form.register("description")}
               className="bg-sidebar text-white min-h-[120px]"
-              placeholder="وصف الميزة"
             />
             {errors.description && (
               <p className="text-red-500 text-xs mt-1">

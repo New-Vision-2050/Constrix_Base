@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 
 interface NewFeatureRow {
   id: string;
-  name: string;
+  title: string;
   description: string;
   is_active: boolean;
 }
@@ -23,15 +23,15 @@ export const useNewFeatureTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "new-feature-list-table",
-    url: `${baseURL}/ecommerce/dashboard/features`,
+    url: `${baseURL}/ecommerce/dashboard/features?type=contact_us`,
     deleteUrl: `${baseURL}/ecommerce/dashboard/features`,
     columns: [
       {
-        key: "name",
-        label: "الاسم",
+        key: "title",
+        label: "العنوان",
         sortable: false,
         render: (_: unknown, row: NewFeatureRow) => (
-          <span className="text-sm font-medium">{row.name || "-"}</span>
+          <span className="text-sm font-medium">{row.title || "-"}</span>
         ),
       },
       {
