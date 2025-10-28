@@ -7,9 +7,11 @@ import { useTranslations } from "next-intl";
 
 interface NewArrivalsRow {
   id: string;
-  name: string;
-  type: string;
-  image: string;
+  url: string;
+  image?: {
+    url: string;
+  };
+  title: string;
   is_active: boolean;
 }
 
@@ -20,37 +22,32 @@ type Params = {
 export const useNewArrivalsTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
-  const t = useTranslations();
+  const t = useTranslations("pagesSettings");
+  const tCommon = useTranslations("labels");
 
   return {
     tableId: "new-arrivals-page-list-table",
-    url: `${baseURL}/ecommerce/dashboard/pages/new-arrivals`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/pages/new-arrivals`,
+    url: `${baseURL}/ecommerce/dashboard/banners?type=new_arrival`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/banners`,
     columns: [
       {
-        key: "name",
-        label: "الاسم",
-        sortable: true,
+        key: "title",
+        label: t("table.image"),
+        sortable: false,
       },
       {
-        key: "type",
-        label: "النوع",
-        sortable: true,
-      },
-      {
-        key: "image",
-        label: "الصورة",
-        render: (value: string) => (
-          <img
-            src={value}
-            alt="Page"
-            className="w-12 h-12 object-cover rounded"
-          />
+        key: "url",
+        label: t("table.url"),
+        sortable: false,
+        render: (_: unknown, row: NewArrivalsRow) => (
+          <span className="text-sm truncate max-w-xs block">
+            {row.url || "-"}
+          </span>
         ),
       },
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("table.status"),
         render: (value: "active" | "inActive", row: NewArrivalsRow) => (
           <TheStatus theStatus={value} id={row.id} type="new-arrivals" />
         ),
@@ -60,7 +57,7 @@ export const useNewArrivalsTableConfig: (params?: Params) => TableConfig = (
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
           <EditIcon />
-          {t("labels.edit")}
+          {tCommon("edit")}
         </DropdownMenuItem>
       ),
     ],

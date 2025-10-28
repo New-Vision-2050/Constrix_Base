@@ -2301,7 +2301,7 @@
       "image": "الصورة",
       "url": "الرابط",
       "status": "الحالة",
-      "noImage": "لا صورة"
+      "noImage": "لا توجد صورة"
     },
     "sections": {
       "header": "القسم الرئيسي",
@@ -2312,8 +2312,11 @@
       "descriptionHeader": "وصف",
       "titleFooter": "عنوان",
       "descriptionFooter": "وصف",
-      "bannerImage": "صورة اللافتة",
-      "bannerUrl": "رابط اللافتة"
+      "bannerDetails": "تفاصيل البانر",
+      "bannerTitle": "عنوان البانر",
+      "bannerDescription": "وصف البانر",
+      "bannerImage": "صورة البانر",
+      "bannerUrl": "رابط البانر"
     },
     "validation": {
       "titleRequired": "العنوان مطلوب",
@@ -2332,41 +2335,10 @@
       "save": "حفظ",
       "saving": "جاري الحفظ...",
       "loading": "جاري التحميل...",
-      "addBanner": "اضافة لافتة جديدة",
+      "addBanner": "اضافة لافته",
       "editBanner": "تعديل لافتة",
-      "cancel": "إلغاء"
-    }
-  },
-  "pagesSettings": {
-    "table": {
-      "image": "الصورة",
-      "url": "الرابط",
-      "status": "الحالة",
-      "noImage": "لا توجد صورة"
-    },
-    "fields": {
-      "bannerDetails": "تفاصيل البانر",
-      "bannerTitle": "عنوان البانر",
-      "bannerDescription": "وصف البانر",
-      "bannerImage": "صورة البانر",
-      "bannerUrl": "رابط البانر"
-    },
-    "actions": {
-      "addBanner": "إضافة بانر",
-      "editBanner": "تعديل بانر",
       "pageSettings": "إعدادات الصفحة",
-      "save": "حفظ",
-      "saving": "جاري الحفظ..."
-    },
-    "validation": {
-      "titleRequired": "العنوان مطلوب",
-      "descriptionRequired": "الوصف مطلوب"
-    },
-    "messages": {
-      "createSuccess": "تم إنشاء البانر بنجاح",
-      "updateSuccess": "تم تحديث البانر بنجاح",
-      "createError": "فشل في إنشاء البانر",
-      "updateError": "فشل في تحديث البانر"
+      "cancel": "إلغاء"
     }
   }
 }
