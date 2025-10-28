@@ -6,8 +6,7 @@ import { useTranslations } from "next-intl";
 
 interface BranchRow {
   id: string;
-  branch_name: string;
-  country: string;
+  name: string;
   address: string;
   phone: string;
   email: string;
@@ -24,27 +23,18 @@ export const useBranchTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "branch-list-table",
-    url: `${baseURL}/ecommerce/dashboard/branches`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/branches`,
+    url: `${baseURL}/ecommerce/dashboard/store-branches?type=contact_us`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/store-branches`,
     columns: [
       {
-        key: "branch_name",
+        key: "name",
         label: "اسم الفرع",
         sortable: false,
         render: (_: unknown, row: BranchRow) => (
-          <span className="text-sm font-medium">
-            {row.branch_name || "-"}
-          </span>
+          <span className="text-sm font-medium">{row.name || "-"}</span>
         ),
       },
-      {
-        key: "country",
-        label: "الدولة",
-        sortable: false,
-        render: (_: unknown, row: BranchRow) => (
-          <span className="text-sm">{row.country || "-"}</span>
-        ),
-      },
+
       {
         key: "address",
         label: "العنوان",

@@ -14,15 +14,24 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/modules/table/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import FormLabel from "@/components/shared/FormLabel";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { apiClient } from "@/config/axios-config";
+import { getCountries } from "@/services/api/shared/countries";
 
 const createBranchSchema = (t: (key: string) => string) =>
   z.object({
-    branch_name: z.string().min(1, { message: "اسم الفرع مطلوب" }),
-    country: z.string().min(1, { message: "الدولة مطلوبة" }),
+    type: z.string().optional(),
+    name: z.string().min(1, { message: "اسم الفرع مطلوب" }),
+    country_id: z.string().min(1, { message: "الدولة مطلوبة" }),
     address: z.string().min(1, { message: "العنوان مطلوب" }),
     phone: z.string().min(1, { message: "رقم الهاتف مطلوب" }),
     email: z.string().email({ message: "البريد الإلكتروني غير صحيح" }),
@@ -48,15 +57,23 @@ export function BranchDialog({
 
   const { data: branchData, isLoading: isFetching } = useQuery({
     queryKey: ["branch", branchId],
-    queryFn: () => apiClient.get(`/ecommerce/dashboard/branches/${branchId}`),
+    queryFn: () => apiClient.get(`/ecommerce/dashboard/store-branches/${branchId}`),
     enabled: isEditMode && open,
   });
+
+  const { data: countriesData, isLoading: isLoadingCountries } = useQuery({
+    queryKey: ["countries"],
+    queryFn: getCountries,
+  });
+
+  const countries = countriesData?.data?.payload || [];
 
   const form = useForm<BranchFormData>({
     resolver: zodResolver(createBranchSchema(t)),
     defaultValues: {
-      branch_name: "",
-      country: "",
+      type: "contact_us",
+      name: "",
+      country_id: "",
       address: "",
       phone: "",
       email: "",
@@ -81,8 +98,9 @@ export function BranchDialog({
   useEffect(() => {
     if (!open) {
       reset({
-        branch_name: "",
-        country: "",
+        type: "contact_us",
+        name: "",
+        country_id: "",
         address: "",
         phone: "",
         email: "",
@@ -94,8 +112,9 @@ export function BranchDialog({
     if (isEditMode && branchData?.data?.payload && open) {
       const branch = branchData.data.payload;
       reset({
-        branch_name: branch.branch_name || "",
-        country: branch.country || "",
+        type: branch.type || "contact_us",
+        name: branch.name || "",
+        country_id: branch.country_id || "",
         address: branch.address || "",
         phone: branch.phone || "",
         email: branch.email || "",
@@ -105,12 +124,21 @@ export function BranchDialog({
 
   const onSubmit = async (data: BranchFormData) => {
     try {
+      const payload = {
+        type: "contact_us",
+        name: data.name,
+        country_id: data.country_id,
+        address: data.address,
+        phone: data.phone,
+        email: data.email,
+      };
+
       const url =
         isEditMode && branchId
-          ? `/ecommerce/dashboard/branches/${branchId}`
-          : "/ecommerce/dashboard/branches";
+          ? `/ecommerce/dashboard/store-branches/${branchId}`
+          : "/ecommerce/dashboard/store-branches";
       
-      await apiClient.post(url, data);
+      await apiClient.post(url, payload);
 
       toast.success(
         isEditMode ? "تم تحديث الفرع بنجاح" : "تم إنشاء الفرع بنجاح"
@@ -155,27 +183,38 @@ export function BranchDialog({
             <div>
               <FormLabel required>اسم الفرع</FormLabel>
               <Input
-                {...form.register("branch_name")}
+                {...form.register("name")}
                 className="bg-sidebar text-white"
                 placeholder="اسم الفرع"
               />
-              {errors.branch_name && (
+              {errors.name && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.branch_name.message}
+                  {errors.name.message}
                 </p>
               )}
             </div>
 
             <div>
               <FormLabel required>الدولة</FormLabel>
-              <Input
-                {...form.register("country")}
-                className="bg-sidebar text-white"
-                placeholder="الدولة"
-              />
-              {errors.country && (
+              <Select
+                value={form.watch("country_id")}
+                onValueChange={(value) => form.setValue("country_id", value)}
+                disabled={isSubmitting || isFetching || isLoadingCountries}
+              >
+                <SelectTrigger className="bg-sidebar text-white border-gray-700">
+                  <SelectValue placeholder="اختر الدولة" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((country: any) => (
+                    <SelectItem key={country.id} value={String(country.id)}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.country_id && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.country.message}
+                  {errors.country_id.message}
                 </p>
               )}
             </div>
