@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useProductsListTableConfig } from "./_config/list-table-config";
 import { useRouter } from "next/navigation";
+import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
+import { statisticsConfig } from "./add/components/statistics-config";
 
 function ListProductsView() {
   const router = useRouter();
@@ -14,23 +16,26 @@ function ListProductsView() {
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
-  
+
   const handleAddProduct = () => {
     router.push("/stores/products/add");
   };
 
   return (
-    <TableBuilder
-      config={tableConfig}
-      searchBarActions={
-        <>
-          <Button onClick={handleAddProduct}>
-            {t("labels.add")} {t("product.singular")}
-          </Button>
-        </>
-      }
-      tableId={tableConfig.tableId}
-    />
+    <>
+      <StatisticsStoreRow config={statisticsConfig} />
+      <TableBuilder
+        config={tableConfig}
+        searchBarActions={
+          <>
+            <Button onClick={handleAddProduct}>
+              {t("labels.add")} {t("product.singular")}
+            </Button>
+          </>
+        }
+        tableId={tableConfig.tableId}
+      />
+    </>
   );
 }
 

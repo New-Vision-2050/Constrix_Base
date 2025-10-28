@@ -1,7 +1,7 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
@@ -14,21 +14,39 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "flex group h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    onClear?: () => void;
+    showClear?: boolean;
+  }
+>(({ className, children, onClear, showClear, ...props }, ref) => (
+  <div className="relative w-full">
+    <SelectPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex group h-9 w-full items-center flex-row-reverse justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        showClear && "pe-2",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <SelectPrimitive.Icon asChild>
+        <ChevronDown className="h-4 w-5  opacity-50 transition group-data-[state=open]:rotate-180" />
+      </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
+    {showClear && onClear && (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClear();
+        }}
+        className="absolute end-10 top-4 -translate-y-1/2 h-5 w-5 rounded-sm opacity-70 hover:opacity-100 hover:bg-accent transition-all flex items-end justify-center"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     )}
-    {...props}
-  >
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50 transition  group-data-[state=open]:rotate-180" />
-    </SelectPrimitive.Icon>
-    {children}
-  </SelectPrimitive.Trigger>
+  </div>
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 

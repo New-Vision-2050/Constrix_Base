@@ -30,24 +30,24 @@ export const useFeaturedDealTableConfig: (params?: Params) => TableConfig = (
     columns: [
       {
         key: "id",
-        label: "قسيمة",
+        label: t("featuredDeal.table.coupon"),
         sortable: true,
       },
       {
         key: "discount_type",
-        label: "نوع القسيمة",
+        label: t("featuredDeal.table.couponType"),
       },
       {
         key: "discount_value",
-        label: "المبلغ",
+        label: t("featuredDeal.table.amount"),
       },
       {
         key: "usage_limit",
-        label: "حد المستخدم",
+        label: t("featuredDeal.table.userLimit"),
       },
       {
         key: "start_date",
-        label: "تاريخ الشهر",
+        label: t("featuredDeal.table.monthDate"),
         render: (value: string, row: FeaturedDealRow) => {
           if (!value) return "-";
           const startDate = new Date(value);
@@ -59,10 +59,10 @@ export const useFeaturedDealTableConfig: (params?: Params) => TableConfig = (
       },
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("featuredDeal.table.status"),
         render: (value: boolean) => (
           <span className={value ? "text-green-500" : "text-red-500"}>
-            {value ? "نشط" : "غير نشط"}
+            {value ? t("featuredDeal.table.active") : t("featuredDeal.table.inactive")}
           </span>
         ),
       },

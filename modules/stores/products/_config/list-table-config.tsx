@@ -81,27 +81,16 @@ export const useProductsListTableConfig: (
         key: "type",
         label: t("labels.type"),
         sortable: true,
-        render: (value: string) => (
-          <span className="text-gray-600">{value}</span>
-        ),
       },
       {
         key: "price",
         label: t("labels.price"),
         sortable: true,
-        render: (value: number) => (
-          <span className="font-medium">
-            {value} {t("labels.currency")}
-          </span>
-        ),
       },
       {
         key: "stock",
         label: t("labels.stock"),
         sortable: true,
-        render: (value: number) => (
-          <span className="text-center block">{value || 0}</span>
-        ),
       },
       {
         key: "is_visible",
@@ -111,5 +100,6 @@ export const useProductsListTableConfig: (
         ),
       },
     ],
+    searchParamName: "search",
   };
 };

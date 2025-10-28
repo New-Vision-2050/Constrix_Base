@@ -33,7 +33,6 @@ export const useSubCategoryTableConfig: (params?: Params) => TableConfig = (
   return {
     tableId: "sub-categories-list-table",
     url: `${baseURL}/ecommerce/dashboard/categories?depth=1`,
-
     deleteUrl: `${baseURL}/ecommerce/dashboard/categories`,
     columns: [
       {

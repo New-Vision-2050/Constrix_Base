@@ -64,18 +64,41 @@ const PlacesPicker: React.FC<Props> = ({ onPick, mapProps }) => {
   const onMapClick = useCallback(
     (e: google.maps.MapMouseEvent) => {
       if (!e.latLng) return;
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: e.latLng }, (results, status) => {
-        if (status === "OK" && results && results[0]) {
-          const lat = e.latLng!.lat();
-          const lng = e.latLng!.lng();
-          setMarker({ lat, lng });
-          const addressData = extractAddressComponents(results[0]);
-          addressData.lat = lat;
-          addressData.lng = lng;
-          onPick(addressData);
-        }
-      });
+      
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+      
+      // Set marker immediately
+      setMarker({ lat, lng });
+      
+      // Try to geocode, but don't fail if it doesn't work
+      try {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: e.latLng }, (results, status) => {
+          if (status === "OK" && results && results[0]) {
+            const addressData = extractAddressComponents(results[0]);
+            addressData.lat = lat;
+            addressData.lng = lng;
+            onPick(addressData);
+          } else {
+            // Even if geocoding fails, still send lat/lng
+            console.warn("Geocoding failed:", status);
+            onPick({
+              address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
+              lat,
+              lng,
+            });
+          }
+        });
+      } catch (error) {
+        console.error("Geocoding error:", error);
+        // Still send lat/lng even if geocoding fails
+        onPick({
+          address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
+          lat,
+          lng,
+        });
+      }
     },
     [onPick]
   );

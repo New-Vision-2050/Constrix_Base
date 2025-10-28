@@ -28,7 +28,7 @@ const TheStatus = ({
   const handleConfirm = async () => {
     try {
       const response = await apiClient.patch(
-        `/ecommerce/dashboard/categories/${id}/toggle-active`
+        `/ecommerce/dashboard/products/${id}/toggle-visibility`
       );
 
       if (response.status === 200) {
