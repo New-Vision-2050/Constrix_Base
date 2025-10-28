@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 export default function GridItem({
   document,
@@ -52,6 +53,7 @@ export default function GridItem({
     setDocToView,
   } = usePublicDocsCxt();
   const { can } = usePermissions();
+  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -132,6 +134,7 @@ export default function GridItem({
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
       refetchDocs();
+      if (!isDir) handleRefetchDocsWidgets();
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));
@@ -236,13 +239,13 @@ export default function GridItem({
                     <Trash
                       onClick={() => setOpenDelete(true)}
                       className="w-5 h-5 text-red-500 hover:text-red-600 cursor-pointer transition-colors"
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Delete Document</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete Document</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
           </div>
         </TooltipProvider>
         <Checkbox

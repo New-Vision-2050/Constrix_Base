@@ -16,7 +16,8 @@ export function getCreateCompanyClientFormConfig(
   currentEmpBranchId?: string,
   currentEmpId?: string,
   isShareClient?: boolean,
-  companyBranchesIds?: string[]
+  companyBranchesIds?: string[],
+  sub_entity_id?: string
 ): FormConfig {
   const formId = "company-client-form";
 
@@ -208,6 +209,20 @@ export function getCreateCompanyClientFormConfig(
       {
         title: t("form.individualClientFormTitle"),
         fields: [
+          // disabled fields
+          {
+            name: "emailisReceived",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
+          // new email
+          {
+            name: "newEmail",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
           //  dialog hidden message
           {
             name: "dialogMessage",
@@ -286,8 +301,20 @@ export function getCreateCompanyClientFormConfig(
 
                     if (!statusInCompany && !statusInAllCompanies) {
                       // not exist in system continue
+                      useFormStore.getState().setValues(formId, {
+                        emailisReceived: true,
+                      });
+                      useFormStore.getState().setValues(formId, {
+                        newEmail: true,
+                      });
                       return true;
                     }
+                    useFormStore.getState().setValues(formId, {
+                      emailisReceived: false,
+                    });
+                    useFormStore.getState().setValues(formId, {
+                      newEmail: false,
+                    });
                     const _user = {
                       userId: userId,
                       email: response.payload?.[0]?.email || "",
@@ -295,10 +322,13 @@ export function getCreateCompanyClientFormConfig(
                       phone: response.payload?.[0]?.phone || "",
                       residence: response.payload?.[0]?.residence || "",
                     };
-
                     // store user id
                     useFormStore.getState().setValues(formId, {
                       user: JSON.stringify(_user),
+                    });
+                    // reset preventRetriveUserData
+                    useFormStore.getState().setValues(formId, {
+                      preventRetriveUserData: true,
                     });
 
                     /**
@@ -401,6 +431,35 @@ export function getCreateCompanyClientFormConfig(
               },
             ],
           },
+          /////=======> Disabled Fields
+          {
+            name: "phone",
+            label: t("form.phone"),
+            type: "phone",
+            disabled: true,
+            placeholder: t("form.phonePlaceholder"),
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "clientName",
+            label: t("form.name"),
+            type: "text",
+            placeholder: t("form.namePlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "residence",
+            label: t("form.identity"),
+            type: "text",
+            placeholder: t("form.identityPlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          //======================
           // phone
           {
             name: "phone",
@@ -414,6 +473,7 @@ export function getCreateCompanyClientFormConfig(
                 message: t("form.phoneInvalid"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // name
           {
@@ -445,6 +505,7 @@ export function getCreateCompanyClientFormConfig(
                 message: t("form.nameMinLength"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // address dialog
           {
@@ -454,6 +515,7 @@ export function getCreateCompanyClientFormConfig(
             render: () => {
               return <AddressDialog formId={formId} />;
             },
+            condition: (values) => values.emailisReceived == true,
           },
           // identity --> residence
           {
@@ -483,6 +545,7 @@ export function getCreateCompanyClientFormConfig(
                 message: t("form.identityPattern"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // branchs
           {
@@ -505,7 +568,7 @@ export function getCreateCompanyClientFormConfig(
             },
             disabled: isShareClient,
             condition: (values) => {
-              return !!isShareClient;
+              return !!isShareClient && values.emailisReceived == true;
             },
           },
           {
@@ -528,7 +591,7 @@ export function getCreateCompanyClientFormConfig(
             },
             disabled: isShareClient,
             condition: (values) => {
-              return !isShareClient;
+              return !isShareClient && values.emailisReceived == true;
             },
           },
           // broker
@@ -548,6 +611,7 @@ export function getCreateCompanyClientFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            condition: (values) => values.emailisReceived == true,
           },
           // chat mail
           {
@@ -555,6 +619,81 @@ export function getCreateCompanyClientFormConfig(
             label: t("form.correspondenceAddress"),
             type: "text",
             placeholder: t("form.correspondenceAddressPlaceholder"),
+            condition: (values) => values.emailisReceived == true,
+          },
+          /////=======> Disabled Fields
+          {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareClient,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "branch_ids",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              setFirstAsDefault: true,
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "broker_id",
+            label: t("form.broker"),
+            type: "select",
+            placeholder: t("form.brokerPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/company-users/brokers`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "chat_mail",
+            label: t("form.correspondenceAddress"),
+            type: "text",
+            placeholder: t("form.correspondenceAddressPlaceholder"),
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
           },
         ],
       },
@@ -588,21 +727,22 @@ export function getCreateCompanyClientFormConfig(
       // Custom step submission handler (optional - will use defaultStepSubmitHandler if not provided)
       onStepSubmit: async (step, values) => {
         // Option to call default way to handle the step
-        let body = values;
+        let body = { ...values, sub_entity_id };
         console.log("Breakpoint101 step,values ::", step, values);
         if (step === 1) {
           body = {
             ...values,
+            sub_entity_id,
             name: values.clientName,
             company_id: values.company_id,
           };
         }
+        console.log("Breakpoint102 step,body ::", step, body);
         const result = await defaultStepSubmitHandler(
           step,
-          body,
+          { ...body, sub_entity_id },
           getCreateCompanyClientFormConfig(t, onSuccessFn)
         );
-        console.log("result before success", result);
         useFormStore.getState().setValues(formId, {
           company_id: result?.data?.payload.id,
         });
@@ -642,6 +782,7 @@ export function getCreateCompanyClientFormConfig(
       return await defaultSubmitHandler(
         {
           ...formData,
+          sub_entity_id,
           branch_ids: isShareClient
             ? formData.branch_ids_all
             : formData.branch_ids,

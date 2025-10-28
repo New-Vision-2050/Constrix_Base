@@ -41,8 +41,8 @@ export const useDropdownSearch = ({
   const isMountedRef = useRef(true);
   const initialFetchDoneRef = useRef(false);
 
-  // Create a debounced search term
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+  // Create a debounced search term with longer delay to reduce cancelation
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   // Fetch label for initial value if needed
   useEffect(() => {
@@ -558,13 +558,15 @@ export const useDropdownSearch = ({
         );
       } catch (err) {
         if (err instanceof Error && err.name === "AbortError") {
-          console.log("Request aborted");
+          // تم إلغاء الطلب - هذا أمر طبيعي عند البحث السريع
+          console.log("Request aborted - this is normal during fast typing");
           return;
         }
 
         if (isMountedRef.current) {
           const errorMessage =
             err instanceof Error ? err.message : "Unknown error";
+          console.warn("Dropdown search error:", errorMessage);
           setError(errorMessage);
         }
       } finally {

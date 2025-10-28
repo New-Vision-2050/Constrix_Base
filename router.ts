@@ -4,6 +4,10 @@ export const ROUTER = {
   Products: "/stores/products",
   Brands: "/stores/brands",
   Categories: "/stores/categories",
+  Terms: "/stores/terms",
+  warehouse: "/stores/warehouse",
+  Discounts: "/stores/discounts",
+  Coupons: "/stores/coupons",
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",
@@ -30,5 +34,5 @@ export const ROUTER = {
   },
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",
-  SOCIAL_MEDIA: "/stores/social-media",
+  TERMS_CONDITIONS: "/stores/terms",
 };

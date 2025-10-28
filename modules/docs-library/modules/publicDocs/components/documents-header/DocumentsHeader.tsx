@@ -32,6 +32,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useDocsLibraryCxt } from "@/modules/docs-library/context/docs-library-cxt";
 
 /**
  * DocumentsHeader component for document management interface
@@ -62,6 +63,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     clearSelectedDocs,
     storeSelectedDocument,
   } = usePublicDocsCxt();
+  const { handleRefetchDocsWidgets } = useDocsLibraryCxt();
   const [openDelete, setOpenDelete] = useState(false);
   const [cpMvDialogType, setcpMvDialogType] = useState<"copy" | "move">("copy");
   const [openCopyMoveDialog, setOpenCopyMoveDialog] = useState(false);
@@ -69,7 +71,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
   const [showAdditionalBtns, setShowAdditionalBtns] = useState(false);
 
   const isDirectory = useMemo(
-    () => !Boolean(selectedDocs?.[0]?.reference_number),
+    () => !Boolean(selectedDocs?.[0]?.is_file),
     [selectedDocs]
   );
 
@@ -85,6 +87,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
       toast.success(t("deleteSuccess"));
       setOpenDelete(false);
       refetchDocs();
+      if (!isDirectory) handleRefetchDocsWidgets();
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || error?.message;
       toast.error(errorMsg || t("deleteFailed"));
@@ -128,7 +131,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
   const handleDownload = async () => {
     try {
-      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.is_file));
       if (files?.length === 0) {
         toast.error("يجب اختيار ملف");
         return;
@@ -173,7 +176,7 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
 
   const handleFavorite = async () => {
     try {
-      const files = selectedDocs?.filter((doc) => Boolean(doc?.reference_number));
+      const files = selectedDocs?.filter((doc) => Boolean(doc?.is_file));
       if (files?.length === 0) {
         toast.error("يجب اختيار ملف");
         return;
@@ -345,8 +348,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
                 setOpenCopyMoveDialog(true);
               }}
               disabled={
-                selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.reference_number) ||
+                selectedDocs?.length == 0 ||
+                selectedDocs?.filter((doc) => !doc.is_file).length > 0 ||
                 !can(PERMISSIONS.library.file.update)
               }
             >
@@ -354,7 +357,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {t("copy")}
             </Button>
             {/* request file button */}
-            <Button disabled variant="outline" className="bg-sidebar h-10" size="sm">
+            <Button
+              disabled
+              variant="outline"
+              className="bg-sidebar h-10"
+              size="sm"
+            >
               <FileText className="mr-2 h-4 w-4" />
               {t("requestFile")}
             </Button>
@@ -386,7 +394,12 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
               {t("download")}
             </Button>
             {/* favorite button */}
-            <Button variant="outline" onClick={handleFavorite} className="bg-sidebar h-10" size="sm">
+            <Button
+              variant="outline"
+              onClick={handleFavorite}
+              className="bg-sidebar h-10"
+              size="sm"
+            >
               <Star className="mr-2 h-4 w-4" />
               {t("favorite")}
             </Button>
@@ -400,8 +413,8 @@ const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
                 setOpenCopyMoveDialog(true);
               }}
               disabled={
-                selectedDocs?.length != 1 ||
-                !Boolean(selectedDocs?.[0]?.reference_number) ||
+                selectedDocs?.length == 0 ||
+                selectedDocs?.filter((doc) => !doc.is_file).length > 0 ||
                 !can(PERMISSIONS.library.file.update)
               }
             >

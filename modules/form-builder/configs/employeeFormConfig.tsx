@@ -3,6 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { useTranslations } from "next-intl";
 import { RetrieveEmployeeFormConfig } from "@/modules/program-settings/users-settings/config/RetrieveEmployeeFormConfig";
 import RetrieveEmployeeData from "@/modules/program-settings/components/retrieve-employee-data";
+import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
 export function employeeFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -46,76 +47,21 @@ export function employeeFormConfig(
             label: "user_id",
             type: "hiddenObject",
           },
+          // new email
           {
-            name: "first_name",
-            label: "اسم الموظف الاول",
-            type: "text",
-            placeholder: "ادخل اسم الموظف الاول",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "اسم الموظف الاول مطلوب",
-              },
-              {
-                type: "pattern",
-                value: /^[\p{Script=Arabic}\s]+$/u,
-                message: t("Validation.arabicFirstName"),
-              },
-              {
-                type: "minLength",
-                value: 2,
-                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
-              },
-            ],
+            name: "newEmail",
+            label: "newEmail",
+            type: "hiddenObject",
+            defaultValue: false,
           },
+          // mail is received
           {
-            name: "last_name",
-            label: "اسم الموظف الأخير",
-            type: "text",
-            placeholder: "اسم الموظف الأخير",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "الاسم مطلوب",
-              },
-              {
-                type: "pattern",
-                value: /^[\p{Script=Arabic}\s]+$/u,
-                message: t("Validation.arabicLastName"),
-              },
-              {
-                type: "minLength",
-                value: 2,
-                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
-              },
-            ],
-          },
-          {
-            name: "country_id",
-            label: "الجنسية",
-            type: "select",
-            placeholder: "اختر الجنسية",
-            dynamicOptions: {
-              url: `${baseURL}/countries`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: "الجنسية مطلوب",
-              },
-            ],
-          },
+            name: "mailReceived",
+            label: "mailReceived",
+            type: "hiddenObject",
+            defaultValue: false,
+          }, ////phone,first_name,last_name,country_id
+          // email
           {
             name: "email",
             label: "البريد الإلكتروني",
@@ -163,6 +109,33 @@ export function employeeFormConfig(
                   successCondition: (response) => {
                     const userId = response.payload?.[0]?.id || "";
                     const roles = response.payload?.[0]?.roles || [];
+
+                    // check new email
+                    const status_in_all_companies =
+                      response.payload?.[0]?.status_in_all_companies || 0;
+                    const status_in_company =
+                      response.payload?.[0]?.status_in_company || 0;
+                    if (
+                      status_in_all_companies === 0 &&
+                      status_in_company === 0
+                    ) {
+                      useFormStore.getState().setValues(formId, {
+                        newEmail: true,
+                      });
+                      useFormStore.getState().setValues(formId, {
+                        mailReceived: true,
+                      });
+                      return true;
+                    }
+
+                    // not new email
+                    useFormStore.getState().setValues(formId, {
+                      newEmail: false,
+                    });
+                    useFormStore.getState().setValues(formId, {
+                      mailReceived: true,
+                    });
+
                     // Update the roles in the form store
                     if (roles.length > 0) {
                       useFormStore.getState().setValues(formId, {
@@ -199,6 +172,118 @@ export function employeeFormConfig(
               },
             ],
           },
+          // firstName
+          {
+            name: "first_name",
+            label: "اسم الموظف الاول",
+            type: "text",
+            placeholder: "ادخل اسم الموظف الاول",
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "اسم الموظف الاول مطلوب",
+              },
+              {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicFirstName"),
+              },
+              {
+                type: "minLength",
+                value: 2,
+                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
+              },
+            ],
+            condition: (values) => values.newEmail == true,
+          },
+          {
+            name: "first_name",
+            label: "اسم الموظف الاول",
+            type: "text",
+            placeholder: "ادخل اسم الموظف الاول",
+            disabled: true,
+            condition: (values) => values.newEmail == false,
+          },
+          // lastName
+          {
+            name: "last_name",
+            label: "اسم الموظف الأخير",
+            type: "text",
+            placeholder: "اسم الموظف الأخير",
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "الاسم مطلوب",
+              },
+              {
+                type: "pattern",
+                value: /^[\p{Script=Arabic}\s]+$/u,
+                message: t("Validation.arabicLastName"),
+              },
+              {
+                type: "minLength",
+                value: 2,
+                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
+              },
+            ],
+            condition: (values) => values.newEmail == true,
+          },
+          {
+            name: "last_name",
+            label: "اسم الموظف الأخير",
+            type: "text",
+            placeholder: "اسم الموظف الأخير",
+            disabled: true,
+            condition: (values) => values.newEmail == false,
+          },
+          // country
+          {
+            name: "country_id",
+            label: "الجنسية",
+            type: "select",
+            placeholder: "اختر الجنسية",
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            required: true,
+            validation: [
+              {
+                type: "required",
+                message: "الجنسية مطلوب",
+              },
+            ],
+            condition: (values) => values.newEmail == true,
+          },
+          {
+            name: "country_id",
+            label: "الجنسية",
+            type: "select",
+            placeholder: "اختر الجنسية",
+            dynamicOptions: {
+              url: `${baseURL}/countries`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.newEmail == false,
+          },
+          // phone
           {
             name: "phone",
             label: "الهاتف",
@@ -209,7 +294,22 @@ export function employeeFormConfig(
               { type: "required", message: "رقم الهاتف مطلوب" },
               { type: "phone", message: "رقم الهاتف غير صحيح" },
             ],
+            condition: (values) => values.newEmail == true,
           },
+          {
+            name: "phone",
+            label: "الهاتف",
+            type: "phone",
+            placeholder: "يرجى إدخال رقم هاتفك.",
+            required: true,
+            validation: [
+              { type: "required", message: "رقم الهاتف مطلوب" },
+              { type: "phone", message: "رقم الهاتف غير صحيح" },
+            ],
+            disabled: true,
+            condition: (values) => values.newEmail == false,
+          },
+          // jobTitle
           {
             type: "select",
             name: "job_title_id",
@@ -227,6 +327,46 @@ export function employeeFormConfig(
               totalCountHeader: "X-Total-Count",
               filterParam: "id",
             },
+            condition: (values) => values.mailReceived == true,
+          },
+          {
+            name: "job_title_id",
+            label: "المسمى الوظيفي",
+            type: "select",
+            placeholder: "اختر المسمى الوظيفي",
+            dynamicOptions: {
+              url: `${baseURL}/job_titles/list`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              filterParam: "id",
+            },
+            disabled: true,
+            condition: (values) => values.mailReceived == false,
+          },
+          // branch
+          {
+            name: "branch_id",
+            label: "الفرع",
+            type: "select",
+            placeholder: "اختر الفرع",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/list?type=branch`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            condition: (values) => values.mailReceived == true,
           },
           {
             name: "branch_id",
@@ -244,6 +384,20 @@ export function employeeFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            disabled: true,
+            condition: (values) => values.mailReceived == false,
+          },
+          // status
+          {
+            name: "status",
+            label: "حالة الموظف",
+            type: "select",
+            placeholder: "اختر حالة الموظف",
+            options: [
+              { label: "نشط", value: "1" },
+              { label: "غير نشط", value: "0" },
+            ],
+            condition: (values) => values.mailReceived == true,
           },
           {
             name: "status",
@@ -254,10 +408,24 @@ export function employeeFormConfig(
               { label: "نشط", value: "1" },
               { label: "غير نشط", value: "0" },
             ],
+            disabled: true,
+            condition: (values) => values.mailReceived == false,
           },
         ],
       },
     ],
+    onSubmit: async (formData) => {
+      console.log("formData10111", formData);
+      const body = {
+        ...formData,
+        country_id: Boolean(formData?.country_id) ? formData?.country_id : null,
+        first_name: formData?.first_name || null,
+        last_name: formData?.last_name || null,
+        phone: formData?.phone || null
+      };
+
+      return await defaultSubmitHandler(body, employeeFormConfig(t));
+    },
     submitButtonText: "حفظ",
     cancelButtonText: "إلغاء",
     showReset: false,

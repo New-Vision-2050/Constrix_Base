@@ -36,6 +36,7 @@ export default function InvalidClientMailDialog({ formId, btnText }: PropsT) {
         clientName: userData.name,
         phone: userData.phone,
         residence: userData.residence,
+        emailisReceived: true,
       });
       // set error to null
       useFormStore.getState().setError(formId, "email", null);

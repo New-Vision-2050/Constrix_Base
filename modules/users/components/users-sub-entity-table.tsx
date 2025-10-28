@@ -38,6 +38,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
     canDelete: can(entityPermissions.delete),
     canEdit: can(entityPermissions.update),
     canView: can(entityPermissions.view),
+    registrationFormSlug
   });
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"

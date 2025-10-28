@@ -34,6 +34,7 @@ export default function InvalidBrokerMailDialog({ formId, btnText }: PropsT) {
         brokerName: userData.name,
         phone: userData.phone,
         residence: userData.residence,
+        emailisReceived: true,
       });
       // set error to null
       useFormStore.getState().setError(formId, "email", null);

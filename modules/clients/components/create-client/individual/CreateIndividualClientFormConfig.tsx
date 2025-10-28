@@ -13,11 +13,10 @@ export function getCreateIndividualClientFormConfig(
   currentEmpBranchId?: string,
   currentEmpId?: string,
   isShareClient?: boolean,
-  companyBranchesIds?: string[]
+  companyBranchesIds?: string[],
+  sub_entity_id?: string,
 ): FormConfig {
   const formId = "individual-client-form";
-
-  console.log("isShareClient", isShareClient, companyBranchesIds);
 
   return {
     formId,
@@ -27,12 +26,23 @@ export function getCreateIndividualClientFormConfig(
       enabled: true,
       errorsPath: "errors", // This is the default in Laravel
     },
-    // initialValues: {
-    //   branch_ids: companyBranchesIds ?? [],
-    // },
     sections: [
       {
         fields: [
+          // disabled fields
+          {
+            name: "emailisReceived",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
+          // new email
+          {
+            name: "newEmail",
+            label: "",
+            type: "hiddenObject",
+            defaultValue: false,
+          },
           //  dialog hidden message
           {
             name: "dialogMessage",
@@ -104,8 +114,20 @@ export function getCreateIndividualClientFormConfig(
 
                     if (!statusInCompany && !statusInAllCompanies) {
                       // not exist in system continue
+                      useFormStore.getState().setValues(formId, {
+                        emailisReceived: true,
+                      });
+                      useFormStore.getState().setValues(formId, {
+                        newEmail: true,
+                      });
                       return true;
                     }
+                    useFormStore.getState().setValues(formId, {
+                      emailisReceived: false,
+                    });
+                    useFormStore.getState().setValues(formId, {
+                      newEmail: false,
+                    });
                     const _user = {
                       userId: userId,
                       email: response.payload?.[0]?.email || "",
@@ -113,7 +135,6 @@ export function getCreateIndividualClientFormConfig(
                       phone: response.payload?.[0]?.phone || "",
                       residence: response.payload?.[0]?.residence || "",
                     };
-
                     // store user id
                     useFormStore.getState().setValues(formId, {
                       user: JSON.stringify(_user),
@@ -223,6 +244,35 @@ export function getCreateIndividualClientFormConfig(
               },
             ],
           },
+          /////=======> Disabled Fields
+          {
+            name: "phone",
+            label: t("form.phone"),
+            type: "phone",
+            disabled: true,
+            placeholder: t("form.phonePlaceholder"),
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "name",
+            label: t("form.name"),
+            type: "text",
+            placeholder: t("form.namePlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          {
+            name: "residence",
+            label: t("form.identity"),
+            type: "text",
+            placeholder: t("form.identityPlaceholder"),
+            disabled: true,
+            condition: (values) =>
+              values.emailisReceived == false || values.newEmail == false,
+          },
+          //======================
           // phone
           {
             name: "phone",
@@ -236,6 +286,7 @@ export function getCreateIndividualClientFormConfig(
                 message: t("form.phoneInvalid"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // name
           {
@@ -267,6 +318,7 @@ export function getCreateIndividualClientFormConfig(
                 message: t("form.nameMinLength"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // address dialog
           {
@@ -276,6 +328,7 @@ export function getCreateIndividualClientFormConfig(
             render: () => {
               return <AddressDialog formId={formId} />;
             },
+            condition: (values) => values.emailisReceived == true,
           },
           // identity --> residence
           {
@@ -305,6 +358,7 @@ export function getCreateIndividualClientFormConfig(
                 message: t("form.identityPattern"),
               },
             ],
+            condition: (values) => values.newEmail == true,
           },
           // branchs
           {
@@ -324,10 +378,12 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
             disabled: isShareClient,
             condition: (values) => {
-              return !!isShareClient;
+              return !!isShareClient && values.emailisReceived == true;
             },
           },
           {
@@ -347,10 +403,12 @@ export function getCreateIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
             disabled: isShareClient,
             condition: (values) => {
-              return !isShareClient;
+              return !isShareClient && values.emailisReceived == true;
             },
           },
           // broker
@@ -370,6 +428,7 @@ export function getCreateIndividualClientFormConfig(
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
             },
+            condition: (values) => values.emailisReceived == true,
           },
           // chat mail
           {
@@ -377,6 +436,81 @@ export function getCreateIndividualClientFormConfig(
             label: t("form.correspondenceAddress"),
             type: "text",
             placeholder: t("form.correspondenceAddressPlaceholder"),
+            condition: (values) => values.emailisReceived == true,
+          },
+          /////=======> Disabled Fields
+          {
+            name: "branch_ids_all",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              selectAll: isShareClient,
+              paginationEnabled: false,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "branch_ids",
+            label: t("form.branches"),
+            type: "select",
+            isMulti: true,
+            placeholder: t("form.branchesPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              setFirstAsDefault: true,
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "broker_id",
+            label: t("form.broker"),
+            type: "select",
+            placeholder: t("form.brokerPlaceholder"),
+            dynamicOptions: {
+              url: `${baseURL}/company-users/brokers`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
+          },
+          {
+            name: "chat_mail",
+            label: t("form.correspondenceAddress"),
+            type: "text",
+            placeholder: t("form.correspondenceAddressPlaceholder"),
+            disabled: true,
+            condition: (values) => values.emailisReceived == false,
           },
         ],
       },
@@ -387,6 +521,7 @@ export function getCreateIndividualClientFormConfig(
       return await defaultSubmitHandler(
         {
           ...formData,
+          sub_entity_id,
           branch_ids: isShareClient
             ? formData.branch_ids_all
             : formData.branch_ids,

@@ -30,7 +30,7 @@ export default function ItemDetails() {
   const t = useTranslations("docs-library.publicDocs.ActivityLogs");
   const { selectedDocument } = usePublicDocsCxt();
   const isDirectory = useMemo(
-    () => !Boolean(selectedDocument?.reference_number),
+    () => !Boolean(selectedDocument?.is_file),
     [selectedDocument]
   );
   const { data: itemLogs, isLoading } = useDocActivityLogs(

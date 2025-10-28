@@ -238,7 +238,11 @@
     "ecommerce": "المتجر",
     "CRMSettings": "اعدادات علاقات العملاء",
     "docs-library": "مستندات والبيانات",
-    "docs-library-docs": "المستندات"
+    "docs-library-docs": "المستندات",
+    "Terms": "الشروط والأحكام",
+    "Warehouse": "المخازن",
+    "Discounts": "الخصومات والكوبونات",
+    "Coupons": "الكوبونات"
   },
   "docs-library": {
     "title": "مكتبة المستندات",
@@ -982,7 +986,10 @@
         "delete": "حذف",
         "confirm": "تأكيد",
         "deleteConfirm": "تأكيد الحذف",
+        "deleteQuestion": "هل أنت متاكد من الحذف؟",
         "deleteConfirmMessage": "تأكيد حذف نوع المستند",
+        "deleteSuccess": "تم حذف بنجاح",
+        "deleteError": "فشل حذف",
         "errorCase": {
           "title": "فشل في تحميل أنواع المستندات",
           "description": "يرجى التحقق من اتصالك ومحاولة مرة أخرى.",
@@ -2282,5 +2289,28 @@
         }
       }
     }
+  },
+  "coupon": {
+    "singular": "قسيمة",
+    "plural": "قسائم",
+    "codeRequired": "كود القسيمة مطلوب",
+    "imageRequired": "صورة القسيمة مطلوبة",
+    "createSuccess": "تم إضافة القسيمة بنجاح",
+    "createError": "فشل في إضافة القسيمة",
+    "updateSuccess": "تم تحديث القسيمة بنجاح",
+    "updateError": "فشل في تحديث القسيمة",
+    "validationError": "خطأ في التحقق من البيانات",
+    "save": "حفظ",
+    "addCoupon": "إضافة قسيمة",
+    "editCoupon": "تعديل قسيمة"
+  },
+   "terms": {
+    "plural": "الشروط والأحكام",
+    "singular": "الشرط",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "enterContent": "أدخل المحتوى هنا...",
+    "updateSuccess": "تم التحديث بنجاح",
+    "updateError": "فشل التحديث. يرجى المحاولة مرة أخرى."
   }
 }
