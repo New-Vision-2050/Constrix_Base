@@ -14,17 +14,17 @@ function PagesSettingView() {
         tabs={[
           {
             label: "الرئيسية",
-            value: "main-page",
+            value: "home",
             component: <MainPageView />,
           },
           {
             label: "الخصومات",
-            value: "discounts",
+            value: "discount",
             component: <DiscountsView />,
           },
           {
             label: "الوصول جديدنا",
-            value: "new-arrivals",
+            value: "new-arrival",
             component: <NewArrivalsView />,
           },
           {
@@ -38,7 +38,7 @@ function PagesSettingView() {
             component: <AboutUsView />,
           },
         ]}
-        defaultValue="main-page"
+        defaultValue="home"
         variant="primary"
       />
     </div>
