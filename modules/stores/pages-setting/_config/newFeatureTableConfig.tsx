@@ -23,17 +23,15 @@ export const useNewFeatureTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "new-feature-list-table",
-    url: `${baseURL}/ecommerce/dashboard/new-features`,
-    deleteUrl: `${baseURL}/ecommerce/dashboard/new-features`,
+    url: `${baseURL}/ecommerce/dashboard/features`,
+    deleteUrl: `${baseURL}/ecommerce/dashboard/features`,
     columns: [
       {
         key: "name",
         label: "الاسم",
         sortable: false,
         render: (_: unknown, row: NewFeatureRow) => (
-          <span className="text-sm font-medium">
-            {row.name || "-"}
-          </span>
+          <span className="text-sm font-medium">{row.name || "-"}</span>
         ),
       },
       {
