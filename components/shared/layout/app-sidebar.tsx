@@ -362,24 +362,32 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         ],
         sub_entities: [
           {
-            name: t("product.plural"),
+            name: t("Sidebar.Products"),
             url: ROUTER.Products,
             icon: UserIcon,
             isActive: pageName === ROUTER.Products,
             show: true,
           },
+
           {
-            name: t("brand.plural"),
-            url: ROUTER.Brands,
+            name: t("Sidebar.Requests"),
+            url: ROUTER.requests,
             icon: UserIcon,
-            isActive: pageName === ROUTER.Brands,
+            isActive: pageName === ROUTER.requests,
             show: true,
           },
           {
-            name: t("category.plural"),
+            name: t("Sidebar.Categories"),
             url: ROUTER.Categories,
             icon: UserIcon,
             isActive: pageName === ROUTER.Categories,
+            show: true,
+          },
+          {
+            name: t("Sidebar.Brands"),
+            url: ROUTER.Brands,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.Brands,
             show: true,
           },
           {
@@ -390,13 +398,6 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show: true,
           },
           {
-            name: t("Sidebar.Terms"),
-            url: ROUTER.Terms,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.Terms,
-            show: true,
-          },
-          {
             name: t("Sidebar.Warehouse"),
             url: ROUTER.warehouse,
             icon: UserIcon,
@@ -404,24 +405,25 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             show: true,
           },
           {
-            name: t("Sidebar.Requests"),
-            url: ROUTER.requests,
+            name: t("Sidebar.PagesSettings"),
+            url: ROUTER.pagesSettings,
             icon: UserIcon,
-            isActive: pageName === ROUTER.requests,
+            isActive: pageName === ROUTER.pagesSettings,
             show: true,
           },
+          {
+            name: t("Sidebar.Terms"),
+            url: ROUTER.Terms,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.Terms,
+            show: true,
+          },
+
           {
             name: t("Sidebar.SocialMedia"),
             url: ROUTER.SocialMedia,
             icon: UserIcon,
             isActive: pageName === ROUTER.SocialMedia,
-            show: true,
-          },
-          {
-            name: t("Sidebar.PagesSettings"),
-            url: ROUTER.pagesSettings,
-            icon: UserIcon,
-            isActive: pageName === ROUTER.pagesSettings,
             show: true,
           },
         ],

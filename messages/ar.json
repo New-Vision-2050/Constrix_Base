@@ -32,10 +32,23 @@
     "permissions": "صلاحيات",
     "programs": "البرامج",
     "roles": "الصلاحيات",
-    "stores": "المخازن",
+    "stores": "المتجر",
     "social-media": "وسائل التواصل الاجتماعي",
     "user-profile": "ملف المستخدم",
-    "view-my-permissions": "عرض صلاحياتي"
+    "view-my-permissions": "عرض صلاحياتي",
+    "brands": "العلامات التجارية",
+    "warehouse": "المخازن",
+    "categories": "الأقسام",
+    "requests": "الطلبات",
+    "coupons": "الكوبونات",
+    "discounts": "الخصومات",
+    "pages-setting": "إعدادات الصفحات",
+    "stores/products": "المنتجات",
+    "stores/categories": "الأقسام",
+    "stores/requests": "الطلبات",
+    "stores/coupons": "الكوبونات",
+    "stores/pages-setting": "إعدادات الصفحات",
+    "terms": "الشروط والأحكام"
   },
   "common": {
     "itemsPerPage": "عناصر في الصفحة",
@@ -245,7 +258,10 @@
     "Coupons": "الكوبونات",
     "Requests": "الطلبات",
     "SocialMedia": "وسائل التواصل الاجتماعي",
-    "PagesSettings": "إعدادات الصفحات"
+    "PagesSettings": "إعدادات الصفحات",
+    "Products": "المنتجات",
+    "Categories": "الأقسام",
+    "Brands": "العلامات التجارية"
   },
   "docs-library": {
     "title": "مكتبة المستندات",
@@ -1932,6 +1948,7 @@
     "plural": "المخازن",
     "singular": "المخزن",
     "addWarehouse": "اضافة مخزن",
+    "editWarehouse": "تعديل مخزن",
     "warehouseName": "اسم المخزن",
     "isDefault": "مخزن افتراضي",
     "district": "المنطقة",
@@ -2484,56 +2501,56 @@
     "areYouSureDeactivate": "هل أنت متأكد من إلغاء تفعيل هذه الصفحة؟"
   },
   "pagesSettings": {
-      "tabs": {
-        "home": "الرئيسية",
-        "discounts": "الخصومات",
-        "newArrivals": "الوصول جديدنا",
-        "contact": "التواصل",
-        "aboutUs": "من نحن"
-      },
-      "table": {
-        "image": "الصورة",
-        "title": "العنوان",
-        "url": "الرابط",
-        "status": "الحالة",
-        "noImage": "لا توجد صورة"
-      },
-      "sections": {
-        "header": "القسم الرئيسي",
-        "footer": "قسم الذيل"
-      },
-      "fields": {
-        "titleHeader": "عنوان",
-        "descriptionHeader": "وصف",
-        "titleFooter": "عنوان",
-        "descriptionFooter": "وصف",
-        "bannerDetails": "تفاصيل البانر",
-        "bannerTitle": "عنوان البانر",
-        "bannerDescription": "وصف البانر",
-        "bannerImage": "صورة البانر",
-        "bannerUrl": "رابط البانر"
-      },
-      "validation": {
-        "titleRequired": "العنوان مطلوب",
-        "descriptionRequired": "الوصف مطلوب",
-        "fillRequired": "يرجى ملء جميع الحقول المطلوبة بشكل صحيح"
-      },
-      "messages": {
-        "saveSuccess": "تم حفظ التعديلات بنجاح!",
-        "saveError": "فشل في حفظ التعديلات. حاول مرة أخرى.",
-        "createSuccess": "تم إنشاء اللافتة بنجاح",
-        "createError": "فشل في إنشاء اللافتة",
-        "updateSuccess": "تم تحديث اللافتة بنجاح",
-        "updateError": "فشل في تحديث اللافتة"
-      },
-      "actions": {
-        "save": "حفظ",
-        "saving": "جاري الحفظ...",
-        "loading": "جاري التحميل...",
-        "addBanner": "اضافة لافته",
-        "editBanner": "تعديل لافتة",
-        "pageSettings": "إعدادات الصفحة",
-        "cancel": "إلغاء"
-      }
+    "tabs": {
+      "home": "الرئيسية",
+      "discounts": "الخصومات",
+      "newArrivals": "الوصول جديدنا",
+      "contact": "التواصل",
+      "aboutUs": "من نحن"
+    },
+    "table": {
+      "image": "الصورة",
+      "title": "العنوان",
+      "url": "الرابط",
+      "status": "الحالة",
+      "noImage": "لا توجد صورة"
+    },
+    "sections": {
+      "header": "القسم الرئيسي",
+      "footer": "قسم الذيل"
+    },
+    "fields": {
+      "titleHeader": "عنوان",
+      "descriptionHeader": "وصف",
+      "titleFooter": "عنوان",
+      "descriptionFooter": "وصف",
+      "bannerDetails": "تفاصيل البانر",
+      "bannerTitle": "عنوان البانر",
+      "bannerDescription": "وصف البانر",
+      "bannerImage": "صورة البانر",
+      "bannerUrl": "رابط البانر"
+    },
+    "validation": {
+      "titleRequired": "العنوان مطلوب",
+      "descriptionRequired": "الوصف مطلوب",
+      "fillRequired": "يرجى ملء جميع الحقول المطلوبة بشكل صحيح"
+    },
+    "messages": {
+      "saveSuccess": "تم حفظ التعديلات بنجاح!",
+      "saveError": "فشل في حفظ التعديلات. حاول مرة أخرى.",
+      "createSuccess": "تم إنشاء اللافتة بنجاح",
+      "createError": "فشل في إنشاء اللافتة",
+      "updateSuccess": "تم تحديث اللافتة بنجاح",
+      "updateError": "فشل في تحديث اللافتة"
+    },
+    "actions": {
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "loading": "جاري التحميل...",
+      "addBanner": "اضافة لافته",
+      "editBanner": "تعديل لافتة",
+      "pageSettings": "إعدادات الصفحة",
+      "cancel": "إلغاء"
+    }
   }
 }

@@ -9,7 +9,11 @@ export function FeaturesTable() {
   const [editingFeatureId, setEditingFeatureId] = useState<string | null>(null);
 
   const newFeatureTableConfig = useNewFeatureTableConfig({
-    onEdit: (id: string) => setEditingFeatureId(id),
+    onEdit: (id: string) => {
+      setEditingFeatureId(id);
+      // Force dialog to open in next tick to ensure state update is processed
+      setTimeout(() => setEditingFeatureId(id), 0);
+    },
   });
   const { reloadTable: reloadFeatureTable } = useTableReload(
     newFeatureTableConfig.tableId
@@ -25,7 +29,6 @@ export function FeaturesTable() {
       />
 
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">ميزات جديدة</h2>
         <TableBuilder
           config={newFeatureTableConfig}
           searchBarActions={

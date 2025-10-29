@@ -9,7 +9,11 @@ export function BranchesTable() {
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
 
   const branchTableConfig = useBranchTableConfig({
-    onEdit: (id: string) => setEditingBranchId(id),
+    onEdit: (id: string) => {
+      setEditingBranchId(id);
+      // Force dialog to open in next tick to ensure state update is processed
+      setTimeout(() => setEditingBranchId(id), 0);
+    },
   });
   const { reloadTable: reloadBranchTable } = useTableReload(
     branchTableConfig.tableId
@@ -25,7 +29,6 @@ export function BranchesTable() {
       />
 
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">الفروع</h2>
         <TableBuilder
           config={branchTableConfig}
           searchBarActions={
