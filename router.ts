@@ -11,6 +11,7 @@ export const ROUTER = {
   SocialMedia: "/stores/social-media",
   pagesSettings: "/stores/pages-setting",
   Coupons: "/stores/coupons",
+  PaymentMethods: "/stores/payment-methods",
   USERS: "/users",
   SETTINGS: "/settings",
   DASHBOARD: "/dashboard",

@@ -359,6 +359,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.warehouse,
           ROUTER.Discounts,
           ROUTER.Coupons,
+          ROUTER.PaymentMethods,
         ],
         sub_entities: [
           {
@@ -424,6 +425,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.SocialMedia,
             icon: UserIcon,
             isActive: pageName === ROUTER.SocialMedia,
+            show: true,
+          },
+          {
+            name: t("Sidebar.PaymentMethods"),
+            url: ROUTER.PaymentMethods,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.PaymentMethods,
             show: true,
           },
         ],

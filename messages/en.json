@@ -50,6 +50,8 @@
     "stores/requests": "Requests",
     "stores/coupons": "Coupons",
     "stores/pages-setting": "Pages Settings",
+    "payment-methods": "Payment Methods",
+    "stores/payment-methods": "Payment Methods",
     "terms": "Terms & Conditions"
   },
   "common": {
@@ -263,7 +265,8 @@
     "PagesSettings": "Pages Settings",
     "Products": "Products",
     "Categories": "Categories",
-    "Brands": "Brands"
+    "Brands": "Brands",
+    "PaymentMethods": "Payment Methods"
   },
   "docs-library": {
     "title": "Docs Library",
