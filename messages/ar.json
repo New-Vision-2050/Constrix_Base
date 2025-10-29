@@ -48,6 +48,8 @@
     "stores/requests": "الطلبات",
     "stores/coupons": "الكوبونات",
     "stores/pages-setting": "إعدادات الصفحات",
+    "payment-methods": "وسائل الدفع",
+    "stores/payment-methods": "وسائل الدفع",
     "terms": "الشروط والأحكام"
   },
   "common": {
@@ -261,7 +263,8 @@
     "PagesSettings": "إعدادات الصفحات",
     "Products": "المنتجات",
     "Categories": "الأقسام",
-    "Brands": "العلامات التجارية"
+    "Brands": "العلامات التجارية",
+    "PaymentMethods": "وسائل الدفع"
   },
   "docs-library": {
     "title": "مكتبة المستندات",
@@ -2552,5 +2555,23 @@
       "pageSettings": "إعدادات الصفحة",
       "cancel": "إلغاء"
     }
+  },
+  "paymentMethods": {
+    "singular": "وسيلة دفع",
+    "plural": "وسائل الدفع",
+    "methodName": "اسم وسيلة الدفع",
+    "methodNamePlaceholder": "أدخل اسم وسيلة الدفع",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "create": "إضافة وسيلة دفع",
+    "edit": "تعديل وسيلة دفع",
+    "nameRequired": "اسم وسيلة الدفع مطلوب",
+    "createSuccess": "تم إنشاء وسيلة الدفع بنجاح",
+    "createError": "فشل إنشاء وسيلة الدفع",
+    "updateSuccess": "تم تحديث وسيلة الدفع بنجاح",
+    "updateError": "فشل تحديث وسيلة الدفع",
+    "deleteSuccess": "تم حذف وسيلة الدفع بنجاح",
+    "deleteError": "فشل حذف وسيلة الدفع"
   }
 }

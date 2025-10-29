@@ -99,12 +99,14 @@ export const getRoutesMap = (
     discounts: getText("discounts", "الخصومات"),
     "social-media": getText("social-media", "وسائل التواصل الاجتماعي"),
     "pages-setting": getText("pages-setting", "إعدادات الصفحات"),
+    "payment-methods": getText("payment-methods", "وسائل الدفع"),
     terms: getText("terms", "الشروط والأحكام"),
 
     // Nested store routes
     "stores/products": getText("stores/products", "المنتجات"),
     "stores/requests": getText("stores/requests", "الطلبات"),
     "stores/coupons": getText("stores/coupons", "الكوبونات"),
+    "stores/payment-methods": getText("stores/payment-methods", "وسائل الدفع"),
   };
 
   return appRoutesMap;
