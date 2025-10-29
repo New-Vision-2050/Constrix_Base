@@ -12,7 +12,11 @@ export function ContactBannersTable() {
   const t = useTranslations("pagesSettings");
 
   const tableConfig = useContactTableConfig({
-    onEdit: (id: string) => setEditingPageId(id),
+    onEdit: (id: string) => {
+      setEditingPageId(id);
+      // Force dialog to open in next tick to ensure state update is processed
+      setTimeout(() => setEditingPageId(id), 0);
+    },
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
 

@@ -9,7 +9,11 @@ export function BranchesTable() {
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
 
   const branchTableConfig = useBranchTableConfig({
-    onEdit: (id: string) => setEditingBranchId(id),
+    onEdit: (id: string) => {
+      setEditingBranchId(id);
+      // Force dialog to open in next tick to ensure state update is processed
+      setTimeout(() => setEditingBranchId(id), 0);
+    },
   });
   const { reloadTable: reloadBranchTable } = useTableReload(
     branchTableConfig.tableId

@@ -28,6 +28,7 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
   const tCommon = useTranslations("labels");
+  const t = useTranslations("requests.table");
 
   return {
     tableId: "requests-list-table",
@@ -36,12 +37,12 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
     columns: [
       {
         key: "order_serial",
-        label: "معرف الطلب",
+        label: t("orderSerial"),
         sortable: true,
       },
       {
         key: "order_date",
-        label: "تاريخ الطلب",
+        label: t("orderDate"),
         sortable: true,
         render: (_: unknown, row: RequestRow) => (
           <span className="text-sm">{row.order_date || "-"}</span>
@@ -49,7 +50,7 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
       },
       {
         key: "store",
-        label: "المتجر",
+        label: t("store"),
         sortable: false,
         render: (_: unknown, row: RequestRow) => (
           <span className="text-sm">{row.store || "-"}</span>
@@ -58,7 +59,7 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
 
       {
         key: "total_amount",
-        label: "الطلبات المكتملة",
+        label: t("totalAmount"),
         sortable: false,
         render: (_: unknown, row: RequestRow) => (
           <span className="text-sm">{row.total_amount || "-"}</span>
@@ -66,7 +67,7 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
       },
       {
         key: "order_status",
-        label: "الحالة",
+        label: t("status"),
         sortable: false,
         render: (_: unknown, row: RequestRow) => (
           <OrderStatusChip status={row.order_status.order_status} />

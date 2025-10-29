@@ -1916,6 +1916,7 @@
     "plural": "Warehouses",
     "singular": "Warehouse",
     "addWarehouse": "Add Warehouse",
+    "editWarehouse": "Edit Warehouse",
     "warehouseName": "Warehouse Name",
     "isDefault": "Default Warehouse",
     "district": "District",
