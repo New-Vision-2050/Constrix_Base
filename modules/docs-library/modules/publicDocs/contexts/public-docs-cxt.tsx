@@ -123,7 +123,7 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   const [visitedDirs, setVisitedDirs] = useState<DocumentT[]>([]);
 
   // users list
-  const { data: usersList,refetch:refetchUsersList } = useUsersData();
+  const { data: usersList, refetch: refetchUsersList } = useUsersData();
 
   // docToView
   const [docToView, setDocToView] = useState<DocumentT | undefined>(undefined);
@@ -184,7 +184,9 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
     }
   };
 
-  const clearSelectedDocs = () => setSelectedDocs([]);
+  const clearSelectedDocs = () => {
+    setSelectedDocs([]);
+  };
 
   const handleRefetchFoldersList = () => refetchFoldersList();
 

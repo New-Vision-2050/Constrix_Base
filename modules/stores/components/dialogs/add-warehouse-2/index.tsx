@@ -16,6 +16,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import FormLabel from "@/components/shared/FormLabel";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import PlacesPicker, {
@@ -145,16 +153,24 @@ export default function AddWarehouse2Dialog({
 
   // Handle location selection from map
   const handleLocationPick = (location: GoogleMapPickerValue) => {
-    if (location.lat && location.lng) {
-      setValue("latitude", location.lat);
-      setValue("longitude", location.lng);
-    }
-    if (location.address) {
-      // Try to extract district from address
-      const addressParts = location.address.split(",");
-      if (addressParts.length > 1) {
-        setValue("district", addressParts[1].trim());
+    console.log("Location picked:", location);
+    
+    try {
+      if (location.lat && location.lng) {
+        setValue("latitude", location.lat, { shouldValidate: true });
+        setValue("longitude", location.lng, { shouldValidate: true });
+        console.log("Updated latitude:", location.lat, "longitude:", location.lng);
       }
+      
+      if (location.address) {
+        // Try to extract district from address
+        const addressParts = location.address.split(",");
+        if (addressParts.length > 1) {
+          setValue("district", addressParts[1].trim(), { shouldValidate: true });
+        }
+      }
+    } catch (error) {
+      console.error("Error in handleLocationPick:", error);
     }
   };
 
@@ -229,9 +245,9 @@ export default function AddWarehouse2Dialog({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <Label htmlFor="name" className="text-sm text-gray-400">
+                <FormLabel htmlFor="name" required>
                   {t("warehouse.warehouseName")}
-                </Label>
+                </FormLabel>
                 <Input
                   id="name"
                   variant="secondary"
@@ -253,12 +269,12 @@ export default function AddWarehouse2Dialog({
                   onCheckedChange={(checked) => setValue("is_default", checked)}
                   disabled={isSubmitting || isFetching}
                 />
-                <Label
+                <FormLabel
                   htmlFor="is_default"
                   className="text-sm font-medium cursor-pointer text-white"
                 >
                   {t("warehouse.isDefault")}
-                </Label>
+                </FormLabel>
               </div>
             </div>
 
@@ -266,32 +282,37 @@ export default function AddWarehouse2Dialog({
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="country_id"
-                      className="text-sm text-gray-400"
-                    >
+                    <FormLabel htmlFor="country_id" required>
                       {t("location.country")}
-                    </Label>
+                    </FormLabel>
                     <Controller
                       name="country_id"
                       control={control}
                       render={({ field }) => (
-                        <select
-                          id="country_id"
-                          className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
-                          disabled={isSubmitting || isFetching}
+                        <Select
                           value={field.value}
-                          onChange={(e) => field.onChange(e.target.value)}
+                          onValueChange={field.onChange}
+                          disabled={isSubmitting || isFetching}
                         >
-                          <option value="">
-                            {t("warehouse.selectCountry")}
-                          </option>
-                          {countries.map((country) => (
-                            <option key={country.id} value={country.id}>
-                              {country.name}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger
+                            className="bg-sidebar border-white text-white h-12"
+                            showClear={!!field.value}
+                            onClear={() => field.onChange("")}
+                          >
+                            <SelectValue placeholder={t("warehouse.selectCountry")} />
+                          </SelectTrigger>
+                          <SelectContent className="bg-sidebar border-gray-700">
+                            {countries.map((country) => (
+                              <SelectItem
+                                key={country.id}
+                                value={country.id}
+                                className="text-white hover:bg-gray-800"
+                              >
+                                {country.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
                     />
                     {errors.country_id && (
@@ -302,27 +323,37 @@ export default function AddWarehouse2Dialog({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="city_id" className="text-sm text-gray-400">
+                    <FormLabel htmlFor="city_id" required>
                       {t("location.city")}
-                    </Label>
+                    </FormLabel>
                     <Controller
                       name="city_id"
                       control={control}
                       render={({ field }) => (
-                        <select
-                          id="city_id"
-                          className="w-full p-3 bg-sidebar border border-gray-700 rounded-md text-white"
-                          disabled={isSubmitting || isFetching}
+                        <Select
                           value={field.value}
-                          onChange={(e) => field.onChange(e.target.value)}
+                          onValueChange={field.onChange}
+                          disabled={isSubmitting || isFetching}
                         >
-                          <option value="">{t("warehouse.selectCity")}</option>
-                          {cities.map((city) => (
-                            <option key={city.id} value={city.id}>
-                              {city.name}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger
+                            className="bg-sidebar border-white text-white h-12"
+                            showClear={!!field.value}
+                            onClear={() => field.onChange("")}
+                          >
+                            <SelectValue placeholder={t("warehouse.selectCity")} />
+                          </SelectTrigger>
+                          <SelectContent className="bg-sidebar border-gray-700">
+                            {cities.map((city) => (
+                              <SelectItem
+                                key={city.id}
+                                value={city.id}
+                                className="text-white hover:bg-gray-800"
+                              >
+                                {city.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
                     />
                     {errors.city_id && (
@@ -335,9 +366,9 @@ export default function AddWarehouse2Dialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="latitude" className="text-sm text-gray-400">
+                    <FormLabel htmlFor="latitude" required>
                       {t("location.latitude")}
-                    </Label>
+                    </FormLabel>
                     <Input
                       id="latitude"
                       variant="secondary"
@@ -355,12 +386,9 @@ export default function AddWarehouse2Dialog({
                   </div>
 
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="longitude"
-                      className="text-sm text-gray-400"
-                    >
+                    <FormLabel htmlFor="longitude" required>
                       {t("location.longitude")}
-                    </Label>
+                    </FormLabel>
                     <Input
                       id="longitude"
                       variant="secondary"
@@ -380,9 +408,9 @@ export default function AddWarehouse2Dialog({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="street" className="text-sm text-gray-400">
+                    <FormLabel htmlFor="street" required>
                       {t("warehouse.street")}
-                    </Label>
+                    </FormLabel>
                     <Input
                       id="street"
                       variant="secondary"
@@ -398,9 +426,9 @@ export default function AddWarehouse2Dialog({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="district" className="text-sm text-gray-400">
+                    <FormLabel htmlFor="district" required>
                       {t("warehouse.district")}
-                    </Label>
+                    </FormLabel>
                     <Input
                       id="district"
                       variant="secondary"
@@ -418,9 +446,9 @@ export default function AddWarehouse2Dialog({
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm text-gray-400">
+              <FormLabel>
                 {t("warehouse.locationMap")}
-              </Label>
+              </FormLabel>
               <div className="bg-gray-200 rounded-lg overflow-hidden">
                 <PlacesPicker
                   onPick={handleLocationPick}

@@ -33,7 +33,7 @@ export const useOfferTableConfig: (params?: Params) => TableConfig = (
     columns: [
       {
         key: "title",
-        label: "العنوان",
+        label: t("offer.table.title"),
         sortable: true,
         render: (_: unknown, row: OfferRow) => (
           <div className="flex items-center gap-3">
@@ -46,7 +46,7 @@ export const useOfferTableConfig: (params?: Params) => TableConfig = (
                   className="object-cover"
                 />
               ) : (
-                <span className="text-gray-400 text-xs">لا صورة</span>
+                <span className="text-gray-400 text-xs">{t("offer.table.noImage")}</span>
               )}
             </div>
             <span>{row.title}</span>
@@ -55,15 +55,15 @@ export const useOfferTableConfig: (params?: Params) => TableConfig = (
       },
       {
         key: "start_date",
-        label: "تاريخ البدء",
+        label: t("offer.table.startDate"),
       },
       {
         key: "expire_date",
-        label: "تاريخ الانتهاء",
+        label: t("offer.table.endDate"),
       },
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("offer.table.status"),
         render: (value: "active" | "inActive", row: OfferRow) => (
           <TheStatus theStatus={value} id={row.id} />
         ),

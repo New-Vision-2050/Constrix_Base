@@ -23,7 +23,7 @@ export default function MainLayout({
   const isRtl = locale === "ar";
 
   const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const currentTheme = theme === "system" ? systemTheme : theme;
   const isLight = currentTheme === "light";
 
   // handle side effects - clear side-menu when page reload
@@ -53,7 +53,7 @@ export default function MainLayout({
       />{" "}
       <SidebarProvider>
         <AppSidebar name={name} mainLogo={mainLogo} />
-        <SidebarInset className="bg-transparent md:overflow-hidden">
+        <SidebarInset className="bg-transparent md:overflow-hidden border-none">
           <Header />
           {children}
         </SidebarInset>

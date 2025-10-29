@@ -33,29 +33,29 @@ export const useCouponTableConfig: (params?: Params) => TableConfig = (
     columns: [
       {
         key: "code",
-        label: "قسيمة",
+        label: t("coupon.table.code"),
         sortable: true,
       },
       {
         key: "coupon_type",
-        label: "نوع القسيمة",
+        label: t("coupon.table.couponType"),
       },
       {
         key: "discount_amount",
-        label: "الخصم",
+        label: t("coupon.table.discount"),
       },
       {
         key: "max_usage_per_user",
-        label: "حد المستخدم",
+        label: t("coupon.table.userLimit"),
       },
       {
         key: "discount_type",
-        label: "نوع الخصم",
+        label: t("coupon.table.discountType"),
       },
 
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("coupon.table.status"),
         render: (value: "active" | "inActive", row: CouponRow) => (
           <TheStatus theStatus={value} id={row.id} />
         ),

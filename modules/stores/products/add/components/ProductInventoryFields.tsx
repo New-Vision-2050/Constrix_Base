@@ -171,7 +171,10 @@ export default function ProductInventoryFields({
                 disabled={isLoadingCategories}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={
                         isLoadingCategories
@@ -211,7 +214,10 @@ export default function ProductInventoryFields({
                 disabled={!selectedCategoryId || isLoadingSubCategories}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={
                         !selectedCategoryId
@@ -259,7 +265,10 @@ export default function ProductInventoryFields({
                 disabled={!selectedSubCategoryId || isLoadingSubSubCategories}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={
                         !selectedSubCategoryId
@@ -310,7 +319,10 @@ export default function ProductInventoryFields({
                 disabled={isLoadingBrands}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={
                         isLoadingBrands
@@ -390,7 +402,10 @@ export default function ProductInventoryFields({
                 value={field.value || undefined}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue placeholder={t("placeholders.selectType")} />
                   </SelectTrigger>
                 </FormControl>
@@ -430,7 +445,10 @@ export default function ProductInventoryFields({
                   disabled={isLoadingUnits}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger
+                      showClear={!!field.value}
+                      onClear={() => field.onChange("")}
+                    >
                       <SelectValue
                         placeholder={
                           isLoadingUnits
@@ -467,7 +485,10 @@ export default function ProductInventoryFields({
                 value={field.value || undefined}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue placeholder={t("placeholders.selectType")} />
                   </SelectTrigger>
                 </FormControl>
@@ -496,7 +517,10 @@ export default function ProductInventoryFields({
                 disabled={isLoadingWarehouses}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    showClear={!!field.value}
+                    onClear={() => field.onChange("")}
+                  >
                     <SelectValue
                       placeholder={
                         isLoadingWarehouses

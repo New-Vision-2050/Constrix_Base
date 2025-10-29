@@ -31,7 +31,9 @@ export default function ProductImageUpload({ form }: ProductImageUploadProps) {
           dimensions="2160 × 2160"
           required={false}
           onChange={handleMainImageChange}
-          initialValue={typeof mainPhotoValue === 'string' ? mainPhotoValue : undefined}
+          initialValue={
+            typeof mainPhotoValue === "string" ? mainPhotoValue : undefined
+          }
           minHeight="200px"
         />
 
@@ -42,7 +44,12 @@ export default function ProductImageUpload({ form }: ProductImageUploadProps) {
           dimensions="2160 × 2160"
           required={false}
           onMultipleChange={handleOtherImagesChange}
-          initialValue={Array.isArray(otherPhotosValue) && otherPhotosValue.every((v: any) => typeof v === 'string') ? otherPhotosValue : undefined}
+          initialValue={
+            Array.isArray(otherPhotosValue) &&
+            otherPhotosValue.every((v: any) => typeof v === "string")
+              ? otherPhotosValue
+              : undefined
+          }
           multiple={true}
           accept="image/*"
           minHeight="200px"
