@@ -2411,6 +2411,37 @@
     "updateSuccess": "Updated successfully",
     "updateError": "Failed to update. Please try again."
   },
+  "pagesSettings": {
+    "table": {
+      "image": "Image",
+      "url": "URL",
+      "status": "Status",
+      "noImage": "No Image"
+    },
+    "fields": {
+      "bannerDetails": "Banner Details",
+      "bannerTitle": "Banner Title",
+      "bannerDescription": "Banner Description",
+      "bannerImage": "Banner Image",
+      "bannerUrl": "Banner URL"
+    },
+    "actions": {
+      "addBanner": "Add Banner",
+      "editBanner": "Edit Banner",
+      "pageSettings": "Page Settings",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required"
+    },
+    "messages": {
+      "createSuccess": "Banner created successfully",
+      "updateSuccess": "Banner updated successfully",
+      "createError": "Failed to create banner",
+      "updateError": "Failed to update banner"
+    }
   "socialMedia": {
     "plural": "Social Media",
     "singular": "Social Media",

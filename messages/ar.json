@@ -2468,6 +2468,60 @@
       "fetchStatusesFailed": "فشل في تحميل خيارات الحالة",
       "selectStatus": "الرجاء اختيار حالة",
       "updateFailed": "فشل في تحديث حالة الطلب"
+  "pages": {
+    "active": "نشط",
+    "success": "نجاح",
+    "error": "خطأ",
+    "activatedSuccessfully": "تم تفعيل الصفحة بنجاح",
+    "deactivatedSuccessfully": "تم إلغاء تفعيل الصفحة بنجاح",
+    "failedToUpdateStatus": "فشل تحديث الحالة",
+    "areYouSureReactivate": "هل أنت متأكد من إعادة تفعيل هذه الصفحة؟",
+    "areYouSureDeactivate": "هل أنت متأكد من إلغاء تفعيل هذه الصفحة؟"
+  },
+  "pagesSettings": {
+    "table": {
+      "image": "الصورة",
+      "title": "العنوان",
+      "url": "الرابط",
+      "status": "الحالة",
+      "noImage": "لا توجد صورة"
+    },
+    "sections": {
+      "header": "القسم الرئيسي",
+      "footer": "قسم الذيل"
+    },
+    "fields": {
+      "titleHeader": "عنوان",
+      "descriptionHeader": "وصف",
+      "titleFooter": "عنوان",
+      "descriptionFooter": "وصف",
+      "bannerDetails": "تفاصيل البانر",
+      "bannerTitle": "عنوان البانر",
+      "bannerDescription": "وصف البانر",
+      "bannerImage": "صورة البانر",
+      "bannerUrl": "رابط البانر"
+    },
+    "validation": {
+      "titleRequired": "العنوان مطلوب",
+      "descriptionRequired": "الوصف مطلوب",
+      "fillRequired": "يرجى ملء جميع الحقول المطلوبة بشكل صحيح"
+    },
+    "messages": {
+      "saveSuccess": "تم حفظ التعديلات بنجاح!",
+      "saveError": "فشل في حفظ التعديلات. حاول مرة أخرى.",
+      "createSuccess": "تم إنشاء اللافتة بنجاح",
+      "createError": "فشل في إنشاء اللافتة",
+      "updateSuccess": "تم تحديث اللافتة بنجاح",
+      "updateError": "فشل في تحديث اللافتة"
+    },
+    "actions": {
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "loading": "جاري التحميل...",
+      "addBanner": "اضافة لافته",
+      "editBanner": "تعديل لافتة",
+      "pageSettings": "إعدادات الصفحة",
+      "cancel": "إلغاء"
     }
   }
 }
