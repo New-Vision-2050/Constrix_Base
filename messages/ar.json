@@ -2428,6 +2428,46 @@
     "updateSuccess": "تم التحديث بنجاح",
     "updateError": "فشل التحديث. يرجى المحاولة مرة أخرى."
   },
+  "requests": {
+    "title": "الطلبات",
+    "singular": "طلب",
+    "plural": "الطلبات",
+    "dialog": {
+      "title": "تعديل حالة الطلب",
+      "statusLabel": "حالة الطلب",
+      "selectStatus": "اختر الحالة",
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "cancel": "الغاء"
+    },
+    "table": {
+      "orderId": "معرف الطلب",
+      "orderSerial": "رقم الطلب",
+      "customerInfo": "معلومات العميل",
+      "orderDate": "تاريخ الطلب",
+      "store": "المتجر",
+      "status": "الحالة",
+      "totalAmount": "المبلغ الإجمالي",
+      "completedOrders": "الطلبات المكتملة",
+      "actions": "اجراءات"
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "confirmed": "مؤكد",
+      "processing": "قيد المعالجة",
+      "out_for_delivery": "خارج للتوصيل",
+      "delivered": "تم التوصيل",
+      "returned": "مرتجع",
+      "failed": "فشل",
+      "canceled": "ملغي"
+    },
+    "success": {
+      "statusUpdated": "تم تحديث حالة الطلب بنجاح"
+    },
+    "errors": {
+      "fetchStatusesFailed": "فشل في تحميل خيارات الحالة",
+      "selectStatus": "الرجاء اختيار حالة",
+      "updateFailed": "فشل في تحديث حالة الطلب"
   "pages": {
     "active": "نشط",
     "success": "نجاح",

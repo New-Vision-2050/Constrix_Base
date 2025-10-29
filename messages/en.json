@@ -2467,5 +2467,47 @@
     "failedToUpdateStatus": "Failed to update status",
     "areYouSureReactivate": "Are you sure you want to reactivate this social media?",
     "areYouSureDeactivate": "Are you sure you want to deactivate this social media?"
+  },
+  "requests": {
+    "title": "Requests",
+    "singular": "Request",
+    "plural": "Requests",
+    "dialog": {
+      "title": "Edit Request Status",
+      "statusLabel": "Order Status",
+      "selectStatus": "Select Status",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "table": {
+      "orderId": "Order ID",
+      "orderSerial": "Order Serial",
+      "customerInfo": "Customer Info",
+      "orderDate": "Order Date",
+      "store": "Store",
+      "status": "Status",
+      "totalAmount": "Total Amount",
+      "completedOrders": "Completed Orders",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "processing": "Processing",
+      "out_for_delivery": "Out for Delivery",
+      "delivered": "Delivered",
+      "returned": "Returned",
+      "failed": "Failed",
+      "canceled": "Canceled"
+    },
+    "success": {
+      "statusUpdated": "Request status updated successfully"
+    },
+    "errors": {
+      "fetchStatusesFailed": "Failed to fetch status options",
+      "selectStatus": "Please select a status",
+      "updateFailed": "Failed to update request status"
+    }
   }
 }
