@@ -1,18 +1,33 @@
 "use client";
 
+import TabsGroup from "@/components/shared/TabsGroup";
 import { ContactBannersTable } from "./ContactBannersTable";
 import { BranchesTable } from "./BranchesTable";
 import { FeaturesTable } from "./FeaturesTable";
 
 function ContactView() {
   return (
-    <div className="w-full" dir="rtl">
-      <div className="max-w-8xl mx-auto space-y-8">
-        <ContactBannersTable />
-        <BranchesTable />
-        <FeaturesTable />
-      </div>
-    </div>
+    <TabsGroup
+      tabs={[
+        {
+          label: "لافتات التواصل",
+          value: "banners",
+          component: <ContactBannersTable />,
+        },
+        {
+          label: "الفروع",
+          value: "branches",
+          component: <BranchesTable />,
+        },
+        {
+          label: "ميزات جديدة",
+          value: "features",
+          component: <FeaturesTable />,
+        },
+      ]}
+      defaultValue="banners"
+      variant="primary"
+    />
   );
 }
 

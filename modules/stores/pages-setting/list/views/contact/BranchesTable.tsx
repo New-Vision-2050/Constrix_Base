@@ -29,7 +29,6 @@ export function BranchesTable() {
       />
 
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">الفروع</h2>
         <TableBuilder
           config={branchTableConfig}
           searchBarActions={

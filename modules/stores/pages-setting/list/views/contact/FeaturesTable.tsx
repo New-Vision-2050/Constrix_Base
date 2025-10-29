@@ -29,7 +29,6 @@ export function FeaturesTable() {
       />
 
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">ميزات جديدة</h2>
         <TableBuilder
           config={newFeatureTableConfig}
           searchBarActions={

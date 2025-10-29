@@ -30,7 +30,6 @@ export function ContactBannersTable() {
       />
 
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">لافتات التواصل</h2>
         <TableBuilder
           config={tableConfig}
           searchBarActions={
