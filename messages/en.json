@@ -242,7 +242,10 @@
     "Terms": "Terms & Conditions",
     "Warehouse": "Warehouses",
     "Discounts": "Discounts & Coupons",
-    "Coupons": "Coupons"
+    "Coupons": "Coupons",
+    "Requests": "Requests",
+    "SocialMedia": "Social Media",
+    "PagesSettings": "Pages Settings"
   },
   "docs-library": {
     "title": "Docs Library",
@@ -2411,37 +2414,69 @@
     "updateSuccess": "Updated successfully",
     "updateError": "Failed to update. Please try again."
   },
+  "pages": {
+    "active": "Active",
+    "success": "Success",
+    "error": "Error",
+    "activatedSuccessfully": "Page activated successfully",
+    "deactivatedSuccessfully": "Page deactivated successfully",
+    "failedToUpdateStatus": "Failed to update status",
+    "areYouSureReactivate": "Are you sure you want to reactivate this page?",
+    "areYouSureDeactivate": "Are you sure you want to deactivate this page?"
+  },
   "pagesSettings": {
+    "tabs": {
+      "home": "Home",
+      "discounts": "Discounts",
+      "newArrivals": "New Arrivals",
+      "contact": "Contact",
+      "aboutUs": "About Us"
+    },
     "table": {
       "image": "Image",
+      "title": "Title",
       "url": "URL",
       "status": "Status",
       "noImage": "No Image"
     },
+    "sections": {
+      "header": "Main Section",
+      "footer": "Footer Section"
+    },
     "fields": {
+      "titleHeader": "Title",
+      "descriptionHeader": "Description",
+      "titleFooter": "Title",
+      "descriptionFooter": "Description",
       "bannerDetails": "Banner Details",
       "bannerTitle": "Banner Title",
       "bannerDescription": "Banner Description",
       "bannerImage": "Banner Image",
       "bannerUrl": "Banner URL"
     },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "fillRequired": "Please fill all required fields correctly"
+    },
+    "messages": {
+      "saveSuccess": "Changes saved successfully!",
+      "saveError": "Failed to save changes. Please try again.",
+      "createSuccess": "Banner created successfully",
+      "createError": "Failed to create banner",
+      "updateSuccess": "Banner updated successfully",
+      "updateError": "Failed to update banner"
+    },
     "actions": {
+      "save": "Save",
+      "saving": "Saving...",
+      "loading": "Loading...",
       "addBanner": "Add Banner",
       "editBanner": "Edit Banner",
       "pageSettings": "Page Settings",
-      "save": "Save",
-      "saving": "Saving..."
-    },
-    "validation": {
-      "titleRequired": "Title is required",
-      "descriptionRequired": "Description is required"
-    },
-    "messages": {
-      "createSuccess": "Banner created successfully",
-      "updateSuccess": "Banner updated successfully",
-      "createError": "Failed to create banner",
-      "updateError": "Failed to update banner"
+      "cancel": "Cancel"
     }
+  },
   "socialMedia": {
     "plural": "Social Media",
     "singular": "Social Media",
