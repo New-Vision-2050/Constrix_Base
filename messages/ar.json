@@ -35,7 +35,20 @@
     "stores": "المتجر",
     "social-media": "وسائل التواصل الاجتماعي",
     "user-profile": "ملف المستخدم",
-    "view-my-permissions": "عرض صلاحياتي"
+    "view-my-permissions": "عرض صلاحياتي",
+    "brands": "العلامات التجارية",
+    "warehouse": "المخازن",
+    "categories": "الأقسام",
+    "requests": "الطلبات",
+    "coupons": "الكوبونات",
+    "discounts": "الخصومات",
+    "pages-setting": "إعدادات الصفحات",
+    "stores/products": "المنتجات",
+    "stores/categories": "الأقسام",
+    "stores/requests": "الطلبات",
+    "stores/coupons": "الكوبونات",
+    "stores/pages-setting": "إعدادات الصفحات",
+    "terms": "الشروط والأحكام"
   },
   "common": {
     "itemsPerPage": "عناصر في الصفحة",
@@ -245,7 +258,10 @@
     "Coupons": "الكوبونات",
     "Requests": "الطلبات",
     "SocialMedia": "وسائل التواصل الاجتماعي",
-    "PagesSettings": "إعدادات الصفحات"
+    "PagesSettings": "إعدادات الصفحات",
+    "Products": "المنتجات",
+    "Categories": "الأقسام",
+    "Brands": "العلامات التجارية"
   },
   "docs-library": {
     "title": "مكتبة المستندات",

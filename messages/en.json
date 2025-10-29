@@ -35,7 +35,22 @@
     "social-media": "Social Media",
     "user-profile": "User Profile",
     "users-settings": "Users Settings",
-    "view-my-permissions": "View My Permissions"
+    "view-my-permissions": "View My Permissions",
+    "brands": "Brands",
+    "warehouse": "Warehouses",
+    "categories": "Categories",
+    "requests": "Requests",
+    "coupons": "Coupons",
+    "discounts": "Discounts",
+    "pages-setting": "Pages Settings",
+    "stores/brands": "Brands",
+    "stores/warehouse": "Warehouses",
+    "stores/products": "Products",
+    "stores/categories": "Categories",
+    "stores/requests": "Requests",
+    "stores/coupons": "Coupons",
+    "stores/pages-setting": "Pages Settings",
+    "terms": "Terms & Conditions"
   },
   "common": {
     "itemsPerPage": "Items per page",
@@ -245,7 +260,10 @@
     "Coupons": "Coupons",
     "Requests": "Requests",
     "SocialMedia": "Social Media",
-    "PagesSettings": "Pages Settings"
+    "PagesSettings": "Pages Settings",
+    "Products": "Products",
+    "Categories": "Categories",
+    "Brands": "Brands"
   },
   "docs-library": {
     "title": "Docs Library",

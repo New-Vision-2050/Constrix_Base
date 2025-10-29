@@ -85,10 +85,26 @@ export const getRoutesMap = (
     permissions: getText("permissions", "صلاحيات"),
     programs: getText("programs", "البرامج"),
     roles: getText("roles", "الصلاحيات"),
-    stores: getText("stores", "المخازن"),
+    stores: getText("stores", "المتجر"),
     "user-profile": getText("user-profile", "ملف المستخدم"),
     "view-my-permissions": getText("view-my-permissions", "عرض صلاحياتي"),
     "users-settings": getText("users-settings", "إعدادات المستخدم"),
+
+    // Store routes
+    brands: getText("brands", "العلامات التجارية"),
+    warehouse: getText("warehouse", "المخازن"),
+    categories: getText("categories", "الأقسام"),
+    requests: getText("requests", "الطلبات"),
+    coupons: getText("coupons", "الكوبونات"),
+    discounts: getText("discounts", "الخصومات"),
+    "social-media": getText("social-media", "وسائل التواصل الاجتماعي"),
+    "pages-setting": getText("pages-setting", "إعدادات الصفحات"),
+    terms: getText("terms", "الشروط والأحكام"),
+
+    // Nested store routes
+    "stores/products": getText("stores/products", "المنتجات"),
+    "stores/requests": getText("stores/requests", "الطلبات"),
+    "stores/coupons": getText("stores/coupons", "الكوبونات"),
   };
 
   return appRoutesMap;
