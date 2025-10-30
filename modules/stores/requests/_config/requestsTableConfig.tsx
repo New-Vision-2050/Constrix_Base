@@ -58,12 +58,9 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
       },
 
       {
-        key: "total_amount",
+        key: "total_price",
         label: t("totalAmount"),
         sortable: false,
-        render: (_: unknown, row: RequestRow) => (
-          <span className="text-sm">{row.total_amount || "-"}</span>
-        ),
       },
       {
         key: "order_status",
