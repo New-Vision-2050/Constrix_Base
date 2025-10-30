@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
@@ -22,22 +22,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
-import axios from "axios";
-import { baseURL } from "@/config/axios-config";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import { getCountries } from "@/services/api/shared/countries";
 import { ProductsApi } from "@/services/api/ecommerce/products";
 import { PaymentMethodsApi } from "@/services/api/ecommerce/payment-methods";
-import { RequestsApi } from "@/services/api/ecommerce/requests";
+import { RequestsApi, Client } from "@/services/api/ecommerce/requests";
 import RadioField from "@/modules/form-builder/components/fields/RadioField";
+import MultiSelect from "@/components/shared/MultiSelect";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
     is_guest: z.enum(["existing", "guest"]),
-    customer_id: z.string().optional(),
+    customer_id: z.array(z.string()).optional(),
     customer_name: z.string().min(1, t("form.customerNameRequired")),
     customer_phone: z.string().min(1, t("form.customerPhoneRequired")),
     customer_email: z.string().email(t("form.customerEmailInvalid")),
@@ -45,7 +44,7 @@ const createRequestSchema = (t: (key: string) => string) =>
     country: z.string().min(1, t("form.countryRequired")),
     shipping_address: z.string().min(1, t("form.shippingAddressRequired")),
     order_note: z.string().optional(),
-    product_id: z.string().min(1, t("form.productRequired")),
+    order_items: z.array(z.string()).min(1, t("form.productRequired")),
     quantity: z.number().min(1, t("form.quantityRequired")),
   });
 
@@ -55,12 +54,14 @@ interface AddRequestDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  requestId?: string;
 }
 
 export default function AddRequestDialog({
   open,
   onClose,
   onSuccess,
+  requestId,
 }: AddRequestDialogProps) {
   const isRtl = useIsRtl();
   const t = useTranslations("requests");
@@ -68,6 +69,8 @@ export default function AddRequestDialog({
   const [customerType, setCustomerType] = useState<"existing" | "guest">(
     "existing"
   );
+
+  const isEditMode = Boolean(requestId);
 
   // Fetch payment methods
   const { data: paymentMethodsData } = useQuery({
@@ -93,13 +96,15 @@ export default function AddRequestDialog({
   // Fetch customers (only when guest customer is selected)
   const { data: customersData } = useQuery({
     queryKey: ["customers-list"],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${baseURL}/ecommerce/dashboard/customers`
-      );
-      return response.data;
-    },
+    queryFn: () => RequestsApi.getClients(),
     enabled: open && customerType === "guest",
+  });
+
+  // Fetch request data when editing
+  const { data: requestData } = useQuery({
+    queryKey: ["request-detail", requestId],
+    queryFn: () => RequestsApi.getDetails(requestId!),
+    enabled: open && isEditMode,
   });
 
   const {
@@ -113,6 +118,7 @@ export default function AddRequestDialog({
     resolver: zodResolver(createRequestSchema(t)),
     defaultValues: {
       is_guest: "existing",
+      customer_id: [],
       customer_name: "",
       customer_phone: "",
       customer_email: "",
@@ -120,7 +126,7 @@ export default function AddRequestDialog({
       country: "",
       shipping_address: "",
       order_note: "",
-      product_id: "",
+      order_items: [],
       quantity: 1,
     },
   });
@@ -143,6 +149,28 @@ export default function AddRequestDialog({
     }
   }, [open, reset]);
 
+  // Populate form when editing
+  useEffect(() => {
+    if (isEditMode && requestData?.payload && open) {
+      const request = requestData.payload;
+      const isGuest = request.customer_id ? false : true;
+      reset({
+        is_guest: isGuest ? "guest" : "existing",
+        customer_id: request.customer_id ? [request.customer_id] : [],
+        customer_name: request.customer_name || "",
+        customer_phone: request.customer_phone || "",
+        customer_email: request.customer_email || "",
+        payment_method: request.payment_method || "",
+        country: request.country || "",
+        shipping_address: request.shipping_address || "",
+        order_note: request.order_note || "",
+        order_items: request.items?.map((item) => item.product_id) || [],
+        quantity: request.items?.[0]?.quantity || 1,
+      });
+      setCustomerType(isGuest ? "guest" : "existing");
+    }
+  }, [isEditMode, requestData, open, reset]);
+
   const paymentMethods = paymentMethodsData?.data?.payload || [];
   const countries = countriesData?.data?.payload || [];
   // Handle both array and paginated response structures
@@ -150,27 +178,52 @@ export default function AddRequestDialog({
   const products = Array.isArray(productsPayload)
     ? productsPayload
     : (productsPayload as any)?.data || [];
-  const customers = customersData?.payload?.data || [];
+  const customers = customersData?.payload || [];
 
   const onSubmit = async (data: RequestFormData) => {
     try {
-      const requestBody = {
-        customer_id: customerType === "existing" ? undefined : data.customer_id,
-        is_guest: customerType === "guest",
-        customer_name: data.customer_name,
-        customer_phone: data.customer_phone,
-        customer_email: data.customer_email,
-        payment_method: data.payment_method,
-        country: data.country,
-        shipping_address: data.shipping_address,
-        order_note: data.order_note,
-        product_id: data.product_id,
+      // Transform order_items to include product_id and quantity
+      const orderItems = data.order_items.map((productId) => ({
+        product_id: productId,
         quantity: data.quantity,
-      };
+      }));
 
-      await RequestsApi.create(requestBody);
+      if (isEditMode && requestId) {
+        // Update request - use UpdateRequestPayload format
+        const updateBody = {
+          customer_id:
+            customerType === "guest" ? undefined : data.customer_id?.[0],
+          is_guest: data.is_guest === "existing",
+          customer_name: data.customer_name,
+          customer_phone: data.customer_phone,
+          customer_email: data.customer_email,
+          payment_method: data.payment_method,
+          country: data.country,
+          shipping_address: data.shipping_address,
+          order_note: data.order_note,
+          product_id: data.order_items[0],
+          quantity: data.quantity,
+        };
+        await RequestsApi.update(requestId, updateBody);
+        toast.success(t("updateSuccess"));
+      } else {
+        // Create request - use CreateRequestPayload format
+        const createBody = {
+          customer_id: customerType === "guest" ? null : data.customer_id?.[0],
+          is_guest: data.is_guest === "existing",
+          customer_name: data.customer_name,
+          customer_phone: data.customer_phone,
+          customer_email: data.customer_email,
+          payment_method: data.payment_method,
+          country: data.country,
+          shipping_address: data.shipping_address,
+          order_note: data.order_note,
+          order_items: orderItems,
+        };
+        await RequestsApi.create(createBody);
+        toast.success(t("createSuccess"));
+      }
 
-      toast.success(t("createSuccess"));
       onSuccess?.();
       reset();
       onClose();
@@ -190,15 +243,8 @@ export default function AddRequestDialog({
     }
   };
 
-  const handleClose = () => {
-    if (!isSubmitting) {
-      reset();
-      onClose();
-    }
-  };
-
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
         className={`max-w-3xl w-full bg-sidebar max-h-[90vh] overflow-y-auto ${
           isRtl ? "rtl" : "ltr"
@@ -207,7 +253,7 @@ export default function AddRequestDialog({
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {t("addNewRequest")}
+            {isEditMode ? t("editRequest") : t("addNewRequest")}
           </DialogTitle>
         </DialogHeader>
 
@@ -224,8 +270,8 @@ export default function AddRequestDialog({
                   type: "radio",
                   label: "",
                   options: [
-                    { value: "existing", label: t("form.existingCustomer") },
                     { value: "guest", label: t("form.guestCustomer") },
+                    { value: "existing", label: t("form.existingCustomer") },
                   ],
                   className: "flex justify-end gap-6",
                 }}
@@ -233,6 +279,17 @@ export default function AddRequestDialog({
                 onChange={(value: string) => {
                   setCustomerType(value as "existing" | "guest");
                   setValue("is_guest", value as "existing" | "guest");
+
+                  // Clear customer-related fields when switching
+                  if (value === "existing") {
+                    // Clear customer selector when switching to existing
+                    setValue("customer_id", []);
+                  } else {
+                    // Clear customer details when switching to guest
+                    setValue("customer_name", "");
+                    setValue("customer_phone", "");
+                    setValue("customer_email", "");
+                  }
                 }}
                 onBlur={() => {}}
               />
@@ -244,35 +301,18 @@ export default function AddRequestDialog({
                 <FormLabel required className="text-xs">
                   {t("form.selectCustomer")}
                 </FormLabel>
-                <Select
-                  value={watch("customer_id")}
-                  onValueChange={(value) => {
-                    setValue("customer_id", value);
-                    // Auto-fill customer details when selected
-                    const selectedCustomer = customers.find(
-                      (c: any) => c.id === value
-                    );
-                    if (selectedCustomer) {
-                      setValue("customer_name", selectedCustomer.name || "");
-                      setValue("customer_phone", selectedCustomer.phone || "");
-                      setValue("customer_email", selectedCustomer.email || "");
-                    }
-                  }}
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger className="mt-1 text-white">
-                    <SelectValue
-                      placeholder={t("form.selectCustomerPlaceholder")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer: any) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="mt-1">
+                  <MultiSelect
+                    options={customers.map((customer: Client) => ({
+                      id: customer.id,
+                      name: customer.name,
+                    }))}
+                    value={watch("customer_id") || []}
+                    onChange={(value) => setValue("customer_id", value)}
+                    placeholder={t("form.selectCustomerPlaceholder")}
+                    searchPlaceholder="بحث عن عميل..."
+                  />
+                </div>
               </div>
             )}
 
@@ -329,22 +369,18 @@ export default function AddRequestDialog({
               <FormLabel required className="text-xs">
                 {t("form.product")}
               </FormLabel>
-              <Select
-                value={watch("product_id")}
-                onValueChange={(value) => setValue("product_id", value)}
-                disabled={isSubmitting}
-              >
-                <SelectTrigger className="mt-1 text-white">
-                  <SelectValue placeholder={t("form.selectProduct")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {products.map((product: any) => (
-                    <SelectItem key={product.id} value={product.id}>
-                      {product.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="mt-1">
+                <MultiSelect
+                  options={products.map((product: any) => ({
+                    id: product.id,
+                    name: product.name,
+                  }))}
+                  value={watch("order_items") || []}
+                  onChange={(value) => setValue("order_items", value)}
+                  placeholder={t("form.selectProduct")}
+                  searchPlaceholder="بحث عن منتج..."
+                />
+              </div>
             </div>
 
             {/* Quantity */}
@@ -378,7 +414,7 @@ export default function AddRequestDialog({
                 </SelectTrigger>
                 <SelectContent>
                   {paymentMethods.map((method: any) => (
-                    <SelectItem key={method.id} value={method.id}>
+                    <SelectItem key={method.id} value={method.type}>
                       {method.name}
                     </SelectItem>
                   ))}
@@ -440,7 +476,12 @@ export default function AddRequestDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={handleClose}
+              onClick={() => {
+                if (!isSubmitting) {
+                  reset();
+                  onClose();
+                }
+              }}
               disabled={isSubmitting}
               className="flex-1 text-gray-300 hover:bg-gray-800"
             >

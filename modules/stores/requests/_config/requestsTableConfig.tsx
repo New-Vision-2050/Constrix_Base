@@ -1,7 +1,7 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
-import { EditIcon } from "lucide-react";
+import { EditIcon, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { OrderStatusChip } from "../components/OrderStatusChip";
 
@@ -11,17 +11,18 @@ interface RequestRow {
   customer_name: string;
   customer_phone: string;
   order_date: string;
-  store: string;
+  order_number: string;
   order_status: {
     order_status: string;
     payment_status: string;
   };
-  total_amount: string;
+  total_price: string;
   actions: string;
 }
 
 type Params = {
   onEdit?: (id: string) => void;
+  onAddRequest?: (id: string) => void;
 };
 
 export const useRequestsTableConfig: (params?: Params) => TableConfig = (
@@ -49,18 +50,18 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
         ),
       },
       {
-        key: "store",
-        label: t("store"),
+        key: "order_number",
+        label: t("orderNumber"),
         sortable: false,
-        render: (_: unknown, row: RequestRow) => (
-          <span className="text-sm">{row.store || "-"}</span>
-        ),
       },
 
       {
         key: "total_price",
         label: t("totalAmount"),
         sortable: false,
+        render: (_: unknown, row: RequestRow) => (
+          <span className="text-sm">{`SAR ${row.total_price}` || "-"}</span>
+        ),
       },
       {
         key: "order_status",
@@ -72,15 +73,25 @@ export const useRequestsTableConfig: (params?: Params) => TableConfig = (
       },
     ],
     executions: [
+      // (row) => (
+      //   <DropdownMenuItem onSelect={() => params?.onAddRequest?.(row.id)}>
+      //     <>
+      //       <Plus />
+      //       {tCommon("add")}
+      //     </>
+      //   </DropdownMenuItem>
+      // ),
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
-          <EditIcon />
-          {tCommon("edit")}
+          <>
+            <EditIcon />
+            {tCommon("edit")}
+          </>
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: false,
+      canDelete: true,
     },
   };
 };

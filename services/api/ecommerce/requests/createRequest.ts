@@ -1,7 +1,7 @@
 import { apiClient } from "@/config/axios-config";
 
 export interface CreateRequestPayload {
-  customer_id?: string;
+  customer_id?: string | null;
   is_guest: boolean;
   customer_name: string;
   customer_phone: string;
@@ -10,8 +10,10 @@ export interface CreateRequestPayload {
   country: string;
   shipping_address: string;
   order_note?: string;
-  product_id: string;
-  quantity: number;
+  order_items: Array<{
+    product_id: string;
+    quantity: number;
+  }>;
 }
 
 export interface CreateRequestResponse {

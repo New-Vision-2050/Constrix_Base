@@ -17,6 +17,9 @@ function RequestsView() {
     onEdit: (id: string) => {
       setEditingRequestId(id);
     },
+    onAddRequest: () => {
+      setAddDialogOpen(true);
+    },
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
 
