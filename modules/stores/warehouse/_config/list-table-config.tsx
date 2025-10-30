@@ -47,5 +47,6 @@ export const useWarehousesListTablConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
+    searchParamName: "search",
   };
 };

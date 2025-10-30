@@ -4,7 +4,7 @@ export interface CreateCouponParams {
   coupon_type: string;
   code: string;
   title: string;
-  customer_id?: string | null;
+  customer_id?: string[];
   max_usage_per_user?: number | null;
   discount_type: "percentage" | "fixed";
   discount_amount: number;

@@ -5,25 +5,23 @@ import { useState, useEffect } from "react";
 import { useRequestsTableConfig } from "../../_config/requestsTableConfig";
 import { useTranslations } from "next-intl";
 import { RequestStatusDialog } from "@/modules/stores/components/dialogs/add-requests/RequestStatusDialog";
+import AddRequestDialog from "@/modules/stores/components/dialogs/add-requests/AddRequestDialog";
+import { Button } from "@/components/ui/button";
 
 function RequestsView() {
   const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const t = useTranslations("requests");
 
   const tableConfig = useRequestsTableConfig({
     onEdit: (id: string) => {
       setEditingRequestId(id);
-      // Force dialog to open in next tick
-      setTimeout(() => setDialogOpen(true), 0);
+    },
+    onAddRequest: () => {
+      setAddDialogOpen(true);
     },
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
-
-  // Sync dialog open state with editingRequestId
-  useEffect(() => {
-    setDialogOpen(Boolean(editingRequestId));
-  }, [editingRequestId]);
 
   return (
     <div className="w-full" dir="rtl">
@@ -34,9 +32,23 @@ function RequestsView() {
         onSuccess={() => reloadTable()}
       />
 
+      <AddRequestDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSuccess={() => reloadTable()}
+      />
+
       <div className="max-w-8xl mx-auto">
         {/* Table Section */}
-        <TableBuilder config={tableConfig} tableId={tableConfig.tableId} />
+        <TableBuilder
+          config={tableConfig}
+          tableId={tableConfig.tableId}
+          searchBarActions={
+            <Button onClick={() => setAddDialogOpen(true)}>
+              {t("addNewRequest")}
+            </Button>
+          }
+        />
       </div>
     </div>
   );

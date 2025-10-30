@@ -40,16 +40,6 @@ export const useProductsListTableConfig: (
     url: `${baseURL}/ecommerce/dashboard/products`,
     deleteUrl: `${baseURL}/ecommerce/dashboard/products`,
 
-    // Add row actions for edit and delete
-    executions: [
-      (row) => (
-        <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
-          <Edit className="w-4 h-4" />
-          {t("labels.edit")}
-        </DropdownMenuItem>
-      ),
-    ],
-
     executionConfig: {
       canDelete: true,
     },
@@ -100,6 +90,15 @@ export const useProductsListTableConfig: (
         ),
       },
     ],
+    executions: [
+      (row) => (
+        <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
+          <Edit className="w-4 h-4" />
+          {t("labels.edit")}
+        </DropdownMenuItem>
+      ),
+    ],
+
     searchParamName: "search",
   };
 };

@@ -261,6 +261,7 @@
     "Requests": "الطلبات",
     "SocialMedia": "وسائل التواصل الاجتماعي",
     "PagesSettings": "إعدادات الصفحات",
+    "HomeStore": "الصفحة الرئيسية",
     "Products": "المنتجات",
     "Categories": "الأقسام",
     "Brands": "العلامات التجارية",
@@ -2329,6 +2330,7 @@
     "singular": "قسيمة",
     "plural": "قسائم",
     "table": {
+      "name": "الاسم",
       "code": "قسيمة",
       "couponType": "نوع القسيمة",
       "discount": "الخصم",
@@ -2361,7 +2363,10 @@
     "minPurchase": "الحد الأدنى للشراء (SAR)",
     "maxDiscount": "الحد الأقصى للخصم (SAR)",
     "startDate": "تاريخ البدء",
-    "expireDate": "تاريخ الإنتهاء"
+    "expireDate": "تاريخ الإنتهاء",
+    "selectCouponType": "اختر نوع القسيمة",
+    "freeDelivery": "توصيل مجاني",
+    "firstOrder": "الطلب الأول"
   },
   "dealOfDay": {
     "singular": "صفقة اليوم",
@@ -2466,6 +2471,7 @@
     "table": {
       "orderId": "معرف الطلب",
       "orderSerial": "رقم الطلب",
+      "orderNumber": "عدد المنتجات",
       "customerInfo": "معلومات العميل",
       "orderDate": "تاريخ الطلب",
       "store": "المتجر",
@@ -2491,6 +2497,41 @@
       "fetchStatusesFailed": "فشل في تحميل خيارات الحالة",
       "selectStatus": "الرجاء اختيار حالة",
       "updateFailed": "فشل في تحديث حالة الطلب"
+    },
+    "addNewRequest": "إضافة طلب جديد",
+    "createSuccess": "تم إنشاء الطلب بنجاح",
+    "createError": "فشل في إنشاء الطلب",
+    "form": {
+      "customerType": "العميل",
+      "existingCustomer": "عميل جديد",
+      "guestCustomer": "عميل حالي",
+      "selectCustomer": "العميل",
+      "selectCustomerPlaceholder": "اختر العميل",
+      "customerName": "الاسم",
+      "customerNamePlaceholder": "أدخل اسم العميل",
+      "customerNameRequired": "اسم العميل مطلوب",
+      "paymentMethod": "وسيلة الدفع",
+      "selectPaymentMethod": "اختر وسيلة الدفع",
+      "paymentMethodRequired": "وسيلة الدفع مطلوبة",
+      "country": "الدولة",
+      "selectCountry": "اختر الدولة",
+      "countryRequired": "الدولة مطلوبة",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "أدخل رقم الهاتف",
+      "customerPhoneRequired": "رقم الهاتف مطلوب",
+      "customerEmail": "البريد الإلكتروني",
+      "customerEmailPlaceholder": "أدخل البريد الإلكتروني",
+      "orderDescription": "وصف الحالة",
+      "orderDescriptionPlaceholder": "أدخل وصف الطلب",
+      "product": "المنتج",
+      "selectProduct": "اختر المنتج",
+      "productRequired": "المنتج مطلوب",
+      "quantity": "الكمية",
+      "quantityRequired": "الكمية مطلوبة",
+      "shippingAddress": "عنوان الشحن",
+      "shippingAddressPlaceholder": "أدخل عنوان الشحن",
+      "shippingAddressRequired": "عنوان الشحن مطلوب",
+      "customerEmailInvalid": "البريد الإلكتروني غير صحيح"
     }
   },
   "pages": {
