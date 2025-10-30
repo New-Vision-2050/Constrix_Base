@@ -342,6 +342,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         name: t("Sidebar.ecommerce"),
         icon: SettingsIcon,
         isActive: [
+          ROUTER.HomeStore,
           ROUTER.Products,
           ROUTER.Brands,
           ROUTER.Categories,
@@ -352,6 +353,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         ].includes(pageName),
         slug: SUPER_ENTITY_SLUG.ECOMMERCE,
         urls: [
+          ROUTER.HomeStore,
           ROUTER.Products,
           ROUTER.Brands,
           ROUTER.Categories,
@@ -362,6 +364,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.PaymentMethods,
         ],
         sub_entities: [
+          {
+            name: t("Sidebar.HomeStore"),
+            url: ROUTER.HomeStore,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.HomeStore,
+            show: true,
+          },
           {
             name: t("Sidebar.Products"),
             url: ROUTER.Products,

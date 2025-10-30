@@ -261,6 +261,7 @@
     "Requests": "الطلبات",
     "SocialMedia": "وسائل التواصل الاجتماعي",
     "PagesSettings": "إعدادات الصفحات",
+    "HomeStore": "الصفحة الرئيسية",
     "Products": "المنتجات",
     "Categories": "الأقسام",
     "Brands": "العلامات التجارية",
@@ -2329,6 +2330,7 @@
     "singular": "قسيمة",
     "plural": "قسائم",
     "table": {
+      "name": "الاسم",
       "code": "قسيمة",
       "couponType": "نوع القسيمة",
       "discount": "الخصم",

@@ -263,6 +263,7 @@
     "Requests": "Requests",
     "SocialMedia": "Social Media",
     "PagesSettings": "Pages Settings",
+    "HomeStore": "Home Store",
     "Products": "Products",
     "Categories": "Categories",
     "Brands": "Brands",
@@ -2314,6 +2315,7 @@
     "singular": "Coupon",
     "plural": "Coupons",
     "table": {
+      "name": "Name",
       "code": "Coupon",
       "couponType": "Coupon Type",
       "discount": "Discount",
