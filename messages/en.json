@@ -2540,6 +2540,7 @@
     "table": {
       "orderId": "Order ID",
       "orderSerial": "Order Serial",
+      "orderNumber": "Product Count",
       "customerInfo": "Customer Info",
       "orderDate": "Order Date",
       "store": "Store",

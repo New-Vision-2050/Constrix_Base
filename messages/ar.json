@@ -2361,7 +2361,10 @@
     "minPurchase": "الحد الأدنى للشراء (SAR)",
     "maxDiscount": "الحد الأقصى للخصم (SAR)",
     "startDate": "تاريخ البدء",
-    "expireDate": "تاريخ الإنتهاء"
+    "expireDate": "تاريخ الإنتهاء",
+    "selectCouponType": "اختر نوع القسيمة",
+    "freeDelivery": "توصيل مجاني",
+    "firstOrder": "الطلب الأول"
   },
   "dealOfDay": {
     "singular": "صفقة اليوم",
@@ -2466,6 +2469,7 @@
     "table": {
       "orderId": "معرف الطلب",
       "orderSerial": "رقم الطلب",
+      "orderNumber": "عدد المنتجات",
       "customerInfo": "معلومات العميل",
       "orderDate": "تاريخ الطلب",
       "store": "المتجر",
