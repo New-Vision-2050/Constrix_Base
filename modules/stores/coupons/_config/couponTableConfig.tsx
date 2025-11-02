@@ -32,6 +32,10 @@ export const useCouponTableConfig: (params?: Params) => TableConfig = (
     deleteUrl: `${baseURL}/ecommerce/dashboard/coupons`,
     columns: [
       {
+        key: "name",
+        label: t("coupon.table.name"),
+      },
+      {
         key: "code",
         label: t("coupon.table.code"),
         sortable: true,
@@ -44,10 +48,7 @@ export const useCouponTableConfig: (params?: Params) => TableConfig = (
         key: "discount_amount",
         label: t("coupon.table.discount"),
       },
-      {
-        key: "max_usage_per_user",
-        label: t("coupon.table.userLimit"),
-      },
+
       {
         key: "discount_type",
         label: t("coupon.table.discountType"),

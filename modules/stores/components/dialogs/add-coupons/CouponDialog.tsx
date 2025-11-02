@@ -27,6 +27,8 @@ import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 import { CouponsApi } from "@/services/api/ecommerce/coupons";
+import { getClients } from "@/services/api/shared/clients/getClients";
+import MultiSelect from "@/components/shared/MultiSelect";
 
 const createCouponSchema = (t: (key: string) => string) =>
   z
@@ -34,12 +36,18 @@ const createCouponSchema = (t: (key: string) => string) =>
       coupon_type: z.string().min(1, "نوع القسيمة مطلوب"),
       code: z.string().min(1, "رمز القسيمة مطلوب"),
       title: z.string().min(1, "عنوان القسيمة مطلوب"),
-      customer_id: z.string().optional().nullable(),
+      customer_id: z.array(z.string()).optional(),
       max_usage_per_user: z.coerce.number().optional().nullable(),
       discount_type: z.enum(["percentage", "fixed"]),
-      discount_amount: z.coerce.number().min(0, "مبلغ الخصم يجب أن يكون صفر أو أكبر"),
-      min_purchase: z.coerce.number().min(0, "الحد الأدنى للشراء يجب أن يكون صفر أو أكبر"),
-      max_discount: z.coerce.number().min(0, "الحد الأقصى للخصم يجب أن يكون صفر أو أكبر"),
+      discount_amount: z.coerce
+        .number()
+        .min(0, "مبلغ الخصم يجب أن يكون صفر أو أكبر"),
+      min_purchase: z.coerce
+        .number()
+        .min(0, "الحد الأدنى للشراء يجب أن يكون صفر أو أكبر"),
+      max_discount: z.coerce
+        .number()
+        .min(0, "الحد الأقصى للخصم يجب أن يكون صفر أو أكبر"),
       start_date: z
         .string()
         .min(1, "تاريخ البدء مطلوب")
@@ -91,6 +99,8 @@ export default function CouponDialog({
     handleSubmit,
     reset,
     control,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CouponFormData>({
     resolver: zodResolver(createCouponSchema(t)),
@@ -98,7 +108,7 @@ export default function CouponDialog({
       coupon_type: "",
       code: "",
       title: "",
-      customer_id: "",
+      customer_id: [],
       max_usage_per_user: "" as any,
       discount_type: "fixed",
       discount_amount: "" as any,
@@ -116,6 +126,13 @@ export default function CouponDialog({
     enabled: !!couponId && open,
   });
 
+  // Fetch customers list
+  const { data: clientsData, isLoading: isLoadingClients } = useQuery({
+    queryKey: ["clients"],
+    queryFn: getClients,
+    enabled: open,
+  });
+
   // Populate form when editing
   useEffect(() => {
     if (couponData?.data?.payload) {
@@ -124,7 +141,7 @@ export default function CouponDialog({
         coupon_type: coupon.coupon_type || "",
         code: coupon.code || "",
         title: coupon.title || "",
-        customer_id: coupon.customer_id || "",
+        customer_id: coupon.customer_id ? [coupon.customer_id] : [],
         max_usage_per_user: coupon.max_usage_per_user || null,
         discount_type: coupon.discount_type || "fixed",
         discount_amount: coupon.discount_amount || 0,
@@ -152,7 +169,9 @@ export default function CouponDialog({
         if (validationErrors) {
           // Display all validation errors
           Object.entries(validationErrors).forEach(([field, messages]) => {
-            const errorMessage = Array.isArray(messages) ? messages.join(", ") : messages;
+            const errorMessage = Array.isArray(messages)
+              ? messages.join(", ")
+              : messages;
             toast.error(`${field}: ${errorMessage}`);
           });
           return;
@@ -178,7 +197,9 @@ export default function CouponDialog({
         if (validationErrors) {
           // Display all validation errors
           Object.entries(validationErrors).forEach(([field, messages]) => {
-            const errorMessage = Array.isArray(messages) ? messages.join(", ") : messages;
+            const errorMessage = Array.isArray(messages)
+              ? messages.join(", ")
+              : messages;
             toast.error(`${field}: ${errorMessage}`);
           });
           return;
@@ -189,12 +210,11 @@ export default function CouponDialog({
   });
 
   const onSubmit = async (data: CouponFormData) => {
-    // Always send customer_id as null
+    // Send customer_id as array of IDs to API
     const submitData = {
       ...data,
-      customer_id: null,
-    };
-    
+    } as any;
+
     if (isEditMode) {
       updateMutation.mutate(submitData);
     } else {
@@ -212,6 +232,13 @@ export default function CouponDialog({
 
   const isLoading =
     isFetchingCoupon || createMutation.isPending || updateMutation.isPending;
+
+  // Transform clients data for MultiSelect
+  const customerOptions =
+    clientsData?.payload?.map((client) => ({
+      id: client.id,
+      name: client.name,
+    })) || [];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -251,8 +278,12 @@ export default function CouponDialog({
                       <SelectValue placeholder={t("coupon.selectCouponType")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="free_delivery">{t("coupon.freeDelivery")}</SelectItem>
-                      <SelectItem value="first_order">{t("coupon.firstOrder")}</SelectItem>
+                      <SelectItem value="free_delivery">
+                        {t("coupon.freeDelivery")}
+                      </SelectItem>
+                      <SelectItem value="first_order">
+                        {t("coupon.firstOrder")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -304,35 +335,20 @@ export default function CouponDialog({
           {/* Row 2: العميل, الحد الأقصى لعدد المستخدم, نوع الخصم */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <FormLabel htmlFor="customer_id">
+              <FormLabel className="text-xs">
                 {t("coupon.customer")}
               </FormLabel>
-              <Controller
-                name="customer_id"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value || ""}
-                    onValueChange={field.onChange}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger
-                      className="mt-1 bg-sidebar border-white text-white h-12"
-                      showClear={!!field.value}
-                      onClear={() => field.onChange("")}
-                    >
-                      <SelectValue placeholder={t("coupon.selectCustomer")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">أحمد محمد</SelectItem>
-                      <SelectItem value="2">فاطمة علي</SelectItem>
-                      <SelectItem value="3">محمد حسن</SelectItem>
-                      <SelectItem value="4">سارة خالد</SelectItem>
-                      <SelectItem value="5">عمر يوسف</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+              <div className="mt-1">
+                <MultiSelect
+                  options={customerOptions}
+                  value={watch("customer_id") || []}
+                  onChange={(selectedIds) => {
+                    setValue("customer_id", selectedIds);
+                  }}
+                  placeholder={t("coupon.selectCustomer")}
+                  searchPlaceholder="بحث عن عميل..."
+                />
+              </div>
             </div>
 
             <div>
@@ -367,10 +383,14 @@ export default function CouponDialog({
                       showClear={!!field.value}
                       onClear={() => field.onChange("percentage")}
                     >
-                      <SelectValue placeholder={t("coupon.selectDiscountType")} />
+                      <SelectValue
+                        placeholder={t("coupon.selectDiscountType")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="percentage">{t("coupon.percentage")}</SelectItem>
+                      <SelectItem value="percentage">
+                        {t("coupon.percentage")}
+                      </SelectItem>
                       <SelectItem value="fixed">{t("coupon.fixed")}</SelectItem>
                     </SelectContent>
                   </Select>
