@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import { ModelsTypes } from "./constants/ModelsTypes";
 import UsersSubEntityFormClientModel from "./client-model";
 import UsersSubEntityFormBrokerModel from "./broker-model";
+import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 type PropsT = {
   tableId: string;
@@ -61,7 +62,7 @@ export default function UsersSubEntityForm({
 
   // broker model
   if (registrationFormSlug === ModelsTypes.BROKER) {
-    return <UsersSubEntityFormBrokerModel  sub_entity_id={sub_entity_id} />;
+    return <UsersSubEntityFormBrokerModel sub_entity_id={sub_entity_id} />;
   }
 
   // define sheet form
@@ -72,6 +73,16 @@ export default function UsersSubEntityForm({
           ...finalFormConfig(t, handleCloseForm),
           apiParams: {
             sub_entity_id: sub_entity_id as string,
+          },
+          onSubmit: async (values, formConfig) => {
+            console.log("Form submitted successfully:", values);
+            return await defaultSubmitHandler(
+              {
+                ...values,
+                sub_entity_id,
+              },
+              finalFormConfig(t, handleCloseForm)
+            );
           },
           onSuccess: () => {
             const tableStore = useTableStore.getState();

@@ -46,6 +46,8 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
       : optionalAttr?.includes(field.name || field.key)
   );
 
+  console.log('Subentity');
+
   const tableConfig: TableConfig = {
     ...usersConfig,
     url: `${baseURL}/sub_entities/records/list?sub_entity_id=${sub_entity_id}&registration_form_id=${registration_form_id}`,
