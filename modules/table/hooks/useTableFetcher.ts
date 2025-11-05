@@ -184,8 +184,11 @@ export const createTableFetcher = () => {
       setData(tableData);
       setLoading(false);
     } catch (err: any) {
-      // Don't handle AbortError as an actual error
-      if (!(err instanceof Error && err.name === "AbortError")) {
+      // Don't handle AbortError or CanceledError as an actual error
+      const isAbortError = err instanceof Error && err.name === "AbortError";
+      const isCanceledError = err?.name === "CanceledError" || err?.code === "ERR_CANCELED" || err?.message === "canceled";
+      
+      if (!isAbortError && !isCanceledError) {
         console.log("Error fetching data:", err);
         setError(
           err instanceof Error ? err.message : "An unknown error occurred"
@@ -194,7 +197,7 @@ export const createTableFetcher = () => {
         setLoading(false);
       } else {
         console.log(
-          "Request was aborted, likely due to component unmount or new request"
+          "Request was aborted or canceled, likely due to component unmount or new request"
         );
       }
     }
