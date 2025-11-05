@@ -36,7 +36,6 @@ export function CloneManagement(props: PropsT): FormConfig {
     sections: [
       {
         fields: [
-
           {
             name: "target_parent_id",
             label: "الادارة تابعة إلى",
@@ -45,42 +44,42 @@ export function CloneManagement(props: PropsT): FormConfig {
             required: true,
             // disabled: true,
             dynamicOptions: {
-                url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
+              url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
               totalCountHeader: "X-Total-Count",
             },
-            validation:[
+            validation: [
               {
-                type:"required",
+                type: "required",
                 message: "الادارة تابعة إلى مطلوب",
-              }
-            ]
+              },
+            ],
           },
-            {
-                name: "source_department_id",
-                label: "الادارة التي سيتم تعيينها",
-                type: "select",
-                required: true,
-                placeholder: "الادارة التي سيتم تعيينها",
-                dynamicOptions: {
-                    url: `${baseURL}/management_hierarchies/non-copied?ignore_branch_id=${branchId}`,
-                    valueField: "id",
-                    labelField: "name",
-                    searchParam: "name",
-                    paginationEnabled: true,
-                    disableReactQuery:true,
-                    totalCountHeader: "X-Total-Count",
-                },
-              validation:[
-              {
-                type:"required",
-                message: "الادارة التي سيتم نسخها مطلوب",
-              }
-            ]
+          {
+            name: "source_department_id",
+            label: "الادارة التي سيتم تعيينها",
+            type: "select",
+            required: true,
+            placeholder: "الادارة التي سيتم تعيينها",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/non-copied?ignore_branch_id=${branchId}`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              disableReactQuery: true,
+              totalCountHeader: "X-Total-Count",
             },
+            validation: [
+              {
+                type: "required",
+                message: "الادارة التي سيتم نسخها مطلوب",
+              },
+            ],
+          },
           {
             name: "reference_user_id",
             label: "الشخص المرجعي",
@@ -150,10 +149,10 @@ export function CloneManagement(props: PropsT): FormConfig {
       },
     ],
     initialValues: {
-        target_parent_id: selectedNode?.id?.toString(),
+      target_parent_id: selectedNode?.id?.toString(),
     },
     onSubmit: async (formData) => {
-      const method = isEdit ? "PUT" : "POST";
+      const method = "POST";
       const reqBody = {
         source_department_id: formData.source_department_id,
         target_parent_id: formData.target_parent_id,
@@ -163,7 +162,9 @@ export function CloneManagement(props: PropsT): FormConfig {
 
       return await defaultSubmitHandler(reqBody, _config, {
         method: method,
-        url: `${baseURL}/management_hierarchies/clone-department`,
+        url: `${baseURL}/management_hierarchies/${
+          isEdit ? "clone-department/" + selectedNode?.id : "clone-department"
+        }`,
       });
     },
     onSuccess: () => {
