@@ -79,6 +79,7 @@ export default function UsersSubEntityForm({
             return await defaultSubmitHandler(
               {
                 ...values,
+                country_id: values.country_id == "" ? null : values.country_id,
                 sub_entity_id,
               },
               finalFormConfig(t, handleCloseForm)
