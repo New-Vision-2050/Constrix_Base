@@ -423,8 +423,8 @@
       },
       "createNewFileDialog": {
         "title": "إنشاء ملف جديد",
-        "name": "اسم المجلد",
-        "namePlaceholder": "ادخل اسم المجلد",
+        "name": "اسم الملف",
+        "namePlaceholder": "ادخل اسم الملف",
         "reference_number": "رقم المرجع",
         "reference_numberPlaceholder": "ادخل رقم المرجع",
         "password": "كلمة المرور",
