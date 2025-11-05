@@ -5,7 +5,7 @@ import CheckStatic from "@/public/icons/check-static";
 import PersonStaticIcon from "@/public/icons/person-static";
 
 export const statisticsConfig = {
-  url: `${baseURL}/ecommerce/dashboard/products/statistics`,
+  url: `${baseURL}/ecommerce/warehouses/statistics`,
   icons: [
     <PersonStaticIcon key={1} />,
     <CheckStatic key={2} />,

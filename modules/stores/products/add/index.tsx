@@ -211,7 +211,7 @@ export default function AddProductView() {
         discount_value: data.discount_value || "",
         vat_percentage: data.vat_percentage || "",
         price_includes_vat: data.price_includes_vat ? 1 : 0,
-        shipping_amount: data.shipping_amount ? 1 : 0,
+        shipping_amount: data.shipping_amount || "",
         shipping_included_in_price: data.shipping_included_in_price ? 1 : 0,
 
         // Video URL

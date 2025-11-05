@@ -35,7 +35,24 @@
     "social-media": "Social Media",
     "user-profile": "User Profile",
     "users-settings": "Users Settings",
-    "view-my-permissions": "View My Permissions"
+    "view-my-permissions": "View My Permissions",
+    "brands": "Brands",
+    "warehouse": "Warehouses",
+    "categories": "Categories",
+    "requests": "Requests",
+    "coupons": "Coupons",
+    "discounts": "Discounts",
+    "pages-setting": "Pages Settings",
+    "stores/brands": "Brands",
+    "stores/warehouse": "Warehouses",
+    "stores/products": "Products",
+    "stores/categories": "Categories",
+    "stores/requests": "Requests",
+    "stores/coupons": "Coupons",
+    "stores/pages-setting": "Pages Settings",
+    "payment-methods": "Payment Methods",
+    "stores/payment-methods": "Payment Methods",
+    "terms": "Terms & Conditions"
   },
   "common": {
     "itemsPerPage": "Items per page",
@@ -242,7 +259,15 @@
     "Terms": "Terms & Conditions",
     "Warehouse": "Warehouses",
     "Discounts": "Discounts & Coupons",
-    "Coupons": "Coupons"
+    "Coupons": "Coupons",
+    "Requests": "Requests",
+    "SocialMedia": "Social Media",
+    "PagesSettings": "Pages Settings",
+    "HomeStore": "Home Store",
+    "Products": "Products",
+    "Categories": "Categories",
+    "Brands": "Brands",
+    "PaymentMethods": "Payment Methods"
   },
   "docs-library": {
     "title": "Docs Library",
@@ -1913,6 +1938,7 @@
     "plural": "Warehouses",
     "singular": "Warehouse",
     "addWarehouse": "Add Warehouse",
+    "editWarehouse": "Edit Warehouse",
     "warehouseName": "Warehouse Name",
     "isDefault": "Default Warehouse",
     "district": "District",
@@ -2289,6 +2315,7 @@
     "singular": "Coupon",
     "plural": "Coupons",
     "table": {
+      "name": "Name",
       "code": "Coupon",
       "couponType": "Coupon Type",
       "discount": "Discount",
@@ -2411,6 +2438,69 @@
     "updateSuccess": "Updated successfully",
     "updateError": "Failed to update. Please try again."
   },
+  "pages": {
+    "active": "Active",
+    "success": "Success",
+    "error": "Error",
+    "activatedSuccessfully": "Page activated successfully",
+    "deactivatedSuccessfully": "Page deactivated successfully",
+    "failedToUpdateStatus": "Failed to update status",
+    "areYouSureReactivate": "Are you sure you want to reactivate this page?",
+    "areYouSureDeactivate": "Are you sure you want to deactivate this page?"
+  },
+  "pagesSettings": {
+    "tabs": {
+      "home": "Home",
+      "discounts": "Discounts",
+      "newArrivals": "New Arrivals",
+      "contact": "Contact",
+      "aboutUs": "About Us"
+    },
+    "table": {
+      "image": "Image",
+      "title": "Title",
+      "url": "URL",
+      "status": "Status",
+      "noImage": "No Image"
+    },
+    "sections": {
+      "header": "Main Section",
+      "footer": "Footer Section"
+    },
+    "fields": {
+      "titleHeader": "Title",
+      "descriptionHeader": "Description",
+      "titleFooter": "Title",
+      "descriptionFooter": "Description",
+      "bannerDetails": "Banner Details",
+      "bannerTitle": "Banner Title",
+      "bannerDescription": "Banner Description",
+      "bannerImage": "Banner Image",
+      "bannerUrl": "Banner URL"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "fillRequired": "Please fill all required fields correctly"
+    },
+    "messages": {
+      "saveSuccess": "Changes saved successfully!",
+      "saveError": "Failed to save changes. Please try again.",
+      "createSuccess": "Banner created successfully",
+      "createError": "Failed to create banner",
+      "updateSuccess": "Banner updated successfully",
+      "updateError": "Failed to update banner"
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving...",
+      "loading": "Loading...",
+      "addBanner": "Add Banner",
+      "editBanner": "Edit Banner",
+      "pageSettings": "Page Settings",
+      "cancel": "Cancel"
+    }
+  },
   "socialMedia": {
     "plural": "Social Media",
     "singular": "Social Media",
@@ -2436,5 +2526,101 @@
     "failedToUpdateStatus": "Failed to update status",
     "areYouSureReactivate": "Are you sure you want to reactivate this social media?",
     "areYouSureDeactivate": "Are you sure you want to deactivate this social media?"
+  },
+  "requests": {
+    "title": "Requests",
+    "singular": "Request",
+    "plural": "Requests",
+    "dialog": {
+      "title": "Edit Request Status",
+      "statusLabel": "Order Status",
+      "selectStatus": "Select Status",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "table": {
+      "orderId": "Order ID",
+      "orderSerial": "Order Serial",
+      "orderNumber": "Product Count",
+      "customerInfo": "Customer Info",
+      "orderDate": "Order Date",
+      "store": "Store",
+      "status": "Status",
+      "totalAmount": "Total Amount",
+      "completedOrders": "Completed Orders",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "processing": "Processing",
+      "out_for_delivery": "Out for Delivery",
+      "delivered": "Delivered",
+      "returned": "Returned",
+      "failed": "Failed",
+      "canceled": "Canceled"
+    },
+    "success": {
+      "statusUpdated": "Request status updated successfully"
+    },
+    "errors": {
+      "fetchStatusesFailed": "Failed to fetch status options",
+      "selectStatus": "Please select a status",
+      "updateFailed": "Failed to update request status"
+    },
+    "addNewRequest": "Add New Request",
+    "createSuccess": "Request created successfully",
+    "createError": "Failed to create request",
+    "form": {
+      "customerType": "Customer",
+      "existingCustomer": "Existing Customer",
+      "guestCustomer": "Guest Customer",
+      "selectCustomer": "Customer",
+      "selectCustomerPlaceholder": "Select Customer",
+      "customerName": "Name",
+      "customerNamePlaceholder": "Enter customer name",
+      "customerNameRequired": "Customer name is required",
+      "paymentMethod": "Payment Method",
+      "selectPaymentMethod": "Select Payment Method",
+      "paymentMethodRequired": "Payment method is required",
+      "country": "Country",
+      "selectCountry": "Select Country",
+      "countryRequired": "Country is required",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "customerPhoneRequired": "Phone number is required",
+      "customerEmail": "Email",
+      "customerEmailPlaceholder": "Enter email address",
+      "orderDescription": "Order Description",
+      "orderDescriptionPlaceholder": "Enter order description",
+      "product": "Product",
+      "selectProduct": "Select Product",
+      "productRequired": "Product is required",
+      "quantity": "Quantity",
+      "quantityRequired": "Quantity is required",
+      "shippingAddress": "Shipping Address",
+      "shippingAddressPlaceholder": "Enter shipping address",
+      "shippingAddressRequired": "Shipping address is required",
+      "customerEmailInvalid": "Invalid email address"
+    }
+  },
+  "paymentMethods": {
+    "singular": "Payment Method",
+    "plural": "Payment Methods",
+    "methodName": "Payment Method Name",
+    "methodNamePlaceholder": "Enter payment method name",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "create": "Add Payment Method",
+    "edit": "Edit Payment Method",
+    "nameRequired": "Payment method name is required",
+    "createSuccess": "Payment method created successfully",
+    "createError": "Failed to create payment method",
+    "updateSuccess": "Payment method updated successfully",
+    "updateError": "Failed to update payment method",
+    "deleteSuccess": "Payment method deleted successfully",
+    "deleteError": "Failed to delete payment method"
   }
 }

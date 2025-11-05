@@ -215,11 +215,18 @@ const TableBuilder: React.FC<TableBuilderProps> = ({
   // Show error toast when an error occurs
   React.useEffect(() => {
     if (error) {
-      toast({
-        title: "Error",
-        description: error,
-        variant: "destructive",
-      });
+      // Don't show toast for canceled errors
+      const isCanceledError = 
+        error.toLowerCase().includes("canceled") || 
+        error.toLowerCase().includes("err_canceled");
+      
+      if (!isCanceledError) {
+        toast({
+          title: "Error",
+          description: error,
+          variant: "destructive",
+        });
+      }
     }
   }, [error, toast]);
 

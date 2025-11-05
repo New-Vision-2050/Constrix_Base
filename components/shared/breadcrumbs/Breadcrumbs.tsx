@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { BreadcrumbsProps, BreadcrumbItem } from "./types";
 import { getRoutesMap } from "./routes-map";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
@@ -16,9 +16,10 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
 }) => {
   const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations("breadcrumbs");
 
   // Get routes map based on current language
-  const defaultRoutesMap = getRoutesMap(locale, (t) => t);
+  const defaultRoutesMap = getRoutesMap(locale, t);
 
   // Merge custom routes map with default one
   const routesMap = { ...defaultRoutesMap, ...(customRoutesMap || {}) };

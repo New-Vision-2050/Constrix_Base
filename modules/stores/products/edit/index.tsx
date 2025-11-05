@@ -83,7 +83,7 @@ const createProductSchema = (t: any) =>
         { message: t("product.validation.vatPercentage") }
       ),
     price_includes_vat: z.boolean().default(false),
-    shipping_amount: z.boolean().default(false),
+    shipping_amount: z.string().optional(),
     shipping_included_in_price: z.boolean().default(false),
 
     // Video URL
@@ -153,7 +153,7 @@ export default function EditProductView() {
       discount_value: "",
       vat_percentage: "",
       price_includes_vat: false,
-      shipping_amount: false,
+      shipping_amount: "",
       shipping_included_in_price: false,
 
       // Video URL
@@ -218,9 +218,9 @@ export default function EditProductView() {
             : "",
         price_includes_vat: product.price_includes_vat === 1,
         shipping_amount:
-          product.shipping_amount === true ||
-          product.shipping_amount === 1 ||
-          false,
+          product.shipping_amount != null
+            ? product.shipping_amount.toString()
+            : "",
         shipping_included_in_price: product.shipping_included_in_price === true,
 
         // Video URL
@@ -276,7 +276,7 @@ export default function EditProductView() {
         discount_value: data.discount_value || "",
         vat_percentage: data.vat_percentage || "",
         price_includes_vat: data.price_includes_vat ? 1 : 0,
-        shipping_amount: data.shipping_amount ? 1 : 0,
+        shipping_amount: data.shipping_amount,
         shipping_included_in_price: data.shipping_included_in_price ? 1 : 0,
 
         // Video URL
@@ -299,22 +299,24 @@ export default function EditProductView() {
 
       // Filter out non-File image fields - only send binary File objects
       const submitData: any = { ...formattedData };
-      
+
       // Remove main_photo if it's not a File (it's a URL string or null)
       if (!(submitData.main_photo instanceof File)) {
         delete submitData.main_photo;
       }
-      
+
       // Filter other_photos to only include File objects
       if (submitData.other_photos && Array.isArray(submitData.other_photos)) {
-        const binaryFiles = submitData.other_photos.filter((photo: any) => photo instanceof File);
+        const binaryFiles = submitData.other_photos.filter(
+          (photo: any) => photo instanceof File
+        );
         if (binaryFiles.length === 0) {
           delete submitData.other_photos;
         } else {
           submitData.other_photos = binaryFiles;
         }
       }
-      
+
       // Remove meta_photo if it's not a File
       if (!(submitData.meta_photo instanceof File)) {
         delete submitData.meta_photo;
@@ -323,10 +325,7 @@ export default function EditProductView() {
       console.log("Submit data (binary files only):", submitData);
 
       // Call the API to update the product
-      const response = await ProductsApi.update(
-        productId,
-        submitData
-      );
+      const response = await ProductsApi.update(productId, submitData);
 
       setUploadProgress(90);
 

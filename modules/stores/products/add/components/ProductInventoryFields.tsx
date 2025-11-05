@@ -350,11 +350,6 @@ export default function ProductInventoryFields({
           control={form.control}
           name="country_ids"
           render={({ field }) => {
-            // Convert IDs to names for display
-            const displayNames = (field.value || []).map(
-              (id: string) => countryIdToName[id] || id
-            );
-
             return (
               <FormItem>
                 <FormLabel>{t("fields.country")}</FormLabel>
@@ -363,17 +358,13 @@ export default function ProductInventoryFields({
                     options={
                       isLoadingCountries
                         ? []
-                        : countries.map((c: any) => c.name)
+                        : countries.map((c: any) => ({
+                            id: c.id.toString(),
+                            name: c.name,
+                          }))
                     }
-                    value={displayNames}
-                    onChange={(names) => {
-                      // Convert names back to IDs
-                      const ids = names.map((name) => {
-                        const country = countries.find(
-                          (c: any) => c.name === name
-                        );
-                        return country ? country.id.toString() : name;
-                      });
+                    value={field.value || []}
+                    onChange={(ids) => {
                       field.onChange(ids);
                     }}
                     placeholder={
@@ -381,6 +372,7 @@ export default function ProductInventoryFields({
                         ? t("placeholders.loading")
                         : t("placeholders.selectCountries")
                     }
+                    searchPlaceholder="بحث عن دولة..."
                   />
                 </FormControl>
                 <FormErrorMessage />
