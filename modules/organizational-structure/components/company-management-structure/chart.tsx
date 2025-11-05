@@ -82,6 +82,7 @@ const BranchManagementsStructure = (props: PropsT) => {
   function onClose() {
     refreshOrgChart();
     closeSheet();
+    closeAddSheet();
   }
 
   const onEditBtnClick = useCallback((node: OrgChartNode) => {
