@@ -21,13 +21,12 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     selectedNode,
     branchId,
     onClose,
-    mainBranch
+    mainBranch,
   } = props;
-
 
   const _config: FormConfig = {
     formId: "org-structure-management-form",
-    title: "اضافة ادارة",
+    title: "KKKاضافة ادارة",
     apiUrl: `${baseURL}/management_hierarchies/create-management`,
     laravelValidation: {
       enabled: true,
@@ -35,58 +34,48 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
     },
     sections: [
       {
-        title: "اضافة ادارة",
         fields: [
           {
-            name: "branch_id",
-            label: "branch_id",
-            type: "hiddenObject",
-          },
-          {
-            name: "management_id",
-            label: "الادارة التابعة الى",
+            name: "target_parent_id",
+            label: "الادارة تابعة إلى",
             type: "select",
-            placeholder: "الادارة التابعة الى",
+            placeholder: "الادارة تابعة إلى",
             required: true,
+            // disabled: true,
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/list?type=management&branch_id=${mainBranch?.id}`,
+              url: `${baseURL}/management_hierarchies/list?type=management&parent_children_id=${selectedNode?.branch_id}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
               paginationEnabled: true,
-              disableReactQuery:true,
               totalCountHeader: "X-Total-Count",
             },
             validation: [
               {
                 type: "required",
-                message: "الادارة مطلوب",
+                message: "الادارة تابعة إلى مطلوب",
               },
             ],
           },
           {
-            name: "name",
-            label: "اسم الادارة",
-            type: "text",
-            placeholder: "برجاء إدخال اسم الادارة",
+            name: "source_department_id",
+            label: "الادارة التي سيتم تعيينها",
+            type: "select",
             required: true,
+            placeholder: "الادارة التي سيتم تعيينها",
+            dynamicOptions: {
+              url: `${baseURL}/management_hierarchies/non-copied?ignore_branch_id=${branchId}`,
+              valueField: "id",
+              labelField: "name",
+              searchParam: "name",
+              paginationEnabled: true,
+              disableReactQuery: true,
+              totalCountHeader: "X-Total-Count",
+            },
             validation: [
               {
                 type: "required",
-                message: `اسم الادارة مطلوب`,
-              },
-            ],
-          },
-          {
-            name: "description",
-            label: "وصف الادارة",
-            type: "text",
-            placeholder: "برجاء إدخال وصف الادارة",
-            required: true,
-            validation: [
-              {
-                type: "required",
-                message: `وصف الادارة مطلوب`,
+                message: "الادارة التي سيتم نسخها مطلوب",
               },
             ],
           },
@@ -138,59 +127,42 @@ export function GetOrgStructureManagementFormConfig(props: PropsT): FormConfig {
               totalCountHeader: "X-Total-Count",
             },
           },
-          {
-            name: "is_active",
-            label: "الحالة",
-            type: "select",
-            placeholder: "الحالة",
-            required: true,
-            options: [
-              { value: "1", label: "نشط" },
-              { value: "0", label: "غير نشط" },
-            ],
-            validation: [
-              {
-                type: "required",
-                message: "الحالة مطلوب",
-              },
-            ],
-          },
+          // {
+          //   name: "is_active",
+          //   label: "الحالة",
+          //   type: "select",
+          //   placeholder: "الحالة",
+          //   required: true,
+          //   options: [
+          //     { value: "1", label: "نشط" },
+          //     { value: "0", label: "غير نشط" },
+          //   ],
+          //   validation: [
+          //     {
+          //       type: "required",
+          //       message: "الحالة مطلوب",
+          //     },
+          //   ],
+          // },
         ],
       },
     ],
     initialValues: {
-      branch_id: mainBranch?.id || selectedNode?.branch_id,
-      name: isEdit ? selectedNode?.name : undefined,
-      description: isEdit ? selectedNode?.description : undefined,
-      is_active: isEdit ? selectedNode?.status == 1 : undefined,
-      management_id: isEdit ? selectedNode?.parent_id?.toString() : selectedNode?.id?.toString(),
-      manager_id: isUserCompanyOwner
-        ? companyOwnerId
-        : !isEdit
-        ? undefined
-        : selectedNode?.manager_id,
-      reference_user_id: isUserCompanyOwner
-        ? companyOwnerId
-        : !isEdit
-        ? undefined
-        : selectedNode?.reference_user_id,
-      deputy_manager_ids: isUserCompanyOwner
-        ? [companyOwnerId]
-        : !isEdit
-        ? []
-        : selectedNode?.deputy_managers?.map((ele) => ele.id),
+      target_parent_id: selectedNode?.id?.toString(),
     },
     onSubmit: async (formData) => {
-      const method = isEdit ? "PUT" : "POST";
-      const body = {
-        ...formData,
-        branch_id: mainBranch?.id|| branchId || selectedNode?.branch_id,
+      const method = "POST";
+      const reqBody = {
+        source_department_id: formData.source_department_id,
+        target_parent_id: formData.target_parent_id,
+        clone_sub_departments: false,
+        clone_managers: false,
       };
 
-      return await defaultSubmitHandler(body, _config, {
+      return await defaultSubmitHandler(reqBody, _config, {
         method: method,
         url: `${baseURL}/management_hierarchies/${
-          isEdit ? `update-management/${selectedNode?.id}` : "create-management"
+          isEdit ? "clone-department/" + selectedNode?.id : "clone-department"
         }`,
       });
     },
