@@ -80,5 +80,6 @@ export const useMainCategoryTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
+    searchParamName: "name",
   };
 };

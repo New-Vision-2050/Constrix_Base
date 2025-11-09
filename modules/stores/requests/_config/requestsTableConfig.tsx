@@ -1,7 +1,7 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
-import { EditIcon, Plus } from "lucide-react";
+import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { OrderStatusChip } from "../components/OrderStatusChip";
 

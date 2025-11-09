@@ -97,7 +97,6 @@ export default function AddSubSubCategoryDialog({
     });
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     reset,
@@ -135,8 +134,8 @@ export default function AddSubSubCategoryDialog({
       CategoriesApi.show(categoryId)
         .then((response) => {
           const data = response.data.payload;
-          setValue("name_ar", data.name || "");
-          setValue("name_en", data.name || "");
+          setValue("name_ar", data.name_ar || "");
+          setValue("name_en", data.name_en || "");
           setValue("priority", data.priority?.toString() || "1");
           setValue("parent_category_id", data.parent?.id || "");
 
@@ -147,6 +146,7 @@ export default function AddSubSubCategoryDialog({
           }
         })
         .catch((error) => {
+          console.error("Error fetching category:", error);
           toast.error(t("category.fetchError") || "Failed to load category");
         })
         .finally(() => {

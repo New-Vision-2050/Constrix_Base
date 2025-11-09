@@ -80,7 +80,6 @@ const TheStatus = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!can(PERMISSIONS.package.update)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

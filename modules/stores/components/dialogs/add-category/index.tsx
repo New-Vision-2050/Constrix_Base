@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Image from "next/image";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import LanguageTabs from "@/components/shared/LanguageTabs";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2} from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { CategoriesApi } from "@/services/api/ecommerce/categories";
 import { toast } from "sonner";
@@ -32,6 +31,7 @@ import {
   CreateCategoryParams,
   UpdateCategoryParams,
 } from "@/services/api/ecommerce/categories/types/params";
+import ImageUpload from "@/components/shared/ImageUpload";
 
 const createCategorySchema = (t: (key: string) => string) =>
   z.object({
@@ -91,7 +91,6 @@ export default function AddCategoryDialog({
   const t = useTranslations();
   const isEditMode = !!categoryId;
   const [activeTab, setActiveTab] = useState("ar");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch category data when editing
@@ -102,12 +101,10 @@ export default function AddCategoryDialog({
   });
 
   const {
-    register,
     handleSubmit,
     reset,
     setValue,
     control,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(createCategorySchema(t)),
@@ -134,14 +131,11 @@ export default function AddCategoryDialog({
     if (isEditMode && categoryData?.data?.payload) {
       const category = categoryData.data.payload;
 
-      setValue("name_ar", category.name || "");
-      setValue("name_en", category.name || "");
+      setValue("name_ar", category.name_ar || "");
+      setValue("name_en", category.name_en || "");
       setValue("priority", String(category.priority || 1));
 
-      // Set image preview if exists
-      if (category.category_image) {
-        setImagePreview(category.category_image);
-      }
+    
     }
   }, [isEditMode, categoryData, setValue]);
 
@@ -180,7 +174,6 @@ export default function AddCategoryDialog({
 
       onSuccess?.();
       reset();
-      setImagePreview(null);
       setActiveTab("ar");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -250,31 +243,10 @@ export default function AddCategoryDialog({
     }
   };
 
-  const handleFileSelect = (file: File) => {
-    setValue("category_image", file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleUpload = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleRemoveImage = () => {
-    setValue("category_image", null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   const handleClose = () => {
     if (!isSubmitting && !isFetching) {
       reset();
-      setImagePreview(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -301,72 +273,16 @@ export default function AddCategoryDialog({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-6">
             {/* Right Column - Image Upload */}
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-full">
-                <Label className="text-xs block text-center mb-2">
-                  {t("category.imageLabel") || "صورة القسم"}
-                </Label>
-                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 flex flex-col items-center justify-center hover:border-gray-500 transition-colors">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        handleFileSelect(file);
-                      }
-                    }}
-                    disabled={isSubmitting || isFetching}
-                  />
-
-                  {imagePreview ? (
-                    <div className="relative w-32 h-32 mb-4">
-                      <Image
-                        src={imagePreview}
-                        alt="Preview"
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
-                        onClick={handleRemoveImage}
-                        title={t("category.removeImage")}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="w-32 h-32 bg-gray-700 rounded-lg flex flex-col items-center justify-center mb-4">
-                      <Upload className="w-10 h-10 " />
-                    </div>
-                  )}
-
-                  <p className="text-xs text-center mb-1">
-                    {t("category.dragDropImage") || "اسحب وأفلت الصورة هنا"}
-                  </p>
-                  <p className="text-xs text-gray-500 text-center mb-4">
-                    {t("category.supportedFormats") ||
-                      "PNG, JPG, WEBP (MAX. 3MB)"}
-                  </p>
-                </div>
-
-                {!imagePreview && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full mt-4 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
-                    onClick={handleUpload}
-                    disabled={isSubmitting || isFetching}
-                  >
-                    {t("category.attachImage") || "إرفاق صورة"}
-                  </Button>
-                )}
-              </div>
+            <div className="flex flex-col  w-full">
+              <ImageUpload
+                label={t("category.imageLabel") || "صورة القسم"}
+                maxSize="5MB - الحجم الأقصى"
+                dimensions="1920 × 1080"
+                required={!isEditMode}
+                onChange={(file) => setValue("category_image", file)}
+                initialValue={categoryData?.data?.payload?.file?.url}
+                minHeight="250px"
+              />
             </div>
             {/* Left Column - Form Fields */}
             <div className="space-y-4">

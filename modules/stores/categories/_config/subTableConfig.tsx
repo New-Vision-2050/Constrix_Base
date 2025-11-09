@@ -63,5 +63,6 @@ export const useSubCategoryTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
+    searchParamName: "name",
   };
 };

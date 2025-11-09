@@ -100,7 +100,6 @@ export default function AddSubCategoryDialog({
   );
 
   const {
-    register,
     handleSubmit,
     reset,
     setValue,
@@ -131,8 +130,8 @@ export default function AddSubCategoryDialog({
     if (isEditMode && categoryData?.data?.payload) {
       const category = categoryData.data.payload;
 
-      setValue("name_ar", category.name || "");
-      setValue("name_en", category.name || "");
+      setValue("name_ar", category.name_ar || "");
+      setValue("name_en", category.name_en || "");
       setValue("priority", String(category.priority || 1));
       setValue("parent_category_id", category.parent?.id || "");
     }

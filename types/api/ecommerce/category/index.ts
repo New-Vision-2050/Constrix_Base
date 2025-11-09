@@ -3,8 +3,12 @@ export interface ECM_Category {
   name: string;
   description?: string;
   parent?: ECM_CategoryParent | null;
-  category_image?: string;
+  file?: {
+    url: string;
+  };
   priority?: number;
+  name_ar?: string;
+  name_en?: string;
 }
 
 export interface ECM_CategoryParent {
