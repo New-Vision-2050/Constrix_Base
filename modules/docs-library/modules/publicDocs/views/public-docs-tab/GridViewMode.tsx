@@ -29,10 +29,10 @@ export default function GridViewMode() {
           // Show actual grid items when loaded
           <>
             {docs?.folders?.map((folder) => (
-              <GridItem isDir document={folder} key={folder.id} />
+              <GridItem isDir={true} document={folder} key={folder.id} />
             ))}
             {docs?.files?.map((file) => (
-              <GridItem document={file} key={file.id} />
+              <GridItem isDir={false} document={file} key={file.id} />
             ))}
           </>
         )}

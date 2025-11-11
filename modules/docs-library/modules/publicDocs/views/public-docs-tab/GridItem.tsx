@@ -58,7 +58,7 @@ export default function GridItem({
   const t = useTranslations("docs-library.publicDocs.table.actions");
   const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
   // calc file size
-  const fileSize = document?.file?.size;
+  const fileSize = isDir ? document?.size : document?.file?.size;
   const fileSizeInMB = (fileSize || 0) / 1024 / 1024;
   // image url
   let imageUrl = document?.file?.url;
