@@ -26,7 +26,7 @@ export function useDropdownState<T extends string | string[]>({
     // For arrays, we need to check if the arrays are different
     const isDifferent = isMulti
       ? JSON.stringify(initialValue) !== JSON.stringify(previousValueRef.current)
-      : initialValue !== previousValueRef.current;
+      : initialValue != previousValueRef.current;
 
     // Always update local value when initialValue changes from parent
     if (isDifferent) {
@@ -58,7 +58,7 @@ export function useDropdownState<T extends string | string[]>({
       const currentValue = localValue as string;
       
       // Only update if value actually changed to prevent loops
-      if (newValue !== currentValue) {
+      if (newValue != currentValue) {
         setLocalValue(newValue as T);
         previousValueRef.current = newValue as T;
         onChangeRef.current(newValue as T);

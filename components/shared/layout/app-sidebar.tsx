@@ -449,15 +449,21 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     return data;
   }, [pageName, isCentralCompany, can, t]);
 
-  const projects = SidebarProjects.filter((project) =>
-    project.sub_entities?.some((subEntity) => subEntity.show)
-  );
-
   const all = React.useMemo(() => {
     if (isLoading) return [];
     if (!Boolean(data)) return [];
-    return mergeProjectsAndMenu(projects, data, isSuperAdmin);
-  }, [projects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
+    const _mergedProjects = mergeProjectsAndMenu(
+      SidebarProjects,
+      data,
+      isSuperAdmin
+    );
+    const _shownProjects = _mergedProjects?.filter((project) => {
+      return project.sub_entities?.some((subEntity) => subEntity.show);
+    });
+    return _shownProjects;
+  }, [SidebarProjects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
+
+  console.log('all101', all)
 
   return (
     <Sidebar

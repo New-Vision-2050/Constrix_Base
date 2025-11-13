@@ -46,8 +46,8 @@ DropdownTrigger.displayName = "DropdownTrigger";
 export default React.memo(DropdownTrigger, (prevProps, nextProps) => {
   // Force re-render if any of these props change
   return (
-    prevProps.selectedOption?.value === nextProps.selectedOption?.value &&
-    prevProps.localValue === nextProps.localValue &&
+    prevProps.selectedOption?.value == nextProps.selectedOption?.value &&
+    prevProps.localValue == nextProps.localValue &&
     prevProps.isDisabled === nextProps.isDisabled &&
     prevProps.open === nextProps.open
   );

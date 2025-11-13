@@ -108,15 +108,15 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             containerClassName: "rtl:flex-row-reverse",
             required: true,
             validation: [
-                {
-                    type: "required",
-                    message: "ادخل الاسم المختصر",
-                },
-                {
-                    type: "pattern",
-                    value: /^[a-zA-Z]+$/,
-                    message: t("Validation.englishName"),
-                },
+              {
+                type: "required",
+                message: "ادخل الاسم المختصر",
+              },
+              {
+                type: "pattern",
+                value: /^[a-zA-Z]+$/,
+                message: t("Validation.englishName"),
+              },
               {
                 type: "apiValidation",
                 message:
@@ -326,7 +326,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             placeholder: "اختر المسمى الوظيفي",
             required: true,
             dynamicOptions: {
-              url: `${baseURL}/job_titles/list?type=general_manager`,
+              url: `${baseURL}/job_titles/list`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
