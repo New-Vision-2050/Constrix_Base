@@ -215,7 +215,7 @@ export const extractDropdownOptions = (
 
     // Remove duplicates
     return validOptions.reduce((acc: DropdownOption[], current) => {
-        const x = acc.find(item => item.value === current.value);
+        const x = acc.find(item => item.value == current.value);
         if (!x) return acc.concat([current]);
         return acc;
     }, []);

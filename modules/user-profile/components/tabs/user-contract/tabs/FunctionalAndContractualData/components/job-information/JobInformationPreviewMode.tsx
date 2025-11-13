@@ -67,6 +67,15 @@ export default function JobInformationPreviewMode() {
           required
         />
       </div>
+      
+      <div className="p-2">
+        <PreviewTextField
+          label="الصلاحيات"
+          value={professionalData?.roles?.join(", ") ?? ""}
+          valid={Boolean(professionalData?.roles?.length)}
+          required
+        />
+      </div>
     </div>
   );
 }

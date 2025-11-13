@@ -54,14 +54,14 @@ export const useDropdownSearch = ({
       if (isMulti && Array.isArray(selectedValue)) {
         const allLabelsFound = selectedValue.every((value) =>
           options.some(
-            (option) => option.value === value && option.label !== value
+            (option) => option.value == value && option.label !== value
           )
         );
         if (allLabelsFound) return;
       } else if (!isMulti && typeof selectedValue === "string") {
         const labelFound = options.some(
           (option) =>
-            option.value === selectedValue && option.label !== selectedValue
+            option.value == selectedValue && option.label !== selectedValue
         );
         if (labelFound) return;
       }
@@ -79,7 +79,7 @@ export const useDropdownSearch = ({
         const valuesToFetchFiltered = valuesToFetch.filter(
           (value) =>
             !options.some(
-              (option) => option.value === value && option.label !== value
+              (option) => option.value == value && option.label !== value
             )
         );
 
@@ -201,7 +201,7 @@ export const useDropdownSearch = ({
 
             validOptions.forEach((newOpt) => {
               const existingIndex = newOptions.findIndex(
-                (opt) => opt.value === newOpt.value
+                (opt) => opt.value == newOpt.value
               );
               if (existingIndex >= 0) {
                 newOptions[existingIndex] = newOpt;
@@ -219,7 +219,7 @@ export const useDropdownSearch = ({
 
             validOptions.forEach((newOpt) => {
               const existingIndex = newBackup.findIndex(
-                (opt) => opt.value === newOpt.value
+                (opt) => opt.value == newOpt.value
               );
               if (existingIndex >= 0) {
                 newBackup[existingIndex] = newOpt;
@@ -257,7 +257,7 @@ export const useDropdownSearch = ({
       const newBackupOptions: DropdownOption[] = [];
 
       selectedValue.forEach((value) => {
-        const selectedOption = options.find((option) => option.value === value);
+        const selectedOption = options.find((option) => option.value == value);
         if (selectedOption) {
           newBackupOptions.push(selectedOption);
         } else if (value) {
@@ -270,7 +270,7 @@ export const useDropdownSearch = ({
     } else if (!isMulti && typeof selectedValue === "string") {
       // For single select, handle string value
       const selectedOption = options.find(
-        (option) => option.value === selectedValue
+        (option) => option.value == selectedValue
       );
       if (selectedOption) {
         setBackupOptions([selectedOption]);
@@ -533,7 +533,7 @@ export const useDropdownSearch = ({
         const validOptions = extractedOptions
           .filter((opt) => opt.value && opt.value.trim() !== "")
           .reduce((acc: DropdownOption[], current) => {
-            const x = acc.find((item) => item.value === current.value);
+            const x = acc.find((item) => item.value == current.value);
             if (!x) return acc.concat([current]);
             return acc;
           }, []);
@@ -545,7 +545,7 @@ export const useDropdownSearch = ({
           // Add any backup options that aren't already in the results
           const optionsToAdd = backupOptions.filter(
             (backupOpt) =>
-              !mergedOptions.some((option) => option.value === backupOpt.value)
+              !mergedOptions.some((option) => option.value == backupOpt.value)
           );
 
           if (optionsToAdd.length > 0) {
