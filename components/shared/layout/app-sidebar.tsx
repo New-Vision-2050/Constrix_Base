@@ -463,6 +463,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     return _shownProjects;
   }, [SidebarProjects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
 
+  console.log('all101', all)
+
   return (
     <Sidebar
       collapsible="icon"
