@@ -102,7 +102,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     } else {
       // For single select
       const singleValue = value as string;
-      const option = options.find((option) => option.value === singleValue);
+      const option = options.find((option) => option.value == singleValue);
 
       // If we have a proper label, use it
       if (option) {
@@ -270,7 +270,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                         // For multi-select, toggle the selected value
                         const currentValues = Array.isArray(value) ? value : [];
                         const newValues = currentValues.includes(option.value)
-                          ? currentValues.filter((v) => v !== option.value)
+                          ? currentValues.filter((v) => v != option.value)
                           : [...currentValues, option.value];
                         onChange(newValues);
                         // Don't close the dropdown for multi-select
@@ -289,7 +289,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                           ? Array.isArray(value) && value.includes(option.value)
                             ? "opacity-100"
                             : "opacity-0"
-                          : value === option.value
+                          : value == option.value
                           ? "opacity-100"
                           : "opacity-0"
                       )}

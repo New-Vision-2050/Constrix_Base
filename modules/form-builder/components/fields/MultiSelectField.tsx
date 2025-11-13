@@ -243,7 +243,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       const validOptions = extractedOptions
         .filter((opt) => opt.value && opt.value.trim() !== "")
         .reduce((acc: DropdownOption[], current) => {
-          const x = acc.find((item) => item.value === current.value);
+          const x = acc.find((item) => item.value == current.value);
           if (!x) return acc.concat([current]);
           return acc;
         }, []);
@@ -254,9 +254,9 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
       // Add any selected options that aren't in the fetched options
       if (value && value.length > 0) {
         value.forEach((val) => {
-          if (!mergedOptions.some((opt) => opt.value === val)) {
+          if (!mergedOptions.some((opt) => opt.value == val)) {
             // If we have a label for this value in the current options, use it
-            const existingOption = options.find((opt) => opt.value === val);
+            const existingOption = options.find((opt) => opt.value == val);
             if (existingOption) {
               mergedOptions.push(existingOption);
             } else {

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { UserTableRow } from "@/modules/table/utils/configs/usersTableConfig";
+import useCurrentAuthCompany from "@/hooks/use-auth-company";
 
 interface PropsT {
   open: boolean;
@@ -22,21 +23,31 @@ interface PropsT {
 const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
   // declare and define vars and state
   const router = useRouter();
+  const { data: authCompanyData, isLoading } = useCurrentAuthCompany();
   // handle redirect to user profile page if user has one company
   useEffect(() => {
-    if (
-      open === true &&
-      user?.companies?.length === 1 &&
-      user?.companies[0]?.users?.length
-    ) {
-      const company = user.companies[0];
-      const userId = company?.users?.[0]?.id ?? "";
-      router.push(
-        `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${company?.id}`
-      );
-      onClose(); // close the dialog after redirect
+    const authCompany = authCompanyData?.payload;
+    if (open && authCompany) {
+      if (!Boolean(authCompany?.is_central_company)) {
+        const company = user.companies[0];
+        const userId = company?.users?.[0]?.id ?? "";
+        router.push(
+          `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${authCompany?.id}`
+        );
+        onClose();
+      } else if (
+        user?.companies?.length === 1 &&
+        user?.companies[0]?.users?.length
+      ) {
+        const company = user.companies[0];
+        const userId = company?.users?.[0]?.id ?? "";
+        router.push(
+          `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${company?.id}`
+        );
+        onClose();
+      }
     }
-  }, [open, user, router, onClose]);
+  }, [open, user, router, onClose, authCompanyData]);
 
   // declare and define functions
   const handleRedirect = (id: string, companyId: string) => {
@@ -44,6 +55,9 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
     router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
   };
 
+  if (isLoading) {
+    return null;
+  }
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">

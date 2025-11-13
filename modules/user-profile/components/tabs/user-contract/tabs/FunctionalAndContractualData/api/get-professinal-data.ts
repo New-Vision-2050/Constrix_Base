@@ -13,6 +13,7 @@ export type ProfessionalT = {
   job_title: { id: string; name: string };
   job_type: { id: string; name: string };
   management: Management;
+  roles: string[];
   attendance_constraint: { id: string; constraint_name: string };
 };
 

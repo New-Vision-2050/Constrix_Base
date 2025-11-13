@@ -35,7 +35,7 @@ const ComboBoxDropdown: React.FC<DropdownBaseProps> = ({
     // Case 2: Array of dependency configs
     if (Array.isArray(dynamicConfig.dependsOn)) {
       return dynamicConfig.dependsOn.some(
-        depConfig => !dependencies[depConfig.field] || dependencies[depConfig.field] === ""
+        depConfig => !dependencies[depConfig.field] || dependencies[depConfig.field] == ""
       );
     }
 
