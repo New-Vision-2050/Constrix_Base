@@ -59,7 +59,7 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
-    deleteUrl: `${baseURL}/ecommerce/dashboard/categories`,
+    deleteUrl: `${baseURL}/company-dashboard/categories`,
     searchParamName: "search",
   };
 };
