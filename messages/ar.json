@@ -2650,6 +2650,28 @@
         "type": "نوع الفئة",
         "edit": "تعديل"
       }
+    },
+    "mainData": {
+      "basicData": {
+        "title": "البيانات الاساسية",
+        "siteTitle": "عنوان الموقع",
+        "siteTitlePlaceholder": "أدخل عنوان الموقع",
+        "siteLogo": "شعار الموقع",
+        "logoMaxSize": "3MB - 2160 x 2160",
+        "logoDimensions": "2160x2160"
+      },
+      "appearance": {
+        "title": "المظهر",
+        "primaryColor": "اللون الاساسي",
+        "secondaryColor": "اللون الثانوي",
+        "backgroundColor": "لون الخلفية",
+        "saveChanges": "حفظ التعديل"
+      },
+      "validation": {
+        "invalidColor": "اللون غير صحيح. يجب أن يكون بتنسيق hex (مثال: #FFFFFF)"
+      },
+      "saveSuccess": "تم الحفظ بنجاح",
+      "saveError": "فشل الحفظ"
     }
   }
 }
