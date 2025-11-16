@@ -30,12 +30,12 @@ import { Loader2 } from "lucide-react";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import { useIsRtl } from "@/hooks/use-is-rtl";
-import { CategoriesApi } from "@/services/api/ecommerce/categories";
+import { CompanyDashboardCategoriesApi } from "@/services/api/company-dashboard/categories";
 import { toast } from "sonner";
 import {
   CreateCategoryParams,
   UpdateCategoryParams,
-} from "@/services/api/ecommerce/categories/types/params";
+} from "@/services/api/company-dashboard/categories/types/params";
 import {
   createCategoryFormSchema,
   CategoryFormData,
@@ -69,8 +69,8 @@ export default function SetCategoryDialog({
 
   // Fetch category data when editing
   const { data: categoryData, isLoading: isFetching } = useQuery({
-    queryKey: ["category", categoryId],
-    queryFn: () => CategoriesApi.show(categoryId!),
+    queryKey: ["company-dashboard-category", categoryId],
+    queryFn: () => CompanyDashboardCategoriesApi.show(categoryId!),
     enabled: isEditMode && open,
   });
 
@@ -132,23 +132,19 @@ export default function SetCategoryDialog({
         const updateParams: UpdateCategoryParams = {
           "name[ar]": data.name_ar,
           "name[en]": data.name_en,
+          type: data.type,
         };
 
-        // Note: If your API supports type field, uncomment and add to params
-        // updateParams.type = data.type;
-
-        await CategoriesApi.update(categoryId, updateParams);
+        await CompanyDashboardCategoriesApi.update(categoryId, updateParams);
       } else {
         // Create new category
         const createParams: CreateCategoryParams = {
           "name[ar]": data.name_ar,
           "name[en]": data.name_en,
+          type: data.type,
         };
 
-        // Note: If your API supports type field, uncomment and add to params
-        // createParams.type = data.type;
-
-        await CategoriesApi.create(createParams);
+        await CompanyDashboardCategoriesApi.create(createParams);
       }
 
       toast.success(

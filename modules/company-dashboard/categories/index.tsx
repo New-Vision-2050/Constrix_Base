@@ -22,8 +22,7 @@ export default function CompanyDashboardCategoriesModule(props: CompanyDashboard
     });
     const { reloadTable } = useTableReload(tableConfig.tableId);
 
-    return <div>
-        <h1>Categories</h1>
+    return <div className="container p-6">
         <SetCategoryDialog
             open={Boolean(editingCategoryId)}
             onClose={() => setEditingCategoryId(null)}
