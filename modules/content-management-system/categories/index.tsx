@@ -13,7 +13,7 @@ interface CompanyDashboardCategoriesModuleProps {
 }
 export default function CompanyDashboardCategoriesModule(props: CompanyDashboardCategoriesModuleProps) {
     // Translations
-    const t = useTranslations("company-dashboard.categories");
+    const t = useTranslations("content-management-system.categories");
     // State for editing category
     const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
     // Table config

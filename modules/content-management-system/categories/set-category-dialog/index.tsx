@@ -64,7 +64,7 @@ export default function SetCategoryDialog({
   categoryId,
 }: SetCategoryDialogProps) {
   const isRtl = useIsRtl();
-  const t = useTranslations("company-dashboard.categories.form");
+  const t = useTranslations("content-management-system.categories.form");
   const isEditMode = !!categoryId;
 
   // Fetch category data when editing

@@ -2623,7 +2623,7 @@
     "deleteSuccess": "Payment method deleted successfully",
     "deleteError": "Failed to delete payment method"
   },
-  "company-dashboard": {
+  "content-management-system": {
     "categories": {
       "title": "Categories Settings",
       "addCategory": "Add New Category",

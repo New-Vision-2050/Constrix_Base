@@ -16,7 +16,7 @@ type Params = {
 export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
-  const t = useTranslations("company-dashboard.categories.table");
+  const t = useTranslations("content-management-system.categories.table");
 
   return {
     tableId: "company-dashboard-categories-list-table",

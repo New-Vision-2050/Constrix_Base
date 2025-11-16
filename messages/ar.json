@@ -2615,7 +2615,7 @@
     "deleteSuccess": "تم حذف وسيلة الدفع بنجاح",
     "deleteError": "فشل حذف وسيلة الدفع"
   },
-  "company-dashboard": {
+  "content-management-system": {
     "categories": {
       "title": "اعدادات الفئات",
       "addCategory": "اضافة فئة جديدة",

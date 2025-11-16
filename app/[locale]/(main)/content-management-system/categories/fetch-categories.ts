@@ -1,5 +1,5 @@
 import { apiClient, baseURL } from "@/config/axios-config";
-import { CompanyDashboardCategory } from "@/modules/company-dashboard/categories/types";
+import { CompanyDashboardCategory } from "@/modules/content-management-system/categories/types";
 
 export async function fetchCategories() {
     try {

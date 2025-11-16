@@ -1,4 +1,4 @@
-import CompanyDashboardCategoriesModule from "@/modules/company-dashboard/categories";
+import CompanyDashboardCategoriesModule from "@/modules/content-management-system/categories";
 import { fetchCategories } from "./fetch-categories";
 
 export default async function CompanyDashboardCategoriesPage() {
