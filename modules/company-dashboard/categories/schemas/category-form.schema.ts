@@ -15,15 +15,15 @@ export const createCategoryFormSchema = (t: (key: string) => string) =>
     name_ar: z
       .string({
         required_error:
-          t("category.nameArRequired") || "Category name in Arabic is required",
+          t("nameArRequired") || "Category name in Arabic is required",
       })
       .min(1, {
         message:
-          t("category.nameArRequired") || "Category name in Arabic is required",
+          t("nameArRequired") || "Category name in Arabic is required",
       })
       .min(2, {
         message:
-          t("category.nameArMinLength") ||
+          t("nameArMinLength") ||
           "Category name in Arabic must be at least 2 characters",
       })
       .trim(),
@@ -31,17 +31,17 @@ export const createCategoryFormSchema = (t: (key: string) => string) =>
     name_en: z
       .string({
         required_error:
-          t("category.nameEnRequired") ||
+          t("nameEnRequired") ||
           "Category name in English is required",
       })
       .min(1, {
         message:
-          t("category.nameEnRequired") ||
+          t("nameEnRequired") ||
           "Category name in English is required",
       })
       .min(2, {
         message:
-          t("category.nameEnMinLength") ||
+          t("nameEnMinLength") ||
           "Category name in English must be at least 2 characters",
       })
       .trim(),
@@ -49,11 +49,11 @@ export const createCategoryFormSchema = (t: (key: string) => string) =>
     type: z
       .string({
         required_error:
-          t("category.typeRequired") || "Category type is required",
+          t("typeRequired") || "Category type is required",
       })
       .min(1, {
         message:
-          t("category.typeRequired") || "Category type is required",
+          t("typeRequired") || "Category type is required",
       }),
   });
 

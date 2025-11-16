@@ -2622,5 +2622,41 @@
     "updateError": "Failed to update payment method",
     "deleteSuccess": "Payment method deleted successfully",
     "deleteError": "Failed to delete payment method"
+  },
+  "company-dashboard": {
+    "categories": {
+      "title": "Categories Settings",
+      "addCategory": "Add New Category",
+      "editCategory": "Edit Category",
+      "form": {
+        "updateSuccess": "Update successful!",
+        "updateError": "Update failed. Please try again.",
+        "createSuccess": "Create successful!",
+        "createError": "Create failed. Please try again.",
+        "validationError": "Validation error",
+        "permissionDenied": "You don't have permission to perform this action",
+        "networkError": "Network error. Please try again.",
+        "editCategory": "Edit Category",
+        "addCategory": "Add Category",
+        "nameAr": "Category Name in Arabic",
+        "nameArPlaceholder": "Enter category name in Arabic",
+        "nameArRequired": "Category name in Arabic is required",
+        "nameArMinLength": "Category name in Arabic must be at least 2 characters",
+        "nameEn": "Category Name in English",
+        "nameEnPlaceholder": "Enter category name in English",
+        "nameEnRequired": "Category name in English is required",
+        "nameEnMinLength": "Category name in English must be at least 2 characters",
+        "type": "Category Type",
+        "typeRequired": "Category type is required",
+        "typePlaceholder": "Select category type",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "table": {
+        "nameAr": "Category Name in Arabic",
+        "nameEn": "Category Name in English",
+        "type": "Category Type"
+      }
+    }
   }
 }
