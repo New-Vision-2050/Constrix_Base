@@ -2614,5 +2614,42 @@
     "updateError": "فشل تحديث وسيلة الدفع",
     "deleteSuccess": "تم حذف وسيلة الدفع بنجاح",
     "deleteError": "فشل حذف وسيلة الدفع"
+  },
+  "content-management-system": {
+    "categories": {
+      "title": "اعدادات الفئات",
+      "addCategory": "اضافة فئة جديدة",
+      "editCategory": "تعديل فئة",
+      "form": {
+        "updateSuccess": "تم التحديث بنجاح!",
+        "updateError": "فشل التحديث. يرجى المحاولة مرة أخرى.",
+        "createSuccess": "تم الإنشاء بنجاح!",
+        "createError": "فشل الإنشاء. يرجى المحاولة مرة أخرى.",
+        "validationError": "خطأ في التحقق من البيانات",
+        "permissionDenied": "ليس لديك صلاحية لإجراء هذا الإجراء",
+        "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
+        "editCategory": "تعديل فئة",
+        "addCategory": "اضافة فئة",
+        "nameAr": "اسم الفئة بالعربية",
+        "nameArPlaceholder": "أدخل اسم الفئة بالعربية",
+        "nameArRequired": "اسم الفئة بالعربية مطلوب",
+        "nameArMinLength": "اسم الفئة بالعربية يجب أن يكون على الأقل حرفين",
+        "nameEn": "اسم الفئة بالإنجليزية",
+        "nameEnPlaceholder": "أدخل اسم الفئة بالإنجليزية",
+        "nameEnRequired": "اسم الفئة بالإنجليزية مطلوب",
+        "nameEnMinLength": "اسم الفئة بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "type": "نوع الفئة",
+        "typePlaceholder": "اختر نوع الفئة",
+        "typeRequired": "نوع الفئة مطلوب",
+        "save": "حفظ",
+        "cancel": "إلغاء"
+      },
+      "table": {
+        "nameAr": "اسم الفئة بالعربية",
+        "nameEn": "اسم الفئة بالإنجليزية",
+        "type": "نوع الفئة",
+        "edit": "تعديل"
+      }
+    }
   }
 }
