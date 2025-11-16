@@ -2655,7 +2655,8 @@
       "table": {
         "nameAr": "Category Name in Arabic",
         "nameEn": "Category Name in English",
-        "type": "Category Type"
+        "type": "Category Type",
+        "edit": "Edit"
       }
     }
   }

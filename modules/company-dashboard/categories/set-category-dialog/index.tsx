@@ -283,7 +283,7 @@ export default function SetCategoryDialog({
                       <SelectContent>
                         {CATEGORY_TYPE_OPTIONS.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
-                            {t(`type.${option.value}`) || option.label}
+                            {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
