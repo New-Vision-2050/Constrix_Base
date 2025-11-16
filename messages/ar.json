@@ -2650,6 +2650,60 @@
         "type": "نوع الفئة",
         "edit": "تعديل"
       }
+    },
+    "news": {
+      "title": "إعدادات الأخبار",
+      "addNews": "اضافة خبر جديد",
+      "editNews": "تعديل خبر",
+      "success": "نجاح",
+      "error": "خطأ",
+      "activatedSuccessfully": "تم تفعيل الخبر بنجاح",
+      "deactivatedSuccessfully": "تم إلغاء تفعيل الخبر بنجاح",
+      "failedToUpdateStatus": "فشل تحديث الحالة",
+      "areYouSureReactivate": "هل أنت متأكد من إعادة تفعيل هذا الخبر؟",
+      "areYouSureDeactivate": "هل أنت متأكد من إلغاء تفعيل هذا الخبر؟",
+      "form": {
+        "updateSuccess": "تم التحديث بنجاح!",
+        "updateError": "فشل التحديث. يرجى المحاولة مرة أخرى.",
+        "createSuccess": "تم الإنشاء بنجاح!",
+        "createError": "فشل الإنشاء. يرجى المحاولة مرة أخرى.",
+        "validationError": "خطأ في التحقق من البيانات",
+        "permissionDenied": "ليس لديك صلاحية لإجراء هذا الإجراء",
+        "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
+        "titleAr": "العنوان عربي",
+        "titleArRequired": "العنوان بالعربية مطلوب",
+        "titleArMinLength": "العنوان بالعربية يجب أن يكون على الأقل حرفين",
+        "titleEn": "العنوان الانجليزية",
+        "titleEnRequired": "العنوان بالإنجليزية مطلوب",
+        "titleEnMinLength": "العنوان بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "contentAr": "محتوى الخبر عربي ",
+        "contentArRequired": "محتوى الخبر بالعربية مطلوب",
+        "contentEn": "محتوى الخبر الانجليزية ",
+        "contentEnRequired": "محتوى الخبر بالإنجليزية مطلوب",
+        "category": "الفئة",
+        "categoryPlaceholder": "أختار الفئة",
+        "categoryRequired": "الفئة مطلوبة",
+        "publishDate": "تاريخ النشر",
+        "publishDateRequired": "تاريخ النشر مطلوب",
+        "endDate": "تاريخ الإنتهاء ",
+        "endDateRequired": "تاريخ الانتهاء مطلوب",
+        "thumbnailImage": "صورة مصغرة",
+        "thumbnailImageRequired": "الصورة المصغرة مطلوبة",
+        "mainImage": "صورة رئيسية",
+        "mainImageRequired": "الصورة الرئيسية مطلوبة",
+        "imagesRequired": "الصور مطلوبة",
+        "save": "حفظ",
+        "cancel": "إلغاء"
+      },
+      "table": {
+        "title": "العنوان",
+        "content": "المحتوي",
+        "category": "الفئة",
+        "publishDate": "تاريخ النشر",
+        "endDate": "تاريخ الانتهاء",
+        "status": "الحالة",
+        "actions": "اجراءات"
+      }
     }
   }
 }

@@ -2658,6 +2658,60 @@
         "type": "Category Type",
         "edit": "Edit"
       }
+    },
+    "news": {
+      "title": "News Settings",
+      "addNews": "Add New News",
+      "editNews": "Edit News",
+      "success": "Success",
+      "error": "Error",
+      "activatedSuccessfully": "News activated successfully",
+      "deactivatedSuccessfully": "News deactivated successfully",
+      "failedToUpdateStatus": "Failed to update status",
+      "areYouSureReactivate": "Are you sure you want to reactivate this news?",
+      "areYouSureDeactivate": "Are you sure you want to deactivate this news?",
+      "form": {
+        "updateSuccess": "Update successful!",
+        "updateError": "Update failed. Please try again.",
+        "createSuccess": "Create successful!",
+        "createError": "Create failed. Please try again.",
+        "validationError": "Validation error",
+        "permissionDenied": "You don't have permission to perform this action",
+        "networkError": "Network error. Please try again.",
+        "titleAr": "Arabic Title",
+        "titleArRequired": "Arabic title is required",
+        "titleArMinLength": "Arabic title must be at least 2 characters",
+        "titleEn": "English Title",
+        "titleEnRequired": "English title is required",
+        "titleEnMinLength": "English title must be at least 2 characters",
+        "contentAr": "Arabic News Content .",
+        "contentArRequired": "Arabic content is required",
+        "contentEn": "English News Content .",
+        "contentEnRequired": "English content is required",
+        "category": "Category",
+        "categoryPlaceholder": "Choose Category",
+        "categoryRequired": "Category is required",
+        "publishDate": "Publish Date",
+        "publishDateRequired": "Publish date is required",
+        "endDate": "End Date",
+        "endDateRequired": "End date is required",
+        "thumbnailImage": "Thumbnail Image",
+        "thumbnailImageRequired": "Thumbnail image is required",
+        "mainImage": "Main Image",
+        "mainImageRequired": "Main image is required",
+        "imagesRequired": "Images are required",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "table": {
+        "title": "Title",
+        "content": "Content",
+        "category": "Category",
+        "publishDate": "Publication Date",
+        "endDate": "End Date",
+        "status": "Status",
+        "actions": "Actions"
+      }
     }
   }
 }
