@@ -122,51 +122,54 @@ export default function ProjectDetailsSection({
         )}
       />
 
-      {/* Project Name Arabic */}
-      <FormField
-        control={control}
-        name="name_ar"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs" required>
-              {t("nameAr") || "Project Name Arabic"}
-            </FormLabel>
-            <FormControl>
-              <Input
-                variant="secondary"
-                disabled={isSubmitting || isFetching}
-                className="mt-1"
-                placeholder="SAAS"
-                {...field}
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
+      {/* Project Name Arabic & English - Side by side on larger screens */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Project Name Arabic */}
+        <FormField
+          control={control}
+          name="name_ar"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs" required>
+                {t("nameAr") || "Project Name Arabic"}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  variant="secondary"
+                  disabled={isSubmitting || isFetching}
+                  className="mt-1"
+                  placeholder="SAAS"
+                  {...field}
+                />
+              </FormControl>
+              <FormErrorMessage />
+            </FormItem>
+          )}
+        />
 
-      {/* Project Name English */}
-      <FormField
-        control={control}
-        name="name_en"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs">
-              {t("nameEn") || "Project Name English"}
-            </FormLabel>
-            <FormControl>
-              <Input
-                variant="secondary"
-                disabled={isSubmitting || isFetching}
-                className="mt-1"
-                placeholder="SAAS"
-                {...field}
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
+        {/* Project Name English */}
+        <FormField
+          control={control}
+          name="name_en"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs">
+                {t("nameEn") || "Project Name English"}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  variant="secondary"
+                  disabled={isSubmitting || isFetching}
+                  className="mt-1"
+                  placeholder="SAAS"
+                  {...field}
+                />
+              </FormControl>
+              <FormErrorMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       {/* Project Description Arabic */}
       <FormField

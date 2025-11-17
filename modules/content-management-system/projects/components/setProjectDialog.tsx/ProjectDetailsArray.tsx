@@ -83,51 +83,54 @@ export default function ProjectDetailsArray({
             )}
           </div>
 
-          {/* Detail Arabic */}
-          <FormField
-            control={control}
-            name={`details.${index}.detail_ar`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs" required>
-                  {t("detailAr") || "Detail Arabic"}
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    variant="secondary"
-                    disabled={isSubmitting || isFetching}
-                    className="mt-1"
-                    placeholder="SAAS"
-                    {...field}
-                  />
-                </FormControl>
-                <FormErrorMessage />
-              </FormItem>
-            )}
-          />
+          {/* Project Name Arabic & English - Side by side on larger screens */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Detail Arabic */}
+            <FormField
+              control={control}
+              name={`details.${index}.detail_ar`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs" required>
+                    {t("detailAr") || "Detail Arabic"}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      variant="secondary"
+                      disabled={isSubmitting || isFetching}
+                      className="mt-1"
+                      placeholder="SAAS"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormErrorMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Detail English */}
-          <FormField
-            control={control}
-            name={`details.${index}.detail_en`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">
-                  {t("detailEn") || "Detail English"}
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    variant="secondary"
-                    disabled={isSubmitting || isFetching}
-                    className="mt-1"
-                    placeholder="SAAS"
-                    {...field}
-                  />
-                </FormControl>
-                <FormErrorMessage />
-              </FormItem>
-            )}
-          />
+            {/* Detail English */}
+            <FormField
+              control={control}
+              name={`details.${index}.detail_en`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">
+                    {t("detailEn") || "Detail English"}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      variant="secondary"
+                      disabled={isSubmitting || isFetching}
+                      className="mt-1"
+                      placeholder="SAAS"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormErrorMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           {/* Service */}
           <FormField
@@ -170,16 +173,18 @@ export default function ProjectDetailsArray({
       ))}
 
       {/* Add Detail Button */}
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleAddDetail}
-        disabled={isSubmitting || isFetching}
-        className="w-full border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
-      >
-        <Plus className="w-4 h-4 mr-2" />
-        {t("addDetail") || "Add Detail"}
-      </Button>
+      <div className="flex items-center justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleAddDetail}
+          disabled={isSubmitting || isFetching}
+          className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {t("addDetail") || "Add Detail"}
+        </Button>
+      </div>
     </div>
   );
 }
