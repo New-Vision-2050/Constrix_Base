@@ -2660,6 +2660,8 @@
       }
     },
     "projects": {
+      "title": "Projects",
+      "addProject": "Add New Project",
       "tabs": {
         "projects": "Projects",
         "projectsTypes": "Projects Types"

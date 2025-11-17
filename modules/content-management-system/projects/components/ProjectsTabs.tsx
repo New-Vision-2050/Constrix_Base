@@ -1,7 +1,7 @@
 'use client';
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { useTranslations } from "next-intl";
-import ProjectsGrid from "./ProjectsGrid";
+import ProjectsTabContent from "./ProjectsTabContent";
 
 export default function ProjectsTabs() {
     const t = useTranslations("content-management-system.projects.tabs");
@@ -9,7 +9,7 @@ export default function ProjectsTabs() {
         {
             id: "projects",
             title: t("projects"),
-            content: <ProjectsGrid />,
+            content: <ProjectsTabContent />,
         },
         {
             id: "projects-types",

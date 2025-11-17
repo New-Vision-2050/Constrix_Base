@@ -2652,6 +2652,8 @@
       }
     },
     "projects": {
+      "title": "المشاريع",
+      "addProject": "اضافة مشروع جديد",
       "tabs": {
         "projects": "المشاريع",
         "projectsTypes": "انواع المشاريع"
