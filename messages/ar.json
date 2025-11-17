@@ -2713,12 +2713,15 @@
         "detailArRequired": "بيان المشروع بالعربية مطلوب"
       },
       "projectTypesTable": {
+        "addProjectType": "اضافة نوع مشروع جديد",
         "projectType": "نوع المشروع",
         "projectsCount": "عدد المشاريع",
         "group": "المجموعة",
         "edit": "تعديل"
       },
       "projectTypeForm": {
+        "addProjectType": "اضافة نوع مشروع جديد",
+        "editProjectType": "تعديل نوع مشروع",
         "nameAr": "اسم النوع بالعربية",
         "nameArPlaceholder": "أدخل اسم النوع بالعربية",
         "nameArRequired": "اسم النوع بالعربية مطلوب",
@@ -2733,7 +2736,13 @@
         "groupMinLength": "المجموعة يجب أن يكون على الأقل حرفين",
         "groupInvalid": "المجموعة غير صالحة",
         "save": "حفظ",
-        "cancel": "إلغاء"
+        "cancel": "إلغاء",
+        "updateSuccess": "تم تحديث النوع بنجاح!",
+        "createSuccess": "تم إنشاء النوع بنجاح!",
+        "updateError": "فشل تحديث النوع. يرجى المحاولة مرة أخرى.",
+        "createError": "فشل إنشاء النوع. يرجى المحاولة مرة أخرى.",
+        "validationError": "خطأ في التحقق من البيانات",
+        "permissionDenied": "ليس لديك صلاحية لإجراء هذا الإجراء"
       }
     }
   }

@@ -2721,12 +2721,15 @@
         "detailArRequired": "Detail in Arabic is required"
       },
       "projectTypesTable": {
+        "addProjectType": "Add New Project Type",
         "projectType": "Project Type",
         "projectsCount": "Projects Count",
         "group": "Group",
         "edit": "Edit"
       },
       "projectTypeForm": {
+        "addProjectType": "Add New Project Type",
+        "editProjectType": "Edit Project Type",
         "nameAr": "Project Type Name in Arabic",
         "nameArPlaceholder": "Enter project type name in Arabic",
         "nameArRequired": "Project type name in Arabic is required",
@@ -2741,7 +2744,13 @@
         "groupMinLength": "Group must be at least 2 characters",
         "groupInvalid": "Group is invalid",
         "save": "Save",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "updateSuccess": "Project type updated successfully!",
+        "createSuccess": "Project type created successfully!",
+        "updateError": "Failed to update project type. Please try again.",
+        "createError": "Failed to create project type. Please try again.",
+        "validationError": "Validation error",
+        "permissionDenied": "You don't have permission to perform this action"
       }
     }
   }

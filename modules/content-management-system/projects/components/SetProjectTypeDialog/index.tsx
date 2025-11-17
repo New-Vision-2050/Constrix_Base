@@ -45,7 +45,7 @@ export default function SetProjectTypeDialog({
   projectTypeId,
 }: SetProjectTypeDialogProps) {
   const isRtl = useIsRtl();
-  const t = useTranslations("content-management-system.projects.projectType.form");
+  const t = useTranslations("content-management-system.projects.projectTypeForm");
   const isEditMode = !!projectTypeId;
 
   // Fetch project type data when editing

@@ -43,17 +43,28 @@ export const createProjectTypeFormSchema = (t: (key: string) => string) =>
 
     group: z
       .union([
-        z.number().int().positive(),
-        z.string().transform((val) => {
-          if (!val || val.trim() === "") return undefined;
-          const num = parseInt(val, 10);
-          if (isNaN(num) || num <= 0) {
-            throw new Error(t("groupInvalid") || "Group must be a valid positive number");
-          }
-          return num;
+        z.number().int().positive({
+          message: t("groupInvalid") || "Group must be a valid positive number",
         }),
+        z.string().refine(
+          (val) => {
+            if (!val || val.trim() === "") return true; // Allow empty string
+            const num = parseInt(val, 10);
+            return !isNaN(num) && num > 0;
+          },
+          {
+            message: t("groupInvalid") || "Group must be a valid positive number",
+          }
+        ),
       ])
-      .optional(),
+      .optional()
+      .transform((val) => {
+        if (typeof val === "string") {
+          if (!val || val.trim() === "") return undefined;
+          return parseInt(val, 10);
+        }
+        return val;
+      }),
   });
 
 /**
