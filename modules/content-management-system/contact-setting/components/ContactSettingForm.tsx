@@ -124,79 +124,81 @@ export default function ContactSettingForm() {
                         <h2 className="text-lg font-semibold text-white">
                             {t("mainSection") || "القسم الرئيسي"}
                         </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Section Image */}
+                            <FormField
+                                control={control}
+                                name="section_image"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs">
+                                            {t("sectionImage") || "صورة القسم"}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <ImageUpload
+                                                label=""
+                                                maxSize="3MB - الحجم الأقصى"
+                                                dimensions="2160 × 2160"
+                                                required={false}
+                                                onChange={(file) => field.onChange(file)}
+                                                initialValue={undefined}
+                                                minHeight="200px"
+                                                className="mt-1"
+                                                accept="image/*"
+                                            />
+                                        </FormControl>
+                                        <FormErrorMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div>
+                                {/* Title */}
+                                <FormField
+                                    control={control}
+                                    name="title"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs">
+                                                {t("title") || "العنوان"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    variant="secondary"
+                                                    disabled={isSubmitting}
+                                                    className="mt-1"
+                                                    placeholder={t("titlePlaceholder") || "Enter title"}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormErrorMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                        {/* Section Image */}
-                        <FormField
-                            control={control}
-                            name="section_image"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("sectionImage") || "صورة القسم"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <ImageUpload
-                                            label=""
-                                            maxSize="3MB - الحجم الأقصى"
-                                            dimensions="2160 × 2160"
-                                            required={false}
-                                            onChange={(file) => field.onChange(file)}
-                                            initialValue={undefined}
-                                            minHeight="200px"
-                                            className="mt-1"
-                                            accept="image/*"
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Title */}
-                        <FormField
-                            control={control}
-                            name="title"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("title") || "العنوان"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            variant="secondary"
-                                            disabled={isSubmitting}
-                                            className="mt-1"
-                                            placeholder={t("titlePlaceholder") || "Enter title"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Description */}
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("description") || "الوصف"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
-                                            placeholder={t("descriptionPlaceholder") || "Enter description"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
+                                {/* Description */}
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs">
+                                                {t("description") || "الوصف"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    disabled={isSubmitting}
+                                                    rows={6}
+                                                    className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                    placeholder={t("descriptionPlaceholder") || "Enter description"}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormErrorMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Page Sections */}
@@ -288,97 +290,101 @@ export default function ContactSettingForm() {
                             )}
                         />
 
-                        {/* Vision Arabic */}
-                        <FormField
-                            control={control}
-                            name="vision_ar"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("visionAr") || "الرؤية عربي"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
-                                            placeholder={t("visionArPlaceholder") || "Enter vision in Arabic"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Vision Arabic */}
+                            <FormField
+                                control={control}
+                                name="vision_ar"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs">
+                                            {t("visionAr") || "الرؤية عربي"}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                disabled={isSubmitting}
+                                                rows={6}
+                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                placeholder={t("visionArPlaceholder") || "Enter vision in Arabic"}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormErrorMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        {/* Vision English */}
-                        <FormField
-                            control={control}
-                            name="vision_en"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("visionEn") || "الرؤية الانجليزية"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
-                                            placeholder={t("visionEnPlaceholder") || "Enter vision in English"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
+                            {/* Vision English */}
+                            <FormField
+                                control={control}
+                                name="vision_en"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs">
+                                            {t("visionEn") || "الرؤية الانجليزية"}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                disabled={isSubmitting}
+                                                rows={6}
+                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                placeholder={t("visionEnPlaceholder") || "Enter vision in English"}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormErrorMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
-                        {/* Company Goal Arabic */}
-                        <FormField
-                            control={control}
-                            name="company_goal_ar"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("companyGoalAr") || "هدف الشركة عربي"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
-                                            placeholder={t("companyGoalArPlaceholder") || "Enter company goal in Arabic"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Company Goal Arabic */}
+                            <FormField
+                                control={control}
+                                name="company_goal_ar"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs">
+                                            {t("companyGoalAr") || "هدف الشركة عربي"}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                disabled={isSubmitting}
+                                                rows={6}
+                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                placeholder={t("companyGoalArPlaceholder") || "Enter company goal in Arabic"}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormErrorMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        {/* Company Goal English */}
-                        <FormField
-                            control={control}
-                            name="company_goal_en"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("companyGoalEn") || "هدف الشركة الانجليزية"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
-                                            placeholder={t("companyGoalEnPlaceholder") || "Enter company goal in English"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
+                            {/* Company Goal English */}
+                            <FormField
+                                control={control}
+                                name="company_goal_en"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-xs">
+                                            {t("companyGoalEn") || "هدف الشركة الانجليزية"}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                disabled={isSubmitting}
+                                                rows={6}
+                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                placeholder={t("companyGoalEnPlaceholder") || "Enter company goal in English"}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormErrorMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
                         {/* Company Slogan Arabic */}
                         <FormField
@@ -390,10 +396,10 @@ export default function ContactSettingForm() {
                                         {t("companySloganAr") || "شعار الشركة عربي"}
                                     </FormLabel>
                                     <FormControl>
-                                        <Textarea
+                                        <Input
+                                            variant="secondary"
                                             disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
+                                            className="mt-1"
                                             placeholder={t("companySloganArPlaceholder") || "Enter company slogan in Arabic"}
                                             {...field}
                                         />
@@ -413,10 +419,10 @@ export default function ContactSettingForm() {
                                         {t("companySloganEn") || "شعار الشركة الانجليزية"}
                                     </FormLabel>
                                     <FormControl>
-                                        <Textarea
+                                        <Input
+                                            variant="secondary"
                                             disabled={isSubmitting}
-                                            rows={6}
-                                            className="mt-1 resize-none bg-sidebar border-white text-white"
+                                            className="mt-1"
                                             placeholder={t("companySloganEnPlaceholder") || "Enter company slogan in English"}
                                             {...field}
                                         />
