@@ -519,7 +519,7 @@
         "branch": "الفرع",
         "address": "العنوان",
         "appointmentDate": "تاريخ التعيين",
-        "image": "يلزم اضافة صورة خلفية بيضاء 6*4"
+        "image": "يلزم اضافة صورة خلفية بيضاء 64"
       },
       "uploadPhoto": {
         "title": "أضافة صورة",
@@ -934,7 +934,7 @@
         "jobTitle": "الوظيفة",
         "address": "العنوان",
         "appointmentDate": "تاريخ التعيين",
-        "image": "يلزم اضافة صورة خلفية بيضاء 6*4"
+        "image": "يلزم اضافة صورة خلفية بيضاء 64"
       },
       "uploadPhoto": {
         "title": "أضافة صورة",
@@ -1026,7 +1026,7 @@
         },
         "form": {
           "title": "اعدادات الاشعارات",
-          "type": "نوع الاشعار (عبر)*",
+          "type": "نوع الاشعار (عبر)",
           "typePlaceholder": "اختر نوع الاشعار",
           "email": "البريد الالكتروني",
           "emailPlaceholder": "ادخل البريد الالكتروني",
@@ -2649,6 +2649,43 @@
         "nameEn": "اسم الفئة بالإنجليزية",
         "type": "نوع الفئة",
         "edit": "تعديل"
+      }
+    },
+    "our-services": {
+      "mainSection": "القسم الرئيسي",
+      "departmentNumber": "قسم رقم",
+      "addDepartment": "إضافة قسم",
+      "form": {
+        "mainTitle": "العنوان",
+        "mainTitlePlaceholder": "أدخل العنوان الرئيسي",
+        "mainTitleRequired": "العنوان الرئيسي مطلوب",
+        "mainDescription": "الوصف",
+        "mainDescriptionPlaceholder": "أدخل الوصف الرئيسي",
+        "mainDescriptionRequired": "الوصف الرئيسي مطلوب",
+        "departmentTitleAr": "العنوان عربي ",
+        "departmentTitleArPlaceholder": "أدخل العنوان بالعربية",
+        "departmentTitleArRequired": "العنوان بالعربية مطلوب",
+        "departmentTitleEn": "العنوان الانجليزية",
+        "departmentTitleEnPlaceholder": "أدخل العنوان بالإنجليزية",
+        "departmentTitleEnRequired": "العنوان بالإنجليزية مطلوب",
+        "departmentDescriptionAr": "الوصف عربي",
+        "departmentDescriptionArPlaceholder": "أدخل الوصف بالعربية",
+        "departmentDescriptionArRequired": "الوصف بالعربية مطلوب",
+        "departmentDescriptionEn": "الوصف الانجليزية",
+        "departmentDescriptionEnPlaceholder": "أدخل الوصف بالإنجليزية",
+        "departmentDescriptionEnRequired": "الوصف بالإنجليزية مطلوب",
+        "designType": "نوع التصميم ",
+        "designTypePlaceholder": "اختر نوع التصميم",
+        "designTypeRequired": "نوع التصميم مطلوب",
+        "serviceNumber": "خدمة رقم",
+        "servicePlaceholder": "أدخل اسم الخدمة",
+        "serviceRequired": "الخدمة مطلوبة",
+        "servicesMinRequired": "يجب إدخال 6 خدمات على الأقل",
+        "departmentsMinRequired": "يجب إدخال قسم واحد على الأقل",
+        "cannotRemoveLastDepartment": "لا يمكن حذف القسم الأخير",
+        "save": "حفظ",
+        "saveSuccess": "تم الحفظ بنجاح!",
+        "saveError": "فشل الحفظ. يرجى المحاولة مرة أخرى."
       }
     }
   }

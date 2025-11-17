@@ -2658,6 +2658,43 @@
         "type": "Category Type",
         "edit": "Edit"
       }
+    },
+    "our-services": {
+      "mainSection": "Main Section",
+      "departmentNumber": "Section No.",
+      "addDepartment": "Add Department",
+      "form": {
+        "mainTitle": "Title",
+        "mainTitlePlaceholder": "Enter main title",
+        "mainTitleRequired": "Main title is required",
+        "mainDescription": "Description",
+        "mainDescriptionPlaceholder": "Enter main description",
+        "mainDescriptionRequired": "Main description is required",
+        "departmentTitleAr": "Arabic Title *",
+        "departmentTitleArPlaceholder": "Enter title in Arabic",
+        "departmentTitleArRequired": "Arabic title is required",
+        "departmentTitleEn": "English Title *",
+        "departmentTitleEnPlaceholder": "Enter title in English",
+        "departmentTitleEnRequired": "English title is required",
+        "departmentDescriptionAr": "Arabic Description *",
+        "departmentDescriptionArPlaceholder": "Enter description in Arabic",
+        "departmentDescriptionArRequired": "Arabic description is required",
+        "departmentDescriptionEn": "English Description *",
+        "departmentDescriptionEnPlaceholder": "Enter description in English",
+        "departmentDescriptionEnRequired": "English description is required",
+        "designType": "Design Type *",
+        "designTypePlaceholder": "Select design type",
+        "designTypeRequired": "Design type is required",
+        "serviceNumber": "Service No.",
+        "servicePlaceholder": "Enter service name",
+        "serviceRequired": "Service is required",
+        "servicesMinRequired": "At least 6 services are required",
+        "departmentsMinRequired": "At least one department is required",
+        "cannotRemoveLastDepartment": "Cannot remove the last department",
+        "save": "Save",
+        "saveSuccess": "Saved successfully!",
+        "saveError": "Failed to save. Please try again."
+      }
     }
   }
 }
