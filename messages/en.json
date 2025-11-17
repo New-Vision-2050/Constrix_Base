@@ -2752,6 +2752,17 @@
         "validationError": "Validation error",
         "permissionDenied": "You don't have permission to perform this action"
       }
+    },
+    "icons": {
+      "title": "Icons",
+      "addIcon": "Add Icon",
+      "editIcon": "Edit Icon",
+      "form": {
+        "updateSuccess": "Icon updated successfully!",
+        "updateError": "Failed to update icon. Please try again.",
+        "createSuccess": "Icon created successfully!",
+        "createError": "Failed to create icon. Please try again."
+      }
     }
   }
 }
