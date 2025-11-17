@@ -82,7 +82,8 @@ export const messagesStructure = new MessagesGroup({
   CRMSettingsModule: crmsettingsModuleMessages,
   AttendanceDepartureModule: attendanceDepartureModuleMessages,
   "hr-settings": hrSettingsMessages,
-  HRSettingsAttendanceDepartureModule: hrsettingsAttendanceDepartureModuleMessages,
+  HRSettingsAttendanceDepartureModule:
+    hrsettingsAttendanceDepartureModuleMessages,
   HRSettingsVacations: hrsettingsVacationsMessages,
   socialMedia: socialMediaMessages,
   RoleTypes: roleTypesMessages,

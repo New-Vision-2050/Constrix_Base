@@ -102,16 +102,23 @@ ${messageGroupCode}
 }
 
 // Generate the structure.ts file with all imports
-function generateStructureFile(groups: Array<{ key: string; varName: string; dirName: string }>): void {
-  const imports = groups.map(({ varName, dirName }) => 
-    `import { ${varName}Messages } from "./groups/${dirName}";`
-  ).join('\n');
+function generateStructureFile(
+  groups: Array<{ key: string; varName: string; dirName: string }>
+): void {
+  const imports = groups
+    .map(
+      ({ varName, dirName }) =>
+        `import { ${varName}Messages } from "./groups/${dirName}";`
+    )
+    .join("\n");
 
-  const structureEntries = groups.map(({ key, varName }) => {
-    // Use quotes for keys with special characters
-    const keyStr = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) ? key : `"${key}"`;
-    return `  ${keyStr}: ${varName}Messages`;
-  }).join(',\n');
+  const structureEntries = groups
+    .map(({ key, varName }) => {
+      // Use quotes for keys with special characters
+      const keyStr = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) ? key : `"${key}"`;
+      return `  ${keyStr}: ${varName}Messages`;
+    })
+    .join(",\n");
 
   const fileContent = `import { MessagesGroup } from "./types";
 ${imports}
@@ -122,9 +129,9 @@ ${structureEntries},
 });
 `;
 
-  const filePath = path.join(__dirname, '../messages/structure.ts');
-  fs.writeFileSync(filePath, fileContent, 'utf-8');
-  console.log('\n✓ Generated structure.ts');
+  const filePath = path.join(__dirname, "../messages/structure.ts");
+  fs.writeFileSync(filePath, fileContent, "utf-8");
+  console.log("\n✓ Generated structure.ts");
 }
 
 // Process all top-level keys from ar.json
@@ -148,7 +155,7 @@ function convertAllTranslations(): void {
     if (isObject(arObj)) {
       const dirName = toKebabCase(key);
       const varName = toCamelCase(dirName);
-      
+
       createGroupFile(key, arObj, enObj);
       groups.push({ key, varName, dirName });
     }
