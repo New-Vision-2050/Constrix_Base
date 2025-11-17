@@ -536,7 +536,7 @@
         "branch": "Branch",
         "address": "address",
         "appointmentDate": "Appointment Date",
-        "image": "A 6*4 white background image is required."
+        "image": "A 64 white background image is required."
       },
       "uploadPhoto": {
         "title": "Upload Image",
@@ -955,7 +955,7 @@
         "jobTitle": "job title",
         "address": "address",
         "appointmentDate": "Appointment Date",
-        "image": "A 6*4 white background image is required."
+        "image": "A 64 white background image is required."
       },
       "uploadPhoto": {
         "title": "Upload Image",
@@ -1047,7 +1047,7 @@
         },
         "form": {
           "title": "Notification Settings",
-          "type": "Notification Type (Arabic)*",
+          "type": "Notification Type (Arabic)",
           "typePlaceholder": "Select notification type",
           "email": "Email",
           "emailPlaceholder": "Enter email",
@@ -2694,6 +2694,60 @@
         "save": "Save",
         "saveSuccess": "Saved successfully!",
         "saveError": "Failed to save. Please try again."
+      },
+      "table": {
+        "nameAr": "Category Name in Arabic",
+        "nameEn": "Category Name in English",
+        "type": "Category Type",
+        "edit": "Edit"
+      }
+    },
+    "founder": {
+      "title": "Founders Settings",
+      "addFounder": "Add New Founder",
+      "editFounder": "Edit Founder",
+      "success": "Success",
+      "error": "Error",
+      "activatedSuccessfully": "Founder activated successfully",
+      "deactivatedSuccessfully": "Founder deactivated successfully",
+      "failedToUpdateStatus": "Failed to update status",
+      "areYouSureReactivate": "Are you sure you want to reactivate this founder?",
+      "areYouSureDeactivate": "Are you sure you want to deactivate this founder?",
+      "form": {
+        "updateSuccess": "Update successful!",
+        "updateError": "Update failed. Please try again.",
+        "createSuccess": "Create successful!",
+        "createError": "Create failed. Please try again.",
+        "validationError": "Validation error",
+        "permissionDenied": "You don't have permission to perform this action",
+        "networkError": "Network error. Please try again.",
+        "nameAr": "Founder Name Arabic ",
+        "nameArRequired": "Founder name in Arabic is required",
+        "nameArMinLength": "Founder name in Arabic must be at least 2 characters",
+        "nameEn": "Founder Name English ",
+        "nameEnRequired": "Founder name in English is required",
+        "nameEnMinLength": "Founder name in English must be at least 2 characters",
+        "jobTitleAr": "Job Title Arabic ",
+        "jobTitleArRequired": "Job title in Arabic is required",
+        "jobTitleArMinLength": "Job title in Arabic must be at least 2 characters",
+        "jobTitleEn": "Job Title English ",
+        "jobTitleEnRequired": "Job title in English is required",
+        "jobTitleEnMinLength": "Job title in English must be at least 2 characters",
+        "descriptionAr": "Description Arabic ",
+        "descriptionArRequired": "Description in Arabic is required",
+        "descriptionEn": "Description English ",
+        "descriptionEnRequired": "Description in English is required",
+        "profileImage": "Profile Picture",
+        "profileImageRequired": "Profile image is required",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "table": {
+        "name": "Name",
+        "jobTitle": "Job Title",
+        "description": "Description",
+        "status": "Status",
+        "actions": "Actions"
       }
     }
   }

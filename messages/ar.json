@@ -2687,6 +2687,54 @@
         "saveSuccess": "تم الحفظ بنجاح!",
         "saveError": "فشل الحفظ. يرجى المحاولة مرة أخرى."
       }
+    },
+    "founder": {
+      "title": "إعدادات المؤسسين",
+      "addFounder": "اضافة مؤسس جديد",
+      "editFounder": "تعديل مؤسس",
+      "success": "نجاح",
+      "error": "خطأ",
+      "activatedSuccessfully": "تم تفعيل المؤسس بنجاح",
+      "deactivatedSuccessfully": "تم إلغاء تفعيل المؤسس بنجاح",
+      "failedToUpdateStatus": "فشل تحديث الحالة",
+      "areYouSureReactivate": "هل أنت متأكد من إعادة تفعيل هذا المؤسس؟",
+      "areYouSureDeactivate": "هل أنت متأكد من إلغاء تفعيل هذا المؤسس؟",
+      "form": {
+        "updateSuccess": "تم التحديث بنجاح!",
+        "updateError": "فشل التحديث. يرجى المحاولة مرة أخرى.",
+        "createSuccess": "تم الإنشاء بنجاح!",
+        "createError": "فشل الإنشاء. يرجى المحاولة مرة أخرى.",
+        "validationError": "خطأ في التحقق من البيانات",
+        "permissionDenied": "ليس لديك صلاحية لإجراء هذا الإجراء",
+        "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
+        "nameAr": "إسم المؤسس عربي ",
+        "nameArRequired": "اسم المؤسس بالعربية مطلوب",
+        "nameArMinLength": "اسم المؤسس بالعربية يجب أن يكون على الأقل حرفين",
+        "nameEn": "إسم المؤسس الانجليزية ",
+        "nameEnRequired": "اسم المؤسس بالإنجليزية مطلوب",
+        "nameEnMinLength": "اسم المؤسس بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "jobTitleAr": "المسمى الوظيفي عربي ",
+        "jobTitleArRequired": "المسمى الوظيفي بالعربية مطلوب",
+        "jobTitleArMinLength": "المسمى الوظيفي بالعربية يجب أن يكون على الأقل حرفين",
+        "jobTitleEn": "المسمى الوظيفي الانجليزية ",
+        "jobTitleEnRequired": "المسمى الوظيفي بالإنجليزية مطلوب",
+        "jobTitleEnMinLength": "المسمى الوظيفي بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "descriptionAr": "الوصف عربي ",
+        "descriptionArRequired": "الوصف بالعربية مطلوب",
+        "descriptionEn": "الوصف الانجليزية ",
+        "descriptionEnRequired": "الوصف بالإنجليزية مطلوب",
+        "profileImage": "الصورة الشخصية",
+        "profileImageRequired": "الصورة الشخصية مطلوبة",
+        "save": "حفظ",
+        "cancel": "إلغاء"
+      },
+      "table": {
+        "name": "الاسم",
+        "jobTitle": "المسمي الوظيفي",
+        "description": "الوصف",
+        "status": "الحالة",
+        "actions": "اجراءات"
+      }
     }
   }
 }
