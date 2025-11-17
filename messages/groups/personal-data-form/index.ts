@@ -30,6 +30,7 @@ export const personalDataFormMessages = new MessagesGroup({
   cancelButtonText: _m("Cancel", "إلغاء"),
   resetButtonText: _m("Clear Form", "مسح النموذج"),
   error: new MessagesGroup({
-
+    loading: _m("", "خطأ في تحميل البيانات"),
+    tryAgain: _m("", "يرجى المحاولة مرة أخرى لاحقا")
   })
 });

@@ -31,6 +31,9 @@ export const clientsModuleMessages = new MessagesGroup({
     companyClient: _m("Company Client", "جهة"),
     title: _m("Add New Client", "إضافة عميل جديد"),
     addClient: _m("Add New Client", "إضافة عميل جديد"),
+    submitButtonText: _m("Add", "إضافة"),
+    cancelButtonText: _m("Cancel", "إلغاء"),
+    resetButtonText: _m("Clear Form", "مسح النموذج"),
     email: _m("Email", "البريد الإلكتروني"),
     emailPlaceholder: _m("Enter email", "ادخل البريد الإلكتروني"),
     emailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
@@ -64,11 +67,6 @@ export const clientsModuleMessages = new MessagesGroup({
     brokerPlaceholder: _m("Select broker", "اختر الوسيط"),
     correspondenceAddress: _m("Correspondence Address", "عنوان المراسلات"),
     correspondenceAddressPlaceholder: _m("Enter correspondence address", "ادخل عنوان المراسلات"),
-    submitButtonText: _m("Add", "إضافة"),
-    cancelButtonText: _m("Cancel", "إلغاء"),
-    resetButtonText: _m("Clear Form", "مسح النموذج"),
-    companyClientFormTitle: _m("Create Company Client", "أنشاء جهة العميل"),
-    individualClientFormTitle: _m("Create Individual Client", "أنشاء الفرد الممثل للجهة"),
     country: _m("Country", "الدولة"),
     countryPlaceholder: _m("Select Country", "اختر الدولة"),
     countryRequired: _m("Country is required", "الدولة مطلوبة"),
@@ -84,10 +82,14 @@ export const clientsModuleMessages = new MessagesGroup({
     supportResponsible: _m("Support Responsible", "المسؤول عن الدعم"),
     supportResponsiblePlaceholder: _m("Select Support Responsible", "اختر المسؤول عن الدعم"),
     supportResponsibleRequired: _m("Support Responsible is required", "المسؤول عن الدعم مطلوب"),
+    companyClientFormTitle: _m("Create Company Client", "أنشاء جهة العميل"),
+    individualClientFormTitle: _m("Create Individual Client", "أنشاء الفرد الممثل للجهة"),
     Validation: new MessagesGroup({
       arabicName: _m("The name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)"),
       englishName: _m("The short name must be in English and not contain symbols", "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز")
-    })
+    }),
+    companyBrokerFormTitle: _m("", "إنشاء وسيط شركة"),
+    individualBrokerFormTitle: _m("", "إنشاء وسيط فرد")
   }),
   dialog: new MessagesGroup({
     triggerText: _m("Select location from map", "اختر الموقع من الخريطة"),

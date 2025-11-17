@@ -2,6 +2,9 @@ import { _m, MessagesGroup } from "../../types";
 
 export const docsLibraryMessages = new MessagesGroup({
   title: _m("Docs Library", "مكتبة المستندات"),
+  cards: new MessagesGroup({
+    noData: _m("No data to display", "لا توجد بيانات للعرض")
+  }),
   statistics: new MessagesGroup({
     documentStats: new MessagesGroup({
       title: _m("Number of company documents", "عدد المستندات الشركة"),
@@ -23,9 +26,6 @@ export const docsLibraryMessages = new MessagesGroup({
       badgeText: _m("expiring soon", "تنتهي قريباً")
     })
   }),
-  cards: new MessagesGroup({
-    noData: _m("No data to display", "لا توجد بيانات للعرض")
-  }),
   tabsTitles: new MessagesGroup({
     publicDocs: _m("Public Docs", "المستندات العامة"),
     empsDocs: _m("Employee Docs", "المستندات الموظفين"),
@@ -37,6 +37,17 @@ export const docsLibraryMessages = new MessagesGroup({
     documentType: _m("Document Type", "نوع المستند"),
     type: _m("Type", "النوع"),
     endDate: _m("End Date", "تاريخ النهاية")
+  }),
+  shareDialog: new MessagesGroup({
+    title: _m("Share", ""),
+    save: _m("Save", ""),
+    copy: _m("Copy Link", ""),
+    cancel: _m("Cancel", ""),
+    selectFolder: _m("Select Folder", ""),
+    searchFolder: _m("Search", ""),
+    noResults: _m("No Results", ""),
+    searchUsers: _m("Search Users", ""),
+    notes: _m("Please enter the email address of the user you want to share the files with", "")
   }),
   publicDocs: new MessagesGroup({
     allBranches: _m("All Branches", "جميع الفروع"),
@@ -108,8 +119,8 @@ export const docsLibraryMessages = new MessagesGroup({
       copyTitle: _m("Copy", "نسخ الى"),
       moveTitle: _m("Move", "نقل الى"),
       save: _m("Save", "حفظ"),
-      label: _m("To Directory", "الى مجلد"),
       cancel: _m("Cancel", "الغاء"),
+      label: _m("To Directory", "الى مجلد"),
       selectFolder: _m("Select Folder", "اختر مجلد"),
       searchFolder: _m("Search", "بحث"),
       noResults: _m("No Results", "لا توجد نتائج"),
@@ -147,6 +158,10 @@ export const docsLibraryMessages = new MessagesGroup({
       permission: _m("Permission", "الصلاحية"),
       public: _m("Public", "عامة"),
       private: _m("Private", "خاصة"),
+      createdAt: _m("Created At", ""),
+      createdAtPlaceholder: _m("Enter Created At", ""),
+      endDate: _m("End Date", ""),
+      endDatePlaceholder: _m("Enter End Date", ""),
       users: _m("Users", "المستخدمين"),
       usersPlaceholder: _m("Select users", "اختر المستخدمين"),
       file: _m("Attach logo or icon", "ارفاق شعار او ايقونة"),

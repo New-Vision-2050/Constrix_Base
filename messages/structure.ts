@@ -30,7 +30,6 @@ import { attendanceDepartureModuleMessages } from "./groups/attendance-departure
 import { hrSettingsMessages } from "./groups/hr-settings";
 import { hrsettingsAttendanceDepartureModuleMessages } from "./groups/hrsettings-attendance-departure-module";
 import { hrsettingsVacationsMessages } from "./groups/hrsettings-vacations";
-import { socialMediaMessages } from "./groups/social-media";
 import { roleTypesMessages } from "./groups/role-types";
 import { createRoleMessages } from "./groups/create-role";
 import { programsMessages } from "./groups/programs";
@@ -45,9 +44,10 @@ import { dealOfDayMessages } from "./groups/deal-of-day";
 import { featuredDealMessages } from "./groups/featured-deal";
 import { offerMessages } from "./groups/offer";
 import { termsMessages } from "./groups/terms";
-import { requestsMessages } from "./groups/requests";
 import { pagesMessages } from "./groups/pages";
 import { pagesSettingsMessages } from "./groups/pages-settings";
+import { socialMediaMessages } from "./groups/social-media";
+import { requestsMessages } from "./groups/requests";
 import { paymentMethodsMessages } from "./groups/payment-methods";
 import { contentManagementSystemMessages } from "./groups/content-management-system";
 
@@ -82,10 +82,8 @@ export const messagesStructure = new MessagesGroup({
   CRMSettingsModule: crmsettingsModuleMessages,
   AttendanceDepartureModule: attendanceDepartureModuleMessages,
   "hr-settings": hrSettingsMessages,
-  HRSettingsAttendanceDepartureModule:
-    hrsettingsAttendanceDepartureModuleMessages,
+  HRSettingsAttendanceDepartureModule: hrsettingsAttendanceDepartureModuleMessages,
   HRSettingsVacations: hrsettingsVacationsMessages,
-  socialMedia: socialMediaMessages,
   RoleTypes: roleTypesMessages,
   CreateRole: createRoleMessages,
   Programs: programsMessages,
@@ -100,9 +98,10 @@ export const messagesStructure = new MessagesGroup({
   featuredDeal: featuredDealMessages,
   offer: offerMessages,
   terms: termsMessages,
-  requests: requestsMessages,
   pages: pagesMessages,
   pagesSettings: pagesSettingsMessages,
+  socialMedia: socialMediaMessages,
+  requests: requestsMessages,
   paymentMethods: paymentMethodsMessages,
   "content-management-system": contentManagementSystemMessages,
 });

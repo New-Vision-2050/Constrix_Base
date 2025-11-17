@@ -2,8 +2,8 @@ import { _m, MessagesGroup } from "../../types";
 
 export const companyStructureMessages = new MessagesGroup({
   actions: new MessagesGroup({
-    viewMode: _m("View Mode", "عرض"),
     print: _m("Print", "طباعة"),
+    viewMode: _m("View Mode", "عرض"),
     exportPdf: _m("Export PDF", "تصدير PDF"),
     setAsParent: _m("Set as Parent", "تعيين كأب"),
     treeView: _m("Tree View", "عرض شجري"),
@@ -60,11 +60,14 @@ export const companyStructureMessages = new MessagesGroup({
           jobTypes: new MessagesGroup({
             title: _m("Job Types", "أنواع الوظائف")
           }),
-          managements: new MessagesGroup({
-
+          management: new MessagesGroup({
+            title: _m("Management", "")
           }),
           departments: new MessagesGroup({
             title: _m("Departments", "اعدادات الاقسام")
+          }),
+          managements: new MessagesGroup({
+            title: _m("", "اعدادات الادارات")
           })
         })
       })

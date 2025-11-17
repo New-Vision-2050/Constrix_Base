@@ -3,8 +3,8 @@ import { _m, MessagesGroup } from "../../types";
 export const hrSettingsMessages = new MessagesGroup({
   tabs: new MessagesGroup({
     attendance: _m("Attendance & Departure", "الحضور و الانصراف"),
-    vacations: _m("Holidays and vacations", "الإجازات و العطلات"),
     recruitment: _m("Recruitment", "التوظيف"),
+    vacations: _m("Holidays and vacations", "الإجازات و العطلات"),
     service: _m("Service", "الخدمة"),
     contractManagement: _m("Contract Management", "ادارة عقد العمل")
   }),

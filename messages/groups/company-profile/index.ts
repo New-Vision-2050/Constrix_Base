@@ -59,17 +59,34 @@ export const companyProfileMessages = new MessagesGroup({
     }),
     branches: new MessagesGroup({
       assignUsersDialog: new MessagesGroup({
-
+        title: _m("", "صلاحية التعديل علي الفرع"),
+        description: _m("", "أعطاء المستخدمين صلاحية التعديل علي الفرع"),
+        cancel: _m("", "الغاء"),
+        assign: _m("", "تعيين"),
+        searchUsers: _m("", "البحث عن مستخدمين"),
+        managerNote: _m("", "مدير الشركة :"),
+        branchManager: _m("", "مدير الفرع :")
       })
+    })
+  }),
+  branches: new MessagesGroup({
+    assignUsersDialog: new MessagesGroup({
+      title: _m("Branch Edit Permission", ""),
+      description: _m("Give users permission to edit this branch", ""),
+      cancel: _m("Cancel", ""),
+      assign: _m("Assign", ""),
+      searchUsers: _m("Search users", ""),
+      managerNote: _m("Company Manager", ""),
+      branchManager: _m("Branch Manager :", "")
     })
   }),
   officialDocs: new MessagesGroup({
     docsSettingsDialog: new MessagesGroup({
       title: _m("Document Settings", "اعدادات المستند"),
       addDoc: _m("Add Document", "اضافة مستند"),
+      docName: _m("Document Type Name", "اسم نوع المستند"),
       notifySettings: _m("Notification Settings", "اعدادات الاشعارات"),
       shareSettings: _m("Share Settings", "اعدادات المشاركة"),
-      docName: _m("Document Type Name", "اسم نوع المستند"),
       cancel: _m("Cancel", "الغاء"),
       save: _m("Save", "حفظ"),
       update: _m("Update", "تعديل"),
@@ -77,9 +94,9 @@ export const companyProfileMessages = new MessagesGroup({
       confirm: _m("Confirm", "تأكيد"),
       deleteConfirm: _m("Confirm Delete", "تأكيد الحذف"),
       deleteQuestion: _m("Are you sure you want to delete?", "هل أنت متاكد من الحذف؟"),
-      deleteConfirmMessage: _m("Are you sure you want to delete this document type?", "تأكيد حذف نوع المستند"),
       deleteSuccess: _m("deleted successfully", "تم حذف بنجاح"),
       deleteError: _m("Failed to delete", "فشل حذف"),
+      deleteConfirmMessage: _m("Are you sure you want to delete this document type?", "تأكيد حذف نوع المستند"),
       errorCase: new MessagesGroup({
         title: _m("Failed to load document types", "فشل في تحميل أنواع المستندات"),
         description: _m("Please check your connection and try again.", "يرجى التحقق من اتصالك ومحاولة مرة أخرى."),

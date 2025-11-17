@@ -17,7 +17,9 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
       status: new MessagesGroup({
         present: _m("Present", "حاضر"),
         late: _m("Late", "متأخر"),
-        absent: _m("Absent", "غائب")
+        absent: _m("Absent", "غائب"),
+        holiday: _m("", "في إجازة"),
+        unspecified: _m("", "غير محدد")
       })
     })
   }),
@@ -31,8 +33,8 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
     fields: new MessagesGroup({
       employeeName: _m("Employee Name", "اسم الموظف"),
       phone: _m("Mobile Number", "رقم الجوال"),
-      department: _m("Department", "القسم"),
       management: _m("Management", "الإدارة"),
+      department: _m("Department", "القسم"),
       email: _m("Email", "البريد الالكتروني"),
       branch: _m("Branch", "الفرع")
     }),
@@ -58,11 +60,6 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
     errorLoading: _m("Error loading data", "حدث خطأ أثناء التحميل"),
     retry: _m("Retry", "إعادة المحاولة"),
     noAttendanceData: _m("No attendance has been recorded by any employee yet", "لم يتم تسجيل حضور من قبل اي موظف بعد"),
-    layers: new MessagesGroup({
-      standard: _m("Standard Map", "خريطة قياسية"),
-      satellite: _m("Satellite Map", "صور الأقمار الصناعية"),
-      hybrid: _m("Hybrid", "مختلطة")
-    }),
     employeeStatus: new MessagesGroup({
       present: _m("Present", "حاضر"),
       absent: _m("Absent", "غائب"),
@@ -87,6 +84,11 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
       totalActualHours: _m("Total actual hours", "إجمالي الساعات الفعلية"),
       totalDeductedTime: _m("Total deducted time", "إجمالي الوقت المستقطع")
     }),
+    layers: new MessagesGroup({
+      standard: _m("Standard Map", "خريطة قياسية"),
+      satellite: _m("Satellite Map", "صور الأقمار الصناعية"),
+      hybrid: _m("Hybrid", "مختلطة")
+    }),
     loading: _m("Loading employee data...", "جاري تحميل بيانات الموظفين..."),
     tooltip: new MessagesGroup({
       employee: _m("Employee:", "الموظف:"),
@@ -95,7 +97,8 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
       lastSeen: _m("Last Seen:", "آخر ظهور:"),
       clockIn: _m("Clock In:", "وقت الدخول:"),
       phone: _m("Phone", "الهاتف")
-    })
+    }),
+    unspecified: _m("", "غير محدد")
   }),
   MapSearchFilter: new MessagesGroup({
     searchPlaceholder: _m("Search", "البحث"),

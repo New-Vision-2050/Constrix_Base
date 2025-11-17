@@ -1,15 +1,6 @@
 import { _m, MessagesGroup } from "../../types";
 
 export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
-  attendanceDeterminantDetails: new MessagesGroup({
-    determinantType: _m("Determinant System Type", "نظام المحدد"),
-    systemNotFound: _m("System not found", "نظام غير موجود"),
-    workHours: _m("Working Hours", "عدد ساعات العمل"),
-    hours: _m("hours", "ساعات"),
-    workdays: _m("Working Days", "أيام العمل"),
-    branches: _m("Branches", "الفروع"),
-    notes: _m("Notes", "ملاحظات")
-  }),
   tabs: new MessagesGroup({
     attendance: _m("Attendance", "الحضور"),
     departure: _m("Departure", "الانصراف"),
@@ -106,5 +97,14 @@ export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
       active: _m("Active", "نشط"),
       inactive: _m("Inactive", "غير نشط")
     })
+  }),
+  attendanceDeterminantDetails: new MessagesGroup({
+    determinantType: _m("Determinant System Type", "نظام المحدد"),
+    systemNotFound: _m("System not found", "نظام غير موجود"),
+    workHours: _m("Working Hours", "عدد ساعات العمل"),
+    hours: _m("hours", "ساعات"),
+    workdays: _m("Working Days", "أيام العمل"),
+    branches: _m("Branches", "الفروع"),
+    notes: _m("Notes", "ملاحظات")
   })
 });

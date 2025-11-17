@@ -37,5 +37,8 @@ export const couponMessages = new MessagesGroup({
   minPurchase: _m("Min Purchase (SAR)", "الحد الأدنى للشراء (SAR)"),
   maxDiscount: _m("Max Discount (SAR)", "الحد الأقصى للخصم (SAR)"),
   startDate: _m("Start Date", "تاريخ البدء"),
-  expireDate: _m("Expire Date", "تاريخ الإنتهاء")
+  expireDate: _m("Expire Date", "تاريخ الإنتهاء"),
+  selectCouponType: _m("", "اختر نوع القسيمة"),
+  freeDelivery: _m("", "توصيل مجاني"),
+  firstOrder: _m("", "الطلب الأول")
 });

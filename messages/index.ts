@@ -1,6 +1,4 @@
 import { messagesStructure } from "./structure";
-import enJson from "./en.json";
-import arJson from "./ar.json";
 
 // Merge the structured messages with JSON file messages
 const enFromStructure = messagesStructure.getEn();
@@ -10,12 +8,10 @@ const arFromStructure = messagesStructure.getAr();
 // JSON messages take precedence
 const en = {
   ...enFromStructure,
-  ...enJson,
 };
 
 const ar = {
   ...arFromStructure,
-  ...arJson,
 };
 
 export const messages = {

@@ -24,8 +24,8 @@ export const contentManagementSystemMessages = new MessagesGroup({
       nameEnRequired: _m("Category name in English is required", "اسم الفئة بالإنجليزية مطلوب"),
       nameEnMinLength: _m("Category name in English must be at least 2 characters", "اسم الفئة بالإنجليزية يجب أن يكون على الأقل حرفين"),
       type: _m("Category Type", "نوع الفئة"),
-      typePlaceholder: _m("Select category type", "اختر نوع الفئة"),
       typeRequired: _m("Category type is required", "نوع الفئة مطلوب"),
+      typePlaceholder: _m("Select category type", "اختر نوع الفئة"),
       save: _m("Save", "حفظ"),
       cancel: _m("Cancel", "إلغاء")
     }),

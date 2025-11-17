@@ -40,5 +40,6 @@ export const labelsMessages = new MessagesGroup({
   sku: _m("SKU", "رقم المنتج"),
   stock: _m("Stock", "الكمية"),
   image: _m("Image", "صورة"),
-  currency: _m("SAR", "ريال")
+  currency: _m("SAR", "ريال"),
+  type: _m("", "النوع")
 });

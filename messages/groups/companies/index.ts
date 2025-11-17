@@ -26,8 +26,8 @@ export const companiesMessages = new MessagesGroup({
   createCompany: _m("Create Company", "انشاء شركة"),
   SaveCompany: _m("The company was saved with number", "تم حفظ الشركة برقم"),
   Validation: new MessagesGroup({
-    arabicName: _m("The name should be in Arabic letters", "الاسم التجاري يجب ان يكون باللغه العربية"),
     englishName: _m("Short name should be in English", "الاسم المختصر يجب ان يكون باللغه الانجليزية"),
+    arabicName: _m("The name should be in Arabic letters", "الاسم التجاري يجب ان يكون باللغه العربية"),
     arabicFirstName: _m("The first name should be in Arabic letters", "اسم المستخدم الاول يجب ان يكون باللغه العربية"),
     arabicLastName: _m("The last name should be in Arabic letters", "اسم المستخدم الأخير يجب ان يكون باللغه العربية")
   })

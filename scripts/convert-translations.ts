@@ -29,42 +29,71 @@ function isObject(value: unknown): boolean {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+// Deep merge translations from both JSON files
+// Creates a unified structure with both en and ar translations
+function mergeTranslations(
+  enData: Record<string, unknown>,
+  arData: Record<string, unknown>
+): Record<string, { en: Record<string, unknown>; ar: Record<string, unknown> }> {
+  const merged: Record<string, { en: Record<string, unknown>; ar: Record<string, unknown> }> = {};
+  const allKeys = new Set([...Object.keys(enData), ...Object.keys(arData)]);
+
+  for (const key of allKeys) {
+    const enValue = enData[key];
+    const arValue = arData[key];
+
+    // Get the values, defaulting to empty objects if not present
+    const enObj = isObject(enValue) ? (enValue as Record<string, unknown>) : {};
+    const arObj = isObject(arValue) ? (arValue as Record<string, unknown>) : {};
+
+    merged[key] = { en: enObj, ar: arObj };
+  }
+
+  return merged;
+}
+
 // Generate the MessagesGroup structure for a nested object
 function generateMessageGroupCode(
-  obj: Record<string, unknown>,
   enObj: Record<string, unknown>,
+  arObj: Record<string, unknown>,
   indent: string = "  "
 ): string {
   const entries: string[] = [];
+  
+  // Merge keys from both objects to ensure we don't miss any
+  const mergedKeys = new Set([...Object.keys(enObj), ...Object.keys(arObj)]);
 
-  for (const key in obj) {
-    const arValue = obj[key];
-    const enValue = enObj?.[key];
+  for (const key of mergedKeys) {
+    const enValue = enObj[key];
+    const arValue = arObj[key];
 
     // Use quotes for keys with special characters or reserved words
     const needsQuotes = !/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key);
     const keyStr = needsQuotes ? `"${key}"` : key;
 
-    if (isObject(arValue)) {
-      // Nested object - create a MessagesGroup
-      const nestedCode = generateMessageGroupCode(
-        arValue as Record<string, unknown>,
-        enValue as Record<string, unknown>,
-        indent + "  "
-      );
+    if (isObject(enValue) || isObject(arValue)) {
+      // At least one is an object - create a MessagesGroup
+      const enNested = isObject(enValue) ? (enValue as Record<string, unknown>) : {};
+      const arNested = isObject(arValue) ? (arValue as Record<string, unknown>) : {};
+      
+      const nestedCode = generateMessageGroupCode(enNested, arNested, indent + "  ");
       entries.push(
         `${indent}${keyStr}: new MessagesGroup({\n${nestedCode}\n${indent}})`
       );
-    } else if (typeof arValue === "string" && typeof enValue === "string") {
-      // Leaf node - create a message with _m()
-      const enEscaped = enValue
+    } else {
+      // Both are primitives (strings) - create a message with _m()
+      const enString = typeof enValue === "string" ? enValue : "";
+      const arString = typeof arValue === "string" ? arValue : "";
+      
+      const enEscaped = enString
         .replace(/\\/g, "\\\\")
         .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n");
-      const arEscaped = arValue
+      const arEscaped = arString
         .replace(/\\/g, "\\\\")
         .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n");
+      
       entries.push(`${indent}${keyStr}: _m("${enEscaped}", "${arEscaped}")`);
     }
   }
@@ -75,8 +104,8 @@ function generateMessageGroupCode(
 // Create a group file
 function createGroupFile(
   groupName: string,
-  arObj: Record<string, unknown>,
-  enObj: Record<string, unknown>
+  enObj: Record<string, unknown>,
+  arObj: Record<string, unknown>
 ): void {
   const dirName = toKebabCase(groupName);
   const varName = toCamelCase(dirName);
@@ -87,7 +116,7 @@ function createGroupFile(
     fs.mkdirSync(dirPath, { recursive: true });
   }
 
-  const messageGroupCode = generateMessageGroupCode(arObj, enObj);
+  const messageGroupCode = generateMessageGroupCode(enObj, arObj);
 
   const fileContent = `import { _m, MessagesGroup } from "../../types";
 
@@ -134,38 +163,40 @@ ${structureEntries},
   console.log("\n✓ Generated structure.ts");
 }
 
-// Process all top-level keys from ar.json
+// Process all top-level keys from both JSON files
 function convertAllTranslations(): void {
   console.log("Starting translation conversion...\n");
 
-  // Skip 'common' and 'navigation' as they already exist
-  const skipGroups: string[] = [];
+  // Step 1: Merge translations from both JSON files
+  console.log("Step 1: Merging translations from en.json and ar.json...");
+  const mergedTranslations = mergeTranslations(enJson, arJson);
+  console.log(`✓ Merged ${Object.keys(mergedTranslations).length} unique groups\n`);
 
+  const skipGroups: string[] = [];
   const groups: Array<{ key: string; varName: string; dirName: string }> = [];
 
-  for (const key in arJson) {
+  // Step 2: Convert merged object to directory structure
+  console.log("Step 2: Generating message group files...\n");
+  
+  for (const [key, { en, ar }] of Object.entries(mergedTranslations)) {
     if (skipGroups.includes(key)) {
-      console.log(`⊘ Skipping ${key} (already exists)`);
+      console.log(`⊘ Skipping ${key} (in skip list)`);
       continue;
     }
 
-    const arObj = arJson[key];
-    const enObj = enJson[key];
+    const dirName = toKebabCase(key);
+    const varName = toCamelCase(dirName);
 
-    if (isObject(arObj)) {
-      const dirName = toKebabCase(key);
-      const varName = toCamelCase(dirName);
-
-      createGroupFile(key, arObj, enObj);
-      groups.push({ key, varName, dirName });
-    }
+    createGroupFile(key, en, ar);
+    groups.push({ key, varName, dirName });
   }
 
-  // Generate the structure.ts file
+  // Step 3: Generate the structure.ts file
+  console.log("\nStep 3: Generating structure.ts...");
   generateStructureFile(groups);
 
   console.log("\n✓ Conversion complete!");
-  console.log("\nNext step: Run validation to check for missing translations");
+  console.log("\nAll translations from both JSON files have been merged and converted.");
 }
 
 // Run the conversion
