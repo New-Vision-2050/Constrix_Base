@@ -2711,6 +2711,12 @@
         "descriptionEnMinLength": "وصف المشروع بالإنجليزية يجب أن يكون على الأقل 10 حروف",
         "detailsRequired": "يجب أن يكون لديك على الأقل بيانات واحدة",
         "detailArRequired": "بيان المشروع بالعربية مطلوب"
+      },
+      "projectTypesTable": {
+        "projectType": "نوع المشروع",
+        "projectsCount": "عدد المشاريع",
+        "group": "المجموعة",
+        "edit": "تعديل"
       }
     }
   }

@@ -2719,6 +2719,12 @@
         "descriptionEnMinLength": "Project description in English must be at least 10 characters",
         "detailsRequired": "At least one detail is required",
         "detailArRequired": "Detail in Arabic is required"
+      },
+      "projectTypesTable": {
+        "projectType": "Project Type",
+        "projectsCount": "Projects Count",
+        "group": "Group",
+        "edit": "Edit"
       }
     }
   }

@@ -2,7 +2,7 @@
  * Project interface for company dashboard
  * Represents a project entity with all its properties
  */
-export interface CompanyDashboardProject {
+export interface CMSProject {
   id: string;
   title_ar?: string;
   title_en?: string;
@@ -30,3 +30,11 @@ export interface ProjectDetail {
   service_id: string;
 }
 
+
+export interface CMSProjectType {
+  id: string;
+  name_ar: string;
+  name_en: string;
+  group: string;
+  projects_count: number;
+}
