@@ -2725,6 +2725,23 @@
         "projectsCount": "Projects Count",
         "group": "Group",
         "edit": "Edit"
+      },
+      "projectTypeForm": {
+        "nameAr": "Project Type Name in Arabic",
+        "nameArPlaceholder": "Enter project type name in Arabic",
+        "nameArRequired": "Project type name in Arabic is required",
+        "nameArMinLength": "Project type name in Arabic must be at least 2 characters",
+        "nameEn": "Project Type Name in English",
+        "nameEnPlaceholder": "Enter project type name in English",
+        "nameEnRequired": "Project type name in English is required",
+        "nameEnMinLength": "Project type name in English must be at least 2 characters",
+        "group": "Group",
+        "groupPlaceholder": "Enter group",
+        "groupRequired": "Group is required",
+        "groupMinLength": "Group must be at least 2 characters",
+        "groupInvalid": "Group is invalid",
+        "save": "Save",
+        "cancel": "Cancel"
       }
     }
   }

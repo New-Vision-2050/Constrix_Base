@@ -2717,6 +2717,23 @@
         "projectsCount": "عدد المشاريع",
         "group": "المجموعة",
         "edit": "تعديل"
+      },
+      "projectTypeForm": {
+        "nameAr": "اسم النوع بالعربية",
+        "nameArPlaceholder": "أدخل اسم النوع بالعربية",
+        "nameArRequired": "اسم النوع بالعربية مطلوب",
+        "nameArMinLength": "اسم النوع بالعربية يجب أن يكون على الأقل حرفين",
+        "nameEn": "اسم النوع بالإنجليزية",
+        "nameEnPlaceholder": "أدخل اسم النوع بالإنجليزية",
+        "nameEnRequired": "اسم النوع بالإنجليزية مطلوب",
+        "nameEnMinLength": "اسم النوع بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "group": "المجموعة",
+        "groupPlaceholder": "أدخل المجموعة",
+        "groupRequired": "المجموعة مطلوبة",
+        "groupMinLength": "المجموعة يجب أن يكون على الأقل حرفين",
+        "groupInvalid": "المجموعة غير صالحة",
+        "save": "حفظ",
+        "cancel": "إلغاء"
       }
     }
   }
