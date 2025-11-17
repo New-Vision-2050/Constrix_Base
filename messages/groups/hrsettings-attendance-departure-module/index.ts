@@ -1,0 +1,110 @@
+import { _m, MessagesGroup } from "../../types";
+
+export const hrsettingsAttendanceDepartureModuleMessages = new MessagesGroup({
+  tabs: new MessagesGroup({
+    attendance: _m("Attendance", "الحضور"),
+    departure: _m("Departure", "الانصراف"),
+    leaves: _m("Leaves", "الإجازات"),
+    vacations: _m("Official Holidays", "العطلات الرسمية")
+  }),
+  attendanceDeterminants: new MessagesGroup({
+    noScheduledDays: _m("No scheduled days", "لا يوجد أيام مجدولة"),
+    selectDayFirst: _m("Please select a day first", "اختر يوماً أولاً"),
+    periodEndRequired: _m("Period end time is required", "الوقت النهايي للفترة مطلوب"),
+    periods: _m("Periods", "الفترات"),
+    title: _m("Attendance Determinants", "محددات الحضور"),
+    createDeterminant: _m("Create New Determinant", "إنشاء محدد جديد"),
+    allDeterminants: _m("All Determinants", "جميع المحددات"),
+    branchDeterminant: _m("Branch Determinant", "محدد فرع"),
+    workHours: _m("Work Hours", "عدد ساعات العمل"),
+    hours: _m("hours", "ساعات"),
+    systemNotFound: _m("System not found", "نظام غير موجود"),
+    notes: _m("Notes", "ملاحظات"),
+    submitButtonText: _m("Save Determinant", "حفظ المحدد"),
+    cancelButtonText: _m("Cancel", "إلغاء"),
+    form: new MessagesGroup({
+      AttendanceDaysDialog: new MessagesGroup({
+        periods: _m("Periods", "الفترات"),
+        timePeriodLabel: _m("Time Period", "الفترة الزمنية"),
+        startTimeLabel: _m("Start Time", "البداية"),
+        earlyPeriodLabel: _m("Early Period", "الفترة المبكرة"),
+        latenessPeriodLabel: _m("Lateness Period", "الفترة المتأخرة"),
+        endTimeLabel: _m("End Time", "النهاية"),
+        durationLabel: _m("Duration", "المدة"),
+        extendsToNextDay: _m("Extends to next day", "تمتد إلى اليوم التالي"),
+        extendsToNextDayWarning: _m("Please note that extends to next day is checked and end time may be less than start time without any validation", "يرجى ملاحظة أن تمتد إلى اليوم التالي مفعل ووقت النهاية قد يكون أقل من وقت البداية بدون أي تحقق"),
+        noPeriods: _m("No time periods found. Please click 'Add Period' to create a new period.", "لا توجد فترات زمنية. الرجاء النقر على 'إضافة فترة' لإنشاء فترة جديدة."),
+        hours: _m("Hours", "ساعة"),
+        timeValidationError: _m("Time validation error", "وقت البداية يجب أن يكون قبل وقت النهاية"),
+        timeFormatError: _m("Must enter valid time in format hours:minutes like 09:00", "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"),
+        periodEndMustBeAfterStart: _m("End time must be after start time", "وقت النهاية يجب أن يكون بعد وقت البداية"),
+        startTimeBeforeEndTime: _m("Start time must be before end time", "وقت البداية قبل وقت النهاية"),
+        addPeriod: _m("Add Period", "إضافة فترة"),
+        editPeriods: _m("Edit Periods", "تعديل فترات"),
+        selectDayFirst: _m("Select day first", "يجب اختيار اليوم أولا"),
+        deletePeriod: _m("Delete Period", "حذف الفترة"),
+        periodStartPlaceholder: _m("09:00", "09:00"),
+        periodEndPlaceholder: _m("17:00", "17:00"),
+        periodStartRequired: _m("Period start time is required", "بداية الفترة مطلوبة"),
+        periodEndRequired: _m("Period end time is required", "نهاية الفترة مطلوبة")
+      }),
+      addAttendanceDays: _m("Add Attendance Days", "أضافة أيام حضور"),
+      editAttendanceDay: _m("Edit Attendance Day", "تعديل يوم حضور"),
+      title: _m("Add New Determinant", "إضافة محدد جديد"),
+      editTitle: _m("Edit Determinant", "تعديل محدد"),
+      basicInfo: _m("Basic Information", "المعلومات الأساسية"),
+      determinantName: _m("Determinant Name", "اسم المحدد"),
+      determinantNamePlaceholder: _m("Cairo Branch", "فرع القاهرة"),
+      determinantNameRequired: _m("Determinant name is required", "اسم المحدد مطلوب"),
+      determinantNamePattern: _m("Determinant name must contain only letters and numbers", "اسم المحدد يجب أن يحتوي على حروف وأرقام فقط"),
+      systemType: _m("System Type", "نظام المحدد"),
+      systemTypePlaceholder: _m("Regular", "منتظم"),
+      systemTypeRequired: _m("System type is required", "نظام المحدد مطلوب"),
+      branches: _m("Branches", "الفروع"),
+      branchesRequired: _m("At least one branch must be selected", "يجب اختيار فرع واحد على الأقل"),
+      locationType: _m("Location Type", "نوع الموقع"),
+      mainLocation: _m("Default branch location", "موقع الفرع الافتراضي"),
+      customLocation: _m("Custom location for each branch", "موقع مخصص لكل فرع"),
+      openMap: _m("Open Map", "فتح الخريطة"),
+      workingHours: _m("Working Hours", "ساعات العمل"),
+      workingDays: _m("Working Days", "أيام العمل"),
+      periodStart: _m("Period Start", "بداية الفترة"),
+      periodEnd: _m("Period End", "نهاية الفترة"),
+      newDay: _m("Next Day", "اليوم التالي"),
+      periodStartPlaceholder: _m("09:00", "09:00"),
+      periodEndPlaceholder: _m("17:00", "17:00"),
+      periodStartRequired: _m("Period start time is required", "بداية الفترة مطلوبة"),
+      periodEndRequired: _m("Period end time is required", "نهاية الفترة مطلوبة"),
+      timeFormatError: _m("Must enter valid time in format hours:minutes like 09:00", "يجب إدخال وقت صحيح بتنسيق ساعات:دقائق مثل 09:00"),
+      periodEndMustBeAfterStart: _m("End time must be after start time", "وقت النهاية يجب أن يكون بعد وقت البداية"),
+      startTimeBeforeEndTime: _m("Start time must be before end time", "وقت البداية قبل وقت النهاية"),
+      addPeriod: _m("Add Period", "إضافة فترة"),
+      editPeriods: _m("Edit Periods", "تعديل فترات"),
+      deletePeriod: _m("Delete Period", "حذف الفترة"),
+      submitButtonText: _m("Save Determinant", "حفظ المحدد"),
+      cancelButtonText: _m("Cancel", "إلغاء"),
+      nextButtonText: _m("Next", "التالي"),
+      prevButtonText: _m("Previous", "السابق")
+    }),
+    determinantsList: new MessagesGroup({
+      allDeterminants: _m("All Determinants", "جميع المحددات")
+    }),
+    error: new MessagesGroup({
+      loading: _m("Error in loading determinants", "خطأ في تحميل المحددات"),
+      tryAgain: _m("Please try again later", "يرجى المحاولة مرة أخرى لاحقا")
+    }),
+    status: new MessagesGroup({
+      active: _m("Active", "نشط"),
+      inactive: _m("Inactive", "غير نشط")
+    })
+  }),
+  attendanceDeterminantDetails: new MessagesGroup({
+    determinantType: _m("Determinant System Type", "نظام المحدد"),
+    systemNotFound: _m("System not found", "نظام غير موجود"),
+    workHours: _m("Working Hours", "عدد ساعات العمل"),
+    hours: _m("hours", "ساعات"),
+    workdays: _m("Working Days", "أيام العمل"),
+    branches: _m("Branches", "الفروع"),
+    notes: _m("Notes", "ملاحظات")
+  })
+});
