@@ -2658,6 +2658,12 @@
         "type": "Category Type",
         "edit": "Edit"
       }
+    },
+    "projects": {
+      "tabs": {
+        "projects": "Projects",
+        "projectsTypes": "Projects Types"
+      }
     }
   }
 }
