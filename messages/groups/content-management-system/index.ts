@@ -237,6 +237,120 @@ export const contentManagementSystemMessages = new MessagesGroup({
       actions: _m("Actions", "الإجراءات"),
     }),
   }),
+  services: new MessagesGroup({
+    addService: _m("Add New Service", "اضافة خدمة جديدة"),
+    editService: _m("Edit Service", "تعديل خدمة"),
+    form: new MessagesGroup({
+      nameAr: _m("Service name (Arabic)", "اسم الخدمة بالعربي"),
+      nameArPlaceholder: _m(
+        "Enter service name in Arabic",
+        "أدخل اسم الخدمة بالعربية"
+      ),
+      nameArRequired: _m(
+        "Arabic service name is required",
+        "اسم الخدمة بالعربية مطلوب"
+      ),
+      nameArMinLength: _m(
+        "Arabic service name must be at least 2 characters",
+        "اسم الخدمة بالعربية يجب أن يكون على الأقل حرفين"
+      ),
+      nameEn: _m("Service name (English)", "اسم الخدمة بالانجليزية"),
+      nameEnPlaceholder: _m(
+        "Enter service name in English",
+        "أدخل اسم الخدمة بالإنجليزية"
+      ),
+      nameEnRequired: _m(
+        "English service name is required",
+        "اسم الخدمة بالإنجليزية مطلوب"
+      ),
+      nameEnMinLength: _m(
+        "English service name must be at least 2 characters",
+        "اسم الخدمة بالإنجليزية يجب أن يكون على الأقل حرفين"
+      ),
+      requestId: _m("Request ID", "رقم تعريف الطلب"),
+      requestIdPlaceholder: _m("Enter request ID", "أدخل رقم تعريف الطلب"),
+      requestIdRequired: _m("Request ID is required", "رقم تعريف الطلب مطلوب"),
+      category: _m("Category", "الفئة"),
+      categoryPlaceholder: _m("Choose Category", "أختار الفئة"),
+      categoryRequired: _m("Category is required", "الفئة مطلوبة"),
+      descriptionAr: _m("Service description (Arabic)", "وصف الخدمة بالعربي"),
+      descriptionArPlaceholder: _m(
+        "Enter service description in Arabic",
+        "أدخل وصف الخدمة بالعربية"
+      ),
+      descriptionArRequired: _m(
+        "Arabic service description is required",
+        "وصف الخدمة بالعربية مطلوب"
+      ),
+      descriptionEn: _m(
+        "Service description (English)",
+        "وصف الخدمة بالانجليزية"
+      ),
+      descriptionEnPlaceholder: _m(
+        "Enter service description in English",
+        "أدخل وصف الخدمة بالإنجليزية"
+      ),
+      descriptionEnRequired: _m(
+        "English service description is required",
+        "وصف الخدمة بالإنجليزية مطلوب"
+      ),
+      featuredServicesTitle: _m(
+        "Featured Services (Display on homepage)",
+        "أبرز الخدمات (العرض في الصفحة الرئيسية)"
+      ),
+      featuredServicesSubtitle: _m(
+        "Display this service on the homepage",
+        "عرض هذه الخدمة في الصفحة الرئيسية"
+      ),
+      iconImage: _m("Icon", "أيقونة"),
+      iconImageRequired: _m("Icon image is required", "صورة الأيقونة مطلوبة"),
+      mainImage: _m("Main Image", "الصورة الرئيسية"),
+      mainImageRequired: _m("Main image is required", "الصورة الرئيسية مطلوبة"),
+      imageMaxSize: _m("Max image size: 3MB", "اقصى حجم الصورة : - 3MB"),
+      imageDimensions: _m("2160x2160", "2160x2160"),
+      previousWorksTitle: _m("Previous Works", "الاعمال اسابقة"),
+      addPreviousWork: _m("Add", "إضافة"),
+      noPreviousWorks: _m(
+        "No previous works added yet",
+        "لم يتم إضافة أعمال سابقة بعد"
+      ),
+      previousWork: _m("Previous Work", "العمل السابق"),
+      previousWorkDescription: _m("Description", "الوصف"),
+      previousWorkDescriptionPlaceholder: _m("Enter description", "أدخل الوصف"),
+      previousWorkDescriptionRequired: _m(
+        "Previous work description is required",
+        "وصف العمل السابق مطلوب"
+      ),
+      previousWorkImage: _m("Attach image", "ارفاق صورة"),
+      updateSuccess: _m(
+        "Service updated successfully!",
+        "تم تحديث الخدمة بنجاح!"
+      ),
+      updateError: _m(
+        "Failed to update service. Please try again.",
+        "فشل تحديث الخدمة. يرجى المحاولة مرة أخرى."
+      ),
+      createSuccess: _m(
+        "Service created successfully!",
+        "تم إنشاء الخدمة بنجاح!"
+      ),
+      createError: _m(
+        "Failed to create service. Please try again.",
+        "فشل إنشاء الخدمة. يرجى المحاولة مرة أخرى."
+      ),
+      validationError: _m("Validation error", "خطأ في التحقق من البيانات"),
+      save: _m("Save", "حفظ"),
+    }),
+    table: new MessagesGroup({
+      serviceName: _m("Service Name", "اسم الخدمة"),
+      category: _m("Category", "الفئة"),
+      type: _m("Type", "النوع"),
+      status: _m("Status", "الحالة"),
+      actions: _m("Actions", "اجراء"),
+      statusUpdated: _m("Status updated successfully", "تم تحديث الحالة بنجاح"),
+      statusUpdateError: _m("Failed to update status", "فشل تحديث الحالة"),
+    }),
+  }),
   "our-services": new MessagesGroup({
     mainSection: _m("Main Section", "القسم الرئيسي"),
     departmentNumber: _m("Section No.", "قسم رقم"),
