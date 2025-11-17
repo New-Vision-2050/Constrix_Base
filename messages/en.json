@@ -2749,6 +2749,28 @@
         "status": "Status",
         "actions": "Actions"
       }
+    },
+    "mainData": {
+      "basicData": {
+        "title": "Basic Data",
+        "siteTitle": "Site Title",
+        "siteTitlePlaceholder": "Enter site title",
+        "siteLogo": "Site Logo",
+        "logoMaxSize": "3MB - 2160x2160",
+        "logoDimensions": "2160x2160"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "primaryColor": "Primary Color",
+        "secondaryColor": "Secondary Color",
+        "backgroundColor": "Background Color",
+        "saveChanges": "Save Changes"
+      },
+      "validation": {
+        "invalidColor": "Invalid color format. Must be in hex format (e.g., #FFFFFF)"
+      },
+      "saveSuccess": "Saved successfully",
+      "saveError": "Save failed"
     }
   }
 }
