@@ -2667,6 +2667,34 @@
         "projectsTypes": "Projects Types"
       },
       "addProjectForm": {
+        "addProject": "Add New Project",
+        "editProject": "Edit Project",
+        "save": "Save",
+        "updateSuccess": "Project updated successfully!",
+        "createSuccess": "Project created successfully!",
+        "updateError": "Failed to update project. Please try again.",
+        "createError": "Failed to create project. Please try again.",
+        "validationError": "Validation error",
+        "featuredServices": "Featured Services (Display on Homepage)",
+        "mainImage": "Main Image",
+        "subImages": "Sub Images (Attach images)",
+        "type": "Project Type",
+        "typePlaceholder": "Select Project Type",
+        "nameAr": "Project Name in Arabic",
+        "nameEn": "Project Name in English",
+        "descriptionAr": "Project Description in Arabic",
+        "descriptionEn": "Project Description in English",
+        "descriptionArPlaceholder": "Enter description in Arabic",
+        "descriptionEnPlaceholder": "Enter description in English",
+        "details": "Details",
+        "addDetail": "Add Detail",
+        "deleteDetail": "Delete Detail",
+        "delete": "Delete",
+        "detailAr": "Detail in Arabic",
+        "detailEn": "Detail in English",
+        "service": "Service",
+        "servicePlaceholder": "Select Service",
+        "mainImageRequiredWhenFeatured": "Main image is required when featured is enabled",
         "title": "Add New Project",
         "titleAr": "Project Name in Arabic",
         "titleArPlaceholder": "Enter project name in Arabic",
@@ -2690,7 +2718,7 @@
         "descriptionEnRequired": "Project description in English is required",
         "descriptionEnMinLength": "Project description in English must be at least 10 characters",
         "detailsRequired": "At least one detail is required",
-        "detailArRequired": "Project detail in Arabic is required"
+        "detailArRequired": "Detail in Arabic is required"
       }
     }
   }
