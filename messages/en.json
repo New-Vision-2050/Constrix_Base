@@ -2904,6 +2904,18 @@
         "companySloganArMinLength": "Company slogan in Arabic must be at least 10 characters if it is entered",
         "companySloganEnMinLength": "Company slogan in English must be at least 10 characters if it is entered"
       }
+    },
+    "termsConditions": {
+      "form": {
+        "title": "Terms and Conditions Data",
+        "contentPlaceholder": "Enter terms and conditions content here...",
+        "saveChanges": "Save Changes",
+        "updateSuccess": "Terms and conditions updated successfully!",
+        "updateError": "Failed to update terms and conditions. Please try again.",
+        "validationError": "Validation error",
+        "contentRequired": "Terms and conditions content is required",
+        "contentMinLength": "Terms and conditions content must be at least 10 characters"
+      }
     }
   }
 }
