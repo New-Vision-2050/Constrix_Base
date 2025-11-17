@@ -1,0 +1,92 @@
+import { _m, MessagesGroup } from "../../types";
+
+export const brokersModuleMessages = new MessagesGroup({
+  StatisticsCards: new MessagesGroup({
+    totalBrokers: _m("Total Brokers", "إجمالي الوسطاء"),
+    activeBrokers: _m("Active Brokers", "الوسطاء النشطين"),
+    inactiveBrokers: _m("Inactive Brokers", "الوسطاء غير النشطين"),
+    totalBrokersInLastMonth: _m("Brokers Added Last Month", "الوسطاء المضافين في الشهر الماضي")
+  }),
+  table: new MessagesGroup({
+    active: _m("Active", "نشط"),
+    inactive: _m("Inactive", "غير نشط"),
+    DeleteConfirmMessage: _m("Are you sure you want to delete this broker?", "هل أنت متأكد من رغبتك في حذف هذا الوسيط؟"),
+    columns: new MessagesGroup({
+      name: _m("Name", "الاسم"),
+      identity: _m("Identity", "رقم الهوية"),
+      email: _m("Email", "البريد الإلكتروني"),
+      phone: _m("Phone", "رقم الهاتف"),
+      status: _m("Status", "الحالة"),
+      branches: _m("Branches", "الفروع"),
+      clientsNumber: _m("Clients Number", "عدد العملاء")
+    }),
+    filters: new MessagesGroup({
+      branchesFilter: _m("Branches", "الفروع"),
+      statusFilter: _m("Status", "الحالة")
+    })
+  }),
+  form: new MessagesGroup({
+    individualBroker: _m("Individual Broker", "وسيط فرد"),
+    companyBroker: _m("Company Broker", "وسيط شركة"),
+    title: _m("Add New Broker", "إضافة وسيط جديد"),
+    addBroker: _m("Add New Broker", "إضافة وسيط جديد"),
+    submitButtonText: _m("Add", "إضافة"),
+    cancelButtonText: _m("Cancel", "إلغاء"),
+    resetButtonText: _m("Clear Form", "مسح النموذج"),
+    email: _m("Email", "البريد الإلكتروني"),
+    emailPlaceholder: _m("Enter email", "أدخل البريد الإلكتروني"),
+    emailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
+    emailInvalid: _m("Please enter a valid email address.", "الرجاء إدخال عنوان بريد إلكتروني صالح."),
+    brokerMailExist: _m("The email is already registered as a broker in the current branch.", "البريد الإلكتروني مسجل بالفعل كوسيط في الفرع الحالي."),
+    mailExistAsEmployee: _m("The email is already registered as an employee in the following branches :", "البريد الإلكتروني مسجل بالفعل كموظف في الفروع التالية :"),
+    mailExistAsBroker: _m("The email is already registered as a broker in the following branches :", "البريد الإلكتروني مسجل بالفعل كوسيط في الفروع التالية :"),
+    mailExistAsClient: _m("The email is already registered as a client in the following branches :", "البريد الإلكتروني مسجل بالفعل كعميل في الفروع التالية :"),
+    mailExistInSystem: _m("The email is already registered in the system.", "البريد الإلكتروني مسجل بالفعل في النظام."),
+    retrieveData: _m("Retrieve Data", "استرجاع البيانات"),
+    phone: _m("Phone", "رقم الهاتف"),
+    phonePlaceholder: _m("Enter phone", "أدخل رقم الهاتف"),
+    phoneRequired: _m("Phone is required", "رقم الهاتف مطلوب"),
+    phoneInvalid: _m("Please enter a valid phone number.", "الرجاء إدخال رقم هاتف صالح."),
+    name: _m("Name", "الاسم"),
+    namePlaceholder: _m("Enter name", "أدخل الاسم"),
+    nameRequired: _m("Name is required", "الاسم مطلوب"),
+    nameThreeTerms: _m("The name must contain exactly three terms (first, middle, and last name)", "يجب أن يتكون الاسم من ثلاثة مقاطع بالضبط (الأول والأوسط والأخير)"),
+    nameLettersOnly: _m("Name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)"),
+    nameMinLength: _m("Name must contain at least two letters.", "يجب أن يحتوي الاسم على حرفين على الأقل."),
+    arabicName: _m("The name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)"),
+    identity: _m("The identity number", "رقم الهوية"),
+    identityPlaceholder: _m("Enter the identity number", "أدخل رقم الهوية"),
+    identityRequired: _m("The identity number is required", "رقم الهوية مطلوب"),
+    identityPattern: _m("The identity number must consist of 10 numbers and start with the number 1 or 2", "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2"),
+    identityMinLength: _m("The identity number must consist of 10 numbers", "رقم الهوية يجب أن يتكون من 10 أرقام"),
+    identityMaxLength: _m("The identity number must consist of 10 numbers", "رقم الهوية يجب أن يتكون من 10 أرقام"),
+    branches: _m("Branch", "الفرع"),
+    branchesPlaceholder: _m("Select branch", "اختر الفرع"),
+    correspondenceAddress: _m("Correspondence Address", "عنوان المراسلة"),
+    correspondenceAddressPlaceholder: _m("Enter correspondence address", "أدخل عنوان المراسلة"),
+    country: _m("Country", "الدولة"),
+    countryPlaceholder: _m("Select Country", "اختر الدولة"),
+    countryRequired: _m("Country is required", "الدولة مطلوبة"),
+    companyField: _m("Company Field", "مجال الشركة"),
+    companyFieldPlaceholder: _m("Select Company Field", "اختر مجال الشركة"),
+    companyFieldRequired: _m("Company Field is required", "مجال الشركة مطلوب"),
+    commerceName: _m("Commercial Name", "الاسم التجاري"),
+    commerceNamePlaceholder: _m("Enter Commercial Name", "أدخل الاسم التجاري"),
+    commerceNameRequired: _m("Commercial Name is required", "الاسم التجاري مطلوب"),
+    shortName: _m("Short Name", "الاسم المختصر"),
+    shortNamePlaceholder: _m("Enter Short Name", "أدخل الاسم المختصر"),
+    shortNameRequired: _m("Short Name is required", "الاسم المختصر مطلوب"),
+    commission: _m("Commission", "العمولة"),
+    commissionPlaceholder: _m("Enter Commission", "أدخل نسبة العمولة"),
+    commissionRequired: _m("Commission is required", "العمولة مطلوبة"),
+    companyBrokerFormTitle: _m("Create Company Broker", "إنشاء وسيط شركة"),
+    individualBrokerFormTitle: _m("Create Individual Broker", "إنشاء وسيط فرد"),
+    supportResponsible: _m("Support Responsible", "المسؤول عن الدعم"),
+    supportResponsiblePlaceholder: _m("Select Support Responsible", "اختر المسؤول عن الدعم"),
+    supportResponsibleRequired: _m("Support Responsible is required", "المسؤول عن الدعم مطلوب"),
+    Validation: new MessagesGroup({
+      arabicName: _m("The name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)"),
+      englishName: _m("The short name must be in English and not contain symbols", "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز")
+    })
+  })
+});
