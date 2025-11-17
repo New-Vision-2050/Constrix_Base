@@ -2657,6 +2657,32 @@
       "tabs": {
         "projects": "المشاريع",
         "projectsTypes": "انواع المشاريع"
+      },
+      "addProjectForm": {
+        "title": "اضافة مشروع جديد",
+        "titleAr": "اسم المشروع بالعربية",
+        "titleArPlaceholder": "أدخل اسم المشروع بالعربية",
+        "titleEn": "اسم المشروع بالإنجليزية",
+        "titleEnPlaceholder": "أدخل اسم المشروع بالإنجليزية",
+        "mainImageInvalid": "يجب أن تكون الصورة الرئيسية ملفًا صالحًا",
+        "mainImageSizeExceeded": "يجب أن يكون حجم الصورة الرئيسية أقل من 3MB",
+        "subImagesInvalid": "يجب أن تكون الصور الفرعية ملفات صالحة",
+        "subImagesSizeExceeded": "يجب أن يكون حجم الصور الفرعية أقل من 3MB",
+        "titleArRequired": "اسم المشروع بالعربية مطلوب",
+        "titleArMinLength": "اسم المشروع بالعربية يجب أن يكون على الأقل حرفين",
+        "titleEnRequired": "اسم المشروع بالإنجليزية مطلوب",
+        "titleEnMinLength": "اسم المشروع بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "typeRequired": "نوع المشروع مطلوب",
+        "nameArRequired": "اسم المشروع بالعربية مطلوب",
+        "nameArMinLength": "اسم المشروع بالعربية يجب أن يكون على الأقل حرفين",
+        "nameEnRequired": "اسم المشروع بالإنجليزية مطلوب",
+        "nameEnMinLength": "اسم المشروع بالإنجليزية يجب أن يكون على الأقل حرفين",
+        "descriptionArRequired": "وصف المشروع بالعربية مطلوب",
+        "descriptionArMinLength": "وصف المشروع بالعربية يجب أن يكون على الأقل 10 حروف",
+        "descriptionEnRequired": "وصف المشروع بالإنجليزية مطلوب",
+        "descriptionEnMinLength": "وصف المشروع بالإنجليزية يجب أن يكون على الأقل 10 حروف",
+        "detailsRequired": "يجب أن يكون لديك على الأقل بيانات واحدة",
+        "detailArRequired": "بيان المشروع بالعربية مطلوب"
       }
     }
   }

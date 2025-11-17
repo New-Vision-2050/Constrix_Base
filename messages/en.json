@@ -2665,6 +2665,32 @@
       "tabs": {
         "projects": "Projects",
         "projectsTypes": "Projects Types"
+      },
+      "addProjectForm": {
+        "title": "Add New Project",
+        "titleAr": "Project Name in Arabic",
+        "titleArPlaceholder": "Enter project name in Arabic",
+        "titleEn": "Project Name in English",
+        "titleEnPlaceholder": "Enter project name in English",
+        "mainImageInvalid": "Main image must be a valid file",
+        "mainImageSizeExceeded": "Main image size must not exceed 3MB",
+        "subImagesInvalid": "Sub images must be valid files",
+        "subImagesSizeExceeded": "Sub images size must not exceed 3MB",
+        "titleArRequired": "Project name in Arabic is required",
+        "titleArMinLength": "Project name in Arabic must be at least 2 characters",
+        "titleEnRequired": "Project name in English is required",
+        "titleEnMinLength": "Project name in English must be at least 2 characters",
+        "typeRequired": "Project type is required",
+        "nameArRequired": "Project name in Arabic is required",
+        "nameArMinLength": "Project name in Arabic must be at least 2 characters",
+        "nameEnRequired": "Project name in English is required",
+        "nameEnMinLength": "Project name in English must be at least 2 characters",
+        "descriptionArRequired": "Project description in Arabic is required",
+        "descriptionArMinLength": "Project description in Arabic must be at least 10 characters",
+        "descriptionEnRequired": "Project description in English is required",
+        "descriptionEnMinLength": "Project description in English must be at least 10 characters",
+        "detailsRequired": "At least one detail is required",
+        "detailArRequired": "Project detail in Arabic is required"
       }
     }
   }
