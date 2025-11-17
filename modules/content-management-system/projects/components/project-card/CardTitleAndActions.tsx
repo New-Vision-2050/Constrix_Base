@@ -16,7 +16,10 @@ const Execution = dynamic(
  * Uses Execution component from TableBuilder for consistent actions UI
  * Follows Single Responsibility Principle
  */
-export default function CardTitleAndActions() {
+type PropsT = {
+  OnEditProject: (id: string) => void;
+}
+export default function CardTitleAndActions({ OnEditProject }: PropsT) {
   // Mock row data - replace with actual project data
   const projectRow = {
     id: "1",
@@ -28,9 +31,10 @@ export default function CardTitleAndActions() {
     {
       label: "Edit",
       icon: <EditIcon className="w-4 h-4" />,
+      disabled: true,
       action: () => {
         // Handle edit action
-        console.log("Edit clicked");
+        OnEditProject(projectRow.id);
       },
     },
   ];
