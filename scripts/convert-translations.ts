@@ -11,6 +11,15 @@ const arJson = JSON.parse(
 
 const groupsDir = path.join(__dirname, "../messages/groups");
 
+// Track missing translations
+const missingTranslations: {
+  ar: Array<{ path: string; enText: string }>;
+  en: Array<{ path: string; arText: string }>;
+} = {
+  ar: [],
+  en: [],
+};
+
 // Helper to convert camelCase or PascalCase to kebab-case
 function toKebabCase(str: string): string {
   return str
@@ -34,8 +43,14 @@ function isObject(value: unknown): boolean {
 function mergeTranslations(
   enData: Record<string, unknown>,
   arData: Record<string, unknown>
-): Record<string, { en: Record<string, unknown>; ar: Record<string, unknown> }> {
-  const merged: Record<string, { en: Record<string, unknown>; ar: Record<string, unknown> }> = {};
+): Record<
+  string,
+  { en: Record<string, unknown>; ar: Record<string, unknown> }
+> {
+  const merged: Record<
+    string,
+    { en: Record<string, unknown>; ar: Record<string, unknown> }
+  > = {};
   const allKeys = new Set([...Object.keys(enData), ...Object.keys(arData)]);
 
   for (const key of allKeys) {
@@ -56,10 +71,11 @@ function mergeTranslations(
 function generateMessageGroupCode(
   enObj: Record<string, unknown>,
   arObj: Record<string, unknown>,
-  indent: string = "  "
+  indent: string = "  ",
+  parentPath: string = ""
 ): string {
   const entries: string[] = [];
-  
+
   // Merge keys from both objects to ensure we don't miss any
   const mergedKeys = new Set([...Object.keys(enObj), ...Object.keys(arObj)]);
 
@@ -67,16 +83,27 @@ function generateMessageGroupCode(
     const enValue = enObj[key];
     const arValue = arObj[key];
 
+    const currentPath = parentPath ? `${parentPath}.${key}` : key;
+
     // Use quotes for keys with special characters or reserved words
     const needsQuotes = !/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key);
     const keyStr = needsQuotes ? `"${key}"` : key;
 
     if (isObject(enValue) || isObject(arValue)) {
       // At least one is an object - create a MessagesGroup
-      const enNested = isObject(enValue) ? (enValue as Record<string, unknown>) : {};
-      const arNested = isObject(arValue) ? (arValue as Record<string, unknown>) : {};
-      
-      const nestedCode = generateMessageGroupCode(enNested, arNested, indent + "  ");
+      const enNested = isObject(enValue)
+        ? (enValue as Record<string, unknown>)
+        : {};
+      const arNested = isObject(arValue)
+        ? (arValue as Record<string, unknown>)
+        : {};
+
+      const nestedCode = generateMessageGroupCode(
+        enNested,
+        arNested,
+        indent + "  ",
+        currentPath
+      );
       entries.push(
         `${indent}${keyStr}: new MessagesGroup({\n${nestedCode}\n${indent}})`
       );
@@ -84,7 +111,15 @@ function generateMessageGroupCode(
       // Both are primitives (strings) - create a message with _m()
       const enString = typeof enValue === "string" ? enValue : "";
       const arString = typeof arValue === "string" ? arValue : "";
-      
+
+      // Track missing translations
+      if (enString && !arString) {
+        missingTranslations.ar.push({ path: currentPath, enText: enString });
+      }
+      if (arString && !enString) {
+        missingTranslations.en.push({ path: currentPath, arText: arString });
+      }
+
       const enEscaped = enString
         .replace(/\\/g, "\\\\")
         .replace(/"/g, '\\"')
@@ -93,7 +128,7 @@ function generateMessageGroupCode(
         .replace(/\\/g, "\\\\")
         .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n");
-      
+
       entries.push(`${indent}${keyStr}: _m("${enEscaped}", "${arEscaped}")`);
     }
   }
@@ -170,14 +205,16 @@ function convertAllTranslations(): void {
   // Step 1: Merge translations from both JSON files
   console.log("Step 1: Merging translations from en.json and ar.json...");
   const mergedTranslations = mergeTranslations(enJson, arJson);
-  console.log(`✓ Merged ${Object.keys(mergedTranslations).length} unique groups\n`);
+  console.log(
+    `✓ Merged ${Object.keys(mergedTranslations).length} unique groups\n`
+  );
 
   const skipGroups: string[] = [];
   const groups: Array<{ key: string; varName: string; dirName: string }> = [];
 
   // Step 2: Convert merged object to directory structure
   console.log("Step 2: Generating message group files...\n");
-  
+
   for (const [key, { en, ar }] of Object.entries(mergedTranslations)) {
     if (skipGroups.includes(key)) {
       console.log(`⊘ Skipping ${key} (in skip list)`);
@@ -196,7 +233,62 @@ function convertAllTranslations(): void {
   generateStructureFile(groups);
 
   console.log("\n✓ Conversion complete!");
-  console.log("\nAll translations from both JSON files have been merged and converted.");
+  console.log(
+    "\nAll translations from both JSON files have been merged and converted."
+  );
+
+  // Write missing translations report
+  writeMissingTranslationsReport();
+}
+
+// Write missing translations to a text file
+function writeMissingTranslationsReport(): void {
+  const reportLines: string[] = [];
+
+  if (
+    missingTranslations.ar.length === 0 &&
+    missingTranslations.en.length === 0
+  ) {
+    console.log("\n✓ No missing translations found!");
+    return;
+  }
+
+  reportLines.push("MISSING TRANSLATIONS REPORT");
+  reportLines.push("==========================");
+  reportLines.push(`Generated: ${new Date().toISOString()}`);
+  reportLines.push("");
+
+  if (missingTranslations.ar.length > 0) {
+    reportLines.push("MISSING ARABIC TRANSLATIONS:");
+    reportLines.push("----------------------------");
+    reportLines.push(`Total: ${missingTranslations.ar.length}`);
+    reportLines.push("");
+
+    for (const { path, enText } of missingTranslations.ar) {
+      reportLines.push(`${path}: "${enText}"`);
+    }
+    reportLines.push("");
+  }
+
+  if (missingTranslations.en.length > 0) {
+    reportLines.push("MISSING ENGLISH TRANSLATIONS:");
+    reportLines.push("-----------------------------");
+    reportLines.push(`Total: ${missingTranslations.en.length}`);
+    reportLines.push("");
+
+    for (const { path, arText } of missingTranslations.en) {
+      reportLines.push(`${path}: "${arText}"`);
+    }
+    reportLines.push("");
+  }
+
+  const reportPath = path.join(__dirname, "../missing-translations.txt");
+  fs.writeFileSync(reportPath, reportLines.join("\n"), "utf-8");
+
+  console.log(
+    `\n⚠ Found ${missingTranslations.ar.length} missing AR and ${missingTranslations.en.length} missing EN translations`
+  );
+  console.log(`📄 Report saved to: missing-translations.txt`);
 }
 
 // Run the conversion
