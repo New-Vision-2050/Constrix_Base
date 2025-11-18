@@ -141,6 +141,19 @@ export const createMainSettingsFormSchema = (t: (key: string) => string) =>
       .default([]),
 
     // Page Sections - Company Profile
+    company_profile_file_link: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || val.trim().length === 0 || isValidUrl(val),
+        {
+          message:
+            t("companyProfileFileLinkInvalid") ||
+            "Company profile file link must be a valid URL",
+        }
+      )
+      .transform((val) => val?.trim() || ""),
+
     company_profile_file: z
       .any()
       .nullable()
@@ -189,6 +202,7 @@ export const getDefaultMainSettingsFormValues = (): MainSettingsFormData => ({
   description_ar: "",
   description_en: "",
   homepage_icons: [],
+  company_profile_file_link: "",
   company_profile_file: null,
 });
 

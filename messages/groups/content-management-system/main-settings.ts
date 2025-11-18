@@ -3,6 +3,7 @@ import { MessagesGroup, _m } from "@/messages";
 export const ContentManagementSystemMainSettingsMessages = new MessagesGroup({
   title: _m("Main Settings", "اعدادات الرئيسية"),
   form: new MessagesGroup({
+    companyProfileFileLinkInvalid: _m("Company profile file link must be a valid URL", "رابط ملف الشركة يجب أن يكون رابط صالح"),
     mainSection: _m("Main Section", "القسم الرئيسي"),
     canAttachVideoInstead: _m("It is possible to attach a video instead of using the link", "يمكن أرفاق فيديو بدلا من استخدام الرابط"),
     canAttachVideoInsteadPlaceholder: _m("Attach video instead of using the link", "أرفق فيديو بدلا من استخدام الرابط"),

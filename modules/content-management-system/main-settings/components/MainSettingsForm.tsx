@@ -313,37 +313,56 @@ export default function MainSettingsForm() {
                         />
 
                         {/* Company Profile File */}
-                        <FormField
-                            control={control}
-                            name="company_profile_file"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs" required>
-                                        {t("companyProfile") || "الملف التعريفي للشركة"}
-                                    </FormLabel>
-                                    <div className="flex items-center justify-between gap-2 border rounded-lg border-gray-700 px-2">
-                                        <p className="text-2xs">
-                                            {t("canAttachFileInstead") ||
-                                                "يمكن أرفاق ملف بدلا من استخدام الرابط"}
-                                        </p>
-                                        <div className="flex flex-col">
-
-                                            <FormControl>
-                                                <FileUploadButton
-                                                    onChange={(file) => field.onChange(file)}
-                                                    accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                    maxSize="10MB"
-                                                    initialValue={field.value}
-                                                    disabled={isSubmitting}
-                                                    className="mt-1"
-                                                />
-                                            </FormControl>
-                                            <FormErrorMessage />
-                                        </div>
-                                    </div>
-                                </FormItem>
-                            )}
-                        />
+                        <div className="space-y-2">
+                            <FormLabel className="text-xs" required>
+                                {t("companyProfile") || "الملف التعريفي للشركة"}
+                            </FormLabel>
+                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
+                                {/* 80% width - Web Video Link */}
+                                <div className="lg:col-span-4">
+                                    <FormField
+                                        control={control}
+                                        name="company_profile_file_link"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input
+                                                        variant="secondary"
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                        placeholder={t("canAttachFileInstead") || "Enter video URL"}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                {/* 20% width - File Upload */}
+                                <div className="lg:col-span-1 flex items-center gap-2">
+                                    <FormField
+                                        control={control}
+                                        name="company_profile_file"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileUploadButton
+                                                        onChange={(file) => field.onChange(file)}
+                                                        accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                        maxSize="100MB"
+                                                        initialValue={field.value}
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Save Button */}

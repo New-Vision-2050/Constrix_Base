@@ -17,6 +17,7 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import ImageUpload from "@/components/shared/ImageUpload";
+import FileUploadButton from "@/components/shared/FileUploadButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
@@ -487,7 +488,7 @@ export default function ContactSettingForm() {
                                     </Button>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                     {/* Project Type Arabic */}
                                     <FormField
                                         control={control}
@@ -533,36 +534,36 @@ export default function ContactSettingForm() {
                                             </FormItem>
                                         )}
                                     />
-                                </div>
 
-                                {/* Projects Count */}
-                                <FormField
-                                    control={control}
-                                    name={`project_types.${index}.projects_count`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-xs" required>
-                                                {t("projectsCount") || "عدد المشاريع"}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    variant="secondary"
-                                                    disabled={isSubmitting}
-                                                    className="mt-1"
-                                                    placeholder={t("projectsCountPlaceholder") || "Enter number of projects"}
-                                                    {...field}
-                                                    value={field.value ?? ""}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        field.onChange(value === "" ? 0 : parseInt(value, 10));
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormErrorMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                    {/* Projects Count */}
+                                    <FormField
+                                        control={control}
+                                        name={`project_types.${index}.projects_count`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs" required>
+                                                    {t("projectsCount") || "عدد المشاريع"}
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        variant="secondary"
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                        placeholder={t("projectsCountPlaceholder") || "Enter number of projects"}
+                                                        {...field}
+                                                        value={field.value ?? ""}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            field.onChange(value === "" ? 0 : parseInt(value, 10));
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -603,56 +604,58 @@ export default function ContactSettingForm() {
                                     </Button>
                                 </div>
 
-                                {/* File Name */}
-                                <FormField
-                                    control={control}
-                                    name={`attachments.${index}.file_name`}
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-xs" required>
-                                                {t("fileName") || "اسم الملف"}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    variant="secondary"
-                                                    disabled={isSubmitting}
-                                                    className="mt-1"
-                                                    placeholder={t("fileNamePlaceholder") || "Enter file name"}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormErrorMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {/* File Upload */}
-                                <div className="flex items-center gap-3">
-                                    <p className="text-xs text-gray-400">
-                                        {t("canAttachPdfFile") || "يمكن أرفاق ملف PDF"}
-                                    </p>
-                                    <FormField
-                                        control={control}
-                                        name={`attachments.${index}.file`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <ImageUpload
-                                                        label=""
-                                                        maxSize="10MB - الحجم الأقصى"
-                                                        dimensions=""
-                                                        required={false}
-                                                        onChange={(file) => field.onChange(file)}
-                                                        initialValue={undefined}
-                                                        minHeight="100px"
-                                                        className="mt-1"
-                                                        accept="application/pdf"
-                                                    />
-                                                </FormControl>
-                                                <FormErrorMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                <div className="space-y-2">
+                                    <FormLabel className="text-xs" required>
+                                        {t("fileName") || "اسم الملف"}
+                                    </FormLabel>
+                                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
+                                        {/* 80% width - File Name */}
+                                        <div className="lg:col-span-4">
+                                            <FormField
+                                                control={control}
+                                                name={`attachments.${index}.file_name`}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <Input
+                                                                variant="secondary"
+                                                                disabled={isSubmitting}
+                                                                className="mt-1"
+                                                                placeholder={t("fileNamePlaceholder") || "Enter file name"}
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormErrorMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        {/* 20% width - File Upload */}
+                                        <div className="lg:col-span-1 flex items-center gap-2">
+                                            <p className="text-xs text-gray-400">
+                                                {t("canAttachPdfFile") || "يمكن أرفاق ملف PDF"}
+                                            </p>
+                                            <FormField
+                                                control={control}
+                                                name={`attachments.${index}.file`}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <FileUploadButton
+                                                                onChange={(file) => field.onChange(file)}
+                                                                accept="application/pdf"
+                                                                maxSize="10MB"
+                                                                initialValue={field.value}
+                                                                disabled={isSubmitting}
+                                                                className="mt-1"
+                                                            />
+                                                        </FormControl>
+                                                        <FormErrorMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
