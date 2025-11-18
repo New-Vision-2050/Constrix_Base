@@ -99,18 +99,16 @@ export default function TermsConditionsForm() {
                     </div>
 
                     {/* Save Button */}
-                    <div className="flex justify-end pt-4">
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
-                        >
-                            {isSubmitting && (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            {t("saveChanges") || "حفظ التعديل"}
-                        </Button>
-                    </div>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                    >
+                        {isSubmitting && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {t("saveChanges") || "حفظ التعديل"}
+                    </Button>
                 </form>
             </Form>
         </div>

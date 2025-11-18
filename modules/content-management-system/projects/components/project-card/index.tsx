@@ -7,7 +7,7 @@ type PropsT = {
 }
 export default function ProjectCard({ OnEdit }: PropsT) {
     return (
-        <div className="bg-sidebar shadow-md rounded-lg p-4 flex flex-col gap-4 w-[400px] h-[350px]">
+        <div className="bg-sidebar shadow-md rounded-xl p-4 flex flex-col gap-4 w-[360px] min-h-[320px]">
             {/* card image */}
             <CardImage />
             {/* card title & actions */}

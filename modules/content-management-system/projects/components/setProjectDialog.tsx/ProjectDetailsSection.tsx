@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { Control } from "react-hook-form";
+import { Control, useWatch } from "react-hook-form";
 import { FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/modules/table/components/ui/textarea";
 import {
@@ -14,12 +15,12 @@ import {
 } from "@/components/ui/select";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import ImageUpload from "@/components/shared/ImageUpload";
 import { ProjectFormData } from "../../schema/project-form.schema";
 
 /**
  * Project Details Section Component
- * Handles core project information fields
- * Follows Single Responsibility Principle
+ * Handles featured toggle, image uploads, and core project information fields
  */
 interface ProjectDetailsSectionProps {
   control: Control<ProjectFormData>;
@@ -27,6 +28,8 @@ interface ProjectDetailsSectionProps {
   isFetching: boolean;
   t: (key: string) => string;
   projectTypeOptions: { value: string; label: string }[];
+  mainImageInitialValue?: string;
+  subImagesInitialValue?: string[];
 }
 
 export default function ProjectDetailsSection({
@@ -35,54 +38,141 @@ export default function ProjectDetailsSection({
   isFetching,
   t,
   projectTypeOptions,
+  mainImageInitialValue,
+  subImagesInitialValue,
 }: ProjectDetailsSectionProps) {
+  const isFeatured = useWatch({
+    control,
+    name: "is_featured",
+    defaultValue: false,
+  });
+
   return (
     <div className="space-y-4">
-      {/* Project Title Arabic */}
+      {/* Featured Toggle */}
       <FormField
         control={control}
-        name="title_ar"
+        name="is_featured"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs" required>
-              {t("titleAr") || "Project Title Arabic"}
-            </FormLabel>
+          <FormItem className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-lg  p-3 sm:p-4">
+            <div className="space-y-0.5">
+              <FormLabel className="text-xs sm:text-sm font-medium">
+                {t("featuredServices") || "Featured Services (Display on Homepage)"}
+              </FormLabel>
+            </div>
             <FormControl>
-              <Input
-                variant="secondary"
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
                 disabled={isSubmitting || isFetching}
-                className="mt-1"
-                placeholder="SAAS"
-                {...field}
               />
             </FormControl>
-            <FormErrorMessage />
           </FormItem>
         )}
       />
 
-      {/* Project Title English */}
-      <FormField
-        control={control}
-        name="title_en"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs">
-              {t("titleEn") || "Project Title English"}
-            </FormLabel>
-            <FormControl>
-              <Input
-                variant="secondary"
-                disabled={isSubmitting || isFetching}
-                className="mt-1"
-                placeholder="SAAS"
-                {...field}
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
+      {/* Images and Titles Row - Responsive Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* w-20% width - Main Image */}
+        <div className="lg:col-span-1">
+          <FormField
+            control={control}
+            name="main_image"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ImageUpload
+                    label={t("mainImage") || "Main Image"}
+                    maxSize="3MB - الحجم الأقصى"
+                    dimensions="2160 × 2160"
+                    required={false}
+                    onChange={(file) => field.onChange(file)}
+                    initialValue={mainImageInitialValue}
+                    minHeight="200px"
+                    className="mt-1"
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* w-20% width - Sub Images */}
+        <div className="lg:col-span-1">
+          <FormField
+            control={control}
+            name="sub_images"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ImageUpload
+                    label={t("subImages") || "Sub Images"}
+                    maxSize="3MB - الحجم الأقصى"
+                    dimensions="2160 × 2160"
+                    required={false}
+                    multiple={true}
+                    onMultipleChange={(files) => field.onChange(files)}
+                    initialValue={subImagesInitialValue}
+                    minHeight="200px"
+                    className="mt-1"
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* w-60% width - Project Title Arabic & English */}
+        <div className="lg:col-span-3 space-y-4">
+          {/* Project Title Arabic */}
+          <FormField
+            control={control}
+            name="title_ar"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs" required>
+                  {t("titleAr") || "Project Title Arabic"}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    variant="secondary"
+                    disabled={isSubmitting || isFetching}
+                    className="mt-1"
+                    placeholder="SAAS"
+                    {...field}
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Project Title English */}
+          <FormField
+            control={control}
+            name="title_en"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">
+                  {t("titleEn") || "Project Title English"}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    variant="secondary"
+                    disabled={isSubmitting || isFetching}
+                    className="mt-1"
+                    placeholder="SAAS"
+                    {...field}
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </div>
 
       {/* Project Type */}
       <FormField
@@ -219,4 +309,3 @@ export default function ProjectDetailsSection({
     </div>
   );
 }
-

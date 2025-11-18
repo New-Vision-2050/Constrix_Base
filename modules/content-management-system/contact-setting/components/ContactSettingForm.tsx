@@ -16,8 +16,8 @@ import {
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import CheckboxGroupField from "@/modules/form-builder/components/fields/CheckboxGroupField";
 import ImageUpload from "@/components/shared/ImageUpload";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
     createContactSettingFormSchema,
@@ -124,34 +124,37 @@ export default function ContactSettingForm() {
                         <h2 className="text-lg font-semibold text-white">
                             {t("mainSection") || "القسم الرئيسي"}
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {/* Section Image */}
-                            <FormField
-                                control={control}
-                                name="section_image"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-xs">
-                                            {t("sectionImage") || "صورة القسم"}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <ImageUpload
-                                                label=""
-                                                maxSize="3MB - الحجم الأقصى"
-                                                dimensions="2160 × 2160"
-                                                required={false}
-                                                onChange={(file) => field.onChange(file)}
-                                                initialValue={undefined}
-                                                minHeight="200px"
-                                                className="mt-1"
-                                                accept="image/*"
-                                            />
-                                        </FormControl>
-                                        <FormErrorMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div>
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                            {/* 20% width - Section Image */}
+                            <div className="lg:col-span-1">
+                                <FormField
+                                    control={control}
+                                    name="section_image"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs">
+                                                {t("sectionImage") || "صورة القسم"}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <ImageUpload
+                                                    label=""
+                                                    maxSize="3MB - الحجم الأقصى"
+                                                    dimensions="2160 × 2160"
+                                                    required={false}
+                                                    onChange={(file) => field.onChange(file)}
+                                                    initialValue={undefined}
+                                                    minHeight="200px"
+                                                    className="mt-1"
+                                                    accept="image/*"
+                                                />
+                                            </FormControl>
+                                            <FormErrorMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            {/* 80% width - Title & Description */}
+                            <div className="lg:col-span-4 space-y-4">
                                 {/* Title */}
                                 <FormField
                                     control={control}
@@ -212,8 +215,8 @@ export default function ContactSettingForm() {
                             control={control}
                             name="about_us_icons"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs" required>
+                                <FormItem className="flex items-center gap-2">
+                                    <FormLabel className="text-2xs pt-2" required>
                                         {t("aboutUsIcons") || "أيقونات من نحن"}
                                     </FormLabel>
                                     <FormControl>
@@ -221,21 +224,36 @@ export default function ContactSettingForm() {
                                             control={control}
                                             name="about_us_icons"
                                             render={({ field: controllerField }) => (
-                                                <CheckboxGroupField
-                                                    field={{
-                                                        name: "about_us_icons",
-                                                        type: "checkboxGroup",
-                                                        label: "",
-                                                        isMulti: true,
-                                                        options: ABOUT_US_ICONS_OPTIONS,
-                                                    }}
-                                                    value={controllerField.value || []}
-                                                    onChange={controllerField.onChange}
-                                                    onBlur={controllerField.onBlur}
-                                                    error={errors.about_us_icons?.message as string}
-                                                    touched={!!errors.about_us_icons}
-                                                    isHorizontal={true}
-                                                />
+                                                <div className="flex flex-wrap gap-4 mt-2">
+                                                    {ABOUT_US_ICONS_OPTIONS.map((option) => {
+                                                        const isChecked = (controllerField.value || []).includes(option.value);
+                                                        return (
+                                                            <label
+                                                                key={option.value}
+                                                                className="flex items-center gap-2 cursor-pointer group"
+                                                            >
+                                                                <Checkbox
+                                                                    checked={isChecked}
+                                                                    onCheckedChange={(checked) => {
+                                                                        const currentValue = controllerField.value || [];
+                                                                        if (checked) {
+                                                                            controllerField.onChange([...currentValue, option.value]);
+                                                                        } else {
+                                                                            controllerField.onChange(
+                                                                                currentValue.filter((v: string) => v !== option.value)
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    onBlur={controllerField.onBlur}
+                                                                    className="h-5 w-5 rounded border-2 border-gray-400 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 data-[state=checked]:text-white"
+                                                                />
+                                                                <span className="text-sm font-medium select-none transition-colors">
+                                                                    {option.label}
+                                                                </span>
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
                                             )}
                                         />
                                     </FormControl>
@@ -301,10 +319,10 @@ export default function ContactSettingForm() {
                                             {t("visionAr") || "الرؤية عربي"}
                                         </FormLabel>
                                         <FormControl>
-                                            <Textarea
+                                            <Input
+                                                variant="secondary"
                                                 disabled={isSubmitting}
-                                                rows={6}
-                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                className="mt-1"
                                                 placeholder={t("visionArPlaceholder") || "Enter vision in Arabic"}
                                                 {...field}
                                             />
@@ -324,10 +342,10 @@ export default function ContactSettingForm() {
                                             {t("visionEn") || "الرؤية الانجليزية"}
                                         </FormLabel>
                                         <FormControl>
-                                            <Textarea
+                                            <Input
+                                                variant="secondary"
                                                 disabled={isSubmitting}
-                                                rows={6}
-                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                className="mt-1"
                                                 placeholder={t("visionEnPlaceholder") || "Enter vision in English"}
                                                 {...field}
                                             />
@@ -349,10 +367,10 @@ export default function ContactSettingForm() {
                                             {t("companyGoalAr") || "هدف الشركة عربي"}
                                         </FormLabel>
                                         <FormControl>
-                                            <Textarea
+                                            <Input
+                                                variant="secondary"
                                                 disabled={isSubmitting}
-                                                rows={6}
-                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                className="mt-1"
                                                 placeholder={t("companyGoalArPlaceholder") || "Enter company goal in Arabic"}
                                                 {...field}
                                             />
@@ -372,10 +390,10 @@ export default function ContactSettingForm() {
                                             {t("companyGoalEn") || "هدف الشركة الانجليزية"}
                                         </FormLabel>
                                         <FormControl>
-                                            <Textarea
+                                            <Input
+                                                variant="secondary"
                                                 disabled={isSubmitting}
-                                                rows={6}
-                                                className="mt-1 resize-none bg-sidebar border-white text-white"
+                                                className="mt-1"
                                                 placeholder={t("companyGoalEnPlaceholder") || "Enter company goal in English"}
                                                 {...field}
                                             />
@@ -441,10 +459,8 @@ export default function ContactSettingForm() {
                             </h2>
                             <Button
                                 type="button"
-                                variant="outline"
                                 onClick={handleAddProjectType}
                                 disabled={isSubmitting}
-                                className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
                                 {t("addNewType") || "إضافة نوع جديد"}
@@ -559,10 +575,8 @@ export default function ContactSettingForm() {
                             </h2>
                             <Button
                                 type="button"
-                                variant="outline"
                                 onClick={handleAddAttachment}
                                 disabled={isSubmitting}
-                                className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
                                 {t("addAttachment") || "إضافة مرفق"}
@@ -645,18 +659,16 @@ export default function ContactSettingForm() {
                     </div>
 
                     {/* Save Button */}
-                    <div className="flex justify-end pt-4">
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
-                        >
-                            {isSubmitting && (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            )}
-                            {t("saveChanges") || "حفظ التعديل"}
-                        </Button>
-                    </div>
+                    <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                    >
+                        {isSubmitting && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {t("saveChanges") || "حفظ التعديل"}
+                    </Button>
                 </form>
             </Form>
         </div>

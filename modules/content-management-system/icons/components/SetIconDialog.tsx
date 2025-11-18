@@ -213,17 +213,14 @@ export default function SetIconDialog({
 
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Left Section - Image Upload  */}
-                            <div>
+                        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+                            {/* Left Section - Image Upload (30%) */}
+                            <div className="lg:col-span-3">
                                 <FormField
                                     control={control}
                                     name="logo_image"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-xs">
-                                                {t("logoImage") || "صورة الشعار"}
-                                            </FormLabel>
                                             <FormControl>
                                                 <ImageUpload
                                                     label={t("logoImage") || "صورة الشعار"}
@@ -246,8 +243,8 @@ export default function SetIconDialog({
                                 />
                             </div>
 
-                            {/* Right Section - Form Fields */}
-                            <div className="space-y-4">
+                            {/* Right Section - Form Fields (70%) */}
+                            <div className="lg:col-span-7 space-y-4">
                                 {/* Icon Name Arabic */}
                                 <FormField
                                     control={control}

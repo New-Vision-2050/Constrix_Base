@@ -24,7 +24,6 @@ import {
   ProjectFormData,
   getDefaultProjectFormValues,
 } from "../../schema/project-form.schema";
-import FeaturedServicesSection from "./FeaturedServicesSection";
 import ProjectDetailsSection from "./ProjectDetailsSection";
 import ProjectDetailsArray from "./ProjectDetailsArray";
 
@@ -179,23 +178,15 @@ export default function SetProjectDialog({
 
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-4">
-            {/* Featured Services Section */}
-            <FeaturedServicesSection
-              control={control}
-              isSubmitting={isSubmitting}
-              isFetching={isFetching}
-              t={t}
-              mainImageInitialValue={undefined}
-              subImagesInitialValue={undefined}
-            />
-
-            {/* Project Details Section */}
+            {/* Project Details Section (includes Featured Services) */}
             <ProjectDetailsSection
               control={control}
               isSubmitting={isSubmitting}
               isFetching={isFetching}
               t={t}
               projectTypeOptions={PROJECT_TYPE_OPTIONS}
+              mainImageInitialValue={undefined}
+              subImagesInitialValue={undefined}
             />
 
             {/* Details Array Section */}

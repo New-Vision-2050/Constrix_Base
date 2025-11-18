@@ -58,6 +58,18 @@ export default function ProjectDetailsArray({
 
   return (
     <div className="space-y-4">
+      {/* Add Detail Button */}
+      <div className="flex items-center justify-end">
+        <Button
+          type="button"
+          onClick={handleAddDetail}
+          disabled={isSubmitting || isFetching}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {t("addDetail") || "Add Detail"}
+        </Button>
+      </div>
+
       {fields.map((field, index) => (
         <div
           key={field.id}
@@ -171,20 +183,6 @@ export default function ProjectDetailsArray({
           />
         </div>
       ))}
-
-      {/* Add Detail Button */}
-      <div className="flex items-center justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleAddDetail}
-          disabled={isSubmitting || isFetching}
-          className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {t("addDetail") || "Add Detail"}
-        </Button>
-      </div>
     </div>
   );
 }

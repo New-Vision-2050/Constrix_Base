@@ -16,8 +16,9 @@ import {
 import { Loader2 } from "lucide-react";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import CheckboxGroupField from "@/modules/form-builder/components/fields/CheckboxGroupField";
 import ImageUpload from "@/components/shared/ImageUpload";
+import FileUploadButton from "@/components/shared/FileUploadButton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 import {
@@ -92,107 +93,115 @@ export default function MainSettingsForm() {
                             {t("mainSection") || "القسم الرئيسي"}
                         </h2>
 
-                        {/* Web Video Link */}
-                        <FormField
-                            control={control}
-                            name="video_link_web"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("videoLinkWeb") ||
-                                            "رابط الفيديو (الوضع الافتراضي الويب)"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            variant="secondary"
-                                            disabled={isSubmitting}
-                                            className="mt-1"
-                                            placeholder={t("videoLinkWebPlaceholder") || "Enter video URL"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
-                        {/* Mobile Video Link */}
-                        <FormField
-                            control={control}
-                            name="video_link_mobile"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs">
-                                        {t("videoLinkMobile") || "رابط الفيديو (وضع الجوال)"}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            variant="secondary"
-                                            disabled={isSubmitting}
-                                            className="mt-1"
-                                            placeholder={t("videoLinkMobilePlaceholder") || "Enter video URL"}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormErrorMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className="flex flex-col md:flex-row gap-6">
-                            <div className="flex flex-col items-center gap-2">
-                                <p className="text-xs text-gray-400">
-                                    {t("canAttachVideoInstead") ||
-                                        "يمكن أرفاق فيديو بدلا من استخدام الرابط"}
-                                </p>
-                                <FormField
-                                    control={control}
-                                    name="video_file_web"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <ImageUpload
-                                                    label=""
-                                                    maxSize="100MB - الحجم الأقصى"
-                                                    dimensions=""
-                                                    required={false}
-                                                    onChange={(file) => field.onChange(file)}
-                                                    initialValue={undefined}
-                                                    minHeight="100px"
-                                                    className="mt-1"
-                                                    accept="video/mp4,video/webm,video/ogg"
-                                                />
-                                            </FormControl>
-                                            <FormErrorMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                        <div className="space-y-2">
+                            <FormLabel className="text-xs">
+                                {t("videoLinkWeb") ||
+                                    "رابط الفيديو (الوضع الافتراضي الويب)"}
+                            </FormLabel>
+                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
+                                {/* 80% width - Web Video Link */}
+                                <div className="lg:col-span-4">
+                                    <FormField
+                                        control={control}
+                                        name="video_link_web"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input
+                                                        variant="secondary"
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                        placeholder={t("videoLinkWebPlaceholder") || "Enter video URL"}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                {/* 20% width - File Upload */}
+                                <div className="lg:col-span-1 flex items-center gap-2">
+                                    <p className="text-xs text-gray-400">
+                                        {t("canAttachVideoInstead") ||
+                                            "يمكن أرفاق فيديو بدلا من استخدام الرابط"}
+                                    </p>
+                                    <FormField
+                                        control={control}
+                                        name="video_file_web"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileUploadButton
+                                                        onChange={(file) => field.onChange(file)}
+                                                        accept="video/mp4,video/webm,video/ogg"
+                                                        maxSize="100MB"
+                                                        initialValue={field.value}
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <p className="text-xs text-gray-400">
-                                    {t("canAttachVideoInstead") ||
-                                        "يمكن أرفاق فيديو بدلا من استخدام الرابط"}
-                                </p>
-                                <FormField
-                                    control={control}
-                                    name="video_file_mobile"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <ImageUpload
-                                                    label=""
-                                                    maxSize="100MB - الحجم الأقصى"
-                                                    dimensions=""
-                                                    required={false}
-                                                    onChange={(file) => field.onChange(file)}
-                                                    initialValue={undefined}
-                                                    minHeight="100px"
-                                                    className="mt-1"
-                                                    accept="video/mp4,video/webm,video/ogg"
-                                                />
-                                            </FormControl>
-                                            <FormErrorMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                        </div>
+
+                        {/* Mobile Video Link */}
+                        <div className="space-y-2">
+                            <FormLabel className="text-xs">
+                                {t("videoLinkMobile") || "رابط الفيديو (وضع الجوال)"}
+                            </FormLabel>
+                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-end">
+                                {/* 80% width - Mobile Video Link */}
+                                <div className="lg:col-span-4">
+                                    <FormField
+                                        control={control}
+                                        name="video_link_mobile"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <Input
+                                                        variant="secondary"
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                        placeholder={t("videoLinkMobilePlaceholder") || "Enter video URL"}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                {/* 20% width - File Upload */}
+                                <div className="lg:col-span-1 flex items-center gap-2">
+                                    <p className="text-xs text-gray-400">
+                                        {t("canAttachVideoInstead") ||
+                                            "يمكن أرفاق فيديو بدلا من استخدام الرابط"}
+                                    </p>
+                                    <FormField
+                                        control={control}
+                                        name="video_file_mobile"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormControl>
+                                                    <FileUploadButton
+                                                        onChange={(file) => field.onChange(file)}
+                                                        accept="video/mp4,video/webm,video/ogg"
+                                                        maxSize="100MB"
+                                                        initialValue={field.value}
+                                                        disabled={isSubmitting}
+                                                        className="mt-1"
+                                                    />
+                                                </FormControl>
+                                                <FormErrorMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -256,8 +265,8 @@ export default function MainSettingsForm() {
                             control={control}
                             name="homepage_icons"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-xs" required>
+                                <FormItem className="flex items-center gap-2">
+                                    <FormLabel className="text-2xs pt-2" required>
                                         {t("homepageIcons") || "أيقونات الصفحة الرئيسية"}
                                     </FormLabel>
                                     <FormControl>
@@ -265,21 +274,36 @@ export default function MainSettingsForm() {
                                             control={control}
                                             name="homepage_icons"
                                             render={({ field: controllerField }) => (
-                                                <CheckboxGroupField
-                                                    field={{
-                                                        name: "homepage_icons",
-                                                        type: "checkboxGroup",
-                                                        label: "",
-                                                        isMulti: true,
-                                                        options: HOMEPAGE_ICONS_OPTIONS,
-                                                    }}
-                                                    value={controllerField.value || []}
-                                                    onChange={controllerField.onChange}
-                                                    onBlur={controllerField.onBlur}
-                                                    error={errors.homepage_icons?.message as string}
-                                                    touched={!!errors.homepage_icons}
-                                                    isHorizontal={true}
-                                                />
+                                                <div className="flex flex-wrap gap-4 mt-2">
+                                                    {HOMEPAGE_ICONS_OPTIONS.map((option) => {
+                                                        const isChecked = (controllerField.value || []).includes(option.value);
+                                                        return (
+                                                            <label
+                                                                key={option.value}
+                                                                className="flex items-center gap-2 cursor-pointer group"
+                                                            >
+                                                                <Checkbox
+                                                                    checked={isChecked}
+                                                                    onCheckedChange={(checked) => {
+                                                                        const currentValue = controllerField.value || [];
+                                                                        if (checked) {
+                                                                            controllerField.onChange([...currentValue, option.value]);
+                                                                        } else {
+                                                                            controllerField.onChange(
+                                                                                currentValue.filter((v: string) => v !== option.value)
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    onBlur={controllerField.onBlur}
+                                                                    className="h-5 w-5 rounded border-2 border-gray-400 data-[state=checked]:bg-pink-500 data-[state=checked]:border-pink-500 data-[state=checked]:text-white"
+                                                                />
+                                                                <span className="text-sm font-medium select-none  transition-colors">
+                                                                    {option.label}
+                                                                </span>
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
                                             )}
                                         />
                                     </FormControl>
@@ -297,33 +321,25 @@ export default function MainSettingsForm() {
                                     <FormLabel className="text-xs" required>
                                         {t("companyProfile") || "الملف التعريفي للشركة"}
                                     </FormLabel>
-                                    <div className="flex gap-3 mt-1">
-                                        <p className="text-xs text-gray-400">
+                                    <div className="flex items-center justify-between gap-2 border rounded-lg border-gray-700 px-2">
+                                        <p className="text-2xs">
                                             {t("canAttachFileInstead") ||
                                                 "يمكن أرفاق ملف بدلا من استخدام الرابط"}
                                         </p>
-                                        <FormField
-                                            control={control}
-                                            name="company_profile_file"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <ImageUpload
-                                                            label=""
-                                                            maxSize="10MB - الحجم الأقصى"
-                                                            dimensions=""
-                                                            required={false}
-                                                            onChange={(file) => field.onChange(file)}
-                                                            initialValue={undefined}
-                                                            minHeight="100px"
-                                                            className="mt-1"
-                                                            accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                                        />
-                                                    </FormControl>
-                                                    <FormErrorMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <div className="flex flex-col">
+
+                                            <FormControl>
+                                                <FileUploadButton
+                                                    onChange={(file) => field.onChange(file)}
+                                                    accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                    maxSize="10MB"
+                                                    initialValue={field.value}
+                                                    disabled={isSubmitting}
+                                                    className="mt-1"
+                                                />
+                                            </FormControl>
+                                            <FormErrorMessage />
+                                        </div>
                                     </div>
                                 </FormItem>
                             )}

@@ -4,7 +4,7 @@ import Img from '@/public/images/logo-placeholder-image.png';
 export default function CardImage() {
     return (
         <Image
-            width={400}
+            width={360}
             height={150}
             src={Img.src}
             alt="Project Image"
