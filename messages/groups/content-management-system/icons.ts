@@ -1,0 +1,37 @@
+import { MessagesGroup, _m } from "@/messages";
+
+export const ContentManagementSystemIconsMessages = new MessagesGroup({
+  title: _m("Icons", "الأيقونات"),
+  addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
+  editIcon: _m("Edit Icon", "تعديل ايقونة"),
+  form: new MessagesGroup({
+    addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
+    editIcon: _m("Edit Icon", "تعديل ايقونة"),
+    nameAr: _m("Icon Name in Arabic", "اسم الأيقونة بالعربية"),
+    nameArPlaceholder: _m("Enter icon name in Arabic", "أدخل اسم الأيقونة بالعربية"),
+    nameArRequired: _m("Icon name in Arabic is required", "اسم الأيقونة بالعربية مطلوب"),
+    nameArMinLength: _m("Icon name in Arabic must be at least 2 characters", "اسم الأيقونة بالعربية يجب أن يكون على الأقل حرفين"),
+    nameEn: _m("Icon Name in English", "اسم الأيقونة بالإنجليزية"),
+    nameEnPlaceholder: _m("Enter icon name in English", "أدخل اسم الأيقونة بالإنجليزية"),
+    nameEnRequired: _m("Icon name in English is required", "اسم الأيقونة بالإنجليزية مطلوب"),
+    nameEnMinLength: _m("Icon name in English must be at least 2 characters", "اسم الأيقونة بالإنجليزية يجب أن يكون على الأقل حرفين"),
+    category: _m("Category", "الفئة"),
+    categoryPlaceholder: _m("Select Category", "اختر الفئة"),
+    categoryRequired: _m("Category is required", "الفئة مطلوبة"),
+    categoryMinLength: _m("Category must be at least 2 characters", "الفئة يجب أن يكون على الأقل حرفين"),
+    categoryInvalid: _m("Category is invalid", "الفئة غير صالحة"),
+    logoImage: _m("Icon Image", "صورة الأيقونة"),
+    logoImagePlaceholder: _m("Attach icon image", "أرفق صورة الأيقونة"),
+    logoImageRequired: _m("Icon image is required", "صورة الأيقونة مطلوبة"),
+    logoImageMinLength: _m("Icon image must be at least 2 characters", "صورة الأيقونة يجب أن يكون على الأقل حرفين"),
+    logoImageInvalid: _m("Icon image is invalid", "صورة الأيقونة غير صالحة"),
+    logoImageSizeExceeded: _m("Icon image size must not exceed 3MB", "صورة الأيقونة يجب أن يكون حجمها أقل من 3MB"),
+    save: _m("Save", "حفظ"),
+    cancel: _m("Cancel", "إلغاء"),
+    updateSuccess: _m("Icon updated successfully!", "تم التحديث بنجاح!"),
+    updateError: _m("Failed to update icon. Please try again.", "فشل التحديث. يرجى المحاولة مرة أخرى."),
+    createSuccess: _m("Icon created successfully!", "تم الإنشاء بنجاح!"),
+    createError: _m("Failed to create icon. Please try again.", "فشل الإنشاء. يرجى المحاولة مرة أخرى."),
+  }),
+});
+
