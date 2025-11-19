@@ -1,6 +1,7 @@
 import { baseApi } from "@/config/axios/instances/base";
 import { ListIconsResponse, ShowIconResponse } from "./types/response";
 import { CreateIconParams, UpdateIconParams } from "./types/params";
+import { serialize } from "object-to-formdata";
 
 export const CompanyDashboardIconsApi = {
   list: (params?: { search?: string }) =>
@@ -9,26 +10,15 @@ export const CompanyDashboardIconsApi = {
     }),
   show: (id: string) =>
     baseApi.get<ShowIconResponse>(`website-icons/${id}`),
-  create: (params: CreateIconParams) => {
-    const formData = new FormData();
-    formData.append("name_ar", params.name_ar);
-    formData.append("name_en", params.name_en);
-    formData.append("category_website_cms_id", params.category_website_cms_id);
-    if (params.icon) {
-      formData.append("icon", params.icon);
-    }
+  create: (body: CreateIconParams) => {
 
-    return baseApi.post("website-icons", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    return baseApi.post("website-icons", serialize(body));
   },
   update: (id: string, params: UpdateIconParams) => {
     const formData = new FormData();
-    if (params.name_ar) formData.append("name_ar", params.name_ar);
-    if (params.name_en) formData.append("name_en", params.name_en);
-    if (params.category_website_cms_id) {
-      formData.append("category_website_cms_id", params.category_website_cms_id);
-    }
+    formData.append("name_ar", params.name_ar || "");
+    formData.append("name_en", params.name_en || "");
+    formData.append("category_website_cms_id", params.category_website_cms_id || "");
     if (params.icon) {
       formData.append("icon", params.icon);
     }

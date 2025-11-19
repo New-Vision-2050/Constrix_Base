@@ -39,6 +39,7 @@ import {
     IconFormData,
     getDefaultIconFormValues,
 } from "../schema/icon-form.schema";
+import { CompanyDashboardIconsApi } from "@/services/api/company-dashboard/icons";
 
 interface SetIconDialogProps {
     open: boolean;
@@ -59,13 +60,12 @@ export default function SetIconDialog({
 
     // Fetch icon data when editing
     const { data: iconData, isLoading: isFetching } = useQuery<{
-        data: { payload: { name_ar?: string; name_en?: string; category_id?: string; logo_image?: string } | null };
+        data: { payload: { name_ar?: string; name_en?: string; category_website_cms_id?: string; icon?: string } | null };
     }>({
         queryKey: ["company-dashboard-icon", iconId],
         queryFn: async () => {
             // TODO: Replace with actual API call
-            // return CompanyDashboardIconsApi.show(iconId!);
-            return { data: { payload: null } };
+            return CompanyDashboardIconsApi.show(iconId!);
         },
         enabled: isEditMode && open,
     });
@@ -115,8 +115,8 @@ export default function SetIconDialog({
                 shouldTouch: true,
                 shouldValidate: true,
             });
-            if (icon.category_id) {
-                setValue("category_id", icon.category_id, {
+            if (icon.category_website_cms_id) {
+                setValue("category_id", icon.category_website_cms_id, {
                     shouldDirty: true,
                     shouldTouch: true,
                     shouldValidate: true,
@@ -129,22 +129,26 @@ export default function SetIconDialog({
         try {
             // TODO: Replace with actual API calls
             if (isEditMode && iconId) {
-                // await CompanyDashboardIconsApi.update(iconId, {
-                //   "name[ar]": data.name_ar,
-                //   "name[en]": data.name_en,
-                //   category_id: data.category_id,
-                //   logo_image: data.logo_image,
-                // });
+                await CompanyDashboardIconsApi.update(iconId, {
+                  name_ar: data.name_ar,
+                  name_en: data.name_en,
+                  category_website_cms_id: data.category_id,
+                  icon: data.logo_image || undefined,
+                });
                 toast.success(
                     t("updateSuccess") || "Icon updated successfully!"
                 );
             } else {
-                // await CompanyDashboardIconsApi.create({
-                //   "name[ar]": data.name_ar,
-                //   "name[en]": data.name_en,
-                //   category_id: data.category_id,
-                //   logo_image: data.logo_image,
-                // });
+                if (!data.logo_image) {
+                    toast.error(t("logoImageRequired") || "Logo image is required");
+                    return;
+                }
+                await CompanyDashboardIconsApi.create({
+                    name_ar: data.name_ar,
+                    name_en: data.name_en,
+                    category_website_cms_id: data.category_id,
+                    icon: data.logo_image,
+                });
                 toast.success(
                     t("createSuccess") || "Icon created successfully!"
                 );
@@ -229,8 +233,8 @@ export default function SetIconDialog({
                                                     required={false}
                                                     onChange={(file) => field.onChange(file)}
                                                     initialValue={
-                                                        isEditMode && iconData?.data?.payload?.logo_image
-                                                            ? iconData.data.payload.logo_image
+                                                        isEditMode && iconData?.data?.payload?.icon
+                                                            ? iconData.data.payload.icon
                                                             : undefined
                                                     }
                                                     minHeight="200px"
@@ -290,46 +294,46 @@ export default function SetIconDialog({
                                         </FormItem>
                                     )}
                                 />
-
-                                {/* Category */}
-                                <FormField
-                                    control={control}
-                                    name="category_id"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-xs" required>
-                                                {t("category") || "الفئة"}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Select
-                                                    value={field.value}
-                                                    onValueChange={field.onChange}
-                                                    disabled={isSubmitting || isFetching}
-                                                >
-                                                    <SelectTrigger
-                                                        className="mt-1 bg-sidebar border-white text-white h-12"
-                                                        showClear={!!field.value}
-                                                        onClear={() => field.onChange("")}
-                                                    >
-                                                        <SelectValue
-                                                            placeholder={t("categoryPlaceholder") || "أختار الفئة"}
-                                                        />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {categories.map((category: any) => (
-                                                            <SelectItem key={category.id} value={category.id}>
-                                                                {category.name || category.name_ar || category.id}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-                                            <FormErrorMessage />
-                                        </FormItem>
-                                    )}
-                                />
                             </div>
                         </div>
+
+                        {/* Category */}
+                        <FormField
+                            control={control}
+                            name="category_id"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs" required>
+                                        {t("category") || "الفئة"}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={field.onChange}
+                                            disabled={isSubmitting || isFetching}
+                                        >
+                                            <SelectTrigger
+                                                className="mt-1 bg-sidebar border-white text-white h-12"
+                                                showClear={!!field.value}
+                                                onClear={() => field.onChange("")}
+                                            >
+                                                <SelectValue
+                                                    placeholder={t("categoryPlaceholder") || "أختار الفئة"}
+                                                />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {categories.map((category: any) => (
+                                                    <SelectItem key={category.id} value={category.id?.toString()}>
+                                                        {category.name || category.name_ar || category.id}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormErrorMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         {/* Save Button */}
                         <div className="mt-6">
