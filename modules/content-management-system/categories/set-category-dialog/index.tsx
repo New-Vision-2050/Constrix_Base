@@ -42,13 +42,6 @@ import {
   getDefaultCategoryFormValues,
 } from "../schemas/category-form.schema";
 
-// Category type options - can be extended later
-const CATEGORY_TYPE_OPTIONS = [
-  { value: "services", label: "Services" },
-  { value: "products", label: "Products" },
-  { value: "category", label: "Category" },
-  { value: "subcategory", label: "Subcategory" },
-];
 
 interface SetCategoryDialogProps {
   open: boolean;
@@ -72,6 +65,13 @@ export default function SetCategoryDialog({
     queryKey: ["company-dashboard-category", categoryId],
     queryFn: () => CompanyDashboardCategoriesApi.show(categoryId!),
     enabled: isEditMode && open,
+  });
+
+  // Fetch category types
+  const { data: categoryTypesData } = useQuery({
+    queryKey: ["company-dashboard-category-types"],
+    queryFn: () => CompanyDashboardCategoriesApi.categoriesTypes(),
+    enabled: open,
   });
 
   const form = useForm<CategoryFormData>({
@@ -112,11 +112,11 @@ export default function SetCategoryDialog({
         shouldTouch: true,
         shouldValidate: true,
       });
-      // Set type if available - adjust based on your API response structure
-      // Note: type field might not exist in ECM_Category, so we check safely
-      const categoryType = (category as any).type;
+      // Set category_type if available - adjust based on your API response structure
+      // Note: category_type field might not exist in ECM_Category, so we check safely
+      const categoryType = (category as any).category_type || (category as any).type;
       if (categoryType) {
-        setValue("type", categoryType, {
+        setValue("category_type", categoryType, {
           shouldDirty: true,
           shouldTouch: true,
           shouldValidate: true,
@@ -130,18 +130,18 @@ export default function SetCategoryDialog({
       if (isEditMode && categoryId) {
         // Update existing category
         const updateParams: UpdateCategoryParams = {
-          "name[ar]": data.name_ar,
-          "name[en]": data.name_en,
-          type: data.type,
+          name_ar: data.name_ar,
+          name_en: data.name_en,
+          category_type: data.category_type,
         };
 
         await CompanyDashboardCategoriesApi.update(categoryId, updateParams);
       } else {
         // Create new category
         const createParams: CreateCategoryParams = {
-          "name[ar]": data.name_ar,
-          "name[en]": data.name_en,
-          type: data.type,
+          name_ar: data.name_ar,
+          name_en: data.name_en,
+          category_type: data.category_type,
         };
 
         await CompanyDashboardCategoriesApi.create(createParams);
@@ -255,7 +255,7 @@ export default function SetCategoryDialog({
             {/* Category Type */}
             <FormField
               control={control}
-              name="type"
+              name="category_type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs" required>
@@ -277,9 +277,9 @@ export default function SetCategoryDialog({
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {CATEGORY_TYPE_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
+                        {categoryTypesData?.data?.payload?.map((option: any) => (
+                          <SelectItem key={option.id} value={option.id.toString()}>
+                            {option.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

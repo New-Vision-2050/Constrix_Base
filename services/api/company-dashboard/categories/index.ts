@@ -4,33 +4,37 @@ import { CreateCategoryParams, UpdateCategoryParams } from "./types/params";
 
 export const CompanyDashboardCategoriesApi = {
   list: (params?: { search?: string }) =>
-    baseApi.get<ListCategoriesResponse>("company-dashboard/categories/list", {
+    baseApi.get<ListCategoriesResponse>("categories-website", {
       params,
     }),
   show: (id: string) =>
     baseApi.get<ShowCategoryResponse>(
-      `company-dashboard/categories/${id}`
+      `categories-website/${id}`
     ),
   create: (params: CreateCategoryParams) => {
     const formData = new FormData();
-    formData.append("name[ar]", params["name[ar]"]);
-    formData.append("name[en]", params["name[en]"]);
-    formData.append("type", params.type);
+    formData.append("name_ar", params.name_ar);
+    formData.append("name_en", params.name_en);
+    formData.append("category_type", params.category_type);
 
-    return baseApi.post("company-dashboard/categories", formData, {
+    return baseApi.post("categories-website", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
   update: (id: string, params: UpdateCategoryParams) => {
     const formData = new FormData();
-    if (params["name[ar]"]) formData.append("name[ar]", params["name[ar]"]);
-    if (params["name[en]"]) formData.append("name[en]", params["name[en]"]);
-    if (params.type) formData.append("type", params.type);
+    if (params.name_ar) formData.append("name_ar", params.name_ar);
+    if (params.name_en) formData.append("name_en", params.name_en);
+    if (params.category_type) formData.append("category_type", params.category_type);
 
-    return baseApi.post(`company-dashboard/categories/${id}`, formData, {
+    console.log('params', params)
+
+    return baseApi.post(`categories-website/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
   delete: (id: string) =>
-    baseApi.delete(`company-dashboard/categories/${id}`),
+    baseApi.delete(`categories-website/${id}`),
+  categoriesTypes: () =>
+    baseApi.get(`categories-website/categeory-types`),
 };

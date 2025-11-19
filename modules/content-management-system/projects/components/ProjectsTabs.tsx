@@ -22,7 +22,7 @@ export default function ProjectsTabs() {
     return (
         <HorizontalTabs
             list={projectsTabs}
-            additionalClasses="justify-start"
+            additionalClassiess="justify-start"
         />
     );
 }

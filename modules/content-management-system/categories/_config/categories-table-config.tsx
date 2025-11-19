@@ -20,7 +20,7 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
 
   return {
     tableId: "company-dashboard-categories-list-table",
-    url: `${baseURL}/company-dashboard/categories/list`,
+    url: `${baseURL}/categories-website`,
     columns: [
       {
         key: "name_ar",
@@ -39,14 +39,9 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
         ),
       },
       {
-        key: "type",
+        key: "category_type",
         label: t("type") || "Type",
         sortable: true,
-        render: (value: string) => (
-          <span className="capitalize">
-            {t(`type.${value}`) || value || "-"}
-          </span>
-        ),
       },
     ],
     executions: [
@@ -59,7 +54,7 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: true,
     },
-    deleteUrl: `${baseURL}/company-dashboard/categories`,
+    deleteUrl: `${baseURL}/categories`,
     searchParamName: "search",
   };
 };
