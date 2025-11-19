@@ -27,9 +27,7 @@ export const CompanyDashboardCategoriesApi = {
     if (params.name_en) formData.append("name_en", params.name_en);
     if (params.category_type) formData.append("category_type", params.category_type);
 
-    console.log('params', params)
-
-    return baseApi.post(`categories-website/${id}`, formData, {
+    return baseApi.put(`categories-website/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },

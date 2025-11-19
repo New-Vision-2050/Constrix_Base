@@ -3,6 +3,8 @@ import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
 import { CompanyDashboardCategory } from "../types";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export interface CategoryRow extends CompanyDashboardCategory {
   name_ar?: string;
@@ -16,6 +18,7 @@ type Params = {
 export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
+  const { can } = usePermissions();
   const t = useTranslations("content-management-system.categories.table");
 
   return {
@@ -46,13 +49,13 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.categories.update)} onSelect={() => params?.onEdit?.(row.id)}>
           {t("edit") || "Edit"}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.CMS.categories.delete),
     },
     deleteUrl: `${baseURL}/categories`,
     searchParamName: "search",
