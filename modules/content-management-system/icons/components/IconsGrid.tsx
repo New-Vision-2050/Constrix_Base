@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
 import { EditIcon, TrashIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 type PropsT = {
     OnEdit: (id: string) => void;
@@ -101,10 +103,13 @@ const IconsGridLoader = () => {
     );
 };
 
+
+type ShowableMenuItem = MenuItem & { show: boolean };
 export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT) {
+    const { can } = usePermissions();
     const t = useTranslations("content-management-system.icons");
 
-    const iconActions: MenuItem[] = [
+    const iconActions: ShowableMenuItem[] = [
         {
             label: "Edit",
             icon: <EditIcon className="w-4 h-4" />,
@@ -112,6 +117,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
             action: (row: { id: string }) => {
                 OnEdit(row.id);
             },
+            show: can(PERMISSIONS.CMS.icons.update),
         },
         {
             label: "Delete",
@@ -120,6 +126,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
             action: (row: { id: string }) => {
                 OnDelete(row.id);
             },
+            show: can(PERMISSIONS.CMS.icons.delete),
         },
     ];
 
@@ -146,7 +153,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
                         id={icon.id}
                         title={icon.name_ar}
                         src={icon.icon}
-                        actions={iconActions}
+                        actions={iconActions?.filter((action) => action.show)}
                     />
                 );
             })}

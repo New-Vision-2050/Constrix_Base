@@ -3,6 +3,8 @@ import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
 import { CMSProjectType } from "../types";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 
 export interface ProjectTypeRow extends CMSProjectType { }
@@ -14,21 +16,22 @@ type Params = {
 export const useProjectsTypesListTableConfig: (params?: Params) => TableConfig = (
     params
 ) => {
+    const { can } = usePermissions();
     const t = useTranslations("content-management-system.projects.projectTypesTable");
 
     return {
         tableId: "company-dashboard-projects-list-table",
-        url: `${baseURL}/company-dashboard/projects-types/list`,
+        url: `${baseURL}/website-project-settings`,
         columns: [
             {
-                key: "type",
-                label: t("projectType") || "نوع المشروع",
+                key: "name_ar",
+                label: t("projectTypeAr") || "نوع المشروع بالعربي",
                 sortable: true,
-                render: (value: string) => (
-                    <span className="font-medium">
-                        {value || "-"}
-                    </span>
-                ),
+            },
+            {
+                key: "name_en",
+                label: t("projectTypeEn") || "نوع المشروع بالانجليزية",
+                sortable: true,
             },
             {
                 key: "projects_count",
@@ -38,26 +41,18 @@ export const useProjectsTypesListTableConfig: (params?: Params) => TableConfig =
                     <span className="font-medium">{value ?? 0}</span>
                 ),
             },
-            {
-                key: "group",
-                label: t("group") || "المجموعة",
-                sortable: true,
-                render: (value: number) => (
-                    <span className="font-medium">{value ?? "-"}</span>
-                ),
-            },
         ],
         executions: [
             (row) => (
-                <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+                can(PERMISSIONS.CMS.projectsTypes.delete) ? <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
                     {t("edit") || "تعديل"}
-                </DropdownMenuItem>
+                </DropdownMenuItem> : null
             ),
         ],
         executionConfig: {
-            canDelete: true,
+            canDelete: can(PERMISSIONS.CMS.projectsTypes.delete),
         },
-        deleteUrl: `${baseURL}/company-dashboard/projects`,
+        deleteUrl: `${baseURL}/website-project-settings`,
         searchParamName: "search",
     };
 };

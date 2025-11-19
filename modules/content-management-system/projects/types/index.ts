@@ -35,6 +35,5 @@ export interface CMSProjectType {
   id: string;
   name_ar: string;
   name_en: string;
-  group: string;
   projects_count: number;
 }

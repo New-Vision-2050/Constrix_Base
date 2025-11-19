@@ -64,8 +64,9 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   projectTypesTable: new MessagesGroup({
     addProjectType: _m("Add New Project Type", "اضافة نوع مشروع جديد"),
     projectType: _m("Project Type", "نوع المشروع"),
+    projectTypeAr: _m("Project Type in Arabic", "نوع المشروع بالعربي"),
+    projectTypeEn: _m("Project Type in English", "نوع المشروع بالانجليزية"),
     projectsCount: _m("Projects Count", "عدد المشاريع"),
-    group: _m("Group", "المجموعة"),
     edit: _m("Edit", "تعديل"),
   }),
   projectTypeForm: new MessagesGroup({
@@ -79,11 +80,6 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     nameEnPlaceholder: _m("Enter project type name in English", "أدخل اسم النوع بالإنجليزية"),
     nameEnRequired: _m("Project type name in English is required", "اسم النوع بالإنجليزية مطلوب"),
     nameEnMinLength: _m("Project type name in English must be at least 2 characters", "اسم النوع بالإنجليزية يجب أن يكون على الأقل حرفين"),
-    group: _m("Group", "المجموعة"),
-    groupPlaceholder: _m("Enter group", "أدخل المجموعة"),
-    groupRequired: _m("Group is required", "المجموعة مطلوبة"),
-    groupMinLength: _m("Group must be at least 2 characters", "المجموعة يجب أن يكون على الأقل حرفين"),
-    groupInvalid: _m("Group is invalid", "المجموعة غير صالحة"),
     save: _m("Save", "حفظ"),
     cancel: _m("Cancel", "إلغاء"),
     updateSuccess: _m("Project type updated successfully!", "تم تحديث النوع بنجاح!"),

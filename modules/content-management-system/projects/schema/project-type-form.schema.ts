@@ -40,31 +40,6 @@ export const createProjectTypeFormSchema = (t: (key: string) => string) =>
         }
       )
       .transform((val) => val?.trim() || ""),
-
-    group: z
-      .union([
-        z.number().int().positive({
-          message: t("groupInvalid") || "Group must be a valid positive number",
-        }),
-        z.string().refine(
-          (val) => {
-            if (!val || val.trim() === "") return true; // Allow empty string
-            const num = parseInt(val, 10);
-            return !isNaN(num) && num > 0;
-          },
-          {
-            message: t("groupInvalid") || "Group must be a valid positive number",
-          }
-        ),
-      ])
-      .optional()
-      .transform((val) => {
-        if (typeof val === "string") {
-          if (!val || val.trim() === "") return undefined;
-          return parseInt(val, 10);
-        }
-        return val;
-      }),
   });
 
 /**
@@ -82,6 +57,5 @@ export type ProjectTypeFormData = z.infer<
 export const getDefaultProjectTypeFormValues = (): ProjectTypeFormData => ({
   name_ar: "",
   name_en: "",
-  group: undefined,
 });
 

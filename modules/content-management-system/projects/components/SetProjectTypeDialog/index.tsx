@@ -30,6 +30,7 @@ import {
   ProjectTypeFormData,
   getDefaultProjectTypeFormValues,
 } from "../../schema/project-type-form.schema";
+import { CompanyDashboardProjectTypesApi } from "@/services/api/company-dashboard/project-types";
 
 interface SetProjectTypeDialogProps {
   open: boolean;
@@ -49,15 +50,9 @@ export default function SetProjectTypeDialog({
   const isEditMode = !!projectTypeId;
 
   // Fetch project type data when editing
-  const { data: projectTypeData, isLoading: isFetching } = useQuery<{
-    data: { payload: { name_ar?: string; name_en?: string; group?: number } | null };
-  }>({
+  const { data: projectTypeData, isLoading: isFetching } = useQuery({
     queryKey: ["company-dashboard-project-type", projectTypeId],
-    queryFn: async () => {
-      // TODO: Replace with actual API call
-      // return CompanyDashboardProjectTypesApi.show(projectTypeId!);
-      return { data: { payload: null } };
-    },
+    queryFn: () => CompanyDashboardProjectTypesApi.show(projectTypeId!),
     enabled: isEditMode && open,
   });
 
@@ -99,34 +94,24 @@ export default function SetProjectTypeDialog({
         shouldTouch: true,
         shouldValidate: true,
       });
-      if (projectType.group !== undefined) {
-        setValue("group", projectType.group, {
-          shouldDirty: true,
-          shouldTouch: true,
-          shouldValidate: true,
-        });
-      }
     }
   }, [isEditMode, projectTypeData, open, setValue]);
 
   const onSubmit = async (data: ProjectTypeFormData) => {
     try {
-      // TODO: Replace with actual API calls
       if (isEditMode && projectTypeId) {
-        // await CompanyDashboardProjectTypesApi.update(projectTypeId, {
-        //   "name[ar]": data.name_ar,
-        //   "name[en]": data.name_en,
-        //   group: data.group,
-        // });
+        await CompanyDashboardProjectTypesApi.update(projectTypeId, {
+          name_ar: data.name_ar,
+          name_en: data.name_en,
+        });
         toast.success(
           t("updateSuccess") || "Project type updated successfully!"
         );
       } else {
-        // await CompanyDashboardProjectTypesApi.create({
-        //   "name[ar]": data.name_ar,
-        //   "name[en]": data.name_en,
-        //   group: data.group,
-        // });
+        await CompanyDashboardProjectTypesApi.create({
+          name_ar: data.name_ar,
+          name_en: data.name_en || "",
+        });
         toast.success(
           t("createSuccess") || "Project type created successfully!"
         );
@@ -232,35 +217,6 @@ export default function SetProjectTypeDialog({
                       className="mt-1"
                       placeholder={t("nameEnPlaceholder") || "Enter project type in English"}
                       {...field}
-                    />
-                  </FormControl>
-                  <FormErrorMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Group */}
-            <FormField
-              control={control}
-              name="group"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">
-                    {t("group") || "المجموعة"}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      variant="secondary"
-                      disabled={isSubmitting || isFetching}
-                      className="mt-1"
-                      placeholder={t("groupPlaceholder") || "أدخل رقم المجموعة"}
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        field.onChange(value === "" ? undefined : value);
-                      }}
                     />
                   </FormControl>
                   <FormErrorMessage />
