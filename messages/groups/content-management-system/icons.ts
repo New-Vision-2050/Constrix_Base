@@ -4,6 +4,7 @@ export const ContentManagementSystemIconsMessages = new MessagesGroup({
   title: _m("Icons", "الأيقونات"),
   addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
   editIcon: _m("Edit Icon", "تعديل ايقونة"),
+  noIconsFound: _m("No icons found", "لا توجد أيقونات"),
   form: new MessagesGroup({
     addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
     editIcon: _m("Edit Icon", "تعديل ايقونة"),

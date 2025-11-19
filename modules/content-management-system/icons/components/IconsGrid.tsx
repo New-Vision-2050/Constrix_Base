@@ -3,6 +3,7 @@ import { CompanyDashboardIcon } from "@/services/api/company-dashboard/icons/typ
 import { Card, CardContent } from "@/components/ui/card";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
 import { EditIcon, TrashIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
     OnEdit: (id: string) => void;
@@ -101,6 +102,7 @@ const IconsGridLoader = () => {
 };
 
 export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT) {
+    const t = useTranslations("content-management-system.icons");
 
     const iconActions: MenuItem[] = [
         {
@@ -123,6 +125,16 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
 
     if (isLoading) {
         return <IconsGridLoader />;
+    }
+
+    if (icons.length === 0 && !isLoading) {
+        return (
+            <div className="w-full flex items-center justify-center py-20">
+                <p className="text-gray-400 text-center text-lg">
+                    {t("noIconsFound")}
+                </p>
+            </div>
+        );
     }
 
     return (
