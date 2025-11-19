@@ -116,7 +116,11 @@ export default function SetCategoryDialog({
       // Note: category_type field might not exist in ECM_Category, so we check safely
       const categoryType = (category as any).category_type || (category as any).type;
       if (categoryType) {
-        setValue("category_type", categoryType, {
+        // If category_type is an object, extract the id, otherwise use the value directly
+        const categoryTypeId = typeof categoryType === 'object' && categoryType?.id 
+          ? categoryType.id 
+          : categoryType;
+        setValue("category_type", categoryTypeId, {
           shouldDirty: true,
           shouldTouch: true,
           shouldValidate: true,

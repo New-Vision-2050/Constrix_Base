@@ -14,17 +14,11 @@ export const CompanyDashboardIconsApi = {
 
     return baseApi.post("website-icons", serialize(body));
   },
-  update: (id: string, params: UpdateIconParams) => {
-    const formData = new FormData();
-    formData.append("name_ar", params.name_ar || "");
-    formData.append("name_en", params.name_en || "");
-    formData.append("category_website_cms_id", params.category_website_cms_id || "");
-    if (params.icon) {
-      formData.append("icon", params.icon);
-    }
-
-    return baseApi.put(`website-icons/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  update: (id: string, body: UpdateIconParams) => {
+    return baseApi.post(`website-icons/${id}`, serialize(body), {
+      params:{
+        _method: "PUT",
+      }
     });
   },
   delete: (id: string) =>

@@ -36,7 +36,7 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
         sortable: true
       },
       {
-        key: "category_type",
+        key: "category_type.name",
         label: t("type") || "Type",
         sortable: true,
       },
@@ -51,7 +51,7 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
     executionConfig: {
       canDelete: can(PERMISSIONS.CMS.categories.delete),
     },
-    deleteUrl: `${baseURL}/categories`,
+    deleteUrl: `${baseURL}/categories-website`,
     searchParamName: "search",
   };
 };
