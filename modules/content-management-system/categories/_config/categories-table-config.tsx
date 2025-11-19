@@ -28,18 +28,12 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
       {
         key: "name_ar",
         label: t("nameAr") || "Category Name in Arabic",
-        sortable: true,
-        render: (_: unknown, row: CategoryRow) => (
-          <span className="font-medium">{row.name}</span>
-        ),
+        sortable: true
       },
       {
         key: "name_en",
         label: t("nameEn") || "Category Name in English",
-        sortable: true,
-        render: (_: unknown, row: CategoryRow) => (
-          <span className="font-medium">{row.name}</span>
-        ),
+        sortable: true
       },
       {
         key: "category_type",

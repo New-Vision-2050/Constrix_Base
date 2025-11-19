@@ -11,25 +11,11 @@ export const CompanyDashboardCategoriesApi = {
     baseApi.get<ShowCategoryResponse>(
       `categories-website/${id}`
     ),
-  create: (params: CreateCategoryParams) => {
-    const formData = new FormData();
-    formData.append("name_ar", params.name_ar);
-    formData.append("name_en", params.name_en);
-    formData.append("category_type", params.category_type);
-
-    return baseApi.post("categories-website", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+  create: (body: CreateCategoryParams) => {
+    return baseApi.post("categories-website", body);
   },
-  update: (id: string, params: UpdateCategoryParams) => {
-    const formData = new FormData();
-    if (params.name_ar) formData.append("name_ar", params.name_ar);
-    if (params.name_en) formData.append("name_en", params.name_en);
-    if (params.category_type) formData.append("category_type", params.category_type);
-
-    return baseApi.put(`categories-website/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+  update: (id: string, body: UpdateCategoryParams) => {
+    return baseApi.put(`categories-website/${id}`, body);
   },
   delete: (id: string) =>
     baseApi.delete(`categories-website/${id}`),
