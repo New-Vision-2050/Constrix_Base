@@ -82,16 +82,19 @@ export default function ContactSettingForm() {
             // TODO: Replace with actual API call
             // await ContactSettingApi.update(data);
             toast.success(t("updateSuccess") || "Settings updated successfully!");
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error updating settings:", error);
 
-            if (error?.response?.status === 422) {
-                const validationErrors = error?.response?.data?.errors;
-                if (validationErrors) {
-                    const firstErrorKey = Object.keys(validationErrors)[0];
-                    const firstErrorMessage = validationErrors[firstErrorKey][0];
-                    toast.error(firstErrorMessage || t("validationError"));
-                    return;
+            if (error && typeof error === 'object' && 'response' in error) {
+                const apiError = error as { response?: { status?: number; data?: { errors?: Record<string, string[]> } } };
+                if (apiError.response?.status === 422) {
+                    const validationErrors = apiError.response?.data?.errors;
+                    if (validationErrors) {
+                        const firstErrorKey = Object.keys(validationErrors)[0];
+                        const firstErrorMessage = validationErrors[firstErrorKey][0];
+                        toast.error(firstErrorMessage || t("validationError"));
+                        return;
+                    }
                 }
             }
 
@@ -554,8 +557,7 @@ export default function ContactSettingForm() {
                                                         {...field}
                                                         value={field.value ?? ""}
                                                         onChange={(e) => {
-                                                            const value = e.target.value;
-                                                            field.onChange(value === "" ? 0 : parseInt(value, 10));
+                                                            field.onChange(e.target.valueAsNumber || 0);
                                                         }}
                                                     />
                                                 </FormControl>
@@ -643,7 +645,7 @@ export default function ContactSettingForm() {
                                                         <FormControl>
                                                             <FileUploadButton
                                                                 onChange={(file) => field.onChange(file)}
-                                                                accept="application/pdf"
+                                                                accept="application/pdf,.pdf"
                                                                 maxSize="10MB"
                                                                 initialValue={field.value}
                                                                 disabled={isSubmitting}

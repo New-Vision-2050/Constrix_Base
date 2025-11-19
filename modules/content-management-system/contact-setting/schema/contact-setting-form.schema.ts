@@ -59,8 +59,7 @@ const attachmentSchema = z.object({
     .trim(),
 
   file: z
-    .any()
-    .nullable()
+    .union([z.instanceof(File), z.null()])
     .refine(
       (file) =>
         file === null ||
@@ -96,8 +95,7 @@ export const createContactSettingFormSchema = (t: (key: string) => string) =>
   z.object({
     // Main Section
     section_image: z
-      .any()
-      .nullable()
+      .union([z.instanceof(File), z.null()])
       .refine(
         (file) =>
           file === null ||

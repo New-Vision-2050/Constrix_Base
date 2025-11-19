@@ -54,8 +54,7 @@ export const createIconFormSchema = (t: (key: string) => string) =>
       }),
 
     logo_image: z
-      .any()
-      .nullable()
+      .union([z.instanceof(File), z.null()])
       .refine(
         (file) =>
           file === null ||
