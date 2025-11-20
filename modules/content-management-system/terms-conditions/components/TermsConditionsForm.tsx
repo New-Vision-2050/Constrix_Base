@@ -5,28 +5,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Form } from "@/modules/table/components/ui/form";
-import {
-    createTermsConditionsFormSchema,
-    TermsConditionsFormData,
-    getDefaultTermsConditionsFormValues,
-} from "../schema/terms-conditions-form.schema";
+import { createTermsConditionsFormSchema, TermsConditionsFormData, getDefaultTermsConditionsFormValues } from "../schema/terms-conditions-form.schema";
 import { useTermsConditions } from "../hooks/useTermsConditions";
 import { useFormErrorToast } from "../hooks/useFormErrorToast";
-import LoadingState from "./LoadingState";
+import { useDataStates } from "../hooks/useDataStates";
 import TermsConditionsEditor from "./TermsConditionsEditor";
 import SubmitButton from "./SubmitButton";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
- * Terms and Conditions Form Component
- * 
- * Manages the editing of website terms and conditions
- * Follows SOLID principles with separated concerns
+ * Terms and Conditions Form - manages editing with SOLID principles
  */
 export default function TermsConditionsForm() {
     const t = useTranslations("content-management-system.termsConditions.form");
-    const { data, isLoading, updateTermsConditions, isUpdating } =
+    const { data, isLoading, error, refetch, updateTermsConditions, isUpdating } =
         useTermsConditions(t);
 
     const form = useForm<TermsConditionsFormData>({
@@ -36,21 +29,24 @@ export default function TermsConditionsForm() {
 
     const { control, handleSubmit, reset, formState: { errors } } = form;
 
-    // Display validation errors as toasts
     useFormErrorToast(errors);
 
     // Load existing data into form
     useEffect(() => {
-        if (data?.content) {
-            reset({ content: data.content });
-        }
+        if (data?.content) reset({ content: data.content });
     }, [data, reset]);
 
-    const onSubmit = (formData: TermsConditionsFormData) => {
-        updateTermsConditions({ content: formData.content });
-    };
+    // Handle loading and error states
+    const dataState = useDataStates({
+        isLoading,
+        error,
+        refetch,
+        errorMessage: t("loadError") || "فشل تحميل الشروط والأحكام",
+    });
+    if (dataState) return dataState;
 
-    if (isLoading) return <LoadingState />;
+    const onSubmit = (formData: TermsConditionsFormData) => 
+        updateTermsConditions({ content: formData.content });
 
     return (
         <Can check={[PERMISSIONS.CMS.termsConditions.update]}>
@@ -69,6 +65,5 @@ export default function TermsConditionsForm() {
                 </Form>
             </div>
         </Can>
-
     );
 }

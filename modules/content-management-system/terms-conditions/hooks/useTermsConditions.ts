@@ -5,17 +5,9 @@ import { toast } from "sonner";
 
 /**
  * Custom hook for managing Terms and Conditions
- * 
- * Follows SOLID principles:
- * - Single Responsibility: Handles only T&C data fetching and updates
- * - Open/Closed: Extensible without modifying existing code
- * - Dependency Inversion: Depends on API abstraction
- * 
+ * Follows SOLID principles for data fetching and updates
  * @param t - Translation function for user messages
  * @returns Object containing query data, loading states, and mutation function
- * 
- * @example
- * const { data, isLoading, updateTermsConditions } = useTermsConditions(t);
  */
 export const useTermsConditions = (t: (key: string) => string) => {
   const queryClient = useQueryClient();
@@ -63,8 +55,8 @@ export const useTermsConditions = (t: (key: string) => string) => {
     data: query.data?.payload,
     isLoading: query.isLoading,
     error: query.error,
+    refetch: query.refetch,
     updateTermsConditions: mutation.mutate,
     isUpdating: mutation.isPending,
   };
 };
-
