@@ -1,0 +1,89 @@
+name: Jira Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+    branches:
+      - master
+      - stage
+      - dev
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  validate-jira:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR Title Contains Jira Ticket
+        id: validate_title
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          # Check if PR title contains Jira ticket pattern (e.g., PROJ-123, ABC-456)
+          if [[ "$PR_TITLE" =~ ^[A-Z]+-[0-9]+:.*$ ]]; then
+            echo "✅ PR title contains valid Jira ticket ID"
+            echo "valid=true" >> $GITHUB_OUTPUT
+            
+            # Extract Jira ticket ID
+            JIRA_ID=$(echo "$PR_TITLE" | grep -oE '^[A-Z]+-[0-9]+')
+            echo "jira_id=$JIRA_ID" >> $GITHUB_OUTPUT
+          else
+            echo "❌ PR title must start with Jira ticket ID (e.g., PROJ-123: Description)"
+            echo "valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Validate Jira Link in PR Body
+        if: success()
+        run: |
+          PR_BODY=$(jq --raw-output .pull_request.body < "$GITHUB_EVENT_PATH")
+
+          # Check if PR body contains Jira link or ticket reference
+          if echo "$PR_BODY" | grep -qiE "(jira\..*\.[a-z]+/browse/[A-Z]+-[0-9]+|Jira Ticket:\s*[A-Z]+-[0-9]+)"; then
+            echo "✅ PR body contains Jira ticket link or reference"
+          else
+            echo "⚠️  Warning: PR body should contain a Jira ticket link"
+            echo "Please add the Jira ticket link in the PR description"
+          fi
+
+      - name: Post Validation Failure Comment
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ **Jira Validation Failed**
+
+            Your PR title must follow this format:
+            ```
+            PROJ-123: Brief description of changes
+            ```
+
+            **Requirements:**
+            - Start with Jira ticket ID (e.g., `CORE-456`, `DEV-789`)
+            - Follow with a colon and space
+            - Include a brief description
+
+            **Example:**
+            ```
+            CORE-123: Add user authentication feature
+            ```
+
+            Please update your PR title and ensure your PR description contains the Jira ticket link.
+
+      - name: Post Validation Success Comment
+        if: success()
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ **Jira Validation Passed**
+
+            Jira Ticket: `${{ steps.validate_title.outputs.jira_id }}`
