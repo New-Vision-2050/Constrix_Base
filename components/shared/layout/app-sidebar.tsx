@@ -134,7 +134,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     };
 
     /**
-     * isCentralProject: "central" | "not-central" | "both";
+     * show calculation based on company type:
      * companies: central
      * users: central
      * human resources: not-central
@@ -153,7 +153,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         isActive: pageName === ROUTER.COMPANIES,
         slug: SUPER_ENTITY_SLUG.COMPANY,
-        isCentralProject: "central",
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.CompaniesList"),
@@ -172,7 +172,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.USERS],
         isActive: pageName === ROUTER.USERS,
         slug: SUPER_ENTITY_SLUG.USERS,
-        isCentralProject: "central",
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.UsersList"),
@@ -190,7 +190,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.Organizational_Structure],
         isActive: pageName === ROUTER.Organizational_Structure,
         slug: SUPER_ENTITY_SLUG.HRM,
-        isCentralProject: "not-central",
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.OrganizationalStructure"),
@@ -234,7 +234,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         urls: [ROUTER.PROGRAM_SETTINGS.USERS],
         isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
-        isCentralProject: "central",
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.Users"),
@@ -252,7 +252,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
         isActive: pageName === ROUTER.CRM.clients,
-        isCentralProject: "not-central",
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.CRMSettings"),
@@ -270,7 +270,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LibraryBig,
         urls: [ROUTER.DOCS_LIBRARY],
         isActive: pageName === ROUTER.DOCS_LIBRARY,
-        isCentralProject: "not-central",
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.docs-library-docs"),
@@ -288,7 +288,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
         urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
-        isCentralProject: "both",
+        show: true,
         sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
@@ -344,7 +344,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: pageName === ROUTER.Powers,
         slug: SUPER_ENTITY_SLUG.POWERS,
         urls: [ROUTER.Programs],
-        isCentralProject: "central",
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.PackagesAndPrograms"),
@@ -371,7 +371,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.Discounts,
           ROUTER.Coupons,
         ].includes(pageName),
-        isCentralProject: "not-central",
+        show: !isCentralCompany,
         slug: SUPER_ENTITY_SLUG.ECOMMERCE,
         urls: [
           ROUTER.HomeStore,
@@ -479,9 +479,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       isSuperAdmin
     );
     const _shownProjects = _mergedProjects?.filter(project => {
-      return (isCentralCompany && project.isCentralProject === "central") ||
-        (!isCentralCompany && project.isCentralProject === "not-central") ||
-        (project.isCentralProject === "both");
+      return project.show;
     })?.filter((project) => {
       return project.sub_entities?.some((subEntity) => subEntity.show);
     });
