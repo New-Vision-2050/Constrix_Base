@@ -18,7 +18,6 @@ import { ServiceFormData } from "../schemas/service-form.schema";
 interface PreviousWorkSectionProps {
   control: Control<ServiceFormData>;
   previousWorkIndex: number;
-  totalPreviousWorks: number;
   isSubmitting: boolean;
   onRemove: () => void;
   initialImageUrl?: string;
@@ -27,7 +26,6 @@ interface PreviousWorkSectionProps {
 export default function PreviousWorkSection({
   control,
   previousWorkIndex,
-  totalPreviousWorks,
   isSubmitting,
   onRemove,
   initialImageUrl,
@@ -50,54 +48,59 @@ export default function PreviousWorkSection({
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
-
-      {/* Description */}
-      <FormField
-        control={control}
-        name={`previous_works.${previousWorkIndex}.description`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs" required>
-              {tForm("previousWorkDescription")}
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                disabled={isSubmitting}
-                className="mt-1 min-h-[100px] bg-sidebar text-white"
-                placeholder={tForm("previousWorkDescriptionPlaceholder")}
-                {...field}
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Image Upload */}
-      <FormField
-        control={control}
-        name={`previous_works.${previousWorkIndex}.image`}
-        render={({ field }) => (
-          <FormItem>
-            <FormControl>
-              <ImageUpload
-                label={tForm("previousWorkImage")}
-                maxSize={tForm("imageMaxSize")}
-                dimensions={tForm("imageDimensions")}
-                onChange={(file) => field.onChange(file)}
-                initialValue={
-                  typeof field.value === "string"
-                    ? field.value
-                    : initialImageUrl
-                }
-                minHeight="100px"
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
+      {/* Grid Layout: Textarea 9 cols, ImageUpload 3 cols */}
+      <div className="grid grid-cols-12 gap-4">
+        {/* Image Upload - 3 columns */}
+        <div className="col-span-3">
+          <FormField
+            control={control}
+            name={`previous_works.${previousWorkIndex}.image`}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ImageUpload
+                    label={tForm("previousWorkImage")}
+                    maxSize={tForm("imageMaxSize")}
+                    dimensions={tForm("imageDimensions")}
+                    onChange={(file) => field.onChange(file)}
+                    initialValue={
+                      typeof field.value === "string"
+                        ? field.value
+                        : initialImageUrl
+                    }
+                    minHeight="100px"
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        {/* Description - 9 columns */}
+        <div className="col-span-9">
+          <FormField
+            control={control}
+            name={`previous_works.${previousWorkIndex}.description`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs text-white" required>
+                  {tForm("previousWorkDescription")}
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    disabled={isSubmitting}
+                    rows={6}
+                    className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                    placeholder={tForm("previousWorkDescriptionPlaceholder")}
+                    {...field}
+                  />
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </div>
     </div>
   );
 }
-
