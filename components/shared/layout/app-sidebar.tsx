@@ -141,8 +141,8 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
      * program management: central
      * CRM: not-central
      * docs library: not-central
-     * settings: central
-     * powers: not-central
+     * settings: both
+     * powers: central
      * ecommerce: not-central
      */
     const data: Project[] = [
