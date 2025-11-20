@@ -59,6 +59,7 @@ export type Project = {
   urls?: string[];
   icon?: string | ComponentType;
   isActive: boolean;
+  show: boolean;
   sub_entities: Entity[];
 };
 
