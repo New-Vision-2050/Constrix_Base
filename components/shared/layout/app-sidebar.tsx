@@ -288,7 +288,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
         urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
-        isCentralProject: "central",
+        isCentralProject: "both",
         sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
@@ -344,7 +344,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: pageName === ROUTER.Powers,
         slug: SUPER_ENTITY_SLUG.POWERS,
         urls: [ROUTER.Programs],
-        isCentralProject: "not-central",
+        isCentralProject: "central",
         sub_entities: [
           {
             name: t("Sidebar.PackagesAndPrograms"),
