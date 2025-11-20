@@ -59,6 +59,7 @@ export type Project = {
   urls?: string[];
   icon?: string | ComponentType;
   isActive: boolean;
+  isCentralProject: "central" | "not-central" | "both";
   sub_entities: Entity[];
 };
 
