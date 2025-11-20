@@ -1,6 +1,8 @@
 ### Description
 
-#### Link to Bitrix / issue:
+#### Jira Ticket:
+
+<!-- Required: Enter Jira ticket ID (e.g., CORE-123) or full link -->
 
 #### Additional Deployment Commands if there is:
 
