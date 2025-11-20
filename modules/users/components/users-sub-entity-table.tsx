@@ -46,7 +46,6 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
       : optionalAttr?.includes(field.name || field.key)
   );
 
-  console.log('Subentity');
 
   const tableConfig: TableConfig = {
     ...usersConfig,

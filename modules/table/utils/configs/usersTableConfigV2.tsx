@@ -4,7 +4,7 @@ import { baseURL } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useMemo } from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
@@ -12,6 +12,11 @@ import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 import { Trash2 } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
 import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
+import { customerFormConfig } from "@/modules/form-builder/configs/customerFormConfig";
+import { brokerFormConfig } from "@/modules/form-builder/configs/brokerFormConfig";
+import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
+import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
+import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/editIndividualBrokerFormConfig";
 
 // Define types for the company data
 interface CompanyData {
@@ -49,6 +54,25 @@ export const UsersConfigV2 = (options?: {
   registrationFormSlug?: string;
 }) => {
   const t = useTranslations("Companies");
+  // define final form config for EDIT mode
+  // Note: This config is used when clicking "Edit" button in the table
+  const finalFormConfig = useMemo(() => {
+    const registrationFromConfig = options?.registrationFormSlug;
+    // client model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.CLIENT) {
+      return editIndividualClientFormConfig(t);
+    }
+    // broker model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.BROKER) {
+      return editIndividualBrokerFormConfig(t);
+    }
+    // employee model - use full form (no simplified version yet)
+    if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
+      return employeeFormConfig(t);
+    }
+    // default fallback (company user form)
+    return GetCompanyUserFormConfig(t);
+  },[options?.registrationFormSlug, t]);
 
   return {
     url: `${baseURL}/company-users`,
@@ -250,7 +274,7 @@ export const UsersConfigV2 = (options?: {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: GetCompanyUserFormConfig(t),
+    formConfig: finalFormConfig,
     executions: [
       ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE ?
         [{
