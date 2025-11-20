@@ -11,6 +11,7 @@ import ChooseUserCompany from "@/modules/users/components/choose-company-dialog"
 import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 import { Trash2 } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
+import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
 
 // Define types for the company data
 interface CompanyData {
@@ -251,32 +252,34 @@ export const UsersConfigV2 = (options?: {
     allowSearchFieldSelection: true,
     formConfig: GetCompanyUserFormConfig(t),
     executions: [
-      {
-        id: "complete-profile",
-        label: "اكمال الملف الشخصي",
-        icon: <GearIcon className="w-4 h-4" />,
-        action: "complete-profile",
-        dialogComponent: ChooseUserCompany,
-        disabled: options?.canEdit,
-        dialogProps: (row: UserTableRow) => {
-          return {
-            user: row
-          };
+      ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE ?
+        [{
+          id: "complete-profile",
+          label: "اكمال الملف الشخصي",
+          icon: <GearIcon className="w-4 h-4" />,
+          action: "complete-profile",
+          dialogComponent: ChooseUserCompany,
+          disabled: options?.canEdit,
+          dialogProps: (row: UserTableRow) => {
+            return {
+              user: row
+            };
+          },
         },
-      },
-      {
-        id: "user-settings",
-        label: "اعدادات الموظف",
-        icon: <GearIcon className="w-4 h-4" />,
-        action: "user-settings",
-        dialogComponent: UserSettingDialog,
-        disabled: options?.canView,
-        dialogProps: (row: UserTableRow) => {
-          return {
-            user: row,
-          };
-        },
-      },
+        {
+          id: "user-settings",
+          label: "اعدادات الموظف",
+          icon: <GearIcon className="w-4 h-4" />,
+          action: "user-settings",
+          dialogComponent: UserSettingDialog,
+          disabled: options?.canView,
+          dialogProps: (row: UserTableRow) => {
+            return {
+              user: row,
+            };
+          },
+        }]
+        : []),
       {
         id: "delete-user",
         label: "حذف",
