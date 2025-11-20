@@ -15,6 +15,8 @@ import { useFormErrorToast } from "../hooks/useFormErrorToast";
 import LoadingState from "./LoadingState";
 import TermsConditionsEditor from "./TermsConditionsEditor";
 import SubmitButton from "./SubmitButton";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * Terms and Conditions Form Component
@@ -24,7 +26,7 @@ import SubmitButton from "./SubmitButton";
  */
 export default function TermsConditionsForm() {
     const t = useTranslations("content-management-system.termsConditions.form");
-    const { data, isLoading, updateTermsConditions, isUpdating } = 
+    const { data, isLoading, updateTermsConditions, isUpdating } =
         useTermsConditions(t);
 
     const form = useForm<TermsConditionsFormData>({
@@ -51,19 +53,22 @@ export default function TermsConditionsForm() {
     if (isLoading) return <LoadingState />;
 
     return (
-        <div className="px-6 py-4">
-            <Form {...form}>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    <TermsConditionsEditor
-                        control={control}
-                        placeholder={t("contentPlaceholder") || "أدخل محتوى الشروط والاحكام هنا..."}
-                    />
-                    <SubmitButton
-                        isUpdating={isUpdating}
-                        label={t("saveChanges") || "حفظ التعديل"}
-                    />
-                </form>
-            </Form>
-        </div>
+        <Can check={[PERMISSIONS.CMS.termsConditions.update]}>
+            <div className="px-6 py-4">
+                <Form {...form}>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                        <TermsConditionsEditor
+                            control={control}
+                            placeholder={t("contentPlaceholder") || "أدخل محتوى الشروط والاحكام هنا..."}
+                        />
+                        <SubmitButton
+                            isUpdating={isUpdating}
+                            label={t("saveChanges") || "حفظ التعديل"}
+                        />
+                    </form>
+                </Form>
+            </div>
+        </Can>
+
     );
 }
