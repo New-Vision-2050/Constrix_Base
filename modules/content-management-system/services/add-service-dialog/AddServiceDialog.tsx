@@ -245,7 +245,7 @@ export default function AddServiceDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className={`max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto`}
+        className={`max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto overflow-x-hidden`}
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
