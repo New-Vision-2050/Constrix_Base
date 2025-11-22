@@ -13,7 +13,7 @@ export const useFounderListTableConfig: (
 
   return {
     tableId: "founder-list-table",
-    url: `${baseURL}/company-dashboard/founders`,
+    url: `${baseURL}/founders`,
     columns: [
       {
         key: "name",
@@ -81,4 +81,3 @@ export const useFounderListTableConfig: (
     searchParamName: "search",
   };
 };
-

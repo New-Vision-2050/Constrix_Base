@@ -96,7 +96,9 @@ export const contentManagementSystemMessages = new MessagesGroup({
     editFounder: _m("Edit Founder", "تعديل مؤسس"),
     form: new MessagesGroup({
       nameAr: _m("Name (Arabic)", "الاسم (عربي)"),
+      nameArPlaceholder: _m("Enter name in Arabic", "أدخل الاسم بالعربية"),
       nameEn: _m("Name (English)", "الاسم (إنجليزي)"),
+      nameEnPlaceholder: _m("Enter name in English", "أدخل الاسم بالإنجليزية"),
       nameArRequired: _m("Arabic name is required", "الاسم بالعربية مطلوب"),
       nameArMinLength: _m(
         "Arabic name must be at least 2 characters",
@@ -108,7 +110,15 @@ export const contentManagementSystemMessages = new MessagesGroup({
         "الاسم بالإنجليزية يجب أن يكون على الأقل حرفين"
       ),
       jobTitleAr: _m("Job Title (Arabic)", "المسمى الوظيفي (عربي)"),
+      jobTitleArPlaceholder: _m(
+        "Enter job title in Arabic",
+        "أدخل المسمى الوظيفي بالعربية"
+      ),
       jobTitleEn: _m("Job Title (English)", "المسمى الوظيفي (إنجليزي)"),
+      jobTitleEnPlaceholder: _m(
+        "Enter job title in English",
+        "أدخل المسمى الوظيفي بالإنجليزية"
+      ),
       jobTitleArRequired: _m(
         "Arabic job title is required",
         "المسمى الوظيفي بالعربية مطلوب"
@@ -126,7 +136,15 @@ export const contentManagementSystemMessages = new MessagesGroup({
         "المسمى الوظيفي بالإنجليزية يجب أن يكون على الأقل حرفين"
       ),
       descriptionAr: _m("Description (Arabic)", "الوصف (عربي)"),
+      descriptionArPlaceholder: _m(
+        "Enter description in Arabic",
+        "أدخل الوصف بالعربية"
+      ),
       descriptionEn: _m("Description (English)", "الوصف (إنجليزي)"),
+      descriptionEnPlaceholder: _m(
+        "Enter description in English",
+        "أدخل الوصف بالإنجليزية"
+      ),
       descriptionArRequired: _m(
         "Arabic description is required",
         "الوصف بالعربية مطلوب"
@@ -140,6 +158,8 @@ export const contentManagementSystemMessages = new MessagesGroup({
         "Profile image is required",
         "صورة الملف الشخصي مطلوبة"
       ),
+      imageMaxSize: _m("Max image size: 2MB", "اقصى حجم الصورة : 2 ميجابايت"),
+      imageDimensions: _m("2160x2160", "2160x2160"),
       updateSuccess: _m(
         "Founder updated successfully!",
         "تم تحديث المؤسس بنجاح!"
