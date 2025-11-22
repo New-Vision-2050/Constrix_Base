@@ -5,12 +5,13 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ServiceFormData } from "../schemas/service-form.schema";
-import { PreviousWork } from "../types";
 import PreviousWorkSection from "./previous-work-section";
+
+type PreviousWorkItem = NonNullable<ServiceFormData["previous_works"]>[number];
 
 interface PreviousWorksListProps {
   control: Control<ServiceFormData>;
-  previousWorks: PreviousWork[];
+  previousWorks: PreviousWorkItem[];
   isSubmitting: boolean;
   onAdd: () => void;
   onRemove: (index: number) => void;
@@ -35,27 +36,11 @@ export default function PreviousWorksList({
 
   return (
     <div className="space-y-6 bg-sidebar p-6 rounded-xl">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-white">
-          {tForm("previousWorksTitle")} ({previousWorks.length})
-        </h2>
-        <Button
-          type="button"
-          onClick={onAdd}
-          variant="outline"
-          className="text-white"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {tForm("addPreviousWork")}
-        </Button>
-      </div>
-
       {previousWorks.map((work, index) => (
         <PreviousWorkSection
           key={work.id}
           control={control}
           previousWorkIndex={index}
-          totalPreviousWorks={previousWorks.length}
           isSubmitting={isSubmitting}
           onRemove={() => onRemove(index)}
           initialImageUrl={initialPreviousWorks[index]?.image?.url}
@@ -67,7 +52,18 @@ export default function PreviousWorksList({
           {tForm("noPreviousWorks")}
         </p>
       )}
+
+      <div className="flex items-center justify-end ">
+        <Button
+          type="button"
+          onClick={onAdd}
+          variant="outline"
+          className="text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          {tForm("addPreviousWork")}
+        </Button>
+      </div>
     </div>
   );
 }
-

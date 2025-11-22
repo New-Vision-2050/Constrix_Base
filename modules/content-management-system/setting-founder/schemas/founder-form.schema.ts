@@ -18,78 +18,75 @@ export const createFounderFormSchema = (
   z.object({
     name_ar: z
       .string({
-        required_error: t("form.nameArRequired"),
+        required_error: t("nameArRequired"),
       })
       .min(1, {
-        message: t("form.nameArRequired"),
+        message: t("nameArRequired"),
       })
       .min(2, {
-        message: t("form.nameArMinLength"),
+        message: t("nameArMinLength"),
       })
       .trim(),
 
     name_en: z
       .string({
-        required_error: t("form.nameEnRequired"),
+        required_error: t("nameEnRequired"),
       })
       .min(1, {
-        message: t("form.nameEnRequired"),
+        message: t("nameEnRequired"),
       })
       .min(2, {
-        message: t("form.nameEnMinLength"),
+        message: t("nameEnMinLength"),
       })
       .trim(),
 
     job_title_ar: z
       .string({
-        required_error: t("form.jobTitleArRequired"),
+        required_error: t("jobTitleArRequired"),
       })
       .min(1, {
-        message: t("form.jobTitleArRequired"),
+        message: t("jobTitleArRequired"),
       })
       .min(2, {
-        message: t("form.jobTitleArMinLength"),
+        message: t("jobTitleArMinLength"),
       })
       .trim(),
 
     job_title_en: z
       .string({
-        required_error: t("form.jobTitleEnRequired"),
+        required_error: t("jobTitleEnRequired"),
       })
       .min(1, {
-        message: t("form.jobTitleEnRequired"),
+        message: t("jobTitleEnRequired"),
       })
       .min(2, {
-        message: t("form.jobTitleEnMinLength"),
+        message: t("jobTitleEnMinLength"),
       })
       .trim(),
 
     description_ar: z
       .string({
-        required_error: t("form.descriptionArRequired"),
+        required_error: t("descriptionArRequired"),
       })
       .min(1, {
-        message: t("form.descriptionArRequired"),
+        message: t("descriptionArRequired"),
       }),
 
     description_en: z
       .string({
-        required_error: t("form.descriptionEnRequired"),
+        required_error: t("descriptionEnRequired"),
       })
       .min(1, {
-        message: t("form.descriptionEnRequired"),
+        message: t("descriptionEnRequired"),
       }),
 
     profile_image: isEditMode
-      ? z.union([z.instanceof(File), z.null()]).optional()
+      ? z.union([z.instanceof(File), z.string(), z.null()]).optional()
       : z
           .union([z.instanceof(File), z.null()])
-          .refine(
-            (file) => file !== null && file !== undefined,
-            {
-              message: t("form.profileImageRequired"),
-            }
-          ),
+          .refine((file) => file !== null && file !== undefined, {
+            message: t("profileImageRequired"),
+          }),
   });
 
 /**
@@ -97,7 +94,9 @@ export const createFounderFormSchema = (
  * Usage: const formData: FounderFormData = {...}
  * Note: This is a base type. The actual schema type may vary based on isEditMode.
  */
-export type FounderFormData = z.infer<ReturnType<typeof createFounderFormSchema>>;
+export type FounderFormData = z.infer<
+  ReturnType<typeof createFounderFormSchema>
+>;
 
 /**
  * Default form values for founder form
@@ -112,4 +111,3 @@ export const getDefaultFounderFormValues = (): FounderFormData => ({
   description_en: "",
   profile_image: null,
 });
-
