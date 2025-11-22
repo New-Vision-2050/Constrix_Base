@@ -46,7 +46,7 @@ export const createCategoryFormSchema = (t: (key: string) => string) =>
       })
       .trim(),
 
-    type: z
+    category_type: z
       .string({
         required_error:
           t("typeRequired") || "Category type is required",
@@ -72,6 +72,6 @@ export type CategoryFormData = z.infer<
 export const getDefaultCategoryFormValues = (): CategoryFormData => ({
   name_ar: "",
   name_en: "",
-  type: "",
+  category_type: "",
 });
 

@@ -3,6 +3,8 @@ import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
 import { CompanyDashboardCategory } from "../types";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export interface CategoryRow extends CompanyDashboardCategory {
   name_ar?: string;
@@ -16,50 +18,40 @@ type Params = {
 export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
+  const { can } = usePermissions();
   const t = useTranslations("content-management-system.categories.table");
 
   return {
     tableId: "company-dashboard-categories-list-table",
-    url: `${baseURL}/company-dashboard/categories/list`,
+    url: `${baseURL}/categories-website`,
     columns: [
       {
         key: "name_ar",
         label: t("nameAr") || "Category Name in Arabic",
-        sortable: true,
-        render: (_: unknown, row: CategoryRow) => (
-          <span className="font-medium">{row.name}</span>
-        ),
+        sortable: true
       },
       {
         key: "name_en",
         label: t("nameEn") || "Category Name in English",
-        sortable: true,
-        render: (_: unknown, row: CategoryRow) => (
-          <span className="font-medium">{row.name}</span>
-        ),
+        sortable: true
       },
       {
-        key: "type",
+        key: "category_type.name",
         label: t("type") || "Type",
         sortable: true,
-        render: (value: string) => (
-          <span className="capitalize">
-            {t(`type.${value}`) || value || "-"}
-          </span>
-        ),
       },
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.categories.update)} onSelect={() => params?.onEdit?.(row.id)}>
           {t("edit") || "Edit"}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.CMS.categories.delete),
     },
-    deleteUrl: `${baseURL}/company-dashboard/categories`,
+    deleteUrl: `${baseURL}/categories-website`,
     searchParamName: "search",
   };
 };

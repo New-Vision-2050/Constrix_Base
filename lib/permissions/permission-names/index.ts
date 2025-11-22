@@ -93,4 +93,14 @@ export const PERMISSIONS = {
     folder: create("FOLDER"),
     file: create("FILE"),
   },
+  // Content Management System
+  CMS:{
+    categories: create("CMS_CATEGORIES"),
+    projects: create("CMS_PROJECTS"),
+    projectsTypes: create("CMS_PROJECTS_TYPES"),
+    icons: create("CMS_ICONS"),
+    mainSettings: create("CMS_MAIN_SETTINGS"),
+    contactSetting: create("CMS_CONTACT_SETTING"),
+    termsConditions: create("CMS_TERMS_CONDITIONS"),
+  }
 };

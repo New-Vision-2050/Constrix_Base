@@ -133,6 +133,18 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       show: can(Object.values(PERMISSIONS.permission)),
     };
 
+    /**
+     * show calculation based on company type:
+     * companies: central
+     * users: central
+     * human resources: not-central
+     * program management: central
+     * CRM: not-central
+     * docs library: not-central
+     * settings: both
+     * powers: central
+     * ecommerce: not-central
+     */
     const data: Project[] = [
       // companies
       {
@@ -141,6 +153,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         isActive: pageName === ROUTER.COMPANIES,
         slug: SUPER_ENTITY_SLUG.COMPANY,
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.CompaniesList"),
@@ -159,6 +172,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.USERS],
         isActive: pageName === ROUTER.USERS,
         slug: SUPER_ENTITY_SLUG.USERS,
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.UsersList"),
@@ -176,6 +190,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.Organizational_Structure],
         isActive: pageName === ROUTER.Organizational_Structure,
         slug: SUPER_ENTITY_SLUG.HRM,
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.OrganizationalStructure"),
@@ -219,6 +234,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         urls: [ROUTER.PROGRAM_SETTINGS.USERS],
         isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.Users"),
@@ -236,6 +252,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
         isActive: pageName === ROUTER.CRM.clients,
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.CRMSettings"),
@@ -253,6 +270,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LibraryBig,
         urls: [ROUTER.DOCS_LIBRARY],
         isActive: pageName === ROUTER.DOCS_LIBRARY,
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.docs-library-docs"),
@@ -270,6 +288,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
         urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+        show: true,
         sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
@@ -325,6 +344,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: pageName === ROUTER.Powers,
         slug: SUPER_ENTITY_SLUG.POWERS,
         urls: [ROUTER.Programs],
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.PackagesAndPrograms"),
@@ -351,6 +371,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.Discounts,
           ROUTER.Coupons,
         ].includes(pageName),
+        show: !isCentralCompany,
         slug: SUPER_ENTITY_SLUG.ECOMMERCE,
         urls: [
           ROUTER.HomeStore,
@@ -457,13 +478,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       data,
       isSuperAdmin
     );
-    const _shownProjects = _mergedProjects?.filter((project) => {
+    const _shownProjects = _mergedProjects?.filter(project => {
+      return project.show;
+    })?.filter((project) => {
       return project.sub_entities?.some((subEntity) => subEntity.show);
     });
     return _shownProjects;
   }, [SidebarProjects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
-
-  console.log('all101', all)
 
   return (
     <Sidebar

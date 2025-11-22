@@ -178,3 +178,12 @@
 .rotate-svg-child {
   @apply [&>svg]:transition-transform [&>svg]:data-[state=open]:rotate-180;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

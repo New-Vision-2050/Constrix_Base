@@ -22,6 +22,7 @@ interface CheckboxGroupFieldProps {
   dependencyValues?: Record<string, any>;
   formValues?: Record<string, any>; // Access to all form values for syncing
   setFieldValue?: (field: string, value: any) => void; // Function to update other fields
+  isHorizontal?: boolean; // Display checkboxes in a row instead of column
 }
 
 const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
@@ -34,6 +35,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   dependencyValues = {},
   formValues = {},
   setFieldValue,
+  isHorizontal = false,
 }) => {
   // State for collapsible
   const [isOpen, setIsOpen] = useState(true);
@@ -274,33 +276,44 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
             </div>
           )}
 
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className="flex items-center gap-x-2 ps-6 mt-2"
-            >
-              <Checkbox
-                id={`${field.name}-${option.value}`}
-                name={field.name}
-                checked={selectedValues.includes(option.value)}
-                disabled={field.disabled}
+          <div
+            className={cn(
+              isHorizontal
+                ? "flex flex-row flex-wrap gap-x-4 gap-y-2 ps-6 mt-2"
+                : "flex flex-col"
+            )}
+          >
+            {options.map((option) => (
+              <div
+                key={option.value}
                 className={cn(
-                  field.className,
-                  !!error && touched ? "border-destructive" : ""
+                  "flex items-center gap-x-2",
+                  !isHorizontal && "mt-2"
                 )}
-                onCheckedChange={(checked) =>
-                  handleChange(option.value, !!checked)
-                }
-                onBlur={onBlur}
-              />
-              <Label
-                htmlFor={`${field.name}-${option.value}`}
-                className="text-sm font-normal"
               >
-                {option.label}
-              </Label>
-            </div>
-          ))}
+                <Checkbox
+                  id={`${field.name}-${option.value}`}
+                  name={field.name}
+                  checked={selectedValues.includes(option.value)}
+                  disabled={field.disabled}
+                  className={cn(
+                    field.className,
+                    !!error && touched ? "border-destructive" : ""
+                  )}
+                  onCheckedChange={(checked) =>
+                    handleChange(option.value, !!checked)
+                  }
+                  onBlur={onBlur}
+                />
+                <Label
+                  htmlFor={`${field.name}-${option.value}`}
+                  className="text-sm font-normal"
+                >
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
         </CollapsibleContent>
       </Collapsible>
 

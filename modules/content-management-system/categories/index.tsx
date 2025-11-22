@@ -7,6 +7,8 @@ import { TableBuilder, useTableReload } from "@/modules/table";
 import { useTranslations } from "next-intl";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import { Button } from "@/components/ui/button";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface CompanyDashboardCategoriesModuleProps {
     categories: CompanyDashboardCategory[];
@@ -22,29 +24,33 @@ export default function CompanyDashboardCategoriesModule(props: CompanyDashboard
     });
     const { reloadTable } = useTableReload(tableConfig.tableId);
 
-    return <div className="container p-6">
-        <SetCategoryDialog
-            open={Boolean(editingCategoryId)}
-            onClose={() => setEditingCategoryId(null)}
-            categoryId={editingCategoryId || undefined}
-            onSuccess={() => reloadTable()}
-        />
-        <TableBuilder
-            config={tableConfig}
-            searchBarActions={
-                <>
-                    <DialogTrigger
-                        component={SetCategoryDialog}
-                        dialogProps={{ onSuccess: () => reloadTable() }}
-                        render={({ onOpen }) => (
-                            <Button onClick={onOpen}>
-                                {t("addCategory")}
-                            </Button>
-                        )}
-                    />
-                </>
-            }
-            tableId={tableConfig.tableId}
-        />
-    </div>;
+    return <Can check={[PERMISSIONS.CMS.categories.view]}>
+        <div className="container p-6">
+            <Can check={[PERMISSIONS.CMS.categories.update]}>
+                <SetCategoryDialog
+                    open={Boolean(editingCategoryId)}
+                    onClose={() => setEditingCategoryId(null)}
+                    categoryId={editingCategoryId || undefined}
+                    onSuccess={() => reloadTable()}
+                />
+            </Can>
+            <TableBuilder
+                config={tableConfig}
+                searchBarActions={
+                    <Can check={[PERMISSIONS.CMS.categories.create]}>
+                        <DialogTrigger
+                            component={SetCategoryDialog}
+                            dialogProps={{ onSuccess: () => reloadTable() }}
+                            render={({ onOpen }) => (
+                                <Button onClick={onOpen}>
+                                    {t("addCategory")}
+                                </Button>
+                            )}
+                        />
+                    </Can>
+                }
+                tableId={tableConfig.tableId}
+            />
+        </div>
+    </Can>;
 }

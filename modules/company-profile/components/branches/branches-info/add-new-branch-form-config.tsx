@@ -137,13 +137,7 @@ export const addNewBranchFormConfig = (branches: Branch[]) => {
               totalCountHeader: "X-Total-Count",
               dependsOn: "state_id",
               filterParam: "state_id",
-            },
-            validation: [
-              {
-                type: "required",
-                message: "ادخل المدينة",
-              },
-            ],
+            }
           },
           {
             name: "parent_name",
