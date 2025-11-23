@@ -102,12 +102,12 @@ export default function SetCategoryDialog({
     if (isEditMode && categoryData?.data?.payload) {
       const category = categoryData.data.payload;
 
-      setValue("name_ar", category.name || "", {
+      setValue("name_ar", category.name_ar || "", {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,
       });
-      setValue("name_en", category.name || "", {
+      setValue("name_en", category.name_en || "", {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,
