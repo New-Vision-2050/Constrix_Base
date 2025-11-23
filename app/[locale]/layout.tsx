@@ -12,6 +12,8 @@ import { Toaster as SonnerToaster } from "sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
+import CustomThemeProvider from "@/theme/theme";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
 const theSans = localFont({
   src: [
@@ -67,28 +69,29 @@ export default async function RootLayout({
     return notFound();
   }
   const messages = await getMessages();
-
+  const direction = locale === "ar" ? "rtl" : "ltr";
   return (
-    <html
-      lang={locale}
-      dir={locale === "ar" ? "rtl" : "ltr"}
-      suppressHydrationWarning
-    >
+    <html lang={locale} dir={direction} suppressHydrationWarning>
       <body className={cn(theSans.variable, "!pointer-events-auto")}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextIntlClientProvider messages={messages}>
-            <main>
-              <ReactQueryProvider>{children}</ReactQueryProvider>
-            </main>
-            <Toaster />
-            <SonnerToaster />
-          </NextIntlClientProvider>
-        </ThemeProvider>
+        +{" "}
+        <AppRouterCacheProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <CustomThemeProvider direction={direction}>
+              <NextIntlClientProvider messages={messages}>
+                <main>
+                  <ReactQueryProvider>{children}</ReactQueryProvider>
+                </main>
+                <Toaster />
+                <SonnerToaster />
+              </NextIntlClientProvider>
+            </CustomThemeProvider>
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );
