@@ -5,7 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Form } from "@/modules/table/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import ColorRow from "./components/color-row";
+import BasicInfoSection from "./components/basic-info-section";
 import {
   getPrimaryColors,
   getSecondaryColors,
@@ -27,14 +29,26 @@ import {
 export default function ThemeSettingExample() {
   const t = useTranslations("content-management-system.themeSetting");
   const tCommon = useTranslations("content-management-system.themeSetting.common");
+  const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
 
   const form = useForm<ThemeSettingFormData>({
     resolver: zodResolver(createThemeSettingFormSchema(t)),
     defaultValues: getDefaultThemeSettingFormValues(),
   });
 
-  const onSubmit = (data: ThemeSettingFormData) => {
-    console.log("Theme settings:", data);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = form;
+
+  const onSubmit = async (data: ThemeSettingFormData) => {
+    try {
+      console.log("Theme settings:", data);
+      // TODO: API call here
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -42,9 +56,18 @@ export default function ThemeSettingExample() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Info Section */}
+          <BasicInfoSection
+            control={form.control}
+            title={tBasicInfo("title")}
+            iconLabel={tBasicInfo("iconLabel")}
+            urlLabel={tBasicInfo("urlLabel")}
+            isSubmitting={isSubmitting}
+          />
+
+          {/* Theme Settings */}
           <div className="space-y-6 bg-background rounded-lg p-6 border border-border">
             <h2 className="text-lg font-semibold text-white">
-              Theme Settings
+              {t("themeSettings")}
             </h2>
 
             {/* Primary Colors */}
@@ -96,7 +119,16 @@ export default function ThemeSettingExample() {
             />
           </div>
 
-          <Button type="submit">Save Theme Settings</Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+          >
+            {isSubmitting && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {t("saveChanges") || "حفظ التعديل"}
+          </Button>
         </form>
       </Form>
     </div>

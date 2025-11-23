@@ -32,7 +32,7 @@ export default function ColorDisplay({ color, onClick }: ColorDisplayProps) {
       />
 
       {/* Color hex value */}
-      <span className="text-white font-mono text-sm">
+      <span className="font-mono text-sm">
         {color}
       </span>
     </button>
