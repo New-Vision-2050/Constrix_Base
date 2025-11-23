@@ -6,25 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Form } from "@/modules/table/components/ui/form";
 import { createTermsConditionsFormSchema, TermsConditionsFormData, getDefaultTermsConditionsFormValues } from "../schema/terms-conditions-form.schema";
-import { useUpdateTermsConditions } from "../hooks/useUpdateTermsConditions";
+import { useTermsConditions } from "../hooks/useTermsConditions";
 import { useFormErrorToast } from "../hooks/useFormErrorToast";
+import { useDataStates } from "../hooks/useDataStates";
 import TermsConditionsEditor from "./TermsConditionsEditor";
 import SubmitButton from "./SubmitButton";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { TermsConditions } from "@/services/api/company-dashboard/terms-conditions/types/response";
-
-interface TermsConditionsFormProps {
-    initialData: TermsConditions | null;
-}
 
 /**
  * Terms and Conditions Form - manages editing with SOLID principles
- * Data is fetched server-side and passed via props
  */
-export default function TermsConditionsForm({ initialData }: TermsConditionsFormProps) {
+export default function TermsConditionsForm() {
     const t = useTranslations("content-management-system.termsConditions.form");
-    const { updateTermsConditions, isUpdating } = useUpdateTermsConditions(t);
+    const { data, isLoading, error, refetch, updateTermsConditions, isUpdating } =
+        useTermsConditions(t);
 
     const form = useForm<TermsConditionsFormData>({
         resolver: zodResolver(createTermsConditionsFormSchema(t)),
@@ -35,12 +31,19 @@ export default function TermsConditionsForm({ initialData }: TermsConditionsForm
 
     useFormErrorToast(errors);
 
-    // Load initial data into form
+    // Load existing data into form
     useEffect(() => {
-        if (initialData?.content) {
-            reset({ content: initialData.content });
-        }
-    }, [initialData, reset]);
+        if (data?.content) reset({ content: data.content });
+    }, [data, reset]);
+
+    // Handle loading and error states
+    const dataState = useDataStates({
+        isLoading,
+        error,
+        refetch,
+        errorMessage: t("loadError") || "فشل تحميل الشروط والأحكام",
+    });
+    if (dataState) return dataState;
 
     const onSubmit = (formData: TermsConditionsFormData) => 
         updateTermsConditions({ content: formData.content });
