@@ -157,6 +157,11 @@
   }
 }
 
+body[data-scroll-locked] .dashboard-sidebar,
+main[aria-hidden="true"] .dashboard-sidebar {
+  margin-right: 15px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -177,10 +182,6 @@
 
 .rotate-svg-child {
   @apply [&>svg]:transition-transform [&>svg]:data-[state=open]:rotate-180;
-}
-
-html {
-  scrollbar-gutter: stable;
 }
 
 @keyframes shimmer {

@@ -494,7 +494,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       collapsible="icon"
       side={sidebarSide}
       {...props}
-      className=" bg-sidebar"
+      className="dashboard-sidebar bg-sidebar"
     >
       <SidebarHeader className=" pt-10 ">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />

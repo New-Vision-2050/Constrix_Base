@@ -59,20 +59,31 @@ export const MainProjectSelector = memo(function MainProjectSelector({
 
       <CustomMenu
         renderAnchor={({ onClick, open }) => (
-          <ButtonBase
+          <Button
+            variant="outlined"
+            endIcon={
+              <ChevronDown
+                className={cn(
+                  "w-5 h-5 transition-transform",
+                  open ? "rotate-180" : ""
+                )}
+              />
+            }
             onClick={onClick}
-            className="flex items-center justify-between w-full p-2"
+            fullWidth
+            sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 2,
+              padding: 1,
+              color: "text.primary",
+              borderColor: "text.primary",
+            }}
           >
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="subtitle1" fontWeight={600}>
               {activeProject?.name}
             </Typography>
-            <ChevronDown
-              className={cn(
-                "w-7 h-7 transition-transform",
-                open ? "rotate-180" : ""
-              )}
-            />
-          </ButtonBase>
+          </Button>
         )}
         menuProps={{
           PaperProps: {
