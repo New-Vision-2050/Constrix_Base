@@ -29,13 +29,11 @@ export const useServiceListTableConfig: (
         ),
       },
       {
-        key: "category",
+        key: "category_website_cms_id",
         label: t("category"),
         sortable: true,
         render: (_: unknown, row: ServiceRow) => (
-          <span className="text-sm">
-            {row.category_name || row.category || "-"}
-          </span>
+          <span className="text-sm">{row.category?.name || "-"}</span>
         ),
       },
       {
