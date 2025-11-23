@@ -36,6 +36,11 @@ export const ContentManagementSystemThemeSettingMessages = new MessagesGroup({
         fontWeightMedium: _m("Font Weight Medium", "وزن الخط المتوسط"),
         fontWeightBold: _m("Font Weight Bold", "وزن الخط الغامق"),
     }),
+    colorPickerPopover: new MessagesGroup({
+        save: _m("Save", "حفظ"),
+        cancel: _m("Cancel", "إلغاء"),
+        invalidHex: _m("Invalid hex color", "اللون غير صالح")
+    }),
     saveChanges: _m("Save Changes", "حفظ التعديلات"),
 });
 

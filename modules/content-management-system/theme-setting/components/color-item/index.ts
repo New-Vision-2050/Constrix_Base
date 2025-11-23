@@ -5,5 +5,6 @@
 
 export { default as ColorItem } from "./ColorItem";
 export { default as ColorDisplay } from "./ColorDisplay";
+export { default as ColorPickerPopover } from "./ColorPickerPopover";
 export { default as ColorPickerDialog } from "./ColorPickerDialog";
 

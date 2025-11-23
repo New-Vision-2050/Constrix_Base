@@ -5,7 +5,7 @@ import { Control, FieldPath, FieldValues } from "react-hook-form";
 import { FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import ColorPickerDialog from "./ColorPickerDialog";
+import ColorPickerPopover from "./ColorPickerPopover";
 import ColorDisplay from "./ColorDisplay";
 
 /**
@@ -27,7 +27,7 @@ export default function ColorItem<TFieldValues extends FieldValues>({
   name,
   label,
 }: ColorItemProps<TFieldValues>) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -36,26 +36,22 @@ export default function ColorItem<TFieldValues extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem className="flex gap-2 items-center">
-            <FormLabel className="text-sm font-medium">{label}</FormLabel>
+            <FormLabel>{label}</FormLabel>
             <FormControl>
-              <ColorDisplay
+              <ColorPickerPopover
+                open={isOpen}
+                onOpenChange={setIsOpen}
                 color={field.value}
-                onClick={() => setIsDialogOpen(true)}
-              />
+                onChange={field.onChange}
+                label={label}
+              >
+                <ColorDisplay color={field.value} />
+              </ColorPickerPopover>
             </FormControl>
             <FormErrorMessage />
-
-            <ColorPickerDialog
-              open={isDialogOpen}
-              onClose={() => setIsDialogOpen(false)}
-              color={field.value}
-              onChange={field.onChange}
-              label={label}
-            />
           </FormItem>
         )}
       />
     </>
   );
 }
-
