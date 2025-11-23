@@ -2,9 +2,18 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Form } from "@/modules/table/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { ColorItem } from "./components/color-item";
+import ColorRow from "./components/color-row";
+import {
+  getPrimaryColors,
+  getSecondaryColors,
+  getInfoColors,
+  getWarningColors,
+  getErrorColors,
+  getTextColors,
+} from "./constants";
 import {
   createThemeSettingFormSchema,
   getDefaultThemeSettingFormValues,
@@ -13,11 +22,13 @@ import {
 
 /**
  * Example usage of ColorItem component
- * Demonstrates integration with React Hook Form
+ * Demonstrates integration with React Hook Form and i18n
  */
 export default function ThemeSettingExample() {
+  const t = useTranslations("content-management-system.themeSetting");
+
   const form = useForm<ThemeSettingFormData>({
-    resolver: zodResolver(createThemeSettingFormSchema((key) => key)),
+    resolver: zodResolver(createThemeSettingFormSchema(t)),
     defaultValues: getDefaultThemeSettingFormValues(),
   });
 
@@ -30,34 +41,52 @@ export default function ThemeSettingExample() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Info Section */}
-          <div className="bg-sidebar rounded-lg p-6 space-y-6">
+          <div className="space-y-6 bg-background rounded-lg p-6 border border-border">
             <h2 className="text-lg font-semibold text-white">
               Theme Settings
             </h2>
 
-            {/* Example: Primary Colors */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ColorItem
-                control={form.control}
-                name="palette.primary.main"
-                label="Primary Main Color"
-              />
-              <ColorItem
-                control={form.control}
-                name="palette.primary.light"
-                label="Primary Light Color"
-              />
-              <ColorItem
-                control={form.control}
-                name="palette.primary.dark"
-                label="Primary Dark Color"
-              />
-              <ColorItem
-                control={form.control}
-                name="palette.primary.contrastText"
-                label="Primary Contrast Text"
-              />
-            </div>
+            {/* Primary Colors */}
+            <ColorRow
+              control={form.control}
+              colors={getPrimaryColors(t)}
+              columns={4}
+            />
+
+            {/* Secondary Colors */}
+            <ColorRow
+              control={form.control}
+              colors={getSecondaryColors(t)}
+              columns={4}
+            />
+
+            {/* Info Colors */}
+            <ColorRow
+              control={form.control}
+              colors={getInfoColors(t)}
+              columns={4}
+            />
+
+            {/* Warning Colors */}
+            <ColorRow
+              control={form.control}
+              colors={getWarningColors(t)}
+              columns={4}
+            />
+
+            {/* Error Colors */}
+            <ColorRow
+              control={form.control}
+              colors={getErrorColors(t)}
+              columns={4}
+            />
+
+            {/* Text Colors */}
+            <ColorRow
+              control={form.control}
+              colors={getTextColors(t)}
+              columns={4}
+            />
           </div>
 
           <Button type="submit">Save Theme Settings</Button>
