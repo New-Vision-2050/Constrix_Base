@@ -1,5 +1,10 @@
 import TermsConditionsForm from "./components/TermsConditionsForm";
+import { TermsConditions } from "@/services/api/company-dashboard/terms-conditions/types/response";
 
-export default function TermsConditionsView() {
-    return <TermsConditionsForm />;
+interface TermsConditionsViewProps {
+    initialData: TermsConditions | null;
+}
+
+export default function TermsConditionsView({ initialData }: TermsConditionsViewProps) {
+    return <TermsConditionsForm initialData={initialData} />;
 }
