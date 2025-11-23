@@ -2,8 +2,7 @@ import { MessagesGroup, _m } from "@/messages";
 
 export const ContentManagementSystemThemeSettingMessages = new MessagesGroup({
     common: new MessagesGroup({
-        save: _m("Save", "حفظ"),
-        cancel: _m("Cancel", "إلغاء"),
+        palette: _m("Color Palette", "لوحة ألوان"),
         primary: _m("Primary", "الاساسي"),
         contrast: _m("Contrast", "نص التباين"),
         light: _m("Light", "فاتح"),
@@ -20,9 +19,13 @@ export const ContentManagementSystemThemeSettingMessages = new MessagesGroup({
         iconLabel: _m("Website Icon", "أيقونة الموقع"),
         urlLabel: _m("Website URL", "عنوان الموقع"),
     }),
-    borderRadiusLabel: _m("Boundary (border radius)", "الحدود (نصف قطر الحدود)"),
-    borderRadiusMin: _m("Border radius must be 0 or greater", "يجب أن يكون نصف قطر الحدود 0 أو أكثر"),
-    borderRadiusMax: _m("Border radius must not exceed 50px", "يجب أن يكون نصف قطر الحدود أقل من 50px"),
-
+    borderRadius: new MessagesGroup({
+        title: _m("Border Radius", "نصف قطر الحدود"),
+        label: _m("Boundary (border radius)", "الحدود (نصف قطر الحدود)"),
+        borderRadiusLabel: _m("Boundary (border radius)", "الحدود (نصف قطر الحدود)"),
+        borderRadiusMin: _m("Border radius must be 0 or greater", "يجب أن يكون نصف قطر الحدود 0 أو أكثر"),
+        borderRadiusMax: _m("Border radius must not exceed 50px", "يجب أن يكون نصف قطر الحدود أقل من 50px"),
+    }),
+    saveChanges: _m("Save Changes", "حفظ التعديلات"),
 });
 

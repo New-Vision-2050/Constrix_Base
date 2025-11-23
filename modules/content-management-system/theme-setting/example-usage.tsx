@@ -6,16 +6,9 @@ import { useTranslations } from "next-intl";
 import { Form } from "@/modules/table/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import ColorRow from "./components/color-row";
 import BasicInfoSection from "./components/basic-info-section";
-import {
-  getPrimaryColors,
-  getSecondaryColors,
-  getInfoColors,
-  getWarningColors,
-  getErrorColors,
-  getTextColors,
-} from "./constants";
+import BorderRadiusSection from "./components/border-radius-section";
+import ColorPaletteSection from "./components/color-palette-section";
 import {
   createThemeSettingFormSchema,
   getDefaultThemeSettingFormValues,
@@ -30,9 +23,10 @@ export default function ThemeSettingExample() {
   const t = useTranslations("content-management-system.themeSetting");
   const tCommon = useTranslations("content-management-system.themeSetting.common");
   const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
+  const tBorderRadius = useTranslations("content-management-system.themeSetting.borderRadius");
 
   const form = useForm<ThemeSettingFormData>({
-    resolver: zodResolver(createThemeSettingFormSchema(t)),
+    resolver: zodResolver(createThemeSettingFormSchema(tBorderRadius)),
     defaultValues: getDefaultThemeSettingFormValues(),
   });
 
@@ -64,60 +58,20 @@ export default function ThemeSettingExample() {
             isSubmitting={isSubmitting}
           />
 
-          {/* Theme Settings */}
-          <div className="space-y-6 bg-background rounded-lg p-6 border border-border">
-            <h2 className="text-lg font-semibold text-white">
-              {t("themeSettings")}
-            </h2>
+          {/* Color Palette Section */}
+          <ColorPaletteSection
+            control={form.control}
+            title={tCommon("palette")}
+            t={tCommon}
+          />
 
-            {/* Primary Colors */}
-            <ColorRow
-              control={form.control}
-              colors={getPrimaryColors(tCommon)}
-              columns={4}
-              title={tCommon('primaryColor')}
-            />
-
-            {/* Secondary Colors */}
-            <ColorRow
-              control={form.control}
-              colors={getSecondaryColors(tCommon)}
-              columns={4}
-              title={tCommon('secondaryColor')}
-            />
-
-            {/* Info Colors */}
-            <ColorRow
-              control={form.control}
-              colors={getInfoColors(tCommon)}
-              columns={4}
-              title={tCommon('infoColor')}
-            />
-
-            {/* Warning Colors */}
-            <ColorRow
-              control={form.control}
-              colors={getWarningColors(tCommon)}
-              columns={4}
-              title={tCommon('warningColor')}
-            />
-
-            {/* Error Colors */}
-            <ColorRow
-              control={form.control}
-              colors={getErrorColors(tCommon)}
-              columns={4}
-              title={tCommon('errorColor')}
-            />
-
-            {/* Text Colors */}
-            <ColorRow
-              control={form.control}
-              colors={getTextColors(tCommon)}
-              columns={4}
-              title={tCommon('textColor')}
-            />
-          </div>
+          {/* Border Radius Section */}
+          <BorderRadiusSection
+            control={form.control}
+            title={tBorderRadius("title")}
+            label={tBorderRadius("label")}
+            isSubmitting={isSubmitting}
+          />
 
           <Button
             type="submit"
