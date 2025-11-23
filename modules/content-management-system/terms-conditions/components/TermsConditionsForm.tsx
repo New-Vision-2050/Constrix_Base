@@ -13,13 +13,17 @@ import TermsConditionsEditor from "./TermsConditionsEditor";
 import SubmitButton from "./SubmitButton";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { TermsConditions } from "@/services/api/company-dashboard/terms-conditions/types/response";
 
+interface TermsConditionsFormProps {
+    termsConditionsData: TermsConditions | null;
+}
 /**
  * Terms and Conditions Form - manages editing with SOLID principles
  */
-export default function TermsConditionsForm() {
+export default function TermsConditionsForm({ termsConditionsData }: TermsConditionsFormProps) {
     const t = useTranslations("content-management-system.termsConditions.form");
-    const { data, isLoading, error, refetch, updateTermsConditions, isUpdating } =
+    const { isLoading, error, refetch, updateTermsConditions, isUpdating } =
         useTermsConditions(t);
 
     const form = useForm<TermsConditionsFormData>({
@@ -33,8 +37,8 @@ export default function TermsConditionsForm() {
 
     // Load existing data into form
     useEffect(() => {
-        if (data?.content) reset({ content: data.content });
-    }, [data, reset]);
+        if (termsConditionsData?.content) reset({ content: termsConditionsData.content });
+    }, [termsConditionsData, reset]);
 
     // Handle loading and error states
     const dataState = useDataStates({
