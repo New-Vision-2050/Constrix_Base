@@ -34,6 +34,7 @@ import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
+import { CompanyDashboardCategoriesApi } from "@/services/api/company-dashboard/categories";
 import {
   createServiceFormSchema,
   ServiceFormData,
@@ -61,34 +62,24 @@ export default function AddServiceDialog({
   const tForm = useTranslations("content-management-system.services.form");
   const isEditMode = !!serviceId;
 
-  // Dummy categories data
-  const categories: Category[] = [
-    {
-      id: "a8be3d9b-d887-425f-9f94-0de5e147150c",
-      name_ar: "تطوير المواقع",
-      name_en: "Web Development",
+  // Fetch categories from API
+  const { data: categoriesData } = useQuery({
+    queryKey: ["company-dashboard-categories"],
+    queryFn: async () => {
+      const response = await CompanyDashboardCategoriesApi.list();
+      return response.data;
     },
-    {
-      id: "a8be3d9b-d887-425f-9f94-0de5e147150a",
-      name_ar: "التسويق الرقمي",
-      name_en: "Digital Marketing",
-    },
-    {
-      id: "a8be3d9b-d887-425f-9f94-0de5e1471504",
-      name_ar: "التصميم الجرافيكي",
-      name_en: "Graphic Design",
-    },
-    {
-      id: "a8be3d9b-d887-425f-9f94-0de5e147150d",
-      name_ar: "البرمجة",
-      name_en: "Programming",
-    },
-    {
-      id: "a8be3d9b-d887-425f-9f94-0de5e147150e",
-      name_ar: "الاستشارات",
-      name_en: "Consulting",
-    },
-  ];
+    enabled: open,
+  });
+
+  // Map categories to match Category interface
+  const categories: Category[] =
+    categoriesData?.payload?.map((category) => ({
+      id: category.id,
+      name_ar: category.name_ar,
+      name_en: category.name_en,
+      name: category.name,
+    })) || [];
 
   // Fetch service data when editing
   const { data: serviceData, isLoading: isFetching } =
