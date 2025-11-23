@@ -6,21 +6,21 @@ import { useTranslations } from "next-intl";
 import { Form } from "@/modules/table/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import BasicInfoSection from "./components/basic-info-section";
-import BorderRadiusSection from "./components/border-radius-section";
-import ColorPaletteSection from "./components/color-palette-section";
-import TypographySection from "./components/typography-section";
+import BasicInfoSection from "./basic-info-section";
+import BorderRadiusSection from "./border-radius-section";
+import ColorPaletteSection from "./color-palette-section";
+import TypographySection from "./typography-section";
 import {
   createThemeSettingFormSchema,
   getDefaultThemeSettingFormValues,
   ThemeSettingFormData,
-} from "./schema";
+} from "../schema";
 
 /**
- * Example usage of ColorItem component
- * Demonstrates integration with React Hook Form and i18n
+ * Theme Setting Form Component
+ * Main form for theme settings with all sections
  */
-export default function ThemeSettingExample() {
+export default function ThemeSettingForm() {
   const t = useTranslations("content-management-system.themeSetting");
   const tCommon = useTranslations("content-management-system.themeSetting.common");
   const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
