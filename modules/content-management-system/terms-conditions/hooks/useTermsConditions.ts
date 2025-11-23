@@ -26,7 +26,7 @@ export const useTermsConditions = (t: (key: string) => string) => {
     mutationFn: (params: UpdateTermsConditionsParams) =>
       CompanyDashboardTermsConditionsApi.updateCurrent(params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["terms-conditions"] });
+      query.refetch();
       toast.success(
         t("updateSuccess") || "Terms and conditions updated successfully!"
       );
