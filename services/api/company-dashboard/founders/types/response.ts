@@ -20,13 +20,10 @@ export interface Founder {
   job_title_en: string;
   description_ar: string;
   description_en: string;
-  personal_photo?: {
-    url?: string;
-  };
+  personal_photo?: string;
 }
 
 export interface ListFoundersResponse
   extends ApiPaginatedResponse<FounderListItem[]> {}
 
 export interface ShowFounderResponse extends ApiBaseResponse<Founder> {}
-

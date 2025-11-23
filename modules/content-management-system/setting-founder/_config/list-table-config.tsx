@@ -14,6 +14,7 @@ export const useFounderListTableConfig: (
   return {
     tableId: "founder-list-table",
     url: `${baseURL}/founders`,
+    deleteUrl: `${baseURL}/founders`,
     columns: [
       {
         key: "name",
@@ -70,14 +71,13 @@ export const useFounderListTableConfig: (
     executions: [
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
-          {t("actions")}
+          {t("editFounder")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
       canDelete: true,
     },
-    deleteUrl: `${baseURL}/company-dashboard/founders`,
     searchParamName: "search",
   };
 };

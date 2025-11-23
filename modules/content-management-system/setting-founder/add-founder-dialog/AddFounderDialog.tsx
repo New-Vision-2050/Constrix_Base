@@ -90,7 +90,7 @@ export default function AddFounderDialog({
         job_title_en: founder.job_title_en || "",
         description_ar: founder.description_ar || "",
         description_en: founder.description_en || "",
-        profile_image: founder.personal_photo?.url || null,
+        profile_image: founder.personal_photo || null,
       });
     }
   }, [isEditMode, founderData, open, reset]);
@@ -183,7 +183,7 @@ export default function AddFounderDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : founderData?.payload?.personal_photo?.url
+                              : founderData?.payload?.personal_photo || null
                           }
                           minHeight="200px"
                         />

@@ -8,8 +8,7 @@ export const CompanyDashboardFoundersApi = {
     baseApi.get<ListFoundersResponse>("founders", {
       params,
     }),
-  show: (id: string) =>
-    baseApi.get<ShowFounderResponse>(`founders/${id}`),
+  show: (id: string) => baseApi.get<ShowFounderResponse>(`founders/${id}`),
   create: (params: CreateFounderParams) =>
     baseApi.post(
       "founders",
@@ -19,7 +18,7 @@ export const CompanyDashboardFoundersApi = {
       })
     ),
   update: (id: string, params: UpdateFounderParams) =>
-    baseApi.put(
+    baseApi.post(
       `founders/${id}`,
       serialize(params, {
         indices: true,
@@ -28,4 +27,3 @@ export const CompanyDashboardFoundersApi = {
     ),
   delete: (id: string) => baseApi.delete(`founders/${id}`),
 };
-

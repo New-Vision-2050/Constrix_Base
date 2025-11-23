@@ -3,6 +3,28 @@ import { MessagesGroup, _m } from "@/messages";
 export const ContentManagementSystemFounderMessages = new MessagesGroup({
   addFounder: _m("Add Founder", "إضافة مؤسس"),
   editFounder: _m("Edit Founder", "تعديل مؤسس"),
+  areYouSureReactivate: _m(
+    "Are you sure you want to reactivate this founder?",
+    "هل أنت متأكد أنك تريد إعادة تفعيل هذا المؤسس؟"
+  ),
+  areYouSureDeactivate: _m(
+    "Are you sure you want to deactivate this founder?",
+    "هل أنت متأكد أنك تريد إلغاء تفعيل هذا المؤسس؟"
+  ),
+  success: _m("Success", "نجح"),
+  error: _m("Error", "خطأ"),
+  activatedSuccessfully: _m(
+    "Founder activated successfully",
+    "تم تفعيل المؤسس بنجاح"
+  ),
+  deactivatedSuccessfully: _m(
+    "Founder deactivated successfully",
+    "تم إلغاء تفعيل المؤسس بنجاح"
+  ),
+  failedToUpdateStatus: _m(
+    "Failed to update founder status. Please try again.",
+    "فشل تحديث حالة المؤسس. يرجى المحاولة مرة أخرى."
+  ),
   form: new MessagesGroup({
     nameAr: _m("Name (Arabic)", "الاسم (عربي)"),
     nameArPlaceholder: _m("Enter name in Arabic", "أدخل الاسم بالعربية"),
@@ -94,5 +116,6 @@ export const ContentManagementSystemFounderMessages = new MessagesGroup({
     description: _m("Description", "الوصف"),
     status: _m("Status", "الحالة"),
     actions: _m("Actions", "الإجراءات"),
+    editFounder: _m("Edit Founder", "تعديل مؤسس"),
   }),
 });
