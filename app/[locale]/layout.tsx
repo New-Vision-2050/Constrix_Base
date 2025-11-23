@@ -14,6 +14,7 @@ import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
 import CustomThemeProvider from "@/theme/theme";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import NextTopLoader from "nextjs-toploader";
 
 const theSans = localFont({
   src: [
@@ -73,7 +74,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body className={cn(theSans.variable, "!pointer-events-auto")}>
-        +{" "}
+        <NextTopLoader />
         <AppRouterCacheProvider>
           <ThemeProvider
             attribute="class"

@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --list-node-background: #F3F4F6;
+    --list-node-background: #f3f4f6;
 
     --list-sub-node-background: #d4d6d9;
 
@@ -81,9 +81,9 @@
     --purple: 248 44% 38%;
   }
   .dark {
-    --list-node-background: #2D174D;
+    --list-node-background: #2d174d;
 
-    --list-sub-node-background: #463D5D;
+    --list-sub-node-background: #463d5d;
 
     --background: 265 100% 11%;
 
@@ -177,6 +177,10 @@
 
 .rotate-svg-child {
   @apply [&>svg]:transition-transform [&>svg]:data-[state=open]:rotate-180;
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 @keyframes shimmer {
