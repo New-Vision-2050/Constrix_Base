@@ -17,7 +17,7 @@ function NewsView() {
   const t = useTranslations("content-management-system.news");
 
   return (
-    <>
+    <div className="container p-6">
       <AddNewsDialog
         open={Boolean(editingNewsId)}
         onClose={() => setEditingNewsId(null)}
@@ -35,18 +35,15 @@ function NewsView() {
               component={AddNewsDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
               render={({ onOpen }) => (
-                <Button onClick={onOpen}>
-                  {t("addNews")}
-                </Button>
+                <Button onClick={onOpen}>{t("addNews")}</Button>
               )}
             />
           </>
         }
         tableId={tableConfig.tableId}
       />
-    </>
+    </div>
   );
 }
 
 export default NewsView;
-

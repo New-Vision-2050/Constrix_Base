@@ -32,20 +32,16 @@ import ImageUpload from "@/components/shared/ImageUpload";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import { useIsRtl } from "@/hooks/use-is-rtl";
-import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import { CompanyDashboardCategoriesApi } from "@/services/api/company-dashboard/categories";
+import { CompanyDashboardNewsApi } from "@/services/api/company-dashboard/news";
+import { ShowNewsResponse } from "@/services/api/company-dashboard/news/types/response";
 import {
   createNewsFormSchema,
   NewsFormData,
   getDefaultNewsFormValues,
 } from "../schemas/news-form.schema";
-import {
-  AddNewsDialogProps,
-  Category,
-  AxiosError,
-  ApiResponse,
-  NewsData,
-} from "../types";
+import { AddNewsDialogProps, Category, AxiosError } from "../types";
 
 export default function AddNewsDialog({
   open,
@@ -58,29 +54,23 @@ export default function AddNewsDialog({
   const isEditMode = !!newsId;
 
   // Fetch categories for dropdown
-  const { data: categoriesData } = useQuery<ApiResponse<Category[]>>({
+  const { data: categoriesData } = useQuery({
     queryKey: ["news-categories"],
     queryFn: async () => {
-      const response = await apiClient.get(
-        `${baseURL}/company-dashboard/categories/list`
-      );
+      const response = await CompanyDashboardCategoriesApi.list();
       return response.data;
     },
     enabled: open,
   });
 
   // Fetch news data when editing
-  const { data: newsData, isLoading: isFetching } = useQuery<
-    ApiResponse<NewsData>
-  >({
+  const { data: newsData, isLoading: isFetching } = useQuery<ShowNewsResponse>({
     queryKey: ["news", newsId],
     queryFn: async () => {
-      const response = await apiClient.get(
-        `${baseURL}/company-dashboard/news/${newsId}`
-      );
+      const response = await CompanyDashboardNewsApi.show(newsId!);
       return response.data;
     },
-    enabled: isEditMode && open,
+    enabled: open && isEditMode,
   });
 
   const form = useForm({
@@ -92,7 +82,6 @@ export default function AddNewsDialog({
     control,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -108,85 +97,47 @@ export default function AddNewsDialog({
 
   // Populate form with news data when editing
   useEffect(() => {
-    if (isEditMode && newsData?.data?.payload) {
-      const news = newsData.data.payload;
+    if (isEditMode && newsData?.payload) {
+      const news = newsData.payload;
+      const categoryId = news.category_id || news.category_website_cms_id;
 
-      setValue("title_ar", news.title_ar || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("title_en", news.title_en || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("content_ar", news.content_ar || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("content_en", news.content_en || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("category_id", news.category_id?.toString() || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("publish_date", news.publish_date || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("end_date", news.end_date || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
+      reset({
+        title_ar: news.title_ar || "",
+        title_en: news.title_en || "",
+        content_ar: news.content_ar || "",
+        content_en: news.content_en || "",
+        category_id: categoryId?.toString() || "",
+        publish_date: news.publish_date || "",
+        end_date: news.end_date || "",
+        thumbnail_image: news.thumbnail, // Will be set via initialValue in ImageUpload
+        main_image: news.main_image, // Will be set via initialValue in ImageUpload
       });
     }
-  }, [isEditMode, newsData, open, setValue]);
+  }, [isEditMode, newsData, open, reset]);
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      const formData = new FormData();
-      formData.append("title[ar]", data.title_ar);
-      formData.append("title[en]", data.title_en);
-      formData.append("content[ar]", data.content_ar);
-      formData.append("content[en]", data.content_en);
-      formData.append("category_id", data.category_id);
-      formData.append("publish_date", data.publish_date);
-      formData.append("end_date", data.end_date);
-
-      if (data.thumbnail_image instanceof File) {
-        formData.append("thumbnail_image", data.thumbnail_image);
-      }
-      if (data.main_image instanceof File) {
-        formData.append("main_image", data.main_image);
-      }
+      const params = {
+        title_ar: data.title_ar,
+        title_en: data.title_en,
+        content_ar: data.content_ar,
+        content_en: data.content_en,
+        category_website_cms_id: data.category_id,
+        publish_date: data.publish_date,
+        end_date: data.end_date,
+        thumbnail:
+          data.thumbnail_image instanceof File ? data.thumbnail_image : null,
+        main_image: data.main_image instanceof File ? data.main_image : null,
+      };
 
       if (isEditMode && newsId) {
-        await apiClient.put(
-          `${baseURL}/company-dashboard/news/${newsId}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await CompanyDashboardNewsApi.update(newsId, params);
       } else {
         if (!data.thumbnail_image || !data.main_image) {
           toast.error(t("form.imagesRequired"));
           return;
         }
-        await apiClient.post(`${baseURL}/company-dashboard/news`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        await CompanyDashboardNewsApi.create(params);
       }
 
       toast.success(
@@ -224,7 +175,16 @@ export default function AddNewsDialog({
     }
   };
 
-  const categories = categoriesData?.data?.payload || [];
+  // Map categories to match Category interface
+  const categories: Category[] =
+    categoriesData?.payload?.map((category) => ({
+      id: category.id,
+      name_ar:
+        typeof category.name_ar === "string" ? category.name_ar : undefined,
+      name_en:
+        typeof category.name_en === "string" ? category.name_en : undefined,
+      name: typeof category.name === "string" ? category.name : undefined,
+    })) || [];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -244,6 +204,58 @@ export default function AddNewsDialog({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Title Fields and Image Uploads Row */}
             <div className="grid grid-cols-2 gap-6">
+              {/* Right Column - Image Uploads */}
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={control}
+                  name="thumbnail_image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ImageUpload
+                          label={t("form.thumbnailImage")}
+                          maxSize="3MB - الحجم الأقصى"
+                          dimensions="2160 × 2160"
+                          required={!isEditMode}
+                          onChange={(file) => field.onChange(file)}
+                          initialValue={
+                            typeof field.value === "string"
+                              ? field.value
+                              : newsData?.payload?.thumbnail_image?.url ||
+                                newsData?.payload?.thumbnail?.url
+                          }
+                          minHeight="100px"
+                        />
+                      </FormControl>
+                      <FormErrorMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="main_image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ImageUpload
+                          label={t("form.mainImage")}
+                          maxSize="3MB - الحجم الأقصى"
+                          dimensions="2160 × 2160"
+                          required={!isEditMode}
+                          onChange={(file) => field.onChange(file)}
+                          initialValue={
+                            typeof field.value === "string"
+                              ? field.value
+                              : newsData?.payload?.main_image?.url
+                          }
+                          minHeight="100px"
+                        />
+                      </FormControl>
+                      <FormErrorMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               {/* Left Column - Title Fields */}
               <div className="space-y-4">
                 <FormField
@@ -287,28 +299,6 @@ export default function AddNewsDialog({
                   )}
                 />
               </div>
-
-              {/* Right Column - Image Uploads */}
-              <div className="grid grid-cols-2 gap-4">
-                <ImageUpload
-                  label={t("form.thumbnailImage")}
-                  maxSize="3MB - الحجم الأقصى"
-                  dimensions="2160 × 2160"
-                  required={!isEditMode}
-                  onChange={(file) => setValue("thumbnail_image", file)}
-                  initialValue={newsData?.data?.payload?.thumbnail_image?.url}
-                  minHeight="100px"
-                />
-                <ImageUpload
-                  label={t("form.mainImage")}
-                  maxSize="3MB - الحجم الأقصى"
-                  dimensions="2160 × 2160"
-                  required={!isEditMode}
-                  onChange={(file) => setValue("main_image", file)}
-                  initialValue={newsData?.data?.payload?.main_image?.url}
-                  minHeight="100px"
-                />
-              </div>
             </div>
             <div className="grid grid-cols-1 gap-4">
               <FormField
@@ -335,16 +325,21 @@ export default function AddNewsDialog({
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.map((category: Category) => (
-                            <SelectItem
-                              key={category.id}
-                              value={category.id.toString()}
-                            >
-                              {isRtl
-                                ? category.name_ar || category.name
-                                : category.name_en || category.name}
-                            </SelectItem>
-                          ))}
+                          {categories.map((category: Category) => {
+                            const displayName = isRtl
+                              ? category.name_ar || category.name || ""
+                              : category.name_en || category.name || "";
+                            return (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id.toString()}
+                              >
+                                {typeof displayName === "string"
+                                  ? displayName
+                                  : String(displayName || "")}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                     </FormControl>

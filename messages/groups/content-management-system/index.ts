@@ -8,6 +8,7 @@ import { ContentManagementSystemTermsConditionsMessages } from "./terms-conditio
 import { ContentManagementSystemMainDataMessages } from "./main-data";
 import { ContentManagementSystemFounderMessages } from "./founder";
 import { ContentManagementSystemServicesMessages } from "./services";
+import { ContentManagementSystemNewsMessages } from "./news";
 
 export const contentManagementSystemMessages = new MessagesGroup({
   categories: ContentManagementSystemCategoriesMessages,
@@ -19,4 +20,5 @@ export const contentManagementSystemMessages = new MessagesGroup({
   mainData: ContentManagementSystemMainDataMessages,
   founder: ContentManagementSystemFounderMessages,
   services: ContentManagementSystemServicesMessages,
+  news: ContentManagementSystemNewsMessages,
 });

@@ -17,7 +17,7 @@ function FounderView() {
   const t = useTranslations("content-management-system.founder");
 
   return (
-    <>
+    <div className="container p-6">
       <AddFounderDialog
         open={Boolean(editingFounderId)}
         onClose={() => setEditingFounderId(null)}
@@ -42,7 +42,7 @@ function FounderView() {
         }
         tableId={tableConfig.tableId}
       />
-    </>
+    </div>
   );
 }
 
