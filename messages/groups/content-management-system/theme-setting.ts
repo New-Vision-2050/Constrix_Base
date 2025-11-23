@@ -26,6 +26,16 @@ export const ContentManagementSystemThemeSettingMessages = new MessagesGroup({
         borderRadiusMin: _m("Border radius must be 0 or greater", "يجب أن يكون نصف قطر الحدود 0 أو أكثر"),
         borderRadiusMax: _m("Border radius must not exceed 50px", "يجب أن يكون نصف قطر الحدود أقل من 50px"),
     }),
+    typography: new MessagesGroup({
+        title: _m("Typography", "النصوص"),
+        htmlFontSize: _m("HTML Font Size", "حجم خط HTML"),
+        fontSize: _m("Font Size", "حجم الخط"),
+        fontFamily: _m("Font Family", "عائلة الخطوط"),
+        fontWeightLight: _m("Font Weight Light", "وزن الخط الخفيف"),
+        fontWeightRegular: _m("Font Weight Regular", "وزن الخط العادي"),
+        fontWeightMedium: _m("Font Weight Medium", "وزن الخط المتوسط"),
+        fontWeightBold: _m("Font Weight Bold", "وزن الخط الغامق"),
+    }),
     saveChanges: _m("Save Changes", "حفظ التعديلات"),
 });
 

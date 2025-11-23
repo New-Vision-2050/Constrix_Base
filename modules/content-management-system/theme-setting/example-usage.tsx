@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import BasicInfoSection from "./components/basic-info-section";
 import BorderRadiusSection from "./components/border-radius-section";
 import ColorPaletteSection from "./components/color-palette-section";
+import TypographySection from "./components/typography-section";
 import {
   createThemeSettingFormSchema,
   getDefaultThemeSettingFormValues,
@@ -24,6 +25,7 @@ export default function ThemeSettingExample() {
   const tCommon = useTranslations("content-management-system.themeSetting.common");
   const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
   const tBorderRadius = useTranslations("content-management-system.themeSetting.borderRadius");
+  const tTypography = useTranslations("content-management-system.themeSetting.typography");
 
   const form = useForm<ThemeSettingFormData>({
     resolver: zodResolver(createThemeSettingFormSchema(tBorderRadius)),
@@ -71,6 +73,14 @@ export default function ThemeSettingExample() {
             title={tBorderRadius("title")}
             label={tBorderRadius("label")}
             isSubmitting={isSubmitting}
+          />
+
+          {/* Typography Section */}
+          <TypographySection
+            control={form.control}
+            title={tTypography("title")}
+            isSubmitting={isSubmitting}
+            t={tTypography}
           />
 
           <Button
