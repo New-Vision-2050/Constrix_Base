@@ -34,6 +34,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
 import ClipboardClockIcon from "@/public/icons/clipboard-clock";
+import { SidebarProgramsListV2 } from "./sidebar-programs-v2";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
@@ -478,11 +479,13 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       data,
       isSuperAdmin
     );
-    const _shownProjects = _mergedProjects?.filter(project => {
-      return project.show;
-    })?.filter((project) => {
-      return project.sub_entities?.some((subEntity) => subEntity.show);
-    });
+    const _shownProjects = _mergedProjects
+      ?.filter((project) => {
+        return project.show;
+      })
+      ?.filter((project) => {
+        return project.sub_entities?.some((subEntity) => subEntity.show);
+      });
     return _shownProjects;
   }, [SidebarProjects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
 
@@ -491,7 +494,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       collapsible="icon"
       side={sidebarSide}
       {...props}
-      className=" bg-sidebar"
+      className="dashboard-sidebar bg-sidebar"
     >
       <SidebarHeader className=" pt-10 ">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
@@ -501,7 +504,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         {(isLoading || !Boolean(data)) && (
           <div className="p-4 flex justify-center">Loading...</div>
         )}
-        {all.length && !isLoading && <SidebarProgramsList projects={all} />}
+        {all.length && !isLoading && <SidebarProgramsListV2 projects={all} />}
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
