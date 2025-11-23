@@ -15,6 +15,8 @@ import {
   getWarningColors,
   getErrorColors,
   getTextColors,
+  getBackgroundColors,
+  getCommonColors,
 } from "../../constants";
 import { ThemeSettingFormData } from "../../schema";
 
@@ -45,6 +47,13 @@ export default function ColorPaletteSection({
         </AccordionTrigger>
         <AccordionContent>
           <div className="p-6 space-y-6">
+            {/* common colors */}
+            <ColorRow
+              control={control}
+              colors={getCommonColors(t)}
+              columns={4}
+              title={t('common')}
+            />
             {/* Primary Colors */}
             <ColorRow
               control={control}
@@ -91,6 +100,14 @@ export default function ColorPaletteSection({
               colors={getTextColors(t)}
               columns={4}
               title={t('textColor')}
+            />
+
+            {/* background color */}
+            <ColorRow
+              control={control}
+              colors={getBackgroundColors(t)}
+              columns={4}
+              title={t('background')}
             />
           </div>
         </AccordionContent>
