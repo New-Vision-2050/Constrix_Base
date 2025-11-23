@@ -7,19 +7,25 @@ import { z } from "zod";
 const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
+ * Optional hex color validation
+ * Allows empty string for cleared colors
+ */
+const optionalHexColor = z
+  .string()
+  .refine(
+    (val) => !val || hexColorRegex.test(val),
+    { message: "Color must be a valid hex color" }
+  )
+  .optional()
+  .or(z.literal(""));
+
+/**
  * Base color schema for simple color objects
  * Used for common and background colors (light & dark only)
  */
 export const simpleColorSchema = z.object({
-  light: z
-    .string()
-    .regex(hexColorRegex, "Light color must be a valid hex color")
-    .trim(),
-  
-  dark: z
-    .string()
-    .regex(hexColorRegex, "Dark color must be a valid hex color")
-    .trim(),
+  light: optionalHexColor,
+  dark: optionalHexColor,
 });
 
 /**
@@ -27,25 +33,10 @@ export const simpleColorSchema = z.object({
  * Used for primary, secondary, info, warning, error, and text colors
  */
 export const fullColorSchema = z.object({
-  main: z
-    .string()
-    .regex(hexColorRegex, "Main color must be a valid hex color")
-    .trim(),
-  
-  light: z
-    .string()
-    .regex(hexColorRegex, "Light color must be a valid hex color")
-    .trim(),
-  
-  dark: z
-    .string()
-    .regex(hexColorRegex, "Dark color must be a valid hex color")
-    .trim(),
-  
-  contrastText: z
-    .string()
-    .regex(hexColorRegex, "Contrast text color must be a valid hex color")
-    .trim(),
+  main: optionalHexColor,
+  light: optionalHexColor,
+  dark: optionalHexColor,
+  contrastText: optionalHexColor,
 });
 
 /**

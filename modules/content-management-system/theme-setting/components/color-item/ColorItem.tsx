@@ -35,17 +35,24 @@ export default function ColorItem<TFieldValues extends FieldValues>({
         control={control}
         name={name}
         render={({ field }) => (
-          <FormItem className="flex gap-2 items-center">
+          <FormItem className="space-y-2">
             <FormLabel>{label}</FormLabel>
             <FormControl>
               <ColorPickerPopover
                 open={isOpen}
                 onOpenChange={setIsOpen}
-                color={field.value}
+                color={field.value || "#000000"}
                 onChange={field.onChange}
                 label={label}
               >
-                <ColorDisplay color={field.value} />
+                <ColorDisplay 
+                  color={field.value} 
+                  onClear={() => {
+                    // Use empty string instead of undefined
+                    // to prevent React Hook Form from reverting to default
+                    field.onChange("");
+                  }}
+                />
               </ColorPickerPopover>
             </FormControl>
             <FormErrorMessage />

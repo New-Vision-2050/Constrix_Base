@@ -7,6 +7,7 @@ export const ContentManagementSystemThemeSettingMessages = new MessagesGroup({
         contrast: _m("Contrast", "نص التباين"),
         light: _m("Light", "فاتح"),
         dark: _m("Dark", "داكن"),
+        pickColor: _m("Pick Color", "اختر اللون"),
         common: _m("Common (black and white)", "شائع (الابيض والاسود)"),
         background: _m("Background", "الخلفية"),
         primaryColor: _m("Primary Color", "اللون الاساسي"),
