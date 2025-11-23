@@ -33,9 +33,8 @@ export const SubProgramsList = memo(function SubProgramsList({
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDarkMode = currentTheme === "dark";
 
-  const visibleSubEntities = activeProject?.sub_entities?.filter(
-    (item) => item.show
-  ) ?? [];
+  const visibleSubEntities =
+    activeProject?.sub_entities?.filter((item) => item.show) ?? [];
 
   if (!visibleSubEntities.length) return null;
 
@@ -149,5 +148,3 @@ export const SubProgramsList = memo(function SubProgramsList({
     </div>
   );
 });
-
-
