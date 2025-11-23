@@ -20,6 +20,7 @@ interface ColorRowProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
   colors: ColorConfig<TFieldValues>[];
   columns?: 1 | 2 | 3 | 4;
+  title: string;
 }
 
 /**
@@ -35,6 +36,7 @@ export default function ColorRow<TFieldValues extends FieldValues>({
   control,
   colors,
   columns = 4,
+  title,
 }: ColorRowProps<TFieldValues>) {
   const gridColsClass = {
     1: "grid-cols-1",
@@ -44,7 +46,9 @@ export default function ColorRow<TFieldValues extends FieldValues>({
   }[columns];
 
   return (
-    <div className={`grid ${gridColsClass} gap-4 bg-sidebar rounded-lg p-6  border border-border`}>
+    <div className="bg-sidebar rounded-lg p-6  border border-border space-y-2">
+      <h5 className="text-sm font-medium">{title}</h5>
+      <div className={`grid ${gridColsClass} gap-4`}>
       {colors.map((color) => (
         <ColorItem
           key={color.name as string}
@@ -54,6 +58,8 @@ export default function ColorRow<TFieldValues extends FieldValues>({
         />
       ))}
     </div>
+    </div>
+    
   );
 }
 

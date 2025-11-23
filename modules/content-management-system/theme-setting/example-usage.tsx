@@ -26,6 +26,7 @@ import {
  */
 export default function ThemeSettingExample() {
   const t = useTranslations("content-management-system.themeSetting");
+  const tCommon = useTranslations("content-management-system.themeSetting.common");
 
   const form = useForm<ThemeSettingFormData>({
     resolver: zodResolver(createThemeSettingFormSchema(t)),
@@ -49,43 +50,49 @@ export default function ThemeSettingExample() {
             {/* Primary Colors */}
             <ColorRow
               control={form.control}
-              colors={getPrimaryColors(t)}
+              colors={getPrimaryColors(tCommon)}
               columns={4}
+              title={tCommon('primaryColor')}
             />
 
             {/* Secondary Colors */}
             <ColorRow
               control={form.control}
-              colors={getSecondaryColors(t)}
+              colors={getSecondaryColors(tCommon)}
               columns={4}
+              title={tCommon('secondaryColor')}
             />
 
             {/* Info Colors */}
             <ColorRow
               control={form.control}
-              colors={getInfoColors(t)}
+              colors={getInfoColors(tCommon)}
               columns={4}
+              title={tCommon('infoColor')}
             />
 
             {/* Warning Colors */}
             <ColorRow
               control={form.control}
-              colors={getWarningColors(t)}
+              colors={getWarningColors(tCommon)}
               columns={4}
+              title={tCommon('warningColor')}
             />
 
             {/* Error Colors */}
             <ColorRow
               control={form.control}
-              colors={getErrorColors(t)}
+              colors={getErrorColors(tCommon)}
               columns={4}
+              title={tCommon('errorColor')}
             />
 
             {/* Text Colors */}
             <ColorRow
               control={form.control}
-              colors={getTextColors(t)}
+              colors={getTextColors(tCommon)}
               columns={4}
+              title={tCommon('textColor')}
             />
           </div>
 
