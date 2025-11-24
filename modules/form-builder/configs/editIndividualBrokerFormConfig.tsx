@@ -4,20 +4,22 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
+import { editBrokerData } from "@/modules/brokers/apis/update-broker";
 
 export function editIndividualBrokerFormConfig(
   t: ReturnType<typeof useTranslations>,
-  handleCloseForm?: () => void
+  handleCloseForm?: () => void,
+  isShareBroker?: boolean,
+  currentEmpId?: string,
 ): FormConfig {
   const formId = "edit-individual-broker-form";
 
   return {
     formId,
     title: "تعديل بيانات الوسيط",
-    apiUrl: `${baseURL}/company-users/brokers`,
+    apiUrl: `${baseURL}/users`,
+    editIdField: 'user_id',
     isEditMode: true,
-    editApiUrl: `${baseURL}/company-users/brokers/:id`,
-    editApiMethod: "PUT",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -81,23 +83,26 @@ export function editIndividualBrokerFormConfig(
           },
           // Branches - Conditional enable/disable based on sharing settings
           {
-            name: "branch_ids",
+            name: "branch_ids_all",
             label: "الفروع",
             type: "select",
             isMulti: true,
             placeholder: "اختر الفروع",
             dynamicOptions: {
-              url: `${baseURL}/branches`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
-              paginationEnabled: true,
+              selectAll: isShareBroker,
+              paginationEnabled: false,
               pageParam: "page",
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
-            // Note: disabled property will be set dynamically based on sharing settings
+            disabled: isShareBroker,
           },
           // Correspondence Address - Enabled for editing
           {
@@ -118,9 +123,21 @@ export function editIndividualBrokerFormConfig(
         name: data?.name,
         phone: data?.phone,
         residence: data?.residence,
-        branch_ids: data?.branch_ids || data?.branches?.map((b: any) => b.id) || [],
+        branch_ids_all: data?.branch_ids || data?.branches?.map((b: any) => b.id) || [],
         chat_mail: data?.chat_mail,
         type: "1",
+      };
+    },
+    onSubmit: async (formData) => {
+      const body = {
+        branch_ids: formData.branch_ids_all,
+        chat_mail: formData.chat_mail,
+      };
+      await editBrokerData(formData.id, body);
+      return {
+        success: true,
+        message: 'Broker data edited successfully',
+        data: formData,
       };
     },
     onSuccess: handleCloseForm,

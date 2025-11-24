@@ -68,7 +68,7 @@ export const UsersConfigV2 = (options?: {
     }
     // broker model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.BROKER) {
-      return { ...editIndividualBrokerFormConfig(t), apiUrl: `${baseURL}/users`, editIdField: 'user_id' };
+      return editIndividualBrokerFormConfig(t, undefined, isShareBroker, currentUserId);
     }
     // employee model - use full form (no simplified version yet)
     if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
