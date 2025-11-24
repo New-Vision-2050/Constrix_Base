@@ -17,7 +17,7 @@ export default function ServicesView() {
   const t = useTranslations("content-management-system.services");
 
   return (
-    <div className="container p-6">
+    <div className="px-8 space-y-7">
       <AddServiceDialog
         open={Boolean(editingServiceId)}
         onClose={() => setEditingServiceId(null)}

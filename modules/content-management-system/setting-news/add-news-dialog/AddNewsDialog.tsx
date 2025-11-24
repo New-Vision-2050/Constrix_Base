@@ -37,6 +37,10 @@ import { CompanyDashboardCategoriesApi } from "@/services/api/company-dashboard/
 import { CompanyDashboardNewsApi } from "@/services/api/company-dashboard/news";
 import { ShowNewsResponse } from "@/services/api/company-dashboard/news/types/response";
 import {
+  UpdateNewsParams,
+  CreateNewsParams,
+} from "@/services/api/company-dashboard/news/types/params";
+import {
   createNewsFormSchema,
   NewsFormData,
   getDefaultNewsFormValues,
@@ -109,35 +113,57 @@ export default function AddNewsDialog({
         category_id: categoryId?.toString() || "",
         publish_date: news.publish_date || "",
         end_date: news.end_date || "",
-        thumbnail_image: news.thumbnail, // Will be set via initialValue in ImageUpload
-        main_image: news.main_image, // Will be set via initialValue in ImageUpload
+        thumbnail_image: news.thumbnail || null, // Will be set via initialValue in ImageUpload
+        main_image: news.main_image || null, // Will be set via initialValue in ImageUpload
       });
     }
   }, [isEditMode, newsData, open, reset]);
 
   const onSubmit = async (data: NewsFormData) => {
     try {
-      const params = {
-        title_ar: data.title_ar,
-        title_en: data.title_en,
-        content_ar: data.content_ar,
-        content_en: data.content_en,
-        category_website_cms_id: data.category_id,
-        publish_date: data.publish_date,
-        end_date: data.end_date,
-        thumbnail:
-          data.thumbnail_image instanceof File ? data.thumbnail_image : null,
-        main_image: data.main_image instanceof File ? data.main_image : null,
-      };
-
       if (isEditMode && newsId) {
-        await CompanyDashboardNewsApi.update(newsId, params);
+        // For update: only include images if they are File objects (new uploads)
+        // If they are strings (existing URLs), omit them to keep the previous photos
+        const updateParams: UpdateNewsParams = {
+          title_ar: data.title_ar,
+          title_en: data.title_en,
+          content_ar: data.content_ar,
+          content_en: data.content_en,
+          category_website_cms_id: data.category_id,
+          publish_date: data.publish_date,
+          end_date: data.end_date,
+        };
+
+        // Only include images if they are File objects (new uploads)
+        if (data.thumbnail_image instanceof File) {
+          updateParams.thumbnail = data.thumbnail_image;
+        }
+        if (data.main_image instanceof File) {
+          updateParams.main_image = data.main_image;
+        }
+
+        await CompanyDashboardNewsApi.update(newsId, updateParams);
       } else {
+        // For create: images are required
         if (!data.thumbnail_image || !data.main_image) {
           toast.error(t("form.imagesRequired"));
           return;
         }
-        await CompanyDashboardNewsApi.create(params);
+
+        const createParams: CreateNewsParams = {
+          title_ar: data.title_ar,
+          title_en: data.title_en,
+          content_ar: data.content_ar,
+          content_en: data.content_en,
+          category_website_cms_id: data.category_id,
+          publish_date: data.publish_date,
+          end_date: data.end_date,
+          thumbnail:
+            data.thumbnail_image instanceof File ? data.thumbnail_image : null,
+          main_image: data.main_image instanceof File ? data.main_image : null,
+        };
+
+        await CompanyDashboardNewsApi.create(createParams);
       }
 
       toast.success(
@@ -221,8 +247,7 @@ export default function AddNewsDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : newsData?.payload?.thumbnail_image?.url ||
-                                newsData?.payload?.thumbnail?.url
+                              : newsData?.payload?.thumbnail
                           }
                           minHeight="100px"
                         />
@@ -246,7 +271,7 @@ export default function AddNewsDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : newsData?.payload?.main_image?.url
+                              : newsData?.payload?.main_image
                           }
                           minHeight="100px"
                         />

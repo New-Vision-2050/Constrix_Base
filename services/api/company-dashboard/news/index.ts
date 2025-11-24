@@ -18,7 +18,7 @@ export const CompanyDashboardNewsApi = {
       })
     ),
   update: (id: string, params: UpdateNewsParams) =>
-    baseApi.put(
+    baseApi.post(
       `website-news/${id}`,
       serialize(params, {
         indices: true,

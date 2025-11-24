@@ -17,7 +17,7 @@ function NewsView() {
   const t = useTranslations("content-management-system.news");
 
   return (
-    <div className="container p-6">
+    <div className="px-8 space-y-7">
       <AddNewsDialog
         open={Boolean(editingNewsId)}
         onClose={() => setEditingNewsId(null)}

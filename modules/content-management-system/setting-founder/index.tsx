@@ -17,7 +17,7 @@ function FounderView() {
   const t = useTranslations("content-management-system.founder");
 
   return (
-    <div className="container p-6">
+    <div className="px-8 space-y-7">
       <AddFounderDialog
         open={Boolean(editingFounderId)}
         onClose={() => setEditingFounderId(null)}
