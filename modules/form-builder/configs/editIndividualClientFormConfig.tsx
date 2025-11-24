@@ -4,7 +4,7 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { baseURL } from "@/config/axios-config";
 import { FormConfig } from "@/modules/form-builder";
-import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { editClientData } from "@/modules/clients/apis/edit-client-data";
 
 export function editIndividualClientFormConfig(
   t: ReturnType<typeof useTranslations>,
@@ -15,10 +15,9 @@ export function editIndividualClientFormConfig(
   return {
     formId,
     title: "تعديل بيانات العميل",
-    apiUrl: `${baseURL}/company-users/clients`,
+    apiUrl: `${baseURL}/users`,
+    editIdField: 'user_id',
     isEditMode: true,
-    editApiUrl: `${baseURL}/company-users/clients/:id`,
-    editApiMethod: "PUT",
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -89,7 +88,7 @@ export function editIndividualClientFormConfig(
             isMulti: true,
             placeholder: "اختر الفروع",
             dynamicOptions: {
-              url: `${baseURL}/branches`,
+              url: `${baseURL}/management_hierarchies/user-access/user/{user_id}/branches?role=2`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -98,6 +97,12 @@ export function editIndividualClientFormConfig(
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
+              dependsOn: [
+                {
+                  field: "user_id",
+                  method: "replace",
+                }
+              ],
             },
             // Note: disabled property will be set dynamically based on sharing settings
           },
@@ -130,10 +135,11 @@ export function editIndividualClientFormConfig(
       },
     ],
     editDataTransformer: (data) => {
+      console.log('editDataTransformer', data);
       // Transform the API response to match form fields
       return {
         id: data?.id,
-        user_id: data?.user_id,
+        user_id: data?.id,
         email: data?.email,
         name: data?.name,
         phone: data?.phone,
@@ -142,6 +148,19 @@ export function editIndividualClientFormConfig(
         broker_id: data?.broker_id,
         chat_mail: data?.chat_mail,
         type: "1",
+      };
+    },
+    onSubmit: async (formData) => {
+      const body = {
+        branch_ids: formData.branch_ids,
+        broker_id: formData.broker_id,
+        chat_mail: formData.chat_mail,
+      };
+      await editClientData(formData.id, body);
+      return {
+        success: true,
+        message: 'Client data edited successfully',
+        data: formData,
       };
     },
     onSuccess: handleCloseForm,
