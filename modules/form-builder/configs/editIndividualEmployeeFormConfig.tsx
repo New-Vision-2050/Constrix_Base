@@ -7,14 +7,14 @@ import { FormConfig } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export function editIndividualEmployeeFormConfig(
-  t: ReturnType<typeof useTranslations>,
+  t: (key: string) => string,
   handleCloseForm?: () => void
 ): FormConfig {
   const formId = "edit-individual-employee-form";
 
   return {
     formId,
-    title: "تعديل بيانات الموظف",
+    title: t("EditEmployeeData"),
     apiUrl: `${baseURL}/users`,
     editIdField: 'user_id',
     isEditMode: true,
@@ -41,36 +41,36 @@ export function editIndividualEmployeeFormConfig(
           // Email - Disabled (display only)
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("Email"),
             type: "email",
-            placeholder: "البريد الإلكتروني",
+            placeholder: t("Email"),
             disabled: true,
             required: false,
           },
           // First Name - Disabled (display only)
           {
             name: "first_name",
-            label: "اسم الموظف الأول",
+            label: t("FirstName"),
             type: "text",
-            placeholder: "اسم الموظف الأول",
+            placeholder: t("FirstName"),
             disabled: true,
             required: false,
           },
           // Last Name - Disabled (display only)
           {
             name: "last_name",
-            label: "اسم الموظف الأخير",
+            label: t("LastName"),
             type: "text",
-            placeholder: "اسم الموظف الأخير",
+            placeholder: t("LastName"),
             disabled: true,
             required: false,
           },
           // Country - Disabled (display only)
           {
             name: "country_id",
-            label: "الجنسية",
+            label: t("Nationality"),
             type: "select",
-            placeholder: "اختر الجنسية",
+            placeholder: t("SelectNationality"),
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -88,18 +88,18 @@ export function editIndividualEmployeeFormConfig(
           // Phone - Disabled (display only)
           {
             name: "phone",
-            label: "الهاتف",
+            label: t("Phone"),
             type: "phone",
-            placeholder: "الهاتف",
+            placeholder: t("Phone"),
             disabled: true,
             required: false,
           },
           // Job Title - Disabled (display only)
           {
             name: "job_title_id",
-            label: "المسمى الوظيفي",
+            label: t("JobTitle"),
             type: "select",
-            placeholder: "اختر المسمى الوظيفي",
+            placeholder: t("SelectJobTitle"),
             dynamicOptions: {
               url: `${baseURL}/job_titles/list`,
               valueField: "id",
@@ -117,9 +117,9 @@ export function editIndividualEmployeeFormConfig(
           // Branch - Enabled for editing
           {
             name: "branch_id",
-            label: "الفرع",
+            label: t("Branch"),
             type: "select",
-            placeholder: "اختر الفرع",
+            placeholder: t("SelectBranch"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
@@ -135,12 +135,12 @@ export function editIndividualEmployeeFormConfig(
           // Status - Enabled for editing
           {
             name: "status",
-            label: "حالة الموظف",
+            label: t("EmployeeStatus"),
             type: "select",
-            placeholder: "اختر حالة الموظف",
+            placeholder: t("SelectEmployeeStatus"),
             options: [
-              { label: "نشط", value: "1" },
-              { label: "غير نشط", value: "0" },
+              { label: t("Active"), value: "1" },
+              { label: t("Inactive"), value: "0" },
             ],
           },
         ],
@@ -174,10 +174,10 @@ export function editIndividualEmployeeFormConfig(
         };
     },
     onSuccess: handleCloseForm,
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("Save"),
+    cancelButtonText: t("Cancel"),
     showReset: false,
-    resetButtonText: "إعادة تعيين",
+    resetButtonText: t("Reset"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: true,

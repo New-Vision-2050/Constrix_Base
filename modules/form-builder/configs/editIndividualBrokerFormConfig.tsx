@@ -7,7 +7,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { editBrokerData } from "@/modules/brokers/apis/update-broker";
 
 export function editIndividualBrokerFormConfig(
-  t: ReturnType<typeof useTranslations>,
+  t: (key: string) => string,
   handleCloseForm?: () => void,
   isShareBroker?: boolean,
   currentEmpId?: string,
@@ -16,7 +16,7 @@ export function editIndividualBrokerFormConfig(
 
   return {
     formId,
-    title: "تعديل بيانات الوسيط",
+    title: t("EditBrokerData"),
     apiUrl: `${baseURL}/users`,
     editIdField: 'user_id',
     isEditMode: true,
@@ -48,46 +48,46 @@ export function editIndividualBrokerFormConfig(
           // Email - Disabled (display only)
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("Email"),
             type: "email",
-            placeholder: "البريد الإلكتروني",
+            placeholder: t("Email"),
             disabled: true,
             required: false,
           },
           // Name - Disabled (display only)
           {
             name: "name",
-            label: "الاسم",
+            label: t("Name"),
             type: "text",
-            placeholder: "الاسم",
+            placeholder: t("Name"),
             disabled: true,
             required: false,
           },
           // Phone - Disabled (display only)
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("Phone"),
             type: "phone",
-            placeholder: "رقم الجوال",
+            placeholder: t("Phone"),
             disabled: true,
             required: false,
           },
           // Identity (residence) - Disabled (display only)
           {
             name: "residence",
-            label: "رقم الهوية",
+            label: t("IdentityNumber"),
             type: "text",
-            placeholder: "رقم الهوية",
+            placeholder: t("IdentityNumber"),
             disabled: true,
             required: false,
           },
           // Branches - Conditional enable/disable based on sharing settings
           {
             name: "branch_ids_all",
-            label: "الفروع",
+            label: t("Branches"),
             type: "select",
             isMulti: true,
-            placeholder: "اختر الفروع",
+            placeholder: t("SelectBranches"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
               valueField: "id",
@@ -107,9 +107,9 @@ export function editIndividualBrokerFormConfig(
           // Correspondence Address - Enabled for editing
           {
             name: "chat_mail",
-            label: "عنوان المراسلات",
+            label: t("CorrespondenceAddress"),
             type: "text",
-            placeholder: "عنوان المراسلات",
+            placeholder: t("CorrespondenceAddress"),
           },
         ],
       },
@@ -141,10 +141,10 @@ export function editIndividualBrokerFormConfig(
       };
     },
     onSuccess: handleCloseForm,
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("Save"),
+    cancelButtonText: t("Cancel"),
     showReset: false,
-    resetButtonText: "إعادة تعيين",
+    resetButtonText: t("Reset"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: true,

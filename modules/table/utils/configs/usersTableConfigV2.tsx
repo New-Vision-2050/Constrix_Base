@@ -58,6 +58,7 @@ export const UsersConfigV2 = (options?: {
   currentUserId?: string;
 }) => {
   const t = useTranslations("Companies");
+  const tEditSubEntity = useTranslations("EditSubEntityMessages");
   // define final form config for EDIT mode
   // Note: This config is used when clicking "Edit" button in the table
   const finalFormConfig = useMemo(() => {
@@ -65,15 +66,15 @@ export const UsersConfigV2 = (options?: {
     const registrationFromConfig = options?.registrationFormSlug;
     // client model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.CLIENT) {
-      return editIndividualClientFormConfig(t, undefined, isShareClient, currentUserId)
+      return editIndividualClientFormConfig(tEditSubEntity, undefined, isShareClient, currentUserId)
     }
     // broker model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.BROKER) {
-      return editIndividualBrokerFormConfig(t, undefined, isShareBroker, currentUserId);
+      return editIndividualBrokerFormConfig(tEditSubEntity, undefined, isShareBroker, currentUserId);
     }
     // employee model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
-      return editIndividualEmployeeFormConfig(t);
+      return editIndividualEmployeeFormConfig(tEditSubEntity);
     }
     // default fallback (company user form)
     return GetCompanyUserFormConfig(t);
