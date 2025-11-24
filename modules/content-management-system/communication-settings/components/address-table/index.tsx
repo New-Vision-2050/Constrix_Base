@@ -21,7 +21,8 @@ export default function AddressTable() {
     const { reloadTable } = useTableReload(tableConfig.tableId);
 
     return <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.view]}>
-        <div className="container p-6">
+        <div className="container p-6 bg-sidebar space-y-4">
+            <h2 className="text-2xl font-bold">{t("title")}</h2>
             <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.update]}>
                 <SetAddressDialog
                     open={Boolean(editingAddressId)}

@@ -5,7 +5,7 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
   
   // Address Table Translations
   table: new MessagesGroup({
-    title: _m("Address List", "قائمة العناوين"),
+    title: _m("Addresses", "العناوين"),
     address: _m("Address", "العنوان"),
     latitude: _m("Latitude", "خط العرض"),
     longitude: _m("Longitude", "خط الطول"),
