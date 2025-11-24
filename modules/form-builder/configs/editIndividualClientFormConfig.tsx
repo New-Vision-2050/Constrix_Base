@@ -12,7 +12,6 @@ export function editIndividualClientFormConfig(
   isShareClient?: boolean,
   currentEmpId?: string,
 ): FormConfig {
-  console.log('isShareClient', isShareClient, currentEmpId);
   const formId = "edit-individual-client-form";
 
   return {
