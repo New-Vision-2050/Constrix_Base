@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import ContactDataForm from "./components/ContactDataForm";
+import AddressTable from "./components/address-table";
 
 export default function CommunicationSettingsModule() {
     // Translations
@@ -8,6 +9,7 @@ export default function CommunicationSettingsModule() {
     return (
         <div className="px-6 py-2 flex flex-col gap-4">
             <ContactDataForm />
+            <AddressTable />
         </div>
     );
 }
