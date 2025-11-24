@@ -6,6 +6,7 @@ import { ContentManagementSystemMainSettingsMessages } from "./main-settings";
 import { ContentManagementSystemContactSettingMessages } from "./contact-setting";
 import { ContentManagementSystemTermsConditionsMessages } from "./terms-conditions";
 import { ContentManagementSystemThemeSettingMessages } from "./theme-setting";
+import { ContentManagementSystemCommunicationSettingsMessages } from "./communication-setting";
 
 export const contentManagementSystemMessages = new MessagesGroup({
   categories: ContentManagementSystemCategoriesMessages,
@@ -15,4 +16,5 @@ export const contentManagementSystemMessages = new MessagesGroup({
   contactSetting: ContentManagementSystemContactSettingMessages,
   termsConditions: ContentManagementSystemTermsConditionsMessages,
   themeSetting: ContentManagementSystemThemeSettingMessages,
+  communicationSetting: ContentManagementSystemCommunicationSettingsMessages,
 });
