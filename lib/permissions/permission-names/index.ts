@@ -105,6 +105,7 @@ export const PERMISSIONS = {
     communicationSettings:{
       contactData: create("CMS_COMMUNICATION_SETTINGS_CONTACT_DATA"),
       addresses: create("CMS_COMMUNICATION_SETTINGS_ADDRESSES"),
+      socialLinks: create("CMS_COMMUNICATION_SETTINGS_SOCIAL_LINKS"),
     }
   }
 };

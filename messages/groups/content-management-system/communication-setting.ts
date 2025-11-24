@@ -2,7 +2,7 @@ import { MessagesGroup, _m } from "@/messages";
 
 export const ContentManagementSystemCommunicationSettingsMessages = new MessagesGroup({
   title: _m("Communication Settings", "اعدادات الاتصال"),
-  
+
   // Address Table Translations
   table: new MessagesGroup({
     title: _m("Addresses", "العناوين"),
@@ -12,20 +12,30 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
     edit: _m("Edit", "تعديل"),
     addAddress: _m("Add Address", "إضافة عنوان"),
   }),
-  
+
+  // Social Links Table Translations
+  socialLinksTable: new MessagesGroup({
+    title: _m("Social Links", "الروابط الاجتماعية"),
+    socialIcon: _m("Social Icon", "الأيقونة"),
+    type: _m("Type", "النوع"),
+    url: _m("URL", "الرابط"),
+    edit: _m("Edit", "تعديل"),
+    addSocialLink: _m("Add Social Link", "إضافة رابط اجتماعي"),
+  }),
+
   // Address Dialog Translations
   addressDialogTitle: _m("Add New Address", "إضافة عنوان جديد"),
   addressLabel: _m("Address", "العنوان"),
   latitudeLabel: _m("Latitude", "خط العرض"),
   longitudeLabel: _m("Longitude", "خط الطول"),
-  
+
   // Address Validation Messages
   addressRequired: _m("Address is required", "العنوان مطلوب"),
   latitudeRequired: _m("Latitude is required", "خط العرض مطلوب"),
   longitudeRequired: _m("Longitude is required", "خط الطول مطلوب"),
   latitudeInvalid: _m("Please enter a valid latitude", "يرجى إدخال خط عرض صحيح"),
   longitudeInvalid: _m("Please enter a valid longitude", "يرجى إدخال خط طول صحيح"),
-  
+
   // Form Labels
   formTitle: _m("Contact Data", "بيانات التواصل"),
   email: _m("Email", "البريد الإلكتروني"),
