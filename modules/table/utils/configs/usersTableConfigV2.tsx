@@ -15,6 +15,7 @@ import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/co
 import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
 import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
 import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/editIndividualBrokerFormConfig";
+import { editIndividualEmployeeFormConfig } from "@/modules/form-builder/configs/editIndividualEmployeeFormConfig";
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import useUserData from "@/hooks/use-user-data";
 
@@ -70,9 +71,9 @@ export const UsersConfigV2 = (options?: {
     if (registrationFromConfig === ModelsTypes.BROKER) {
       return editIndividualBrokerFormConfig(t, undefined, isShareBroker, currentUserId);
     }
-    // employee model - use full form (no simplified version yet)
+    // employee model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
-      return { ...employeeFormConfig(t), apiUrl: `${baseURL}/users`, editIdField: 'user_id' };
+      return editIndividualEmployeeFormConfig(t);
     }
     // default fallback (company user form)
     return GetCompanyUserFormConfig(t);
