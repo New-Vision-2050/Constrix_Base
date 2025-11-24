@@ -60,15 +60,15 @@ export const UsersConfigV2 = (options?: {
     const registrationFromConfig = options?.registrationFormSlug;
     // client model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.CLIENT) {
-      return editIndividualClientFormConfig(t);
+      return {...editIndividualClientFormConfig(t),apiUrl: `${baseURL}/users`, editIdField: 'user_id'};
     }
     // broker model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.BROKER) {
-      return editIndividualBrokerFormConfig(t);
+      return {...editIndividualBrokerFormConfig(t),apiUrl: `${baseURL}/users`, editIdField: 'user_id'};
     }
     // employee model - use full form (no simplified version yet)
     if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
-      return employeeFormConfig(t);
+      return {...employeeFormConfig(t),apiUrl: `${baseURL}/users`, editIdField: 'user_id'};
     }
     // default fallback (company user form)
     return GetCompanyUserFormConfig(t);
