@@ -8,8 +8,11 @@ import { editClientData } from "@/modules/clients/apis/edit-client-data";
 
 export function editIndividualClientFormConfig(
   t: ReturnType<typeof useTranslations>,
-  handleCloseForm?: () => void
+  handleCloseForm?: () => void,
+  isShareClient?: boolean,
+  currentEmpId?: string,
 ): FormConfig {
+  console.log('isShareClient', isShareClient, currentEmpId);
   const formId = "edit-individual-client-form";
 
   return {
@@ -80,31 +83,27 @@ export function editIndividualClientFormConfig(
             required: false,
           },
           // Branches - Conditional enable/disable based on sharing settings
-          // This will be controlled by parent component
           {
-            name: "branch_ids",
+            name: "branch_ids_all",
             label: "الفروع",
             type: "select",
             isMulti: true,
             placeholder: "اختر الفروع",
             dynamicOptions: {
-              url: `${baseURL}/management_hierarchies/user-access/user/{user_id}/branches?role=2`,
+              url: `${baseURL}/management_hierarchies/user-access/user/${currentEmpId}/branches?role=2`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
-              paginationEnabled: true,
+              selectAll: isShareClient,
+              paginationEnabled: false,
               pageParam: "page",
               limitParam: "per_page",
               itemsPerPage: 10,
               totalCountHeader: "X-Total-Count",
-              dependsOn: [
-                {
-                  field: "user_id",
-                  method: "replace",
-                }
-              ],
+              // disableReactQuery: true,
+              // disableReactQuery: false,
             },
-            // Note: disabled property will be set dynamically based on sharing settings
+            disabled: isShareClient,
           },
           // Broker - Enabled for editing
           {
@@ -144,7 +143,7 @@ export function editIndividualClientFormConfig(
         name: data?.name,
         phone: data?.phone,
         residence: data?.residence,
-        branch_ids: data?.branch_ids || data?.branches?.map((b: any) => b.id) || [],
+        branch_ids_all: data?.branch_ids || data?.branches?.map((b: any) => b.id) || [],
         broker_id: data?.broker_id,
         chat_mail: data?.chat_mail,
         type: "1",
@@ -152,7 +151,7 @@ export function editIndividualClientFormConfig(
     },
     onSubmit: async (formData) => {
       const body = {
-        branch_ids: formData.branch_ids,
+        branch_ids: formData.branch_ids_all,
         broker_id: formData.broker_id,
         chat_mail: formData.chat_mail,
       };

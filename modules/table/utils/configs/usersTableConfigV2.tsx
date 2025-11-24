@@ -15,6 +15,8 @@ import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/co
 import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
 import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
 import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/editIndividualBrokerFormConfig";
+import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
+import useUserData from "@/hooks/use-user-data";
 
 // Define types for the company data
 interface CompanyData {
@@ -50,15 +52,19 @@ export const UsersConfigV2 = (options?: {
   canDelete: boolean;
   canView: boolean;
   registrationFormSlug?: string;
+  isShareClient?: boolean;
+  isShareBroker?: boolean;
+  currentUserId?: string;
 }) => {
   const t = useTranslations("Companies");
   // define final form config for EDIT mode
   // Note: This config is used when clicking "Edit" button in the table
   const finalFormConfig = useMemo(() => {
+    const { isShareClient, isShareBroker, currentUserId } = options || {};
     const registrationFromConfig = options?.registrationFormSlug;
     // client model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.CLIENT) {
-      return editIndividualClientFormConfig(t)
+      return editIndividualClientFormConfig(t, undefined, isShareClient, currentUserId)
     }
     // broker model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.BROKER) {
@@ -70,7 +76,7 @@ export const UsersConfigV2 = (options?: {
     }
     // default fallback (company user form)
     return GetCompanyUserFormConfig(t);
-  }, [options?.registrationFormSlug, t]);
+  }, [options?.registrationFormSlug, t, options?.isShareClient, options?.isShareBroker, options?.currentUserId]);
 
   return {
     url: `${baseURL}/company-users`,
