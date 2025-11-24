@@ -18,12 +18,14 @@ import StatisticsRow from "@/components/shared/layout/statistics-row";
 import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config";
 import useUserData from "@/hooks/use-user-data";
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   programName: SuperEntitySlug;
 };
 
 const UsersSubEntityTable = ({ programName }: PropsT) => {
+  const t = useTranslations();
   // current user data
   const { data: userData } = useUserData();
   // shared settings
@@ -84,7 +86,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
     return (
       <div className="px-8 space-y-7">
         <div className="flex items-center justify-center py-8">
-          <div className="text-lg">جاري تحميل البيانات...</div>
+          <div className="text-lg">{t("Main.Loading")}</div>
         </div>
       </div>
     );
