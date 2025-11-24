@@ -5,6 +5,7 @@ import { ContentManagementSystemIconsMessages } from "./icons";
 import { ContentManagementSystemMainSettingsMessages } from "./main-settings";
 import { ContentManagementSystemContactSettingMessages } from "./contact-setting";
 import { ContentManagementSystemTermsConditionsMessages } from "./terms-conditions";
+import { ContentManagementSystemThemeSettingMessages } from "./theme-setting";
 
 export const contentManagementSystemMessages = new MessagesGroup({
   categories: ContentManagementSystemCategoriesMessages,
@@ -13,4 +14,5 @@ export const contentManagementSystemMessages = new MessagesGroup({
   mainSettings: ContentManagementSystemMainSettingsMessages,
   contactSetting: ContentManagementSystemContactSettingMessages,
   termsConditions: ContentManagementSystemTermsConditionsMessages,
+  themeSetting: ContentManagementSystemThemeSettingMessages,
 });
