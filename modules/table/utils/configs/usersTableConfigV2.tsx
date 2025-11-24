@@ -12,8 +12,6 @@ import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 import { Trash2 } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
 import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
-import { customerFormConfig } from "@/modules/form-builder/configs/customerFormConfig";
-import { brokerFormConfig } from "@/modules/form-builder/configs/brokerFormConfig";
 import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
 import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
 import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/editIndividualBrokerFormConfig";
@@ -60,19 +58,19 @@ export const UsersConfigV2 = (options?: {
     const registrationFromConfig = options?.registrationFormSlug;
     // client model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.CLIENT) {
-      return {...editIndividualClientFormConfig(t),apiUrl: `${baseURL}/users`, editIdField: 'user_id'};
+      return editIndividualClientFormConfig(t)
     }
     // broker model - use simplified edit form
     if (registrationFromConfig === ModelsTypes.BROKER) {
-      return {...editIndividualBrokerFormConfig(t),apiUrl: `${baseURL}/users`, editIdField: 'user_id'};
+      return { ...editIndividualBrokerFormConfig(t), apiUrl: `${baseURL}/users`, editIdField: 'user_id' };
     }
     // employee model - use full form (no simplified version yet)
     if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
-      return {...employeeFormConfig(t),apiUrl: `${baseURL}/users`, editIdField: 'user_id'};
+      return { ...employeeFormConfig(t), apiUrl: `${baseURL}/users`, editIdField: 'user_id' };
     }
     // default fallback (company user form)
     return GetCompanyUserFormConfig(t);
-  },[options?.registrationFormSlug, t]);
+  }, [options?.registrationFormSlug, t]);
 
   return {
     url: `${baseURL}/company-users`,
