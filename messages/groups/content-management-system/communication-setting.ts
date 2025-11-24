@@ -12,6 +12,20 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
     edit: _m("Edit", "تعديل"),
     addAddress: _m("Add Address", "إضافة عنوان"),
   }),
+  
+  // Address Dialog Translations
+  addressDialogTitle: _m("Add New Address", "إضافة عنوان جديد"),
+  addressLabel: _m("Address", "العنوان"),
+  latitudeLabel: _m("Latitude", "خط العرض"),
+  longitudeLabel: _m("Longitude", "خط الطول"),
+  
+  // Address Validation Messages
+  addressRequired: _m("Address is required", "العنوان مطلوب"),
+  latitudeRequired: _m("Latitude is required", "خط العرض مطلوب"),
+  longitudeRequired: _m("Longitude is required", "خط الطول مطلوب"),
+  latitudeInvalid: _m("Please enter a valid latitude", "يرجى إدخال خط عرض صحيح"),
+  longitudeInvalid: _m("Please enter a valid longitude", "يرجى إدخال خط طول صحيح"),
+  
   // Form Labels
   formTitle: _m("Contact Data", "بيانات التواصل"),
   email: _m("Email", "البريد الإلكتروني"),
