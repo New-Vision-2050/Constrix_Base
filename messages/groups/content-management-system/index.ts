@@ -9,6 +9,7 @@ import { ContentManagementSystemMainDataMessages } from "./main-data";
 import { ContentManagementSystemFounderMessages } from "./founder";
 import { ContentManagementSystemServicesMessages } from "./services";
 import { ContentManagementSystemNewsMessages } from "./news";
+import { ContentManagementSystemThemeSettingMessages } from "./theme-setting";
 
 export const contentManagementSystemMessages = new MessagesGroup({
   categories: ContentManagementSystemCategoriesMessages,
@@ -21,4 +22,5 @@ export const contentManagementSystemMessages = new MessagesGroup({
   founder: ContentManagementSystemFounderMessages,
   services: ContentManagementSystemServicesMessages,
   news: ContentManagementSystemNewsMessages,
+  themeSetting: ContentManagementSystemThemeSettingMessages,
 });
