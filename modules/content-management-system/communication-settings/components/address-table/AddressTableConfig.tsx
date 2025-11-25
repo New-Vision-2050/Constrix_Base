@@ -1,10 +1,10 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { CMSAddress } from "../../types/cms-address";
+import { baseURL } from "@/config/axios-config";
 
 export interface AddressRow extends CMSAddress { }
 
@@ -23,8 +23,13 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
         url: `${baseURL}/website-addresses`,
         columns: [
             {
-                key: "address",
+                key: "title",
                 label: t("address") || "Address",
+                sortable: true
+            },
+            {
+                key: "city.name",
+                label: t("city") || "City",
                 sortable: true
             },
             {
@@ -48,7 +53,7 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
         executionConfig: {
             canDelete: can(PERMISSIONS.CMS.communicationSettings.addresses.delete),
         },
-        deleteUrl: `${baseURL}/website-addresses`,
+        deleteUrl: "website-addresses",
         searchParamName: "search",
     };
 };
