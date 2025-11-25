@@ -3,6 +3,13 @@ import { MessagesGroup, _m } from "@/messages";
 export const ContentManagementSystemCommunicationSettingsMessages = new MessagesGroup({
   title: _m("Communication Settings", "اعدادات الاتصال"),
 
+  // Tabs Translations
+  tabs: new MessagesGroup({
+    contactData: _m("Contact Data", "بيانات التواصل"),
+    addresses: _m("Addresses", "العناوين"),
+    socialLinks: _m("Social Links", "الروابط الاجتماعية"),
+  }),
+
   // Address Table Translations
   table: new MessagesGroup({
     title: _m("Addresses", "العناوين"),
