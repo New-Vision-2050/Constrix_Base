@@ -1,9 +1,28 @@
-export default function ClientProfilePage() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
-      <h1 className="text-2xl font-bold mb-4">Client Profile</h1>
-      <p className="text-muted-foreground">Please select a client to view their profile.</p>
-    </div>
-  );
+import { baseURL } from "@/config/axios-config";
+import { ClientProfileData } from "./[id]/types";
+import { baseApi } from "@/config/axios/instances/base";
+import { notFound } from "next/navigation";
+import ClientProfileModule from "@/modules/client-profile";
+
+export default async function ClientProfilePage() {
+  // fetch me data
+  const meData = await fetchMeData();
+
+  if (!meData) {
+    return notFound();
+  }
+
+  return <ClientProfileModule profileData={meData} />
 }
 
+
+
+async function fetchMeData(): Promise<ClientProfileData | null> {
+  try {
+    const response = await baseApi.get(`${baseURL}/users/me`);
+    return response.data.payload;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
+  }
+}
