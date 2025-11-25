@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import { toast } from "sonner";
-import { CommunicationSettingsAddressesApi } from "@/services/api/communication-settings/addresses";
+import { CommunicationSettingsAddressesApi } from "@/services/api/company-dashboard/communication-settings/addresses";
 import { createAddressSchema, AddressFormValues, DEFAULT_ADDRESS_DATA } from "../../schema/address.schema";
 import AddressMapComponent from "./AddressMapComponent";
 

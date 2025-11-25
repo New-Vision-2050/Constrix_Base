@@ -10,11 +10,12 @@ import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import { Loader2 } from "lucide-react";
 import PhoneField from "@/modules/form-builder/components/fields/PhoneField";
+import { toast } from "sonner";
+import { CommunicationWebsiteContactInfoApi } from "@/services/api/company-dashboard/communication-settings";
 import { createContactDataSchema, DEFAULT_CONTACT_DATA, ContactDataFormValues } from "../schema/contact-data.schema";
 
 /**
  * ContactDataForm - Email and phone contact form with validation
- * @param onSubmit - Async callback for form submission
  * @param initialValues - Optional initial form values
  */
 interface ContactDataFormProps {
@@ -31,11 +32,19 @@ export default function ContactDataForm({ initialValues }: ContactDataFormProps)
   const { control, handleSubmit, formState: { isSubmitting } } = form;
 
   const onSubmit = async (data: ContactDataFormValues) => {
-    console.log(data);
+    try {
+      await CommunicationWebsiteContactInfoApi.update({
+        email: data.email,
+        phone: data.phone,
+      });
+      toast.success(t("updateSuccess") || "Contact info updated successfully");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || t("updateFailed") || "Failed to update contact info");
+    }
   };
 
   return (
-    <div className="px-6 py-4">
+    <div>
       <Form {...form}>
         <form onSubmit={handleSubmit(async (data) => await onSubmit?.(data))} className="space-y-6">
           <div className="space-y-6 bg-sidebar rounded-lg p-6 border border-border">

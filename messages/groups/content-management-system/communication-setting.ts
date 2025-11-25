@@ -72,4 +72,8 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
 
   // Actions
   saveButton: _m("Save Changes", "حفظ التعديل"),
+
+  // Success/Error Messages
+  updateSuccess: _m("Contact information updated successfully", "تم تحديث معلومات الاتصال بنجاح"),
+  updateFailed: _m("Failed to update contact information", "فشل تحديث معلومات الاتصال"),
 });

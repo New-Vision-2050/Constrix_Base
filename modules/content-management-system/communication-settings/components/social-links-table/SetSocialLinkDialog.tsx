@@ -15,7 +15,7 @@ import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import ImageUpload from "@/components/shared/ImageUpload";
 import { toast } from "sonner";
-import { CommunicationSettingsSocialLinksApi } from "@/services/api/communication-settings/social-links";
+import { CommunicationSettingsSocialLinksApi } from "@/services/api/company-dashboard/communication-settings";
 import {
     socialLinkSchema,
     SocialLinkFormData,

@@ -64,3 +64,12 @@ export const DEFAULT_CONTACT_DATA: ContactDataFormValues = {
   phone: "",
 };
 
+/**
+ * Contact Info Type
+ * Represents contact information from API
+ */
+export interface ContactInfo {
+  email: string;
+  phone: string;
+}
+
