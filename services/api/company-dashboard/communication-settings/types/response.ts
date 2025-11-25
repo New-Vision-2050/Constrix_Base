@@ -39,14 +39,23 @@ export type GetAllAddressesResponse = ApiBaseResponse<Address[]>;
 /**
  * Social Link Response Types
  */
+export interface SocialLinkType {
+  id: string;
+  name: string;
+}
+
 export interface SocialLink {
   id: string;
-  type: string;
-  url: string;
-  social_icon: string;
+  type: SocialLinkType;
+  link: string;
+  status: number;
+  icon_url: string;
+  icon_name: string;
+  company_id: string;
   created_at: string;
   updated_at: string;
 }
 
 export type ShowSocialLinkResponse = ApiBaseResponse<SocialLink>;
+export type ListSocialLinksResponse = ApiBaseResponse<SocialLink[]>;
 
