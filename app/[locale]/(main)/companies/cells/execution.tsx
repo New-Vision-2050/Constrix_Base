@@ -232,7 +232,11 @@ const Execution = ({
       {/* Edit Form */}
       {formConfig && actionState.edit && actionState.edit.config && (
         <SheetFormBuilder
-          recordId={row.id}
+          recordId={
+            formConfig.editIdField
+              ? (row[formConfig.editIdField] as string | number)
+              : row.id
+          }
           onSuccess={() => {
             reloadTable();
           }}

@@ -279,6 +279,7 @@ export interface FormConfig {
   editApiHeaders?: Record<string, string>; // Custom headers for the edit API request
   editDataPath?: string; // Path to the data in the API response (e.g., 'data' or 'data.user')
   editDataTransformer?: (data: any) => Record<string, any>; // Function to transform API response data
+  editIdField?: string; // Name of the field to use as ID for fetching edit data (default: 'id')
   // Laravel validation response support
   laravelValidation?: {
     enabled: boolean;

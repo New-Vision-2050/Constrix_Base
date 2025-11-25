@@ -50,6 +50,7 @@ import { socialMediaMessages } from "./groups/social-media";
 import { requestsMessages } from "./groups/requests";
 import { paymentMethodsMessages } from "./groups/payment-methods";
 import { contentManagementSystemMessages } from "./groups/content-management-system";
+import { editSubEntityMessages } from "./groups/edit-sub-entity";
 import { wysiwygMessages } from "./groups/wysiwyg";
 
 // Main messages structure combining all groups
@@ -69,6 +70,7 @@ export const messagesStructure = new MessagesGroup({
   Companies: companiesMessages,
   Sidebar: sidebarMessages,
   "docs-library": docsLibraryMessages,
+  EditSubEntityMessages: editSubEntityMessages,
   UserSettingDialog: userSettingDialogMessages,
   Header: headerMessages,
   attendanceDeparture: attendanceDepartureMessages,

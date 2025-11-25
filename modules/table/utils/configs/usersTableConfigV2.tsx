@@ -4,7 +4,7 @@ import { baseURL } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useMemo } from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
@@ -12,6 +12,12 @@ import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
 import { Trash2 } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
 import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
+import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
+import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
+import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/editIndividualBrokerFormConfig";
+import { editIndividualEmployeeFormConfig } from "@/modules/form-builder/configs/editIndividualEmployeeFormConfig";
+import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
+import useUserData from "@/hooks/use-user-data";
 
 // Define types for the company data
 interface CompanyData {
@@ -47,8 +53,32 @@ export const UsersConfigV2 = (options?: {
   canDelete: boolean;
   canView: boolean;
   registrationFormSlug?: string;
+  isShareClient?: boolean;
+  isShareBroker?: boolean;
+  currentUserId?: string;
 }) => {
   const t = useTranslations("Companies");
+  const tEditSubEntity = useTranslations("EditSubEntityMessages");
+  // define final form config for EDIT mode
+  // Note: This config is used when clicking "Edit" button in the table
+  const finalFormConfig = useMemo(() => {
+    const { isShareClient, isShareBroker, currentUserId } = options || {};
+    const registrationFromConfig = options?.registrationFormSlug;
+    // client model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.CLIENT) {
+      return editIndividualClientFormConfig(tEditSubEntity, undefined, isShareClient, currentUserId)
+    }
+    // broker model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.BROKER) {
+      return editIndividualBrokerFormConfig(tEditSubEntity, undefined, isShareBroker, currentUserId);
+    }
+    // employee model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
+      return editIndividualEmployeeFormConfig(tEditSubEntity);
+    }
+    // default fallback (company user form)
+    return GetCompanyUserFormConfig(t);
+  }, [options?.registrationFormSlug, t, options?.isShareClient, options?.isShareBroker, options?.currentUserId]);
 
   return {
     url: `${baseURL}/company-users`,
@@ -250,7 +280,7 @@ export const UsersConfigV2 = (options?: {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: GetCompanyUserFormConfig(t),
+    formConfig: finalFormConfig,
     executions: [
       ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE ?
         [{
