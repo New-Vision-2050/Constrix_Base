@@ -1,5 +1,5 @@
 import { baseApi } from "@/config/axios/instances/base";
-import { ShowAddressResponse } from "./types/response";
+import { ShowAddressResponse, GetAllAddressesResponse } from "./types/response";
 import { CreateAddressParams, UpdateAddressParams } from "./types/params";
 
 /**
@@ -7,6 +7,11 @@ import { CreateAddressParams, UpdateAddressParams } from "./types/params";
  * Handles CRUD operations for address management
  */
 export const CommunicationSettingsAddressesApi = {
+  /**
+   * Get all addresses
+   */
+  getAll: () =>
+    baseApi.get<GetAllAddressesResponse>("website-addresses"),
   /**
    * Fetch single address by ID
    */

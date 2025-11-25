@@ -20,7 +20,7 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
 
     return {
         tableId: "communication-settings-address-list-table",
-        url: `${baseURL}/communication-settings/addresses`,
+        url: `${baseURL}/website-addresses`,
         columns: [
             {
                 key: "address",
@@ -48,7 +48,7 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
         executionConfig: {
             canDelete: can(PERMISSIONS.CMS.communicationSettings.addresses.delete),
         },
-        deleteUrl: `${baseURL}/categories-website`,
+        deleteUrl: `${baseURL}/website-addresses`,
         searchParamName: "search",
     };
 };
