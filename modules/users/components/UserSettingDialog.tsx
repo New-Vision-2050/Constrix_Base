@@ -34,7 +34,7 @@ const UserSettingDialog: React.FC<PropsT> = ({
   const [loading, setLoading] = useState(false);
 
   // declare and define functions
-  const handleSendLink = async () => {
+  const handleSendLink = async (type: "mail" | "sms") => {
     try {
       setLoading(true);
       let _user_id = user.user_id;
@@ -51,6 +51,7 @@ const UserSettingDialog: React.FC<PropsT> = ({
       // send link to user
       await apiClient.post(`${baseURL}/users/send-email-company-link`, {
         user_id: _user_id ?? "user_id undefined",
+        type: type,
       });
       //  show toast
       toast.success(t("sendLinkSuccess"));
@@ -80,9 +81,13 @@ const UserSettingDialog: React.FC<PropsT> = ({
           </DialogTitle>
         </DialogHeader>
         <DialogDescription asChild>
-          <div className="flex gap-6 items-center justify-center flex-wrap">
-            <Button disabled={loading} onClick={handleSendLink}>
+          <div className="flex flex-col gap-6 items-center justify-center flex-wrap">
+            <Button disabled={loading} onClick={() => handleSendLink("mail")}>
               {t("sendLink")}
+            </Button>
+
+            <Button disabled={loading} onClick={() => handleSendLink("sms")}>
+              {t("sendSMS")}
             </Button>
           </div>
         </DialogDescription>

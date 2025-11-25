@@ -296,19 +296,6 @@ export const UsersConfigV2 = (options?: {
               user: row
             };
           },
-        },
-        {
-          id: "user-settings",
-          label: "اعدادات الموظف",
-          icon: <GearIcon className="w-4 h-4" />,
-          action: "user-settings",
-          dialogComponent: UserSettingDialog,
-          disabled: options?.canView,
-          dialogProps: (row: UserTableRow) => {
-            return {
-              user: row,
-            };
-          },
         }]
         : [
           {
@@ -321,6 +308,20 @@ export const UsersConfigV2 = (options?: {
             disabled: true
           }
         ]),
+      {
+        id: "user-settings",
+        label: `اعدادات ${options?.registrationFormSlug === ModelsTypes.CLIENT ? "العميل" : options?.registrationFormSlug === ModelsTypes.BROKER ? "الوسيط" : "الموظف"}`,
+        icon: <GearIcon className="w-4 h-4" />,
+        action: "user-settings",
+        dialogComponent: UserSettingDialog,
+        disabled: options?.canView,
+        dialogProps: (row: UserTableRow) => {
+          return {
+            user: row,
+            title: `اعدادات ${options?.registrationFormSlug === ModelsTypes.CLIENT ? "العميل" : options?.registrationFormSlug === ModelsTypes.BROKER ? "الوسيط" : "الموظف"}`
+          };
+        },
+      },
       {
         id: "delete-user",
         label: "حذف",
