@@ -28,7 +28,7 @@ const TheStatus = ({
   const handleConfirm = async () => {
     try {
       const response = await apiClient.patch(
-        `${baseURL}/company-dashboard/founders/${id}/toggle-active`
+        `${baseURL}/founders/${id}/toggle-active`
       );
 
       if (response.status === 200) {
@@ -83,9 +83,7 @@ const TheStatus = ({
           onClose={handleCancel}
           onConfirm={handleConfirm}
           description={
-            !isActive
-              ? t("areYouSureReactivate")
-              : t("areYouSureDeactivate")
+            !isActive ? t("areYouSureReactivate") : t("areYouSureDeactivate")
           }
         />
       </Dialog>
@@ -94,4 +92,3 @@ const TheStatus = ({
 };
 
 export default TheStatus;
-

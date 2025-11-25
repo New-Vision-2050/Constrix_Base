@@ -81,26 +81,20 @@ export const createNewsFormSchema = (
       }),
 
     thumbnail_image: isEditMode
-      ? z.union([z.instanceof(File), z.null()]).optional()
+      ? z.union([z.instanceof(File), z.string(), z.null()]).optional()
       : z
           .union([z.instanceof(File), z.null()])
-          .refine(
-            (file) => file !== null && file !== undefined,
-            {
-              message: t("form.thumbnailImageRequired"),
-            }
-          ),
+          .refine((file) => file !== null && file !== undefined, {
+            message: t("form.thumbnailImageRequired"),
+          }),
 
     main_image: isEditMode
-      ? z.union([z.instanceof(File), z.null()]).optional()
+      ? z.union([z.instanceof(File), z.string(), z.null()]).optional()
       : z
           .union([z.instanceof(File), z.null()])
-          .refine(
-            (file) => file !== null && file !== undefined,
-            {
-              message: t("form.mainImageRequired"),
-            }
-          ),
+          .refine((file) => file !== null && file !== undefined, {
+            message: t("form.mainImageRequired"),
+          }),
   });
 
 /**
@@ -125,4 +119,3 @@ export const getDefaultNewsFormValues = (): NewsFormData => ({
   thumbnail_image: null,
   main_image: null,
 });
-

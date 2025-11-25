@@ -5,6 +5,10 @@ import { ContentManagementSystemIconsMessages } from "./icons";
 import { ContentManagementSystemMainSettingsMessages } from "./main-settings";
 import { ContentManagementSystemContactSettingMessages } from "./contact-setting";
 import { ContentManagementSystemTermsConditionsMessages } from "./terms-conditions";
+import { ContentManagementSystemMainDataMessages } from "./main-data";
+import { ContentManagementSystemFounderMessages } from "./founder";
+import { ContentManagementSystemServicesMessages } from "./services";
+import { ContentManagementSystemNewsMessages } from "./news";
 import { ContentManagementSystemThemeSettingMessages } from "./theme-setting";
 
 export const contentManagementSystemMessages = new MessagesGroup({
@@ -14,5 +18,9 @@ export const contentManagementSystemMessages = new MessagesGroup({
   mainSettings: ContentManagementSystemMainSettingsMessages,
   contactSetting: ContentManagementSystemContactSettingMessages,
   termsConditions: ContentManagementSystemTermsConditionsMessages,
+  mainData: ContentManagementSystemMainDataMessages,
+  founder: ContentManagementSystemFounderMessages,
+  services: ContentManagementSystemServicesMessages,
+  news: ContentManagementSystemNewsMessages,
   themeSetting: ContentManagementSystemThemeSettingMessages,
 });

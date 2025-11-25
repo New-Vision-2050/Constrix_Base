@@ -32,13 +32,7 @@ export const createServiceFormSchema = (
       })
       .trim(),
 
-    request_id: z
-      .string({
-        required_error: t("requestIdRequired"),
-      })
-      .min(1, {
-        message: t("requestIdRequired"),
-      }),
+    request_id: z.string().optional(),
 
     category_id: z
       .string({
@@ -48,21 +42,9 @@ export const createServiceFormSchema = (
         message: t("categoryRequired"),
       }),
 
-    description_ar: z
-      .string({
-        required_error: t("descriptionArRequired"),
-      })
-      .min(1, {
-        message: t("descriptionArRequired"),
-      }),
+    description_ar: z.string().optional(),
 
-    description_en: z
-      .string({
-        required_error: t("descriptionEnRequired"),
-      })
-      .min(1, {
-        message: t("descriptionEnRequired"),
-      }),
+    description_en: z.string().optional(),
 
     is_featured: z.boolean().default(false),
 
@@ -93,16 +75,20 @@ export const createServiceFormSchema = (
             .min(1, {
               message: t("previousWorkDescriptionRequired"),
             }),
-          image: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
+          image: z
+            .union([z.instanceof(File), z.string(), z.null()])
+            .default(null),
         })
       )
-      .optional(),
+      .default([]),
   });
 
 /**
  * Type inference from the service form schema
  */
-export type ServiceFormData = z.infer<ReturnType<typeof createServiceFormSchema>>;
+export type ServiceFormData = z.infer<
+  ReturnType<typeof createServiceFormSchema>
+>;
 
 /**
  * Default form values for service form
@@ -119,4 +105,3 @@ export const getDefaultServiceFormValues = (): ServiceFormData => ({
   main_image: null,
   previous_works: [],
 });
-
