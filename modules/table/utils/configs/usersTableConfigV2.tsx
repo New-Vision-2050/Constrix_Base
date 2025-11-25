@@ -9,7 +9,7 @@ import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, UserIcon } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
 import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
 import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
@@ -18,7 +18,7 @@ import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/e
 import { editIndividualEmployeeFormConfig } from "@/modules/form-builder/configs/editIndividualEmployeeFormConfig";
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import useUserData from "@/hooks/use-user-data";
-
+import { useRouter } from "next/navigation";
 // Define types for the company data
 interface CompanyData {
   id: string;
@@ -57,6 +57,7 @@ export const UsersConfigV2 = (options?: {
   isShareBroker?: boolean;
   currentUserId?: string;
 }) => {
+  const router = useRouter();
   const t = useTranslations("Companies");
   const tEditSubEntity = useTranslations("EditSubEntityMessages");
   // define final form config for EDIT mode
@@ -309,7 +310,17 @@ export const UsersConfigV2 = (options?: {
             };
           },
         }]
-        : []),
+        : [
+          {
+            id: "complate-client-profile",
+            label: `أكمال ملف ${options?.registrationFormSlug === ModelsTypes.CLIENT ? "العميل" : "الوسيط"}`,
+            action: (row: UserTableRow) => {
+              router.push(`/client-profile/${row.user_id}`);
+            },
+            icon: <UserIcon className="w-4 h-4" />,
+            disabled: true
+          }
+        ]),
       {
         id: "delete-user",
         label: "حذف",
