@@ -10,15 +10,21 @@ export interface UpdateContactInfoParams {
  * Address Parameters
  */
 export interface CreateAddressParams {
+  title_ar: string;
+  title_en: string;
   address: string;
   latitude: number;
   longitude: number;
+  status?: number;
 }
 
 export interface UpdateAddressParams {
+  title_ar: string;
+  title_en: string;
   address: string;
   latitude: number;
   longitude: number;
+  status?: number;
 }
 
 /**

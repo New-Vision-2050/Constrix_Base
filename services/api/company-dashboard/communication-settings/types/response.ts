@@ -25,6 +25,7 @@ export interface Address {
   title: string;
   title_ar: string;
   title_en: string;
+  address: string;
   latitude: string;
   longitude: string;
   status: number;

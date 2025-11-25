@@ -16,6 +16,8 @@ const LONGITUDE_PATTERN = /^-?((1[0-7][0-9]|[1-9]?[0-9])(\.\d+)?|180(\.0+)?)$/;
  * Validation constraints for address fields
  */
 const CONSTRAINTS = {
+  TITLE_MAX_LENGTH: 200,
+  TITLE_MIN_LENGTH: 2,
   ADDRESS_MAX_LENGTH: 500,
   ADDRESS_MIN_LENGTH: 3,
 } as const;
@@ -32,6 +34,20 @@ const CONSTRAINTS = {
  */
 export const createAddressSchema = (t: (key: string) => string) =>
   z.object({
+    // Title in Arabic
+    title_ar: z
+      .string()
+      .min(1, t("titleArRequired") || "Title in Arabic is required")
+      .min(CONSTRAINTS.TITLE_MIN_LENGTH, `Minimum ${CONSTRAINTS.TITLE_MIN_LENGTH} characters`)
+      .max(CONSTRAINTS.TITLE_MAX_LENGTH, `Maximum ${CONSTRAINTS.TITLE_MAX_LENGTH} characters`),
+
+    // Title in English
+    title_en: z
+      .string()
+      .min(1, t("titleEnRequired") || "Title in English is required")
+      .min(CONSTRAINTS.TITLE_MIN_LENGTH, `Minimum ${CONSTRAINTS.TITLE_MIN_LENGTH} characters`)
+      .max(CONSTRAINTS.TITLE_MAX_LENGTH, `Maximum ${CONSTRAINTS.TITLE_MAX_LENGTH} characters`),
+
     // Address text field with length validation
     address: z
       .string()
@@ -50,6 +66,9 @@ export const createAddressSchema = (t: (key: string) => string) =>
       .string()
       .min(1, t("longitudeRequired") || "Longitude is required")
       .regex(LONGITUDE_PATTERN, t("longitudeInvalid") || "Longitude must be between -180 and 180"),
+
+    // Status field (optional)
+    status: z.number().optional(),
   });
 
 /**
@@ -62,8 +81,11 @@ export type AddressFormValues = z.infer<ReturnType<typeof createAddressSchema>>;
  * Default values for address form initialization
  */
 export const DEFAULT_ADDRESS_DATA: AddressFormValues = {
+  title_ar: "",
+  title_en: "",
   address: "",
   latitude: "",
   longitude: "",
+  status: 1,
 };
 

@@ -38,32 +38,63 @@ export default function SetAddressDialog({ open, onClose, onSuccess, addressId }
 
     useEffect(() => {
         if (isEditMode && addressData?.data?.payload) {
-            const { address, latitude: lat, longitude: lng } = addressData.data.payload;
+            const { title_ar, title_en, address, latitude: lat, longitude: lng, status } = addressData.data.payload;
+            setValue("title_ar", title_ar || "");
+            setValue("title_en", title_en || "");
             setValue("address", address || "");
             setValue("latitude", lat?.toString() || "");
             setValue("longitude", lng?.toString() || "");
+            setValue("status", status || 1);
         }
     }, [isEditMode, addressData, setValue]);
 
     const onSubmit = async (data: AddressFormValues) => {
         try {
-            isEditMode ? await CommunicationSettingsAddressesApi.update(addressId!, data)
-                : await CommunicationSettingsAddressesApi.create(data);
-            toast.success(isEditMode ? "Address updated" : "Address created");
-            onSuccess?.(); reset(); onClose();
+            const payload = {
+                title_ar: data.title_ar,
+                title_en: data.title_en,
+                address: data.address,
+                latitude: parseFloat(data.latitude),
+                longitude: parseFloat(data.longitude),
+                status: data.status || 1,
+                city_id: 1,
+            };
+            
+            isEditMode 
+                ? await CommunicationSettingsAddressesApi.update(addressId!, payload)
+                : await CommunicationSettingsAddressesApi.create(payload);
+            
+            toast.success(isEditMode ? t("updateSuccess") : t("createSuccess"));
+            onSuccess?.(); 
+            reset(); 
+            onClose();
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Operation failed");
+            toast.error(error?.response?.data?.message || t("operationFailed"));
         }
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="max-w-2xl bg-sidebar border-gray-700">
-                <DialogHeader><DialogTitle className="text-center">{t("addressDialogTitle")}</DialogTitle></DialogHeader>
+                <DialogHeader>
+                    <DialogTitle className="text-center">
+                        {isEditMode ? t("table.editAddressTitle") : t("table.addAddressTitle")}
+                    </DialogTitle>
+                </DialogHeader>
                 <Form {...form}><form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField control={control} name="title_ar" render={({ field }) => (
+                            <FormItem><FormLabel required>{t("titleArLabel")}</FormLabel>
+                                <FormControl><Input variant="secondary" disabled={isSubmitting || isLoading} placeholder={t("titleArPlaceholder")} {...field} /></FormControl>
+                                <FormErrorMessage /></FormItem>)} />
+                        <FormField control={control} name="title_en" render={({ field }) => (
+                            <FormItem><FormLabel required>{t("titleEnLabel")}</FormLabel>
+                                <FormControl><Input variant="secondary" disabled={isSubmitting || isLoading} placeholder={t("titleEnPlaceholder")} {...field} /></FormControl>
+                                <FormErrorMessage /></FormItem>)} />
+                    </div>
                     <FormField control={control} name="address" render={({ field }) => (
                         <FormItem><FormLabel required>{t("addressLabel")}</FormLabel>
-                            <FormControl><Input variant="secondary" disabled={isSubmitting || isLoading} {...field} /></FormControl>
+                            <FormControl><Input variant="secondary" disabled={isSubmitting || isLoading} placeholder={t("addressPlaceholder")} {...field} /></FormControl>
                             <FormErrorMessage /></FormItem>)} />
                     <div className="grid grid-cols-2 gap-4">
                         <FormField control={control} name="latitude" render={({ field }) => (

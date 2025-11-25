@@ -12,6 +12,8 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
     longitude: _m("Longitude", "خط الطول"),
     edit: _m("Edit", "تعديل"),
     addAddress: _m("Add Address", "إضافة عنوان"),
+    addAddressTitle: _m("Add New Address", "إضافة عنوان جديد"),
+    editAddressTitle: _m("Edit Address", "تعديل العنوان"),
   }),
 
   // Social Links Table Translations
@@ -43,16 +45,28 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
 
   // Address Dialog Translations
   addressDialogTitle: _m("Add New Address", "إضافة عنوان جديد"),
-  addressLabel: _m("Address", "العنوان"),
+  titleArLabel: _m("Title in Arabic", "العنوان بالعربية"),
+  titleEnLabel: _m("Title in English", "العنوان بالإنجليزية"),
+  titleArPlaceholder: _m("e.g. Main Office", "مثال: المكتب الرئيسي"),
+  titleEnPlaceholder: _m("e.g. Main Office", "مثال: Main Office"),
+  addressLabel: _m("Full Address", "العنوان الكامل"),
+  addressPlaceholder: _m("e.g. Egypt, Sohag, Tahta", "مثال: مصر، سوهاج، طهطا"),
   latitudeLabel: _m("Latitude", "خط العرض"),
   longitudeLabel: _m("Longitude", "خط الطول"),
 
   // Address Validation Messages
+  titleArRequired: _m("Title in Arabic is required", "العنوان بالعربية مطلوب"),
+  titleEnRequired: _m("Title in English is required", "العنوان بالإنجليزية مطلوب"),
   addressRequired: _m("Address is required", "العنوان مطلوب"),
   latitudeRequired: _m("Latitude is required", "خط العرض مطلوب"),
   longitudeRequired: _m("Longitude is required", "خط الطول مطلوب"),
   latitudeInvalid: _m("Please enter a valid latitude", "يرجى إدخال خط عرض صحيح"),
   longitudeInvalid: _m("Please enter a valid longitude", "يرجى إدخال خط طول صحيح"),
+  
+  // Address Success Messages
+  createSuccess: _m("Address created successfully", "تم إنشاء العنوان بنجاح"),
+  updateSuccess: _m("Address updated successfully", "تم تحديث العنوان بنجاح"),
+  operationFailed: _m("Operation failed", "فشلت العملية"),
 
   // Form Labels
   formTitle: _m("Contact Data", "بيانات التواصل"),
