@@ -4,33 +4,21 @@ import { CreateCategoryParams, UpdateCategoryParams } from "./types/params";
 
 export const CompanyDashboardCategoriesApi = {
   list: (params?: { search?: string }) =>
-    baseApi.get<ListCategoriesResponse>("company-dashboard/categories/list", {
+    baseApi.get<ListCategoriesResponse>("categories-website", {
       params,
     }),
   show: (id: string) =>
     baseApi.get<ShowCategoryResponse>(
-      `company-dashboard/categories/${id}`
+      `categories-website/${id}`
     ),
-  create: (params: CreateCategoryParams) => {
-    const formData = new FormData();
-    formData.append("name[ar]", params["name[ar]"]);
-    formData.append("name[en]", params["name[en]"]);
-    formData.append("type", params.type);
-
-    return baseApi.post("company-dashboard/categories", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+  create: (body: CreateCategoryParams) => {
+    return baseApi.post("categories-website", body);
   },
-  update: (id: string, params: UpdateCategoryParams) => {
-    const formData = new FormData();
-    if (params["name[ar]"]) formData.append("name[ar]", params["name[ar]"]);
-    if (params["name[en]"]) formData.append("name[en]", params["name[en]"]);
-    if (params.type) formData.append("type", params.type);
-
-    return baseApi.post(`company-dashboard/categories/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+  update: (id: string, body: UpdateCategoryParams) => {
+    return baseApi.put(`categories-website/${id}`, body);
   },
   delete: (id: string) =>
-    baseApi.delete(`company-dashboard/categories/${id}`),
+    baseApi.delete(`categories-website/${id}`),
+  categoriesTypes: () =>
+    baseApi.get(`categories-website/categeory-types`),
 };

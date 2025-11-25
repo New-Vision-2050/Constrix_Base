@@ -5,11 +5,10 @@ import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Dialog } from "@/components/ui/dialog";
 import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
-import { apiClient } from "@/config/axios-config";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { baseURL } from "@/config/axios-config";
+import { CompanyDashboardNewsApi } from "@/services/api/company-dashboard/news";
 
 const TheStatus = ({
   theStatus,
@@ -27,25 +26,15 @@ const TheStatus = ({
 
   const handleConfirm = async () => {
     try {
-      const response = await apiClient.patch(
-        `${baseURL}/company-dashboard/news/${id}/toggle-active`
-      );
-
-      if (response.status === 200) {
-        setIsActive(tempIsActive);
-        setShowDialog(false);
-        toast({
-          title: t("success") || "Success",
-          description: tempIsActive
-            ? t("activatedSuccessfully")
-            : t("deactivatedSuccessfully"),
-        });
-      } else {
-        toast({
-          title: t("error") || "Error",
-          description: t("failedToUpdateStatus"),
-        });
-      }
+      await CompanyDashboardNewsApi.toggleActive(id);
+      setIsActive(tempIsActive);
+      setShowDialog(false);
+      toast({
+        title: t("success") || "Success",
+        description: tempIsActive
+          ? t("activatedSuccessfully")
+          : t("deactivatedSuccessfully"),
+      });
     } catch {
       toast({
         title: t("error") || "Error",

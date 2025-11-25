@@ -29,7 +29,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   dependencies,
   placeholder = "Select option",
   isMulti = false,
-  isDisabled=undefined
+  isDisabled = undefined,
 }) => {
   const { toast } = useToast();
 
@@ -76,7 +76,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     // Function to check if a dependency has changed
     const hasDependencyChanged = () => {
       // Case 1: String format (backward compatibility)
-      if (typeof dynamicConfig.dependsOn === 'string') {
+      if (typeof dynamicConfig.dependsOn === "string") {
         const dependencyKey = dynamicConfig.dependsOn;
         const currentValue = dependencies[dependencyKey] || "";
         const previousValue = previousDependencyValues[dependencyKey] || "";
@@ -108,7 +108,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
         }
       }
       // Case 3: Object with field names as keys
-      else if (typeof dynamicConfig.dependsOn === 'object') {
+      else if (typeof dynamicConfig.dependsOn === "object") {
         for (const field of Object.keys(dynamicConfig.dependsOn)) {
           const currentValue = dependencies[field] || "";
           const previousValue = previousDependencyValues[field] || "";
@@ -154,12 +154,12 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   // Handle API errors
   useEffect(() => {
     // Don't show toast for canceled requests
-    const isCanceledError = error && (
-      error.includes("canceled") || 
-      error.includes("aborted") ||
-      error.includes("abort")
-    );
-    
+    const isCanceledError =
+      error &&
+      (error.includes("canceled") ||
+        error.includes("aborted") ||
+        error.includes("abort"));
+
     if (error && !isCanceledError) {
       toast({
         title: "Error loading options",
@@ -173,7 +173,8 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   const handleChange = useCallback(
     (newValue: string | string[]) => {
       const isEqual = isMulti
-        ? Array.isArray(value) && Array.isArray(newValue) &&
+        ? Array.isArray(value) &&
+          Array.isArray(newValue) &&
           JSON.stringify(value) === JSON.stringify(newValue)
         : newValue === value;
 
@@ -185,38 +186,44 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     [onChange, columnKey, value, isMulti]
   );
 
-if(isDisabled === undefined) {
+  if (isDisabled === undefined) {
     // Determine if the dropdown should be disabled
     isDisabled = (() => {
-        if (!dynamicConfig?.dependsOn || !dependencies) return false;
+      if (!dynamicConfig?.dependsOn || !dependencies) return false;
 
-        // Case 1: String format (backward compatibility)
-        if (typeof dynamicConfig.dependsOn === 'string') {
-            return !dependencies[dynamicConfig.dependsOn];
-        }
+      // Case 1: String format (backward compatibility)
+      if (typeof dynamicConfig.dependsOn === "string") {
+        return !dependencies[dynamicConfig.dependsOn];
+      }
 
-        // Case 2: Array of dependency configs
-        if (Array.isArray(dynamicConfig.dependsOn)) {
-            return dynamicConfig.dependsOn.some(
-                depConfig => !dependencies[depConfig.field]
-            );
-        }
+      // Case 2: Array of dependency configs
+      if (Array.isArray(dynamicConfig.dependsOn)) {
+        return dynamicConfig.dependsOn.some(
+          (depConfig) => !dependencies[depConfig.field]
+        );
+      }
 
-        // Case 3: Object with field names as keys
-        if (typeof dynamicConfig.dependsOn === 'object') {
-            return Object.keys(dynamicConfig.dependsOn).some(
-                field => !dependencies[field]
-            );
-        }
+      // Case 3: Object with field names as keys
+      if (typeof dynamicConfig.dependsOn === "object") {
+        return Object.keys(dynamicConfig.dependsOn).some(
+          (field) => !dependencies[field]
+        );
+      }
 
-        return false;
+      return false;
     })();
-}
+  }
 
   // Convert value to appropriate type based on isMulti
   const processedValue = isMulti
-    ? (Array.isArray(value) ? value : value ? [value] : [])
-    : (Array.isArray(value) && value.length > 0 ? value[0] : value || '');
+    ? Array.isArray(value)
+      ? value
+      : value
+      ? [value]
+      : []
+    : Array.isArray(value) && value.length > 0
+    ? value[0]
+    : value || "";
 
   // If we're using the paginated dropdown with search
   if (dynamicConfig?.paginationEnabled) {

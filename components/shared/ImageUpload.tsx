@@ -37,7 +37,12 @@ export default function ImageUpload({
   const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [initialPreviews, setInitialPreviews] = useState<string[]>([]);
-  const uploadId = `upload-${Math.random().toString(36).substr(2, 9)}`;
+  const [uploadId, setUploadId] = useState<string>("");
+
+  // Initialize uploadId only on client side to avoid hydration mismatch
+  React.useEffect(() => {
+    setUploadId(`upload-${Math.random().toString(36).substr(2, 9)}`);
+  }, []);
 
   // Handle initial value for edit mode
   React.useEffect(() => {
@@ -84,8 +89,10 @@ export default function ImageUpload({
     onChange?.(null);
     onMultipleChange?.([]);
     // Reset the input
-    const input = document.getElementById(uploadId) as HTMLInputElement;
-    if (input) input.value = "";
+    if (uploadId) {
+      const input = document.getElementById(uploadId) as HTMLInputElement;
+      if (input) input.value = "";
+    }
   };
 
   const removeFile = (index: number) => {
@@ -132,7 +139,7 @@ export default function ImageUpload({
                 <X className="w-4 h-4" />
               </button>
             </>
-          ) : (
+          ) : uploadId ? (
             <>
               <Upload className="w-12 h-12 text-gray-400 mb-3" />
               <p className="text-gray-400 text-sm mb-1">{maxSize}</p>
@@ -155,7 +162,7 @@ export default function ImageUpload({
                 className="hidden"
               />
             </>
-          )}
+          ) : null}
         </div>
       )}
 
@@ -248,30 +255,32 @@ export default function ImageUpload({
               ))}
 
               {/* Add more button */}
-              <div
-                className="relative border-2 border-dashed border-[#3c345a] rounded-lg p-4 flex items-center justify-center gap-3 hover:border-primary/50 transition-colors cursor-pointer"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(26, 11, 46, 0.3) 0%, rgba(45, 27, 78, 0.3) 50%, rgba(26, 11, 46, 0.3) 100%)",
-                }}
-                onClick={() => document.getElementById(uploadId)?.click()}
-              >
-                <Upload className="w-5 h-5 text-gray-400" />
-                <p className="text-gray-400 text-sm">إضافة المزيد من الملفات</p>
-                <input
-                  id={uploadId}
-                  type="file"
-                  accept={accept}
-                  multiple={multiple}
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </div>
+              {uploadId && (
+                <div
+                  className="relative border-2 border-dashed border-[#3c345a] rounded-lg p-4 flex items-center justify-center gap-3 hover:border-primary/50 transition-colors cursor-pointer"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(26, 11, 46, 0.3) 0%, rgba(45, 27, 78, 0.3) 50%, rgba(26, 11, 46, 0.3) 100%)",
+                  }}
+                  onClick={() => document.getElementById(uploadId)?.click()}
+                >
+                  <Upload className="w-5 h-5 text-gray-400" />
+                  <p className="text-gray-400 text-sm">إضافة المزيد من الملفات</p>
+                  <input
+                    id={uploadId}
+                    type="file"
+                    accept={accept}
+                    multiple={multiple}
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </div>
+              )}
             </div>
           )}
 
           {/* Initial upload area when no files */}
-          {selectedFiles.length === 0 && (
+          {selectedFiles.length === 0 && uploadId && (
             <div
               className="relative border-2 border-dashed border-[#3c345a] rounded-lg p-8 flex flex-col items-center justify-center bg-[#1a1a2e]/50 hover:border-primary/50 transition-colors cursor-pointer"
               style={{

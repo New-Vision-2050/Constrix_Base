@@ -1,12 +1,12 @@
 export interface CreateCategoryParams {
-  "name[ar]": string;
-  "name[en]": string;
-  type: string;
+  name_ar: string;
+  name_en: string;
+  category_type: string;
 }
 
 export interface UpdateCategoryParams {
-  "name[ar]"?: string;
-  "name[en]"?: string;
-  type?: string;
+  name_ar?: string;
+  name_en?: string;
+  category_type?: string;
 }
 

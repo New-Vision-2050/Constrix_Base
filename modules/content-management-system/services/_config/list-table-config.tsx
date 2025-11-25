@@ -1,9 +1,10 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import TheStatus from "../components/the-status";
 import { ServiceRow, TableConfigParams } from "../types";
+import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
+import { baseURL } from "@/config/axios-config";
 
 export const useServiceListTableConfig: (
   params?: TableConfigParams
@@ -13,7 +14,7 @@ export const useServiceListTableConfig: (
 
   return {
     tableId: "service-list-table",
-    url: `${baseURL}/company-dashboard/services`,
+    url: `${baseURL}/website-services`,
     columns: [
       {
         key: "name",
@@ -28,41 +29,47 @@ export const useServiceListTableConfig: (
         ),
       },
       {
-        key: "category",
+        key: "category_website_cms_id",
         label: t("category"),
         sortable: true,
         render: (_: unknown, row: ServiceRow) => (
-          <span className="text-sm">
-            {row.category_name || row.category || "-"}
-          </span>
-        ),
-      },
-      {
-        key: "is_featured",
-        label: t("type"),
-        render: (value: boolean, row: ServiceRow) => (
-          <TheStatus theStatus={value ? "active" : "inActive"} id={row.id} />
+          <span className="text-sm">{row.category?.name || "-"}</span>
         ),
       },
       {
         key: "is_active",
-        label: t("status"),
+        label: t("visibility"),
         render: (value: "active" | "inActive", row: ServiceRow) => (
-          <TheStatus theStatus={value} id={row.id} />
+          <TheStatus theStatus={value} id={row.id} field="is_active" />
+        ),
+      },
+      {
+        key: "is_featured",
+        label: t("featured"),
+        render: (value: boolean, row: ServiceRow) => (
+          <TheStatus
+            theStatus={value ? "active" : "inActive"}
+            id={row.id}
+            field="is_featured"
+          />
         ),
       },
     ],
     executions: [
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
-          {t("actions")}
+          {t("edit")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
       canDelete: true,
+      onDelete: async (id: string) => {
+        await CompanyDashboardServicesApi.delete(id);
+      },
     },
-    deleteUrl: `${baseURL}/company-dashboard/services`,
     searchParamName: "search",
+    defaultPageSize: 10,
+    pageSizeOptions: [10, 20, 50],
   };
 };
