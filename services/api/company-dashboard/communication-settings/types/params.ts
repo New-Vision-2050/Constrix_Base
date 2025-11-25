@@ -32,13 +32,13 @@ export interface UpdateAddressParams {
  */
 export interface CreateSocialLinkParams {
   type: string;
-  url: string;
-  social_icon: File;
+  link: string;
+  icon?: File;
 }
 
 export interface UpdateSocialLinkParams {
   type: string;
-  url: string;
-  social_icon: File;
+  link: string;
+  icon?: File;
 }
 

@@ -1,6 +1,8 @@
 import { baseApi } from "@/config/axios/instances/base";
 import { ShowSocialLinkResponse, ListSocialLinksResponse } from "./types/response";
 import { CreateSocialLinkParams, UpdateSocialLinkParams } from "./types/params";
+import { serialize } from "object-to-formdata";
+
 
 
 /**
@@ -23,14 +25,18 @@ export const CommunicationSettingsSocialLinksApi = {
    * Create new social link
    */
   create: (body: CreateSocialLinkParams) => {
-    return baseApi.post("social-media-links", body);
+    return baseApi.post("social-media-links",serialize(body));
   },
 
   /**
    * Update existing social link
    */
   update: (id: string, body: UpdateSocialLinkParams) => {
-    return baseApi.put(`social-media-links/${id}`, body);
+    return baseApi.post(`social-media-links/${id}`, serialize(body), {
+      params:{
+        _method: "PUT",
+      }
+    });
   },
 
   /**

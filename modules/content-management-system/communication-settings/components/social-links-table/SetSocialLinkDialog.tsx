@@ -55,10 +55,10 @@ export default function SetSocialLinkDialog({
 
     useEffect(() => {
         if (isEditMode && socialLinkData?.data?.payload) {
-            const { type, url } = socialLinkData.data.payload;
-            setValue("type", type);
-            setValue("url", url);
-            // social_icon is handled by ImageUpload component via initialValue
+            const { type, link } = socialLinkData.data.payload;
+            setValue("type", type.id as any);
+            setValue("link", link);
+            // icon is handled by ImageUpload component via initialValue
         }
     }, [isEditMode, socialLinkData, setValue]);
 
@@ -89,18 +89,18 @@ export default function SetSocialLinkDialog({
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                             {/* 30% width - Social Icon */}
                             <div className="lg:col-span-2">
-                                <FormField control={control} name="social_icon" render={({ field }) => (
+                                <FormField control={control} name="icon" render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
                                             <ImageUpload
                                                 label={t("iconLabel") || "Social Icon"}
                                                 maxSize="5MB - Max size"
                                                 dimensions="512 x 512"
-                                                required={true}
+                                                required={false}
                                                 onChange={(file) => field.onChange(file)}
                                                 initialValue={
-                                                    isEditMode && socialLinkData?.data?.payload?.social_icon
-                                                        ? socialLinkData.data.payload.social_icon
+                                                    isEditMode && socialLinkData?.data?.payload?.icon_url
+                                                        ? socialLinkData.data.payload.icon_url
                                                         : undefined
                                                 }
                                                 minHeight="150px"
@@ -111,7 +111,7 @@ export default function SetSocialLinkDialog({
                                     </FormItem>
                                 )} />
                             </div>
-                            {/* 70% width - Type & URL */}
+                            {/* 70% width - Type & Link */}
                             <div className="lg:col-span-3 space-y-4">
                                 {/* Type */}
                                 <FormField control={control} name="type" render={({ field }) => (
@@ -134,8 +134,8 @@ export default function SetSocialLinkDialog({
                                         <FormErrorMessage />
                                     </FormItem>
                                 )} />
-                                {/* URL */}
-                                <FormField control={control} name="url" render={({ field }) => (
+                                {/* Link */}
+                                <FormField control={control} name="link" render={({ field }) => (
                                     <FormItem>
                                         <FormLabel required>{t("urlLabel")}</FormLabel>
                                         <FormControl>
