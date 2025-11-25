@@ -33,14 +33,14 @@ const urlSchema = z
 
 /**
  * Social Icon Validation Schema
- * Validates icon URL or identifier
+ * Validates icon file upload
  */
 const socialIconSchema = z
-  .string()
-  .min(1, "Social icon is required")
+  .instanceof(File, { message: "Social icon is required" })
+  .refine((file) => file.size <= 5 * 1024 * 1024, "File size must be less than 5MB")
   .refine(
-    (icon) => icon.length <= 500,
-    "Icon identifier must be less than 500 characters"
+    (file) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type),
+    "Only JPEG, PNG, and WebP formats are allowed"
   );
 
 /**
@@ -62,11 +62,12 @@ export type SocialLinkFormData = z.infer<typeof socialLinkSchema>;
 /**
  * Default values for form initialization
  * Provides clean initial state
+ * Note: social_icon must be set to a File object when used
  */
-export const socialLinkDefaultValues: SocialLinkFormData = {
+export const socialLinkDefaultValues: Partial<SocialLinkFormData> = {
   type: "facebook",
   url: "",
-  social_icon: "",
+  // social_icon will be set via ImageUpload component
 };
 
 /**

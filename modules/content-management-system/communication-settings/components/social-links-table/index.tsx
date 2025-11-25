@@ -7,6 +7,7 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useSocialLinksListTableConfig } from "./SocialLinksTableConfig";
+import SetSocialLinkDialog from "./SetSocialLinkDialog";
 
 export default function SocialLinksTable() {
     // Translations
@@ -22,28 +23,27 @@ export default function SocialLinksTable() {
     return <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.view]}>
         <div className="container p-6 bg-sidebar space-y-4">
             <h2 className="text-2xl font-bold">{t("title")}</h2>
-            {/* <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.update]}>
-                <SetAddressDialog
-                    open={Boolean(editingAddressId)}
-                    onClose={() => setEditingAddressId(null)}
-                    addressId={editingAddressId || undefined}
+            <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.update]}>
+                <SetSocialLinkDialog
+                    open={Boolean(editingSocialLinkId)}
+                    onClose={() => setEditingSocialLinkId(null)}
+                    socialLinkId={editingSocialLinkId || undefined}
                     onSuccess={() => reloadTable()}
                 />
-            </Can> */}
+            </Can>
             <TableBuilder
                 config={tableConfig}
                 searchBarActions={
                     <Can check={[PERMISSIONS.CMS.categories.create]}>
-                        {/* <DialogTrigger
-                            component={SetAddressDialog}
+                        <DialogTrigger
+                            component={SetSocialLinkDialog}
                             dialogProps={{ onSuccess: () => reloadTable() }}
                             render={({ onOpen }) => (
                                 <Button onClick={onOpen}>
-                                    {t("addAddress")}
+                                    {t("addSocialLink")}
                                 </Button>
                             )}
-                        /> */}
-                        add social link
+                        />
                     </Can>
                 }
                 tableId={tableConfig.tableId}
