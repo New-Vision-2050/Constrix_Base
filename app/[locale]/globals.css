@@ -162,6 +162,10 @@ main[aria-hidden="true"] .dashboard-sidebar {
   margin-right: 15px;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
