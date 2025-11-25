@@ -21,6 +21,23 @@ export const ContentManagementSystemCommunicationSettingsMessages = new Messages
     url: _m("URL", "الرابط"),
     edit: _m("Edit", "تعديل"),
     addSocialLink: _m("Add Social Link", "إضافة رابط اجتماعي"),
+    
+    // Dialog Translations
+    addTitle: _m("Add New Social Link", "إضافة رابط جديد"),
+    editTitle: _m("Edit Social Link", "تعديل الرابط"),
+    typeLabel: _m("Link Type", "نوع الرابط"),
+    typePlaceholder: _m("Select link type", "اختر نوع الرابط"),
+    urlLabel: _m("URL", "الرابط"),
+    iconLabel: _m("Social Icon", "أيقونة"),
+    iconPlaceholder: _m("Icon URL or identifier", "رابط الأيقونة أو المعرّف"),
+    saveButton: _m("Save", "حفظ"),
+    
+    // Success Messages
+    createSuccess: _m("Social link created successfully", "تم إنشاء الرابط بنجاح"),
+    updateSuccess: _m("Social link updated successfully", "تم تحديث الرابط بنجاح"),
+    
+    // Error Messages
+    operationFailed: _m("Operation failed", "فشلت العملية"),
   }),
 
   // Address Dialog Translations
