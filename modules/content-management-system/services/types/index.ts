@@ -22,7 +22,7 @@ export interface ServiceRow {
   name_ar?: string;
   name_en?: string;
   name?: string;
-  category?: string;
+  category?: Category;
   category_name?: string;
   is_featured?: boolean;
   is_active?: "active" | "inActive";
@@ -84,4 +84,3 @@ export interface Category {
   name_en?: string;
   name?: string;
 }
-

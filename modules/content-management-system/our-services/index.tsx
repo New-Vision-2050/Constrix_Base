@@ -74,7 +74,7 @@ export default function OurServicesModule() {
   };
 
   return (
-    <div className="container p-6">
+    <div className="px-8 space-y-7">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Main Section */}

@@ -17,7 +17,7 @@ export default function ServicesView() {
   const t = useTranslations("content-management-system.services");
 
   return (
-    <>
+    <div className="px-8 space-y-7">
       <AddServiceDialog
         open={Boolean(editingServiceId)}
         onClose={() => setEditingServiceId(null)}
@@ -42,6 +42,6 @@ export default function ServicesView() {
         }
         tableId={tableConfig.tableId}
       />
-    </>
+    </div>
   );
 }

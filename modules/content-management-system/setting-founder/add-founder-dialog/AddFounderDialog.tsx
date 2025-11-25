@@ -24,20 +24,16 @@ import { Loader2 } from "lucide-react";
 import ImageUpload from "@/components/shared/ImageUpload";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import { useIsRtl } from "@/hooks/use-is-rtl";
-import { apiClient, baseURL } from "@/config/axios-config";
 import { toast } from "sonner";
+import { CompanyDashboardFoundersApi } from "@/services/api/company-dashboard/founders";
 import {
   createFounderFormSchema,
   FounderFormData,
   getDefaultFounderFormValues,
 } from "../schemas/founder-form.schema";
-import {
-  AddFounderDialogProps,
-  AxiosError,
-  ApiResponse,
-  FounderData,
-} from "../types";
+import { AddFounderDialogProps, AxiosError } from "../types";
+import { ShowFounderResponse } from "@/services/api/company-dashboard/founders/types/response";
+import { CreateFounderParams } from "@/services/api/company-dashboard/founders/types/params";
 
 export default function AddFounderDialog({
   open,
@@ -45,26 +41,23 @@ export default function AddFounderDialog({
   onSuccess,
   founderId,
 }: AddFounderDialogProps) {
-  const isRtl = useIsRtl();
   const t = useTranslations("content-management-system.founder");
+  const tForm = useTranslations("content-management-system.founder.form");
   const isEditMode = !!founderId;
 
   // Fetch founder data when editing
-  const { data: founderData, isLoading: isFetching } = useQuery<
-    ApiResponse<FounderData>
-  >({
-    queryKey: ["founder", founderId],
-    queryFn: async () => {
-      const response = await apiClient.get(
-        `${baseURL}/company-dashboard/founders/${founderId}`
-      );
-      return response.data;
-    },
-    enabled: isEditMode && open,
-  });
+  const { data: founderData, isLoading: isFetching } =
+    useQuery<ShowFounderResponse>({
+      queryKey: ["founder", founderId],
+      queryFn: async () => {
+        const response = await CompanyDashboardFoundersApi.show(founderId!);
+        return response.data;
+      },
+      enabled: isEditMode && open && !!founderId,
+    });
 
   const form = useForm({
-    resolver: zodResolver(createFounderFormSchema(t, isEditMode)),
+    resolver: zodResolver(createFounderFormSchema(tForm, isEditMode)),
     defaultValues: getDefaultFounderFormValues(),
   });
 
@@ -72,7 +65,6 @@ export default function AddFounderDialog({
     control,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -88,89 +80,47 @@ export default function AddFounderDialog({
 
   // Populate form with founder data when editing
   useEffect(() => {
-    if (isEditMode && founderData?.data?.payload) {
-      const founder = founderData.data.payload;
+    if (isEditMode && founderData?.payload) {
+      const founder = founderData.payload;
 
-      setValue("name_ar", founder.name_ar || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("name_en", founder.name_en || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("job_title_ar", founder.job_title_ar || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("job_title_en", founder.job_title_en || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("description_ar", founder.description_ar || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      });
-      setValue("description_en", founder.description_en || "", {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
+      reset({
+        name_ar: founder.name_ar || "",
+        name_en: founder.name_en || "",
+        job_title_ar: founder.job_title_ar || "",
+        job_title_en: founder.job_title_en || "",
+        description_ar: founder.description_ar || "",
+        description_en: founder.description_en || "",
+        profile_image: founder.personal_photo || null,
       });
     }
-  }, [isEditMode, founderData, open, setValue]);
+  }, [isEditMode, founderData, open, reset]);
 
   const onSubmit = async (data: FounderFormData) => {
     try {
-      const formData = new FormData();
-      formData.append("name[ar]", data.name_ar);
-      formData.append("name[en]", data.name_en);
-      formData.append("job_title[ar]", data.job_title_ar);
-      formData.append("job_title[en]", data.job_title_en);
-      formData.append("description[ar]", data.description_ar);
-      formData.append("description[en]", data.description_en);
-
-      if (data.profile_image instanceof File) {
-        formData.append("profile_image", data.profile_image);
-      }
+      const params: CreateFounderParams = {
+        name_ar: data.name_ar,
+        name_en: data.name_en,
+        job_title_ar: data.job_title_ar,
+        job_title_en: data.job_title_en,
+        description_ar: data.description_ar,
+        description_en: data.description_en,
+        personal_photo:
+          data.profile_image instanceof File ? data.profile_image : null,
+      };
 
       if (isEditMode && founderId) {
-        await apiClient.put(
-          `${baseURL}/company-dashboard/founders/${founderId}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await CompanyDashboardFoundersApi.update(founderId, params);
       } else {
-        if (!data.profile_image) {
-          toast.error(t("form.profileImageRequired"));
-          return;
-        }
-        await apiClient.post(
-          `${baseURL}/company-dashboard/founders`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await CompanyDashboardFoundersApi.create(params);
       }
 
       toast.success(
-        isEditMode ? t("form.updateSuccess") : t("form.createSuccess")
+        isEditMode ? tForm("updateSuccess") : tForm("createSuccess")
       );
       onSuccess?.();
       reset();
       onClose();
-    } catch (error: unknown) {
+    } catch (error) {
       console.error(
         `Error ${isEditMode ? "updating" : "creating"} founder:`,
         error
@@ -183,12 +133,12 @@ export default function AddFounderDialog({
         if (validationErrors) {
           const firstErrorKey = Object.keys(validationErrors)[0];
           const firstErrorMessage = validationErrors[firstErrorKey][0];
-          toast.error(firstErrorMessage || t("form.validationError"));
+          toast.error(firstErrorMessage || tForm("validationError"));
           return;
         }
       }
 
-      toast.error(isEditMode ? t("form.updateError") : t("form.createError"));
+      toast.error(isEditMode ? tForm("updateError") : tForm("createError"));
     }
   };
 
@@ -202,44 +152,64 @@ export default function AddFounderDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className={`max-w-5xl w-full bg-sidebar max-h-[90vh] overflow-y-auto ${
-          isRtl ? "rtl" : "ltr"
-        }`}
-        dir={isRtl ? "rtl" : "ltr"}
+        className={`max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto`}
       >
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold text-white">
-            {isEditMode ? t("editFounder") : t("addFounder")}
+            {isEditMode
+              ? t("editFounder") || "Edit founder"
+              : t("addFounder") || "Add new founder"}
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Left Column - Form Fields */}
-            <div className="grid grid-cols-2 gap-6 ">
-              <ImageUpload
-                label={t("form.profileImage")}
-                maxSize="3MB - الحجم الأقصى"
-                dimensions="2160 × 2160"
-                required={!isEditMode}
-                onChange={(file) => setValue("profile_image", file)}
-                initialValue={founderData?.data?.payload?.profile_image?.url}
-                minHeight="100px"
-              />
-              <div className="grid grid-cols-1 gap-6 ">
+            {/* Image Upload and Founder Names - 12 Column Grid */}
+            <div className="grid grid-cols-12 gap-4">
+              {/* Personal Photo - 3 columns */}
+              <div className="col-span-3">
+                <FormField
+                  control={control}
+                  name="profile_image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ImageUpload
+                          label={tForm("profileImage")}
+                          maxSize={tForm("imageMaxSize")}
+                          dimensions={tForm("imageDimensions")}
+                          required={!isEditMode}
+                          onChange={(file) => field.onChange(file)}
+                          initialValue={
+                            typeof field.value === "string"
+                              ? field.value
+                              : founderData?.payload?.personal_photo || null
+                          }
+                          minHeight="200px"
+                        />
+                      </FormControl>
+                      <FormErrorMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Founder Names - 9 columns */}
+              <div className="col-span-9 space-y-4">
                 <FormField
                   control={control}
                   name="name_ar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs" required>
-                        {t("form.nameAr")}
+                      <FormLabel className="text-xs text-white" required>
+                        {tForm("nameAr")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1"
+                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          placeholder={tForm("nameArPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -247,21 +217,20 @@ export default function AddFounderDialog({
                     </FormItem>
                   )}
                 />
-
-                {/* Name English */}
                 <FormField
                   control={control}
                   name="name_en"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs" required>
-                        {t("form.nameEn")}
+                      <FormLabel className="text-xs text-white" required>
+                        {tForm("nameEn")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1"
+                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          placeholder={tForm("nameEnPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -271,42 +240,23 @@ export default function AddFounderDialog({
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 gap-6 ">
-              {/* Job Title English */}
-              <FormField
-                control={control}
-                name="job_title_en"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.jobTitleEn")}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        variant="secondary"
-                        disabled={isSubmitting || isFetching}
-                        className="mt-1"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormErrorMessage />
-                  </FormItem>
-                )}
-              />
-              {/* Job Title Arabic */}
+
+            {/* Job Titles - 2 Column Grid */}
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={control}
                 name="job_title_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.jobTitleAr")}
+                    <FormLabel className="text-xs text-white" required>
+                      {tForm("jobTitleAr")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
-                        className="mt-1"
+                        className="mt-1 bg-sidebar text-white border-gray-700"
+                        placeholder={tForm("jobTitleArPlaceholder")}
                         {...field}
                       />
                     </FormControl>
@@ -314,20 +264,46 @@ export default function AddFounderDialog({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={control}
+                name="job_title_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs text-white" required>
+                      {tForm("jobTitleEn")}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        variant="secondary"
+                        disabled={isSubmitting || isFetching}
+                        className="mt-1 bg-sidebar text-white border-gray-700"
+                        placeholder={tForm("jobTitleEnPlaceholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormErrorMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Founder Details */}
+            <div className="grid grid-cols-1 gap-4">
               {/* Description Arabic */}
               <FormField
                 control={control}
                 name="description_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.descriptionAr")}
+                    <FormLabel className="text-xs text-white" required>
+                      {tForm("descriptionAr")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
-                        rows={4}
-                        className="mt-1 resize-none"
+                        rows={6}
+                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        placeholder={tForm("descriptionArPlaceholder")}
                         {...field}
                       />
                     </FormControl>
@@ -342,14 +318,15 @@ export default function AddFounderDialog({
                 name="description_en"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.descriptionEn")}
+                    <FormLabel className="text-xs text-white" required>
+                      {tForm("descriptionEn")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
-                        rows={4}
-                        className="mt-1 resize-none"
+                        rows={6}
+                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        placeholder={tForm("descriptionEnPlaceholder")}
                         {...field}
                       />
                     </FormControl>
@@ -358,6 +335,8 @@ export default function AddFounderDialog({
                 )}
               />
             </div>
+
+            {/* Submit Button */}
             <div className="mt-6">
               <Button
                 type="submit"
@@ -367,7 +346,7 @@ export default function AddFounderDialog({
                 {(isSubmitting || isFetching) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {t("form.save")}
+                {tForm("save")}
               </Button>
             </div>
           </form>
