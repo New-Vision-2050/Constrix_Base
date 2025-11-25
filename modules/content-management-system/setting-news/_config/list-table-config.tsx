@@ -13,7 +13,7 @@ export const useNewsListTableConfig: (
 
   return {
     tableId: "news-list-table",
-    url: `${baseURL}/company-dashboard/news`,
+    url: `${baseURL}/website-news`,
     columns: [
       {
         key: "title",
@@ -44,13 +44,11 @@ export const useNewsListTableConfig: (
         },
       },
       {
-        key: "category",
+        key: "category_website_cms_id",
         label: t("category"),
         sortable: true,
         render: (_: unknown, row: NewsRow) => (
-          <span className="text-sm">
-            {row.category_name || row.category || "-"}
-          </span>
+          <span className="text-sm">{row.category.name || "-"}</span>
         ),
       },
       {
@@ -80,14 +78,14 @@ export const useNewsListTableConfig: (
     executions: [
       (row) => (
         <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
-          {t("actions")}
+          {t("editNews")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
       canDelete: true,
     },
-    deleteUrl: `${baseURL}/company-dashboard/news`,
+    deleteUrl: `${baseURL}/website-news`,
     searchParamName: "search",
   };
 };

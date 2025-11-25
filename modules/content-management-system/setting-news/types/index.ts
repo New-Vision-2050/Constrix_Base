@@ -25,7 +25,7 @@ export interface NewsRow {
   content: string;
   content_ar?: string;
   content_en?: string;
-  category: string;
+  category: Category;
   category_id?: number | string;
   category_name?: string;
   publish_date: string;
