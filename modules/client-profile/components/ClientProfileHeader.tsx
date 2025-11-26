@@ -6,12 +6,15 @@ import { useState } from "react";
 import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from "@mui/material";
 import { MoreVert, Person, Business, Edit } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
     profileData: ClientProfileData;
 }
 
 export default function ClientProfileHeader({ profileData }: PropsT) {
+    // Translations
+    const t = useTranslations("ClientProfile");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const router = useRouter();
@@ -77,7 +80,7 @@ export default function ClientProfileHeader({ profileData }: PropsT) {
                         <ListItemIcon>
                             <Person fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>{userType.role == '1' ? 'عميل' : userType.role == '2' ? 'وسيط' : 'موظف'}</ListItemText>
+                        <ListItemText>{userType.role == '1' ? t("header.userTypes.client") : userType.role == '2' ? t("header.userTypes.broker") : t("header.userTypes.employee")}</ListItemText>
                     </MenuItem>
                 ))}
             </Menu>

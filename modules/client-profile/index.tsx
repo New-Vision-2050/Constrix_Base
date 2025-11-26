@@ -4,12 +4,16 @@ import ClientProfileStatisticsCards from "./components/statistics-cards";
 import EmptyUserDataSection from "../dashboard/components/EmptyUserDataSection";
 import { Button } from "@mui/material";
 import { PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
     profileData: ClientProfileData;
 }
 
 export default function ClientProfileModule({ profileData }: PropsT) {
+    // Translations
+    const t = useTranslations("ClientProfile");
+
     return (
         <div className="px-6 py-4 flex flex-col gap-4">
             <ClientProfileHeader profileData={profileData} />
@@ -18,18 +22,18 @@ export default function ClientProfileModule({ profileData }: PropsT) {
                 {/* statistics cards */}
                 <ClientProfileStatisticsCards />
                 {/* user logs */}
-                <EmptyUserDataSection title="سجل الانشطة" description="ليس لديك اي انشطة بعد" />
+                <EmptyUserDataSection title={t("sections.activityLog.title")} description={t("sections.activityLog.emptyDescription")} />
                 {/* incoming meetings */}
-                <EmptyUserDataSection title="الاجتماعات القادمة" description="ليس لديك اي اجتماعات قادمة بعد" actionsBtn={<Button variant="text" color="primary" startIcon={<PlusIcon />}>طلب اجتماع</Button>} />
+                <EmptyUserDataSection title={t("sections.upcomingMeetings.title")} description={t("sections.upcomingMeetings.emptyDescription")} actionsBtn={<Button variant="text" color="primary" startIcon={<PlusIcon />}>{t("sections.upcomingMeetings.requestMeetingBtn")}</Button>} />
             </div>
             {/* projects */}
-            <EmptyUserDataSection title="المشاريع" description="ليس لديك اي مشاريع بعد" />
+            <EmptyUserDataSection title={t("sections.projects.title")} description={t("sections.projects.emptyDescription")} />
             {/* requests */}
-            <EmptyUserDataSection title="الطلبات" description="ليس لديك اي طلبات بعد" />
+            <EmptyUserDataSection title={t("sections.requests.title")} description={t("sections.requests.emptyDescription")} />
             {/* price offers */}
-            <EmptyUserDataSection title="عروض الأسعار" description="ليس لديك اي عروض اسعار بعد" />
+            <EmptyUserDataSection title={t("sections.priceOffers.title")} description={t("sections.priceOffers.emptyDescription")} />
             {/* contracts */}
-            <EmptyUserDataSection title="العقود" description="ليس لديك اي عقود بعد" />
+            <EmptyUserDataSection title={t("sections.contracts.title")} description={t("sections.contracts.emptyDescription")} />
         </div>
     );
 }
