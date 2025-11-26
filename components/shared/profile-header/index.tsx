@@ -20,6 +20,7 @@ type PropsT = {
   children?: React.ReactNode;
   setOpenUploadImgDialog?: React.Dispatch<SetStateAction<boolean>>;
   subItems?: ProfileSubItem[];
+  actionSlot?: React.ReactNode;
 };
 
 /**
@@ -42,7 +43,9 @@ export default function UserProfileHeader(props: PropsT) {
     children,
     setOpenUploadImgDialog,
     subItems,
+    actionSlot,
   } = props;
+  
 
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
@@ -62,6 +65,7 @@ export default function UserProfileHeader(props: PropsT) {
         job_title={job_title}
         date_appointment={date_appointment}
         subItems={subItems}
+        actionSlot={actionSlot}
       />
     </div>
   );

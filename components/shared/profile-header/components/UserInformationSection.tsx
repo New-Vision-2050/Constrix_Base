@@ -12,6 +12,7 @@ type PropsT = {
   branch?: string;
   date_appointment?: string;
   subItems?: ProfileSubItem[];
+  actionSlot?: React.ReactNode;
 };
 /**
  * UserProfileHeaderUserInformationSection Component
@@ -22,7 +23,7 @@ type PropsT = {
 export default function UserProfileHeaderUserInformationSection(props: PropsT) {
   // declare and define vars and state
   const t = useTranslations("UserProfile.header.placeholder");
-  const { loading, name, branch, job_title, address, date_appointment, subItems } = props;
+  const { loading, name, actionSlot, subItems } = props;
 
   // handle loading state
   if (loading)
@@ -32,7 +33,11 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
 
   return (
     <div className="flex flex-col items-center justify-center md:justify-around md:items-start gap-4 w-full">
-      <h2 className="text-xl font-bold">{name}</h2>
+      <div className="w-full flex items-center justify-between flex-col md:flex-row  gap-2">
+        <h2 className="text-xl font-bold">{name}</h2>
+        {/* action slot */}
+        {actionSlot}
+      </div>
       <div className="flex flex-wrap gap-4 text-gray-600">
         {subItems?.filter((item) => Boolean(item.value))?.map((item, index) => (
           <div className="flex items-center gap-2" key={`sub-item-${index}`}>
