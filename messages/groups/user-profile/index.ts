@@ -11,6 +11,10 @@ export const userProfileMessages = new MessagesGroup({
       image: _m("A 6*4 white background image is required.", "يلزم اضافة صورة خلفية بيضاء 6*4")
     }),
     uploadPhoto: new MessagesGroup({
+      branch: _m("Branch", "الفرع"),
+      jobTitle: _m("Job Title", "المسمى الوظيفي"),
+      address: _m("Address", "العنوان"),
+      appointmentDate: _m("Appointment Date", "تاريخ التعيين"), 
       title: _m("Upload Image", "أضافة صورة"),
       actions: new MessagesGroup({
         checkLabel: _m("Check Image", "التحقق من الصورة"),

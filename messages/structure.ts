@@ -52,6 +52,7 @@ import { paymentMethodsMessages } from "./groups/payment-methods";
 import { contentManagementSystemMessages } from "./groups/content-management-system";
 import { editSubEntityMessages } from "./groups/edit-sub-entity";
 import { wysiwygMessages } from "./groups/wysiwyg";
+import { clientProfileModuleMessages } from "./groups/client-profile";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -108,4 +109,5 @@ export const messagesStructure = new MessagesGroup({
   paymentMethods: paymentMethodsMessages,
   "content-management-system": contentManagementSystemMessages,
   wysiwyg: wysiwygMessages,
+  ClientProfile: clientProfileModuleMessages,
 });
