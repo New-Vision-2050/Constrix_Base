@@ -102,5 +102,6 @@ export const PERMISSIONS = {
     mainSettings: create("CMS_MAIN_SETTINGS"),
     contactSetting: create("CMS_CONTACT_SETTING"),
     termsConditions: create("CMS_TERMS_CONDITIONS"),
+    themeSetting: create("CMS_THEME_SETTING"),
   }
 };

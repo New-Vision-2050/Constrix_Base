@@ -10,8 +10,9 @@ import { useQuery } from "@tanstack/react-query";
 import { CompanyDashboardIconsApi } from "@/services/api/company-dashboard/icons";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 
-export default function CMSIconsModule() {
+function CMSIconsModule() {
     const t = useTranslations("content-management-system.icons");
     const [editingIconId, setEditingIconId] = useState<string | null>(null);
 
@@ -33,8 +34,7 @@ export default function CMSIconsModule() {
         }
     }
 
-    return <Can check={[PERMISSIONS.CMS.icons.view]}>
-        <div className="px-6 py-2 flex flex-col gap-4">
+    return <div className="px-6 py-2 flex flex-col gap-4">
             {/* title & add action */}
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">{t("title")}</h1>
@@ -52,7 +52,7 @@ export default function CMSIconsModule() {
                 </Can>
             </div>
             {/* icons grid */}
-            <Can check={[PERMISSIONS.CMS.icons.update]}>
+            <Can check={[PERMISSIONS.CMS.icons.list]}>
                 <IconsGrid OnDelete={OnDeleteIcon} icons={iconsData?.data?.payload || []} isLoading={isLoading} OnEdit={OnEditIcon} />
             </Can>
             <Can check={[PERMISSIONS.CMS.icons.update]}>
@@ -65,5 +65,6 @@ export default function CMSIconsModule() {
             </Can>
 
         </div>
-    </Can>
 }
+
+export default withPermissions(CMSIconsModule, [PERMISSIONS.CMS.icons.view]);

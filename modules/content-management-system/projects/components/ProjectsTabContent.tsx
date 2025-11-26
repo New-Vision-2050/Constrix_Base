@@ -5,6 +5,8 @@ import ProjectsGrid from "./ProjectsGrid";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import SetProjectDialog from "./setProjectDialog.tsx";
 import { useState } from "react";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export default function ProjectsTabContent() {
     const t = useTranslations("content-management-system.projects");
@@ -19,26 +21,31 @@ export default function ProjectsTabContent() {
             {/*  add project button & title */}
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">{t("title")}</h1>
-                <DialogTrigger
-                    component={SetProjectDialog}
-                    dialogProps={{ onSuccess: () => { } }}
-                    render={({ onOpen }) => (
-                        <Button onClick={onOpen}>
-                            <PlusIcon />
-                            {t("addProject")}
-                        </Button>
-                    )}
-                />
-
+                <Can check={[PERMISSIONS.CMS.projects.create]}>
+                    <DialogTrigger
+                        component={SetProjectDialog}
+                        dialogProps={{ onSuccess: () => { } }}
+                        render={({ onOpen }) => (
+                            <Button onClick={onOpen}>
+                                <PlusIcon />
+                                {t("addProject")}
+                            </Button>
+                        )}
+                    />
+                </Can>
             </div>
             {/* projects grid */}
-            <ProjectsGrid OnEditProject={OnEditProject}/>
+            <Can check={[PERMISSIONS.CMS.projects.view]}>
+                <ProjectsGrid OnEditProject={OnEditProject} />
+            </Can>
         </div>
-        <SetProjectDialog
-            open={Boolean(editingProjectId)}
-            onClose={() => setEditingProjectId(null)}
-            projectId={editingProjectId || undefined}
-            onSuccess={() => { }}
-        />
+        <Can check={[PERMISSIONS.CMS.projects.update]}>
+            <SetProjectDialog
+                open={Boolean(editingProjectId)}
+                onClose={() => setEditingProjectId(null)}
+                projectId={editingProjectId || undefined}
+                onSuccess={() => { }}
+            />
+        </Can>
     </>
 }
