@@ -13,6 +13,8 @@ import PhoneField from "@/modules/form-builder/components/fields/PhoneField";
 import { toast } from "sonner";
 import { CommunicationWebsiteContactInfoApi } from "@/services/api/company-dashboard/communication-settings";
 import { createContactDataSchema, DEFAULT_CONTACT_DATA, ContactDataFormValues } from "../schema/contact-data.schema";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * ContactDataForm - Email and phone contact form with validation
@@ -22,7 +24,7 @@ interface ContactDataFormProps {
   initialValues?: Partial<ContactDataFormValues>;
 }
 
-export default function ContactDataForm({ initialValues }: ContactDataFormProps) {
+function ContactDataForm({ initialValues }: ContactDataFormProps) {
   const t = useTranslations("content-management-system.communicationSetting");
   const form = useForm<ContactDataFormValues>({
     resolver: zodResolver(createContactDataSchema(t)),
@@ -95,4 +97,6 @@ export default function ContactDataForm({ initialValues }: ContactDataFormProps)
     </div>
   );
 }
+
+export default withPermissions(ContactDataForm, [PERMISSIONS.CMS.communicationSettings.contactData.update]);
 

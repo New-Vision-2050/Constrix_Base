@@ -45,7 +45,9 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
         ],
         executions: [
             (row) => (
-                <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.communicationSettings.addresses.update)} onSelect={() => params?.onEdit?.(row.id)}>
+                <DropdownMenuItem 
+                 //disabled={!can(PERMISSIONS.CMS.communicationSettings.addresses.update)}
+                 onSelect={() => params?.onEdit?.(row.id)}>
                     {t("edit") || "Edit"}
                 </DropdownMenuItem>
             ),

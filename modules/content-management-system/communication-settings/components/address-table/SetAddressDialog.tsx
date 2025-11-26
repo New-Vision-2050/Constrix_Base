@@ -106,8 +106,12 @@ export default function SetAddressDialog({ open, onClose, onSuccess, addressId }
                                 <FormControl><Input variant="secondary" disabled={isSubmitting || isLoading} {...field} /></FormControl>
                                 <FormErrorMessage /></FormItem>)} />
                     </div>
-                    <AddressMapComponent latitude={latitude} longitude={longitude}
-                        onLocationSelect={(lat, lng) => { setValue("latitude", lat); setValue("longitude", lng); }} />
+                    <AddressMapComponent 
+                        latitude={latitude} 
+                        longitude={longitude}
+                        onLocationSelect={(lat, lng) => { setValue("latitude", lat); setValue("longitude", lng); }}
+                        disabled={isSubmitting || isLoading}
+                    />
                     <Button type="submit" disabled={isSubmitting || isLoading}
                         className="w-full bg-gradient-to-r from-pink-500 to-pink-600">
                         {(isSubmitting || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

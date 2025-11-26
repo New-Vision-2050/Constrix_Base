@@ -65,7 +65,9 @@ export const useSocialLinksListTableConfig: (params?: Params) => TableConfig = (
         ],
         executions: [
             (row) => (
-                <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.communicationSettings.socialLinks.update)} onSelect={() => params?.onEdit?.(row.id)}>
+                <DropdownMenuItem 
+                //disabled={!can(PERMISSIONS.CMS.communicationSettings.socialLinks.update)} 
+                onSelect={() => params?.onEdit?.(row.id)}>
                     {t("edit") || "Edit"}
                 </DropdownMenuItem>
             ),

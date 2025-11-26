@@ -9,11 +9,13 @@ import "leaflet/dist/leaflet.css";
  * Map click handler component
  * Captures user clicks on map to set coordinates
  */
-function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
+function MapClickHandler({ onClick, disabled }: { onClick: (lat: number, lng: number) => void; disabled?: boolean }) {
   useMapEvents({
     click: (e: any) => {
-      const { lat, lng } = e.latlng;
-      onClick(lat, lng);
+      if (!disabled) {
+        const { lat, lng } = e.latlng;
+        onClick(lat, lng);
+      }
     },
   });
   return null;
@@ -23,6 +25,7 @@ interface AddressMapComponentProps {
   latitude: string;
   longitude: string;
   onLocationSelect: (lat: string, lng: string) => void;
+  disabled?: boolean;
 }
 
 /**
@@ -33,6 +36,7 @@ export default function AddressMapComponent({
   latitude,
   longitude,
   onLocationSelect,
+  disabled = false,
 }: AddressMapComponentProps) {
   const mapRef = useRef<any>(null);
 
@@ -54,17 +58,38 @@ export default function AddressMapComponent({
   }, [latitude, longitude]);
 
   const handleMapClick = (lat: number, lng: number) => {
-    onLocationSelect(lat.toFixed(6), lng.toFixed(6));
+    if (!disabled) {
+      onLocationSelect(lat.toFixed(6), lng.toFixed(6));
+    }
   };
 
   return (
-    <div className="rounded-lg h-64 overflow-hidden border border-border">
-      <MapContainer center={position} zoom={13} style={{ height: "100%", width: "100%" }} ref={mapRef}>
+    <div className="relative rounded-lg h-64 overflow-hidden border border-border">
+      <MapContainer 
+        center={position} 
+        zoom={13} 
+        style={{ height: "100%", width: "100%" }} 
+        ref={mapRef}
+        dragging={!disabled}
+        zoomControl={!disabled}
+        scrollWheelZoom={!disabled}
+        doubleClickZoom={!disabled}
+        touchZoom={!disabled}
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap' />
         <Marker position={position} icon={customIcon} />
-        <MapClickHandler onClick={handleMapClick} />
+        <MapClickHandler onClick={handleMapClick} disabled={disabled} />
       </MapContainer>
+      
+      {/* Overlay when disabled */}
+      {disabled && (
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px] cursor-not-allowed z-[1000] flex items-center justify-center">
+          <div className="bg-background/80 px-4 py-2 rounded-lg text-sm font-medium">
+            Map is disabled
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -23,6 +23,10 @@ export default function CommunicationTabs({ contactInfo }: CommunicationTabsProp
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
+  /**
+   * 
+   * @returns PERMISSIONS.CMS.communicationSettings.contactData.update
+   */
 
   // Render content based on active tab
   const renderTabContent = () => {

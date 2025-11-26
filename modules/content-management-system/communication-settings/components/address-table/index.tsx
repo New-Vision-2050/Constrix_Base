@@ -8,8 +8,9 @@ import SetAddressDialog from "./SetAddressDialog";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 
-export default function AddressTable() {
+function AddressTable() {
     // Translations
     const t = useTranslations("content-management-system.communicationSetting.table");
     // State for editing category
@@ -20,34 +21,34 @@ export default function AddressTable() {
     });
     const { reloadTable } = useTableReload(tableConfig.tableId);
 
-    return <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.view]}>
-        <div className="container p-6 bg-sidebar space-y-4 rounded-lg border border-border">
-            <h2 className="text-2xl font-bold">{t("title")}</h2>
-            <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.update]}>
-                <SetAddressDialog
-                    open={Boolean(editingAddressId)}
-                    onClose={() => setEditingAddressId(null)}
-                    addressId={editingAddressId || undefined}
-                    onSuccess={() => reloadTable()}
-                />
-            </Can>
-            <TableBuilder
-                config={tableConfig}
-                searchBarActions={
-                    <Can check={[PERMISSIONS.CMS.categories.create]}>
-                        <DialogTrigger
-                            component={SetAddressDialog}
-                            dialogProps={{ onSuccess: () => reloadTable() }}
-                            render={({ onOpen }) => (
-                                <Button onClick={onOpen}>
-                                    {t("addAddress")}
-                                </Button>
-                            )}
-                        />
-                    </Can>
-                }
-                tableId={tableConfig.tableId}
+    return <div className="container p-6 bg-sidebar space-y-4 rounded-lg border border-border">
+        <h2 className="text-2xl font-bold">{t("title")}</h2>
+        <Can check={[PERMISSIONS.CMS.communicationSettings.addresses.update]}>
+            <SetAddressDialog
+                open={Boolean(editingAddressId)}
+                onClose={() => setEditingAddressId(null)}
+                addressId={editingAddressId || undefined}
+                onSuccess={() => reloadTable()}
             />
-        </div>
-    </Can>;
+        </Can>
+        <TableBuilder
+            config={tableConfig}
+            searchBarActions={
+                <Can check={[PERMISSIONS.CMS.categories.create]}>
+                    <DialogTrigger
+                        component={SetAddressDialog}
+                        dialogProps={{ onSuccess: () => reloadTable() }}
+                        render={({ onOpen }) => (
+                            <Button onClick={onOpen}>
+                                {t("addAddress")}
+                            </Button>
+                        )}
+                    />
+                </Can>
+            }
+            tableId={tableConfig.tableId}
+        />
+    </div>
 }
+
+export default withPermissions(AddressTable, [PERMISSIONS.CMS.communicationSettings.addresses.view]);
