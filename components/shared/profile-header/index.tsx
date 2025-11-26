@@ -1,3 +1,5 @@
+"use client";
+
 import { SetStateAction } from "react";
 import UserProfileHeaderImageSection from "./components/ImageSection";
 import UserProfileHeaderUserInformationSection from "./components/UserInformationSection";

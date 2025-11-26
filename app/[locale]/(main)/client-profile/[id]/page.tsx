@@ -4,14 +4,16 @@ import { notFound } from "next/navigation";
 import { baseApi } from "@/config/axios/instances/base";
 import { baseURL } from "@/config/axios-config";
 
+// Force Node.js runtime (axios and MUI require Node.js APIs)
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export default async function ClientProfileDetailPage({
   params,
 }: {
-  params: { id: string; locale: string };
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id, locale } = await params;
+  const { id } = await params;
 
   // Fetch user data with the provided ID
   const userData = await fetchUserData(id);
