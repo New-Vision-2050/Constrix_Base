@@ -12,29 +12,6 @@ interface CommunicationTabsProps {
   contactInfo?: ContactInfo;
 }
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-/**
- * Tab Panel Component
- * Renders content for each tab
- */
-function TabPanel({ children, value, index }: TabPanelProps) {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`tabpanel-${index}`}
-      aria-labelledby={`tab-${index}`}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-}
-
 /**
  * Communication Settings Tabs Component
  * Organizes contact, address, and social links in separate tabs
@@ -45,6 +22,20 @@ export default function CommunicationTabs({ contactInfo }: CommunicationTabsProp
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+  };
+
+  // Render content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0:
+        return <ContactDataForm initialValues={contactInfo} />;
+      case 1:
+        return <AddressTable />;
+      case 2:
+        return <SocialLinksTable />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -63,17 +54,15 @@ export default function CommunicationTabs({ contactInfo }: CommunicationTabsProp
         </Tabs>
       </Box>
 
-      <TabPanel value={activeTab} index={0}>
-        <ContactDataForm initialValues={contactInfo} />
-      </TabPanel>
-
-      <TabPanel value={activeTab} index={1}>
-        <AddressTable />
-      </TabPanel>
-
-      <TabPanel value={activeTab} index={2}>
-        <SocialLinksTable />
-      </TabPanel>
+      {/* Single Tab Panel */}
+      <Box 
+        role="tabpanel" 
+        id={`tabpanel-${activeTab}`}
+        aria-labelledby={`tab-${activeTab}`}
+        sx={{ py: 3 }}
+      >
+        {renderTabContent()}
+      </Box>
     </Box>
   );
 }

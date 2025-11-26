@@ -10,7 +10,7 @@ interface CommunicationSettingsModuleProps {
  * Communication Settings Module
  * Main container for managing contact information, addresses, and social links
  */
-export default function CommunicationSettingsModule({ contactInfo }: CommunicationSettingsModuleProps) {
+export default function CommunicationSettingsView({ contactInfo }: CommunicationSettingsModuleProps) {
     const t = useTranslations("content-management-system.communicationSetting");
 
     return (
