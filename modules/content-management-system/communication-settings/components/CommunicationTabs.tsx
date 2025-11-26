@@ -6,33 +6,24 @@ import { useTranslations } from "next-intl";
 import ContactDataForm from "./ContactDataForm";
 import AddressTable from "./address-table";
 import SocialLinksTable from "./social-links-table";
-import { ContactInfo } from "../schema/contact-data.schema";
-
-interface CommunicationTabsProps {
-  contactInfo?: ContactInfo;
-}
 
 /**
  * Communication Settings Tabs Component
  * Organizes contact, address, and social links in separate tabs
  */
-export default function CommunicationTabs({ contactInfo }: CommunicationTabsProps) {
+export default function CommunicationTabs() {
   const t = useTranslations("content-management-system.communicationSetting");
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-  /**
-   * 
-   * @returns PERMISSIONS.CMS.communicationSettings.contactData.update
-   */
 
   // Render content based on active tab
   const renderTabContent = () => {
     switch (activeTab) {
       case 0:
-        return <ContactDataForm initialValues={contactInfo} />;
+        return <ContactDataForm />;
       case 1:
         return <AddressTable />;
       case 2:

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,37 +20,73 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * ContactDataForm - Email and phone contact form with validation
- * @param initialValues - Optional initial form values
  */
-interface ContactDataFormProps {
-  initialValues?: Partial<ContactDataFormValues>;
-}
-
-function ContactDataForm({ initialValues }: ContactDataFormProps) {
+function ContactDataForm() {
   const t = useTranslations("content-management-system.communicationSetting");
-  const form = useForm<ContactDataFormValues>({
-    resolver: zodResolver(createContactDataSchema(t)),
-    defaultValues: { ...DEFAULT_CONTACT_DATA, ...initialValues },
+  const queryClient = useQueryClient();
+
+  // Fetch contact info
+  const { data: contactData, isLoading: isLoadingData } = useQuery({
+    queryKey: ["cms-contact-info"],
+    queryFn: async () => {
+      const response = await CommunicationWebsiteContactInfoApi.getCurrent();
+      return response?.data?.payload;
+    },
   });
 
-  const { control, handleSubmit, formState: { isSubmitting } } = form;
+  const form = useForm<ContactDataFormValues>({
+    resolver: zodResolver(createContactDataSchema(t)),
+    defaultValues: DEFAULT_CONTACT_DATA,
+  });
 
-  const onSubmit = async (data: ContactDataFormValues) => {
-    try {
-      await CommunicationWebsiteContactInfoApi.update({
+  const { control, handleSubmit, reset, formState: { isSubmitting } } = form;
+
+  // Update form values when data is loaded
+  useEffect(() => {
+    if (contactData) {
+      reset({
+        email: contactData.email || "",
+        phone: contactData.phone || "",
+      });
+    }
+  }, [contactData, reset]);
+
+  // Mutation for updating contact info
+  const updateMutation = useMutation({
+    mutationFn: async (data: ContactDataFormValues) => {
+      return await CommunicationWebsiteContactInfoApi.update({
         email: data.email,
         phone: data.phone,
       });
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the contact info
+      queryClient.invalidateQueries({ queryKey: ["cms-contact-info"] });
       toast.success(t("updateSuccess") || "Contact info updated successfully");
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       toast.error(error?.response?.data?.message || t("updateFailed") || "Failed to update contact info");
-    }
+    },
+  });
+
+  const onSubmit = async (data: ContactDataFormValues) => {
+    updateMutation.mutate(data);
   };
+
+  const isDisabled = isSubmitting || isLoadingData || updateMutation.isPending;
+
+  if (isLoadingData) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
+      </div>
+    );
+  }
 
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={handleSubmit(async (data) => await onSubmit?.(data))} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-6 bg-sidebar rounded-lg p-6 border border-border">
             <h2 className="text-lg font-semibold">{t("formTitle")}</h2>
 
@@ -56,7 +94,7 @@ function ContactDataForm({ initialValues }: ContactDataFormProps) {
               <FormItem>
                 <FormLabel required>{t("email")}</FormLabel>
                 <FormControl>
-                  <Input variant="secondary" disabled={isSubmitting} placeholder={t("emailPlaceholder")} {...field} />
+                  <Input variant="secondary" disabled={isDisabled} placeholder={t("emailPlaceholder")} {...field} />
                 </FormControl>
                 <FormErrorMessage />
               </FormItem>
@@ -72,7 +110,7 @@ function ContactDataForm({ initialValues }: ContactDataFormProps) {
                       label: t("phone"),
                       type: "phone",
                       placeholder: t("phonePlaceholder"),
-                      disabled: isSubmitting,
+                      disabled: isDisabled,
                       required: true,
                     }}
                     value={field.value || ""}
@@ -87,9 +125,9 @@ function ContactDataForm({ initialValues }: ContactDataFormProps) {
             )} />
           </div>
 
-          <Button type="submit" disabled={isSubmitting}
+          <Button type="submit" disabled={isDisabled}
             className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700">
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isDisabled && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t("saveButton")}
           </Button>
         </form>
