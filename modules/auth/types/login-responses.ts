@@ -1,3 +1,5 @@
+import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
+
 export type LoginOption = "sms" | "mail" | "password" | "social";
 
 export type LoginWaysSuccessResponse = {
@@ -38,6 +40,7 @@ export type LoginStepsSuccessResponse = {
       name: string;
       email: string;
       is_super_admin: number;
+      user_types?: UserRoleType[];
     };
   };
 };

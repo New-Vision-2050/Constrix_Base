@@ -19,6 +19,7 @@ export const ROUTER = {
   ECOMMERCE: "/ecommerce",
   COMPANY_PROFILE: "/company-profile",
   USER_PROFILE: "/user-profile",
+  CLIENT_PROFILE: "/client-profile",
   PROGRAM_SETTINGS: {
     USERS: "/users-settings",
   },
