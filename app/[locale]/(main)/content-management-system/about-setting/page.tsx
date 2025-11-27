@@ -1,7 +1,9 @@
 import AboutSettingView from "@/modules/content-management-system/about-setting";
+import { CompanyDashboardAboutApi } from "@/services/api/company-dashboard/about";
 
-export default function AboutSettingPage() {
+export default async function AboutSettingPage() {
+    const aboutUsData = await CompanyDashboardAboutApi.getCurrent();
     return (
-        <AboutSettingView />
+        <AboutSettingView initialData={aboutUsData.data?.payload ?? null} />
     );
 }

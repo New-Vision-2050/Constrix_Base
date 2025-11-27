@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { AboutUsData } from "@/services/api/company-dashboard/about/types/response";
+import { UpdateAboutUsParams } from "@/services/api/company-dashboard/about/types/params";
 
 /**
  * Schema for project type item
@@ -312,4 +314,86 @@ export const getDefaultAboutSettingFormValues = (): AboutSettingFormData => ({
   project_types: [],
   attachments: [],
 });
+
+/**
+ * Converts API data to form initial values
+ * Maps AboutUsData from API to AboutSettingFormData format
+ * 
+ * @param apiData - Data from API response
+ * @returns Form values compatible with AboutSettingFormData
+ */
+export const setInitialDataFromApi = (
+  apiData: AboutUsData
+): AboutSettingFormData & { main_image_url?: string } => {
+  // Build about_us_icons array from boolean flags
+  const about_us_icons: string[] = [];
+  if (apiData.is_companies === 1) about_us_icons.push("companies");
+  if (apiData.is_approvals === 1) about_us_icons.push("accreditations");
+  if (apiData.is_certificates === 1) about_us_icons.push("certificates");
+
+  return {
+    section_image: null, // File object - will be set separately if user uploads new image
+    title: apiData.title || "",
+    description: apiData.description || "",
+    about_us_icons,
+    about_us_ar: apiData.about_me?.ar || "",
+    about_us_en: apiData.about_me?.en || "",
+    vision_ar: apiData.vision?.ar || "",
+    vision_en: apiData.vision?.en || "",
+    company_goal_ar: apiData.target?.ar || "",
+    company_goal_en: apiData.target?.en || "",
+    company_slogan_ar: apiData.slogan?.ar || "",
+    company_slogan_en: apiData.slogan?.en || "",
+    project_types: (apiData.project_types || []).map((pt) => ({
+      name_ar: pt.title.ar || "",
+      name_en: pt.title.en || "",
+      projects_count: pt.count || 0,
+    })),
+    attachments: (apiData.attachments || []).map((att) => ({
+      file_name: att.name || "",
+      file: null, // Existing files don't need File object
+    })),
+    // @ts-ignore - Add main_image_url for displaying existing image
+    main_image_url: apiData.main_image || undefined,
+  };
+};
+
+/**
+ * Converts form data to API request parameters
+ * Maps AboutSettingFormData to UpdateAboutUsParams format
+ * 
+ * @param formData - Data from the form
+ * @returns API request parameters
+ */
+export const convertFormDataToApiParams = (
+  formData: AboutSettingFormData
+): UpdateAboutUsParams => {
+  return {
+    title: formData.title || undefined,
+    description: formData.description || undefined,
+    is_certificates: formData.about_us_icons.includes("certificates") ? 1 : 0,
+    is_approvals: formData.about_us_icons.includes("accreditations") ? 1 : 0,
+    is_companies: formData.about_us_icons.includes("companies") ? 1 : 0,
+    about_me_ar: formData.about_us_ar || undefined,
+    about_me_en: formData.about_us_en || undefined,
+    vision_ar: formData.vision_ar || undefined,
+    vision_en: formData.vision_en || undefined,
+    target_ar: formData.company_goal_ar || undefined,
+    target_en: formData.company_goal_en || undefined,
+    slogan_ar: formData.company_slogan_ar || undefined,
+    slogan_en: formData.company_slogan_en || undefined,
+    main_image: formData.section_image || undefined,
+    project_types: formData.project_types
+      .map((pt) => ({
+        title_ar: pt.name_ar,
+        title_en: pt.name_en || "",
+        count: pt.projects_count || 0,
+      })),
+    attachments: formData.attachments
+      .map((att) => ({
+        name: att.file_name,
+        file: att.file || undefined,
+      })),
+  };
+};
 

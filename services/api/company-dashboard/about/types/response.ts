@@ -4,8 +4,7 @@ import { ApiBaseResponse } from "@/types/common/response/base";
  * Project Type in About Us
  */
 export interface AboutProjectType {
-  title_ar: string;
-  title_en: string;
+  title: LocalizedText;
   count: number;
 }
 

@@ -24,7 +24,11 @@ import {
     createAboutSettingFormSchema,
     AboutSettingFormData,
     getDefaultAboutSettingFormValues,
+    setInitialDataFromApi,
+    convertFormDataToApiParams,
 } from "../schema/about-setting-form.schema";
+import { AboutUsData } from "@/services/api/company-dashboard/about/types/response";
+import { CompanyDashboardAboutApi } from "@/services/api/company-dashboard/about";
 
 // About Us icons options
 const ABOUT_US_ICONS_OPTIONS = [
@@ -33,9 +37,11 @@ const ABOUT_US_ICONS_OPTIONS = [
     { value: "certificates", label: "الشهادات" },
 ];
 
-export default function AboutSettingForm() {
+export default function AboutSettingForm({ initialData }: { initialData: AboutUsData | null }) {
     const t = useTranslations("content-management-system.aboutSetting.form");
+    const [mainImageUrl, setMainImageUrl] = React.useState<string | undefined>(undefined);
 
+    console.log('initialData101', initialData);
     const form = useForm<AboutSettingFormData>({
         resolver: zodResolver(createAboutSettingFormSchema(t)),
         defaultValues: getDefaultAboutSettingFormValues(),
@@ -46,6 +52,16 @@ export default function AboutSettingForm() {
         handleSubmit,
         formState: { errors, isSubmitting },
     } = form;
+
+    // Set initial data when initialData is provided
+    useEffect(() => {
+        if (initialData) {
+            const formValues = setInitialDataFromApi(initialData);
+            // @ts-ignore
+            setMainImageUrl(formValues.main_image_url);
+            form.reset(formValues);
+        }
+    }, [initialData, form]);
 
     // Project types array
     const {
@@ -80,7 +96,8 @@ export default function AboutSettingForm() {
     const onSubmit = async (data: AboutSettingFormData) => {
         try {
             // TODO: Replace with actual API call
-            // await AboutSettingApi.update(data);
+            let body = convertFormDataToApiParams(data);
+            await CompanyDashboardAboutApi.updateCurrent(body);
             toast.success(t("updateSuccess") || "Settings updated successfully!");
         } catch (error: unknown) {
             console.error("Error updating settings:", error);
@@ -146,7 +163,7 @@ export default function AboutSettingForm() {
                                                     dimensions="2160 × 2160"
                                                     required={false}
                                                     onChange={(file) => field.onChange(file)}
-                                                    initialValue={undefined}
+                                                    initialValue={mainImageUrl}
                                                     minHeight="200px"
                                                     className="mt-1"
                                                     accept="image/*"
