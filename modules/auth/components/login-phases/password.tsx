@@ -72,12 +72,24 @@ const PasswordPhase = ({
           setValue("token", data.payload.token);
           const nextStep = data.payload.login_way.step?.login_option;
           if (!data.payload.login_way.step) {
+            const userTypes = data.payload.user.user_types ?? [];
             useAuthStore.getState().setUser(data.payload.user);
             setCookie("new-vision-token", data.payload.token, {
               maxAge: 7 * 24 * 60 * 60,
               path: "/",
             });
-            router.push(ROUTER.COMPANIES);
+
+            // handle redirect based on user type
+            if (userTypes.length > 0) {
+              const isEmployee = userTypes.some(userType => userType.role == '3');
+              const isBroker = userTypes.some(userType => userType.role == '2');
+              const isClient = userTypes.some(userType => userType.role == '1');
+              if (isEmployee) {
+                router.push(ROUTER.USER_PROFILE);
+              } else if (isClient || isBroker) {
+                router.push(ROUTER.CLIENT_PROFILE);
+              }
+            } else { router.push(ROUTER.COMPANIES); }
             return;
           }
           switch (nextStep) {

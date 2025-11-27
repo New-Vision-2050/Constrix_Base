@@ -1,3 +1,5 @@
+"use client";
+
 import { ClientProfileData } from "@/app/[locale]/(main)/client-profile/[id]/types";
 import ClientProfileHeader from "./components/ClientProfileHeader";
 import ClientProfileStatisticsCards from "./components/statistics-cards";
