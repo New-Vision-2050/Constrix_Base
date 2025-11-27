@@ -93,7 +93,7 @@ export default function UsersSubEntityForm({
             }, 100);
           },
         }}
-        trigger={<Button>اضافة</Button>}
+        trigger={<Button>{t("SubEntitiesForm.AddEmployee")}</Button>}
         onSuccess={(values) => {
           console.log("Form submitted successfully:", values);
         }}
