@@ -394,7 +394,7 @@ export const convertFormDataToApiParams = (
     attachments: formData.attachments
       .map((att) => ({
         name: att.file_name,
-        file: att.file || undefined,
+        attachment: att.file || undefined,
       })),
   };
 };
