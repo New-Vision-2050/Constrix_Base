@@ -30,5 +30,27 @@ export const companiesMessages = new MessagesGroup({
     arabicName: _m("The name should be in Arabic letters", "الاسم التجاري يجب ان يكون باللغه العربية"),
     arabicFirstName: _m("The first name should be in Arabic letters", "اسم المستخدم الاول يجب ان يكون باللغه العربية"),
     arabicLastName: _m("The last name should be in Arabic letters", "اسم المستخدم الأخير يجب ان يكون باللغه العربية")
+  }),
+  // sub entities table
+  SubEntitiesTable: new MessagesGroup({
+    Name: _m("Name", "الاسم"),
+    JobTitle: _m("Job Title", "المسمى الوظيفي"),
+    ResidenceNumber: _m("Residence Number", "رقم الهوية"),
+    Phone: _m("Phone", "رقم الجوال"),
+    Branch: _m("Branch", "الفرع"),
+    Broker: _m("Broker", "الوسيط"),
+    NumberOfProjects: _m("Number of Projects", "عدد المشاريع"),
+    Company: _m("Company", "الشركة"),
+    ContractEndDate: _m("Contract End Date", "تاريخ نهاية العقد"),
+    UserType: _m("User Type", "نوع المستخدم"),
+    CompleteProfile: _m("Complete Profile", "اكمال الملف الشخصي"),
+    CompleteClientProfile: _m("Complete Client Profile", "أكمال ملف العميل"),
+    CompleteBrokerProfile: _m("Complete Broker Profile", "أكمال ملف الوسيط"),
+    ClientSettings: _m("Client Settings", "اعدادات العميل"),
+    BrokerSettings: _m("Broker Settings", "اعدادات الوسيط"),
+    EmployeeSettings: _m("Employee Settings", "اعدادات الموظف"),
+    Delete: _m("Delete", "حذف"),
+    EmailOrPhone: _m("Email / Phone", "البريد الإليكتروني / الجوال"),
+    UserStatus: _m("User Status", "حالة المستخدم"),
   })
 });
