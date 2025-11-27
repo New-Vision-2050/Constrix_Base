@@ -324,7 +324,7 @@ export const getDefaultAboutSettingFormValues = (): AboutSettingFormData => ({
  */
 export const setInitialDataFromApi = (
   apiData: AboutUsData
-): AboutSettingFormData & { main_image_url?: string } => {
+): AboutSettingFormData & { main_image_url?: string; attachment_urls?: (string | null)[] } => {
   // Build about_us_icons array from boolean flags
   const about_us_icons: string[] = [];
   if (apiData.is_companies === 1) about_us_icons.push("companies");
@@ -355,6 +355,8 @@ export const setInitialDataFromApi = (
     })),
     // @ts-ignore - Add main_image_url for displaying existing image
     main_image_url: apiData.main_image || undefined,
+    // @ts-ignore - Add attachment_urls for displaying existing attachments
+    attachment_urls: (apiData.attachments || []).map((att) => att.attachment_url || null),
   };
 };
 

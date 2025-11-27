@@ -40,6 +40,7 @@ const ABOUT_US_ICONS_OPTIONS = [
 export default function AboutSettingForm({ initialData }: { initialData: AboutUsData | null }) {
     const t = useTranslations("content-management-system.aboutSetting.form");
     const [mainImageUrl, setMainImageUrl] = React.useState<string | undefined>(undefined);
+    const [attachmentUrls, setAttachmentUrls] = React.useState<(string | null)[]>([]);
 
     console.log('initialData101', initialData);
     const form = useForm<AboutSettingFormData>({
@@ -59,6 +60,8 @@ export default function AboutSettingForm({ initialData }: { initialData: AboutUs
             const formValues = setInitialDataFromApi(initialData);
             // @ts-ignore
             setMainImageUrl(formValues.main_image_url);
+            // @ts-ignore
+            setAttachmentUrls(formValues.attachment_urls || []);
             form.reset(formValues);
         }
     }, [initialData, form]);
@@ -664,7 +667,7 @@ export default function AboutSettingForm({ initialData }: { initialData: AboutUs
                                                                 onChange={(file) => field.onChange(file)}
                                                                 accept="application/pdf,.pdf"
                                                                 maxSize="10MB"
-                                                                initialValue={field.value}
+                                                                initialValue={attachmentUrls[index] || field.value}
                                                                 disabled={isSubmitting}
                                                                 className="mt-1"
                                                             />

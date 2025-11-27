@@ -12,8 +12,10 @@ export interface AboutProjectType {
  * Attachment in About Us
  */
 export interface AboutAttachment {
+  id?: number;
   name: string;
   url?: string;
+  attachment_url?: string | null;
   file?: File;
 }
 
