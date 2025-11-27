@@ -6,13 +6,14 @@ import RetrieveEmployeeData from "@/modules/program-settings/components/retrieve
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 
 export function employeeFormConfig(
-  t: ReturnType<typeof useTranslations>,
+  t: (key: string) => string,
   handleCloseForm?: () => void
 ): FormConfig {
   const formId = "employee-form";
+  
   return {
     formId,
-    title: "اضافة",
+    title: t("SubEntitiesForm.AddEmployee"),
     apiUrl: `${baseURL}/company-users/employees`,
     laravelValidation: {
       enabled: true,
@@ -64,18 +65,18 @@ export function employeeFormConfig(
           // email
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("SubEntitiesForm.Email"),
             type: "email",
-            placeholder: "ادخل البريد الإلكتروني",
+            placeholder: t("SubEntitiesForm.EnterEmail"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "البريد الإلكتروني مطلوب",
+                message: t("SubEntitiesForm.EmailRequired"),
               },
               {
                 type: "email",
-                message: "يرجى إدخال عنوان بريد إلكتروني صالح.",
+                message: t("SubEntitiesForm.InvalidEmail"),
               },
               {
                 type: "apiValidation",
@@ -83,7 +84,7 @@ export function employeeFormConfig(
                   <RetrieveEmployeeData
                     formId={formId}
                     handleCloseForm={handleCloseForm}
-                    dialogStatement="البريد الإلكتروني أدناه مضاف مسبقًا"
+                    dialogStatement={t("SubEntitiesForm.EmailAlreadyAdded")}
                     formConfig={(
                       userId: string,
                       branchesIds?: string[],
@@ -175,14 +176,14 @@ export function employeeFormConfig(
           // firstName
           {
             name: "first_name",
-            label: "اسم الموظف الاول",
+            label: t("SubEntitiesForm.FirstName"),
             type: "text",
-            placeholder: "ادخل اسم الموظف الاول",
+            placeholder: t("SubEntitiesForm.EnterFirstName"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "اسم الموظف الاول مطلوب",
+                message: t("SubEntitiesForm.FirstNameRequired"),
               },
               {
                 type: "pattern",
@@ -192,30 +193,30 @@ export function employeeFormConfig(
               {
                 type: "minLength",
                 value: 2,
-                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
+                message: t("SubEntitiesForm.NameMinLength"),
               },
             ],
             condition: (values) => values.newEmail == true,
           },
           {
             name: "first_name",
-            label: "اسم الموظف الاول",
+            label: t("SubEntitiesForm.FirstName"),
             type: "text",
-            placeholder: "ادخل اسم الموظف الاول",
+            placeholder: t("SubEntitiesForm.EnterFirstName"),
             disabled: true,
             condition: (values) => values.newEmail == false,
           },
           // lastName
           {
             name: "last_name",
-            label: "اسم الموظف الأخير",
+            label: t("SubEntitiesForm.LastName"),
             type: "text",
-            placeholder: "اسم الموظف الأخير",
+            placeholder: t("SubEntitiesForm.EnterLastName"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "الاسم مطلوب",
+                message: t("SubEntitiesForm.LastNameRequired"),
               },
               {
                 type: "pattern",
@@ -225,25 +226,25 @@ export function employeeFormConfig(
               {
                 type: "minLength",
                 value: 2,
-                message: "الاسم يجب أن يحتوي على حرفين على الأقل.",
+                message: t("SubEntitiesForm.NameMinLength"),
               },
             ],
             condition: (values) => values.newEmail == true,
           },
           {
             name: "last_name",
-            label: "اسم الموظف الأخير",
+            label: t("SubEntitiesForm.LastName"),
             type: "text",
-            placeholder: "اسم الموظف الأخير",
+            placeholder: t("SubEntitiesForm.EnterLastName"),
             disabled: true,
             condition: (values) => values.newEmail == false,
           },
           // country
           {
             name: "country_id",
-            label: "الجنسية",
+            label: t("SubEntitiesForm.Nationality"),
             type: "select",
-            placeholder: "اختر الجنسية",
+            placeholder: t("SubEntitiesForm.ChooseNationality"),
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -259,16 +260,16 @@ export function employeeFormConfig(
             validation: [
               {
                 type: "required",
-                message: "الجنسية مطلوب",
+                message: t("SubEntitiesForm.NationalityRequired"),
               },
             ],
             condition: (values) => values.newEmail == true,
           },
           {
             name: "country_id",
-            label: "الجنسية",
+            label: t("SubEntitiesForm.Nationality"),
             type: "select",
-            placeholder: "اختر الجنسية",
+            placeholder: t("SubEntitiesForm.ChooseNationality"),
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -286,25 +287,25 @@ export function employeeFormConfig(
           // phone
           {
             name: "phone",
-            label: "الهاتف",
+            label: t("SubEntitiesForm.Phone"),
             type: "phone",
-            placeholder: "يرجى إدخال رقم هاتفك.",
+            placeholder: t("SubEntitiesForm.EnterPhone"),
             required: true,
             validation: [
-              { type: "required", message: "رقم الهاتف مطلوب" },
-              { type: "phone", message: "رقم الهاتف غير صحيح" },
+              { type: "required", message: t("SubEntitiesForm.PhoneRequired") },
+              { type: "phone", message: t("SubEntitiesForm.InvalidPhone") },
             ],
             condition: (values) => values.newEmail == true,
           },
           {
             name: "phone",
-            label: "الهاتف",
+            label: t("SubEntitiesForm.Phone"),
             type: "phone",
-            placeholder: "يرجى إدخال رقم هاتفك.",
+            placeholder: t("SubEntitiesForm.EnterPhone"),
             required: true,
             validation: [
-              { type: "required", message: "رقم الهاتف مطلوب" },
-              { type: "phone", message: "رقم الهاتف غير صحيح" },
+              { type: "required", message: t("SubEntitiesForm.PhoneRequired") },
+              { type: "phone", message: t("SubEntitiesForm.InvalidPhone") },
             ],
             disabled: true,
             condition: (values) => values.newEmail == false,
@@ -313,8 +314,8 @@ export function employeeFormConfig(
           {
             type: "select",
             name: "job_title_id",
-            label: "المسمى الوظيفي",
-            placeholder: "اختر المسمى الوظيفي",
+            label: t("SubEntitiesForm.JobTitle"),
+            placeholder: t("SubEntitiesForm.ChooseJobTitle"),
             dynamicOptions: {
               url: `${baseURL}/job_titles/list`,
               valueField: "id",
@@ -331,9 +332,9 @@ export function employeeFormConfig(
           },
           {
             name: "job_title_id",
-            label: "المسمى الوظيفي",
+            label: t("SubEntitiesForm.JobTitle"),
             type: "select",
-            placeholder: "اختر المسمى الوظيفي",
+            placeholder: t("SubEntitiesForm.ChooseJobTitle"),
             dynamicOptions: {
               url: `${baseURL}/job_titles/list`,
               valueField: "id",
@@ -352,9 +353,9 @@ export function employeeFormConfig(
           // branch
           {
             name: "branch_id",
-            label: "الفرع",
+            label: t("SubEntitiesForm.Branch"),
             type: "select",
-            placeholder: "اختر الفرع",
+            placeholder: t("SubEntitiesForm.ChooseBranch"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
@@ -370,9 +371,9 @@ export function employeeFormConfig(
           },
           {
             name: "branch_id",
-            label: "الفرع",
+            label: t("SubEntitiesForm.Branch"),
             type: "select",
-            placeholder: "اختر الفرع",
+            placeholder: t("SubEntitiesForm.ChooseBranch"),
             dynamicOptions: {
               url: `${baseURL}/management_hierarchies/list?type=branch`,
               valueField: "id",
@@ -390,23 +391,23 @@ export function employeeFormConfig(
           // status
           {
             name: "status",
-            label: "حالة الموظف",
+            label: t("SubEntitiesForm.EmployeeStatus"),
             type: "select",
-            placeholder: "اختر حالة الموظف",
+            placeholder: t("SubEntitiesForm.ChooseEmployeeStatus"),
             options: [
-              { label: "نشط", value: "1" },
-              { label: "غير نشط", value: "0" },
+              { label: t("SubEntitiesForm.Active"), value: "1" },
+              { label: t("SubEntitiesForm.Inactive"), value: "0" },
             ],
             condition: (values) => values.mailReceived == true,
           },
           {
             name: "status",
-            label: "حالة الموظف",
+            label: t("SubEntitiesForm.EmployeeStatus"),
             type: "select",
-            placeholder: "اختر حالة الموظف",
+            placeholder: t("SubEntitiesForm.ChooseEmployeeStatus"),
             options: [
-              { label: "نشط", value: "1" },
-              { label: "غير نشط", value: "0" },
+              { label: t("SubEntitiesForm.Active"), value: "1" },
+              { label: t("SubEntitiesForm.Inactive"), value: "0" },
             ],
             disabled: true,
             condition: (values) => values.mailReceived == false,
@@ -426,10 +427,10 @@ export function employeeFormConfig(
 
       return await defaultSubmitHandler(body, employeeFormConfig(t));
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("SubEntitiesForm.Save"),
+    cancelButtonText: t("SubEntitiesForm.Cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("SubEntitiesForm.ClearForm"),
     showSubmitLoader: true,
     resetOnSuccess: true,
     showCancelButton: false,

@@ -7,6 +7,7 @@ import FormBuilder from "@/modules/form-builder/components/FormBuilder";
 import { useMemo, useState } from "react";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { UsersTypes } from "../../constants/users-types";
+import { useTranslations } from "next-intl";
 
 type Branch = {
   id: string;
@@ -33,6 +34,8 @@ type PropsT = {
   ) => FormConfig;
 };
 export default function EmployeeInvalidMailDialog(props: PropsT) {
+  // Translations
+  const t = useTranslations("Companies.RetrieveEmployeeData");
   //  declare and define component state and variables
   const { formId, btnText, dialogStatement, onSuccess, formConfig } = props;
 
@@ -111,11 +114,11 @@ export default function EmployeeInvalidMailDialog(props: PropsT) {
 
   //sameTypeExist
   const message = useMemo(() => {
-    if (employeeInCompany) return `الأيميل مسجل كموظف مسبقأ فى الشركة`;
+    if (employeeInCompany) return t("EmailRegisteredAsEmployee");
 
-    return `البريد الإلكتروني مسجل مسبقا لدي الشركة 
-      ${clientExist ? `كعميل لدي الأفرع الأتية (${clientBranchesNames})` : ""} 
-      ${brokerExist ? `كوسيط لدي الأفرع الأتية (${brokerBranchesNames})` : ""} 
+    return `${t("EmailRegisteredPreviously")} 
+      ${clientExist ? `${t("AsClientInBranches")} (${clientBranchesNames})` : ""} 
+      ${brokerExist ? `${t("AsBrokerInBranches")} (${brokerBranchesNames})` : ""} 
       `;
   }, [
     employeeInCompany,
@@ -123,6 +126,7 @@ export default function EmployeeInvalidMailDialog(props: PropsT) {
     brokerBranchesNames,
     clientExist,
     clientBranchesNames,
+    t,
   ]);
 
   // declare and define the form configuration for retrieving broker data
@@ -186,7 +190,7 @@ export default function EmployeeInvalidMailDialog(props: PropsT) {
       <ErrorDialog
         isOpen={openEmployeeErr}
         handleClose={() => setOpenEmployeeErr(false)}
-        desc={`الموظف مسجل بالفعل فى الشركة مسبقأ`}
+        desc={t("EmployeeAlreadyRegistered")}
       />
       <p className="text-white">
         {message}
@@ -197,7 +201,7 @@ export default function EmployeeInvalidMailDialog(props: PropsT) {
           }}
           className="text-primary cursor-pointer"
         >
-          {btnText || "لأضافته لفرع أخر أضغط هنا"}
+          {btnText || t("ClickToAddToAnotherBranch")}
         </span>
       </p>
       <Dialog open={isOpen} onOpenChange={handleClose}>

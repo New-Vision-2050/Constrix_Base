@@ -52,5 +52,69 @@ export const companiesMessages = new MessagesGroup({
     Delete: _m("Delete", "حذف"),
     EmailOrPhone: _m("Email / Phone", "البريد الإليكتروني / الجوال"),
     UserStatus: _m("User Status", "حالة المستخدم"),
-  })
+  }),
+  // sub entities form
+  SubEntitiesForm: new MessagesGroup({
+    // Form titles
+    AddEmployee: _m("Add Employee", "اضافة"),
+    
+    // Email field
+    Email: _m("Email", "البريد الإلكتروني"),
+    EnterEmail: _m("Enter Email", "ادخل البريد الإلكتروني"),
+    EmailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
+    InvalidEmail: _m("Please enter a valid email address.", "يرجى إدخال عنوان بريد إلكتروني صالح."),
+    EmailAlreadyAdded: _m("The email below has been added previously", "البريد الإلكتروني أدناه مضاف مسبقًا"),
+    
+    // Name fields
+    FirstName: _m("First Name", "اسم الموظف الاول"),
+    EnterFirstName: _m("Enter First Name", "ادخل اسم الموظف الاول"),
+    FirstNameRequired: _m("First name is required", "اسم الموظف الاول مطلوب"),
+    LastName: _m("Last Name", "اسم الموظف الأخير"),
+    EnterLastName: _m("Enter Last Name", "اسم الموظف الأخير"),
+    LastNameRequired: _m("Last name is required", "الاسم مطلوب"),
+    NameMinLength: _m("Name must contain at least two characters.", "الاسم يجب أن يحتوي على حرفين على الأقل."),
+    
+    // Country field
+    Nationality: _m("Nationality", "الجنسية"),
+    ChooseNationality: _m("Choose Nationality", "اختر الجنسية"),
+    NationalityRequired: _m("Nationality is required", "الجنسية مطلوب"),
+    
+    // Phone field
+    Phone: _m("Phone", "الهاتف"),
+    EnterPhone: _m("Please enter your phone number.", "يرجى إدخال رقم هاتفك."),
+    PhoneRequired: _m("Phone number is required", "رقم الهاتف مطلوب"),
+    InvalidPhone: _m("Invalid phone number", "رقم الهاتف غير صحيح"),
+    
+    // Job title field
+    JobTitle: _m("Job Title", "المسمى الوظيفي"),
+    ChooseJobTitle: _m("Choose Job Title", "اختر المسمى الوظيفي"),
+    
+    // Branch field
+    Branch: _m("Branch", "الفرع"),
+    ChooseBranch: _m("Choose Branch", "اختر الفرع"),
+    
+    // Status field
+    EmployeeStatus: _m("Employee Status", "حالة الموظف"),
+    ChooseEmployeeStatus: _m("Choose Employee Status", "اختر حالة الموظف"),
+    Active: _m("Active", "نشط"),
+    Inactive: _m("Inactive", "غير نشط"),
+    
+    // Buttons
+    Save: _m("Save", "حفظ"),
+    Cancel: _m("Cancel", "إلغاء"),
+    ClearForm: _m("Clear Form", "مسح النموذج"),
+  }),
+  // retrieve employee data
+  RetrieveEmployeeData: new MessagesGroup({
+    EmployeeAlreadyAdded: _m("The employee below has been added previously", "الموظف أدناه مضاف مسبقًا"),
+    EmailAlreadyAdded: _m("The email below has been added previously", "البريد الإلكتروني أدناه مضاف مسبقًا"),
+    EmployeeRegisteredInAnotherCompany: _m("The employee is registered with another company", "الموظف مسجل لدي شركة أخري"),
+    ClickHereToRetrieve: _m("Click here to retrieve", "أضغط هنا لأسترجاع"),
+    EmailRegisteredAsEmployee: _m("The email is already registered as an employee in the company", "الأيميل مسجل كموظف مسبقأ فى الشركة"),
+    EmailRegisteredPreviously: _m("The email is already registered with the company", "البريد الإلكتروني مسجل مسبقا لدي الشركة"),
+    AsClientInBranches: _m("as a client in the following branches", "كعميل لدي الأفرع الأتية"),
+    AsBrokerInBranches: _m("as a broker in the following branches", "كوسيط لدي الأفرع الأتية"),
+    EmployeeAlreadyRegistered: _m("The employee is already registered in the company", "الموظف مسجل بالفعل فى الشركة مسبقأ"),
+    ClickToAddToAnotherBranch: _m("Click here to add to another branch", "لأضافته لفرع أخر أضغط هنا"),
+  }),
 });

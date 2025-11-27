@@ -1,5 +1,6 @@
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import EmployeeInvalidMailDialog from "./EmployeeInvalidMailDialog";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   formId: string;
@@ -15,6 +16,8 @@ type PropsT = {
 };
 
 export default function RetrieveEmployeeData(props: PropsT) {
+  // Translations
+  const t = useTranslations("Companies.RetrieveEmployeeData");
   // extract data from props
   const { formId, handleCloseForm, dialogStatement, formConfig } = props;
 
@@ -47,7 +50,7 @@ export default function RetrieveEmployeeData(props: PropsT) {
       <EmployeeInvalidMailDialog
         formId={formId}
         dialogStatement={
-          dialogStatement || "البريد الإلكتروني أدناه مضاف مسبقًا"
+          dialogStatement || t("EmailAlreadyAdded")
         }
         onSuccess={() => {
           handleCloseForm?.();
@@ -58,9 +61,9 @@ export default function RetrieveEmployeeData(props: PropsT) {
 
   return (
     <p className="text-white">
-      الموظف مسجل لدي شركة أخري {" "}
+      {t("EmployeeRegisteredInAnotherCompany")}{" "}
       <span onClick={handleClick} className="text-primary cursor-pointer">
-        أضغط هنا لأسترجاع
+        {t("ClickHereToRetrieve")}
       </span>
     </p>
   );
