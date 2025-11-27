@@ -4,10 +4,6 @@ import { baseApi } from "@/config/axios/instances/base";
 import { notFound } from "next/navigation";
 import ClientProfileModule from "@/modules/client-profile";
 
-// Force Node.js runtime (axios and MUI require Node.js APIs)
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 export default async function ClientProfilePage() {
   // fetch me data
   const meData = await fetchMeData();
