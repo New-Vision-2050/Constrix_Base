@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import { baseApi } from "@/config/axios/instances/base";
 import { baseURL } from "@/config/axios-config";
 
-// Force Node.js runtime (axios and MUI require Node.js APIs)
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+// Enable static generation with dynamic params
+export const dynamicParams = true;
+
 
 export default async function ClientProfileDetailPage({
   params,
