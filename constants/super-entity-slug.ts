@@ -9,4 +9,5 @@ export const SUPER_ENTITY_SLUG = {
   CRM: "client-relations",
   STORES: "stores",
   DOCS_LIBRARY: "library-docs",
+  CMS: "content-management-system",
 };

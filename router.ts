@@ -41,4 +41,18 @@ export const ROUTER = {
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",
   TERMS_CONDITIONS: "/stores/terms",
+  CMS: {
+    CATEGORIES: "/content-management-system/categories",
+    ICONS: "/content-management-system/icons",
+    MAIN_SETTINGS: "/content-management-system/main-settings",
+    CONTACT_SETTING: "/content-management-system/contact-setting",
+    TERMS_CONDITIONS: "/content-management-system/terms-conditions",
+    MAIN_DATA: "/content-management-system/mainData",
+    FOUNDER: "/content-management-system/setting-founder",
+    SERVICES: "/content-management-system/services",
+    OUR_SERVICES: "/content-management-system/our-services",
+    NEWS: "/content-management-system/setting-news",
+    PROJECTS: "/content-management-system/projects",
+    THEME_SETTING: "/content-management-system/theme-setting",
+  },
 };
