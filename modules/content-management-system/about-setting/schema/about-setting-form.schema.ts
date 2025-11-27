@@ -82,16 +82,16 @@ const attachmentSchema = z.object({
 });
 
 /**
- * Creates a Zod schema for contact setting form validation
+ * Creates a Zod schema for about setting form validation
  * Follows SOLID principles:
  * - Single Responsibility: Handles only validation logic
  * - Open/Closed: Extensible via factory function pattern
  * - Dependency Inversion: Depends on translation abstraction
  *
  * @param t - Translation function for localized error messages
- * @returns Zod schema object for contact setting form validation
+ * @returns Zod schema object for about setting form validation
  */
-export const createContactSettingFormSchema = (t: (key: string) => string) =>
+export const createAboutSettingFormSchema = (t: (key: string) => string) =>
   z.object({
     // Main Section
     section_image: z
@@ -275,11 +275,11 @@ export const createContactSettingFormSchema = (t: (key: string) => string) =>
   });
 
 /**
- * Type inference from the contact setting form schema
- * Usage: const formData: ContactSettingFormData = {...}
+ * Type inference from the about setting form schema
+ * Usage: const formData: AboutSettingFormData = {...}
  */
-export type ContactSettingFormData = z.infer<
-  ReturnType<typeof createContactSettingFormSchema>
+export type AboutSettingFormData = z.infer<
+  ReturnType<typeof createAboutSettingFormSchema>
 >;
 
 /**
@@ -293,10 +293,10 @@ export type ProjectTypeItem = z.infer<typeof projectTypeSchema>;
 export type AttachmentItem = z.infer<typeof attachmentSchema>;
 
 /**
- * Default form values for contact setting form
+ * Default form values for about setting form
  * Provides initial state for React Hook Form
  */
-export const getDefaultContactSettingFormValues = (): ContactSettingFormData => ({
+export const getDefaultAboutSettingFormValues = (): AboutSettingFormData => ({
   section_image: null,
   title: "",
   description: "",

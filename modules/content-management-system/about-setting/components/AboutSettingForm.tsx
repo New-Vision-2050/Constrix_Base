@@ -21,10 +21,10 @@ import FileUploadButton from "@/components/shared/FileUploadButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
-    createContactSettingFormSchema,
-    ContactSettingFormData,
-    getDefaultContactSettingFormValues,
-} from "../schema/contact-setting-form.schema";
+    createAboutSettingFormSchema,
+    AboutSettingFormData,
+    getDefaultAboutSettingFormValues,
+} from "../schema/about-setting-form.schema";
 
 // About Us icons options
 const ABOUT_US_ICONS_OPTIONS = [
@@ -33,12 +33,12 @@ const ABOUT_US_ICONS_OPTIONS = [
     { value: "certificates", label: "الشهادات" },
 ];
 
-export default function ContactSettingForm() {
-    const t = useTranslations("content-management-system.contactSetting.form");
+export default function AboutSettingForm() {
+    const t = useTranslations("content-management-system.aboutSetting.form");
 
-    const form = useForm<ContactSettingFormData>({
-        resolver: zodResolver(createContactSettingFormSchema(t)),
-        defaultValues: getDefaultContactSettingFormValues(),
+    const form = useForm<AboutSettingFormData>({
+        resolver: zodResolver(createAboutSettingFormSchema(t)),
+        defaultValues: getDefaultAboutSettingFormValues(),
     });
 
     const {
@@ -77,10 +77,10 @@ export default function ContactSettingForm() {
         }
     }, [errors]);
 
-    const onSubmit = async (data: ContactSettingFormData) => {
+    const onSubmit = async (data: AboutSettingFormData) => {
         try {
             // TODO: Replace with actual API call
-            // await ContactSettingApi.update(data);
+            // await AboutSettingApi.update(data);
             toast.success(t("updateSuccess") || "Settings updated successfully!");
         } catch (error: unknown) {
             console.error("Error updating settings:", error);
