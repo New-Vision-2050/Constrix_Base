@@ -4,10 +4,13 @@ import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import TheStatus from "../component/the-status";
 import { FounderRow, TableConfigParams } from "../types";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const useFounderListTableConfig: (
   params?: TableConfigParams
 ) => TableConfig = (params) => {
+  const { can } = usePermissions();
   const t = useTranslations("content-management-system.founder.table");
   const locale = useLocale();
 
@@ -70,13 +73,13 @@ export const useFounderListTableConfig: (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.founder.update)} onSelect={() => params?.onEdit?.(row.id)}>
           {t("editFounder")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.CMS.founder.delete),
     },
     searchParamName: "search",
   };

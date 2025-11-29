@@ -7,6 +7,8 @@ import AddNewsDialog from "./add-news-dialog";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useNewsListTableConfig } from "./_config/list-table-config";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function NewsView() {
   const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
@@ -17,32 +19,36 @@ function NewsView() {
   const t = useTranslations("content-management-system.news");
 
   return (
-    <div className="px-8 space-y-7">
-      <AddNewsDialog
-        open={Boolean(editingNewsId)}
-        onClose={() => setEditingNewsId(null)}
-        newsId={editingNewsId || undefined}
-        onSuccess={() => {
-          reloadTable();
-          setEditingNewsId(null);
-        }}
-      />
-      <TableBuilder
-        config={tableConfig}
-        searchBarActions={
-          <>
-            <DialogTrigger
-              component={AddNewsDialog}
-              dialogProps={{ onSuccess: () => reloadTable() }}
-              render={({ onOpen }) => (
-                <Button onClick={onOpen}>{t("addNews")}</Button>
-              )}
-            />
-          </>
-        }
-        tableId={tableConfig.tableId}
-      />
-    </div>
+    <Can check={[PERMISSIONS.CMS.news.view]}>
+      <div className="px-8 space-y-7">
+        <Can check={[PERMISSIONS.CMS.news.update]}>
+          <AddNewsDialog
+            open={Boolean(editingNewsId)}
+            onClose={() => setEditingNewsId(null)}
+            newsId={editingNewsId || undefined}
+            onSuccess={() => {
+              reloadTable();
+              setEditingNewsId(null);
+            }}
+          />
+        </Can>
+        <TableBuilder
+          config={tableConfig}
+          searchBarActions={
+            <Can check={[PERMISSIONS.CMS.news.create]}>
+              <DialogTrigger
+                component={AddNewsDialog}
+                dialogProps={{ onSuccess: () => reloadTable() }}
+                render={({ onOpen }) => (
+                  <Button onClick={onOpen}>{t("addNews")}</Button>
+                )}
+              />
+            </Can>
+          }
+          tableId={tableConfig.tableId}
+        />
+      </div>
+    </Can>
   );
 }
 

@@ -5,10 +5,13 @@ import TheStatus from "../components/the-status";
 import { ServiceRow, TableConfigParams } from "../types";
 import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
 import { baseURL } from "@/config/axios-config";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const useServiceListTableConfig: (
   params?: TableConfigParams
 ) => TableConfig = (params) => {
+  const { can } = usePermissions();
   const t = useTranslations("content-management-system.services.table");
   const locale = useLocale();
 
@@ -57,13 +60,16 @@ export const useServiceListTableConfig: (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem
+          disabled={!can(PERMISSIONS.CMS.services.update)}
+          onSelect={() => params?.onEdit?.(row.id)}
+        >
           {t("edit")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.CMS.services.delete),
       onDelete: async (id: string) => {
         await CompanyDashboardServicesApi.delete(id);
       },

@@ -7,6 +7,8 @@ import AddFounderDialog from "./add-founder-dialog";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useFounderListTableConfig } from "./_config/list-table-config";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function FounderView() {
   const [editingFounderId, setEditingFounderId] = useState<string | null>(null);
@@ -17,32 +19,36 @@ function FounderView() {
   const t = useTranslations("content-management-system.founder");
 
   return (
-    <div className="px-8 space-y-7">
-      <AddFounderDialog
-        open={Boolean(editingFounderId)}
-        onClose={() => setEditingFounderId(null)}
-        founderId={editingFounderId || undefined}
-        onSuccess={() => {
-          reloadTable();
-          setEditingFounderId(null);
-        }}
-      />
-      <TableBuilder
-        config={tableConfig}
-        searchBarActions={
-          <>
-            <DialogTrigger
-              component={AddFounderDialog}
-              dialogProps={{ onSuccess: () => reloadTable() }}
-              render={({ onOpen }) => (
-                <Button onClick={onOpen}>{t("addFounder")}</Button>
-              )}
-            />
-          </>
-        }
-        tableId={tableConfig.tableId}
-      />
-    </div>
+    <Can check={[PERMISSIONS.CMS.founder.view]}>
+      <div className="px-8 space-y-7">
+        <Can check={[PERMISSIONS.CMS.founder.update]}>
+          <AddFounderDialog
+            open={Boolean(editingFounderId)}
+            onClose={() => setEditingFounderId(null)}
+            founderId={editingFounderId || undefined}
+            onSuccess={() => {
+              reloadTable();
+              setEditingFounderId(null);
+            }}
+          />
+        </Can>
+        <TableBuilder
+          config={tableConfig}
+          searchBarActions={
+            <Can check={[PERMISSIONS.CMS.founder.create]}>
+              <DialogTrigger
+                component={AddFounderDialog}
+                dialogProps={{ onSuccess: () => reloadTable() }}
+                render={({ onOpen }) => (
+                  <Button onClick={onOpen}>{t("addFounder")}</Button>
+                )}
+              />
+            </Can>
+          }
+          tableId={tableConfig.tableId}
+        />
+      </div>
+    </Can>
   );
 }
 
