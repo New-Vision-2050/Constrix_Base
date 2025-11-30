@@ -14,8 +14,14 @@ export const breadcrumbsMessages = new MessagesGroup({
   products: _m("Products", "المنتجات"),
   "products/categories": _m("Product Categories", "فئات المنتجات"),
   reports: _m("Reports", "التقارير"),
-  "hr-settings/attendance-determinants": _m("Attendance Determinants Settings", "إعدادات محددات الحضور"),
-  "hr-settings/attendance-determinants/create": _m("Create New Determinant", "إنشاء محدد حضور جديد"),
+  "hr-settings/attendance-determinants": _m(
+    "Attendance Determinants Settings",
+    "إعدادات محددات الحضور"
+  ),
+  "hr-settings/attendance-determinants/create": _m(
+    "Create New Determinant",
+    "إنشاء محدد حضور جديد"
+  ),
   details: _m("Details", "التفاصيل"),
   separator: _m("/", "/"),
   back: _m("Back", "رجوع"),
@@ -53,5 +59,30 @@ export const breadcrumbsMessages = new MessagesGroup({
   "stores/pages-setting": _m("Pages Settings", "إعدادات الصفحات"),
   "payment-methods": _m("Payment Methods", "وسائل الدفع"),
   "stores/payment-methods": _m("Payment Methods", "وسائل الدفع"),
-  terms: _m("Terms & Conditions", "الشروط والأحكام")
+  terms: _m("Terms & Conditions", "الشروط والأحكام"),
+  "content-management-system": _m("Content Management System", "اعداد المحتوي"),
+  "content-management-system/categories": _m("Categories", "الفئات"),
+  "content-management-system/icons": _m("Icons", "الأيقونات"),
+  "content-management-system/main-settings": _m(
+    "Main Settings",
+    "اعدادات الرئيسية"
+  ),
+  "content-management-system/contact-setting": _m(
+    "Contact Setting",
+    "اعدادات التواصل"
+  ),
+  "content-management-system/terms-conditions": _m(
+    "Terms & Conditions",
+    "الشروط والأحكام"
+  ),
+  "content-management-system/mainData": _m("Main Data", "البيانات الأساسية"),
+  "content-management-system/setting-founder": _m("Founders", "المؤسسين"),
+  "content-management-system/services": _m("Services", "الخدمات"),
+  "content-management-system/our-services": _m("Our Services", "خدماتنا"),
+  "content-management-system/setting-news": _m("News", "الأخبار"),
+  "content-management-system/projects": _m("Projects", "المشاريع"),
+  "content-management-system/theme-setting": _m(
+    "Theme Setting",
+    "إعدادات المظهر"
+  ),
 });

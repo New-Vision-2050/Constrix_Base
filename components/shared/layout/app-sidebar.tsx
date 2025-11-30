@@ -5,7 +5,6 @@ import {
   LayoutDashboardIcon,
   RollerCoasterIcon,
   UserIcon,
-  Users,
   Settings,
   FolderClosed,
   LibraryBig,
@@ -25,7 +24,6 @@ import { usePathname } from "next/navigation";
 import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
 import InboxIcon from "@/public/icons/inbox-icon";
-import { SidebarProgramsList } from "./sidebar-programs";
 import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { Menu, Project } from "@/types/sidebar-menu";
@@ -42,7 +40,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
-  const { menu, isLoading, data } = useSidebarMenu();
+  const { isLoading, data } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
@@ -463,6 +461,127 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
             url: ROUTER.PaymentMethods,
             icon: UserIcon,
             isActive: pageName === ROUTER.PaymentMethods,
+            show: true,
+          },
+        ],
+      },
+      // CMS (Content Management System)
+      {
+        name: t("Sidebar.CMS.title"),
+        icon: SettingsIcon,
+        isActive: [
+          ROUTER.CMS.CATEGORIES,
+          ROUTER.CMS.ICONS,
+          ROUTER.CMS.MAIN_SETTINGS,
+          ROUTER.CMS.CONTACT_SETTING,
+          ROUTER.CMS.TERMS_CONDITIONS,
+          ROUTER.CMS.MAIN_DATA,
+          ROUTER.CMS.FOUNDER,
+          ROUTER.CMS.SERVICES,
+          ROUTER.CMS.OUR_SERVICES,
+          ROUTER.CMS.NEWS,
+          ROUTER.CMS.PROJECTS,
+          ROUTER.CMS.THEME_SETTING,
+        ].includes(pageName),
+        show: !isCentralCompany,
+        slug: SUPER_ENTITY_SLUG.CMS,
+        urls: [
+          ROUTER.CMS.CATEGORIES,
+          ROUTER.CMS.ICONS,
+          ROUTER.CMS.MAIN_SETTINGS,
+          ROUTER.CMS.CONTACT_SETTING,
+          ROUTER.CMS.TERMS_CONDITIONS,
+          ROUTER.CMS.MAIN_DATA,
+          ROUTER.CMS.FOUNDER,
+          ROUTER.CMS.SERVICES,
+          ROUTER.CMS.OUR_SERVICES,
+          ROUTER.CMS.NEWS,
+          ROUTER.CMS.PROJECTS,
+          ROUTER.CMS.THEME_SETTING,
+        ],
+        sub_entities: [
+          {
+            name: t("Sidebar.CMS.MainData"),
+            url: ROUTER.CMS.MAIN_DATA,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.MAIN_DATA,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.MainSettings"),
+            url: ROUTER.CMS.MAIN_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.MAIN_SETTINGS,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.ThemeSetting"),
+            url: ROUTER.CMS.THEME_SETTING,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.THEME_SETTING,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.ContactSetting"),
+            url: ROUTER.CMS.CONTACT_SETTING,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.CONTACT_SETTING,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.Categories"),
+            url: ROUTER.CMS.CATEGORIES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.CATEGORIES,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.Icons"),
+            url: ROUTER.CMS.ICONS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.ICONS,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.Services"),
+            url: ROUTER.CMS.SERVICES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.SERVICES,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.OurServices"),
+            url: ROUTER.CMS.OUR_SERVICES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.OUR_SERVICES,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.Projects"),
+            url: ROUTER.CMS.PROJECTS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.PROJECTS,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.News"),
+            url: ROUTER.CMS.NEWS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.NEWS,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.Founder"),
+            url: ROUTER.CMS.FOUNDER,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.CMS.FOUNDER,
+            show: true,
+          },
+          {
+            name: t("Sidebar.CMS.TermsConditions"),
+            url: ROUTER.CMS.TERMS_CONDITIONS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.TERMS_CONDITIONS,
             show: true,
           },
         ],

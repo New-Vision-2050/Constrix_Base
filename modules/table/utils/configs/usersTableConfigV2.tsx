@@ -59,6 +59,7 @@ export const UsersConfigV2 = (options?: {
 }) => {
   const router = useRouter();
   const t = useTranslations("Companies");
+  const tSubTable = useTranslations("Companies.SubEntitiesTable");
   const tEditSubEntity = useTranslations("EditSubEntityMessages");
   // define final form config for EDIT mode
   // Note: This config is used when clicking "Edit" button in the table
@@ -87,7 +88,7 @@ export const UsersConfigV2 = (options?: {
     columns: [
       {
         key: "name",
-        label: "الاسم",
+        label: tSubTable("Name"),
         sortable: true,
         searchable: true,
         render: (_: unknown, row: UserTableRow) => (
@@ -98,11 +99,11 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "job_title",
-        label: "المسمى الوظيفي",
+        label: tSubTable("JobTitle"),
       },
       {
         key: "residence",
-        label: "رقم الهوية",
+        label: tSubTable("ResidenceNumber"),
       },
       {
         key: "email",
@@ -111,7 +112,7 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "phone",
-        label: "رقم الجوال",
+        label: tSubTable("Phone"),
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
@@ -132,21 +133,21 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "branch",
-        label: "الفرع",
+        label: tSubTable("Branch"),
         sortable: true,
       },
       {
         key: "broker",
-        label: "الوسيط",
+        label: tSubTable("Broker"),
       },
       {
         key: "number-of-projects",
-        label: "عدد المشاريع",
+        label: tSubTable("NumberOfProjects"),
         sortable: true,
       },
       {
         key: "companies",
-        label: "الشركة",
+        label: tSubTable("Company"),
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
             {value &&
@@ -160,12 +161,12 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "end_date",
-        label: "تاريخ نهاية العقد",
+        label: tSubTable("ContractEndDate"),
         sortable: true,
       },
       {
         key: "user-type",
-        label: "نوع المستخدم",
+        label: tSubTable("UserType"),
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
@@ -214,7 +215,7 @@ export const UsersConfigV2 = (options?: {
         name: "companies",
         searchType: {
           type: "dropdown",
-          placeholder: "الشركة",
+          placeholder: tSubTable("Company"),
           dynamicDropdown: {
             url: `${baseURL}/companies`,
             valueField: "id",
@@ -244,7 +245,7 @@ export const UsersConfigV2 = (options?: {
         name: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال",
+          placeholder: tSubTable("EmailOrPhone"),
         },
       },
     ],
@@ -286,7 +287,7 @@ export const UsersConfigV2 = (options?: {
       ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE ?
         [{
           id: "complete-profile",
-          label: "اكمال الملف الشخصي",
+          label: tSubTable("CompleteProfile"),
           icon: <GearIcon className="w-4 h-4" />,
           action: "complete-profile",
           dialogComponent: ChooseUserCompany,
@@ -300,7 +301,9 @@ export const UsersConfigV2 = (options?: {
         : [
           {
             id: "complate-client-profile",
-            label: `أكمال ملف ${options?.registrationFormSlug === ModelsTypes.CLIENT ? "العميل" : "الوسيط"}`,
+            label: options?.registrationFormSlug === ModelsTypes.CLIENT 
+              ? tSubTable("CompleteClientProfile")
+              : tSubTable("CompleteBrokerProfile"),
             action: (row: UserTableRow) => {
               router.push(`/client-profile/${row.user_id}`);
             },
@@ -310,7 +313,11 @@ export const UsersConfigV2 = (options?: {
         ]),
       {
         id: "user-settings",
-        label: `اعدادات ${options?.registrationFormSlug === ModelsTypes.CLIENT ? "العميل" : options?.registrationFormSlug === ModelsTypes.BROKER ? "الوسيط" : "الموظف"}`,
+        label: options?.registrationFormSlug === ModelsTypes.CLIENT 
+          ? tSubTable("ClientSettings")
+          : options?.registrationFormSlug === ModelsTypes.BROKER 
+            ? tSubTable("BrokerSettings")
+            : tSubTable("EmployeeSettings"),
         icon: <GearIcon className="w-4 h-4" />,
         action: "user-settings",
         dialogComponent: UserSettingDialog,
@@ -318,13 +325,17 @@ export const UsersConfigV2 = (options?: {
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
-            title: `اعدادات ${options?.registrationFormSlug === ModelsTypes.CLIENT ? "العميل" : options?.registrationFormSlug === ModelsTypes.BROKER ? "الوسيط" : "الموظف"}`
+            title: options?.registrationFormSlug === ModelsTypes.CLIENT 
+              ? tSubTable("ClientSettings")
+              : options?.registrationFormSlug === ModelsTypes.BROKER 
+                ? tSubTable("BrokerSettings")
+                : tSubTable("EmployeeSettings")
           };
         },
       },
       {
         id: "delete-user",
-        label: "حذف",
+        label: tSubTable("Delete"),
         action: "delete-user",
         icon: <Trash2 className="w-4 h-4 text-red-500" />,
         dialogComponent: DeleteSpecificRowDialog,

@@ -17,7 +17,10 @@ export const sidebarMessages = new MessagesGroup({
   HRSettings: _m("Settings", "اعدادات"),
   CompanyName: _m("New Vision", "نيو فيجن"),
   OrganizationalStructure: _m("Organizational Structure", "الهيكل التنظيمي"),
-  AttendanceDeparture: _m("Attendance and Departure", "الحضور والانصراف اليومي"),
+  AttendanceDeparture: _m(
+    "Attendance and Departure",
+    "الحضور والانصراف اليومي"
+  ),
   HumanResources: _m("Human Resources", "الموارد البشرية"),
   ProgramManagement: _m("Program Management", "ادارة البرامج"),
   Powers: _m("Powers", "الصلاحيات"),
@@ -40,5 +43,20 @@ export const sidebarMessages = new MessagesGroup({
   Products: _m("Products", "المنتجات"),
   Categories: _m("Categories", "الأقسام"),
   Brands: _m("Brands", "العلامات التجارية"),
-  PaymentMethods: _m("Payment Methods", "وسائل الدفع")
+  PaymentMethods: _m("Payment Methods", "وسائل الدفع"),
+  CMS: new MessagesGroup({
+    title: _m("CMS", "اعداد المحتوي"),
+    MainData: _m("Main Data", "البيانات الأساسية"),
+    MainSettings: _m("Main Settings", "اعدادات الرئيسية"),
+    ThemeSetting: _m("Theme Setting", "إعدادات المظهر"),
+    ContactSetting: _m("Contact Setting", "اعدادات التواصل"),
+    Categories: _m("Categories", "الفئات"),
+    Icons: _m("Icons", "الأيقونات"),
+    Services: _m("Services", "الخدمات"),
+    OurServices: _m("Our Services", "خدماتنا"),
+    Projects: _m("Projects", "المشاريع"),
+    News: _m("News", "الأخبار"),
+    Founder: _m("Founders", "المؤسسين"),
+    TermsConditions: _m("Terms & Conditions", "الشروط والأحكام"),
+  }),
 });
