@@ -102,5 +102,11 @@ export const PERMISSIONS = {
     mainSettings: create("CMS_MAIN_SETTINGS"),
     contactSetting: create("CMS_CONTACT_SETTING"),
     termsConditions: create("CMS_TERMS_CONDITIONS"),
+    communicationSettings:{
+      contactData: create("CMS_COMMUNICATION_SETTINGS_CONTACT_DATA"),
+      addresses: create("CMS_COMMUNICATION_SETTINGS_ADDRESSES"),
+      socialLinks: create("CMS_COMMUNICATION_SETTINGS_SOCIAL_LINKS"),
+    },
+    themeSetting: create("CMS_THEME_SETTING"),
   }
 };

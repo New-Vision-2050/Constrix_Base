@@ -8,5 +8,5 @@ export default withServerPermissionsPage(
         const termsConditionsData = await CompanyDashboardTermsConditionsApi.getCurrent();
         return <TermsConditionsView initialData={termsConditionsData.data?.payload ?? null} />
     },
-    [PERMISSIONS.CMS.termsConditions.view]
+    [PERMISSIONS.CMS.termsConditions.view, PERMISSIONS.CMS.termsConditions.update]
 );

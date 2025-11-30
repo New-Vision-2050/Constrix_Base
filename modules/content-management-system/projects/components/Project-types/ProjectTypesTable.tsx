@@ -7,8 +7,9 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { Button } from "@/components/ui/button";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 
-export default function ProjectTypesTable() {
+function ProjectTypesTable() {
     // Translations
     const t = useTranslations("content-management-system.projects.projectTypesTable");
     // State for editing ProjectType
@@ -19,34 +20,34 @@ export default function ProjectTypesTable() {
     });
     const { reloadTable } = useTableReload(tableConfig.tableId);
 
-    return <Can check={[PERMISSIONS.CMS.projectsTypes.view]}>
-        <div className="container p-6">
-            <Can check={[PERMISSIONS.CMS.projectsTypes.update]}>
-                <SetProjectTypeDialog
-                    open={Boolean(editingProjectTypeId)}
-                    onClose={() => setEditingProjectTypeId(null)}
-                    projectTypeId={editingProjectTypeId || undefined}
-                    onSuccess={() => reloadTable()}
-                />
-            </Can>
-
-            <TableBuilder
-                config={tableConfig}
-                searchBarActions={
-                    <Can check={[PERMISSIONS.CMS.projectsTypes.create]}>
-                        <DialogTrigger
-                            component={SetProjectTypeDialog}
-                            dialogProps={{ onSuccess: () => reloadTable() }}
-                            render={({ onOpen }) => (
-                                <Button onClick={onOpen}>
-                                    {t("addProjectType")}
-                                </Button>
-                            )}
-                        />
-                    </Can>
-                }
-                tableId={tableConfig.tableId}
+    return <div className="container p-6">
+        <Can check={[PERMISSIONS.CMS.projectsTypes.update]}>
+            <SetProjectTypeDialog
+                open={Boolean(editingProjectTypeId)}
+                onClose={() => setEditingProjectTypeId(null)}
+                projectTypeId={editingProjectTypeId || undefined}
+                onSuccess={() => reloadTable()}
             />
-        </div>
-    </Can>;
+        </Can>
+
+        <TableBuilder
+            config={tableConfig}
+            searchBarActions={
+                <Can check={[PERMISSIONS.CMS.projectsTypes.create]}>
+                    <DialogTrigger
+                        component={SetProjectTypeDialog}
+                        dialogProps={{ onSuccess: () => reloadTable() }}
+                        render={({ onOpen }) => (
+                            <Button onClick={onOpen}>
+                                {t("addProjectType")}
+                            </Button>
+                        )}
+                    />
+                </Can>
+            }
+            tableId={tableConfig.tableId}
+        />
+    </div>
 }
+
+export default withPermissions(ProjectTypesTable, [PERMISSIONS.CMS.projectsTypes.view]);
