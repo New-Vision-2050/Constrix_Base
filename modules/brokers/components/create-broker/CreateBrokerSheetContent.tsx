@@ -5,7 +5,9 @@ import CreateBrokerCompanyForm from "./company";
 
 export default function CreateBrokerSheetContent({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) {
   const t = useTranslations("BrokersModule.form");
@@ -13,12 +15,12 @@ export default function CreateBrokerSheetContent({
     {
       id: "individual-broker",
       title: t("individualBroker"),
-      content: <CreateIndividualBrokerForm sub_entity_id={sub_entity_id} />,
+      content: <CreateIndividualBrokerForm sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />,
     },
     {
       id: "company-broker",
       title: t("companyBroker"),
-      content: <CreateBrokerCompanyForm sub_entity_id={sub_entity_id} />,
+      content: <CreateBrokerCompanyForm sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />,
     },
   ];
 

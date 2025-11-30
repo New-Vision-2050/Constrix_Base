@@ -4,20 +4,23 @@
 import { apiClient } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 interface Config {
   url: string;
   icons: React.ReactNode[];
 }
 
-const StatisticsRow = ({ config }: { config: Config }) => {
-  const { data, isLoading, isSuccess } = useQuery({
+const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetch?: boolean }) => {
+  const { data, isLoading, isSuccess, refetch } = useQuery({
     queryKey: ["widgets", config.url],
     queryFn: async () => {
       const response = await apiClient.get(config.url);
       return response.data;
     },
   });
+
+  useEffect(() => { refetch() }, [toggleRefetch, refetch]);
 
   const payload = data?.payload || [{}, {}, {}, {}];
 
@@ -53,10 +56,9 @@ const StatisticsRow = ({ config }: { config: Config }) => {
               {/* percentage */}
               <span
                 dir="ltr"
-                className={`text-lg font-semibold ${
-                  isSuccess &&
+                className={`text-lg font-semibold ${isSuccess &&
                   (item.percentage >= 0 ? "text-green-500" : "text-red-500")
-                }`}
+                  }`}
               >
                 {isSuccess && (
                   <>

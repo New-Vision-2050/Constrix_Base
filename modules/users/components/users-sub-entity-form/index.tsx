@@ -18,6 +18,7 @@ type PropsT = {
   sub_entity_id?: string;
   slug?: string;
   registrationFormSlug?: string;
+  handleRefreshWidgetsData?: () => void;
 };
 
 export default function UsersSubEntityForm({
@@ -25,6 +26,7 @@ export default function UsersSubEntityForm({
   sub_entity_id,
   slug,
   registrationFormSlug,
+  handleRefreshWidgetsData,
 }: PropsT) {
   // declare and define component state and vars
   const t = useTranslations("Companies");
@@ -57,12 +59,12 @@ export default function UsersSubEntityForm({
 
   // client model
   if (registrationFormSlug === ModelsTypes.CLIENT) {
-    return <UsersSubEntityFormClientModel sub_entity_id={sub_entity_id} />;
+    return <UsersSubEntityFormClientModel sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />;
   }
 
   // broker model
   if (registrationFormSlug === ModelsTypes.BROKER) {
-    return <UsersSubEntityFormBrokerModel sub_entity_id={sub_entity_id} />;
+    return <UsersSubEntityFormBrokerModel sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />;
   }
 
   // define sheet form - employee model
@@ -75,7 +77,6 @@ export default function UsersSubEntityForm({
             sub_entity_id: sub_entity_id as string,
           },
           onSubmit: async (values, formConfig) => {
-            console.log("Form submitted successfully:", values);
             return await defaultSubmitHandler(
               {
                 ...values,
@@ -88,6 +89,7 @@ export default function UsersSubEntityForm({
           onSuccess: () => {
             const tableStore = useTableStore.getState();
             tableStore.reloadTable(tableId);
+            handleRefreshWidgetsData?.();
             setTimeout(() => {
               tableStore.setLoading(tableId, false);
             }, 100);
