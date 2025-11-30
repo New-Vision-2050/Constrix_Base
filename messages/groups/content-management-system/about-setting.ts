@@ -1,6 +1,6 @@
 import { MessagesGroup, _m } from "@/messages";
 
-export const ContentManagementSystemContactSettingMessages = new MessagesGroup({
+export const AboutManagementSystemContactSettingMessages = new MessagesGroup({
   form: new MessagesGroup({
     mainSection: _m("Main Section", "القسم الرئيسي"),
     sectionImage: _m("Section Image", "صورة القسم"),

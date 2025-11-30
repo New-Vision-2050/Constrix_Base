@@ -3,7 +3,7 @@ import { ContentManagementSystemProjectsPageMessages } from "./projects";
 import { ContentManagementSystemCategoriesMessages } from "./categories";
 import { ContentManagementSystemIconsMessages } from "./icons";
 import { ContentManagementSystemMainSettingsMessages } from "./main-settings";
-import { ContentManagementSystemContactSettingMessages } from "./contact-setting";
+import { AboutManagementSystemContactSettingMessages } from "./about-setting";
 import { ContentManagementSystemTermsConditionsMessages } from "./terms-conditions";
 import { ContentManagementSystemMainDataMessages } from "./main-data";
 import { ContentManagementSystemFounderMessages } from "./founder";
@@ -17,7 +17,7 @@ export const contentManagementSystemMessages = new MessagesGroup({
   projects: ContentManagementSystemProjectsPageMessages,
   icons: ContentManagementSystemIconsMessages,
   mainSettings: ContentManagementSystemMainSettingsMessages,
-  contactSetting: ContentManagementSystemContactSettingMessages,
+  aboutSetting: AboutManagementSystemContactSettingMessages,
   termsConditions: ContentManagementSystemTermsConditionsMessages,
   mainData: ContentManagementSystemMainDataMessages,
   founder: ContentManagementSystemFounderMessages,
