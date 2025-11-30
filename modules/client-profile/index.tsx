@@ -7,6 +7,7 @@ import EmptyUserDataSection from "../dashboard/components/EmptyUserDataSection";
 import { Button } from "@mui/material";
 import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 type PropsT = {
     profileData: ClientProfileData;
@@ -15,10 +16,13 @@ type PropsT = {
 export default function ClientProfileModule({ profileData }: PropsT) {
     // Translations
     const t = useTranslations("ClientProfile");
+    // extract query params
+    const searchParams = useSearchParams();
+    const readonly = Boolean(searchParams.get('readonly'));
 
     return (
         <div className="px-6 py-4 flex flex-col gap-4">
-            <ClientProfileHeader profileData={profileData} />
+            <ClientProfileHeader profileData={profileData} readonly={readonly} />
             {/* grid have 3 columns in md and 1 column in xs*/}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* statistics cards */}

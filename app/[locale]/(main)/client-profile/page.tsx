@@ -17,7 +17,7 @@ export default async function ClientProfilePage() {
 
 
 
-async function fetchMeData(): Promise<ClientProfileData | null> {
+export async function fetchMeData(): Promise<ClientProfileData | null> {
   try {
     const response = await baseApi.get(`${baseURL}/users/me`);
     return response.data.payload;
