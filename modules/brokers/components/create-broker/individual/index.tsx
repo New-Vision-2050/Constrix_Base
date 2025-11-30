@@ -13,12 +13,12 @@ export default function CreateIndividualBrokerForm({
 }) {
   const t = useTranslations("BrokersModule");
   const { sharedSettings } = useBrokersDataCxt();
-  const { branchId: currentEmpBranchId, userId: currentEmpId, closeCreateBrokerSheet } =
+  const { branchId: currentEmpBranchId, tableId, userId: currentEmpId, closeCreateBrokerSheet } =
     useCreateBrokerCxt();
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable("brokers-table");
+    tableStore.reloadTable(tableId ?? "brokers-table");
 
     closeCreateBrokerSheet();
   };

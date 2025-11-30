@@ -17,11 +17,12 @@ export default function CreateIndividualClientForm({
     closeCreateClientSheet,
     companyBranchesIds,
     sharedSettings,
+    tableId,
   } = useCreateClientCxt();
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable("clients-table");
+    tableStore.reloadTable(tableId ?? "clients-table");
 
     closeCreateClientSheet();
   };

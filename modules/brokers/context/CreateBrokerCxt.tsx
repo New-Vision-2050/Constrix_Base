@@ -16,6 +16,7 @@ interface CxtType {
   closeCreateBrokerSheet: () => void;
   branchId: string | undefined;
   userId: string | undefined;
+  tableId?: string;
 }
 
 // Create the context
@@ -24,9 +25,10 @@ const Cxt = createContext<CxtType | undefined>(undefined);
 // Provider component
 interface PropsT {
   children: ReactNode;
+  tableId?: string;
 }
 
-export const CreateBrokerCxtProvider: React.FC<PropsT> = ({ children }) => {
+export const CreateBrokerCxtProvider: React.FC<PropsT> = ({ children, tableId }) => {
   // ** declare and define helper variables
   // control open sheet
   const [openCreateBroker, setOpenCreateBroker] = useState(false);
@@ -62,6 +64,8 @@ export const CreateBrokerCxtProvider: React.FC<PropsT> = ({ children }) => {
         branchId,
         // user id
         userId,
+        // table id
+        tableId,
       }}
     >
       {children}
