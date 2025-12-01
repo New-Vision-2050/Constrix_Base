@@ -94,7 +94,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       },
     ],
     initialValues: {
-      marital_status: relative?.marital_status,
+      marital_status_id: relative?.marital_status?.id?.toString(),
       name: relative?.name,
       phone: relative?.phone,
       relationship: relative?.relationship,
