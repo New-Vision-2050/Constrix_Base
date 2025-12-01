@@ -51,4 +51,4 @@ function AddressTable() {
     </div>
 }
 
-export default withPermissions(AddressTable, [PERMISSIONS.CMS.communicationSettings.addresses.view]);
+export default withPermissions(AddressTable, [PERMISSIONS.CMS.communicationSettings.addresses.list]);

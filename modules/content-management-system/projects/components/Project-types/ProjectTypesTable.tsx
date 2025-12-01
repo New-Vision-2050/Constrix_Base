@@ -50,4 +50,4 @@ function ProjectTypesTable() {
     </div>
 }
 
-export default withPermissions(ProjectTypesTable, [PERMISSIONS.CMS.projectsTypes.view]);
+export default withPermissions(ProjectTypesTable, [PERMISSIONS.CMS.projectsTypes.list]);

@@ -51,4 +51,4 @@ function SocialLinksTable() {
     </div>
 }
 
-export default withPermissions(SocialLinksTable, [PERMISSIONS.CMS.communicationSettings.socialLinks.view]);
+export default withPermissions(SocialLinksTable, [PERMISSIONS.CMS.communicationSettings.socialLinks.list]);
