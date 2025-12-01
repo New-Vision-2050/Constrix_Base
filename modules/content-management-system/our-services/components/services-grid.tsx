@@ -2,16 +2,10 @@
 
 import { Control } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/input";
-import {
-  FormField,
-  FormItem,
-  FormControl,
-} from "@/modules/table/components/ui/form";
-import FormLabel from "@/components/shared/FormLabel";
-import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import { Grid } from "@mui/material";
 import { OurServicesFormData } from "../schemas/our-services-form.schema";
 import { DepartmentService } from "../types";
+import FormTextField from "./shared/FormTextField";
 
 interface ServicesGridProps {
   control: Control<OurServicesFormData>;
@@ -20,6 +14,11 @@ interface ServicesGridProps {
   isSubmitting: boolean;
 }
 
+/**
+ * Services grid component displaying service input fields
+ * Displays services in a responsive 2-column grid layout
+ * Supports RTL/LTR automatically through MUI Grid
+ */
 export default function ServicesGrid({
   control,
   services,
@@ -29,31 +28,18 @@ export default function ServicesGrid({
   const tForm = useTranslations("content-management-system.services.form");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <Grid container spacing={2}>
       {services.map((service, serviceIndex) => (
-        <FormField
-          key={service.id}
-          control={control}
-          name={`departments.${departmentIndex}.services.${serviceIndex}.value`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs">
-                {tForm("serviceNumber")} {serviceIndex + 1}
-              </FormLabel>
-              <FormControl>
-                <Input
-                  variant="secondary"
-                  disabled={isSubmitting}
-                  className="mt-1"
-                  placeholder={tForm("servicePlaceholder")}
-                  {...field}
-                />
-              </FormControl>
-              <FormErrorMessage />
-            </FormItem>
-          )}
-        />
+        <Grid item xs={12} md={6} key={service.id}>
+          <FormTextField
+            control={control}
+            name={`departments.${departmentIndex}.services.${serviceIndex}.value`}
+            label={`${tForm("serviceNumber")} ${serviceIndex + 1}`}
+            placeholder={tForm("servicePlaceholder")}
+            disabled={isSubmitting}
+          />
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 }

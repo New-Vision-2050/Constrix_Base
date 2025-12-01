@@ -2,22 +2,20 @@
 
 import { Control } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/modules/table/components/ui/textarea";
-import {
-  FormField,
-  FormItem,
-  FormControl,
-} from "@/modules/table/components/ui/form";
-import FormLabel from "@/components/shared/FormLabel";
-import FormErrorMessage from "@/components/shared/FormErrorMessage";
+import { Box, Typography, Paper } from "@mui/material";
 import { OurServicesFormData } from "../schemas/our-services-form.schema";
+import FormTextField from "./shared/FormTextField";
 
 interface MainSectionProps {
   control: Control<OurServicesFormData>;
   isSubmitting: boolean;
 }
 
+/**
+ * Main section component for our services form
+ * Contains title and description fields
+ * Supports RTL/LTR and theme modes
+ */
 export default function MainSection({
   control,
   isSubmitting,
@@ -26,55 +24,44 @@ export default function MainSection({
   const tForm = useTranslations("content-management-system.services.form");
 
   return (
-    <div className="space-y-4 bg-sidebar p-6">
-      <h2 className="text-xl font-semibold text-white mb-4">
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        backgroundColor: (theme) =>
+          theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
+      }}
+    >
+      {/* Section Title */}
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
         {t("mainSection")}
-      </h2>
+      </Typography>
 
-      {/* Main Title */}
-      <FormField
-        control={control}
-        name="mainTitle"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs" required>
-              {tForm("mainTitle")}
-            </FormLabel>
-            <FormControl>
-              <Input
-                variant="secondary"
-                disabled={isSubmitting}
-                className="mt-1"
-                placeholder={tForm("mainTitlePlaceholder")}
-                {...field}
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
+      {/* Main Title Field */}
+      <Box sx={{ mb: 3 }}>
+        <FormTextField
+          control={control}
+          name="mainTitle"
+          label={tForm("mainTitle")}
+          placeholder={tForm("mainTitlePlaceholder")}
+          disabled={isSubmitting}
+          required
+        />
+      </Box>
 
-      {/* Main Description */}
-      <FormField
-        control={control}
-        name="mainDescription"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-xs" required>
-              {tForm("mainDescription")}
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                disabled={isSubmitting}
-                className="mt-1 min-h-[100px] bg-sidebar border-gray-700 text-white"
-                placeholder={tForm("mainDescriptionPlaceholder")}
-                {...field}
-              />
-            </FormControl>
-            <FormErrorMessage />
-          </FormItem>
-        )}
-      />
-    </div>
+      {/* Main Description Field */}
+      <Box>
+        <FormTextField
+          control={control}
+          name="mainDescription"
+          label={tForm("mainDescription")}
+          placeholder={tForm("mainDescriptionPlaceholder")}
+          disabled={isSubmitting}
+          required
+          multiline
+          rows={4}
+        />
+      </Box>
+    </Paper>
   );
 }
