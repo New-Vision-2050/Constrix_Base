@@ -7,21 +7,22 @@ import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Button } from "
 import { MoreVert, Person, Business, Edit } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { UsersRole } from "@/constants/users-role.enum";
 
 type PropsT = {
     profileData: ClientProfileData;
+    readonly: boolean;
 }
 
-export default function ClientProfileHeader({ profileData }: PropsT) {
+export default function ClientProfileHeader({ profileData, readonly }: PropsT) {
     // Translations
     const t = useTranslations("ClientProfile");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const router = useRouter();
     // user types
     const userTypes = profileData?.user_types ?? [];
     // current role
-    const [profileRole, setProfileRole] = useState(userTypes[0]?.role ?? '');
+    const [profileRole, setProfileRole] = useState(readonly ? UsersRole.Employee : userTypes[0]?.role ?? '');
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -63,7 +64,7 @@ export default function ClientProfileHeader({ profileData }: PropsT) {
                 startIcon={<Person fontSize="small" />}
                 endIcon={<MoreVert />}
             >
-                {profileRole == '1' ? t("header.userTypes.client") : profileRole == '2' ? t("header.userTypes.broker") : t("header.userTypes.employee")}
+                {profileRole == UsersRole?.Client ? t("header.userTypes.client") : profileRole == UsersRole?.Broker ? t("header.userTypes.broker") : t("header.userTypes.employee")}
             </Button>
             <Menu
                 id="user-menu"
@@ -82,14 +83,19 @@ export default function ClientProfileHeader({ profileData }: PropsT) {
                     horizontal: 'right',
                 }}
             >
-                {userTypes.map((userType) => (
+                {!readonly && userTypes?.length > 0 && userTypes.map((userType) => (
                     <MenuItem key={userType.id} disabled={profileRole == userType.role} onClick={() => handleMenuItemClick(userType)}>
                         <ListItemIcon>
                             <Person fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>{userType.role == '1' ? t("header.userTypes.client") : userType.role == '2' ? t("header.userTypes.broker") : t("header.userTypes.employee")}</ListItemText>
+                        <ListItemText>{userType.role == UsersRole.Client ? t("header.userTypes.client") : userType.role == UsersRole.Broker ? t("header.userTypes.broker") : t("header.userTypes.employee")}</ListItemText>
                     </MenuItem>
                 ))}
+                {readonly && (
+                    <MenuItem disabled>
+                        <ListItemText>{t("header.userTypes.employee")}</ListItemText>
+                    </MenuItem>
+                )}
             </Menu>
         </>
     );

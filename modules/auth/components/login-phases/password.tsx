@@ -16,6 +16,7 @@ import { errorEvent, getErrorMessage } from "@/utils/errorHandler";
 import { useModal } from "@/hooks/use-modal";
 import ErrorDialog from "@/components/shared/error-dialog";
 import { useTranslations } from "next-intl";
+import { UsersRole } from "@/constants/users-role.enum";
 
 const PasswordPhase = ({
   handleSetStep,
@@ -81,15 +82,17 @@ const PasswordPhase = ({
 
             // handle redirect based on user type
             if (userTypes.length > 0) {
-              const isEmployee = userTypes.some(userType => userType.role == '3');
-              const isBroker = userTypes.some(userType => userType.role == '2');
-              const isClient = userTypes.some(userType => userType.role == '1');
+              const isEmployee = userTypes.some(userType => userType.role == UsersRole.Employee);
+              const isBroker = userTypes.some(userType => userType.role == UsersRole.Broker);
+              const isClient = userTypes.some(userType => userType.role == UsersRole.Client);
               if (isEmployee) {
                 router.push(ROUTER.USER_PROFILE);
               } else if (isClient || isBroker) {
                 router.push(ROUTER.CLIENT_PROFILE);
               }
-            } else { router.push(ROUTER.COMPANIES); }
+            } else {
+              router.push(`${ROUTER.CLIENT_PROFILE}?readonly=true`);
+            }
             return;
           }
           switch (nextStep) {
