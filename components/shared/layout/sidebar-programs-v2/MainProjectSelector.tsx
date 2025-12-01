@@ -5,14 +5,7 @@ import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import CustomMenu from "@/components/headless/custom-menu";
-import {
-  MenuItem,
-  ListItemText,
-  Box,
-  Button,
-  ButtonBase,
-  Typography,
-} from "@mui/material";
+import { MenuItem, ListItemText, Box, Button, Typography } from "@mui/material";
 import { ChevronDown, Check } from "lucide-react";
 import { memo } from "react";
 import Link from "next/link";
@@ -110,9 +103,9 @@ export const MainProjectSelector = memo(function MainProjectSelector({
                 py: 1.5,
                 px: 2,
                 "&.Mui-selected": {
-                  backgroundColor: isDarkMode ? "#2D174D" : "#f3f4f6",
+                  backgroundColor: "background.default",
                   "&:hover": {
-                    backgroundColor: isDarkMode ? "#3D2460" : "#e5e7eb",
+                    backgroundColor: "background.paper",
                   },
                 },
               }}

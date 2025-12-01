@@ -1,14 +1,21 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 import { tableIcon } from "@/modules/program-settings/users-settings/tableIcon";
 import React, { memo } from "react";
 import Link from "next/link";
 import { Project } from "@/types/sidebar-menu";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  useTheme,
+  alpha,
+} from "@mui/material";
 
 type SubProgramsListProps = {
   activeUrl: string;
@@ -29,9 +36,7 @@ export const SubProgramsList = memo(function SubProgramsList({
 }: SubProgramsListProps) {
   const { open } = useSidebar();
   const t = useTranslations();
-  const { theme, systemTheme } = useTheme();
-  const currentTheme = theme === "system" ? systemTheme : theme;
-  const isDarkMode = currentTheme === "dark";
+  const { palette } = useTheme();
 
   const visibleSubEntities =
     activeProject?.sub_entities?.filter((item) => item.show) ?? [];
@@ -39,7 +44,7 @@ export const SubProgramsList = memo(function SubProgramsList({
   if (!visibleSubEntities.length) return null;
 
   return (
-    <div className="w-full mt-4">
+    <Box sx={{ width: "100%", mt: 2 }}>
       {/* Label with animation */}
       <motion.div
         animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
@@ -47,108 +52,137 @@ export const SubProgramsList = memo(function SubProgramsList({
         transition={{ duration: 0.3 }}
         style={{ overflow: "hidden" }}
       >
-        <label
-          className={cn(
-            "block mb-3 px-2 text-sm font-medium",
-            isDarkMode ? "text-gray-300" : "text-gray-700"
-          )}
+        <Box
+          sx={{
+            display: "block",
+            mb: 1.5,
+            px: 1,
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            color: "text.secondary",
+          }}
         >
           {t("Sidebar.subPrograms")}
-        </label>
+        </Box>
       </motion.div>
 
       {/* Sub Programs Menu List */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className="space-y-1"
-      >
-        {visibleSubEntities.map((sub, index) => {
-          const subUrl = sub.url || `/${activeProject?.slug}/${sub.slug}`;
-          const isActive = subUrl === activeUrl;
+      <List sx={{ py: 0 }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          {visibleSubEntities.map((sub, index) => {
+            const subUrl = sub.url || `/${activeProject?.slug}/${sub.slug}`;
+            const isActive = subUrl === activeUrl;
 
-          return (
-            <motion.div
-              key={sub.name}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2, delay: index * 0.05 }}
-            >
-              <SidebarMenuButton
-                asChild
-                tooltip={sub.name}
-                className={cn(
-                  "relative overflow-hidden transition-all duration-200",
-                  "hover:bg-gray-100 dark:hover:bg-gray-800",
-                  isActive && [
-                    "text-purple-600 dark:text-purple-400",
-                    "bg-purple-50 dark:bg-purple-950/30",
-                    "font-semibold",
-                    "before:absolute before:left-0 before:top-0 before:bottom-0",
-                    "before:w-1 before:bg-purple-600 before:rounded-r-full",
-                  ]
-                )}
-                onClick={() => onSubEntityClick(subUrl)}
+            return (
+              <motion.div
+                key={sub.name}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2, delay: index * 0.05 }}
               >
-                <Link
+                <ListItemButton
+                  component={Link}
                   href={subUrl}
-                  className={cn(
-                    "flex gap-3 items-center cursor-pointer",
-                    "px-4 py-2.5 rounded-md w-full",
-                    "group transition-all duration-200",
-                    isActive && "pl-6"
-                  )}
+                  onClick={() => onSubEntityClick(subUrl)}
+                  selected={isActive}
+                  sx={{
+                    position: "relative",
+                    borderRadius: 1.5,
+                    mb: 0.5,
+                    mx: 0.5,
+                    transition: "all 0.2s ease-in-out",
+                    overflow: "hidden",
+                    "&.Mui-selected": {
+                      backgroundColor: alpha(palette.primary.main, 0.1),
+                      color: "primary.main",
+                      fontWeight: 600,
+                      "&:hover": {
+                        backgroundColor: alpha(palette.primary.main, 0.2),
+                      },
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        backgroundColor: "primary.main",
+                        borderRadius: "0 4px 4px 0",
+                      },
+                    },
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                      transform: "translateX(4px)",
+                    },
+                    pl: isActive ? 3 : 2,
+                  }}
                 >
                   {/* Icon */}
                   {sub.icon && (
-                    <span
-                      className={cn(
-                        "flex-shrink-0 transition-transform duration-200",
-                        "group-hover:scale-110",
-                        isActive && "text-purple-600 dark:text-purple-400"
-                      )}
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 40,
+                        color: isActive ? "primary.main" : "text.primary",
+                        transition: "all 0.2s ease-in-out",
+                        "& svg": {
+                          fontSize: "1.25rem",
+                        },
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                        },
+                      }}
                     >
                       {typeof sub.icon !== "string" ? (
                         <sub.icon />
                       ) : isValidIconKey(sub.icon) ? (
                         React.createElement(tableIcon[sub.icon], {
-                          className: cn(
-                            "w-5 h-5 transition-colors",
-                            isActive
-                              ? "fill-purple-600 dark:fill-purple-400"
-                              : "fill-gray-700 dark:fill-gray-300"
-                          ),
+                          style: {
+                            width: "20px",
+                            height: "20px",
+                            fill: isActive ? "currentColor" : undefined,
+                          },
                         })
                       ) : (
-                        <span className="w-5 h-5 flex items-center justify-center text-xs">
+                        <Box
+                          component="span"
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.75rem",
+                          }}
+                        >
                           •
-                        </span>
+                        </Box>
                       )}
-                    </span>
+                    </ListItemIcon>
                   )}
 
                   {/* Text */}
-                  <span
-                    className={cn(
-                      "flex-1 truncate text-sm transition-colors",
-                      isActive
-                        ? "text-purple-600 dark:text-purple-400"
-                        : "text-gray-700 dark:text-gray-300"
-                    )}
-                  >
-                    {sub.name}
-                  </span>
-                </Link>
-              </SidebarMenuButton>
-            </motion.div>
-          );
-        })}
-      </motion.div>
-    </div>
+                  <ListItemText
+                    primary={sub.name}
+                    primaryTypographyProps={{
+                      fontSize: "0.875rem",
+                      fontWeight: isActive ? 600 : 400,
+                      noWrap: true,
+                      sx: {
+                        color: isActive ? "primary.main" : "text.primary",
+                        transition: "color 0.2s ease-in-out",
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </List>
+    </Box>
   );
 });
-
-
-
-
