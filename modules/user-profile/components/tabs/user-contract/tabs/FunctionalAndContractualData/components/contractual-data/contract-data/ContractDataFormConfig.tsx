@@ -40,7 +40,7 @@ const convertToDays = (
 };
 
 export const ContractDataFormConfig = ({ contract }: PropsT) => {
-  const { user, handleRefetchDataStatus, handleRefetchWidgetData } =
+  const { userId, handleRefetchDataStatus, handleRefetchWidgetData } =
     useUserProfileCxt();
   const { handleRefetchContractData, timeUnits } =
     useFunctionalContractualCxt();
@@ -590,7 +590,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
         start_date: formatDateYYYYMMDD(startDate),
         commencement_date: formatDateYYYYMMDD(commencementDate),
       };
