@@ -8,7 +8,9 @@ import { useBrokersDataCxt } from "@/modules/brokers/context/BrokersDataCxt";
 
 export default function CreateBrokerCompanyForm({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) {
   const t = useTranslations("BrokersModule");
@@ -22,7 +24,7 @@ export default function CreateBrokerCompanyForm({
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
     tableStore.reloadTable("brokers-table");
-
+    handleRefreshWidgetsData?.();
     closeCreateBrokerSheet();
   };
 
