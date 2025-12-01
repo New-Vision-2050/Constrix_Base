@@ -19,7 +19,7 @@ export const QualificationFormConfig = ({
   const formType = qualification ? "Edit" : "Create";
   const { handleRefreshUserQualifications } = useUserAcademicTabsCxt();
   const t = useTranslations("UserProfile.nestedTabs.qualificationsData");
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
 
   // form config
   const qualificationFormConfig: FormConfig = {
@@ -189,7 +189,7 @@ export const QualificationFormConfig = ({
 
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
         graduation_date: formatDate(graduationDate),
       };
 
