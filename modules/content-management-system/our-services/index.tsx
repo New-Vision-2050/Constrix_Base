@@ -17,7 +17,7 @@ import MainSection from "./components/main-section";
 import DepartmentsList from "./components/departments-list";
 
 export default function OurServicesModule() {
-  const tForm = useTranslations("content-management-system.our-services.form");
+  const tForm = useTranslations("content-management-system.services.form");
 
   const form = useForm<OurServicesFormData>({
     resolver: zodResolver(createOurServicesFormSchema(tForm)),

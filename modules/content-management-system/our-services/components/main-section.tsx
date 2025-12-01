@@ -22,8 +22,8 @@ export default function MainSection({
   control,
   isSubmitting,
 }: MainSectionProps) {
-  const t = useTranslations("content-management-system.our-services");
-  const tForm = useTranslations("content-management-system.our-services.form");
+  const t = useTranslations("content-management-system.services");
+  const tForm = useTranslations("content-management-system.services.form");
 
   return (
     <div className="space-y-4 bg-sidebar p-6">

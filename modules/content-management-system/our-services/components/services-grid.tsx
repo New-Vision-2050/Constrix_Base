@@ -26,7 +26,7 @@ export default function ServicesGrid({
   departmentIndex,
   isSubmitting,
 }: ServicesGridProps) {
-  const tForm = useTranslations("content-management-system.our-services.form");
+  const tForm = useTranslations("content-management-system.services.form");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

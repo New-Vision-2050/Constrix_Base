@@ -23,7 +23,7 @@ export default function DepartmentsList({
   onAdd,
   onRemove,
 }: DepartmentsListProps) {
-  const t = useTranslations("content-management-system.our-services");
+  const t = useTranslations("content-management-system.services");
 
   return (
     <div className="space-y-6 bg-sidebar p-6">

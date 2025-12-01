@@ -50,8 +50,8 @@ export default function DepartmentSection({
   onRemove,
 }: DepartmentSectionProps) {
   const isRtl = useIsRtl();
-  const t = useTranslations("content-management-system.our-services");
-  const tForm = useTranslations("content-management-system.our-services.form");
+  const t = useTranslations("content-management-system.services");
+  const tForm = useTranslations("content-management-system.services.form");
 
   return (
     <div className="space-y-4 pt-6 mb-4">
