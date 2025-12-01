@@ -3,24 +3,26 @@ import { ContentManagementSystemProjectsPageMessages } from "./projects";
 import { ContentManagementSystemCategoriesMessages } from "./categories";
 import { ContentManagementSystemIconsMessages } from "./icons";
 import { ContentManagementSystemMainSettingsMessages } from "./main-settings";
-import { ContentManagementSystemContactSettingMessages } from "./contact-setting";
+import { AboutManagementSystemContactSettingMessages } from "./about-setting";
 import { ContentManagementSystemTermsConditionsMessages } from "./terms-conditions";
 import { ContentManagementSystemMainDataMessages } from "./main-data";
 import { ContentManagementSystemFounderMessages } from "./founder";
 import { ContentManagementSystemServicesMessages } from "./services";
 import { ContentManagementSystemNewsMessages } from "./news";
 import { ContentManagementSystemThemeSettingMessages } from "./theme-setting";
+import { ContentManagementSystemCommunicationSettingsMessages } from "./communication-setting";
 
 export const contentManagementSystemMessages = new MessagesGroup({
   categories: ContentManagementSystemCategoriesMessages,
   projects: ContentManagementSystemProjectsPageMessages,
   icons: ContentManagementSystemIconsMessages,
   mainSettings: ContentManagementSystemMainSettingsMessages,
-  contactSetting: ContentManagementSystemContactSettingMessages,
+  aboutSetting: AboutManagementSystemContactSettingMessages,
   termsConditions: ContentManagementSystemTermsConditionsMessages,
   mainData: ContentManagementSystemMainDataMessages,
   founder: ContentManagementSystemFounderMessages,
   services: ContentManagementSystemServicesMessages,
   news: ContentManagementSystemNewsMessages,
   themeSetting: ContentManagementSystemThemeSettingMessages,
+  communicationSetting: ContentManagementSystemCommunicationSettingsMessages,
 });

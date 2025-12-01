@@ -56,6 +56,7 @@ export const UsersConfigV2 = (options?: {
   isShareClient?: boolean;
   isShareBroker?: boolean;
   currentUserId?: string;
+  handleRefreshWidgetsData?: () => void;
 }) => {
   const router = useRouter();
   const t = useTranslations("Companies");
@@ -344,6 +345,7 @@ export const UsersConfigV2 = (options?: {
           return {
             user: row,
             registrationFormSlug: options?.registrationFormSlug,
+            handleRefreshWidgetsData: options?.handleRefreshWidgetsData,
           };
         },
       },

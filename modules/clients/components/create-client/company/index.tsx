@@ -7,7 +7,9 @@ import { getCreateCompanyClientFormConfig } from "./CreateCompanyClientFormConfi
 
 export default function CreateClientCompanyForm({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) {
   const t = useTranslations("ClientsModule");
@@ -22,7 +24,7 @@ export default function CreateClientCompanyForm({
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
     tableStore.reloadTable("clients-table");
-
+    handleRefreshWidgetsData?.();
     closeCreateClientSheet();
   };
 

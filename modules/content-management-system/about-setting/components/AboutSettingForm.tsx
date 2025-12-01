@@ -21,10 +21,14 @@ import FileUploadButton from "@/components/shared/FileUploadButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
-    createContactSettingFormSchema,
-    ContactSettingFormData,
-    getDefaultContactSettingFormValues,
-} from "../schema/contact-setting-form.schema";
+    createAboutSettingFormSchema,
+    AboutSettingFormData,
+    getDefaultAboutSettingFormValues,
+    setInitialDataFromApi,
+    convertFormDataToApiParams,
+} from "../schema/about-setting-form.schema";
+import { AboutUsData } from "@/services/api/company-dashboard/about/types/response";
+import { CompanyDashboardAboutApi } from "@/services/api/company-dashboard/about";
 
 // About Us icons options
 const ABOUT_US_ICONS_OPTIONS = [
@@ -33,12 +37,15 @@ const ABOUT_US_ICONS_OPTIONS = [
     { value: "certificates", label: "الشهادات" },
 ];
 
-export default function ContactSettingForm() {
-    const t = useTranslations("content-management-system.contactSetting.form");
+export default function AboutSettingForm({ initialData }: { initialData: AboutUsData | null }) {
+    const t = useTranslations("content-management-system.aboutSetting.form");
+    const [mainImageUrl, setMainImageUrl] = React.useState<string | undefined>(undefined);
+    const [attachmentUrls, setAttachmentUrls] = React.useState<(string | null)[]>([]);
 
-    const form = useForm<ContactSettingFormData>({
-        resolver: zodResolver(createContactSettingFormSchema(t)),
-        defaultValues: getDefaultContactSettingFormValues(),
+    console.log('initialData101', initialData);
+    const form = useForm<AboutSettingFormData>({
+        resolver: zodResolver(createAboutSettingFormSchema(t)),
+        defaultValues: getDefaultAboutSettingFormValues(),
     });
 
     const {
@@ -46,6 +53,18 @@ export default function ContactSettingForm() {
         handleSubmit,
         formState: { errors, isSubmitting },
     } = form;
+
+    // Set initial data when initialData is provided
+    useEffect(() => {
+        if (initialData) {
+            const formValues = setInitialDataFromApi(initialData);
+            // @ts-ignore
+            setMainImageUrl(formValues.main_image_url);
+            // @ts-ignore
+            setAttachmentUrls(formValues.attachment_urls || []);
+            form.reset(formValues);
+        }
+    }, [initialData, form]);
 
     // Project types array
     const {
@@ -77,10 +96,11 @@ export default function ContactSettingForm() {
         }
     }, [errors]);
 
-    const onSubmit = async (data: ContactSettingFormData) => {
+    const onSubmit = async (data: AboutSettingFormData) => {
         try {
             // TODO: Replace with actual API call
-            // await ContactSettingApi.update(data);
+            let body = convertFormDataToApiParams(data);
+            await CompanyDashboardAboutApi.updateCurrent(body);
             toast.success(t("updateSuccess") || "Settings updated successfully!");
         } catch (error: unknown) {
             console.error("Error updating settings:", error);
@@ -146,7 +166,7 @@ export default function ContactSettingForm() {
                                                     dimensions="2160 × 2160"
                                                     required={false}
                                                     onChange={(file) => field.onChange(file)}
-                                                    initialValue={undefined}
+                                                    initialValue={mainImageUrl}
                                                     minHeight="200px"
                                                     className="mt-1"
                                                     accept="image/*"
@@ -647,7 +667,7 @@ export default function ContactSettingForm() {
                                                                 onChange={(file) => field.onChange(file)}
                                                                 accept="application/pdf,.pdf"
                                                                 maxSize="10MB"
-                                                                initialValue={field.value}
+                                                                initialValue={attachmentUrls[index] || field.value}
                                                                 disabled={isSubmitting}
                                                                 className="mt-1"
                                                             />

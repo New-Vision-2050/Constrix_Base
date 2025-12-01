@@ -15,12 +15,14 @@ import {
   getDefaultThemeSettingFormValues,
   ThemeSettingFormData,
 } from "../schema";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * Theme Setting Form Component
  * Main form for theme settings with all sections
  */
-export default function ThemeSettingForm() {
+function ThemeSettingForm() {
   const t = useTranslations("content-management-system.themeSetting");
   const tCommon = useTranslations("content-management-system.themeSetting.common");
   const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
@@ -99,3 +101,4 @@ export default function ThemeSettingForm() {
   );
 }
 
+export default withPermissions(ThemeSettingForm, [PERMISSIONS.CMS.themeSetting.update]);

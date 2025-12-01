@@ -33,13 +33,16 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
 import ClipboardClockIcon from "@/public/icons/clipboard-clock";
 import { SidebarProgramsListV2 } from "./sidebar-programs-v2";
+import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
+import { UsersRole } from "@/constants/users-role.enum";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
   mainLogo?: string;
+  userTypes: UserRoleType[];
 }
 
-export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
+export function AppSidebar({ name, mainLogo, userTypes, ...props }: AppSidebarProps) {
   const { isLoading, data } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
@@ -48,6 +51,20 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
     { can, isCentralCompany, isSuperAdmin } = p;
+  // user profile url
+  const userProfileUrl = React.useMemo(() => {
+    const isEmployee = userTypes.some(userType => userType.role == UsersRole.Employee);
+    const isBroker = userTypes.some(userType => userType.role == UsersRole.Broker);
+    const isClient = userTypes.some(userType => userType.role == UsersRole.Client);
+    if (userTypes.length > 0) {
+      if (isEmployee) {
+        return ROUTER.USER_PROFILE;
+      } else if (isBroker || isClient) {
+        return ROUTER.CLIENT_PROFILE;
+      }
+    }
+    return `${ROUTER.CLIENT_PROFILE}?readonly=true`;
+  }, [userTypes]);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
@@ -286,14 +303,14 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: SettingsIcon,
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
-        urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+        urls: [userProfileUrl, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
         show: true,
         sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
-            url: ROUTER.USER_PROFILE,
+            url: userProfileUrl,
             icon: UserIcon,
-            isActive: pageName === ROUTER.USER_PROFILE,
+            isActive: pageName === userProfileUrl,
             show: can([
               ...Object.values(PERMISSIONS.userProfile).flatMap((p) =>
                 Object.values(p)
