@@ -8,7 +8,7 @@ type ResponseT = {
 };
 
 export default async function GetPrivileges(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/user_privileges/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/user_privileges/user${Boolean(userId) ? '/' + userId : ''}`);
 
   return res.data.payload;
 }
