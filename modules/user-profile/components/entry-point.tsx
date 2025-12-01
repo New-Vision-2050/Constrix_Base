@@ -11,7 +11,9 @@ import { MapPinIcon } from "lucide-react";
 import BackpackIcon from "@/public/icons/backpack";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 
-export default function UserProfileEntryPoint() {
+
+
+export default function UserProfileEntryPoint({ userId, companyId }: { userId: string, companyId: string }) {
   // declare and define component state
   const t = useTranslations("UserProfile.header.uploadPhoto");
   const [openDialog, setOpenDialog] = useState(false);
@@ -73,7 +75,7 @@ export default function UserProfileEntryPoint() {
       {/* Statistics cards */}
       <StatisticsCardsSection />
       {/* tabs */}
-      <UserProfileTabs />
+      <UserProfileTabs userId={userId} companyId={companyId} />
     </div>
   );
 }

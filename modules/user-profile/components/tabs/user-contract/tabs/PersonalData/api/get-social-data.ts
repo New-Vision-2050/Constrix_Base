@@ -17,7 +17,7 @@ type ResponseT = {
 };
 
 export default async function GetUserSocialData(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/socials/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/socials${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }
