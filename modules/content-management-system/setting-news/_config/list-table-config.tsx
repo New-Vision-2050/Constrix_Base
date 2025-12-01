@@ -4,10 +4,13 @@ import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import TheStatus from "../component/the-status";
 import { NewsRow, TableConfigParams } from "../types";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const useNewsListTableConfig: (
   params?: TableConfigParams
 ) => TableConfig = (params) => {
+  const { can } = usePermissions();
   const t = useTranslations("content-management-system.news.table");
   const locale = useLocale();
 
@@ -77,13 +80,13 @@ export const useNewsListTableConfig: (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.news.update)} onSelect={() => params?.onEdit?.(row.id)}>
           {t("editNews")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.CMS.news.delete),
     },
     deleteUrl: `${baseURL}/website-news`,
     searchParamName: "search",

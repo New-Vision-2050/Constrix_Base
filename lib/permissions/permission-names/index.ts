@@ -1,4 +1,7 @@
-import { createPermissions as create, PERMISSION_ACTIONS } from "./default-permissions";
+import {
+  createPermissions as create,
+  PERMISSION_ACTIONS,
+} from "./default-permissions";
 
 export const PERMISSIONS = {
   user: create("USER"),
@@ -94,7 +97,7 @@ export const PERMISSIONS = {
     file: create("FILE"),
   },
   // Content Management System
-  CMS:{
+  CMS: {
     categories: create("CMS_CATEGORIES"),
     projects: create("CMS_PROJECTS"),
     projectsTypes: create("CMS_PROJECTS_TYPES"),
@@ -102,6 +105,10 @@ export const PERMISSIONS = {
     mainSettings: create("CMS_MAIN_SETTINGS"),
     contactSetting: create("CMS_CONTACT_SETTING"),
     termsConditions: create("CMS_TERMS_CONDITIONS"),
+    news: create("CMS_NEWS"),
+    founder: create("CMS_FOUNDER"),
+    services: create("CMS_SERVICES"),
+  },
     communicationSettings:{
       contactData: create("CMS_COMMUNICATION_SETTINGS_CONTACT_DATA"),
       addresses: create("CMS_COMMUNICATION_SETTINGS_ADDRESSES"),
