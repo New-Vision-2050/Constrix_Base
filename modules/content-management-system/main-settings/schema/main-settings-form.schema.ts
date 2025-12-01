@@ -1,38 +1,25 @@
 import { z } from "zod";
-
-/**
- * Creates a Zod schema for main settings form validation
- * Follows SOLID principles:
- * - Single Responsibility: Handles only validation logic
- * - Open/Closed: Extensible via factory function pattern
- * - Dependency Inversion: Depends on translation abstraction
- *
- * @param t - Translation function for localized error messages
- * @returns Zod schema object for main settings form validation
- */
 export const createMainSettingsFormSchema = (t: (key: string) => string) =>
   z.object({
-    // Main Section - Video Links
-    video_link_web: z
+    web_video_link: z
       .string()
       .optional()
-      .refine(
-        (val) => !val || val.trim().length === 0 || isValidUrl(val),
-        {
-          message:
-            t("videoLinkWebInvalid") || "Web video link must be a valid URL",
-        }
-      )
-      .transform((val) => val?.trim() || ""),
+      .nullable()
+      .refine((val) => !val || val.trim().length === 0 || isValidUrl(val), {
+        message:
+          t("videoLinkWebInvalid") || "Web video link must be a valid URL",
+      })
+      .transform((val) => val?.trim() || null),
 
-    video_file_web: z
+    web_video_file: z
       .any()
       .nullable()
       .refine(
         (file) =>
           file === null ||
           file === undefined ||
-          file instanceof File,
+          file instanceof File ||
+          typeof file === "string",
         {
           message:
             t("videoFileWebInvalid") || "Web video file must be a valid file",
@@ -40,39 +27,48 @@ export const createMainSettingsFormSchema = (t: (key: string) => string) =>
       )
       .refine(
         (file) => {
-          if (!file || !(file instanceof File)) return true;
+          if (!file || typeof file === "string") return true;
+          if (!(file instanceof File)) return true;
           // Check if it's a video file
-          const validTypes = ["video/mp4", "video/webm", "video/ogg"];
+          const validTypes = [
+            "video/mp4",
+            "video/webm",
+            "video/ogg",
+            "video/mov",
+            "video/avi",
+            "video/wmv",
+            "video/flv",
+            "video/mkv",
+          ];
           return validTypes.includes(file.type);
         },
         {
           message:
             t("videoFileWebTypeInvalid") ||
-            "Web video file must be a valid video format (mp4, webm, ogg)",
+            "Web video file must be a valid video format",
         }
       ),
 
-    video_link_mobile: z
+    mobile_video_link: z
       .string()
       .optional()
-      .refine(
-        (val) => !val || val.trim().length === 0 || isValidUrl(val),
-        {
-          message:
-            t("videoLinkMobileInvalid") ||
-            "Mobile video link must be a valid URL",
-        }
-      )
-      .transform((val) => val?.trim() || ""),
+      .nullable()
+      .refine((val) => !val || val.trim().length === 0 || isValidUrl(val), {
+        message:
+          t("videoLinkMobileInvalid") ||
+          "Mobile video link must be a valid URL",
+      })
+      .transform((val) => val?.trim() || null),
 
-    video_file_mobile: z
+    mobile_video_file: z
       .any()
       .nullable()
       .refine(
         (file) =>
           file === null ||
           file === undefined ||
-          file instanceof File,
+          file instanceof File ||
+          typeof file === "string",
         {
           message:
             t("videoFileMobileInvalid") ||
@@ -81,15 +77,25 @@ export const createMainSettingsFormSchema = (t: (key: string) => string) =>
       )
       .refine(
         (file) => {
-          if (!file || !(file instanceof File)) return true;
+          if (!file || typeof file === "string") return true;
+          if (!(file instanceof File)) return true;
           // Check if it's a video file
-          const validTypes = ["video/mp4", "video/webm", "video/ogg"];
+          const validTypes = [
+            "video/mp4",
+            "video/webm",
+            "video/ogg",
+            "video/mov",
+            "video/avi",
+            "video/wmv",
+            "video/flv",
+            "video/mkv",
+          ];
           return validTypes.includes(file.type);
         },
         {
           message:
             t("videoFileMobileTypeInvalid") ||
-            "Mobile video file must be a valid video format (mp4, webm, ogg)",
+            "Mobile video file must be a valid video format",
         }
       ),
 
@@ -130,38 +136,32 @@ export const createMainSettingsFormSchema = (t: (key: string) => string) =>
       })
       .trim(),
 
-    // Page Sections - Homepage Icons
-    homepage_icons: z
-      .array(z.string())
-      .min(1, {
-        message:
-          t("homepageIconsRequired") ||
-          "At least one homepage icon must be selected",
-      })
-      .default([]),
+    // Page Sections - Homepage Sections (matching API field names)
+    is_companies: z
+      .union([z.literal(0), z.literal(1), z.boolean()])
+      .transform((val) => (typeof val === "boolean" ? (val ? 1 : 0) : val))
+      .default(0),
 
-    // Page Sections - Company Profile
-    company_profile_file_link: z
-      .string()
-      .optional()
-      .refine(
-        (val) => !val || val.trim().length === 0 || isValidUrl(val),
-        {
-          message:
-            t("companyProfileFileLinkInvalid") ||
-            "Company profile file link must be a valid URL",
-        }
-      )
-      .transform((val) => val?.trim() || ""),
+    is_approvals: z
+      .union([z.literal(0), z.literal(1), z.boolean()])
+      .transform((val) => (typeof val === "boolean" ? (val ? 1 : 0) : val))
+      .default(0),
 
-    company_profile_file: z
+    is_certificates: z
+      .union([z.literal(0), z.literal(1), z.boolean()])
+      .transform((val) => (typeof val === "boolean" ? (val ? 1 : 0) : val))
+      .default(0),
+
+    // Page Sections - Company Profile (matching API field name)
+    video_profile_file: z
       .any()
       .nullable()
       .refine(
         (file) =>
           file === null ||
           file === undefined ||
-          file instanceof File,
+          file instanceof File ||
+          typeof file === "string",
         {
           message:
             t("companyProfileFileInvalid") ||
@@ -182,27 +182,54 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-/**
- * Type inference from the main settings form schema
- * Usage: const formData: MainSettingsFormData = {...}
- */
 export type MainSettingsFormData = z.infer<
   ReturnType<typeof createMainSettingsFormSchema>
 >;
 
-/**
- * Default form values for main settings form
- * Provides initial state for React Hook Form
- */
 export const getDefaultMainSettingsFormValues = (): MainSettingsFormData => ({
-  video_link_web: "",
-  video_file_web: null,
-  video_link_mobile: "",
-  video_file_mobile: null,
+  web_video_link: null,
+  web_video_file: null,
+  mobile_video_link: null,
+  mobile_video_file: null,
   description_ar: "",
   description_en: "",
-  homepage_icons: [],
-  company_profile_file_link: "",
-  company_profile_file: null,
+  is_companies: 0,
+  is_approvals: 0,
+  is_certificates: 0,
+  video_profile_file: null,
 });
 
+/**
+ * Map API response to form data
+ */
+export const mapApiResponseToFormData = (data: {
+  web_video_link?: string | null;
+  web_video_file?: string | null;
+  mobile_video_link?: string | null;
+  mobile_video_file?: string | null;
+  video_profile_file?: string | null;
+  description?: string | null;
+  description_en?: string | null;
+  is_companies?: 0 | 1;
+  is_approvals?: 0 | 1;
+  is_certificates?: 0 | 1;
+}): Partial<MainSettingsFormData> => {
+  // Map homepage icons from API boolean fields
+  const homepageIcons: string[] = [];
+  if (data.is_companies === 1) homepageIcons.push("companies");
+  if (data.is_approvals === 1) homepageIcons.push("accreditations");
+  if (data.is_certificates === 1) homepageIcons.push("certificates");
+
+  return {
+    web_video_link: data.web_video_link || null,
+    web_video_file: data.web_video_file || null, // URL string from API
+    mobile_video_link: data.mobile_video_link || null,
+    mobile_video_file: data.mobile_video_file || null, // URL string from API
+    description_ar: data.description || "",
+    description_en: data.description_en || "",
+    is_companies: data.is_companies || 0,
+    is_approvals: data.is_approvals || 0,
+    is_certificates: data.is_certificates || 0,
+    video_profile_file: data.video_profile_file || null, // URL string from API
+  };
+};
