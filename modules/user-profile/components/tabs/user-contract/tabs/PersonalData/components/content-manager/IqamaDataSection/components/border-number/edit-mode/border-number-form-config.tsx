@@ -7,7 +7,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useTranslations } from "next-intl";
 
 export const BorderNumberFormConfig = () => {
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
   const { handleRefetchDataStatus } = useUserProfileCxt();
@@ -127,7 +127,7 @@ export const BorderNumberFormConfig = () => {
         serialize(body),
         borderNumberFormConfig,
         {
-          url: `/company-users/identity-data/${user?.user_id}`,
+          url: `/company-users/identity-data${Boolean(userId) ? "/" + userId : ""}`,
           method: "POST",
         }
       );

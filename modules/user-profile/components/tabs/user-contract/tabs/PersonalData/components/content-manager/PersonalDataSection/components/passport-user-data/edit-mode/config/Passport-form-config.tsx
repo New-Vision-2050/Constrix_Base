@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 export const PassportDataFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
-  const { handleRefetchDataStatus, user } = useUserProfileCxt();
+  const { handleRefetchDataStatus, userId } = useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.passportData");
 
   const PassportFormConfig: FormConfig = {
@@ -126,7 +126,7 @@ export const PassportDataFormConfig = () => {
       };
 
       return await defaultSubmitHandler(serialize(body), PassportFormConfig, {
-        url: `/company-users/identity-data/${user?.user_id}`,
+        url: `/company-users/identity-data${Boolean(userId) ? "/" + userId : ""}`,
         method: "POST",
       });
     },

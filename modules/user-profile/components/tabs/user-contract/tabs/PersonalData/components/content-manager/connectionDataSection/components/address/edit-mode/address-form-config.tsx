@@ -6,7 +6,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useTranslations } from "next-intl";
 
 export const AddressFormConfig = () => {
-  const { user, handleRefetchDataStatus, handleRefetchProfileData } =
+  const { userId, handleRefetchDataStatus, handleRefetchProfileData } =
     useUserProfileCxt();
   const { userContactData, handleRefetchUserContactData } =
     useConnectionDataCxt();
@@ -15,7 +15,7 @@ export const AddressFormConfig = () => {
   const addressFormConfig: FormConfig = {
     formId: "ConnectionInformation-address-data-form",
     title: t("title"),
-    apiUrl: `${baseURL}/contactinfos/address/${user?.user_id}`,
+    apiUrl: `${baseURL}/contactinfos/address${Boolean(userId) ? "/" + userId : ""}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -81,7 +81,7 @@ export const AddressFormConfig = () => {
       };
 
       return await defaultSubmitHandler(body, addressFormConfig, {
-        url: `/contactinfos/address/${user?.user_id}`,
+        url: `/contactinfos/address${Boolean(userId) ? "/" + userId : ""}`,
         method: "PUT",
       });
     },

@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 export const IdentityDataFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
-  const { handleRefetchDataStatus, user } = useUserProfileCxt();
+  const { handleRefetchDataStatus, userId } = useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.identityData");
 
   const IdentityFormConfig: FormConfig = {
@@ -140,7 +140,7 @@ export const IdentityDataFormConfig = () => {
       };
 
       return await defaultSubmitHandler(serialize(body), IdentityFormConfig, {
-        url: `/company-users/identity-data/${user?.user_id}`,
+        url: `/company-users/identity-data${Boolean(userId) ? "/" + userId : ""}`,
         method: "POST",
       });
     },
