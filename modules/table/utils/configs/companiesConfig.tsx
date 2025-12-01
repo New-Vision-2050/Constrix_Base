@@ -27,7 +27,7 @@ interface CompanyData {
 }
 
 // Create a component that uses the translations
-export const CompaniesConfig = () => {
+export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
   const t = useTranslations("Companies");
   const router = useRouter();
   const { can } = usePermissions();
@@ -77,7 +77,11 @@ export const CompaniesConfig = () => {
         key: "is_active",
         label: t("Status"),
         render: (value: "active" | "inActive", row: CompanyData) => (
-          <TheStatus theStatus={value} id={row.id} />
+          <TheStatus
+            theStatus={value}
+            id={row.id}
+            onStatusChange={options?.onStatusChange}
+          />
         ),
       },
     ],
@@ -138,7 +142,7 @@ export const CompaniesConfig = () => {
       {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
-        action: (e: any) => {
+        action: (e: { id: string; [key: string]: unknown }) => {
           fetchCompanyAdmin(e.id).then((data) => {
             const { url, token } = data;
             if (url && token) {
@@ -151,7 +155,7 @@ export const CompaniesConfig = () => {
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
-        action: (row: CompanyData) =>
+        action: (row: { id: string; [key: string]: unknown }) =>
           router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
         disabled: can(PERMISSIONS.company.view),
       },
@@ -162,9 +166,9 @@ export const CompaniesConfig = () => {
         action: "send-link",
         dialogComponent: UserSettingDialog,
         disabled: can(PERMISSIONS.company.view),
-        dialogProps: (row: CompanyData) => {
+        dialogProps: (row: { id: string; [key: string]: unknown }) => {
           return {
-            user: row,
+            user: row as CompanyData,
             inCompany: true,
           };
         },
