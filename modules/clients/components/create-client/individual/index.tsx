@@ -7,7 +7,9 @@ import { useTableStore } from "@/modules/table/store/useTableStore";
 
 export default function CreateIndividualClientForm({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) {
   const t = useTranslations("ClientsModule");
@@ -22,7 +24,8 @@ export default function CreateIndividualClientForm({
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable(tableId ?? "clients-table");
+    tableStore.reloadTable("clients-table");
+    handleRefreshWidgetsData?.();
 
     closeCreateClientSheet();
   };

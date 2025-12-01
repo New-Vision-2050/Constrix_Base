@@ -19,6 +19,9 @@ import { subEntityStatisticsConfig } from "./users-sub-entity-statistics-config"
 import useUserData from "@/hooks/use-user-data";
 import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { Button } from "@mui/material";
+import { RefreshCcwIcon } from "lucide-react";
 
 type PropsT = {
   programName: SuperEntitySlug;
@@ -30,6 +33,8 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   const { data: userData } = useUserData();
   // shared settings
   const { data: sharedSettings } = useCRMSharedSetting();
+  // toggle refetch
+  const [toggleRefetch, setToggleRefetch] = useState(false);
   // is share client
   const isShareClient = sharedSettings?.is_share_client == "1";
   // is share broker
@@ -51,6 +56,11 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   // Check if data is loaded
   const isDataLoaded = sharedSettings !== undefined && userData !== undefined;
 
+  // handle refresh widgets data
+  const handleRefreshWidgetsData = () => {
+    setToggleRefetch(!toggleRefetch);
+  };
+
   const usersConfig = UsersConfigV2({
     canDelete: can(entityPermissions.delete),
     canEdit: can(entityPermissions.update),
@@ -59,6 +69,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
     isShareClient,
     isShareBroker,
     currentUserId,
+    handleRefreshWidgetsData,
   });
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"
@@ -95,6 +106,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow
+        toggleRefetch={toggleRefetch}
         config={subEntityStatisticsConfig(
           sub_entity_id ?? "",
           registration_form_id ?? ""
@@ -115,6 +127,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
                           sub_entity_id={sub_entity_id}
                           slug={slug}
                           registrationFormSlug={registrationFormSlug}
+                          handleRefreshWidgetsData={handleRefreshWidgetsData}
                         />
                       </Can>
                     </div>

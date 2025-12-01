@@ -8,16 +8,19 @@ import Header from "./header";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { useSidebarStore } from "@/store/useSidebarStore";
+import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 
 export default function MainLayout({
   children,
   mainLogo,
   name,
+  userTypes,
 }: Readonly<{
   children: React.ReactNode;
   isCentral: boolean;
   mainLogo?: string;
   name?: string;
+  userTypes: UserRoleType[];
 }>) {
   const locale = useLocale();
   const isRtl = locale === "ar";
@@ -52,7 +55,7 @@ export default function MainLayout({
         particleColor={isLight ? "#18003A" : "#ffffff"}
       />{" "}
       <SidebarProvider>
-        <AppSidebar name={name} mainLogo={mainLogo} />
+        <AppSidebar userTypes={userTypes} name={name} mainLogo={mainLogo} />
         <SidebarInset className="bg-transparent md:overflow-hidden border-none">
           <Header />
           {children}

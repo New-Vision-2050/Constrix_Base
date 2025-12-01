@@ -22,11 +22,12 @@ interface PropsT {
   onClose: () => void;
   user: UserTableRow;
   registrationFormSlug?: string;
+  handleRefreshWidgetsData?: () => void;
 }
 
 export default function DeleteSpecificRowDialog(props: PropsT) {
   // declare and define component state and vars
-  const { open, onClose, user, registrationFormSlug } = props;
+  const { open, onClose, user, registrationFormSlug, handleRefreshWidgetsData } = props;
   const t = useTranslations("Companies");
   const t2 = useTranslations("companyProfile.officialDocs.docsSettingsDialog");
 
@@ -61,8 +62,8 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
         registrationFormSlug === ModelsTypes.CLIENT
           ? 2
           : registrationFormSlug === ModelsTypes.BROKER
-          ? 3
-          : 1;
+            ? 3
+            : 1;
 
       const response = await apiClient.delete(
         `/company-users/users/${user.user_id}/specific-role`,
@@ -72,6 +73,7 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
           },
         }
       );
+      handleRefreshWidgetsData?.();
       toast.success(t2("deleteSuccess"));
       formWithTableReload.reloadTable();
       onClose();
