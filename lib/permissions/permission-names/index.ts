@@ -108,8 +108,7 @@ export const PERMISSIONS = {
     news: create("CMS_NEWS"),
     founder: create("CMS_FOUNDER"),
     services: create("CMS_SERVICES"),
-  },
-    communicationSettings:{
+    communicationSettings: {
       contactData: create("CMS_COMMUNICATION_SETTINGS_CONTACT_DATA"),
       addresses: create("CMS_COMMUNICATION_SETTINGS_ADDRESSES"),
       socialLinks: create("CMS_COMMUNICATION_SETTINGS_SOCIAL_LINKS"),
