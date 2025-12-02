@@ -83,6 +83,7 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
     addService: _m("Add Service", "إضافة خدمة"),
     removeService: _m("Remove Service", "حذف الخدمة"),
     mainTitle: _m("Main Title", "العنوان الرئيسي"),
+    loadingData: _m("Loading data...", "جاري تحميل البيانات..."),
     mainTitlePlaceholder: _m("Enter main title", "أدخل العنوان الرئيسي"),
     mainTitleRequired: _m("Main title is required", "العنوان الرئيسي مطلوب"),
     mainDescription: _m("Main Description", "الوصف الرئيسي"),

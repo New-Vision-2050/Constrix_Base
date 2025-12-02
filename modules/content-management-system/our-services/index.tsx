@@ -16,6 +16,7 @@ import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/se
 import { MultiSelectOption } from "@/components/shared/searchable-multi-select";
 import { CompanyDashboardOurServicesApi } from "@/services/api/company-dashboard/our-services";
 import { OurServicesData } from "@/services/api/company-dashboard/our-services/types/response";
+import Loading from "@/components/shared/Loading";
 
 /**
  * Main Our Services Module - Manages form state and CRUD operations
@@ -52,7 +53,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
   }, [initialData, setValue]);
 
   // get services list
-  const { data: servicesListData } = useQuery({
+  const { data: servicesListData, isLoading: isServicesListLoading } = useQuery({
     queryKey: ["company-dashboard-services-list"],
     queryFn: async () => {
       const response = await CompanyDashboardServicesApi.list();
@@ -62,7 +63,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
   });
   const servicesList: MultiSelectOption[] = servicesListData?.payload?.map((service) => ({ value: service.id, label: service.name ?? service.name_ar ?? service.name_en ?? "" })) || [];
   // get design types list
-  const { data: designTypesListData } = useQuery({
+  const { data: designTypesListData, isLoading: isDesignTypesListLoading } = useQuery({
     queryKey: ["company-dashboard-design-types-list"],
     queryFn: async () => {
       const response = await CompanyDashboardOurServicesApi.getDesignTypes();
@@ -117,6 +118,13 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
       toast.error(tForm("saveError"));
     }
   };
+
+
+  // loading state
+  // isServicesListLoading || isDesignTypesListLoading
+  if (isServicesListLoading) {
+    return <Loading message={tForm("loadingData")} />;
+  }
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ px: 4, py: 3 }}>
