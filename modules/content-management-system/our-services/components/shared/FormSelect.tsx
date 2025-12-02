@@ -41,9 +41,10 @@ export default function FormSelect<T extends FieldValues>({
             label={label}
             disabled={disabled}
             displayEmpty
+            defaultValue={Boolean(placeholder) ? "placeholder" : ""}
             className="w-full bg-sidebar"
           >
-            {placeholder && <MenuItem value="" disabled>{placeholder}</MenuItem>}
+            {placeholder && <MenuItem value="placeholder" disabled>{placeholder}</MenuItem>}
             {options.map((opt) => (
               <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
             ))}

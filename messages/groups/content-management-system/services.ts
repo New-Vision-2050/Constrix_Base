@@ -79,7 +79,9 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
       "فشل إنشاء الخدمة. يرجى المحاولة مرة أخرى."
     ),
     validationError: _m("Validation error", "خطأ في التحقق من البيانات"),
-    save: _m("Save", "حفظ"),
+    save: _m("Save Changes", "حفظ التعديلات"),
+    addService: _m("Add Service", "إضافة خدمة"),
+    removeService: _m("Remove Service", "حذف الخدمة"),
     mainTitle: _m("Main Title", "العنوان الرئيسي"),
     mainTitlePlaceholder: _m("Enter main title", "أدخل العنوان الرئيسي"),
     mainTitleRequired: _m("Main title is required", "العنوان الرئيسي مطلوب"),

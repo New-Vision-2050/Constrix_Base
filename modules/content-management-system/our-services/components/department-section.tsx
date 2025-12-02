@@ -9,6 +9,7 @@ import DepartmentTitleFields from "./department/DepartmentTitleFields";
 import DepartmentDescriptionFields from "./department/DepartmentDescriptionFields";
 import DepartmentDesignTypeField from "./department/DepartmentDesignTypeField";
 import ServicesGrid from "./services-grid";
+import { MultiSelectOption } from "@/components/shared/searchable-multi-select";
 
 interface DepartmentSectionProps {
   control: Control<OurServicesFormData>;
@@ -17,6 +18,7 @@ interface DepartmentSectionProps {
   totalDepartments: number;
   isSubmitting: boolean;
   onRemove: () => void;
+  servicesList: MultiSelectOption[];
 }
 
 /**
@@ -30,6 +32,7 @@ export default function DepartmentSection({
   totalDepartments,
   isSubmitting,
   onRemove,
+  servicesList,
 }: DepartmentSectionProps) {
   return (
     <Box sx={{ pt: 3, mb: 4 }}>
@@ -57,9 +60,9 @@ export default function DepartmentSection({
         />
         <ServicesGrid
           control={control}
-          services={department.services}
           departmentIndex={departmentIndex}
           isSubmitting={isSubmitting}
+          servicesList={servicesList}
         />
       </Stack>
     </Box>

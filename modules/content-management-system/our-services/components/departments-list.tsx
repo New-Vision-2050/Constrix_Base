@@ -7,6 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { OurServicesFormData } from "../schemas/our-services-form.schema";
 import { Department } from "../types";
 import DepartmentSection from "./department-section";
+import { MultiSelectOption } from "@/components/shared/searchable-multi-select";
 
 interface DepartmentsListProps {
   control: Control<OurServicesFormData>;
@@ -14,6 +15,7 @@ interface DepartmentsListProps {
   isSubmitting: boolean;
   onAdd: () => void;
   onRemove: (index: number) => void;
+  servicesList: MultiSelectOption[];
 }
 
 /**
@@ -26,6 +28,7 @@ export default function DepartmentsList({
   isSubmitting,
   onAdd,
   onRemove,
+  servicesList,
 }: DepartmentsListProps) {
   const t = useTranslations("content-management-system.services");
 
@@ -46,6 +49,7 @@ export default function DepartmentsList({
             totalDepartments={departments.length}
             isSubmitting={isSubmitting}
             onRemove={() => onRemove(deptIndex)}
+            servicesList={servicesList}
           />
         ))}
 

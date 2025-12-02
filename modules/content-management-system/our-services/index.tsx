@@ -10,6 +10,9 @@ import { createOurServicesFormSchema, getDefaultOurServicesFormValues, OurServic
 import { Department } from "./types";
 import MainSection from "./components/main-section";
 import DepartmentsList from "./components/departments-list";
+import { useQuery } from "@tanstack/react-query";
+import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
+import { MultiSelectOption } from "@/components/shared/searchable-multi-select";
 
 /**
  * Main Our Services Module - Manages form state and CRUD operations
@@ -20,6 +23,16 @@ export default function OurServicesModule() {
     resolver: zodResolver(createOurServicesFormSchema(tForm)),
     defaultValues: getDefaultOurServicesFormValues(),
   });
+
+  const { data } = useQuery({
+    queryKey: ["company-dashboard-services-list"],
+    queryFn: async () => {
+      const response = await CompanyDashboardServicesApi.list();
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+  const servicesList: MultiSelectOption[] = data?.payload?.map((service) => ({ value: service.id, label: service.name ?? service.name_ar ?? service.name_en ?? "" })) || [];
 
   const departments = watch("departments");
 
@@ -45,6 +58,20 @@ export default function OurServicesModule() {
   const onSubmit = async (data: OurServicesFormData) => {
     try {
       console.log("Form data:", data);
+      // process data to send to api
+      const payload = {
+        title: data.mainTitle,
+        description: data.mainDescription,
+        status: 1,
+        departments: data.departments.map((department) => ({
+          title_ar: data.departments[0].titleAr,
+          title_en: data.departments[0].titleEn,
+          description_ar: data.departments[0].descriptionAr,
+          description_en: data.departments[0].descriptionEn,
+          type: data.departments[0].designType,
+          website_service_ids: data.departments[0].services.map((service) => service.value),
+        }))
+      };
       toast.success(tForm("saveSuccess"));
     } catch {
       toast.error(tForm("saveError"));
@@ -61,6 +88,7 @@ export default function OurServicesModule() {
           isSubmitting={formState.isSubmitting}
           onAdd={addDepartment}
           onRemove={removeDepartment}
+          servicesList={servicesList}
         />
         <Button type="submit" variant="contained" startIcon={<SaveIcon />} disabled={formState.isSubmitting} className="w-48">
           {tForm("save")}
