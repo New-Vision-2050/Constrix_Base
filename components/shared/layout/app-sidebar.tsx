@@ -42,7 +42,12 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userTypes: UserRoleType[];
 }
 
-export function AppSidebar({ name, mainLogo, userTypes, ...props }: AppSidebarProps) {
+export function AppSidebar({
+  name,
+  mainLogo,
+  userTypes,
+  ...props
+}: AppSidebarProps) {
   const { isLoading, data } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
@@ -53,9 +58,15 @@ export function AppSidebar({ name, mainLogo, userTypes, ...props }: AppSidebarPr
     { can, isCentralCompany, isSuperAdmin } = p;
   // user profile url
   const userProfileUrl = React.useMemo(() => {
-    const isEmployee = userTypes.some(userType => userType.role == UsersRole.Employee);
-    const isBroker = userTypes.some(userType => userType.role == UsersRole.Broker);
-    const isClient = userTypes.some(userType => userType.role == UsersRole.Client);
+    const isEmployee = userTypes.some(
+      (userType) => userType.role == UsersRole.Employee
+    );
+    const isBroker = userTypes.some(
+      (userType) => userType.role == UsersRole.Broker
+    );
+    const isClient = userTypes.some(
+      (userType) => userType.role == UsersRole.Client
+    );
     if (userTypes.length > 0) {
       if (isEmployee) {
         return ROUTER.USER_PROFILE;
@@ -522,84 +533,124 @@ export function AppSidebar({ name, mainLogo, userTypes, ...props }: AppSidebarPr
             url: ROUTER.CMS.MAIN_DATA,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.CMS.MAIN_DATA,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.aboutSetting.view,
+                PERMISSIONS.CMS.aboutSetting.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.MainSettings"),
             url: ROUTER.CMS.MAIN_SETTINGS,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.CMS.MAIN_SETTINGS,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.mainSettings.view,
+                PERMISSIONS.CMS.mainSettings.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.ThemeSetting"),
             url: ROUTER.CMS.THEME_SETTING,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.CMS.THEME_SETTING,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.themeSetting.view,
+                PERMISSIONS.CMS.themeSetting.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.ContactSetting"),
             url: ROUTER.CMS.CONTACT_SETTING,
             icon: SettingsIcon,
             isActive: pageName === ROUTER.CMS.CONTACT_SETTING,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.communicationSettings.contactData.view,
+                PERMISSIONS.CMS.communicationSettings.contactData.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.Categories"),
             url: ROUTER.CMS.CATEGORIES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.CATEGORIES,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.CMS.categories)),
           },
           {
             name: t("Sidebar.CMS.Icons"),
             url: ROUTER.CMS.ICONS,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.ICONS,
-            show: true,
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.icons)),
           },
           {
             name: t("Sidebar.CMS.Services"),
             url: ROUTER.CMS.SERVICES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.SERVICES,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.services.view,
+                PERMISSIONS.CMS.services.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.OurServices"),
             url: ROUTER.CMS.OUR_SERVICES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.OUR_SERVICES,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.services.view,
+                PERMISSIONS.CMS.services.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.Projects"),
             url: ROUTER.CMS.PROJECTS,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.PROJECTS,
-            show: true,
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.projects)),
           },
           {
             name: t("Sidebar.CMS.News"),
             url: ROUTER.CMS.NEWS,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.NEWS,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.news)),
           },
           {
             name: t("Sidebar.CMS.Founder"),
             url: ROUTER.CMS.FOUNDER,
             icon: UserIcon,
             isActive: pageName === ROUTER.CMS.FOUNDER,
-            show: true,
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.founder)),
           },
           {
             name: t("Sidebar.CMS.TermsConditions"),
             url: ROUTER.CMS.TERMS_CONDITIONS,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.TERMS_CONDITIONS,
-            show: true,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.termsConditions.view,
+                PERMISSIONS.CMS.termsConditions.update,
+              ]),
           },
         ],
       },
