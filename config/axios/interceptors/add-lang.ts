@@ -15,7 +15,8 @@ const getCurrentLocale = async (): Promise<string> => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { cookies } = require("next/headers");
-        const localeCookie = cookies().get("NEXT_LOCALE")?.value;
+        const cookieStore = await cookies();
+        const localeCookie = cookieStore.get("NEXT_LOCALE")?.value;
         if (localeCookie) {
           return localeCookie;
         }

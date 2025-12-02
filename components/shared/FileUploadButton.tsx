@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, File } from "lucide-react";
+import { Upload, X, File as FileIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -159,7 +159,7 @@ export default function FileUploadButton({
 
       {selectedFile ? (
         <div className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-lg">
-          <File className="h-4 w-4 text-sidebar-foreground/60 flex-shrink-0" />
+          <FileIcon className="h-4 w-4 text-sidebar-foreground/60 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <TooltipProvider>
               <Tooltip>

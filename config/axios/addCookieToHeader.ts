@@ -1,14 +1,15 @@
 import { InternalAxiosRequestConfig } from "axios";
 import { getCookie } from "cookies-next";
 
-export const anywhereGetCookieValue = (
+export const anywhereGetCookieValue = async (
   cookieName: string
-): string | undefined => {
+): Promise<string | undefined> => {
   if (typeof window === "undefined") {
     // Running on the server
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { cookies } = require("next/headers"); // Require dynamically
-    return cookies().get(cookieName)?.value;
+    const cookieStore = await cookies();
+    return cookieStore.get(cookieName)?.value;
   } else {
     // Running on the client
     return getCookie(cookieName) as string | undefined;
@@ -22,8 +23,8 @@ export const addCookieToHeaders =
     parseHeader: (value?: string | boolean | null) => string | undefined | null,
     validate: (value?: string | boolean | null) => boolean
   ) =>
-  (config: InternalAxiosRequestConfig) => {
-    const cookieValue = anywhereGetCookieValue(cookieName);
+  async (config: InternalAxiosRequestConfig) => {
+    const cookieValue = await anywhereGetCookieValue(cookieName);
 
     if (validate && !validate(cookieValue)) {
       throw new Error(
