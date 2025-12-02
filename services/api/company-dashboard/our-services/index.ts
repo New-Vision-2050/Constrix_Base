@@ -1,5 +1,5 @@
 import { baseApi } from "@/config/axios/instances/base";
-import { GetCurrentOurServicesResponse, UpdateOurServicesResponse } from "./types/response";
+import { GetCurrentOurServicesResponse, GetDesignTypesResponse, UpdateOurServicesResponse } from "./types/response";
 import { UpdateOurServicesParams } from "./types/params";
 
 /**
@@ -22,5 +22,13 @@ export const CompanyDashboardOurServicesApi = {
   updateCurrent: (body: UpdateOurServicesParams) => {
     return baseApi.post<UpdateOurServicesResponse>("website-our-services/current", body);
   },
+
+
+  /**
+   * Get design types list
+   * GET /website-our-services/design-types
+   */
+  getDesignTypes: () =>
+    baseApi.get<GetDesignTypesResponse>("/website-our-services/service-types"),
 };
 

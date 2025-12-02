@@ -16,6 +16,7 @@ interface DepartmentsListProps {
   onAdd: () => void;
   onRemove: (index: number) => void;
   servicesList: MultiSelectOption[];
+  designTypesList: MultiSelectOption[];
 }
 
 /**
@@ -29,6 +30,7 @@ export default function DepartmentsList({
   onAdd,
   onRemove,
   servicesList,
+  designTypesList,
 }: DepartmentsListProps) {
   const t = useTranslations("content-management-system.services");
 
@@ -50,6 +52,7 @@ export default function DepartmentsList({
             isSubmitting={isSubmitting}
             onRemove={() => onRemove(deptIndex)}
             servicesList={servicesList}
+            designTypesList={designTypesList}
           />
         ))}
 

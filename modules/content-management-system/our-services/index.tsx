@@ -62,8 +62,16 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
   });
   const servicesList: MultiSelectOption[] = servicesListData?.payload?.map((service) => ({ value: service.id, label: service.name ?? service.name_ar ?? service.name_en ?? "" })) || [];
   // get design types list
+  const { data: designTypesListData } = useQuery({
+    queryKey: ["company-dashboard-design-types-list"],
+    queryFn: async () => {
+      const response = await CompanyDashboardOurServicesApi.getDesignTypes();
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+  const designTypesList: MultiSelectOption[] = designTypesListData?.payload?.map((designType) => ({ value: designType.id, label: designType.name ?? designType.name_ar ?? designType.name_en ?? "" })) || [];
 
-  
   const departments = watch("departments");
 
   const addDepartment = () => {
@@ -102,7 +110,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
           website_service_ids: department.services.map((service) => service.value),
         }))
       };
-      
+
       await CompanyDashboardOurServicesApi.updateCurrent(payload);
       toast.success(tForm("saveSuccess"));
     } catch {
@@ -121,6 +129,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
           onAdd={addDepartment}
           onRemove={removeDepartment}
           servicesList={servicesList}
+          designTypesList={designTypesList}
         />
         <Button type="submit" variant="contained" startIcon={<SaveIcon />} disabled={formState.isSubmitting} className="w-48">
           {tForm("save")}

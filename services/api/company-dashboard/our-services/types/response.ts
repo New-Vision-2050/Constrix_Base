@@ -37,6 +37,16 @@ export interface OurServicesData {
 }
 
 /**
+ * Design type option
+ */
+export interface DesignOptionType {
+  id: string;
+  name: string;
+  name_ar: string;
+  name_en: string;
+}
+
+/**
  * Response for getting current Our Services
  */
 export interface GetCurrentOurServicesResponse extends ApiBaseResponse<OurServicesData> {}
@@ -45,4 +55,10 @@ export interface GetCurrentOurServicesResponse extends ApiBaseResponse<OurServic
  * Response for updating Our Services
  */
 export interface UpdateOurServicesResponse extends ApiBaseResponse<OurServicesData> {}
+
+
+/**
+ * Response for getting design types list
+ */
+export interface GetDesignTypesResponse extends ApiBaseResponse<DesignOptionType[]> {}
 

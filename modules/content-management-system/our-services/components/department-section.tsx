@@ -19,6 +19,7 @@ interface DepartmentSectionProps {
   isSubmitting: boolean;
   onRemove: () => void;
   servicesList: MultiSelectOption[];
+  designTypesList: MultiSelectOption[];
 }
 
 /**
@@ -33,6 +34,7 @@ export default function DepartmentSection({
   isSubmitting,
   onRemove,
   servicesList,
+  designTypesList,
 }: DepartmentSectionProps) {
   return (
     <Box sx={{ pt: 3, mb: 4 }}>
@@ -57,6 +59,7 @@ export default function DepartmentSection({
           control={control}
           departmentIndex={departmentIndex}
           isSubmitting={isSubmitting}
+          designTypesList={designTypesList}
         />
         <ServicesGrid
           control={control}
