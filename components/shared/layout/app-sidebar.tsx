@@ -130,6 +130,7 @@ export function AppSidebar({ name, mainLogo, userTypes, ...props }: AppSidebarPr
     const settingsRoutesNames = [
       ROUTER.SETTINGS,
       ROUTER.DASHBOARD,
+      ROUTER.CLIENT_PROFILE,
       ROUTER.USER_PROFILE,
       ROUTER.COMPANY_PROFILE,
     ];
@@ -318,6 +319,7 @@ export function AppSidebar({ name, mainLogo, userTypes, ...props }: AppSidebarPr
               ...Object.values(PERMISSIONS.profile).flatMap((p) =>
                 Object.values(p)
               ),
+              // client profile permission
             ]),
           },
           {
