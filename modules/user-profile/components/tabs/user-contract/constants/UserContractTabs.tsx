@@ -9,7 +9,9 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const GetUserContractTabsList = (
-  t: (key: string) => string
+  t: (key: string) => string,
+  userId: string,
+  companyId: string
 ): SystemTab[] => {
   // declare and define component state and variables
   const { can } = usePermissions();
@@ -19,7 +21,7 @@ export const GetUserContractTabsList = (
       id: "user-contract-tab-personal-data",
       title: t("personalTab"),
       icon: <UserIcon />,
-      content: <PersonalDataTab />,
+      content: <PersonalDataTab userId={userId} companyId={companyId} />,
       show: can([
         PERMISSIONS.profile.personalInfo.view,
         PERMISSIONS.profile.passportInfo.view,

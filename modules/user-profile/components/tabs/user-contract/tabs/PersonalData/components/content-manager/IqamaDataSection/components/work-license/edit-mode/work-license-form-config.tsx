@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 export const WorkLicenseFormConfig = () => {
   const { userIdentityData, handleRefreshIdentityData } =
     usePersonalDataTabCxt();
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.licenseData");
 
   const workLicenseFormConfig: FormConfig = {
@@ -126,7 +126,7 @@ export const WorkLicenseFormConfig = () => {
         serialize(body),
         workLicenseFormConfig,
         {
-          url: `/company-users/identity-data/${user?.user_id}`,
+          url: `/company-users/identity-data${Boolean(userId) ? "/" + userId : ""}`,
           method: "POST",
         }
       );

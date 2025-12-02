@@ -39,12 +39,12 @@ export const UserBankingDataCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const {
     data: bankAccounts,
     isLoading: bankAccountsLoading,
     refetch: refreshBankingData,
-  } = useUserBankingData(user?.user_id ?? "");
+  } = useUserBankingData(userId ?? "");
   const { data: bankTypes } = useBankAccountTypes();
 
   // ** handle side effects

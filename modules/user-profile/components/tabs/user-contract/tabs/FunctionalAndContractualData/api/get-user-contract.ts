@@ -9,7 +9,7 @@ type ResponseT = {
 
 export default async function GetUserContractData(userId: string) {
   const res = await apiClient.get<ResponseT>(
-    `/employment_contracts/user/${userId}`
+    `/employment_contracts/user${Boolean(userId) ? "/" + userId : ""}`
   );
 
   return res.data.payload;
