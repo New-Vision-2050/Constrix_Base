@@ -17,6 +17,7 @@ import {
 } from "../schema";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { CompanyDashboardThemeSettingApi } from "@/services/api/company-dashboard/theme-setting";
 
 /**
  * Theme Setting Form Component
@@ -42,7 +43,6 @@ function ThemeSettingForm() {
 
   const onSubmit = async (data: ThemeSettingFormData) => {
     try {
-      console.log("Theme settings:", data);
       const payload = {
         // basic info
         url: data.basicInfo.websiteUrl,
@@ -52,11 +52,11 @@ function ThemeSettingForm() {
         // typography
         html_font_size: data.typography.htmlFontSize,
         font_family: data.typography.fontFamily,
-        font_size: data.typography.fontSize,
-        font_weight_light: data.typography.fontWeightLight,
-        font_weight_regular: data.typography.fontWeightRegular,
-        font_weight_medium: data.typography.fontWeightMedium,
-        font_weight_bold: data.typography.fontWeightBold,
+        font_size: data.typography.fontSize.toString(),
+        font_weight_light: data.typography.fontWeightLight.toString(),
+        font_weight_regular: data.typography.fontWeightRegular.toString(),
+        font_weight_medium: data.typography.fontWeightMedium.toString(),
+        font_weight_bold: data.typography.fontWeightBold.toString(),
         // color palette
         color_palettes: Object.entries(data.palette).map(([key, value]) => {
           switch (key) {
@@ -95,7 +95,7 @@ function ThemeSettingForm() {
           }
         }),
       }
-      console.log("Payload:", payload);
+      await CompanyDashboardThemeSettingApi.updateCurrent(payload);
       // TODO: API call here
     } catch (error) {
       console.error("Error:", error);

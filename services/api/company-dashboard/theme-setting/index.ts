@@ -1,6 +1,7 @@
 import { baseApi } from "@/config/axios/instances/base";
 import { GetCurrentThemeSettingResponse, UpdateThemeSettingResponse } from "./types/response";
 import { UpdateThemeSettingParams } from "./types/params";
+import { serialize } from "object-to-formdata";
 
 /**
  * Theme Setting API Service
@@ -20,7 +21,9 @@ export const CompanyDashboardThemeSettingApi = {
    * @param body - Theme Settings update parameters
    */
   updateCurrent: (body: UpdateThemeSettingParams) => {
-    return baseApi.post<UpdateThemeSettingResponse>("website-themes/current-company", body);
+    return baseApi.post<UpdateThemeSettingResponse>("website-themes/current-company", serialize(body,{
+      indices: true,
+    }));
   },
 };
 
