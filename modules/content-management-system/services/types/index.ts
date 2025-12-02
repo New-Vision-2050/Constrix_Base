@@ -11,7 +11,7 @@ export interface ServiceFormData {
   category_id: string;
   description_ar: string;
   description_en: string;
-  is_featured: boolean;
+  status: boolean;
   icon_image: File | string | null;
   main_image: File | string | null;
   previous_works: PreviousWork[];
@@ -24,7 +24,7 @@ export interface ServiceRow {
   name?: string;
   category?: Category;
   category_name?: string;
-  is_featured?: boolean;
+  status?: boolean;
   is_active?: "active" | "inActive";
 }
 
@@ -36,7 +36,7 @@ export interface ServiceData {
   category_id: string;
   description_ar: string;
   description_en: string;
-  is_featured: boolean;
+  status: boolean;
   icon_image?: {
     url?: string;
   };

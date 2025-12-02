@@ -8,9 +8,9 @@ export interface CreateServiceParams {
   name_en: string;
   reference_number?: string;
   category_website_cms_id: string;
-  description_ar?: string;
-  description_en?: string;
-  is_featured: boolean;
+  description_ar: string;
+  description_en: string;
+  status: boolean;
   icon?: File | null;
   main_image?: File | null;
   previous_work?: PreviousWorkParam[];

@@ -8,7 +8,7 @@ export interface ServiceListItem {
   name?: string;
   category?: string;
   category_name?: string;
-  is_featured?: boolean;
+  status?: boolean;
   is_active?: "active" | "inActive";
 }
 
@@ -20,7 +20,7 @@ export interface Service {
   category_id: string;
   description_ar: string;
   description_en: string;
-  is_featured: boolean;
+  status: boolean;
   icon_image?: {
     url?: string;
   };
