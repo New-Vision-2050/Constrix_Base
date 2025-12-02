@@ -1,5 +1,5 @@
 import { Controller, Control, FieldValues, Path } from "react-hook-form";
-import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from "@mui/material";
+import { TextField, MenuItem } from "@mui/material";
 
 interface SelectOption {
   value: string;
@@ -17,8 +17,9 @@ interface FormSelectProps<T extends FieldValues> {
 }
 
 /**
- * Reusable MUI Select with react-hook-form integration
+ * Reusable MUI TextField with select prop and react-hook-form integration
  * RTL/LTR handled automatically by MUI
+ * Supports Light/Dark mode through MUI theme
  */
 export default function FormSelect<T extends FieldValues>({
   control,
@@ -34,23 +35,32 @@ export default function FormSelect<T extends FieldValues>({
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <FormControl fullWidth error={!!error} size="small" required={required}>
-          <InputLabel>{label}</InputLabel>
-          <Select
-            {...field}
-            label={label}
-            disabled={disabled}
-            displayEmpty
-            defaultValue={Boolean(placeholder) ? "placeholder" : ""}
-            className="w-full bg-sidebar"
-          >
-            {placeholder && <MenuItem value="placeholder" disabled>{placeholder}</MenuItem>}
-            {options.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
-            ))}
-          </Select>
-          {error && <FormHelperText>{error.message}</FormHelperText>}
-        </FormControl>
+        <TextField
+          {...field}
+          select
+          label={label}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          fullWidth
+          size="small"
+          error={!!error}
+          helperText={error?.message}
+          SelectProps={{
+            displayEmpty: Boolean(placeholder),
+          }}
+        >
+          {placeholder && (
+            <MenuItem value="" disabled>
+              {placeholder}
+            </MenuItem>
+          )}
+          {options.map((opt) => (
+            <MenuItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </MenuItem>
+          ))}
+        </TextField>
       )}
     />
   );
