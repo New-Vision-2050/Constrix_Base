@@ -3,10 +3,24 @@ import { Label } from "@/components/ui/label";
 import PreviewTextField from "../../../../../../../components/previewTextField";
 import { usePersonalDataTabCxt } from "../../../../../../context/PersonalDataCxt";
 import { useTranslations } from "next-intl";
+import { useAuthStore } from "@/modules/auth/store/use-auth";
+import { useEffect } from "react";
 
 export default function UserProfilePersonalDataReview() {
   const { userPersonalData } = usePersonalDataTabCxt();
+  const user = useAuthStore.getState().user;
   const t = useTranslations("UserProfile.nestedTabs.PeronalDataTab");
+
+  useEffect(() => {
+    if(userPersonalData?.name && user){
+      if (user.name !== userPersonalData.name) {
+        useAuthStore.getState().setUser({
+          ...user,
+          name: userPersonalData.name,
+        });
+      }
+    }
+  }, [user, userPersonalData]);
 
   return (
     <div className="grid grid-cols-3 gap-4">
