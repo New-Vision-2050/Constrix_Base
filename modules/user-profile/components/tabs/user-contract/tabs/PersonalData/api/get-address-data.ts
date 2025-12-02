@@ -18,7 +18,7 @@ type ResponseT = {
 };
 
 export default async function GetUserContactInfoData(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/contactinfos/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/contactinfos${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

@@ -8,7 +8,7 @@ type ResponseT = {
 };
 
 export default async function GetUserJobOffersData(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/job_offers/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/job_offers/user${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

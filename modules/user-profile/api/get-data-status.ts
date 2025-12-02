@@ -9,7 +9,7 @@ type ResponseT = {
 
 export default async function getProfileDataStatus(userId: string) {
   const res = await apiClient.get<ResponseT>(
-    `/company-users/data-status/user/${userId}`
+    `/company-users/data-status/user${Boolean(userId) ? "/" + userId : ""}`
   );
 
   return res.data.payload;

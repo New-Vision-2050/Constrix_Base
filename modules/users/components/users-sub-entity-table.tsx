@@ -114,9 +114,9 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
       />{" "}
       {hasHydrated && !!subEntity && (
         <BrokersDataCxtProvider>
-          <CreateBrokerCxtProvider>
+          <CreateBrokerCxtProvider tableId={TABLE_ID}>
             <ClientsDataCxtProvider>
-              <CreateClientCxtProvider>
+              <CreateClientCxtProvider tableId={TABLE_ID}>
                 <TableBuilder
                   config={tableConfig}
                   searchBarActions={

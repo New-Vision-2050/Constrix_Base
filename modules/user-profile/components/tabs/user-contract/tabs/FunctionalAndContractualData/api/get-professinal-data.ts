@@ -25,7 +25,7 @@ type ResponseT = {
 
 export default async function GetProfessionalData(userId: string) {
   const res = await apiClient.get<ResponseT>(
-    `/user_professional_data/user/${userId}`
+    `/user_professional_data/user${Boolean(userId) ? "/" + userId : ""}`
   );
 
   return res.data.payload;

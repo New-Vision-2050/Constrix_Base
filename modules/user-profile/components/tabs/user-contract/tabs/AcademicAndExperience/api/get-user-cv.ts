@@ -13,7 +13,7 @@ type ResponseT = {
 };
 
 export default async function GetUserCV(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/biographies/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/biographies/user${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

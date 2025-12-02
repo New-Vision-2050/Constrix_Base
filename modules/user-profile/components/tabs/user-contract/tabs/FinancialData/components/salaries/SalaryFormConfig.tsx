@@ -65,7 +65,7 @@ const calculateHourlyRate = (
 
 export const SalaryFormConfig = () => {
   // declare and define component state and variables
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
 
   const salaryFormConfig: FormConfig = {
@@ -325,7 +325,7 @@ export const SalaryFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
       };
       return await defaultSubmitHandler(body, salaryFormConfig);
     },

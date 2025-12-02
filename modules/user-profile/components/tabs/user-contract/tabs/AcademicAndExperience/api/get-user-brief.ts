@@ -9,7 +9,7 @@ type ResponseT = {
 };
 
 export default async function GetUserBrief(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/user_abouts/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/user_abouts/user${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

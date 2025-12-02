@@ -8,7 +8,7 @@ type ResponseT = {
 };
 
 export default async function GetQualificationsData(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/qualifications/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/qualifications/user${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

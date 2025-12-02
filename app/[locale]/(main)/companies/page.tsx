@@ -21,7 +21,13 @@ import { withPermissionsPage } from "@/lib/permissions/client/withPermissionsPag
 const CompaniesPage = () => {
   // Get the translated config using the component
   const t = useTranslations("Companies");
-  const config = CompaniesConfig();
+  const [statisticsRefetchTrigger, setStatisticsRefetchTrigger] =
+    useState(false);
+  const config = CompaniesConfig({
+    onStatusChange: () => {
+      setStatisticsRefetchTrigger((prev) => !prev);
+    },
+  });
   const [isOpen, handleOpen, handleClose] = useModal();
   const [companyNumber, setCompanyNumber] = useState<string>("");
 
@@ -69,7 +75,10 @@ const CompaniesPage = () => {
 
   return (
     <div className="px-8 space-y-7">
-      <StatisticsRow config={statisticsConfig} />
+      <StatisticsRow
+        config={statisticsConfig}
+        toggleRefetch={statisticsRefetchTrigger}
+      />
 
       <TableBuilder
         config={config}

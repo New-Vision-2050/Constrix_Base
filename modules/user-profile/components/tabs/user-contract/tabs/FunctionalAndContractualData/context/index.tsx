@@ -63,33 +63,32 @@ export const FunctionalContractualCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const { data: companyData } = useCurrentCompany();
   const company = useMemo(() => companyData?.payload, [companyData]);
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
     FunctionalContractualList()[0]
   );
 
-  console.log("companyDatacompanyData", companyData);
   // user job offers data
   const {
     data: userJobOffersData,
     isLoading: userJobOffersDataLoading,
     refetch: refetchJobOffer,
-  } = useUserJobOffersData(user?.user_id ?? "");
+  } = useUserJobOffersData(userId ?? "");
 
   // user contract data
   const {
     data: userContractData,
     isLoading: userContractDataLoading,
     refetch: refetchContractData,
-  } = useUserContractData(user?.user_id ?? "");
+  } = useUserContractData(userId ?? "");
 
   const {
     data: professionalData,
     isLoading: professionalDataLoading,
     refetch: refetchProfessionalData,
-  } = useProfessionalData(user?.user_id ?? "");
+  } = useProfessionalData(userId ?? "");
 
   const { data: timeUnits } = useTimeUnitsData();
 

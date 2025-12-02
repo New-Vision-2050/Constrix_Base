@@ -13,26 +13,30 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 const TheStatus = ({
   theStatus,
   id,
+  onStatusChange,
 }: {
   theStatus: "active" | "inActive";
   id: string;
+  onStatusChange?: () => void;
 }) => {
   const t = useTranslations();
   const [isActive, setIsActive] = useState(!!theStatus);
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive); // Store the original state
   const { toast } = useToast();
-  const {can} = usePermissions();
+  const { can } = usePermissions();
   const handleConfirm = async (activationDate: string) => {
     try {
       const response = await apiClient.put(`/companies/${id}/activate`, {
-          is_active: Number(tempIsActive),
-          date_activate: activationDate,
+        is_active: Number(tempIsActive),
+        date_activate: activationDate,
       });
 
       if (response.status === 200) {
         setIsActive(tempIsActive);
         setShowDialog(false);
+        // Trigger statistics refetch if callback is provided
+        onStatusChange?.();
       } else {
         toast({
           title: "Error",
@@ -76,7 +80,11 @@ const TheStatus = ({
           onClose={handleCancel}
           onConfirm={handleConfirm}
           // title={isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
-          description={!isActive ? t("Companies.AreYouSureReactivate") : t("Companies.AreYouSureDeactivate")}
+          description={
+            !isActive
+              ? t("Companies.AreYouSureReactivate")
+              : t("Companies.AreYouSureDeactivate")
+          }
           showDatePicker={!isActive}
         />
       </Dialog>

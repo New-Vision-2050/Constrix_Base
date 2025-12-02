@@ -55,38 +55,34 @@ export const usePersonalDataTabCxt = () => {
 
 export const PersonalDataTabCxtProvider = ({
   children,
+  userId,
+  companyId,
 }: {
+  userId: string;
+  companyId: string;
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
   const t = useTranslations("UserProfile.tabs.verticalLists.personalList");
-  const { user: _user } = useUserProfileCxt();
-  const [user, setUser] = useState<UserProfileData>();
 
   const {
     data: userPersonalData,
     isLoading: userPersonalDataLoading,
     refetch: refreshPersonalData,
-  } = useUserPersonalData(user?.user_id);
+  } = useUserPersonalData(userId);
   const {
     data: userConnectionData,
     isLoading: userConnectionDataLoading,
     refetch: refreshConnectionData,
-  } = useUserConnectionData(user?.user_id);
+  } = useUserConnectionData(userId);
   const {
     data: userIdentityData,
     isLoading: userIdentityDataLoading,
     refetch: refetchIdentityData,
-  } = useUserIdentityData(user?.user_id);
+  } = useUserIdentityData(userId);
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
     PersonalDataSections(t)[0]
   );
-
-  console.log("user?.user_iduser?.user_id", user?.user_id);
-  // ** handle side effects
-  useEffect(() => {
-    if (_user) setUser(_user);
-  }, [_user]);
 
   // ** declare and define component helper methods
   const handleRefreshIdentityData = () => {
