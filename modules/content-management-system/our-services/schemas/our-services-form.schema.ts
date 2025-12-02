@@ -81,14 +81,10 @@ export const createOurServicesFormSchema = (t: (key: string) => string) =>
               message: t("designTypeRequired") || "Design type is required",
             }),
           services: z
-            .array(
-              z.object({
-                id: z.string(),
-                value: z.string().min(1, {
-                  message: t("serviceRequired") || "Service is required",
-                }),
-              })
-            ),
+            .array(z.string())
+            .min(1, {
+              message: t("servicesRequired") || "At least one service is required",
+            }),
         })
       )
       .min(1, {

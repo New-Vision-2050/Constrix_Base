@@ -42,10 +42,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
         descriptionAr: dept.description_ar,
         descriptionEn: dept.description_en,
         designType: dept.type,
-        services: dept.website_services.map((service) => ({
-          id: service.id,
-          value: service.id,
-        })),
+        services: dept.website_services.map((service) => service.id),
       }));
 
       setValue("departments", transformedDepartments);
@@ -83,7 +80,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
       descriptionAr: "",
       descriptionEn: "",
       designType: "",
-      services: Array.from({ length: 6 }, (_, i) => ({ id: `${i + 1}`, value: "" })),
+      services: [],
     };
     setValue("departments", [...departments, newDept]);
   };
@@ -108,7 +105,7 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
           description_en: department.descriptionEn,
           // type: department.designType,//until later API which return design types merged
           type: "cards",//until later API which return design types merged
-          website_service_ids: department.services.map((service) => service.value),
+          website_service_ids: department.services,
         }))
       };
 
