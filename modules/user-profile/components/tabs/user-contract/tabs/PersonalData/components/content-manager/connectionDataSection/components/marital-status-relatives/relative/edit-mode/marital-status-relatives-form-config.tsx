@@ -14,7 +14,7 @@ type PropsT = {
 
 export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { relative, onSuccess } = props;
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
   const formMode = !relative ? "Create" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
@@ -121,7 +121,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
 
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
       };
 
       return await defaultSubmitHandler(

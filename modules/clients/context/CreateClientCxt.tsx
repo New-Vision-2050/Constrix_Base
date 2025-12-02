@@ -21,6 +21,7 @@ interface CxtType {
   userId: string | undefined;
   sharedSettings: CRMSettingsT | undefined;
   companyBranchesIds: string[];
+  tableId?: string;
 }
 
 // Create the context
@@ -29,9 +30,10 @@ const Cxt = createContext<CxtType | undefined>(undefined);
 // Provider component
 interface PropsT {
   children: ReactNode;
+  tableId?: string;
 }
 
-export const CreateClientCxtProvider: React.FC<PropsT> = ({ children }) => {
+export const CreateClientCxtProvider: React.FC<PropsT> = ({ children, tableId }) => {
   // ** declare and define helper variables
   // control open sheet
   const [openCreateClient, setOpenCreateClient] = useState(false);
@@ -77,6 +79,8 @@ export const CreateClientCxtProvider: React.FC<PropsT> = ({ children }) => {
         sharedSettings,
         // company branches ids
         companyBranchesIds,
+        // table id
+        tableId,
       }}
     >
       {children}

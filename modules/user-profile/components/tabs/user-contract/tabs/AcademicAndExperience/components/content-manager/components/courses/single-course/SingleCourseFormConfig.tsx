@@ -14,7 +14,7 @@ type PropsT = {
 export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
   // ** declare and define component state and variables
   const formType = course ? "Edit" : "Create";
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
 
   const singleCourseFormConfig: FormConfig = {
@@ -150,7 +150,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       // Create the final body
       const body = {
         ...formDataCopy,
-        user_id: user?.user_id,
+        user_id: userId,
         date_obtain: formatDateYYYYMMDD(dateObtain),
         date_end: formatDateYYYYMMDD(endDate),
       };

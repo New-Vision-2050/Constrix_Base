@@ -17,7 +17,7 @@ export const SingleExperienceFormConfig = ({
 }: PropsT) => {
   // declare and define component state and variables
   const formType = experience ? "Edit" : "Create";
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserExperiences } = useUserAcademicTabsCxt();
   const t = useTranslations('UserProfile.nestedTabs.academicExperience'); 
 
@@ -108,7 +108,7 @@ export const SingleExperienceFormConfig = ({
 
       const body = {
         ...formData,
-        user_id: user?.user_id ?? "",
+        user_id: userId,
         training_from: formatDateYYYYMMDD(trainingFrom),
         training_to: formatDateYYYYMMDD(trainingTo),
       };

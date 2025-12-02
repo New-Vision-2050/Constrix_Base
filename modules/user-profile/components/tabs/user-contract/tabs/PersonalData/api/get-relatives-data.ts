@@ -8,7 +8,7 @@ type ResponseT = {
 };
 
 export default async function GetUserRelativesData(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/user_relatives/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/user_relatives/user${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

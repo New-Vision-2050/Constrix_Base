@@ -6,7 +6,7 @@ import { useFunctionalContractualCxt } from "../../context";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 
 export const JobFormConfig = () => {
-  const { user, handleRefetchDataStatus, companyId } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus, companyId } = useUserProfileCxt();
   const { professionalData, company, handleRefetchProfessionalData } =
     useFunctionalContractualCxt();
 
@@ -233,7 +233,7 @@ export const JobFormConfig = () => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
       };
 
       return await defaultSubmitHandler(serialize(body), jobFormConfig, {

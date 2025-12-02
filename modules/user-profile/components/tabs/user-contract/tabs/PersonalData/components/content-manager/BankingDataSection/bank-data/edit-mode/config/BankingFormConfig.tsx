@@ -15,7 +15,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
   const { bank, onSuccess } = props ?? {};
   const formType = bank ? "Edit" : "Create";
   const { handleRefreshBankingData } = useUserBankingDataCxt();
-  const { user, handleRefetchDataStatus, handleRefetchProfileData } =
+  const { userId, handleRefetchDataStatus, handleRefetchProfileData } =
     useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.bankingData");
 
@@ -214,7 +214,7 @@ export const BankingDataFormConfig = (props: PropsT) => {
     onSubmit: async (formData: Record<string, unknown>) => {
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
       };
       const method = formType !== "Edit" ? "POST" : "PUT";
       const url = `/bank_accounts${formType === "Edit" ? `/${bank?.id}` : ""}`;

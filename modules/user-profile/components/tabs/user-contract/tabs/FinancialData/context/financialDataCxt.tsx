@@ -55,7 +55,7 @@ export const FinancialDataCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
     financialDataSections()?.[0]
   );
@@ -65,7 +65,7 @@ export const FinancialDataCxtProvider = ({
     data: userSalary,
     isLoading: userSalaryLoading,
     refetch: refetchSalaryData,
-  } = useUserSalaryData(user?.user_id ?? "");
+  } = useUserSalaryData(userId ?? "");
 
   // privileges data
   const { data: privileges, refetch: refreshPrivileges } = usePrivilegesData();
@@ -75,7 +75,7 @@ export const FinancialDataCxtProvider = ({
     data: addedPrivilegesList,
     isLoading: addedPrivilegesListLoading,
     refetch: refreshPrivilegesList,
-  } = usePrivileges(user?.user_id ?? "");
+  } = usePrivileges(userId ?? "");
 
   // ** declare and define component helper methods
   const handleRefreshPrivilegesList = () => {

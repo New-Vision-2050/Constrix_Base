@@ -8,7 +8,7 @@ type ResponseT = {
 };
 
 export default async function GetUserBankingData(userId: string) {
-  const res = await apiClient.get<ResponseT>(`/bank_accounts/user/${userId}`);
+  const res = await apiClient.get<ResponseT>(`/bank_accounts/user${Boolean(userId) ? "/" + userId : ""}`);
 
   return res.data.payload;
 }

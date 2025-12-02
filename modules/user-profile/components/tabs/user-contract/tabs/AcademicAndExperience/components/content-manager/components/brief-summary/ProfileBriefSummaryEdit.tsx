@@ -11,14 +11,14 @@ export default function ProfileBriefSummaryEdit() {
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const { userBrief } = useUserAcademicTabsCxt();
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const t = useTranslations("UserProfile.nestedTabs.briefSummary");
 
   const handleUpdateUserBrief = async () => {
     try {
       setLoading(true);
       await apiClient.post(`/user_abouts`, {
-        user_id: user?.user_id ?? "",
+        user_id: userId,
         about_me: summary,
       });
       setLoading(false);
