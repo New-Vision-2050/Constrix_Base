@@ -59,21 +59,21 @@ export const getTextColors = (
 ): ColorConfig<ThemeSettingFormData>[] => [
   { name: "palette.text.main", label: t("primary") },
   { name: "palette.text.light", label: t("light") },
-  { name: "palette.text.dark", label: t("dark") },
-  { name: "palette.text.contrastText", label: t("contrast") },
+  { name: "palette.text.dark", label: t("divider") },
+  { name: "palette.text.contrastText", label: t("disabled") },
 ];
 
 export const getCommonColors = (
   t: (key: string) => string
 ): ColorConfig<ThemeSettingFormData>[] => [
-  { name: "palette.common.light", label: t("light") },
-  { name: "palette.common.dark", label: t("dark") },
+  { name: "palette.common.light", label: t("white") },
+  { name: "palette.common.dark", label: t("black") },
 ];
 
 export const getBackgroundColors = (
   t: (key: string) => string
 ): ColorConfig<ThemeSettingFormData>[] => [
-  { name: "palette.background.light", label: t("light") },
-  { name: "palette.background.dark", label: t("dark") },
+  { name: "palette.background.light", label: t("paper") },
+  { name: "palette.background.dark", label: t("default") },
 ];
 
