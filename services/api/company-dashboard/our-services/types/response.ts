@@ -14,9 +14,11 @@ export interface WebsiteService {
  */
 export interface OurServiceDepartment {
   id: string;
-  title: string;
-  description: string;
-  type: "hexa" | "cards";
+  title_ar: string;
+  title_en: string;
+  description_ar: string;
+  description_en: string;
+  type: string;
   website_services: WebsiteService[];
 }
 
@@ -27,7 +29,7 @@ export interface OurServicesData {
   id: string;
   title: string;
   description: string;
-  status: 0 | 1;
+  status: number;
   company_id: string;
   created_at: string;
   updated_at: string;

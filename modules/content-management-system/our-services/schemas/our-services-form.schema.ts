@@ -88,11 +88,7 @@ export const createOurServicesFormSchema = (t: (key: string) => string) =>
                   message: t("serviceRequired") || "Service is required",
                 }),
               })
-            )
-            .min(6, {
-              message:
-                t("servicesMinRequired") || "At least 6 services are required",
-            }),
+            ),
         })
       )
       .min(1, {
@@ -114,16 +110,6 @@ export type OurServicesFormData = z.infer<
 export const getDefaultOurServicesFormValues = (): OurServicesFormData => ({
   mainTitle: "",
   mainDescription: "",
-  departments: [
-    {
-      id: "1",
-      titleAr: "خدماتنا",
-      titleEn: "Our Services",
-      descriptionAr: "",
-      descriptionEn: "",
-      designType: "",
-      services: [],
-    },
-  ],
+  departments: [],
 });
 

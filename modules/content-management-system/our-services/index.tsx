@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Box, Button } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import { toast } from "sonner";
+import { useEffect } from "react";
 import { createOurServicesFormSchema, getDefaultOurServicesFormValues, OurServicesFormData } from "./schemas/our-services-form.schema";
 import { Department } from "./types";
 import MainSection from "./components/main-section";
@@ -13,18 +14,45 @@ import DepartmentsList from "./components/departments-list";
 import { useQuery } from "@tanstack/react-query";
 import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
 import { MultiSelectOption } from "@/components/shared/searchable-multi-select";
+import { CompanyDashboardOurServicesApi } from "@/services/api/company-dashboard/our-services";
+import { OurServicesData } from "@/services/api/company-dashboard/our-services/types/response";
 
 /**
  * Main Our Services Module - Manages form state and CRUD operations
  */
-export default function OurServicesModule() {
+export default function OurServicesModule({ initialData }: { initialData: OurServicesData }) {
   const tForm = useTranslations("content-management-system.services.form");
   const { control, handleSubmit, watch, setValue, formState } = useForm<OurServicesFormData>({
     resolver: zodResolver(createOurServicesFormSchema(tForm)),
     defaultValues: getDefaultOurServicesFormValues(),
   });
 
-  const { data } = useQuery({
+  // set initial data
+  useEffect(() => {
+    if (initialData) {
+      setValue("mainTitle", initialData.title);
+      setValue("mainDescription", initialData.description);
+
+      // Transform API data to form data structure
+      const transformedDepartments: Department[] = initialData.departments.map((dept) => ({
+        id: dept.id,
+        titleAr: dept.title_ar,
+        titleEn: dept.title_en,
+        descriptionAr: dept.description_ar,
+        descriptionEn: dept.description_en,
+        designType: dept.type,
+        services: dept.website_services.map((service) => ({
+          id: service.id,
+          value: service.id,
+        })),
+      }));
+
+      setValue("departments", transformedDepartments);
+    }
+  }, [initialData, setValue]);
+
+  // get services list
+  const { data: servicesListData } = useQuery({
     queryKey: ["company-dashboard-services-list"],
     queryFn: async () => {
       const response = await CompanyDashboardServicesApi.list();
@@ -32,8 +60,10 @@ export default function OurServicesModule() {
     },
     staleTime: 1000 * 60 * 60 * 24,
   });
-  const servicesList: MultiSelectOption[] = data?.payload?.map((service) => ({ value: service.id, label: service.name ?? service.name_ar ?? service.name_en ?? "" })) || [];
+  const servicesList: MultiSelectOption[] = servicesListData?.payload?.map((service) => ({ value: service.id, label: service.name ?? service.name_ar ?? service.name_en ?? "" })) || [];
+  // get design types list
 
+  
   const departments = watch("departments");
 
   const addDepartment = () => {
@@ -57,7 +87,6 @@ export default function OurServicesModule() {
 
   const onSubmit = async (data: OurServicesFormData) => {
     try {
-      console.log("Form data:", data);
       // process data to send to api
       const payload = {
         title: data.mainTitle,
@@ -68,10 +97,13 @@ export default function OurServicesModule() {
           title_en: department.titleEn,
           description_ar: department.descriptionAr,
           description_en: department.descriptionEn,
-          type: department.designType,
+          // type: department.designType,//until later API which return design types merged
+          type: "cards",//until later API which return design types merged
           website_service_ids: department.services.map((service) => service.value),
         }))
       };
+      
+      await CompanyDashboardOurServicesApi.updateCurrent(payload);
       toast.success(tForm("saveSuccess"));
     } catch {
       toast.error(tForm("saveError"));
