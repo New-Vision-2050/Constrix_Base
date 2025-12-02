@@ -43,6 +43,59 @@ function ThemeSettingForm() {
   const onSubmit = async (data: ThemeSettingFormData) => {
     try {
       console.log("Theme settings:", data);
+      const payload = {
+        // basic info
+        url: data.basicInfo.websiteUrl,
+        icon: data.basicInfo.websiteIcon,
+        // border radius
+        radius: data.borderRadius,
+        // typography
+        html_font_size: data.typography.htmlFontSize,
+        font_family: data.typography.fontFamily,
+        font_size: data.typography.fontSize,
+        font_weight_light: data.typography.fontWeightLight,
+        font_weight_regular: data.typography.fontWeightRegular,
+        font_weight_medium: data.typography.fontWeightMedium,
+        font_weight_bold: data.typography.fontWeightBold,
+        // color palette
+        color_palettes: Object.entries(data.palette).map(([key, value]) => {
+          switch (key) {
+            case "common":
+              return {
+                slug: key,
+                name: "Common (black and white)",
+                black: value.dark,
+                white: value.light
+              }
+            case "background":
+              return {
+                slug: key,
+                name: "Background",
+                paper: value.light,
+                default: value.dark,
+              }
+            case "text":
+              return {
+                slug: key,
+                name: "Text",
+                primary: "main" in value ? value.main : undefined,
+                secondary: value.light,
+                divider: value.dark,
+                disabled: "contrastText" in value ? value.contrastText : undefined,
+              }
+            default:
+              return {
+                slug: key,
+                name: key,
+                main: "main" in value ? value.main : undefined,
+                light: value.light,
+                dark: value.dark,
+                contrast: "contrastText" in value ? value.contrastText : undefined,
+              }
+          }
+        }),
+      }
+      console.log("Payload:", payload);
       // TODO: API call here
     } catch (error) {
       console.error("Error:", error);
