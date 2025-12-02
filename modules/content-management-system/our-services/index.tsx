@@ -64,12 +64,12 @@ export default function OurServicesModule() {
         description: data.mainDescription,
         status: 1,
         departments: data.departments.map((department) => ({
-          title_ar: data.departments[0].titleAr,
-          title_en: data.departments[0].titleEn,
-          description_ar: data.departments[0].descriptionAr,
-          description_en: data.departments[0].descriptionEn,
-          type: data.departments[0].designType,
-          website_service_ids: data.departments[0].services.map((service) => service.value),
+          title_ar: department.titleAr,
+          title_en: department.titleEn,
+          description_ar: department.descriptionAr,
+          description_en: department.descriptionEn,
+          type: department.designType,
+          website_service_ids: department.services.map((service) => service.value),
         }))
       };
       toast.success(tForm("saveSuccess"));

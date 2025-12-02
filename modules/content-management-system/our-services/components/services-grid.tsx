@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button, IconButton } from "@mui/material";
 import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { OurServicesFormData } from "../schemas/our-services-form.schema";
-import FormTextField from "./shared/FormTextField";
+import FormSelect from "./shared/FormSelect";
 import { MultiSelectOption } from "@/components/shared/searchable-multi-select";
 
 interface ServicesGridProps {
@@ -43,10 +43,14 @@ export default function ServicesGrid({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {fields.map((service, serviceIndex) => (
           <div key={service.id} className="flex items-start gap-2">
-            <FormTextField
+            <FormSelect
               control={control}
               name={`departments.${departmentIndex}.services.${serviceIndex}.value`}
               label={`${tForm("serviceNumber")} ${serviceIndex + 1}`}
+              options={servicesList.map((item) => ({
+                value: item.value,
+                label: item.label,
+              }))}
               placeholder={tForm("servicePlaceholder")}
               disabled={isSubmitting}
             />

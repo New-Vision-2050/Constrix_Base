@@ -122,10 +122,7 @@ export const getDefaultOurServicesFormValues = (): OurServicesFormData => ({
       descriptionAr: "",
       descriptionEn: "",
       designType: "",
-      services: Array.from({ length: 6 }, (_, i) => ({
-        id: `${i + 1}`,
-        value: "تصميم مواقع",
-      })),
+      services: [],
     },
   ],
 });
