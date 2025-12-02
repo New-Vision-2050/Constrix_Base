@@ -26,10 +26,26 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
       "Enter description in Arabic",
       "أدخل الوصف بالعربية"
     ),
+    descriptionArRequired: _m(
+      "Arabic description is required",
+      "الوصف بالعربية مطلوب"
+    ),
+    descriptionArMinLength: _m(
+      "Arabic description must be at least 10 characters",
+      "الوصف بالعربية يجب أن يكون على الأقل 10 أحرف"
+    ),
     descriptionEn: _m("Description (English)", "الوصف (إنجليزي)"),
     descriptionEnPlaceholder: _m(
       "Enter description in English",
       "أدخل الوصف بالإنجليزية"
+    ),
+    descriptionEnRequired: _m(
+      "English description is required",
+      "الوصف بالإنجليزية مطلوب"
+    ),
+    descriptionEnMinLength: _m(
+      "English description must be at least 10 characters",
+      "الوصف بالإنجليزية يجب أن يكون على الأقل 10 أحرف"
     ),
     requestId: _m("Request ID", "رقم الطلب"),
     requestIdPlaceholder: _m(
@@ -87,5 +103,7 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
     visibility: _m("Visibility", "الظهور"),
     featured: _m("Featured", "مميز"),
     edit: _m("Edit", "تعديل"),
+    statusUpdated: _m("Status updated successfully", "تم تحديث الحالة بنجاح"),
+    statusUpdateError: _m("Failed to update status", "فشل تحديث الحالة"),
   }),
 });

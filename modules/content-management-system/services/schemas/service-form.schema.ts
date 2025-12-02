@@ -42,11 +42,31 @@ export const createServiceFormSchema = (
         message: t("categoryRequired"),
       }),
 
-    description_ar: z.string().optional(),
+    description_ar: z
+      .string({
+        required_error: t("descriptionArRequired"),
+      })
+      .min(1, {
+        message: t("descriptionArRequired"),
+      })
+      .min(10, {
+        message: t("descriptionArMinLength"),
+      })
+      .trim(),
 
-    description_en: z.string().optional(),
+    description_en: z
+      .string({
+        required_error: t("descriptionEnRequired"),
+      })
+      .min(1, {
+        message: t("descriptionEnRequired"),
+      })
+      .min(10, {
+        message: t("descriptionEnMinLength"),
+      })
+      .trim(),
 
-    is_featured: z.boolean().default(false),
+    status: z.boolean().default(false),
 
     icon_image: isEditMode
       ? z.union([z.instanceof(File), z.string(), z.null()]).optional()
@@ -100,7 +120,7 @@ export const getDefaultServiceFormValues = (): ServiceFormData => ({
   category_id: "",
   description_ar: "",
   description_en: "",
-  is_featured: false,
+  status: false,
   icon_image: null,
   main_image: null,
   previous_works: [],

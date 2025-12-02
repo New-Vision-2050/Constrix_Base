@@ -117,7 +117,12 @@ export const PERMISSIONS = {
     termsConditions: create("WEBSITE_TERM_AND_CONDITION", ["VIEW", "UPDATE"]), // just view,update
     news: create("WEBSITE_NEWS", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
     founder: create("FOUNDER", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
-    services: create("WEBSITE_OUR_SERVICE", ["VIEW", "UPDATE"]), // just view,update
+    services: create("WEBSITE_OUR_SERVICE", [
+      "VIEW",
+      "UPDATE",
+      "CREATE",
+      "DELETE",
+    ]), // just view,update,create,delete
     // WEBSITE_SERVICE - LIST,CREATE,UPDATE,ACTIVATE,DELETE
     communicationSettings: {
       contactData: create("WEBSITE_CONTACT", ["VIEW", "UPDATE"]), // just view,update
