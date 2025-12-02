@@ -35,7 +35,7 @@ export default function ProjectsTabContent() {
                 </Can>
             </div>
             {/* projects grid */}
-            <Can check={[PERMISSIONS.CMS.projects.view]}>
+            <Can check={[PERMISSIONS.CMS.projects.list]}>
                 <ProjectsGrid OnEditProject={OnEditProject} />
             </Can>
         </div>

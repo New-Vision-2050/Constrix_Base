@@ -98,21 +98,43 @@ export const PERMISSIONS = {
   },
   // Content Management System
   CMS: {
-    categories: create("CMS_CATEGORIES"),
-    projects: create("CMS_PROJECTS"),
-    projectsTypes: create("CMS_PROJECTS_TYPES"),
-    icons: create("CMS_ICONS"),
-    mainSettings: create("CMS_MAIN_SETTINGS"),
-    contactSetting: create("CMS_CONTACT_SETTING"),
-    termsConditions: create("CMS_TERMS_CONDITIONS"),
-    news: create("CMS_NEWS"),
-    founder: create("CMS_FOUNDER"),
-    services: create("CMS_SERVICES"),
+    categories: create("CATEGORY_WEBSITE", [
+      "LIST",
+      "CREATE",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,CREATE,UPDATE,DELETE
+    projects: create("WEBSITE_PROJECT", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    projectsTypes: create("WEBSITE_PROJECT_SETTING", [
+      "LIST",
+      "CREATE",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,CREATE,UPDATE,DELETE
+    icons: create("WEBSITE_ICON", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    mainSettings: create("WEBSITE_HOME_PAGE_SETTING", ["VIEW", "UPDATE"]), // just view,update
+    aboutSetting: create("WEBSITE_ABOUT_US", ["VIEW", "UPDATE"]), // just view,update - renames to aboutSetting
+    termsConditions: create("WEBSITE_TERM_AND_CONDITION", ["VIEW", "UPDATE"]), // just view,update
+    news: create("WEBSITE_NEWS", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    founder: create("FOUNDER", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    services: create("WEBSITE_OUR_SERVICE", ["VIEW", "UPDATE"]), // just view,update
+    // WEBSITE_SERVICE - LIST,CREATE,UPDATE,ACTIVATE,DELETE
     communicationSettings: {
-      contactData: create("CMS_COMMUNICATION_SETTINGS_CONTACT_DATA"),
-      addresses: create("CMS_COMMUNICATION_SETTINGS_ADDRESSES"),
-      socialLinks: create("CMS_COMMUNICATION_SETTINGS_SOCIAL_LINKS"),
+      contactData: create("WEBSITE_CONTACT", ["VIEW", "UPDATE"]), // just view,update
+      addresses: create("WEBSITE_ADDRESS", [
+        "LIST",
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+      ]), //LIST,CREATE,UPDATE,DELETE
+      socialLinks: create("SOCIAL_MEDIA_LINK", [
+        "LIST",
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+      ]), //LIST,CREATE,UPDATE,DELETE
     },
-    themeSetting: create("CMS_THEME_SETTING"),
-  }
+    themeSetting: create("WEBSITE_THEME", ["VIEW", "UPDATE"]), // just view,update
+    //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
+  },
 };

@@ -7,14 +7,14 @@ import { useTranslations } from "next-intl";
 
 
 export const SocialMediaSitesFormConfig = () => {
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSocialData } = useConnectionDataCxt();
   const t = useTranslations("UserProfile.nestedTabs.socialData");
 
   const socialMediaSitesFormConfig: FormConfig = {
     formId: "ConnectionInformation-data-form",
     title: t("title"),
-    apiUrl: `${baseURL}/socials/${user?.user_id}`,
+    apiUrl: `${baseURL}/socials${Boolean(userId) ? "/" + userId : ""}`,
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -123,7 +123,7 @@ export const SocialMediaSitesFormConfig = () => {
       };
 
       return await defaultSubmitHandler(body, socialMediaSitesFormConfig, {
-        url: `/socials/${user?.user_id}`,
+        url: `/socials${Boolean(userId) ? "/" + userId : ""}`,
         method: "PUT",
       });
     },

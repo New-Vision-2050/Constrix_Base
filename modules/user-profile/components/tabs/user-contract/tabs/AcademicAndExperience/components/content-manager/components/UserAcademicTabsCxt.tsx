@@ -66,17 +66,17 @@ export const UserAcademicTabsCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   // user qualifications
   const {
     data: userQualifications,
     isLoading: userQualificationsLoading,
     refetch: refreshUserQualifications,
-  } = useUserQualifications(user?.user_id ?? "");
+  } = useUserQualifications(userId ?? "");
 
   // user brief
   const { data: userBrief, refetch: refetchUserBrief } = useUserBriefData(
-    user?.user_id ?? ""
+    userId ?? ""
   );
 
   // user experiences
@@ -84,25 +84,25 @@ export const UserAcademicTabsCxtProvider = ({
     data: userExperiences,
     isLoading: userExperiencesLoading,
     refetch: refetchUserExperiences,
-  } = useUserExperiences(user?.user_id ?? "");
+  } = useUserExperiences(userId ?? "");
 
   // user courses
   const {
     data: userCourses,
     isLoading: userCoursesLoading,
     refetch: refetchUserCourses,
-  } = useUserCoursesData(user?.user_id ?? "");
+  } = useUserCoursesData(userId ?? "");
 
   // user certifications
   const {
     data: userCertifications,
     isLoading: userCertificationsLoading,
     refetch: refetchUserCertifications,
-  } = useUserCertificationsData(user?.user_id ?? "");
+  } = useUserCertificationsData(userId ?? "");
 
   // user cv
   const { data: userCV, refetch: refetchUserCV } = useUserCVData(
-    user?.user_id ?? ""
+    userId ?? ""
   );
 
   // ** handle side effects

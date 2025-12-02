@@ -30,13 +30,13 @@ export default function CommunicationTabs() {
       id: "addresses",
       label: t("tabs.addresses"),
       content: <AddressTable />,
-      show: can(PERMISSIONS.CMS.communicationSettings.addresses.view),
+      show: can(PERMISSIONS.CMS.communicationSettings.addresses.list),
     },
     {
       id: "socialLinks",
       label: t("tabs.socialLinks"),
       content: <SocialLinksTable />,
-      show: can(PERMISSIONS.CMS.communicationSettings.socialLinks.view),
+      show: can(PERMISSIONS.CMS.communicationSettings.socialLinks.list),
     },
   ];
 

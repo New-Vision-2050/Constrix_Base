@@ -24,7 +24,7 @@ type PropsT = {
 };
 
 export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const [timer, setTimer] = useState(0);
   const { openMailOtp, toggleMailOtpDialog, togglePhoneOtpDialog } =
     useConnectionOTPCxt();
@@ -89,7 +89,7 @@ export function OTPVerifyDialog({ open, identifier, setOpen }: PropsT) {
         type,
       };
       await apiClient.post(
-        `/company-users/validate-otp/${user?.user_id}`,
+        `/company-users/validate-otp${Boolean(userId) ? "/" + userId : ""}`,
         body
       );
       handleClose();

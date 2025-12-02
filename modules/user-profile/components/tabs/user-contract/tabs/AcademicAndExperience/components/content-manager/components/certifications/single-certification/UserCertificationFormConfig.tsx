@@ -20,7 +20,7 @@ export const UserCertificationFormConfig = ({
   // declare and define component state and variables
   const formType = certification ? "Edit" : "Create";
   const t = useTranslations('UserProfile.nestedTabs.certificationsData');
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCertifications } = useUserAcademicTabsCxt();
 
   // form config
@@ -39,9 +39,8 @@ export const UserCertificationFormConfig = ({
             label: t('professionalBodie'),
             placeholder: t('professionalBodiePlaceholder'),
             dynamicOptions: {
-              url: `${baseURL}/professional_bodies/user/${
-                user?.user_id
-              }?now=${Date.now()}`,
+              url: `${baseURL}/professional_bodies/user/${userId
+                }?now=${Date.now()}`,
               valueField: "id",
               labelField: "name",
               searchParam: "name",
@@ -144,16 +143,16 @@ export const UserCertificationFormConfig = ({
 
       // Create a copy of the form data
       const formDataCopy = { ...formData };
-      
+
       // Check if file is empty or not provided, and remove it if it's empty
       if (!formDataCopy.file) {
         delete formDataCopy.file;
       }
-      
+
       // Create the final body
       const body = {
         ...formDataCopy,
-        user_id: user?.user_id,
+        user_id: userId,
         date_obtain: formatDateYYYYMMDD(dateObtain),
         date_end: formatDateYYYYMMDD(endDate),
       };

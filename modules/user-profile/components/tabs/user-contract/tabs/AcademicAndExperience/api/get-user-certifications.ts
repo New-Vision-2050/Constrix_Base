@@ -9,7 +9,7 @@ type ResponseT = {
 
 export default async function GetCertificationsData(userId: string) {
   const res = await apiClient.get<ResponseT>(
-    `/professional_certificates/user/${userId}`
+    `/professional_certificates/user${Boolean(userId) ? "/" + userId : ""}`
   );
 
   return res.data.payload;

@@ -46,6 +46,9 @@ type UserProfileCxtType = {
   // company id
   companyId: string | null;
 
+  // user id
+  userId: string | null;
+
   // user activities
   userActivities: UserActivityT[] | undefined;
   isLoadingUserActivities: boolean;
@@ -66,13 +69,11 @@ export const useUserProfileCxt = () => {
   return context;
 };
 
-type PropsT = { children: ReactNode };
-export const UserProfileCxtProvider = ({ children }: PropsT) => {
+type PropsT = { children: ReactNode, userId: string, companyId: string };
+export const UserProfileCxtProvider = ({ children, userId, companyId }: PropsT) => {
   // ** declare and define component state and variables
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userId = searchParams.get("id");
-  const companyId = searchParams.get("company_id");
   const [tab1, setTab1] = useState(searchParams.get("tab1") ?? "");
   const [tab2, setTab2] = useState(searchParams.get("tab2") ?? "");
   const verticalSection = searchParams.get("verticalSection");
@@ -81,15 +82,15 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
     data: _user,
     isLoading,
     refetch: refetchProfileData,
-  } = useUserProfileData(userId !== null ? userId : undefined);
+  } = useUserProfileData(userId);
   const { data: userActivities, isLoading: isLoadingUserActivities } =
-    useUserActivitiesData(userId !== null ? userId : undefined);
+    useUserActivitiesData(userId);
   const { data: userDataStatus, refetch: refetchDataStatus } =
-    useProfileDataStatus((userId || _user?.user_id) ?? "");
+    useProfileDataStatus(userId);
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
-    useUserPersonalData(user?.user_id);
+    useUserPersonalData(userId);
   const { data: widgetData, refetch: refetchWidgetData } = useProfileWidgetData(
-    (userId || _user?.user_id) ?? ""
+    userId
   );
 
   // ** handle side effects
@@ -167,6 +168,9 @@ export const UserProfileCxtProvider = ({ children }: PropsT) => {
 
         // company id
         companyId,
+
+        // user id
+        userId,
 
         // user activities
         userActivities,

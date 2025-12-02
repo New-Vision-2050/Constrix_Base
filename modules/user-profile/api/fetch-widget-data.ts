@@ -9,7 +9,7 @@ type ResponseT = {
 
 export default async function getProfileWidgetsData(userId: string) {
   const res = await apiClient.get<ResponseT>(
-    `/company-users/widget/user/${userId}`
+    `/company-users/widget/user${Boolean(userId) ? "/" + userId : ""}`
   );
 
   return res.data.payload;

@@ -6,7 +6,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useTranslations } from "next-intl";
 
 export const ConnectionInformationFormConfig = () => {
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userContactData } = useConnectionDataCxt();
   const t = useTranslations("UserProfile.nestedTabs.connectionData");
 
@@ -105,7 +105,7 @@ export const ConnectionInformationFormConfig = () => {
         body,
         _ConnectionInformationFormConfig,
         {
-          url: `/contactinfos/${user?.user_id}`,
+          url: `/contactinfos${Boolean(userId) ? "/" + userId : ""}`,
           method: "PUT",
         }
       );
