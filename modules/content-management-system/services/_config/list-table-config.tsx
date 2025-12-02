@@ -50,11 +50,7 @@ export const useServiceListTableConfig: (
         key: "status",
         label: t("featured"),
         render: (value: boolean, row: ServiceRow) => (
-          <TheStatus
-            theStatus={value ? "active" : "inActive"}
-            id={row.id}
-            field="status"
-          />
+          <TheStatus theStatus={value ? "active" : "inActive"} id={row.id} />
         ),
       },
     ],

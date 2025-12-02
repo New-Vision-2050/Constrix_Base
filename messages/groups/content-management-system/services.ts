@@ -103,5 +103,7 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
     visibility: _m("Visibility", "الظهور"),
     featured: _m("Featured", "مميز"),
     edit: _m("Edit", "تعديل"),
+    statusUpdated: _m("Status updated successfully", "تم تحديث الحالة بنجاح"),
+    statusUpdateError: _m("Failed to update status", "فشل تحديث الحالة"),
   }),
 });
