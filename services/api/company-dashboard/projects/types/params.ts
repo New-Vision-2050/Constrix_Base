@@ -1,19 +1,28 @@
 /**
+ * Project detail parameters
+ * Used in create/update project requests
+ */
+export interface ProjectDetailParams {
+  name_ar: string;
+  name_en: string;
+  website_service_id: string;
+}
+
+/**
  * Parameters for creating a new project
  * Follows the project form schema structure
  */
 export interface CreateProjectParams {
-  is_featured?: boolean;
+  website_project_setting_id: string;
+  title_ar: string;
+  title_en: string;
+  name_ar: string;
+  name_en: string;
+  description_ar?: string;
+  description_en?: string;
   main_image?: File | null;
-  sub_images?: File[];
-  "title[ar]": string;
-  "title[en]"?: string;
-  type: string;
-  "name[ar]": string;
-  "name[en]"?: string;
-  "description[ar]": string;
-  "description[en]"?: string;
-  details?: ProjectDetailParams[];
+  secondary_image?: File | null;
+  project_details?: ProjectDetailParams[];
 }
 
 /**
@@ -21,26 +30,14 @@ export interface CreateProjectParams {
  * All fields are optional for partial updates
  */
 export interface UpdateProjectParams {
-  is_featured?: boolean;
+  website_project_setting_id?: string;
+  title_ar?: string;
+  title_en?: string;
+  name_ar?: string;
+  name_en?: string;
+  description_ar?: string;
+  description_en?: string;
   main_image?: File | null;
-  sub_images?: File[];
-  "title[ar]"?: string;
-  "title[en]"?: string;
-  type?: string;
-  "name[ar]"?: string;
-  "name[en]"?: string;
-  "description[ar]"?: string;
-  "description[en]"?: string;
-  details?: ProjectDetailParams[];
+  secondary_image?: File | null;
+  project_details?: ProjectDetailParams[];
 }
-
-/**
- * Project detail parameters
- * Used in create/update project requests
- */
-export interface ProjectDetailParams {
-  detail_ar: string;
-  detail_en?: string;
-  service_id: string;
-}
-
