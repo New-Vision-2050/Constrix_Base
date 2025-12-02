@@ -2,7 +2,7 @@
 
 import { Control } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { Grid } from "@mui/material";
+import { Stack } from "@mui/material";
 import { OurServicesFormData } from "../../schemas/our-services-form.schema";
 import FormTextField from "../shared/FormTextField";
 
@@ -24,35 +24,31 @@ export default function DepartmentDescriptionFields({
   const tForm = useTranslations("content-management-system.services.form");
 
   return (
-    <Grid container spacing={2}>
+    <Stack gap={2}>
       {/* Arabic Description */}
-      <Grid item xs={12} md={6}>
-        <FormTextField
-          control={control}
-          name={`departments.${departmentIndex}.descriptionAr`}
-          label={tForm("departmentDescriptionAr")}
-          placeholder={tForm("departmentDescriptionArPlaceholder")}
-          disabled={isSubmitting}
-          required
-          multiline
-          rows={4}
-        />
-      </Grid>
+      <FormTextField
+        control={control}
+        name={`departments.${departmentIndex}.descriptionAr`}
+        label={tForm("departmentDescriptionAr")}
+        placeholder={tForm("departmentDescriptionArPlaceholder")}
+        disabled={isSubmitting}
+        required
+        multiline
+        rows={4}
+      />
 
       {/* English Description */}
-      <Grid item xs={12} md={6}>
-        <FormTextField
-          control={control}
-          name={`departments.${departmentIndex}.descriptionEn`}
-          label={tForm("departmentDescriptionEn")}
-          placeholder={tForm("departmentDescriptionEnPlaceholder")}
-          disabled={isSubmitting}
-          required
-          multiline
-          rows={4}
-        />
-      </Grid>
-    </Grid>
+      <FormTextField
+        control={control}
+        name={`departments.${departmentIndex}.descriptionEn`}
+        label={tForm("departmentDescriptionEn")}
+        placeholder={tForm("departmentDescriptionEnPlaceholder")}
+        disabled={isSubmitting}
+        required
+        multiline
+        rows={4}
+      />
+    </Stack>
   );
 }
 

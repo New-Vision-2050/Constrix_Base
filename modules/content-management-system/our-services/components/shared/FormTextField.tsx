@@ -44,12 +44,6 @@ export default function FormTextField<T extends FieldValues>({
           fullWidth
           variant="outlined"
           size="small"
-          sx={{
-            "& .MuiInputBase-root": {
-              backgroundColor: (theme) =>
-                theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
-            },
-          }}
         />
       )}
     />

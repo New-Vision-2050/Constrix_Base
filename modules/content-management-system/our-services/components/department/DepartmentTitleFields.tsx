@@ -24,31 +24,27 @@ export default function DepartmentTitleFields({
   const tForm = useTranslations("content-management-system.services.form");
 
   return (
-    <Grid container spacing={2}>
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Arabic Title */}
-      <Grid item xs={12} md={6}>
-        <FormTextField
-          control={control}
-          name={`departments.${departmentIndex}.titleAr`}
-          label={tForm("departmentTitleAr")}
-          placeholder={tForm("departmentTitleArPlaceholder")}
-          disabled={isSubmitting}
-          required
-        />
-      </Grid>
+      <FormTextField
+        control={control}
+        name={`departments.${departmentIndex}.titleAr`}
+        label={tForm("departmentTitleAr")}
+        placeholder={tForm("departmentTitleArPlaceholder")}
+        disabled={isSubmitting}
+        required
+      />
 
       {/* English Title */}
-      <Grid item xs={12} md={6}>
-        <FormTextField
-          control={control}
-          name={`departments.${departmentIndex}.titleEn`}
-          label={tForm("departmentTitleEn")}
-          placeholder={tForm("departmentTitleEnPlaceholder")}
-          disabled={isSubmitting}
-          required
-        />
-      </Grid>
-    </Grid>
+      <FormTextField
+        control={control}
+        name={`departments.${departmentIndex}.titleEn`}
+        label={tForm("departmentTitleEn")}
+        placeholder={tForm("departmentTitleEnPlaceholder")}
+        disabled={isSubmitting}
+        required
+      />
+    </div>
   );
 }
 

@@ -28,18 +28,17 @@ export default function ServicesGrid({
   const tForm = useTranslations("content-management-system.services.form");
 
   return (
-    <Grid container spacing={2}>
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
       {services.map((service, serviceIndex) => (
-        <Grid item xs={12} md={6} key={service.id}>
-          <FormTextField
-            control={control}
-            name={`departments.${departmentIndex}.services.${serviceIndex}.value`}
-            label={`${tForm("serviceNumber")} ${serviceIndex + 1}`}
-            placeholder={tForm("servicePlaceholder")}
-            disabled={isSubmitting}
-          />
-        </Grid>
+        <FormTextField
+          key={service.id}
+          control={control}
+          name={`departments.${departmentIndex}.services.${serviceIndex}.value`}
+          label={`${tForm("serviceNumber")} ${serviceIndex + 1}`}
+          placeholder={tForm("servicePlaceholder")}
+          disabled={isSubmitting}
+        />
       ))}
-    </Grid>
+    </div>
   );
 }

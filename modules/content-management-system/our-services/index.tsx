@@ -55,14 +55,14 @@ export default function OurServicesModule() {
     <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ px: 4, py: 3 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <MainSection control={control} isSubmitting={formState.isSubmitting} />
-        <DepartmentsList 
-          control={control} 
-          departments={departments} 
-          isSubmitting={formState.isSubmitting} 
-          onAdd={addDepartment} 
-          onRemove={removeDepartment} 
+        <DepartmentsList
+          control={control}
+          departments={departments}
+          isSubmitting={formState.isSubmitting}
+          onAdd={addDepartment}
+          onRemove={removeDepartment}
         />
-        <Button type="submit" variant="contained" startIcon={<SaveIcon />} disabled={formState.isSubmitting} fullWidth size="large">
+        <Button type="submit" variant="contained" startIcon={<SaveIcon />} disabled={formState.isSubmitting} className="w-48">
           {tForm("save")}
         </Button>
       </Box>

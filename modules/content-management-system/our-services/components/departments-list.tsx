@@ -2,7 +2,7 @@
 
 import { Control } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { Box, Button, Paper } from "@mui/material";
+import { Button, Paper, Stack } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { OurServicesFormData } from "../schemas/our-services-form.schema";
 import { Department } from "../types";
@@ -32,13 +32,10 @@ export default function DepartmentsList({
   return (
     <Paper
       elevation={0}
-      sx={{
-        p: 3,
-        backgroundColor: (theme) =>
-          theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
-      }}
+      sx={{ p: 3 }}
+      className="bg-sidebar"
     >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Stack gap={3}>
         {/* Render all departments */}
         {departments.map((department, deptIndex) => (
           <DepartmentSection
@@ -63,7 +60,7 @@ export default function DepartmentsList({
         >
           {t("addDepartment")}
         </Button>
-      </Box>
+      </Stack>
     </Paper>
   );
 }

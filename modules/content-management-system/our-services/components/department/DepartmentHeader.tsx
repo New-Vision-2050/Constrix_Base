@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Typography, IconButton, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 interface DepartmentHeaderProps {
@@ -22,13 +22,12 @@ export default function DepartmentHeader({
   const t = useTranslations("content-management-system.services");
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        mb: 3,
-      }}
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={3}
+      gap={2}
     >
       <Typography variant="h6" sx={{ fontWeight: 600 }}>
         {t("departmentNumber")} {departmentIndex + 1}
@@ -46,7 +45,7 @@ export default function DepartmentHeader({
           <DeleteIcon fontSize="small" />
         </IconButton>
       )}
-    </Box>
+    </Stack>
   );
 }
 

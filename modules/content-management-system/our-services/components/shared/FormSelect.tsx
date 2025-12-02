@@ -41,7 +41,7 @@ export default function FormSelect<T extends FieldValues>({
             label={label}
             disabled={disabled}
             displayEmpty
-            sx={{ backgroundColor: (t) => t.palette.mode === "dark" ? "#1e293b" : "#f8fafc" }}
+            className="w-full bg-sidebar"
           >
             {placeholder && <MenuItem value="" disabled>{placeholder}</MenuItem>}
             {options.map((opt) => (

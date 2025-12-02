@@ -28,9 +28,8 @@ export default function MainSection({
       elevation={0}
       sx={{
         p: 3,
-        backgroundColor: (theme) =>
-          theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
       }}
+      className="bg-sidebar"
     >
       {/* Section Title */}
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
