@@ -18,12 +18,14 @@ import {
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { CompanyDashboardThemeSettingApi } from "@/services/api/company-dashboard/theme-setting";
+import { ThemeSettingFormInitialData } from "../types";
+import { useEffect } from "react";
 
 /**
  * Theme Setting Form Component
  * Main form for theme settings with all sections
  */
-function ThemeSettingForm() {
+function ThemeSettingForm({ initialData }: { initialData: ThemeSettingFormInitialData }) {
   const t = useTranslations("content-management-system.themeSetting");
   const tCommon = useTranslations("content-management-system.themeSetting.common");
   const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
@@ -32,7 +34,7 @@ function ThemeSettingForm() {
 
   const form = useForm<ThemeSettingFormData>({
     resolver: zodResolver(createThemeSettingFormSchema(tBorderRadius)),
-    defaultValues: getDefaultThemeSettingFormValues(),
+    defaultValues: Boolean(initialData) ? initialData as ThemeSettingFormData : undefined,
   });
 
   const {
@@ -40,6 +42,11 @@ function ThemeSettingForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = form;
+
+  // set initial data
+  useEffect(() => {
+    form.reset(initialData);
+  }, [initialData, form]);
 
   const onSubmit = async (data: ThemeSettingFormData) => {
     try {

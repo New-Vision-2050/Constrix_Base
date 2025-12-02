@@ -5,11 +5,16 @@ import { ApiBaseResponse } from "@/types/common/response/base";
  */
 export interface ColorPaletteItem {
   id: string;
+  slug: string;
   name: string;
   primary: string | null;
   light: string;
   dark: string;
   contrast: string | null;
+  paper: string | null;
+  default: string | null;
+  secondary: string | null;
+  divider: string | null;
 }
 
 /**
