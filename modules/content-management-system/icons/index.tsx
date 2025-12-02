@@ -67,4 +67,4 @@ function CMSIconsModule() {
         </div>
 }
 
-export default withPermissions(CMSIconsModule, [PERMISSIONS.CMS.icons.view]);
+export default withPermissions(CMSIconsModule, [PERMISSIONS.CMS.icons.list]);

@@ -14,13 +14,13 @@ export default function ProjectsTabs() {
             id: "projects",
             title: t("projects"),
             content: <ProjectsTabContent />,
-            show: can(PERMISSIONS.CMS.projects.view),
+            show: can(PERMISSIONS.CMS.projects.list),
         },
         {
             id: "projects-types",
             title: t("projectsTypes"),
             content: <ProjectTypesTable />,
-            show: can(PERMISSIONS.CMS.projectsTypes.view),
+            show: can(PERMISSIONS.CMS.projectsTypes.list),
         },
     ];
 

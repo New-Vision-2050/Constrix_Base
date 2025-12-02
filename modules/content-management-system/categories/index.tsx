@@ -54,4 +54,4 @@ function CompanyDashboardCategoriesModule(props: CompanyDashboardCategoriesModul
     </div>
 }
 
-export default withPermissions(CompanyDashboardCategoriesModule, [PERMISSIONS.CMS.categories.view]);
+export default withPermissions(CompanyDashboardCategoriesModule, [PERMISSIONS.CMS.categories.list]);
