@@ -501,7 +501,7 @@ export function AppSidebar({
           ROUTER.CMS.CATEGORIES,
           ROUTER.CMS.ICONS,
           ROUTER.CMS.MAIN_SETTINGS,
-          ROUTER.CMS.CONTACT_SETTING,
+          ROUTER.CMS.ABOUT_SETTINGS,
           ROUTER.CMS.TERMS_CONDITIONS,
           ROUTER.CMS.MAIN_DATA,
           ROUTER.CMS.FOUNDER,
@@ -517,7 +517,7 @@ export function AppSidebar({
           ROUTER.CMS.CATEGORIES,
           ROUTER.CMS.ICONS,
           ROUTER.CMS.MAIN_SETTINGS,
-          ROUTER.CMS.CONTACT_SETTING,
+          ROUTER.CMS.ABOUT_SETTINGS,
           ROUTER.CMS.TERMS_CONDITIONS,
           ROUTER.CMS.MAIN_DATA,
           ROUTER.CMS.FOUNDER,
@@ -528,18 +528,6 @@ export function AppSidebar({
           ROUTER.CMS.THEME_SETTING,
         ],
         sub_entities: [
-          {
-            name: t("Sidebar.CMS.MainData"),
-            url: ROUTER.CMS.MAIN_DATA,
-            icon: SettingsIcon,
-            isActive: pageName === ROUTER.CMS.MAIN_DATA,
-            show:
-              !isCentralCompany &&
-              can([
-                PERMISSIONS.CMS.aboutSetting.view,
-                PERMISSIONS.CMS.aboutSetting.update,
-              ]),
-          },
           {
             name: t("Sidebar.CMS.MainSettings"),
             url: ROUTER.CMS.MAIN_SETTINGS,
@@ -566,9 +554,9 @@ export function AppSidebar({
           },
           {
             name: t("Sidebar.CMS.ContactSetting"),
-            url: ROUTER.CMS.CONTACT_SETTING,
+            url: ROUTER.CMS.ABOUT_SETTINGS,
             icon: SettingsIcon,
-            isActive: pageName === ROUTER.CMS.CONTACT_SETTING,
+            isActive: pageName === ROUTER.CMS.ABOUT_SETTINGS,
             show:
               !isCentralCompany &&
               can([

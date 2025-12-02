@@ -45,7 +45,7 @@ export const ROUTER = {
     CATEGORIES: "/content-management-system/categories",
     ICONS: "/content-management-system/icons",
     MAIN_SETTINGS: "/content-management-system/main-settings",
-    CONTACT_SETTING: "/content-management-system/contact-setting",
+    ABOUT_SETTINGS: "/content-management-system/about-setting",
     TERMS_CONDITIONS: "/content-management-system/terms-conditions",
     MAIN_DATA: "/content-management-system/mainData",
     FOUNDER: "/content-management-system/setting-founder",
