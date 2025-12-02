@@ -45,7 +45,7 @@ export const sidebarMessages = new MessagesGroup({
   Brands: _m("Brands", "العلامات التجارية"),
   PaymentMethods: _m("Payment Methods", "وسائل الدفع"),
   CMS: new MessagesGroup({
-    title: _m("CMS", "اعداد المحتوي"),
+    title: _m("CMS", "الملف التعريفي"),
     MainData: _m("Main Data", "البيانات الأساسية"),
     MainSettings: _m("Main Settings", "اعدادات الرئيسية"),
     ThemeSetting: _m("Theme Setting", "إعدادات المظهر"),
