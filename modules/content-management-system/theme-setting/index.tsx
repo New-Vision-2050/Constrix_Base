@@ -91,9 +91,6 @@ export default function ThemeSettingModule({ initialData }: { initialData: Theme
         }
     }, [initialData]);
 
-    console.log('formData', formData);
-    console.log('initialData', initialData);
-
     return <div className="px-6 py-2 flex flex-col gap-4">
         <ThemeSettingForm initialData={formData} />
     </div>
