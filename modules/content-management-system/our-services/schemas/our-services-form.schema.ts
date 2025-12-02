@@ -81,17 +81,9 @@ export const createOurServicesFormSchema = (t: (key: string) => string) =>
               message: t("designTypeRequired") || "Design type is required",
             }),
           services: z
-            .array(
-              z.object({
-                id: z.string(),
-                value: z.string().min(1, {
-                  message: t("serviceRequired") || "Service is required",
-                }),
-              })
-            )
-            .min(6, {
-              message:
-                t("servicesMinRequired") || "At least 6 services are required",
+            .array(z.string())
+            .min(1, {
+              message: t("servicesRequired") || "At least one service is required",
             }),
         })
       )
@@ -114,19 +106,6 @@ export type OurServicesFormData = z.infer<
 export const getDefaultOurServicesFormValues = (): OurServicesFormData => ({
   mainTitle: "",
   mainDescription: "",
-  departments: [
-    {
-      id: "1",
-      titleAr: "خدماتنا",
-      titleEn: "Our Services",
-      descriptionAr: "",
-      descriptionEn: "",
-      designType: "",
-      services: Array.from({ length: 6 }, (_, i) => ({
-        id: `${i + 1}`,
-        value: "تصميم مواقع",
-      })),
-    },
-  ],
+  departments: [],
 });
 

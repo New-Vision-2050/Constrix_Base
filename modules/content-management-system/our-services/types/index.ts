@@ -1,8 +1,3 @@
-export interface DepartmentService {
-  id: string;
-  value: string;
-}
-
 export interface Department {
   id: string;
   titleAr: string;
@@ -10,7 +5,7 @@ export interface Department {
   descriptionAr: string;
   descriptionEn: string;
   designType: string;
-  services: DepartmentService[];
+  services: string[];
 }
 
 export interface OurServicesFormData {

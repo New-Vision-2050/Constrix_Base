@@ -12,11 +12,7 @@ interface TheStatusProps {
   field?: "is_active" | "is_featured";
 }
 
-export default function TheStatus({ 
-  theStatus, 
-  id,
-  field = "is_active" 
-}: TheStatusProps) {
+export default function TheStatus({ theStatus, id }: TheStatusProps) {
   const t = useTranslations("content-management-system.services");
   const { reloadTable } = useTableReload("service-list-table");
 
@@ -24,9 +20,9 @@ export default function TheStatus({
     try {
       // For now, we'll use a generic update endpoint
       // You may need to adjust this based on your API
-      await CompanyDashboardServicesApi.update(id, {
-        [field]: checked,
-      } as any);
+      await CompanyDashboardServicesApi.status(id, {
+        status: checked ? 1 : 0,
+      });
       toast.success(t("table.statusUpdated") || "Status updated successfully");
       reloadTable();
     } catch (error) {
@@ -36,10 +32,6 @@ export default function TheStatus({
   };
 
   return (
-    <Switch
-      checked={theStatus === "active"}
-      onCheckedChange={handleToggle}
-    />
+    <Switch checked={theStatus === "active"} onCheckedChange={handleToggle} />
   );
 }
-

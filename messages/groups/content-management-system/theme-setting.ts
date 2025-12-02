@@ -16,6 +16,12 @@ export const ContentManagementSystemThemeSettingMessages = new MessagesGroup({
         warningColor: _m("Warning Color", "اللون التحذيري"),
         errorColor: _m("Error Color", "اللون الخطأ"),
         textColor: _m("Text Color", "اللون النصي"),
+        paper: _m("Paper", "الورقة"),
+        default: _m("Default", "الافتراضي"),
+        white: _m("White", "الابيض"),
+        black: _m("Black", "الاسود"),
+        disabled: _m("Disabled", "معطل"),
+        divider: _m("Divider", "الفاصل")
     }),
     basicInfo: new MessagesGroup({
         title: _m("Basic Info", "البيانات الاساسية"),

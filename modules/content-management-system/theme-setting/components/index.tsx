@@ -17,12 +17,15 @@ import {
 } from "../schema";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { CompanyDashboardThemeSettingApi } from "@/services/api/company-dashboard/theme-setting";
+import { ThemeSettingFormInitialData } from "../types";
+import { useEffect } from "react";
 
 /**
  * Theme Setting Form Component
  * Main form for theme settings with all sections
  */
-function ThemeSettingForm() {
+function ThemeSettingForm({ initialData }: { initialData: ThemeSettingFormInitialData }) {
   const t = useTranslations("content-management-system.themeSetting");
   const tCommon = useTranslations("content-management-system.themeSetting.common");
   const tBasicInfo = useTranslations("content-management-system.themeSetting.basicInfo");
@@ -31,7 +34,7 @@ function ThemeSettingForm() {
 
   const form = useForm<ThemeSettingFormData>({
     resolver: zodResolver(createThemeSettingFormSchema(tBorderRadius)),
-    defaultValues: getDefaultThemeSettingFormValues(),
+    defaultValues: Boolean(initialData) ? initialData as ThemeSettingFormData : undefined,
   });
 
   const {
@@ -40,9 +43,66 @@ function ThemeSettingForm() {
     formState: { errors, isSubmitting },
   } = form;
 
+  // set initial data
+  useEffect(() => {
+    form.reset(initialData);
+  }, [initialData, form]);
+
   const onSubmit = async (data: ThemeSettingFormData) => {
     try {
-      console.log("Theme settings:", data);
+      const payload = {
+        // basic info
+        url: data.basicInfo.websiteUrl,
+        icon: data.basicInfo.websiteIcon,
+        // border radius
+        radius: data.borderRadius,
+        // typography
+        html_font_size: data.typography.htmlFontSize,
+        font_family: data.typography.fontFamily,
+        font_size: data.typography.fontSize.toString(),
+        font_weight_light: data.typography.fontWeightLight.toString(),
+        font_weight_regular: data.typography.fontWeightRegular.toString(),
+        font_weight_medium: data.typography.fontWeightMedium.toString(),
+        font_weight_bold: data.typography.fontWeightBold.toString(),
+        // color palette
+        color_palettes: Object.entries(data.palette).map(([key, value]) => {
+          switch (key) {
+            case "common":
+              return {
+                slug: key,
+                name: "Common (black and white)",
+                black: value.dark,
+                white: value.light
+              }
+            case "background":
+              return {
+                slug: key,
+                name: "Background",
+                paper: value.light,
+                default: value.dark,
+              }
+            case "text":
+              return {
+                slug: key,
+                name: "Text",
+                primary: "main" in value ? value.main : undefined,
+                secondary: value.light,
+                divider: value.dark,
+                disabled: "contrastText" in value ? value.contrastText : undefined,
+              }
+            default:
+              return {
+                slug: key,
+                name: key,
+                main: "main" in value ? value.main : undefined,
+                light: value.light,
+                dark: value.dark,
+                contrast: "contrastText" in value ? value.contrastText : undefined,
+              }
+          }
+        }),
+      }
+      await CompanyDashboardThemeSettingApi.updateCurrent(payload);
       // TODO: API call here
     } catch (error) {
       console.error("Error:", error);

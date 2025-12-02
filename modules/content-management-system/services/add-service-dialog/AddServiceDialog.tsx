@@ -130,7 +130,7 @@ export default function AddServiceDialog({
         category_id: service.category_id?.toString() || "",
         description_ar: service.description_ar || "",
         description_en: service.description_en || "",
-        is_featured: service.is_featured || false,
+        status: service.status || false,
         icon_image: service.icon_image?.url || null,
         main_image: service.main_image?.url || null,
         previous_works:
@@ -172,7 +172,9 @@ export default function AddServiceDialog({
         name_ar: data.name_ar,
         name_en: data.name_en,
         category_website_cms_id: data.category_id,
-        is_featured: data.is_featured,
+        description_ar: data.description_ar,
+        description_en: data.description_en,
+        status: data.status,
         icon: data.icon_image instanceof File ? data.icon_image : null,
         main_image: data.main_image instanceof File ? data.main_image : null,
         previous_work:
@@ -184,12 +186,6 @@ export default function AddServiceDialog({
 
       if (data.request_id) {
         params.reference_number = data.request_id;
-      }
-      if (data.description_ar) {
-        params.description_ar = data.description_ar;
-      }
-      if (data.description_en) {
-        params.description_en = data.description_en;
       }
 
       if (isEditMode && serviceId) {
@@ -256,7 +252,7 @@ export default function AddServiceDialog({
               </h3>
               <FormField
                 control={control}
-                name="is_featured"
+                name="status"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -449,7 +445,7 @@ export default function AddServiceDialog({
                 name="description_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white">
+                    <FormLabel className="text-xs text-white" required>
                       {tForm("descriptionAr")}
                     </FormLabel>
                     <FormControl>
@@ -472,7 +468,7 @@ export default function AddServiceDialog({
                 name="description_en"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white">
+                    <FormLabel className="text-xs text-white" required>
                       {tForm("descriptionEn")}
                     </FormLabel>
                     <FormControl>
