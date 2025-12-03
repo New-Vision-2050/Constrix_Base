@@ -4,16 +4,37 @@ import { useTranslations } from "next-intl";
 import ProjectsGrid from "./ProjectsGrid";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import SetProjectDialog from "./setProjectDialog.tsx";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import useProjects from "../hooks/useProjects";
+import { StateLoading, StateError } from "@/components/shared/states";
 
 export default function ProjectsTabContent() {
     const t = useTranslations("content-management-system.projects");
     const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
-
+    // Get projects list from API
+    const {
+        data: projectsList,
+        isLoading: isLoadingProjectsList,
+        isError: isErrorProjectsList,
+        error: projectsError,
+        refetch: refetchProjectsList
+    } = useProjects();
+    const projects = useMemo(() => projectsList?.data?.payload || [], [projectsList]);
+    
     const OnEditProject = (id: string) => {
         setEditingProjectId(id);
+    }
+
+
+    // Handle loading and error states
+    if (isLoadingProjectsList) {
+        return <StateLoading />;
+    }
+    
+    if (isErrorProjectsList) {
+        return <StateError message={projectsError?.message} onRetry={refetchProjectsList} />;
     }
 
     return <>
@@ -36,7 +57,7 @@ export default function ProjectsTabContent() {
             </div>
             {/* projects grid */}
             <Can check={[PERMISSIONS.CMS.projects.list]}>
-                <ProjectsGrid OnEditProject={OnEditProject} />
+                <ProjectsGrid OnEditProject={OnEditProject} projects={projects} />
             </Can>
         </div>
         <Can check={[PERMISSIONS.CMS.projects.update]}>

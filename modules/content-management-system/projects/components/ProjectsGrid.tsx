@@ -1,11 +1,13 @@
 import ProjectCard from "./project-card";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
 import { EditIcon } from "lucide-react";
+import { CMSProject } from "../types";
 
 type PropsT = {
     OnEditProject: (id: string) => void;
+    projects: CMSProject[];
 }
-export default function ProjectsGrid({ OnEditProject }: PropsT) {
+export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
     const actions: MenuItem[] = [
         {
             label: "Edit",
@@ -18,12 +20,13 @@ export default function ProjectsGrid({ OnEditProject }: PropsT) {
     ];
 
     return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ProjectCard id="1" src="" title="Project 1" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 2" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 3" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 4" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 5" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 6" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 7" actions={actions} />
+        {projects.map((project) => (
+            <ProjectCard 
+            key={project.id} 
+            id={project.id} 
+            src={project.main_image || ""} 
+            title={project.name || ""} 
+            actions={actions} />
+        ))}
     </div>
 }
