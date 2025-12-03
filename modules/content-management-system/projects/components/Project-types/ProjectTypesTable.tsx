@@ -20,7 +20,7 @@ function ProjectTypesTable() {
     });
     const { reloadTable } = useTableReload(tableConfig.tableId);
 
-    return <div className="container p-6">
+    return <div className="p-6">
         <Can check={[PERMISSIONS.CMS.projectsTypes.update]}>
             <SetProjectTypeDialog
                 open={Boolean(editingProjectTypeId)}

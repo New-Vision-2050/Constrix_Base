@@ -18,10 +18,13 @@ export const CompanyDashboardProjectsApi = {
    * @param params - Optional search parameters
    * @returns Promise with paginated list of projects
    */
-  list: (params?: { search?: string, page?: number, limit?: number }) =>
+  list: (params?: { search?: string, page?: number, limit?: number, projectType?: string, sortBy?: string }) =>
     baseApi.get<ListProjectsResponse>("website-projects", {
       params: {
         ...params,
+        project_type: params?.projectType,
+        sort_by: params?.sortBy,
+        name: params?.search,
         page: params?.page || 1,
         limit: params?.limit || 10,
       },

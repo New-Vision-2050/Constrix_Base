@@ -7,6 +7,20 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   deleteProject: _m("Delete Project", "حذف المشروع"),
   editProject: _m("Edit Project", "تعديل المشروع"),
   deleteSuccess: _m("Project deleted successfully!", "تم حذف المشروع بنجاح!"),
+  // Search and filters
+  searchPlaceholder: _m("Search", "بحث"),
+  sortBy: _m("Sort by", "ترتيب"),
+  projectType: _m("Project Type", "نوع المشروع"),
+  allTypes: _m("All Types", "كل الأنواع"),
+  all: _m("All", "كل"),
+  name: _m("Name", "الاسم"),
+  createdAt: _m("Created At", "تاريخ الإنشاء"),
+  sortOptions: new MessagesGroup({
+    newest: _m("Newest", "الأحدث"),
+    oldest: _m("Oldest", "الأقدم"),
+    nameAZ: _m("Name (A-Z)", "الاسم (أ-ي)"),
+    nameZA: _m("Name (Z-A)", "الاسم (ي-أ)"),
+  }),
   tabs: new MessagesGroup({
     projects: _m("Projects", "المشاريع"),
     projectsTypes: _m("Projects Types", "انواع المشاريع"),
