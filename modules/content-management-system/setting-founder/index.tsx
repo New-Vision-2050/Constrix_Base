@@ -19,7 +19,7 @@ function FounderView() {
   const t = useTranslations("content-management-system.founder");
 
   return (
-    <Can check={[PERMISSIONS.CMS.founder.view]}>
+    <Can check={[PERMISSIONS.CMS.founder.list]}>
       <div className="px-8 space-y-7">
         <Can check={[PERMISSIONS.CMS.founder.update]}>
           <AddFounderDialog
