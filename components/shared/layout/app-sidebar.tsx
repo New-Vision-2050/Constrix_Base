@@ -542,18 +542,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.themeSetting.update,
               ]),
           },
-          {
-            name: t("Sidebar.CMS.ContactSetting"),
-            url: ROUTER.CMS.ABOUT_SETTINGS,
-            icon: SettingsIcon,
-            isActive: pageName === ROUTER.CMS.ABOUT_SETTINGS,
-            show:
-              !isCentralCompany &&
-              can([
-                PERMISSIONS.CMS.communicationSettings.contactData.view,
-                PERMISSIONS.CMS.communicationSettings.contactData.update,
-              ]),
-          },
+
           {
             name: t("Sidebar.CMS.Categories"),
             url: ROUTER.CMS.CATEGORIES,
@@ -617,6 +606,30 @@ export function AppSidebar({
               can([
                 PERMISSIONS.CMS.mainSettings.view,
                 PERMISSIONS.CMS.mainSettings.update,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.CommunicationSettings"),
+            url: ROUTER.CMS.COMMUNICATION_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.COMMUNICATION_SETTINGS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.aboutSetting.update,
+                PERMISSIONS.CMS.aboutSetting.view,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.AboutUsPage"),
+            url: ROUTER.CMS.ABOUT_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.ABOUT_SETTINGS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.aboutSetting.update,
+                PERMISSIONS.CMS.aboutSetting.view,
               ]),
           },
           {

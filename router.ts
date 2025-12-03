@@ -54,5 +54,6 @@ export const ROUTER = {
     NEWS: "/content-management-system/setting-news",
     PROJECTS: "/content-management-system/projects",
     THEME_SETTING: "/content-management-system/theme-setting",
+    COMMUNICATION_SETTINGS: "/content-management-system/communication-settings",
   },
 };

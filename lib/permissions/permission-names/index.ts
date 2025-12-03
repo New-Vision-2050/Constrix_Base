@@ -118,7 +118,7 @@ export const PERMISSIONS = {
     ourServices: create("WEBSITE_OUR_SERVICE", ["VIEW", "UPDATE"]), // just view,update,create,delete
     // WEBSITE_SERVICE - LIST,CREATE,UPDATE,ACTIVATE,DELETE
     communicationSettings: {
-      contactData: create("WEBSITE_CONTACT", ["VIEW", "UPDATE"]), // just view,update
+      contactData: create("WEBSITE_CONTACT_INFO", ["VIEW", "UPDATE"]), // just view,update
       addresses: create("WEBSITE_ADDRESS", [
         "LIST",
         "CREATE",
