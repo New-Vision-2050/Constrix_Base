@@ -24,6 +24,7 @@ export const CompanyDashboardProjectsApi = {
         project_type: params?.projectType,
         sort_by: params?.sortBy,
         name: params?.search,
+        title: params?.search,
         page: params?.page || 1,
         limit: params?.limit || 10,
       },
