@@ -2,6 +2,7 @@
 import dynamic from "next/dynamic";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
 import { truncateString } from "@/utils/truncate-string";
+import { useTranslations } from "next-intl";
 
 // Dynamically import Execution component (same as TableBuilder)
 const Execution = dynamic(
@@ -22,7 +23,7 @@ type PropsT = {
   actions?: MenuItem[];
 }
 export default function CardTitleAndActions({ id, title, actions = [] }: PropsT) {
-  // Mock row data - replace with actual project data
+  const t = useTranslations("content-management-system.projects.addProjectForm");
   const projectRow = {
     id: id,
     title: title,
@@ -37,7 +38,7 @@ export default function CardTitleAndActions({ id, title, actions = [] }: PropsT)
         <Execution
           row={projectRow}
           executions={actions}
-          buttonLabel="Actions"
+          buttonLabel={t("actions")}
           className="px-5 bg-[#8785A2] hover:bg-[#8785A2] rotate-svg-child"
           showEdit={false}
           showDelete={false}

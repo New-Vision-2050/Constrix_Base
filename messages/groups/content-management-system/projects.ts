@@ -4,6 +4,8 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   title: _m("Projects", "المشاريع"),
   addProject: _m("Add New Project", "اضافة مشروع جديد"),
   noProjects: _m("No projects found", "لم يتم إيجاد مشاريع"),
+  deleteProject: _m("Delete Project", "حذف المشروع"),
+  editProject: _m("Edit Project", "تعديل المشروع"),
   deleteSuccess: _m("Project deleted successfully!", "تم حذف المشروع بنجاح!"),
   tabs: new MessagesGroup({
     projects: _m("Projects", "المشاريع"),
@@ -13,6 +15,7 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     addProject: _m("Add New Project", "اضافة مشروع جديدة"),
     editProject: _m("Edit Project", "تعديل مشروع"),
     save: _m("Save", "حفظ"),
+    actions: _m("Actions", "الإجراءات"),
     updateSuccess: _m("Project updated successfully!", "تم تحديث المشروع بنجاح!"),
     createSuccess: _m("Project created successfully!", "تم إنشاء المشروع بنجاح!"),
     updateError: _m("Failed to update project. Please try again.", "فشل تحديث المشروع. يرجى المحاولة مرة أخرى."),
