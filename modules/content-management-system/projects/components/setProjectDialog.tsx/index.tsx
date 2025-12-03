@@ -168,7 +168,7 @@ export default function SetProjectDialog({
       // TODO: Replace with actual API calls
       const payload = {
         main_image: data.main_image,
-        secondary_image: data.sub_images[0],
+        secondary_images: data.sub_images,
         website_project_setting_id: data.type,
         title_ar: data.title_ar,
         title_en: data.title_en,
@@ -256,7 +256,7 @@ export default function SetProjectDialog({
               t={t}
               projectTypeOptions={projectTypesOptions}
               mainImageInitialValue={projectData?.data?.payload?.main_image}
-              subImagesInitialValue={projectData?.data?.payload?.secondary_image ? [projectData.data.payload.secondary_image] : undefined}
+              subImagesInitialValue={projectData?.data?.payload?.secondary_images}
             />
 
             {/* Details Array Section */}
