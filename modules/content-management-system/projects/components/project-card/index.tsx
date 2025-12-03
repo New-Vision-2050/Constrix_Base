@@ -21,7 +21,7 @@ export default function ProjectCard({ id, src, title, description, actions }: Pr
                 {/* card title & actions */}
                 <CardTitleAndActions id={id} title={title} actions={actions} />
                 {/* card description */}
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground break-words line-clamp-3">
                     {description || ""}
                 </p>
             </CardContent>

@@ -3,6 +3,24 @@ import { MessagesGroup, _m } from "@/messages";
 export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   title: _m("Projects", "المشاريع"),
   addProject: _m("Add New Project", "اضافة مشروع جديد"),
+  noProjects: _m("No projects found", "لم يتم إيجاد مشاريع"),
+  deleteProject: _m("Delete Project", "حذف المشروع"),
+  editProject: _m("Edit Project", "تعديل المشروع"),
+  deleteSuccess: _m("Project deleted successfully!", "تم حذف المشروع بنجاح!"),
+  // Search and filters
+  searchPlaceholder: _m("Search", "بحث"),
+  sortBy: _m("Sort by", "ترتيب"),
+  projectType: _m("Project Type", "نوع المشروع"),
+  allTypes: _m("All Types", "كل الأنواع"),
+  all: _m("All", "كل"),
+  name: _m("Name", "الاسم"),
+  createdAt: _m("Created At", "تاريخ الإنشاء"),
+  sortOptions: new MessagesGroup({
+    newest: _m("Newest", "الأحدث"),
+    oldest: _m("Oldest", "الأقدم"),
+    nameAZ: _m("Name (A-Z)", "الاسم (أ-ي)"),
+    nameZA: _m("Name (Z-A)", "الاسم (ي-أ)"),
+  }),
   tabs: new MessagesGroup({
     projects: _m("Projects", "المشاريع"),
     projectsTypes: _m("Projects Types", "انواع المشاريع"),
@@ -11,6 +29,7 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     addProject: _m("Add New Project", "اضافة مشروع جديدة"),
     editProject: _m("Edit Project", "تعديل مشروع"),
     save: _m("Save", "حفظ"),
+    actions: _m("Actions", "الإجراءات"),
     updateSuccess: _m("Project updated successfully!", "تم تحديث المشروع بنجاح!"),
     createSuccess: _m("Project created successfully!", "تم إنشاء المشروع بنجاح!"),
     updateError: _m("Failed to update project. Please try again.", "فشل تحديث المشروع. يرجى المحاولة مرة أخرى."),

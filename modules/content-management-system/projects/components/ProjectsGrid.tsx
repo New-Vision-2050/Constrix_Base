@@ -1,29 +1,57 @@
 import ProjectCard from "./project-card";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
-import { EditIcon } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
+import { CMSProject } from "../types";
+import { StateError } from "@/components/shared/states";
+import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
+type ShowableMenuItem = MenuItem & { show: boolean };
 type PropsT = {
     OnEditProject: (id: string) => void;
+    OnDeleteProject: (id: string) => void;
+    projects: CMSProject[];
 }
-export default function ProjectsGrid({ OnEditProject }: PropsT) {
-    const actions: MenuItem[] = [
+export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects }: PropsT) {
+    const { can } = usePermissions();
+    const t = useTranslations("content-management-system.projects");
+
+    const actions: ShowableMenuItem[] = [
         {
-            label: "Edit",
-            icon: <EditIcon className="w-4 h-4" />,
-            disabled: false,
+            label: t("editProject"),
+            icon: <EditIcon className="w-4 h-4 text-blue-500" />,
+            disabled: true,
             action: (row) => {
                 OnEditProject(row.id);
             },
+            show: can(PERMISSIONS.CMS.projects.update),
         },
+        {
+            label: t("deleteProject"),
+            icon: <TrashIcon className="w-4 h-4 text-red-500" />,
+            disabled: true,
+            action: (row) => {
+                OnDeleteProject(row.id);
+            },
+            show: can(PERMISSIONS.CMS.projects.delete),
+        }
     ];
 
+     // handle no projects
+     if (projects.length === 0) {
+        return <StateError message={t("noProjects")} />;
+    }
+
     return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <ProjectCard id="1" src="" title="Project 1" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 2" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 3" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 4" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 5" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 6" actions={actions} />
-        <ProjectCard id="1" src="" title="Project 7" actions={actions} />
+        {projects.map((project) => (
+            <ProjectCard 
+            key={project.id} 
+            id={project.id} 
+            src={project.main_image || ""} 
+            description={project.description || ""}
+            title={project.name || ""} 
+            actions={actions?.filter((action) => action.show)} />
+        ))}
     </div>
 }
