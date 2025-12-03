@@ -1,18 +1,23 @@
 import ProjectCard from "./project-card";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
-import { EditIcon } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import { CMSProject } from "../types";
 import { StateError } from "@/components/shared/states";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
+type ShowableMenuItem = MenuItem & { show: boolean };
 type PropsT = {
     OnEditProject: (id: string) => void;
+    OnDeleteProject: (id: string) => void;
     projects: CMSProject[];
 }
-export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
+export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects }: PropsT) {
+    const { can } = usePermissions();
     const t = useTranslations("content-management-system.projects");
 
-    const actions: MenuItem[] = [
+    const actions: ShowableMenuItem[] = [
         {
             label: "Edit",
             icon: <EditIcon className="w-4 h-4" />,
@@ -20,7 +25,17 @@ export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
             action: (row) => {
                 OnEditProject(row.id);
             },
+            show: can(PERMISSIONS.CMS.projects.update),
         },
+        {
+            label: "Delete",
+            icon: <TrashIcon className="w-4 h-4" />,
+            disabled: true,
+            action: (row) => {
+                OnDeleteProject(row.id);
+            },
+            show: can(PERMISSIONS.CMS.projects.delete),
+        }
     ];
 
      // handle no projects
@@ -36,7 +51,7 @@ export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
             src={project.main_image || ""} 
             description={project.description || ""}
             title={project.name || ""} 
-            actions={actions} />
+            actions={actions?.filter((action) => action.show)} />
         ))}
     </div>
 }

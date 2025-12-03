@@ -9,10 +9,13 @@ import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import useProjects from "../hooks/useProjects";
 import { StateLoading, StateError } from "@/components/shared/states";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
+import { toast } from "sonner";
 
 export default function ProjectsTabContent() {
     const t = useTranslations("content-management-system.projects");
     const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+    const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
     // Get projects list from API
     const {
         data: projectsList,
@@ -25,6 +28,9 @@ export default function ProjectsTabContent() {
 
     const OnEditProject = (id: string) => {
         setEditingProjectId(id);
+    }
+    const OnDeleteProject = (id: string) => {
+        setDeletingProjectId(id);
     }
 
 
@@ -58,7 +64,7 @@ export default function ProjectsTabContent() {
             </div>
             {/* projects grid */}
             <Can check={[PERMISSIONS.CMS.projects.list]}>
-                <ProjectsGrid OnEditProject={OnEditProject} projects={projects} />
+                <ProjectsGrid OnEditProject={OnEditProject} OnDeleteProject={OnDeleteProject} projects={projects} />
             </Can>
         </div>
         <Can check={[PERMISSIONS.CMS.projects.update]}>
@@ -67,6 +73,17 @@ export default function ProjectsTabContent() {
                 onClose={() => setEditingProjectId(null)}
                 projectId={editingProjectId || undefined}
                 onSuccess={() => { refetchProjectsList() }}
+            />
+        </Can>
+        <Can check={[PERMISSIONS.CMS.projects.delete]}>
+            <DeleteConfirmationDialog
+                open={Boolean(deletingProjectId)}
+                onClose={() => setDeletingProjectId(null)}
+                deleteUrl={`website-projects/${deletingProjectId}`}
+                onSuccess={() => { 
+                    toast.success(t("deleteSuccess"));
+                    refetchProjectsList()
+                 }}
             />
         </Can>
     </>
