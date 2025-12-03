@@ -141,6 +141,7 @@ export function AppSidebar({
     const settingsRoutesNames = [
       ROUTER.SETTINGS,
       ROUTER.DASHBOARD,
+      ROUTER.CLIENT_PROFILE,
       ROUTER.USER_PROFILE,
       ROUTER.COMPANY_PROFILE,
     ];
@@ -329,6 +330,7 @@ export function AppSidebar({
               ...Object.values(PERMISSIONS.profile).flatMap((p) =>
                 Object.values(p)
               ),
+              // client profile permission
             ]),
           },
           {
