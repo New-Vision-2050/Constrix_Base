@@ -1,7 +1,7 @@
 "use client";
 
 import { Stack, TextField, MenuItem, Menu, Button, InputAdornment } from "@mui/material";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, SortAsc } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState, useEffect } from "react";
@@ -160,6 +160,7 @@ export default function ProjectsSearchBar({
                 color={undefined}
                 onClick={(e) => setSortByAnchor(e.currentTarget)}
                 endIcon={<ChevronDown size={16} />}
+                startIcon={<SortAsc size={16} />}
                 sx={{ minWidth: 110, justifyContent: "space-between", color: "gray", borderColor: "gray" }}
             >
                 {currentSortByLabel}
