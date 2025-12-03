@@ -1,12 +1,19 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Box,
+  Stack,
+  Typography,
+  Chip,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { CommunicationMessagesApi } from "@/services/api/company-dashboard/communication-messages";
 import { StateLoading } from "@/components/shared/states";
-import { Badge } from "@/components/ui/badge";
 
 interface MessageDetailsDialogProps {
   messageId: string | null;
@@ -16,8 +23,8 @@ interface MessageDetailsDialogProps {
 
 /**
  * Dialog for viewing message details including reply
- * - RTL/LTR support via Dialog component
- * - Light/Dark mode styling
+ * - RTL/LTR support via MUI Dialog
+ * - Light/Dark mode styling via MUI theme
  * - Shows full message and reply if available
  */
 export default function MessageDetailsDialog({
@@ -39,72 +46,114 @@ export default function MessageDetailsDialog({
   const message = messageData?.data?.payload;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{tDetails("title")}</DialogTitle>
-        </DialogHeader>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{tDetails("title")}</DialogTitle>
 
+      <DialogContent>
         {isLoading ? (
           <StateLoading minHeight="200px" />
         ) : message ? (
-          <div className="space-y-4">
+          <Box sx={{ mt: 2 }}>
             {/* Contact info */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("name")}</p>
-                <p className="font-medium">{message.name}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{t("email")}</p>
-                <p className="font-medium">{message.email}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{t("phone")}</p>
-                <p className="font-medium">{message.phone}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{t("status")}</p>
-                <Badge variant={message.status === "replied" ? "default" : "secondary"}>
-                  {t(message.status)}
-                </Badge>
-              </div>
-            </div>
+            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2, mb: 3 }}>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t("name")}
+                </Typography>
+                <Typography variant="body1" fontWeight="medium">
+                  {message.name}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t("email")}
+                </Typography>
+                <Typography variant="body1" fontWeight="medium">
+                  {message.email}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t("phone")}
+                </Typography>
+                <Typography variant="body1" fontWeight="medium">
+                  {message.phone}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t("status")}
+                </Typography>
+                <Box sx={{ mt: 0.5 }}>
+                  <Chip
+                    label={t(message.status)}
+                    color={message.status === "replied" ? "success" : "default"}
+                    size="small"
+                  />
+                </Box>
+              </Box>
+            </Box>
 
             {/* Subject */}
-            <div>
-              <p className="text-sm text-muted-foreground">{t("subject")}</p>
-              <p className="font-medium">{message.subject}</p>
-            </div>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="caption" color="text.secondary">
+                {t("subject")}
+              </Typography>
+              <Typography variant="body1" fontWeight="medium">
+                {message.subject}
+              </Typography>
+            </Box>
 
             {/* Message */}
-            <div>
-              <p className="text-sm text-muted-foreground">{t("message")}</p>
-              <p className="p-4 bg-muted rounded-lg whitespace-pre-wrap break-words">
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="caption" color="text.secondary">
+                {t("message")}
+              </Typography>
+              <Box
+                sx={{
+                  p: 2,
+                  mt: 1,
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
                 {message.message}
-              </p>
-            </div>
+              </Box>
+            </Box>
 
             {/* Reply (if available) */}
             {message.reply && (
-              <div>
-                <p className="text-sm text-muted-foreground">
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="caption" color="text.secondary">
                   {tDetails("repliedAt")}: {new Date(message.replied_at!).toLocaleString()}
-                </p>
-                <p className="p-4 bg-primary/10 rounded-lg whitespace-pre-wrap break-words mt-2">
+                </Typography>
+                <Box
+                  sx={{
+                    p: 2,
+                    mt: 1,
+                    bgcolor: "primary.light",
+                    color: "primary.contrastText",
+                    borderRadius: 1,
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                  }}
+                >
                   {message.reply}
-                </p>
-              </div>
+                </Box>
+              </Box>
             )}
 
             {/* Close button */}
-            <div className="flex justify-end">
-              <Button onClick={onClose}>{tDetails("close")}</Button>
-            </div>
-          </div>
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button variant="contained" onClick={onClose}>
+                {tDetails("close")}
+              </Button>
+            </Box>
+          </Box>
         ) : null}
       </DialogContent>
     </Dialog>
   );
 }
-

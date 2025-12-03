@@ -1,16 +1,6 @@
 import { baseApi } from "@/config/axios/instances/base";
-import { ApiBaseResponse } from "@/types/common/response/base";
-import { ApiPaginatedResponse } from "@/types/common/response/paginated";
-import { CommunicationMessage, ReplyMessageParams } from "../types";
-
-/**
- * API responses for communication messages
- */
-export interface ListMessagesResponse
-  extends ApiPaginatedResponse<CommunicationMessage[]> {}
-
-export interface ShowMessageResponse
-  extends ApiBaseResponse<CommunicationMessage> {}
+import { ListMessagesResponse, ShowMessageResponse } from "./types/response";
+import { ReplyMessageParams } from "./types/params";
 
 /**
  * Communication Messages API service
