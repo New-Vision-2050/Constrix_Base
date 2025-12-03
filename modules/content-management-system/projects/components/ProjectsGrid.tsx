@@ -2,12 +2,16 @@ import ProjectCard from "./project-card";
 import type { MenuItem } from "@/app/[locale]/(main)/companies/cells/execution";
 import { EditIcon } from "lucide-react";
 import { CMSProject } from "../types";
+import { StateError } from "@/components/shared/states";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
     OnEditProject: (id: string) => void;
     projects: CMSProject[];
 }
 export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
+    const t = useTranslations("content-management-system.projects");
+
     const actions: MenuItem[] = [
         {
             label: "Edit",
@@ -18,6 +22,11 @@ export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
             },
         },
     ];
+
+     // handle no projects
+     if (projects.length === 0) {
+        return <StateError message={t("noProjects")} />;
+    }
 
     return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {projects.map((project) => (

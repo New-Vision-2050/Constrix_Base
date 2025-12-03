@@ -32,11 +32,12 @@ export default function ProjectsTabContent() {
     if (isLoadingProjectsList) {
         return <StateLoading />;
     }
-    
+    // handle error
     if (isErrorProjectsList) {
         return <StateError message={projectsError?.message} onRetry={refetchProjectsList} />;
     }
-
+    
+    // normal flow
     return <>
         <div className="flex flex-col gap-4">
             {/*  add project button & title */}

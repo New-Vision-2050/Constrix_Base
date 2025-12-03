@@ -3,6 +3,7 @@ import { MessagesGroup, _m } from "@/messages";
 export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   title: _m("Projects", "المشاريع"),
   addProject: _m("Add New Project", "اضافة مشروع جديد"),
+  noProjects: _m("No projects found", "لم يتم إيجاد مشاريع"),
   tabs: new MessagesGroup({
     projects: _m("Projects", "المشاريع"),
     projectsTypes: _m("Projects Types", "انواع المشاريع"),
