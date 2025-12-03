@@ -4,24 +4,24 @@
  */
 export interface ProjectDetailParams {
   name_ar: string;
-  name_en: string;
+  name_en?: string;
   website_service_id: string;
 }
 
 /**
  * Parameters for creating a new project
- * Follows the project form schema structure
+ * Follows the API body structure
  */
 export interface CreateProjectParams {
   website_project_setting_id: string;
   title_ar: string;
-  title_en: string;
+  title_en?: string;
   name_ar: string;
-  name_en: string;
+  name_en?: string;
   description_ar?: string;
   description_en?: string;
   main_image?: File | null;
-  secondary_image?: File | null;
+  secondary_image?: File[] | null;
   project_details?: ProjectDetailParams[];
 }
 
@@ -38,6 +38,6 @@ export interface UpdateProjectParams {
   description_ar?: string;
   description_en?: string;
   main_image?: File | null;
-  secondary_image?: File | null;
+  secondary_image?: File[] | null;
   project_details?: ProjectDetailParams[];
 }

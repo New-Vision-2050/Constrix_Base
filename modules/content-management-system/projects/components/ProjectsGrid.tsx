@@ -16,7 +16,7 @@ export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
         {
             label: "Edit",
             icon: <EditIcon className="w-4 h-4" />,
-            disabled: false,
+            disabled: true,
             action: (row) => {
                 OnEditProject(row.id);
             },
@@ -34,6 +34,7 @@ export default function ProjectsGrid({ OnEditProject, projects }: PropsT) {
             key={project.id} 
             id={project.id} 
             src={project.main_image || ""} 
+            description={project.description || ""}
             title={project.name || ""} 
             actions={actions} />
         ))}

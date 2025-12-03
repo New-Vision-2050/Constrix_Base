@@ -58,6 +58,7 @@ export interface WebsiteService {
  */
 export interface CMSProject {
   id: string;
+  website_project_setting_id?: string;
   name?: string;
   name_ar?: string;
   name_en?: string;

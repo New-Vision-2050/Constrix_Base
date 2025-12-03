@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -26,6 +26,9 @@ import {
 } from "../../schema/project-form.schema";
 import ProjectDetailsSection from "./ProjectDetailsSection";
 import ProjectDetailsArray from "./ProjectDetailsArray";
+import { CompanyDashboardProjectsApi } from "@/services/api/company-dashboard/projects";
+import { CompanyDashboardProjectTypesApi } from "@/services/api/company-dashboard/project-types";
+import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
 
 // Project type options - can be extended later
 const PROJECT_TYPE_OPTIONS = [
@@ -67,8 +70,7 @@ export default function SetProjectDialog({
     queryKey: ["project", projectId],
     queryFn: async () => {
       // TODO: Replace with actual API call
-      // return ProjectsApi.show(projectId!);
-      return { data: { payload: null } };
+      return CompanyDashboardProjectsApi.show(projectId!);
     },
     enabled: isEditMode && open,
   });
@@ -87,7 +89,29 @@ export default function SetProjectDialog({
     formState: { errors, isSubmitting },
   } = form;
 
-  const isFeatured = watch("is_featured");
+  // Fetch project types (cached for 5 minutes to avoid unnecessary refetches)
+  const { data: projectTypesData } = useQuery({
+    queryKey: ["company-dashboard-project-types"],
+    queryFn: () => CompanyDashboardProjectTypesApi.list(),
+    staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
+    gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes
+  });
+  const projectTypesOptions = useMemo(() => projectTypesData?.data?.payload?.map((projectType: any) => ({
+    value: projectType.id,
+    label: projectType.name,
+  })) || [], [projectTypesData]);
+
+  // Fetch services (cached for 5 minutes to avoid unnecessary refetches)
+  const { data: servicesData } = useQuery({
+    queryKey: ["company-dashboard-services"],
+    queryFn: () => CompanyDashboardServicesApi.list(),
+    staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
+    gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes
+  });
+  const servicesOptions = useMemo(() => servicesData?.data?.payload?.map((service: any) => ({
+    value: service.id,
+    label: service.name,
+  })) || [], [servicesData]);
 
   // Show toast for validation errors
   useEffect(() => {
@@ -103,20 +127,66 @@ export default function SetProjectDialog({
   useEffect(() => {
     if (isEditMode && projectData?.data?.payload) {
       const project = projectData.data.payload;
-      // TODO: Map API response to form data
-      // setValue("title_ar", project.title_ar || "");
-      // ... etc
+
+      // Set core project fields
+      setValue("name_ar", project.name_ar || "");
+      setValue("name_en", project.name_en || "");
+      setValue("title_ar", project.name_ar || ""); // Title maps to name for now
+      setValue("title_en", project.name_en || "");
+      setValue("description_ar", project.description_ar || "");
+      setValue("description_en", project.description_en || "");
+      // set type
+      setValue("type", project.website_project_setting_id || "");
+
+      // Set featured status based on project status
+      setValue("is_featured", project.status === 1);
+
+      // Transform project_details to form details array format
+      if (project.project_details && project.project_details.length > 0) {
+        const formDetails = project.project_details.map((detail) => {
+          // Extract Arabic and English content from translations
+          const arTranslation = detail.translations?.find(
+            (t) => t.locale === "ar" && t.field === "name"
+          );
+          const enTranslation = detail.translations?.find(
+            (t) => t.locale === "en" && t.field === "name"
+          );
+
+          return {
+            detail_ar: arTranslation?.content || "",
+            detail_en: enTranslation?.content || "",
+            service_id: detail.website_service_id || "",
+          };
+        });
+        setValue("details", formDetails);
+      }
     }
   }, [isEditMode, projectData, open, setValue]);
 
   const onSubmit = async (data: ProjectFormData) => {
     try {
       // TODO: Replace with actual API calls
+      const payload = {
+        main_image: data.main_image,
+        secondary_image: data.sub_images[0],
+        website_project_setting_id: data.type,
+        title_ar: data.title_ar,
+        title_en: data.title_en,
+        name_ar: data.name_ar,
+        name_en: data.name_en,
+        description_ar: data.description_ar,
+        description_en: data.description_en,
+        project_details: data.details.map((detail) => ({
+          name_ar: detail.detail_ar,
+          name_en: detail.detail_en,
+          website_service_id: detail.service_id,
+        })),
+      };
       if (isEditMode && projectId) {
-        // await ProjectsApi.update(projectId, data);
+        await CompanyDashboardProjectsApi.update(projectId, payload);
         toast.success(t("updateSuccess") || "Project updated successfully!");
       } else {
-        // await ProjectsApi.create(data);
+        await CompanyDashboardProjectsApi.create(payload);
         toast.success(t("createSuccess") || "Project created successfully!");
       }
 
@@ -184,9 +254,9 @@ export default function SetProjectDialog({
               isSubmitting={isSubmitting}
               isFetching={isFetching}
               t={t}
-              projectTypeOptions={PROJECT_TYPE_OPTIONS}
-              mainImageInitialValue={undefined}
-              subImagesInitialValue={undefined}
+              projectTypeOptions={projectTypesOptions}
+              mainImageInitialValue={projectData?.data?.payload?.main_image}
+              subImagesInitialValue={projectData?.data?.payload?.secondary_image ? [projectData.data.payload.secondary_image] : undefined}
             />
 
             {/* Details Array Section */}
@@ -195,7 +265,7 @@ export default function SetProjectDialog({
               isSubmitting={isSubmitting}
               isFetching={isFetching}
               t={t}
-              serviceOptions={SERVICE_OPTIONS}
+              serviceOptions={servicesOptions}
             />
 
             {/* Save Button */}

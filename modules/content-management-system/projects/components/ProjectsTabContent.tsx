@@ -22,7 +22,7 @@ export default function ProjectsTabContent() {
         refetch: refetchProjectsList
     } = useProjects();
     const projects = useMemo(() => projectsList?.data?.payload || [], [projectsList]);
-    
+
     const OnEditProject = (id: string) => {
         setEditingProjectId(id);
     }
@@ -36,7 +36,7 @@ export default function ProjectsTabContent() {
     if (isErrorProjectsList) {
         return <StateError message={projectsError?.message} onRetry={refetchProjectsList} />;
     }
-    
+
     // normal flow
     return <>
         <div className="flex flex-col gap-4">
@@ -46,7 +46,7 @@ export default function ProjectsTabContent() {
                 <Can check={[PERMISSIONS.CMS.projects.create]}>
                     <DialogTrigger
                         component={SetProjectDialog}
-                        dialogProps={{ onSuccess: () => { } }}
+                        dialogProps={{ onSuccess: () => { refetchProjectsList() } }}
                         render={({ onOpen }) => (
                             <Button onClick={onOpen}>
                                 <PlusIcon />
@@ -66,7 +66,7 @@ export default function ProjectsTabContent() {
                 open={Boolean(editingProjectId)}
                 onClose={() => setEditingProjectId(null)}
                 projectId={editingProjectId || undefined}
-                onSuccess={() => { }}
+                onSuccess={() => { refetchProjectsList() }}
             />
         </Can>
     </>

@@ -53,7 +53,11 @@ export const CompanyDashboardProjectsApi = {
       `website-projects/${id}`,
       serialize(body, {
         indices: true,
-      }));
+      }), {
+      params: {
+        _method: "PUT",
+      }
+    });
   },
 
   /**
