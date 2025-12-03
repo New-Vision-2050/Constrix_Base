@@ -19,7 +19,7 @@ export default function ServicesView() {
   const t = useTranslations("content-management-system.services");
 
   return (
-    <Can check={[PERMISSIONS.CMS.services.view]}>
+    <Can check={[PERMISSIONS.CMS.services.list]}>
       <div className="px-8 space-y-7">
         <Can check={[PERMISSIONS.CMS.services.update]}>
           <AddServiceDialog

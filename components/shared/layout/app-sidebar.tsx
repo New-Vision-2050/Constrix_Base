@@ -589,7 +589,7 @@ export function AppSidebar({
             show:
               !isCentralCompany &&
               can([
-                PERMISSIONS.CMS.services.view,
+                PERMISSIONS.CMS.services.list,
                 PERMISSIONS.CMS.services.update,
               ]),
           },
@@ -601,7 +601,7 @@ export function AppSidebar({
             show:
               !isCentralCompany &&
               can([
-                PERMISSIONS.CMS.services.view,
+                PERMISSIONS.CMS.services.list,
                 PERMISSIONS.CMS.services.update,
               ]),
           },

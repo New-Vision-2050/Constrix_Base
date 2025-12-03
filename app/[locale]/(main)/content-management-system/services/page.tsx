@@ -7,5 +7,5 @@ function MainSettingsPage() {
 }
 
 export default withServerPermissionsPage(MainSettingsPage, [
-  Object.values(PERMISSIONS.CMS.services),
+  PERMISSIONS.CMS.services.list,
 ]);
