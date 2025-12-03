@@ -88,8 +88,6 @@ export default function ProjectsTabContent() {
                                 onChange={(_, newPage) => setPage(newPage)}
                                 color="primary"
                                 shape="rounded"
-                                // showFirstButton
-                                // showLastButton
                             />
                         </Stack>
                     </>

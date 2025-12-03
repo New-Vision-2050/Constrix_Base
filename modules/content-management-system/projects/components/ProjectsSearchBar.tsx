@@ -1,10 +1,10 @@
 "use client";
 
-import { Stack, TextField, MenuItem, Select, FormControl, InputLabel, InputAdornment } from "@mui/material";
-import { Search } from "lucide-react";
+import { Stack, TextField, MenuItem, Menu, Button, InputAdornment } from "@mui/material";
+import { Search, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { CompanyDashboardProjectTypesApi } from "@/services/api/company-dashboard/project-types";
 
 interface ProjectsSearchBarProps {
@@ -20,12 +20,13 @@ interface ProjectsSearchBarProps {
     sortBy: string;
     /** Callback when sort by filter changes */
     onSortByChange: (value: string) => void;
-    /** additional actions */
+    /** Additional actions */
     actions?: React.ReactNode;
 }
 
 /**
  * Search and filter bar for projects
+ * - Uses Button with dropdown Menu instead of Select
  * - Supports RTL/LTR automatically via MUI
  * - Light/Dark mode via theme
  * - Fetches project types with caching
@@ -41,6 +42,23 @@ export default function ProjectsSearchBar({
 }: ProjectsSearchBarProps) {
     const t = useTranslations("content-management-system.projects");
 
+    // Local search state for debouncing (avoids API call on every keystroke)
+    const [localSearch, setLocalSearch] = useState(search);
+
+    // Anchor elements for dropdown menus
+    const [projectTypeAnchor, setProjectTypeAnchor] = useState<null | HTMLElement>(null);
+    const [sortByAnchor, setSortByAnchor] = useState<null | HTMLElement>(null);
+
+    // Debounce search: wait 500ms after user stops typing before updating parent
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onSearchChange(localSearch);
+        }, 500);
+
+        // Cleanup: cancel timer if user types again before 500ms
+        return () => clearTimeout(timer);
+    }, [localSearch, onSearchChange]);
+
     // Fetch project types with caching (5 min fresh, 10 min in cache)
     const { data: projectTypesData } = useQuery({
         queryKey: ["company-dashboard-project-types-filter"],
@@ -54,22 +72,39 @@ export default function ProjectsSearchBar({
         [projectTypesData]
     );
 
+    // Get current labels for display
+    const currentProjectTypeLabel = useMemo(() => {
+        if (!projectType) return t("projectType");
+        const type = projectTypeOptions.find((t: any) => t.id === projectType);
+        return type?.name_ar || type?.name_en || t("projectType");
+    }, [projectType, projectTypeOptions, t]);
+
+    const currentSortByLabel = useMemo(() => {
+        if (!sortBy) return t("sortBy");
+        const labels: Record<string, string> = {
+            name: t("name"),
+            createdAt: t("createdAt"),
+        };
+        return labels[sortBy] || t("sortBy");
+    }, [sortBy, t]);
+
     return (
         <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
             alignItems="stretch"
             sx={{ mb: 3 }}
+            flexWrap={"wrap"}
             className="bg-sidebar p-4 rounded-lg"
         >
-            {/* Search input */}
+            {/* Search input with debouncing */}
             <TextField
-                fullWidth
+                sx={{ minWidth: 200,flexGrow: 1 }}
+                size="small"
                 placeholder={t("searchPlaceholder")}
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
                 InputProps={{
-                    size: "small",
                     startAdornment: (
                         <InputAdornment position="start">
                             <Search size={20} />
@@ -77,41 +112,88 @@ export default function ProjectsSearchBar({
                     ),
                 }}
             />
-            {/* additional actions */}
-            {actions && <>{actions}</>}
-            
-            {/* Project type filter */}
-            <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel size="small">{t("projectType")}</InputLabel>
-                <Select
-                    value={projectType}
-                    size="small"
-                    label={t("projectType")}
-                    onChange={(e) => onProjectTypeChange(e.target.value)}
-                >
-                    <MenuItem value="">{t("allTypes")}</MenuItem>
-                    {projectTypeOptions.map((type: any) => (
-                        <MenuItem key={type.id} value={type.id}>
-                            {type.name}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
 
-            {/* Sort by */}
-            <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel size="small">{t("sortBy")}</InputLabel>
-                <Select
-                    value={sortBy}
-                    size="small"
-                    label={t("sortBy")}
-                    onChange={(e) => onSortByChange(e.target.value)}
+            {/* Additional actions (e.g., Add button) */}
+            {actions && <>{actions}</>}
+
+            {/* Project type dropdown button */}
+            <Button
+                variant="outlined"
+                size="small"
+                color={undefined}
+                onClick={(e) => setProjectTypeAnchor(e.currentTarget)}
+                endIcon={<ChevronDown size={16} />}
+                sx={{ minWidth: 110, justifyContent: "space-between", color: "gray", borderColor: "gray" }}
+            >
+                {currentProjectTypeLabel}
+            </Button>
+            <Menu
+                anchorEl={projectTypeAnchor}
+                open={Boolean(projectTypeAnchor)}
+                onClose={() => setProjectTypeAnchor(null)}
+            >
+                <MenuItem
+                    onClick={() => {
+                        onProjectTypeChange("");
+                        setProjectTypeAnchor(null);
+                    }}
                 >
-                    <MenuItem value="">{t("all")}</MenuItem>
-                    <MenuItem value="name">{t("name")}</MenuItem>
-                    <MenuItem value="createdAt">{t("createdAt")}</MenuItem>
-                </Select>
-            </FormControl>
+                    {t("allTypes")}
+                </MenuItem>
+                {projectTypeOptions.map((type: any) => (
+                    <MenuItem
+                        key={type.id}
+                        onClick={() => {
+                            onProjectTypeChange(type.id);
+                            setProjectTypeAnchor(null);
+                        }}
+                    >
+                        {type.name_ar || type.name_en}
+                    </MenuItem>
+                ))}
+            </Menu>
+
+            {/* Sort by dropdown button */}
+            <Button
+                variant="outlined"
+                size="small"
+                color={undefined}
+                onClick={(e) => setSortByAnchor(e.currentTarget)}
+                endIcon={<ChevronDown size={16} />}
+                sx={{ minWidth: 110, justifyContent: "space-between", color: "gray", borderColor: "gray" }}
+            >
+                {currentSortByLabel}
+            </Button>
+            <Menu
+                anchorEl={sortByAnchor}
+                open={Boolean(sortByAnchor)}
+                onClose={() => setSortByAnchor(null)}
+            >
+                <MenuItem
+                    onClick={() => {
+                        onSortByChange("");
+                        setSortByAnchor(null);
+                    }}
+                >
+                    {t("all")}
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        onSortByChange("name");
+                        setSortByAnchor(null);
+                    }}
+                >
+                    {t("name")}
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        onSortByChange("createdAt");
+                        setSortByAnchor(null);
+                    }}
+                >
+                    {t("createdAt")}
+                </MenuItem>
+            </Menu>
         </Stack>
     );
 }

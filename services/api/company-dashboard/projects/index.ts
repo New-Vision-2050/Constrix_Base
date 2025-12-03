@@ -21,7 +21,6 @@ export const CompanyDashboardProjectsApi = {
   list: (params?: { search?: string, page?: number, limit?: number, projectType?: string, sortBy?: string }) =>
     baseApi.get<ListProjectsResponse>("website-projects", {
       params: {
-        ...params,
         project_type: params?.projectType,
         sort_by: params?.sortBy,
         name: params?.search,
