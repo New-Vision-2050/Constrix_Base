@@ -132,6 +132,12 @@ export const PERMISSIONS = {
         "DELETE",
       ]), //LIST,CREATE,UPDATE,DELETE
     },
+    communicationMessages: create("COMMUNICATION_MESSAGE", [
+      "LIST",
+      "VIEW",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,VIEW,REPLY=UPDATE,DELETE
     themeSetting: create("WEBSITE_THEME"), // just view,update
     //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
   },
