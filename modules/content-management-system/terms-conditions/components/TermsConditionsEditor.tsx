@@ -1,15 +1,15 @@
 import { FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import { Textarea } from "@/modules/table/components/ui/textarea";
+import WysiwygEditor from "@/components/headless/wysiwyg/base";
 import { Control } from "react-hook-form";
 import { TermsConditionsFormData } from "../schema/terms-conditions-form.schema";
 
 /**
  * Terms and Conditions Editor Component
  * 
- * Renders the textarea editor for terms and conditions content
+ * Renders the WYSIWYG editor for terms and conditions content
  * Follows Single Responsibility Principle - only handles editor rendering
- * Supports both dark and light modes with appropriate styling
+ * Supports rich text editing with formatting options
  * 
  * @param control - React Hook Form control
  * @param placeholder - Placeholder text for the editor
@@ -31,12 +31,12 @@ export default function TermsConditionsEditor({
         render={({ field }) => (
           <FormItem>
             <FormControl>
-              <Textarea
+              <WysiwygEditor
                 value={field.value || ""}
-                onChange={(e) => field.onChange(e.target.value)}
+                onChange={field.onChange}
                 placeholder={placeholder}
-                rows={12}
-                className="resize-none bg-white dark:bg-sidebar border-gray-300 dark:border-white text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                minHeight={400}
+                maxHeight={800}
               />
             </FormControl>
             <FormErrorMessage />
