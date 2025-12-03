@@ -529,18 +529,6 @@ export function AppSidebar({
         ],
         sub_entities: [
           {
-            name: t("Sidebar.CMS.MainSettings"),
-            url: ROUTER.CMS.MAIN_SETTINGS,
-            icon: SettingsIcon,
-            isActive: pageName === ROUTER.CMS.MAIN_SETTINGS,
-            show:
-              !isCentralCompany &&
-              can([
-                PERMISSIONS.CMS.mainSettings.view,
-                PERMISSIONS.CMS.mainSettings.update,
-              ]),
-          },
-          {
             name: t("Sidebar.CMS.ThemeSetting"),
             url: ROUTER.CMS.THEME_SETTING,
             icon: SettingsIcon,
@@ -589,22 +577,11 @@ export function AppSidebar({
             show:
               !isCentralCompany &&
               can([
-                PERMISSIONS.CMS.services.view,
+                PERMISSIONS.CMS.services.list,
                 PERMISSIONS.CMS.services.update,
               ]),
           },
-          {
-            name: t("Sidebar.CMS.OurServices"),
-            url: ROUTER.CMS.OUR_SERVICES,
-            icon: LayoutDashboardIcon,
-            isActive: pageName === ROUTER.CMS.OUR_SERVICES,
-            show:
-              !isCentralCompany &&
-              can([
-                PERMISSIONS.CMS.services.view,
-                PERMISSIONS.CMS.services.update,
-              ]),
-          },
+
           {
             name: t("Sidebar.CMS.Projects"),
             url: ROUTER.CMS.PROJECTS,
@@ -627,6 +604,30 @@ export function AppSidebar({
             isActive: pageName === ROUTER.CMS.FOUNDER,
             show:
               !isCentralCompany && can(Object.values(PERMISSIONS.CMS.founder)),
+          },
+          {
+            name: t("Sidebar.CMS.MainSettings"),
+            url: ROUTER.CMS.MAIN_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.MAIN_SETTINGS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.mainSettings.view,
+                PERMISSIONS.CMS.mainSettings.update,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.OurServices"),
+            url: ROUTER.CMS.OUR_SERVICES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.OUR_SERVICES,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.services.list,
+                PERMISSIONS.CMS.services.update,
+              ]),
           },
           {
             name: t("Sidebar.CMS.TermsConditions"),

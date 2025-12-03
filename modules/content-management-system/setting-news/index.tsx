@@ -19,7 +19,7 @@ function NewsView() {
   const t = useTranslations("content-management-system.news");
 
   return (
-    <Can check={[PERMISSIONS.CMS.news.view]}>
+    <Can check={[PERMISSIONS.CMS.news.list]}>
       <div className="px-8 space-y-7">
         <Can check={[PERMISSIONS.CMS.news.update]}>
           <AddNewsDialog

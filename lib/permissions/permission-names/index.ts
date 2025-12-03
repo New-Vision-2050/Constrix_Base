@@ -1,7 +1,4 @@
-import {
-  createPermissions as create,
-  PERMISSION_ACTIONS,
-} from "./default-permissions";
+import { createPermissions as create } from "./default-permissions";
 
 export const PERMISSIONS = {
   user: create("USER"),
@@ -98,7 +95,7 @@ export const PERMISSIONS = {
   },
   // Content Management System
   CMS: {
-    categories: create("CATEGORY_WEBSITE", [
+    categories: create("CATEGORY_WEBSITE_CMS_CREATE", [
       "LIST",
       "CREATE",
       "UPDATE",
@@ -117,12 +114,8 @@ export const PERMISSIONS = {
     termsConditions: create("WEBSITE_TERM_AND_CONDITION", ["VIEW", "UPDATE"]), // just view,update
     news: create("WEBSITE_NEWS", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
     founder: create("FOUNDER", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
-    services: create("WEBSITE_OUR_SERVICE", [
-      "VIEW",
-      "UPDATE",
-      "CREATE",
-      "DELETE",
-    ]), // just view,update,create,delete
+    services: create("WEBSITE_SERVICE", ["LIST", "UPDATE", "CREATE", "DELETE"]), // just view,update,create,delete
+    ourServices: create("WEBSITE_OUR_SERVICE", ["VIEW", "UPDATE"]), // just view,update,create,delete
     // WEBSITE_SERVICE - LIST,CREATE,UPDATE,ACTIVATE,DELETE
     communicationSettings: {
       contactData: create("WEBSITE_CONTACT", ["VIEW", "UPDATE"]), // just view,update
@@ -139,7 +132,7 @@ export const PERMISSIONS = {
         "DELETE",
       ]), //LIST,CREATE,UPDATE,DELETE
     },
-    themeSetting: create("WEBSITE_THEME", ["VIEW", "UPDATE"]), // just view,update
+    themeSetting: create("WEBSITE_THEME"), // just view,update
     //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
   },
 };
