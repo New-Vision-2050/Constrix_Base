@@ -11,20 +11,28 @@ import useProjects from "../hooks/useProjects";
 import { StateLoading, StateError } from "@/components/shared/states";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { toast } from "sonner";
+import { Pagination, Stack } from "@mui/material";
 
 export default function ProjectsTabContent() {
     const t = useTranslations("content-management-system.projects");
     const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
     const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
-    // Get projects list from API
+
+    // Pagination state
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+
+    // Get projects list from API (re-fetches when page/limit changes)
     const {
         data: projectsList,
         isLoading: isLoadingProjectsList,
         isError: isErrorProjectsList,
         error: projectsError,
         refetch: refetchProjectsList
-    } = useProjects();
+    } = useProjects(page, limit);
     const projects = useMemo(() => projectsList?.data?.payload || [], [projectsList]);
+    const totalPages = useMemo(() => projectsList?.data?.pagination?.last_page || 1, [projectsList]);
+
 
     const OnEditProject = (id: string) => {
         setEditingProjectId(id);
@@ -65,6 +73,18 @@ export default function ProjectsTabContent() {
             {/* projects grid */}
             <Can check={[PERMISSIONS.CMS.projects.list]}>
                 <ProjectsGrid OnEditProject={OnEditProject} OnDeleteProject={OnDeleteProject} projects={projects} />
+                {/* MUI Pagination - supports RTL automatically */}
+                <Stack direction="row" justifyContent="center" mt={3}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(_, newPage) => setPage(newPage)}
+                        color="primary"
+                        shape="rounded"
+                        showFirstButton
+                        showLastButton
+                    />
+                </Stack>
             </Can>
         </div>
         <Can check={[PERMISSIONS.CMS.projects.update]}>
@@ -80,10 +100,10 @@ export default function ProjectsTabContent() {
                 open={Boolean(deletingProjectId)}
                 onClose={() => setDeletingProjectId(null)}
                 deleteUrl={`website-projects/${deletingProjectId}`}
-                onSuccess={() => { 
+                onSuccess={() => {
                     toast.success(t("deleteSuccess"));
                     refetchProjectsList()
-                 }}
+                }}
             />
         </Can>
     </>

@@ -4,6 +4,7 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   title: _m("Projects", "المشاريع"),
   addProject: _m("Add New Project", "اضافة مشروع جديد"),
   noProjects: _m("No projects found", "لم يتم إيجاد مشاريع"),
+  deleteSuccess: _m("Project deleted successfully!", "تم حذف المشروع بنجاح!"),
   tabs: new MessagesGroup({
     projects: _m("Projects", "المشاريع"),
     projectsTypes: _m("Projects Types", "انواع المشاريع"),

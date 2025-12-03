@@ -20,7 +20,7 @@ export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects 
     const actions: ShowableMenuItem[] = [
         {
             label: "Edit",
-            icon: <EditIcon className="w-4 h-4" />,
+            icon: <EditIcon className="w-4 h-4 text-blue-500" />,
             disabled: true,
             action: (row) => {
                 OnEditProject(row.id);
@@ -29,7 +29,7 @@ export default function ProjectsGrid({ OnEditProject, OnDeleteProject, projects 
         },
         {
             label: "Delete",
-            icon: <TrashIcon className="w-4 h-4" />,
+            icon: <TrashIcon className="w-4 h-4 text-red-500" />,
             disabled: true,
             action: (row) => {
                 OnDeleteProject(row.id);

@@ -220,21 +220,21 @@ export const createProjectFormSchema = (t: (key: string) => string) =>
         })
         .default([]),
     })
-    .refine(
-      (data) => {
-        // If featured, main image is required
-        if (data.is_featured && !data.main_image) {
-          return false;
-        }
-        return true;
-      },
-      {
-        message:
-          t("mainImageRequiredWhenFeatured") ||
-          "Main image is required when project is featured",
-        path: ["main_image"],
-      }
-    );
+    // .refine(
+    //   (data) => {
+    //     // If featured, main image is required
+    //     if (data.is_featured && !data.main_image) {
+    //       return false;
+    //     }
+    //     return true;
+    //   },
+    //   {
+    //     message:
+    //       t("mainImageRequiredWhenFeatured") ||
+    //       "Main image is required when project is featured",
+    //     path: ["main_image"],
+    //   }
+    // );
 
 /**
  * Type inference from the project form schema
