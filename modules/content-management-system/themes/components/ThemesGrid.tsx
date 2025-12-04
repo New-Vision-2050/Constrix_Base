@@ -1,10 +1,10 @@
 "use client";
 
-import { Theme } from "../types";
+import { ThemeData } from "../types";
 import { Card, CardMedia, CardContent, Typography, Box } from "@mui/material";
 
 interface ThemesGridProps {
-  themes: Theme[];
+  themes: ThemeData[];
   onThemeClick: (id: string) => void;
 }
 

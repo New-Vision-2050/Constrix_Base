@@ -9,10 +9,10 @@ export interface ThemeDepartment {
 }
 
 /**
- * Theme interface
+ * Theme data interface
  * Represents a website theme with all its properties
  */
-export interface Theme {
+export interface ThemeData {
   id: string;
   title: string;
   description: string;

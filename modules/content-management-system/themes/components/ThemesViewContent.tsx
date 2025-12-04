@@ -9,6 +9,7 @@ import ThemesSearchBar from "./ThemesSearchBar";
 import ThemesGrid from "./ThemesGrid";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import { useRouter } from "next/navigation";
 
 /**
  * Main themes view component
@@ -17,8 +18,7 @@ import Can from "@/lib/permissions/client/Can";
  * - Supports RTL/LTR and Light/Dark modes
  */
 export default function ThemesView() {
-    const t = useTranslations("content-management-system.themes");
-
+    const router = useRouter();
     // Pagination and filter state
     const [page, setPage] = useState(1);
     const [limit] = useState(9);
@@ -43,7 +43,8 @@ export default function ThemesView() {
 
     // Handle theme card click - log ID to console
     const handleThemeClick = (id: string) => {
-        console.log("Theme ID:", id);
+        // redirect to the theme detail page
+        router.push(`/content-management-system/themes/${id}`);
     };
 
     if (isError) {
