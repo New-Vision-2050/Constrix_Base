@@ -41,6 +41,7 @@ import {
   CategoryFormData,
   getDefaultCategoryFormValues,
 } from "../schemas/category-form.schema";
+import { CategoryTypes } from "../enums/Category-types";
 
 
 interface SetCategoryDialogProps {
@@ -70,7 +71,9 @@ export default function SetCategoryDialog({
   // Fetch category types
   const { data: categoryTypesData } = useQuery({
     queryKey: ["company-dashboard-category-types"],
-    queryFn: () => CompanyDashboardCategoriesApi.categoriesTypes(),
+    queryFn: () => CompanyDashboardCategoriesApi.categoriesTypes({
+      category_type: CategoryTypes.CATEGORY_WEBSITE_TYPE,
+    }),
     enabled: open,
   });
 
