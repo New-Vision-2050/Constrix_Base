@@ -7,5 +7,5 @@ function ThemesPage() {
 }
 
 export default withServerPermissionsPage(ThemesPage, [
-    // Object.values(PERMISSIONS.CMS.themes)
+    Object.values(PERMISSIONS.CMS.themes)
 ]);

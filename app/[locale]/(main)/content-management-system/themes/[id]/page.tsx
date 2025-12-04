@@ -1,3 +1,5 @@
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import ThemeDetailView from "@/modules/content-management-system/theme-details";
 import { ThemesApi } from "@/services/api/company-dashboard/themes";
 import { notFound } from "next/navigation";
@@ -6,7 +8,7 @@ import { notFound } from "next/navigation";
 export const dynamicParams = true;
 
 
-export default async function ThemeDetailPage({
+async function ThemeDetailPage({
   params,
 }: {
   params: Promise<{ id: string; locale: string }>;
@@ -23,3 +25,8 @@ export default async function ThemeDetailPage({
 
   return <ThemeDetailView initialData={themeDetailData} />
 }
+
+
+export default withServerPermissionsPage(ThemeDetailPage, [
+  PERMISSIONS.CMS.themes.view
+]);
