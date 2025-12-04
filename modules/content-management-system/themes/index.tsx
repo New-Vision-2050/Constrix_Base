@@ -1,3 +1,5 @@
+import ThemesViewContent from "./components/ThemesViewContent";
+
 export default function ThemesView() {
-    return <div>Themes view</div>;
+  return <ThemesViewContent />;
 }
