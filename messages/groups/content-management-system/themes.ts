@@ -16,4 +16,10 @@ export const ContentManagementSystemThemesMessages = new MessagesGroup({
   active: _m("Active", "مفعّل"),
   inactive: _m("Inactive", "غير مفعّل"),
   departments: _m("Departments", "الأقسام"),
+  // Theme details
+  about: _m("About", "عن"),
+  relatedThemes: _m("Related Themes", "ثيمات اخري"),
+  viewTheme: _m("View Theme", "عرض"),
+  default: _m("Default", "افتراضي"),
+  notDefault: _m("Not Default", "غير افتراضي"),
 });

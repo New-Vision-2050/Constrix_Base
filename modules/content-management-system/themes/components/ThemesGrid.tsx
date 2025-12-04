@@ -53,7 +53,7 @@ interface ThemeCardProps {
  * - Supports RTL/LTR automatically
  * - Light/Dark mode via MUI theme
  */
-function ThemeCard({ src, title, description, onClick }: ThemeCardProps) {
+export function ThemeCard({ src, title, description, onClick }: ThemeCardProps) {
   return (
     <Card
       onClick={onClick}
