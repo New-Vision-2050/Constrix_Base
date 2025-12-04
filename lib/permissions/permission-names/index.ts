@@ -95,7 +95,7 @@ export const PERMISSIONS = {
   },
   // Content Management System
   CMS: {
-    categories: create("CATEGORY_WEBSITE_CMS_CREATE", [
+    categories: create("CATEGORY_WEBSITE_CMS", [
       "LIST",
       "CREATE",
       "UPDATE",
