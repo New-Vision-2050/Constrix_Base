@@ -54,11 +54,13 @@ export const useCommunicationMessagesTableConfig: (
         key: "status",
         label: t("status"),
         sortable: true,
-        render: (row: CommunicationMessage) => (
-          <Badge variant={row.status === 1 ? "default" : "secondary"}>
-            {row.status === 1 ? t("replied") : t("pending")}
+        render: (status: 0 | 1) => {
+          const statusText = status == 1 ? t("replied") : t("pending");
+          const statusColor = status == 1 ? "default" : "secondary";
+          return <Badge variant={statusColor}>
+            {statusText}
           </Badge>
-        ),
+        },
       },
       // message
       {
