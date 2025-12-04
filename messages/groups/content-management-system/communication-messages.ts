@@ -26,6 +26,7 @@ export const CommunicationMessagesMessages = new MessagesGroup({
       "Enter your reply...",
       "أدخل ردك..."
     ),
+    status: _m("Status", "الحالة"),
     send: _m("Send", "إرسال"),
     cancel: _m("Cancel", "إلغاء"),
     success: _m("Reply sent successfully!", "تم إرسال الرد بنجاح!"),

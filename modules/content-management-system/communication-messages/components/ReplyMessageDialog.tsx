@@ -8,6 +8,7 @@ import {
   TextField,
   Box,
   Stack,
+  MenuItem,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -35,10 +36,11 @@ export default function ReplyMessageDialog({
 }: ReplyMessageDialogProps) {
   const t = useTranslations("content-management-system.communicationMessages.replyDialog");
   const [reply, setReply] = useState("");
+  const [status, setStatus] = useState("0");
   const queryClient = useQueryClient();
 
   // Fetch message details with caching
-  const { data: messageData } = useQuery({
+  const { data: messageData, isLoading: isFetching } = useQuery({
     queryKey: ["communication-message", messageId],
     queryFn: () => CommunicationMessagesApi.show(messageId!),
     enabled: Boolean(messageId) && open,
@@ -48,7 +50,7 @@ export default function ReplyMessageDialog({
   // Reply mutation
   const replyMutation = useMutation({
     mutationFn: (data: { reply_message: string }) =>
-      CommunicationMessagesApi.reply(messageId!, { status: 1, reply_message: data.reply_message }),
+      CommunicationMessagesApi.reply(messageId!, { status: +status as 0 | 1, reply_message: data.reply_message }),
     onSuccess: () => {
       toast.success(t("success"));
       queryClient.invalidateQueries({ queryKey: ["communication-messages"] });
@@ -74,7 +76,7 @@ export default function ReplyMessageDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t("title")}</DialogTitle>
+      <DialogTitle sx={{ textAlign: "center" }}>{t("title")}</DialogTitle>
 
       <DialogContent>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
@@ -91,32 +93,43 @@ export default function ReplyMessageDialog({
               </Box>
             )}
 
+            {/* select status */}
+            <TextField select
+              label={t("status")}
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              fullWidth
+              variant="outlined"
+              size="small"
+            >
+              <MenuItem value="1">Replied</MenuItem>
+              <MenuItem value="0">Pending</MenuItem>
+            </TextField>
+
             {/* Reply textarea */}
             <TextField
               multiline
               rows={6}
               fullWidth
               required
+              disabled={isFetching || replyMutation.isPending}
               value={reply}
               onChange={(e) => setReply(e.target.value)}
               placeholder={t("replyPlaceholder")}
+              label={t("replyLabel")}
               variant="outlined"
             />
 
             {/* Actions */}
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button variant="outlined" onClick={handleClose}>
-                {t("cancel")}
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={replyMutation.isPending}
-                startIcon={replyMutation.isPending ? <Loader2 className="animate-spin" size={16} /> : null}
-              >
-                {t("send")}
-              </Button>
-            </Stack>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={isFetching || replyMutation.isPending}
+              startIcon={replyMutation.isPending ? <Loader2 className="animate-spin" size={16} /> : null}
+            >
+              {t("send")}
+            </Button>
           </Stack>
         </Box>
       </DialogContent>

@@ -9,6 +9,7 @@ import {
   Stack,
   Typography,
   Chip,
+  TextField,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
@@ -47,7 +48,7 @@ export default function MessageDetailsDialog({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{tDetails("title")}</DialogTitle>
+      <DialogTitle sx={{ textAlign: "center" }}>{tDetails("title")}</DialogTitle>
 
       <DialogContent>
         {isLoading ? (
@@ -55,82 +56,55 @@ export default function MessageDetailsDialog({
         ) : message ? (
           <Box sx={{ mt: 2 }}>
             {/* Contact info */}
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 2, mb: 3 }}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t("name")}
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {message.name}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t("email")}
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {message.email}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t("phone")}
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {message.phone}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t("status")}
-                </Typography>
-                <Box sx={{ mt: 0.5 }}>
-                  <Chip
-                    label={message.status === 1 ? t("replied") : t("pending")}
-                    color={message.status === 1 ? "success" : "default"}
-                    size="small"
-                  />
-                </Box>
-              </Box>
-            </Box>
-
-            {/* Address */}
-            {message.address && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="caption" color="text.secondary">
-                  {t("address")}
-                </Typography>
-                <Typography variant="body1" fontWeight="medium">
-                  {message.address}
-                </Typography>
-              </Box>
-            )}
-
-            {/* Message */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="caption" color="text.secondary">
-                {t("message")}
-              </Typography>
-              <Box
-                sx={{
-                  p: 2,
-                  mt: 1,
-                  bgcolor: "action.hover",
-                  borderRadius: 1,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                }}
-              >
-                {message.message}
-              </Box>
-            </Box>
-
-            {/* Close button */}
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button variant="contained" onClick={onClose}>
-                {tDetails("close")}
-              </Button>
-            </Box>
+            <Stack gap={4} mb={3}>
+              {/* Name */}
+              <TextField
+                disabled
+                size="small"
+                label={t("name")}
+                variant="outlined"
+                value={message.name}
+                fullWidth
+              />
+              {/* Phone */}
+              <TextField
+                disabled
+                size="small"
+                label={t("phone")}
+                variant="outlined"
+                value={message.phone}
+                fullWidth
+              />
+              {/* Email */}
+              <TextField
+                disabled
+                size="small"
+                label={t("email")}
+                variant="outlined"
+                value={message.email}
+                fullWidth
+              />
+              {/* address */}
+              <TextField
+                disabled
+                size="small"
+                label={t("address")}
+                variant="outlined"
+                value={message.address}
+                fullWidth
+              />
+              {/* message */}
+              <TextField
+                disabled
+                size="small"
+                multiline
+                rows={6}
+                label={t("message")}
+                variant="outlined"
+                value={message.message}
+                fullWidth
+              />
+            </Stack>
           </Box>
         ) : null}
       </DialogContent>
