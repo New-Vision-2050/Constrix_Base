@@ -86,23 +86,25 @@ export default function MessageDetailsDialog({
                 </Typography>
                 <Box sx={{ mt: 0.5 }}>
                   <Chip
-                    label={t(message.status)}
-                    color={message.status === "replied" ? "success" : "default"}
+                    label={message.status === 1 ? t("replied") : t("pending")}
+                    color={message.status === 1 ? "success" : "default"}
                     size="small"
                   />
                 </Box>
               </Box>
             </Box>
 
-            {/* Subject */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="caption" color="text.secondary">
-                {t("subject")}
-              </Typography>
-              <Typography variant="body1" fontWeight="medium">
-                {message.subject}
-              </Typography>
-            </Box>
+            {/* Address */}
+            {message.address && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("address")}
+                </Typography>
+                <Typography variant="body1" fontWeight="medium">
+                  {message.address}
+                </Typography>
+              </Box>
+            )}
 
             {/* Message */}
             <Box sx={{ mb: 3 }}>
@@ -122,28 +124,6 @@ export default function MessageDetailsDialog({
                 {message.message}
               </Box>
             </Box>
-
-            {/* Reply (if available) */}
-            {message.reply && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="caption" color="text.secondary">
-                  {tDetails("repliedAt")}: {new Date(message.replied_at!).toLocaleString()}
-                </Typography>
-                <Box
-                  sx={{
-                    p: 2,
-                    mt: 1,
-                    bgcolor: "primary.light",
-                    color: "primary.contrastText",
-                    borderRadius: 1,
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {message.reply}
-                </Box>
-              </Box>
-            )}
 
             {/* Close button */}
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

@@ -2,6 +2,7 @@
  * Reply parameters for responding to a message
  */
 export interface ReplyMessageParams {
-  reply: string;
+  status: 1;
+  reply_message: string;
 }
 

@@ -7,7 +7,7 @@ export const CommunicationMessagesMessages = new MessagesGroup({
   name: _m("Name", "الاسم"),
   email: _m("Email", "البريد الإلكتروني"),
   phone: _m("Phone", "رقم الهاتف"),
-  subject: _m("Subject", "العنوان"),
+  address: _m("Address", "العنوان"),
   message: _m("Message", "الرسالة"),
   status: _m("Status", "الحالة"),
   createdAt: _m("Date", "التاريخ"),
@@ -35,7 +35,6 @@ export const CommunicationMessagesMessages = new MessagesGroup({
   detailsDialog: new MessagesGroup({
     title: _m("Message Details", "تفاصيل الرسالة"),
     close: _m("Close", "إغلاق"),
-    repliedAt: _m("Replied at", "تم الرد في"),
   }),
 });
 

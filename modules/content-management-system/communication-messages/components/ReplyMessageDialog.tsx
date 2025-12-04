@@ -47,8 +47,8 @@ export default function ReplyMessageDialog({
 
   // Reply mutation
   const replyMutation = useMutation({
-    mutationFn: (data: { reply: string }) =>
-      CommunicationMessagesApi.reply(messageId!, data),
+    mutationFn: (data: { reply_message: string }) =>
+      CommunicationMessagesApi.reply(messageId!, { status: 1, reply_message: data.reply_message }),
     onSuccess: () => {
       toast.success(t("success"));
       queryClient.invalidateQueries({ queryKey: ["communication-messages"] });
@@ -62,7 +62,7 @@ export default function ReplyMessageDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reply.trim()) return;
-    replyMutation.mutate({ reply: reply.trim() });
+    replyMutation.mutate({ reply_message: reply.trim() });
   };
 
   const handleClose = () => {

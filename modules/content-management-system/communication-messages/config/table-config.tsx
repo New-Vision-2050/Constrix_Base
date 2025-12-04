@@ -28,7 +28,7 @@ export const useCommunicationMessagesTableConfig: (
 
   return {
     tableId: "communication-messages-table",
-    url: `${baseURL}/communication-messages`,
+    url: `${baseURL}/website-contact-messages`,
     columns: [
       {
         key: "name",
@@ -46,17 +46,17 @@ export const useCommunicationMessagesTableConfig: (
         sortable: false,
       },
       {
-        key: "subject",
-        label: t("subject"),
-        sortable: true,
+        key: "address",
+        label: t("address"),
+        sortable: false,
       },
       {
         key: "status",
         label: t("status"),
         sortable: true,
         render: (row: CommunicationMessage) => (
-          <Badge variant={row.status === "replied" ? "default" : "secondary"}>
-            {t(row.status)}
+          <Badge variant={row.status === 1 ? "default" : "secondary"}>
+            {row.status === 1 ? t("replied") : t("pending")}
           </Badge>
         ),
       },
@@ -75,7 +75,7 @@ export const useCommunicationMessagesTableConfig: (
       ),
       (row) => (
         <DropdownMenuItem
-          disabled={row.status === "replied" || !can(PERMISSIONS.CMS.communicationMessages?.update)}
+          disabled={row.status === 1 || !can(PERMISSIONS.CMS.communicationMessages?.update)}
           onSelect={() => params?.onReply?.(row.id)}
         >
           {t("reply")}
@@ -85,7 +85,7 @@ export const useCommunicationMessagesTableConfig: (
     executionConfig: {
       canDelete: can(PERMISSIONS.CMS.communicationMessages?.delete),
     },
-    deleteUrl: `${baseURL}/communication-messages`,
+    deleteUrl: `${baseURL}/website-contact-messages`,
     searchParamName: "search",
   };
 };
