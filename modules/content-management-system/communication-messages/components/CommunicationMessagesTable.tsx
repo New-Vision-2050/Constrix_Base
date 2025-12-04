@@ -6,6 +6,8 @@ import { TableBuilder } from "@/modules/table";
 import { useCommunicationMessagesTableConfig } from "../config/table-config";
 import ReplyMessageDialog from "./ReplyMessageDialog";
 import MessageDetailsDialog from "./MessageDetailsDialog";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 /**
  * Communication messages table component
@@ -27,22 +29,30 @@ export default function CommunicationMessagesTable() {
     <>
       <div className="space-y-4">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <TableBuilder config={tableConfig} />
+        <Can check={[PERMISSIONS.CMS.communicationContactMessages.list]}>
+          <TableBuilder config={tableConfig} />
+        </Can>
       </div>
 
       {/* Reply dialog */}
-      <ReplyMessageDialog
-        messageId={replyingToId}
-        open={Boolean(replyingToId)}
-        onClose={() => setReplyingToId(null)}
-      />
+      <Can check={[PERMISSIONS.CMS.communicationContactMessages.update]}>
+        <ReplyMessageDialog
+          messageId={replyingToId}
+          open={Boolean(replyingToId)}
+          onClose={() => setReplyingToId(null)}
+        />
+      </Can>
+
+
 
       {/* Details dialog */}
-      <MessageDetailsDialog
-        messageId={viewingDetailsId}
-        open={Boolean(viewingDetailsId)}
-        onClose={() => setViewingDetailsId(null)}
-      />
+      <Can check={[PERMISSIONS.CMS.communicationContactMessages.list]}>
+        <MessageDetailsDialog
+          messageId={viewingDetailsId}
+          open={Boolean(viewingDetailsId)}
+          onClose={() => setViewingDetailsId(null)}
+        />
+      </Can>
     </>
   );
 }

@@ -71,13 +71,13 @@ export const useCommunicationMessagesTableConfig: (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onViewDetails?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.communicationContactMessages.list)} onSelect={() => params?.onViewDetails?.(row.id)}>
           {t("details")}
         </DropdownMenuItem>
       ),
       (row) => (
         <DropdownMenuItem
-          disabled={row.status === 1 || !can(PERMISSIONS.CMS.communicationMessages?.update)}
+          disabled={row.status === 1 || !can(PERMISSIONS.CMS.communicationContactMessages?.update)}
           onSelect={() => params?.onReply?.(row.id)}
         >
           {t("reply")}
@@ -85,7 +85,7 @@ export const useCommunicationMessagesTableConfig: (
       ),
     ],
     executionConfig: {
-      canDelete: can(PERMISSIONS.CMS.communicationMessages?.delete),
+      canDelete: can(PERMISSIONS.CMS.communicationContactMessages?.delete),
     },
     deleteUrl: `${baseURL}/website-contact-messages`,
     searchParamName: "search",
