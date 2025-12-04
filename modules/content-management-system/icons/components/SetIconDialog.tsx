@@ -196,7 +196,7 @@ export default function SetIconDialog({
     };
 
     // Get categories for dropdown
-    const categories = categoriesData?.data?.payload || [];
+    const categories = categoriesData?.payload || [];
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
