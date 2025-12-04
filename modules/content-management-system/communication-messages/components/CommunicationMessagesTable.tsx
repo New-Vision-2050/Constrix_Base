@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { TableBuilder } from "@/modules/table";
+import { TableBuilder, useTableReload } from "@/modules/table";
 import { useCommunicationMessagesTableConfig } from "../config/table-config";
 import ReplyMessageDialog from "./ReplyMessageDialog";
 import MessageDetailsDialog from "./MessageDetailsDialog";
@@ -25,6 +25,9 @@ export default function CommunicationMessagesTable() {
     onViewDetails: (id) => setViewingDetailsId(id),
   });
 
+  // reload table when reply or view details is closed
+  const { reloadTable } = useTableReload(tableConfig.tableId);
+
   return (
     <>
       <div className="space-y-4">
@@ -39,7 +42,10 @@ export default function CommunicationMessagesTable() {
         <ReplyMessageDialog
           messageId={replyingToId}
           open={Boolean(replyingToId)}
-          onClose={() => setReplyingToId(null)}
+          onClose={() => {
+            reloadTable();
+            setReplyingToId(null);
+          }}
         />
       </Can>
 
