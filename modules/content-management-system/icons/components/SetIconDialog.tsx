@@ -40,6 +40,7 @@ import {
     getDefaultIconFormValues,
 } from "../schema/icon-form.schema";
 import { CompanyDashboardIconsApi } from "@/services/api/company-dashboard/icons";
+import { apiClient, baseURL } from "@/config/axios-config";
 
 interface SetIconDialogProps {
     open: boolean;
@@ -60,7 +61,7 @@ export default function SetIconDialog({
 
     // Fetch icon data when editing
     const { data: iconData, isLoading: isFetching } = useQuery<{
-        data: { payload: { name_ar?: string; name_en?: string; category_website_cms_id?: string; icon?: string } | null };
+        data: { payload: { name_ar?: string; name_en?: string; website_icon_category_type?: string; icon?: string } | null };
     }>({
         queryKey: ["company-dashboard-icon", iconId],
         queryFn: async () => {
@@ -73,7 +74,10 @@ export default function SetIconDialog({
     // Fetch categories for dropdown
     const { data: categoriesData } = useQuery({
         queryKey: ["company-dashboard-categories"],
-        queryFn: () => CompanyDashboardCategoriesApi.list(),
+        queryFn: async () => {
+            const response = await apiClient.get(baseURL + '/website-icons/category-types');
+            return response.data;
+        },
         enabled: open,
     });
 
@@ -115,8 +119,8 @@ export default function SetIconDialog({
                 shouldTouch: true,
                 shouldValidate: true,
             });
-            if (icon.category_website_cms_id) {
-                setValue("category_id", icon.category_website_cms_id, {
+            if (icon.website_icon_category_type) {
+                setValue("category_id", icon.website_icon_category_type, {
                     shouldDirty: true,
                     shouldTouch: true,
                     shouldValidate: true,
@@ -130,10 +134,10 @@ export default function SetIconDialog({
             // TODO: Replace with actual API calls
             if (isEditMode && iconId) {
                 await CompanyDashboardIconsApi.update(iconId, {
-                  name_ar: data.name_ar,
-                  name_en: data.name_en,
-                  category_website_cms_id: data.category_id,
-                  icon: data.logo_image || undefined,
+                    name_ar: data.name_ar,
+                    name_en: data.name_en,
+                    website_icon_category_type: data.category_id,
+                    icon: data.logo_image || undefined,
                 });
                 toast.success(
                     t("updateSuccess") || "Icon updated successfully!"
@@ -146,7 +150,7 @@ export default function SetIconDialog({
                 await CompanyDashboardIconsApi.create({
                     name_ar: data.name_ar,
                     name_en: data.name_en,
-                    category_website_cms_id: data.category_id,
+                    website_icon_category_type: data.category_id,
                     icon: data.logo_image,
                 });
                 toast.success(
@@ -192,7 +196,7 @@ export default function SetIconDialog({
     };
 
     // Get categories for dropdown
-    const categories = categoriesData?.data?.payload || [];
+    const categories = categoriesData?.payload || [];
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
@@ -324,7 +328,7 @@ export default function SetIconDialog({
                                             <SelectContent>
                                                 {categories.map((category: any) => (
                                                     <SelectItem key={category.id} value={category.id?.toString()}>
-                                                        {category.name || category.name_ar || category.id}
+                                                        {category.name || category?.name_ar || category.id}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

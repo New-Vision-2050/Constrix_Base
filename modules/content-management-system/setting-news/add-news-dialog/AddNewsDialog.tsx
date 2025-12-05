@@ -46,6 +46,7 @@ import {
   getDefaultNewsFormValues,
 } from "../schemas/news-form.schema";
 import { AddNewsDialogProps, Category, AxiosError } from "../types";
+import { CategoryTypes } from "../../categories/enums/Category-types";
 
 export default function AddNewsDialog({
   open,
@@ -61,7 +62,9 @@ export default function AddNewsDialog({
   const { data: categoriesData } = useQuery({
     queryKey: ["news-categories"],
     queryFn: async () => {
-      const response = await CompanyDashboardCategoriesApi.list();
+      const response = await CompanyDashboardCategoriesApi.list({
+        category_type: CategoryTypes.NEWS_WEBSITE_TYPE,
+      });
       return response.data;
     },
     enabled: open,
