@@ -13,6 +13,8 @@ export const tableMessages = new MessagesGroup({
   Actions: _m("Actions", "الاجراء"),
   ToggleColumns: _m("Toggle visible columns", "تبديل الأعمدة المرئية"),
   VisibleColumns: _m("Visible Columns", "الأعمدة المرئية"),
+  From: _m("From", "من"),
+  To: _m("To", "إلى"),
   Minimal: _m("Minimal", "الحد الأدنى"),
   All: _m("All", "الكل")
 });
