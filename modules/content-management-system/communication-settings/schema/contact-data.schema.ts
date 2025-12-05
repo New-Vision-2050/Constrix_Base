@@ -1,4 +1,5 @@
 import { z } from "zod";
+import libphonenumbers from "libphonenumbers";
 
 /**
  * Email validation regex pattern
@@ -7,19 +8,32 @@ import { z } from "zod";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Phone validation regex pattern
- * Supports international formats with optional country code and various separators
- */
-const PHONE_PATTERN = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
-
-/**
  * Validation constraints for contact data fields
  */
 const CONSTRAINTS = {
   EMAIL_MAX_LENGTH: 255,
-  PHONE_MIN_LENGTH: 10,
-  PHONE_MAX_LENGTH: 20,
 } as const;
+
+/**
+ * Phone validation function using libphonenumbers
+ * Same validation logic as form builder
+ */
+const validatePhoneNumber = (phone: string): boolean => {
+  const phoneUtil = libphonenumbers.PhoneNumberUtil.getInstance();
+  try {
+    const number = phoneUtil.parseAndKeepRawInput(phone);
+    const splitValue = phone.split(" ");
+    
+    // Reject if national number starts with 0
+    if (splitValue.length > 0 && splitValue[1]?.startsWith("0")) {
+      return false;
+    }
+    
+    return phoneUtil.isValidNumber(number);
+  } catch (error) {
+    return false;
+  }
+};
 
 /**
  * Creates a Zod schema for contact data form validation
@@ -41,13 +55,13 @@ export const createContactDataSchema = (t: (key: string) => string) =>
       .regex(EMAIL_PATTERN, t("emailInvalid") || "Invalid email address")
       .max(CONSTRAINTS.EMAIL_MAX_LENGTH, `Maximum ${CONSTRAINTS.EMAIL_MAX_LENGTH} characters`),
 
-    // Phone number field with length and format validation
+    // Phone number field with libphonenumbers validation (same as form builder)
     phone: z
       .string()
       .min(1, t("phoneRequired") || "Phone number is required")
-      .min(CONSTRAINTS.PHONE_MIN_LENGTH, t("phoneMinLength") || "Phone must be at least 10 digits")
-      .max(CONSTRAINTS.PHONE_MAX_LENGTH, t("phoneMaxLength") || "Phone must not exceed 20 digits")
-      .regex(PHONE_PATTERN, t("phoneInvalid") || "Invalid phone number"),
+      .refine(validatePhoneNumber, {
+        message: t("phoneInvalid") || "رقم الجوال غير صحيح",
+      }),
   });
 
 /**

@@ -114,7 +114,7 @@ function ContactDataForm() {
                       required: true,
                     }}
                     value={field.value || ""}
-                    error={fieldState.error?.message}
+                    // error={fieldState.error?.message}
                     touched={fieldState.isTouched}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
