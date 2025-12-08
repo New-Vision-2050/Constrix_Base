@@ -25,8 +25,6 @@ export default function UserProfilePersonalDataReview() {
     }
   }, [user, userPersonalData]);
 
-  console.log('userPersonalData', userPersonalData, userId, user)
-
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* First row */}
