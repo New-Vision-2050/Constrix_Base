@@ -1,9 +1,11 @@
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
-import CommunicationMessagesView from "@/modules/content-management-system/communication-messages";
+import CommunicationMessagesClientWrapper from "@/modules/content-management-system/communication-messages/CommunicationMessagesClientWrapper";
 
 function CommunicationContactMessagesPage() {
-    return <CommunicationMessagesView />;
+  return <CommunicationMessagesClientWrapper />;
 }
 
-export default withServerPermissionsPage(CommunicationContactMessagesPage,[Object.values(PERMISSIONS.CMS.communicationContactMessages)]);
+export default withServerPermissionsPage(CommunicationContactMessagesPage, [
+  Object.values(PERMISSIONS.CMS.communicationContactMessages),
+]);
