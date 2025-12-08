@@ -123,6 +123,7 @@ export const UserCertificationFormConfig = ({
       date_obtain: certification?.date_obtain,
       date_end: certification?.date_end,
       // Initialize file field empty if editing existing certification
+      file: certification?.file,
     },
     submitButtonText: t('submitButtonText'),
     cancelButtonText: t('cancelButtonText'),
