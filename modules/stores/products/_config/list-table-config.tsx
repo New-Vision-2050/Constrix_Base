@@ -89,7 +89,7 @@ export const useProductsListTableConfig: (
         key: "is_visible",
         label: t("product.fields.status"),
         render: (value: "active" | "inActive", row: ProductRow) => (
-          <TheStatus theStatus={value} id={row.id} />
+          <TheStatus disabled={!can(PERMISSIONS.ecommerce.product.update)} theStatus={value} id={row.id} />
         ),
       },
     ],
