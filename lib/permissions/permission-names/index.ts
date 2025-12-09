@@ -140,8 +140,8 @@ export const PERMISSIONS = {
     ]), //LIST,VIEW,REPLY=UPDATE,DELETE
     //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
   },
-  // stores
-  stores: {
+  // ecommerce
+  ecommerce: {
     //Banner
     banner: create("ECOMMERCE_BANNER", ["LIST", 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
     //Coupon
