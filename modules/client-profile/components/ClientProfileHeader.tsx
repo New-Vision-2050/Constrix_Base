@@ -1,14 +1,9 @@
 "use client";
-import { ClientProfileData, UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
+import { ClientProfileData } from "@/app/[locale]/(main)/client-profile/[id]/types";
 import UserProfileHeader, { ProfileSubItem } from "@/components/shared/profile-header";
 import { Mail, Phone } from "lucide-react";
-import { useState } from "react";
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Button } from "@mui/material";
-import { MoreVert, Person, Business, Edit } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { UsersRole } from "@/constants/users-role.enum";
-import Link from "next/link";
+import ProfileRoleSelector from "./ProfileRoleSelector";
 
 type PropsT = {
     profileData: ClientProfileData;
@@ -18,26 +13,9 @@ type PropsT = {
 export default function ClientProfileHeader({ profileData, readonly }: PropsT) {
     // Translations
     const t = useTranslations("ClientProfile");
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    
     // user types
     const userTypes = profileData?.user_types ?? [];
-    // current role
-    const [profileRole, setProfileRole] = useState(readonly ? UsersRole.Employee : userTypes[0]?.role ?? '');
-
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = (): void => {
-        setAnchorEl(null);
-    };
-
-    const handleMenuItemClick = (action: UserRoleType) => {
-        setProfileRole(action.role);
-        handleClose();
-    };
-
 
     // sub items
     const subItems: ProfileSubItem[] = [
@@ -51,60 +29,6 @@ export default function ClientProfileHeader({ profileData, readonly }: PropsT) {
         },
     ];
 
-    // action slot - MUI Dropdown Menu
-    const actionSlot = (
-        <>
-            <Button
-                onClick={handleClick}
-                variant="outlined"
-                aria-controls={open ? 'user-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-                startIcon={<Person fontSize="small" />}
-                endIcon={<MoreVert />}
-            >
-                {profileRole == UsersRole?.Client ? t("header.userTypes.client") : profileRole == UsersRole?.Broker ? t("header.userTypes.broker") : t("header.userTypes.employee")}
-            </Button>
-            <Menu
-                id="user-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                    'aria-labelledby': 'user-menu-button',
-                }}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-            >
-                {!readonly && userTypes?.length > 0 && userTypes.map((userType) => (
-                    <MenuItem
-                        component={Link}
-                        href={userType.role == UsersRole.Employee ? `/user-profile?id=${profileData.id}` : `/client-profile/${profileData.id}?role=${userType.role}`}
-                        key={userType.id}
-                        disabled={profileRole == userType.role}
-                        onClick={() => handleMenuItemClick(userType)}
-                    >
-                        <ListItemIcon>
-                            <Person fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>{userType.role == UsersRole.Client ? t("header.userTypes.client") : userType.role == UsersRole.Broker ? t("header.userTypes.broker") : t("header.userTypes.employee")}</ListItemText>
-                    </MenuItem>
-                ))}
-                {readonly && (
-                    <MenuItem disabled>
-                        <ListItemText>{t("header.userTypes.employee")}</ListItemText>
-                    </MenuItem>
-                )}
-            </Menu>
-        </>
-    );
-
     return <UserProfileHeader
         imgSrc={''}
         loading={false}
@@ -114,6 +38,6 @@ export default function ClientProfileHeader({ profileData, readonly }: PropsT) {
         address={'address'}
         date_appointment={'date_appointment'}
         setOpenUploadImgDialog={() => { }}
-        actionSlot={userTypes.length > 0 ? actionSlot : undefined}
+        actionSlot={userTypes.length > 0 ? <ProfileRoleSelector id={profileData.id} userTypes={userTypes} readonly={readonly} /> : undefined}
     />
 }
