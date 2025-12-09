@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { MapPinIcon } from "lucide-react";
 import BackpackIcon from "@/public/icons/backpack";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
+import ProfileRoleSelector from "@/modules/client-profile/components/ProfileRoleSelector";
 
 
 
@@ -59,6 +60,7 @@ export default function UserProfileEntryPoint({ userId, companyId }: { userId: s
         address={user?.address}
         date_appointment={user?.date_appointment}
         setOpenUploadImgDialog={setOpenDialog}
+        actionSlot={<ProfileRoleSelector id={userPersonalData?.id ?? ''} userTypes={userPersonalData?.user_types ?? []} readonly={false} />}
       >
         <UploadProfileImageDialog
           title={t("title")}
