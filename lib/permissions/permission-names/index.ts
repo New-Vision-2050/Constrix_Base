@@ -167,6 +167,8 @@ export const PERMISSIONS = {
     // Warehouse
     warehouse: create('ECOMMERCE_WAREHOUSE', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
     //Page
-    page: create('ECOMMERCE_PAGE', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'DELETE'])
+    page: create('ECOMMERCE_PAGE', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'DELETE']),
+    //Payment Method
+    paymentMethod: create('ECOMMERCE_PAYMENT_METHOD', ['LIST', 'ACTIVATE']),
   }
 };

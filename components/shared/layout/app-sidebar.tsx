@@ -420,7 +420,7 @@ export function AppSidebar({
             url: ROUTER.HomeStore,
             icon: UserIcon,
             isActive: pageName === ROUTER.HomeStore,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.dashboard)),
           },
           // Products
           {
@@ -460,7 +460,12 @@ export function AppSidebar({
             url: ROUTER.Coupons,
             icon: UserIcon,
             isActive: pageName === ROUTER.Coupons,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.coupon)),
+            show: !isCentralCompany && can([
+              PERMISSIONS.ecommerce.coupon.list,
+              PERMISSIONS.ecommerce.featureDeal.list,
+              PERMISSIONS.ecommerce.flashDeal.list,
+              PERMISSIONS.ecommerce.dealDay.list
+            ]),
           },
           // Warehouse
           {
@@ -476,7 +481,7 @@ export function AppSidebar({
             url: ROUTER.pagesSettings,
             icon: UserIcon,
             isActive: pageName === ROUTER.pagesSettings,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.page)),
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
           },
           // Terms !!!
           {
@@ -484,7 +489,7 @@ export function AppSidebar({
             url: ROUTER.Terms,
             icon: UserIcon,
             isActive: pageName === ROUTER.Terms,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.page)),
           },
           // Social Media
           {
@@ -500,7 +505,7 @@ export function AppSidebar({
             url: ROUTER.PaymentMethods,
             icon: UserIcon,
             isActive: pageName === ROUTER.PaymentMethods,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.coupon)),
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.paymentMethod)),
           },
         ],
       },
