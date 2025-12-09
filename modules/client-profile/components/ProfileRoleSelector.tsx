@@ -6,7 +6,7 @@ import { MoreVert, Person } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 type PropsT = {
     id: number | string;
@@ -20,14 +20,16 @@ export default function ProfileRoleSelector({ id, userTypes, readonly }: PropsT)
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
+    // current url
+    const url = usePathname();
+    const isUserProfile = url.includes('user-profile');
     // get role from query params
     const searchParams = useSearchParams();
-    const role = searchParams.get('role') ?? '2';
-
+    const role = isUserProfile ? UsersRole.Employee : searchParams.get('role') ?? '2';
     // current role
     const defaultRole = useMemo(() => {
-        return readonly ? UsersRole.Employee : role == '2' ? UsersRole.Client : UsersRole.Broker;
-    }, [readonly, role]);
+        return readonly || isUserProfile ? UsersRole.Employee : role == '2' ? UsersRole.Client : UsersRole.Broker;
+    }, [readonly, role, isUserProfile]);
     const [profileRole, setProfileRole] = useState<string | null>(defaultRole);
     console.log('defaultRole', defaultRole, role, profileRole);
 
