@@ -31,7 +31,6 @@ export default function ProfileRoleSelector({ id, userTypes, readonly }: PropsT)
         return readonly || isUserProfile ? UsersRole.Employee : role == '2' ? UsersRole.Client : UsersRole.Broker;
     }, [readonly, role, isUserProfile]);
     const [profileRole, setProfileRole] = useState<string | null>(defaultRole);
-    console.log('defaultRole', defaultRole, role, profileRole);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
