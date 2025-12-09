@@ -302,11 +302,11 @@ export const UsersConfigV2 = (options?: {
         : [
           {
             id: "complate-client-profile",
-            label: options?.registrationFormSlug === ModelsTypes.CLIENT 
+            label: options?.registrationFormSlug === ModelsTypes.CLIENT
               ? tSubTable("CompleteClientProfile")
               : tSubTable("CompleteBrokerProfile"),
             action: (row: UserTableRow) => {
-              router.push(`/client-profile/${row.user_id}`);
+              router.push(`/client-profile/${row.user_id}?role=${options?.registrationFormSlug === ModelsTypes.CLIENT ? '2' : '3'}`);
             },
             icon: <UserIcon className="w-4 h-4" />,
             disabled: true
@@ -314,9 +314,9 @@ export const UsersConfigV2 = (options?: {
         ]),
       {
         id: "user-settings",
-        label: options?.registrationFormSlug === ModelsTypes.CLIENT 
+        label: options?.registrationFormSlug === ModelsTypes.CLIENT
           ? tSubTable("ClientSettings")
-          : options?.registrationFormSlug === ModelsTypes.BROKER 
+          : options?.registrationFormSlug === ModelsTypes.BROKER
             ? tSubTable("BrokerSettings")
             : tSubTable("EmployeeSettings"),
         icon: <GearIcon className="w-4 h-4" />,
@@ -326,9 +326,9 @@ export const UsersConfigV2 = (options?: {
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
-            title: options?.registrationFormSlug === ModelsTypes.CLIENT 
+            title: options?.registrationFormSlug === ModelsTypes.CLIENT
               ? tSubTable("ClientSettings")
-              : options?.registrationFormSlug === ModelsTypes.BROKER 
+              : options?.registrationFormSlug === ModelsTypes.BROKER
                 ? tSubTable("BrokerSettings")
                 : tSubTable("EmployeeSettings")
           };

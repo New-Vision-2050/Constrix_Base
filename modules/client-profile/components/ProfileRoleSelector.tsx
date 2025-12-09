@@ -1,11 +1,12 @@
 "use client";
 import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText, Button } from "@mui/material";
 import { MoreVert, Person } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 type PropsT = {
     id: number | string;
@@ -18,9 +19,17 @@ export default function ProfileRoleSelector({ id, userTypes, readonly }: PropsT)
     const t = useTranslations("ClientProfile");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    
+
+    // get role from query params
+    const searchParams = useSearchParams();
+    const role = searchParams.get('role') ?? '2';
+
     // current role
-    const [profileRole, setProfileRole] = useState(readonly ? UsersRole.Employee : userTypes[0]?.role ?? '');
+    const defaultRole = useMemo(() => {
+        return readonly ? UsersRole.Employee : role == '2' ? UsersRole.Client : UsersRole.Broker;
+    }, [readonly, role]);
+    const [profileRole, setProfileRole] = useState<string | null>(defaultRole);
+    console.log('defaultRole', defaultRole, role, profileRole);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
