@@ -94,7 +94,7 @@ function ThemeSettingForm({ initialData }: { initialData: ThemeSettingFormInitia
               return {
                 slug: key,
                 name: key,
-                main: "main" in value ? value.main : undefined,
+                primary: "main" in value ? value.main : undefined,
                 light: value.light,
                 dark: value.dark,
                 contrast: "contrastText" in value ? value.contrastText : undefined,
