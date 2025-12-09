@@ -414,6 +414,7 @@ export function AppSidebar({
           ROUTER.PaymentMethods,
         ],
         sub_entities: [
+          // Dashboard
           {
             name: t("Sidebar.HomeStore"),
             url: ROUTER.HomeStore,
@@ -421,6 +422,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.HomeStore,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
           },
+          // Products
           {
             name: t("Sidebar.Products"),
             url: ROUTER.Products,
@@ -428,6 +430,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.Products,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.product)),
           },
+          // Requests
           {
             name: t("Sidebar.Requests"),
             url: ROUTER.requests,
@@ -435,6 +438,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.requests,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.order)),
           },
+          // Categories
           {
             name: t("Sidebar.Categories"),
             url: ROUTER.Categories,
@@ -442,6 +446,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.Categories,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.category)),
           },
+          // Brands
           {
             name: t("Sidebar.Brands"),
             url: ROUTER.Brands,
@@ -449,6 +454,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.Brands,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.brand)),
           },
+          // Coupons
           {
             name: t("Sidebar.Coupons"),
             url: ROUTER.Coupons,
@@ -456,6 +462,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.Coupons,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.coupon)),
           },
+          // Warehouse
           {
             name: t("Sidebar.Warehouse"),
             url: ROUTER.warehouse,
@@ -463,6 +470,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.warehouse,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.warehouse)),
           },
+          // Pages Settings
           {
             name: t("Sidebar.PagesSettings"),
             url: ROUTER.pagesSettings,
@@ -470,6 +478,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.pagesSettings,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.page)),
           },
+          // Terms !!!
           {
             name: t("Sidebar.Terms"),
             url: ROUTER.Terms,
@@ -477,7 +486,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.Terms,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
           },
-
+          // Social Media
           {
             name: t("Sidebar.SocialMedia"),
             url: ROUTER.SocialMedia,
@@ -485,6 +494,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.SocialMedia,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.socialMedia)),
           },
+          // Payment Methods
           {
             name: t("Sidebar.PaymentMethods"),
             url: ROUTER.PaymentMethods,
