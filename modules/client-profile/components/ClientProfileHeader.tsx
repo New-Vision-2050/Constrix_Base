@@ -29,7 +29,7 @@ export default function ClientProfileHeader({ profileData, readonly }: PropsT) {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleClose = (): void => {
         setAnchorEl(null);
     };
 
@@ -85,7 +85,7 @@ export default function ClientProfileHeader({ profileData, readonly }: PropsT) {
                 {!readonly && userTypes?.length > 0 && userTypes.map((userType) => (
                     <MenuItem
                         component={Link}
-                        href={userType.role == UsersRole.Employee ? "/user-profile" : `/client-profile/${profileData.id}?role=${userType.role}`}
+                        href={userType.role == UsersRole.Employee ? `/user-profile?id=${profileData.id}` : `/client-profile/${profileData.id}?role=${userType.role}`}
                         key={userType.id}
                         disabled={profileRole == userType.role}
                         onClick={() => handleMenuItemClick(userType)}
