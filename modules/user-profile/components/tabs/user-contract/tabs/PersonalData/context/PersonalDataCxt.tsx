@@ -36,6 +36,9 @@ type PersonalDataTabCxtType = {
   userIdentityDataLoading: boolean;
   userIdentityData: UserIdentityInformationT | undefined;
   handleRefreshIdentityData: () => void;
+
+  // user id
+  userId: string;
 };
 
 export const PersonalDataTabCxt = createContext<PersonalDataTabCxtType>(
@@ -118,6 +121,8 @@ export const PersonalDataTabCxtProvider = ({
         userIdentityData,
         userIdentityDataLoading,
         handleRefreshIdentityData,
+        // user id
+        userId,
       }}
     >
       {children}
