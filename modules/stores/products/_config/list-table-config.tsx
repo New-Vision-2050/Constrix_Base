@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import TheStatus from "../add/components/the-status";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Product row type interface
 export interface ProductRow {
@@ -32,6 +34,7 @@ export interface ProductsListTableConfigProps {
 export const useProductsListTableConfig: (
   props?: ProductsListTableConfigProps
 ) => TableConfig = (props) => {
+  const { can } = usePermissions();
   const t = useTranslations();
   const { onEdit } = props || {};
 
@@ -92,7 +95,7 @@ export const useProductsListTableConfig: (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.product.update)} onSelect={() => onEdit?.(row.id)}>
           <Edit className="w-4 h-4" />
           {t("labels.edit")}
         </DropdownMenuItem>
