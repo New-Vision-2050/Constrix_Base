@@ -37,8 +37,8 @@ export default function ThemeSettingModule({ initialData }: { initialData: Theme
             palette: {
                 // common
                 common: {
-                    light: common?.light || undefined,
-                    dark: common?.dark || undefined,
+                    light: common?.white || undefined,
+                    dark: common?.black || undefined,
                 },
                 // background
                 background: {
@@ -85,12 +85,12 @@ export default function ThemeSettingModule({ initialData }: { initialData: Theme
                     main: text?.primary || undefined,
                     light: text?.secondary || undefined,
                     dark: text?.divider || undefined,
-                    contrastText: text?.contrast || undefined,
+                    contrastText: text?.disabled || undefined,
                 },
             }
         }
     }, [initialData]);
-
+    
     return <div className="px-6 py-2 flex flex-col gap-4">
         <ThemeSettingForm initialData={formData} />
     </div>
