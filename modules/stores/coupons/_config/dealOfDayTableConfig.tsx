@@ -4,6 +4,8 @@ import TheStatus from "@/modules/bouquet/components/the-status";
 import { TableConfig } from "@/modules/table";
 import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface DealOfDayRow {
   id: string;
@@ -28,7 +30,7 @@ export const useDealOfDayTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
   const t = useTranslations();
-
+  const { can } = usePermissions();
   return {
     tableId: "deal-of-day-list-table",
     url: `${baseURL}/ecommerce/dashboard/deal_days`,
@@ -54,14 +56,14 @@ export const useDealOfDayTableConfig: (params?: Params) => TableConfig = (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.dealDay.update)} onSelect={() => params?.onEdit?.(row.id)}>
           <EditIcon />
           {t("labels.edit")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.ecommerce.dealDay.delete),
     },
   };
 };
