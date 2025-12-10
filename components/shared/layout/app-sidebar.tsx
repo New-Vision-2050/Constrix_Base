@@ -530,6 +530,15 @@ export function AppSidebar({
           ROUTER.CMS.THEME_SETTING,
         ],
         sub_entities: [
+          // themes
+          {
+            name: t("Sidebar.CMS.Themes"),
+            url: ROUTER.CMS.THEMES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.THEMES,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.themes)),
+          },
+          // theme setting
           {
             name: t("Sidebar.CMS.ThemeSetting"),
             url: ROUTER.CMS.THEME_SETTING,
@@ -542,7 +551,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.themeSetting.update,
               ]),
           },
-
+          // categories
           {
             name: t("Sidebar.CMS.Categories"),
             url: ROUTER.CMS.CATEGORIES,
@@ -552,6 +561,7 @@ export function AppSidebar({
               !isCentralCompany &&
               can(Object.values(PERMISSIONS.CMS.categories)),
           },
+          // icons
           {
             name: t("Sidebar.CMS.Icons"),
             url: ROUTER.CMS.ICONS,
@@ -560,6 +570,7 @@ export function AppSidebar({
             show:
               !isCentralCompany && can(Object.values(PERMISSIONS.CMS.icons)),
           },
+          // services
           {
             name: t("Sidebar.CMS.Services"),
             url: ROUTER.CMS.SERVICES,
@@ -572,7 +583,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.services.update,
               ]),
           },
-
+          // projects
           {
             name: t("Sidebar.CMS.Projects"),
             url: ROUTER.CMS.PROJECTS,
@@ -581,6 +592,7 @@ export function AppSidebar({
             show:
               !isCentralCompany && can(Object.values(PERMISSIONS.CMS.projects)),
           },
+          // news
           {
             name: t("Sidebar.CMS.News"),
             url: ROUTER.CMS.NEWS,
@@ -588,6 +600,7 @@ export function AppSidebar({
             isActive: pageName === ROUTER.CMS.NEWS,
             show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.news)),
           },
+          // founder
           {
             name: t("Sidebar.CMS.Founder"),
             url: ROUTER.CMS.FOUNDER,
@@ -596,6 +609,7 @@ export function AppSidebar({
             show:
               !isCentralCompany && can(Object.values(PERMISSIONS.CMS.founder)),
           },
+          // main settings
           {
             name: t("Sidebar.CMS.MainSettings"),
             url: ROUTER.CMS.MAIN_SETTINGS,
@@ -608,6 +622,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.mainSettings.update,
               ]),
           },
+          // communication settings
           {
             name: t("Sidebar.CMS.CommunicationSettings"),
             url: ROUTER.CMS.COMMUNICATION_SETTINGS,
@@ -620,6 +635,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.aboutSetting.view,
               ]),
           },
+          // about us page
           {
             name: t("Sidebar.CMS.AboutUsPage"),
             url: ROUTER.CMS.ABOUT_SETTINGS,
@@ -632,6 +648,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.aboutSetting.view,
               ]),
           },
+          // our services
           {
             name: t("Sidebar.CMS.OurServices"),
             url: ROUTER.CMS.OUR_SERVICES,
@@ -644,6 +661,7 @@ export function AppSidebar({
                 PERMISSIONS.CMS.services.update,
               ]),
           },
+          // terms conditions
           {
             name: t("Sidebar.CMS.TermsConditions"),
             url: ROUTER.CMS.TERMS_CONDITIONS,

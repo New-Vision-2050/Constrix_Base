@@ -49,6 +49,7 @@ export const sidebarMessages = new MessagesGroup({
     MainData: _m("Main Data", "البيانات الأساسية"),
     MainSettings: _m("Main Settings", "الصفحة الرئيسية"),
     ThemeSetting: _m("Theme Setting", "إعدادات المظهر"),
+    Themes: _m("Themes", "المظاهر"),
     ContactSetting: _m("Contact Setting", "اعدادات التواصل"),
     AboutUsPage: _m("About Us Page", "صفحة نبذة عنا"),
     CommunicationSettings: _m("Communication Settings", "اعدادات التواصل"),
