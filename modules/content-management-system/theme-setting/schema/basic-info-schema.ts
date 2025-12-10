@@ -44,10 +44,6 @@ export const basicInfoSchema = z.object({
   websiteUrl: z
     .string()
     .min(1, "Website URL is required")
-    .refine(
-      (val) => isValidUrl(val),
-      { message: "Website URL must be a valid URL" }
-    )
     .transform((val) => val?.trim() || ""),
 });
 

@@ -15,6 +15,9 @@ export interface ColorPaletteItem {
   default: string | null;
   secondary: string | null;
   divider: string | null;
+  disabled: string | null;
+  black: string | null;
+  white: string | null;
 }
 
 /**

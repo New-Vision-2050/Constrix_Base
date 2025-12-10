@@ -30,7 +30,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
     if (open && authCompany) {
       if (!Boolean(authCompany?.is_central_company)) {
         const company = user.companies[0];
-        const userId = company?.users?.[0]?.id ?? "";
+        const userId = user?.user_id ?? company?.users?.[0]?.id ?? "";
         router.push(
           `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${authCompany?.id}`
         );

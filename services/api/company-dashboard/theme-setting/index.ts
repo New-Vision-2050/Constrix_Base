@@ -13,7 +13,7 @@ export const CompanyDashboardThemeSettingApi = {
    * GET /website-themes/current-company
    */
   getCurrent: () =>
-    baseApi.get<GetCurrentThemeSettingResponse>("website-themes/current-company"),
+    baseApi.get<GetCurrentThemeSettingResponse>("website-themes/current-company-with-attributes"),
 
   /**
    * Update current Theme Settings for the company

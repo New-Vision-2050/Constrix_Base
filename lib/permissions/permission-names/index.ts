@@ -139,6 +139,7 @@ export const PERMISSIONS = {
       "DELETE",
     ]), //LIST,VIEW,REPLY=UPDATE,DELETE
     //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
+    themes: create("WEBSITE_THEME_SETTING", ["LIST", "VIEW", "ACTIVATE"]), //LIST,SHOW,ACTIVATE
   },
   // ecommerce
   ecommerce: {
