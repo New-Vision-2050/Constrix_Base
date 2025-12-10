@@ -48,6 +48,7 @@ export const ROUTER = {
     ABOUT_SETTINGS: "/content-management-system/about-setting",
     TERMS_CONDITIONS: "/content-management-system/terms-conditions",
     THEMES: "/content-management-system/themes",
+    COMMUNICATION_MESSAGES: "/content-management-system/communication-messages",
     MAIN_DATA: "/content-management-system/mainData",
     FOUNDER: "/content-management-system/setting-founder",
     SERVICES: "/content-management-system/services",

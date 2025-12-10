@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Typography, Chip, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { ThemeDepartment } from "../../themes/types";
@@ -12,7 +14,9 @@ interface ThemeDepartmentsProps {
  * - RTL/LTR support via MUI
  * - Responsive layout
  */
-export default function ThemeDepartments({ departments }: ThemeDepartmentsProps) {
+export default function ThemeDepartments({
+  departments,
+}: ThemeDepartmentsProps) {
   const t = useTranslations("content-management-system.themes");
 
   if (!departments || departments.length === 0) return null;
@@ -35,4 +39,3 @@ export default function ThemeDepartments({ departments }: ThemeDepartmentsProps)
     </Box>
   );
 }
-

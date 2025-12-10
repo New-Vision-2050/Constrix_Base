@@ -1,3 +1,5 @@
+"use client";
+
 import { Box } from "@mui/material";
 
 interface ThemeImageSectionProps {
@@ -10,7 +12,10 @@ interface ThemeImageSectionProps {
  * - Responsive image with overlay
  * - RTL/LTR support
  */
-export default function ThemeImageSection({ imageUrl, alt }: ThemeImageSectionProps) {
+export default function ThemeImageSection({
+  imageUrl,
+  alt,
+}: ThemeImageSectionProps) {
   return (
     <Box
       sx={{
@@ -35,4 +40,3 @@ export default function ThemeImageSection({ imageUrl, alt }: ThemeImageSectionPr
     </Box>
   );
 }
-
