@@ -7,17 +7,20 @@ import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { useEffect } from "react";
 
 export default function UserProfilePersonalDataReview() {
-  const { userPersonalData } = usePersonalDataTabCxt();
+  const { userPersonalData, userId } = usePersonalDataTabCxt();
   const user = useAuthStore.getState().user;
   const t = useTranslations("UserProfile.nestedTabs.PeronalDataTab");
 
   useEffect(() => {
-    if(userPersonalData?.name && user){
-      if (user.name !== userPersonalData.name) {
-        useAuthStore.getState().setUser({
-          ...user,
-          name: userPersonalData.name,
-        });
+    if (userPersonalData?.name && user) {
+      // check if current user is auth user
+      if (userId === user?.id) {
+        if (user.name !== userPersonalData.name) {
+          useAuthStore.getState().setUser({
+            ...user,
+            name: userPersonalData.name,
+          });
+        }
       }
     }
   }, [user, userPersonalData]);
@@ -69,8 +72,8 @@ export default function UserProfilePersonalDataReview() {
           value={
             userPersonalData?.birthdate_gregorian
               ? new Date(
-                  userPersonalData?.birthdate_gregorian ?? ""
-                ).toLocaleDateString()
+                userPersonalData?.birthdate_gregorian ?? ""
+              ).toLocaleDateString()
               : ""
           }
           valid={Boolean(userPersonalData?.birthdate_gregorian)}

@@ -11,6 +11,7 @@ import { ContentManagementSystemServicesMessages } from "./services";
 import { ContentManagementSystemNewsMessages } from "./news";
 import { ContentManagementSystemThemeSettingMessages } from "./theme-setting";
 import { ContentManagementSystemCommunicationSettingsMessages } from "./communication-setting";
+import { CommunicationMessagesMessages } from "./communication-messages";
 import { ContentManagementSystemThemesMessages } from "./themes";
 
 export const contentManagementSystemMessages = new MessagesGroup({
@@ -27,4 +28,5 @@ export const contentManagementSystemMessages = new MessagesGroup({
   themes: ContentManagementSystemThemesMessages,
   themeSetting: ContentManagementSystemThemeSettingMessages,
   communicationSetting: ContentManagementSystemCommunicationSettingsMessages,
+  communicationMessages: CommunicationMessagesMessages,
 });

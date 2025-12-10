@@ -4,7 +4,9 @@
 import { apiClient } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { setCookie } from "cookies-next";
 
 interface Config {
   url: string;
@@ -12,9 +14,23 @@ interface Config {
 }
 
 const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetch?: boolean }) => {
+  // Extract locale from pathname to ensure reactivity when URL changes
+  const pathname = usePathname();
+  const locale = useMemo(() => {
+    const segments = pathname.split("/");
+    const possibleLocale = segments[1];
+    return ["ar", "en"].includes(possibleLocale) ? possibleLocale : "ar";
+  }, [pathname]);
+
+  // Update cookie when locale changes to ensure axios interceptor uses correct locale
+  useEffect(() => {
+    setCookie("NEXT_LOCALE", locale);
+  }, [locale]);
+
   const { data, isLoading, isSuccess, refetch } = useQuery({
-    queryKey: ["widgets", config.url],
+    queryKey: [`widgets-${locale}`, config.url],
     queryFn: async () => {
+      // Axios interceptor will automatically add Lang headers from NEXT_LOCALE cookie
       const response = await apiClient.get(config.url);
       return response.data;
     },

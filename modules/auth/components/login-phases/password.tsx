@@ -88,7 +88,7 @@ const PasswordPhase = ({
               if (isEmployee) {
                 router.push(ROUTER.USER_PROFILE);
               } else if (isClient || isBroker) {
-                router.push(ROUTER.CLIENT_PROFILE);
+                router.push(`${ROUTER.CLIENT_PROFILE}?role=${isClient ? UsersRole.Client : UsersRole.Broker}`);
               }
             } else {
               router.push(`${ROUTER.CLIENT_PROFILE}?readonly=true`);

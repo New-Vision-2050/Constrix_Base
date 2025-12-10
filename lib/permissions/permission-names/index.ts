@@ -133,6 +133,12 @@ export const PERMISSIONS = {
       ]), //LIST,CREATE,UPDATE,DELETE
     },
     themeSetting: create("WEBSITE_THEME"), // just view,update
+    communicationContactMessages: create("WEBSITE_CONTACT_MESSAGE", [
+      "LIST",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,VIEW,REPLY=UPDATE,DELETE
+    //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
     themes: create("WEBSITE_THEME_SETTING", ["LIST", "VIEW", "ACTIVATE"]), //LIST,SHOW,ACTIVATE
   },
 };

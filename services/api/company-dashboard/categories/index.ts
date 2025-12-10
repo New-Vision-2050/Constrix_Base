@@ -3,7 +3,7 @@ import { ListCategoriesResponse, ShowCategoryResponse } from "./types/response";
 import { CreateCategoryParams, UpdateCategoryParams } from "./types/params";
 
 export const CompanyDashboardCategoriesApi = {
-  list: (params?: { search?: string }) =>
+  list: (params?: { search?: string, category_type?: string }) =>
     baseApi.get<ListCategoriesResponse>("categories-website", {
       params,
     }),
@@ -19,6 +19,8 @@ export const CompanyDashboardCategoriesApi = {
   },
   delete: (id: string) =>
     baseApi.delete(`categories-website/${id}`),
-  categoriesTypes: () =>
-    baseApi.get(`categories-website/categeory-types`),
+  categoriesTypes: (params?:{[key: string]: string}) =>
+    baseApi.get(`categories-website/categeory-types`, {
+      params,
+    }),
 };

@@ -78,7 +78,7 @@ export default function BasicInfoSection({
                     variant="secondary"
                     disabled={isSubmitting}
                     className="mt-1"
-                    placeholder="https://example.com"
+                    placeholder="example.com"
                     {...field}
                   />
                 </FormControl>

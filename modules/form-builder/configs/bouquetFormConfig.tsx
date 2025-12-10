@@ -4,6 +4,8 @@ import {InvalidMessage} from "@/modules/companies/components/retrieve-data-via-m
 import {useTranslations} from "next-intl";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { useParams } from "next/navigation";
+import { CurrencySelector } from "./components/CurrencySelector";
+import { PeriodUnitSelector } from "./components/PeriodUnitSelector";
 
 // Create a config function that accepts id as a parameter instead of using hooks directly
 export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: string): FormConfig {
@@ -42,28 +44,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
               placeholder: "أدخل قيمة الاشتراك",
               required: true,
               defaultValue: "12",
-              postfix: (
-                <div className="w-full h-full">
-                  <select
-                    className="rounded-lg p-2 bg-transparent border-0 outline-none"
-                    defaultValue="EGP"
-                    onChange={(e) => {
-                      useFormStore
-                        .getState()
-                        .setValues("bouquet-form", {
-                          currency: e.target.value,
-                        });
-                    }}
-                  >
-                    <option value="SAR" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                    ر.س
-                    </option>
-                    <option value="EGP" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                    ج.م
-                    </option>
-                  </select>
-                </div>
-              ),
+              postfix: <CurrencySelector formId="bouquet-form" />,
             },
            
             {
@@ -80,36 +61,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
               placeholder: "أدخل مدة الاشتراك",
               required: true,
               defaultValue: "12",
-              postfix: (
-                <div className="w-full h-full">
-                  <select
-                    className="rounded-lg p-2 bg-transparent border-0 outline-none"
-                    defaultValue={
-                      useFormStore.getState().getValues("bouquet-form")?.subscription_period_unit
-                    }
-                    onChange={(e) => {
-                      useFormStore
-                        .getState()
-                        .setValues("bouquet-form", {
-                          subscription_period_unit: e.target.value,
-                        });
-                    }}
-                  >
-                    <option value="day" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      يوم
-                    </option>
-                    <option value="week" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      أسبوع
-                    </option>
-                    <option value="month" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      شهر
-                    </option>
-                    <option value="year" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      سنة
-                    </option>
-                  </select>
-                </div>
-              ),
+              postfix: <PeriodUnitSelector formId="bouquet-form" fieldName="subscription_period_unit" />,
             },
            
             {
@@ -126,33 +78,7 @@ export function GetBouquetFormConfig(t:ReturnType<typeof useTranslations>, id?: 
               placeholder: "أدخل مدة الفترة التجريبية",
               required: true,
               defaultValue: "12",
-              postfix: (
-                <div className="w-full h-full">
-                  <select
-                    className="rounded-lg p-2 bg-transparent border-0 outline-none"
-                    onChange={(e) => {
-                      useFormStore
-                        .getState()
-                        .setValues("bouquet-form", {
-                          trial_period_unit: e.target.value,
-                        });
-                    }}
-                  >
-                    <option value="day" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      يوم
-                    </option>
-                    <option value="week" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      أسبوع
-                    </option>
-                    <option value="month" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      شهر
-                    </option>
-                    <option value="year" className="bg-white text-black dark:bg-gray-800 dark:text-white">
-                      سنة
-                    </option>
-                  </select>
-                </div>
-              ),
+              postfix: <PeriodUnitSelector formId="bouquet-form" fieldName="trial_period_unit" />,
             },
           
           {
