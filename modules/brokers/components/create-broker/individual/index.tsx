@@ -8,18 +8,20 @@ import { useBrokersDataCxt } from "@/modules/brokers/context/BrokersDataCxt";
 
 export default function CreateIndividualBrokerForm({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) {
   const t = useTranslations("BrokersModule");
   const { sharedSettings } = useBrokersDataCxt();
-  const { branchId: currentEmpBranchId, userId: currentEmpId, closeCreateBrokerSheet } =
+  const { branchId: currentEmpBranchId, tableId, userId: currentEmpId, closeCreateBrokerSheet } =
     useCreateBrokerCxt();
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
     tableStore.reloadTable("brokers-table");
-
+    handleRefreshWidgetsData?.();
     closeCreateBrokerSheet();
   };
 

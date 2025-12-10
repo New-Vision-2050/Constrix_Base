@@ -19,6 +19,7 @@ export const ROUTER = {
   ECOMMERCE: "/ecommerce",
   COMPANY_PROFILE: "/company-profile",
   USER_PROFILE: "/user-profile",
+  CLIENT_PROFILE: "/client-profile",
   PROGRAM_SETTINGS: {
     USERS: "/users-settings",
   },
@@ -40,4 +41,19 @@ export const ROUTER = {
   DOCS_LIBRARY: "/docs-library",
   ACTIVITIES_LOGS: "/activities-logs",
   TERMS_CONDITIONS: "/stores/terms",
+  CMS: {
+    CATEGORIES: "/content-management-system/categories",
+    ICONS: "/content-management-system/icons",
+    MAIN_SETTINGS: "/content-management-system/main-settings",
+    ABOUT_SETTINGS: "/content-management-system/about-setting",
+    TERMS_CONDITIONS: "/content-management-system/terms-conditions",
+    MAIN_DATA: "/content-management-system/mainData",
+    FOUNDER: "/content-management-system/setting-founder",
+    SERVICES: "/content-management-system/services",
+    OUR_SERVICES: "/content-management-system/our-services",
+    NEWS: "/content-management-system/setting-news",
+    PROJECTS: "/content-management-system/projects",
+    THEME_SETTING: "/content-management-system/theme-setting",
+    COMMUNICATION_SETTINGS: "/content-management-system/communication-settings",
+  },
 };

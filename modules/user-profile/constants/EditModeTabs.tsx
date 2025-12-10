@@ -8,7 +8,9 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
 export const useGetEditModeTabsList = (
-  t: (key: string) => string
+  t: (key: string) => string,
+  userId: string,
+  companyId: string
 ): SystemTab[] => {
   const { can } = usePermissions();
 
@@ -24,7 +26,7 @@ export const useGetEditModeTabsList = (
       id: "edit-mode-tabs-contract",
       title: t("contract"),
       icon: <Users />,
-      content: <UserContractTab />,
+      content: <UserContractTab  userId={userId} companyId={companyId} />,
       show: can([
         PERMISSIONS.profile.personalInfo.view,
         PERMISSIONS.profile.passportInfo.view,

@@ -82,9 +82,9 @@ export const bouquetConfig = () => {
       {
         key: "subscription_period",
         label: "مدة الاشتراك ",
-        render: (_: unknown, row: BouquetTableRow) => (
-          <p className="font-medium">{row.subscription_period}</p>
-        ),
+        render: (_: unknown, row: BouquetTableRow) => {
+          return <p className="font-medium">{row.subscription_period} {t(`${row.subscription_period_unit}`)}</p>
+        },
       },
       {
         key: "company_fields",

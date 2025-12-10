@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 
 export const PersonalDataFormConfig = () => {
   const t = useTranslations();
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const { userPersonalData } = usePersonalDataTabCxt();
   const {
     handleRefetchUserPersonalData,
@@ -195,8 +195,9 @@ export const PersonalDataFormConfig = () => {
         is_default: formData?.is_default ? 1 : 0,
       };
 
+      const url = Boolean(userId) ? `/company-users/data-info/${userId}` : `${baseURL}/company-users/data-info`;
       return await defaultSubmitHandler(body, PersonalFormConfig, {
-        url: `/company-users/data-info/${user?.user_id}`,
+        url: url,
         method: "PUT",
       });
     },

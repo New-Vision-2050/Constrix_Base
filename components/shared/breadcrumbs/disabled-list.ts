@@ -5,7 +5,9 @@
 export const DISABLED_BREADCRUMB_SEGMENTS: string[] = [
   // Add your custom disabled segments here
   "bouquet",
-  "bouquetDetails"
+  "bouquetDetails",
+  "company-dashboard",
+  "content-management-system"
 ];
 
 /**

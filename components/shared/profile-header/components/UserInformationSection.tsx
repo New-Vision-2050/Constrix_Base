@@ -2,6 +2,7 @@ import BackpackIcon from "@/public/icons/backpack";
 import CalendarRangeIcon from "@/public/icons/calendar-range";
 import MapPinIcon from "@/public/icons/map-pin";
 import { useTranslations } from "next-intl";
+import { ProfileSubItem } from "..";
 
 type PropsT = {
   loading: boolean;
@@ -10,6 +11,8 @@ type PropsT = {
   job_title?: string;
   branch?: string;
   date_appointment?: string;
+  subItems?: ProfileSubItem[];
+  actionSlot?: React.ReactNode;
 };
 /**
  * UserProfileHeaderUserInformationSection Component
@@ -20,7 +23,7 @@ type PropsT = {
 export default function UserProfileHeaderUserInformationSection(props: PropsT) {
   // declare and define vars and state
   const t = useTranslations("UserProfile.header.placeholder");
-  const { loading, name, branch, job_title, address, date_appointment } = props;
+  const { loading, name, actionSlot, subItems } = props;
 
   // handle loading state
   if (loading)
@@ -30,54 +33,23 @@ export default function UserProfileHeaderUserInformationSection(props: PropsT) {
 
   return (
     <div className="flex flex-col items-center justify-center md:justify-around md:items-start gap-4 w-full">
-      <h2 className="text-xl font-bold">{name}</h2>
+      <div className="w-full flex items-center justify-between flex-col md:flex-row  gap-2">
+        <h2 className="text-xl font-bold">{name}</h2>
+        {/* action slot */}
+        {actionSlot}
+      </div>
       <div className="flex flex-wrap gap-4 text-gray-600">
-        {branch && (
-          <div className="flex items-center gap-2">
-            <MapPinIcon />
+        {subItems?.filter((item) => Boolean(item.value))?.map((item, index) => (
+          <div className="flex items-center gap-2" key={`sub-item-${index}`}>
+            {item.icon}
             <div className="flex flex-col">
-              <span className="text-sm font-semibold">{t("branch")}</span>
+              {item.label && <span className="text-sm font-semibold">{item.label ?? "-"}</span>}
               <span className="font-medium dark:text-white">
-                {branch ?? "--"}
+                {item.value ?? "--"}
               </span>
             </div>
           </div>
-        )}
-        {job_title && (
-          <div className="flex items-center gap-2">
-            <BackpackIcon />
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">{t("jobTitle")}</span>
-              <span className="font-medium dark:text-white">
-                {job_title ?? "--"}
-              </span>
-            </div>
-          </div>
-        )}
-        {address && (
-          <div className="flex items-center gap-2">
-            <MapPinIcon />
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">{t("address")}</span>
-              <span className="font-medium dark:text-white">
-                {address ?? "--"}
-              </span>
-            </div>
-          </div>
-        )}
-        {date_appointment && (
-          <div className="flex items-center gap-2">
-            <CalendarRangeIcon />
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">
-                {t("appointmentDate")}
-              </span>
-              <span className="font-medium dark:text-white">
-                {date_appointment ?? "--"}
-              </span>
-            </div>
-          </div>
-        )}
+        ))}
       </div>
     </div>
   );

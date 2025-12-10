@@ -1,6 +1,15 @@
+"use client";
+
 import { SetStateAction } from "react";
 import UserProfileHeaderImageSection from "./components/ImageSection";
 import UserProfileHeaderUserInformationSection from "./components/UserInformationSection";
+
+
+export type ProfileSubItem = {
+  icon: React.ReactNode;
+  value: string;
+  label?: string;
+};
 
 type PropsT = {
   loading: boolean;
@@ -12,6 +21,8 @@ type PropsT = {
   date_appointment?: string;
   children?: React.ReactNode;
   setOpenUploadImgDialog?: React.Dispatch<SetStateAction<boolean>>;
+  subItems?: ProfileSubItem[];
+  actionSlot?: React.ReactNode;
 };
 
 /**
@@ -33,7 +44,10 @@ export default function UserProfileHeader(props: PropsT) {
     date_appointment,
     children,
     setOpenUploadImgDialog,
+    subItems,
+    actionSlot,
   } = props;
+  
 
   return (
     <div className="bg-sidebar shadow-md rounded-xl p-6 flex flex-col md:flex-row gap-6">
@@ -52,6 +66,8 @@ export default function UserProfileHeader(props: PropsT) {
         address={address}
         job_title={job_title}
         date_appointment={date_appointment}
+        subItems={subItems}
+        actionSlot={actionSlot}
       />
     </div>
   );

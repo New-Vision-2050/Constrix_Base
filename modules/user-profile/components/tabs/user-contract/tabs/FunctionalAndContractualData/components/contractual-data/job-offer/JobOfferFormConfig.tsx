@@ -11,7 +11,7 @@ type PropsT = {
 };
 
 export const JobOfferFormConfig = ({ offer }: PropsT) => {
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const { handleRefetchJobOffer } = useFunctionalContractualCxt();
 
   const jobOfferFormConfig: FormConfig = {
@@ -90,7 +90,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
 
       const body = {
         ...formData,
-        user_id: user?.user_id,
+        user_id: userId,
         date_send: formatDateYYYYMMDD(dateSend),
         date_accept: formatDateYYYYMMDD(dateAccept),
       };

@@ -1,0 +1,154 @@
+name: Branch Naming Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - master
+      - stage
+      - dev
+  create:
+    # Trigger on branch creation
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  validate-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Branch Naming Convention
+        id: validate
+        run: |
+          # Get branch name from PR or create event
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          else
+            BRANCH_NAME="${{ github.ref_name }}"
+          fi
+
+          echo "🔍 Validating branch name: $BRANCH_NAME"
+
+          # Define allowed branch types
+          ALLOWED_TYPES="feature|bugfix|hotfix|release|chore|refactor|docs|test"
+
+          # Define the pattern: <type>/<JIRA-TICKET>/<short-description>
+          # Example: feature/PROJ-123/user-authentication
+          PATTERN="^($ALLOWED_TYPES)/[A-Z]+-[0-9]+/[a-z0-9-]+$"
+
+          # Protected branches that don't need to follow the pattern
+          PROTECTED_BRANCHES="^(master|main|stage|dev|develop)$"
+
+          # Check if branch is protected
+          if [[ "$BRANCH_NAME" =~ $PROTECTED_BRANCHES ]]; then
+            echo "✅ Protected branch - skipping validation"
+            echo "valid=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Validate branch name
+          if [[ "$BRANCH_NAME" =~ $PATTERN ]]; then
+            echo "✅ Branch name is valid!"
+            
+            # Extract components
+            TYPE=$(echo "$BRANCH_NAME" | cut -d'/' -f1)
+            JIRA_ID=$(echo "$BRANCH_NAME" | cut -d'/' -f2)
+            DESCRIPTION=$(echo "$BRANCH_NAME" | cut -d'/' -f3)
+            
+            echo "  - Type: $TYPE"
+            echo "  - Jira Ticket: $JIRA_ID"
+            echo "  - Description: $DESCRIPTION"
+            
+            echo "valid=true" >> $GITHUB_OUTPUT
+            echo "type=$TYPE" >> $GITHUB_OUTPUT
+            echo "jira_id=$JIRA_ID" >> $GITHUB_OUTPUT
+            echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Invalid branch name!"
+            echo "valid=false" >> $GITHUB_OUTPUT
+            
+            echo ""
+            echo "Branch name must follow this pattern:"
+            echo "  <type>/<JIRA-TICKET>/<short-description>"
+            echo ""
+            echo "Allowed types: feature, bugfix, hotfix, release, chore, refactor, docs, test"
+            echo ""
+            echo "Examples:"
+            echo "  ✅ feature/PROJ-123/user-authentication"
+            echo "  ✅ bugfix/CORE-456/fix-login-error"
+            echo "  ✅ hotfix/API-789/critical-security-patch"
+            echo "  ✅ chore/DEV-101/update-dependencies"
+            echo ""
+            echo "Your branch: $BRANCH_NAME"
+            echo ""
+            
+            exit 1
+          fi
+
+      - name: Post Validation Comment (PR)
+        if: failure() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ **Branch Naming Validation Failed**
+
+            Your branch name does not follow the required naming convention.
+
+            **Required Pattern:**
+            ```
+            <type>/<JIRA-TICKET>/<short-description>
+            ```
+
+            **Allowed Types:**
+            - `feature` - New features
+            - `bugfix` - Bug fixes
+            - `hotfix` - Critical fixes for production
+            - `release` - Release branches
+            - `chore` - Maintenance tasks
+            - `refactor` - Code refactoring
+            - `docs` - Documentation updates
+            - `test` - Test additions or updates
+
+            **Requirements:**
+            - Type must be lowercase
+            - JIRA ticket must be uppercase (e.g., `PROJ-123`, `CORE-456`)
+            - Description must be lowercase with hyphens (kebab-case)
+
+            **Valid Examples:**
+            ```
+            ✅ feature/PROJ-123/user-authentication
+            ✅ bugfix/CORE-456/fix-login-error
+            ✅ hotfix/API-789/critical-security-patch
+            ✅ chore/DEV-101/update-dependencies
+            ✅ refactor/TECH-202/improve-performance
+            ✅ docs/DOC-303/update-readme
+            ```
+
+            **Your branch:** `${{ github.event.pull_request.head.ref }}`
+
+            Please rename your branch to follow the naming convention:
+            ```bash
+            git branch -m <new-branch-name>
+            git push origin -u <new-branch-name>
+            git push origin --delete ${{ github.event.pull_request.head.ref }}
+            ```
+
+      - name: Post Success Comment (PR)
+        if: success() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ **Branch Naming Validation Passed**
+
+            Branch details:
+            - **Type:** `${{ steps.validate.outputs.type }}`
+            - **Jira Ticket:** `${{ steps.validate.outputs.jira_id }}`
+            - **Description:** `${{ steps.validate.outputs.description }}`

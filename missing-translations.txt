@@ -1,0 +1,59 @@
+MISSING TRANSLATIONS REPORT
+==========================
+Generated: 2025-11-17T17:55:56.671Z
+
+MISSING ARABIC TRANSLATIONS:
+----------------------------
+Total: 27
+
+stores/brands: "Brands"
+stores/warehouse: "Warehouses"
+shareDialog.title: "Share"
+shareDialog.save: "Save"
+shareDialog.copy: "Copy Link"
+shareDialog.cancel: "Cancel"
+shareDialog.selectFolder: "Select Folder"
+shareDialog.searchFolder: "Search"
+shareDialog.noResults: "No Results"
+shareDialog.searchUsers: "Search Users"
+shareDialog.notes: "Please enter the email address of the user you want to share the files with"
+publicDocs.createNewDirDialog.createdAt: "Created At"
+publicDocs.createNewDirDialog.createdAtPlaceholder: "Enter Created At"
+publicDocs.createNewDirDialog.endDate: "End Date"
+publicDocs.createNewDirDialog.endDatePlaceholder: "Enter End Date"
+nestedTabs.identityData.identityNumber: "Identity Number"
+nestedTabs.identityData.identityNumberRequired: "Identity Number is required"
+nestedTabs.identityData.identityNumberPattern: "Identity Number must be between 6 and 20 characters or numbers"
+nestedTabs.iqamaData.iqamaStartDateRequired: "Iqama Start Date is required"
+branches.assignUsersDialog.title: "Branch Edit Permission"
+branches.assignUsersDialog.description: "Give users permission to edit this branch"
+branches.assignUsersDialog.cancel: "Cancel"
+branches.assignUsersDialog.assign: "Assign"
+branches.assignUsersDialog.searchUsers: "Search users"
+branches.assignUsersDialog.managerNote: "Company Manager"
+branches.assignUsersDialog.branchManager: "Branch Manager :"
+tabs.mainTabs.organizational-structure-main-tab-2.tabs.management.title: "Management"
+
+MISSING ENGLISH TRANSLATIONS:
+-----------------------------
+Total: 19
+
+tabs.branches.assignUsersDialog.title: "صلاحية التعديل علي الفرع"
+tabs.branches.assignUsersDialog.description: "أعطاء المستخدمين صلاحية التعديل علي الفرع"
+tabs.branches.assignUsersDialog.cancel: "الغاء"
+tabs.branches.assignUsersDialog.assign: "تعيين"
+tabs.branches.assignUsersDialog.searchUsers: "البحث عن مستخدمين"
+tabs.branches.assignUsersDialog.managerNote: "مدير الشركة :"
+tabs.branches.assignUsersDialog.branchManager: "مدير الفرع :"
+tabs.mainTabs.organizational-structure-main-tab-2.tabs.managements.title: "اعدادات الادارات"
+error.loading: "خطأ في تحميل البيانات"
+error.tryAgain: "يرجى المحاولة مرة أخرى لاحقا"
+form.companyBrokerFormTitle: "إنشاء وسيط شركة"
+form.individualBrokerFormTitle: "إنشاء وسيط فرد"
+shared.EmployeeInfoSection.status.holiday: "في إجازة"
+shared.EmployeeInfoSection.status.unspecified: "غير محدد"
+Map.unspecified: "غير محدد"
+type: "النوع"
+selectCouponType: "اختر نوع القسيمة"
+freeDelivery: "توصيل مجاني"
+firstOrder: "الطلب الأول"

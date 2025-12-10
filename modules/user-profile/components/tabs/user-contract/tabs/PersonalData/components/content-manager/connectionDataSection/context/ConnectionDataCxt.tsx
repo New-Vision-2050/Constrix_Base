@@ -49,24 +49,24 @@ export const ConnectionDataCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { user } = useUserProfileCxt();
+  const { userId } = useUserProfileCxt();
   const {
     data: userSocialData,
     isLoading: userSocialDataLoading,
     refetch: refetchUserSocialData,
-  } = useUserSocialData(user?.user_id ?? "");
+  } = useUserSocialData(userId ?? "");
 
   const {
     data: userContactData,
     isLoading: userContactDataLoading,
     refetch: refetchUserContactData,
-  } = useUserContactInfoData(user?.user_id ?? "");
+  } = useUserContactInfoData(userId ?? "");
 
   const {
     data: userRelativesData,
     isLoading: userRelativesDataLoading,
     refetch: refetchUserRelativesData,
-  } = useUserRelativesData(user?.user_id ?? "");
+  } = useUserRelativesData(userId ?? "");
 
   // ** handle side effects
 

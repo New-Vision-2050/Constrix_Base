@@ -1,3 +1,4 @@
+import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
 import { apiClient } from "@/config/axios-config";
 
 export type PersonalUserDataSectionT = {
@@ -11,6 +12,8 @@ export type PersonalUserDataSectionT = {
   country: string;
   country_id: number;
   nationalityRelation: string;
+  id: string;
+  user_types?: UserRoleType[];
 };
 
 type ResponseT = {
@@ -21,7 +24,7 @@ type ResponseT = {
 
 export default async function GetPersonalUserData(userId?: string) {
   const res = await apiClient.get<ResponseT>(
-    `company-users/show-data-info${userId ? "/" + userId : ""}`
+    `company-users/show-data-info${Boolean(userId) ? "/" + userId : ""}`
   );
 
   return res.data.payload;

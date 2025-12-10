@@ -11,7 +11,7 @@ export default async function getUserActivities(
   userId?: string,
   limit?: number
 ) {
-  const url = userId ? `/audits?user_id=${userId}` : `/audits`;
+  const url = Boolean(userId) ? `/audits?user_id=${userId}` : `/audits`;
   const res = await apiClient.get<ResponseT>(url, {
     params: { per_page: limit ?? 6 },
   });

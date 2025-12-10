@@ -4,14 +4,21 @@ import { baseURL } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { rulesIcons } from "@/modules/users/constants/rules-icons";
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useMemo } from "react";
 import GearIcon from "@/public/icons/gear";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import ChooseUserCompany from "@/modules/users/components/choose-company-dialog";
 import UserSettingDialog from "@/modules/users/components/UserSettingDialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, UserIcon } from "lucide-react";
 import DeleteSpecificRowDialog from "@/modules/users/components/DeleteSpecificRow";
-
+import { ModelsTypes } from "@/modules/users/components/users-sub-entity-form/constants/ModelsTypes";
+import { employeeFormConfig } from "@/modules/form-builder/configs/employeeFormConfig";
+import { editIndividualClientFormConfig } from "@/modules/form-builder/configs/editIndividualClientFormConfig";
+import { editIndividualBrokerFormConfig } from "@/modules/form-builder/configs/editIndividualBrokerFormConfig";
+import { editIndividualEmployeeFormConfig } from "@/modules/form-builder/configs/editIndividualEmployeeFormConfig";
+import { useCRMSharedSetting } from "@/modules/crm-settings/hooks/useCRMSharedSetting";
+import useUserData from "@/hooks/use-user-data";
+import { useRouter } from "next/navigation";
 // Define types for the company data
 interface CompanyData {
   id: string;
@@ -46,8 +53,35 @@ export const UsersConfigV2 = (options?: {
   canDelete: boolean;
   canView: boolean;
   registrationFormSlug?: string;
+  isShareClient?: boolean;
+  isShareBroker?: boolean;
+  currentUserId?: string;
+  handleRefreshWidgetsData?: () => void;
 }) => {
+  const router = useRouter();
   const t = useTranslations("Companies");
+  const tSubTable = useTranslations("Companies.SubEntitiesTable");
+  const tEditSubEntity = useTranslations("EditSubEntityMessages");
+  // define final form config for EDIT mode
+  // Note: This config is used when clicking "Edit" button in the table
+  const finalFormConfig = useMemo(() => {
+    const { isShareClient, isShareBroker, currentUserId } = options || {};
+    const registrationFromConfig = options?.registrationFormSlug;
+    // client model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.CLIENT) {
+      return editIndividualClientFormConfig(tEditSubEntity, undefined, isShareClient, currentUserId)
+    }
+    // broker model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.BROKER) {
+      return editIndividualBrokerFormConfig(tEditSubEntity, undefined, isShareBroker, currentUserId);
+    }
+    // employee model - use simplified edit form
+    if (registrationFromConfig === ModelsTypes.EMPLOYEE) {
+      return editIndividualEmployeeFormConfig(tEditSubEntity);
+    }
+    // default fallback (company user form)
+    return GetCompanyUserFormConfig(t);
+  }, [options?.registrationFormSlug, t, options?.isShareClient, options?.isShareBroker, options?.currentUserId]);
 
   return {
     url: `${baseURL}/company-users`,
@@ -55,7 +89,7 @@ export const UsersConfigV2 = (options?: {
     columns: [
       {
         key: "name",
-        label: "الاسم",
+        label: tSubTable("Name"),
         sortable: true,
         searchable: true,
         render: (_: unknown, row: UserTableRow) => (
@@ -66,11 +100,11 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "job_title",
-        label: "المسمى الوظيفي",
+        label: tSubTable("JobTitle"),
       },
       {
         key: "residence",
-        label: "رقم الهوية",
+        label: tSubTable("ResidenceNumber"),
       },
       {
         key: "email",
@@ -79,7 +113,7 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "phone",
-        label: "رقم الجوال",
+        label: tSubTable("Phone"),
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
@@ -100,21 +134,21 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "branch",
-        label: "الفرع",
+        label: tSubTable("Branch"),
         sortable: true,
       },
       {
         key: "broker",
-        label: "الوسيط",
+        label: tSubTable("Broker"),
       },
       {
         key: "number-of-projects",
-        label: "عدد المشاريع",
+        label: tSubTable("NumberOfProjects"),
         sortable: true,
       },
       {
         key: "companies",
-        label: "الشركة",
+        label: tSubTable("Company"),
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
             {value &&
@@ -128,12 +162,12 @@ export const UsersConfigV2 = (options?: {
       },
       {
         key: "end_date",
-        label: "تاريخ نهاية العقد",
+        label: tSubTable("ContractEndDate"),
         sortable: true,
       },
       {
         key: "user-type",
-        label: "نوع المستخدم",
+        label: tSubTable("UserType"),
         render: (_: unknown, row: UserTableRow) => {
           const companies = row.companies || [];
           return (
@@ -182,7 +216,7 @@ export const UsersConfigV2 = (options?: {
         name: "companies",
         searchType: {
           type: "dropdown",
-          placeholder: "الشركة",
+          placeholder: tSubTable("Company"),
           dynamicDropdown: {
             url: `${baseURL}/companies`,
             valueField: "id",
@@ -212,7 +246,7 @@ export const UsersConfigV2 = (options?: {
         name: "email_or_phone",
         searchType: {
           type: "text",
-          placeholder: "البريد الإليكتروني / الجوال",
+          placeholder: tSubTable("EmailOrPhone"),
         },
       },
     ],
@@ -249,24 +283,42 @@ export const UsersConfigV2 = (options?: {
     searchParamName: "q",
     searchFieldParamName: "fields",
     allowSearchFieldSelection: true,
-    formConfig: GetCompanyUserFormConfig(t),
+    formConfig: finalFormConfig,
     executions: [
-      {
-        id: "complete-profile",
-        label: "اكمال الملف الشخصي",
-        icon: <GearIcon className="w-4 h-4" />,
-        action: "complete-profile",
-        dialogComponent: ChooseUserCompany,
-        disabled: options?.canEdit,
-        dialogProps: (row: UserTableRow) => {
-          return {
-            user: row
-          };
-        },
-      },
+      ...(options?.registrationFormSlug === ModelsTypes.EMPLOYEE ?
+        [{
+          id: "complete-profile",
+          label: tSubTable("CompleteProfile"),
+          icon: <GearIcon className="w-4 h-4" />,
+          action: "complete-profile",
+          dialogComponent: ChooseUserCompany,
+          disabled: options?.canEdit,
+          dialogProps: (row: UserTableRow) => {
+            return {
+              user: row
+            };
+          },
+        }]
+        : [
+          {
+            id: "complate-client-profile",
+            label: options?.registrationFormSlug === ModelsTypes.CLIENT
+              ? tSubTable("CompleteClientProfile")
+              : tSubTable("CompleteBrokerProfile"),
+            action: (row: UserTableRow) => {
+              router.push(`/client-profile/${row.user_id}?role=${options?.registrationFormSlug === ModelsTypes.CLIENT ? '2' : '3'}`);
+            },
+            icon: <UserIcon className="w-4 h-4" />,
+            disabled: true
+          }
+        ]),
       {
         id: "user-settings",
-        label: "اعدادات الموظف",
+        label: options?.registrationFormSlug === ModelsTypes.CLIENT
+          ? tSubTable("ClientSettings")
+          : options?.registrationFormSlug === ModelsTypes.BROKER
+            ? tSubTable("BrokerSettings")
+            : tSubTable("EmployeeSettings"),
         icon: <GearIcon className="w-4 h-4" />,
         action: "user-settings",
         dialogComponent: UserSettingDialog,
@@ -274,12 +326,17 @@ export const UsersConfigV2 = (options?: {
         dialogProps: (row: UserTableRow) => {
           return {
             user: row,
+            title: options?.registrationFormSlug === ModelsTypes.CLIENT
+              ? tSubTable("ClientSettings")
+              : options?.registrationFormSlug === ModelsTypes.BROKER
+                ? tSubTable("BrokerSettings")
+                : tSubTable("EmployeeSettings")
           };
         },
       },
       {
         id: "delete-user",
-        label: "حذف",
+        label: tSubTable("Delete"),
         action: "delete-user",
         icon: <Trash2 className="w-4 h-4 text-red-500" />,
         dialogComponent: DeleteSpecificRowDialog,
@@ -288,6 +345,7 @@ export const UsersConfigV2 = (options?: {
           return {
             user: row,
             registrationFormSlug: options?.registrationFormSlug,
+            handleRefreshWidgetsData: options?.handleRefreshWidgetsData,
           };
         },
       },

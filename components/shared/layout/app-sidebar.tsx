@@ -5,7 +5,6 @@ import {
   LayoutDashboardIcon,
   RollerCoasterIcon,
   UserIcon,
-  Users,
   Settings,
   FolderClosed,
   LibraryBig,
@@ -25,7 +24,6 @@ import { usePathname } from "next/navigation";
 import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
 import InboxIcon from "@/public/icons/inbox-icon";
-import { SidebarProgramsList } from "./sidebar-programs";
 import { useSidebarMenu } from "@/hooks/useSidebarMenu";
 import { SUPER_ENTITY_SLUG } from "@/constants/super-entity-slug";
 import { Menu, Project } from "@/types/sidebar-menu";
@@ -34,14 +32,23 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { createPermissions } from "@/lib/permissions/permission-names/default-permissions";
 import ClipboardClockIcon from "@/public/icons/clipboard-clock";
+import { SidebarProgramsListV2 } from "./sidebar-programs-v2";
+import { UserRoleType } from "@/app/[locale]/(main)/client-profile/[id]/types";
+import { UsersRole } from "@/constants/users-role.enum";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name?: string;
   mainLogo?: string;
+  userTypes: UserRoleType[];
 }
 
-export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
-  const { menu, isLoading, data } = useSidebarMenu();
+export function AppSidebar({
+  name,
+  mainLogo,
+  userTypes,
+  ...props
+}: AppSidebarProps) {
+  const { isLoading, data } = useSidebarMenu();
   const locale = useLocale();
   const t = useTranslations();
   const isRtl = locale === "ar";
@@ -49,6 +56,26 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
   const pageName = "/" + path.split("/").at(-1);
   const p = usePermissions(),
     { can, isCentralCompany, isSuperAdmin } = p;
+  // user profile url
+  const userProfileUrl = React.useMemo(() => {
+    const isEmployee = userTypes.some(
+      (userType) => userType.role == UsersRole.Employee
+    );
+    const isBroker = userTypes.some(
+      (userType) => userType.role == UsersRole.Broker
+    );
+    const isClient = userTypes.some(
+      (userType) => userType.role == UsersRole.Client
+    );
+    if (userTypes.length > 0) {
+      if (isEmployee) {
+        return ROUTER.USER_PROFILE;
+      } else if (isBroker || isClient) {
+        return ROUTER.CLIENT_PROFILE;
+      }
+    }
+    return `${ROUTER.CLIENT_PROFILE}?readonly=true`;
+  }, [userTypes]);
   // For RTL languages like Arabic, the sidebar should be on the right
   // For LTR languages like English, the sidebar should be on the left
   const sidebarSide = isRtl ? "right" : "left";
@@ -114,6 +141,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
     const settingsRoutesNames = [
       ROUTER.SETTINGS,
       ROUTER.DASHBOARD,
+      ROUTER.CLIENT_PROFILE,
       ROUTER.USER_PROFILE,
       ROUTER.COMPANY_PROFILE,
     ];
@@ -133,6 +161,18 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       show: can(Object.values(PERMISSIONS.permission)),
     };
 
+    /**
+     * show calculation based on company type:
+     * companies: central
+     * users: central
+     * human resources: not-central
+     * program management: central
+     * CRM: not-central
+     * docs library: not-central
+     * settings: both
+     * powers: central
+     * ecommerce: not-central
+     */
     const data: Project[] = [
       // companies
       {
@@ -141,6 +181,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         isActive: pageName === ROUTER.COMPANIES,
         slug: SUPER_ENTITY_SLUG.COMPANY,
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.CompaniesList"),
@@ -159,6 +200,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.USERS],
         isActive: pageName === ROUTER.USERS,
         slug: SUPER_ENTITY_SLUG.USERS,
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.UsersList"),
@@ -176,6 +218,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         urls: [ROUTER.Organizational_Structure],
         isActive: pageName === ROUTER.Organizational_Structure,
         slug: SUPER_ENTITY_SLUG.HRM,
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.OrganizationalStructure"),
@@ -219,6 +262,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         urls: [ROUTER.PROGRAM_SETTINGS.USERS],
         isActive: pageName === ROUTER.PROGRAM_SETTINGS.USERS,
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.Users"),
@@ -236,6 +280,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LayoutDashboardIcon,
         urls: [ROUTER.CRM.clients, ROUTER.CRM.brokers, ROUTER.CRM.settings],
         isActive: pageName === ROUTER.CRM.clients,
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.CRMSettings"),
@@ -253,6 +298,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: LibraryBig,
         urls: [ROUTER.DOCS_LIBRARY],
         isActive: pageName === ROUTER.DOCS_LIBRARY,
+        show: !isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.docs-library-docs"),
@@ -269,13 +315,14 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         icon: SettingsIcon,
         isActive: settingsRoutesNames.indexOf(pageName) !== -1,
         slug: SUPER_ENTITY_SLUG.SETTINGS,
-        urls: [ROUTER.USER_PROFILE, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+        urls: [userProfileUrl, ROUTER.COMPANY_PROFILE, ROUTER.SETTINGS],
+        show: true,
         sub_entities: [
           {
             name: t("Sidebar.UserProfileSettings"),
-            url: ROUTER.USER_PROFILE,
+            url: userProfileUrl,
             icon: UserIcon,
-            isActive: pageName === ROUTER.USER_PROFILE,
+            isActive: pageName === userProfileUrl,
             show: can([
               ...Object.values(PERMISSIONS.userProfile).flatMap((p) =>
                 Object.values(p)
@@ -283,6 +330,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
               ...Object.values(PERMISSIONS.profile).flatMap((p) =>
                 Object.values(p)
               ),
+              // client profile permission
             ]),
           },
           {
@@ -325,6 +373,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         isActive: pageName === ROUTER.Powers,
         slug: SUPER_ENTITY_SLUG.POWERS,
         urls: [ROUTER.Programs],
+        show: isCentralCompany,
         sub_entities: [
           {
             name: t("Sidebar.PackagesAndPrograms"),
@@ -351,6 +400,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           ROUTER.Discounts,
           ROUTER.Coupons,
         ].includes(pageName),
+        show: !isCentralCompany,
         slug: SUPER_ENTITY_SLUG.ECOMMERCE,
         urls: [
           ROUTER.HomeStore,
@@ -445,6 +495,169 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
           },
         ],
       },
+      // CMS (Content Management System)
+      {
+        name: t("Sidebar.CMS.title"),
+        icon: SettingsIcon,
+        isActive: [
+          ROUTER.CMS.CATEGORIES,
+          ROUTER.CMS.ICONS,
+          ROUTER.CMS.MAIN_SETTINGS,
+          ROUTER.CMS.ABOUT_SETTINGS,
+          ROUTER.CMS.TERMS_CONDITIONS,
+          ROUTER.CMS.MAIN_DATA,
+          ROUTER.CMS.FOUNDER,
+          ROUTER.CMS.SERVICES,
+          ROUTER.CMS.OUR_SERVICES,
+          ROUTER.CMS.NEWS,
+          ROUTER.CMS.PROJECTS,
+          ROUTER.CMS.THEME_SETTING,
+        ].includes(pageName),
+        show: !isCentralCompany,
+        slug: SUPER_ENTITY_SLUG.CMS,
+        urls: [
+          ROUTER.CMS.CATEGORIES,
+          ROUTER.CMS.ICONS,
+          ROUTER.CMS.MAIN_SETTINGS,
+          ROUTER.CMS.ABOUT_SETTINGS,
+          ROUTER.CMS.TERMS_CONDITIONS,
+          ROUTER.CMS.MAIN_DATA,
+          ROUTER.CMS.FOUNDER,
+          ROUTER.CMS.SERVICES,
+          ROUTER.CMS.OUR_SERVICES,
+          ROUTER.CMS.NEWS,
+          ROUTER.CMS.PROJECTS,
+          ROUTER.CMS.THEME_SETTING,
+        ],
+        sub_entities: [
+          {
+            name: t("Sidebar.CMS.ThemeSetting"),
+            url: ROUTER.CMS.THEME_SETTING,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.THEME_SETTING,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.themeSetting.view,
+                PERMISSIONS.CMS.themeSetting.update,
+              ]),
+          },
+
+          {
+            name: t("Sidebar.CMS.Categories"),
+            url: ROUTER.CMS.CATEGORIES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.CATEGORIES,
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.CMS.categories)),
+          },
+          {
+            name: t("Sidebar.CMS.Icons"),
+            url: ROUTER.CMS.ICONS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.ICONS,
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.icons)),
+          },
+          {
+            name: t("Sidebar.CMS.Services"),
+            url: ROUTER.CMS.SERVICES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.SERVICES,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.services.list,
+                PERMISSIONS.CMS.services.update,
+              ]),
+          },
+
+          {
+            name: t("Sidebar.CMS.Projects"),
+            url: ROUTER.CMS.PROJECTS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.PROJECTS,
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.projects)),
+          },
+          {
+            name: t("Sidebar.CMS.News"),
+            url: ROUTER.CMS.NEWS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.NEWS,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.news)),
+          },
+          {
+            name: t("Sidebar.CMS.Founder"),
+            url: ROUTER.CMS.FOUNDER,
+            icon: UserIcon,
+            isActive: pageName === ROUTER.CMS.FOUNDER,
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.founder)),
+          },
+          {
+            name: t("Sidebar.CMS.MainSettings"),
+            url: ROUTER.CMS.MAIN_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.MAIN_SETTINGS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.mainSettings.view,
+                PERMISSIONS.CMS.mainSettings.update,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.CommunicationSettings"),
+            url: ROUTER.CMS.COMMUNICATION_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.COMMUNICATION_SETTINGS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.aboutSetting.update,
+                PERMISSIONS.CMS.aboutSetting.view,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.AboutUsPage"),
+            url: ROUTER.CMS.ABOUT_SETTINGS,
+            icon: SettingsIcon,
+            isActive: pageName === ROUTER.CMS.ABOUT_SETTINGS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.aboutSetting.update,
+                PERMISSIONS.CMS.aboutSetting.view,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.OurServices"),
+            url: ROUTER.CMS.OUR_SERVICES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.OUR_SERVICES,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.services.list,
+                PERMISSIONS.CMS.services.update,
+              ]),
+          },
+          {
+            name: t("Sidebar.CMS.TermsConditions"),
+            url: ROUTER.CMS.TERMS_CONDITIONS,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.TERMS_CONDITIONS,
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.CMS.termsConditions.view,
+                PERMISSIONS.CMS.termsConditions.update,
+              ]),
+          },
+        ],
+      },
     ];
     return data;
   }, [pageName, isCentralCompany, can, t]);
@@ -457,20 +670,22 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
       data,
       isSuperAdmin
     );
-    const _shownProjects = _mergedProjects?.filter((project) => {
-      return project.sub_entities?.some((subEntity) => subEntity.show);
-    });
+    const _shownProjects = _mergedProjects
+      ?.filter((project) => {
+        return project.show;
+      })
+      ?.filter((project) => {
+        return project.sub_entities?.some((subEntity) => subEntity.show);
+      });
     return _shownProjects;
   }, [SidebarProjects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
-
-  console.log('all101', all)
 
   return (
     <Sidebar
       collapsible="icon"
       side={sidebarSide}
       {...props}
-      className=" bg-sidebar"
+      className="dashboard-sidebar bg-sidebar"
     >
       <SidebarHeader className=" pt-10 ">
         <SidebarTrigger className="absolute top-2.5 right-3.5 left-auto rtl:right-auto rtl:left-3.5 " />
@@ -480,7 +695,7 @@ export function AppSidebar({ name, mainLogo, ...props }: AppSidebarProps) {
         {(isLoading || !Boolean(data)) && (
           <div className="p-4 flex justify-center">Loading...</div>
         )}
-        {all.length && !isLoading && <SidebarProgramsList projects={all} />}
+        {all.length && !isLoading && <SidebarProgramsListV2 projects={all} />}
         {/* <NavCompanies projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>

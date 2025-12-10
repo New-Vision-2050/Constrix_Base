@@ -1,4 +1,4 @@
-import { createPermissions as create, PERMISSION_ACTIONS } from "./default-permissions";
+import { createPermissions as create } from "./default-permissions";
 
 export const PERMISSIONS = {
   user: create("USER"),
@@ -92,5 +92,53 @@ export const PERMISSIONS = {
   library: {
     folder: create("FOLDER"),
     file: create("FILE"),
+  },
+  // Content Management System
+  CMS: {
+    categories: create("CATEGORY_WEBSITE_CMS", [
+      "LIST",
+      "CREATE",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,CREATE,UPDATE,DELETE
+    projects: create("WEBSITE_PROJECT", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    projectsTypes: create("WEBSITE_PROJECT_SETTING", [
+      "LIST",
+      "CREATE",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,CREATE,UPDATE,DELETE
+    icons: create("WEBSITE_ICON", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    mainSettings: create("WEBSITE_HOME_PAGE_SETTING", ["VIEW", "UPDATE"]), // just view,update
+    aboutSetting: create("WEBSITE_ABOUT_US", ["VIEW", "UPDATE"]), // just view,update - renames to aboutSetting
+    termsConditions: create("WEBSITE_TERM_AND_CONDITION", ["VIEW", "UPDATE"]), // just view,update
+    news: create("WEBSITE_NEWS", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    founder: create("FOUNDER", ["LIST", "CREATE", "UPDATE", "DELETE"]), //LIST,CREATE,UPDATE,DELETE
+    services: create("WEBSITE_SERVICE", ["LIST", "UPDATE", "CREATE", "DELETE"]), // just view,update,create,delete
+    ourServices: create("WEBSITE_OUR_SERVICE", ["VIEW", "UPDATE"]), // just view,update,create,delete
+    // WEBSITE_SERVICE - LIST,CREATE,UPDATE,ACTIVATE,DELETE
+    communicationSettings: {
+      contactData: create("WEBSITE_CONTACT_INFO", ["VIEW", "UPDATE"]), // just view,update
+      addresses: create("WEBSITE_ADDRESS", [
+        "LIST",
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+      ]), //LIST,CREATE,UPDATE,DELETE
+      socialLinks: create("SOCIAL_MEDIA_LINK", [
+        "LIST",
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+      ]), //LIST,CREATE,UPDATE,DELETE
+    },
+    themeSetting: create("WEBSITE_THEME"), // just view,update
+    communicationContactMessages: create("WEBSITE_CONTACT_MESSAGE", [
+      "LIST",
+      "UPDATE",
+      "DELETE",
+    ]), //LIST,VIEW,REPLY=UPDATE,DELETE
+    //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
+    themes: create("WEBSITE_THEME_SETTING", ["LIST", "VIEW", "ACTIVATE"]), //LIST,SHOW,ACTIVATE
   },
 };

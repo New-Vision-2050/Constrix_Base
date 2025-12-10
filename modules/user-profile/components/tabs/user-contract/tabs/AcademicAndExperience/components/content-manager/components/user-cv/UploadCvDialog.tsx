@@ -25,7 +25,7 @@ type PropsT = {
 export default function UploadCvDialog(props: PropsT) {
   // declare and define component state and variables
   const { open, setOpen } = props;
-  const { user, handleRefetchDataStatus } = useUserProfileCxt();
+  const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCV } = useUserAcademicTabsCxt();
   const [loading, setLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File>();
@@ -51,7 +51,7 @@ export default function UploadCvDialog(props: PropsT) {
         `/biographies`,
         serialize({
           file: uploadedFile,
-          user_id: user?.user_id,
+          user_id: userId,
         })
       );
       setOpen(false);

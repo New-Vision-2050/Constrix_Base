@@ -5,7 +5,9 @@ import CreateClientCompanyForm from "./company";
 
 export default function CreateClientSheetContent({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) {
   const t = useTranslations("ClientsModule.form");
@@ -13,12 +15,12 @@ export default function CreateClientSheetContent({
     {
       id: "individual-client",
       title: t("individualClient"),
-      content: <CreateIndividualClientForm sub_entity_id={sub_entity_id} />,
+      content: <CreateIndividualClientForm sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />,
     },
     {
       id: "company-client",
       title: t("companyClient"),
-      content: <CreateClientCompanyForm sub_entity_id={sub_entity_id} />,
+      content: <CreateClientCompanyForm sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />,
     },
   ];
 

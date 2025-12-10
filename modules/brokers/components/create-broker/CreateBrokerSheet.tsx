@@ -17,7 +17,9 @@ import CreateBrokerSheetContent from "./CreateBrokerSheetContent";
 
 const CreateBrokerSheet = ({
   sub_entity_id,
+  handleRefreshWidgetsData,
 }: {
+  handleRefreshWidgetsData?: () => void;
   sub_entity_id?: string;
 }) => {
   const locale = useLocale();
@@ -50,7 +52,7 @@ const CreateBrokerSheet = ({
               {t("title")}
             </SheetTitle>
           </SheetHeader>
-          <CreateBrokerSheetContent sub_entity_id={sub_entity_id} />
+          <CreateBrokerSheetContent sub_entity_id={sub_entity_id} handleRefreshWidgetsData={handleRefreshWidgetsData} />
           <SheetFooter />
         </SheetContent>
       </Sheet>
