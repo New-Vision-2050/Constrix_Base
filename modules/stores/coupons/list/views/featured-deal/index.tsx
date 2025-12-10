@@ -7,6 +7,8 @@ import { FeaturedDealDialog } from "@/modules/stores/components/dialogs/add-coup
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useFeaturedDealTableConfig } from "../../../_config/featuredDealTableConfig";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function FeaturedDealView() {
   const [editingDealId, setEditingDealId] = useState<string | null>(null);
@@ -15,19 +17,21 @@ function FeaturedDealView() {
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
-  
+
   return (
     <>
-      <FeaturedDealDialog
-        open={Boolean(editingDealId)}
-        onClose={() => setEditingDealId(null)}
-        dealId={editingDealId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.featureDeal.update]}>
+        <FeaturedDealDialog
+          open={Boolean(editingDealId)}
+          onClose={() => setEditingDealId(null)}
+          dealId={editingDealId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.featureDeal.create]}>
             <DialogTrigger
               component={FeaturedDealDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -35,7 +39,7 @@ function FeaturedDealView() {
                 <Button onClick={onOpen}>اضافة صفقة مميزة</Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />

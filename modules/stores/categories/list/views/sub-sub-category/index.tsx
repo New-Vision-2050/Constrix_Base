@@ -8,6 +8,8 @@ import { useState } from "react";
 import AddSubCategoryDialog from "@/modules/stores/components/dialogs/add-category/addSubCategory";
 import { useSubSubCategoryTableConfig } from "../../../_config/subSubTableConfig";
 import AddSubSubCategoryDialog from "@/modules/stores/components/dialogs/add-category/addSubSubCategory";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function SubSubCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
@@ -22,16 +24,19 @@ function SubSubCategoriesView() {
   const t = useTranslations();
   return (
     <>
-      <AddSubSubCategoryDialog
-        open={Boolean(editingCategoryId)}
-        onClose={() => setEditingCategoryId(null)}
-        categoryId={editingCategoryId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.category.update]}>
+        <AddSubSubCategoryDialog
+          open={Boolean(editingCategoryId)}
+          onClose={() => setEditingCategoryId(null)}
+          categoryId={editingCategoryId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
+
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.category.create]}>
             <DialogTrigger
               component={AddSubSubCategoryDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -39,7 +44,7 @@ function SubSubCategoriesView() {
                 <Button onClick={onOpen}>اضافة قسم فرعي فرعي</Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />

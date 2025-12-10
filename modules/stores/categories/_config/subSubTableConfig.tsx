@@ -4,6 +4,8 @@ import { TableConfig } from "@/modules/table";
 import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import TheStatus from "../component/the-status";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface CategoryRow {
   id: string;
@@ -28,6 +30,7 @@ type Params = {
 export const useSubSubCategoryTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
+  const { can } = usePermissions();
   const t = useTranslations();
 
   return {
@@ -55,14 +58,14 @@ export const useSubSubCategoryTableConfig: (params?: Params) => TableConfig = (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.category.update)} onSelect={() => params?.onEdit?.(row.id)}>
           <EditIcon />
           {t("labels.edit")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.ecommerce.category.delete),
     },
   };
 };

@@ -7,12 +7,14 @@ interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export default function RichTextEditor({
   value,
   onChange,
   placeholder,
+  disabled = false,
 }: RichTextEditorProps) {
   return (
     <Textarea
@@ -20,6 +22,7 @@ export default function RichTextEditor({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder || "أدخل المحتوى هنا..."}
       rows={12}
+      disabled={disabled}
       className="resize-none bg-sidebar border-white text-white"
     />
   );

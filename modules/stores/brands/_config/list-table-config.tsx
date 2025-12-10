@@ -5,6 +5,8 @@ import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import TheStatus from "../component/the-status";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export interface BrandRow {
   id: string;
@@ -29,6 +31,7 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
   params
 ) => {
   const t = useTranslations();
+  const { can } = usePermissions();
   const locale = useLocale();
 
   return {
@@ -69,13 +72,13 @@ export const useBrandsListTableConfig: (params?: Params) => TableConfig = (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.brand.update)} onSelect={() => params?.onEdit?.(row.id)}>
           {t("labels.edit")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.ecommerce.brand.delete),
     },
     deleteUrl: `${baseURL}/ecommerce/dashboard/brands`,
     searchParamName: "search",

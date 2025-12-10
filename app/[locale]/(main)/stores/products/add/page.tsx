@@ -1,3 +1,5 @@
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import AddProductView from "@/modules/stores/products/add";
 import { Metadata } from "next";
 
@@ -10,4 +12,4 @@ function AddProductPage() {
   return <AddProductView />;
 }
 
-export default AddProductPage;
+export default withServerPermissionsPage(AddProductPage, [PERMISSIONS.ecommerce.product.create]);

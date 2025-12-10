@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useMainPageTableConfig } from "../../../_config/mainPageTableConfig";
 import { MainPageDialog } from "@/modules/stores/components/dialogs/add-page-setting";
 import { useTranslations } from "next-intl";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 function MainPageView() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
@@ -19,19 +21,21 @@ function MainPageView() {
 
   return (
     <div className="w-full" dir="rtl">
-      <MainPageDialog
-        open={Boolean(editingPageId)}
-        onClose={() => setEditingPageId(null)}
-        pageId={editingPageId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.banner.update]}>
+        <MainPageDialog
+          open={Boolean(editingPageId)}
+          onClose={() => setEditingPageId(null)}
+          pageId={editingPageId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
 
       <div className="max-w-8xl mx-auto">
         {/* Table Section */}
         <TableBuilder
           config={tableConfig}
           searchBarActions={
-            <>
+            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
               <DialogTrigger
                 component={MainPageDialog}
                 dialogProps={{
@@ -41,7 +45,7 @@ function MainPageView() {
                   <Button onClick={onOpen}>{t("actions.addBanner")}</Button>
                 )}
               />
-            </>
+            </Can>
           }
           tableId={tableConfig.tableId}
         />

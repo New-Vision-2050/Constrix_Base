@@ -9,6 +9,8 @@ import { useWarehousesListTablConfig } from "../_config/list-table-config";
 import { useState } from "react";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { statisticsConfig } from "../component/statistics-config";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 function ListWarehousesView() {
   const [editingWarehouseId, setEditingWarehouseId] = useState<string | null>(
@@ -22,16 +24,18 @@ function ListWarehousesView() {
   return (
     <>
       <StatisticsStoreRow config={statisticsConfig} />
-      <AddWarehouse2Dialog
-        open={Boolean(editingWarehouseId)}
-        onClose={() => setEditingWarehouseId(null)}
-        warehouseId={editingWarehouseId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.warehouse.update]}>
+        <AddWarehouse2Dialog
+          open={Boolean(editingWarehouseId)}
+          onClose={() => setEditingWarehouseId(null)}
+          warehouseId={editingWarehouseId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.warehouse.create]}>
             <DialogTrigger
               component={AddWarehouse2Dialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -41,7 +45,7 @@ function ListWarehousesView() {
                 </Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />

@@ -9,6 +9,8 @@ import { useState } from "react";
 import { useBrandsListTableConfig } from "./_config/list-table-config";
 import { statisticsConfig } from "./component/statistics-config";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function BrandsView() {
   const [editingBrandId, setEditingBrandId] = useState<string | null>(null);
@@ -20,16 +22,18 @@ function BrandsView() {
   return (
     <>
       <StatisticsStoreRow config={statisticsConfig} />
+      <Can check={[PERMISSIONS.ecommerce.brand.update]}>
+        <AddBrandDialog
+          open={Boolean(editingBrandId)}
+          onClose={() => setEditingBrandId(null)}
+          brandId={editingBrandId || undefined}
+        />
+      </Can>
 
-      <AddBrandDialog
-        open={Boolean(editingBrandId)}
-        onClose={() => setEditingBrandId(null)}
-        brandId={editingBrandId || undefined}
-      />
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.brand.create]}>
             <DialogTrigger
               component={AddBrandDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -39,7 +43,7 @@ function BrandsView() {
                 </Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />

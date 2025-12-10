@@ -141,4 +141,35 @@ export const PERMISSIONS = {
     //WEBSITE_THEME_SETTING - LIST,SHOW,ACTIVATE
     themes: create("WEBSITE_THEME_SETTING", ["LIST", "VIEW", "ACTIVATE"]), //LIST,SHOW,ACTIVATE
   },
+  // ecommerce
+  ecommerce: {
+    //Banner
+    banner: create("ECOMMERCE_BANNER", ["LIST", 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Coupon
+    coupon: create('ECOMMERCE_COUPON', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Dashboard
+    dashboard: create('ECOMMERCE_DASHBOARD', ['VIEW']),//'ORDERS_CHART','WAREHOUSES_TABLE'
+    //Deal Day
+    dealDay: create('ECOMMERCE_DEAL_DAY', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Brand
+    brand: create('ECOMMERCE_ECO_BRAND', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Category
+    category: create('ECOMMERCE_CATEGORY', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Product
+    product: create('ECOMMERCE_PRODUCT', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Feature Deal
+    featureDeal: create('ECOMMERCE_FEATURE_DEAL', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Flash Deal
+    flashDeal: create('ECOMMERCE_FLASH_DEAL', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Order
+    order: create('ECOMMERCE_ORDER', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Social Media
+    socialMedia: create('ECOMMERCE_SOCIAL_MEDIA', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    // Warehouse
+    warehouse: create('ECOMMERCE_WAREHOUSE', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'ACTIVATE', 'DELETE', 'EXPORT']),
+    //Page
+    page: create('ECOMMERCE_PAGE', ['LIST', 'VIEW', 'CREATE', 'UPDATE', 'DELETE']),
+    //Payment Method
+    paymentMethod: create('ECOMMERCE_PAYMENT_METHOD', ['LIST', 'ACTIVATE']),
+  }
 };

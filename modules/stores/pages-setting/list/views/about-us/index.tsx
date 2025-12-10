@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAboutUsTableConfig } from "../../../_config/aboutUsTableConfig";
 import { AboutUsDialog } from "@/modules/stores/components/dialogs/add-page-setting";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function AboutUsView() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
@@ -19,18 +21,20 @@ function AboutUsView() {
 
   return (
     <div className="w-full" dir="rtl">
-      <AboutUsDialog
-        open={Boolean(editingPageId)}
-        onClose={() => setEditingPageId(null)}
-        pageId={editingPageId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.banner.update]}>
+        <AboutUsDialog
+          open={Boolean(editingPageId)}
+          onClose={() => setEditingPageId(null)}
+          pageId={editingPageId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
 
       <div className="max-w-8xl mx-auto">
         <TableBuilder
           config={tableConfig}
           searchBarActions={
-            <>
+            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
               <DialogTrigger
                 component={AboutUsDialog}
                 dialogProps={{
@@ -40,7 +44,7 @@ function AboutUsView() {
                   <Button onClick={onOpen}>{t("actions.addBanner")}</Button>
                 )}
               />
-            </>
+            </Can>
           }
           tableId={tableConfig.tableId}
         />
