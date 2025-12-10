@@ -5,6 +5,8 @@ import { ContactDialog } from "@/modules/stores/components/dialogs/add-page-sett
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useContactTableConfig } from "../../../_config/contactTableConfig";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export function ContactBannersTable() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
@@ -22,18 +24,20 @@ export function ContactBannersTable() {
 
   return (
     <>
-      <ContactDialog
-        open={Boolean(editingPageId)}
-        onClose={() => setEditingPageId(null)}
-        pageId={editingPageId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.banner.update]}>
+        <ContactDialog
+          open={Boolean(editingPageId)}
+          onClose={() => setEditingPageId(null)}
+          pageId={editingPageId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
 
       <div>
         <TableBuilder
           config={tableConfig}
           searchBarActions={
-            <>
+            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
               <DialogTrigger
                 component={ContactDialog}
                 dialogProps={{
@@ -43,7 +47,7 @@ export function ContactBannersTable() {
                   <Button onClick={onOpen}>{t("actions.addBanner")}</Button>
                 )}
               />
-            </>
+            </Can>
           }
           tableId={tableConfig.tableId}
         />

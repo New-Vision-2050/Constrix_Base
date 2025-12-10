@@ -4,27 +4,39 @@ import TabsGroup from "@/components/shared/TabsGroup";
 import { ContactBannersTable } from "./ContactBannersTable";
 import { BranchesTable } from "./BranchesTable";
 import { FeaturesTable } from "./FeaturesTable";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { Tab } from "@/types/Tab";
+
+type ShowableTab = Tab & { show: boolean };
 
 function ContactView() {
+  const { can } = usePermissions();
+
+  const tabs: ShowableTab[] = [
+    {
+      label: "لافتات التواصل",
+      value: "banners",
+      component: <ContactBannersTable />,
+      show: can(PERMISSIONS.ecommerce.banner.list),
+    },
+    {
+      label: "الفروع",
+      value: "branches",
+      component: <BranchesTable />,
+      show: can(PERMISSIONS.ecommerce.banner.list),
+    },
+    {
+      label: "ميزات جديدة",
+      value: "features",
+      component: <FeaturesTable />,
+      show: can(PERMISSIONS.ecommerce.banner.list),
+    },
+  ];
+  
   return (
     <TabsGroup
-      tabs={[
-        {
-          label: "لافتات التواصل",
-          value: "banners",
-          component: <ContactBannersTable />,
-        },
-        {
-          label: "الفروع",
-          value: "branches",
-          component: <BranchesTable />,
-        },
-        {
-          label: "ميزات جديدة",
-          value: "features",
-          component: <FeaturesTable />,
-        },
-      ]}
+      tabs={tabs.filter((tab) => tab.show)}
       defaultValue="banners"
       variant="primary"
     />

@@ -4,6 +4,8 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { NewFeatureDialog } from "@/modules/stores/components/dialogs/add-page-setting";
 import { useState } from "react";
 import { useNewFeatureTableConfig } from "../../../_config/newFeatureTableConfig";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 export function FeaturesTable() {
   const [editingFeatureId, setEditingFeatureId] = useState<string | null>(null);
@@ -21,18 +23,20 @@ export function FeaturesTable() {
 
   return (
     <>
-      <NewFeatureDialog
-        open={Boolean(editingFeatureId)}
-        onClose={() => setEditingFeatureId(null)}
-        featureId={editingFeatureId || undefined}
-        onSuccess={() => reloadFeatureTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.banner.update]}>
+        <NewFeatureDialog
+          open={Boolean(editingFeatureId)}
+          onClose={() => setEditingFeatureId(null)}
+          featureId={editingFeatureId || undefined}
+          onSuccess={() => reloadFeatureTable()}
+        />
+      </Can>
 
       <div>
         <TableBuilder
           config={newFeatureTableConfig}
           searchBarActions={
-            <>
+            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
               <DialogTrigger
                 component={NewFeatureDialog}
                 dialogProps={{
@@ -42,7 +46,7 @@ export function FeaturesTable() {
                   <Button onClick={onOpen}>اضافة ميزة جديدة</Button>
                 )}
               />
-            </>
+            </Can>
           }
           tableId={newFeatureTableConfig.tableId}
         />
