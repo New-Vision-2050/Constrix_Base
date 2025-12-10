@@ -1,5 +1,7 @@
 import TermsConditionsView from "@/modules/stores/terms/list/view";
 import { Metadata } from "next";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",
@@ -10,4 +12,4 @@ function TermsConditionsPage() {
   return <TermsConditionsView />;
 }
 
-export default TermsConditionsPage;
+export default withServerPermissionsPage(TermsConditionsPage, [Object.values(PERMISSIONS.ecommerce.page)]);

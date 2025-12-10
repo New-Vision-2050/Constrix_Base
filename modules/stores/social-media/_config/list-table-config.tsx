@@ -6,6 +6,8 @@ import { useTranslations } from "next-intl";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import TheStatus from "../components/the-status";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Social Media row type interface
 export interface SocialMediaRow {
@@ -27,6 +29,7 @@ export const useSocialMediaListTableConfig: (
   props?: SocialMediaListTableConfigProps
 ) => TableConfig = (props) => {
   const t = useTranslations();
+  const { can } = usePermissions();
   const { onEdit, onToggle } = props || {};
 
   return {
@@ -54,16 +57,16 @@ export const useSocialMediaListTableConfig: (
         label: t("socialMedia.status"),
         sortable: false,
         render: (value: "active" | "inActive", row: SocialMediaRow) => (
-          <TheStatus theStatus={value} id={row.id} />
+          <TheStatus disabled={!can(PERMISSIONS.ecommerce.socialMedia.activate)} theStatus={value} id={row.id} />
         ),
       },
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.ecommerce.socialMedia.delete),
     },
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.socialMedia.update)} onSelect={() => onEdit?.(row.id)}>
           <Edit className="w-4 h-4" />
           {t("labels.edit")}
         </DropdownMenuItem>
