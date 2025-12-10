@@ -35,6 +35,7 @@ function CategoriesView() {
       show: can(PERMISSIONS.ecommerce.category.view),
     },
   ];
+  
   return (
     <div className="space-y-1">
       <StatisticsStoreRow config={statisticsConfig} />
