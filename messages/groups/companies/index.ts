@@ -115,6 +115,6 @@ export const companiesMessages = new MessagesGroup({
     AsClientInBranches: _m("as a client in the following branches", "كعميل لدي الأفرع الأتية"),
     AsBrokerInBranches: _m("as a broker in the following branches", "كوسيط لدي الأفرع الأتية"),
     EmployeeAlreadyRegistered: _m("The employee is already registered in the company", "الموظف مسجل بالفعل فى الشركة مسبقأ"),
-    ClickToAddToAnotherBranch: _m("Click here to add to another branch", "لأضافته لفرع أخر أضغط هنا"),
+    ClickToAddToAnotherBranch: _m("Click here to add as employee to another branch", "لأضافته لفرع أخر كموظف أضغط هنا"),
   }),
 });
