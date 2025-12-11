@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import LogoPlaceholder from "@/public/images/logo-placeholder-image.png";
 import { UserTableRow } from "@/modules/table/utils/configs/usersTableConfig";
 import useCurrentAuthCompany from "@/hooks/use-auth-company";
+import { UsersTypes } from "@/modules/program-settings/constants/users-types";
 
 interface PropsT {
   open: boolean;
@@ -31,9 +32,9 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
       if (!Boolean(authCompany?.is_central_company)) {
         const company = user.companies[0];
         const userId = user?.user_id ?? company?.users?.[0]?.id ?? "";
-        router.push(
-          `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${authCompany?.id}`
-        );
+        const role = user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
+
+        handleRedirectWithRole(userId, authCompany?.id, role.toString());
         onClose();
       } else if (
         user?.companies?.length === 1 &&
@@ -41,18 +42,22 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
       ) {
         const company = user.companies[0];
         const userId = company?.users?.[0]?.id ?? "";
-        router.push(
-          `${ROUTER.USER_PROFILE}?id=${userId}&company_id=${company?.id}`
-        );
+        const role = user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
+        
+        handleRedirectWithRole(userId, company?.id, role.toString());
         onClose();
       }
     }
   }, [open, user, router, onClose, authCompanyData]);
 
-  // declare and define functions
-  const handleRedirect = (id: string, companyId: string) => {
+  // handle redirect to profile page with role
+  const handleRedirectWithRole = (id: string, companyId: string, role: string) => {
     if (!id) return;
-    router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}`);
+    if (role.toString() == UsersTypes.Employee) {
+      router.push(`${ROUTER.USER_PROFILE}?id=${id}&company_id=${companyId}&role=${role}`);
+    } else {
+      router.push(`${ROUTER.CLIENT_PROFILE}?id=${id}&role=${role}`);
+    }
   };
 
   if (isLoading) {
@@ -78,9 +83,10 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
               <div
                 key={company?.id}
                 onClick={() =>
-                  handleRedirect(
+                  handleRedirectWithRole(
                     company?.users?.[0]?.id ?? "",
-                    company?.id ?? ""
+                    company?.id ?? "",
+                    company?.roles?.[0]?.role?.toString() ?? UsersTypes.Employee
                   )
                 }
                 className="flex flex-col items-center justify-center cursor-pointer"
