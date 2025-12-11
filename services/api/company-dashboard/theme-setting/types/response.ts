@@ -42,6 +42,7 @@ export interface ThemeSettingData {
   company_id: string;
   url: string | null;
   radius: number;
+  icon_url: string | null;
   html_font_size: number;
   font_family: string;
   font_size: string;

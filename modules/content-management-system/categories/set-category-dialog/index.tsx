@@ -62,7 +62,7 @@ export default function SetCategoryDialog({
   const isEditMode = !!categoryId;
 
   // Fetch category data when editing
-  const { data: categoryData, isLoading: isFetching } = useQuery({
+  const { data: categoryData, isLoading: isFetching,refetch } = useQuery({
     queryKey: ["company-dashboard-category", categoryId],
     queryFn: () => CompanyDashboardCategoriesApi.show(categoryId!),
     enabled: isEditMode && open,
@@ -143,6 +143,7 @@ export default function SetCategoryDialog({
         };
 
         await CompanyDashboardCategoriesApi.update(categoryId, updateParams);
+        refetch();
       } else {
         // Create new category
         const createParams: CreateCategoryParams = {

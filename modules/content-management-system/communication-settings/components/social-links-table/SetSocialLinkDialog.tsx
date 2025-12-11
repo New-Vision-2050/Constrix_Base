@@ -40,7 +40,7 @@ export default function SetSocialLinkDialog({
     const t = useTranslations("content-management-system.communicationSetting.socialLinksTable");
     const isEditMode = !!socialLinkId;
 
-    const { data: socialLinkData, isLoading } = useQuery({
+    const { data: socialLinkData, isLoading,refetch } = useQuery({
         queryKey: ["cms-social-link", socialLinkId],
         queryFn: () => CommunicationSettingsSocialLinksApi.show(socialLinkId!),
         enabled: isEditMode && open,
@@ -70,6 +70,7 @@ export default function SetSocialLinkDialog({
             toast.success(isEditMode ? t("updateSuccess") : t("createSuccess"));
             onSuccess?.();
             reset();
+            refetch();
             onClose();
         } catch (error: any) {
             toast.error(error?.response?.data?.message || t("operationFailed"));
