@@ -40,7 +40,7 @@ export default function ReplyMessageDialog({
   const queryClient = useQueryClient();
 
   // Fetch message details with caching
-  const { data: messageData, isLoading: isFetching } = useQuery({
+  const { data: messageData, isLoading: isFetching,refetch } = useQuery({
     queryKey: ["communication-message", messageId],
     queryFn: () => CommunicationMessagesApi.show(messageId!),
     enabled: Boolean(messageId) && open,
@@ -53,7 +53,7 @@ export default function ReplyMessageDialog({
       CommunicationMessagesApi.reply(messageId!, { status: +status as 0 | 1, reply_message: data.reply_message }),
     onSuccess: () => {
       toast.success(t("success"));
-      queryClient.invalidateQueries({ queryKey: ["communication-messages"] });
+      refetch();
       handleClose();
     },
     onError: () => {
