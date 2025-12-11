@@ -41,7 +41,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
         user?.companies[0]?.users?.length
       ) {
         const company = user.companies[0];
-        const userId = company?.users?.[0]?.id ?? "";
+        const userId = user?.user_id ?? company?.users?.[0]?.id ?? "";
         const role = user?.companies[0]?.roles?.[0]?.role ?? UsersTypes.Employee;
         
         handleRedirectWithRole(userId, company?.id, role.toString());
@@ -84,7 +84,7 @@ const ChooseUserCompany: React.FC<PropsT> = ({ open, onClose, user }) => {
                 key={company?.id}
                 onClick={() =>
                   handleRedirectWithRole(
-                    company?.users?.[0]?.id ?? "",
+                    user?.user_id ?? company?.users?.[0]?.id ?? "",
                     company?.id ?? "",
                     company?.roles?.[0]?.role?.toString() ?? UsersTypes.Employee
                   )
