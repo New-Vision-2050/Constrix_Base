@@ -24,6 +24,7 @@ interface BasicInfoSectionProps {
   iconLabel: string;
   urlLabel: string;
   isSubmitting?: boolean;
+  initialIconUrl?: string;
 }
 
 export default function BasicInfoSection({
@@ -32,6 +33,7 @@ export default function BasicInfoSection({
   iconLabel,
   urlLabel,
   isSubmitting = false,
+  initialIconUrl,
 }: BasicInfoSectionProps) {
   return (
     <div className="space-y-6 bg-sidebar rounded-lg p-6 border border-border">
@@ -53,7 +55,7 @@ export default function BasicInfoSection({
                     dimensions="512 x 512"
                     required={false}
                     onChange={(file) => onChange(file)}
-                    initialValue={undefined}
+                    initialValue={initialIconUrl}
                     minHeight="200px"
                     className="mt-1"
                     accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/x-icon"
