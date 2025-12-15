@@ -2,10 +2,27 @@
 FROM node:22-alpine AS builder
 
 WORKDIR /app
-RUN apk add --no-cache yarn
+
+# Install dependencies required for sharp and other native modules
+RUN apk add --no-cache \
+    libc6-compat \
+    vips-dev \
+    fftw-dev \
+    build-base \
+    gcc \
+    g++ \
+    make \
+    python3 \
+    yarn
+
+# Set environment variables for sharp
+ENV NEXT_SHARP_PATH=/app/node_modules/sharp
+
+COPY package.json ./
+RUN yarn install
 
 COPY . .
-RUN yarn install && yarn build
+RUN yarn build
 
 # Optional: build args
 ARG DEPLOYMENT_ID
@@ -17,6 +34,11 @@ RUN echo "Cache bust: ${CACHEBUST}"
 FROM node:22-alpine AS runner
 
 WORKDIR /app
+
+# Install runtime dependencies for sharp
+RUN apk add --no-cache \
+    libc6-compat \
+    vips
 
 # Copy built app from builder stage
 COPY --from=builder /app/.next/standalone ./
