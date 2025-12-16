@@ -20,8 +20,8 @@ ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci --omit=optional || npm install --omit=optional
+# Install dependencies (use legacy-peer-deps to handle peer dependency conflicts)
+RUN npm install --omit=optional --legacy-peer-deps
 
 # Then install sharp specifically for Alpine Linux with wasm support
 RUN npm install --cpu=wasm32 sharp
