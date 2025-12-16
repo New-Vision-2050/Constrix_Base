@@ -21,6 +21,9 @@ ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 COPY package.json ./
 RUN yarn install
 
+# Install sharp with the correct architecture for Alpine Linux
+RUN yarn add sharp --ignore-engines
+
 COPY . .
 RUN yarn build
 
