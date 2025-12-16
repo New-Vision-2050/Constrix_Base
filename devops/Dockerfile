@@ -12,20 +12,22 @@ RUN apk add --no-cache \
     gcc \
     g++ \
     make \
-    python3 \
-    yarn
+    python3
 
 # Set environment variables for sharp
 ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 
-COPY package.json ./
-RUN yarn install
+# Copy package files
+COPY package.json package-lock.json* ./
 
-# Install sharp with the correct architecture for Alpine Linux
-RUN yarn add sharp --ignore-engines
+# Install dependencies
+RUN npm ci --omit=optional || npm install --omit=optional
+
+# Then install sharp specifically for Alpine Linux with wasm support
+RUN npm install --cpu=wasm32 sharp
 
 COPY . .
-RUN yarn build
+RUN npm run build
 
 # Optional: build args
 ARG DEPLOYMENT_ID
