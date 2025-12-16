@@ -36,6 +36,7 @@ const nextConfig: NextConfig = {
   // },
   images: {
     unoptimized: true, // Disable static image optimization during build
+    disableStaticImages: true, // Disable static image imports (no blur placeholders)
     remotePatterns: [
       {
         protocol: "https",
