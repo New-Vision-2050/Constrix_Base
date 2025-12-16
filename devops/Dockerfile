@@ -14,14 +14,12 @@ RUN apk add --no-cache \
     make \
     python3
 
-# Set environment variables for sharp to use system libvips
-ENV SHARP_FORCE_GLOBAL_LIBVIPS=1
-
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install all dependencies including sharp (uses system libvips)
-RUN npm install --legacy-peer-deps
+# Install all dependencies including sharp
+# Set environment to tell sharp to download prebuilt binaries for Alpine Linux
+RUN npm_config_platform=linuxmusl npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
