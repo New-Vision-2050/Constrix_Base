@@ -23,8 +23,12 @@ COPY package.json package-lock.json* ./
 # Install dependencies (use legacy-peer-deps to handle peer dependency conflicts)
 RUN npm install --omit=optional --legacy-peer-deps
 
-# Then install sharp specifically for Alpine Linux with wasm support
-RUN npm install --cpu=wasm32 --legacy-peer-deps sharp
+# Then install sharp specifically for Alpine Linux
+# Force sharp to use prebuilt binaries for musl (Alpine Linux)
+ENV npm_config_platform=linux
+ENV npm_config_arch=x64
+ENV npm_config_libc=musl
+RUN npm install --legacy-peer-deps sharp
 
 COPY . .
 RUN npm run build
