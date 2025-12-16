@@ -14,21 +14,14 @@ RUN apk add --no-cache \
     make \
     python3
 
-# Set environment variables for sharp
-ENV NEXT_SHARP_PATH=/app/node_modules/sharp
+# Set environment variables for sharp to use system libvips
+ENV SHARP_FORCE_GLOBAL_LIBVIPS=1
 
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies (use legacy-peer-deps to handle peer dependency conflicts)
-RUN npm install --omit=optional --legacy-peer-deps
-
-# Then install sharp specifically for Alpine Linux
-# Force sharp to use prebuilt binaries for musl (Alpine Linux)
-ENV npm_config_platform=linux
-ENV npm_config_arch=x64
-ENV npm_config_libc=musl
-RUN npm install --legacy-peer-deps sharp
+# Install all dependencies including sharp (uses system libvips)
+RUN npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
