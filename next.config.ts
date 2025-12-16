@@ -35,17 +35,18 @@ const nextConfig: NextConfig = {
   //    domains: ['constrix.fra1.digitaloceanspaces.com'],
   // },
   images: {
+    unoptimized: true, // Disable static image optimization during build
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'constrix.fra1.digitaloceanspaces.com',
-        port: '',
-        pathname: '/**/**',
-        search: '',
+        protocol: "https",
+        hostname: "constrix.fra1.digitaloceanspaces.com",
+        port: "",
+        pathname: "/**/**",
+        search: "",
       },
     ],
   },
-   output: 'standalone',
+  output: "standalone",
 };
 const withNextIntl = createNextIntlPlugin();
 
