@@ -2,10 +2,12 @@
 FROM node:22-alpine AS builder
 
 WORKDIR /app
-RUN apk add --no-cache yarn
+
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
-RUN yarn install && yarn build
+RUN npm run build
 
 # Optional: build args
 ARG DEPLOYMENT_ID
