@@ -24,7 +24,7 @@ interface SetAddressDialogProps {
 export default function SetAddressDialog({ open, onClose, onSuccess, addressId }: SetAddressDialogProps) {
     const t = useTranslations("content-management-system.communicationSetting");
     const isEditMode = !!addressId;
-    const { data: addressData, isLoading } = useQuery({
+    const { data: addressData, isLoading,refetch } = useQuery({
         queryKey: ["cms-address", addressId],
         queryFn: () => CommunicationSettingsAddressesApi.show(addressId!),
         enabled: isEditMode && open,
@@ -66,7 +66,8 @@ export default function SetAddressDialog({ open, onClose, onSuccess, addressId }
             
             toast.success(isEditMode ? t("updateSuccess") : t("createSuccess"));
             onSuccess?.(); 
-            reset(); 
+            reset();
+            refetch();
             onClose();
         } catch (error: any) {
             toast.error(error?.response?.data?.message || t("operationFailed"));
