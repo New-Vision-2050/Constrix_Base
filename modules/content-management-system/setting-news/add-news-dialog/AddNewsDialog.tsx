@@ -8,29 +8,21 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/modules/table/components/ui/textarea";
-import {
+  DialogActions,
+  TextField,
+  Button,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormField,
-  FormItem,
+  MenuItem,
   FormControl,
-} from "@/modules/table/components/ui/form";
-import { Loader2 } from "lucide-react";
+  InputLabel,
+  Box,
+  Grid,
+  FormHelperText,
+  CircularProgress,
+} from "@mui/material";
+import { Controller } from "react-hook-form";
 import ImageUpload from "@/components/shared/ImageUpload";
-import FormLabel from "@/components/shared/FormLabel";
-import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
 import { CompanyDashboardCategoriesApi } from "@/services/api/company-dashboard/categories";
@@ -216,31 +208,32 @@ export default function AddNewsDialog({
     })) || [];
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent
-        className={`max-w-5xl w-full bg-sidebar border-gray-700 max-h-[90vh] overflow-y-auto ${
-          isRtl ? "rtl" : "ltr"
-        }`}
-        dir={isRtl ? "rtl" : "ltr"}
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="lg"
+      fullWidth
+      dir={isRtl ? "rtl" : "ltr"}
+    >
+      <DialogTitle
+        sx={{ textAlign: "center", fontSize: "1.125rem", fontWeight: 600 }}
       >
-        <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold">
-            {isEditMode ? t("editNews") : t("addNews")}
-          </DialogTitle>
-        </DialogHeader>
+        {isEditMode ? t("editNews") : t("addNews")}
+      </DialogTitle>
 
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Title Fields and Image Uploads Row */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Right Column - Image Uploads */}
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={control}
-                  name="thumbnail_image"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
+      <DialogContent sx={{ maxHeight: "90vh", overflow: "auto" }}>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 2 }}>
+          {/* Title Fields and Image Uploads Row */}
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            {/* Right Column - Image Uploads */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <Controller
+                    control={control}
+                    name="thumbnail_image"
+                    render={({ field, fieldState }) => (
+                      <Box>
                         <ImageUpload
                           label={t("form.thumbnailImage")}
                           maxSize="3MB - الحجم الأقصى"
@@ -254,17 +247,21 @@ export default function AddNewsDialog({
                           }
                           minHeight="100px"
                         />
-                      </FormControl>
-                      <FormErrorMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="main_image"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
+                        {fieldState.error && (
+                          <FormHelperText error>
+                            {fieldState.error.message}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                    )}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <Controller
+                    control={control}
+                    name="main_image"
+                    render={({ field, fieldState }) => (
+                      <Box>
                         <ImageUpload
                           label={t("form.mainImage")}
                           maxSize="3MB - الحجم الأقصى"
@@ -278,210 +275,204 @@ export default function AddNewsDialog({
                           }
                           minHeight="100px"
                         />
-                      </FormControl>
-                      <FormErrorMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              {/* Left Column - Title Fields */}
-              <div className="space-y-4">
-                <FormField
+                        {fieldState.error && (
+                          <FormHelperText error>
+                            {fieldState.error.message}
+                          </FormHelperText>
+                        )}
+                      </Box>
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            {/* Left Column - Title Fields */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: 2,
+                  height: "100%",
+                }}
+              >
+                <Controller
                   control={control}
                   name="title_ar"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs" required>
-                        {t("form.titleAr")}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          variant="secondary"
-                          disabled={isSubmitting || isFetching}
-                          className="mt-1"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormErrorMessage />
-                    </FormItem>
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      label={t("form.titleAr")}
+                      required
+                      disabled={isSubmitting || isFetching}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      size="small"
+                      fullWidth
+                    />
                   )}
                 />
-                <FormField
+                <Controller
                   control={control}
                   name="title_en"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs" required>
-                        {t("form.titleEn")}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          variant="secondary"
-                          disabled={isSubmitting || isFetching}
-                          className="mt-1"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormErrorMessage />
-                    </FormItem>
+                  render={({ field, fieldState }) => (
+                    <TextField
+                      {...field}
+                      label={t("form.titleEn")}
+                      required
+                      disabled={isSubmitting || isFetching}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      size="small"
+                      fullWidth
+                    />
                   )}
                 />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-4">
-              <FormField
+              </Box>
+            </Grid>
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid size={12}>
+              <Controller
                 control={control}
                 name="category_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.category")}
-                    </FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isSubmitting || isFetching}
-                      >
-                        <SelectTrigger
-                          className="mt-1 bg-sidebar border-white text-white h-12"
-                          showClear={!!field.value}
-                          onClear={() => field.onChange("")}
-                        >
-                          <SelectValue
-                            placeholder={t("form.categoryPlaceholder")}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map((category: Category) => {
-                            const displayName = isRtl
-                              ? category.name_ar || category.name || ""
-                              : category.name_en || category.name || "";
-                            return (
-                              <SelectItem
-                                key={category.id}
-                                value={category.id.toString()}
-                              >
-                                {typeof displayName === "string"
-                                  ? displayName
-                                  : String(displayName || "")}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormErrorMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <FormControl
+                    fullWidth
+                    size="small"
+                    error={!!fieldState.error}
+                  >
+                    <InputLabel required>{t("form.category")}</InputLabel>
+                    <Select
+                      {...field}
+                      label={t("form.category")}
+                      disabled={isSubmitting || isFetching}
+                    >
+                      {categories.map((category: Category) => {
+                        const displayName = isRtl
+                          ? category.name_ar || category.name || ""
+                          : category.name_en || category.name || "";
+                        return (
+                          <MenuItem
+                            key={category.id}
+                            value={category.id.toString()}
+                          >
+                            {typeof displayName === "string"
+                              ? displayName
+                              : String(displayName || "")}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                    {fieldState.error && (
+                      <FormHelperText>
+                        {fieldState.error.message}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
                 )}
               />
-            </div>
-            {/* Category and Dates Row */}
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
+            </Grid>
+          </Grid>
+          {/* Dates Row */}
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Controller
                 control={control}
                 name="publish_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.publishDate")}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        variant="secondary"
-                        disabled={isSubmitting || isFetching}
-                        className="mt-1"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormErrorMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    type="date"
+                    label={t("form.publishDate")}
+                    required
+                    disabled={isSubmitting || isFetching}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    size="small"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                  />
                 )}
               />
-
-              <FormField
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Controller
                 control={control}
                 name="end_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.endDate")}
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        variant="secondary"
-                        disabled={isSubmitting || isFetching}
-                        className="mt-1"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormErrorMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    type="date"
+                    label={t("form.endDate")}
+                    required
+                    disabled={isSubmitting || isFetching}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    size="small"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                  />
                 )}
               />
-            </div>
+            </Grid>
+          </Grid>
 
-            {/* Content Fields */}
-            <div className="space-y-4">
-              <FormField
-                control={control}
-                name="content_ar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.contentAr")}
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        disabled={isSubmitting || isFetching}
-                        rows={6}
-                        className="mt-1 resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormErrorMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="content_en"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs" required>
-                      {t("form.contentEn")}
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        disabled={isSubmitting || isFetching}
-                        rows={6}
-                        className="mt-1 resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormErrorMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="mt-6">
-              <Button
-                type="submit"
-                disabled={isSubmitting || isFetching}
-                className="w-full text-white"
-              >
-                {(isSubmitting || isFetching) && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {t("form.save")}
-              </Button>
-            </div>
-          </form>
-        </Form>
+          {/* Content Fields */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}>
+            <Controller
+              control={control}
+              name="content_ar"
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label={t("form.contentAr")}
+                  required
+                  multiline
+                  rows={6}
+                  disabled={isSubmitting || isFetching}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  fullWidth
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="content_en"
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label={t("form.contentEn")}
+                  required
+                  multiline
+                  rows={6}
+                  disabled={isSubmitting || isFetching}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  fullWidth
+                />
+              )}
+            />
+          </Box>
+        </Box>
       </DialogContent>
+
+      <DialogActions sx={{ p: 3 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={isSubmitting || isFetching}
+          fullWidth
+          onClick={handleSubmit(onSubmit)}
+          startIcon={
+            (isSubmitting || isFetching) && <CircularProgress size={16} />
+          }
+        >
+          {t("form.save")}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }
