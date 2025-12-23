@@ -224,7 +224,7 @@ export default function AddNewsDialog({
         dir={isRtl ? "rtl" : "ltr"}
       >
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-white">
+          <DialogTitle className="text-center text-lg font-semibold">
             {isEditMode ? t("editNews") : t("addNews")}
           </DialogTitle>
         </DialogHeader>
