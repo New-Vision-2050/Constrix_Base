@@ -39,7 +39,34 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
         key: "category_type.name",
         label: t("type") || "Type",
         sortable: true,
+        searchable:true
       },
+    ],
+    enableSearch: true,
+    enableColumnSearch: true,
+    searchFields: [],
+    searchParamName: "search",
+    searchFieldParamName: "fields",
+    allowSearchFieldSelection: true,
+    allSearchedFields: [
+      {
+        key: "category_type",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("searchType"),
+          dynamicDropdown: {
+            url: `${baseURL}/categories-website/categeory-types`,
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 10,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
+      }
     ],
     executions: [
       (row) => (
@@ -52,6 +79,5 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
       canDelete: can(PERMISSIONS.CMS.categories.delete),
     },
     deleteUrl: `${baseURL}/categories-website`,
-    searchParamName: "search",
   };
 };
