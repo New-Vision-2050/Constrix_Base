@@ -70,6 +70,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
     isShareBroker,
     currentUserId,
     handleRefreshWidgetsData,
+    tableId: TABLE_ID
   });
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"

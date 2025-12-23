@@ -23,11 +23,12 @@ interface PropsT {
   user: UserTableRow;
   registrationFormSlug?: string;
   handleRefreshWidgetsData?: () => void;
+  tableId?: string
 }
 
 export default function DeleteSpecificRowDialog(props: PropsT) {
   // declare and define component state and vars
-  const { open, onClose, user, registrationFormSlug, handleRefreshWidgetsData } = props;
+  const { open, onClose, user, registrationFormSlug, handleRefreshWidgetsData, tableId } = props;
   const t = useTranslations("Companies");
   const t2 = useTranslations("companyProfile.officialDocs.docsSettingsDialog");
 
@@ -44,7 +45,7 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
 
   const formWithTableReload = useFormWithTableReload({
     config: finalFormConfig(t),
-    tableId: "users-table-v2",
+    tableId: tableId ?? "users-table-v2",
   });
 
   // declare and define helper methods
@@ -65,7 +66,7 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
             ? 3
             : 1;
 
-      const response = await apiClient.delete(
+      await apiClient.delete(
         `/company-users/users/${user.user_id}/specific-role`,
         {
           data: {
@@ -73,8 +74,10 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
           },
         }
       );
+      console.log('Breakpoint101');
       handleRefreshWidgetsData?.();
       toast.success(t2("deleteSuccess"));
+      console.log('Breakpoint102');
       formWithTableReload.reloadTable();
       onClose();
     } catch (error) {

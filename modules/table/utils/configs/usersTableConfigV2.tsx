@@ -57,7 +57,9 @@ export const UsersConfigV2 = (options?: {
   isShareBroker?: boolean;
   currentUserId?: string;
   handleRefreshWidgetsData?: () => void;
+  tableId?: string
 }) => {
+  console.log('options909options', options)
   const router = useRouter();
   const t = useTranslations("Companies");
   const tSubTable = useTranslations("Companies.SubEntitiesTable");
@@ -346,6 +348,7 @@ export const UsersConfigV2 = (options?: {
             user: row,
             registrationFormSlug: options?.registrationFormSlug,
             handleRefreshWidgetsData: options?.handleRefreshWidgetsData,
+            tableId: options?.tableId
           };
         },
       },
