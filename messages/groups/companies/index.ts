@@ -117,4 +117,71 @@ export const companiesMessages = new MessagesGroup({
     EmployeeAlreadyRegistered: _m("The employee is already registered in the company", "الموظف مسجل بالفعل فى الشركة مسبقأ"),
     ClickToAddToAnotherBranch: _m("Click here to add as employee to another branch", "لأضافته لفرع أخر كموظف أضغط هنا"),
   }),
+  // add company form
+  AddCompanyForm: new MessagesGroup({
+    Title: _m("Add New Company", "اضافة شركة جديدة"),
+    CreateCompanySectionTitle: _m("Create Company", "إنشاء شركة"),
+    CountryLabel: _m("Company Country", "دولة الشركة"),
+    CountryPlaceholder: _m("Select company country", "اختر دولة الشركة"),
+    CountryRequired: _m("Company country is required", "ادخل دولة الشركة"),
+    CompanyFieldLabel: _m("Company Activity", "النشاط"),
+    CompanyFieldPlaceholder: _m("Select activity", "اختر النشاط"),
+    CompanyFieldRequired: _m("Please choose an activity", "برجاء اختيار النشاط"),
+    TradeNameLabel: _m("Trade Name", "الاسم التجاري"),
+    TradeNamePlaceholder: _m("Enter trade name", "برجاء إدخال الاسم التجاري"),
+    TradeNameApiMessage: _m(
+      "Trade name must be in Arabic",
+      "الاسم التجاري يجب ان يكون باللغة العربية"
+    ),
+    ShortNameLabel: _m("Short Name", "الاسم المختصر"),
+    ShortNamePlaceholder: _m("Enter short name", "برجاء إدخال الاسم المختصر"),
+    ShortNameRequired: _m("Short name is required", "ادخل الاسم المختصر"),
+    ShortNameApiMessage: _m(
+      "Short name must be English letters only",
+      "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز"
+    ),
+    SupportManagerLabel: _m("Support Manager", "مسؤول الدعم"),
+    SupportManagerPlaceholder: _m("Select support manager", "اختر مسؤول الدعم"),
+    SupportManagerRequired: _m("Support manager is required", "اختر مسؤول الدعم"),
+    CompanyCheckboxLabel: _m("Company", "الشركة"),
+    CompanyCheckboxPlaceholder: _m("Select company", "اختر الشركة"),
+    CreateUserSectionTitle: _m("Create User", "إنشاء مستخدم"),
+    CompanyIdLabel: _m("Company", "الشركة"),
+    CompanyIdPlaceholder: _m("Select company", "اختر الشركة"),
+    CompanyIdRequired: _m("Company is required", "الشركة"),
+    FirstNameLabel: _m("First Name", "اسم المستخدم الاول"),
+    FirstNamePlaceholder: _m("Enter first name", "ادخل اسم المستخدم الاول"),
+    FirstNameRequired: _m("First name is required", "اسم المستخدم الاول مطلوب"),
+    NameMinLength: _m(
+      "Name must be at least 2 characters",
+      "الاسم يجب أن يحتوي على حرفين على الأقل"
+    ),
+    LastNameLabel: _m("Last Name", "اسم المستخدم الأخير"),
+    LastNamePlaceholder: _m("Enter last name", "اسم المستخدم الأخير"),
+    LastNameRequired: _m("Last name is required", "الاسم مطلوب"),
+    EmailLabel: _m("Email", "البريد الإلكتروني"),
+    EmailPlaceholder: _m("Enter email", "ادخل البريد الإلكتروني"),
+    EmailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
+    EmailInvalid: _m("Please enter a valid email address", "يرجى إدخال بريد إلكتروني صالح"),
+    PhoneLabel: _m("Phone", "الهاتف"),
+    PhonePlaceholder: _m("Enter phone number", "أدخل رقم الجوال"),
+    PhoneInvalid: _m("Invalid phone number", "رقم هاتف غير صالح"),
+    JobTitleLabel: _m("Job Title", "المسمى الوظيفي"),
+    JobTitlePlaceholder: _m("Select job title", "اختر المسمى الوظيفي"),
+    JobTitleRequired: _m("Job title is required", "المسمى الوظيفي"),
+    SubmitButtonText: _m("Send Message", "إرسال"),
+    CancelButtonText: _m("Cancel", "إلغاء"),
+    ResetButtonText: _m("Clear Form", "مسح النموذج"),
+    NextButtonText: _m("Continue", "التالي"),
+    BackButtonText: _m("Back", "رجوع"),
+    FinishButtonText: _m("Save", "حفظ"),
+    StepSubmitButtonText: _m("Next", "التالي"),
+    TimeZoneCheckbox: new MessagesGroup({
+      ConfirmText: _m(
+        "To confirm changing the time zone,",
+        "لتأكيد تغيير المنطقة الزمنية،"
+      ),
+      ClickHere: _m("Click here", "اضغط هنا"),
+    }),
+  })
 });
