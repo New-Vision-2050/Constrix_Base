@@ -3,7 +3,8 @@ import { Switch } from "@/components/ui/switch";
 import { baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 import { useTranslations } from "next-intl";
-
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 type Params = {
   onEdit?: (id: string) => void;
 };
@@ -11,7 +12,7 @@ export const useWarehousesListTablConfig: (params?: Params) => TableConfig = (
   params
 ) => {
   const t = useTranslations();
-
+  const { can } = usePermissions();
   return {
     tableId: "warehouses-list-table",
     url: `${baseURL}/ecommerce/warehouses`,
@@ -39,13 +40,13 @@ export const useWarehousesListTablConfig: (params?: Params) => TableConfig = (
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.warehouse.update)} onSelect={() => params?.onEdit?.(row.id)}>
           {t("labels.edit")}
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
-      canDelete: true,
+      canDelete: can(PERMISSIONS.ecommerce.warehouse.delete),
     },
     searchParamName: "search",
   };

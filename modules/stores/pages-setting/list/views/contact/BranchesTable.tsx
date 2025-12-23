@@ -4,6 +4,8 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { BranchDialog } from "@/modules/stores/components/dialogs/add-page-setting";
 import { useState } from "react";
 import { useBranchTableConfig } from "../../../_config/branchTableConfig";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 export function BranchesTable() {
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
@@ -21,18 +23,20 @@ export function BranchesTable() {
 
   return (
     <>
-      <BranchDialog
-        open={Boolean(editingBranchId)}
-        onClose={() => setEditingBranchId(null)}
-        branchId={editingBranchId || undefined}
-        onSuccess={() => reloadBranchTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.banner.update]}>
+        <BranchDialog
+          open={Boolean(editingBranchId)}
+          onClose={() => setEditingBranchId(null)}
+          branchId={editingBranchId || undefined}
+          onSuccess={() => reloadBranchTable()}
+        />
+      </Can>
 
       <div>
         <TableBuilder
           config={branchTableConfig}
           searchBarActions={
-            <>
+            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
               <DialogTrigger
                 component={BranchDialog}
                 dialogProps={{
@@ -42,7 +46,7 @@ export function BranchesTable() {
                   <Button onClick={onOpen}>اضافة فرع جديد</Button>
                 )}
               />
-            </>
+            </Can>
           }
           tableId={branchTableConfig.tableId}
         />

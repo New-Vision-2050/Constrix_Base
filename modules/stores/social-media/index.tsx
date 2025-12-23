@@ -9,6 +9,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { SocialMediaApi } from "@/services/api/ecommerce/social-media";
 import { toast } from "sonner";
 import AddSocialMediaDialog from "../components/dialogs/add-social-media";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function ListSocialMediaView() {
   const t = useTranslations();
@@ -60,21 +62,22 @@ function ListSocialMediaView() {
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.socialMedia.create]}>
             <Button onClick={handleAddSocialMedia}>
               {t("labels.add")} {t("socialMedia.singular")}
             </Button>
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />
-
-      <AddSocialMediaDialog
-        open={isDialogOpen}
-        onClose={handleDialogClose}
-        onSuccess={handleSuccess}
-        socialMediaId={editingId}
-      />
+      <Can check={[PERMISSIONS.ecommerce.socialMedia.update]}>
+        <AddSocialMediaDialog
+          open={isDialogOpen}
+          onClose={handleDialogClose}
+          onSuccess={handleSuccess}
+          socialMediaId={editingId}
+        />
+      </Can>
     </>
   );
 }

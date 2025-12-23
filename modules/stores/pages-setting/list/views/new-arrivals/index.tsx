@@ -7,6 +7,8 @@ import { NewArrivalsDialog } from "@/modules/stores/components/dialogs/add-page-
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useNewArrivalsTableConfig } from "../../../_config/newArrivalsTableConfig";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function NewArrivalsView() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
@@ -19,18 +21,20 @@ function NewArrivalsView() {
 
   return (
     <div className="w-full" dir="rtl">
-      <NewArrivalsDialog
-        open={Boolean(editingPageId)}
-        onClose={() => setEditingPageId(null)}
-        pageId={editingPageId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.banner.update]}>
+        <NewArrivalsDialog
+          open={Boolean(editingPageId)}
+          onClose={() => setEditingPageId(null)}
+          pageId={editingPageId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
 
       <div className="max-w-8xl mx-auto">
         <TableBuilder
           config={tableConfig}
           searchBarActions={
-            <>
+            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
               <DialogTrigger
                 component={NewArrivalsDialog}
                 dialogProps={{
@@ -40,7 +44,7 @@ function NewArrivalsView() {
                   <Button onClick={onOpen}>{t("actions.addBanner")}</Button>
                 )}
               />
-            </>
+            </Can>
           }
           tableId={tableConfig.tableId}
         />

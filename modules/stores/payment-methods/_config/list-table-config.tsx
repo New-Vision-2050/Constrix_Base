@@ -6,6 +6,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import TheStatus from "../components/the-status";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 // Payment Method row type interface
 export interface PaymentMethodRow {
@@ -23,6 +25,7 @@ export interface PaymentMethodListTableConfigProps {
 export const usePaymentMethodListTableConfig: (
   props?: PaymentMethodListTableConfigProps
 ) => TableConfig = (props) => {
+  const { can } = usePermissions();
   const t = useTranslations();
   const locale = useLocale();
   const { onEdit, onToggle } = props || {};
@@ -42,21 +45,22 @@ export const usePaymentMethodListTableConfig: (
         label: t("paymentMethods.status"),
         sortable: false,
         render: (value: "active" | "inActive", row: PaymentMethodRow) => (
-          <TheStatus theStatus={value} id={row.type} />
+          <TheStatus disabled={!can(PERMISSIONS.ecommerce.paymentMethod.activate)} theStatus={value} id={row.type} />
         ),
       },
     ],
     executionConfig: {
-      canDelete: true,
+      canEdit: false,
+      canDelete: false,
     },
-    executions: [
-      (row) => (
-        <DropdownMenuItem onSelect={() => onEdit?.(row.id)}>
-          <Edit className="w-4 h-4" />
-          {t("labels.edit")}
-        </DropdownMenuItem>
-      ),
-    ],
+    // executions: [
+    //   (row) => (
+    //     <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.paymentMethod.activate)} onSelect={() => onEdit?.(row.id)}>
+    //       <Edit className="w-4 h-4" />
+    //       {t("labels.edit")}
+    //     </DropdownMenuItem>
+    //   ),
+    // ],
     searchParamName: "search",
   };
 };

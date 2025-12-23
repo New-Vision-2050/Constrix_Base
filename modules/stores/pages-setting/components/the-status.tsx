@@ -11,6 +11,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 const TheStatus = ({
+  disabled = false,
   theStatus,
   id,
   type = "main",
@@ -18,6 +19,7 @@ const TheStatus = ({
   theStatus: "active" | "inActive";
   id: string;
   type?: "main" | "discounts" | "new-arrivals" | "contact" | "about-us" | "new-features";
+  disabled?: boolean;
 }) => {
   const t = useTranslations();
   const [isActive, setIsActive] = useState(!!theStatus);
@@ -80,7 +82,7 @@ const TheStatus = ({
           id={`${id}-switcher`}
           checked={isActive}
           onCheckedChange={handleChange}
-          disabled={!can(PERMISSIONS.package.update)}
+          disabled={disabled || !can(PERMISSIONS.ecommerce.banner.update)}
         />
       </div>
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

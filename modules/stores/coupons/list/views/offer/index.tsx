@@ -7,6 +7,8 @@ import { OfferDialog } from "@/modules/stores/components/dialogs/add-coupons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useOfferTableConfig } from "../../../_config/offerTableConfig";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import Can from "@/lib/permissions/client/Can";
 
 function OfferView() {
   const [editingOfferId, setEditingOfferId] = useState<string | null>(null);
@@ -15,19 +17,21 @@ function OfferView() {
   });
   const { reloadTable } = useTableReload(tableConfig.tableId);
   const t = useTranslations();
-  
+
   return (
     <>
-      <OfferDialog
-        open={Boolean(editingOfferId)}
-        onClose={() => setEditingOfferId(null)}
-        offerId={editingOfferId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.flashDeal.update]}>
+        <OfferDialog
+          open={Boolean(editingOfferId)}
+          onClose={() => setEditingOfferId(null)}
+          offerId={editingOfferId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.flashDeal.create]}>
             <DialogTrigger
               component={OfferDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -35,7 +39,7 @@ function OfferView() {
                 <Button onClick={onOpen}>اضافة عرض</Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />

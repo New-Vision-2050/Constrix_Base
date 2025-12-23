@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import AddSubCategoryDialog from "@/modules/stores/components/dialogs/add-category/addSubCategory";
 import { useSubCategoryTableConfig } from "../../../_config/subTableConfig";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function SubCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
@@ -21,16 +23,18 @@ function SubCategoriesView() {
   const t = useTranslations();
   return (
     <>
-      <AddSubCategoryDialog
-        open={Boolean(editingCategoryId)}
-        onClose={() => setEditingCategoryId(null)}
-        categoryId={editingCategoryId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.category.update]}>
+        <AddSubCategoryDialog
+          open={Boolean(editingCategoryId)}
+          onClose={() => setEditingCategoryId(null)}
+          categoryId={editingCategoryId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.category.create]}>
             <DialogTrigger
               component={AddSubCategoryDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -38,7 +42,7 @@ function SubCategoriesView() {
                 <Button onClick={onOpen}>اضافة قسم فرعي </Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />

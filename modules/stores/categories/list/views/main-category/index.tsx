@@ -7,6 +7,8 @@ import AddCategoryDialog from "@/modules/stores/components/dialogs/add-category"
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMainCategoryTableConfig } from "../../../_config/mainTableConfig";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function MainCategoriesView() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
@@ -19,16 +21,19 @@ function MainCategoriesView() {
   const t = useTranslations();
   return (
     <>
-      <AddCategoryDialog
-        open={Boolean(editingCategoryId)}
-        onClose={() => setEditingCategoryId(null)}
-        categoryId={editingCategoryId || undefined}
-        onSuccess={() => reloadTable()}
-      />
+      <Can check={[PERMISSIONS.ecommerce.category.update]}>
+        <AddCategoryDialog
+          open={Boolean(editingCategoryId)}
+          onClose={() => setEditingCategoryId(null)}
+          categoryId={editingCategoryId || undefined}
+          onSuccess={() => reloadTable()}
+        />
+      </Can>
+
       <TableBuilder
         config={tableConfig}
         searchBarActions={
-          <>
+          <Can check={[PERMISSIONS.ecommerce.category.create]}>
             <DialogTrigger
               component={AddCategoryDialog}
               dialogProps={{ onSuccess: () => reloadTable() }}
@@ -36,7 +41,7 @@ function MainCategoriesView() {
                 <Button onClick={onOpen}>اضافة قسم</Button>
               )}
             />
-          </>
+          </Can>
         }
         tableId={tableConfig.tableId}
       />
