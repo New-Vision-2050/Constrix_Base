@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DesignTypes } from "../constants/design-types-enum";
 
 /**
  * Creates a Zod schema for our-services form validation
@@ -26,66 +27,86 @@ export const createOurServicesFormSchema = (t: (key: string) => string) =>
 
     departments: z
       .array(
-        z.object({
-          id: z.string(),
-          titleAr: z
-            .string({
-              required_error:
-                t("departmentTitleArRequired") || "Arabic title is required",
-            })
-            .min(1, {
-              message:
-                t("departmentTitleArRequired") || "Arabic title is required",
-            })
-            .trim(),
-          titleEn: z
-            .string({
-              required_error:
-                t("departmentTitleEnRequired") || "English title is required",
-            })
-            .min(1, {
-              message:
-                t("departmentTitleEnRequired") || "English title is required",
-            })
-            .trim(),
-          descriptionAr: z
-            .string({
-              required_error:
-                t("departmentDescriptionArRequired") ||
-                "Arabic description is required",
-            })
-            .min(1, {
-              message:
-                t("departmentDescriptionArRequired") ||
-                "Arabic description is required",
-            })
-            .trim(),
-          descriptionEn: z
-            .string({
-              required_error:
-                t("departmentDescriptionEnRequired") ||
-                "English description is required",
-            })
-            .min(1, {
-              message:
-                t("departmentDescriptionEnRequired") ||
-                "English description is required",
-            })
-            .trim(),
-          designType: z
-            .string({
-              required_error:
-                t("designTypeRequired") || "Design type is required",
-            })
-            .min(1, {
-              message: t("designTypeRequired") || "Design type is required",
-            }),
-          services: z
-            .array(z.string())
-            .min(1, {
-              message: t("servicesRequired") || "At least one service is required",
-            }),
-        })
+        z
+          .object({
+            id: z.string(),
+            titleAr: z
+              .string({
+                required_error:
+                  t("departmentTitleArRequired") || "Arabic title is required",
+              })
+              .min(1, {
+                message:
+                  t("departmentTitleArRequired") || "Arabic title is required",
+              })
+              .trim(),
+            titleEn: z
+              .string({
+                required_error:
+                  t("departmentTitleEnRequired") || "English title is required",
+              })
+              .min(1, {
+                message:
+                  t("departmentTitleEnRequired") || "English title is required",
+              })
+              .trim(),
+            descriptionAr: z
+              .string({
+                required_error:
+                  t("departmentDescriptionArRequired") ||
+                  "Arabic description is required",
+              })
+              .min(1, {
+                message:
+                  t("departmentDescriptionArRequired") ||
+                  "Arabic description is required",
+              })
+              .trim(),
+            descriptionEn: z
+              .string({
+                required_error:
+                  t("departmentDescriptionEnRequired") ||
+                  "English description is required",
+              })
+              .min(1, {
+                message:
+                  t("departmentDescriptionEnRequired") ||
+                  "English description is required",
+              })
+              .trim(),
+            designType: z
+              .string({
+                required_error:
+                  t("designTypeRequired") || "Design type is required",
+              })
+              .min(1, {
+                message: t("designTypeRequired") || "Design type is required",
+              }),
+            services: z
+              .array(z.string())
+              .min(1, {
+                message:
+                  t("servicesRequired") || "At least one service is required",
+              }),
+          })
+          .superRefine((department, ctx) => {
+            if (
+              department.designType === DesignTypes.HEXA &&
+              department.services.length < 6
+            ) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.too_small,
+                minimum: 6,
+                type: "array",
+                inclusive: true,
+                exact: false,
+                path: ["services"],
+                message:
+                  t("hexaServicesMinRequired") ||
+                  "At least six services are required for this design type",
+              });
+            }
+          })
       )
       .min(1, {
         message:
