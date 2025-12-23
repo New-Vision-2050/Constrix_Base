@@ -73,9 +73,10 @@ export const useNewsListTableConfig: (
       {
         key: "is_active",
         label: t("status"),
-        render: (value: "active" | "inActive", row: NewsRow) => (
-          <TheStatus theStatus={value} id={row.id} />
-        ),
+        render: (value: "active" | "inActive", row: NewsRow) => {
+          const isActive = row.status == 1 ? true : false;
+          return <TheStatus theStatus={isActive} id={row.id} />
+        },
       },
     ],
     executions: [
