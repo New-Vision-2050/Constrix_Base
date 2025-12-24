@@ -151,7 +151,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
                     <ProjectCard
                         key={icon.id}
                         id={icon.id}
-                        title={icon.name_ar}
+                        title={icon.name}
                         src={icon.icon}
                         description={icon.website_icon_category_type_label}
                         actions={iconActions?.filter((action) => action.show)}
