@@ -66,13 +66,18 @@ export default function SetProjectDialog({
   const isEditMode = !!projectId;
 
   // Fetch project data when editing
-  const { data: projectData, isLoading: isFetching,refetch } = useQuery({
+  const { data: projectData, isLoading: isFetching, refetch } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
       // TODO: Replace with actual API call
       return CompanyDashboardProjectsApi.show(projectId!);
     },
     enabled: isEditMode && open,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    staleTime: Infinity,
   });
 
   const form = useForm<ProjectFormData>({
