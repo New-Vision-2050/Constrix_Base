@@ -134,8 +134,6 @@ export default function SetCategoryDialog({
           shouldValidate: true,
         });
       }
-    } else if (isEditMode) {
-      refetch()
     }
   }, [isEditMode, categoryData, open, setValue]);
 
