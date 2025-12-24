@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import axios from "axios";
 import { baseURL } from "@/config/axios-config";
 import { usePaymentMethodListTableConfig } from "./_config/list-table-config";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 function ListPaymentMethodsView() {
   const t = useTranslations();
@@ -59,7 +61,9 @@ function ListPaymentMethodsView() {
 
   return (
     <>
-      <TableBuilder config={tableConfig} tableId={tableConfig.tableId} />
+      <Can check={[PERMISSIONS.ecommerce.paymentMethod.activate]}>
+        <TableBuilder config={tableConfig} tableId={tableConfig.tableId} />
+      </Can>
     </>
   );
 }

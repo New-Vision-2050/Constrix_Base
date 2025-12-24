@@ -414,84 +414,98 @@ export function AppSidebar({
           ROUTER.PaymentMethods,
         ],
         sub_entities: [
+          // Dashboard
           {
             name: t("Sidebar.HomeStore"),
             url: ROUTER.HomeStore,
             icon: UserIcon,
             isActive: pageName === ROUTER.HomeStore,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.dashboard)),
           },
+          // Products
           {
             name: t("Sidebar.Products"),
             url: ROUTER.Products,
             icon: UserIcon,
             isActive: pageName === ROUTER.Products,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.product)),
           },
-
+          // Requests
           {
             name: t("Sidebar.Requests"),
             url: ROUTER.requests,
             icon: UserIcon,
             isActive: pageName === ROUTER.requests,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.order)),
           },
+          // Categories
           {
             name: t("Sidebar.Categories"),
             url: ROUTER.Categories,
             icon: UserIcon,
             isActive: pageName === ROUTER.Categories,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.category)),
           },
+          // Brands
           {
             name: t("Sidebar.Brands"),
             url: ROUTER.Brands,
             icon: UserIcon,
             isActive: pageName === ROUTER.Brands,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.brand)),
           },
+          // Coupons
           {
             name: t("Sidebar.Coupons"),
             url: ROUTER.Coupons,
             icon: UserIcon,
             isActive: pageName === ROUTER.Coupons,
-            show: true,
+            show: !isCentralCompany && can([
+              PERMISSIONS.ecommerce.coupon.list,
+              PERMISSIONS.ecommerce.featureDeal.list,
+              PERMISSIONS.ecommerce.flashDeal.list,
+              PERMISSIONS.ecommerce.dealDay.list
+            ]),
           },
+          // Warehouse
           {
             name: t("Sidebar.Warehouse"),
             url: ROUTER.warehouse,
             icon: UserIcon,
             isActive: pageName === ROUTER.warehouse,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.warehouse)),
           },
+          // Pages Settings
           {
             name: t("Sidebar.PagesSettings"),
             url: ROUTER.pagesSettings,
             icon: UserIcon,
             isActive: pageName === ROUTER.pagesSettings,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
           },
+          // Terms !!!
           {
             name: t("Sidebar.Terms"),
             url: ROUTER.Terms,
             icon: UserIcon,
             isActive: pageName === ROUTER.Terms,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.page)),
           },
-
+          // Social Media
           {
             name: t("Sidebar.SocialMedia"),
             url: ROUTER.SocialMedia,
             icon: UserIcon,
             isActive: pageName === ROUTER.SocialMedia,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.socialMedia)),
           },
+          // Payment Methods
           {
             name: t("Sidebar.PaymentMethods"),
             url: ROUTER.PaymentMethods,
             icon: UserIcon,
             isActive: pageName === ROUTER.PaymentMethods,
-            show: true,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.paymentMethod)),
           },
         ],
       },

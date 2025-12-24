@@ -1,3 +1,5 @@
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 import BrandsView from "@/modules/stores/brands";
 import { Metadata } from "next";
 
@@ -10,4 +12,4 @@ function ListBrandsPage() {
   return <BrandsView />;
 }
 
-export default ListBrandsPage;
+export default withServerPermissionsPage(ListBrandsPage, [Object.values(PERMISSIONS.ecommerce.brand)]);
