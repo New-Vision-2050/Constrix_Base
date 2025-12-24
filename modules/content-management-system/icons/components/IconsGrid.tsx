@@ -153,6 +153,7 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
                         id={icon.id}
                         title={icon.name_ar}
                         src={icon.icon}
+                        description={icon.website_icon_category_type_label}
                         actions={iconActions?.filter((action) => action.show)}
                     />
                 );
