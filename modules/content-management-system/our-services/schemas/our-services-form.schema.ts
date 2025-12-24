@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { DesignTypes } from "../constants/design-types-enum";
 
 /**
  * Creates a Zod schema for our-services form validation
@@ -88,24 +87,6 @@ export const createOurServicesFormSchema = (t: (key: string) => string) =>
                 message:
                   t("servicesRequired") || "At least one service is required",
               }),
-          })
-          .superRefine((department, ctx) => {
-            if (
-              department.designType === DesignTypes.HEXA &&
-              department.services.length < 6
-            ) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.too_small,
-                minimum: 6,
-                type: "array",
-                inclusive: true,
-                exact: false,
-                path: ["services"],
-                message:
-                  t("hexaServicesMinRequired") ||
-                  "At least six services are required for this design type",
-              });
-            }
           })
       )
       .min(1, {
