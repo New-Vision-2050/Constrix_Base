@@ -38,7 +38,7 @@ export default function PreviousWorksList({
     <div className="space-y-6 bg-sidebar p-6 rounded-xl">
       {previousWorks.map((work, index) => (
         <PreviousWorkSection
-          key={work.id}
+          key={`${work.id}-${index}-${work.description}`}
           control={control}
           previousWorkIndex={index}
           isSubmitting={isSubmitting}

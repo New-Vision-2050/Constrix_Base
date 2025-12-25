@@ -3,7 +3,6 @@ import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import TheStatus from "../components/the-status";
 import { ServiceRow, TableConfigParams } from "../types";
-import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
 import { baseURL } from "@/config/axios-config";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -64,13 +63,11 @@ export const useServiceListTableConfig: (
         </DropdownMenuItem>
       ),
     ],
+    searchParamName: "search",
     executionConfig: {
       canDelete: can(PERMISSIONS.CMS.services.delete),
-      onDelete: async (id: string) => {
-        await CompanyDashboardServicesApi.delete(id);
-      },
     },
-    searchParamName: "search",
+    deleteUrl: `${baseURL}/website-services`,
     defaultPageSize: 10,
     pageSizeOptions: [10, 20, 50],
   };

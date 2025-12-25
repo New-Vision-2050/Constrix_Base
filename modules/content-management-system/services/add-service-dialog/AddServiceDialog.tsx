@@ -123,30 +123,70 @@ export default function AddServiceDialog({
     if (isEditMode && serviceData?.payload) {
       const service = serviceData.payload;
 
+      // Handle icon - can be direct URL string or nested object
+      const iconUrl =
+        typeof service.icon === "string"
+          ? service.icon
+          : service.icon_image?.url || null;
+
+      // Handle main_image - can be direct URL string or nested object
+      const mainImageUrl =
+        typeof service.main_image === "string"
+          ? service.main_image
+          : typeof service.main_image === "object" && service.main_image?.url
+          ? service.main_image.url
+          : null;
+
+      // Handle category_id - can be category_id or category_website_cms_id
+      const categoryId =
+        service.category_website_cms_id?.toString() ||
+        service.category_id?.toString() ||
+        "";
+
+      // Handle status - can be boolean or number (1/0)
+      const statusValue =
+        typeof service.status === "number"
+          ? service.status === 1
+          : service.status || false;
+
+      // Handle previous_works - API might return previous_work (singular) or previous_works (plural)
+      const previousWorksData =
+        service.previous_works || service.previous_work || [];
+
       reset({
         name_ar: service.name_ar || "",
         name_en: service.name_en || "",
-        request_id: service.request_id || "",
-        category_id: service.category_id?.toString() || "",
+        request_id: service.request_id || service.reference_number || "",
+        category_id: categoryId,
         description_ar: service.description_ar || "",
         description_en: service.description_en || "",
-        status: service.status || false,
-        icon_image: service.icon_image?.url || null,
-        main_image: service.main_image?.url || null,
+        status: statusValue,
+        icon_image: iconUrl,
+        main_image: mainImageUrl,
         previous_works:
-          service.previous_works?.map(
+          previousWorksData.map(
             (
               work: {
                 id: string;
                 description: string;
-                image?: { url?: string };
+                image?: string | { url?: string };
               },
               index: number
-            ) => ({
-              id: work.id || `${index + 1}`,
-              description: work.description || "",
-              image: (work.image?.url || null) as File | string | null,
-            })
+            ) => {
+              // Handle previous work image - can be direct URL string or nested object
+              const workImageUrl =
+                typeof work.image === "string"
+                  ? work.image
+                  : typeof work.image === "object" && work.image?.url
+                  ? work.image.url
+                  : null;
+
+              return {
+                id: work.id || `${index + 1}`,
+                description: work.description || "",
+                image: workImageUrl as File | string | null,
+              };
+            }
           ) || [],
       });
     }
@@ -182,11 +222,8 @@ export default function AddServiceDialog({
             description: work.description,
             image: work.image instanceof File ? work.image : null,
           })) || [],
+        reference_number: data.request_id,
       };
-
-      if (data.request_id) {
-        params.reference_number = data.request_id;
-      }
 
       if (isEditMode && serviceId) {
         await CompanyDashboardServicesApi.update(serviceId, params);
@@ -286,6 +323,8 @@ export default function AddServiceDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
+                              : typeof serviceData?.payload?.icon === "string"
+                              ? serviceData.payload.icon
                               : serviceData?.payload?.icon_image?.url
                           }
                           minHeight="200px"
@@ -314,7 +353,14 @@ export default function AddServiceDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : serviceData?.payload?.main_image?.url
+                              : typeof serviceData?.payload?.main_image ===
+                                "string"
+                              ? serviceData.payload.main_image
+                              : typeof serviceData?.payload?.main_image ===
+                                  "object" &&
+                                serviceData.payload.main_image?.url
+                              ? serviceData.payload.main_image.url
+                              : null
                           }
                           minHeight="200px"
                         />
@@ -493,7 +539,37 @@ export default function AddServiceDialog({
               isSubmitting={isSubmitting || isFetching}
               onAdd={addPreviousWork}
               onRemove={removePreviousWork}
-              initialPreviousWorks={serviceData?.payload?.previous_works}
+              initialPreviousWorks={
+                isEditMode && serviceData?.payload
+                  ? ((
+                      (serviceData.payload.previous_works ||
+                        serviceData.payload.previous_work ||
+                        []) as Array<{
+                        id: string;
+                        description: string;
+                        image?: string | { url?: string };
+                      }>
+                    ).map((work) => {
+                      // Handle image - can be direct URL string or nested object
+                      const imageUrl =
+                        typeof work.image === "string"
+                          ? work.image
+                          : typeof work.image === "object" && work.image?.url
+                          ? work.image.url
+                          : undefined;
+
+                      return {
+                        id: work.id,
+                        description: work.description,
+                        image: imageUrl ? { url: imageUrl } : undefined,
+                      };
+                    }) as Array<{
+                      id: string;
+                      description: string;
+                      image?: { url?: string };
+                    }>)
+                  : []
+              }
             />
 
             {/* Submit Button */}

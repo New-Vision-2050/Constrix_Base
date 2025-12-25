@@ -26,7 +26,6 @@ export const CompanyDashboardServicesApi = {
         booleansAsIntegers: true,
       })
     ),
-  delete: (id: string) => baseApi.delete(`website-services/${id}`),
   status: (id: string, params: { status: number }) =>
     baseApi.put(`website-services/${id}/status`, params),
 };

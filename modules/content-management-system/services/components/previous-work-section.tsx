@@ -55,25 +55,31 @@ export default function PreviousWorkSection({
           <FormField
             control={control}
             name={`previous_works.${previousWorkIndex}.image`}
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <ImageUpload
-                    label={tForm("previousWorkImage")}
-                    maxSize={tForm("imageMaxSize")}
-                    dimensions={tForm("imageDimensions")}
-                    onChange={(file) => field.onChange(file)}
-                    initialValue={
-                      typeof field.value === "string"
-                        ? field.value
-                        : initialImageUrl
-                    }
-                    minHeight="100px"
-                  />
-                </FormControl>
-                <FormErrorMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              // Determine the image URL to display
+              // Priority: field.value (string) > initialImageUrl > undefined
+              const displayImageUrl =
+                (typeof field.value === "string" && field.value) ||
+                initialImageUrl ||
+                undefined;
+
+              return (
+                <FormItem>
+                  <FormControl>
+                    <ImageUpload
+                      key={`image-${previousWorkIndex}-${displayImageUrl}`}
+                      label={tForm("previousWorkImage")}
+                      maxSize={tForm("imageMaxSize")}
+                      dimensions={tForm("imageDimensions")}
+                      onChange={(file) => field.onChange(file)}
+                      initialValue={displayImageUrl}
+                      minHeight="100px"
+                    />
+                  </FormControl>
+                  <FormErrorMessage />
+                </FormItem>
+              );
+            }}
           />
         </div>
         {/* Description - 9 columns */}

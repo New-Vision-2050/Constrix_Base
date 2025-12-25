@@ -16,23 +16,39 @@ export interface Service {
   id: string;
   name_ar: string;
   name_en: string;
-  request_id: string;
-  category_id: string;
+  request_id?: string;
+  reference_number?: string;
+  category_id?: string;
+  category_website_cms_id?: string;
   description_ar: string;
   description_en: string;
-  status: boolean;
+  status: boolean | number;
+  icon?: string;
   icon_image?: {
     url?: string;
   };
-  main_image?: {
-    url?: string;
-  };
+  main_image?:
+    | string
+    | {
+        url?: string;
+      };
   previous_works?: Array<{
     id: string;
     description: string;
-    image?: {
-      url?: string;
-    };
+    image?:
+      | string
+      | {
+          url?: string;
+        };
+  }>;
+  previous_work?: Array<{
+    id: string;
+    description: string;
+    image?:
+      | string
+      | {
+          url?: string;
+        };
   }>;
 }
 
