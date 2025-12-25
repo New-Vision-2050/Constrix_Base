@@ -82,7 +82,7 @@ export default function AddServiceDialog({
     })) || [];
 
   // Fetch service data when editing
-  const { data: serviceData, isLoading: isFetching } =
+  const { data: serviceData, isLoading: isFetching, refetch } =
     useQuery<ShowServiceResponse>({
       queryKey: ["service", serviceId],
       queryFn: async () => {
@@ -90,6 +90,11 @@ export default function AddServiceDialog({
         return response.data;
       },
       enabled: isEditMode && open && !!serviceId,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      staleTime: Infinity,
     });
 
   const form = useForm({
@@ -126,26 +131,26 @@ export default function AddServiceDialog({
       reset({
         name_ar: service.name_ar || "",
         name_en: service.name_en || "",
-        request_id: service.request_id || "",
-        category_id: service.category_id?.toString() || "",
+        request_id: service.reference_number || "",
+        category_id: service.category_website_cms_id?.toString() || "",
         description_ar: service.description_ar || "",
         description_en: service.description_en || "",
-        status: service.status || false,
-        icon_image: service.icon_image?.url || null,
-        main_image: service.main_image?.url || null,
+        status: service.status == 1,
+        icon_image: service.icon || null,
+        main_image: service.main_image || null,
         previous_works:
-          service.previous_works?.map(
+          service.previous_work?.map(
             (
               work: {
                 id: string;
                 description: string;
-                image?: { url?: string };
+                image?: string;
               },
               index: number
             ) => ({
               id: work.id || `${index + 1}`,
               description: work.description || "",
-              image: (work.image?.url || null) as File | string | null,
+              image: (work.image || null) as File | string | null,
             })
           ) || [],
       });
@@ -197,8 +202,9 @@ export default function AddServiceDialog({
       toast.success(
         isEditMode ? tForm("updateSuccess") : tForm("createSuccess")
       );
+      refetch();
       onSuccess?.();
-      reset();
+      reset({});
       onClose();
     } catch (error) {
       console.error(
@@ -286,7 +292,7 @@ export default function AddServiceDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : serviceData?.payload?.icon_image?.url
+                              : serviceData?.payload?.icon
                           }
                           minHeight="200px"
                         />
@@ -314,7 +320,7 @@ export default function AddServiceDialog({
                           initialValue={
                             typeof field.value === "string"
                               ? field.value
-                              : serviceData?.payload?.main_image?.url
+                              : serviceData?.payload?.main_image
                           }
                           minHeight="200px"
                         />
@@ -493,7 +499,11 @@ export default function AddServiceDialog({
               isSubmitting={isSubmitting || isFetching}
               onAdd={addPreviousWork}
               onRemove={removePreviousWork}
-              initialPreviousWorks={serviceData?.payload?.previous_works}
+              initialPreviousWorks={serviceData?.payload?.previous_work?.map((work) => ({
+                id: work.id,
+                description: work.description,
+                image: work.image ? { url: work.image } : undefined,
+              }))}
             />
 
             {/* Submit Button */}
