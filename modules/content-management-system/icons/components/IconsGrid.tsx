@@ -141,8 +141,19 @@ export default function IconsGrid({
 
   if (icons.length === 0 && !isLoading) {
     return (
-      <div className="w-full flex items-center justify-center py-20">
-        <p className="text-gray-400 text-center text-lg">{t("noIconsFound")}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {icons.map((icon) => {
+          return (
+            <ProjectCard
+              key={icon.id}
+              id={icon.id}
+              title={icon.name}
+              src={icon.icon}
+              description={icon.website_icon_category_type_label}
+              actions={iconActions?.filter((action) => action.show)}
+            />
+          );
+        })}
       </div>
     );
   }

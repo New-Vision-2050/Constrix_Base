@@ -12,6 +12,7 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   sortBy: _m("Sort by", "ترتيب"),
   projectType: _m("Project Type", "نوع المشروع"),
   allTypes: _m("All Types", "كل الأنواع"),
+  CategoryType: _m("Category", "الفئة"),
   all: _m("All", "كل"),
   name: _m("Name", "الاسم"),
   createdAt: _m("Created At", "تاريخ الإنشاء"),

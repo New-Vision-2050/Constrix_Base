@@ -3,10 +3,17 @@ import { ListIconsResponse, ShowIconResponse } from "./types/response";
 import { CreateIconParams, UpdateIconParams } from "./types/params";
 import { serialize } from "object-to-formdata";
 
+type ListIconsParams = {
+  search?: string;
+  categoryType?: string;
+}
 export const CompanyDashboardIconsApi = {
-  list: (params?: { search?: string }) =>
+  list: (params?: ListIconsParams) =>
     baseApi.get<ListIconsResponse>("website-icons", {
-      params,
+      params: {
+        name: Boolean(params?.search) ? params?.search : undefined,
+        website_icon_category_type: Boolean(params?.categoryType) ? params?.categoryType : undefined
+      },
     }),
   show: (id: string) =>
     baseApi.get<ShowIconResponse>(`website-icons/${id}`),
@@ -16,7 +23,7 @@ export const CompanyDashboardIconsApi = {
   },
   update: (id: string, body: UpdateIconParams) => {
     return baseApi.post(`website-icons/${id}`, serialize(body), {
-      params:{
+      params: {
         _method: "PUT",
       }
     });
