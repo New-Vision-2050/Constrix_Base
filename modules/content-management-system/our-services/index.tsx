@@ -103,8 +103,8 @@ export default function OurServicesModule({ initialData }: { initialData: OurSer
           title_en: department.titleEn,
           description_ar: department.descriptionAr,
           description_en: department.descriptionEn,
-          // type: department.designType,//until later API which return design types merged
-          type: "cards",//until later API which return design types merged
+          type: department.designType,//until later API which return design types merged
+          // type: "cards",//until later API which return design types merged
           website_service_ids: department.services,
         }))
       };
