@@ -11,6 +11,7 @@ export interface UpdateAboutProjectTypeParams {
  * Attachment parameters for About Us update
  */
 export interface UpdateAboutAttachmentParams {
+  id?: string;
   name: string;
   file?: File;
 }
