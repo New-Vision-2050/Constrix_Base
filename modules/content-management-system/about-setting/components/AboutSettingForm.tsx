@@ -42,7 +42,6 @@ export default function AboutSettingForm({ initialData }: { initialData: AboutUs
     const [mainImageUrl, setMainImageUrl] = React.useState<string | undefined>(undefined);
     const [attachmentUrls, setAttachmentUrls] = React.useState<(string | null)[]>([]);
 
-    console.log('initialData101', initialData);
     const form = useForm<AboutSettingFormData>({
         resolver: zodResolver(createAboutSettingFormSchema(t)),
         defaultValues: getDefaultAboutSettingFormValues(),
@@ -100,6 +99,7 @@ export default function AboutSettingForm({ initialData }: { initialData: AboutUs
         try {
             // TODO: Replace with actual API call
             let body = convertFormDataToApiParams(data);
+            
             await CompanyDashboardAboutApi.updateCurrent(body);
             toast.success(t("updateSuccess") || "Settings updated successfully!");
         } catch (error: unknown) {
