@@ -33,9 +33,9 @@ function CMSIconsModule() {
         }),
     });
 
-    const OnDeleteIcon = (id: string) => {
+    const OnDeleteIcon = async (id: string) => {
         try {
-            CompanyDashboardIconsApi.delete(id);
+            await CompanyDashboardIconsApi.delete(id);
             refetch();
         } catch (error) {
             console.error(error);
