@@ -6,6 +6,8 @@ import { EditIcon, TrashIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
+import { useState } from "react";
 
 type PropsT = {
     OnEdit: (id: string) => void;
@@ -108,6 +110,21 @@ type ShowableMenuItem = MenuItem & { show: boolean };
 export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT) {
     const { can } = usePermissions();
     const t = useTranslations("content-management-system.icons");
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [iconIdToDelete, setIconIdToDelete] = useState<string | null>(null);
+
+    const handleCancel = () => { 
+        setOpenDeleteDialog(false);
+        setIconIdToDelete(null);
+    }
+
+    const handleDeleteMedia = async (activationDate: string) => {
+        if (iconIdToDelete) {
+            OnDelete(iconIdToDelete);
+            setOpenDeleteDialog(false);
+            setIconIdToDelete(null);
+        }
+    }
 
     const iconActions: ShowableMenuItem[] = [
         {
@@ -124,7 +141,8 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
             icon: <TrashIcon className="w-4 h-4" />,
             disabled: true,
             action: (row: { id: string }) => {
-                OnDelete(row.id);
+                setIconIdToDelete(row.id);
+                setOpenDeleteDialog(true);
             },
             show: can(PERMISSIONS.CMS.icons.delete),
         },
@@ -158,6 +176,13 @@ export default function IconsGrid({ OnEdit, OnDelete, icons, isLoading }: PropsT
                     />
                 );
             })}
+            <ConfirmationDialog
+                open={openDeleteDialog}
+                onClose={handleCancel}
+                onConfirm={handleDeleteMedia}
+                description={t('confirmDeleteMessage')}
+                showDatePicker={false}
+            />
         </div>
     );
 }
