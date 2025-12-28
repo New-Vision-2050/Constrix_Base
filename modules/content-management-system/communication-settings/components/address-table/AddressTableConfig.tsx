@@ -28,8 +28,8 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
                 sortable: true
             },
             {
-                key: "city.name",
-                label: t("city") || "City",
+                key: "address",
+                label: t("address") || "City",
                 sortable: true
             },
             {
