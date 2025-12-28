@@ -66,9 +66,10 @@ export const useFounderListTableConfig: (
       {
         key: "is_active",
         label: t("status"),
-        render: (value: "active" | "inActive", row: FounderRow) => (
-          <TheStatus theStatus={value} id={row.id} />
-        ),
+        render: (value: "active" | "inActive", row: FounderRow) => {
+          const isActive = row.status == 1 ? true : false;
+          return <TheStatus theStatus={isActive} id={row.id} />
+        },
       },
     ],
     executions: [

@@ -15,11 +15,11 @@ const TheStatus = ({
   theStatus,
   id,
 }: {
-  theStatus: "active" | "inActive";
+  theStatus: boolean;
   id: string;
 }) => {
   const t = useTranslations("content-management-system.founder");
-  const [isActive, setIsActive] = useState(!!theStatus);
+  const [isActive, setIsActive] = useState(theStatus);
   const [showDialog, setShowDialog] = useState(false);
   const [tempIsActive, setTempIsActive] = useState(isActive);
   const { toast } = useToast();
