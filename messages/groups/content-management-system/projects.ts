@@ -7,6 +7,9 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
   deleteProject: _m("Delete Project", "حذف المشروع"),
   editProject: _m("Edit Project", "تعديل المشروع"),
   deleteSuccess: _m("Project deleted successfully!", "تم حذف المشروع بنجاح!"),
+  // sort options
+  asc: _m("Ascending", "تصاعدي"),
+  desc: _m("Descending", "تنازلي"),
   // Search and filters
   searchPlaceholder: _m("Search", "بحث"),
   sortBy: _m("Sort by", "ترتيب"),

@@ -26,10 +26,11 @@ function CMSIconsModule() {
     }
     // fetch icons use query
     const { data: iconsData, isLoading, refetch } = useQuery({
-        queryKey: ["company-dashboard-icons", search, categoryType],
+        queryKey: ["company-dashboard-icons", search, categoryType, sortBy],
         queryFn: () => CompanyDashboardIconsApi.list({
             search,
-            categoryType
+            categoryType,
+            sortBy
         }),
     });
 
