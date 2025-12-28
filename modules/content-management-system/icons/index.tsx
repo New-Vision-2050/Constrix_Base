@@ -75,16 +75,19 @@ function CMSIconsModule() {
                 }
             />
             <IconsGrid OnDelete={OnDeleteIcon} icons={iconsData?.data?.payload || []} isLoading={isLoading} OnEdit={OnEditIcon} />
-            {/* MUI Pagination - supports RTL automatically */}
-            <Stack direction="row" justifyContent="center" mt={3}>
-                <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(_, newPage) => setPage(newPage)}
-                    color="primary"
-                    shape="rounded"
-                />
-            </Stack>
+            {/* Pagination */}
+            {
+                totalPages > 1 && <Stack direction="row" justifyContent="center" mt={3}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(_, newPage) => setPage(newPage)}
+                        color="primary"
+                        shape="rounded"
+                    />
+                </Stack>
+            }
+
         </Can>
         <Can check={[PERMISSIONS.CMS.icons.update]}>
             <SetIconDialog
