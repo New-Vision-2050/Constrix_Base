@@ -392,6 +392,7 @@ export default function AddNewsDialog({
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
                         className="mt-1"
+                        min={new Date().toISOString().split("T")[0]}
                         {...field}
                       />
                     </FormControl>
@@ -414,6 +415,7 @@ export default function AddNewsDialog({
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
                         className="mt-1"
+                        min={new Date().toISOString().split("T")[0]}
                         {...field}
                       />
                     </FormControl>
