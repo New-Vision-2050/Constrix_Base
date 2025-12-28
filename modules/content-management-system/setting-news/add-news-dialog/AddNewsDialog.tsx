@@ -405,7 +405,7 @@ export default function AddNewsDialog({
                 name="end_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs" required>
+                    <FormLabel className="text-xs">
                       {t("form.endDate")}
                     </FormLabel>
                     <FormControl>
