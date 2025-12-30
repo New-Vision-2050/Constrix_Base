@@ -74,10 +74,8 @@ export default function DeleteSpecificRowDialog(props: PropsT) {
           },
         }
       );
-      console.log('Breakpoint101');
       handleRefreshWidgetsData?.();
       toast.success(t2("deleteSuccess"));
-      console.log('Breakpoint102');
       formWithTableReload.reloadTable();
       onClose();
     } catch (error) {

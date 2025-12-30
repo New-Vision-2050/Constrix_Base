@@ -15,6 +15,7 @@ export default function CreateBrokerCompanyForm({
 }) {
   const t = useTranslations("BrokersModule");
   const {
+    tableId,
     branchId: currentEmpBranchId,
     userId: currentEmpId,
     closeCreateBrokerSheet,
@@ -23,7 +24,7 @@ export default function CreateBrokerCompanyForm({
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable("brokers-table");
+    tableStore.reloadTable(tableId ?? "brokers-table");
     handleRefreshWidgetsData?.();
     closeCreateBrokerSheet();
   };

@@ -34,7 +34,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   // shared settings
   const { data: sharedSettings } = useCRMSharedSetting();
   // toggle refetch
-  const [toggleRefetch, setToggleRefetch] = useState(false);
+  const [toggleRefetch, setToggleRefetch] = useState(0);
   // is share client
   const isShareClient = sharedSettings?.is_share_client == "1";
   // is share broker
@@ -58,7 +58,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
 
   // handle refresh widgets data
   const handleRefreshWidgetsData = () => {
-    setToggleRefetch(!toggleRefetch);
+    setToggleRefetch(prev => ++prev);
   };
 
   const usersConfig = UsersConfigV2({

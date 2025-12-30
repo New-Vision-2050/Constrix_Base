@@ -141,9 +141,9 @@ export default function ImageUpload({
             </>
           ) : uploadId ? (
             <>
-              <Upload className="w-12 h-12 text-gray-500 mb-3" />
-              <p className="text-gray-500 text-sm mb-1">{maxSize}</p>
-              <p className="text-gray-500 text-xs mb-4">{dimensions}</p>
+              <Upload className="w-12 h-12  mb-3" />
+              <p className=" text-sm mb-1">{maxSize}</p>
+              <p className=" text-xs mb-4">{dimensions}</p>
               <label htmlFor={uploadId}>
                 <Button
                   type="button"
@@ -228,7 +228,7 @@ export default function ImageUpload({
                       />
                     ) : (
                       <div className="w-16 h-16 flex items-center justify-center rounded bg-[#1a1a2e]">
-                        <Upload className="w-6 h-6 text-gray-400" />
+                        <Upload className="w-6 h-6 " />
                       </div>
                     )}
                   </div>
@@ -264,8 +264,8 @@ export default function ImageUpload({
                   }}
                   onClick={() => document.getElementById(uploadId)?.click()}
                 >
-                  <Upload className="w-5 h-5 text-gray-400" />
-                  <p className="text-gray-400 text-sm">إضافة المزيد من الملفات</p>
+                  <Upload className="w-5 h-5 " />
+                  <p className=" text-sm">إضافة المزيد من الملفات</p>
                   <input
                     id={uploadId}
                     type="file"
@@ -290,8 +290,8 @@ export default function ImageUpload({
               }}
               onClick={() => document.getElementById(uploadId)?.click()}
             >
-              <Upload className="w-12 h-12 text-gray-400 mb-3" />
-              <p className="text-gray-400 text-sm mb-1">{maxSize}</p>
+              <Upload className="w-12 h-12  mb-3" />
+              <p className=" text-sm mb-1">{maxSize}</p>
               <p className="text-gray-500 text-xs mb-4">{dimensions}</p>
               <Button
                 type="button"

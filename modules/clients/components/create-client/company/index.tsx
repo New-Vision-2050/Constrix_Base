@@ -14,6 +14,7 @@ export default function CreateClientCompanyForm({
 }) {
   const t = useTranslations("ClientsModule");
   const {
+    tableId,
     branchId: currentEmpBranchId,
     userId: currentEmpId,
     closeCreateClientSheet,
@@ -23,7 +24,7 @@ export default function CreateClientCompanyForm({
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable("clients-table");
+    tableStore.reloadTable(tableId ?? "clients-table");
     handleRefreshWidgetsData?.();
     closeCreateClientSheet();
   };
