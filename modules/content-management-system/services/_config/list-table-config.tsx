@@ -3,7 +3,6 @@ import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import TheStatus from "../components/the-status";
 import { ServiceRow, TableConfigParams } from "../types";
-import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
 import { baseURL } from "@/config/axios-config";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
