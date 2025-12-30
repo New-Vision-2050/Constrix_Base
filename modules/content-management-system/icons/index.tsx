@@ -4,7 +4,7 @@ import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import IconsGrid from "./components/IconsGrid";
 import DialogTrigger from "@/components/headless/dialog-trigger";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SetIconDialog from "./components/SetIconDialog";
 import { useQuery } from "@tanstack/react-query";
 import { CompanyDashboardIconsApi } from "@/services/api/company-dashboard/icons";
@@ -12,6 +12,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import IconsSearchBar from "./components/IconsSearchBar";
+import { Pagination, Stack } from "@mui/material";
 
 function CMSIconsModule() {
     const t = useTranslations("content-management-system.icons");
@@ -20,19 +21,25 @@ function CMSIconsModule() {
     const [search, setSearch] = useState("");
     const [categoryType, setCategoryType] = useState("");
     const [sortBy, setSortBy] = useState("");
+    // pagenation
+    const [page, setPage] = useState(1);
 
     const OnEditIcon = (id: string) => {
         setEditingIconId(id);
     }
     // fetch icons use query
     const { data: iconsData, isLoading, refetch } = useQuery({
-        queryKey: ["company-dashboard-icons", search, categoryType, sortBy],
+        queryKey: ["company-dashboard-icons", search, categoryType, page, sortBy],
         queryFn: () => CompanyDashboardIconsApi.list({
+            page,
             search,
             categoryType,
             sortBy
         }),
     });
+
+
+    const totalPages = useMemo(() => iconsData?.data?.pagination?.last_page || 1, [iconsData]);
 
     const OnDeleteIcon = async (id: string) => {
         try {
@@ -69,6 +76,19 @@ function CMSIconsModule() {
                 }
             />
             <IconsGrid OnDelete={OnDeleteIcon} icons={iconsData?.data?.payload || []} isLoading={isLoading} OnEdit={OnEditIcon} />
+            {/* Pagination */}
+            {
+                totalPages > 1 && <Stack direction="row" justifyContent="center" mt={3}>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(_, newPage) => setPage(newPage)}
+                        color="primary"
+                        shape="rounded"
+                    />
+                </Stack>
+            }
+
         </Can>
         <Can check={[PERMISSIONS.CMS.icons.update]}>
             <SetIconDialog

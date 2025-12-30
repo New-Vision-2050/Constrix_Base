@@ -32,7 +32,13 @@ const CompanyLogo = ({
         ) : (
           <>
             {logo ? (
-              <Image src={logo} alt="company-logo" width={180} height={90} />
+              <Image
+                src={logo}
+                alt="company-logo"
+                width={180}
+                height={100}
+                className="object-contain w-full h-full"
+              />
             ) : (
               <div className="w-full h-full bg-foreground flex flex-col items-center justify-center cursor-pointer">
                 <Camera className="w-6 h-6 text-background mb-2" />
