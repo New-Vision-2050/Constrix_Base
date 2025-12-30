@@ -1,7 +1,7 @@
 import { ApiBaseResponse } from "@/types/common/response/base";
 import { ApiPaginatedResponse } from "@/types/common/response/paginated";
 
-export interface ServiceListItem {
+export interface BE_ServiceListItem {
   id: string;
   name_ar?: string;
   name_en?: string;
@@ -12,7 +12,7 @@ export interface ServiceListItem {
   is_active?: "active" | "inActive";
 }
 
-export interface Service {
+export interface BE_Service {
   id: string;
   name?: string;
   name_ar: string;
@@ -42,6 +42,6 @@ export interface Service {
 }
 
 export interface ListServicesResponse
-  extends ApiPaginatedResponse<ServiceListItem[]> {}
+  extends ApiPaginatedResponse<BE_ServiceListItem[]> { }
 
-export interface ShowServiceResponse extends ApiBaseResponse<Service> {}
+export interface ShowServiceResponse extends ApiBaseResponse<BE_Service> { }
