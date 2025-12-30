@@ -5,6 +5,7 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { CMSAddress } from "../../types/cms-address";
 import { baseURL } from "@/config/axios-config";
+import { truncateString } from "@/utils/truncate-string";
 
 export interface AddressRow extends CMSAddress { }
 
@@ -24,13 +25,16 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
         columns: [
             {
                 key: "title",
-                label: t("address") || "Address",
+                label: t("name") || "Address",
                 sortable: true
             },
             {
-                key: "city.name",
-                label: t("city") || "City",
-                sortable: true
+                key: "address",
+                label: t("address") || "City",
+                sortable: true,
+                render(value, row) {
+                    return <p>{truncateString(value ?? '-', 30)}</p>
+                },
             },
             {
                 key: "latitude",
@@ -45,9 +49,9 @@ export const useAddressListTableConfig: (params?: Params) => TableConfig = (
         ],
         executions: [
             (row) => (
-                <DropdownMenuItem 
-                 //disabled={!can(PERMISSIONS.CMS.communicationSettings.addresses.update)}
-                 onSelect={() => params?.onEdit?.(row.id)}>
+                <DropdownMenuItem
+                    //disabled={!can(PERMISSIONS.CMS.communicationSettings.addresses.update)}
+                    onSelect={() => params?.onEdit?.(row.id)}>
                     {t("edit") || "Edit"}
                 </DropdownMenuItem>
             ),

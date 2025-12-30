@@ -32,7 +32,7 @@ export const useProjectsTypesListTableConfig: (
         sortable: true,
       },
       {
-        key: "projects_count",
+        key: "website_projects_count",
         label: t("projectsCount") || "عدد المشاريع",
         sortable: true,
         render: (value: number) => (
