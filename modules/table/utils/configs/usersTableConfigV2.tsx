@@ -59,7 +59,6 @@ export const UsersConfigV2 = (options?: {
   handleRefreshWidgetsData?: () => void;
   tableId?: string
 }) => {
-  console.log('options909options', options)
   const router = useRouter();
   const t = useTranslations("Companies");
   const tSubTable = useTranslations("Companies.SubEntitiesTable");
