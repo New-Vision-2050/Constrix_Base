@@ -12,7 +12,7 @@ export default function FormLabel({
   htmlFor,
   children,
   required = false,
-  className = "text-gray-400 text-sm mb-2 block",
+  className = "text-gray-500 text-sm mb-2 block",
 }: FormLabelProps) {
   return (
     <Label htmlFor={htmlFor} className={className}>

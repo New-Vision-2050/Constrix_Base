@@ -141,8 +141,8 @@ export default function ImageUpload({
             </>
           ) : uploadId ? (
             <>
-              <Upload className="w-12 h-12 text-gray-400 mb-3" />
-              <p className="text-gray-400 text-sm mb-1">{maxSize}</p>
+              <Upload className="w-12 h-12 text-gray-500 mb-3" />
+              <p className="text-gray-500 text-sm mb-1">{maxSize}</p>
               <p className="text-gray-500 text-xs mb-4">{dimensions}</p>
               <label htmlFor={uploadId}>
                 <Button
