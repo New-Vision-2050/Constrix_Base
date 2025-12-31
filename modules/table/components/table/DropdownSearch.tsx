@@ -6,6 +6,8 @@ import ComboBoxDropdown from "./dropdowns/ComboBoxDropdown";
 import { DynamicDropdownConfig } from "@/modules/form-builder/types/formTypes";
 import { useToast } from "@/modules/table/hooks/use-toast";
 import PaginatedDropdown from "./dropdowns/PaginatedDropdown";
+import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface DropdownSearchProps {
   columnKey: string;
@@ -31,6 +33,7 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
   isMulti = false,
   isDisabled = undefined,
 }) => {
+  const t = useTranslations();
   const { toast } = useToast();
 
   const [previousDependencyValues, setPreviousDependencyValues] = useState<
@@ -51,11 +54,11 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     error,
     refresh,
   } = dynamicConfig && !dynamicConfig.paginationEnabled
-    ? useDynamicOptions({
+      ? useDynamicOptions({
         dynamicConfig,
         dependencies,
       })
-    : { options: [], loading: false, error: null, refresh: () => {} };
+      : { options: [], loading: false, error: null, refresh: () => { } };
 
   // Handle dependency changes to clear child values - this effect runs only when dependencies change
   useEffect(() => {
@@ -174,8 +177,8 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     (newValue: string | string[]) => {
       const isEqual = isMulti
         ? Array.isArray(value) &&
-          Array.isArray(newValue) &&
-          JSON.stringify(value) === JSON.stringify(newValue)
+        Array.isArray(newValue) &&
+        JSON.stringify(value) === JSON.stringify(newValue)
         : newValue === value;
 
       if (!isEqual) {
@@ -219,11 +222,18 @@ const DropdownSearch: React.FC<DropdownSearchProps> = ({
     ? Array.isArray(value)
       ? value
       : value
-      ? [value]
-      : []
+        ? [value]
+        : []
     : Array.isArray(value) && value.length > 0
-    ? value[0]
-    : value || "";
+      ? value[0]
+      : value || "";
+
+  if (loading && Boolean(value)) {
+    return <div className="flex text-center text-sm">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      {t("Main.Loading")}
+    </div>
+  }
 
   // If we're using the paginated dropdown with search
   if (dynamicConfig?.paginationEnabled) {
