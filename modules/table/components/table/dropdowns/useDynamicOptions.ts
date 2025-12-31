@@ -26,7 +26,7 @@ export const useDynamicOptions = ({
   dependencies,
 }: UseDynamicOptionsProps): UseDynamicOptionsResult => {
   const [options, setOptions] = useState<DropdownOption[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const previousDependenciesRef = useRef<Record<string, string | string[]>>({});
@@ -245,7 +245,7 @@ export const useDynamicOptions = ({
       dependencies
     );
 
-    if ( url == null || url === urlRef.current && !shouldRefetch) {
+    if (url == null || url === urlRef.current && !shouldRefetch) {
       setLoading(false);
       processingFetchRef.current = false;
       return;
@@ -272,11 +272,11 @@ export const useDynamicOptions = ({
         .catch((err) => {
           if (isMountedRef.current) {
             // Don't show error for canceled requests
-            const isCanceled = err?.name === "CanceledError" || 
-                              err?.name === "AbortError" || 
-                              err?.code === "ERR_CANCELED" ||
-                              err?.message?.includes("canceled");
-            
+            const isCanceled = err?.name === "CanceledError" ||
+              err?.name === "AbortError" ||
+              err?.code === "ERR_CANCELED" ||
+              err?.message?.includes("canceled");
+
             if (!isCanceled) {
               setError(err instanceof Error ? err.message : "Unknown error");
               console.log("Error fetching options:", err);
