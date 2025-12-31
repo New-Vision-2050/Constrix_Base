@@ -136,8 +136,8 @@ export default function SetProjectDialog({
       // Set core project fields
       setValue("name_ar", project.name_ar || "");
       setValue("name_en", project.name_en || "");
-      setValue("title_ar", project.name_ar || ""); // Title maps to name for now
-      setValue("title_en", project.name_en || "");
+      setValue("title_ar", project.title_ar || ""); // Title maps to name for now
+      setValue("title_en", project.title_en || "");
       setValue("description_ar", project.description_ar || "");
       setValue("description_en", project.description_en || "");
       // set type
