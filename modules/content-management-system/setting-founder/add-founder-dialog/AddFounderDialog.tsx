@@ -155,7 +155,7 @@ export default function AddFounderDialog({
         className={`max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto`}
       >
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-white">
+          <DialogTitle className="text-center text-lg font-semibold">
             {isEditMode
               ? t("editFounder") || "Edit founder"
               : t("addFounder") || "Add new founder"}
@@ -201,14 +201,14 @@ export default function AddFounderDialog({
                   name="name_ar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-white" required>
+                      <FormLabel className="text-xs " required>
                         {tForm("nameAr")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          className="mt-1 bg-sidebar  border-gray-700"
                           placeholder={tForm("nameArPlaceholder")}
                           {...field}
                         />
@@ -222,14 +222,14 @@ export default function AddFounderDialog({
                   name="name_en"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-white" required>
+                      <FormLabel className="text-xs " required>
                         {tForm("nameEn")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          className="mt-1 bg-sidebar  border-gray-700"
                           placeholder={tForm("nameEnPlaceholder")}
                           {...field}
                         />
@@ -248,14 +248,14 @@ export default function AddFounderDialog({
                 name="job_title_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("jobTitleAr")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
-                        className="mt-1 bg-sidebar text-white border-gray-700"
+                        className="mt-1 bg-sidebar  border-gray-700"
                         placeholder={tForm("jobTitleArPlaceholder")}
                         {...field}
                       />
@@ -269,14 +269,14 @@ export default function AddFounderDialog({
                 name="job_title_en"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("jobTitleEn")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
-                        className="mt-1 bg-sidebar text-white border-gray-700"
+                        className="mt-1 bg-sidebar  border-gray-700"
                         placeholder={tForm("jobTitleEnPlaceholder")}
                         {...field}
                       />
@@ -295,14 +295,14 @@ export default function AddFounderDialog({
                 name="description_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("descriptionAr")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
                         rows={6}
-                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        className="mt-1 resize-none bg-sidebar  border-gray-700"
                         placeholder={tForm("descriptionArPlaceholder")}
                         {...field}
                       />
@@ -318,14 +318,14 @@ export default function AddFounderDialog({
                 name="description_en"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("descriptionEn")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
                         rows={6}
-                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        className="mt-1 resize-none bg-sidebar  border-gray-700"
                         placeholder={tForm("descriptionEnPlaceholder")}
                         {...field}
                       />
@@ -341,7 +341,7 @@ export default function AddFounderDialog({
               <Button
                 type="submit"
                 disabled={isSubmitting || isFetching}
-                className="w-full text-white"
+                className="w-full "
               >
                 {(isSubmitting || isFetching) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
