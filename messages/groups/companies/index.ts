@@ -3,6 +3,7 @@ import { _m, MessagesGroup } from "../../types";
 export const companiesMessages = new MessagesGroup({
   Companies: _m("Companies", "الشركات"),
   Edit: _m("Edit", "تعديل"),
+  activity: _m("Activity", "النشاط"),
   Email: _m("Email", "البريد الالكتروني"),
   CompanyType: _m("Company Type", "نوع الشركة"),
   CompanySection: _m("Company Section", "نشاط الشركه"),
