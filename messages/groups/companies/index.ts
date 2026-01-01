@@ -129,6 +129,7 @@ export const companiesMessages = new MessagesGroup({
     CompanyFieldPlaceholder: _m("Select activity", "اختر النشاط"),
     CompanyFieldRequired: _m("Please choose an activity", "برجاء اختيار النشاط"),
     TradeNameLabel: _m("Trade Name", "الاسم التجاري"),
+    TradeNameRequired: _m("Trade name is required", "الاسم التجاري مطلوب"),
     TradeNamePlaceholder: _m("Enter trade name", "برجاء إدخال الاسم التجاري"),
     TradeNameApiMessage: _m(
       "Trade name must be in Arabic",

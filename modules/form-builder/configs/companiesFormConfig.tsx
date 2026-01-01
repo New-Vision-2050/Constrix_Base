@@ -82,6 +82,10 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             required: true,
             validation: [
               {
+                type: "required",
+                message: t("AddCompanyForm.TradeNameRequired"),
+              },
+              {
                 type: "pattern",
                 value: /^[\p{Script=Arabic}\s]+$/u,
                 message: t("Validation.arabicName"),
