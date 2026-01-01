@@ -16,5 +16,8 @@ export const tableMessages = new MessagesGroup({
   From: _m("From", "من"),
   To: _m("To", "إلى"),
   Minimal: _m("Minimal", "الحد الأدنى"),
-  All: _m("All", "الكل")
+  All: _m("All", "الكل"),
+  Searching: _m("Searching...", "جاري البحث..."),
+  LoadingOptions: _m("Loading options...", "جاري تحميل الخيارات..."),
+  Error: _m("Error", "خطأ"),
 });
