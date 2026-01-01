@@ -49,7 +49,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       },
       {
         key: "company_field",
-        label: "النشاط",
+        label: t("activity"),
         searchable: true,
         render: (value: any[] | null) => (
           <div className="line-clamp-3">
@@ -142,7 +142,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       {
         label: t("LoginAsManager"),
         icon: <EnterIcon className="w-4 h-4" />,
-        action: (e: { id: string; [key: string]: unknown }) => {
+        action: (e: { id: string;[key: string]: unknown }) => {
           fetchCompanyAdmin(e.id).then((data) => {
             const { url, token } = data;
             if (url && token) {
@@ -155,7 +155,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
       {
         label: "اكمال ملف الشركة",
         icon: <GearIcon className="w-4 h-4" />,
-        action: (row: { id: string; [key: string]: unknown }) =>
+        action: (row: { id: string;[key: string]: unknown }) =>
           router.push(`${ROUTER.COMPANY_PROFILE}/${row.id}`),
         disabled: can(PERMISSIONS.company.view),
       },
@@ -166,7 +166,7 @@ export const CompaniesConfig = (options?: { onStatusChange?: () => void }) => {
         action: "send-link",
         dialogComponent: UserSettingDialog,
         disabled: can(PERMISSIONS.company.view),
-        dialogProps: (row: { id: string; [key: string]: unknown }) => {
+        dialogProps: (row: { id: string;[key: string]: unknown }) => {
           return {
             user: row as CompanyData,
             inCompany: true,
