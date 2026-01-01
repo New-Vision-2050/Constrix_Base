@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { UsersRole } from "@/constants/users-role.enum";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { UsersTypes } from "@/modules/program-settings/constants/users-types";
 
 type PropsT = {
     id: number | string;
@@ -78,7 +79,7 @@ export default function ProfileRoleSelector({ id, userTypes, readonly }: PropsT)
                 {!readonly && userTypes?.length > 0 && userTypes.map((userType) => (
                     <MenuItem
                         component={Link}
-                        href={userType.role == UsersRole.Employee ? `/user-profile?id=${id}` : `/client-profile/${id}?role=${userType.role}`}
+                        href={userType.role == UsersRole.Employee ? `/user-profile?id=${id}&role=${UsersTypes.Employee}` : `/client-profile/${id}?role=${userType.role}`}
                         key={userType.id}
                         disabled={profileRole == userType.role}
                         onClick={() => handleMenuItemClick(userType)}

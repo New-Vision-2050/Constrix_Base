@@ -19,6 +19,8 @@ export interface Translation {
  */
 export interface ProjectDetail {
   id: string;
+  name_ar?:string;
+  name_en?:string;
   website_project_id: string;
   website_service_id: string;
   created_at?: string;

@@ -9,12 +9,13 @@ export interface CompanyDashboardIcon {
   name_en: string;
   icon: string;
   website_icon_category_type: string;
+  website_icon_category_type_label?: string;
   category: CompanyDashboardCategory;
 }
 
 export interface ListIconsResponse
-  extends ApiPaginatedResponse<CompanyDashboardIcon[]> {}
+  extends ApiPaginatedResponse<CompanyDashboardIcon[]> { }
 
 export interface ShowIconResponse
-  extends ApiBaseResponse<CompanyDashboardIcon> {}
+  extends ApiBaseResponse<CompanyDashboardIcon> { }
 

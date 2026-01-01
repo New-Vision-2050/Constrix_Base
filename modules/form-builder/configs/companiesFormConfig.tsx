@@ -4,13 +4,13 @@ import { baseURL } from "@/config/axios-config";
 import { defaultStepSubmitHandler } from "@/modules/form-builder/utils/defaultStepSubmitHandler";
 import { TimeZoneCheckbox } from "../components/TimeZoneCheckbox";
 import { InvalidMessage } from "@/modules/companies/components/retrieve-data-via-mail/EmailExistDialog";
-import { useTranslations } from 'next-intl'
+import { useTranslations } from "next-intl";
 
 export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): FormConfig {
   return {
 
     formId: "companies-form",
-    title: "اضافة شركة جديدة",
+    title: t("AddCompanyForm.Title"),
     apiUrl: `${baseURL}/companies`,
     laravelValidation: {
       enabled: true,
@@ -18,13 +18,13 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
     },
     sections: [
       {
-        title: "إنشاء شركة",
+        title: t("AddCompanyForm.CreateCompanySectionTitle"),
         fields: [
           {
             type: "select",
             name: "country_id",
-            label: "دولة الشركة",
-            placeholder: "اختر دولة الشركة",
+            label: t("AddCompanyForm.CountryLabel"),
+            placeholder: t("AddCompanyForm.CountryPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -45,16 +45,16 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             validation: [
               {
                 type: "required",
-                message: "ادخل دولة الشركة",
+                message: t("AddCompanyForm.CountryRequired"),
               },
             ],
           },
           {
             name: "company_field_id",
-            label: "النشاط",
+            label: t("AddCompanyForm.CompanyFieldLabel"),
             type: "select",
             isMulti: true,
-            placeholder: "اختر النشاط",
+            placeholder: t("AddCompanyForm.CompanyFieldPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/company_fields`,
@@ -70,15 +70,15 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             validation: [
               {
                 type: "required",
-                message: "برجاء اختيار النشاط",
+                message: t("AddCompanyForm.CompanyFieldRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "الاسم التجاري",
+            label: t("AddCompanyForm.TradeNameLabel"),
             type: "text",
-            placeholder: "برجاء إدخال الاسم التجاري",
+            placeholder: t("AddCompanyForm.TradeNamePlaceholder"),
             required: true,
             validation: [
               {
@@ -88,7 +88,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               },
               {
                 type: "apiValidation",
-                message: "الاسم التجاري يجب ان يكون باللغة العربية",
+                message: t("AddCompanyForm.TradeNameApiMessage"),
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -101,16 +101,16 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
           },
           {
             name: "user_name",
-            label: "الاسم المختصر",
+            label: t("AddCompanyForm.ShortNameLabel"),
             type: "text",
-            placeholder: "برجاء إدخال الاسم المختصر",
+            placeholder: t("AddCompanyForm.ShortNamePlaceholder"),
             postfix: "constrix.com",
             containerClassName: "rtl:flex-row-reverse",
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل الاسم المختصر",
+                message: t("AddCompanyForm.ShortNameRequired"),
               },
               {
                 type: "pattern",
@@ -119,8 +119,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               },
               {
                 type: "apiValidation",
-                message:
-                  "الاسم المختصر يجب ان يكون بالغة الانجليزية ولا يتخلله رموز",
+                message: t("AddCompanyForm.ShortNameApiMessage"),
                 apiConfig: {
                   url: `${baseURL}/companies/validated`,
                   method: "POST",
@@ -135,8 +134,8 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
           {
             type: "select",
             name: "general_manager_id",
-            label: "مسؤول الدعم",
-            placeholder: "اختر مسؤول الدعم",
+            label: t("AddCompanyForm.SupportManagerLabel"),
+            placeholder: t("AddCompanyForm.SupportManagerPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/users/admin-users`,
@@ -152,15 +151,15 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             validation: [
               {
                 type: "required",
-                message: "اختر مسؤول الدعم",
+                message: t("AddCompanyForm.SupportManagerRequired"),
               },
             ],
           },
           {
             type: "checkbox",
             name: "change_local_time",
-            label: "الشركة",
-            placeholder: "اختر الشركة",
+            label: t("AddCompanyForm.CompanyCheckboxLabel"),
+            placeholder: t("AddCompanyForm.CompanyCheckboxPlaceholder"),
             render: (
               field: any,
               value: boolean,
@@ -192,7 +191,7 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
         ],
       },
       {
-        title: "إنشاء مستخدم",
+        title: t("AddCompanyForm.CreateUserSectionTitle"),
         collapsible: false,
         fields: [
           {
@@ -210,28 +209,28 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
           {
             type: "text",
             name: "company_id",
-            label: "الشركة",
-            placeholder: "اختر الشركة",
+            label: t("AddCompanyForm.CompanyIdLabel"),
+            placeholder: t("AddCompanyForm.CompanyIdPlaceholder"),
             required: true,
             disabled: true,
             hidden: true,
             validation: [
               {
                 type: "required",
-                message: "الشركة",
+                message: t("AddCompanyForm.CompanyIdRequired"),
               },
             ],
           },
           {
             name: "first_name",
-            label: "اسم المستخدم الاول",
+            label: t("AddCompanyForm.FirstNameLabel"),
             type: "text",
-            placeholder: "ادخل اسم المستخدم الاول",
+            placeholder: t("AddCompanyForm.FirstNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "اسم المستخدم الاول مطلوب",
+                message: t("AddCompanyForm.FirstNameRequired"),
               },
               {
                 type: "pattern",
@@ -241,20 +240,20 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               {
                 type: "minLength",
                 value: 2,
-                message: "Name must be at least 2 characters",
+                message: t("AddCompanyForm.NameMinLength"),
               },
             ],
           },
           {
             name: "last_name",
-            label: "اسم المستخدم الأخير",
+            label: t("AddCompanyForm.LastNameLabel"),
             type: "text",
-            placeholder: "اسم المستخدم الأخير",
+            placeholder: t("AddCompanyForm.LastNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "الاسم مطلوب",
+                message: t("AddCompanyForm.LastNameRequired"),
               },
               {
                 type: "pattern",
@@ -264,24 +263,24 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
               {
                 type: "minLength",
                 value: 2,
-                message: "Name must be at least 2 characters",
+                message: t("AddCompanyForm.NameMinLength"),
               },
             ],
           },
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("AddCompanyForm.EmailLabel"),
             type: "email",
-            placeholder: "ادخل البريد الإلكتروني",
+            placeholder: t("AddCompanyForm.EmailPlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "البريد الإلكتروني مطلوب",
+                message: t("AddCompanyForm.EmailRequired"),
               },
               {
                 type: "email",
-                message: "Please enter a valid email address",
+                message: t("AddCompanyForm.EmailInvalid"),
               },
               {
                 type: "apiValidation",
@@ -307,14 +306,14 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
           },
           {
             name: "phone",
-            label: "الهاتف",
+            label: t("AddCompanyForm.PhoneLabel"),
             type: "phone",
             required: true,
-            placeholder: "Enter your phone",
+            placeholder: t("AddCompanyForm.PhonePlaceholder"),
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: t("AddCompanyForm.PhoneInvalid"),
               },
             ],
           },
@@ -322,8 +321,8 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             type: "select",
             name: "job_title_id",
             disabled: true,
-            label: "المسمى الوظيفي",
-            placeholder: "اختر المسمى الوظيفي",
+            label: t("AddCompanyForm.JobTitleLabel"),
+            placeholder: t("AddCompanyForm.JobTitlePlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/job_titles/list`,
@@ -340,17 +339,17 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
             validation: [
               {
                 type: "required",
-                message: "المسمى الوظيفي",
+                message: t("AddCompanyForm.JobTitleRequired"),
               },
             ],
           },
         ],
       },
     ],
-    submitButtonText: "Send Message",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("AddCompanyForm.SubmitButtonText"),
+    cancelButtonText: t("AddCompanyForm.CancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("AddCompanyForm.ResetButtonText"),
     showSubmitLoader: true,
     resetOnSuccess: true,
     showCancelButton: false,
@@ -364,12 +363,12 @@ export function GetCompaniesFormConfig(t:ReturnType<typeof useTranslations>): Fo
       showStepTitles: false,
       validateStepBeforeNext: true,
       allowStepNavigation: false,
-      nextButtonText: "Continue",
-      prevButtonText: "Back",
-      finishButtonText: "حفظ",
+      nextButtonText: t("AddCompanyForm.NextButtonText"),
+      prevButtonText: t("AddCompanyForm.BackButtonText"),
+      finishButtonText: t("AddCompanyForm.FinishButtonText"),
       // Enable submitting each step individually
       submitEachStep: true,
-      submitButtonTextPerStep: "التالي",
+      submitButtonTextPerStep: t("AddCompanyForm.StepSubmitButtonText"),
       // API URLs for each step
       stepApiUrls: {
         0: `${baseURL}/companies`,

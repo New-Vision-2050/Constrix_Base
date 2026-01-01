@@ -5,7 +5,7 @@ import { apiClient } from "@/config/axios-config";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { setCookie } from "cookies-next";
 
 interface Config {
@@ -13,7 +13,7 @@ interface Config {
   icons: React.ReactNode[];
 }
 
-const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetch?: boolean }) => {
+const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetch?: number }) => {
   // Extract locale from pathname to ensure reactivity when URL changes
   const pathname = usePathname();
   const locale = useMemo(() => {
@@ -28,17 +28,20 @@ const StatisticsRow = ({ config, toggleRefetch }: { config: Config, toggleRefetc
   }, [locale]);
 
   const { data, isLoading, isSuccess, refetch } = useQuery({
-    queryKey: [`widgets-${locale}`, config.url],
+    queryKey: [`widgets-${locale}`, config.url, toggleRefetch],
     queryFn: async () => {
       // Axios interceptor will automatically add Lang headers from NEXT_LOCALE cookie
       const response = await apiClient.get(config.url);
       return response.data;
-    },
+    }
   });
 
-  useEffect(() => { refetch() }, [toggleRefetch, refetch]);
+  useEffect(() => {
+    console.log('refetch()', toggleRefetch);
+    refetch()
+  }, [toggleRefetch, refetch]);
 
-  const payload = data?.payload || [{}, {}, {}, {}];
+  const payload = useMemo(() => data?.payload || [{}, {}, {}, {}], [data]);
 
   return (
     <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">

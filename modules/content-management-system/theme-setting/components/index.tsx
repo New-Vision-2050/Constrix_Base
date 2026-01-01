@@ -120,6 +120,7 @@ function ThemeSettingForm({ initialData }: { initialData: ThemeSettingFormInitia
             iconLabel={tBasicInfo("iconLabel")}
             urlLabel={tBasicInfo("urlLabel")}
             isSubmitting={isSubmitting}
+            initialIconUrl={initialData.basicInfo.websiteIconUrl}
           />
 
           {/* Color Palette Section */}

@@ -235,7 +235,7 @@ export default function AddServiceDialog({
         className={`max-w-6xl w-full bg-sidebar max-h-[90vh] overflow-y-auto overflow-x-hidden`}
       >
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold text-white">
+          <DialogTitle className="text-center text-lg font-semibold ">
             {isEditMode
               ? t("editService") || "Edit service"
               : t("addService") || "Add new service"}
@@ -246,7 +246,7 @@ export default function AddServiceDialog({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Featured Services Toggle - Top Section */}
             <div className="flex items-center justify-between gap-4">
-              <h3 className="text-sm font-semibold text-white">
+              <h3 className="text-sm font-semibold">
                 {tForm("featuredServicesTitle") ||
                   "Featured service (show on homepage)"}
               </h3>
@@ -332,14 +332,14 @@ export default function AddServiceDialog({
                   name="name_ar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-white" required>
+                      <FormLabel className="text-xs " required>
                         {tForm("nameAr")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          className="mt-1 bg-sidebar  border-gray-700"
                           placeholder={tForm("nameArPlaceholder")}
                           {...field}
                         />
@@ -353,14 +353,14 @@ export default function AddServiceDialog({
                   name="name_en"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs text-white" required>
+                      <FormLabel className="text-xs " required>
                         {tForm("nameEn")}
                       </FormLabel>
                       <FormControl>
                         <Input
                           variant="secondary"
                           disabled={isSubmitting || isFetching}
-                          className="mt-1 bg-sidebar text-white border-gray-700"
+                          className="mt-1 bg-sidebar  border-gray-700"
                           placeholder={tForm("nameEnPlaceholder")}
                           {...field}
                         />
@@ -378,7 +378,7 @@ export default function AddServiceDialog({
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("category")}
                     </FormLabel>
                     <FormControl>
@@ -388,7 +388,7 @@ export default function AddServiceDialog({
                         disabled={isSubmitting || isFetching}
                       >
                         <SelectTrigger
-                          className="mt-1 bg-sidebar border-gray-700 text-white h-12"
+                          className="mt-1 bg-sidebar border-gray-700  h-12"
                           showClear={!!field.value}
                           onClear={() => field.onChange("")}
                         >
@@ -420,14 +420,14 @@ export default function AddServiceDialog({
                 name="request_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white">
+                    <FormLabel className="text-xs ">
                       {tForm("requestId")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
-                        className="mt-1 bg-sidebar text-white border-gray-700"
+                        className="mt-1 bg-sidebar  border-gray-700"
                         placeholder={tForm("requestIdPlaceholder")}
                         {...field}
                       />
@@ -445,14 +445,14 @@ export default function AddServiceDialog({
                 name="description_ar"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("descriptionAr")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
                         rows={6}
-                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        className="mt-1 resize-none bg-sidebar  border-gray-700"
                         placeholder={tForm("descriptionArPlaceholder")}
                         {...field}
                       />
@@ -468,14 +468,14 @@ export default function AddServiceDialog({
                 name="description_en"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-white" required>
+                    <FormLabel className="text-xs " required>
                       {tForm("descriptionEn")}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting || isFetching}
                         rows={6}
-                        className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                        className="mt-1 resize-none bg-sidebar  border-gray-700"
                         placeholder={tForm("descriptionEnPlaceholder")}
                         {...field}
                       />
@@ -501,7 +501,7 @@ export default function AddServiceDialog({
               <Button
                 type="submit"
                 disabled={isSubmitting || isFetching}
-                className="w-full text-white"
+                className="w-full "
               >
                 {(isSubmitting || isFetching) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -123,6 +123,7 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
     departmentDescriptionEnPlaceholder: _m("Enter department description in English", "أدخل وصف القسم بالإنجليزية"),
     departmentDescriptionEnRequired: _m("English description is required", "الوصف بالإنجليزية مطلوب"),
     designType: _m("Design Type", "نوع التصميم"),
+    hexaServicesMinRequired:_m("services at least 6 with design type hexa","عدد الخدمات لا يقل عن 6 فى حالة الشكل السداسي"),
     designTypePlaceholder: _m("Select design type", "اختر نوع التصميم"),
     designTypeRequired: _m("Design type is required", "نوع التصميم مطلوب"),
     serviceNumber: _m("Service", "الخدمة"),

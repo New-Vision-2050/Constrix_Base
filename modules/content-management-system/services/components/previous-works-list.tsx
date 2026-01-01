@@ -54,12 +54,7 @@ export default function PreviousWorksList({
       )}
 
       <div className="flex items-center justify-end ">
-        <Button
-          type="button"
-          onClick={onAdd}
-          variant="outline"
-          className="text-white"
-        >
+        <Button type="button" onClick={onAdd} variant="outline">
           <Plus className="h-4 w-4 mr-2" />
           {tForm("addPreviousWork")}
         </Button>

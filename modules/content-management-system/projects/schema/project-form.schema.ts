@@ -214,27 +214,23 @@ export const createProjectFormSchema = (t: (key: string) => string) =>
       // Details Array (repeatable section)
       details: z
         .array(projectDetailSchema)
-        .min(1, {
-          message:
-            t("detailsRequired") || "At least one detail is required",
-        })
         .default([]),
     })
-    // .refine(
-    //   (data) => {
-    //     // If featured, main image is required
-    //     if (data.is_featured && !data.main_image) {
-    //       return false;
-    //     }
-    //     return true;
-    //   },
-    //   {
-    //     message:
-    //       t("mainImageRequiredWhenFeatured") ||
-    //       "Main image is required when project is featured",
-    //     path: ["main_image"],
-    //   }
-    // );
+// .refine(
+//   (data) => {
+//     // If featured, main image is required
+//     if (data.is_featured && !data.main_image) {
+//       return false;
+//     }
+//     return true;
+//   },
+//   {
+//     message:
+//       t("mainImageRequiredWhenFeatured") ||
+//       "Main image is required when project is featured",
+//     path: ["main_image"],
+//   }
+// );
 
 /**
  * Type inference from the project form schema
@@ -264,12 +260,6 @@ export const getDefaultProjectFormValues = (): ProjectFormData => ({
   name_en: "",
   description_ar: "",
   description_en: "",
-  details: [
-    {
-      detail_ar: "",
-      detail_en: "",
-      service_id: "",
-    },
-  ],
+  details: [],
 });
 

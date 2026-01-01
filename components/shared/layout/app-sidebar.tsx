@@ -524,6 +524,8 @@ export function AppSidebar({
           ROUTER.CMS.SERVICES,
           ROUTER.CMS.OUR_SERVICES,
           ROUTER.CMS.NEWS,
+          ROUTER.CMS.THEMES,
+          ROUTER.CMS.COMMUNICATION_MESSAGES,
           ROUTER.CMS.PROJECTS,
           ROUTER.CMS.THEME_SETTING,
         ].includes(pageName),
@@ -542,6 +544,8 @@ export function AppSidebar({
           ROUTER.CMS.NEWS,
           ROUTER.CMS.PROJECTS,
           ROUTER.CMS.THEME_SETTING,
+          ROUTER.CMS.THEMES,
+          ROUTER.CMS.COMMUNICATION_MESSAGES,
         ],
         sub_entities: [
           // themes
@@ -635,6 +639,14 @@ export function AppSidebar({
                 PERMISSIONS.CMS.mainSettings.view,
                 PERMISSIONS.CMS.mainSettings.update,
               ]),
+          },
+          // communication messages
+          {
+            name: t("Sidebar.CMS.CommunicationMessages"),
+            url: ROUTER.CMS.COMMUNICATION_MESSAGES,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.CMS.COMMUNICATION_MESSAGES,
+            show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.communicationContactMessages)),
           },
           // communication settings
           {

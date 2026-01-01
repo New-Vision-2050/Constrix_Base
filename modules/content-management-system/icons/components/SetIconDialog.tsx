@@ -60,7 +60,7 @@ export default function SetIconDialog({
     const isEditMode = !!iconId;
 
     // Fetch icon data when editing
-    const { data: iconData, isLoading: isFetching } = useQuery<{
+    const { data: iconData, isLoading: isFetching, refetch } = useQuery<{
         data: { payload: { name_ar?: string; name_en?: string; website_icon_category_type?: string; icon?: string } | null };
     }>({
         queryKey: ["company-dashboard-icon", iconId],
@@ -69,6 +69,11 @@ export default function SetIconDialog({
             return CompanyDashboardIconsApi.show(iconId!);
         },
         enabled: isEditMode && open,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+        retry: false,
+        staleTime: Infinity,
     });
 
     // Fetch categories for dropdown
@@ -139,6 +144,7 @@ export default function SetIconDialog({
                     website_icon_category_type: data.category_id,
                     icon: data.logo_image || undefined,
                 });
+                refetch();
                 toast.success(
                     t("updateSuccess") || "Icon updated successfully!"
                 );

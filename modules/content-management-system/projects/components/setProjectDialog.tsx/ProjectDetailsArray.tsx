@@ -51,9 +51,7 @@ export default function ProjectDetailsArray({
   };
 
   const handleRemoveDetail = (index: number) => {
-    if (fields.length > 1) {
-      remove(index);
-    }
+    remove(index);
   };
 
   return (
@@ -79,20 +77,18 @@ export default function ProjectDetailsArray({
             <h4 className="text-sm font-semibold text-white">
               {t("details")} ({index + 1})
             </h4>
-            {fields.length > 1 && (
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => handleRemoveDetail(index)}
-                disabled={isSubmitting || isFetching}
-                className="w-full sm:w-auto"
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">{t("deleteDetail") || "Delete Detail"}</span>
-                <span className="sm:hidden">{t("delete") || "Delete"}</span>
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={() => handleRemoveDetail(index)}
+              disabled={isSubmitting || isFetching}
+              className="w-full sm:w-auto"
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">{t("deleteDetail") || "Delete Detail"}</span>
+              <span className="sm:hidden">{t("delete") || "Delete"}</span>
+            </Button>
           </div>
 
           {/* Project Name Arabic & English - Side by side on larger screens */}

@@ -32,6 +32,7 @@ export const ContentManagementSystemCategoriesMessages = new MessagesGroup({
     nameAr: _m("Category Name in Arabic", "اسم الفئة بالعربية"),
     nameEn: _m("Category Name in English", "اسم الفئة بالإنجليزية"),
     type: _m("Category Type", "نوع الفئة"),
+    searchType:_m("Type", "النوع"),
     edit: _m("Edit", "تعديل"),
   }),
 });

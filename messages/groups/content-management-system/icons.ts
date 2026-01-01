@@ -5,6 +5,7 @@ export const ContentManagementSystemIconsMessages = new MessagesGroup({
   addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
   editIcon: _m("Edit Icon", "تعديل ايقونة"),
   noIconsFound: _m("No icons found", "لا توجد أيقونات"),
+  confirmDeleteMessage:_m("Are you sure you deleted the icon?","هل انت متاكد من حذف الأيقونة؟"),
   form: new MessagesGroup({
     addIcon: _m("Add Icon", "اضافة ايقونة جديدة"),
     editIcon: _m("Edit Icon", "تعديل ايقونة"),

@@ -10,6 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { IconButton } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 
 interface FileUploadButtonProps {
   onChange?: (file: File | null) => void;
@@ -33,6 +35,7 @@ export default function FileUploadButton({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadId, setUploadId] = useState<string | null>(null);
+  const [existingFile, setExistingFile] = useState('');
 
   // Initialize upload ID on client side only
   useEffect(() => {
@@ -45,13 +48,12 @@ export default function FileUploadButton({
       if (initialValue instanceof File) {
         setSelectedFile(initialValue);
       } else if (typeof initialValue === "string") {
-        // If it's a URL, we can't set it as a File, but we can show the filename
-        // Extract filename from URL if possible
-        // Note: This won't work for actual file operations, just for display
-        // For now, we'll skip handling string URLs as files
+        setExistingFile(initialValue)
       }
     }
   }, [initialValue, selectedFile]);
+
+  const handleClearFile = () => { setExistingFile('') }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -143,6 +145,18 @@ export default function FileUploadButton({
 
   if (!uploadId) {
     return null;
+  }
+
+
+  if (Boolean(existingFile)) {
+    return <div className="relative">
+      {/* clear button */}
+      <IconButton onClick={handleClearFile} color="error" sx={{ position: 'absolute', right: '1%', top: '1%' }}>
+        <CloseIcon />
+      </IconButton>
+      {/* file iframe */}
+      <iframe src={existingFile} width={"100%"} height={"100px"} />
+    </div>
   }
 
   return (

@@ -4,6 +4,7 @@
 export interface ThemeSettingBasicInfo {
   websiteIcon: File | null;
   websiteUrl: string;
+  websiteIconUrl?: string;
 }
 
 /**

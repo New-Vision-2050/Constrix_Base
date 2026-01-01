@@ -66,13 +66,18 @@ export default function SetProjectDialog({
   const isEditMode = !!projectId;
 
   // Fetch project data when editing
-  const { data: projectData, isLoading: isFetching } = useQuery({
+  const { data: projectData, isLoading: isFetching, refetch } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
       // TODO: Replace with actual API call
       return CompanyDashboardProjectsApi.show(projectId!);
     },
     enabled: isEditMode && open,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    staleTime: Infinity,
   });
 
   const form = useForm<ProjectFormData>({
@@ -144,17 +149,9 @@ export default function SetProjectDialog({
       // Transform project_details to form details array format
       if (project.project_details && project.project_details.length > 0) {
         const formDetails = project.project_details.map((detail) => {
-          // Extract Arabic and English content from translations
-          const arTranslation = detail.translations?.find(
-            (t) => t.locale === "ar" && t.field === "name"
-          );
-          const enTranslation = detail.translations?.find(
-            (t) => t.locale === "en" && t.field === "name"
-          );
-
           return {
-            detail_ar: arTranslation?.content || "",
-            detail_en: enTranslation?.content || "",
+            detail_ar: detail?.name_ar || "",
+            detail_en: detail?.name_en || "",
             service_id: detail.website_service_id || "",
           };
         });
@@ -192,6 +189,7 @@ export default function SetProjectDialog({
 
       onSuccess?.();
       reset();
+      refetch();
       onClose();
     } catch (error: any) {
       console.error(
@@ -227,9 +225,8 @@ export default function SetProjectDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-sidebar border-gray-700 p-4 sm:p-6 ${
-          isRtl ? "rtl" : "ltr"
-        }`}
+        className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-sidebar border-gray-700 p-4 sm:p-6 ${isRtl ? "rtl" : "ltr"
+          }`}
         dir={isRtl ? "rtl" : "ltr"}
       >
         <DialogHeader className="relative">

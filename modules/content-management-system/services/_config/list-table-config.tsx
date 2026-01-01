@@ -66,10 +66,8 @@ export const useServiceListTableConfig: (
     ],
     executionConfig: {
       canDelete: can(PERMISSIONS.CMS.services.delete),
-      onDelete: async (id: string) => {
-        await CompanyDashboardServicesApi.delete(id);
-      },
     },
+    deleteUrl: `${baseURL}/website-services`,
     searchParamName: "search",
     defaultPageSize: 10,
     pageSizeOptions: [10, 20, 50],

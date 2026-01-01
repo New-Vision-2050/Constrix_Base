@@ -121,6 +121,9 @@ export const PersonalDataFormConfig = () => {
                 );
             },
             validation: [],
+            maxDate: {
+              value: new Date().toDateString()
+            }
           },
           {
             name: "birthdate_hijri",
@@ -138,6 +141,9 @@ export const PersonalDataFormConfig = () => {
                 );
             },
             validation: [],
+            maxDate: {
+              value: new Date().toDateString()
+            }
           },
           {
             name: "country_id",

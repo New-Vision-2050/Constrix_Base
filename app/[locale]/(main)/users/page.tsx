@@ -5,19 +5,23 @@ import { SheetFormBuilder } from "@/modules/form-builder";
 import TableBuilder from "@/modules/table/components/TableBuilder";
 import { UsersConfig } from "@/modules/table/utils/configs/usersTableConfig";
 import { statisticsConfig } from "@/modules/users/components/statistics-config";
-import React from "react";
+import React, { useState } from "react";
 import { GetCompanyUserFormConfig } from "@/modules/form-builder/configs/companyUserFormConfig";
 import { useTranslations } from "next-intl";
 import { withPermissionsPage } from "@/lib/permissions/client/withPermissionsPage";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import { useTableStore } from "@/modules/table/store/useTableStore";
 
 const UsersPage = () => {
   const config = UsersConfig();
   const t = useTranslations("Companies");
+  const [refreshWidget, setRefreshWidget] = useState(0);
+  // handle reload table
+
   return (
     <div className="px-8 space-y-7">
-      <StatisticsRow config={statisticsConfig} />{" "}
+      <StatisticsRow toggleRefetch={refreshWidget} config={statisticsConfig} />{" "}
       <TableBuilder
         config={config}
         searchBarActions={
@@ -27,7 +31,9 @@ const UsersPage = () => {
                 config={GetCompanyUserFormConfig(t)}
                 trigger={<Button>إنشاء مستخدم</Button>}
                 onSuccess={(values) => {
-                  console.log("Form submitted successfully:", values);
+                  setRefreshWidget(prev => ++prev)
+                  const tableStore = useTableStore.getState();
+                  tableStore.reloadTable(config.tableId);
                 }}
               />
             </Can>

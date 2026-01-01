@@ -113,6 +113,9 @@ export const QualificationFormConfig = ({
             label: t("graduationDate"),
             placeholder: t("graduationDate"),
             validation: [],
+            maxDate: {
+              value: new Date().toDateString()
+            }
           },
           {
             type: "text",
