@@ -83,6 +83,9 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     descriptionEnMinLength: _m("Project description in English must be at least 10 characters", "وصف المشروع بالإنجليزية يجب أن يكون على الأقل 10 حروف"),
     detailsRequired: _m("At least one detail is required", "يجب أن يكون لديك على الأقل بيانات واحدة"),
     detailArRequired: _m("Detail in Arabic is required", "بيان المشروع بالعربية مطلوب"),
+    detailArMinLength: _m("Detail in Arabic must be at least 2 characters", "بيان المشروع بالعربية يجب أن يكون على الأقل حرفين"),
+    detailEnMinLength: _m("Detail in English must be at least 2 characters if provided", "بيان المشروع بالإنجليزية يجب أن يكون على الأقل حرفين إذا تم توفيره"),
+    serviceRequired: _m("Service is required", "الخدمة مطلوبة"),
   }),
   projectTypesTable: new MessagesGroup({
     addProjectType: _m("Add New Project Type", "اضافة نوع مشروع جديد"),
