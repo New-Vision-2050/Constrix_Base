@@ -157,6 +157,15 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
     }
   }, [open]);
 
+
+  if (loading && Boolean(value)) {
+    return <div className="flex text-center text-sm">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      {t("Main.Loading")}
+    </div>
+  }
+
+
   return (
     <div className="space-y-2">
       {label && <Label className="mb-2 block">{label}</Label>}
@@ -176,14 +185,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 "w-full justify-between bg-sidebar whitespace-normal",
                 (!value ||
                   (isMulti && Array.isArray(value) && value.length === 0)) &&
-                  "text-muted-foreground",
+                "text-muted-foreground",
                 isDisabled && "opacity-50 cursor-not-allowed"
               )}
               onKeyDown={handleKeyDown}
             >
               <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
                 {value &&
-                (!isMulti || (Array.isArray(value) && value.length > 0))
+                  (!isMulti || (Array.isArray(value) && value.length > 0))
                   ? selectedLabel
                   : placeholder}
               </div>
@@ -191,7 +200,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             </Button>
           </PopoverTrigger>
           {(value && !isMulti) ||
-          (isMulti && Array.isArray(value) && value.length > 0) ? (
+            (isMulti && Array.isArray(value) && value.length > 0) ? (
             <Button
               variant="ghost"
               size="icon"
@@ -296,8 +305,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                             ? "opacity-100"
                             : "opacity-0"
                           : value == option.value
-                          ? "opacity-100"
-                          : "opacity-0"
+                            ? "opacity-100"
+                            : "opacity-0"
                       )}
                     />
                     {option.label}
