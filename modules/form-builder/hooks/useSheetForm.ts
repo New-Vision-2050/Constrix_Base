@@ -5,7 +5,6 @@ import { RequestOptions } from "../types/requestTypes";
 import { defaultSubmitHandler } from "../utils/defaultSubmitHandler";
 import { defaultStepSubmitHandler } from "../utils/defaultStepSubmitHandler";
 import { useFormInstance, useFormStore } from "./useFormStore";
-
 interface UseSheetFormProps {
   config: FormConfig;
   recordId?: string | number | null; // Optional record ID for editing
@@ -62,6 +61,7 @@ interface UseSheetFormResult {
 
 import { apiClient } from "@/config/axios-config";
 import { useToast } from "@/modules/table/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 export function useSheetForm({
   config,
@@ -98,7 +98,7 @@ export function useSheetForm({
     setIsValid,
     hasValidatingFields,
   } = useFormInstance(actualFormId, config.initialValues || {});
-
+  const t = useTranslations("FormBuilder");
   // Local state for sheet-specific functionality
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -311,7 +311,8 @@ export function useSheetForm({
 
           toast({
             title: "Success",
-            description: "Form Submitted Successfully",
+            description: t("sheetForm.formSucess")
+ 
           });
 
           // Close the sheet after successful submission
