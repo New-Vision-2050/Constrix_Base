@@ -10,4 +10,10 @@ export const commonMessages = new MessagesGroup({
     retry: _m("Retry", "إعادة المحاولة"),
   }),
   noCountryCode: _m("No country code found", "لا يوجد رمز الدولة"),
+  // File upload messages
+  fileUpload: new MessagesGroup({
+    uploadFile: _m("Upload File", "رفع ملف"),
+    maxSize: _m("Max size: {size}", "الحجم الأقصى: {size}"),
+    fileSizeExceeds: _m("File size exceeds the maximum allowed size of {size}", "حجم الملف يتجاوز الحجم الأقصى المسموح به وهو {size}"),
+  }),
 });
