@@ -87,8 +87,8 @@ export default function IconsSearchBar({
     const currentSortByLabel = useMemo(() => {
         if (!sortBy) return t("sortBy");
         const labels: Record<string, string> = {
-            name: t("name"),
-            createdAt: t("createdAt"),
+            asc: t("asc"),
+            desc: t("desc"),
         };
         return labels[sortBy] || t("sortBy");
     }, [sortBy, t]);
@@ -184,23 +184,23 @@ export default function IconsSearchBar({
                         setSortByAnchor(null);
                     }}
                 >
-                    {t("all")}
+                    {t("sortBy")}
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
-                        onSortByChange("name");
+                        onSortByChange("asc");
                         setSortByAnchor(null);
                     }}
                 >
-                    {t("name")}
+                    {t("asc")}
                 </MenuItem>
                 <MenuItem
                     onClick={() => {
-                        onSortByChange("createdAt");
+                        onSortByChange("desc");
                         setSortByAnchor(null);
                     }}
                 >
-                    {t("createdAt")}
+                    {t("desc")}
                 </MenuItem>
             </Menu>
         </Stack>

@@ -29,6 +29,7 @@ export interface FounderRow {
   description_ar?: string;
   description_en?: string;
   is_active: number;
+  status: number;
   profile_image?: FounderImage;
 }
 
