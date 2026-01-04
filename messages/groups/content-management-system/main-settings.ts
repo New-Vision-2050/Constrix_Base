@@ -62,6 +62,8 @@ export const ContentManagementSystemMainSettingsMessages = new MessagesGroup({
     companyProfileFileInvalid: _m("Company profile must be a valid file", "ملف الشركة يجب أن يكون ملفًا صالحًا"),
     save: _m("Save", "حفظ"),
     cancel: _m("Cancel", "إلغاء"),
+    updateSuccess: _m("Settings updated successfully!", "تم تحديث الإعدادات بنجاح!"),
+    updateError: _m("Failed to update settings. Please try again.", "فشل تحديث الإعدادات. يرجى المحاولة مرة أخرى."),
   }),
 });
 
