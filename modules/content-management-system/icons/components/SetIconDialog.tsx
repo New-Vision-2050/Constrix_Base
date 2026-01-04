@@ -220,7 +220,7 @@ export default function SetIconDialog({
                     >
                         <X className="h-4 w-4" />
                     </Button>
-                    <DialogTitle className="text-center text-lg font-semibold text-white">
+                    <DialogTitle className="text-center text-lg font-semibold">
                         {isEditMode ? t("editIcon") : t("addIcon")}
                     </DialogTitle>
                 </DialogHeader>
@@ -323,7 +323,7 @@ export default function SetIconDialog({
                                             disabled={isSubmitting || isFetching}
                                         >
                                             <SelectTrigger
-                                                className="mt-1 bg-sidebar border-white text-white h-12"
+                                                className="mt-1 bg-sidebar h-12"
                                                 showClear={!!field.value}
                                                 onClear={() => field.onChange("")}
                                             >

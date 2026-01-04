@@ -7,17 +7,10 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/modules/table/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/modules/table/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { useTranslations } from "next-intl";
+} from '@/modules/table/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/modules/table/components/ui/command';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 // Country codes for phone numbers with flags
 const countryCodesData = [
