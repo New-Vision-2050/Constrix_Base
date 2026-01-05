@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { Branch } from "../../types/company";
 import { apiClient } from "@/config/axios-config";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Tab } from "@/types/Tab";
@@ -64,7 +64,10 @@ const Branches = () => {
       value: "general",
       component: (
         <Can check={[PERMISSIONS.companyProfile.branch.list]}>
-          <BranchesInfo branches={branches} handleBranchesRefetch={handleBranchesRefetch} />
+          <BranchesInfo
+            branches={branches}
+            handleBranchesRefetch={handleBranchesRefetch}
+          />
         </Can>
       ),
       show: can([PERMISSIONS.companyProfile.branch.list]),

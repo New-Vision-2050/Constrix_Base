@@ -18,21 +18,23 @@ export async function middleware(req: NextRequest) {
   const isLoginPage = /^\/([a-z]{2}\/)?login$/.test(pathname);
 
   // Debug logging for shared-file routes
-  if (pathname.includes('shared-file')) {
+  if (pathname.includes("shared-file")) {
     return NextResponse.next();
   }
 
+  // Extract locale from pathname
+  const localeMatch = pathname.match(/^\/([a-z]{2})\//);
+  const locale = localeMatch ? localeMatch[1] : "ar";
+
+  // Strip locale from pathname for comparisons
+  const pathnameWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "") || "/";
+
   if (!nvToken && !isLoginPage) {
-    return NextResponse.redirect(new URL("ar/login", req.url));
+    return NextResponse.redirect(new URL("/ar/login", req.url));
   }
 
   const res = intlMiddleware(req);
-  
-  if (pathname.includes("/en/")) {
-    res.cookies.set("NEXT_LOCALE", "en");
-  } else {
-    res.cookies.set("NEXT_LOCALE", "ar");
-  }
+
   if ((!existingCompanyCookie && currentHost) || isLoginPage) {
     try {
       const response = await apiClient.get(endPoints.getCompanyByHost, {
@@ -58,9 +60,11 @@ export async function middleware(req: NextRequest) {
 
       if (
         !!company?.payload.is_central_company &&
-        protectedCentralPages.includes(pathname)
+        protectedCentralPages.includes(pathnameWithoutLocale)
       ) {
-        return NextResponse.redirect(new URL("/user-profile", req.url));
+        return NextResponse.redirect(
+          new URL(`/${locale}/user-profile`, req.url)
+        );
       }
     } catch (error) {
       res.cookies.delete("company-data");
@@ -75,8 +79,8 @@ export async function middleware(req: NextRequest) {
 
     const isCentral = !!company?.is_central_company;
 
-    if (!isCentral && protectedCentralPages.includes(pathname)) {
-      return NextResponse.redirect(new URL("/user-profile", req.url));
+    if (!isCentral && protectedCentralPages.includes(pathnameWithoutLocale)) {
+      return NextResponse.redirect(new URL(`/${locale}/user-profile`, req.url));
     }
   }
 
