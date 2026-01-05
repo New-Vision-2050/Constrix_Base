@@ -107,6 +107,39 @@ export const getRoutesMap = (
     "stores/requests": getText("stores/requests", "الطلبات"),
     "stores/coupons": getText("stores/coupons", "الكوبونات"),
     "stores/payment-methods": getText("stores/payment-methods", "وسائل الدفع"),
+
+    // Content Management System routes
+    "content-management-system": getText("content-management-system", "إدارة المحتوى"),
+    "setting-news": getText("cms_setting-news", "اعدادات الأخبار"),
+
+    "content-management-system/categories": getText("cms_categories", "الفئات"),
+    "content-management-system/icons": getText("cms_icons", "الأيقونات"),
+    "content-management-system/main-settings": getText(
+      "cms_main-settings",
+      "اعدادات الرئيسية"
+    ),
+    "content-management-system/contact-setting": getText(
+      "cms_contact-setting",
+      "اعدادات التواصل"
+    ),
+    "content-management-system/terms-conditions": getText(
+      "cms_terms-conditions",
+      "الشروط والأحكام"
+    ),
+    "content-management-system/mainData": getText("cms_mainData", "البيانات الأساسية"),
+    "content-management-system/setting-founder": getText("cms_setting-founder", "المؤسسين"),
+    "content-management-system/services": getText("cms_services", "الخدمات"),
+    "content-management-system/our-services": getText("cms_our-services", "خدماتنا"),
+    "content-management-system/projects": getText("cms_projects", "المشاريع"),
+    "content-management-system/theme-setting": getText(
+      "cms_theme-setting",
+      "إعدادات المظهر"
+    ),
+    "content-management-system/communication-messages":
+      getText("cms_communication-messages", "رسائل التواصل"),
+    "content-management-system/themes": getText("cms_themes", "المظاهر"),
+    "content-management-system/communication-settings": getText("cms_communication-settings", "اعدادات التواصل"),
+    "content-management-system/about-setting": getText("cms_about-setting", "اعدادات النبذة"),
   };
 
   return appRoutesMap;

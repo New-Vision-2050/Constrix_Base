@@ -61,28 +61,32 @@ export const breadcrumbsMessages = new MessagesGroup({
   "stores/payment-methods": _m("Payment Methods", "وسائل الدفع"),
   terms: _m("Terms & Conditions", "الشروط والأحكام"),
   "content-management-system": _m("Content Management System", "اعداد المحتوي"),
-  "content-management-system/categories": _m("Categories", "الفئات"),
-  "content-management-system/icons": _m("Icons", "الأيقونات"),
-  "content-management-system/main-settings": _m(
+  "cms_categories": _m("Categories Settings", "اعدادات الفئات"),
+  "cms_icons": _m("Icons Settings", "اعدادات الأيقونات"),
+  "cms_main-settings": _m(
     "Main Settings",
     "اعدادات الرئيسية"
   ),
-  "content-management-system/contact-setting": _m(
+  "cms_contact-setting": _m(
     "Contact Setting",
     "اعدادات التواصل"
   ),
-  "content-management-system/terms-conditions": _m(
+  "cms_terms-conditions": _m(
     "Terms & Conditions",
     "الشروط والأحكام"
   ),
-  "content-management-system/mainData": _m("Main Data", "البيانات الأساسية"),
-  "content-management-system/setting-founder": _m("Founders", "المؤسسين"),
-  "content-management-system/services": _m("Services", "الخدمات"),
-  "content-management-system/our-services": _m("Our Services", "خدماتنا"),
-  "content-management-system/setting-news": _m("News", "الأخبار"),
-  "content-management-system/projects": _m("Projects", "المشاريع"),
-  "content-management-system/theme-setting": _m(
+  "cms_mainData": _m("Main Data Settings", "اعدادات البيانات الأساسية"),
+  "cms_setting-founder": _m("Founders Settings", "اعدادات المؤسسين"),
+  "cms_services": _m("Services Settings", "اعدادات الخدمات"),
+  "cms_our-services": _m("Our Services Settings", "اعدادات خدماتنا"),
+  "cms_setting-news": _m("News Settings", "اعدادات الأخبار"),
+  "cms_projects": _m("Projects Settings", "اعدادات المشاريع"),
+  "cms_theme-setting": _m(
     "Theme Setting",
     "إعدادات المظهر"
   ),
+  "cms_communication-messages": _m("Communication Messages Settings", "اعدادات رسائل التواصل"),
+  "cms_themes": _m("Themes Settings", "اعدادات المظاهر"),
+  "cms_communication-settings": _m("Communication Settings", "اعدادات التواصل"),
+  "cms_about-setting": _m("About Us Settings", "اعدادات النبذة عنا"),
 });
