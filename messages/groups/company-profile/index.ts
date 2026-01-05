@@ -39,7 +39,9 @@ export const companyProfileMessages = new MessagesGroup({
       academicAndExperience: _m("Academic and Experience Data", "البيانات الاكاديمية والخبرة"),
       employmentAndContractalData: _m("Employment and Contractual Data", "البيانات الوظيفية والتعاقدية"),
       financialPrivileges: _m("Financial Benefits", "الامتيازات المالية"),
-      contractManagement: _m("Contract Management", "ادارة العقد")
+      contractManagement: _m("Contract Management", "ادارة العقد"),
+       salary: _m("salary", "الراتب "),
+      alternatives: _m("Privileges and Allowances", "الامتيازات و البدلات"),
     }),
     verticalLists: new MessagesGroup({
       personalList: new MessagesGroup({
