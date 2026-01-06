@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { apiClient } from "@/config/axios-config";
 import InfoIcon from "@/public/icons/info";
+import { useTranslations } from "next-intl";
 
 interface DeleteConfirmationDialogProps {
   open: boolean;
@@ -50,6 +51,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       mutation.mutate(deleteUrl);
     }
   };
+  const t = useTranslations("content-management-system.news.table");
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -84,7 +86,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             loading={mutation.isPending}
             className="w-32 h-10"
           >
-            حذف{" "}
+            {t("deleteConfirm")}
           </Button>
           <Button
             variant="outline"
@@ -92,7 +94,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             disabled={mutation.isPending}
             className="w-32 h-10"
           >
-            الغاء
+            {t("cancelconfirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

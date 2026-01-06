@@ -93,5 +93,12 @@ export const ContentManagementSystemNewsMessages = new MessagesGroup({
     status: _m("Status", "الحالة"),
     actions: _m("Actions", "الإجراءات"),
     editNews: _m("Edit News", "تعديل خبر"),
+    deleteConfirmMessage: _m(
+      "Are you sure you want to delete this news?",
+      "هل أنت متأكد أنك تريد حذف هذا الخبر؟"
+    ),
+    deleteConfirm: _m("Delete", "حذف"),
+    cancelconfirm: _m("Cancel", "إلغاء"
+    ),  
   }),
 });

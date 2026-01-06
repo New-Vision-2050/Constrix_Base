@@ -117,5 +117,8 @@ export const useNewsListTableConfig: (
       canDelete: can(PERMISSIONS.CMS.news.delete),
     },
     deleteUrl: `${baseURL}/website-news`,
+    deleteConfirmMessage:t("deleteConfirmMessage"),
+
+
   };
 };
