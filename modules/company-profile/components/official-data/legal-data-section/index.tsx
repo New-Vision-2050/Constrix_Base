@@ -26,6 +26,7 @@ import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import SetLegalDataForm from "./set-legal-data";
+import AddLegalDataSheet from "./set-legal-data/AddLegalDataSheet";
 
 const LegalDataSection = ({
   currentCompanyId,
@@ -60,6 +61,9 @@ const LegalDataSection = ({
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyForm, handleOpenMyForm, handleCloseMyForm] = useModal();
+
+  // add legal data sheet
+  const [isOpenAddLegalDataSheet, handleOpenAddLegalDataSheet, handleCloseAddLegalDataSheet] = useModal();
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
@@ -100,7 +104,7 @@ const LegalDataSection = ({
                   },
                   {
                     title: "اضافة بيان قانوني",
-                    onClick: handleOpenMyForm,
+                    onClick: handleOpenAddLegalDataSheet,
                   },
                 ],
                 disabledEdit: !can([
@@ -113,9 +117,12 @@ const LegalDataSection = ({
           {!!companyLegalData && companyLegalData.length > 0 ? (
             <>
               {mode === "Preview" ? (
-                <LegalDataPreview companyLegalData={companyLegalData} />
+                <>
+                  <AddLegalDataSheet open={isOpenAddLegalDataSheet} onOpenChange={handleCloseAddLegalDataSheet}/>
+                  <LegalDataPreview companyLegalData={companyLegalData} />
+                </>
               ) : (
-                <SetLegalDataForm 
+                <SetLegalDataForm
                   initialData={{
                     data: companyLegalData.map((item) => ({
                       id: item.id,
@@ -124,10 +131,11 @@ const LegalDataSection = ({
                       registration_number: item.registration_number || "",
                       start_date: item.start_date,
                       end_date: item.end_date,
-                      files: item.file?.map((file) => 
-                        typeof file === 'string' ? { url: file } : file
-                      ) || [],
-                    }))
+                      files:
+                        item.file?.map((file) =>
+                          typeof file === "string" ? { url: file } : file
+                        ) || [],
+                    })),
                   }}
                   mode="edit"
                   onCancel={handleEditClick}
