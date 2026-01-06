@@ -68,7 +68,7 @@ export default function SetLegalDataForm({
     name: "data",
   });
 
-  console.log("errors77errors", errors,initialData);
+  console.log("errors77errors", errors, initialData);
 
   // Show toast for validation errors
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function SetLegalDataForm({
         await CompanyProfileLegalDataApi.create(payload);
       } else {
         // Edit mode: send update payload
-        console.log('updatedata',data)
+        console.log("updatedata", data);
         const updatePayload = {
           data: data?.data?.map((item) => {
             const binaryFiles = item.files.filter(
@@ -168,15 +168,16 @@ export default function SetLegalDataForm({
             watch={watch}
             index={index}
             onDelete={() => remove(index)}
-            canDelete={fields.length > 1}
+            canDelete={fields.length > 1 && mode == "add"}
             t={t}
+            mode={mode}
             registrationTypes={registrationTypesOptions || []}
             isSubmitting={isSubmitting}
           />
         ))}
 
         {/* Add New Record Button */}
-        {fields.length < 10 && (
+        {fields.length < 10 && mode == "add" && (
           <Button
             type="button"
             variant="outline"

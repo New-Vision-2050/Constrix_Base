@@ -33,6 +33,7 @@ interface LegalDataRowProps {
   t: (key: string) => string;
   registrationTypes: Array<{ id: string; name: string; type: string }>;
   isSubmitting: boolean;
+  mode?: "add" | "edit";
 }
 
 export default function LegalDataRow({
@@ -44,6 +45,7 @@ export default function LegalDataRow({
   t,
   registrationTypes,
   isSubmitting,
+  mode,
 }: LegalDataRowProps) {
   // detect direction
   const lang = useLocale();
@@ -87,7 +89,7 @@ export default function LegalDataRow({
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || mode === "edit"}
                   >
                     <SelectTrigger className="mt-1 bg-sidebar border-white text-white h-12">
                       <SelectValue
@@ -123,7 +125,7 @@ export default function LegalDataRow({
                   <FormControl>
                     <Input
                       variant="secondary"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || mode === "edit"}
                       className="mt-1"
                       placeholder={t("registrationNumberPlaceholder")}
                       {...field}
@@ -209,13 +211,23 @@ export default function LegalDataRow({
           control={control}
           name={`data.${index}.files`}
           render={({ field }) => {
-            const existingFiles = field.value?.filter(
-              (file): file is { url: string } =>
-                !(file instanceof File) && typeof file === "object" && "url" in file
-            ) || [];
-            const newFiles = field.value?.filter(
-              (file): file is File => file instanceof File
-            ) || [];
+            const existingFiles =
+              field.value?.filter(
+                (
+                  file
+                ): file is {
+                  url: string;
+                  name?: string;
+                  id?: number | string;
+                } =>
+                  !(file instanceof File) &&
+                  typeof file === "object" &&
+                  "url" in file
+              ) || [];
+            const newFiles =
+              field.value?.filter(
+                (file): file is File => file instanceof File
+              ) || [];
 
             return (
               <FormItem>
@@ -228,12 +240,16 @@ export default function LegalDataRow({
                     {existingFiles.length > 0 && (
                       <div className="space-y-2">
                         {existingFiles.map((file, idx) => {
-                          const fileUrl = typeof file?.url === 'string' ? file?.url : '';
-                          const fileName = fileUrl ? fileUrl.split("/").pop() : "ملف مرفق";
-                          
+                          const fileUrl =
+                            typeof file?.url === "string" ? file?.url : "";
+                          const fileName =
+                            file?.name ||
+                            fileUrl?.split("/").pop() ||
+                            "ملف مرفق";
+
                           return (
                             <div
-                              key={idx}
+                              key={file?.id || idx}
                               className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-lg"
                             >
                               <a
@@ -248,8 +264,12 @@ export default function LegalDataRow({
                                 size="small"
                                 color="error"
                                 onClick={() => {
-                                  const updatedFiles = field.value?.filter((_, i) => 
-                                    !(i === idx && !(_ instanceof File))
+                                  const updatedFiles = field.value?.filter(
+                                    (f) =>
+                                      f instanceof File ||
+                                      (typeof f === "object" &&
+                                        "id" in f &&
+                                        f.id !== file.id)
                                   );
                                   field.onChange(updatedFiles || []);
                                 }}
@@ -266,7 +286,11 @@ export default function LegalDataRow({
                     {/* File upload button */}
                     <FileUploadButton
                       onChange={(files) => {
-                        const uploadedFiles = Array.isArray(files) ? files : files ? [files] : [];
+                        const uploadedFiles = Array.isArray(files)
+                          ? files
+                          : files
+                          ? [files]
+                          : [];
                         field.onChange([...existingFiles, ...uploadedFiles]);
                       }}
                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"

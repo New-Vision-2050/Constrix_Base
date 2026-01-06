@@ -13,6 +13,7 @@ const ALLOWED_FILE_TYPES = [
 // File schema factory accepting translation function
 const createFileSchema = (t: (key: string) => string) =>
   z.union([
+    // New File being uploaded
     z
       .instanceof(File)
       .refine((file) => file.size <= MAX_FILE_SIZE, {
@@ -21,8 +22,20 @@ const createFileSchema = (t: (key: string) => string) =>
       .refine((file) => ALLOWED_FILE_TYPES.includes(file.type), {
         message: t("fileTypeError"),
       }),
+    // Existing file from backend (simple format with just url)
     z
       .object({
+        url: z.string(),
+      })
+      .passthrough(),
+    // Existing file from backend (full format with all properties)
+    z
+      .object({
+        id: z.number().or(z.string()),
+        mime_type: z.string(),
+        name: z.string(),
+        size: z.number().optional(),
+        type: z.string().optional(),
         url: z.string(),
       })
       .passthrough(),

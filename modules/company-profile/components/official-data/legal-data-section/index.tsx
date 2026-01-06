@@ -124,7 +124,9 @@ const LegalDataSection = ({
                       registration_number: item.registration_number || "",
                       start_date: item.start_date,
                       end_date: item.end_date,
-                      files: item.file?.map((url) => ({ url })) || [],
+                      files: item.file?.map((file) => 
+                        typeof file === 'string' ? { url: file } : file
+                      ) || [],
                     }))
                   }}
                   mode="edit"
