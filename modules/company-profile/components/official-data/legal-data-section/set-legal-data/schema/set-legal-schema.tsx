@@ -24,49 +24,69 @@ const fileSchema = z.union([
 ]);
 
 const legalDataRowSchema = z.object({
+    // Record ID (required for edit mode, auto-generated for add mode)
     id: z.string().or(z.number()).optional(),
-    // id of the registration type
-    registration_type_id: z.string(),
-    // type of the registration type
-    registration_type_type: z.string().optional(),
-    // name of the registration type
+    
+    // Registration type ID (required)
+    registration_type_id: z.string({
+        required_error: "نوع التسجيل مطلوب",
+    }),
+    
+    // Registration type type (required for conditional validation logic)
+    registration_type_type: z.string({
+        required_error: "نوع التسجيل مطلوب",
+    }),
+    
+    // Registration type name (optional, for display purposes)
     registration_type: z.string().optional(),
-    // registration number
+    
+    // Registration number (conditional based on type)
     registration_number: z.string()
-        .regex(/^700\d*$/, "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط")
+        .regex(
+            /^(700|40|101)\d*$/, 
+            "يجب أن يبدأ الرقم بـ 700 أو 40 أو 101 ويحتوي على أرقام فقط"
+        )
+        .min(1, "رقم التسجيل لا يمكن أن يكون فارغاً")
         .optional(),
-    // start date
+    
+    // Issue date (required)
     start_date: z.string({
         required_error: "ادخل تاريخ الاصدار",
     }).or(z.date()),
-    // end date
+    
+    // Expiry date (required)
     end_date: z.string({
         required_error: "ادخل تاريخ الانتهاء",
     }).or(z.date()),
-    // files
-    files: z.array(fileSchema).min(1, "يجب إرفاق ملف"),
-}).refine(
-    (data) => {
-        if (data.registration_type_type != RegistrationTypes.WithoutARegister) {
-            return !!data.registration_number;
+    
+    // Attached files (at least one file required)
+    files: z.array(fileSchema).min(1, "يجب إرفاق ملف واحد على الأقل"),
+})
+    // Validate: registration_number is required if type is not "Without Register"
+    .refine(
+        (data) => {
+            if (data.registration_type_type !== RegistrationTypes.WithoutARegister) {
+                return !!data.registration_number && data.registration_number.trim().length > 0;
+            }
+            return true;
+        },
+        {
+            message: "رقم التسجيل مطلوب لهذا النوع",
+            path: ["registration_number"],
         }
-        return true;
-    },
-    {
-        message: "رقم التسجيل مطلوب",
-        path: ["registration_number"],
-    }
-).refine(
-    (data) => {
-        const startDate = new Date(data.start_date);
-        const endDate = new Date(data.end_date);
-        return startDate <= endDate;
-    },
-    {
-        message: "تاريخ الإصدار يجب أن يكون قبل تاريخ الانتهاء",
-        path: ["end_date"],
-    }
-);
+    )
+    // Validate: start_date must be before or equal to end_date
+    .refine(
+        (data) => {
+            const startDate = new Date(data.start_date);
+            const endDate = new Date(data.end_date);
+            return startDate <= endDate;
+        },
+        {
+            message: "تاريخ الإصدار يجب أن يكون قبل تاريخ الانتهاء",
+            path: ["end_date"],
+        }
+    );
 
 export const legalDataFormSchema = z.object({
     data: z.array(legalDataRowSchema).max(10, "الحد الأقصى 10 سجلات"),
