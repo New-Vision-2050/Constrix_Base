@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import SetLegalDataForm from "./set-legal-data";
 
 const LegalDataSection = ({
   currentCompanyId,
@@ -112,8 +113,9 @@ const LegalDataSection = ({
           {!!companyLegalData && companyLegalData.length > 0 ? (
             <>
               {mode === "Preview" ? (
-                <LegalDataPreview companyLegalData={companyLegalData} />
+                <SetLegalDataForm />
               ) : (
+                // <LegalDataPreview companyLegalData={companyLegalData} />
                 <LegalDataForm
                   companyLegalData={companyLegalData}
                   id={id}

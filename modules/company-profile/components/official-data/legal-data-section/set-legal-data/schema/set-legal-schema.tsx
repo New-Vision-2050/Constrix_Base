@@ -10,31 +10,33 @@ const ALLOWED_FILE_TYPES = [
     "image/png",
 ];
 
-const fileSchema = z.union([
+// File schema factory accepting translation function
+const createFileSchema = (t: (key: string) => string) => z.union([
     z.instanceof(File).refine(
         (file) => file.size <= MAX_FILE_SIZE,
-        { message: "حجم الملف يجب أن يكون أقل من 5 ميجابايت" }
+        { message: t("fileSizeError") }
     ).refine(
         (file) => ALLOWED_FILE_TYPES.includes(file.type),
-        { message: "نوع الملف غير مسموح" }
+        { message: t("fileTypeError") }
     ),
     z.object({
         url: z.string(),
     }).passthrough(),
 ]);
 
-const legalDataRowSchema = z.object({
+// Create schema factory function accepting translation function
+export const createLegalDataRowSchema = (t: (key: string) => string) => z.object({
     // Record ID (required for edit mode, auto-generated for add mode)
     id: z.string().or(z.number()).optional(),
     
     // Registration type ID (required)
     registration_type_id: z.string({
-        required_error: "نوع التسجيل مطلوب",
+        required_error: t("registration_type_id_required"),
     }),
     
     // Registration type type (required for conditional validation logic)
     registration_type_type: z.string({
-        required_error: "نوع التسجيل مطلوب",
+        required_error: t("registration_type_id_required"),
     }),
     
     // Registration type name (optional, for display purposes)
@@ -44,23 +46,23 @@ const legalDataRowSchema = z.object({
     registration_number: z.string()
         .regex(
             /^(700|40|101)\d*$/, 
-            "يجب أن يبدأ الرقم بـ 700 أو 40 أو 101 ويحتوي على أرقام فقط"
+            t("registrationNumberPattern")
         )
-        .min(1, "رقم التسجيل لا يمكن أن يكون فارغاً")
+        .min(1, t("registrationNumberEmpty"))
         .optional(),
     
     // Issue date (required)
     start_date: z.string({
-        required_error: "ادخل تاريخ الاصدار",
+        required_error: t("startDateRequired"),
     }).or(z.date()),
     
     // Expiry date (required)
     end_date: z.string({
-        required_error: "ادخل تاريخ الانتهاء",
+        required_error: t("endDateRequired"),
     }).or(z.date()),
     
     // Attached files (at least one file required)
-    files: z.array(fileSchema).min(1, "يجب إرفاق ملف واحد على الأقل"),
+    files: z.array(createFileSchema(t)).min(1, t("filesRequired")),
 })
     // Validate: registration_number is required if type is not "Without Register"
     .refine(
@@ -71,7 +73,7 @@ const legalDataRowSchema = z.object({
             return true;
         },
         {
-            message: "رقم التسجيل مطلوب لهذا النوع",
+            message: t("registrationNumberRequiredForType"),
             path: ["registration_number"],
         }
     )
@@ -83,13 +85,14 @@ const legalDataRowSchema = z.object({
             return startDate <= endDate;
         },
         {
-            message: "تاريخ الإصدار يجب أن يكون قبل تاريخ الانتهاء",
+            message: t("startDateBeforeEndDate"),
             path: ["end_date"],
         }
     );
 
-export const legalDataFormSchema = z.object({
-    data: z.array(legalDataRowSchema).max(10, "الحد الأقصى 10 سجلات"),
+// Create form schema factory function
+export const createLegalDataFormSchema = (t: (key: string) => string) => z.object({
+    data: z.array(createLegalDataRowSchema(t)).max(10, t("maxRecords")),
 });
 
-export type LegalDataFormValues = z.infer<typeof legalDataFormSchema>;
+export type LegalDataFormValues = z.infer<ReturnType<typeof createLegalDataFormSchema>>;
