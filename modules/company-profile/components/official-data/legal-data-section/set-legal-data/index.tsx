@@ -33,7 +33,6 @@ export default function SetLegalDataForm({
   mode = "add",
 }: SetLegalDataFormProps) {
   const t = useTranslations("companyProfileLegalDataForm");
-
   // Fetch registration types
   const { data: registrationTypesData } = useQuery({
     queryKey: ["company-registration-types"],
@@ -48,8 +47,6 @@ export default function SetLegalDataForm({
       name: item.name,
       type: item.id_type,
     })) || [];
-
-  console.log("initialData707", initialData);
 
   const form = useForm<LegalDataFormValues>({
     resolver: zodResolver(createLegalDataFormSchema(t)),
@@ -70,6 +67,8 @@ export default function SetLegalDataForm({
     control,
     name: "data",
   });
+
+  console.log("errors77errors", errors,initialData);
 
   // Show toast for validation errors
   useEffect(() => {
@@ -151,7 +150,6 @@ export default function SetLegalDataForm({
     }
     append({
       registration_type_id: "",
-      registration_type_type: "",
       registration_number: "",
       start_date: "",
       end_date: "",

@@ -41,9 +41,9 @@ export const createLegalDataRowSchema = (t: (key: string) => string) =>
       }),
 
       // Registration type type (required for conditional validation logic)
-      registration_type_type: z.string({
-        required_error: t("registration_type_id_required"),
-      }),
+      // registration_type_type: z.string({
+      //   required_error: t("registration_type_id_required"),
+      // }),
 
       // Registration type name (optional, for display purposes)
       registration_type: z.string().optional(),

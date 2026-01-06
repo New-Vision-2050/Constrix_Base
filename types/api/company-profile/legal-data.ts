@@ -10,7 +10,7 @@ export interface CP_RegistrationType {
 export interface CP_LegalDataRecord {
   id?: string | number;
   registration_type_id: string;
-  registration_type_type: string;
+  // registration_type_type: string;
   registration_type?: string;
   registration_number?: string;
   start_date: string;
