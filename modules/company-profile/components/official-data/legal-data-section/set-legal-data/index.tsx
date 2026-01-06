@@ -16,6 +16,7 @@ import LegalDataRow from "./components/LegalDataRow";
 import { useQuery } from "@tanstack/react-query";
 import { baseURL } from "@/config/axios-config";
 import axios from "axios";
+import { CompanyProfileLegalDataApi } from "@/services/api/company-profile/legal-data";
 
 interface SetLegalDataFormProps {
   onSuccess?: () => void;
@@ -36,10 +37,16 @@ export default function SetLegalDataForm({
   const { data: registrationTypesData } = useQuery({
     queryKey: ["company-registration-types"],
     queryFn: async () => {
-      const response = await axios.get(`${baseURL}/company_registration_types`);
+      const response = await CompanyProfileLegalDataApi.getRegistrationTypes();
       return response.data;
     },
   });
+  const registrationTypesOptions =
+    registrationTypesData?.payload?.map((item) => ({
+      id: item.id_type,
+      name: item.name,
+      type: item.id_type,
+    })) || [];
 
   const form = useForm<LegalDataFormValues>({
     resolver: zodResolver(createLegalDataFormSchema(t)),
@@ -82,7 +89,11 @@ export default function SetLegalDataForm({
 
   const onSubmit = async (data: LegalDataFormValues) => {
     try {
-      console.log("Form data:", data);
+      const payload = data?.data?.map((item) => ({
+        ...item,
+        registration_type_id: item.registration_type_id?.split("_")?.[0],
+      }));
+      console.log("Form data:", payload);
       toast.success(t("save"));
       onSuccess?.();
     } catch (error) {
@@ -119,7 +130,7 @@ export default function SetLegalDataForm({
             onDelete={() => remove(index)}
             canDelete={fields.length > 1}
             t={t}
-            registrationTypes={registrationTypesData?.payload || []}
+            registrationTypes={registrationTypesOptions || []}
             isSubmitting={isSubmitting}
           />
         ))}

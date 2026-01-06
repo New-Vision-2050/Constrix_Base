@@ -1,18 +1,28 @@
-'use client';
+"use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Control, UseFormWatch } from "react-hook-form";
 import { IconButton } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import { FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  FormField,
+  FormItem,
+  FormControl,
+} from "@/modules/table/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
-import CustomDateField from "@/components/shared/CustomDateField";
 import FileUploadButton from "@/components/shared/FileUploadButton";
 import { LegalDataFormValues } from "../schema/set-legal-schema";
 import { RegistrationTypes } from "../../registration-types";
+import { useLocale } from "next-intl";
 
 interface LegalDataRowProps {
   control: Control<LegalDataFormValues>;
@@ -35,9 +45,17 @@ export default function LegalDataRow({
   registrationTypes,
   isSubmitting,
 }: LegalDataRowProps) {
+  // detect direction
+  const lang = useLocale();
+  const dir = lang == "ar" ? "rtl" : "ltr";
   // Watch registration type to conditionally show registration number field
-  const registrationType = watch(`data.${index}.registration_type_type`);
-  const showRegistrationNumber = registrationType !== RegistrationTypes.WithoutARegister;
+  const registrationTypeId = watch(`data.${index}.registration_type_id`);
+  const registrationType = useMemo(
+    () => registrationTypeId?.split("_")?.[1],
+    [registrationTypeId]
+  );
+  const showRegistrationNumber =
+    registrationType !== RegistrationTypes.WithoutARegister;
 
   return (
     <div className="p-4 bg-sidebar rounded-lg border border-sidebar-border relative mb-4">
@@ -57,62 +75,64 @@ export default function LegalDataRow({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Registration Type */}
         <div className={showRegistrationNumber ? "" : "md:col-span-2"}>
-        <FormField
-          control={control}
-          name={`data.${index}.registration_type_id`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs" required>
-                {t("registrationType")}
-              </FormLabel>
-              <FormControl>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger className="mt-1 bg-sidebar border-white text-white h-12">
-                    <SelectValue placeholder={t("registrationTypePlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {registrationTypes?.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormErrorMessage />
-            </FormItem>
-          )}
-        />
-        </div>
-
-        {/* Registration Number - Conditional */}
-        {showRegistrationNumber && (
-          <div>
           <FormField
             control={control}
-            name={`data.${index}.registration_number`}
+            name={`data.${index}.registration_type_id`}
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs" required>
-                  {t("registrationNumber")}
+                  {t("registrationType")}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    variant="secondary"
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
                     disabled={isSubmitting}
-                    className="mt-1"
-                    placeholder={t("registrationNumberPlaceholder")}
-                    {...field}
-                  />
+                  >
+                    <SelectTrigger className="mt-1 bg-sidebar border-white text-white h-12">
+                      <SelectValue
+                        placeholder={t("registrationTypePlaceholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent dir={dir}>
+                      {registrationTypes?.map((option) => (
+                        <SelectItem key={option.id} value={option.id}>
+                          {option.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormErrorMessage />
               </FormItem>
             )}
           />
+        </div>
+
+        {/* Registration Number - Conditional */}
+        {showRegistrationNumber && (
+          <div>
+            <FormField
+              control={control}
+              name={`data.${index}.registration_number`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs" required>
+                    {t("registrationNumber")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      variant="secondary"
+                      disabled={isSubmitting}
+                      className="mt-1"
+                      placeholder={t("registrationNumberPlaceholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormErrorMessage />
+                </FormItem>
+              )}
+            />
           </div>
         )}
 
@@ -126,16 +146,23 @@ export default function LegalDataRow({
                 {t("startDate")}
               </FormLabel>
               <FormControl>
-                <CustomDateField
-                  name={field.name}
+                <Input
+                  type="date"
+                  variant="secondary"
                   disabled={isSubmitting}
-                  placeholder={t("startDatePlaceholder")}
-                  selectedDate={field.value ? new Date(field.value) : undefined}
-                  setSelectedDate={(value) => {
-                    const newDate = typeof value === 'function' ? value(field.value ? new Date(field.value) : undefined) : value;
-                    field.onChange(newDate ? newDate.toISOString() : undefined);
+                  className="mt-1"
+                  {...field}
+                  value={
+                    field.value
+                      ? new Date(field.value).toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const dateValue = e.target.value;
+                    field.onChange(
+                      dateValue ? new Date(dateValue).toISOString() : ""
+                    );
                   }}
-                  className="mt-1 bg-sidebar border-white text-white"
                 />
               </FormControl>
               <FormErrorMessage />
@@ -153,16 +180,23 @@ export default function LegalDataRow({
                 {t("endDate")}
               </FormLabel>
               <FormControl>
-                <CustomDateField
-                  name={field.name}
+                <Input
+                  type="date"
+                  variant="secondary"
                   disabled={isSubmitting}
-                  placeholder={t("endDatePlaceholder")}
-                  selectedDate={field.value ? new Date(field.value) : undefined}
-                  setSelectedDate={(value) => {
-                    const newDate = typeof value === 'function' ? value(field.value ? new Date(field.value) : undefined) : value;
-                    field.onChange(newDate ? newDate.toISOString() : undefined);
+                  className="mt-1"
+                  {...field}
+                  value={
+                    field.value
+                      ? new Date(field.value).toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const dateValue = e.target.value;
+                    field.onChange(
+                      dateValue ? new Date(dateValue).toISOString() : ""
+                    );
                   }}
-                  className="mt-1 bg-sidebar border-white text-white"
                 />
               </FormControl>
               <FormErrorMessage />
