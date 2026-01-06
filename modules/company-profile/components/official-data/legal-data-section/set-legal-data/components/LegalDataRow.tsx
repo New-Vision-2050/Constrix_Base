@@ -215,11 +215,12 @@ export default function LegalDataRow({
               </FormLabel>
               <FormControl>
                 <FileUploadButton
-                  onChange={(file) => field.onChange(file ? [file] : [])}
+                  onChange={(files) => field.onChange(files || [])}
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                   maxSize="5MB"
                   disabled={isSubmitting}
                   label={t("attachFile")}
+                  multiple
                 />
               </FormControl>
               <FormErrorMessage />

@@ -14,13 +14,14 @@ import { IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
 interface FileUploadButtonProps {
-  onChange?: (file: File | null) => void;
+  onChange?: (file: File | File[] | null) => void;
   accept?: string;
   maxSize?: string; // e.g., "10MB"
   className?: string;
   disabled?: boolean;
-  initialValue?: string | File | null;
+  initialValue?: string | File | File[] | null;
   label?: string;
+  multiple?: boolean;
 }
 
 export default function FileUploadButton({
@@ -31,9 +32,11 @@ export default function FileUploadButton({
   disabled = false,
   initialValue,
   label,
+  multiple = false,
 }: FileUploadButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [existingFile, setExistingFile] = useState('');
 
@@ -44,39 +47,72 @@ export default function FileUploadButton({
 
   // Handle initial value
   useEffect(() => {
-    if (initialValue && !selectedFile) {
-      if (initialValue instanceof File) {
-        setSelectedFile(initialValue);
+    if (initialValue) {
+      if (Array.isArray(initialValue)) {
+        setSelectedFiles(initialValue);
+      } else if (initialValue instanceof File) {
+        if (multiple) {
+          setSelectedFiles([initialValue]);
+        } else {
+          setSelectedFile(initialValue);
+        }
       } else if (typeof initialValue === "string") {
         setExistingFile(initialValue)
       }
     }
-  }, [initialValue, selectedFile]);
+  }, [initialValue, multiple]);
 
   const handleClearFile = () => { setExistingFile('') }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    if (multiple) {
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
 
-    // Validate file size if maxSize is provided
-    if (maxSize) {
-      const maxSizeBytes = parseSize(maxSize);
-      if (file.size > maxSizeBytes) {
-        alert(`File size exceeds the maximum allowed size of ${maxSize}`);
-        e.target.value = "";
-        return;
+      // Validate file sizes if maxSize is provided
+      if (maxSize) {
+        const maxSizeBytes = parseSize(maxSize);
+        const invalidFiles = files.filter(file => file.size > maxSizeBytes);
+        if (invalidFiles.length > 0) {
+          alert(`Some files exceed the maximum allowed size of ${maxSize}`);
+          e.target.value = "";
+          return;
+        }
       }
-    }
 
-    setSelectedFile(file);
-    onChange?.(file);
-    e.target.value = ""; // Reset input to allow selecting the same file again
+      setSelectedFiles(files);
+      onChange?.(files);
+      e.target.value = "";
+    } else {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Validate file size if maxSize is provided
+      if (maxSize) {
+        const maxSizeBytes = parseSize(maxSize);
+        if (file.size > maxSizeBytes) {
+          alert(`File size exceeds the maximum allowed size of ${maxSize}`);
+          e.target.value = "";
+          return;
+        }
+      }
+
+      setSelectedFile(file);
+      onChange?.(file);
+      e.target.value = "";
+    }
   };
 
-  const handleRemoveFile = () => {
-    setSelectedFile(null);
-    onChange?.(null);
+  const handleRemoveFile = (index?: number) => {
+    if (multiple && index !== undefined) {
+      const newFiles = selectedFiles.filter((_, i) => i !== index);
+      setSelectedFiles(newFiles);
+      onChange?.(newFiles.length > 0 ? newFiles : null);
+    } else {
+      setSelectedFile(null);
+      setSelectedFiles([]);
+      onChange?.(null);
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -169,9 +205,50 @@ export default function FileUploadButton({
         onChange={handleFileSelect}
         className="hidden"
         disabled={disabled}
+        multiple={multiple}
       />
 
-      {selectedFile ? (
+      {multiple && selectedFiles.length > 0 ? (
+        <div className="space-y-2">
+          {selectedFiles.map((file, index) => (
+            <div key={index} className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-lg">
+              <FileIcon className="h-4 w-4 text-sidebar-foreground/60 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p
+                        className="text-sm text-sidebar-foreground truncate cursor-default"
+                        title={file.name}
+                      >
+                        {truncateFileName(file.name)}
+                      </p>
+                    </TooltipTrigger>
+                    {file.name.length > 30 && (
+                      <TooltipContent>
+                        <p className="max-w-xs break-words">{file.name}</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+                <p className="text-xs text-sidebar-foreground/60">
+                  {formatFileSize(file.size)}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => handleRemoveFile(index)}
+                disabled={disabled}
+                className="flex-shrink-0 border-sidebar-border hover:bg-sidebar-accent hover:border-sidebar-accent-foreground"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : selectedFile ? (
         <div className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-lg">
           <FileIcon className="h-4 w-4 text-sidebar-foreground/60 flex-shrink-0" />
           <div className="flex-1 min-w-0">
@@ -200,7 +277,7 @@ export default function FileUploadButton({
             type="button"
             variant="outline"
             size="icon"
-            onClick={handleRemoveFile}
+            onClick={() => handleRemoveFile()}
             disabled={disabled}
             className="flex-shrink-0 border-sidebar-border hover:bg-sidebar-accent hover:border-sidebar-accent-foreground"
           >
