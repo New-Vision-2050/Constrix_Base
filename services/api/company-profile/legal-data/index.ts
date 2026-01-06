@@ -23,13 +23,26 @@ export const CompanyProfileLegalDataApi = {
     ),
 
   // Create new legal data record
-  create: (body: CP_CreateLegalDataParams, params: { company_id?: string; branch_id?: string }) => {
-    const formData = serialize(body);
+  create: (
+    body: CP_CreateLegalDataParams[],
+    params?: { company_id?: string; branch_id?: string }
+  ) => {
+    // Wrap in data property
+    const payload = {
+      data: body,
+    };
+
+    // Serialize to FormData
+    const formData = serialize(payload, { indices: true });
+
     return baseApi.post<CP_CreateLegalDataResponse>(
       "companies/company-profile/legal-data/create-legal-data",
       formData,
       {
-        params,
+        params: {
+          ...(params?.branch_id && { branch_id: params.branch_id }),
+          ...(params?.company_id && { company_id: params.company_id }),
+        },
         headers: {
           "Content-Type": "multipart/form-data",
         },

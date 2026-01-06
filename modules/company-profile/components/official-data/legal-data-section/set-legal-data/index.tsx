@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { baseURL } from "@/config/axios-config";
 import axios from "axios";
 import { CompanyProfileLegalDataApi } from "@/services/api/company-profile/legal-data";
+import { serialize } from "object-to-formdata";
 
 interface SetLegalDataFormProps {
   onSuccess?: () => void;
@@ -90,10 +91,14 @@ export default function SetLegalDataForm({
   const onSubmit = async (data: LegalDataFormValues) => {
     try {
       const payload = data?.data?.map((item) => ({
-        ...item,
         registration_type_id: item.registration_type_id?.split("_")?.[0],
+        regestration_number: item.registration_number || undefined,
+        start_date: typeof item.start_date === 'string' ? item.start_date : item.start_date.toISOString(),
+        end_date: typeof item.end_date === 'string' ? item.end_date : item.end_date.toISOString(),
+        files: item.files.filter((file): file is File => file instanceof File),
       }));
-      console.log("Form data:", payload);
+
+      await CompanyProfileLegalDataApi.create(payload);
       toast.success(t("save"));
       onSuccess?.();
     } catch (error) {

@@ -25,7 +25,7 @@ export interface CP_CreateLegalDataParams {
   regestration_number?: string;
   start_date: string;
   end_date: string;
-  file: File[];
+  files: File[];
 }
 
 // Update Legal Data Request
