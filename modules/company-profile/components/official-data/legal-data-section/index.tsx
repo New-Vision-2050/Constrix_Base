@@ -113,14 +113,14 @@ const LegalDataSection = ({
           {!!companyLegalData && companyLegalData.length > 0 ? (
             <>
               {mode === "Preview" ? (
-                <SetLegalDataForm />
+                <LegalDataPreview companyLegalData={companyLegalData} />
               ) : (
-                // <LegalDataPreview companyLegalData={companyLegalData} />
-                <LegalDataForm
-                  companyLegalData={companyLegalData}
-                  id={id}
-                  handleEditClick={handleEditClick}
-                />
+                <SetLegalDataForm />
+                // <LegalDataForm
+                //   companyLegalData={companyLegalData}
+                //   id={id}
+                //   handleEditClick={handleEditClick}
+                // />
               )}
             </>
           ) : (
