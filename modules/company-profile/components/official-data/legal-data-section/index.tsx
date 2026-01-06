@@ -115,7 +115,22 @@ const LegalDataSection = ({
               {mode === "Preview" ? (
                 <LegalDataPreview companyLegalData={companyLegalData} />
               ) : (
-                <SetLegalDataForm />
+                <SetLegalDataForm 
+                  initialData={{
+                    data: companyLegalData.map((item) => ({
+                      id: item.id,
+                      registration_type_id: `${item.registration_type_id}_${item.registration_type_type}`,
+                      registration_type_type: item.registration_type_type,
+                      registration_type: item.registration_type,
+                      registration_number: item.registration_number || "",
+                      start_date: item.start_date,
+                      end_date: item.end_date,
+                      files: item.file?.map((url) => ({ url })) || [],
+                    }))
+                  }}
+                  mode="edit"
+                  onCancel={handleEditClick}
+                />
                 // <LegalDataForm
                 //   companyLegalData={companyLegalData}
                 //   id={id}

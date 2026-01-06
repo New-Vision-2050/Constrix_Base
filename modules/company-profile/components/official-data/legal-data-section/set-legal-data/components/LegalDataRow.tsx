@@ -208,24 +208,80 @@ export default function LegalDataRow({
         <FormField
           control={control}
           name={`data.${index}.files`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs" required>
-                {t("attachFile")}
-              </FormLabel>
-              <FormControl>
-                <FileUploadButton
-                  onChange={(files) => field.onChange(files || [])}
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  maxSize="5MB"
-                  disabled={isSubmitting}
-                  label={t("attachFile")}
-                  multiple
-                />
-              </FormControl>
-              <FormErrorMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const existingFiles = field.value?.filter(
+              (file): file is { url: string } =>
+                !(file instanceof File) && typeof file === "object" && "url" in file
+            ) || [];
+            const newFiles = field.value?.filter(
+              (file): file is File => file instanceof File
+            ) || [];
+
+            return (
+              <FormItem>
+                <FormLabel className="text-xs" required>
+                  {t("attachFile")}
+                </FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
+                    {/* Display existing files from backend */}
+                    {existingFiles.length > 0 && (
+                      <div className="space-y-2">
+                        {existingFiles.map((file, idx) => {
+                          const fileUrl = typeof file?.url === 'string' ? file?.url : '';
+                          const fileName = fileUrl ? fileUrl.split("/").pop() : "ملف مرفق";
+                          
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-center gap-2 p-2 bg-sidebar border border-sidebar-border rounded-lg"
+                            >
+                              <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 text-sm text-primary hover:underline truncate"
+                              >
+                                {fileName}
+                              </a>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => {
+                                  const updatedFiles = field.value?.filter((_, i) => 
+                                    !(i === idx && !(_ instanceof File))
+                                  );
+                                  field.onChange(updatedFiles || []);
+                                }}
+                                disabled={isSubmitting}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* File upload button */}
+                    <FileUploadButton
+                      onChange={(files) => {
+                        const uploadedFiles = Array.isArray(files) ? files : files ? [files] : [];
+                        field.onChange([...existingFiles, ...uploadedFiles]);
+                      }}
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      maxSize="5MB"
+                      disabled={isSubmitting}
+                      label={t("attachFile")}
+                      multiple
+                      initialValue={newFiles}
+                    />
+                  </div>
+                </FormControl>
+                <FormErrorMessage />
+              </FormItem>
+            );
+          }}
         />
       </div>
     </div>

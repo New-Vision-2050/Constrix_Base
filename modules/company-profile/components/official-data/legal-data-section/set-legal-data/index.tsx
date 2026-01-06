@@ -49,20 +49,13 @@ export default function SetLegalDataForm({
       type: item.id_type,
     })) || [];
 
+  console.log("initialData707", initialData);
+
   const form = useForm<LegalDataFormValues>({
     resolver: zodResolver(createLegalDataFormSchema(t)),
     mode: "onChange",
     defaultValues: initialData || {
-      data: [
-        {
-          registration_type_id: "",
-          registration_type_type: "",
-          registration_number: "",
-          start_date: "",
-          end_date: "",
-          files: [],
-        },
-      ],
+      data: [],
     },
   });
 
@@ -95,29 +88,49 @@ export default function SetLegalDataForm({
         const payload = data?.data?.map((item) => ({
           registration_type_id: item.registration_type_id?.split("_")?.[0],
           regestration_number: item.registration_number || undefined,
-          start_date: typeof item.start_date === 'string' ? item.start_date : item.start_date.toISOString(),
-          end_date: typeof item.end_date === 'string' ? item.end_date : item.end_date.toISOString(),
-          files: item.files.filter((file): file is File => file instanceof File),
+          start_date:
+            typeof item.start_date === "string"
+              ? item.start_date
+              : item.start_date.toISOString(),
+          end_date:
+            typeof item.end_date === "string"
+              ? item.end_date
+              : item.end_date.toISOString(),
+          files: item.files.filter(
+            (file): file is File => file instanceof File
+          ),
         }));
 
         await CompanyProfileLegalDataApi.create(payload);
       } else {
         // Edit mode: send update payload
+        console.log('updatedata',data)
         const updatePayload = {
           data: data?.data?.map((item) => {
-            const binaryFiles = item.files.filter((file): file is File => file instanceof File);
-            const backendFiles = item.files.filter((file): file is { url: string } => 
-              !(file instanceof File) && typeof file === 'object' && 'url' in file
+            const binaryFiles = item.files.filter(
+              (file): file is File => file instanceof File
+            );
+            const backendFiles = item.files.filter(
+              (file): file is { url: string } =>
+                !(file instanceof File) &&
+                typeof file === "object" &&
+                "url" in file
             );
 
             return {
               id: item.id,
-              start_date: typeof item.start_date === 'string' ? item.start_date : item.start_date.toISOString(),
-              end_date: typeof item.end_date === 'string' ? item.end_date : item.end_date.toISOString(),
+              start_date:
+                typeof item.start_date === "string"
+                  ? item.start_date
+                  : item.start_date.toISOString(),
+              end_date:
+                typeof item.end_date === "string"
+                  ? item.end_date
+                  : item.end_date.toISOString(),
               file: binaryFiles.length > 0 ? binaryFiles : undefined,
               files: backendFiles.length > 0 ? backendFiles : undefined,
             };
-          })
+          }),
         };
 
         await CompanyProfileLegalDataApi.update(updatePayload, {});
