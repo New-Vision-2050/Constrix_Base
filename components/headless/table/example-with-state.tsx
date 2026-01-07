@@ -171,15 +171,11 @@ export function ExampleWithState() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Paper sx={{ p: 2 }} variant="outlined">
-        <UserTable.TopActions state={state} />
-
-        <UserTable.Table state={state} loadingOptions={{ rows: 5 }} />
-
-        <Box sx={{ mt: 2 }}>
-          <UserTable.Pagination state={state} />
-        </Box>
-      </Paper>
+      <UserTable
+        filters={<UserTable.TopActions state={state} />}
+        table={<UserTable.Table state={state} loadingOptions={{ rows: 5 }} />}
+        pagination={<UserTable.Pagination state={state} />}
+      />
 
       {/* Debug Info */}
       <Paper sx={{ p: 2, mt: 2 }} variant="outlined">
