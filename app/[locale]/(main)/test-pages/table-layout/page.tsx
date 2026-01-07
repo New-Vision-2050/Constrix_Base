@@ -1,7 +1,7 @@
-import { ExampleWithLayout } from "@/components/headless/table/example";
+import { ExampleWithState } from "@/components/headless/table/example-with-state";
 
 function TableLayoutPage() {
-  return <ExampleWithLayout />;
+  return <ExampleWithState />;
 }
 
 export default TableLayoutPage;

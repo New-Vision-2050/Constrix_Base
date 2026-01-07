@@ -5,11 +5,14 @@ A fully type-safe table compound component built with Material-UI, providing bea
 ## Features
 
 - ✅ **Type-safe**: Full TypeScript support with generic row types
+- ✅ **Centralized State Management**: `useState` hook for managing all table state
 - ✅ **Compound Component Pattern**: Use together or individually
 - ✅ **Material-UI Design**: Beautiful, modern UI with MUI components
 - ✅ **Sorting Support**: Optional controlled sorting with TableSortLabel
 - ✅ **Skeleton Loading**: Customizable skeleton loaders with configurable row count
 - ✅ **Row Selection**: Built-in checkbox selection with select all functionality
+- ✅ **Built-in Pagination**: Pagination component with page size controls
+- ✅ **Bulk Actions**: TopActions component for export, delete, and custom actions
 - ✅ **Empty States**: Beautiful empty state designs with icons
 - ✅ **Flexible Column Definitions**: Custom render functions with full access to row data
 - ✅ **Modular Architecture**: Components organized in separate directories
@@ -59,7 +62,40 @@ const columns = [
 
 ### 3. Use the table
 
-#### Option A: With TableLayout (Full Compound Component)
+#### Option A: With State Pattern (Recommended)
+
+```typescript
+// Initialize centralized state
+const state = UserTable.useState({
+  data: users,
+  columns,
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalItems: users.length,
+  },
+  getRowId: (user) => user.id.toString(),
+  initialSortBy: "name",
+  initialSortDirection: "asc",
+  loading: false,
+  filtered: false,
+  onExport: async (selectedRows) => {
+    console.log("Exporting:", selectedRows);
+  },
+  onDelete: async (selectedRows) => {
+    console.log("Deleting:", selectedRows);
+  },
+});
+
+// Use components with state
+<>
+  <UserTable.TopActions state={state} />
+  <UserTable.Table state={state} />
+  <UserTable.Pagination state={state} />
+</>;
+```
+
+#### Option B: With TableLayout (Full Compound Component)
 
 ```typescript
 <UserTable
@@ -79,7 +115,7 @@ const columns = [
 />
 ```
 
-#### Option B: Standalone Table
+#### Option C: Standalone Table (Individual Props)
 
 ```typescript
 <UserTable.Table columns={columns} data={users} />
@@ -99,6 +135,9 @@ Factory function that creates a typed table component.
 
 - `TableLayoutComponent`: Main wrapper component
 - `TableLayoutComponent.Table`: Table component
+- `TableLayoutComponent.Pagination`: Pagination component
+- `TableLayoutComponent.TopActions`: Bulk actions component
+- `TableLayoutComponent.useState`: State management hook
 
 ---
 
@@ -152,6 +191,98 @@ type TableProps<TRow> = {
 - **`loading`** (optional): When `true`, shows skeleton loading state
 - **`loadingOptions`** (optional): Customize loading state appearance
 - **`selectable`** (optional): Enable row selection with checkboxes
+
+---
+
+### `TableStateOptions<TRow>`
+
+Configuration options for the `useState` hook.
+
+```typescript
+type TableStateOptions<TRow> = {
+  // Data (required)
+  data: TRow[];
+  columns: ColumnDef<TRow>[];
+
+  // Pagination (optional)
+  pagination?: {
+    page?: number; // Initial page (default: 1)
+    limit?: number; // Items per page (default: 10)
+    totalItems?: number; // Total items (default: data.length)
+  };
+
+  // Selection (optional)
+  getRowId?: (row: TRow) => string;
+
+  // Sorting (optional)
+  initialSortBy?: string;
+  initialSortDirection?: "asc" | "desc";
+
+  // States (optional)
+  loading?: boolean;
+  filtered?: boolean;
+
+  // Actions (optional)
+  onExport?: (selectedRows: TRow[]) => void | Promise<void>;
+  onDelete?: (selectedRows: TRow[]) => void | Promise<void>;
+};
+```
+
+---
+
+### `TableState<TRow>`
+
+The state object returned by `useState` hook.
+
+```typescript
+type TableState<TRow> = {
+  // Table state
+  table: {
+    columns: ColumnDef<TRow>[];
+    data: TRow[]; // Paginated data
+    sortBy?: string;
+    sortDirection?: "asc" | "desc";
+    loading: boolean;
+    filtered: boolean;
+    handleSort: (key: string) => void;
+  };
+
+  // Pagination state
+  pagination: {
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+    setPage: (page: number) => void;
+    setLimit: (limit: number) => void;
+    nextPage: () => void;
+    prevPage: () => void;
+    canNextPage: boolean;
+    canPrevPage: boolean;
+    paginatedData: TRow[];
+  };
+
+  // Selection state
+  selection: {
+    selectedRows: TRow[];
+    setSelectedRows: (rows: TRow[]) => void;
+    clearSelection: () => void;
+    selectAll: () => void;
+    hasSelection: boolean;
+    selectedCount: number;
+    isRowSelected: (row: TRow) => boolean;
+    toggleRow: (row: TRow) => void;
+  };
+
+  // Actions
+  actions: {
+    onExport?: () => void | Promise<void>;
+    onDelete?: () => void | Promise<void>;
+    canExport: boolean;
+    canDelete: boolean;
+  };
+};
+```
 
 ---
 
@@ -327,28 +458,56 @@ const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 console.log("Selected:", selectedUsers);
 ```
 
-### Example 7: Full Featured Table
+### Example 7: Full Featured Table with State Pattern
 
 ```typescript
-const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-const [sortBy, setSortBy] = useState<string>("name");
-const [sort, setSort] = useState<"asc" | "desc">("asc");
+const state = UserTable.useState({
+  data: users,
+  columns,
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalItems: users.length,
+  },
+  getRowId: (user) => user.id.toString(),
+  initialSortBy: "name",
+  initialSortDirection: "asc",
+  loading: isLoading,
+  filtered: hasFilters,
+  onExport: async (selectedRows) => {
+    // Export logic
+    await exportToCSV(selectedRows);
+  },
+  onDelete: async (selectedRows) => {
+    // Delete logic
+    await deleteUsers(selectedRows.map((u) => u.id));
+  },
+});
 
-<UserTable.Table
-  columns={columns}
-  data={sortedUsers}
-  sortBy={sortBy}
-  sort={sort}
-  handleSort={handleSort}
-  loading={isLoading}
-  loadingOptions={{ rows: 5 }}
-  filtered={hasFilters}
-  selectable={{
-    selectedRows: selectedUsers,
-    onSelectionChange: setSelectedUsers,
-    getRowId: (user) => user.id.toString(),
-  }}
-/>;
+<Box>
+  <UserTable.TopActions state={state} />
+  <UserTable.Table state={state} loadingOptions={{ rows: 5 }} />
+  <UserTable.Pagination state={state} />
+</Box>;
+
+// Access state values
+console.log("Selected:", state.selection.selectedCount);
+console.log("Current page:", state.pagination.page);
+```
+
+### Example 8: Custom Actions with TopActions
+
+```typescript
+<UserTable.TopActions
+  state={state}
+  customActions={
+    <>
+      <Button onClick={() => console.log("Custom action")}>
+        Custom Action
+      </Button>
+    </>
+  }
+/>
 ```
 
 ## States
@@ -404,23 +563,76 @@ components/headless/table/
 │   ├── table-component/
 │   │   ├── index.tsx          # Table rendering component
 │   │   └── types.ts           # ColumnDef, TableProps, LoadingOptions, SelectionConfig
-│   └── table-layout/
-│       ├── index.tsx          # Layout wrapper component
-│       └── types.ts           # TableLayoutProps
+│   ├── table-layout/
+│   │   ├── index.tsx          # Layout wrapper component
+│   │   └── types.ts           # TableLayoutProps
+│   ├── table-state/
+│   │   ├── index.tsx          # State management hook
+│   │   └── types.ts           # TableState, TableStateOptions
+│   ├── pagination/
+│   │   └── index.tsx          # Pagination component
+│   └── top-actions/
+│       └── index.tsx          # Bulk actions component
 ├── index.tsx                  # Main entry point
-├── example.tsx                # Usage examples
+├── example.tsx                # Usage examples (individual props)
+├── example-with-state.tsx     # Usage examples (state pattern)
 └── README.md                  # Documentation
 ```
+
+## State Management Pattern
+
+The new `useState` hook provides centralized state management:
+
+### Benefits
+
+1. **Single Source of Truth**: All table state in one place
+2. **Less Boilerplate**: No need to manage multiple useState hooks
+3. **Built-in Pagination**: Automatic data slicing and page management
+4. **Integrated Selection**: Selection state managed automatically
+5. **Sticky Selection**: Selected rows stay visible at the top when changing pages
+6. **Action Handlers**: Export/delete actions with selected rows
+7. **Type-safe**: Full TypeScript support with generics
+
+### State Structure
+
+The state is organized into logical sections:
+
+- **`table`**: Data, columns, sorting, loading states
+- **`pagination`**: Page, limit, navigation, computed values
+- **`selection`**: Selected rows, selection actions
+- **`actions`**: Export, delete, and custom action handlers
+
+### Sticky Selection Feature
+
+When using the state pattern, selected rows remain visible at the top of the table even when navigating to different pages:
+
+- **Selected rows from other pages** appear at the top with a blue left border
+- **Current page rows** appear below the sticky rows
+- **Visual distinction**: Sticky rows have a subtle background color and colored border
+- **Persistent selection**: Selection is maintained across page changes, sorting, and limit changes
+- **Better UX**: Users can always see what they've selected without losing context
+
+### Performance
+
+The state hook uses React's `useMemo` and `useCallback` for optimal performance:
+
+- Paginated data is memoized
+- Action handlers are memoized
+- No unnecessary re-renders
+- Sticky selection computed efficiently
 
 ## Design Decisions
 
 1. **Modular Architecture**: Components split into separate directories with co-located types
 2. **Type-safe**: Generic type ensures your columns and data are always in sync
-3. **Controlled Sorting**: Parent manages sorting logic and state
-4. **Controlled Selection**: Parent manages selected rows state
-5. **Compound Pattern**: Components work together but can be used independently
-6. **Column Key**: Used for sorting identification, not data access (use in render function)
-7. **Skeleton Loading**: Better UX than spinners, shows table structure while loading
+3. **Centralized State**: Optional useState hook for managing all table state
+4. **Sticky Selection**: Selected rows stay visible at top across pagination
+5. **Backward Compatible**: Old prop-based pattern still works
+6. **Controlled Sorting**: Parent manages sorting logic and state
+7. **Controlled Selection**: Parent manages selected rows state
+8. **Compound Pattern**: Components work together but can be used independently
+9. **Column Key**: Used for sorting identification, not data access (use in render function)
+10. **Skeleton Loading**: Better UX than spinners, shows table structure while loading
 
 ## TypeScript Tips
 
@@ -439,20 +651,27 @@ render: (row: User, index: number, column: ColumnDef<User>) => {
 
 ## Future Enhancements
 
-- [ ] Pagination component
+- [x] Pagination component
 - [x] Row selection with checkboxes
 - [x] Skeleton loading states
+- [x] Centralized state management
+- [x] Bulk actions (export, delete)
 - [ ] Column resizing
 - [ ] Column reordering
 - [ ] Customizable empty/loading states
 - [ ] Sticky headers
 - [ ] Virtual scrolling for large datasets
 - [ ] Row actions menu
-- [ ] Bulk actions for selected rows
+- [ ] Server-side pagination support
+- [ ] Advanced filtering UI
 
 ## See Also
 
-- `example.tsx` - Comprehensive usage examples
+- `example.tsx` - Usage examples with individual props
+- `example-with-state.tsx` - Usage examples with state pattern (recommended)
 - `index.tsx` - Main entry point
 - `components/table-component/` - Table rendering logic
 - `components/table-layout/` - Layout wrapper component
+- `components/table-state/` - State management hook
+- `components/pagination/` - Pagination component
+- `components/top-actions/` - Bulk actions component

@@ -21,17 +21,36 @@ import { TableProps } from "./types";
 // ============================================================================
 
 export function createTableComponent<TRow>() {
-  const TableComponent = ({
-    columns,
-    data,
-    sortBy,
-    sort,
-    handleSort,
-    filtered = false,
-    loading = false,
-    loadingOptions = { rows: 5 },
-    selectable,
-  }: TableProps<TRow>) => {
+  const TableComponent = (props: TableProps<TRow>) => {
+    // Extract props based on whether state is provided
+    const isUsingState = "state" in props && props.state !== undefined;
+
+    const columns = isUsingState ? props.state.table.columns : props.columns;
+    const data = isUsingState ? props.state.table.data : props.data;
+    const sortBy = isUsingState ? props.state.table.sortBy : props.sortBy;
+    const sort = isUsingState ? props.state.table.sortDirection : props.sort;
+    const handleSort = isUsingState
+      ? props.state.table.handleSort
+      : props.handleSort;
+    const filtered = isUsingState
+      ? props.state.table.filtered
+      : props.filtered || false;
+    const loading = isUsingState
+      ? props.state.table.loading
+      : props.loading || false;
+    const loadingOptions = props.loadingOptions || { rows: 5 };
+
+    // Selection config
+    const selectable = isUsingState
+      ? {
+          selectedRows: props.state.selection.selectedRows,
+          onSelectionChange: props.state.selection.setSelectedRows,
+          getRowId: undefined, // Will use state's internal logic
+        }
+      : props.selectable;
+
+    // Use state's selection methods when available
+    const stateSelection = isUsingState ? props.state.selection : null;
     const handleColumnSort = (columnKey: string, sortable?: boolean) => {
       if (sortable && handleSort) {
         handleSort(columnKey);
@@ -45,6 +64,10 @@ export function createTableComponent<TRow>() {
 
     const isRowSelected = (row: TRow, index: number): boolean => {
       if (!selectable) return false;
+      // Use state's selection method if available
+      if (stateSelection) {
+        return stateSelection.isRowSelected(row);
+      }
       const rowId = getRowId(row, index);
       return selectable.selectedRows.some(
         (selectedRow, selectedIndex) =>
@@ -54,6 +77,15 @@ export function createTableComponent<TRow>() {
 
     const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (!selectable) return;
+      // Use state's selection methods if available
+      if (stateSelection) {
+        if (event.target.checked) {
+          stateSelection.selectAll();
+        } else {
+          stateSelection.clearSelection();
+        }
+        return;
+      }
       if (event.target.checked) {
         selectable.onSelectionChange(data);
       } else {
@@ -63,6 +95,11 @@ export function createTableComponent<TRow>() {
 
     const handleRowSelect = (row: TRow, index: number) => {
       if (!selectable) return;
+      // Use state's toggle method if available
+      if (stateSelection) {
+        stateSelection.toggleRow(row);
+        return;
+      }
       const rowId = getRowId(row, index);
       const isSelected = isRowSelected(row, index);
 
@@ -206,6 +243,8 @@ export function createTableComponent<TRow>() {
               ? renderEmptyState()
               : data.map((row, index) => {
                   const selected = isRowSelected(row, index);
+                  const isSticky =
+                    stateSelection?.isRowFromOtherPage(row) || false;
                   return (
                     <TableRow
                       key={index}
@@ -213,6 +252,11 @@ export function createTableComponent<TRow>() {
                       selected={selected}
                       sx={{
                         "&:last-child td, &:last-child th": { border: 0 },
+                        ...(isSticky && {
+                          backgroundColor: "action.hover",
+                          borderLeft: "3px solid",
+                          borderLeftColor: "primary.main",
+                        }),
                       }}
                     >
                       {selectable && (
