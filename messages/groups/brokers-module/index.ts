@@ -86,7 +86,8 @@ export const brokersModuleMessages = new MessagesGroup({
     supportResponsibleRequired: _m("Support Responsible is required", "المسؤول عن الدعم مطلوب"),
     Validation: new MessagesGroup({
       arabicName: _m("The name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)"),
-      englishName: _m("The short name must be in English and not contain symbols", "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز")
-    })
+englishName: _m("The short name must be in English and contain no spaces or special characters",
+  "الاسم المختصر يجب أن يكون باللغة الإنجليزية وبدون مسافات وبدون رموز"),
+      })
   })
 });
