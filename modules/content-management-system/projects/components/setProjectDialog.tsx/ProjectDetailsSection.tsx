@@ -2,7 +2,11 @@
 
 import React from "react";
 import { Control, useWatch } from "react-hook-form";
-import { FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormControl,
+} from "@/modules/table/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/modules/table/components/ui/textarea";
@@ -17,6 +21,8 @@ import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import ImageUpload from "@/components/shared/ImageUpload";
 import { ProjectFormData } from "../../schema/project-form.schema";
+import { CompanyDashboardProjectsApi } from "@/services/api/company-dashboard/projects";
+import { toast } from "sonner";
 
 /**
  * Project Details Section Component
@@ -29,7 +35,8 @@ interface ProjectDetailsSectionProps {
   t: (key: string) => string;
   projectTypeOptions: { value: string; label: string }[];
   mainImageInitialValue?: string;
-  subImagesInitialValue?: string[];
+  subImagesInitialValue?: { id: string; url: string }[];
+  projectId?: string;
 }
 
 export default function ProjectDetailsSection({
@@ -40,6 +47,7 @@ export default function ProjectDetailsSection({
   projectTypeOptions,
   mainImageInitialValue,
   subImagesInitialValue,
+  projectId,
 }: ProjectDetailsSectionProps) {
   const isFeatured = useWatch({
     control,
@@ -57,7 +65,8 @@ export default function ProjectDetailsSection({
           <FormItem className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-lg  p-3 sm:p-4">
             <div className="space-y-0.5">
               <FormLabel className="text-xs sm:text-sm font-medium">
-                {t("featuredServices") || "Featured Services (Display on Homepage)"}
+                {t("featuredServices") ||
+                  "Featured Services (Display on Homepage)"}
               </FormLabel>
             </div>
             <FormControl>
@@ -116,6 +125,18 @@ export default function ProjectDetailsSection({
                     initialValue={subImagesInitialValue}
                     minHeight="200px"
                     className="mt-1"
+                    showDeleteConfirm={true}
+                    OnDelete={async (input) => {
+                      try {
+                        await CompanyDashboardProjectsApi.deleteMedia(
+                          projectId ?? "",
+                          input.id ?? ""
+                        );
+                        toast.success(t("deleteSuccess") || "Image deleted successfully!");
+                      } catch (error) {
+                        toast.error(t("deleteError") || "Failed to delete image");
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormErrorMessage />
@@ -275,7 +296,9 @@ export default function ProjectDetailsSection({
                 disabled={isSubmitting || isFetching}
                 rows={4}
                 className="mt-1 resize-none bg-sidebar border-white text-white"
-                placeholder={t("descriptionArPlaceholder") || "Enter description"}
+                placeholder={
+                  t("descriptionArPlaceholder") || "Enter description"
+                }
                 {...field}
               />
             </FormControl>
@@ -298,7 +321,9 @@ export default function ProjectDetailsSection({
                 disabled={isSubmitting || isFetching}
                 rows={4}
                 className="mt-1 resize-none bg-sidebar border-white text-white"
-                placeholder={t("descriptionEnPlaceholder") || "Enter description"}
+                placeholder={
+                  t("descriptionEnPlaceholder") || "Enter description"
+                }
                 {...field}
               />
             </FormControl>

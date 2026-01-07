@@ -72,7 +72,7 @@ export interface CMSProject {
   description_en?: string;
   status?: number;
   main_image?: string;
-  secondary_images?: string[];
+  secondary_images?: { id: string; url: string }[];
   project_details?: ProjectDetail[];
   services?: WebsiteService[];
   created_at?: string;

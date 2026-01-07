@@ -251,6 +251,7 @@ export default function SetProjectDialog({
               isSubmitting={isSubmitting}
               isFetching={isFetching}
               t={t}
+              projectId={projectId}
               projectTypeOptions={projectTypesOptions}
               mainImageInitialValue={projectData?.data?.payload?.main_image}
               subImagesInitialValue={projectData?.data?.payload?.secondary_images}
