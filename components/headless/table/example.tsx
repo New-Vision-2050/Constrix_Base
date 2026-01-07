@@ -61,6 +61,7 @@ const mockUsers: User[] = [
 // ============================================================================
 // Example 1: Full TableLayout with all features
 // ============================================================================
+const UserTable = HeadlessTableLayout<User>();
 
 export function ExampleWithLayout() {
   const [data, setData] = useState<User[]>(mockUsers);
@@ -70,7 +71,6 @@ export function ExampleWithLayout() {
   const [filtered, setFiltered] = useState(false);
 
   // Create typed table instance
-  const UserTable = HeadlessTableLayout<User>();
 
   // Handle sorting
   const handleSort = (key: string) => {
