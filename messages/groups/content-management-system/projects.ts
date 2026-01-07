@@ -48,8 +48,14 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     nameEn: _m("Project Name in English", "إسم المشروع الانجليزية"),
     descriptionAr: _m("Project Description in Arabic", "وصف المشروع عربي"),
     descriptionEn: _m("Project Description in English", "وصف المشروع الانجليزية"),
-    descriptionArPlaceholder: _m("Enter description in Arabic", "أدخل الوصف"),
-    descriptionEnPlaceholder: _m("Enter description in English", "Enter description"),
+    descriptionArPlaceholder: _m("Enter description in Arabic", "أدخل الوصف بالعربية"),
+    descriptionEnPlaceholder: _m("Enter description in English", "أدخل الوصف بالانجليزية"),
+    ProjectNameinEnglish: _m("Project Name in English", "اسم المشروع بالانجليزية"),
+    ProjectNameinArabic: _m("Project Name in Arabic", "اسم المشروع بالعربية"),
+    ProjectTitleinEnglish: _m("Project Title in English", "عنوان المشروع بالانجليزية"),
+    ProjectTitleinArabic: _m("Project Title in Arabic", "عنوان المشروع بالعربية"),
+  
+
     details: _m("Details", "التفاصيل"),
     addDetail: _m("Add Detail", "إضافة تفاصيل"),
     deleteDetail: _m("Delete Detail", "حذف تفاصيل"),

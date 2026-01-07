@@ -140,7 +140,7 @@ export default function ProjectDetailsSection({
                     variant="secondary"
                     disabled={isSubmitting || isFetching}
                     className="mt-1"
-                    placeholder="SAAS"
+                    placeholder={t("ProjectTitleinArabic") || "عنوان المشروع بالغه العربيه"}
                     {...field}
                   />
                 </FormControl>
@@ -163,7 +163,7 @@ export default function ProjectDetailsSection({
                     variant="secondary"
                     disabled={isSubmitting || isFetching}
                     className="mt-1"
-                    placeholder="SAAS"
+                    placeholder={t("ProjectTitleinEnglish") || "عنوان المشروع بالغه الانجليزيه"}
                     {...field}
                   />
                 </FormControl>
@@ -228,7 +228,7 @@ export default function ProjectDetailsSection({
                   variant="secondary"
                   disabled={isSubmitting || isFetching}
                   className="mt-1"
-                  placeholder="SAAS"
+                  placeholder={t("ProjectNameinArabic") || "اسم المشروع بالغه العربيه"}
                   {...field}
                 />
               </FormControl>
@@ -251,7 +251,7 @@ export default function ProjectDetailsSection({
                   variant="secondary"
                   disabled={isSubmitting || isFetching}
                   className="mt-1"
-                  placeholder="SAAS"
+                  placeholder={t("ProjectNameinEnglish") || "اسم المشروع بالغه الانجليزيه"}
                   {...field}
                 />
               </FormControl>
@@ -291,14 +291,14 @@ export default function ProjectDetailsSection({
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-xs">
-              {t("descriptionEn") || "Project Description English"}
+              {t("descriptionEn") || "دخل وصف المشروع بالغه الانجليزيه"}
             </FormLabel>
             <FormControl>
               <Textarea
                 disabled={isSubmitting || isFetching}
                 rows={4}
                 className="mt-1 resize-none bg-sidebar border-white text-white"
-                placeholder={t("descriptionEnPlaceholder") || "Enter description"}
+                placeholder={t("descriptionEnPlaceholder") || "ادخل وصف المشروع بالغه الانجليزيه"}
                 {...field}
               />
             </FormControl>
