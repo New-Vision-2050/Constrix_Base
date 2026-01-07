@@ -24,6 +24,8 @@ interface SetLegalDataFormProps {
   onCancel?: () => void;
   initialData?: LegalDataFormValues;
   mode?: "add" | "edit";
+  companyId?: string;
+  branchId?: string;
 }
 
 export default function SetLegalDataForm({
@@ -31,6 +33,8 @@ export default function SetLegalDataForm({
   onCancel,
   initialData,
   mode = "add",
+  companyId,
+  branchId,
 }: SetLegalDataFormProps) {
   const t = useTranslations("companyProfileLegalDataForm");
   // Fetch registration types
@@ -68,8 +72,6 @@ export default function SetLegalDataForm({
     name: "data",
   });
 
-  console.log("errors77errors", errors, initialData);
-
   // Show toast for validation errors
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
@@ -100,7 +102,10 @@ export default function SetLegalDataForm({
           ),
         }));
 
-        await CompanyProfileLegalDataApi.create(payload);
+        await CompanyProfileLegalDataApi.create(payload, {
+          company_id: companyId,
+          branch_id: branchId,
+        });
       } else {
         // Edit mode: send update payload
         console.log("updatedata", data);
@@ -132,7 +137,10 @@ export default function SetLegalDataForm({
           }),
         };
 
-        await CompanyProfileLegalDataApi.update(updatePayload, {});
+        await CompanyProfileLegalDataApi.update(updatePayload, {
+          company_id: companyId,
+          branch_id: branchId,
+        });
       }
 
       toast.success(t("save"));

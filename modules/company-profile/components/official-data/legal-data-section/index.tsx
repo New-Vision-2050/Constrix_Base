@@ -36,7 +36,7 @@ const LegalDataSection = ({
   id?: string;
 }) => {
   const { can } = usePermissions();
-  const { data, isPending, isSuccess } = useQuery({
+  const { data, isPending, isSuccess, refetch } = useQuery({
     queryKey: ["company-legal-data", id, currentCompanyId],
     queryFn: async () => {
       const response = await apiClient.get<
@@ -63,7 +63,11 @@ const LegalDataSection = ({
   const [isOpenMyForm, handleOpenMyForm, handleCloseMyForm] = useModal();
 
   // add legal data sheet
-  const [isOpenAddLegalDataSheet, handleOpenAddLegalDataSheet, handleCloseAddLegalDataSheet] = useModal();
+  const [
+    isOpenAddLegalDataSheet,
+    handleOpenAddLegalDataSheet,
+    handleCloseAddLegalDataSheet,
+  ] = useModal();
 
   const handleEditClick = () =>
     setMode((prev) => (prev === "Preview" ? "Edit" : "Preview"));
@@ -118,7 +122,15 @@ const LegalDataSection = ({
             <>
               {mode === "Preview" ? (
                 <>
-                  <AddLegalDataSheet open={isOpenAddLegalDataSheet} onOpenChange={handleCloseAddLegalDataSheet}/>
+                  <AddLegalDataSheet
+                    open={isOpenAddLegalDataSheet}
+                    onOpenChange={handleCloseAddLegalDataSheet}
+                    companyId={currentCompanyId}
+                    branchId={id}
+                    onSuccess={() => {
+                      refetch();
+                    }}
+                  />
                   <LegalDataPreview companyLegalData={companyLegalData} />
                 </>
               ) : (
@@ -139,6 +151,9 @@ const LegalDataSection = ({
                   }}
                   mode="edit"
                   onCancel={handleEditClick}
+                  onSuccess={() => {
+                    refetch();
+                  }}
                 />
                 // <LegalDataForm
                 //   companyLegalData={companyLegalData}

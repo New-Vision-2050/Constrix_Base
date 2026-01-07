@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Sheet,
   SheetContent,
@@ -13,17 +13,26 @@ import {
 import { Button } from "@/components/ui/button";
 import SetLegalDataForm from ".";
 
-
-type PropsT ={
-    open: boolean
-    onOpenChange: (open: boolean) => void
-}
-function AddLegalDataSheet({open, onOpenChange}: PropsT) {
+type PropsT = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  companyId?: string;
+  branchId?: string;
+  onSuccess: () => void;
+};
+function AddLegalDataSheet({
+  open,
+  onOpenChange,
+  companyId,
+  branchId,
+  onSuccess,
+}: PropsT) {
   const locale = useLocale();
   const isRtl = locale === "ar";
   const sheetSide = isRtl ? "left" : "right";
   // control open state
-  // get Translation 
+  // get Translation
+  const t = useTranslations("companyProfileLegalDataForm");
 
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
@@ -46,10 +55,19 @@ function AddLegalDataSheet({open, onOpenChange}: PropsT) {
         }}
       >
         <SheetHeader>
-          <SheetTitle className="text-center my-3">إضافة بيان قانوني</SheetTitle>
+          <SheetTitle className="text-center my-3">
+            {t("addLegalData")}
+          </SheetTitle>
         </SheetHeader>
 
-        <SetLegalDataForm onSuccess={() => onOpenChange(false)} />
+        <SetLegalDataForm
+          onSuccess={() => {
+            onSuccess();
+            onOpenChange(false);
+          }}
+          companyId={companyId}
+          branchId={branchId}
+        />
 
         <SheetFooter />
       </SheetContent>
