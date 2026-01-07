@@ -107,6 +107,60 @@ export const getRoutesMap = (
     "stores/requests": getText("stores/requests", "الطلبات"),
     "stores/coupons": getText("stores/coupons", "الكوبونات"),
     "stores/payment-methods": getText("stores/payment-methods", "وسائل الدفع"),
+
+    // Content Management System routes
+    "content-management-system": getText(
+      "content-management-system",
+      "اعداد المحتوي"
+    ),
+    "content-management-system/categories": getText(
+      "content-management-system/categories",
+      "الفئات"
+    ),
+    "content-management-system/icons": getText(
+      "content-management-system/icons",
+      "الأيقونات"
+    ),
+    "content-management-system/main-settings": getText(
+      "content-management-system/main-settings",
+      "اعدادات الرئيسية"
+    ),
+    "content-management-system/contact-setting": getText(
+      "content-management-system/contact-setting",
+      "اعدادات التواصل"
+    ),
+    "content-management-system/terms-conditions": getText(
+      "content-management-system/terms-conditions",
+      "الشروط والأحكام"
+    ),
+    "content-management-system/mainData": getText(
+      "content-management-system/mainData",
+      "البيانات الأساسية"
+    ),
+    "content-management-system/setting-founder": getText(
+      "content-management-system/setting-founder",
+      "المؤسسين"
+    ),
+    "content-management-system/services": getText(
+      "content-management-system/services",
+      "الخدمات"
+    ),
+    "content-management-system/our-services": getText(
+      "content-management-system/our-services",
+      "خدماتنا"
+    ),
+    "content-management-system/setting-news": getText(
+      "content-management-system/setting-news",
+      "الأخبار"
+    ),
+    "content-management-system/projects": getText(
+      "content-management-system/projects",
+      "المشاريع"
+    ),
+    "content-management-system/theme-setting": getText(
+      "content-management-system/theme-setting",
+      "إعدادات المظهر"
+    ),
   };
 
   return appRoutesMap;
