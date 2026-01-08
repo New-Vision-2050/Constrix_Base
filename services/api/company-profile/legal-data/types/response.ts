@@ -7,10 +7,10 @@ export interface CP_ListRegistrationTypesResponse
   extends ApiPaginatedResponse<CP_RegistrationType[]> {}
 
 // Create Legal Data Response
-export interface CP_CreateLegalDataResponse extends ApiBaseResponse<any> {}
+export interface CP_CreateLegalDataResponse extends ApiBaseResponse<CP_LegalDataRecord[]> {}
 
 // Update Legal Data Response
-export interface CP_UpdateLegalDataResponse extends ApiBaseResponse<any> {}
+export interface CP_UpdateLegalDataResponse extends ApiBaseResponse<CP_LegalDataRecord[]> {}
 
 // Get Legal Data Response
 export interface CP_GetLegalDataResponse
