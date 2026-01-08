@@ -17,27 +17,13 @@ export const CompanyProfileLegalDataApi = {
 
   // Get legal data for a company/branch
   getLegalData: (params: { company_id?: string; branch_id?: string }) =>
-    baseApi.get<CP_GetLegalDataResponse>(
-      "companies/company-profile/legal-data",
-      { params }
-    ),
+    baseApi.get<CP_GetLegalDataResponse>("companies/company-profile/legal-data", { params }),
 
   // Create new legal data record
-  create: (
-    body: CP_CreateLegalDataParams[],
-    params?: { company_id?: string; branch_id?: string }
-  ) => {
-    // Wrap in data property
-    const payload = {
-      data: body,
-    };
-
-    // Serialize to FormData
-    const formData = serialize(payload, { indices: true });
-
-    return baseApi.post<CP_CreateLegalDataResponse>(
+  create: (body: CP_CreateLegalDataParams[], params?: { company_id?: string; branch_id?: string }) =>
+    baseApi.post<CP_CreateLegalDataResponse>(
       "companies/company-profile/legal-data/create-legal-data",
-      formData,
+      serialize({ data: body }, { indices: true }),
       {
         params: {
           ...(params?.branch_id && { branch_id: params.branch_id }),
@@ -47,23 +33,20 @@ export const CompanyProfileLegalDataApi = {
           "Content-Type": "multipart/form-data",
         },
       }
-    );
-  },
+    ),
 
   // Update legal data records
-  update: (body: CP_UpdateLegalDataParams, params: { company_id?: string; branch_id?: string }) => {
-    const formData = serialize(body, { indices: true });
-    return baseApi.post<CP_UpdateLegalDataResponse>(
+  update: (body: CP_UpdateLegalDataParams, params: { company_id?: string; branch_id?: string }) =>
+    baseApi.post<CP_UpdateLegalDataResponse>(
       "companies/company-profile/legal-data/update",
-      formData,
+      serialize(body, { indices: true }),
       {
         params,
         headers: {
           "Content-Type": "multipart/form-data",
         },
       }
-    );
-  },
+    ),
 
   // Delete legal data record
   delete: (id: string | number, params?: { company_id?: string; branch_id?: string }) =>
