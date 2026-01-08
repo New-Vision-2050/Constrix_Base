@@ -11,7 +11,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IconButton } from "@mui/material";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
+import { useTranslations } from "next-intl";
 
 interface FileUploadButtonProps {
   onChange?: (file: File | File[] | null) => void;
@@ -34,11 +35,12 @@ export default function FileUploadButton({
   label,
   multiple = false,
 }: FileUploadButtonProps) {
+  const t = useTranslations("common.fileUpload");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadId, setUploadId] = useState<string | null>(null);
-  const [existingFile, setExistingFile] = useState('');
+  const [existingFile, setExistingFile] = useState("");
 
   // Initialize upload ID on client side only
   useEffect(() => {
@@ -57,12 +59,14 @@ export default function FileUploadButton({
           setSelectedFile(initialValue);
         }
       } else if (typeof initialValue === "string") {
-        setExistingFile(initialValue)
+        setExistingFile(initialValue);
       }
     }
   }, [initialValue, multiple]);
 
-  const handleClearFile = () => { setExistingFile('') }
+  const handleClearFile = () => {
+    setExistingFile("");
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (multiple) {
@@ -87,15 +91,15 @@ export default function FileUploadButton({
       const file = e.target.files?.[0];
       if (!file) return;
 
-      // Validate file size if maxSize is provided
-      if (maxSize) {
-        const maxSizeBytes = parseSize(maxSize);
-        if (file.size > maxSizeBytes) {
-          alert(`File size exceeds the maximum allowed size of ${maxSize}`);
-          e.target.value = "";
-          return;
-        }
+    // Validate file size if maxSize is provided
+    if (maxSize) {
+      const maxSizeBytes = parseSize(maxSize);
+      if (file.size > maxSizeBytes) {
+        alert(t("fileSizeExceeds", { size: maxSize }));
+        e.target.value = "";
+        return;
       }
+    }
 
       setSelectedFile(file);
       onChange?.(file);
@@ -183,16 +187,21 @@ export default function FileUploadButton({
     return null;
   }
 
-
   if (Boolean(existingFile)) {
-    return <div className="relative">
-      {/* clear button */}
-      <IconButton onClick={handleClearFile} color="error" sx={{ position: 'absolute', right: '1%', top: '1%' }}>
-        <CloseIcon />
-      </IconButton>
-      {/* file iframe */}
-      <iframe src={existingFile} width={"100%"} height={"100px"} />
-    </div>
+    return (
+      <div className="relative">
+        {/* clear button */}
+        <IconButton
+          onClick={handleClearFile}
+          color="error"
+          sx={{ position: "absolute", right: "1%", top: "1%" }}
+        >
+          <CloseIcon />
+        </IconButton>
+        {/* file iframe */}
+        <iframe src={existingFile} width={"100%"} height={"100px"} />
+      </div>
+    );
   }
 
   return (
@@ -293,13 +302,13 @@ export default function FileUploadButton({
           className="text-sidebar-foreground border-primary border-2 hover:bg-primary/10 hover:border-primary hover:text-primary transition-colors"
         >
           <Upload className="h-4 w-4 mr-2" />
-          {label || "رفع ملف"}
+          {label || t("uploadFile")}
         </Button>
       )}
 
       {maxSize && (
         <p className="text-xs text-sidebar-foreground/60">
-          الحجم الأقصى: {maxSize}
+          {t("maxSize", { size: maxSize })}
         </p>
       )}
     </div>

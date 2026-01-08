@@ -5,6 +5,7 @@ import { serialize } from "object-to-formdata";
 
 type ListIconsParams = {
   page: number;
+  limit?: number;
   search?: string;
   categoryType?: string;
   sortBy?: string;
@@ -14,6 +15,7 @@ export const CompanyDashboardIconsApi = {
     baseApi.get<ListIconsResponse>("website-icons", {
       params: {
         page: params?.page ?? 1,
+        limit: params?.limit ?? 10,
         name: Boolean(params?.search) ? params?.search : undefined,
         website_icon_category_type: Boolean(params?.categoryType) ? params?.categoryType : undefined,
         sort: Boolean(params?.sortBy) ? params?.sortBy : undefined

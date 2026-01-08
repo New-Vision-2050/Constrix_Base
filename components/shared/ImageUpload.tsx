@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FormLabel from "@/components/shared/FormLabel";
+import { useTranslations } from "next-intl";
 
 interface ImageUploadProps {
   label: string;
@@ -22,7 +23,7 @@ interface ImageUploadProps {
 
 export default function ImageUpload({
   label,
-  maxSize = "3MB - الحجم الأقصى",
+  maxSize,
   dimensions = "2160 × 2160",
   required = false,
   onChange,
@@ -34,10 +35,14 @@ export default function ImageUpload({
   multiple = false,
   accept = "image/*",
 }: ImageUploadProps) {
+  const t = useTranslations("common.imageUpload");
   const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [initialPreviews, setInitialPreviews] = useState<string[]>([]);
   const [uploadId, setUploadId] = useState<string>("");
+  
+  // Default maxSize with translation if not provided
+  const displayMaxSize = maxSize || `3MB - ${t("maxSizeLabel")}`;
 
   // Initialize uploadId only on client side to avoid hydration mismatch
   React.useEffect(() => {
@@ -142,7 +147,7 @@ export default function ImageUpload({
           ) : uploadId ? (
             <>
               <Upload className="w-12 h-12  mb-3" />
-              <p className=" text-sm mb-1">{maxSize}</p>
+              <p className=" text-sm mb-1">{displayMaxSize}</p>
               <p className=" text-xs mb-4">{dimensions}</p>
               <label htmlFor={uploadId}>
                 <Button
@@ -151,7 +156,7 @@ export default function ImageUpload({
                   className="border-primary text-primary hover:bg-primary hover:text-white"
                   onClick={() => document.getElementById(uploadId)?.click()}
                 >
-                  إرفاق
+                  {t("attach")}
                 </Button>
               </label>
               <input
@@ -190,7 +195,7 @@ export default function ImageUpload({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-300 truncate">
-                      صورة موجودة {index + 1}
+                      {t("existingImage", { index: index + 1 })}
                     </p>
                   </div>
                   {/* Remove button */}
@@ -265,7 +270,7 @@ export default function ImageUpload({
                   onClick={() => document.getElementById(uploadId)?.click()}
                 >
                   <Upload className="w-5 h-5 " />
-                  <p className=" text-sm">إضافة المزيد من الملفات</p>
+                  <p className=" text-sm">{t("addMoreFiles")}</p>
                   <input
                     id={uploadId}
                     type="file"
@@ -291,14 +296,14 @@ export default function ImageUpload({
               onClick={() => document.getElementById(uploadId)?.click()}
             >
               <Upload className="w-12 h-12  mb-3" />
-              <p className=" text-sm mb-1">{maxSize}</p>
+              <p className=" text-sm mb-1">{displayMaxSize}</p>
               <p className="text-gray-500 text-xs mb-4">{dimensions}</p>
               <Button
                 type="button"
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-white"
               >
-                إرفاق
+                {t("attach")}
               </Button>
               <input
                 id={uploadId}

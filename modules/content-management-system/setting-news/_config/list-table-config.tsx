@@ -7,6 +7,7 @@ import { NewsRow, TableConfigParams } from "../types";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { CategoryTypes } from "../../categories/enums/Category-types";
+import { EditIcon } from "lucide-react";
 
 export const useNewsListTableConfig: (
   params?: TableConfigParams
@@ -76,7 +77,7 @@ export const useNewsListTableConfig: (
         label: t("status"),
         render: (value: "active" | "inActive", row: NewsRow) => {
           const isActive = row.status == 1 ? true : false;
-          return <TheStatus theStatus={isActive} id={row.id} />
+          return <TheStatus theStatus={isActive} id={row.id} />;
         },
       },
     ],
@@ -104,12 +105,18 @@ export const useNewsListTableConfig: (
             totalCountHeader: "x-total-count",
           },
         },
-      }
+      },
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.news.update)} onSelect={() => params?.onEdit?.(row.id)}>
-          {t("editNews")}
+        <DropdownMenuItem
+          disabled={!can(PERMISSIONS.CMS.news.update)}
+          onSelect={() => params?.onEdit?.(row.id)}
+        >
+          <div className="flex items-center justify-between w-full">
+            <EditIcon size={16} />
+            {t("editNews")}
+          </div>
         </DropdownMenuItem>
       ),
     ],

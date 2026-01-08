@@ -2,7 +2,11 @@
 
 import React from "react";
 import { Control, useWatch } from "react-hook-form";
-import { FormField, FormItem, FormControl } from "@/modules/table/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormControl,
+} from "@/modules/table/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/modules/table/components/ui/textarea";
@@ -57,7 +61,8 @@ export default function ProjectDetailsSection({
           <FormItem className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-lg  p-3 sm:p-4">
             <div className="space-y-0.5">
               <FormLabel className="text-xs sm:text-sm font-medium">
-                {t("featuredServices") || "Featured Services (Display on Homepage)"}
+                {t("featuredServices") ||
+                  "Featured Services (Display on Homepage)"}
               </FormLabel>
             </div>
             <FormControl>
@@ -72,9 +77,9 @@ export default function ProjectDetailsSection({
       />
 
       {/* Images and Titles Row - Responsive Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
         {/* w-20% width - Main Image */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <FormField
             control={control}
             name="main_image"
@@ -99,7 +104,7 @@ export default function ProjectDetailsSection({
         </div>
 
         {/* w-20% width - Sub Images */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <FormField
             control={control}
             name="sub_images"
@@ -275,7 +280,9 @@ export default function ProjectDetailsSection({
                 disabled={isSubmitting || isFetching}
                 rows={4}
                 className="mt-1 resize-none bg-sidebar border-white text-white"
-                placeholder={t("descriptionArPlaceholder") || "Enter description"}
+                placeholder={
+                  t("descriptionArPlaceholder") || "Enter description"
+                }
                 {...field}
               />
             </FormControl>
@@ -298,7 +305,9 @@ export default function ProjectDetailsSection({
                 disabled={isSubmitting || isFetching}
                 rows={4}
                 className="mt-1 resize-none bg-sidebar border-white text-white"
-                placeholder={t("descriptionEnPlaceholder") || "Enter description"}
+                placeholder={
+                  t("descriptionEnPlaceholder") || "Enter description"
+                }
                 {...field}
               />
             </FormControl>
