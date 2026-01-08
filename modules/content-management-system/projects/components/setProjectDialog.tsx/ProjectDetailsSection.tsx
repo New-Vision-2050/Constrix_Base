@@ -81,9 +81,9 @@ export default function ProjectDetailsSection({
       />
 
       {/* Images and Titles Row - Responsive Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
         {/* w-20% width - Main Image */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <FormField
             control={control}
             name="main_image"
@@ -108,7 +108,7 @@ export default function ProjectDetailsSection({
         </div>
 
         {/* w-20% width - Sub Images */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <FormField
             control={control}
             name="sub_images"
