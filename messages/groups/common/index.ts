@@ -13,6 +13,12 @@ export const commonMessages = new MessagesGroup({
     retry: _m("Retry", "إعادة المحاولة"),
   }),
   noCountryCode: _m("No country code found", "لا يوجد رمز الدولة"),
+  // Delete confirmation dialog messages
+  deleteConfirmation: new MessagesGroup({
+    defaultMessage: _m("Are you sure you want to delete this?", "هل أنت متأكد من حذف هذا؟"),
+    delete: _m("Delete", "حذف"),
+    cancel: _m("Cancel", "إلغاء"),
+  }),
   // File upload messages
   fileUpload: new MessagesGroup({
     uploadFile: _m("Upload File", "رفع ملف"),
