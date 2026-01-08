@@ -280,7 +280,9 @@ export default function SetCategoryDialog({
                       disabled={isSubmitting || isFetching}
                     >
                       <SelectTrigger
-                        className="mt-1 bg-sidebar border-white text-white h-12"
+                        className={`mt-1 bg-sidebar border-white text-white h-12 
+                       ${isRtl ? "text-right" : "text-left"}`}
+                       dir={isRtl ? "ltr" : "rtl"}
                         showClear={!!field.value}
                         onClear={() => field.onChange("")}
                       >

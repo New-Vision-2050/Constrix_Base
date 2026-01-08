@@ -197,15 +197,18 @@ const Execution = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {menuItems.map((item, index) => (
-            <DropdownMenuItem
-              key={index}
-              onClick={() => handleMenuItemClick(item.action)}
-              className={item.color ? `text-${item.color}` : ""}
-              disabled={!item.disabled || false}
-            >
-              {item.icon && <span className="me-2">{item.icon}</span>}
-              {item.label}
-            </DropdownMenuItem>
+          <DropdownMenuItem
+          key={index}
+        onClick={() => handleMenuItemClick(item.action)}
+         disabled={item.disabled ?? false}
+           className={`flex items-center gap-2 ${
+          item.color ? `text-${item.color}` : ""
+          }`}
+         >
+         {item.icon}
+         <span>{item.label}</span>
+         </DropdownMenuItem>
+
           ))}
           {/* Render custom render functions as dropdown items */}
           {renderFunctions.map((renderFn, index) => (
