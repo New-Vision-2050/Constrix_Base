@@ -6,7 +6,7 @@ import ReactQueryProvider from "@/providers/react-query";
 import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { NextIntlClientProvider } from "next-intl";
-import { notFound } from "next/navigation";
+import { notFound } from "@i18n/navigation";
 import { Toaster } from "@/modules/table/components/ui/toaster";
 import { Toaster as SonnerToaster } from "sonner";
 import { ThemeProvider } from "@/providers/theme-provider";

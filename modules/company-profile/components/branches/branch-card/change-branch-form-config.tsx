@@ -3,7 +3,7 @@ import { baseURL } from "@/config/axios-config";
 import { Branch } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 export const changeBranchForm = (branchId: string, branches: Branch[]) => {
   const { company_id }: { company_id: string | undefined } = useParams();
@@ -54,7 +54,7 @@ export const changeBranchForm = (branchId: string, branches: Branch[]) => {
 
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["company-branches",  company_id],
+        queryKey: ["company-branches", company_id],
       });
     },
 

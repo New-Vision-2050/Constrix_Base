@@ -4,7 +4,7 @@ import { TableBuilder, useTableReload } from "@/modules/table";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useProductsListTableConfig } from "./_config/list-table-config";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { statisticsConfig } from "./add/components/statistics-config";
 

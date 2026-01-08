@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import InfoIcon from "@/public/icons/InfoIcon";
 import SettingsIcon from "@/public/icons/settings";
 import { Button } from "@/components/ui/button";

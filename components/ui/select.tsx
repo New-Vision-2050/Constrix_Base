@@ -5,6 +5,7 @@ import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
+import { useLocale } from "next-intl";
 
 const Select = SelectPrimitive.Root;
 
@@ -18,36 +19,45 @@ const SelectTrigger = forwardRef<
     onClear?: () => void;
     showClear?: boolean;
   }
->(({ className, children, onClear, showClear, ...props }, ref) => (
-  <div className="relative w-full">
-    <SelectPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        "flex group h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-        showClear && "pe-2",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDown className="h-4 w-5  opacity-50 transition group-data-[state=open]:rotate-180" />
-      </SelectPrimitive.Icon>
-    </SelectPrimitive.Trigger>
-    {showClear && onClear && (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClear();
-        }}
-        className="absolute end-10 top-4 -translate-y-1/2 h-5 w-5 rounded-sm opacity-70 hover:opacity-100 hover:bg-accent transition-all flex items-end justify-center"
+>(({ className, children, onClear, showClear, ...props }, ref) => {
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
+  return (
+    <div className="relative w-full">
+      <SelectPrimitive.Trigger
+        ref={ref}
+        className={cn(
+          "flex group h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+          isRtl ? "flex-row-reverse" : "flex-row",
+          showClear && "pe-2",
+          className
+        )}
+        {...props}
       >
-        <X className="h-3.5 w-3.5" />
-      </button>
-    )}
-  </div>
-));
+        {children}
+        <SelectPrimitive.Icon asChild>
+          <ChevronDown className="h-4 w-5  opacity-50 transition group-data-[state=open]:rotate-180" />
+        </SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+      {showClear && onClear && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClear();
+          }}
+          className={cn(
+            "absolute top-4 -translate-y-1/2 h-5 w-5 rounded-sm opacity-70 hover:opacity-100 hover:bg-accent transition-all flex items-end justify-center",
+            isRtl ? "end-10" : "right-10"
+          )}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
+  );
+});
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 const SelectScrollUpButton = forwardRef<
@@ -132,23 +142,34 @@ SelectLabel.displayName = SelectPrimitive.Label.displayName;
 const SelectItem = forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative cursor-pointer flex w-full select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
-    {...props}
-  >
-    <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </SelectPrimitive.ItemIndicator>
-    </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-  </SelectPrimitive.Item>
-));
+>(({ className, children, ...props }, ref) => {
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
+  return (
+    <SelectPrimitive.Item
+      ref={ref}
+      className={cn(
+        "relative cursor-pointer flex w-full select-none items-center rounded-sm py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        isRtl ? "pl-2 pr-8" : "pl-8 pr-2",
+        className
+      )}
+      {...props}
+    >
+      <span
+        className={cn(
+          "absolute flex h-3.5 w-3.5 items-center justify-center",
+          isRtl ? "right-2" : "left-2"
+        )}
+      >
+        <SelectPrimitive.ItemIndicator>
+          <Check className="h-4 w-4" />
+        </SelectPrimitive.ItemIndicator>
+      </span>
+      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    </SelectPrimitive.Item>
+  );
+});
 SelectItem.displayName = SelectPrimitive.Item.displayName;
 
 const SelectSeparator = forwardRef<
