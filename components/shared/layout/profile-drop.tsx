@@ -14,7 +14,7 @@ import { deleteCookie, getCookie } from "cookies-next"; // Ensure you have this 
 import { useAuthStore } from "@/modules/auth/store/use-auth";
 import { AvatarGroup } from "../avatar-group";
 import LogoutIcon from "@/public/icons/logout";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { useCurrentCompany } from "@/modules/company-profile/components/shared/company-header";
 import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 import { setCookie } from "cookies-next";
@@ -147,7 +147,9 @@ const ProfileDrop = () => {
           <Button className="px-5 bg-[transparent] hover:bg-[transparent] text-foreground rotate-svg-child shadow-none">
             {user?.name}
             {branchObj?.name && (
-              <span className="text-xs text-gray-500">({truncateString(branchObj.name, 12)})</span>
+              <span className="text-xs text-gray-500">
+                ({truncateString(branchObj.name, 12)})
+              </span>
             )}
             <ChevronDown />
           </Button>

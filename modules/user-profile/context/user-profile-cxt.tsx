@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "@i18n/navigation";
 
 // types
 import type { ReactNode, SetStateAction } from "react";
@@ -69,8 +69,12 @@ export const useUserProfileCxt = () => {
   return context;
 };
 
-type PropsT = { children: ReactNode, userId: string, companyId: string };
-export const UserProfileCxtProvider = ({ children, userId, companyId }: PropsT) => {
+type PropsT = { children: ReactNode; userId: string; companyId: string };
+export const UserProfileCxtProvider = ({
+  children,
+  userId,
+  companyId,
+}: PropsT) => {
   // ** declare and define component state and variables
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -89,9 +93,8 @@ export const UserProfileCxtProvider = ({ children, userId, companyId }: PropsT) 
     useProfileDataStatus(userId);
   const { data: userPersonalData, refetch: refreshUserPersonalData } =
     useUserPersonalData(userId);
-  const { data: widgetData, refetch: refetchWidgetData } = useProfileWidgetData(
-    userId
-  );
+  const { data: widgetData, refetch: refetchWidgetData } =
+    useProfileWidgetData(userId);
 
   // ** handle side effects
   useEffect(() => {

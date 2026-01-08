@@ -3,7 +3,7 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { tableIcon } from "@/modules/program-settings/users-settings/tableIcon";
 import React, { memo } from "react";
-import Link from "next/link";
+import Link from "@i18n/link";
 import { Project } from "@/types/sidebar-menu";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";

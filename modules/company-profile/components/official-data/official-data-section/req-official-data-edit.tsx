@@ -2,7 +2,7 @@ import { FormConfig } from "@/modules/form-builder";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { officialData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
@@ -178,9 +178,9 @@ export const ReqOfficialDataEdit = ({
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData: Record<string, unknown>) => {
-      const sendData = serialize(formData ,{
-          indices: true,
-        })
+      const sendData = serialize(formData, {
+        indices: true,
+      });
       return await defaultSubmitHandler(sendData, reqOfficialDataEdit, {
         config: {
           params: {
@@ -194,9 +194,14 @@ export const ReqOfficialDataEdit = ({
     },
     onSuccess: () => {
       queryClient.refetchQueries({
-        queryKey: ["admin-requests", "companyOfficialDataUpdate", company_id, id]
+        queryKey: [
+          "admin-requests",
+          "companyOfficialDataUpdate",
+          company_id,
+          id,
+        ],
       });
-    }
+    },
   };
   return reqOfficialDataEdit;
 };

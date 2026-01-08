@@ -20,7 +20,7 @@ import {
 import SidebarHeaderContent from "./sidebar-header-content";
 import SidebarFooterContent from "./sidebar-footer-content";
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@i18n/navigation";
 import { ROUTER } from "@/router";
 import SettingsIcon from "@/public/icons/settings";
 import InboxIcon from "@/public/icons/inbox-icon";
@@ -420,7 +420,9 @@ export function AppSidebar({
             url: ROUTER.HomeStore,
             icon: UserIcon,
             isActive: pageName === ROUTER.HomeStore,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.dashboard)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.dashboard)),
           },
           // Products
           {
@@ -428,7 +430,9 @@ export function AppSidebar({
             url: ROUTER.Products,
             icon: UserIcon,
             isActive: pageName === ROUTER.Products,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.product)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.product)),
           },
           // Requests
           {
@@ -436,7 +440,9 @@ export function AppSidebar({
             url: ROUTER.requests,
             icon: UserIcon,
             isActive: pageName === ROUTER.requests,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.order)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.order)),
           },
           // Categories
           {
@@ -444,7 +450,9 @@ export function AppSidebar({
             url: ROUTER.Categories,
             icon: UserIcon,
             isActive: pageName === ROUTER.Categories,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.category)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.category)),
           },
           // Brands
           {
@@ -452,7 +460,9 @@ export function AppSidebar({
             url: ROUTER.Brands,
             icon: UserIcon,
             isActive: pageName === ROUTER.Brands,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.brand)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.brand)),
           },
           // Coupons
           {
@@ -460,12 +470,14 @@ export function AppSidebar({
             url: ROUTER.Coupons,
             icon: UserIcon,
             isActive: pageName === ROUTER.Coupons,
-            show: !isCentralCompany && can([
-              PERMISSIONS.ecommerce.coupon.list,
-              PERMISSIONS.ecommerce.featureDeal.list,
-              PERMISSIONS.ecommerce.flashDeal.list,
-              PERMISSIONS.ecommerce.dealDay.list
-            ]),
+            show:
+              !isCentralCompany &&
+              can([
+                PERMISSIONS.ecommerce.coupon.list,
+                PERMISSIONS.ecommerce.featureDeal.list,
+                PERMISSIONS.ecommerce.flashDeal.list,
+                PERMISSIONS.ecommerce.dealDay.list,
+              ]),
           },
           // Warehouse
           {
@@ -473,7 +485,9 @@ export function AppSidebar({
             url: ROUTER.warehouse,
             icon: UserIcon,
             isActive: pageName === ROUTER.warehouse,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.warehouse)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.warehouse)),
           },
           // Pages Settings
           {
@@ -481,7 +495,9 @@ export function AppSidebar({
             url: ROUTER.pagesSettings,
             icon: UserIcon,
             isActive: pageName === ROUTER.pagesSettings,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.banner)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.banner)),
           },
           // Terms !!!
           {
@@ -489,7 +505,9 @@ export function AppSidebar({
             url: ROUTER.Terms,
             icon: UserIcon,
             isActive: pageName === ROUTER.Terms,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.page)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.page)),
           },
           // Social Media
           {
@@ -497,7 +515,9 @@ export function AppSidebar({
             url: ROUTER.SocialMedia,
             icon: UserIcon,
             isActive: pageName === ROUTER.SocialMedia,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.socialMedia)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.socialMedia)),
           },
           // Payment Methods
           {
@@ -505,7 +525,9 @@ export function AppSidebar({
             url: ROUTER.PaymentMethods,
             icon: UserIcon,
             isActive: pageName === ROUTER.PaymentMethods,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.ecommerce.paymentMethod)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.ecommerce.paymentMethod)),
           },
         ],
       },
@@ -554,7 +576,8 @@ export function AppSidebar({
             url: ROUTER.CMS.THEMES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.THEMES,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.themes)),
+            show:
+              !isCentralCompany && can(Object.values(PERMISSIONS.CMS.themes)),
           },
           // theme setting
           {
@@ -646,7 +669,9 @@ export function AppSidebar({
             url: ROUTER.CMS.COMMUNICATION_MESSAGES,
             icon: LayoutDashboardIcon,
             isActive: pageName === ROUTER.CMS.COMMUNICATION_MESSAGES,
-            show: !isCentralCompany && can(Object.values(PERMISSIONS.CMS.communicationContactMessages)),
+            show:
+              !isCentralCompany &&
+              can(Object.values(PERMISSIONS.CMS.communicationContactMessages)),
           },
           // communication settings
           {
