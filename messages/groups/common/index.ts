@@ -12,6 +12,8 @@ export const commonMessages = new MessagesGroup({
     ),
     retry: _m("Retry", "إعادة المحاولة"),
   }),
+  cancel: _m("Cancel", "إلغاء"),
+  confirm: _m("Confirm", "تاكيد"),
   noCountryCode: _m("No country code found", "لا يوجد رمز الدولة"),
   // Delete confirmation dialog messages
   deleteConfirmation: new MessagesGroup({
