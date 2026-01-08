@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
 import { CompanyData } from "../../types/company";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -18,7 +18,7 @@ import { useState, useEffect } from "react";
 
 const OfficialData = ({ id }: { id?: string }) => {
   const { company_id } = useParams();
-  
+
   // State to track cookie changes
   const [cookieBranchId, setCookieBranchId] = useState<string | undefined>();
 
@@ -27,10 +27,9 @@ const OfficialData = ({ id }: { id?: string }) => {
     const checkCookieChanges = () => {
       const currentCookieValue = getCookie("current-branch-id");
       // Handle both sync and async cookie values
-      const cookieValue = typeof currentCookieValue === 'string' 
-        ? currentCookieValue 
-        : undefined;
-      
+      const cookieValue =
+        typeof currentCookieValue === "string" ? currentCookieValue : undefined;
+
       if (cookieValue !== cookieBranchId) {
         setCookieBranchId(cookieValue);
       }

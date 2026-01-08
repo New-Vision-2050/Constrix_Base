@@ -13,7 +13,7 @@ import validCompanyProfileImage from "@/modules/company-profile/service/validate
 import { cn } from "@/lib/utils";
 import uploadCompanyImage from "@/modules/company-profile/service/upload-company-image";
 import { deleteCookie, getCookie } from "cookies-next";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 
 interface FormValues {
   image: FileList;
@@ -178,10 +178,19 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
                   validate: {
                     format: (fileList) => {
                       if (!fileList?.[0]) return true;
-                      const validFormats = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/svg+xml"];
-                      return validFormats.includes(fileList[0].type) || "يجب أن يكون حقل logo ملفًا من نوع: jpeg, jpg, png, gif, svg.";
-                    }
-                  }
+                      const validFormats = [
+                        "image/jpeg",
+                        "image/jpg",
+                        "image/png",
+                        "image/gif",
+                        "image/svg+xml",
+                      ];
+                      return (
+                        validFormats.includes(fileList[0].type) ||
+                        "يجب أن يكون حقل logo ملفًا من نوع: jpeg, jpg, png, gif, svg."
+                      );
+                    },
+                  },
                 })}
               />
             </label>

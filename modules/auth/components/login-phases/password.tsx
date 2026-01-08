@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LOGIN_PHASES, LoginPhase } from "../../constant/login-phase";
 import { useForgetPassword, useLoginSteps } from "../../store/mutations";
 import { useAuthStore } from "../../store/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
 import AnotherCheckingWay from "../another-checking-way";
@@ -82,13 +82,23 @@ const PasswordPhase = ({
 
             // handle redirect based on user type
             if (userTypes.length > 0) {
-              const isEmployee = userTypes.some(userType => userType.role == UsersRole.Employee);
-              const isBroker = userTypes.some(userType => userType.role == UsersRole.Broker);
-              const isClient = userTypes.some(userType => userType.role == UsersRole.Client);
+              const isEmployee = userTypes.some(
+                (userType) => userType.role == UsersRole.Employee
+              );
+              const isBroker = userTypes.some(
+                (userType) => userType.role == UsersRole.Broker
+              );
+              const isClient = userTypes.some(
+                (userType) => userType.role == UsersRole.Client
+              );
               if (isEmployee) {
                 router.push(ROUTER.USER_PROFILE);
               } else if (isClient || isBroker) {
-                router.push(`${ROUTER.CLIENT_PROFILE}?role=${isClient ? UsersRole.Client : UsersRole.Broker}`);
+                router.push(
+                  `${ROUTER.CLIENT_PROFILE}?role=${
+                    isClient ? UsersRole.Client : UsersRole.Broker
+                  }`
+                );
               }
             } else {
               router.push(`${ROUTER.CLIENT_PROFILE}?readonly=true`);

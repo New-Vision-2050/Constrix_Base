@@ -1,12 +1,11 @@
 import ClientProfileModule from "@/modules/client-profile";
 import { ClientProfileData } from "./types";
-import { notFound } from "next/navigation";
+import { notFound } from "@i18n/navigation";
 import { baseApi } from "@/config/axios/instances/base";
 import { baseURL } from "@/config/axios-config";
 
 // Enable static generation with dynamic params
 export const dynamicParams = true;
-
 
 export default async function ClientProfileDetailPage({
   params,
@@ -23,16 +22,17 @@ export default async function ClientProfileDetailPage({
     notFound();
   }
 
-  return <ClientProfileModule profileData={userData} />
+  return <ClientProfileModule profileData={userData} />;
 }
 
-async function fetchUserData(userId: string): Promise<ClientProfileData | null> {
+async function fetchUserData(
+  userId: string
+): Promise<ClientProfileData | null> {
   try {
     const response = await baseApi.get(`${baseURL}/users/${userId}`);
     return response.data.payload;
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error("Error fetching user data:", error);
     return null;
   }
 }
-

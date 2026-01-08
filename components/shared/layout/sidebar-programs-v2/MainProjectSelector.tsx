@@ -8,7 +8,7 @@ import CustomMenu from "@/components/headless/custom-menu";
 import { MenuItem, ListItemText, Box, Button, Typography } from "@mui/material";
 import { ChevronDown, Check } from "lucide-react";
 import { memo } from "react";
-import Link from "next/link";
+import Link from "@i18n/link";
 
 type MainProjectSelectorProps = {
   projects: Project[];

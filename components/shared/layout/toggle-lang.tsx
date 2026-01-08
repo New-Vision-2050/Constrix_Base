@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LangIcon from "@/public/icons/lang";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@i18n/navigation";
 import { SA, US } from "country-flag-icons/react/3x2";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
