@@ -79,5 +79,6 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
       canDelete: can(PERMISSIONS.CMS.categories.delete),
     },
     deleteUrl: `${baseURL}/categories-website`,
+    deleteConfirmMessage: t("deleteCategoryConfirm"),
   };
 };

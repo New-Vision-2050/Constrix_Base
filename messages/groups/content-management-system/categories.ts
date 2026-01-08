@@ -34,6 +34,7 @@ export const ContentManagementSystemCategoriesMessages = new MessagesGroup({
     type: _m("Category Type", "نوع الفئة"),
     searchType:_m("Type", "النوع"),
     edit: _m("Edit", "تعديل"),
+    deleteCategoryConfirm: _m("Are you sure you want to delete this category? This action cannot be undone.", "هل أنت متأكد من حذف هذه الفئة؟ لا يمكن التراجع عن هذا الإجراء."),
   }),
 });
 

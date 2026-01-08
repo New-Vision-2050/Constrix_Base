@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { apiClient } from "@/config/axios-config";
 import InfoIcon from "@/public/icons/info";
+import { useTranslations } from "next-intl";
+
 
 interface DeleteConfirmationDialogProps {
   open: boolean;
@@ -51,6 +53,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
     }
   };
 
+  const t= useTranslations("FormBuilder.ConfirmationDialog");
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -68,7 +72,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
         <DialogDescription asChild>
           <div>
             <h3 className="text-center !text-2xl mb-9">
-              {deleteConfirmMessage ?? "هل انت متاكد تريد الحذف؟"}
+              {deleteConfirmMessage ?? t("message")}
             </h3>
             {errorMsg && (
               <p className="text-red-500 text-center text-sm mt-2">
@@ -84,7 +88,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             loading={mutation.isPending}
             className="w-32 h-10"
           >
-            حذف{" "}
+            {t("delete")}
           </Button>
           <Button
             variant="outline"
@@ -92,7 +96,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             disabled={mutation.isPending}
             className="w-32 h-10"
           >
-            الغاء
+            {t("cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>

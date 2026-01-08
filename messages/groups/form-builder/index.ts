@@ -1,3 +1,4 @@
+import ConfirmationDialog from "@/components/shared/ConfirmationDialog";
 import { _m, MessagesGroup } from "../../types";
 
 export const formBuilderMessages = new MessagesGroup({
@@ -40,5 +41,11 @@ export const formBuilderMessages = new MessagesGroup({
       UploadSuccessful: _m("Upload successful", "تم الرفع بنجاح"),
       FileRequired: _m("File is required", "الملف مطلوب")
     })
-  })
+  }),
+  ConfirmationDialog: new MessagesGroup({
+    title: _m("Are you sure?", "هل أنت متأكد؟"),
+    message: _m("This action cannot be undone.", "لا يمكن التراجع عن هذا الإجراء."),
+    cancel: _m("Cancel", "إلغاء"),
+    delete: _m("Delete", "حذف"),
+  }),
 });
