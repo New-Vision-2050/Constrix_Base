@@ -354,9 +354,12 @@ export default function AddNewsDialog({
                           className="mt-1 bg-sidebar border-white text-white h-12"
                           showClear={!!field.value}
                           onClear={() => field.onChange("")}
+                          dir={isRtl ? "rtl" : "ltr"}
                         >
                           <SelectValue
                             placeholder={t("form.categoryPlaceholder")}
+                            className={isRtl ? "text-right" : "text-left"}
+                            dir={isRtl ? "rtl" : "ltr"}
                           />
                         </SelectTrigger>
                         <SelectContent>
@@ -368,6 +371,7 @@ export default function AddNewsDialog({
                               <SelectItem
                                 key={category.id}
                                 value={category.id.toString()}
+                                dir={isRtl ? "rtl" : "ltr"}
                               >
                                 {typeof displayName === "string"
                                   ? displayName
