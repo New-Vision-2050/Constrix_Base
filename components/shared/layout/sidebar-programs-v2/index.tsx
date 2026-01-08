@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, useMemo } from "react";
 import { SidebarGroup, SidebarMenu, useSidebar } from "@/components/ui/sidebar";
 import { Project } from "@/types/sidebar-menu";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@i18n/navigation";
 import { useLocale } from "next-intl";
 import { MainProjectSelector } from "./MainProjectSelector";
 import { SubProgramsList } from "./SubProgramsList";

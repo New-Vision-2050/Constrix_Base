@@ -92,22 +92,16 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
     if (onOpenChange) {
       onOpenChange(open);
     }
-      if (open) {
-        openSheet();
-      } else {
-        closeSheet();
-      }
-
+    if (open) {
+      openSheet();
+    } else {
+      closeSheet();
+    }
   };
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={handleOpenChange}
-    >
-      {trigger && (
-        <SheetTrigger asChild>{trigger}</SheetTrigger>
-      )}
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
       <SheetContent
         side={sheetSide}
         className={`h-fit max-h-[100vh] overflow-visible ${className || ""}`}
@@ -122,7 +116,12 @@ const SheetFormBuilder: React.FC<SheetFormBuilderProps> = ({
           }
         }}
       >
-        <SheetHeader>
+        <SheetHeader
+          style={{
+            textAlign: isRtl ? "right" : "left",
+            marginTop: "30px",
+          }}
+        >
           {config.title && <SheetTitle>{config.title}</SheetTitle>}
           {config.description && (
             <SheetDescription>{config.description}</SheetDescription>

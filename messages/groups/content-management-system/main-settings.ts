@@ -64,6 +64,11 @@ export const ContentManagementSystemMainSettingsMessages = new MessagesGroup({
     cancel: _m("Cancel", "إلغاء"),
     updateSuccess: _m("Settings updated successfully!", "تم تحديث الإعدادات بنجاح!"),
     updateError: _m("Failed to update settings. Please try again.", "فشل تحديث الإعدادات. يرجى المحاولة مرة أخرى."),
+    homepageIconOptions: new MessagesGroup({
+      companies: _m("Companies", "الشركات"),
+      accreditations: _m("Accreditations", "الاعتمادات"),
+      certificates: _m("Certificates", "الشهادات"),
+    }),
   }),
 });
 

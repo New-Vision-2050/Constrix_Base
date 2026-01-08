@@ -18,7 +18,7 @@ import AnotherCheckingWay from "../another-checking-way";
 import { useLoginSteps } from "../../store/mutations";
 import OtpHub from "../resend-otp/otp-hub";
 import { useAuthStore } from "../../store/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 import { ROUTER } from "@/router";
 import { setCookie } from "cookies-next";
 import { useTranslations } from "next-intl";

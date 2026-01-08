@@ -3,11 +3,13 @@ import { baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import { RegistrationTypes } from "./registration-types";
 
-export const LegalDataAddReqFormEditConfig = (id?: string , company_id?:string) => {
-
+export const LegalDataAddReqFormEditConfig = (
+  id?: string,
+  company_id?: string
+) => {
   const queryClient = useQueryClient();
   const LegalDataAddReqFormEditConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
@@ -58,7 +60,8 @@ export const LegalDataAddReqFormEditConfig = (id?: string , company_id?:string) 
               {
                 type: "pattern",
                 value: /^(700|40|101)\d*$/,
-                message: "يجب أن يبدأ الرقم بـ 700 أو 40 أو 101 ويحتوي على أرقام فقط",
+                message:
+                  "يجب أن يبدأ الرقم بـ 700 أو 40 أو 101 ويحتوي على أرقام فقط",
               },
             ],
           },

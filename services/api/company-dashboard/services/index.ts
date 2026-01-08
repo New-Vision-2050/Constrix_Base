@@ -19,12 +19,16 @@ export const CompanyDashboardServicesApi = {
       })
     ),
   update: (id: string, params: UpdateServiceParams) =>
-    baseApi.put(
+    baseApi.post(
       `website-services/${id}`,
       serialize(params, {
         indices: true,
         booleansAsIntegers: true,
-      })
+      }), {
+      params: {
+        _method: "PUT",
+      }
+    }
     ),
   delete: (id: string) => baseApi.delete(`website-services/${id}`),
   status: (id: string, params: { status: number }) =>
