@@ -9,5 +9,7 @@ export const commonMessages = new MessagesGroup({
     error: _m("Something went wrong. Please try again.", "حدث خطأ ما. يرجى المحاولة مرة أخرى."),
     retry: _m("Retry", "إعادة المحاولة"),
   }),
+  cancel: _m("Cancel", "إلغاء"),
+  confirm: _m("Confirm", "تاكيد"),
   noCountryCode: _m("No country code found", "لا يوجد رمز الدولة"),
 });
