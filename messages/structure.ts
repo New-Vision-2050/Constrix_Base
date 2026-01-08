@@ -53,6 +53,7 @@ import { contentManagementSystemMessages } from "./groups/content-management-sys
 import { editSubEntityMessages } from "./groups/edit-sub-entity";
 import { wysiwygMessages } from "./groups/wysiwyg";
 import { clientProfileModuleMessages } from "./groups/client-profile";
+import { companyProfileLegalDataFormMessages } from "./groups/company-profile/legal-data-form";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -79,6 +80,7 @@ export const messagesStructure = new MessagesGroup({
   UserProfile: userProfileMessages,
   activitiesLogs: activitiesLogsMessages,
   companyProfile: companyProfileMessages,
+  companyProfileLegalDataForm: companyProfileLegalDataFormMessages,
   CompanyStructure: companyStructureMessages,
   PersonalDataForm: personalDataFormMessages,
   ClientsModule: clientsModuleMessages,
@@ -86,7 +88,8 @@ export const messagesStructure = new MessagesGroup({
   CRMSettingsModule: crmsettingsModuleMessages,
   AttendanceDepartureModule: attendanceDepartureModuleMessages,
   "hr-settings": hrSettingsMessages,
-  HRSettingsAttendanceDepartureModule: hrsettingsAttendanceDepartureModuleMessages,
+  HRSettingsAttendanceDepartureModule:
+    hrsettingsAttendanceDepartureModuleMessages,
   HRSettingsVacations: hrsettingsVacationsMessages,
   RoleTypes: roleTypesMessages,
   CreateRole: createRoleMessages,
