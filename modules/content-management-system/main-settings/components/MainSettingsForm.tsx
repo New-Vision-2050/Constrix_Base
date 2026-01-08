@@ -29,15 +29,15 @@ import {
 import { CompanyDashboardHomepageSettingsApi } from "@/services/api/company-dashboard/homepage-settings";
 import { GetCurrentHomepageSettingsResponse } from "@/services/api/company-dashboard/homepage-settings/types/response";
 
-// Homepage icons options
-const HOMEPAGE_ICONS_OPTIONS = [
-  { value: "companies", label: "الشركات" },
-  { value: "accreditations", label: "الاعتمادات" },
-  { value: "certificates", label: "الشهادات" },
-];
-
 export default function MainSettingsForm() {
   const t = useTranslations("content-management-system.mainSettings.form");
+
+  // Homepage icons options with translations
+  const HOMEPAGE_ICONS_OPTIONS = [
+    { value: "companies", label: t("homepageIconOptions.companies") },
+    { value: "accreditations", label: t("homepageIconOptions.accreditations") },
+    { value: "certificates", label: t("homepageIconOptions.certificates") },
+  ];
 
   // Fetch current settings using react-query
   const { data: settingsData, isLoading: isFetching } =

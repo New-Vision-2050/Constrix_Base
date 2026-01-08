@@ -62,6 +62,11 @@ export const ContentManagementSystemMainSettingsMessages = new MessagesGroup({
     companyProfileFileInvalid: _m("Company profile must be a valid file", "ملف الشركة يجب أن يكون ملفًا صالحًا"),
     save: _m("Save", "حفظ"),
     cancel: _m("Cancel", "إلغاء"),
+    homepageIconOptions: new MessagesGroup({
+      companies: _m("Companies", "الشركات"),
+      accreditations: _m("Accreditations", "الاعتمادات"),
+      certificates: _m("Certificates", "الشهادات"),
+    }),
   }),
 });
 
