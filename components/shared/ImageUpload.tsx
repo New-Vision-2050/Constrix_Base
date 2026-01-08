@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import FormLabel from "@/components/shared/FormLabel";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useTranslations } from "next-intl";
+import { Media } from "@/modules/docs-library/modules/publicDocs/types/Directory";
 
 interface ImageUploadProps {
   label: string;
@@ -15,7 +16,7 @@ interface ImageUploadProps {
   onChange?: (file: File | null) => void;
   onMultipleChange?: (files: File[]) => void;
   value?: File | string | null;
-  initialValue?: string | any[] | null;
+  initialValue?: string | Media[] | null;
   className?: string;
   minHeight?: string;
   multiple?: boolean;
