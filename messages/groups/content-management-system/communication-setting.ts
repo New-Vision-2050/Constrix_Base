@@ -23,6 +23,7 @@ export const ContentManagementSystemCommunicationSettingsMessages =
       addAddress: _m("Add Address", "إضافة عنوان"),
       addAddressTitle: _m("Add New Address", "إضافة عنوان جديد"),
       editAddressTitle: _m("Edit Address", "تعديل العنوان"),
+      search: _m("Search", "بحث"),
     }),
 
     // Social Links Table Translations
@@ -43,7 +44,7 @@ export const ContentManagementSystemCommunicationSettingsMessages =
       iconLabel: _m("Social Icon", "أيقونة"),
       iconPlaceholder: _m("Icon URL or identifier", "رابط الأيقونة أو المعرّف"),
       saveButton: _m("Save", "حفظ"),
-
+      search: _m("Search", "البحث  "),
       // Success Messages
       createSuccess: _m(
         "Social link created successfully",
