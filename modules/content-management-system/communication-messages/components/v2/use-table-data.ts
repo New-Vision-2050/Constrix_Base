@@ -8,7 +8,7 @@ import { CommunicationMessage } from "../../types";
  */
 export function useTableData() {
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit, setLimit] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -47,6 +47,11 @@ export function useTableData() {
     setPage(1);
   };
 
+  const handleLimitChange = (value: number) => {
+    setLimit(value);
+    setPage(1); // Reset to page 1 when limit changes
+  };
+
   const handleReset = () => {
     setSearchQuery("");
     setStatusFilter("all");
@@ -63,6 +68,7 @@ export function useTableData() {
     searchQuery,
     statusFilter,
     setPage,
+    setLimit: handleLimitChange,
     handleSearchChange,
     handleStatusChange,
     handleReset,

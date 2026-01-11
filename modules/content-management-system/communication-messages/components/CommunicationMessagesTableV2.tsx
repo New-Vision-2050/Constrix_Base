@@ -45,6 +45,7 @@ export default function CommunicationMessagesTableV2() {
     searchQuery,
     statusFilter,
     setPage,
+    setLimit,
     handleSearchChange,
     handleStatusChange,
     handleReset,
@@ -114,12 +115,18 @@ export default function CommunicationMessagesTableV2() {
     filtered: searchQuery !== "" || statusFilter !== "all",
   });
 
-  // Sync table state page changes with our local state
+  // Sync table state pagination changes with our local state to trigger new API requests
   React.useEffect(() => {
     if (state.pagination.page !== page) {
       setPage(state.pagination.page);
     }
-  }, [state.pagination.page]);
+  }, [state.pagination.page, page, setPage]);
+
+  React.useEffect(() => {
+    if (state.pagination.limit !== limit) {
+      setLimit(state.pagination.limit);
+    }
+  }, [state.pagination.limit, limit, setLimit]);
 
   return (
     <Can check={[PERMISSIONS.CMS.communicationContactMessages.list]}>
