@@ -1,17 +1,17 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CompanyDashboardFoundersApi } from "@/services/api/company-dashboard/founders";
 import { FounderRow } from "../types";
 
 /**
- * Custom hook for managing Founder table data and filters
- * Handles pagination, search, and API data fetching
+ * Custom hook for fetching Founder table data
+ * Accepts pagination and filter parameters from parent component
  */
-export function useTableData() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [searchQuery, setSearchQuery] = useState("");
-
+export function useTableData(
+  page: number,
+  limit: number,
+  searchQuery: string
+) {
   // Fetch data with filters
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["founders", page, limit, searchQuery],
@@ -23,7 +23,7 @@ export function useTableData() {
       }),
   });
 
-  // Extract founders from API response and cast to FounderRow
+  // Extract founders from API response
   const founders = useMemo<FounderRow[]>(
     () => (data?.data?.payload || []) as unknown as FounderRow[],
     [data]
@@ -39,36 +39,11 @@ export function useTableData() {
     [data]
   );
 
-  // Search handler with page reset
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setPage(1);
-  };
-
-  // Limit handler with page reset
-  const handleLimitChange = (value: number) => {
-    setLimit(value);
-    setPage(1);
-  };
-
-  // Reset all filters
-  const handleReset = () => {
-    setSearchQuery("");
-    setPage(1);
-  };
-
   return {
     founders,
     isLoading,
-    page,
-    limit,
     totalPages,
     totalItems,
-    searchQuery,
-    setPage,
-    setLimit: handleLimitChange,
-    handleSearchChange,
-    handleReset,
     refetch,
   };
 }

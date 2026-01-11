@@ -36,21 +36,23 @@ export default function FounderViewV2() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
-  // Table data and filters
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // ✅ STEP 1: useTableParams (BEFORE query)
+  const params = FounderTable.useTableParams({
+    initialPage: 1,
+    initialLimit: 10,
+  });
+
+  // ✅ STEP 2: Fetch data using custom hook
   const {
     founders,
     isLoading,
-    page,
-    limit,
     totalPages,
     totalItems,
-    searchQuery,
-    setPage,
-    setLimit,
-    handleSearchChange,
-    handleReset,
     refetch,
-  } = useTableData();
+  } = useTableData(params.page, params.limit, searchQuery);
 
   // Permission checks
   const canEdit = can(PERMISSIONS.CMS.founder.update);
@@ -78,6 +80,17 @@ export default function FounderViewV2() {
     setDeleteConfirmId(null);
   };
 
+  // Filter handlers
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    params.setPage(1);
+  };
+
+  const handleReset = () => {
+    setSearchQuery("");
+    params.reset();
+  };
+
   // Table columns with actions
   const columns = [
     ...createColumns(tTable, locale),
@@ -98,33 +111,17 @@ export default function FounderViewV2() {
     },
   ];
 
-  // Initialize table state with server-side pagination
-  const state = FounderTable.useState({
+  // ✅ STEP 3: useTableState (AFTER query)
+  const state = FounderTable.useTableState({
     data: founders,
     columns,
-    pagination: {
-      page,
-      limit,
-      totalPages,
-      totalItems,
-    },
+    totalPages,
+    totalItems,
+    params,
     getRowId: (founder) => founder.id,
     loading: isLoading,
     filtered: searchQuery !== "",
   });
-
-  // Sync pagination changes with API state
-  React.useEffect(() => {
-    if (state.pagination.page !== page) {
-      setPage(state.pagination.page);
-    }
-  }, [state.pagination.page, page, setPage]);
-
-  React.useEffect(() => {
-    if (state.pagination.limit !== limit) {
-      setLimit(state.pagination.limit);
-    }
-  }, [state.pagination.limit, limit, setLimit]);
 
   return (
     <Can check={[PERMISSIONS.CMS.founder.list]}>
