@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "./index";
 import { Box, Paper, Chip, TextField, Button, Stack } from "@mui/material";
 import { Search, Refresh } from "@mui/icons-material";
 
 // ============================================================================
-// Example Usage with State Pattern
+// Example Usage with Two-Hook Pattern
 // ============================================================================
 
 type User = {
@@ -106,23 +107,81 @@ const mockUsers: User[] = [
 // Create typed table instance outside component
 const UserTable = HeadlessTableLayout<User>();
 
+// Simulated API function
+const fetchUsers = async (
+  page: number,
+  limit: number,
+  sortBy?: string,
+  sortDirection?: "asc" | "desc",
+  search?: string,
+  role?: string
+): Promise<{ data: User[]; totalPages: number; totalItems: number }> => {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const filtered = mockUsers.filter((user) => {
+    const matchesSearch =
+      !search ||
+      user.name.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = !role || role === "all" || user.role === role;
+    return matchesSearch && matchesRole;
+  });
+
+  if (sortBy) {
+    filtered.sort((a, b) => {
+      const aVal = a[sortBy as keyof User];
+      const bVal = b[sortBy as keyof User];
+      const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return sortDirection === "desc" ? -comparison : comparison;
+    });
+  }
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / limit);
+  const startIndex = (page - 1) * limit;
+  const paginatedData = filtered.slice(startIndex, startIndex + limit);
+
+  return { data: paginatedData, totalPages, totalItems };
+};
+
 export function ExampleWithState() {
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
 
-  // Demo state controls
-  const [isLoading, setIsLoading] = useState(false);
-  const [tableData, setTableData] = useState(mockUsers);
-
-  // Filter data based on search and role
-  const filteredUsers = tableData.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    return matchesSearch && matchesRole;
+  // ✅ STEP 1: useTableParams (BEFORE query)
+  const params = UserTable.useTableParams({
+    initialPage: 1,
+    initialLimit: 5,
+    initialSortBy: "name",
+    initialSortDirection: "asc",
   });
+
+  // ✅ STEP 2: Fetch data using useQuery
+  const { data: queryData, isLoading } = useQuery({
+    queryKey: [
+      "users",
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortDirection,
+      searchQuery,
+      roleFilter,
+    ],
+    queryFn: () =>
+      fetchUsers(
+        params.page,
+        params.limit,
+        params.sortBy,
+        params.sortDirection,
+        searchQuery,
+        roleFilter
+      ),
+  });
+
+  const data = queryData?.data || [];
+  const totalPages = queryData?.totalPages || 0;
+  const totalItems = queryData?.totalItems || 0;
 
   // Define columns
   const columns = [
@@ -164,26 +223,22 @@ export function ExampleWithState() {
     },
   ];
 
-  // Initialize table state with all configuration
-  const state = UserTable.useState({
-    data: filteredUsers,
+  // ✅ STEP 3: useTableState (AFTER query)
+  const state = UserTable.useTableState({
+    data,
     columns,
-    selectable: true, // Enable row selection with checkboxes
-    pagination: {
-      page: 1,
-      limit: 5,
-      totalPages: 20, // From backend - total pages available
-      totalItems: 100, // Optional - total items count
-    },
-    getRowId: (user) => user.id.toString(),
-    initialSortBy: "name",
+    totalPages,
+    totalItems,
+    params,
+    selectable: true,
+    getRowId: (user: User) => user.id.toString(),
     loading: isLoading,
     filtered: searchQuery !== "" || roleFilter !== "all",
-    onExport: async (selectedRows) => {
+    onExport: async (selectedRows: User[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
     },
-    onDelete: async (selectedRows) => {
+    onDelete: async (selectedRows: User[]) => {
       console.log("Deleting rows:", selectedRows);
       alert(`Deleting ${selectedRows.length} rows`);
     },
@@ -192,26 +247,7 @@ export function ExampleWithState() {
   const handleReset = () => {
     setSearchQuery("");
     setRoleFilter("all");
-  };
-
-  // Demo action handlers
-  const handleToggleLoading = () => {
-    setIsLoading((prev) => !prev);
-  };
-
-  const handleClearData = () => {
-    setTableData([]);
-  };
-
-  const handleRestoreData = () => {
-    setTableData(mockUsers);
-  };
-
-  const handleSimulateLoad = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    params.reset();
   };
 
   return (
@@ -225,7 +261,10 @@ export function ExampleWithState() {
                 size="small"
                 placeholder="Search by name or email..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  params.setPage(1);
+                }}
                 InputProps={{
                   startAdornment: (
                     <Search sx={{ mr: 1, color: "action.active" }} />
@@ -238,7 +277,10 @@ export function ExampleWithState() {
                 size="small"
                 label="Role"
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                onChange={(e) => {
+                  setRoleFilter(e.target.value);
+                  params.setPage(1);
+                }}
                 SelectProps={{ native: true }}
                 sx={{ minWidth: 150 }}
               >
@@ -257,46 +299,7 @@ export function ExampleWithState() {
             </Stack>
 
             {/* Top Actions */}
-            <UserTable.TopActions
-              state={state}
-              customActions={
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleToggleLoading}
-                    color={isLoading ? "error" : "primary"}
-                  >
-                    {isLoading ? "Stop Loading" : "Start Loading"}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleSimulateLoad}
-                    disabled={isLoading}
-                  >
-                    Simulate Load (2s)
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleClearData}
-                    color="warning"
-                    disabled={tableData.length === 0}
-                  >
-                    Clear Data
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={handleRestoreData}
-                    disabled={tableData.length === mockUsers.length}
-                  >
-                    Restore Data
-                  </Button>
-                </Stack>
-              }
-            />
+            <UserTable.TopActions state={state} />
           </Stack>
         }
         table={<UserTable.Table state={state} loadingOptions={{ rows: 5 }} />}
@@ -306,13 +309,21 @@ export function ExampleWithState() {
       {/* Debug Info */}
       <Paper sx={{ p: 2, mt: 2 }} variant="outlined">
         <Box sx={{ fontFamily: "monospace", fontSize: "0.875rem" }}>
+          <div>
+            <strong>Two-Hook Pattern</strong>
+          </div>
           <div>Selected: {state.selection.selectedCount}</div>
           <div>
-            Page: {state.pagination.page} / {state.pagination.totalPages}
+            Page: {params.page} / {totalPages}
           </div>
-          <div>Limit: {state.pagination.limit}</div>
+          <div>Limit: {params.limit}</div>
+          <div>Total Items: {totalItems}</div>
           <div>
-            Sort: {state.table.sortBy} ({state.table.sortDirection})
+            Sort: {params.sortBy} ({params.sortDirection})
+          </div>
+          <div>Loading: {isLoading ? "Yes" : "No"}</div>
+          <div>
+            Filters: {searchQuery || "(none)"} | Role: {roleFilter}
           </div>
         </Box>
       </Paper>
