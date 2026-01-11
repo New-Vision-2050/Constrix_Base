@@ -42,15 +42,20 @@ export function createTableComponent<TRow>() {
 
     // Selection config
     const selectable = isUsingState
-      ? {
-          selectedRows: props.state.selection.selectedRows,
-          onSelectionChange: props.state.selection.setSelectedRows,
-          getRowId: undefined, // Will use state's internal logic
-        }
+      ? props.state.table.selectable
+        ? {
+            selectedRows: props.state.selection.selectedRows,
+            onSelectionChange: props.state.selection.setSelectedRows,
+            getRowId: undefined, // Will use state's internal logic
+          }
+        : undefined
       : props.selectable;
 
     // Use state's selection methods when available
-    const stateSelection = isUsingState ? props.state.selection : null;
+    const stateSelection =
+      isUsingState && props.state.table.selectable
+        ? props.state.selection
+        : null;
     const handleColumnSort = (columnKey: string, sortable?: boolean) => {
       if (sortable && handleSort) {
         handleSort(columnKey);

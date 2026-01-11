@@ -19,6 +19,7 @@ export type TableStateOptions<TRow> = {
   pagination?: PaginationConfig;
 
   // Selection
+  selectable?: boolean; // Enable row selection with checkboxes (default: false)
   getRowId?: (row: TRow) => string;
 
   // Sorting
@@ -44,6 +45,7 @@ export type TableState<TRow> = {
     loading: boolean;
     filtered: boolean;
     handleSort: (key: string) => void;
+    selectable: boolean; // Whether selection is enabled
   };
 
   // Pagination state

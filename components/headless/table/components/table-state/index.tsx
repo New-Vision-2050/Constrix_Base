@@ -13,6 +13,7 @@ export function createTableStateHook<TRow>() {
       data,
       columns,
       pagination: paginationConfig,
+      selectable = false,
       getRowId,
       initialSortBy,
       initialSortDirection = "asc",
@@ -194,6 +195,7 @@ export function createTableStateHook<TRow>() {
         loading,
         filtered,
         handleSort,
+        selectable,
       },
       pagination: {
         page,
