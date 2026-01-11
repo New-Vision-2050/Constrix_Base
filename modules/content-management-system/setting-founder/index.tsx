@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useFounderListTableConfig } from "./_config/list-table-config";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import FounderViewV2 from "./FounderViewV2";
 
 function FounderView() {
   const [editingFounderId, setEditingFounderId] = useState<string | null>(null);
@@ -20,7 +21,7 @@ function FounderView() {
 
   return (
     <Can check={[PERMISSIONS.CMS.founder.list]}>
-      <div className="px-8 space-y-7">
+      {/* <div className="px-8 space-y-7">
         <Can check={[PERMISSIONS.CMS.founder.update]}>
           <AddFounderDialog
             open={Boolean(editingFounderId)}
@@ -47,7 +48,8 @@ function FounderView() {
           }
           tableId={tableConfig.tableId}
         />
-      </div>
+      </div> */}
+      <FounderViewV2 />
     </Can>
   );
 }

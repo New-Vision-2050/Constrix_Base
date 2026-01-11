@@ -115,7 +115,20 @@ export const ContentManagementSystemFounderMessages = new MessagesGroup({
     jobTitle: _m("Job Title", "المسمى الوظيفي"),
     description: _m("Description", "الوصف"),
     status: _m("Status", "الحالة"),
+    active: _m("Active", "نشط"),
+    inactive: _m("Inactive", "غير نشط"),
     actions: _m("Actions", "الإجراءات"),
+    action: _m("Action", "الإجراء"),
     editFounder: _m("Edit Founder", "تعديل مؤسس"),
+    delete: _m("Delete", "حذف"),
+    deleteSuccess: _m("Founder deleted successfully", "تم حذف المؤسس بنجاح"),
+    deleteError: _m("Failed to delete founder", "فشل حذف المؤسس"),
+    deleteConfirmMessage: _m(
+      "Are you sure you want to delete this founder?",
+      "هل أنت متأكد من حذف هذا المؤسس؟"
+    ),
+    searchPlaceholder: _m("Search by name or job title...", "البحث بالاسم أو المسمى الوظيفي..."),
+    reset: _m("Reset", "إعادة تعيين"),
   }),
+  title: _m("Founders", "المؤسسون"),
 });
