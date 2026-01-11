@@ -172,7 +172,8 @@ export function ExampleWithState() {
     pagination: {
       page: 1,
       limit: 5,
-      totalItems: mockUsers.length,
+      totalPages: 20, // From backend - total pages available
+      totalItems: 100, // Optional - total items count
     },
     getRowId: (user) => user.id.toString(),
     initialSortBy: "name",

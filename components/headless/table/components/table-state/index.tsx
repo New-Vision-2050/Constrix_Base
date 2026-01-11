@@ -26,6 +26,12 @@ export function createTableStateHook<TRow>() {
     // Pagination state
     const [page, setPage] = useState(paginationConfig?.page || 1);
     const [limit, setLimit] = useState(paginationConfig?.limit || 10);
+
+    // Total pages: use from config if provided (backend), otherwise calculate from totalItems
+    const totalPages = paginationConfig?.totalPages
+      ? paginationConfig.totalPages
+      : Math.ceil((paginationConfig?.totalItems || data.length) / limit);
+
     const totalItems = paginationConfig?.totalItems || data.length;
 
     // Selection state
@@ -38,7 +44,6 @@ export function createTableStateHook<TRow>() {
     );
 
     // Computed pagination values
-    const totalPages = Math.ceil(totalItems / limit);
     const canNextPage = page < totalPages;
     const canPrevPage = page > 1;
 

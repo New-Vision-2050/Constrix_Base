@@ -7,7 +7,8 @@ import { ColumnDef } from "../table-component/types";
 export type PaginationConfig = {
   page?: number; // Initial page (default: 1)
   limit?: number; // Items per page (default: 10)
-  totalItems?: number; // Total number of items
+  totalPages?: number; // Total pages from backend (if not provided, calculated from totalItems)
+  totalItems?: number; // Total number of items (optional if totalPages is provided)
 };
 
 export type TableStateOptions<TRow> = {
