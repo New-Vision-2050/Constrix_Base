@@ -34,23 +34,24 @@ export default function CommunicationMessagesTableV2() {
   const [viewingDetailsId, setViewingDetailsId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  // Table data and filters
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // ✅ STEP 1: useTableParams (BEFORE query)
+  const params = MessageTable.useTableParams({
+    initialPage: 1,
+    initialLimit: 10,
+  });
+
+  // ✅ STEP 2: Fetch data using custom hook
   const {
     messages,
     isLoading,
-    page,
-    limit,
     totalPages,
     totalItems,
-    searchQuery,
-    statusFilter,
-    setPage,
-    setLimit,
-    handleSearchChange,
-    handleStatusChange,
-    handleReset,
     refetch,
-  } = useTableData();
+  } = useTableData(params.page, params.limit, searchQuery, statusFilter);
 
   // Permission checks
   const canView = can(PERMISSIONS.CMS.communicationContactMessages.list);
@@ -78,6 +79,23 @@ export default function CommunicationMessagesTableV2() {
     setDeleteConfirmId(null);
   };
 
+  // Filter handlers
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    params.setPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    params.setPage(1);
+  };
+
+  const handleReset = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    params.reset();
+  };
+
   // Table columns with actions
   const columns = [
     ...createColumns(t),
@@ -100,33 +118,17 @@ export default function CommunicationMessagesTableV2() {
     },
   ];
 
-  // Initialize table state
-  const state = MessageTable.useState({
+  // ✅ STEP 3: useTableState (AFTER query)
+  const state = MessageTable.useTableState({
     data: messages,
     columns,
-    pagination: {
-      page,
-      limit,
-      totalPages,
-      totalItems,
-    },
+    totalPages,
+    totalItems,
+    params,
     getRowId: (msg) => msg.id,
     loading: isLoading,
     filtered: searchQuery !== "" || statusFilter !== "all",
   });
-
-  // Sync table state pagination changes with our local state to trigger new API requests
-  React.useEffect(() => {
-    if (state.pagination.page !== page) {
-      setPage(state.pagination.page);
-    }
-  }, [state.pagination.page, page, setPage]);
-
-  React.useEffect(() => {
-    if (state.pagination.limit !== limit) {
-      setLimit(state.pagination.limit);
-    }
-  }, [state.pagination.limit, limit, setLimit]);
 
   return (
     <Can check={[PERMISSIONS.CMS.communicationContactMessages.list]}>

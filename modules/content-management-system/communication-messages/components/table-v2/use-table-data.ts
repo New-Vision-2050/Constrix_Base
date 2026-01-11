@@ -1,17 +1,17 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import useCommunicationMessages from "../../hooks/useCommunicationMessages";
 import { CommunicationMessage } from "../../types";
 
 /**
- * Custom hook for managing table data and filters
- * Handles pagination, search, and status filtering
+ * Custom hook for fetching table data
+ * Accepts pagination and filter parameters from parent component
  */
-export function useTableData() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
+export function useTableData(
+  page: number,
+  limit: number,
+  searchQuery: string,
+  statusFilter: string
+) {
   // Fetch data with filters
   const { data, isLoading, refetch } = useCommunicationMessages(
     page,
@@ -20,9 +20,9 @@ export function useTableData() {
     statusFilter !== "all" ? statusFilter : undefined
   );
 
-  // Extract pagination info from API response
+  // Extract messages from API response
   const messages = useMemo<CommunicationMessage[]>(
-    () => data?.data?.payload || [],
+    () => (data?.data?.payload || []) as unknown as CommunicationMessage[],
     [data]
   );
 
@@ -36,42 +36,11 @@ export function useTableData() {
     [data]
   );
 
-  // Reset to page 1 when filters change
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setPage(1);
-  };
-
-  const handleStatusChange = (value: string) => {
-    setStatusFilter(value);
-    setPage(1);
-  };
-
-  const handleLimitChange = (value: number) => {
-    setLimit(value);
-    setPage(1); // Reset to page 1 when limit changes
-  };
-
-  const handleReset = () => {
-    setSearchQuery("");
-    setStatusFilter("all");
-    setPage(1);
-  };
-
   return {
     messages,
     isLoading,
-    page,
-    limit,
     totalPages,
     totalItems,
-    searchQuery,
-    statusFilter,
-    setPage,
-    setLimit: handleLimitChange,
-    handleSearchChange,
-    handleStatusChange,
-    handleReset,
     refetch,
   };
 }
