@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import DialogTrigger from "@/components/headless/dialog-trigger";
@@ -31,55 +31,100 @@ function SocialLinksTable() {
   // Fetch data using query
   const queryClient = useQueryClient();
 
-  const { data: socialLinksData, isLoading: isFetchingSocialLinks } = useQuery({
-    queryKey: [SOCIAL_LINKS_QUERY_KEY],
-    queryFn: async () => {
-      const response = await CommunicationSettingsSocialLinksApi.getAll();
-      return response.data.payload;
-    },
-  });
-
-  const socialLinks = useMemo(() => socialLinksData ?? [], [socialLinksData]);
-
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [SOCIAL_LINKS_QUERY_KEY] });
   };
 
-  const [tableData, setTableData] = useState<SocialLink[]>([]);
-
-  useEffect(() => {
-    setTableData(socialLinks);
-  }, [socialLinks]);
-
-  // Filter data based on search and role
-  const filteredSocialLinks = tableData.filter((socialLink) => {
-    const matchesSearch =
-      (socialLink.type?.name ?? "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (socialLink.link ?? "-")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
-    return matchesSearch;
+  // ✅ STEP 1: useTableParams (BEFORE query)
+  const params = SocialLinksTableLayout.useTableParams({
+    initialPage: 1,
+    initialLimit: 5,
+    initialSortBy: "type",
+    initialSortDirection: "asc",
   });
+
+  // ✅ STEP 2: Fetch data using useQuery
+  const { data: queryData, isLoading } = useQuery({
+    queryKey: [
+      SOCIAL_LINKS_QUERY_KEY,
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortDirection,
+      searchQuery,
+    ],
+    queryFn: async () => {
+      const response = await CommunicationSettingsSocialLinksApi.getAll();
+      const allData = response.data.payload ?? [];
+
+      // Filter data based on search and role
+      const filtered = allData.filter((socialLink: SocialLink) => {
+        const matchesSearch =
+          !searchQuery ||
+          (socialLink.type?.name ?? "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          (socialLink.link ?? "-").toLowerCase();
+
+        return matchesSearch;
+      });
+
+      // Sort
+      if (params.sortBy) {
+        filtered.sort((a: SocialLink, b: SocialLink) => {
+          const aVal =
+            params.sortBy === "type"
+              ? a.type?.name
+              : a[params.sortBy as keyof SocialLink];
+          const bVal =
+            params.sortBy === "type"
+              ? b.type?.name
+              : b[params.sortBy as keyof SocialLink];
+          const comparison =
+            (aVal ?? "") < (bVal ?? "")
+              ? -1
+              : (aVal ?? "") > (bVal ?? "")
+              ? 1
+              : 0;
+          return params.sortDirection === "desc" ? -comparison : comparison;
+        });
+      }
+
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / params.limit);
+      const startIndex = (params.page - 1) * params.limit;
+      const paginatedData = filtered.slice(
+        startIndex,
+        startIndex + params.limit
+      );
+
+      return { data: paginatedData, totalPages, totalItems };
+    },
+  });
+
+  const data = queryData?.data || [];
+  const totalPages = queryData?.totalPages || 0;
+  const totalItems = queryData?.totalItems || 0;
 
   // Define columns
   const columns = getSocialLinksColumns(t);
 
-  // Initialize table state
-  const state = SocialLinksTableLayout.useState({
-    data: filteredSocialLinks,
+  // ✅ STEP 3: useTableState (AFTER query)
+  const state = SocialLinksTableLayout.useTableState({
+    data,
     columns,
+    totalPages,
+    totalItems,
+    params,
     selectable: true,
-    getRowId: (socialLink) => socialLink.id,
-    loading: isFetchingSocialLinks,
+    getRowId: (socialLink: SocialLink) => socialLink.id,
+    loading: isLoading,
     filtered: searchQuery !== "",
-    onExport: async (selectedRows) => {
+    onExport: async (selectedRows: SocialLink[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
     },
-    onDelete: async (selectedRows) => {
+    onDelete: async (selectedRows: SocialLink[]) => {
       console.log("Deleting rows:", selectedRows);
       alert(`Deleting ${selectedRows.length} rows`);
     },
@@ -96,7 +141,10 @@ function SocialLinksTable() {
                 size="small"
                 placeholder={t("search")}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  params.setPage(1);
+                }}
                 InputProps={{
                   startAdornment: (
                     <Search sx={{ mr: 1, color: "action.active" }} />

@@ -1,31 +1,25 @@
 import { ColumnDef } from "../table-component/types";
+import { TableParams } from "../table-params/types";
 
 // ============================================================================
-// Table State Types
+// Table State Types (After Query)
 // ============================================================================
 
-export type PaginationConfig = {
-  page?: number; // Initial page (default: 1)
-  limit?: number; // Items per page (default: 10)
-  totalPages?: number; // Total pages from backend (if not provided, calculated from totalItems)
-  totalItems?: number; // Total number of items (optional if totalPages is provided)
-};
-
-export type TableStateOptions<TRow> = {
-  // Data
+export type TableStateV2Options<TRow> = {
+  // Data from query
   data: TRow[];
   columns: ColumnDef<TRow>[];
 
-  // Pagination
-  pagination?: PaginationConfig;
+  // Pagination info from backend
+  totalPages: number;
+  totalItems?: number;
+
+  // Params from useTableParams
+  params: TableParams;
 
   // Selection
-  selectable?: boolean; // Enable row selection with checkboxes (default: false)
+  selectable?: boolean;
   getRowId?: (row: TRow) => string;
-
-  // Sorting
-  initialSortBy?: string;
-  initialSortDirection?: "asc" | "desc";
 
   // Loading & Filtering
   loading?: boolean;
@@ -36,17 +30,17 @@ export type TableStateOptions<TRow> = {
   onDelete?: (selectedRows: TRow[]) => void | Promise<void>;
 };
 
-export type TableState<TRow> = {
+export type TableStateV2<TRow> = {
   // Table-specific state
   table: {
     columns: ColumnDef<TRow>[];
-    data: TRow[];
+    data: TRow[]; // With sticky selected rows
     sortBy?: string;
     sortDirection?: "asc" | "desc";
     loading: boolean;
     filtered: boolean;
     handleSort: (key: string) => void;
-    selectable: boolean; // Whether selection is enabled
+    selectable: boolean;
   };
 
   // Pagination state
@@ -61,7 +55,7 @@ export type TableState<TRow> = {
     prevPage: () => void;
     canNextPage: boolean;
     canPrevPage: boolean;
-    paginatedData: TRow[];
+    paginatedData: TRow[]; // Same as table.data (for backward compatibility)
   };
 
   // Selection state
@@ -74,7 +68,7 @@ export type TableState<TRow> = {
     selectedCount: number;
     isRowSelected: (row: TRow) => boolean;
     toggleRow: (row: TRow) => void;
-    isRowFromOtherPage: (row: TRow) => boolean; // Check if row is sticky (from another page)
+    isRowFromOtherPage: (row: TRow) => boolean;
   };
 
   // Actions
