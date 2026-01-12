@@ -35,7 +35,7 @@ export default function PreviousWorkSection({
   return (
     <div className="space-y-4 border-t border-gray-700 pt-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-lg font-semibold ">
           {tForm("previousWork")} ({previousWorkIndex + 1})
         </h3>
         <Button
@@ -83,14 +83,14 @@ export default function PreviousWorkSection({
             name={`previous_works.${previousWorkIndex}.description`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs text-white" required>
+                <FormLabel className="text-xs " required>
                   {tForm("previousWorkDescription")}
                 </FormLabel>
                 <FormControl>
                   <Textarea
                     disabled={isSubmitting}
                     rows={6}
-                    className="mt-1 resize-none bg-sidebar text-white border-gray-700"
+                    className="mt-1 resize-none bg-sidebar  border-gray-700"
                     placeholder={tForm("previousWorkDescriptionPlaceholder")}
                     {...field}
                   />
