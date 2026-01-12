@@ -27,6 +27,7 @@ function SocialLinksTable() {
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Fetch data using query
   const queryClient = useQueryClient();
@@ -38,9 +39,7 @@ function SocialLinksTable() {
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = SocialLinksTableLayout.useTableParams({
     initialPage: 1,
-    initialLimit: 5,
-    initialSortBy: "type",
-    initialSortDirection: "asc",
+    initialLimit: 10,
   });
 
   // ✅ STEP 2: Fetch data using useQuery
@@ -49,56 +48,25 @@ function SocialLinksTable() {
       SOCIAL_LINKS_QUERY_KEY,
       params.page,
       params.limit,
-      params.sortBy,
-      params.sortDirection,
       searchQuery,
+      statusFilter,
     ],
     queryFn: async () => {
-      const response = await CommunicationSettingsSocialLinksApi.getAll();
-      const allData = response.data.payload ?? [];
-
-      // Filter data based on search and role
-      const filtered = allData.filter((socialLink: SocialLink) => {
-        const matchesSearch =
-          !searchQuery ||
-          (socialLink.type?.name ?? "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          (socialLink.link ?? "-").toLowerCase();
-
-        return matchesSearch;
+      const response = await CommunicationSettingsSocialLinksApi.getAll({
+        page: params.page,
+        per_page: params.limit,
+        type: searchQuery || undefined,
+        status: statusFilter !== "all" ? Number(statusFilter) : undefined,
       });
 
-      // Sort
-      if (params.sortBy) {
-        filtered.sort((a: SocialLink, b: SocialLink) => {
-          const aVal =
-            params.sortBy === "type"
-              ? a.type?.name
-              : a[params.sortBy as keyof SocialLink];
-          const bVal =
-            params.sortBy === "type"
-              ? b.type?.name
-              : b[params.sortBy as keyof SocialLink];
-          const comparison =
-            (aVal ?? "") < (bVal ?? "")
-              ? -1
-              : (aVal ?? "") > (bVal ?? "")
-              ? 1
-              : 0;
-          return params.sortDirection === "desc" ? -comparison : comparison;
-        });
-      }
+      const data = response.data.payload ?? [];
+      const pagination = response.data.pagination;
 
-      const totalItems = filtered.length;
-      const totalPages = Math.ceil(totalItems / params.limit);
-      const startIndex = (params.page - 1) * params.limit;
-      const paginatedData = filtered.slice(
-        startIndex,
-        startIndex + params.limit
-      );
-
-      return { data: paginatedData, totalPages, totalItems };
+      return {
+        data,
+        totalPages: pagination?.last_page ?? 1,
+        totalItems: pagination?.result_count ?? data.length,
+      };
     },
   });
 
@@ -119,7 +87,7 @@ function SocialLinksTable() {
     selectable: true,
     getRowId: (socialLink: SocialLink) => socialLink.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    filtered: searchQuery !== "" || statusFilter !== "all",
     onExport: async (selectedRows: SocialLink[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
@@ -152,6 +120,22 @@ function SocialLinksTable() {
                 }}
                 sx={{ flexGrow: 1 }}
               />
+              <TextField
+                select
+                size="small"
+                label="Status"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  params.setPage(1);
+                }}
+                SelectProps={{ native: true }}
+                sx={{ minWidth: 150 }}
+              >
+                <option value="all">All Status</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </TextField>
             </Stack>
 
             {/* Top Actions */}

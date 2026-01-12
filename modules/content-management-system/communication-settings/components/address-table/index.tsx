@@ -26,6 +26,7 @@ function AddressTable() {
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Fetch data using query
   const queryClient = useQueryClient();
@@ -48,45 +49,25 @@ function AddressTable() {
       ADDRESSES_QUERY_KEY,
       params.page,
       params.limit,
-      params.sortBy,
-      params.sortDirection,
       searchQuery,
+      statusFilter,
     ],
     queryFn: async () => {
-      const response = await CommunicationSettingsAddressesApi.getAll();
-      const allData = response.data.payload ?? [];
-
-      // Filter data based on search and role
-      const filtered = allData.filter((address: Address) => {
-        const matchesSearch =
-          !searchQuery ||
-          address.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (address.address ?? "-")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-
-        return matchesSearch;
+      const response = await CommunicationSettingsAddressesApi.getAll({
+        page: params.page,
+        per_page: params.limit,
+        title: searchQuery || undefined,
+        status: statusFilter !== "all" ? Number(statusFilter) : undefined,
       });
 
-      // Sort
-      if (params.sortBy) {
-        filtered.sort((a: Address, b: Address) => {
-          const aVal = a[params.sortBy as keyof Address];
-          const bVal = b[params.sortBy as keyof Address];
-          const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-          return params.sortDirection === "desc" ? -comparison : comparison;
-        });
-      }
+      const data = response.data.payload ?? [];
+      const pagination = response.data.pagination;
 
-      const totalItems = filtered.length;
-      const totalPages = Math.ceil(totalItems / params.limit);
-      const startIndex = (params.page - 1) * params.limit;
-      const paginatedData = filtered.slice(
-        startIndex,
-        startIndex + params.limit
-      );
-
-      return { data: paginatedData, totalPages, totalItems };
+      return {
+        data,
+        totalPages: pagination?.last_page ?? 1,
+        totalItems: pagination?.result_count ?? data.length,
+      };
     },
   });
 
@@ -107,7 +88,7 @@ function AddressTable() {
     selectable: true,
     getRowId: (address: Address) => address.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    filtered: searchQuery !== "" || statusFilter !== "all",
     onExport: async (selectedRows: Address[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
@@ -140,6 +121,22 @@ function AddressTable() {
                 }}
                 sx={{ flexGrow: 1 }}
               />
+              <TextField
+                select
+                size="small"
+                label="Status"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  params.setPage(1);
+                }}
+                SelectProps={{ native: true }}
+                sx={{ minWidth: 150 }}
+              >
+                <option value="all">All Status</option>
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </TextField>
             </Stack>
 
             {/* Top Actions */}
