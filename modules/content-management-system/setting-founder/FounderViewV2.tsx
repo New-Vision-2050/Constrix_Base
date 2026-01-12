@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "@/components/headless/table";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
@@ -12,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import { createColumns } from "./table-v2/columns";
 import { TableFilters } from "./table-v2/filters";
 import { RowActions } from "./table-v2/actions";
-import { useTableData } from "./table-v2/use-table-data";
 import AddFounderDialog from "./add-founder-dialog";
 import ConfirmDeleteDialog from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
 import { FounderRow } from "./types";
+import { ListFoundersResponse } from "@/services/api/company-dashboard/founders/types/response";
 
 // Create typed table instance
 const FounderTable = HeadlessTableLayout<FounderRow>();
@@ -44,14 +45,34 @@ export default function FounderViewV2() {
     initialLimit: 10,
   });
 
-  // ✅ STEP 2: Fetch data using custom hook
-  const {
-    founders,
-    isLoading,
-    totalPages,
-    totalItems,
-    refetch,
-  } = useTableData(params.page, params.limit, searchQuery);
+  // ✅ STEP 2: Fetch data using useQuery directly
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["founders", params.page, params.limit, searchQuery],
+    queryFn: async () => {
+      const response = await CompanyDashboardFoundersApi.list({
+        page: params.page,
+        per_page: params.limit,
+        search: searchQuery || undefined,
+      });
+      return response.data as ListFoundersResponse;
+    },
+  });
+
+  // Extract data from response with proper typing
+  const founders = useMemo<FounderRow[]>(
+    () => (data?.payload || []) as unknown as FounderRow[],
+    [data]
+  );
+
+  const totalPages = useMemo(
+    () => data?.pagination?.last_page || 1,
+    [data]
+  );
+
+  const totalItems = useMemo(
+    () => data?.pagination?.result_count || 0,
+    [data]
+  );
 
   // Permission checks
   const canEdit = can(PERMISSIONS.CMS.founder.update);

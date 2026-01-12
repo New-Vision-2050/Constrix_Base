@@ -5,4 +5,3 @@
 export { createColumns } from "./columns";
 export { TableFilters } from "./filters";
 export { RowActions } from "./actions";
-export { useTableData } from "./use-table-data";
