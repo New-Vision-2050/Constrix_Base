@@ -10,6 +10,7 @@ import {
 } from '@/modules/table/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/modules/table/components/ui/command';
 import { Check, ChevronsUpDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 // Country codes for phone numbers with flags
 const countryCodes = [
@@ -52,6 +53,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   onChange,
   onBlur,
 }) => {
+  // translate messages
+  const t = useTranslations("common");
   // Parse the value into country code and phone number
   const [countryCode, setCountryCode] = useState('+966');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -238,7 +241,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
               <Command>
                 <CommandInput placeholder="Search country..." />
                 <CommandList>
-                  <CommandEmpty>No country found.</CommandEmpty>
+                  <CommandEmpty>{t("noCountryCode")}</CommandEmpty>
                   <CommandGroup>
                     {countryCodes.map((country) => (
                       <CommandItem

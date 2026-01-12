@@ -48,18 +48,11 @@ export default function PreviousWorksList({
       ))}
 
       {previousWorks.length === 0 && (
-        <p className="text-gray-400 text-center py-8">
-          {tForm("noPreviousWorks")}
-        </p>
+        <p className=" text-center py-8">{tForm("noPreviousWorks")}</p>
       )}
 
       <div className="flex items-center justify-end ">
-        <Button
-          type="button"
-          onClick={onAdd}
-          variant="outline"
-          className="text-white"
-        >
+        <Button type="button" onClick={onAdd} variant="outline">
           <Plus className="h-4 w-4 mr-2" />
           {tForm("addPreviousWork")}
         </Button>

@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ThemesApi } from "@/services/api/company-dashboard/themes";
 import { useMemo } from "react";
 import { ThemeCard } from "../../themes/components/ThemesGrid";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@i18n/navigation";
 
 interface RelatedThemesProps {
   currentThemeId: string;
@@ -30,7 +30,10 @@ export default function RelatedThemes({ currentThemeId }: RelatedThemesProps) {
   });
 
   const relatedThemes = useMemo(
-    () => themesData?.data?.payload?.filter((t: ThemeData) => t.id !== currentThemeId).slice(0, 3) || [],
+    () =>
+      themesData?.data?.payload
+        ?.filter((t: ThemeData) => t.id !== currentThemeId)
+        .slice(0, 3) || [],
     [themesData, currentThemeId]
   );
 
@@ -49,7 +52,9 @@ export default function RelatedThemes({ currentThemeId }: RelatedThemesProps) {
               src={theme.main_image}
               title={theme.title}
               description={theme.description}
-              onClick={() => { router.push(`/content-management-system/themes/${theme.id}`); }}
+              onClick={() => {
+                router.push(`/content-management-system/themes/${theme.id}`);
+              }}
             />
           </Grid>
         ))}
@@ -57,4 +62,3 @@ export default function RelatedThemes({ currentThemeId }: RelatedThemesProps) {
     </Box>
   );
 }
-

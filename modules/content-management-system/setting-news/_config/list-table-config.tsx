@@ -6,6 +6,8 @@ import TheStatus from "../component/the-status";
 import { NewsRow, TableConfigParams } from "../types";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { CategoryTypes } from "../../categories/enums/Category-types";
+import { EditIcon } from "lucide-react";
 
 export const useNewsListTableConfig: (
   params?: TableConfigParams
@@ -73,15 +75,48 @@ export const useNewsListTableConfig: (
       {
         key: "is_active",
         label: t("status"),
-        render: (value: "active" | "inActive", row: NewsRow) => (
-          <TheStatus theStatus={value} id={row.id} />
-        ),
+        render: (value: "active" | "inActive", row: NewsRow) => {
+          const isActive = row.status == 1 ? true : false;
+          return <TheStatus theStatus={isActive} id={row.id} />;
+        },
+      },
+    ],
+    enableSearch: true,
+    enableColumnSearch: true,
+    searchFields: [],
+    searchParamName: "search",
+    searchFieldParamName: "fields",
+    allowSearchFieldSelection: true,
+    allSearchedFields: [
+      {
+        key: "category_website_cms_id",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("category"),
+          dynamicDropdown: {
+            url: `${baseURL}/categories-website/all?category_type=${CategoryTypes.NEWS_WEBSITE_TYPE}`,
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 10,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
       },
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.news.update)} onSelect={() => params?.onEdit?.(row.id)}>
-          {t("editNews")}
+        <DropdownMenuItem
+          disabled={!can(PERMISSIONS.CMS.news.update)}
+          onSelect={() => params?.onEdit?.(row.id)}
+        >
+          <div className="flex items-center justify-between w-full">
+            <EditIcon size={16} />
+            {t("editNews")}
+          </div>
         </DropdownMenuItem>
       ),
     ],
@@ -89,6 +124,5 @@ export const useNewsListTableConfig: (
       canDelete: can(PERMISSIONS.CMS.news.delete),
     },
     deleteUrl: `${baseURL}/website-news`,
-    searchParamName: "search",
   };
 };

@@ -50,13 +50,15 @@ export default function SetProjectTypeDialog({
   const isEditMode = !!projectTypeId;
 
   // Fetch project type data when editing
-  const { data: projectTypeData, isFetching } = useQuery({
+  const { data: projectTypeData, isFetching, refetch } = useQuery({
     queryKey: ["company-dashboard-project-type", projectTypeId],
     queryFn: () => CompanyDashboardProjectTypesApi.show(projectTypeId!),
     enabled: isEditMode && open,
-    refetchOnMount: 'always',
-    staleTime: 0,
-    gcTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    staleTime: Infinity,
   });
 
   const form = useForm<ProjectTypeFormData>({
@@ -122,6 +124,7 @@ export default function SetProjectTypeDialog({
 
       onSuccess?.();
       reset();
+      refetch();
       onClose();
     } catch (error: any) {
       console.error(

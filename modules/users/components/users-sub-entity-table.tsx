@@ -8,7 +8,7 @@ import { createPermissions } from "@/lib/permissions/permission-names/default-pe
 import { TableBuilder, TableConfig } from "@/modules/table";
 import { UsersConfigV2 } from "@/modules/table/utils/configs/usersTableConfigV2";
 import { useSidebarStore } from "@/store/useSidebarStore";
-import { useParams } from "next/navigation";
+import { useParams } from "@i18n/navigation";
 import UsersSubEntityForm from "./users-sub-entity-form";
 import { ClientsDataCxtProvider } from "@/modules/clients/context/ClientsDataCxt";
 import { CreateClientCxtProvider } from "@/modules/clients/context/CreateClientCxt";
@@ -34,7 +34,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
   // shared settings
   const { data: sharedSettings } = useCRMSharedSetting();
   // toggle refetch
-  const [toggleRefetch, setToggleRefetch] = useState(false);
+  const [toggleRefetch, setToggleRefetch] = useState(0);
   // is share client
   const isShareClient = sharedSettings?.is_share_client == "1";
   // is share broker
@@ -58,7 +58,7 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
 
   // handle refresh widgets data
   const handleRefreshWidgetsData = () => {
-    setToggleRefetch(!toggleRefetch);
+    setToggleRefetch((prev) => ++prev);
   };
 
   const usersConfig = UsersConfigV2({
@@ -70,13 +70,13 @@ const UsersSubEntityTable = ({ programName }: PropsT) => {
     isShareBroker,
     currentUserId,
     handleRefreshWidgetsData,
+    tableId: TABLE_ID,
   });
   const allSearchedFields = usersConfig.allSearchedFields.filter((field) =>
     field.key === "email_or_phone"
       ? optionalAttr?.includes("email") || optionalAttr?.includes("phone")
       : optionalAttr?.includes(field.name || field.key)
   );
-
 
   const tableConfig: TableConfig = {
     ...usersConfig,

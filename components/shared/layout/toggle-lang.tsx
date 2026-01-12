@@ -7,15 +7,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LangIcon from "@/public/icons/lang";
-import { usePathname } from "next/navigation";
+import { usePathname } from "@i18n/navigation";
 import { SA, US } from "country-flag-icons/react/3x2";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "next-intl";
+import { Check } from "lucide-react";
 
 const ToggleLang = () => {
-    const locale = useLocale();
-    const isRtl = locale === "ar";
-  
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
   const pathname = usePathname();
 
   const handleLocaleChange = (newLocale: string) => {
@@ -41,13 +42,15 @@ const ToggleLang = () => {
             title="United States"
           />
           English
+          {locale == "en" && <Check className="w-4 h-4" />}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleLocaleChange("ar")}>
           <SA
             style={{ width: "20px", marginRight: "5px" }}
             title="Saudi Arabia"
           />
-          Arabic
+          العربية
+          {locale == "ar" && <Check className="w-4 h-4" />}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

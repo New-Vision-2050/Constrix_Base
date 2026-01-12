@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import {
-  Form,
-} from "@/modules/table/components/ui/form";
+import { Form } from "@/modules/table/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { useIsRtl } from "@/hooks/use-is-rtl";
 import { toast } from "sonner";
@@ -62,17 +60,28 @@ export default function SetProjectDialog({
   projectId,
 }: SetProjectDialogProps) {
   const isRtl = useIsRtl();
-  const t = useTranslations("content-management-system.projects.addProjectForm");
+  const t = useTranslations(
+    "content-management-system.projects.addProjectForm"
+  );
   const isEditMode = !!projectId;
 
   // Fetch project data when editing
-  const { data: projectData, isLoading: isFetching } = useQuery({
+  const {
+    data: projectData,
+    isLoading: isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["project", projectId],
     queryFn: async () => {
       // TODO: Replace with actual API call
       return CompanyDashboardProjectsApi.show(projectId!);
     },
     enabled: isEditMode && open,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    staleTime: Infinity,
   });
 
   const form = useForm<ProjectFormData>({
@@ -94,24 +103,32 @@ export default function SetProjectDialog({
     queryKey: ["company-dashboard-project-types"],
     queryFn: () => CompanyDashboardProjectTypesApi.list(),
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
-    gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
-  const projectTypesOptions = useMemo(() => projectTypesData?.data?.payload?.map((projectType: any) => ({
-    value: projectType.id,
-    label: projectType.name,
-  })) || [], [projectTypesData]);
+  const projectTypesOptions = useMemo(
+    () =>
+      projectTypesData?.data?.payload?.map((projectType: any) => ({
+        value: projectType.id,
+        label: projectType.name,
+      })) || [],
+    [projectTypesData]
+  );
 
   // Fetch services (cached for 5 minutes to avoid unnecessary refetches)
   const { data: servicesData } = useQuery({
     queryKey: ["company-dashboard-services"],
     queryFn: () => CompanyDashboardServicesApi.list(),
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
-    gcTime: 10 * 60 * 1000,   // Keep in cache for 10 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
-  const servicesOptions = useMemo(() => servicesData?.data?.payload?.map((service: any) => ({
-    value: service.id,
-    label: service.name,
-  })) || [], [servicesData]);
+  const servicesOptions = useMemo(
+    () =>
+      servicesData?.data?.payload?.map((service: any) => ({
+        value: service.id,
+        label: service.name,
+      })) || [],
+    [servicesData]
+  );
 
   // Show toast for validation errors
   useEffect(() => {
@@ -131,8 +148,8 @@ export default function SetProjectDialog({
       // Set core project fields
       setValue("name_ar", project.name_ar || "");
       setValue("name_en", project.name_en || "");
-      setValue("title_ar", project.name_ar || ""); // Title maps to name for now
-      setValue("title_en", project.name_en || "");
+      setValue("title_ar", project.title_ar || ""); // Title maps to name for now
+      setValue("title_en", project.title_en || "");
       setValue("description_ar", project.description_ar || "");
       setValue("description_en", project.description_en || "");
       // set type
@@ -144,17 +161,9 @@ export default function SetProjectDialog({
       // Transform project_details to form details array format
       if (project.project_details && project.project_details.length > 0) {
         const formDetails = project.project_details.map((detail) => {
-          // Extract Arabic and English content from translations
-          const arTranslation = detail.translations?.find(
-            (t) => t.locale === "ar" && t.field === "name"
-          );
-          const enTranslation = detail.translations?.find(
-            (t) => t.locale === "en" && t.field === "name"
-          );
-
           return {
-            detail_ar: arTranslation?.content || "",
-            detail_en: enTranslation?.content || "",
+            detail_ar: detail?.name_ar || "",
+            detail_en: detail?.name_en || "",
             service_id: detail.website_service_id || "",
           };
         });
@@ -192,6 +201,7 @@ export default function SetProjectDialog({
 
       onSuccess?.();
       reset();
+      refetch();
       onClose();
     } catch (error: any) {
       console.error(
@@ -256,7 +266,9 @@ export default function SetProjectDialog({
               t={t}
               projectTypeOptions={projectTypesOptions}
               mainImageInitialValue={projectData?.data?.payload?.main_image}
-              subImagesInitialValue={projectData?.data?.payload?.secondary_images}
+              subImagesInitialValue={
+                projectData?.data?.payload?.secondary_images
+              }
             />
 
             {/* Details Array Section */}

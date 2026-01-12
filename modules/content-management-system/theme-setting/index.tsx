@@ -21,6 +21,7 @@ export default function ThemeSettingModule({ initialData }: { initialData: Theme
                 // base 
                 websiteIcon: null,
                 websiteUrl: initialData.url || "",
+                websiteIconUrl: initialData.icon_url || "",
             },
             borderRadius: initialData.radius,
             typography: {

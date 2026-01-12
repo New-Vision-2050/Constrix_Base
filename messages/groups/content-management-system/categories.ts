@@ -13,7 +13,7 @@ export const ContentManagementSystemCategoriesMessages = new MessagesGroup({
     permissionDenied: _m("You don't have permission to perform this action", "ليس لديك صلاحية لإجراء هذا الإجراء"),
     networkError: _m("Network error. Please try again.", "خطأ في الشبكة. يرجى المحاولة مرة أخرى."),
     editCategory: _m("Edit Category", "تعديل فئة"),
-    addCategory: _m("Add Category", "اضافة فئة"),
+    addCategory: _m("Add New Category", "اضافة فئة جديدة"),
     nameAr: _m("Category Name in Arabic", "اسم الفئة بالعربية"),
     nameArPlaceholder: _m("Enter category name in Arabic", "أدخل اسم الفئة بالعربية"),
     nameArRequired: _m("Category name in Arabic is required", "اسم الفئة بالعربية مطلوب"),
@@ -32,6 +32,7 @@ export const ContentManagementSystemCategoriesMessages = new MessagesGroup({
     nameAr: _m("Category Name in Arabic", "اسم الفئة بالعربية"),
     nameEn: _m("Category Name in English", "اسم الفئة بالإنجليزية"),
     type: _m("Category Type", "نوع الفئة"),
+    searchType:_m("Type", "النوع"),
     edit: _m("Edit", "تعديل"),
   }),
 });

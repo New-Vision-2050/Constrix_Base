@@ -24,7 +24,7 @@ export default function CreateIndividualClientForm({
 
   const onSuccessFn = () => {
     const tableStore = useTableStore.getState();
-    tableStore.reloadTable("clients-table");
+    tableStore.reloadTable(tableId ?? "clients-table");
     handleRefreshWidgetsData?.();
 
     closeCreateClientSheet();

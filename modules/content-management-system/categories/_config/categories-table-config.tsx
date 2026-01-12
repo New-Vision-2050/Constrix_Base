@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CompanyDashboardCategory } from "../types";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { EditIcon } from "lucide-react";
 
 export interface CategoryRow extends CompanyDashboardCategory {
   name_ar?: string;
@@ -28,23 +29,56 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
       {
         key: "name_ar",
         label: t("nameAr") || "Category Name in Arabic",
-        sortable: true
+        sortable: true,
       },
       {
         key: "name_en",
         label: t("nameEn") || "Category Name in English",
-        sortable: true
+        sortable: true,
       },
       {
         key: "category_type.name",
         label: t("type") || "Type",
         sortable: true,
+        searchable: true,
+      },
+    ],
+    enableSearch: true,
+    enableColumnSearch: true,
+    searchFields: [],
+    searchParamName: "search",
+    searchFieldParamName: "fields",
+    allowSearchFieldSelection: true,
+    allSearchedFields: [
+      {
+        key: "category_type",
+        searchType: {
+          type: "dropdown",
+          placeholder: t("searchType"),
+          dynamicDropdown: {
+            url: `${baseURL}/categories-website/categeory-types`,
+            valueField: "id",
+            labelField: "name",
+            paginationEnabled: true,
+            itemsPerPage: 10,
+            searchParam: "name",
+            pageParam: "page",
+            limitParam: "per_page",
+            totalCountHeader: "x-total-count",
+          },
+        },
       },
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem disabled={!can(PERMISSIONS.CMS.categories.update)} onSelect={() => params?.onEdit?.(row.id)}>
-          {t("edit") || "Edit"}
+        <DropdownMenuItem
+          disabled={!can(PERMISSIONS.CMS.categories.update)}
+          onSelect={() => params?.onEdit?.(row.id)}
+        >
+          <div className="flex items-center justify-between w-full">
+            <EditIcon size={16} />
+            {t("edit") || "Edit"}
+          </div>
         </DropdownMenuItem>
       ),
     ],
@@ -52,6 +86,5 @@ export const useCategoriesListTableConfig: (params?: Params) => TableConfig = (
       canDelete: can(PERMISSIONS.CMS.categories.delete),
     },
     deleteUrl: `${baseURL}/categories-website`,
-    searchParamName: "search",
   };
 };

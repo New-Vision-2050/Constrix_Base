@@ -102,6 +102,13 @@ export default function AddNewsDialog({
     }
   }, [errors]);
 
+  // Reset form to default values when dialog opens or newsId changes
+  useEffect(() => {
+    if (open) {
+      reset(getDefaultNewsFormValues());
+    }
+  }, [open, newsId, reset]);
+
   // Populate form with news data when editing
   useEffect(() => {
     if (isEditMode && newsData?.payload) {
@@ -120,7 +127,7 @@ export default function AddNewsDialog({
         main_image: news.main_image || null, // Will be set via initialValue in ImageUpload
       });
     }
-  }, [isEditMode, newsData, open, reset]);
+  }, [isEditMode, newsData, reset]);
 
   const onSubmit = async (data: NewsFormData) => {
     try {
@@ -347,9 +354,12 @@ export default function AddNewsDialog({
                           className="mt-1 bg-sidebar border-white text-white h-12"
                           showClear={!!field.value}
                           onClear={() => field.onChange("")}
+                          dir={isRtl ? "rtl" : "ltr"}
                         >
                           <SelectValue
                             placeholder={t("form.categoryPlaceholder")}
+                            className={isRtl ? "text-right" : "text-left"}
+                            dir={isRtl ? "rtl" : "ltr"}
                           />
                         </SelectTrigger>
                         <SelectContent>
@@ -361,6 +371,7 @@ export default function AddNewsDialog({
                               <SelectItem
                                 key={category.id}
                                 value={category.id.toString()}
+                                dir={isRtl ? "rtl" : "ltr"}
                               >
                                 {typeof displayName === "string"
                                   ? displayName
@@ -392,6 +403,7 @@ export default function AddNewsDialog({
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
                         className="mt-1"
+                        min={new Date().toISOString().split("T")[0]}
                         {...field}
                       />
                     </FormControl>
@@ -405,7 +417,7 @@ export default function AddNewsDialog({
                 name="end_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs" required>
+                    <FormLabel className="text-xs">
                       {t("form.endDate")}
                     </FormLabel>
                     <FormControl>
@@ -414,6 +426,7 @@ export default function AddNewsDialog({
                         variant="secondary"
                         disabled={isSubmitting || isFetching}
                         className="mt-1"
+                        min={new Date().toISOString().split("T")[0]}
                         {...field}
                       />
                     </FormControl>

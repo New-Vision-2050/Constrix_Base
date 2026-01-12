@@ -13,7 +13,14 @@ export interface CompanyLegalData {
   registration_type_type: string;
   start_date: string;
   end_date: string;
-  file: string[];
+  file: Array<string | {
+    id: number;
+    mime_type: string;
+    name: string;
+    size?: number;
+    type?: string;
+    url: string;
+  }>;
 }
 
 export interface CompanyDocument {

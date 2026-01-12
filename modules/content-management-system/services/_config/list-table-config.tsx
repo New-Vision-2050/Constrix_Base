@@ -3,10 +3,10 @@ import { TableConfig } from "@/modules/table";
 import { useTranslations, useLocale } from "next-intl";
 import TheStatus from "../components/the-status";
 import { ServiceRow, TableConfigParams } from "../types";
-import { CompanyDashboardServicesApi } from "@/services/api/company-dashboard/services";
 import { baseURL } from "@/config/axios-config";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { Box, EditIcon } from "lucide-react";
 
 export const useServiceListTableConfig: (
   params?: TableConfigParams
@@ -40,13 +40,6 @@ export const useServiceListTableConfig: (
         ),
       },
       {
-        key: "is_active",
-        label: t("visibility"),
-        render: (value: "active" | "inActive", row: ServiceRow) => (
-          <TheStatus theStatus={value} id={row.id} field="is_active" />
-        ),
-      },
-      {
         key: "status",
         label: t("featured"),
         render: (value: boolean, row: ServiceRow) => (
@@ -60,16 +53,17 @@ export const useServiceListTableConfig: (
           disabled={!can(PERMISSIONS.CMS.services.update)}
           onSelect={() => params?.onEdit?.(row.id)}
         >
-          {t("edit")}
+          <div className="flex items-center justify-between w-full">
+            <EditIcon size={16} />
+            {t("edit")}
+          </div>
         </DropdownMenuItem>
       ),
     ],
     executionConfig: {
       canDelete: can(PERMISSIONS.CMS.services.delete),
-      onDelete: async (id: string) => {
-        await CompanyDashboardServicesApi.delete(id);
-      },
     },
+    deleteUrl: `${baseURL}/website-services`,
     searchParamName: "search",
     defaultPageSize: 10,
     pageSizeOptions: [10, 20, 50],

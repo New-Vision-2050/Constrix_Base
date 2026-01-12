@@ -48,6 +48,7 @@ const projectTypeSchema = z.object({
  * Used in the attachments array
  */
 const attachmentSchema = z.object({
+  id: z.string().optional(),
   file_name: z
     .string({
       required_error: "File name is required",
@@ -350,6 +351,7 @@ export const setInitialDataFromApi = (
       projects_count: pt.count || 0,
     })),
     attachments: (apiData.attachments || []).map((att) => ({
+      id: att?.id?.toString(),
       file_name: att.name || "",
       file: null, // Existing files don't need File object
     })),
@@ -393,6 +395,7 @@ export const convertFormDataToApiParams = (
       })),
     attachments: formData.attachments
       .map((att) => ({
+        id: Boolean(att?.id) ? att?.id?.toString() : 'null',
         name: att.file_name,
         attachment: att.file || undefined,
       })),

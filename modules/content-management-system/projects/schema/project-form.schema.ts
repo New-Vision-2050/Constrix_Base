@@ -4,39 +4,43 @@ import { z } from "zod";
  * Project detail item schema
  * Represents a single detail entry with Arabic/English text and service
  */
-const projectDetailSchema = z.object({
-  detail_ar: z
-    .string({
-      required_error: "Detail in Arabic is required",
-    })
-    .min(1, {
-      message: "Detail in Arabic is required",
-    })
-    .min(2, {
-      message: "Detail in Arabic must be at least 2 characters",
-    })
-    .trim(),
+const createProjectDetailSchema = (t: (key: string) => string) =>
+  z.object({
+    detail_ar: z
+      .string({
+        required_error: t("detailArRequired") || "Detail in Arabic is required",
+      })
+      .min(1, {
+        message: t("detailArRequired") || "Detail in Arabic is required",
+      })
+      .min(2, {
+        message:
+          t("detailArMinLength") ||
+          "Detail in Arabic must be at least 2 characters",
+      })
+      .trim(),
 
-  detail_en: z
-    .string()
-    .optional()
-    .refine(
-      (val) => !val || val.length >= 2,
-      {
-        message: "Detail in English must be at least 2 characters if provided",
-      }
-    )
-    .transform((val) => val?.trim() || ""),
+    detail_en: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || val.length >= 2,
+        {
+          message:
+            t("detailEnMinLength") ||
+            "Detail in English must be at least 2 characters if provided",
+        }
+      )
+      .transform((val) => val?.trim() || ""),
 
-  service_id: z
-    .string({
-      required_error: "Service is required",
-    })
-    .min(1, {
-      message: "Service is required",
-    }),
-});
-
+   service_id: z
+      .string({
+        required_error: t("serviceRequired") || "Service is required",
+      })
+      .min(1, {
+        message: t("serviceRequired") || "Service is required",
+      }),
+  });
 /**
  * Creates a Zod schema for project form validation
  * Follows SOLID principles:
@@ -213,28 +217,24 @@ export const createProjectFormSchema = (t: (key: string) => string) =>
 
       // Details Array (repeatable section)
       details: z
-        .array(projectDetailSchema)
-        .min(1, {
-          message:
-            t("detailsRequired") || "At least one detail is required",
-        })
+        .array(createProjectDetailSchema(t))
         .default([]),
     })
-    // .refine(
-    //   (data) => {
-    //     // If featured, main image is required
-    //     if (data.is_featured && !data.main_image) {
-    //       return false;
-    //     }
-    //     return true;
-    //   },
-    //   {
-    //     message:
-    //       t("mainImageRequiredWhenFeatured") ||
-    //       "Main image is required when project is featured",
-    //     path: ["main_image"],
-    //   }
-    // );
+// .refine(
+//   (data) => {
+//     // If featured, main image is required
+//     if (data.is_featured && !data.main_image) {
+//       return false;
+//     }
+//     return true;
+//   },
+//   {
+//     message:
+//       t("mainImageRequiredWhenFeatured") ||
+//       "Main image is required when project is featured",
+//     path: ["main_image"],
+//   }
+// );
 
 /**
  * Type inference from the project form schema
@@ -247,7 +247,9 @@ export type ProjectFormData = z.infer<
 /**
  * Project detail item type
  */
-export type ProjectDetailItem = z.infer<typeof projectDetailSchema>;
+export type ProjectDetailItem = z.infer<
+  ReturnType<typeof createProjectDetailSchema>
+>;
 
 /**
  * Default form values for project form
@@ -264,12 +266,6 @@ export const getDefaultProjectFormValues = (): ProjectFormData => ({
   name_en: "",
   description_ar: "",
   description_en: "",
-  details: [
-    {
-      detail_ar: "",
-      detail_en: "",
-      service_id: "",
-    },
-  ],
+  details: [],
 });
 

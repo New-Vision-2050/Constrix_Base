@@ -81,10 +81,17 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       options.length > 0 &&
       (!value || (Array.isArray(value) && value.length === 0))
     ) {
-      const allValues = options.map(option => option.value);
+      const allValues = options.map((option) => option.value);
       onChange(allValues);
     }
-  }, [options, value, dynamicConfig?.selectAll, isMulti, onChange, dataFetched]);
+  }, [
+    options,
+    value,
+    dynamicConfig?.selectAll,
+    isMulti,
+    onChange,
+    dataFetched,
+  ]);
 
   // Find the label(s) for the current value(s)
   const getSelectedLabels = () => {
@@ -93,9 +100,9 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
       return value
         .map((val) => {
           const option = options.find((opt) => {
-            return opt.value == val && typeof opt.value == 'string';
+            return opt.value == val && typeof opt.value == "string";
           });
-          
+
           return option ? option.label : val;
         })
         .join(", ");
@@ -151,6 +158,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   }, [open]);
 
 
+  if (loading && Boolean(value)) {
+    return <div className="flex text-center text-sm">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      {t("Main.Loading")}
+    </div>
+  }
+
+
   return (
     <div className="space-y-2">
       {label && <Label className="mb-2 block">{label}</Label>}
@@ -170,14 +185,14 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 "w-full justify-between bg-sidebar whitespace-normal",
                 (!value ||
                   (isMulti && Array.isArray(value) && value.length === 0)) &&
-                  "text-muted-foreground",
+                "text-muted-foreground",
                 isDisabled && "opacity-50 cursor-not-allowed"
               )}
               onKeyDown={handleKeyDown}
             >
               <div className="flex-1 overflow-hidden text-ellipsis line-clamp-1 text-start">
                 {value &&
-                (!isMulti || (Array.isArray(value) && value.length > 0))
+                  (!isMulti || (Array.isArray(value) && value.length > 0))
                   ? selectedLabel
                   : placeholder}
               </div>
@@ -185,7 +200,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             </Button>
           </PopoverTrigger>
           {(value && !isMulti) ||
-          (isMulti && Array.isArray(value) && value.length > 0) ? (
+            (isMulti && Array.isArray(value) && value.length > 0) ? (
             <Button
               variant="ghost"
               size="icon"
@@ -248,11 +263,11 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 {loading ? (
                   <div className="py-6 text-center text-sm">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-                    Loading options...
+                    {t("Table.LoadingOptions")}
                   </div>
                 ) : error ? (
                   <div className="py-6 text-center text-sm text-destructive">
-                    Error: {error}
+                    {t("Table.Error")}: {error}
                   </div>
                 ) : (
                   <div className="py-6 text-center text-sm">
@@ -290,8 +305,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                             ? "opacity-100"
                             : "opacity-0"
                           : value == option.value
-                          ? "opacity-100"
-                          : "opacity-0"
+                            ? "opacity-100"
+                            : "opacity-0"
                       )}
                     />
                     {option.label}
@@ -301,7 +316,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   <div className="py-2 text-center text-sm text-muted-foreground">
                     <div className="flex items-center justify-center">
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Searching...
+                      {t("Table.Searching")}
                     </div>
                   </div>
                 )}

@@ -19,6 +19,8 @@ export interface Translation {
  */
 export interface ProjectDetail {
   id: string;
+  name_ar?: string;
+  name_en?: string;
   website_project_id: string;
   website_service_id: string;
   created_at?: string;
@@ -59,6 +61,9 @@ export interface WebsiteService {
 export interface CMSProject {
   id: string;
   website_project_setting_id?: string;
+  title?: string;
+  title_ar?: string;
+  title_en?: string;
   name?: string;
   name_ar?: string;
   name_en?: string;

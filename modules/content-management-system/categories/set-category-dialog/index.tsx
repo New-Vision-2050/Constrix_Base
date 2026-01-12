@@ -62,10 +62,15 @@ export default function SetCategoryDialog({
   const isEditMode = !!categoryId;
 
   // Fetch category data when editing
-  const { data: categoryData, isLoading: isFetching } = useQuery({
+  const { data: categoryData, isLoading: isFetching, refetch } = useQuery({
     queryKey: ["company-dashboard-category", categoryId],
     queryFn: () => CompanyDashboardCategoriesApi.show(categoryId!),
     enabled: isEditMode && open,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    staleTime: Infinity,
   });
 
   // Fetch category types
@@ -120,8 +125,8 @@ export default function SetCategoryDialog({
       const categoryType = (category as any).category_type || (category as any).type;
       if (categoryType) {
         // If category_type is an object, extract the id, otherwise use the value directly
-        const categoryTypeId = typeof categoryType === 'object' && categoryType?.id 
-          ? categoryType.id 
+        const categoryTypeId = typeof categoryType === 'object' && categoryType?.id
+          ? categoryType.id
           : categoryType;
         setValue("category_type", categoryTypeId, {
           shouldDirty: true,
@@ -143,6 +148,7 @@ export default function SetCategoryDialog({
         };
 
         await CompanyDashboardCategoriesApi.update(categoryId, updateParams);
+        refetch();
       } else {
         // Create new category
         const createParams: CreateCategoryParams = {
@@ -183,9 +189,9 @@ export default function SetCategoryDialog({
       toast.error(
         isEditMode
           ? t("updateError") ||
-              "Failed to update category. Please try again."
+          "Failed to update category. Please try again."
           : t("createError") ||
-              "Failed to create category. Please try again."
+          "Failed to create category. Please try again."
       );
     }
   };
@@ -200,9 +206,8 @@ export default function SetCategoryDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className={`max-w-2xl w-full bg-sidebar border-gray-700 ${
-          isRtl ? "rtl" : "ltr"
-        }`}
+        className={`max-w-2xl w-full bg-sidebar border-gray-700 ${isRtl ? "rtl" : "ltr"
+          }`}
         dir={isRtl ? "rtl" : "ltr"}
       >
         <DialogHeader>
