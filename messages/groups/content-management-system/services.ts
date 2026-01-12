@@ -126,6 +126,7 @@ export const ContentManagementSystemServicesMessages = new MessagesGroup({
     hexaServicesMinRequired:_m("services at least 6 with design type hexa","عدد الخدمات لا يقل عن 6 فى حالة الشكل السداسي"),
     designTypePlaceholder: _m("Select design type", "اختر نوع التصميم"),
     designTypeRequired: _m("Design type is required", "نوع التصميم مطلوب"),
+    servicesHexaMinRequired:_m("services at least 6 with design type hexa","عدد الخدمات لا يقل عن 6 فى حالة الشكل السداسي"),
     serviceNumber: _m("Service", "الخدمة"),
     servicePlaceholder: _m("Enter service name", "أدخل اسم الخدمة"),
     serviceRequired: _m("Service is required", "الخدمة مطلوبة"),

@@ -48,9 +48,7 @@ export default function PreviousWorksList({
       ))}
 
       {previousWorks.length === 0 && (
-        <p className="text-gray-400 text-center py-8">
-          {tForm("noPreviousWorks")}
-        </p>
+        <p className=" text-center py-8">{tForm("noPreviousWorks")}</p>
       )}
 
       <div className="flex items-center justify-end ">
