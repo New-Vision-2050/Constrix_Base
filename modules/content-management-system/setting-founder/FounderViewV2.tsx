@@ -29,7 +29,6 @@ export default function FounderViewV2() {
   const { can } = usePermissions();
   const t = useTranslations("content-management-system.founder");
   const tTable = useTranslations("content-management-system.founder.table");
-  const locale = useLocale();
 
   // Dialog states
   const [editingFounderId, setEditingFounderId] = useState<string | null>(null);
@@ -93,7 +92,7 @@ export default function FounderViewV2() {
 
   // Table columns with actions
   const columns = [
-    ...createColumns(tTable, locale),
+    ...createColumns(tTable),
     {
       key: "actions",
       name: tTable("actions"),

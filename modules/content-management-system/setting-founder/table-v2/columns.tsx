@@ -5,15 +5,14 @@ import { FounderRow } from "../types";
  * Creates column definitions for the Founder table
  * Handles bilingual content (AR/EN) and status display
  */
-export const createColumns = (t: (key: string) => string, locale: string) => {
+export const createColumns = (t: (key: string) => string) => {
   return [
     {
       key: "name",
       name: t("name"),
       sortable: true,
       render: (row: FounderRow) => {
-        const name =
-          locale === "ar" ? row.name_ar || row.name : row.name_en || row.name;
+        const name = row.name;
         return <strong className="text-sm">{name}</strong>;
       },
     },
@@ -22,10 +21,7 @@ export const createColumns = (t: (key: string) => string, locale: string) => {
       name: t("jobTitle"),
       sortable: true,
       render: (row: FounderRow) => {
-        const jobTitle =
-          locale === "ar"
-            ? row.job_title_ar || row.job_title
-            : row.job_title_en || row.job_title;
+        const jobTitle = row.job_title;
         return (
           <span className="text-sm text-gray-600 dark:text-gray-400">
             {jobTitle || "-"}
@@ -38,10 +34,7 @@ export const createColumns = (t: (key: string) => string, locale: string) => {
       name: t("description"),
       sortable: false,
       render: (row: FounderRow) => {
-        const description =
-          locale === "ar"
-            ? row.description_ar || row.description
-            : row.description_en || row.description;
+        const description = row.description;
         return (
           <span className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
             {description ? `${description.substring(0, 50)}...` : "-"}
