@@ -1,3 +1,4 @@
+import { truncateString } from "@/utils/truncate-string";
 import TheStatus from "../component/the-status";
 import { FounderRow } from "../types";
 
@@ -37,7 +38,7 @@ export const createColumns = (t: (key: string) => string) => {
         const description = row.description;
         return (
           <span className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-            {description ? `${description.substring(0, 50)}...` : "-"}
+            {description ? truncateString(description ?? "", 40) : "-"}
           </span>
         );
       },

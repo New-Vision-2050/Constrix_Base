@@ -111,6 +111,7 @@ export const ContentManagementSystemFounderMessages = new MessagesGroup({
     save: _m("Save", "حفظ"),
   }),
   table: new MessagesGroup({
+    addFounder: _m("Add Founder", "إضافة مؤسس"),
     name: _m("Name", "الاسم"),
     jobTitle: _m("Job Title", "المسمى الوظيفي"),
     description: _m("Description", "الوصف"),

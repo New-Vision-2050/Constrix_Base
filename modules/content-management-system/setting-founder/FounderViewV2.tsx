@@ -28,7 +28,6 @@ const FounderTable = HeadlessTableLayout<FounderRow>();
  */
 export default function FounderViewV2() {
   const { can } = usePermissions();
-  const t = useTranslations("content-management-system.founder");
   const tTable = useTranslations("content-management-system.founder.table");
 
   // Dialog states
@@ -146,16 +145,6 @@ export default function FounderViewV2() {
   return (
     <Can check={[PERMISSIONS.CMS.founder.list]}>
       <div className="px-8 space-y-4">
-        {/* Title and Add Button */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <Can check={[PERMISSIONS.CMS.founder.create]}>
-            <Button onClick={() => setAddDialogOpen(true)}>
-              {t("addFounder")}
-            </Button>
-          </Can>
-        </div>
-
         <FounderTable
           filters={
             <TableFilters
@@ -163,6 +152,7 @@ export default function FounderViewV2() {
               onSearchChange={handleSearchChange}
               onReset={handleReset}
               t={tTable}
+              setAddDialogOpen={setAddDialogOpen}
             />
           }
           table={<FounderTable.Table state={state} loadingOptions={{ rows: 5 }} />}

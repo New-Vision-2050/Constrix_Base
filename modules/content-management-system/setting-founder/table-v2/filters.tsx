@@ -2,12 +2,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
 interface TableFiltersProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onReset: () => void;
   t: (key: string) => string;
+  setAddDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -19,6 +22,7 @@ export function TableFilters({
   onSearchChange,
   onReset,
   t,
+  setAddDialogOpen
 }: TableFiltersProps) {
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
@@ -38,7 +42,7 @@ export function TableFilters({
   }, [localSearch, searchQuery, onSearchChange]);
 
   return (
-    <div className="flex items-center gap-3 mb-4">
+    <div className="flex items-center justify-between gap-3 mb-4">
       {/* Search input */}
       <div className="relative flex-1 max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -50,13 +54,11 @@ export function TableFilters({
         />
       </div>
 
-      {/* Reset button */}
-      {searchQuery && (
-        <Button variant="outline" size="sm" onClick={onReset}>
-          <X className="h-4 w-4 mr-1" />
-          {t("reset")}
+      <Can check={[PERMISSIONS.CMS.founder.create]}>
+        <Button onClick={() => setAddDialogOpen(true)}>
+          {t("addFounder")}
         </Button>
-      )}
+      </Can>
     </div>
   );
 }
