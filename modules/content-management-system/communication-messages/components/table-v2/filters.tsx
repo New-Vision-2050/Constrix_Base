@@ -54,27 +54,6 @@ export function TableFilters({
           className="pl-10"
         />
       </div>
-
-      {/* Status filter */}
-      <div className="flex gap-2 items-center">
-        <Select value={statusFilter} onValueChange={onStatusChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={t("allStatus")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("allStatus")}</SelectItem>
-            <SelectItem value="0">{t("pending")}</SelectItem>
-            <SelectItem value="1">{t("replied")}</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Reset button */}
-        {(searchQuery || statusFilter !== "all") && (
-          <Button variant="outline" size="sm" onClick={onReset}>
-            {t("reset")}
-          </Button>
-        )}
-      </div>
     </div>
   );
 }
