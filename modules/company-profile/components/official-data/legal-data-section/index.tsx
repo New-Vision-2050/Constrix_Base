@@ -108,7 +108,9 @@ const LegalDataSection = ({
                   },
                   {
                     title: "اضافة بيان قانوني",
-                    onClick: handleOpenAddLegalDataSheet,
+                    onClick: () => {
+                      handleOpenAddLegalDataSheet();
+                    },
                   },
                 ],
                 disabledEdit: !can([
@@ -122,15 +124,6 @@ const LegalDataSection = ({
             <>
               {mode === "Preview" ? (
                 <>
-                  <AddLegalDataSheet
-                    open={isOpenAddLegalDataSheet}
-                    onOpenChange={handleCloseAddLegalDataSheet}
-                    companyId={currentCompanyId}
-                    branchId={id}
-                    onSuccess={() => {
-                      refetch();
-                    }}
-                  />
                   <LegalDataPreview companyLegalData={companyLegalData} />
                 </>
               ) : (
@@ -168,6 +161,15 @@ const LegalDataSection = ({
               <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
             </div>
           )}
+          <AddLegalDataSheet
+            open={isOpenAddLegalDataSheet}
+            onOpenChange={handleCloseAddLegalDataSheet}
+            companyId={currentCompanyId}
+            branchId={id}
+            onSuccess={() => {
+              refetch();
+            }}
+          />
         </FormFieldSet>
       )}
 
