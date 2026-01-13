@@ -30,7 +30,7 @@ function AttendanceContent() {
       {/* Table or map */}
       {view === "table" ? (
         <>
-          <AttendanceDepartureTable />
+          {/* <AttendanceDepartureTable /> */}
           <AttendanceTableV2 />
         </>
       ) : (
