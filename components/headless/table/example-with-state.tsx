@@ -105,8 +105,6 @@ const mockUsers: User[] = [
 ];
 
 // Create typed table instance outside component
-const UserTable = HeadlessTableLayout<User>();
-
 // Simulated API function
 const fetchUsers = async (
   page: number,
@@ -145,6 +143,8 @@ const fetchUsers = async (
 };
 
 export function ExampleWithState() {
+  const UserTable = HeadlessTableLayout<User>();
+
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");

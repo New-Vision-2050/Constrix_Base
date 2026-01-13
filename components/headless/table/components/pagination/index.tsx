@@ -5,8 +5,9 @@ import {
   MenuItem,
   Typography,
   Stack,
+  Grid,
 } from "@mui/material";
-import { TableState } from "../table-state/types";
+import { TableState } from "../..";
 
 // ============================================================================
 // Pagination Component
@@ -27,23 +28,23 @@ export function createPaginationComponent<TRow>() {
     const { pagination } = state;
 
     return (
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ width: "100%" }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          Showing{" "}
-          {pagination.paginatedData.length > 0
-            ? (pagination.page - 1) * pagination.limit + 1
-            : 0}{" "}
-          to{" "}
-          {Math.min(pagination.page * pagination.limit, pagination.totalItems)}{" "}
-          of {pagination.totalItems} results
-        </Typography>
-
-        <Stack direction="row" spacing={2} alignItems="center">
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, lg: 4 }}></Grid>
+        <Grid
+          size={{ xs: 12, lg: 4 }}
+          justifyContent={{ xs: "start", lg: "center" }}
+          display="flex"
+        >
+          <MuiPagination
+            count={pagination.totalPages}
+            page={pagination.page}
+            onChange={(_, page) => pagination.setPage(page)}
+            color="primary"
+            shape="rounded"
+            variant="outlined"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 4 }} justifyContent="end" display="flex">
           {showPageSize && (
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body2" color="text.secondary">
@@ -63,17 +64,8 @@ export function createPaginationComponent<TRow>() {
               </Select>
             </Stack>
           )}
-
-          <MuiPagination
-            count={pagination.totalPages}
-            page={pagination.page}
-            onChange={(_, page) => pagination.setPage(page)}
-            color="primary"
-            showFirstButton
-            showLastButton
-          />
-        </Stack>
-      </Stack>
+        </Grid>
+      </Grid>
     );
   };
 

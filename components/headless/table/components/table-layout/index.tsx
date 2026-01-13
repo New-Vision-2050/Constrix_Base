@@ -12,20 +12,13 @@ export const TableLayoutComponent = ({
   pagination,
 }: TableLayoutProps) => {
   return (
-    <Box
-      sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}
+    <Paper
+      variant="outlined"
+      sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 1 }}
     >
-      {filters && (
-        <Paper sx={{ p: 2 }} variant="outlined">
-          {filters}
-        </Paper>
-      )}
+      {filters && <Box sx={{ p: 2 }}>{filters}</Box>}
       <Box>{table}</Box>
-      {pagination && (
-        <Paper sx={{ p: 2 }} variant="outlined">
-          {pagination}
-        </Paper>
-      )}
-    </Box>
+      {pagination && <Box sx={{ p: 2 }}>{pagination}</Box>}
+    </Paper>
   );
 };

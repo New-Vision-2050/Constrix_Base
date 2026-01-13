@@ -6,7 +6,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Box,
   Typography,
   TableSortLabel,
@@ -196,18 +195,34 @@ export function createTableComponent<TRow>() {
     };
 
     return (
-      <TableContainer component={Paper} elevation={0} variant="outlined">
-        <Table sx={{ tableLayout: "fixed" }}>
+      <TableContainer>
+        <Table
+          sx={{
+            tableLayout: "fixed",
+            borderTopWidth: 1,
+            borderTopColor: "divider",
+            borderTopStyle: "solid",
+            borderBottomWidth: 1,
+            borderBottomColor: "divider",
+            borderBottomStyle: "solid",
+            ".MuiTableCell-root": {
+              borderBottomWidth: 1,
+              borderBottomColor: "divider",
+              borderBottomStyle: "solid",
+            },
+          }}
+        >
           <TableHead>
-            <TableRow>
+            <TableRow
+              sx={{
+                ".MuiTableCell-root": {
+                  fontWeight: 600,
+                  backgroundColor: "background.default",
+                },
+              }}
+            >
               {selectable && (
-                <TableCell
-                  padding="checkbox"
-                  sx={{
-                    fontWeight: 600,
-                    backgroundColor: "action.hover",
-                  }}
-                >
+                <TableCell padding="checkbox">
                   <Checkbox
                     indeterminate={isSomeSelected}
                     checked={isAllSelected}
@@ -217,13 +232,7 @@ export function createTableComponent<TRow>() {
                 </TableCell>
               )}
               {columns.map((column) => (
-                <TableCell
-                  key={column.key}
-                  sx={{
-                    fontWeight: 600,
-                    backgroundColor: "action.hover",
-                  }}
-                >
+                <TableCell key={column.key}>
                   {column.sortable ? (
                     <TableSortLabel
                       active={sortBy === column.key}

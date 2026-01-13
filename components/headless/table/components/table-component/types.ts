@@ -1,5 +1,5 @@
 import React from "react";
-import { TableState } from "../table-state/types";
+import { TableState } from "../..";
 
 export type ColumnDef<TRow> = {
   key: string; // Unique identifier for the column (used for sorting)
