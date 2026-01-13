@@ -4,13 +4,13 @@ import { truncateString } from "@/utils/truncate-string";
 export const getAddressColumns = (t: (key: string) => string) => [
   {
     key: "title",
-    name: t("name") || "Address",
+    name: t("table.name") || "Address",
     sortable: true,
     render: (row: Address) => <strong>{row.title}</strong>,
   },
   {
     key: "address",
-    name: t("address") || "Address",
+    name: t("table.address") || "Address",
     sortable: true,
     render: (row: Address) => (
       <span>{truncateString(row.address ?? "-", 30)}</span>
@@ -18,13 +18,13 @@ export const getAddressColumns = (t: (key: string) => string) => [
   },
   {
     key: "latitude",
-    name: t("latitude") || "Latitude",
+    name: t("table.latitude") || "Latitude",
     sortable: true,
     render: (row: Address) => <span>{row.latitude}</span>,
   },
   {
     key: "longitude",
-    name: t("longitude") || "Longitude",
+    name: t("table.longitude") || "Longitude",
     sortable: true,
     render: (row: Address) => <span>{row.longitude}</span>,
   },

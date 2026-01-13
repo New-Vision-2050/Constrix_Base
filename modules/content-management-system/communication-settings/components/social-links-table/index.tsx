@@ -13,6 +13,10 @@ import { SocialLink } from "@/services/api/company-dashboard/communication-setti
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommunicationSettingsSocialLinksApi } from "@/services/api/company-dashboard/communication-settings/social-links";
 import { getSocialLinksColumns } from "./columns";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
+import Execution from "@/app/[locale]/(main)/companies/cells/execution";
+import { baseURL } from "@/config/axios-config";
+import { EditIcon, Trash2 } from "lucide-react";
 
 const SOCIAL_LINKS_QUERY_KEY = "communication-settings-social-links";
 
@@ -24,14 +28,20 @@ function SocialLinksTable() {
   const t = useTranslations(
     "content-management-system.communicationSetting.socialLinksTable"
   );
+  const queryClient = useQueryClient();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingSocialLinkId, setEditingSocialLinkId] = useState<
+    string | undefined
+  >();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingSocialLinkId, setDeletingSocialLinkId] = useState<
+    string | undefined
+  >();
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Fetch data using query
-  const queryClient = useQueryClient();
-
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [SOCIAL_LINKS_QUERY_KEY] });
   };
@@ -44,19 +54,12 @@ function SocialLinksTable() {
 
   // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [
-      SOCIAL_LINKS_QUERY_KEY,
-      params.page,
-      params.limit,
-      searchQuery,
-      statusFilter,
-    ],
+    queryKey: [SOCIAL_LINKS_QUERY_KEY, params.page, params.limit, searchQuery],
     queryFn: async () => {
       const response = await CommunicationSettingsSocialLinksApi.getAll({
         page: params.page,
         per_page: params.limit,
         type: searchQuery || undefined,
-        status: statusFilter !== "all" ? Number(statusFilter) : undefined,
       });
 
       const data = response.data.payload ?? [];
@@ -75,7 +78,43 @@ function SocialLinksTable() {
   const totalItems = queryData?.totalItems || 0;
 
   // Define columns
-  const columns = getSocialLinksColumns(t);
+  const columns = [
+    ...getSocialLinksColumns(t),
+    {
+      key: "actions",
+      name: t("actions"),
+      sortable: false,
+      render: (row: SocialLink) => (
+        <Execution
+          row={row as unknown as { id: string; [key: string]: unknown }}
+          buttonLabel={t("actions")}
+          className="px-5 rotate-svg-child"
+          showEdit={false}
+          showDelete={false}
+          executions={[
+            {
+              label: t("edit"),
+              icon: <EditIcon className="w-4 h-4" />,
+              disabled: true,
+              action: () => {
+                setEditingSocialLinkId(row.id);
+                setEditDialogOpen(true);
+              },
+            },
+            {
+              label: t("delete"),
+              icon: <Trash2 className="w-4 h-4" />,
+              disabled: true,
+              action: () => {
+                setDeletingSocialLinkId(row.id);
+                setDeleteDialogOpen(true);
+              },
+            },
+          ]}
+        />
+      ),
+    },
+  ];
 
   // ✅ STEP 3: useTableState (AFTER query)
   const state = SocialLinksTableLayout.useTableState({
@@ -87,7 +126,7 @@ function SocialLinksTable() {
     selectable: true,
     getRowId: (socialLink: SocialLink) => socialLink.id,
     loading: isLoading,
-    filtered: searchQuery !== "" || statusFilter !== "all",
+    filtered: searchQuery !== "",
     onExport: async (selectedRows: SocialLink[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
@@ -104,7 +143,7 @@ function SocialLinksTable() {
         filters={
           <Stack spacing={2}>
             {/* Filter Controls */}
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={2}>
               <TextField
                 size="small"
                 placeholder={t("search")}
@@ -118,49 +157,26 @@ function SocialLinksTable() {
                     <Search sx={{ mr: 1, color: "action.active" }} />
                   ),
                 }}
-                sx={{ flexGrow: 1 }}
+                sx={{ flex: 9 }}
               />
-              <TextField
-                select
-                size="small"
-                label="Status"
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  params.setPage(1);
-                }}
-                SelectProps={{ native: true }}
-                sx={{ minWidth: 150 }}
-              >
-                <option value="all">All Status</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
-              </TextField>
+              <Box sx={{ flex: 3 }}>
+                <Can
+                  check={[
+                    PERMISSIONS.CMS.communicationSettings.socialLinks.create,
+                  ]}
+                >
+                  <DialogTrigger
+                    component={SetSocialLinkDialog}
+                    dialogProps={{ onSuccess: () => invalidate() }}
+                    render={({ onOpen }) => (
+                      <Button variant="contained" onClick={onOpen} fullWidth>
+                        {t("addSocialLink")}
+                      </Button>
+                    )}
+                  />
+                </Can>
+              </Box>
             </Stack>
-
-            {/* Top Actions */}
-            <SocialLinksTableLayout.TopActions
-              state={state}
-              customActions={
-                <Stack direction="row" spacing={1}>
-                  <Can
-                    check={[
-                      PERMISSIONS.CMS.communicationSettings.socialLinks.create,
-                    ]}
-                  >
-                    <DialogTrigger
-                      component={SetSocialLinkDialog}
-                      dialogProps={{ onSuccess: () => invalidate() }}
-                      render={({ onOpen }) => (
-                        <Button variant="contained" onClick={onOpen}>
-                          {t("addSocialLink")}
-                        </Button>
-                      )}
-                    />
-                  </Can>
-                </Stack>
-              }
-            />
           </Stack>
         }
         table={
@@ -170,6 +186,36 @@ function SocialLinksTable() {
           />
         }
         pagination={<SocialLinksTableLayout.Pagination state={state} />}
+      />
+
+      {/* Edit Dialog */}
+      <SetSocialLinkDialog
+        open={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditingSocialLinkId(undefined);
+        }}
+        onSuccess={() => {
+          invalidate();
+          setEditDialogOpen(false);
+          setEditingSocialLinkId(undefined);
+        }}
+        socialLinkId={editingSocialLinkId}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        deleteUrl={`${baseURL}/social-media-links/${deletingSocialLinkId}`}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeletingSocialLinkId(undefined);
+        }}
+        open={deleteDialogOpen}
+        onSuccess={() => {
+          invalidate();
+          setDeleteDialogOpen(false);
+          setDeletingSocialLinkId(undefined);
+        }}
       />
     </Box>
   );

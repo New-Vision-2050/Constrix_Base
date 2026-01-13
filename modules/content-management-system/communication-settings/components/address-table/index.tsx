@@ -7,12 +7,16 @@ import DialogTrigger from "@/components/headless/dialog-trigger";
 import { Box, Stack, TextField, Button } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
-import withPermissions from "@/lib/permissions/client/withPermissions";
 import HeadlessTableLayout from "@/components/headless/table";
 import { Address } from "@/services/api/company-dashboard/communication-settings/types/response";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommunicationSettingsAddressesApi } from "@/services/api/company-dashboard/communication-settings/addresses";
 import { getAddressColumns } from "./columns";
+import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
+import Execution from "@/app/[locale]/(main)/companies/cells/execution";
+import { baseURL } from "@/config/axios-config";
+import { EditIcon, Trash2 } from "lucide-react";
+import withPermissions from "@/lib/permissions/client/withPermissions";
 
 const ADDRESSES_QUERY_KEY = "communication-settings-addresses";
 
@@ -20,17 +24,21 @@ const ADDRESSES_QUERY_KEY = "communication-settings-addresses";
 const AddressTableLayout = HeadlessTableLayout<Address>();
 
 function AddressTable() {
-  const t = useTranslations(
-    "content-management-system.communicationSetting.table"
-  );
+  const t = useTranslations("content-management-system.communicationSetting");
+  const queryClient = useQueryClient();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<
+    string | undefined
+  >();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingAddressId, setDeletingAddressId] = useState<
+    string | undefined
+  >();
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Fetch data using query
-  const queryClient = useQueryClient();
-
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [ADDRESSES_QUERY_KEY] });
   };
@@ -45,19 +53,12 @@ function AddressTable() {
 
   // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [
-      ADDRESSES_QUERY_KEY,
-      params.page,
-      params.limit,
-      searchQuery,
-      statusFilter,
-    ],
+    queryKey: [ADDRESSES_QUERY_KEY, params.page, params.limit, searchQuery],
     queryFn: async () => {
       const response = await CommunicationSettingsAddressesApi.getAll({
         page: params.page,
         per_page: params.limit,
         title: searchQuery || undefined,
-        status: statusFilter !== "all" ? Number(statusFilter) : undefined,
       });
 
       const data = response.data.payload ?? [];
@@ -76,7 +77,43 @@ function AddressTable() {
   const totalItems = queryData?.totalItems || 0;
 
   // Define columns
-  const columns = getAddressColumns(t);
+  const columns = [
+    ...getAddressColumns(t),
+    {
+      key: "actions",
+      name: t("table.actions"),
+      sortable: false,
+      render: (row: Address) => (
+        <Execution
+          row={row as unknown as { id: string; [key: string]: unknown }}
+          buttonLabel={t("table.actions")}
+          className="px-5 rotate-svg-child"
+          showEdit={false}
+          showDelete={false}
+          executions={[
+            {
+              label: t("table.edit"),
+              icon: <EditIcon className="w-4 h-4" />,
+              disabled: true,
+              action: () => {
+                setEditingAddressId(row.id);
+                setEditDialogOpen(true);
+              },
+            },
+            {
+              label: t("table.delete"),
+              icon: <Trash2 className="w-4 h-4" />,
+              disabled: true,
+              action: () => {
+                setDeletingAddressId(row.id);
+                setDeleteDialogOpen(true);
+              },
+            },
+          ]}
+        />
+      ),
+    },
+  ];
 
   // ✅ STEP 3: useTableState (AFTER query)
   const state = AddressTableLayout.useTableState({
@@ -88,14 +125,10 @@ function AddressTable() {
     selectable: true,
     getRowId: (address: Address) => address.id,
     loading: isLoading,
-    filtered: searchQuery !== "" || statusFilter !== "all",
+    filtered: searchQuery !== "",
     onExport: async (selectedRows: Address[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
-    },
-    onDelete: async (selectedRows: Address[]) => {
-      console.log("Deleting rows:", selectedRows);
-      alert(`Deleting ${selectedRows.length} rows`);
     },
   });
 
@@ -108,7 +141,7 @@ function AddressTable() {
             <Stack direction="row" spacing={2} alignItems="center">
               <TextField
                 size="small"
-                placeholder={t("search")}
+                placeholder={t("table.search")}
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -121,22 +154,6 @@ function AddressTable() {
                 }}
                 sx={{ flexGrow: 1 }}
               />
-              <TextField
-                select
-                size="small"
-                label="Status"
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  params.setPage(1);
-                }}
-                SelectProps={{ native: true }}
-                sx={{ minWidth: 150 }}
-              >
-                <option value="all">All Status</option>
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
-              </TextField>
             </Stack>
 
             {/* Top Actions */}
@@ -154,7 +171,7 @@ function AddressTable() {
                       dialogProps={{ onSuccess: () => invalidate() }}
                       render={({ onOpen }) => (
                         <Button variant="contained" onClick={onOpen}>
-                          {t("addAddress")}
+                          {t("table.addAddress")}
                         </Button>
                       )}
                     />
@@ -171,6 +188,36 @@ function AddressTable() {
           />
         }
         pagination={<AddressTableLayout.Pagination state={state} />}
+      />
+
+      {/* Edit Dialog */}
+      <SetAddressDialog
+        open={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditingAddressId(undefined);
+        }}
+        onSuccess={() => {
+          invalidate();
+          setEditDialogOpen(false);
+          setEditingAddressId(undefined);
+        }}
+        addressId={editingAddressId}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        deleteUrl={`${baseURL}/website-addresses/${deletingAddressId}`}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeletingAddressId(undefined);
+        }}
+        open={deleteDialogOpen}
+        onSuccess={() => {
+          invalidate();
+          setDeleteDialogOpen(false);
+          setDeletingAddressId(undefined);
+        }}
       />
     </Box>
   );
