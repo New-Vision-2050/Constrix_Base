@@ -5,13 +5,13 @@ export const getAddressColumns = (t: (key: string) => string) => [
   {
     key: "title",
     name: t("table.name") || "Address",
-    sortable: true,
+    sortable: false,
     render: (row: Address) => <strong>{row.title}</strong>,
   },
   {
     key: "address",
     name: t("table.address") || "Address",
-    sortable: true,
+    sortable: false,
     render: (row: Address) => (
       <span>{truncateString(row.address ?? "-", 30)}</span>
     ),
@@ -19,13 +19,13 @@ export const getAddressColumns = (t: (key: string) => string) => [
   {
     key: "latitude",
     name: t("table.latitude") || "Latitude",
-    sortable: true,
+    sortable: false,
     render: (row: Address) => <span>{row.latitude}</span>,
   },
   {
     key: "longitude",
     name: t("table.longitude") || "Longitude",
-    sortable: true,
+    sortable: false,
     render: (row: Address) => <span>{row.longitude}</span>,
   },
 ];

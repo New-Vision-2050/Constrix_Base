@@ -4,7 +4,15 @@ import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import SetAddressDialog from "./SetAddressDialog";
 import DialogTrigger from "@/components/headless/dialog-trigger";
-import { Box, Stack, TextField, Button } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Grid,
+  TextField,
+  Button,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -13,7 +21,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommunicationSettingsAddressesApi } from "@/services/api/company-dashboard/communication-settings/addresses";
 import { getAddressColumns } from "./columns";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
-import Execution from "@/app/[locale]/(main)/companies/cells/execution";
+import CustomMenu from "@/components/headless/custom-menu";
 import { baseURL } from "@/config/axios-config";
 import { EditIcon, Trash2 } from "lucide-react";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -47,8 +55,6 @@ function AddressTable() {
   const params = AddressTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 5,
-    initialSortBy: "title",
-    initialSortDirection: "asc",
   });
 
   // ✅ STEP 2: Fetch data using useQuery
@@ -84,33 +90,30 @@ function AddressTable() {
       name: t("table.actions"),
       sortable: false,
       render: (row: Address) => (
-        <Execution
-          row={row as unknown as { id: string; [key: string]: unknown }}
-          buttonLabel={t("table.actions")}
-          className="px-5 rotate-svg-child"
-          showEdit={false}
-          showDelete={false}
-          executions={[
-            {
-              label: t("table.edit"),
-              icon: <EditIcon className="w-4 h-4" />,
-              disabled: true,
-              action: () => {
-                setEditingAddressId(row.id);
-                setEditDialogOpen(true);
-              },
-            },
-            {
-              label: t("table.delete"),
-              icon: <Trash2 className="w-4 h-4" />,
-              disabled: true,
-              action: () => {
-                setDeletingAddressId(row.id);
-                setDeleteDialogOpen(true);
-              },
-            },
-          ]}
-        />
+        <CustomMenu
+          renderAnchor={({ onClick }) => (
+            <Button onClick={onClick}>{t("table.actions")}</Button>
+          )}
+        >
+          <MenuItem
+            onClick={() => {
+              setEditingAddressId(row.id);
+              setEditDialogOpen(true);
+            }}
+          >
+            <EditIcon className="w-4 h-4 ml-2" />
+            {t("table.edit")}
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setDeletingAddressId(row.id);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <Trash2 className="w-4 h-4 ml-2" />
+            {t("table.delete")}
+          </MenuItem>
+        </CustomMenu>
       ),
     },
   ];
@@ -126,59 +129,53 @@ function AddressTable() {
     getRowId: (address: Address) => address.id,
     loading: isLoading,
     filtered: searchQuery !== "",
-    onExport: async (selectedRows: Address[]) => {
-      console.log("Exporting rows:", selectedRows);
-      alert(`Exporting ${selectedRows.length} rows`);
-    },
   });
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box py={2}>
       <AddressTableLayout
         filters={
           <Stack spacing={2}>
+            <Typography variant="h6" sx={{ my: 4 }}>
+              {t("table.title")}
+            </Typography>
             {/* Filter Controls */}
-            <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                size="small"
-                placeholder={t("table.search")}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  params.setPage(1);
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <Search sx={{ mr: 1, color: "action.active" }} />
-                  ),
-                }}
-                sx={{ flexGrow: 1 }}
-              />
-            </Stack>
-
-            {/* Top Actions */}
-            <AddressTableLayout.TopActions
-              state={state}
-              customActions={
-                <Stack direction="row" spacing={1}>
-                  <Can
-                    check={[
-                      PERMISSIONS.CMS.communicationSettings.addresses.create,
-                    ]}
-                  >
-                    <DialogTrigger
-                      component={SetAddressDialog}
-                      dialogProps={{ onSuccess: () => invalidate() }}
-                      render={({ onOpen }) => (
-                        <Button variant="contained" onClick={onOpen}>
-                          {t("table.addAddress")}
-                        </Button>
-                      )}
-                    />
-                  </Can>
-                </Stack>
-              }
-            />
+            <Grid container spacing={2}>
+              <Grid size={{ md: 10 }}>
+                <TextField
+                  size="small"
+                  placeholder={t("table.search")}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    params.setPage(1);
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <Search sx={{ mr: 1, color: "action.active" }} />
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ md: 2 }}>
+                <Can
+                  check={[
+                    PERMISSIONS.CMS.communicationSettings.addresses.create,
+                  ]}
+                >
+                  <DialogTrigger
+                    component={SetAddressDialog}
+                    dialogProps={{ onSuccess: () => invalidate() }}
+                    render={({ onOpen }) => (
+                      <Button variant="contained" onClick={onOpen} fullWidth>
+                        {t("table.addAddress")}
+                      </Button>
+                    )}
+                  />
+                </Can>
+              </Grid>
+            </Grid>
           </Stack>
         }
         table={

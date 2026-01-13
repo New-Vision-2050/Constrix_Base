@@ -24,13 +24,13 @@ export const getSocialLinksColumns = (t: (key: string) => string) => [
   {
     key: "type",
     name: t("type") || "Type",
-    sortable: true,
+    sortable: false,
     render: (row: SocialLink) => <strong>{row.type?.name ?? "-"}</strong>,
   },
   {
     key: "link",
     name: t("url") || "URL",
-    sortable: true,
+    sortable: false,
     render: (row: SocialLink) => (
       <span>{truncateString(row.link ?? "-", 30)}</span>
     ),

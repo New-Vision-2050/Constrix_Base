@@ -3,7 +3,15 @@ import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import DialogTrigger from "@/components/headless/dialog-trigger";
-import { Box, Stack, TextField, Button } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Grid,
+  TextField,
+  Button,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import SetSocialLinkDialog from "./SetSocialLinkDialog";
@@ -14,7 +22,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommunicationSettingsSocialLinksApi } from "@/services/api/company-dashboard/communication-settings/social-links";
 import { getSocialLinksColumns } from "./columns";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
-import Execution from "@/app/[locale]/(main)/companies/cells/execution";
+import CustomMenu from "@/components/headless/custom-menu";
 import { baseURL } from "@/config/axios-config";
 import { EditIcon, Trash2 } from "lucide-react";
 
@@ -85,33 +93,30 @@ function SocialLinksTable() {
       name: t("actions"),
       sortable: false,
       render: (row: SocialLink) => (
-        <Execution
-          row={row as unknown as { id: string; [key: string]: unknown }}
-          buttonLabel={t("actions")}
-          className="px-5 rotate-svg-child"
-          showEdit={false}
-          showDelete={false}
-          executions={[
-            {
-              label: t("edit"),
-              icon: <EditIcon className="w-4 h-4" />,
-              disabled: true,
-              action: () => {
-                setEditingSocialLinkId(row.id);
-                setEditDialogOpen(true);
-              },
-            },
-            {
-              label: t("delete"),
-              icon: <Trash2 className="w-4 h-4" />,
-              disabled: true,
-              action: () => {
-                setDeletingSocialLinkId(row.id);
-                setDeleteDialogOpen(true);
-              },
-            },
-          ]}
-        />
+        <CustomMenu
+          renderAnchor={({ onClick }) => (
+            <Button onClick={onClick}>{t("actions")}</Button>
+          )}
+        >
+          <MenuItem
+            onClick={() => {
+              setEditingSocialLinkId(row.id);
+              setEditDialogOpen(true);
+            }}
+          >
+            <EditIcon className="w-4 h-4 ml-2" />
+            {t("edit")}
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setDeletingSocialLinkId(row.id);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <Trash2 className="w-4 h-4 ml-2" />
+            {t("delete")}
+          </MenuItem>
+        </CustomMenu>
       ),
     },
   ];
@@ -127,39 +132,36 @@ function SocialLinksTable() {
     getRowId: (socialLink: SocialLink) => socialLink.id,
     loading: isLoading,
     filtered: searchQuery !== "",
-    onExport: async (selectedRows: SocialLink[]) => {
-      console.log("Exporting rows:", selectedRows);
-      alert(`Exporting ${selectedRows.length} rows`);
-    },
-    onDelete: async (selectedRows: SocialLink[]) => {
-      console.log("Deleting rows:", selectedRows);
-      alert(`Deleting ${selectedRows.length} rows`);
-    },
   });
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <SocialLinksTableLayout
         filters={
           <Stack spacing={2}>
+            <Typography variant="h6" sx={{ my: 4 }}>
+              {t("title")}
+            </Typography>
             {/* Filter Controls */}
-            <Stack direction="row" spacing={2}>
-              <TextField
-                size="small"
-                placeholder={t("search")}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  params.setPage(1);
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <Search sx={{ mr: 1, color: "action.active" }} />
-                  ),
-                }}
-                sx={{ flex: 9 }}
-              />
-              <Box sx={{ flex: 3 }}>
+            <Grid container spacing={2}>
+              <Grid size={{ md: 10 }}>
+                <TextField
+                  size="small"
+                  placeholder={t("search")}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    params.setPage(1);
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <Search sx={{ mr: 1, color: "action.active" }} />
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ md: 2 }}>
                 <Can
                   check={[
                     PERMISSIONS.CMS.communicationSettings.socialLinks.create,
@@ -175,8 +177,8 @@ function SocialLinksTable() {
                     )}
                   />
                 </Can>
-              </Box>
-            </Stack>
+              </Grid>
+            </Grid>
           </Stack>
         }
         table={
