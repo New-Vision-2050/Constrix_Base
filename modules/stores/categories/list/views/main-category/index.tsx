@@ -1,24 +1,20 @@
 "use client";
 
-import { TableBuilder, useTableReload } from "@/modules/table";
-import { Button } from "@/components/ui/button";
-import DialogTrigger from "@/components/headless/dialog-trigger";
-import AddCategoryDialog from "@/modules/stores/components/dialogs/add-category";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { useMainCategoryTableConfig } from "../../../_config/mainTableConfig";
+import { useTranslations } from "next-intl";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import AddCategoryDialog from "@/modules/stores/components/dialogs/add-category";
+import { MainCategoriesTableV2 } from "./table-v2/MainCategoriesTableV2";
 
+/**
+ * Main Categories View - V2 Implementation
+ * Uses HeadlessTable with Two-Hook Pattern for better performance
+ */
 function MainCategoriesView() {
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
-    null
-  );
-  const tableConfig = useMainCategoryTableConfig({
-    onEdit: (id: string) => setEditingCategoryId(id),
-  });
-  const { reloadTable } = useTableReload(tableConfig.tableId);
-  const t = useTranslations();
+  const t = useTranslations("stores.mainCategories");
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+
   return (
     <>
       <Can check={[PERMISSIONS.ecommerce.category.update]}>
@@ -26,25 +22,14 @@ function MainCategoriesView() {
           open={Boolean(editingCategoryId)}
           onClose={() => setEditingCategoryId(null)}
           categoryId={editingCategoryId || undefined}
-          onSuccess={() => reloadTable()}
+          onSuccess={() => {
+            // Refetch will be handled by the table component
+            setEditingCategoryId(null);
+          }}
         />
       </Can>
-
-      <TableBuilder
-        config={tableConfig}
-        searchBarActions={
-          <Can check={[PERMISSIONS.ecommerce.category.create]}>
-            <DialogTrigger
-              component={AddCategoryDialog}
-              dialogProps={{ onSuccess: () => reloadTable() }}
-              render={({ onOpen }) => (
-                <Button onClick={onOpen}>اضافة قسم</Button>
-              )}
-            />
-          </Can>
-        }
-        tableId={tableConfig.tableId}
-      />
+      
+      <MainCategoriesTableV2 />
     </>
   );
 }

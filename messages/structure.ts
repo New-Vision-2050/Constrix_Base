@@ -54,6 +54,7 @@ import { editSubEntityMessages } from "./groups/edit-sub-entity";
 import { wysiwygMessages } from "./groups/wysiwyg";
 import { clientProfileModuleMessages } from "./groups/client-profile";
 import { companyProfileLegalDataFormMessages } from "./groups/company-profile/legal-data-form";
+import { storesMessages } from "./groups/stores";
 
 // Main messages structure combining all groups
 export const messagesStructure = new MessagesGroup({
@@ -111,6 +112,7 @@ export const messagesStructure = new MessagesGroup({
   requests: requestsMessages,
   paymentMethods: paymentMethodsMessages,
   "content-management-system": contentManagementSystemMessages,
+  stores: storesMessages,
   wysiwyg: wysiwygMessages,
   ClientProfile: clientProfileModuleMessages,
 });
