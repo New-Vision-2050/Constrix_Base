@@ -1,7 +1,6 @@
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Box, TextField, Button, Stack } from "@mui/material";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
@@ -42,23 +41,35 @@ export function TableFilters({
   }, [localSearch, searchQuery, onSearchChange]);
 
   return (
-    <div className="flex items-center justify-between gap-3 mb-4">
-      {/* Search input */}
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
+    <Box sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={2} alignItems="center">
+        {/* Search input */}
+        <TextField
+          size="small"
           placeholder={t("searchPlaceholder")}
           value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          className="pl-10"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <Box component="span" sx={{ mr: 1, display: 'flex' }}>
+                <Search size={16} style={{ color: 'rgba(0, 0, 0, 0.54)' }} />
+              </Box>
+            ),
+          }}
+          sx={{ flexGrow: 1 }}
         />
-      </div>
 
-      <Can check={[PERMISSIONS.CMS.founder.create]}>
-        <Button onClick={() => setAddDialogOpen(true)}>
-          {t("addFounder")}
-        </Button>
-      </Can>
-    </div>
+        {/* Add button */}
+        <Can check={[PERMISSIONS.CMS.founder.create]}>
+          <Button
+            variant="contained"
+            startIcon={<Plus />}
+            onClick={() => setAddDialogOpen(true)}
+          >
+            {t("addFounder")}
+          </Button>
+        </Can>
+      </Stack>
+    </Box>
   );
 }
