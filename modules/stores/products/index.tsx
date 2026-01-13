@@ -25,7 +25,7 @@ import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { statisticsConfig } from "./add/components/statistics-config";
 import CustomMenu from "@/components/headless/custom-menu";
 import { EditIcon, Trash2 } from "lucide-react";
-import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
+import DeleteButton from "@/components/shared/delete-button";
 import { useQueryClient } from "@tanstack/react-query";
 
 const PRODUCTS_QUERY_KEY = "stores-products";
@@ -185,17 +185,20 @@ function ProductsTable() {
           pagination={<ProductsTableLayout.Pagination state={state} />}
         />
         {/* Delete Confirmation Dialog */}
-        <DeleteConfirmationDialog
-          deleteUrl={`/api/ecommerce/products/${deletingAddressId}`}
-          onClose={() => {
+        <DeleteButton
+          message={t("product.deleteConfirm")}
+          onDelete={async () => {
+            await ProductsApi.delete(deletingAddressId!);
+            queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY] });
             setDeleteDialogOpen(false);
             setDeletingAddressId(null);
           }}
           open={deleteDialogOpen}
-          onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY] });
-            setDeleteDialogOpen(false);
-            setDeletingAddressId(null);
+          setOpen={setDeleteDialogOpen}
+          translations={{
+            deleteSuccess: t("labels.deleteSuccess"),
+            deleteError: t("labels.deleteError"),
+            deleteCancelled: t("labels.deleteCancelled"),
           }}
         />
       </Box>

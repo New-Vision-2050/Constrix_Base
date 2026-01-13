@@ -31,10 +31,9 @@ import StatisticsStoreRow from "@/components/shared/layout/statistics-store";
 import { statisticsConfig } from "./component/statistics-config";
 import CustomMenu from "@/components/headless/custom-menu";
 import { EditIcon, Trash2 } from "lucide-react";
-import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import AddBrandDialog from "@/modules/stores/components/dialogs/add-brand";
-import { baseURL } from "@/config/axios-config";
+import DeleteButton from "@/components/shared/delete-button";
 
 const BRANDS_QUERY_KEY = "stores-brands";
 
@@ -202,19 +201,23 @@ function BrandsTable() {
           pagination={<BrandsTableLayout.Pagination state={state} />}
         />
         {/* Delete Confirmation Dialog */}
-        <DeleteConfirmationDialog
-          deleteUrl={`${baseURL}/ecommerce/dashboard/brands/${deletingBrandId}`}
-          onClose={() => {
-            setDeleteDialogOpen(false);
-            setDeletingBrandId(null);
-          }}
-          open={deleteDialogOpen}
-          onSuccess={() => {
+        <DeleteButton
+          message={t("brand.deleteConfirm")}
+          onDelete={async () => {
+            await BrandsApi.delete(deletingBrandId!);
             queryClient.invalidateQueries({ queryKey: [BRANDS_QUERY_KEY] });
             setDeleteDialogOpen(false);
             setDeletingBrandId(null);
           }}
+          open={deleteDialogOpen}
+          setOpen={setDeleteDialogOpen}
+          translations={{
+            deleteSuccess: t("labels.deleteSuccess"),
+            deleteError: t("labels.deleteError"),
+            deleteCancelled: t("labels.deleteCancelled"),
+          }}
         />
+
         {/* Add/Edit Brand Dialog */}
         <Can check={[PERMISSIONS.ecommerce.brand.update]}>
           <AddBrandDialog

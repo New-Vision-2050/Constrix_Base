@@ -319,4 +319,8 @@ export const productMessages = new MessagesGroup({
       }),
     }),
   }),
+  deleteConfirm: _m(
+    "Are you sure you want to delete this product?",
+    "هل أنت متأكد من حذف هذا المنتج؟"
+  ),
 });
