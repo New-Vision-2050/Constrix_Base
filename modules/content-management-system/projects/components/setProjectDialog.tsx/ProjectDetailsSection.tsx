@@ -21,6 +21,8 @@ import FormLabel from "@/components/shared/FormLabel";
 import FormErrorMessage from "@/components/shared/FormErrorMessage";
 import ImageUpload from "@/components/shared/ImageUpload";
 import { ProjectFormData } from "../../schema/project-form.schema";
+import { CompanyDashboardProjectsApi } from "@/services/api/company-dashboard/projects";
+import { toast } from "sonner";
 
 /**
  * Project Details Section Component
@@ -33,7 +35,8 @@ interface ProjectDetailsSectionProps {
   t: (key: string) => string;
   projectTypeOptions: { value: string; label: string }[];
   mainImageInitialValue?: string;
-  subImagesInitialValue?: string[];
+  subImagesInitialValue?: { id: string; url: string }[];
+  projectId?: string;
 }
 
 export default function ProjectDetailsSection({
@@ -44,6 +47,7 @@ export default function ProjectDetailsSection({
   projectTypeOptions,
   mainImageInitialValue,
   subImagesInitialValue,
+  projectId,
 }: ProjectDetailsSectionProps) {
   const isFeatured = useWatch({
     control,
@@ -121,6 +125,18 @@ export default function ProjectDetailsSection({
                     initialValue={subImagesInitialValue}
                     minHeight="200px"
                     className="mt-1"
+                    showDeleteConfirm={true}
+                    OnDelete={async (input) => {
+                      try {
+                        await CompanyDashboardProjectsApi.deleteMedia(
+                          projectId ?? "",
+                          input.id ?? ""
+                        );
+                        toast.success(t("deleteSuccess") || "Image deleted successfully!");
+                      } catch (error) {
+                        toast.error(t("deleteError") || "Failed to delete image");
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormErrorMessage />

@@ -73,4 +73,8 @@ export const CompanyDashboardProjectsApi = {
    * @returns Promise
    */
   delete: (id: string) => baseApi.delete(`website-projects/${id}`),
+
+
+  // delete media
+  deleteMedia: (id: string,mediaId:string) => baseApi.delete(`/website-projects/${id}/media/${mediaId}`),
 };

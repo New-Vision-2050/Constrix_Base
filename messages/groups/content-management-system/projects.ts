@@ -33,13 +33,37 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     addProject: _m("Add New Project", "اضافة مشروع جديدة"),
     editProject: _m("Edit Project", "تعديل مشروع"),
     save: _m("Save", "حفظ"),
+    deleteSuccess: _m("Media deleted successfully!", "تم حذف الوسائط بنجاح!"),
+    deleteError: _m(
+      "Failed to delete media. Please try again.",
+      "فشل حذف الوسائط. يرجى المحاولة مرة أخرى."
+    ),
+    deleteConfirmMessage: _m(
+      "Are you sure you want to delete this media?",
+      "هل أنت متأكد من حذف هذا الوسائط؟"
+    ),
     actions: _m("Actions", "الإجراءات"),
-    updateSuccess: _m("Project updated successfully!", "تم تحديث المشروع بنجاح!"),
-    createSuccess: _m("Project created successfully!", "تم إنشاء المشروع بنجاح!"),
-    updateError: _m("Failed to update project. Please try again.", "فشل تحديث المشروع. يرجى المحاولة مرة أخرى."),
-    createError: _m("Failed to create project. Please try again.", "فشل إنشاء المشروع. يرجى المحاولة مرة أخرى."),
+    updateSuccess: _m(
+      "Project updated successfully!",
+      "تم تحديث المشروع بنجاح!"
+    ),
+    createSuccess: _m(
+      "Project created successfully!",
+      "تم إنشاء المشروع بنجاح!"
+    ),
+    updateError: _m(
+      "Failed to update project. Please try again.",
+      "فشل تحديث المشروع. يرجى المحاولة مرة أخرى."
+    ),
+    createError: _m(
+      "Failed to create project. Please try again.",
+      "فشل إنشاء المشروع. يرجى المحاولة مرة أخرى."
+    ),
     validationError: _m("Validation error", "خطأ في التحقق من البيانات"),
-    featuredServices: _m("Featured Services (Display on Homepage)", "أبرز الخدمات (العرض في الصفحة الرئيسية)"),
+    featuredServices: _m(
+      "Featured Services (Display on Homepage)",
+      "أبرز الخدمات (العرض في الصفحة الرئيسية)"
+    ),
     mainImage: _m("Main Image", "صورة رئيسية"),
     subImages: _m("Sub Images (Attach images)", "الصور الفرعية (أرفاق صور)"),
     type: _m("Project Type", "نوع المشروع"),
@@ -47,9 +71,15 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     nameAr: _m("Project Name in Arabic", "إسم المشروع عربي"),
     nameEn: _m("Project Name in English", "إسم المشروع الانجليزية"),
     descriptionAr: _m("Project Description in Arabic", "وصف المشروع عربي"),
-    descriptionEn: _m("Project Description in English", "وصف المشروع الانجليزية"),
+    descriptionEn: _m(
+      "Project Description in English",
+      "وصف المشروع الانجليزية"
+    ),
     descriptionArPlaceholder: _m("Enter description in Arabic", "أدخل الوصف"),
-    descriptionEnPlaceholder: _m("Enter description in English", "Enter description"),
+    descriptionEnPlaceholder: _m(
+      "Enter description in English",
+      "Enter description"
+    ),
     details: _m("Details", "التفاصيل"),
     addDetail: _m("Add Detail", "إضافة تفاصيل"),
     deleteDetail: _m("Delete Detail", "حذف تفاصيل"),
@@ -58,33 +88,102 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     detailEn: _m("Detail in English", "تفاصيل الانجليزية"),
     service: _m("Service", "الخدمة"),
     servicePlaceholder: _m("Select Service", "أختار الخدمة"),
-    mainImageRequiredWhenFeatured: _m("Main image is required when featured is enabled", "الصورة الرئيسية مطلوبة عند تفعيل العرض في الصفحة الرئيسية"),
+    mainImageRequiredWhenFeatured: _m(
+      "Main image is required when featured is enabled",
+      "الصورة الرئيسية مطلوبة عند تفعيل العرض في الصفحة الرئيسية"
+    ),
     title: _m("Add New Project", "اضافة مشروع جديد"),
     titleAr: _m("Project Title in Arabic", "عنوان المشروع بالعربية"),
-    titleArPlaceholder: _m("Enter project title in Arabic", "أدخل عنوان المشروع بالعربية"),
+    titleArPlaceholder: _m(
+      "Enter project title in Arabic",
+      "أدخل عنوان المشروع بالعربية"
+    ),
     titleEn: _m("Project Title in English", "عنوان المشروع بالإنجليزية"),
-    titleEnPlaceholder: _m("Enter project title in English", "أدخل اسم المشروع بالإنجليزية"),
-    mainImageInvalid: _m("Main image must be a valid file", "يجب أن تكون الصورة الرئيسية ملفًا صالحًا"),
-    mainImageSizeExceeded: _m("Main image size must not exceed 3MB", "يجب أن يكون حجم الصورة الرئيسية أقل من 3MB"),
-    subImagesInvalid: _m("Sub images must be valid files", "يجب أن تكون الصور الفرعية ملفات صالحة"),
-    subImagesSizeExceeded: _m("Sub images size must not exceed 3MB", "يجب أن يكون حجم الصور الفرعية أقل من 3MB"),
-    titleArRequired: _m("Project name in Arabic is required", "عنوان المشروع بالعربية مطلوب"),
-    titleArMinLength: _m("Project name in Arabic must be at least 2 characters", "عنوان المشروع بالعربية يجب أن يكون على الأقل حرفين"),
-    titleEnRequired: _m("Project name in English is required", "اسم المشروع بالإنجليزية مطلوب"),
-    titleEnMinLength: _m("Project name in English must be at least 2 characters", "اسم المشروع بالإنجليزية يجب أن يكون على الأقل حرفين"),
+    titleEnPlaceholder: _m(
+      "Enter project title in English",
+      "أدخل اسم المشروع بالإنجليزية"
+    ),
+    mainImageInvalid: _m(
+      "Main image must be a valid file",
+      "يجب أن تكون الصورة الرئيسية ملفًا صالحًا"
+    ),
+    mainImageSizeExceeded: _m(
+      "Main image size must not exceed 3MB",
+      "يجب أن يكون حجم الصورة الرئيسية أقل من 3MB"
+    ),
+    subImagesInvalid: _m(
+      "Sub images must be valid files",
+      "يجب أن تكون الصور الفرعية ملفات صالحة"
+    ),
+    subImagesSizeExceeded: _m(
+      "Sub images size must not exceed 3MB",
+      "يجب أن يكون حجم الصور الفرعية أقل من 3MB"
+    ),
+    titleArRequired: _m(
+      "Project name in Arabic is required",
+      "عنوان المشروع بالعربية مطلوب"
+    ),
+    titleArMinLength: _m(
+      "Project name in Arabic must be at least 2 characters",
+      "عنوان المشروع بالعربية يجب أن يكون على الأقل حرفين"
+    ),
+    titleEnRequired: _m(
+      "Project name in English is required",
+      "اسم المشروع بالإنجليزية مطلوب"
+    ),
+    titleEnMinLength: _m(
+      "Project name in English must be at least 2 characters",
+      "اسم المشروع بالإنجليزية يجب أن يكون على الأقل حرفين"
+    ),
     typeRequired: _m("Project type is required", "نوع المشروع مطلوب"),
-    nameArRequired: _m("Project name in Arabic is required", "اسم المشروع بالعربية مطلوب"),
-    nameArMinLength: _m("Project name in Arabic must be at least 2 characters", "اسم المشروع بالعربية يجب أن يكون على الأقل حرفين"),
-    nameEnRequired: _m("Project name in English is required", "اسم المشروع بالإنجليزية مطلوب"),
-    nameEnMinLength: _m("Project name in English must be at least 2 characters", "اسم المشروع بالإنجليزية يجب أن يكون على الأقل حرفين"),
-    descriptionArRequired: _m("Project description in Arabic is required", "وصف المشروع بالعربية مطلوب"),
-    descriptionArMinLength: _m("Project description in Arabic must be at least 10 characters", "وصف المشروع بالعربية يجب أن يكون على الأقل 10 حروف"),
-    descriptionEnRequired: _m("Project description in English is required", "وصف المشروع بالإنجليزية مطلوب"),
-    descriptionEnMinLength: _m("Project description in English must be at least 10 characters", "وصف المشروع بالإنجليزية يجب أن يكون على الأقل 10 حروف"),
-    detailsRequired: _m("At least one detail is required", "يجب أن يكون لديك على الأقل بيانات واحدة"),
-    detailArRequired: _m("Detail in Arabic is required", "بيان المشروع بالعربية مطلوب"),
-    detailArMinLength: _m("Detail in Arabic must be at least 2 characters", "بيان المشروع بالعربية يجب أن يكون على الأقل حرفين"),
-    detailEnMinLength: _m("Detail in English must be at least 2 characters if provided", "بيان المشروع بالإنجليزية يجب أن يكون على الأقل حرفين إذا تم توفيره"),
+    nameArRequired: _m(
+      "Project name in Arabic is required",
+      "اسم المشروع بالعربية مطلوب"
+    ),
+    nameArMinLength: _m(
+      "Project name in Arabic must be at least 2 characters",
+      "اسم المشروع بالعربية يجب أن يكون على الأقل حرفين"
+    ),
+    nameEnRequired: _m(
+      "Project name in English is required",
+      "اسم المشروع بالإنجليزية مطلوب"
+    ),
+    nameEnMinLength: _m(
+      "Project name in English must be at least 2 characters",
+      "اسم المشروع بالإنجليزية يجب أن يكون على الأقل حرفين"
+    ),
+    descriptionArRequired: _m(
+      "Project description in Arabic is required",
+      "وصف المشروع بالعربية مطلوب"
+    ),
+    descriptionArMinLength: _m(
+      "Project description in Arabic must be at least 10 characters",
+      "وصف المشروع بالعربية يجب أن يكون على الأقل 10 حروف"
+    ),
+    descriptionEnRequired: _m(
+      "Project description in English is required",
+      "وصف المشروع بالإنجليزية مطلوب"
+    ),
+    descriptionEnMinLength: _m(
+      "Project description in English must be at least 10 characters",
+      "وصف المشروع بالإنجليزية يجب أن يكون على الأقل 10 حروف"
+    ),
+    detailsRequired: _m(
+      "At least one detail is required",
+      "يجب أن يكون لديك على الأقل بيانات واحدة"
+    ),
+    detailArRequired: _m(
+      "Detail in Arabic is required",
+      "بيان المشروع بالعربية مطلوب"
+    ),
+    detailArMinLength: _m(
+      "Detail in Arabic must be at least 2 characters",
+      "بيان المشروع بالعربية يجب أن يكون على الأقل حرفين"
+    ),
+    detailEnMinLength: _m(
+      "Detail in English must be at least 2 characters if provided",
+      "بيان المشروع بالإنجليزية يجب أن يكون على الأقل حرفين إذا تم توفيره"
+    ),
     serviceRequired: _m("Service is required", "الخدمة مطلوبة"),
   }),
   projectTypesTable: new MessagesGroup({
@@ -99,20 +198,53 @@ export const ContentManagementSystemProjectsPageMessages = new MessagesGroup({
     addProjectType: _m("Add New Project Type", "اضافة نوع مشروع جديد"),
     editProjectType: _m("Edit Project Type", "تعديل نوع مشروع"),
     nameAr: _m("Project Type Name in Arabic", "اسم النوع بالعربية"),
-    nameArPlaceholder: _m("Enter project type name in Arabic", "أدخل اسم النوع بالعربية"),
-    nameArRequired: _m("Project type name in Arabic is required", "اسم النوع بالعربية مطلوب"),
-    nameArMinLength: _m("Project type name in Arabic must be at least 2 characters", "اسم النوع بالعربية يجب أن يكون على الأقل حرفين"),
+    nameArPlaceholder: _m(
+      "Enter project type name in Arabic",
+      "أدخل اسم النوع بالعربية"
+    ),
+    nameArRequired: _m(
+      "Project type name in Arabic is required",
+      "اسم النوع بالعربية مطلوب"
+    ),
+    nameArMinLength: _m(
+      "Project type name in Arabic must be at least 2 characters",
+      "اسم النوع بالعربية يجب أن يكون على الأقل حرفين"
+    ),
     nameEn: _m("Project Type Name in English", "اسم النوع بالإنجليزية"),
-    nameEnPlaceholder: _m("Enter project type name in English", "أدخل اسم النوع بالإنجليزية"),
-    nameEnRequired: _m("Project type name in English is required", "اسم النوع بالإنجليزية مطلوب"),
-    nameEnMinLength: _m("Project type name in English must be at least 2 characters", "اسم النوع بالإنجليزية يجب أن يكون على الأقل حرفين"),
+    nameEnPlaceholder: _m(
+      "Enter project type name in English",
+      "أدخل اسم النوع بالإنجليزية"
+    ),
+    nameEnRequired: _m(
+      "Project type name in English is required",
+      "اسم النوع بالإنجليزية مطلوب"
+    ),
+    nameEnMinLength: _m(
+      "Project type name in English must be at least 2 characters",
+      "اسم النوع بالإنجليزية يجب أن يكون على الأقل حرفين"
+    ),
     save: _m("Save", "حفظ"),
     cancel: _m("Cancel", "إلغاء"),
-    updateSuccess: _m("Project type updated successfully!", "تم تحديث النوع بنجاح!"),
-    createSuccess: _m("Project type created successfully!", "تم إنشاء النوع بنجاح!"),
-    updateError: _m("Failed to update project type. Please try again.", "فشل تحديث النوع. يرجى المحاولة مرة أخرى."),
-    createError: _m("Failed to create project type. Please try again.", "فشل إنشاء النوع. يرجى المحاولة مرة أخرى."),
+    updateSuccess: _m(
+      "Project type updated successfully!",
+      "تم تحديث النوع بنجاح!"
+    ),
+    createSuccess: _m(
+      "Project type created successfully!",
+      "تم إنشاء النوع بنجاح!"
+    ),
+    updateError: _m(
+      "Failed to update project type. Please try again.",
+      "فشل تحديث النوع. يرجى المحاولة مرة أخرى."
+    ),
+    createError: _m(
+      "Failed to create project type. Please try again.",
+      "فشل إنشاء النوع. يرجى المحاولة مرة أخرى."
+    ),
     validationError: _m("Validation error", "خطأ في التحقق من البيانات"),
-    permissionDenied: _m("You don't have permission to perform this action", "ليس لديك صلاحية لإجراء هذا الإجراء"),
+    permissionDenied: _m(
+      "You don't have permission to perform this action",
+      "ليس لديك صلاحية لإجراء هذا الإجراء"
+    ),
   }),
 });
