@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import { Box, TextField, Button, Stack, Autocomplete } from "@mui/material";
+import { Box, TextField, Button, Stack, Autocomplete, Typography } from "@mui/material";
 import { Search, Refresh, Map } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { AttendanceFiltersProps, DropdownOption } from "./types";
@@ -56,20 +56,33 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
   return (
     <Box sx={{ p: 2, bgcolor: "background.paper", borderRadius: 1, mb: 2 }}>
       <Stack spacing={2}>
-        {/* Search text field */}
-        <TextField
-          fullWidth
-          size="small"
-          placeholder={t("searchPlaceholder")}
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
-          InputProps={{
-            startAdornment: <Search sx={{ mr: 1, color: "text.secondary" }} />,
+        {/* search title */}
+        <Typography variant="h6">{t("searchTitle")}</Typography>
+        {/* Grid layout for filters - 3 items per row on md+, 1 item on mobile */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(3, 1fr)",
+            },
+            gap: 2,
           }}
-        />
+        >
+          {/* Search text field */}
+          <TextField
+            fullWidth
+            size="small"
+            variant="outlined"
+            placeholder={t("searchPlaceholder")}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSearchClick()}
+            InputProps={{
+              startAdornment: <Search sx={{ mr: 1, color: "text.secondary" }} />,
+            }}
+          />
 
-        <Stack direction="row" spacing={2}>
           {/* Branch filter */}
           <Autocomplete
             fullWidth
@@ -101,9 +114,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
               <TextField {...params} placeholder={t("managementPlaceholder")} />
             )}
           />
-        </Stack>
 
-        <Stack direction="row" spacing={2}>
           {/* Constraint filter */}
           <Autocomplete
             fullWidth
@@ -122,7 +133,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             )}
           />
 
-          {/* Date filters */}
+          {/* Start Date filter */}
           <TextField
             type="date"
             size="small"
@@ -134,6 +145,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             InputLabelProps={{ shrink: true }}
           />
 
+          {/* End Date filter */}
           <TextField
             type="date"
             size="small"
@@ -144,7 +156,7 @@ export const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             }
             InputLabelProps={{ shrink: true }}
           />
-        </Stack>
+        </Box>
 
         {/* Action buttons */}
         <Stack direction="row" spacing={2} justifyContent="flex-end">

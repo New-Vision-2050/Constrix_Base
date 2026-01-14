@@ -150,6 +150,7 @@ export const attendanceDepartureModuleMessages = new MessagesGroup({
     filters: new MessagesGroup({
       search: _m("Search", "بحث"),
       reset: _m("Reset", "مسح"),
+      searchTitle: _m("Search Filters", "فلاتر البحث"),
       mapView: _m("Map View", "الخريطة"),
       searchPlaceholder: _m("Search", "بحث"),
       branchPlaceholder: _m("Branch", "الفرع"),
