@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, Refresh } from "@mui/icons-material";
 import { Box, TextField, Button, Stack } from "@mui/material";
+import { useDebouncedValue } from "@/modules/table/hooks/useDebounce";
 
 interface FiltersProps {
   searchQuery: string;
@@ -26,21 +27,19 @@ export function TableFilters({
   t,
 }: FiltersProps) {
   const [localSearch, setLocalSearch] = useState(searchQuery);
+  const debouncedSearch = useDebouncedValue(localSearch, 500);
 
   // Sync with parent when searchQuery changes externally
   useEffect(() => {
     setLocalSearch(searchQuery);
   }, [searchQuery]);
 
-  // Debounce search input
+  // Call onSearchChange when debounced value changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localSearch !== searchQuery) {
-        onSearchChange(localSearch);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [localSearch, searchQuery, onSearchChange]);
+    if (debouncedSearch !== searchQuery) {
+      onSearchChange(debouncedSearch);
+    }
+  }, [debouncedSearch, searchQuery, onSearchChange]);
 
   return (
     <Box sx={{ mb: 2 }}>
