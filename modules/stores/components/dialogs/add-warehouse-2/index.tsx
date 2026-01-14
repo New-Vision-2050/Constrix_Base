@@ -113,8 +113,6 @@ export default function AddWarehouse2Dialog({
 
       setValue("name", warehouse.name || "");
       setValue("is_default", Boolean(warehouse.is_default));
-      // Note: country_id and city_id are not available in the show response
-      // They would need to be included in the API response for full edit functionality
       setValue("district", warehouse.district || "");
       setValue("street", warehouse.street || "");
       setValue(
@@ -125,10 +123,38 @@ export default function AddWarehouse2Dialog({
         "longitude",
         warehouse.longitude ? parseFloat(warehouse.longitude) : 0
       );
-      if (warehouse?.country) setValue("country_id", warehouse?.country?.id);
-      if (warehouse?.city) setValue("city_id", warehouse?.city?.id);
+      
+      // Only set country_id and city_id if countries/cities are loaded
+      if (countries.length > 0 && warehouse?.country?.id) {
+        setValue("country_id", warehouse.country.id);
+      }
+      
+      if (cities.length > 0 && warehouse?.city?.id) {
+        setValue("city_id", warehouse.city.id);
+      }
     }
-  }, [isEditMode, warehouseData, setValue]);
+  }, [isEditMode, warehouseData, setValue, countries.length, cities.length]);
+
+  // Additional effect to set country_id and city_id when countries/cities are loaded
+  useEffect(() => {
+    if (isEditMode && warehouseData?.data?.payload && countries.length > 0) {
+      const warehouse = warehouseData.data.payload;
+      
+      if (warehouse?.country?.id) {
+        setValue("country_id", warehouse.country.id);
+        console.log("Set country_id after countries loaded:", warehouse.country.id);
+      }
+    }
+    
+    if (isEditMode && warehouseData?.data?.payload && cities.length > 0) {
+      const warehouse = warehouseData.data.payload;
+      
+      if (warehouse?.city?.id) {
+        setValue("city_id", warehouse.city.id);
+        console.log("Set city_id after cities loaded:", warehouse.city.id);
+      }
+    }
+  }, [isEditMode, warehouseData, setValue, countries, cities]);
 
   // Load countries and cities on component mount
   useEffect(() => {
@@ -154,19 +180,20 @@ export default function AddWarehouse2Dialog({
   // Handle location selection from map
   const handleLocationPick = (location: GoogleMapPickerValue) => {
     console.log("Location picked:", location);
-    
+
     try {
       if (location.lat && location.lng) {
         setValue("latitude", location.lat, { shouldValidate: true });
         setValue("longitude", location.lng, { shouldValidate: true });
-        console.log("Updated latitude:", location.lat, "longitude:", location.lng);
       }
-      
+
       if (location.address) {
         // Try to extract district from address
         const addressParts = location.address.split(",");
         if (addressParts.length > 1) {
-          setValue("district", addressParts[1].trim(), { shouldValidate: true });
+          setValue("district", addressParts[1].trim(), {
+            shouldValidate: true,
+          });
         }
       }
     } catch (error) {
@@ -288,7 +315,8 @@ export default function AddWarehouse2Dialog({
                     <Controller
                       name="country_id"
                       control={control}
-                      render={({ field }) => (
+                      render={({ field }) => {
+                        return (
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
@@ -299,7 +327,9 @@ export default function AddWarehouse2Dialog({
                             showClear={!!field.value}
                             onClear={() => field.onChange("")}
                           >
-                            <SelectValue placeholder={t("warehouse.selectCountry")} />
+                            <SelectValue
+                              placeholder={t("warehouse.selectCountry")}
+                            />
                           </SelectTrigger>
                           <SelectContent className="bg-sidebar border-gray-700">
                             {countries.map((country) => (
@@ -313,7 +343,8 @@ export default function AddWarehouse2Dialog({
                             ))}
                           </SelectContent>
                         </Select>
-                      )}
+                        );
+                      }}
                     />
                     {errors.country_id && (
                       <p className="text-red-500 text-sm">
@@ -340,7 +371,9 @@ export default function AddWarehouse2Dialog({
                             showClear={!!field.value}
                             onClear={() => field.onChange("")}
                           >
-                            <SelectValue placeholder={t("warehouse.selectCity")} />
+                            <SelectValue
+                              placeholder={t("warehouse.selectCity")}
+                            />
                           </SelectTrigger>
                           <SelectContent className="bg-sidebar border-gray-700">
                             {cities.map((city) => (
@@ -446,9 +479,7 @@ export default function AddWarehouse2Dialog({
               </div>
             </div>
             <div className="space-y-2">
-              <FormLabel>
-                {t("warehouse.locationMap")}
-              </FormLabel>
+              <FormLabel>{t("warehouse.locationMap")}</FormLabel>
               <div className="bg-gray-200 rounded-lg overflow-hidden">
                 <PlacesPicker
                   onPick={handleLocationPick}
