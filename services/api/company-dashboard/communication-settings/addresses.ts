@@ -10,8 +10,13 @@ export const CommunicationSettingsAddressesApi = {
   /**
    * Get all addresses
    */
-  getAll: () =>
-    baseApi.get<GetAllAddressesResponse>("website-addresses"),
+  getAll: (params?: {
+    page?: number;
+    per_page?: number;
+    title?: string;
+    city_id?: string;
+    status?: number;
+  }) => baseApi.get<GetAllAddressesResponse>("website-addresses", { params }),
   /**
    * Fetch single address by ID
    */
@@ -33,7 +38,5 @@ export const CommunicationSettingsAddressesApi = {
   /**
    * Delete address
    */
-  delete: (id: string) =>
-    baseApi.delete(`website-addresses/${id}`),
+  delete: (id: string) => baseApi.delete(`website-addresses/${id}`),
 };
-
