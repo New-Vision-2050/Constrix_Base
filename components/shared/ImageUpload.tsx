@@ -79,11 +79,9 @@ export default function ImageUpload({
       // Append new files to existing ones instead of replacing
       const updatedFiles = [...selectedFiles, ...newFiles];
       setSelectedFiles(updatedFiles);
-      onMultipleChange?.(updatedFiles);
-      // Clear initial previews when user starts uploading new files
-      if (newFiles.length > 0) {
-        setInitialPreviews([]);
-      }
+      // Merge initial previews (URLs) with new files to preserve existing images
+      const mergedData = [...initialPreviews, ...updatedFiles];
+      onMultipleChange?.(mergedData as any);
       // Reset input to allow selecting the same file again
       e.target.value = "";
     } else {
@@ -137,16 +135,17 @@ export default function ImageUpload({
   const removeFile = (index: number) => {
     const newFiles = selectedFiles.filter((_, i) => i !== index);
     setSelectedFiles(newFiles);
-    onMultipleChange?.(newFiles);
+    // Merge initial previews with remaining files
+    const mergedData = [...initialPreviews, ...newFiles];
+    onMultipleChange?.(mergedData as any);
   };
 
   const removeInitialImage = (index: number) => {
     const newPreviews = initialPreviews.filter((_, i) => i !== index);
     setInitialPreviews(newPreviews);
-    // If all initial images are removed, trigger onChange with empty array
-    if (newPreviews.length === 0) {
-      onMultipleChange?.([]);
-    }
+    // Merge remaining initial previews with selected files
+    const mergedData = [...newPreviews, ...selectedFiles];
+    onMultipleChange?.(mergedData as any);
   };
 
   return (
@@ -216,14 +215,14 @@ export default function ImageUpload({
       {multiple && (
         <>
           {/* Display initial images from edit mode */}
-          {initialPreviews.length > 0 && selectedFiles.length === 0 && (
+          {initialPreviews.length > 0 && (
             <div className="space-y-3">
               {initialPreviews.map((item, index) => {
                 const imageUrl =
                   typeof item === "string" ? item : item?.url || "";
                 return (
                   <div
-                    key={index}
+                    key={`initial-${index}`}
                     className="relative border-2 border-dashed border-[#3c345a] rounded-lg p-3 hover:border-primary/50 transition-colors flex items-center gap-4"
                     style={{
                       background:
