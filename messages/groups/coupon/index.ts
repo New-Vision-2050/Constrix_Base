@@ -10,7 +10,11 @@ export const couponMessages = new MessagesGroup({
     discount: _m("Discount", "الخصم"),
     userLimit: _m("User Limit", "حد المستخدم"),
     discountType: _m("Discount Type", "نوع الخصم"),
-    status: _m("Status", "الحالة")
+    status: _m("Status", "الحالة"),
+    usageLimit: _m("Usage Limit", "حد الاستخدام"),
+    usedCount: _m("Used Count", "عدد الاستخدامات"),
+    startDate: _m("Start Date", "تاريخ البدء"),
+    endDate: _m("End Date", "تاريخ الانتهاء"),
   }),
   deleteSuccess: _m("Coupon deleted successfully", "تم حذف القسيمة بنجاح"),
   deleteError: _m("Failed to delete coupon", "فشل في حذف القسيمة"),
