@@ -12,6 +12,7 @@ import { AttendanceProvider, useAttendance } from "./context/AttendanceContext";
 import AttendanceDepartureStatisticsCards from "./components/StatisticsCards/AttendanceDepartureStatisticsCards";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { AttendanceTableV2 } from "./components/AttendanceDepartureTable/table-v2";
 
 // Internal component that uses the context
 function AttendanceContent() {
@@ -28,7 +29,10 @@ function AttendanceContent() {
 
       {/* Table or map */}
       {view === "table" ? (
-        <AttendanceDepartureTable />
+        <>
+          {/* <AttendanceDepartureTable /> */}
+          <AttendanceTableV2 />
+        </>
       ) : (
         <Can check={[PERMISSIONS.attendance.attendance_departure.map]}>
           {/* Search filter */}
