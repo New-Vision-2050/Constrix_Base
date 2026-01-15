@@ -174,10 +174,14 @@ export default function SetProjectDialog({
 
   const onSubmit = async (data: ProjectFormData) => {
     try {
-      // TODO: Replace with actual API calls
+      // Filter secondary_images to send only new File uploads (not existing images)
+      const newSecondaryImages = data.sub_images?.filter(
+        (item: any) => item instanceof File
+      ) || [];
+
       const payload = {
         main_image: data.main_image,
-        secondary_images: data.sub_images,
+        secondary_images: newSecondaryImages,
         website_project_setting_id: data.type,
         title_ar: data.title_ar,
         title_en: data.title_en,
