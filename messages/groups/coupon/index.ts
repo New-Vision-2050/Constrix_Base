@@ -12,6 +12,12 @@ export const couponMessages = new MessagesGroup({
     discountType: _m("Discount Type", "نوع الخصم"),
     status: _m("Status", "الحالة")
   }),
+  deleteSuccess: _m("Coupon deleted successfully", "تم حذف القسيمة بنجاح"),
+  deleteError: _m("Failed to delete coupon", "فشل في حذف القسيمة"),
+  actions: _m("Actions", "الإجراءات"),
+  deleteConfirmMessage: _m("Are you sure you want to delete this coupon?", "هل أنت متأكد من حذف هذه القسيمة؟"),
+  searchPlaceholder: _m("Search coupons", "بحث القسائم"),
+  reset: _m("Reset", "إعادة تعيين"),
   codeRequired: _m("Coupon code is required", "كود القسيمة مطلوب"),
   imageRequired: _m("Coupon image is required", "صورة القسيمة مطلوبة"),
   createSuccess: _m("Coupon created successfully", "تم إضافة القسيمة بنجاح"),
