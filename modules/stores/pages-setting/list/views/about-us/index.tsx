@@ -10,7 +10,7 @@ import withPermissions from "@/lib/permissions/client/withPermissions";
 import HeadlessTableLayout from "@/components/headless/table";
 import { AboutUsRow } from "./types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PagesSettingApi } from "@/services/api/ecommerce/pages-setting";
+import { PagesSettingApi } from "@/services/api/ecommerce/pages-setting/about-us";
 import { getAboutUsColumns } from "./columns";
 import DeleteButton from "@/components/shared/delete-button";
 import CustomMenu from "@/components/headless/custom-menu";
