@@ -749,6 +749,8 @@ export function AppSidebar({
     return _shownProjects;
   }, [SidebarProjects, isLoading, data, isSuperAdmin, mergeProjectsAndMenu]);
 
+  console.log("data101data", data);
+
   return (
     <Sidebar
       collapsible="icon"
