@@ -14,6 +14,10 @@ export const pagesSettingsMessages = new MessagesGroup({
     url: _m("URL", "الرابط"),
     status: _m("Status", "الحالة"),
     noImage: _m("No Image", "لا توجد صورة"),
+    name: _m("Name", "الاسم"),
+    address: _m("Address", "العنوان"),
+    phone: _m("Phone", "رقم الهاتف"),
+    email: _m("Email", "البريد الالكتروني"),
   }),
   sections: new MessagesGroup({
     header: _m("Main Section", "القسم الرئيسي"),
