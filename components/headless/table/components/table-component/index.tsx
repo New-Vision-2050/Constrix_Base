@@ -212,6 +212,7 @@ export function createTableComponent<TRow>() {
               borderBottomWidth: 1,
               borderBottomColor: "divider",
               borderBottomStyle: "solid",
+              padding: 1,
             },
           }}
         >
