@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FormLabel from "@/components/shared/FormLabel";
+import { Typography } from "@mui/material";
 
 interface ImageUploadProps {
   label: string;
@@ -27,7 +28,6 @@ export default function ImageUpload({
   required = false,
   onChange,
   onMultipleChange,
-  value,
   initialValue,
   className = "",
   minHeight = "200px",
@@ -49,7 +49,7 @@ export default function ImageUpload({
     if (initialValue) {
       if (multiple && Array.isArray(initialValue)) {
         setInitialPreviews(
-          initialValue.filter((url) => typeof url === "string")
+          initialValue.filter((url) => typeof url === "string"),
         );
       } else if (!multiple && typeof initialValue === "string") {
         setImagePreview(initialValue);
@@ -142,8 +142,12 @@ export default function ImageUpload({
           ) : uploadId ? (
             <>
               <Upload className="w-12 h-12 text-gray-600 mb-3" />
-              <p className="text-sm mb-1">{maxSize}</p>
-              <p className="text-xs mb-4">{dimensions}</p>
+              <Typography sx={{ fontSize: "14px", mb: 1 }}>
+                {maxSize}
+              </Typography>
+              <Typography sx={{ fontSize: "14px", mb: 4 }}>
+                {dimensions}
+              </Typography>
               <label htmlFor={uploadId}>
                 <Button
                   type="button"
@@ -189,9 +193,11 @@ export default function ImageUpload({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-300 truncate">
+                    <Typography
+                      sx={{ fontSize: "14px", color: "text.secondary" }}
+                    >
                       صورة موجودة {index + 1}
-                    </p>
+                    </Typography>
                   </div>
                   {/* Remove button */}
                   <button
@@ -235,12 +241,16 @@ export default function ImageUpload({
 
                   {/* File info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-300 truncate">
+                    <Typography
+                      sx={{ fontSize: "20", color: "text.secondary" }}
+                    >
                       {file.name}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: "20px", color: "text.disabled", mt: 1 }}
+                    >
                       {(file.size / 1024).toFixed(2)} KB
-                    </p>
+                    </Typography>
                   </div>
 
                   {/* Remove button */}
@@ -265,9 +275,9 @@ export default function ImageUpload({
                   onClick={() => document.getElementById(uploadId)?.click()}
                 >
                   <Upload className="w-5 h-5 text-gray-600" />
-                  <p className="text-gray-600 text-sm">
+                  <Typography sx={{ color: "text.primary", fontSize: "14px" }}>
                     إضافة المزيد من الملفات
-                  </p>
+                  </Typography>
                   <input
                     id={uploadId}
                     type="file"
@@ -293,8 +303,16 @@ export default function ImageUpload({
               onClick={() => document.getElementById(uploadId)?.click()}
             >
               <Upload className="w-12 h-12 text-gray-600 mb-3" />
-              <p className="text-gray-600 text-sm mb-1">{maxSize}</p>
-              <p className="text-gray-500 text-xs mb-4">{dimensions}</p>
+              <Typography
+                sx={{ color: "text.primary", fontSize: "14px", mb: 1 }}
+              >
+                {maxSize}
+              </Typography>
+              <Typography
+                sx={{ color: "text.disabled", fontSize: "12px", mb: 4 }}
+              >
+                {dimensions}
+              </Typography>
               <Button
                 type="button"
                 variant="outline"
