@@ -18,6 +18,7 @@ export const pagesSettingsMessages = new MessagesGroup({
     address: _m("Address", "العنوان"),
     phone: _m("Phone", "رقم الهاتف"),
     email: _m("Email", "البريد الالكتروني"),
+    description: _m("Description", "الوصف"),
   }),
   sections: new MessagesGroup({
     header: _m("Main Section", "القسم الرئيسي"),
@@ -39,14 +40,14 @@ export const pagesSettingsMessages = new MessagesGroup({
     descriptionRequired: _m("Description is required", "الوصف مطلوب"),
     fillRequired: _m(
       "Please fill all required fields correctly",
-      "يرجى ملء جميع الحقول المطلوبة بشكل صحيح"
+      "يرجى ملء جميع الحقول المطلوبة بشكل صحيح",
     ),
   }),
   messages: new MessagesGroup({
     saveSuccess: _m("Changes saved successfully!", "تم حفظ التعديلات بنجاح!"),
     saveError: _m(
       "Failed to save changes. Please try again.",
-      "فشل في حفظ التعديلات. حاول مرة أخرى."
+      "فشل في حفظ التعديلات. حاول مرة أخرى.",
     ),
     createSuccess: _m("Banner created successfully", "تم إنشاء اللافتة بنجاح"),
     createError: _m("Failed to create banner", "فشل في إنشاء اللافتة"),
@@ -65,7 +66,7 @@ export const pagesSettingsMessages = new MessagesGroup({
   confirmations: new MessagesGroup({
     delete: _m(
       "Are you sure you want to delete this item?",
-      "هل أنت متأكد من أنك تريد حذف هذا العنصر؟"
+      "هل أنت متأكد من أنك تريد حذف هذا العنصر؟",
     ),
   }),
 });
