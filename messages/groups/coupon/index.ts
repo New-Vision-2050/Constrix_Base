@@ -10,7 +10,7 @@ export const couponMessages = new MessagesGroup({
     discount: _m("Discount", "الخصم"),
     userLimit: _m("User Limit", "حد المستخدم"),
     discountType: _m("Discount Type", "نوع الخصم"),
-    status: _m("Status", "الحالة")
+    status: _m("Status", "الحالة"),
   }),
   codeRequired: _m("Coupon code is required", "كود القسيمة مطلوب"),
   imageRequired: _m("Coupon image is required", "صورة القسيمة مطلوبة"),
@@ -40,5 +40,9 @@ export const couponMessages = new MessagesGroup({
   expireDate: _m("Expire Date", "تاريخ الإنتهاء"),
   selectCouponType: _m("", "اختر نوع القسيمة"),
   freeDelivery: _m("", "توصيل مجاني"),
-  firstOrder: _m("", "الطلب الأول")
+  firstOrder: _m("", "الطلب الأول"),
+  deleteConfirm: _m(
+    "Are you sure you want to delete this coupon?",
+    "هل أنت متأكد من حذف هذه القسيمة؟",
+  ),
 });
