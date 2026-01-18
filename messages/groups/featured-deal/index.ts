@@ -11,7 +11,7 @@ export const featuredDealMessages = new MessagesGroup({
     monthDate: _m("Month Date", "تاريخ الشهر"),
     status: _m("Status", "الحالة"),
     active: _m("Active", "نشط"),
-    inactive: _m("Inactive", "غير نشط")
+    inactive: _m("Inactive", "غير نشط"),
   }),
   add: _m("Add New Featured Deal", "إضافة صفقة مميزة جديدة"),
   edit: _m("Edit Featured Deal", "تعديل صفقة مميزة جديدة"),
@@ -24,10 +24,26 @@ export const featuredDealMessages = new MessagesGroup({
   percentage: _m("Percentage", "نسبة مئوية"),
   amount: _m("Fixed Amount", "مبلغ ثابت"),
   discountValue: _m("Discount Value", "قيمة الخصم"),
-  createSuccess: _m("Featured deal created successfully", "تم إضافة الصفقة المميزة بنجاح"),
-  createError: _m("Failed to create featured deal", "فشل في إضافة الصفقة المميزة"),
-  updateSuccess: _m("Featured deal updated successfully", "تم تحديث الصفقة المميزة بنجاح"),
-  updateError: _m("Failed to update featured deal", "فشل في تحديث الصفقة المميزة"),
+  createSuccess: _m(
+    "Featured deal created successfully",
+    "تم إضافة الصفقة المميزة بنجاح",
+  ),
+  createError: _m(
+    "Failed to create featured deal",
+    "فشل في إضافة الصفقة المميزة",
+  ),
+  updateSuccess: _m(
+    "Featured deal updated successfully",
+    "تم تحديث الصفقة المميزة بنجاح",
+  ),
+  updateError: _m(
+    "Failed to update featured deal",
+    "فشل في تحديث الصفقة المميزة",
+  ),
   save: _m("Save", "حفظ"),
-  cancel: _m("Cancel", "إلغاء")
+  cancel: _m("Cancel", "إلغاء"),
+  deleteConfirm: _m(
+    "Are you sure you want to delete this featured deal?",
+    "هل أنت متأكد من حذف هذه الصفقة المميزة؟",
+  ),
 });
