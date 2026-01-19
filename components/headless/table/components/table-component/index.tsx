@@ -13,6 +13,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import { InboxOutlined, SearchOff } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
 import { TableProps } from "./types";
 
 // ============================================================================
@@ -21,6 +22,8 @@ import { TableProps } from "./types";
 
 export function createTableComponent<TRow>() {
   const TableComponent = (props: TableProps<TRow>) => {
+    const t = useTranslations("Table");
+
     // Extract props based on whether state is provided
     const isUsingState = "state" in props && props.state !== undefined;
 
@@ -171,20 +174,20 @@ export function createTableComponent<TRow>() {
                 <>
                   <SearchOff sx={{ fontSize: 64, opacity: 0.5 }} />
                   <Typography variant="h6" color="text.secondary">
-                    No results found
+                    {t("NoResultsFound")}
                   </Typography>
                   <Typography variant="body2" color="text.disabled">
-                    Try adjusting your filters
+                    {t("NoResultsDescription")}
                   </Typography>
                 </>
               ) : (
                 <>
                   <InboxOutlined sx={{ fontSize: 64, opacity: 0.5 }} />
                   <Typography variant="h6" color="text.secondary">
-                    No data
+                    {t("NoData")}
                   </Typography>
                   <Typography variant="body2" color="text.disabled">
-                    There is no data to display
+                    {t("NoDataDescription")}
                   </Typography>
                 </>
               )}
@@ -209,6 +212,7 @@ export function createTableComponent<TRow>() {
               borderBottomWidth: 1,
               borderBottomColor: "divider",
               borderBottomStyle: "solid",
+              padding: 1,
             },
           }}
         >

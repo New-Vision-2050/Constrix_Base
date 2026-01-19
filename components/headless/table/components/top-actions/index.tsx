@@ -1,7 +1,8 @@
 import React from "react";
 import { Box, Button, Stack, Typography, Chip } from "@mui/material";
 import { FileDownload, Delete } from "@mui/icons-material";
-import { TableState } from "../table-state/types";
+import { useTranslations } from "next-intl";
+import { TableStateV2 as TableState } from "../table-state-v2/types";
 
 // ============================================================================
 // TopActions Component
@@ -18,6 +19,7 @@ export function createTopActionsComponent<TRow>() {
     customActions,
   }: TopActionsProps<TRow>) => {
     const { selection, actions } = state;
+    const t = useTranslations("Table");
 
     if (!selection.hasSelection && !customActions) {
       return null;
@@ -36,7 +38,7 @@ export function createTopActionsComponent<TRow>() {
               <>
                 <Typography variant="body2" color="text.secondary">
                   <Chip
-                    label={`${selection.selectedCount} selected`}
+                    label={`${selection.selectedCount} ${t("Selected")}`}
                     size="small"
                     color="primary"
                     variant="outlined"
@@ -47,7 +49,7 @@ export function createTopActionsComponent<TRow>() {
                   onClick={selection.clearSelection}
                   variant="outlined"
                 >
-                  Clear Selection
+                  {t("ClearSelection")}
                 </Button>
               </>
             )}
@@ -64,7 +66,7 @@ export function createTopActionsComponent<TRow>() {
                 onClick={actions.onExport}
                 disabled={!actions.canExport}
               >
-                Export
+                {t("Export")}
               </Button>
             )}
 
@@ -77,7 +79,7 @@ export function createTopActionsComponent<TRow>() {
                 onClick={actions.onDelete}
                 disabled={!actions.canDelete}
               >
-                Delete
+                {t("Delete")}
               </Button>
             )}
           </Stack>

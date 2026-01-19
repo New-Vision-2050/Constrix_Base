@@ -7,6 +7,7 @@ import {
   Stack,
   Grid,
 } from "@mui/material";
+import { useTranslations } from "next-intl";
 import { TableState } from "../..";
 
 // ============================================================================
@@ -26,6 +27,7 @@ export function createPaginationComponent<TRow>() {
     pageSizeOptions = [5, 10, 25, 50, 100],
   }: PaginationProps<TRow>) => {
     const { pagination } = state;
+    const t = useTranslations("Table");
 
     return (
       <Grid container spacing={2}>
@@ -41,14 +43,29 @@ export function createPaginationComponent<TRow>() {
             onChange={(_, page) => pagination.setPage(page)}
             color="primary"
             shape="rounded"
-            variant="outlined"
+            variant="text"
+            sx={{
+              "& .MuiPaginationItem-text": {
+                bgcolor: "background.default",
+                borderStyle: "solid",
+                borderWidth: "1px",
+                borderColor: "divider",
+                minWidth: "30px",
+                height: "30px",
+              },
+              "& .MuiPaginationItem-root.Mui-selected": {
+                borderColor: "primary.main",
+                minWidth: "34px",
+                height: "34px",
+              },
+            }}
           />
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }} justifyContent="end" display="flex">
           {showPageSize && (
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body2" color="text.secondary">
-                Rows per page:
+                {t("RowsPerPage")}
               </Typography>
               <Select
                 value={pagination.limit}

@@ -41,5 +41,8 @@ export const labelsMessages = new MessagesGroup({
   stock: _m("Stock", "الكمية"),
   image: _m("Image", "صورة"),
   currency: _m("SAR", "ريال"),
-  type: _m("", "النوع")
+  type: _m("", "النوع"),
+  deleteSuccess: _m("Item deleted successfully", "تم حذف العنصر بنجاح"),
+  deleteError: _m("Failed to delete item", "فشل في حذف العنصر"),
+  deleteCancelled: _m("Delete cancelled", "تم إلغاء الحذف"),
 });

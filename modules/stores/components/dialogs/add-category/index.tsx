@@ -134,14 +134,10 @@ export default function AddCategoryDialog({
     if (isEditMode && categoryData?.data?.payload) {
       const category = categoryData.data.payload;
 
-      setValue("name_ar", category.name || "");
-      setValue("name_en", category.name || "");
-      setValue("priority", String(category.priority || 1));
-
-      // Set image preview if exists
-      if (category.category_image) {
-        setImagePreview(category.category_image);
-      }
+      setValue("name_ar", category?.name_ar || "");
+      setValue("name_en", category?.name_en || "");
+      setValue("priority", String(category?.priority || 1));
+      setImagePreview(category.category_image ?? category?.file?.url ?? "");
     }
   }, [isEditMode, categoryData, setValue]);
 

@@ -404,6 +404,7 @@ export default function AddNewsDialog({
                         disabled={isSubmitting || isFetching}
                         className="mt-1"
                         min={new Date().toISOString().split("T")[0]}
+                        onClick={(e) => e.currentTarget.showPicker?.()}
                         {...field}
                       />
                     </FormControl>
@@ -427,6 +428,7 @@ export default function AddNewsDialog({
                         disabled={isSubmitting || isFetching}
                         className="mt-1"
                         min={new Date().toISOString().split("T")[0]}
+                        onClick={(e) => e.currentTarget.showPicker?.()}
                         {...field}
                       />
                     </FormControl>
