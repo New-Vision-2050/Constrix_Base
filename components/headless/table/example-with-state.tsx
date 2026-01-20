@@ -142,9 +142,8 @@ const fetchUsers = async (
   return { data: paginatedData, totalPages, totalItems };
 };
 
+const UserTable = HeadlessTableLayout<User>("users");
 export function ExampleWithState() {
-  const UserTable = HeadlessTableLayout<User>();
-
   // Filter state
   const [roleFilter, setRoleFilter] = useState<string>("all");
 

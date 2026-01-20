@@ -28,11 +28,11 @@ export type { SearchProps } from "./components/search/types";
 // Headless Table Factory
 // ============================================================================
 
-export function HeadlessTableLayout<TRow>() {
+export function HeadlessTableLayout<TRow>(prefix?: string) {
   const TableComponent = createTableComponent<TRow>();
   const PaginationComponent = createPaginationComponent<TRow>();
   const SearchComponent = createSearchComponent();
-  const useTableParams = createTableParamsHook();
+  const useTableParams = createTableParamsHook(prefix);
   const useTableState = createTableStateV2Hook<TRow>();
   const TopActionsComponent = createTopActionsComponent<TRow>(SearchComponent);
   const Layout = TableLayoutComponent;
