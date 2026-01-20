@@ -7,13 +7,14 @@ import { TableParams, TableParamsOptions } from "./types";
 
 export function createTableParamsHook() {
   return function useTableParams(
-    options: TableParamsOptions = {}
+    options: TableParamsOptions = {},
   ): TableParams {
     const {
       initialPage = 1,
       initialLimit = 10,
       initialSortBy,
       initialSortDirection = "asc",
+      initialSearch = "",
     } = options;
 
     // Pagination state
@@ -23,8 +24,11 @@ export function createTableParamsHook() {
     // Sorting state
     const [sortBy, setSortBy] = useState<string | undefined>(initialSortBy);
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">(
-      initialSortDirection
+      initialSortDirection,
     );
+
+    // Search state
+    const [search, setSearch] = useState<string>(initialSearch);
 
     // Pagination actions
     const nextPage = useCallback(() => {
@@ -40,6 +44,11 @@ export function createTableParamsHook() {
       setPage(1); // Reset to first page when limit changes
     }, []);
 
+    const handleSetSearch = useCallback((newSearch: string) => {
+      setSearch(newSearch);
+      setPage(1); // Reset to first page when search changes
+    }, []);
+
     // Sorting handler
     const handleSort = useCallback(
       (key: string) => {
@@ -52,7 +61,7 @@ export function createTableParamsHook() {
           setSortDirection("asc");
         }
       },
-      [sortBy]
+      [sortBy],
     );
 
     // Reset all params
@@ -61,7 +70,14 @@ export function createTableParamsHook() {
       setLimit(initialLimit);
       setSortBy(initialSortBy);
       setSortDirection(initialSortDirection);
-    }, [initialPage, initialLimit, initialSortBy, initialSortDirection]);
+      setSearch(initialSearch);
+    }, [
+      initialPage,
+      initialLimit,
+      initialSortBy,
+      initialSortDirection,
+      initialSearch,
+    ]);
 
     return {
       page,
@@ -73,6 +89,8 @@ export function createTableParamsHook() {
       sortBy,
       sortDirection,
       handleSort,
+      search,
+      setSearch: handleSetSearch,
       reset,
     };
   };

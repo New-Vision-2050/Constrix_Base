@@ -7,7 +7,7 @@ import { TableStateV2, TableStateV2Options } from "./types";
 
 export function createTableStateV2Hook<TRow>() {
   return function useTableState(
-    options: TableStateV2Options<TRow>
+    options: TableStateV2Options<TRow>,
   ): TableStateV2<TRow> {
     const {
       data,
@@ -16,6 +16,7 @@ export function createTableStateV2Hook<TRow>() {
       totalItems = 0,
       params,
       selectable = false,
+      searchable = false,
       getRowId,
       loading = false,
       filtered = false,
@@ -35,7 +36,7 @@ export function createTableStateV2Hook<TRow>() {
       (row: TRow): string => {
         return getRowId ? getRowId(row) : JSON.stringify(row);
       },
-      [getRowId]
+      [getRowId],
     );
 
     // Data with sticky selected rows at top
@@ -62,30 +63,30 @@ export function createTableStateV2Hook<TRow>() {
       (row: TRow): boolean => {
         const rowId = getRowIdentifier(row);
         return selectedRows.some(
-          (selectedRow) => getRowIdentifier(selectedRow) === rowId
+          (selectedRow) => getRowIdentifier(selectedRow) === rowId,
         );
       },
-      [selectedRows, getRowIdentifier]
+      [selectedRows, getRowIdentifier],
     );
 
     const toggleRow = useCallback(
       (row: TRow) => {
         const rowId = getRowIdentifier(row);
         const isSelected = selectedRows.some(
-          (selectedRow) => getRowIdentifier(selectedRow) === rowId
+          (selectedRow) => getRowIdentifier(selectedRow) === rowId,
         );
 
         if (isSelected) {
           setSelectedRows((prev) =>
             prev.filter(
-              (selectedRow) => getRowIdentifier(selectedRow) !== rowId
-            )
+              (selectedRow) => getRowIdentifier(selectedRow) !== rowId,
+            ),
           );
         } else {
           setSelectedRows((prev) => [...prev, row]);
         }
       },
-      [selectedRows, getRowIdentifier]
+      [selectedRows, getRowIdentifier],
     );
 
     const clearSelection = useCallback(() => {
@@ -110,12 +111,12 @@ export function createTableStateV2Hook<TRow>() {
       (row: TRow): boolean => {
         const rowId = getRowIdentifier(row);
         const isInCurrentPage = data.some(
-          (pageRow) => getRowIdentifier(pageRow) === rowId
+          (pageRow) => getRowIdentifier(pageRow) === rowId,
         );
 
         return !isInCurrentPage && isRowSelected(row);
       },
-      [data, getRowIdentifier, isRowSelected]
+      [data, getRowIdentifier, isRowSelected],
     );
 
     // Action handlers
@@ -143,6 +144,7 @@ export function createTableStateV2Hook<TRow>() {
         filtered,
         handleSort: params.handleSort,
         selectable,
+        searchable,
       },
       pagination: {
         page: params.page,

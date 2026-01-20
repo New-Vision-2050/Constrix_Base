@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "./index";
 import { Box, Paper, Chip, TextField, Button, Stack } from "@mui/material";
-import { Search, Refresh } from "@mui/icons-material";
+import { Refresh } from "@mui/icons-material";
 
 // ============================================================================
 // Example Usage with Two-Hook Pattern
@@ -146,7 +146,6 @@ export function ExampleWithState() {
   const UserTable = HeadlessTableLayout<User>();
 
   // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
 
   // ✅ STEP 1: useTableParams (BEFORE query)
@@ -155,6 +154,7 @@ export function ExampleWithState() {
     initialLimit: 5,
     initialSortBy: "name",
     initialSortDirection: "asc",
+    initialSearch: "",
   });
 
   // ✅ STEP 2: Fetch data using useQuery
@@ -165,7 +165,7 @@ export function ExampleWithState() {
       params.limit,
       params.sortBy,
       params.sortDirection,
-      searchQuery,
+      params.search,
       roleFilter,
     ],
     queryFn: () =>
@@ -174,7 +174,7 @@ export function ExampleWithState() {
         params.limit,
         params.sortBy,
         params.sortDirection,
-        searchQuery,
+        params.search,
         roleFilter,
       ),
   });
@@ -231,9 +231,10 @@ export function ExampleWithState() {
     totalItems,
     params,
     selectable: true,
+    searchable: true,
     getRowId: (user: User) => user.id.toString(),
     loading: isLoading,
-    filtered: searchQuery !== "" || roleFilter !== "all",
+    filtered: params.search !== "" || roleFilter !== "all",
     onExport: async (selectedRows: User[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
@@ -245,7 +246,6 @@ export function ExampleWithState() {
   });
 
   const handleReset = () => {
-    setSearchQuery("");
     setRoleFilter("all");
     params.reset();
   };
@@ -254,27 +254,8 @@ export function ExampleWithState() {
     <Box sx={{ p: 3 }}>
       <UserTable
         filters={
-          <UserTable.TopActions
-            state={state}
-            searchComponent={<TextField fullWidth label="Search" />}
-            customActions={<Button>Custom Action</Button>}
-          >
+          <Stack spacing={2}>
             <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                size="small"
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  params.setPage(1);
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <Search sx={{ mr: 1, color: "action.active" }} />
-                  ),
-                }}
-                sx={{ flexGrow: 1 }}
-              />
               <TextField
                 select
                 size="small"
@@ -300,7 +281,18 @@ export function ExampleWithState() {
                 Reset
               </Button>
             </Stack>
-          </UserTable.TopActions>
+            <UserTable.TopActions
+              state={state}
+              searchComponent={
+                state.table.searchable ? (
+                  <UserTable.Search
+                    params={params}
+                    placeholder="Search by name or email..."
+                  />
+                ) : undefined
+              }
+            />
+          </Stack>
         }
         table={<UserTable.Table state={state} loadingOptions={{ rows: 5 }} />}
         pagination={<UserTable.Pagination state={state} />}
@@ -323,7 +315,7 @@ export function ExampleWithState() {
           </div>
           <div>Loading: {isLoading ? "Yes" : "No"}</div>
           <div>
-            Filters: {searchQuery || "(none)"} | Role: {roleFilter}
+            Search: {params.search || "(none)"} | Role: {roleFilter}
           </div>
         </Box>
       </Paper>

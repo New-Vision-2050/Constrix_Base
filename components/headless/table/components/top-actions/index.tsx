@@ -3,6 +3,7 @@ import { Box, Button, Stack } from "@mui/material";
 import { FileDownload, Delete } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { TableStateV2 as TableState } from "../table-state-v2/types";
+import { TableParams } from "../table-params/types";
 
 // ============================================================================
 // TopActions Component
@@ -10,20 +11,35 @@ import { TableStateV2 as TableState } from "../table-state-v2/types";
 
 export type TopActionsProps<TRow> = {
   state: TableState<TRow>;
+  params?: TableParams;
   customActions?: React.ReactNode;
   searchComponent?: React.ReactNode;
   children?: React.ReactNode;
 };
 
-export function createTopActionsComponent<TRow>() {
+export function createTopActionsComponent<TRow>(
+  SearchComponent: React.ComponentType<{
+    params: TableParams;
+    placeholder?: string;
+  }>,
+) {
   const TopActionsComponent = ({
     state,
+    params,
     customActions,
     searchComponent,
     children,
   }: TopActionsProps<TRow>) => {
     const { actions } = state;
     const t = useTranslations("Table");
+
+    // Use provided searchComponent, or default Search if searchable and params provided
+    const finalSearchComponent =
+      searchComponent !== undefined ? (
+        searchComponent
+      ) : state.table.searchable && params ? (
+        <SearchComponent params={params} />
+      ) : null;
 
     return (
       <Stack spacing={2}>
@@ -36,7 +52,7 @@ export function createTopActionsComponent<TRow>() {
             gap: 2,
           }}
         >
-          <Box flexGrow={1}>{searchComponent}</Box>
+          <Box flexGrow={1}>{finalSearchComponent}</Box>
           <Stack direction="row" spacing={1}>
             {actions.onExport && (
               <div>

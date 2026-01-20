@@ -21,6 +21,9 @@ export type TableStateV2Options<TRow> = {
   selectable?: boolean;
   getRowId?: (row: TRow) => string;
 
+  // Search
+  searchable?: boolean;
+
   // Loading & Filtering
   loading?: boolean;
   filtered?: boolean;
@@ -41,6 +44,7 @@ export type TableStateV2<TRow> = {
     filtered: boolean;
     handleSort: (key: string) => void;
     selectable: boolean;
+    searchable: boolean;
   };
 
   // Pagination state

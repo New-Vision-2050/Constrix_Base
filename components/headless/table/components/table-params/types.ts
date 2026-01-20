@@ -10,6 +10,9 @@ export type TableParamsOptions = {
   // Initial sorting
   initialSortBy?: string;
   initialSortDirection?: "asc" | "desc";
+
+  // Initial search
+  initialSearch?: string;
 };
 
 export type TableParams = {
@@ -25,6 +28,10 @@ export type TableParams = {
   sortBy?: string;
   sortDirection?: "asc" | "desc";
   handleSort: (key: string) => void;
+
+  // Search params
+  search: string;
+  setSearch: (search: string) => void;
 
   // Reset all params
   reset: () => void;
