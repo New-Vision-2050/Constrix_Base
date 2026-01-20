@@ -4,7 +4,6 @@ import TheStatus from "../components/the-status";
 import { TableConfig } from "@/modules/table";
 import { EditIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 
@@ -55,13 +54,21 @@ export const useMainPageTableConfig: (params?: Params) => TableConfig = (
         key: "is_active",
         label: t("table.status"),
         render: (value: "active" | "inActive", row: MainPageRow) => (
-          <TheStatus disabled={!can(PERMISSIONS.ecommerce.banner.activate)} theStatus={value} id={row.id} type="main" />
+          <TheStatus
+            disabled={!can(PERMISSIONS.ecommerce.banner.activate)}
+            theStatus={value}
+            id={row.id}
+            type="main"
+          />
         ),
       },
     ],
     executions: [
       (row) => (
-        <DropdownMenuItem disabled={!can(PERMISSIONS.ecommerce.banner.update)} onSelect={() => params?.onEdit?.(row.id)}>
+        <DropdownMenuItem
+          disabled={!can(PERMISSIONS.ecommerce.banner.update)}
+          onSelect={() => params?.onEdit?.(row.id)}
+        >
           <EditIcon />
           {tCommon("edit")}
         </DropdownMenuItem>

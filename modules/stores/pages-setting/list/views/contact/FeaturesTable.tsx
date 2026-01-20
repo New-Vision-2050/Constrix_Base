@@ -1,56 +1,222 @@
-import { TableBuilder, useTableReload } from "@/modules/table";
-import { Button } from "@/components/ui/button";
-import DialogTrigger from "@/components/headless/dialog-trigger";
-import { NewFeatureDialog } from "@/modules/stores/components/dialogs/add-page-setting";
+"use client";
 import { useState } from "react";
-import { useNewFeatureTableConfig } from "../../../_config/newFeatureTableConfig";
-import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
+import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
+import { Search } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
+import { NewFeatureDialog } from "@/modules/stores/components/dialogs/add-page-setting";
+import withPermissions from "@/lib/permissions/client/withPermissions";
+import HeadlessTableLayout from "@/components/headless/table";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import DeleteButton from "@/components/shared/delete-button";
+import CustomMenu from "@/components/headless/custom-menu";
+import { EditIcon, Trash2 } from "lucide-react";
+import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import { FeaturesRow } from "./types/features-types";
+import { getFeaturesColumns } from "./columns/Features-columns";
+import { FeaturesApi } from "@/services/api/ecommerce/pages-setting/contact/features";
 
-export function FeaturesTable() {
-  const [editingFeatureId, setEditingFeatureId] = useState<string | null>(null);
+const CONTACT_FEATURES_QUERY_KEY = "pages-setting-contact-features";
 
-  const newFeatureTableConfig = useNewFeatureTableConfig({
-    onEdit: (id: string) => {
-      setEditingFeatureId(id);
-      // Force dialog to open in next tick to ensure state update is processed
-      setTimeout(() => setEditingFeatureId(id), 0);
+// Create typed table instance
+const ContactFeaturesTableLayout = HeadlessTableLayout<FeaturesRow>();
+
+function FeaturesTable() {
+  const t = useTranslations("pagesSettings");
+  const tCommon = useTranslations("labels");
+  const queryClient = useQueryClient();
+  const { can } = usePermissions();
+
+  // Edit dialog state
+  const [editingPageId, setEditingPageId] = useState<string | null>(null);
+
+  // Delete dialog state
+  const [deletingPageId, setDeletingPageId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // ✅ STEP 1: useTableParams (BEFORE query)
+  const params = ContactFeaturesTableLayout.useTableParams({
+    initialPage: 1,
+    initialLimit: 10,
+  });
+
+  // ✅ STEP 2: Fetch data using useQuery
+  const { data: queryData, isLoading } = useQuery({
+    queryKey: [
+      CONTACT_FEATURES_QUERY_KEY,
+      params.page,
+      params.limit,
+      searchQuery,
+    ],
+    queryFn: async () => {
+      const response = await FeaturesApi.list({
+        type: "contact_us",
+        page: params.page,
+        per_page: params.limit,
+        search: searchQuery,
+      });
+
+      return {
+        data: response.data.payload || [],
+        totalPages: response.data.pagination?.last_page ?? 1,
+        totalItems:
+          response.data.pagination?.result_count ??
+          (response.data.payload || []).length,
+      };
     },
   });
-  const { reloadTable: reloadFeatureTable } = useTableReload(
-    newFeatureTableConfig.tableId
-  );
+
+  const data = queryData?.data || [];
+  const totalPages = queryData?.totalPages || 0;
+  const totalItems = queryData?.totalItems || 0;
+
+  // Define columns
+  const columns = [
+    ...getFeaturesColumns(t, can),
+    {
+      key: "actions",
+      name: tCommon("actions"),
+      sortable: false,
+      render: (row: FeaturesRow) => (
+        <CustomMenu
+          renderAnchor={({ onClick }) => (
+            <Button onClick={onClick}>{tCommon("actions")}</Button>
+          )}
+        >
+          <MenuItem
+            onClick={() => {
+              setEditingPageId(row.id);
+            }}
+          >
+            <EditIcon className="w-4 h-4 ml-2" />
+            {tCommon("edit")}
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setDeletingPageId(row.id);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <Trash2 className="w-4 h-4 ml-2" />
+            {tCommon("delete")}
+          </MenuItem>
+        </CustomMenu>
+      ),
+    },
+  ];
+
+  // ✅ STEP 3: useTableState (AFTER query)
+  const state = ContactFeaturesTableLayout.useTableState({
+    data,
+    columns,
+    totalPages,
+    totalItems,
+    params,
+    selectable: true,
+    getRowId: (page: FeaturesRow) => page.id,
+    loading: isLoading,
+    filtered: searchQuery !== "",
+  });
+
+  const handleAddPage = () => {
+    setEditingPageId("new");
+  };
 
   return (
     <>
+      <Box>
+        <ContactFeaturesTableLayout
+          filters={
+            <Stack spacing={2}>
+              {/* Filter Controls */}
+              <Grid container spacing={2}>
+                <Grid size={{ md: 10 }}>
+                  <TextField
+                    size="small"
+                    placeholder={tCommon("search")}
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      params.setPage(1);
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <Search sx={{ mr: 1, color: "action.active" }} />
+                      ),
+                    }}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ md: 2 }}>
+                  <Can check={[PERMISSIONS.ecommerce.banner.create]}>
+                    <Button
+                      variant="contained"
+                      onClick={handleAddPage}
+                      fullWidth
+                    >
+                      اضافة ميزة جديدة
+                    </Button>
+                  </Can>
+                </Grid>
+              </Grid>
+            </Stack>
+          }
+          table={
+            <ContactFeaturesTableLayout.Table
+              state={state}
+              loadingOptions={{ rows: 5 }}
+            />
+          }
+          pagination={<ContactFeaturesTableLayout.Pagination state={state} />}
+        />
+      </Box>
+
+      {/* Add/Edit Page Dialog */}
       <Can check={[PERMISSIONS.ecommerce.banner.update]}>
         <NewFeatureDialog
-          open={Boolean(editingFeatureId)}
-          onClose={() => setEditingFeatureId(null)}
-          featureId={editingFeatureId || undefined}
-          onSuccess={() => reloadFeatureTable()}
+          open={Boolean(editingPageId)}
+          onClose={() => setEditingPageId(null)}
+          featureId={
+            editingPageId === "new" ? undefined : (editingPageId ?? undefined)
+          }
+          onSuccess={() => {
+            queryClient.invalidateQueries({
+              queryKey: [CONTACT_FEATURES_QUERY_KEY],
+            });
+            setEditingPageId(null);
+          }}
         />
       </Can>
 
-      <div>
-        <TableBuilder
-          config={newFeatureTableConfig}
-          searchBarActions={
-            <Can check={[PERMISSIONS.ecommerce.banner.create]}>
-              <DialogTrigger
-                component={NewFeatureDialog}
-                dialogProps={{
-                  onSuccess: () => reloadFeatureTable(),
-                }}
-                render={({ onOpen }) => (
-                  <Button onClick={onOpen}>اضافة ميزة جديدة</Button>
-                )}
-              />
-            </Can>
+      {/* Delete Confirmation Dialog */}
+      <DeleteButton
+        message={t("confirmations.delete")}
+        onDelete={async () => {
+          if (deletingPageId) {
+            await FeaturesApi.delete(deletingPageId);
+            queryClient.invalidateQueries({
+              queryKey: [CONTACT_FEATURES_QUERY_KEY],
+            });
           }
-          tableId={newFeatureTableConfig.tableId}
-        />
-      </div>
+          setDeleteDialogOpen(false);
+          setDeletingPageId(null);
+        }}
+        open={deleteDialogOpen}
+        setOpen={setDeleteDialogOpen}
+        translations={{
+          deleteSuccess: tCommon("deleteSuccess"),
+          deleteError: tCommon("deleteError"),
+          deleteCancelled: tCommon("deleteCancelled"),
+        }}
+      />
     </>
   );
 }
+
+export default withPermissions(FeaturesTable, [
+  PERMISSIONS.ecommerce.banner.list,
+]);
