@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Stack, Typography, Chip } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import { FileDownload, Delete } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { TableStateV2 as TableState } from "../table-state-v2/types";
@@ -11,80 +11,64 @@ import { TableStateV2 as TableState } from "../table-state-v2/types";
 export type TopActionsProps<TRow> = {
   state: TableState<TRow>;
   customActions?: React.ReactNode;
+  searchComponent?: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export function createTopActionsComponent<TRow>() {
   const TopActionsComponent = ({
     state,
     customActions,
+    searchComponent,
+    children,
   }: TopActionsProps<TRow>) => {
-    const { selection, actions } = state;
+    const { actions } = state;
     const t = useTranslations("Table");
 
-    if (!selection.hasSelection && !customActions) {
-      return null;
-    }
-
     return (
-      <Box sx={{ mb: 2 }}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          spacing={2}
+      <Stack spacing={2}>
+        <Box>{children}</Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 2,
+          }}
         >
-          <Stack direction="row" spacing={2} alignItems="center">
-            {selection.hasSelection && (
-              <>
-                <Typography variant="body2" color="text.secondary">
-                  <Chip
-                    label={`${selection.selectedCount} ${t("Selected")}`}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
-                </Typography>
-                <Button
-                  size="small"
-                  onClick={selection.clearSelection}
-                  variant="outlined"
-                >
-                  {t("ClearSelection")}
-                </Button>
-              </>
-            )}
-          </Stack>
-
+          <Box flexGrow={1}>{searchComponent}</Box>
           <Stack direction="row" spacing={1}>
-            {customActions}
-
             {actions.onExport && (
-              <Button
-                size="small"
-                variant="outlined"
-                startIcon={<FileDownload />}
-                onClick={actions.onExport}
-                disabled={!actions.canExport}
-              >
-                {t("Export")}
-              </Button>
+              <div>
+                <Button
+                  variant="outlined"
+                  startIcon={<FileDownload />}
+                  onClick={actions.onExport}
+                  disabled={!actions.canExport}
+                  color="info"
+                >
+                  {t("Export")}
+                </Button>
+              </div>
             )}
 
             {actions.onDelete && (
-              <Button
-                size="small"
-                variant="outlined"
-                color="error"
-                startIcon={<Delete />}
-                onClick={actions.onDelete}
-                disabled={!actions.canDelete}
-              >
-                {t("Delete")}
-              </Button>
+              <div>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Delete />}
+                  onClick={actions.onDelete}
+                  disabled={!actions.canDelete}
+                >
+                  {t("Delete")}
+                </Button>
+              </div>
             )}
+            {customActions}
           </Stack>
-        </Stack>
-      </Box>
+        </Box>
+      </Stack>
     );
   };
 

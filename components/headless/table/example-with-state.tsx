@@ -112,7 +112,7 @@ const fetchUsers = async (
   sortBy?: string,
   sortDirection?: "asc" | "desc",
   search?: string,
-  role?: string
+  role?: string,
 ): Promise<{ data: User[]; totalPages: number; totalItems: number }> => {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -175,7 +175,7 @@ export function ExampleWithState() {
         params.sortBy,
         params.sortDirection,
         searchQuery,
-        roleFilter
+        roleFilter,
       ),
   });
 
@@ -254,8 +254,11 @@ export function ExampleWithState() {
     <Box sx={{ p: 3 }}>
       <UserTable
         filters={
-          <Stack spacing={2}>
-            {/* Filter Controls */}
+          <UserTable.TopActions
+            state={state}
+            searchComponent={<TextField fullWidth label="Search" />}
+            customActions={<Button>Custom Action</Button>}
+          >
             <Stack direction="row" spacing={2} alignItems="center">
               <TextField
                 size="small"
@@ -297,10 +300,7 @@ export function ExampleWithState() {
                 Reset
               </Button>
             </Stack>
-
-            {/* Top Actions */}
-            <UserTable.TopActions state={state} />
-          </Stack>
+          </UserTable.TopActions>
         }
         table={<UserTable.Table state={state} loadingOptions={{ rows: 5 }} />}
         pagination={<UserTable.Pagination state={state} />}
