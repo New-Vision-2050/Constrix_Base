@@ -13,6 +13,8 @@ import { RowActions } from "./actions";
 import { WarehouseRow } from "./types";
 import AddWarehouse2Dialog from "@/modules/stores/components/dialogs/add-warehouse-2";
 import ConfirmDeleteDialog from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
+import { WarehousesApi } from "@/services/api/ecommerce/warehouses";
+import { downloadFromResponse } from "@/utils/downloadFromResponse";
 
 // Create typed table instance
 const WarehousesTable = HeadlessTableLayout<WarehouseRow>();
@@ -27,7 +29,9 @@ export function WarehousesTableV2() {
   const t = useTranslations("stores.warehouse");
 
   // Dialog states
-  const [editingWarehouseId, setEditingWarehouseId] = useState<string | null>(null);
+  const [editingWarehouseId, setEditingWarehouseId] = useState<string | null>(
+    null,
+  );
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Filter state
@@ -53,27 +57,18 @@ export function WarehousesTableV2() {
     ],
     queryFn: async () => {
       const response = await apiClient.get(
-        `${baseURL}/ecommerce/warehouses?page=${params.page}&per_page=${params.limit}&search=${searchQuery || ""}&sort_by=${params.sortBy}&sort_direction=${params.sortDirection}`
+        `${baseURL}/ecommerce/warehouses?page=${params.page}&per_page=${params.limit}&search=${searchQuery || ""}&sort_by=${params.sortBy}&sort_direction=${params.sortDirection}`,
       );
       return response.data;
     },
   });
 
   // Extract data from response
-  const warehouses = useMemo<WarehouseRow[]>(
-    () => data?.payload || [],
-    [data]
-  );
+  const warehouses = useMemo<WarehouseRow[]>(() => data?.payload || [], [data]);
 
-  const totalPages = useMemo(
-    () => data?.pagination?.last_page || 1,
-    [data]
-  );
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
 
-  const totalItems = useMemo(
-    () => data?.pagination?.result_count || 0,
-    [data]
-  );
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
 
   // Permission checks
   const canEdit = can(PERMISSIONS.ecommerce.warehouse.update);
@@ -87,7 +82,9 @@ export function WarehousesTableV2() {
   const confirmDelete = async () => {
     if (!deleteConfirmId) return;
     try {
-      await apiClient.delete(`${baseURL}/ecommerce/warehouses/${deleteConfirmId}`);
+      await apiClient.delete(
+        `${baseURL}/ecommerce/warehouses/${deleteConfirmId}`,
+      );
       refetch();
       setDeleteConfirmId(null);
     } catch (error) {
@@ -140,21 +137,29 @@ export function WarehousesTableV2() {
     getRowId: (warehouse) => warehouse.id,
     loading: isLoading,
     filtered: searchQuery !== "",
+    selectable: true,
+    onExport: async () => {
+      downloadFromResponse(await WarehousesApi.export());
+    },
   });
 
   return (
     <>
       <WarehousesTable
         filters={
-          <TableFilters
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            onReset={handleReset}
-            t={t}
-            refetch={refetch}
-          />
+          <WarehousesTable.TopActions state={state}>
+            <TableFilters
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              onReset={handleReset}
+              t={t}
+              refetch={refetch}
+            />
+          </WarehousesTable.TopActions>
         }
-        table={<WarehousesTable.Table state={state} loadingOptions={{ rows: 5 }} />}
+        table={
+          <WarehousesTable.Table state={state} loadingOptions={{ rows: 5 }} />
+        }
         pagination={<WarehousesTable.Pagination state={state} />}
       />
 
