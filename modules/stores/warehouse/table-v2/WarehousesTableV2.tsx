@@ -17,7 +17,7 @@ import { WarehousesApi } from "@/services/api/ecommerce/warehouses";
 import { downloadFromResponse } from "@/utils/downloadFromResponse";
 
 // Create typed table instance
-const WarehousesTable = HeadlessTableLayout<WarehouseRow>();
+const WarehousesTable = HeadlessTableLayout<WarehouseRow>("stwh");
 
 /**
  * Warehouses Table V2 - HeadlessTable Implementation

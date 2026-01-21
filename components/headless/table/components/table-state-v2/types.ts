@@ -1,5 +1,6 @@
 import { ColumnDef } from "../table-component/types";
 import { TableParams } from "../table-params/types";
+import { ColumnVisibilityState } from "../column-visibility";
 
 // ============================================================================
 // Table State Types (After Query)
@@ -24,6 +25,20 @@ export type TableStateV2Options<TRow> = {
   // Search
   searchable?: boolean;
 
+  // Column Visibility
+  columnVisibility?: {
+    columnVisibility: ColumnVisibilityState;
+    toggleColumn: (columnKey: string) => void;
+    showAllColumns: () => void;
+    hideAllColumns: () => void;
+    resetColumnVisibility: () => void;
+    visibleColumns: ColumnDef<TRow>[];
+    allColumns: ColumnDef<TRow>[];
+    visibleCount: number;
+    totalCount: number;
+    hasHiddenColumns: boolean;
+  };
+
   // Loading & Filtering
   loading?: boolean;
   filtered?: boolean;
@@ -45,6 +60,20 @@ export type TableStateV2<TRow> = {
     handleSort: (key: string) => void;
     selectable: boolean;
     searchable: boolean;
+  };
+
+  // Column Visibility state (optional, only if prefix provided)
+  columnVisibility?: {
+    columnVisibility: ColumnVisibilityState;
+    toggleColumn: (columnKey: string) => void;
+    showAllColumns: () => void;
+    hideAllColumns: () => void;
+    resetColumnVisibility: () => void;
+    visibleColumns: ColumnDef<TRow>[];
+    allColumns: ColumnDef<TRow>[];
+    visibleCount: number;
+    totalCount: number;
+    hasHiddenColumns: boolean;
   };
 
   // Pagination state

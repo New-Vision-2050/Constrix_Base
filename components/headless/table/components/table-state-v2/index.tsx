@@ -1,11 +1,17 @@
 import { useState, useMemo, useCallback } from "react";
 import { TableStateV2, TableStateV2Options } from "./types";
+import { createColumnVisibilityHook } from "../column-visibility";
 
 // ============================================================================
 // Table State Hook V2 (After Query)
 // ============================================================================
 
-export function createTableStateV2Hook<TRow>() {
+export function createTableStateV2Hook<TRow>(prefix?: string) {
+  // Create column visibility hook if prefix is provided, otherwise create a no-op hook
+  const useColumnVisibilityHook = prefix
+    ? createColumnVisibilityHook<TRow>(prefix)
+    : () => null;
+
   return function useTableState(
     options: TableStateV2Options<TRow>,
   ): TableStateV2<TRow> {
@@ -22,7 +28,17 @@ export function createTableStateV2Hook<TRow>() {
       filtered = false,
       onExport,
       onDelete,
+      columnVisibility: externalColumnVisibility,
     } = options;
+
+    // Automatically create column visibility if prefix exists and not provided externally
+    // Hook is always called unconditionally (returns null if no prefix)
+    const internalColumnVisibility = useColumnVisibilityHook(columns);
+    const columnVisibility =
+      externalColumnVisibility ?? internalColumnVisibility ?? undefined;
+
+    // Use visible columns if column visibility is enabled, otherwise use all columns
+    const activeColumns = columnVisibility?.visibleColumns ?? columns;
 
     // Selection state
     const [selectedRows, setSelectedRows] = useState<TRow[]>([]);
@@ -136,7 +152,7 @@ export function createTableStateV2Hook<TRow>() {
     // Return structured state
     return {
       table: {
-        columns,
+        columns: activeColumns,
         data: dataWithStickyRows,
         sortBy: params.sortBy,
         sortDirection: params.sortDirection,
@@ -146,6 +162,7 @@ export function createTableStateV2Hook<TRow>() {
         selectable,
         searchable,
       },
+      columnVisibility,
       pagination: {
         page: params.page,
         limit: params.limit,

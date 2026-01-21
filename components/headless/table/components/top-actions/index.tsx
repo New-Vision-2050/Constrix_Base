@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Button, Stack } from "@mui/material";
-import { FileDownload, Delete } from "@mui/icons-material";
+import { FileDownload, Delete, ViewColumn } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { TableStateV2 as TableState } from "../table-state-v2/types";
+import { ColumnVisibilityDialog } from "../column-visibility/ColumnVisibilityDialog";
 
 // ============================================================================
 // TopActions Component
@@ -30,8 +31,9 @@ export function createTopActionsComponent<TRow>(
     searchComponent,
     children,
   }: TopActionsProps<TRow>) => {
-    const { actions } = state;
+    const { actions, columnVisibility } = state;
     const t = useTranslations("Table");
+    const [columnDialogOpen, setColumnDialogOpen] = useState(false);
 
     // Use provided searchComponent, or default Search if searchable
     const finalSearchComponent =
@@ -83,7 +85,31 @@ export function createTopActionsComponent<TRow>(
             )}
             {customActions}
           </Stack>
+          {columnVisibility && (
+            <div>
+              <Button
+                variant="outlined"
+                startIcon={<ViewColumn />}
+                onClick={() => setColumnDialogOpen(true)}
+              >
+                {t("Columns")}
+              </Button>
+            </div>
+          )}
         </Box>
+
+        {columnVisibility && (
+          <ColumnVisibilityDialog
+            open={columnDialogOpen}
+            onClose={() => setColumnDialogOpen(false)}
+            columns={columnVisibility.allColumns}
+            columnVisibility={columnVisibility.columnVisibility}
+            toggleColumn={columnVisibility.toggleColumn}
+            showAllColumns={columnVisibility.showAllColumns}
+            hideAllColumns={columnVisibility.hideAllColumns}
+            resetColumnVisibility={columnVisibility.resetColumnVisibility}
+          />
+        )}
       </Stack>
     );
   };

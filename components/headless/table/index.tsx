@@ -5,6 +5,7 @@ import { createTableStateV2Hook } from "./components/table-state-v2";
 import { createPaginationComponent } from "./components/pagination";
 import { createTopActionsComponent } from "./components/top-actions";
 import { createSearchComponent } from "./components/search";
+import { createColumnVisibilityHook } from "./components/column-visibility";
 
 // Re-export types
 export type {
@@ -23,6 +24,7 @@ export type {
   TableStateV2Options as TableStateOptions,
 } from "./components/table-state-v2/types";
 export type { SearchProps } from "./components/search/types";
+export type { ColumnVisibilityState } from "./components/column-visibility";
 
 // ============================================================================
 // Headless Table Factory
@@ -33,7 +35,8 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
   const PaginationComponent = createPaginationComponent<TRow>();
   const SearchComponent = createSearchComponent();
   const useTableParams = createTableParamsHook(prefix);
-  const useTableState = createTableStateV2Hook<TRow>();
+  const useTableState = createTableStateV2Hook<TRow>(prefix);
+  const useColumnVisibility = createColumnVisibilityHook<TRow>(prefix);
   const TopActionsComponent = createTopActionsComponent<TRow>(SearchComponent);
   const Layout = TableLayoutComponent;
 
@@ -44,6 +47,7 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
     Search: typeof SearchComponent;
     useTableParams: typeof useTableParams;
     useTableState: typeof useTableState;
+    useColumnVisibility: typeof useColumnVisibility;
   };
 
   LayoutWithComponents.Table = TableComponent;
@@ -52,6 +56,7 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
   LayoutWithComponents.Search = SearchComponent;
   LayoutWithComponents.useTableParams = useTableParams;
   LayoutWithComponents.useTableState = useTableState;
+  LayoutWithComponents.useColumnVisibility = useColumnVisibility;
 
   return LayoutWithComponents;
 }
