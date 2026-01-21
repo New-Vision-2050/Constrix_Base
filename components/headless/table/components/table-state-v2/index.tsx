@@ -159,6 +159,10 @@ export function createTableStateV2Hook<TRow>() {
         canPrevPage,
         paginatedData: dataWithStickyRows,
       },
+      search: {
+        search: params.search,
+        setSearch: params.setSearch,
+      },
       selection: {
         selectedRows,
         setSelectedRows,

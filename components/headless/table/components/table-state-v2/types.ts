@@ -62,6 +62,12 @@ export type TableStateV2<TRow> = {
     paginatedData: TRow[]; // Same as table.data (for backward compatibility)
   };
 
+  // Search state
+  search: {
+    search: string;
+    setSearch: (search: string) => void;
+  };
+
   // Selection state
   selection: {
     selectedRows: TRow[];

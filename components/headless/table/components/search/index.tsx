@@ -9,7 +9,7 @@ import { SearchProps } from "./types";
 // ============================================================================
 
 export function createSearchComponent() {
-  const SearchComponent = ({ params, placeholder }: SearchProps) => {
+  const SearchComponent = ({ search, placeholder }: SearchProps) => {
     const t = useTranslations("Table");
 
     return (
@@ -17,8 +17,8 @@ export function createSearchComponent() {
         fullWidth
         size="small"
         placeholder={placeholder || t("Search")}
-        value={params.search}
-        onChange={(e) => params.setSearch(e.target.value)}
+        value={search.search}
+        onChange={(e) => search.setSearch(e.target.value)}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

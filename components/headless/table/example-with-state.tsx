@@ -285,7 +285,7 @@ export function ExampleWithState() {
               searchComponent={
                 state.table.searchable ? (
                   <UserTable.Search
-                    params={params}
+                    search={state.search}
                     placeholder="Search by name or email..."
                   />
                 ) : undefined

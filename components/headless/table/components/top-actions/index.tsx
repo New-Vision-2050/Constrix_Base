@@ -3,7 +3,6 @@ import { Box, Button, Stack } from "@mui/material";
 import { FileDownload, Delete } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 import { TableStateV2 as TableState } from "../table-state-v2/types";
-import { TableParams } from "../table-params/types";
 
 // ============================================================================
 // TopActions Component
@@ -11,7 +10,6 @@ import { TableParams } from "../table-params/types";
 
 export type TopActionsProps<TRow> = {
   state: TableState<TRow>;
-  params?: TableParams;
   customActions?: React.ReactNode;
   searchComponent?: React.ReactNode;
   children?: React.ReactNode;
@@ -19,13 +17,15 @@ export type TopActionsProps<TRow> = {
 
 export function createTopActionsComponent<TRow>(
   SearchComponent: React.ComponentType<{
-    params: TableParams;
+    search: {
+      search: string;
+      setSearch: (search: string) => void;
+    };
     placeholder?: string;
   }>,
 ) {
   const TopActionsComponent = ({
     state,
-    params,
     customActions,
     searchComponent,
     children,
@@ -33,12 +33,12 @@ export function createTopActionsComponent<TRow>(
     const { actions } = state;
     const t = useTranslations("Table");
 
-    // Use provided searchComponent, or default Search if searchable and params provided
+    // Use provided searchComponent, or default Search if searchable
     const finalSearchComponent =
       searchComponent !== undefined ? (
         searchComponent
-      ) : state.table.searchable && params ? (
-        <SearchComponent params={params} />
+      ) : state.table.searchable ? (
+        <SearchComponent search={state.search} />
       ) : null;
 
     return (

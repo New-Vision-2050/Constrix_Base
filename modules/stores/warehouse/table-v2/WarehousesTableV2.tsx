@@ -136,6 +136,7 @@ export function WarehousesTableV2() {
     params,
     getRowId: (warehouse) => warehouse.id,
     loading: isLoading,
+    searchable: true,
     filtered: searchQuery !== "",
     selectable: true,
     onExport: async () => {
