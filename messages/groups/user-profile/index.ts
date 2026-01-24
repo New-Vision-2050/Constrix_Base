@@ -60,8 +60,18 @@ export const userProfileMessages = new MessagesGroup({
       academicAndExperience: _m("Academic and Experience Data", "البيانات الاكاديمية والخبرة"),
       employmentAndContractalData: _m("Employment and Contractual Data", "البيانات الوظيفية والتعاقدية"),
       financialPrivileges: _m("Financial Benefits", "الامتيازات المالية"),
-      contractManagement: _m("Contract Management", "ادارة العقد")
-    }),
+      contractManagement: _m("Contract Management", "ادارة العقد"),
+      alternatives: _m("Benefits and Allowances", " الامتيازات و البدلات"),
+     salary: _m("salary", "الراتب"),
+      salaryType: _m("Base Salary", "الراتب الاساسي"),
+     MyRequests: _m("MyRequests", "الراتب الاساسي"),
+     CreateRequest: _m("CreateRequest", "الراتب الاساسي"),
+     PaymentCycle: _m("Payment Cycle","دورة القبض"),
+    BasicSalaryAmount: _m("Basic Salary Amount", "مبلغ الراتب الاساسي"),
+    HourlyRate: _m("Hourly Rate ", " قيمة الساعة"),
+    BaseSalaryAccountDescription: _m("Base Salary Account Description", " وصف اساس حساب الراتب"),
+}),
+
     verticalLists: new MessagesGroup({
       personalList: new MessagesGroup({
         personalData: _m("Personal Data", "البيانات الشخصية"),

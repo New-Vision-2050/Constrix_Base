@@ -5,14 +5,14 @@ import PrivilegesAndAllowances from "../components/privileges-and-allowances";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-
+import { useTranslations } from "next-intl";
 export const financialDataSections = (): UserProfileNestedTab[] => {
   const { can } = usePermissions();
-
+const t = useTranslations("UserProfile");
   const tabs: (UserProfileNestedTab & { show: boolean })[] = [
     {
       id: "financial-data-salaries",
-      title: "الراتب",
+      title: t("tabs.contractTabs.salary"),
       type: "user_salary",
       icon: <GraduationCapIcon />,
       content: <Salaries />,
@@ -20,7 +20,7 @@ export const financialDataSections = (): UserProfileNestedTab[] => {
     },
     {
       id: "financial-data-alternatives",
-      title: "الامتيازات و البدلات",
+      title: t("tabs.contractTabs.alternatives"),
       type: "userPrivilege",
       icon: <GraduationCapIcon />,
       content: <PrivilegesAndAllowances />,
