@@ -180,7 +180,7 @@ export function editIndividualEmployeeFormConfig(
     resetButtonText: t("Reset"),
     showSubmitLoader: true,
     resetOnSuccess: false,
-    showCancelButton: true,
+    showCancelButton:false,
     showBackButton: false,
   };
 }
