@@ -22,12 +22,28 @@ interface TimeFieldProps {
   disabled?: boolean;
 }
 
-
 // convert string to time in minutes
 const convertStringToMinutes = (timeString: string) => {
   if (!timeString) return 0;
   const [hours, minutes] = timeString?.split(":")?.map(Number);
   return hours * 60 + minutes;
+};
+
+const normalizeTimeValue = (input?: string) => {
+  if (!input) {
+    return { hour: "", minute: "" };
+  }
+
+  const parts = String(input).split(":");
+  const hourPart = parts[0];
+  const minutePart = parts[1] ?? "00";
+
+  const normalizedHour = Number.isNaN(Number(hourPart))
+    ? ""
+    : String(parseInt(hourPart, 10));
+  const normalizedMinute = minutePart.padStart(2, "0");
+
+  return { hour: normalizedHour, minute: normalizedMinute };
 };
 
 const NewInputTimeField = ({
@@ -39,47 +55,107 @@ const NewInputTimeField = ({
   disabled = false,
 }: TimeFieldProps) => {
   // context
-  const { dayAvsilableHours, isEdit, minEdgeInNextDay } = useAttendanceDayCxt();
-  const [selectedHour, setSelectedHour] = useState<string>(
-    value?.split(":")[0] || ""
-  );
+  const { dayAvsilableHours, minEdgeInNextDay, dayPeriods } =
+    useAttendanceDayCxt();
+  const initialTime = normalizeTimeValue(value);
+  const [selectedHour, setSelectedHour] = useState<string>(initialTime.hour);
   const [selectedMinute, setSelectedMinute] = useState<string>(
-    value?.split(":")[1] || ""
+    initialTime.minute,
   );
 
+  // Sync state with value prop when it changes (for edit mode)
+  useEffect(() => {
+    const normalized = normalizeTimeValue(value);
+    setSelectedHour(normalized.hour);
+    setSelectedMinute(normalized.minute);
+  }, [value]);
+
+  const previousPeriod = useMemo(() => {
+    if (type !== "start") return null;
+    return dayPeriods?.find((item) => item.index === period.index - 1) ?? null;
+  }, [dayPeriods, period.index, type]);
+
+  const otherPeriods = useMemo(() => {
+    return dayPeriods?.filter((item) => item.index !== period.index) ?? [];
+  }, [dayPeriods, period.index]);
+
+  const baseHours = useMemo(() => {
+    return (
+      dayAvsilableHours?.map((hour) => ({
+        ...hour,
+        available: true,
+      })) ?? []
+    );
+  }, [dayAvsilableHours]);
+
   const _dayAvsilableHours = useMemo(() => {
-    if (type !== "end" || !period.start_time) return dayAvsilableHours;
+    if (type === "start" && previousPeriod?.end_time) {
+      const [endHour, endMinute] = previousPeriod.end_time
+        .split(":")
+        .map(Number);
+
+      return baseHours?.map((hour) => {
+        const currentHour = Number(hour.value);
+        if (currentHour < endHour) {
+          return { ...hour, available: false };
+        }
+        if (Number(hour.value) !== endHour) return hour;
+        if (Number.isNaN(endHour) || Number.isNaN(endMinute)) return hour;
+        if (endMinute >= 59) return { ...hour, available: false };
+        return { ...hour, available: true };
+      });
+    }
+
+    if (type !== "end" || !period.start_time) return baseHours;
 
     let foundUnavailable = false;
     const startHour = parseInt(period.start_time?.split(":")[0]);
 
-    return dayAvsilableHours?.map((hour) => {
+    return baseHours?.map((hour) => {
       const currentHour = parseInt(hour.value);
 
-      console.log('minEdgeInNextDay', minEdgeInNextDay)
-
       if (type === "end" && period?.extends_to_next_day) {
-        if(minEdgeInNextDay){
+        if (minEdgeInNextDay) {
           const _minEdgeInNextDay = convertStringToMinutes(minEdgeInNextDay);
-          
-          if(Number(hour.value) > Number(_minEdgeInNextDay/60)){
+
+          if (Number(hour.value) > Number(_minEdgeInNextDay / 60)) {
             return { ...hour, available: false };
           }
         }
         return { ...hour, available: true };
       }
 
-      if (!hour.available) {
-        if (currentHour >= startHour) foundUnavailable = true;
-        return hour;
+      const isUnavailableByOtherPeriod = otherPeriods.some((item) => {
+        if (!item.start_time || !item.end_time) return false;
+        const itemStartHour = Number(item.start_time.split(":")[0]);
+        let itemEndHour = Number(item.end_time.split(":")[0]);
+        if (item.extends_to_next_day) itemEndHour = 24;
+        return currentHour >= itemStartHour && currentHour <= itemEndHour;
+      });
+
+      if (isUnavailableByOtherPeriod) {
+        if (currentHour > startHour) {
+          foundUnavailable = true;
+          return { ...hour, available: false };
+        }
+        return { ...hour, available: currentHour === startHour };
       }
 
+      // Allow same hour or greater (end time can be 1 minute after start)
       return {
         ...hour,
-        available: currentHour > startHour && !foundUnavailable,
+        available: currentHour >= startHour && !foundUnavailable,
       };
     });
-  }, [type, dayAvsilableHours, period.start_time]);
+  }, [
+    type,
+    baseHours,
+    period.start_time,
+    period?.extends_to_next_day,
+    minEdgeInNextDay,
+    previousPeriod?.end_time,
+    otherPeriods,
+  ]);
 
   // reset end if period extends to next day
   useEffect(() => {
@@ -125,6 +201,55 @@ const NewInputTimeField = ({
     </Select>
   );
 
+  // Get available minutes - filter based on start time when end time is same hour
+  const availableMinutes = useMemo(() => {
+    const hourMinutes =
+      dayAvsilableHours?.filter((el) => el.value === selectedHour)?.[0]
+        ?.minutes || [];
+
+    if (type === "start" && previousPeriod?.end_time && selectedHour) {
+      const [endHour, endMinute] = previousPeriod.end_time
+        .split(":")
+        .map(Number);
+      const currentHour = parseInt(selectedHour);
+
+      if (currentHour < endHour) {
+        return hourMinutes.map((minute) => ({
+          ...minute,
+          available: false,
+        }));
+      }
+
+      if (currentHour === endHour) {
+        return hourMinutes.map((minute) => ({
+          ...minute,
+          available: minute.available && parseInt(minute.value) > endMinute,
+        }));
+      }
+    }
+
+    // If this is end time and same hour as start, only show minutes after start minute
+    if (type === "end" && period.start_time) {
+      const startHour = parseInt(period.start_time.split(":")[0]);
+      const startMinute = parseInt(period.start_time.split(":")[1]);
+
+      if (parseInt(selectedHour) === startHour) {
+        return hourMinutes.map((minute) => ({
+          ...minute,
+          available: minute.available && parseInt(minute.value) > startMinute,
+        }));
+      }
+    }
+
+    return hourMinutes;
+  }, [
+    dayAvsilableHours,
+    selectedHour,
+    type,
+    period.start_time,
+    previousPeriod?.end_time,
+  ]);
+
   // Componente de selección de minuto
   const minuteSelect = (
     <Select
@@ -136,39 +261,29 @@ const NewInputTimeField = ({
         <SelectValue placeholder="MM" />
       </SelectTrigger>
       <SelectContent className="bg-gray-800 border-gray-700 text-white">
-        {dayAvsilableHours
-          ?.filter((el) => el.value === selectedHour)?.[0]
-          ?.minutes?.map((minute) => (
-            <SelectItem
-              key={minute.value}
-              value={minute.value}
-              disabled={!minute.available}
-              className="text-white hover:bg-gray-700"
-            >
-              {minute.label}
-            </SelectItem>
-          ))}
+        {availableMinutes?.map((minute) => (
+          <SelectItem
+            key={minute.value}
+            value={minute.value}
+            disabled={!minute.available}
+            className="text-white hover:bg-gray-700"
+          >
+            {minute.label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );
 
-  if (!isEdit)
-    return (
-      <div className="flex flex-col space-y-1">
-        {label && <label className="text-sm text-gray-400">{label}</label>}
-        <div className="flex items-center space-x-1">
-          {hourSelect}
-          <span className="text-gray-400">:</span>
-          {minuteSelect}
-        </div>
-      </div>
-    );
-
-  // edit view
+  // Show editable dropdowns in both create and edit modes
   return (
     <div className="flex flex-col space-y-1">
       {label && <label className="text-sm text-gray-400">{label}</label>}
-      <div className="flex items-center space-x-1">{value}</div>
+      <div className="flex items-center space-x-1">
+        {hourSelect}
+        <span className="text-gray-400">:</span>
+        {minuteSelect}
+      </div>
     </div>
   );
 };

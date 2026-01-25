@@ -16,7 +16,7 @@ type PropsT = {
 export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
   //  constext
   const { handleUpdateDayPeriod } = useAttendanceDayCxt();
- 
+
   // handle change periods edges
   const handleTimeChange = (type: "start" | "end", value: string) => {
     let newStartTime = period.start_time;
@@ -27,8 +27,8 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
       newEndTime = value;
     }
 
-    // if type start and end exist and start > end reset end
-    if (type === "start" && newStartTime && newEndTime && newStartTime > newEndTime) {
+    const isEndAt24 = newEndTime === "24:00";
+    if (newStartTime && newEndTime && newStartTime > newEndTime && !isEndAt24) {
       newEndTime = "";
     }
 

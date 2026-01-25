@@ -53,7 +53,7 @@ type AttendanceDayCxtType = {
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
-  {} as AttendanceDayCxtType
+  {} as AttendanceDayCxtType,
 );
 
 // ** create a custom hook to use the context
@@ -61,7 +61,7 @@ export const useAttendanceDayCxt = () => {
   const context = useContext(AttendanceDayCxt);
   if (!context) {
     throw new Error(
-      "useAttendanceDayCxt must be used within a AttendanceDayCxtProvider"
+      "useAttendanceDayCxt must be used within a AttendanceDayCxtProvider",
     );
   }
   return context;
@@ -143,7 +143,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     if (_period) {
       // day after _period day
       const _periodDayIndex = DAYS_OF_WEEK.findIndex(
-        (day) => day.value == selectedDay
+        (day) => day.value == selectedDay,
       );
       const _periodDay = DAYS_OF_WEEK[_periodDayIndex];
       // next day name
@@ -159,7 +159,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         ?.getState()
         .getValue("create-determinant-form", "weekly_schedule");
       const _nextDayConfig = _weekly_schedule?.find(
-        (day: any) => day.day == _nextDayName.value
+        (day: any) => day.day == _nextDayName.value,
       );
 
       if (_nextDayConfig) {
@@ -183,10 +183,10 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         for (let i = 0; i < _nextDayPeriodsCount; i++) {
           const _nextDayPeriod = _nextDayPeriods[i];
           const _nextDayPeriodMinEdge = convertStringToMinutes(
-            _nextDayPeriod.start_time
+            _nextDayPeriod.start_time,
           );
           const _nextDayPeriodMaxEdge = convertStringToMinutes(
-            _nextDayPeriodsMinEdge
+            _nextDayPeriodsMinEdge,
           );
           if (_nextDayPeriodMinEdge < _nextDayPeriodMaxEdge) {
             _nextDayPeriodsMinEdge = _nextDayPeriod.start_time;
@@ -213,11 +213,14 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
 
   const usedDays: string[] = useMemo(() => {
     if (_editedDay) {
-      return DAYS_OF_WEEK.filter((day) => day.value !== _editedDay.day).map(
-        (day) => day.value
+      // When editing, exclude the edited day from usedDays so it remains selectable
+      return (
+        _weekly_schedule
+          ?.filter((day: any) => day.day !== _editedDay.day)
+          ?.map((day: any) => day.day as string) || []
       );
     }
-    return _weekly_schedule?.map((day: any) => day.day as string);
+    return _weekly_schedule?.map((day: any) => day.day as string) || [];
   }, [_weekly_schedule, _editedDay]);
 
   useEffect(() => {
@@ -245,7 +248,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
               lateness_period: period.lateness_period,
               lateness_unit: period.lateness_unit,
             };
-          }
+          },
         );
         SetSelectedDay(_editedDay.day);
         SetDayPeriods(_newPeriods);
@@ -260,13 +263,28 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     };
   }, []);
 
+  const addMinuteToTime = (timeString?: string) => {
+    if (!timeString) return "";
+    const [hours, minutes] = timeString.split(":").map(Number);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return "";
+
+    const totalMinutes = hours * 60 + minutes + 1;
+    if (totalMinutes > 24 * 60) return "";
+
+    const newHours = Math.floor(totalMinutes / 60);
+    const newMinutes = totalMinutes % 60;
+    return `${String(newHours).padStart(2, "0")}:${String(newMinutes).padStart(2, "0")}`;
+  };
+
   //  handle add day period
   const handleAddDayPeriod = () => {
+    const lastPeriod = dayPeriods[dayPeriods.length - 1];
+    const nextStartTime = addMinuteToTime(lastPeriod?.end_time);
     SetDayPeriods([
       ...dayPeriods,
       {
         index: dayPeriods.length + 1,
-        start_time: "",
+        start_time: nextStartTime,
         end_time: "",
       },
     ]);
@@ -315,15 +333,15 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     // update day periods
     SetDayPeriods(
       dayPeriods.map((period) =>
-        period.index === _period.index ? _period : period
-      )
+        period.index === _period.index ? _period : period,
+      ),
     );
   };
 
-  // handle empty day periods
+  // handle edit day periods - switch to edit mode without clearing periods
   const handleEmptyDayPeriods = () => {
     setIsEdit(false);
-    SetDayPeriods([]);
+    // Don't clear periods - keep them for editing
   };
 
   // ** return component ui
