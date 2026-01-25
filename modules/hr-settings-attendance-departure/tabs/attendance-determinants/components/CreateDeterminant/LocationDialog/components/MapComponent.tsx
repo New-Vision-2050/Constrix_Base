@@ -1,6 +1,13 @@
 import React, { useMemo, useEffect, useRef } from "react";
 // @ts-ignore
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Circle,
+  useMapEvents,
+  useMap,
+} from "react-leaflet";
 // @ts-ignore
 import L from "leaflet";
 import "./MapComponent.css";
@@ -9,9 +16,12 @@ import MapSearchControl from "./MapSearchControl";
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
 interface MapComponentProps {
@@ -19,11 +29,16 @@ interface MapComponentProps {
   isDefaultLocation: boolean;
   latitude: string;
   longitude: string;
+  radius: string;
   onMapClick: (latitude: string, longitude: string) => void;
 }
 
 // Component to handle map click events
-function MapClickHandler({ onMapClick }: { onMapClick: (lat: string, lng: string) => void }) {
+function MapClickHandler({
+  onMapClick,
+}: {
+  onMapClick: (lat: string, lng: string) => void;
+}) {
   useMapEvents({
     click: (e: any) => {
       const { lat, lng } = e.latlng;
@@ -33,34 +48,52 @@ function MapClickHandler({ onMapClick }: { onMapClick: (lat: string, lng: string
   return null;
 }
 
+// Component to recenter map when position changes
+function MapCenterUpdater({ position }: { position: [number, number] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(position, map.getZoom());
+  }, [map, position]);
+
+  return null;
+}
+
 export default function MapComponent({
   selectedBranch,
   isDefaultLocation,
   latitude,
   longitude,
+  radius,
   onMapClick,
 }: MapComponentProps) {
   // Default coordinates for Riyadh city, used only when no coordinates are provided
   const DEFAULT_RIYADH_LAT = "24.7136";
   const DEFAULT_RIYADH_LNG = "46.6753";
-  
+
   const latStr = latitude || DEFAULT_RIYADH_LAT;
   const lngStr = longitude || DEFAULT_RIYADH_LNG;
-  
+
+  // Convert radius to number (default 1000 meters)
+  const radiusValue = useMemo(() => {
+    const r = parseFloat(radius);
+    return isNaN(r) || r <= 0 ? 1000 : r;
+  }, [radius]);
+
   // Convert coordinates to numbers
   const position = useMemo(() => {
     const lat = parseFloat(latStr);
     const lng = parseFloat(lngStr);
     return [lat, lng] as [number, number];
   }, [latStr, lngStr]);
-  
+
   // Reference to the map instance
   const mapRef = useRef(null);
-  
+
   // Custom marker icon for selected location
   const customIcon = useMemo(() => {
     return L.divIcon({
-      className: 'custom-marker',
+      className: "custom-marker",
       html: `
         <div style="
           width: 24px; 
@@ -91,7 +124,7 @@ export default function MapComponent({
         <MapContainer
           center={position}
           zoom={13}
-          style={{ height: '100%', width: '100%' }}
+          style={{ height: "100%", width: "100%" }}
           className="rounded-lg"
           ref={mapRef}
           // @ts-ignore - Using whenReady to get map instance - react-leaflet type defs can be inconsistent
@@ -104,12 +137,31 @@ export default function MapComponent({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          
+
           {/* @ts-ignore */}
-          <Marker key={position.toString()} position={position} icon={customIcon} />
-          
+          <Marker
+            key={position.toString()}
+            position={position}
+            icon={customIcon}
+          />
+
+          {/* Circle to show radius */}
+          {/* @ts-ignore */}
+          <Circle
+            center={position}
+            radius={radiusValue}
+            pathOptions={{
+              color: "#ec4899",
+              fillColor: "#ec4899",
+              fillOpacity: 0.2,
+              weight: 2,
+            }}
+          />
+
+          <MapCenterUpdater position={position} />
+
           <MapClickHandler onMapClick={onMapClick} />
-          
+
           <MapSearchControl
             onLocationSelected={onMapClick}
             position="topleft"
@@ -118,7 +170,7 @@ export default function MapComponent({
             autoClose={true}
           />
         </MapContainer>
-        
+
         {/* Default Location Badge */}
         {isDefaultLocation && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
