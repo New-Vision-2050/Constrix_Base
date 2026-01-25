@@ -61,23 +61,23 @@ export const companyProfileMessages = new MessagesGroup({
       assignUsersDialog: new MessagesGroup({
         title: _m("", "صلاحية التعديل علي الفرع"),
         description: _m("", "أعطاء المستخدمين صلاحية التعديل علي الفرع"),
-        cancel: _m("", "الغاء"),
-        assign: _m("", "تعيين"),
-        searchUsers: _m("", "البحث عن مستخدمين"),
-        managerNote: _m("", "مدير الشركة :"),
-        branchManager: _m("", "مدير الفرع :")
+        cancel: _m("Cancel", "الغاء"),
+        assign: _m("Assign", "تعيين"),
+        searchUsers: _m("Search users", "البحث عن مستخدمين"),
+        managerNote: _m("Company Manager", "مدير الشركة :"),
+        branchManager: _m("Branch Manager", "مدير الفرع :")
       })
     })
   }),
   branches: new MessagesGroup({
     assignUsersDialog: new MessagesGroup({
-      title: _m("Branch Edit Permission", ""),
-      description: _m("Give users permission to edit this branch", ""),
-      cancel: _m("Cancel", ""),
-      assign: _m("Assign", ""),
-      searchUsers: _m("Search users", ""),
-      managerNote: _m("Company Manager", ""),
-      branchManager: _m("Branch Manager :", "")
+      title: _m("Branch Edit Permission", "صلاحية التعديل علي الفرع"),
+      description: _m("Give users permission to edit this branch", "أعطاء المستخدمين صلاحية التعديل علي الفرع"),
+      cancel: _m("Cancel", "الغاء"),
+      assign: _m("Assign", "تعيين"),
+      searchUsers: _m("Search users", "البحث عن مستخدمين"),
+      managerNote: _m("Company Manager", "مدير الشركة :"),
+      branchManager: _m("Branch Manager", "مدير الفرع :")
     })
   }),
   officialDocs: new MessagesGroup({
