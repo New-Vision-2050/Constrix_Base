@@ -26,7 +26,7 @@ interface LocationDialogContextType {
   branchLocations: Record<string, BranchLocationData>;
   updateBranchLocation: (
     branchId: string,
-    data: Partial<BranchLocationData>
+    data: Partial<BranchLocationData>,
   ) => void;
   getBranchLocation: (branchId: string) => BranchLocationData;
 }
@@ -51,7 +51,6 @@ export function LocationDialogProvider({
   const [defaultCoordinates, setDefaultCoordinates] = useState<
     Record<string, { latitude: string; longitude: string; radius: string }>
   >({});
-
 
   // Update branches data when branchesData changes
   useEffect(() => {
@@ -95,26 +94,43 @@ export function LocationDialogProvider({
 
   // Initialize branch locations from form values if in edit mode
   useEffect(() => {
-    if (
-      values.branch_locations &&
-      Object.keys(values.branch_locations).length > 0
-    ) {
+    if (values.branch_locations) {
       // Map the branch_locations data to our format
       const existingLocations: Record<string, BranchLocationData> = {};
 
-      Object.entries(values.branch_locations).forEach(
-        ([branchId, locationData]: [string, any]) => {
-          if (locationData) {
-            existingLocations[locationData.branch_id] = {
-              branchId: locationData.branch_id,
-              isDefault: locationData.is_default || false,
+      // Handle string format (from SaveButton JSON.stringify)
+      let locationsArray: any[] = [];
+      if (typeof values.branch_locations === "string") {
+        try {
+          locationsArray = JSON.parse(values.branch_locations);
+        } catch {
+          locationsArray = [];
+        }
+      } else if (Array.isArray(values.branch_locations)) {
+        locationsArray = values.branch_locations;
+      } else if (typeof values.branch_locations === "object") {
+        // Object format from edit mode
+        locationsArray = Object.values(values.branch_locations);
+      }
+
+      locationsArray.forEach((locationData: any) => {
+        if (locationData) {
+          // Support both field naming conventions
+          const branchId = locationData.branch_id || locationData.branchId;
+          if (branchId) {
+            existingLocations[branchId] = {
+              branchId: branchId,
+              isDefault:
+                locationData.is_default ??
+                locationData.isDefaultLocation ??
+                false,
               latitude: locationData.latitude?.toString() || "",
               longitude: locationData.longitude?.toString() || "",
               radius: locationData.radius?.toString() || "100",
             };
           }
         }
-      );
+      });
 
       if (Object.keys(existingLocations).length > 0) {
         setBranchLocations(existingLocations);
@@ -125,7 +141,7 @@ export function LocationDialogProvider({
   // Update branch location data
   const updateBranchLocation = (
     branchId: string,
-    data: Partial<BranchLocationData>
+    data: Partial<BranchLocationData>,
   ) => {
     // If isDefault is true, we need to use the default coordinates from defaultCoordinates
     if (data.isDefault === true) {
@@ -135,7 +151,7 @@ export function LocationDialogProvider({
         longitude: "46.6753",
         radius: "100",
       };
-      
+
       // Update with default coordinates when isDefault is true
       setBranchLocations((prev) => ({
         ...prev,
@@ -161,7 +177,6 @@ export function LocationDialogProvider({
       }));
     }
   };
-
 
   // Get branch location data with defaults
   const getBranchLocation = (branchId: string): BranchLocationData => {
@@ -206,7 +221,7 @@ export function useLocationDialog() {
   const context = useContext(LocationDialogContext);
   if (context === undefined) {
     throw new Error(
-      "useLocationDialog must be used within a LocationDialogProvider"
+      "useLocationDialog must be used within a LocationDialogProvider",
     );
   }
   return context;
