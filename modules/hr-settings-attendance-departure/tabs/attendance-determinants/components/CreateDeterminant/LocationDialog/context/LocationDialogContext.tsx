@@ -147,6 +147,7 @@ export function LocationDialogProvider({
         radius: "100",
       };
 
+      // Update with default coordinates when isDefault is true
       setBranchLocations((prev) => ({
         ...prev,
         [branchId]: {
