@@ -95,10 +95,8 @@ export function LocationDialogProvider({
   // Initialize branch locations from form values if in edit mode
   useEffect(() => {
     if (values.branch_locations) {
-      // Map the branch_locations data to our format
       const existingLocations: Record<string, BranchLocationData> = {};
 
-      // Handle string format (from SaveButton JSON.stringify)
       let locationsArray: any[] = [];
       if (typeof values.branch_locations === "string") {
         try {
@@ -109,17 +107,15 @@ export function LocationDialogProvider({
       } else if (Array.isArray(values.branch_locations)) {
         locationsArray = values.branch_locations;
       } else if (typeof values.branch_locations === "object") {
-        // Object format from edit mode
         locationsArray = Object.values(values.branch_locations);
       }
 
       locationsArray.forEach((locationData: any) => {
         if (locationData) {
-          // Support both field naming conventions
           const branchId = locationData.branch_id || locationData.branchId;
           if (branchId) {
             existingLocations[branchId] = {
-              branchId: branchId,
+              branchId,
               isDefault:
                 locationData.is_default ??
                 locationData.isDefaultLocation ??
@@ -145,7 +141,6 @@ export function LocationDialogProvider({
   ) => {
     // If isDefault is true, we need to use the default coordinates from defaultCoordinates
     if (data.isDefault === true) {
-      // Get the default coordinates for this branch
       const branchDefaults = defaultCoordinates[branchId] || {
         latitude: "24.7136",
         longitude: "46.6753",
@@ -161,12 +156,10 @@ export function LocationDialogProvider({
           isDefault: true,
           latitude: branchDefaults.latitude,
           longitude: branchDefaults.longitude,
-          // Keep the current radius value if it exists, otherwise use data.radius (from request) or default radius
           radius: branchDefaults.radius,
         },
       }));
     } else {
-      // Normal update for other cases
       setBranchLocations((prev) => ({
         ...prev,
         [branchId]: {
@@ -180,14 +173,12 @@ export function LocationDialogProvider({
 
   // Get branch location data with defaults
   const getBranchLocation = (branchId: string): BranchLocationData => {
-    // If we already have stored location data for this branch, return it
     if (branchLocations[branchId]) {
       return branchLocations[branchId];
     }
 
-    // Return default data for branch from the defaultCoordinates if available
     const defaults = defaultCoordinates[branchId] || {
-      latitude: "24.7136", // Riyadh default
+      latitude: "24.7136",
       longitude: "46.6753",
       radius: "100",
     };
