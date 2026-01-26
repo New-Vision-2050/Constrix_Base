@@ -1,5 +1,6 @@
 import { createTableComponent } from "./components/table-component";
 import { TableLayoutComponent } from "./components/table-layout";
+import type { TableLayoutProps } from "./components/table-layout/types";
 import { createTableParamsHook } from "./components/table-params";
 import { createTableStateV2Hook } from "./components/table-state-v2";
 import { createPaginationComponent } from "./components/pagination";
@@ -33,14 +34,29 @@ export type { ColumnVisibilityState } from "./components/column-visibility";
 export function HeadlessTableLayout<TRow>(prefix?: string) {
   const TableComponent = createTableComponent<TRow>();
   const PaginationComponent = createPaginationComponent<TRow>();
-  const SearchComponent = createSearchComponent();
   const useTableParams = createTableParamsHook(prefix);
+  const SearchComponent = createSearchComponent();
   const useTableState = createTableStateV2Hook<TRow>(prefix);
   const useColumnVisibility = createColumnVisibilityHook<TRow>(prefix);
   const TopActionsComponent = createTopActionsComponent<TRow>(SearchComponent);
-  const Layout = TableLayoutComponent;
 
-  const LayoutWithComponents = Layout as typeof Layout & {
+  // Create a new Layout component instance for each call
+  const Layout = Object.assign(
+    function TableLayout(props: TableLayoutProps) {
+      return TableLayoutComponent(props);
+    },
+    {
+      Table: TableComponent,
+      Pagination: PaginationComponent,
+      TopActions: TopActionsComponent,
+      Search: SearchComponent,
+      useTableParams: useTableParams,
+      useTableState: useTableState,
+      useColumnVisibility: useColumnVisibility,
+    },
+  );
+
+  return Layout as typeof TableLayoutComponent & {
     Table: typeof TableComponent;
     Pagination: typeof PaginationComponent;
     TopActions: typeof TopActionsComponent;
@@ -49,16 +65,6 @@ export function HeadlessTableLayout<TRow>(prefix?: string) {
     useTableState: typeof useTableState;
     useColumnVisibility: typeof useColumnVisibility;
   };
-
-  LayoutWithComponents.Table = TableComponent;
-  LayoutWithComponents.Pagination = PaginationComponent;
-  LayoutWithComponents.TopActions = TopActionsComponent;
-  LayoutWithComponents.Search = SearchComponent;
-  LayoutWithComponents.useTableParams = useTableParams;
-  LayoutWithComponents.useTableState = useTableState;
-  LayoutWithComponents.useColumnVisibility = useColumnVisibility;
-
-  return LayoutWithComponents;
 }
 
 // ============================================================================
