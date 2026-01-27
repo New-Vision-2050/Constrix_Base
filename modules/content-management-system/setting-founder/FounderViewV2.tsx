@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import Can from "@/lib/permissions/client/Can";
 import { Button } from "@/components/ui/button";
 import { createColumns } from "./table-v2/columns";
-import { TableFilters } from "./table-v2/filters";
 import { RowActions } from "./table-v2/actions";
 import AddFounderDialog from "./add-founder-dialog";
 import ConfirmDeleteDialog from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
@@ -19,7 +18,7 @@ import { FounderRow } from "./types";
 import { ListFoundersResponse } from "@/services/api/company-dashboard/founders/types/response";
 
 // Create typed table instance
-const FounderTable = HeadlessTableLayout<FounderRow>();
+const FounderTable = HeadlessTableLayout<FounderRow>("csfd");
 
 /**
  * Founder View V2 - HeadlessTable Implementation
@@ -35,9 +34,6 @@ export default function FounderViewV2() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
-
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = FounderTable.useTableParams({
     initialPage: 1,
@@ -46,12 +42,12 @@ export default function FounderViewV2() {
 
   // ✅ STEP 2: Fetch data using useQuery directly
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["founders", params.page, params.limit, searchQuery],
+    queryKey: ["founders", params.page, params.limit, params.search],
     queryFn: async () => {
       const response = await CompanyDashboardFoundersApi.list({
         page: params.page,
         per_page: params.limit,
-        search: searchQuery || undefined,
+        search: params.search || undefined,
       });
       return response.data as ListFoundersResponse;
     },
@@ -60,18 +56,12 @@ export default function FounderViewV2() {
   // Extract data from response with proper typing
   const founders = useMemo<FounderRow[]>(
     () => (data?.payload || []) as unknown as FounderRow[],
-    [data]
+    [data],
   );
 
-  const totalPages = useMemo(
-    () => data?.pagination?.last_page || 1,
-    [data]
-  );
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
 
-  const totalItems = useMemo(
-    () => data?.pagination?.result_count || 0,
-    [data]
-  );
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
 
   // Permission checks
   const canEdit = can(PERMISSIONS.CMS.founder.update);
@@ -97,17 +87,6 @@ export default function FounderViewV2() {
 
   const cancelDelete = () => {
     setDeleteConfirmId(null);
-  };
-
-  // Filter handlers
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    params.setPage(1);
-  };
-
-  const handleReset = () => {
-    setSearchQuery("");
-    params.reset();
   };
 
   // Table columns with actions
@@ -139,7 +118,8 @@ export default function FounderViewV2() {
     params,
     getRowId: (founder) => founder.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
@@ -147,21 +127,28 @@ export default function FounderViewV2() {
       <div className="px-8 space-y-4">
         <FounderTable
           filters={
-            <TableFilters
-              searchQuery={searchQuery}
-              onSearchChange={handleSearchChange}
-              onReset={handleReset}
-              t={tTable}
-              setAddDialogOpen={setAddDialogOpen}
+            <FounderTable.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.CMS.founder.create]}>
+                  <Button onClick={() => setAddDialogOpen(true)}>
+                    {tTable("addFounder")}
+                  </Button>
+                </Can>
+              }
             />
           }
-          table={<FounderTable.Table state={state} loadingOptions={{ rows: 5 }} />}
+          table={
+            <FounderTable.Table state={state} loadingOptions={{ rows: 5 }} />
+          }
           pagination={<FounderTable.Pagination state={state} />}
         />
       </div>
 
       {/* Add/Edit Dialog */}
-      <Can check={[PERMISSIONS.CMS.founder.create, PERMISSIONS.CMS.founder.update]}>
+      <Can
+        check={[PERMISSIONS.CMS.founder.create, PERMISSIONS.CMS.founder.update]}
+      >
         <AddFounderDialog
           open={addDialogOpen || Boolean(editingFounderId)}
           onClose={() => {
