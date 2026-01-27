@@ -10,7 +10,7 @@ import { MapPin } from "lucide-react";
 import React from "react";
 import LocationSelector from "./LocationSelector";
 import { cn } from "@/lib/utils";
-
+import { useTranslations } from "next-intl";
 const defaultKeys = [
   "city_id",
   "state_id",
@@ -42,7 +42,7 @@ const PickupMap = ({
 }) => {
   const [isOpen, handleOpen, handleClose] = useModal();
   const { setValue, getValue } = useFormStore();
-
+const t = useTranslations("companyProfile");
   const handleSaveMap = (obj: Record<string, string | number | undefined>) => {
     if (formId) {
       const keys = keysToUpdate ?? defaultKeys;
@@ -86,7 +86,7 @@ const PickupMap = ({
         <div className="flex w-full items-center gap-2">
           <MapPin className="text-primary w-4" />
           <button onClick={handleOpen} type="button" className="underline">
-            اظهار الموقع من الخريطة
+            {t("header.placeholder.PickupMap")}
           </button>
         </div>
       </div>
@@ -95,8 +95,8 @@ const PickupMap = ({
           <DialogHeader>
             <DialogTitle className="text-center my-5">
               {viewOnly
-                ? "احداثيات موقع العنوان الوطني"
-                : "تعديل احداثيات موقع العنوان الوطني"}
+                ? t("header.placeholder.PickupMap")
+                : t("header.placeholder.EditPickupMap")}
             </DialogTitle>
           </DialogHeader>
           <LocationSelector

@@ -6,6 +6,7 @@ import { useParams } from "@i18n/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
+import {useTranslations} from "next-intl";
 
 type ReqOfficialDataEditProps = {
   officialData: officialData;
@@ -19,10 +20,10 @@ export const ReqOfficialDataEdit = ({
   id,
 }: ReqOfficialDataEditProps) => {
   const queryClient = useQueryClient();
-
+const t = useTranslations("companyProfile");
   const reqOfficialDataEdit: FormConfig = {
     formId: `ReqOfficialDataEdit-${id}-${company_id}`,
-    title: "طلب تعديل البيانات الرسمية",
+    title: t("header.placeholder.OfficialData"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -33,8 +34,8 @@ export const ReqOfficialDataEdit = ({
           {
             type: "select",
             name: "country_id",
-            label: "دولة المركز الرئيسي",
-            placeholder: "اختر دولة المركز الرئيسي",
+            label: t("header.placeholder.country"),
+            placeholder: t("header.placeholder.country"),
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -49,15 +50,15 @@ export const ReqOfficialDataEdit = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل دولة المركز الرئيسي",
+                message: t("header.placeholder.countryRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "company_type_id",
-            label: "كيان الشركة",
-            placeholder: "كيان الشركة",
+            label: t("header.placeholder.companyType"),
+            placeholder: t("header.placeholder.companyType"),
             dynamicOptions: {
               url: `${baseURL}/company_types`,
               valueField: "id",
@@ -72,15 +73,15 @@ export const ReqOfficialDataEdit = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل كيان الشركة",
+                message: t("header.placeholder.companyFieldRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "company_field_id",
-            label: "مجال الشركة",
-            placeholder: "مجال الشركة",
+            label: t("header.placeholder.companyField"),
+            placeholder: t("header.placeholder.companyField"),
             dynamicOptions: {
               url: `${baseURL}/company_fields`,
               valueField: "id",
@@ -95,50 +96,50 @@ export const ReqOfficialDataEdit = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل مجال الشركة",
+                message: t("header.placeholder.companyFieldRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "اسم الشركة",
+            label: t("header.placeholder.companyName"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("header.placeholder.companyName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("header.placeholder.companyNameRequired"),
               },
             ],
           },
           {
             name: "bucket",
-            label: "الباقة",
+            label: t("header.placeholder.bucket"),
             type: "select",
             options: [{ label: "متميز", value: "متميز" }],
             validation: [
               {
                 type: "required",
-                message: "الباقة مطلوبة",
+                message: t("header.placeholder.bucketRequired"),
               },
             ],
           },
           {
             name: "notes",
-            label: "ملاحظات",
+            label: t("header.placeholder.notes"),
             type: "text",
-            placeholder: "ملاحظات",
+            placeholder: t("header.placeholder.notes"),
             validation: [
               {
                 type: "required",
-                message: "الملاحظات مطلوبة",
+                message: t("header.placeholder.notesRequired"),
               },
             ],
           },
           {
             type: "file",
             name: "file",
-            label: "اضافة المرفقات",
+            label: t("header.placeholder.attachFile"),
             isMulti: true,
             fileConfig: {
               allowedFileTypes: [
@@ -169,8 +170,8 @@ export const ReqOfficialDataEdit = ({
       email: officialData?.email ?? "",
       bucket: "متميز",
     },
-    submitButtonText: "ارسال طلب التعديل",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.placeholder.submitRequest"),
+    cancelButtonText: t("header.placeholder.cancel")  ,
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

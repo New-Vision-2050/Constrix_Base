@@ -5,15 +5,16 @@ import { Tab } from "@/types/Tab";
 import { DollarSign, Lock, MapPin, Send, User, Users } from "lucide-react";
 import OfficialData from "../official-data";
 import Branches from "../branches";
-import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import {useTranslations} from "next-intl";
 
 const CompanyProfileTabs = (): Tab[] => {
   const { can } = usePermissions();
+  const t = useTranslations("companyProfile");
   const tabs: (Tab & { show: boolean })[] = [
     {
-      label: "البيانات الرسمية",
+      label: t("header.placeholder.OfficialData"),
       icon: <User size={18} />,
       value: "official-data",
       component: <OfficialData />,
@@ -26,7 +27,7 @@ const CompanyProfileTabs = (): Tab[] => {
       ]),
     },
     {
-      label: "الفروع",
+      label: t("header.placeholder.Branches"),
       icon: <MapPin size={18} />,
       value: "branches",
       component: <Branches />,
@@ -49,10 +50,10 @@ export const CompanyProfile = () => {
 };
 export const CompanyTabs = (): Tab[] => {
   const { can } = usePermissions();
-
+  const t = useTranslations("companyProfile");
   const tabs: (Tab & { show: boolean })[] = [
     {
-      label: "ملف الشركة",
+      label: t("header.placeholder.CompanyProfile"),
       icon: <User size={18} />,
       value: "company",
       component: <CompanyProfile />,
@@ -66,31 +67,31 @@ export const CompanyTabs = (): Tab[] => {
       ]),
     },
     {
-      label: "اعدادات الموقع والتطبيق",
+      label: t("header.placeholder.Location"),
       icon: <Users size={18} />,
       value: "location",
       show: true,
     },
     {
-      label: "المشاريع",
+      label: t("header.placeholder.Projects"),
       icon: <Lock size={18} />,
       value: "projects",
       show: true,
     },
     {
-      label: "البيانات المالية",
+      label: t("header.placeholder.Finance"),
       icon: <DollarSign size={18} />,
       value: "finance",
       show: true,
     },
     {
-      label: "الاجازات",
+      label: t("header.placeholder.Leaves"),
       icon: <Send size={18} />,
       value: "leaves",
       show: true,
     },
     {
-      label: "اجراءات المستخدم",
+      label: t("header.placeholder.UserActions"),
       icon: <Lock size={18} />,
       value: "user-actions",
       show: true,

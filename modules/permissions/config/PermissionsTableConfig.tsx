@@ -2,34 +2,34 @@ import TableStatusSwitcher from "@/components/shared/table-status";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { TableConfig } from "@/modules/table";
 
-export const permissionsTableConfig: () => TableConfig = () => {
+export const permissionsTableConfig: (t: any) => TableConfig = (t) => {
   return {
     url: `${baseURL}/role_and_permissions/permissions`,
     tableId: "permissions-table",
     columns: [
       {
         key: "name",
-        label: "اسم الصلاحية",
+        label: t("header.permissions.name"),
         sortable: true,
       },
       {
         key: "2",
-        label: "فئة الصلاحية",
+        label: t("header.permissions.category"),
         sortable: true,
       },
       {
         key: "user_count",
-        label: "عدد المستخدمين",
+        label: t("header.permissions.userCount"),
         sortable: true,
       },
       {
         key: "status",
-        label: "الحالة",
+        label: t("header.permissions.status"),
         sortable: true,
         render: (_: unknown, row: any) => (
           <TableStatusSwitcher
             id={row.id}
-            label={"نشط"}
+            label={t("header.permissions.active")}
             initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
               return await apiClient.patch(
@@ -40,7 +40,7 @@ export const permissionsTableConfig: () => TableConfig = () => {
               );
             }}
             confirmDescription={(isActive) =>
-              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
+              !isActive ? t("header.permissions.deactivate") : t("header.permissions.activate")
             }
             showDatePicker={() => false}
           />

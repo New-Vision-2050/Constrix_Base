@@ -1,56 +1,57 @@
 import PickupMap from "@/components/shared/pickup-map";
 import { CompanyAddress } from "@/modules/company-profile/types/company";
 import FieldPreview from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
-import { CircleCheckIcon, MapPin } from "lucide-react";
+import { CircleCheckIcon } from "lucide-react";
 import React from "react";
-
+import { useTranslations } from "next-intl";
 const NationalAddressDataPreview = ({
   companyAddress,
 }: {
   companyAddress: CompanyAddress;
 }) => {
+  const t = useTranslations("companyProfile.header.Label");
   const previewData = [
     {
       valid: Boolean(companyAddress.country_name),
-      label: "الدولة",
+      label: t("Country"),
       value: companyAddress.country_name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(companyAddress.state_name),
-      label: "المنطقة",
+      label: t("State"),
       value: companyAddress.state_name ?? "",
     },
     {
       valid: Boolean(companyAddress.city_name),
-      label: "المدينة",
+      label: t("City"),
       value: companyAddress.city_name ?? "",
     },
     {
       valid: Boolean(companyAddress.neighborhood_name),
-      label: "الحي",
+      label: t("Neighborhood"),
       value: companyAddress.neighborhood_name ?? "",
     },
 
     {
       valid: Boolean(companyAddress.building_number),
-      label: "رقم المبنى",
+      label: t("BuildingNumber"),
       value: companyAddress.building_number ?? "",
     },
     {
       valid: Boolean(companyAddress.additional_phone),
-      label: "الرقم الاضافي",
+      label: t("AdditionalPhone"),
       value: companyAddress.additional_phone ?? "",
     },
 
     {
       valid: Boolean(companyAddress.postal_code),
-      label: "الرمز البريدي",
+      label: t("PostalCode"),
       value: companyAddress.postal_code ?? "",
     },
     {
       valid: Boolean(companyAddress.street_name),
-      label: "الشارع",
+      label: t("Street"),
       value: companyAddress.street_name ?? "",
     },
   ];

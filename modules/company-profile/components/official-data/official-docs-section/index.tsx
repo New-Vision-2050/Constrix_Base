@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import SettingsIcon from "@/public/icons/settings";
-import { useLocale } from "next-intl";
+import {useLocale, useTranslations} from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/config/axios-config";
 import { ServerSuccessResponse } from "@/types/ServerResponse";
@@ -34,6 +34,7 @@ const OfficialDocsSection = ({
   id?: string;
   currentCompanyId?: string;
 }) => {
+  const t = useTranslations("companyProfile");
   const { data, isPending, isSuccess, refetch } = useOfficialDocsData(
     id,
     currentCompanyId
@@ -55,11 +56,11 @@ const OfficialDocsSection = ({
 
   const dropdownItems = [
     {
-      label: "اضافة مستند رسمي",
+      label: t("header.placeholder.AddOfficialDocument"),
       onClick: handleOpenAddDoc,
     },
     {
-      label: "اعدادات المستندات",
+      label: t("header.placeholder.DocsSettings"),
       onClick: handleOpenSettings,
     },
   ];
@@ -76,7 +77,7 @@ const OfficialDocsSection = ({
 
       {isSuccess && (
         <FormFieldSet
-          title="المستندات الرسمية"
+          title={t("header.placeholder.OfficialDocument")}
           valid={
             !!companyOfficialDocuments && companyOfficialDocuments.length > 0
           }
@@ -112,7 +113,7 @@ const OfficialDocsSection = ({
             <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
               <InfoIcon additionClass="text-orange-500 " />
               <p className="text-center px-5">
-                يجب اضافة مستند رسمي واحد على الاقل
+                {t("header.placeholder.AddOfficialDocumentRequired")}
               </p>
             </div>
           )}

@@ -1,12 +1,15 @@
+"use client";
+
 import React from "react";
 import { officialData } from "@/modules/company-profile/types/company";
 import PreviewField from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
-
+import { useTranslations } from "next-intl";
 const OfficialDataPreview = ({
   officialData,
 }: {
   officialData: officialData;
 }) => {
+  const t = useTranslations("companyProfile");
   const {
     branch,
     name,
@@ -22,36 +25,36 @@ const OfficialDataPreview = ({
 
   const previewData = [
     {
-      label: "اسم الشركة",
+      label: t("header.Label.CompanyName"),
       value: name ?? "",
       valid: Boolean(name),
       needRequest: true,
     },
     {
       valid: Boolean(branch),
-      label: "اسم الفرع",
+      label: t("header.Label.Branch"),
       value: branch ?? "",
     },
     {
       valid: Boolean(name_en),
-      label: "اسم الشركة بالانجليزي",
+      label: t("header.Label.CompanyNameEnglish"),
       value: name_en ?? "",
       containerClassName: "col-span-2",
     },
     {
       valid: Boolean(company_type),
-      label: "كيان الشركة",
+      label: t("header.Label.CompanyType"),
       value: company_type ?? "",
     },
     {
       valid: Boolean(country_name),
-      label: "دولة المركز الرئيسي",
+      label: t("header.Label.MainCountry"),
       value: country_name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(company_field) && company_field?.length > 0,
-      label: "مجال الشركة",
+      label: t("header.Label.CompanyField"),
       value: Boolean(company_field)
         ? company_field?.map((field) => field?.name).join(" , ")
         : "",
@@ -59,23 +62,23 @@ const OfficialDataPreview = ({
     },
     {
       valid: Boolean(phone),
-      label: "رقم الجوال",
+      label: t("header.Label.Phone"),
       value: phone ?? "",
     },
     {
       valid: Boolean(email),
-      label: "البريد الالكتروني",
+      label: t("header.Label.Email"),
       value: email ?? "",
     },
     {
       valid: Boolean(company_access_programs),
-      label: "البرنامج",
+      label: t("header.Label.Program"),
       value: company_access_programs?.[0]?.name ?? "",
       needRequest: true,
     },
     {
       valid: Boolean(packages),
-      label: "الباقة",
+      label: t("header.Label.Bucket"),
       value: packages?.[0]?.name ?? "",
       needRequest: true,
     },

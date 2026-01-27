@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import PickupMap from "../../../../../components/shared/pickup-map";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
-
+import { useTranslations } from "next-intl";
 export const NationalAddressFormConfig = (
   companyAddress?: CompanyAddress,
   id?: string,
@@ -13,10 +13,11 @@ export const NationalAddressFormConfig = (
 ) => {
   const formId = `NationalAddressFormConfig-${id}-${company_id}`;
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
 
   const NationalAddressFormConfig: FormConfig = {
     formId,
-    title: "اضافة بيان قانوني",
+    title:t("header.Label.NationalAddress"),
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -27,7 +28,7 @@ export const NationalAddressFormConfig = (
         columns: 2,
         fields: [
           {
-            label: "تعديل الموقع من الخريطة",
+            label: t("header.placeholder.PickupMap"),
             name: "map",
             type: "text",
             render: () => (
@@ -64,16 +65,16 @@ export const NationalAddressFormConfig = (
           },
           {
             name: "country_name",
-            label: "الدولة",
+            label: t("header.Label.Country"),
             type: "text",
-            placeholder: "الدولة",
+            placeholder: t("header.placeholder.Country"),
             disabled: true,
           },
           {
             type: "select",
             name: "state_id",
-            label: "المنطقة",
-            placeholder: "المنطقة",
+            label: t("header.Label.State"),
+            placeholder: t("header.placeholder.State"),
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -90,15 +91,15 @@ export const NationalAddressFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل المنطقة",
+                message: t("header.placeholder.State"),
               },
             ],
           },
           {
             type: "select",
             name: "city_id",
-            label: "المدينة",
-            placeholder: "المدينة",
+            label: t("header.Label.City"),
+            placeholder: t("header.placeholder.City"),
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -115,71 +116,71 @@ export const NationalAddressFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل المدينة",
+                message: t("header.placeholder.City"),
               },
             ],
           },
           {
             name: "neighborhood_name",
-            label: "الحي",
+            label: t("header.Label.Neighborhood"),
             type: "text",
-            placeholder: "الحي",
+            placeholder: t("header.placeholder.Neighborhood") ,
             validation: [
               {
                 type: "required",
-                message: "الحي مطلوب",
+                message: t("header.placeholder.Neighborhood"),
               },
             ],
           },
           {
             name: "building_number",
-            label: "رقم المبنى",
+            label: t("header.Label.BuildingNumber"),
             type: "text",
-            placeholder: "رقم المبنى",
+            placeholder: t("header.placeholder.BuildingNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم المبنى مطلوب",
+                message: t("header.placeholder.BuildingNumber"),
               },
             ],
           },
           {
             name: "additional_phone",
-            label: "الرقم الاضافي",
+            label: t("header.Label.AdditionalPhone"),
             type: "phone",
-            placeholder: "الرقم الاضافي",
+            placeholder: t("header.placeholder.AdditionalPhone"),
             validation: [
               {
                 type: "phone",
-                message: "رقم الهاتف غير صالح",
+                message: t("header.placeholder.AdditionalPhoneInvalid"),
               },
               {
                 type: "required",
-                message: "الرقم الاضافي مطلوب",
+                message: t("header.placeholder.AdditionalPhoneRequired"),
               },
             ],
           },
           {
             name: "postal_code",
-            label: "الرمز البريدي",
+            label: t("header.Label.PostalCode"),
             type: "text",
-            placeholder: "الرمز البريدي",
+            placeholder: t("header.placeholder.PostalCode"),
             validation: [
               {
                 type: "required",
-                message: "الرمز البريدي مطلوب",
+                message: t("header.placeholder.PostalCodeRequired"),
               },
             ],
           },
           {
             name: "street_name",
-            label: "الشارع",
+            label: t("header.Label.Street"),
             type: "text",
-            placeholder: "الشارع",
+            placeholder: t("header.placeholder.Street"),
             validation: [
               {
                 type: "required",
-                message: "الشارع مطلوب",
+                message: t("header.placeholder.StreetRequired")   ,
               },
             ],
           },
@@ -199,8 +200,8 @@ export const NationalAddressFormConfig = (
       longitude: companyAddress?.country_long ?? "",
       latitude: companyAddress?.country_lat ?? "",
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

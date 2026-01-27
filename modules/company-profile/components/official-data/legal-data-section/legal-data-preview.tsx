@@ -4,12 +4,14 @@ import FieldPreview, {
 } from "@/modules/user-profile/components/tabs/user-contract/tabs/components/previewTextField";
 import { FilePlus } from "lucide-react";
 import { RegistrationTypes } from "./registration-types";
+import { useTranslations } from "next-intl";
 
 const LegalDataPreview = ({
   companyLegalData,
 }: {
   companyLegalData: CompanyLegalData[];
 }) => {
+  const t = useTranslations("companyProfile");
   console.log("companyLegalData", { companyLegalData });
   const previewData = companyLegalData?.map((obj) => {
     const showRegisterNumber =
@@ -17,7 +19,7 @@ const LegalDataPreview = ({
     return [
       {
         valid: Boolean(obj?.registration_type),
-        label: "نوع التسجل",
+        label: t("header.placeholder.RegistrationType"),
         value: obj?.registration_type,
         needRequest: true,
         containerClassName: "col-span-4",
@@ -25,7 +27,7 @@ const LegalDataPreview = ({
       },
       {
         valid: Boolean(obj?.registration_number),
-        label: " رقم السجل التجاري / رقم الـ 700",
+        label: t("header.placeholder.RegistrationNumber"),
         needRequest: true,
         value: obj?.registration_number,
         containerClassName: "col-span-2",
@@ -33,7 +35,7 @@ const LegalDataPreview = ({
       },
       {
         valid: Boolean(obj?.start_date),
-        label: "تاريخ الإصدار",
+        label: t("header.placeholder.IssueDate"),
         type: "date" as PreviewTextFieldType,
         value: obj?.start_date
           ? new Date(obj.start_date).toLocaleDateString("en-GB")
@@ -43,7 +45,7 @@ const LegalDataPreview = ({
       },
       {
         valid: Boolean(obj?.end_date),
-        label: "تاريخ الانتهاء",
+        label: t("header.placeholder.ExpiryDate"),
         value: obj?.end_date
           ? new Date(obj.end_date).toLocaleDateString("en-GB")
           : "",
@@ -52,7 +54,7 @@ const LegalDataPreview = ({
           <div className="flex items-stretch gap-3">
             <FieldPreview
               valid={true}
-              label="تاريخ الانتهاء"
+              label={t("header.placeholder.ExpiryDate")}
               type="date"
               value={
                 obj?.end_date
