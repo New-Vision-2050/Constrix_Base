@@ -8,14 +8,17 @@ import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { apiClient, baseURL } from "@/config/axios-config";
 import { createColumns } from "./columns";
-import { TableFilters } from "./filters";
-import { RowActions } from "./actions";
 import { CategoryRow } from "./types";
 import AddCategoryDialog from "@/modules/stores/components/dialogs/add-category";
 import ConfirmDeleteDialog from "@/modules/company-profile/components/official-data/official-docs-section/docs-settings-dialog/AddDocumentType/ConfirmDeleteDialog";
+import Can from "@/lib/permissions/client/Can";
+import DialogTrigger from "@/components/headless/dialog-trigger";
+import CustomMenu from "@/components/headless/custom-menu";
+import { Box, Button, MenuItem, Typography } from "@mui/material";
+import { EditIcon, Trash2 } from "lucide-react";
 
 // Create typed table instance
-const CategoriesTable = HeadlessTableLayout<CategoryRow>();
+const CategoriesTable = HeadlessTableLayout<CategoryRow>("smct");
 
 /**
  * Main Categories Table V2 - HeadlessTable Implementation
@@ -27,12 +30,10 @@ export function MainCategoriesTableV2() {
   const t = useTranslations("stores.mainCategories");
 
   // Dialog states
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
+    null,
+  );
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
 
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = CategoriesTable.useTableParams({
@@ -50,11 +51,11 @@ export function MainCategoriesTableV2() {
       params.limit,
       params.sortBy,
       params.sortDirection,
-      searchQuery,
+      params.search,
     ],
     queryFn: async () => {
       const response = await apiClient.get(
-        `${baseURL}/ecommerce/dashboard/categories?depth=0&page=${params.page}&per_page=${params.limit}&search=${searchQuery || ""}&sort_by=${params.sortBy}&sort_direction=${params.sortDirection}`
+        `${baseURL}/ecommerce/dashboard/categories?depth=0&page=${params.page}&per_page=${params.limit}&search=${params.search || ""}&sort_by=${params.sortBy}&sort_direction=${params.sortDirection}`,
       );
       const result = await response.data;
       return result;
@@ -62,20 +63,11 @@ export function MainCategoriesTableV2() {
   });
 
   // Extract data from response
-  const categories = useMemo<CategoryRow[]>(
-    () => data?.payload || [],
-    [data]
-  );
+  const categories = useMemo<CategoryRow[]>(() => data?.payload || [], [data]);
 
-  const totalPages = useMemo(
-    () => data?.pagination?.last_page || 1,
-    [data]
-  );
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
 
-  const totalItems = useMemo(
-    () => data?.pagination?.result_count || 0,
-    [data]
-  );
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
 
   // Permission checks
   const canEdit = can(PERMISSIONS.ecommerce.category.update);
@@ -89,7 +81,9 @@ export function MainCategoriesTableV2() {
   const confirmDelete = async () => {
     if (!deleteConfirmId) return;
     try {
-      await apiClient.delete(`${baseURL}/ecommerce/dashboard/categories/${deleteConfirmId}`);
+      await apiClient.delete(
+        `${baseURL}/ecommerce/dashboard/categories/${deleteConfirmId}`,
+      );
       refetch();
       setDeleteConfirmId(null);
     } catch (error) {
@@ -101,17 +95,6 @@ export function MainCategoriesTableV2() {
     setDeleteConfirmId(null);
   };
 
-  // Filter handlers
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    params.setPage(1);
-  };
-
-  const handleReset = () => {
-    setSearchQuery("");
-    params.reset();
-  };
-
   // Table columns with actions
   const columns = [
     ...createColumns(t),
@@ -120,14 +103,30 @@ export function MainCategoriesTableV2() {
       name: t("table.actions"),
       sortable: false,
       render: (row: CategoryRow) => (
-        <RowActions
-          row={row}
-          onEdit={setEditingCategoryId}
-          onDelete={handleDeleteClick}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          t={t}
-        />
+        <CustomMenu
+          renderAnchor={({ onClick }) => (
+            <Button onClick={onClick}>{t("table.actions")}</Button>
+          )}
+        >
+          <MenuItem
+            disabled={!canEdit}
+            onClick={() => {
+              setEditingCategoryId(row.id);
+            }}
+          >
+            <EditIcon className="w-4 h-4 ml-2" />
+            {t("table.edit")}
+          </MenuItem>
+          <MenuItem
+            disabled={!canDelete}
+            onClick={() => {
+              handleDeleteClick(row.id);
+            }}
+          >
+            <Trash2 className="w-4 h-4 ml-2" />
+            {t("table.delete")}
+          </MenuItem>
+        </CustomMenu>
       ),
     },
   ];
@@ -141,23 +140,44 @@ export function MainCategoriesTableV2() {
     params,
     getRowId: (category) => category.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
     <>
       <CategoriesTable
         filters={
-          <TableFilters
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            onReset={handleReset}
-            t={t}
-            setAddDialogOpen={setAddDialogOpen}
-            refetch={refetch}
-          />
+          <CategoriesTable.TopActions
+            state={state}
+            customActions={
+              <Can check={[PERMISSIONS.ecommerce.category.create]}>
+                <DialogTrigger
+                  component={AddCategoryDialog}
+                  dialogProps={{
+                    onSuccess: () => {
+                      refetch();
+                    },
+                  }}
+                  render={({ onOpen }) => (
+                    <Button variant="contained" onClick={onOpen}>
+                      {t("table.add")}
+                    </Button>
+                  )}
+                />
+              </Can>
+            }
+          >
+            <Box>
+              <Typography variant="h6" sx={{ my: 4 }}>
+                {t("title")}
+              </Typography>
+            </Box>
+          </CategoriesTable.TopActions>
         }
-        table={<CategoriesTable.Table state={state} loadingOptions={{ rows: 5 }} />}
+        table={
+          <CategoriesTable.Table state={state} loadingOptions={{ rows: 5 }} />
+        }
         pagination={<CategoriesTable.Pagination state={state} />}
       />
 
