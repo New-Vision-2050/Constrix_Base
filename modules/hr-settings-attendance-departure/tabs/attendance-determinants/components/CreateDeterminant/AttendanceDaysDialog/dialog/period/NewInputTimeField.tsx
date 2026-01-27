@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Select,
   SelectContent,
@@ -40,7 +40,7 @@ const normalizeTimeValue = (input?: string) => {
 
   const normalizedHour = Number.isNaN(Number(hourPart))
     ? ""
-    : String(parseInt(hourPart, 10));
+    : String(parseInt(hourPart, 10)).padStart(2, "0");
   const normalizedMinute = minutePart.padStart(2, "0");
 
   return { hour: normalizedHour, minute: normalizedMinute };
@@ -63,11 +63,22 @@ const NewInputTimeField = ({
     initialTime.minute,
   );
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const isInternalUpdate = useRef(false);
+  const lastSentValue = useRef(value);
+
   // Sync state with value prop when it changes (for edit mode)
   useEffect(() => {
+    if (isInternalUpdate.current) {
+      isInternalUpdate.current = false;
+      return;
+    }
     const normalized = normalizeTimeValue(value);
     setSelectedHour(normalized.hour);
     setSelectedMinute(normalized.minute);
+    lastSentValue.current = value;
   }, [value]);
 
   const previousPeriod = useMemo(() => {
@@ -169,11 +180,13 @@ const NewInputTimeField = ({
   useEffect(() => {
     if (selectedHour && selectedMinute) {
       const newTimeValue = `${selectedHour.padStart(2, "0")}:${selectedMinute}`;
-      if (newTimeValue !== value) {
-        onChange(newTimeValue);
+      if (newTimeValue !== lastSentValue.current) {
+        lastSentValue.current = newTimeValue;
+        isInternalUpdate.current = true;
+        onChangeRef.current(newTimeValue);
       }
     }
-  }, [selectedHour, selectedMinute, onChange, value]);
+  }, [selectedHour, selectedMinute]);
 
   // Componente de selección de hora
   const hourSelect = (
