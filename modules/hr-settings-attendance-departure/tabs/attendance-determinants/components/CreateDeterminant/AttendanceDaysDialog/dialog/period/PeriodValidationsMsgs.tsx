@@ -18,7 +18,8 @@ const convertTimeToMinutes = (timeString: string): number => {
 };
 
 export default function PeriodValidationsMsgs({ t, period }: PropsT) {
-  const { handleUpdateDayPeriod, maxEdge,extendsToNextDayMsg } = useAttendanceDayCxt();
+  const { handleUpdateDayPeriod, maxEdge, extendsToNextDayMsg } =
+    useAttendanceDayCxt();
 
   // handle change
   const handleChange = (checked: boolean) => {
@@ -35,20 +36,18 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
         end_time: "",
       });
     } else {
-      // Normal update
-      console.log("Normal update checked", checked,period);
+      // Normal update - don't force end_time, let user select
       handleUpdateDayPeriod({
         ...period,
-        end_time: "00:00",
         extends_to_next_day: checked,
       });
-    } 
+    }
   };
 
   return (
     <div className="text-xs mt-1 flex flex-col gap-2">
       <span className="italic text-gray-500">{t("timeFormatError")}</span>
-      {maxEdge == period.end_time && (
+      {(maxEdge == period.end_time || period.extends_to_next_day) && (
         <div className="flex gap-1 items-center">
           <Checkbox
             id="extends-next-day"
@@ -66,7 +65,9 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
       {/* warning message if extends_to_next_day is checked and end_time is less than start_time */}
       {period.extends_to_next_day && (
         <div className="flex gap-1 flex-col">
-          <span className="italic text-gray-500">{t("extendsToNextDayWarning")}</span>
+          <span className="italic text-gray-500">
+            {t("extendsToNextDayWarning")}
+          </span>
           <span className="italic text-yellow-500">{extendsToNextDayMsg}</span>
         </div>
       )}
