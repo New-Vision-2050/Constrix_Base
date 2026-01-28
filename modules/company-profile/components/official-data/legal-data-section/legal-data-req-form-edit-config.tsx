@@ -1,9 +1,9 @@
 import { FormConfig } from "@/modules/form-builder";
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { CompanyLegalData } from "@/modules/company-profile/types/company";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
-import { RegistrationTypes } from "./registration-types";
+import { useTranslations } from "next-intl";
 
 type LegalDataReqFormEditConfigProps = {
   companyLegalData: CompanyLegalData[];
@@ -17,9 +17,10 @@ export const LegalDataReqFormEditConfig = ({
   id,
 }: LegalDataReqFormEditConfigProps) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
   const LegalDataReqFormEditConfig: FormConfig = {
     formId: `LegalDataReqFormEditConfig-${id}-${company_id}`,
-    title: "طلب تعديل البيان القانوني",
+    title: t("header.placeholder.RequestEditLegalData"),
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -38,8 +39,8 @@ export const LegalDataReqFormEditConfig = ({
                 {
                   type: "select",
                   name: "registration_type_id",
-                  label: "نوع التسجل",
-                  placeholder: "نوع التسجل",
+                  label: t("header.placeholder.RegistrationType"),
+                  placeholder: t("header.placeholder.RegistrationType"),
                   dynamicOptions: {
                     url: `${baseURL}/company_registration_types`,
                     valueField: "id",
@@ -54,15 +55,15 @@ export const LegalDataReqFormEditConfig = ({
                   validation: [
                     {
                       type: "required",
-                      message: "ادخل نوع التسجل",
+                      message: t("header.placeholder.RegistrationTypeRequired"),
                     },
                   ],
                 },
                 {
                   name: "registration_number",
-                  label: "رقم السجل التجاري / رقم الـ 700",
+                  label: t("header.placeholder.RegistrationNumber"),
                   type: "number",
-                  placeholder: "رقم السجل التجاري / رقم الـ 700",
+                  placeholder: t("header.placeholder.RegistrationNumber"),
                   // condition: (values) => {
                   //   console.log("values", values);
                   //   // Disable the field if registration_type_id is 3 (Without Commercial Register)
@@ -74,7 +75,7 @@ export const LegalDataReqFormEditConfig = ({
                     {
                       type: "pattern",
                       value: /^700\d*$/,
-                      message: "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط",
+                      message: t("header.placeholder.RegistrationNumberPattern"),
                     },
                   ],
                 },
@@ -97,8 +98,8 @@ export const LegalDataReqFormEditConfig = ({
     initialValues: {
       data: companyLegalData,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.Label.Save"),
+    cancelButtonText: t("header.Label.Cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
@@ -106,7 +107,7 @@ export const LegalDataReqFormEditConfig = ({
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const obj = formData?.data.map((obj: any) => ({
+      const obj = (formData?.data as unknown[]).map((obj: any) => ({
         id: obj.id,
         registration_type_id: obj.registration_type_id,
         registration_number: obj.registration_number,

@@ -14,6 +14,7 @@ import ChartStaticIcon from "@/public/icons/chart-static";
 import CheckStatic from "@/public/icons/check-static";
 import PersonStaticIcon from "@/public/icons/person-static";
 import React, { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const statisticsConfig = {
   url: `${baseURL}/role_and_permissions/roles/widgets`,
@@ -26,6 +27,7 @@ const statisticsConfig = {
 };
 
 const RolesPages = () => {
+  const t = useTranslations("companyProfile");
   const [isOpen, handleOpen, handleClose] = useModal();
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
 
@@ -61,7 +63,7 @@ const RolesPages = () => {
         searchBarActions={
           <>
             <Can check={[PERMISSIONS.role.create]}>
-              <Button onClick={() => handleOpenRolesSheet({})}>انشاء</Button>
+              <Button onClick={() => handleOpenRolesSheet({})}>{t("header.rules.create")}</Button>
             </Can>
 
             <UpdateRoleDrawer

@@ -2,9 +2,8 @@ import { baseURL } from "@/config/axios-config";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@i18n/navigation";
 import { serialize } from "object-to-formdata";
-import { RegistrationTypes } from "../legal-data-section/registration-types";
+import { useTranslations } from "next-intl";
 
 export const AddDocFormConfig = (
   id?: string,
@@ -12,10 +11,11 @@ export const AddDocFormConfig = (
   onClose?: () => void
 ) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
 
   const AddDocFormConfig: FormConfig = {
     formId: `AddDocFormConfig-${id}-${company_id}`,
-    title: "اضافة مستند رسمي",
+    title: t("header.placeholder.AddOfficialDocument"),
     apiUrl: `${baseURL}/companies/company-profile/official-document`,
     laravelValidation: {
       enabled: true,
@@ -27,8 +27,8 @@ export const AddDocFormConfig = (
           {
             type: "select",
             name: "document_type_id",
-            label: "نوع المستند",
-            placeholder: "نوع المستند",
+            label: t("header.placeholder.DocumentType"),
+            placeholder: t("header.placeholder.DocumentType"),
             dynamicOptions: {
               url: `${baseURL}/document_types`,
               valueField: "id",
@@ -43,45 +43,40 @@ export const AddDocFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل نوع المستند",
+                message: t("header.placeholder.DocumentTypeRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "اسم المستند",
+            label: t("header.placeholder.DocumentName"),
             type: "text",
-            placeholder: "ادخل اسم المستند",
+            placeholder: t("header.placeholder.DocumentNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل الوصف",
+                message: t("header.placeholder.DescriptionPlaceholder"),
               },
             ],
           },
           {
             name: "description",
-            label: "الوصف",
+            label: t("header.placeholder.Description"),
             type: "text",
-            placeholder: "ادخل الوصف",
+            placeholder: t("header.placeholder.DescriptionPlaceholder"),
           },
           {
             name: "document_number",
-            label: "رقم المستند",
+            label: t("header.placeholder.DocumentNumber"),
             type: "text",
-            placeholder: "ادخل رقم المستند",
-            condition: (values) => {
-              // Disable the field if registration_type_id is 3 (Without Commercial Register)
-              const typeId = values["document_type_id"]?.split("_")?.[1];
-              return typeId !== RegistrationTypes.WithoutARegister;
-            },
+            placeholder: t("header.placeholder.DocumentNumberPlaceholder"),
           },
           {
             name: "start_date",
-            label: "تاريخ الإصدار",
+            label: t("header.placeholder.IssueDate"),
             type: "date",
-            placeholder: "تاريخ الإصدار",
+            placeholder: t("header.placeholder.IssueDate"),
             maxDate: {
               formId: `AddDocFormConfig-${id}-${company_id}`,
               field: "end_date",
@@ -89,15 +84,15 @@ export const AddDocFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الاصدار",
+                message: t("header.placeholder.IssueDateRequired"),
               },
             ],
           },
           {
             name: "end_date",
-            label: "تاريخ الانتهاء",
+            label: t("header.placeholder.ExpiryDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("header.placeholder.ExpiryDate"),
             minDate: {
               formId: `AddDocFormConfig-${id}-${company_id}`,
               field: "start_date",
@@ -109,11 +104,11 @@ export const AddDocFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الانتهاء",
+                message: t("header.placeholder.ExpiryDateRequired"),
               },
             ],
             onChange: (value) => {
-              const endDate = new Date(value);
+              const endDate = new Date(value as string);
               endDate.setDate(endDate.getDate() - 7);
               const notificationDate = endDate.toLocaleDateString("en-CA");
               useFormStore
@@ -125,9 +120,9 @@ export const AddDocFormConfig = (
           },
           {
             name: "notification_date",
-            label: "تاريخ الاشعار",
+            label: t("header.placeholder.NotificationDate"),
             type: "date",
-            placeholder: "تاريخ الاشعار",
+            placeholder: t("header.placeholder.NotificationDate"),
             minDate: {
               formId: `AddDocFormConfig-${id}-${company_id}`,
               field: "start_date",
@@ -140,43 +135,38 @@ export const AddDocFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الاشعار",
+                message: t("header.placeholder.NotificationDateRequired"),
               },
             ],
           },
           {
             type: "file",
             name: "files",
-            label: "اضافة مستندات",
+            label: t("header.placeholder.AddDocuments"),
             validation: [
               {
                 type: "required",
-                message: "يجب ادخال مرفق على الاقل",
+                message: t("header.placeholder.AtLeastOneAttachment"),
               },
             ],
             isMulti: true,
             fileConfig: {
               allowedFileTypes: [
-                "application/pdf", // pdf
-                "application/msword", // doc
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
-                "image/jpeg", // jpeg & jpg
-                "image/png", // png
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "image/jpeg",
+                "image/png",
               ],
-              maxFileSize: 5 * 1024 * 1024, // 10MB
+              maxFileSize: 5 * 1024 * 1024,
               showThumbnails: true,
-              // If you have an upload endpoint, you can specify it here
-              // uploadUrl: "/api/upload-file",
-              // uploadHeaders: {
-              //   Authorization: "Bearer your-token",
-              // },
             },
           },
         ],
       },
     ],
-    submitButtonText: "إضافة",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.placeholder.Add"),
+    cancelButtonText: t("header.Label.Cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
@@ -186,13 +176,11 @@ export const AddDocFormConfig = (
     onSubmit: async (formData) => {
       const sendForm = serialize({
         ...formData,
-        document_type_id: (formData.document_type_id as string)?.split(
-          "_"
-        )?.[0],
-        start_date: new Date(formData.start_date).toLocaleDateString("en-CA"),
-        end_date: new Date(formData.end_date).toLocaleDateString("en-CA"),
+        document_type_id: (formData.document_type_id as string)?.split("_")?.[0],
+        start_date: new Date(formData.start_date as string).toLocaleDateString("en-CA"),
+        end_date: new Date(formData.end_date as string).toLocaleDateString("en-CA"),
         notification_date: new Date(
-          formData.notification_date
+          formData.notification_date as string
         ).toLocaleDateString("en-CA"),
       });
 

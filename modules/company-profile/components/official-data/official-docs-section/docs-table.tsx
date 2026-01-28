@@ -8,16 +8,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
-import CopyIcon from "@/public/icons/copy";
 import FolderIcon from "@/public/icons/folder";
 import ImageIcon from "@/public/icons/image-icon";
 import { Trash } from "lucide-react";
 import UserActivityLog from "./show-table";
 import CopyButton from "@/components/shared/CopyButton";
 import { CompanyDocument } from "@/modules/company-profile/types/company";
-import { useState } from "react";
 import { SheetFormBuilder } from "@/modules/form-builder";
-import { updateDocsFormConfig } from "./update-docs-form-config";
+import { useUpdateDocsFormConfig } from "./update-docs-form-config";
 import { baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
@@ -44,6 +42,8 @@ const DocTableRow = ({
 
   const queryClient = useQueryClient();
 
+  const config = useUpdateDocsFormConfig(doc, id, onSuccess);
+
   return (
     <>
       <tr>
@@ -66,7 +66,7 @@ const DocTableRow = ({
         <td className="py-3 px-3 border-b">{doc.notification_date}</td>
         <td className="py-3 px-3 border-b">
           <div className="flex items-center gap-1">
-            {doc.files?.slice(0, 4).map((file, index) => {
+            {doc.files?.slice(0, 4).map((file) => {
               // Determine icon based on mime_type
               const getFileIcon = () => {
                 if (file.mime_type.includes("pdf")) {
@@ -129,7 +129,7 @@ const DocTableRow = ({
         <td className="py-3 px-3 border-b">
           <div className="flex gap-2 items-center">
             <SheetFormBuilder
-              config={updateDocsFormConfig(doc, id, onSuccess)}
+              config={config}
               trigger={
                 <button
                   disabled={Boolean(doc?.company_legal_data)}

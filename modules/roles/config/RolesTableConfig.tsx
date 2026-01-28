@@ -3,6 +3,7 @@ import { apiClient, baseURL } from "@/config/axios-config";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Edit } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export const useRolesTableConfig = ({
   handleOpenRolesSheet,
@@ -16,38 +17,39 @@ export const useRolesTableConfig = ({
   }) => void;
 }) => {
   const { can } = usePermissions();
+  const t = useTranslations("companyProfile");
   return {
     url: `${baseURL}/role_and_permissions/roles`,
     tableId: "roles-table",
     columns: [
       {
         key: "name",
-        label: "اسم الدور",
+        label: t("header.rules.name"),
         sortable: true,
       },
       {
         key: "programs_count",
-        label: "عدد البرامج",
+        label: t("header.rules.programsCount"),
         sortable: true,
       },
       {
         key: "permission_count",
-        label: "عدد الصلاحيات",
+        label: t("header.rules.permissionsCount"),
         sortable: true,
       },
       {
         key: "users_count",
-        label: "عدد المستخدمين",
+        label: t("header.rules.usersCount"),
         sortable: true,
       },
       {
         key: "is_active",
-        label: "الحالة",
+        label: t("header.rules.status"),
         sortable: true,
         render: (_: unknown, row: any) => (
           <TableStatusSwitcher
             id={row.id}
-            label={"نشط"}
+            label={t("header.rules.active")}
             initialStatus={row.status == 1}
             confirmAction={async (isActive) => {
               return await apiClient.patch(
@@ -58,7 +60,7 @@ export const useRolesTableConfig = ({
               );
             }}
             confirmDescription={(isActive) =>
-              !isActive ? "تغير الحالة الى غير نشط" : "تغير الحالة الى نشط"
+              !isActive ? t("header.rules.deactivate") : t("header.rules.activate")
             }
             showDatePicker={() => false}
           />
@@ -70,7 +72,7 @@ export const useRolesTableConfig = ({
         key: "name",
         searchType: {
           type: "dropdown",
-          placeholder: "اسم الدور",
+          placeholder: t("header.rules.name"),
           dynamicDropdown: {
             url: `${baseURL}/role_and_permissions/roles`,
             valueField: "name",
@@ -88,22 +90,22 @@ export const useRolesTableConfig = ({
         key: "employee_name",
         searchType: {
           type: "text",
-          placeholder: "اسم الموظف",
+          placeholder: t("header.rules.employeeName"),
         },
       },
       {
         key: "status",
         searchType: {
           type: "dropdown",
-          placeholder: "حالة الدور",
+          placeholder: t("header.rules.status"),
           dropdownOptions: [
             {
               value: "1",
-              label: "نشط",
+              label: t("header.rules.active"),
             },
             {
               value: "0",
-              label: "غير نشط",
+              label: t("header.rules.inactive"),
             },
           ],
         },
@@ -124,7 +126,7 @@ export const useRolesTableConfig = ({
     deleteUrl: `${baseURL}/role_and_permissions/roles`,
     executions: [
       {
-        label: "تعديل",
+        label: t("header.rules.edit"),
         icon: <Edit className="w-4 h-4" />,
         action: (row: { id: string }) =>
           handleOpenRolesSheet({

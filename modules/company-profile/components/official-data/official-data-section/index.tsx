@@ -14,11 +14,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useLocale } from "next-intl";
+import {useLocale, useTranslations} from "next-intl";
 import MyRequests from "./my-requests";
 import { Button } from "@/components/ui/button";
 import { officialData } from "@/modules/company-profile/types/company";
-import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 
@@ -36,7 +35,7 @@ const OfficialDataSection = ({
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
   const { can } = usePermissions();
-
+const t = useTranslations("companyProfile");
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
 
@@ -47,7 +46,7 @@ const OfficialDataSection = ({
   return (
     <>
       <FormFieldSet
-        title="البيانات الرسمية"
+        title={t("header.placeholder.OfficialData")}
         valid={Object.values(officialData).every((value) =>
           Array.isArray(value) ? value.length > 0 : Boolean(value)
         )}
@@ -58,11 +57,11 @@ const OfficialDataSection = ({
             settingsBtn={{
               items: [
                 {
-                  title: "طلباتي",
+                  title: t("header.placeholder.MyRequests"),
                   onClick: handleOpenMyReq,
                 },
                 {
-                  title: "طلب تعديل البيانات الرسمية",
+                  title: t("header.placeholder.RequestEdit"),
                   onClick: handleOpenReqForm,
                 },
               ],
@@ -99,7 +98,7 @@ const OfficialDataSection = ({
           className={`h-fit max-h-[100vh] overflow-scroll`}
         >
           <SheetHeader>
-            <SheetTitle>طلباتي</SheetTitle>
+            <SheetTitle>{t("header.placeholder.MyRequests")}</SheetTitle>
           </SheetHeader>
           <MyRequests
             type="companyOfficialDataUpdate"
@@ -107,7 +106,7 @@ const OfficialDataSection = ({
             branch_id={id}
           />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
-            الرجوع
+            {t("header.placeholder.Back")}
           </Button>
         </SheetContent>
       </Sheet>

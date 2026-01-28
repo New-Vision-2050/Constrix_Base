@@ -6,6 +6,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { serialize } from "object-to-formdata";
 import { useParams } from "@i18n/navigation";
 import { RegistrationTypes } from "./registration-types";
+import { useTranslations } from "next-intl";
 
 export const LegalDataFormConfig = (
   companyLegalData: CompanyLegalData[],
@@ -14,6 +15,7 @@ export const LegalDataFormConfig = (
   const { company_id }: { company_id: string | undefined } = useParams();
 
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
 
   const LegalDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
@@ -39,17 +41,17 @@ export const LegalDataFormConfig = (
                 },
                 {
                   name: "registration_type",
-                  label: "نوع التسجل",
+                  label: t("header.placeholder.RegistrationType"),
                   type: "text",
-                  placeholder: "نوع التسجل",
+                  placeholder: t("header.placeholder.RegistrationType"),
                   disabled: true,
                   gridArea: 4,
                 },
                 {
                   name: "registration_number",
-                  label: "ادخل رقم السجل التجاري / رقم الـ 700",
+                  label: t("header.placeholder.RegistrationNumber"),
                   type: "text",
-                  placeholder: "رقم السجل التجاري",
+                  placeholder: t("header.placeholder.RegistrationNumber"),
                   disabled: true,
                   gridArea: 2,
                   condition: (values) => {
@@ -62,15 +64,15 @@ export const LegalDataFormConfig = (
                     {
                       type: "pattern",
                       value: /^700\d*$/,
-                      message: "يجب أن يبدأ الرقم بـ 700 ويحتوي على أرقام فقط",
+                      message: t("header.placeholder.RegistrationNumberPattern"),
                     },
                   ],
                 },
                 {
                   name: "start_date",
-                  label: "تاريخ الإصدار",
+                  label: t("header.placeholder.IssueDate"),
                   type: "date",
-                  placeholder: "تاريخ الإصدار",
+                  placeholder: t("header.placeholder.IssueDate"),
                   maxDate: {
                     formId: `company-official-data-form-${id}-${company_id}`,
                     field: "end_date",
@@ -78,15 +80,15 @@ export const LegalDataFormConfig = (
                   validation: [
                     {
                       type: "required",
-                      message: "ادخل تاريخ الاصدار",
+                      message: t("header.placeholder.IssueDateRequired"),
                     },
                   ],
                 },
                 {
                   name: "end_date",
-                  label: "تاريخ الانتهاء",
+                  label: t("header.placeholder.ExpiryDate"),
                   type: "date",
-                  placeholder: "تاريخ الانتهاء",
+                  placeholder: t("header.placeholder.ExpiryDate"),
                   minDate: {
                     formId: `company-official-data-form-${id}-${company_id}`,
                     field: "start_date",
@@ -94,14 +96,14 @@ export const LegalDataFormConfig = (
                   validation: [
                     {
                       type: "required",
-                      message: "ادخل تاريخ الانتهاء",
+                      message: t("header.placeholder.ExpiryDateRequired"),
                     },
                   ],
                 },
                 {
                   type: "file",
                   name: "files",
-                  label: "اضافة مرفق",
+                  label: t("header.placeholder.AddAttachment"),
                   isMulti: true,
                   fileConfig: {
                     maxFileSize: 5 * 1024 * 1024, // 10MB
@@ -135,8 +137,8 @@ export const LegalDataFormConfig = (
         files: entry.file,
       })),
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.Label.Save"),
+    cancelButtonText: t("header.Label.Cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
@@ -144,7 +146,7 @@ export const LegalDataFormConfig = (
     showCancelButton: false,
     showBackButton: false,
     onSubmit: async (formData) => {
-      const obj = formData.data.map((obj: any) => {
+      const obj = (formData.data as unknown[]).map((obj: any) => {
         const backendFiles = Array.isArray(obj.files)
           ? obj.files.filter(
               (file: any) => file && typeof file === "object" && "url" in file
@@ -162,11 +164,11 @@ export const LegalDataFormConfig = (
             .setError(
               `company-official-data-form-${id}-${company_id}`,
               "files",
-              "يجب إرفاق ملف"
+              t("header.placeholder.AttachmentRequired")
             );
           return {
             success: false,
-            message: "يجب إرفاق ملف",
+            message: t("header.placeholder.AttachmentRequired"),
           };
         }
 

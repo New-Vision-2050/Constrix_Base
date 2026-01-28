@@ -11,6 +11,7 @@ import ChartStaticIcon from "@/public/icons/chart-static";
 import CheckStatic from "@/public/icons/check-static";
 import PersonStaticIcon from "@/public/icons/person-static";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 const statisticsConfig = {
   url: `${baseURL}/role_and_permissions/permissions/widgets`,
@@ -23,7 +24,8 @@ const statisticsConfig = {
 };
 
 const AuthoritiesPage = () => {
-  const config = permissionsTableConfig();
+  const t = useTranslations("companyProfile");
+  const config = permissionsTableConfig(t);
   return (
     <div className="px-8 space-y-7">
       <StatisticsRow config={statisticsConfig} />

@@ -8,6 +8,7 @@ import { apiClient } from "@/config/axios-config";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCookie } from "cookies-next/client";
 import { useParams } from "@i18n/navigation";
+import {useTranslations} from "next-intl";
 
 export const useCurrentCompany = () => {
   const { company_id }: { company_id: string } = useParams();
@@ -29,7 +30,7 @@ export const useCurrentCompany = () => {
 
 const CompanyHeader = () => {
   const { data, isPending, isSuccess } = useCurrentCompany();
-
+const t = useTranslations("companyProfile");
   const createdAt = data?.payload?.created_at;
   const joinDate = createdAt
     ? new Date(createdAt).toLocaleDateString("en-GB")
@@ -56,7 +57,7 @@ const CompanyHeader = () => {
             <div className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4 text-foreground/70" />
               <div className="leading-tight">
-                <div className="text-xs">تاريخ الانضمام</div>
+                <div className="text-xs">{t("header.placeholder.JoinDate")}</div>
                 <div className="font-bold text-base">{joinDate}</div>
               </div>
             </div>

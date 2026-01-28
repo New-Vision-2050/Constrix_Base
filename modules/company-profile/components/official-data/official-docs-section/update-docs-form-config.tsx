@@ -1,22 +1,22 @@
-import { apiClient, baseURL } from "@/config/axios-config";
+import { baseURL } from "@/config/axios-config";
 import { CompanyDocument } from "@/modules/company-profile/types/company";
 import { FormConfig, useFormStore } from "@/modules/form-builder";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@i18n/navigation";
 import { serialize } from "object-to-formdata";
+import { useTranslations } from "next-intl";
 
-export const updateDocsFormConfig = (
+export const useUpdateDocsFormConfig = (
   doc: CompanyDocument,
   id?: string,
   onSuccess?: () => void
 ) => {
   const { company_id }: { company_id: string | undefined } = useParams();
-  const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
 
-  const updateDocsFormConfig: FormConfig = {
+  const config: FormConfig = {
     formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
-    title: "تحديث مستند رسمي",
+    title: t("header.placeholder.UpdateOfficialDocument"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -27,8 +27,8 @@ export const updateDocsFormConfig = (
           {
             type: "select",
             name: "document_type_id",
-            label: "نوع المستند",
-            placeholder: "نوع المستند",
+            label: t("header.placeholder.DocumentType"),
+            placeholder: t("header.placeholder.DocumentType"),
             dynamicOptions: {
               url: `${baseURL}/document_types`,
               valueField: "id",
@@ -43,40 +43,40 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل نوع المستند",
+                message: t("header.placeholder.DocumentTypeRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "اسم المستند",
+            label: t("header.placeholder.DocumentName"),
             type: "text",
-            placeholder: "ادخل اسم المستند",
+            placeholder: t("header.placeholder.DocumentNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل الوصف",
+                message: t("header.placeholder.DescriptionPlaceholder"),
               },
             ],
           },
           {
             name: "description",
-            label: "الوصف",
+            label: t("header.placeholder.Description"),
             type: "text",
-            placeholder: "ادخل الوصف",
+            placeholder: t("header.placeholder.DescriptionPlaceholder"),
           },
           {
             name: "document_number",
-            label: "رقم المستند",
+            label: t("header.placeholder.DocumentNumber"),
             type: "text",
-            placeholder: "ادخل رقم المستند",
+            placeholder: t("header.placeholder.DocumentNumberPlaceholder"),
           },
           {
             name: "start_date",
-            label: "تاريخ الإصدار",
+            label: t("header.placeholder.IssueDate"),
             type: "date",
-            placeholder: "تاريخ الإصدار",
+            placeholder: t("header.placeholder.IssueDate"),
             maxDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "end_date",
@@ -84,15 +84,15 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الاصدار",
+                message: t("header.placeholder.IssueDateRequired"),
               },
             ],
           },
           {
             name: "end_date",
-            label: "تاريخ الانتهاء",
+            label: t("header.placeholder.ExpiryDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("header.placeholder.ExpiryDate"),
             minDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
@@ -104,11 +104,11 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الانتهاء",
+                message: t("header.placeholder.ExpiryDateRequired"),
               },
             ],
             onChange: (value) => {
-              const endDate = new Date(value);
+              const endDate = new Date(value as string);
               endDate.setDate(endDate.getDate() - 7);
               const notificationDate = endDate.toLocaleDateString("en-CA");
               useFormStore
@@ -123,9 +123,9 @@ export const updateDocsFormConfig = (
           },
           {
             name: "notification_date",
-            label: "تاريخ الاشعار",
+            label: t("header.placeholder.NotificationDate"),
             type: "date",
-            placeholder: "تاريخ الاشعار",
+            placeholder: t("header.placeholder.NotificationDate"),
             minDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
@@ -138,36 +138,31 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الاشعار",
+                message: t("header.placeholder.NotificationDateRequired"),
               },
             ],
           },
           {
             type: "file",
             name: "files",
-            label: "اضافة مستندات",
+            label: t("header.placeholder.AddDocuments"),
             validation: [
               {
                 type: "required",
-                message: "يجب ادخال مرفق على الاقل",
+                message: t("header.placeholder.AtLeastOneAttachment"),
               },
             ],
             isMulti: true,
             fileConfig: {
               allowedFileTypes: [
-                "application/pdf", // pdf
-                "application/msword", // doc
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
-                "image/jpeg", // jpeg & jpg
-                "image/png", // png
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "image/jpeg",
+                "image/png",
               ],
-              maxFileSize: 5 * 1024 * 1024, // 10MB
+              maxFileSize: 5 * 1024 * 1024,
               showThumbnails: true,
-              // If you have an upload endpoint, you can specify it here
-              // uploadUrl: "/api/upload-file",
-              // uploadHeaders: {
-              //   Authorization: "Bearer your-token",
-              // },
             },
           },
         ],
@@ -176,8 +171,8 @@ export const updateDocsFormConfig = (
     initialValues: {
       ...doc,
     },
-    submitButtonText: "تحديث",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.placeholder.Update"),
+    cancelButtonText: t("header.Label.Cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
@@ -186,31 +181,31 @@ export const updateDocsFormConfig = (
     showBackButton: false,
     onSubmit: async (formData) => {
       const pastFiles = doc.files;
-      const serverFiles: number[] = formData.files
-        .filter((file: any) => !(file instanceof File))
-        .map((file: any) => file.id);
+      const serverFiles: number[] = (formData.files as unknown[])
+        .filter((file) => !(file instanceof File))
+        .map((file: { id: number }) => file.id);
       const files_deleted = pastFiles
         .filter((file) => !serverFiles.includes(file.id))
-        .map((file: any) => file.id);
-      const files = formData.files.filter((file: any) => file instanceof File);
+        .map((file) => file.id);
+      const files = (formData.files as unknown[]).filter((file) => file instanceof File) as File[];
 
       const obj = {
         files,
         files_deleted,
-        start_date: new Date(formData.start_date).toISOString().split("T")[0],
-        end_date: new Date(formData.end_date).toISOString().split("T")[0],
-        notification_date: new Date(formData.notification_date)
+        start_date: new Date(formData.start_date as string).toISOString().split("T")[0],
+        end_date: new Date(formData.end_date as string).toISOString().split("T")[0],
+        notification_date: new Date(formData.notification_date as string)
           .toISOString()
           .split("T")[0],
-        name: formData.name,
-        description: formData.description,
-        document_number: formData.document_number,
-        document_type_id: formData.document_type_id,
+        name: formData.name as string,
+        description: formData.description as string,
+        document_number: formData.document_number as string,
+        document_type_id: formData.document_type_id as string,
       };
 
       const newFormData = serialize(obj);
 
-      return await defaultSubmitHandler(newFormData, updateDocsFormConfig, {
+      return await defaultSubmitHandler(newFormData, config, {
         config: {
           params: {
             ...(id && { branch_id: id }),
@@ -225,5 +220,5 @@ export const updateDocsFormConfig = (
       onSuccess?.();
     },
   };
-  return updateDocsFormConfig;
+  return config;
 };

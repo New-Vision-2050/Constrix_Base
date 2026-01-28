@@ -3,17 +3,18 @@ import { baseURL } from "@/config/axios-config";
 import { useQueryClient } from "@tanstack/react-query";
 import { serialize } from "object-to-formdata";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
-import { useParams } from "@i18n/navigation";
 import { RegistrationTypes } from "./registration-types";
+import { useTranslations } from "next-intl";
 
 export const LegalDataAddReqFormEditConfig = (
   id?: string,
   company_id?: string
 ) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
   const LegalDataAddReqFormEditConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
-    title: "اضافة بيان قانوني",
+    title: t("header.placeholder.AddLegalData"),
     apiUrl: `${baseURL}/companies/company-profile/legal-data/create-legal-data`,
     laravelValidation: {
       enabled: true,
@@ -25,8 +26,8 @@ export const LegalDataAddReqFormEditConfig = (
           {
             type: "select",
             name: "registration_type_id",
-            label: "نوع التسجل",
-            placeholder: "نوع التسجل",
+            label: t("header.placeholder.RegistrationType"),
+            placeholder: t("header.placeholder.RegistrationType"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/company_registration_types`,
@@ -42,15 +43,15 @@ export const LegalDataAddReqFormEditConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل نوع التسجل",
+                message: t("header.placeholder.RegistrationTypeRequired"),
               },
             ],
           },
           {
             name: "regestration_number",
-            label: "رقم السجل التجاري",
+            label: t("header.placeholder.RegistrationNumber"),
             type: "text",
-            placeholder: "رقم السجل التجاري",
+            placeholder: t("header.placeholder.RegistrationNumber"),
             condition: (values) => {
               // Disable the field if registration_type_id is 3 (Without Commercial Register)
               const typeId = values["registration_type_id"]?.split("_")?.[1];
@@ -60,16 +61,15 @@ export const LegalDataAddReqFormEditConfig = (
               {
                 type: "pattern",
                 value: /^(700|40|101)\d*$/,
-                message:
-                  "يجب أن يبدأ الرقم بـ 700 أو 40 أو 101 ويحتوي على أرقام فقط",
+                message: t("header.placeholder.RegistrationNumberPattern"),
               },
             ],
           },
           {
             name: "start_date",
-            label: "تاريخ الإصدار",
+            label: t("header.placeholder.IssueDate"),
             type: "date",
-            placeholder: "تاريخ الإصدار",
+            placeholder: t("header.placeholder.IssueDate"),
             required: true,
             maxDate: {
               formId: `company-official-data-form-${id}-${company_id}`,
@@ -78,15 +78,15 @@ export const LegalDataAddReqFormEditConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الإصدار",
+                message: t("header.placeholder.IssueDateRequired"),
               },
             ],
           },
           {
             name: "end_date",
-            label: "تاريخ الانتهاء",
+            label: t("header.placeholder.ExpiryDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("header.placeholder.ExpiryDate"),
             required: true,
             minDate: {
               formId: `company-official-data-form-${id}-${company_id}`,
@@ -95,14 +95,14 @@ export const LegalDataAddReqFormEditConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الانتهاء",
+                message: t("header.placeholder.ExpiryDateRequired"),
               },
             ],
           },
           {
             type: "file",
             name: "file",
-            label: "اضافة مرفق",
+            label: t("header.placeholder.AddAttachment"),
             isMulti: true,
             fileConfig: {
               showThumbnails: true,
@@ -118,8 +118,8 @@ export const LegalDataAddReqFormEditConfig = (
         ],
       },
     ],
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.Label.Save"),
+    cancelButtonText: t("header.Label.Cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

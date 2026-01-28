@@ -4,6 +4,7 @@ import { officialData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export const CompanyOfficialData = (
   officialData: officialData,
@@ -12,6 +13,7 @@ export const CompanyOfficialData = (
   const { company_id }: { company_id: string | undefined } = useParams();
   console.log("officialData", officialData);
   const queryClient = useQueryClient();
+  const t = useTranslations("companyProfile");
   const OfficialDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
     // apiUrl: `${baseURL}/companies/company-profile/official-data`,
@@ -25,41 +27,41 @@ export const CompanyOfficialData = (
         fields: [
           {
             name: "name",
-            label: "اسم الشركة",
+              label: t("header.Label.CompanyName"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("header.Label.CompanyName")  ,
             disabled: true,
           },
           {
             name: "branch_name",
-            label: "اسم الفرع",
+            label: t("header.Label.BranchName") ,
             type: "text",
-            placeholder: "اسم الفرع",
+            placeholder: t("header.Label.BranchName") ,
             validation: [
               {
                 type: "required",
-                message: "اسم الفرع مطلوب",
+                message: t("header.Label.BranchNameRequired"),
               },
             ],
           },
           {
             name: "name_en",
-            label: "اسم الشركة بالانجليزي",
+            label: t("header.Label.CompanyNameEnglish"),
             type: "text",
-            placeholder: "يجب كتابة الاسم باللغة الانجليزية",
+            placeholder: t("header.Label.CompanyNameEnglish") ,
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("header.Label.CompanyNameEnglishRequired") ,
               },
             ],
             gridArea: 2,
           },
           {
             name: "company_type_id",
-            label: "كيان الشركة",
+            label: t("header.Label.CompanyType"),
             type: "select",
-            placeholder: "كيان الشركة",
+            placeholder: t("header.Label.CompanyType")  ,
             dynamicOptions: {
               url: `${baseURL}/company_types`,
               valueField: "id",
@@ -74,29 +76,29 @@ export const CompanyOfficialData = (
             validation: [
               {
                 type: "required",
-                message: "كيان الشركة مطلوب",
+                message: t("header.Label.CompanyTypeRequired"),
               },
             ],
           },
           {
             name: "country",
-            label: "دولة المركز الرئيسي",
+            label: t("header.Label.MainCountry"),
             type: "text",
-            placeholder: "دولة المركز الرئيسي",
+            placeholder: t("header.Label.MainCountry") ,
             disabled: true,
           },
           {
             name: "company_field",
-            label: "مجال الشركة",
+            label: t("header.Label.CompanyField"),
             type: "text",
-            placeholder: "مجال الشركة",
+            placeholder: t("header.Label.CompanyField") ,
             disabled: true,
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("header.Label.Phone"),
             type: "phone",
-            placeholder: "رقم الجوال",
+            placeholder: t("header.Label.Phone")  ,
             validation: [
               {
                 type: "phone",
@@ -104,31 +106,31 @@ export const CompanyOfficialData = (
               },
               {
                 type: "required",
-                message: "field is required",
+                message: t("header.Label.PhoneRequired")  ,
               },
             ],
           },
           {
             name: "email",
-            label: "البريد الالكتروني",
+            label: t("header.Label.Email"),
             type: "text",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("header.Label.Email")    ,
             validation: [
               {
                 type: "required",
-                message: "ادخل البريد الالكتروني",
+                message: t("header.Label.EmailRequired")  ,
               },
               {
-                type: "email",
-                message: "البريد الالكتروني غير صحيح",
+                  type: "email",
+                message: t("header.Label.EmailInvalid")  ,
               },
             ],
           },
           {
             name: "program_id",
-            label: "البرنامج",
+            label: t("header.Label.Program"),
             type: "select",
-            placeholder: "البرنامج",
+            placeholder: t("header.Label.Program"),
             dynamicOptions: {
               url: `${baseURL}/company_access_programs/list?company_field=${officialData?.company_field.map(
                 (item) => item.id
@@ -147,9 +149,9 @@ export const CompanyOfficialData = (
           },
           {
             name: "packages",
-            label: "الباقة",
+            label: t("header.Label.Bucket"),
             type: "select",
-            placeholder: "الباقة",
+            placeholder: t("header.Label.Bucket") ,
             dynamicOptions: {
               url: `${baseURL}/packages/list`,
               valueField: "id",
@@ -179,7 +181,7 @@ export const CompanyOfficialData = (
           : "",
       phone: officialData?.phone ?? "",
       email: officialData?.email ?? "",
-      bucket: "متميز",
+      bucket: t("header.Label.Bucket"),
       program_id:
         !!officialData?.company_access_programs &&
         officialData?.company_access_programs.length > 0
@@ -192,8 +194,8 @@ export const CompanyOfficialData = (
           ? officialData?.packages.map((pack) => pack.id)
           : "",
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.Label.Save"),
+    cancelButtonText: t("header.Label.Cancel")  ,
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
