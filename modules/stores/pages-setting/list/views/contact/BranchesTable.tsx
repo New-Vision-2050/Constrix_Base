@@ -2,8 +2,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import { Box, Stack, Grid, TextField, Button, MenuItem } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { BranchDialog } from "@/modules/stores/components/dialogs/add-page-setting";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -20,7 +19,7 @@ import { BranchesApi } from "@/services/api/ecommerce/pages-setting/contact/bran
 const CONTACT_BRANCHES_QUERY_KEY = "pages-setting-contact-branches";
 
 // Create typed table instance
-const ContactBranchesTableLayout = HeadlessTableLayout<BranchRow>();
+const ContactBranchesTableLayout = HeadlessTableLayout<BranchRow>("spscr");
 
 function BranchesTable() {
   const t = useTranslations("pagesSettings");
@@ -35,9 +34,6 @@ function BranchesTable() {
   const [deletingPageId, setDeletingPageId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
-
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = ContactBranchesTableLayout.useTableParams({
     initialPage: 1,
@@ -50,14 +46,14 @@ function BranchesTable() {
       CONTACT_BRANCHES_QUERY_KEY,
       params.page,
       params.limit,
-      searchQuery,
+      params.search,
     ],
     queryFn: async () => {
       const response = await BranchesApi.list({
         type: "contact_us",
         page: params.page,
         per_page: params.limit,
-        search: searchQuery,
+        search: params.search,
       });
 
       return {
@@ -119,7 +115,8 @@ function BranchesTable() {
     selectable: true,
     getRowId: (page: BranchRow) => page.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   const handleAddPage = () => {
@@ -131,39 +128,16 @@ function BranchesTable() {
       <Box>
         <ContactBranchesTableLayout
           filters={
-            <Stack spacing={2}>
-              {/* Filter Controls */}
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={tCommon("search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.banner.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddPage}
-                      fullWidth
-                    >
-                      اضافة فرع جديد
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            <ContactBranchesTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.banner.create]}>
+                  <Button variant="contained" onClick={handleAddPage}>
+                    اضافة فرع جديد
+                  </Button>
+                </Can>
+              }
+            />
           }
           table={
             <ContactBranchesTableLayout.Table
@@ -181,7 +155,7 @@ function BranchesTable() {
           open={Boolean(editingPageId)}
           onClose={() => setEditingPageId(null)}
           branchId={
-            editingPageId === "new" ? undefined : editingPageId ?? undefined
+            editingPageId === "new" ? undefined : (editingPageId ?? undefined)
           }
           onSuccess={() => {
             queryClient.invalidateQueries({

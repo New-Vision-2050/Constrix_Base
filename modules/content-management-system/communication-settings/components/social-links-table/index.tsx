@@ -1,18 +1,7 @@
 "use client";
-import { useState } from "react";
-import Can from "@/lib/permissions/client/Can";
+import { useMemo, useState } from "react";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import DialogTrigger from "@/components/headless/dialog-trigger";
-import {
-  Box,
-  Stack,
-  Grid,
-  TextField,
-  Button,
-  MenuItem,
-  Typography,
-} from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 import SetSocialLinkDialog from "./SetSocialLinkDialog";
 import withPermissions from "@/lib/permissions/client/withPermissions";
@@ -25,16 +14,19 @@ import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDial
 import CustomMenu from "@/components/headless/custom-menu";
 import { baseURL } from "@/config/axios-config";
 import { EditIcon, Trash2 } from "lucide-react";
+import { downloadFromResponse } from "@/utils/downloadFromResponse";
+import Can from "@/lib/permissions/client/Can";
+import DialogTrigger from "@/components/headless/dialog-trigger";
 
 const SOCIAL_LINKS_QUERY_KEY = "communication-settings-social-links";
 
 // Create typed table instance
-const SocialLinksTableLayout = HeadlessTableLayout<SocialLink>();
+const SocialLinksTableLayout = HeadlessTableLayout<SocialLink>("cssl");
 
 function SocialLinksTable() {
   // Translations
   const t = useTranslations(
-    "content-management-system.communicationSetting.socialLinksTable"
+    "content-management-system.communicationSetting.socialLinksTable",
   );
   const queryClient = useQueryClient();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -47,7 +39,6 @@ function SocialLinksTable() {
   >();
 
   // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch data using query
   const invalidate = () => {
@@ -58,32 +49,37 @@ function SocialLinksTable() {
   const params = SocialLinksTableLayout.useTableParams({
     initialPage: 1,
     initialLimit: 10,
+    initialSortBy: "type",
+    initialSortDirection: "asc",
   });
 
-  // ✅ STEP 2: Fetch data using useQuery
-  const { data: queryData, isLoading } = useQuery({
-    queryKey: [SOCIAL_LINKS_QUERY_KEY, params.page, params.limit, searchQuery],
+  // ✅ STEP 2: Fetch data using useQuery directly
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [
+      SOCIAL_LINKS_QUERY_KEY,
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortDirection,
+      params.search,
+    ],
     queryFn: async () => {
       const response = await CommunicationSettingsSocialLinksApi.getAll({
         page: params.page,
         per_page: params.limit,
-        type: searchQuery || undefined,
+        sort_by: params.sortBy,
+        sort_direction: params.sortDirection,
+        type: params.search,
       });
 
-      const data = response.data.payload ?? [];
-      const pagination = response.data.pagination;
-
-      return {
-        data,
-        totalPages: pagination?.last_page ?? 1,
-        totalItems: pagination?.result_count ?? data.length,
-      };
+      return response.data;
     },
   });
 
-  const data = queryData?.data || [];
-  const totalPages = queryData?.totalPages || 0;
-  const totalItems = queryData?.totalItems || 0;
+  // Extract data from response
+  const socialLinks = useMemo<SocialLink[]>(() => data?.payload || [], [data]);
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
 
   // Define columns
   const columns = [
@@ -123,7 +119,7 @@ function SocialLinksTable() {
 
   // ✅ STEP 3: useTableState (AFTER query)
   const state = SocialLinksTableLayout.useTableState({
-    data,
+    data: socialLinks,
     columns,
     totalPages,
     totalItems,
@@ -131,55 +127,43 @@ function SocialLinksTable() {
     selectable: true,
     getRowId: (socialLink: SocialLink) => socialLink.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    onExport: async () => {
+      downloadFromResponse(await CommunicationSettingsSocialLinksApi.export());
+    },
   });
 
   return (
     <Box>
+      <Typography variant="h6" sx={{ my: 4 }}>
+        {t("title")}
+      </Typography>
       <SocialLinksTableLayout
         filters={
-          <Stack spacing={2}>
-            <Typography variant="h6" sx={{ my: 4 }}>
-              {t("title")}
-            </Typography>
-            {/* Filter Controls */}
-            <Grid container spacing={2}>
-              <Grid size={{ md: 10 }}>
-                <TextField
-                  size="small"
-                  placeholder={t("search")}
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    params.setPage(1);
+          <SocialLinksTableLayout.TopActions
+            state={state}
+            customActions={
+              <Can
+                check={[
+                  PERMISSIONS.CMS.communicationSettings.socialLinks.create,
+                ]}
+              >
+                <DialogTrigger
+                  component={SetSocialLinkDialog}
+                  dialogProps={{
+                    onSuccess: () => {
+                      refetch();
+                    },
                   }}
-                  InputProps={{
-                    startAdornment: (
-                      <Search sx={{ mr: 1, color: "action.active" }} />
-                    ),
-                  }}
-                  fullWidth
+                  render={({ onOpen }) => (
+                    <Button variant="contained" onClick={onOpen}>
+                      {t("addSocialLink")}
+                    </Button>
+                  )}
                 />
-              </Grid>
-              <Grid size={{ md: 2 }}>
-                <Can
-                  check={[
-                    PERMISSIONS.CMS.communicationSettings.socialLinks.create,
-                  ]}
-                >
-                  <DialogTrigger
-                    component={SetSocialLinkDialog}
-                    dialogProps={{ onSuccess: () => invalidate() }}
-                    render={({ onOpen }) => (
-                      <Button variant="contained" onClick={onOpen} fullWidth>
-                        {t("addSocialLink")}
-                      </Button>
-                    )}
-                  />
-                </Can>
-              </Grid>
-            </Grid>
-          </Stack>
+              </Can>
+            }
+          ></SocialLinksTableLayout.TopActions>
         }
         table={
           <SocialLinksTableLayout.Table

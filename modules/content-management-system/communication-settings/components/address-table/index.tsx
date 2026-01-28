@@ -1,21 +1,11 @@
 "use client";
-import { useState } from "react";
-import Can from "@/lib/permissions/client/Can";
+import { useMemo, useState } from "react";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import SetAddressDialog from "./SetAddressDialog";
-import DialogTrigger from "@/components/headless/dialog-trigger";
-import {
-  Box,
-  Stack,
-  Grid,
-  TextField,
-  Button,
-  MenuItem,
-  Typography,
-} from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, MenuItem, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 import HeadlessTableLayout from "@/components/headless/table";
+import DialogTrigger from "@/components/headless/dialog-trigger";
 import { Address } from "@/services/api/company-dashboard/communication-settings/types/response";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommunicationSettingsAddressesApi } from "@/services/api/company-dashboard/communication-settings/addresses";
@@ -24,12 +14,14 @@ import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDial
 import CustomMenu from "@/components/headless/custom-menu";
 import { baseURL } from "@/config/axios-config";
 import { EditIcon, Trash2 } from "lucide-react";
+import { downloadFromResponse } from "@/utils/downloadFromResponse";
 import withPermissions from "@/lib/permissions/client/withPermissions";
+import Can from "@/lib/permissions/client/Can";
 
 const ADDRESSES_QUERY_KEY = "communication-settings-addresses";
 
 // Create typed table instance
-const AddressTableLayout = HeadlessTableLayout<Address>();
+const AddressTableLayout = HeadlessTableLayout<Address>("csad");
 
 function AddressTable() {
   const t = useTranslations("content-management-system.communicationSetting");
@@ -44,8 +36,6 @@ function AddressTable() {
   >();
 
   // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
-
   // Fetch data using query
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: [ADDRESSES_QUERY_KEY] });
@@ -54,33 +44,38 @@ function AddressTable() {
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = AddressTableLayout.useTableParams({
     initialPage: 1,
-    initialLimit: 5,
+    initialLimit: 10,
+    initialSortBy: "title",
+    initialSortDirection: "asc",
   });
 
-  // ✅ STEP 2: Fetch data using useQuery
-  const { data: queryData, isLoading } = useQuery({
-    queryKey: [ADDRESSES_QUERY_KEY, params.page, params.limit, searchQuery],
+  // ✅ STEP 2: Fetch data using useQuery directly
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: [
+      ADDRESSES_QUERY_KEY,
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortDirection,
+      params.search,
+    ],
     queryFn: async () => {
       const response = await CommunicationSettingsAddressesApi.getAll({
         page: params.page,
         per_page: params.limit,
-        title: searchQuery || undefined,
+        sort_by: params.sortBy,
+        sort_direction: params.sortDirection,
+        title: params.search,
       });
 
-      const data = response.data.payload ?? [];
-      const pagination = response.data.pagination;
-
-      return {
-        data,
-        totalPages: pagination?.last_page ?? 1,
-        totalItems: pagination?.result_count ?? data.length,
-      };
+      return response.data;
     },
   });
 
-  const data = queryData?.data || [];
-  const totalPages = queryData?.totalPages || 0;
-  const totalItems = queryData?.totalItems || 0;
+  // Extract data from response
+  const addresses = useMemo<Address[]>(() => data?.payload || [], [data]);
+  const totalPages = useMemo(() => data?.pagination?.last_page || 1, [data]);
+  const totalItems = useMemo(() => data?.pagination?.result_count || 0, [data]);
 
   // Define columns
   const columns = [
@@ -120,7 +115,7 @@ function AddressTable() {
 
   // ✅ STEP 3: useTableState (AFTER query)
   const state = AddressTableLayout.useTableState({
-    data,
+    data: addresses,
     columns,
     totalPages,
     totalItems,
@@ -128,55 +123,43 @@ function AddressTable() {
     selectable: true,
     getRowId: (address: Address) => address.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    onExport: async () => {
+      downloadFromResponse(await CommunicationSettingsAddressesApi.export());
+    },
   });
 
   return (
     <Box py={2}>
+      <Typography variant="h6" sx={{ my: 4 }}>
+        {t("table.title")}
+      </Typography>
       <AddressTableLayout
         filters={
-          <Stack spacing={2}>
-            <Typography variant="h6" sx={{ my: 4 }}>
-              {t("table.title")}
-            </Typography>
-            {/* Filter Controls */}
-            <Grid container spacing={2}>
-              <Grid size={{ md: 10 }}>
-                <TextField
-                  size="small"
-                  placeholder={t("table.search")}
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    params.setPage(1);
+          <AddressTableLayout.TopActions
+            state={state}
+            customActions={
+              <Can
+                check={[PERMISSIONS.CMS.communicationSettings.addresses.create]}
+              >
+                <DialogTrigger
+                  component={SetAddressDialog}
+                  dialogProps={{
+                    onSuccess: () => {
+                      refetch();
+                    },
                   }}
-                  InputProps={{
-                    startAdornment: (
-                      <Search sx={{ mr: 1, color: "action.active" }} />
-                    ),
-                  }}
-                  fullWidth
+                  render={({ onOpen }) => (
+                    <Button variant="contained" onClick={onOpen}>
+                      {t("table.addAddress")}
+                    </Button>
+                  )}
                 />
-              </Grid>
-              <Grid size={{ md: 2 }}>
-                <Can
-                  check={[
-                    PERMISSIONS.CMS.communicationSettings.addresses.create,
-                  ]}
-                >
-                  <DialogTrigger
-                    component={SetAddressDialog}
-                    dialogProps={{ onSuccess: () => invalidate() }}
-                    render={({ onOpen }) => (
-                      <Button variant="contained" onClick={onOpen} fullWidth>
-                        {t("table.addAddress")}
-                      </Button>
-                    )}
-                  />
-                </Can>
-              </Grid>
-            </Grid>
-          </Stack>
+              </Can>
+            }
+          >
+            {/* Add address button */}
+          </AddressTableLayout.TopActions>
         }
         table={
           <AddressTableLayout.Table

@@ -2,16 +2,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import {
-  Box,
-  Stack,
-  Grid,
-  TextField,
-  Button,
-  Typography,
-  MenuItem,
-} from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, Typography, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -34,18 +25,16 @@ import { EditIcon, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import AddBrandDialog from "@/modules/stores/components/dialogs/add-brand";
 import DeleteButton from "@/components/shared/delete-button";
+import DialogTrigger from "@/components/headless/dialog-trigger";
 
 const BRANDS_QUERY_KEY = "stores-brands";
 
 // Create typed table instance
-const BrandsTableLayout = HeadlessTableLayout<BrandRow>();
+const BrandsTableLayout = HeadlessTableLayout<BrandRow>("sbr");
 
 function BrandsTable() {
   const t = useTranslations();
   const queryClient = useQueryClient();
-
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Delete dialog state
   const [deletingBrandId, setDeletingBrandId] = useState<string | null>(null);
@@ -62,10 +51,10 @@ function BrandsTable() {
 
   // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [BRANDS_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [BRANDS_QUERY_KEY, params.page, params.limit, params.search],
     queryFn: async () => {
       const response = await BrandsApi.list({
-        search: searchQuery,
+        search: params.search,
       });
 
       const brands = response.data.payload || [];
@@ -78,7 +67,7 @@ function BrandsTable() {
           is_active: brand.is_active ?? 1, // Default to active if not provided
           num_products: brand.num_products ?? 0, // Default to 0 if not provided
           num_requests: brand.num_requests ?? 0, // Default to 0 if not provided
-        })
+        }),
       );
 
       return {
@@ -138,12 +127,9 @@ function BrandsTable() {
     selectable: true,
     getRowId: (brand: BrandRow) => brand.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
-
-  const handleAddBrand = () => {
-    setEditingBrandId("new"); // Set to "new" to open dialog in add mode
-  };
 
   const handleEditBrand = (brandId: string) => {
     setEditingBrandId(brandId);
@@ -155,42 +141,33 @@ function BrandsTable() {
       <Box sx={{ p: 3 }}>
         <BrandsTableLayout
           filters={
-            <Stack spacing={2}>
+            <BrandsTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.brand.create]}>
+                  <DialogTrigger
+                    component={AddBrandDialog}
+                    dialogProps={{
+                      brandId: undefined,
+                      onSuccess: () => {
+                        queryClient.invalidateQueries({
+                          queryKey: [BRANDS_QUERY_KEY],
+                        });
+                      },
+                    }}
+                    render={({ onOpen }) => (
+                      <Button variant="contained" onClick={onOpen}>
+                        {t("labels.add")} {t("brand.singular")}
+                      </Button>
+                    )}
+                  />
+                </Can>
+              }
+            >
               <Typography variant="h6" sx={{ my: 4 }}>
                 {t("brand.plural")}
               </Typography>
-              {/* Filter Controls */}
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={t("labels.search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.brand.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddBrand}
-                      fullWidth
-                    >
-                      {t("labels.add")} {t("brand.singular")}
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            </BrandsTableLayout.TopActions>
           }
           table={
             <BrandsTableLayout.Table

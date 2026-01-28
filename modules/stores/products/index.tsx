@@ -2,16 +2,7 @@
 import { useState } from "react";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-import {
-  Box,
-  Stack,
-  Grid,
-  TextField,
-  Button,
-  Typography,
-  MenuItem,
-} from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Box, Button, Typography, MenuItem } from "@mui/material";
 import { useTranslations } from "next-intl";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import HeadlessTableLayout from "@/components/headless/table";
@@ -31,19 +22,16 @@ import { useQueryClient } from "@tanstack/react-query";
 const PRODUCTS_QUERY_KEY = "stores-products";
 
 // Create typed table instance
-const ProductsTableLayout = HeadlessTableLayout<ProductRow>();
+const ProductsTableLayout = HeadlessTableLayout<ProductRow>("spr");
 
 function ProductsTable() {
   const router = useRouter();
   const t = useTranslations();
   const queryClient = useQueryClient();
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
-
   // Delete dialog state
   const [deletingAddressId, setDeletingAddressId] = useState<string | null>(
-    null
+    null,
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -55,10 +43,10 @@ function ProductsTable() {
 
   // ✅ STEP 2: Fetch data using useQuery
   const { data: queryData, isLoading } = useQuery({
-    queryKey: [PRODUCTS_QUERY_KEY, params.page, params.limit, searchQuery],
+    queryKey: [PRODUCTS_QUERY_KEY, params.page, params.limit, params.search],
     queryFn: async () => {
       const response = await ProductsApi.list({
-        search: searchQuery,
+        search: params.search,
       });
 
       const products =
@@ -122,7 +110,8 @@ function ProductsTable() {
     selectable: true,
     getRowId: (product: ProductRow) => product.id,
     loading: isLoading,
-    filtered: searchQuery !== "",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   const handleAddProduct = () => {
@@ -139,42 +128,20 @@ function ProductsTable() {
       <Box sx={{ p: 3 }}>
         <ProductsTableLayout
           filters={
-            <Stack spacing={2}>
+            <ProductsTableLayout.TopActions
+              state={state}
+              customActions={
+                <Can check={[PERMISSIONS.ecommerce.product.create]}>
+                  <Button variant="contained" onClick={handleAddProduct}>
+                    {t("labels.add")} {t("product.singular")}
+                  </Button>
+                </Can>
+              }
+            >
               <Typography variant="h6" sx={{ my: 4 }}>
                 {t("product.plural")}
               </Typography>
-              {/* Filter Controls */}
-              <Grid container spacing={2}>
-                <Grid size={{ md: 10 }}>
-                  <TextField
-                    size="small"
-                    placeholder={t("labels.search")}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      params.setPage(1);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <Search sx={{ mr: 1, color: "action.active" }} />
-                      ),
-                    }}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid size={{ md: 2 }}>
-                  <Can check={[PERMISSIONS.ecommerce.product.create]}>
-                    <Button
-                      variant="contained"
-                      onClick={handleAddProduct}
-                      fullWidth
-                    >
-                      {t("labels.add")} {t("product.singular")}
-                    </Button>
-                  </Can>
-                </Grid>
-              </Grid>
-            </Stack>
+            </ProductsTableLayout.TopActions>
           }
           table={
             <ProductsTableLayout.Table
