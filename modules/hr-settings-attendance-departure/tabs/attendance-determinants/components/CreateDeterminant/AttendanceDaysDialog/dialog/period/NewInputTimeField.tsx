@@ -38,9 +38,10 @@ const normalizeTimeValue = (input?: string) => {
   const hourPart = parts[0];
   const minutePart = parts[1] ?? "00";
 
+  // Don't pad hour - it should match InitialTimeHours values ("0", "1", "2", ... "23")
   const normalizedHour = Number.isNaN(Number(hourPart))
     ? ""
-    : String(parseInt(hourPart, 10)).padStart(2, "0");
+    : String(parseInt(hourPart, 10));
   const normalizedMinute = minutePart.padStart(2, "0");
 
   return { hour: normalizedHour, minute: normalizedMinute };
@@ -55,8 +56,12 @@ const NewInputTimeField = ({
   disabled = false,
 }: TimeFieldProps) => {
   // context
-  const { dayAvsilableHours, minEdgeInNextDay, dayPeriods } =
-    useAttendanceDayCxt();
+  const {
+    dayAvsilableHours,
+    minEdgeInNextDay,
+    dayPeriods,
+    previousDayExtendedEndTime,
+  } = useAttendanceDayCxt();
   const initialTime = normalizeTimeValue(value);
   const [selectedHour, setSelectedHour] = useState<string>(initialTime.hour);
   const [selectedMinute, setSelectedMinute] = useState<string>(
@@ -100,6 +105,24 @@ const NewInputTimeField = ({
   }, [dayAvsilableHours]);
 
   const _dayAvsilableHours = useMemo(() => {
+    // For start time: check if previous day has extended period that blocks early hours
+    if (type === "start" && period.index === 1 && previousDayExtendedEndTime) {
+      const [extEndHour, extEndMinute] = previousDayExtendedEndTime
+        .split(":")
+        .map(Number);
+
+      return baseHours?.map((hour) => {
+        const currentHour = Number(hour.value);
+        if (currentHour < extEndHour) {
+          return { ...hour, available: false };
+        }
+        if (currentHour !== extEndHour) return hour;
+        if (Number.isNaN(extEndHour) || Number.isNaN(extEndMinute)) return hour;
+        if (extEndMinute >= 59) return { ...hour, available: false };
+        return { ...hour, available: true };
+      });
+    }
+
     if (type === "start" && previousPeriod?.end_time) {
       const [endHour, endMinute] = previousPeriod.end_time
         .split(":")
@@ -162,19 +185,16 @@ const NewInputTimeField = ({
     type,
     baseHours,
     period.start_time,
+    period.index,
     period?.extends_to_next_day,
     minEdgeInNextDay,
     previousPeriod?.end_time,
+    previousDayExtendedEndTime,
     otherPeriods,
   ]);
 
-  // reset end if period extends to next day
-  useEffect(() => {
-    if (period?.extends_to_next_day && type === "end") {
-      setSelectedHour("00");
-      setSelectedMinute("00");
-    }
-  }, [period?.extends_to_next_day, type]);
+  // When extends_to_next_day is enabled, keep the current selection or allow user to choose
+  // Don't force reset to 00:00 - let user select end time on next day
 
   // Cuando cambia la hora o el minuto, actualizar el valor
   useEffect(() => {
@@ -220,6 +240,33 @@ const NewInputTimeField = ({
       dayAvsilableHours?.filter((el) => el.value === selectedHour)?.[0]
         ?.minutes || [];
 
+    // For first period: check if previous day has extended period that blocks early minutes
+    if (
+      type === "start" &&
+      period.index === 1 &&
+      previousDayExtendedEndTime &&
+      selectedHour
+    ) {
+      const [extEndHour, extEndMinute] = previousDayExtendedEndTime
+        .split(":")
+        .map(Number);
+      const currentHour = parseInt(selectedHour);
+
+      if (currentHour < extEndHour) {
+        return hourMinutes.map((minute) => ({
+          ...minute,
+          available: false,
+        }));
+      }
+
+      if (currentHour === extEndHour) {
+        return hourMinutes.map((minute) => ({
+          ...minute,
+          available: minute.available && parseInt(minute.value) > extEndMinute,
+        }));
+      }
+    }
+
     if (type === "start" && previousPeriod?.end_time && selectedHour) {
       const [endHour, endMinute] = previousPeriod.end_time
         .split(":")
@@ -259,8 +306,10 @@ const NewInputTimeField = ({
     dayAvsilableHours,
     selectedHour,
     type,
+    period.index,
     period.start_time,
     previousPeriod?.end_time,
+    previousDayExtendedEndTime,
   ]);
 
   // Componente de selección de minuto

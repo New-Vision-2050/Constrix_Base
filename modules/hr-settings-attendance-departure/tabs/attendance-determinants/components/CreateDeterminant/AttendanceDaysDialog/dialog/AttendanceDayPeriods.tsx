@@ -20,7 +20,7 @@ export default function AttendanceDayPeriods() {
     selectedDay,
   } = useAttendanceDayCxt();
   const t = useTranslations(
-    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog"
+    "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog",
   );
 
   return (
@@ -77,8 +77,11 @@ export default function AttendanceDayPeriods() {
       </div>
 
       {dayPeriods.length > 0 ? (
-        dayPeriods.map((period, index) => (
-          <AttendanceDayPeriodItem key={index} period={period} />
+        dayPeriods.map((period) => (
+          <AttendanceDayPeriodItem
+            key={`${period.index}-${period.start_time}-${period.end_time}`}
+            period={period}
+          />
         ))
       ) : (
         <EmptyState icon={<Clock className="h-10 w-10 text-amber-500" />} />

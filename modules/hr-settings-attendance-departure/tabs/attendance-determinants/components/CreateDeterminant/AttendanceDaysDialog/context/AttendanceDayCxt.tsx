@@ -50,6 +50,9 @@ type AttendanceDayCxtType = {
 
   // min edge in next day
   minEdgeInNextDay: string;
+
+  // end time of extended period from previous day (blocks hours before this)
+  previousDayExtendedEndTime: string;
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -83,6 +86,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // extends to next day message
   const [extendsToNextDayMsg, SetExtendsToNextDayMsg] = useState<string>("");
   const [minEdgeInNextDay, setMinEdgeInNextDay] = useState<string>("");
+  // end time of extended period from previous day
+  const [previousDayExtendedEndTime, setPreviousDayExtendedEndTime] =
+    useState<string>("");
 
   useEffect(() => {
     const _n = dayPeriods.length;
@@ -223,6 +229,43 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
     return _weekly_schedule?.map((day: any) => day.day as string) || [];
   }, [_weekly_schedule, _editedDay]);
 
+  // Check if previous day has a period that extends to current day
+  useEffect(() => {
+    if (!selectedDay || !_weekly_schedule) {
+      setPreviousDayExtendedEndTime("");
+      return;
+    }
+
+    // Get previous day
+    const currentDayIndex = DAYS_OF_WEEK.findIndex(
+      (d) => d.value === selectedDay,
+    );
+    const previousDayIndex =
+      (currentDayIndex - 1 + DAYS_OF_WEEK.length) % DAYS_OF_WEEK.length;
+    const previousDayValue = DAYS_OF_WEEK[previousDayIndex].value;
+
+    // Find previous day config in weekly schedule
+    const previousDayConfig = _weekly_schedule?.find(
+      (day: any) => day.day === previousDayValue,
+    );
+
+    if (previousDayConfig) {
+      // Check if any period extends to next day
+      const extendedPeriod = previousDayConfig.periods?.find(
+        (period: any) => period.extends_to_next_day,
+      );
+
+      if (extendedPeriod) {
+        // Set the end time of the extended period - this blocks hours before it
+        setPreviousDayExtendedEndTime(extendedPeriod.to || "");
+      } else {
+        setPreviousDayExtendedEndTime("");
+      }
+    } else {
+      setPreviousDayExtendedEndTime("");
+    }
+  }, [selectedDay, _weekly_schedule]);
+
   useEffect(() => {
     // reset selected day and day periods when dialog is closed
     if (!_openDialog) {
@@ -247,6 +290,7 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
               early_unit: period.early_unit,
               lateness_period: period.lateness_period,
               lateness_unit: period.lateness_unit,
+              extends_to_next_day: period.extends_to_next_day,
             };
           },
         );
@@ -279,7 +323,16 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   //  handle add day period
   const handleAddDayPeriod = () => {
     const lastPeriod = dayPeriods[dayPeriods.length - 1];
-    const nextStartTime = addMinuteToTime(lastPeriod?.end_time);
+    let nextStartTime = "";
+
+    if (lastPeriod?.end_time) {
+      // If there's a previous period, start after it
+      nextStartTime = addMinuteToTime(lastPeriod.end_time);
+    } else if (dayPeriods.length === 0 && previousDayExtendedEndTime) {
+      // If it's the first period and previous day has extended period, start after it
+      nextStartTime = addMinuteToTime(previousDayExtendedEndTime);
+    }
+
     SetDayPeriods([
       ...dayPeriods,
       {
@@ -370,6 +423,8 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         extendsToNextDayMsg,
         // min edge in next day
         minEdgeInNextDay,
+        // end time of extended period from previous day
+        previousDayExtendedEndTime,
       }}
     >
       {children}
