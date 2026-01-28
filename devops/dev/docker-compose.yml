@@ -23,7 +23,7 @@ services:
       - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.entrypoints=https"
       - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.tls.certresolver=letsencrypt"
       - "traefik.http.services.nextjs-${DEPLOYMENT_ID}.loadbalancer.server.port=3000"
-      - "traefik.http.routers.main.priority=12"
+      - "traefik.http.routers.nextjs-${DEPLOYMENT_ID}.priority=12"
 
     networks:
       - traefik_network
