@@ -200,6 +200,17 @@ export const companyProfileMessages = new MessagesGroup({
     contract: _m("Employment Contract", "عقد العمل"),
     attendance: _m("Attendance Policy", "سياسة الحضور"),
     usersActions: _m("User Actions", "اجراءات المستخدم"),
+    branches: new MessagesGroup({
+      assignUsersDialog: new MessagesGroup({
+        title: _m("Branch Edit Permission", "صلاحية التعديل علي الفرع"),
+        description: _m("Give users permission to edit this branch", "أعطاء المستخدمين صلاحية التعديل علي الفرع"),
+        cancel: _m("Cancel", "الغاء"),
+        assign: _m("Assign", "تعيين"),
+        searchUsers: _m("Search Users", "البحث عن مستخدمين"),
+        managerNote: _m("Company Manager", "مدير الشركة :"),
+        branchManager: _m("Branch Manager", "مدير الفرع :")
+      })
+    }),
     contractTabs: new MessagesGroup({
       personalTab: _m("Personal Data", "البيانات الشخصية"),
       academicAndExperience: _m("Academic and Experience Data", "البيانات الاكاديمية والخبرة"),
@@ -222,17 +233,6 @@ export const companyProfileMessages = new MessagesGroup({
         certifications: _m("Professional Certifications", "الشهادات المهنية"),
         cv: _m("CV", "السيرة الذاتية")
       })
-    })
-  }),
-  branches: new MessagesGroup({
-    assignUsersDialog: new MessagesGroup({
-      title: _m("Branch Edit Permission", "صلاحية التعديل علي الفرع"),
-      description: _m("Give users permission to edit this branch", "أعطاء المستخدمين صلاحية التعديل علي الفرع"),
-      cancel: _m("Cancel", "الغاء"),
-      assign: _m("Assign", "تعيين"),
-      searchUsers: _m("Search Users", "البحث عن مستخدمين"),
-      managerNote: _m("Company Manager", "مدير الشركة :"),
-      branchManager: _m("Branch Manager", "مدير الفرع :")
     })
   }),
   officialDocs: new MessagesGroup({
