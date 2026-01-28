@@ -19,6 +19,8 @@ export const tableMessages = new MessagesGroup({
   All: _m("All", "الكل"),
   Searching: _m("Searching...", "جاري البحث..."),
   LoadingOptions: _m("Loading options...", "جاري تحميل الخيارات..."),
+  ErrorLoadingOptions: _m("Error loading options", "خطأ في تحميل الخيارات"),
+  NoOptionsFound: _m("No options found", "لم يتم العثور على خيارات"),
   Error: _m("Error", "خطأ"),
 
   // HeadlessTableLayout translations
