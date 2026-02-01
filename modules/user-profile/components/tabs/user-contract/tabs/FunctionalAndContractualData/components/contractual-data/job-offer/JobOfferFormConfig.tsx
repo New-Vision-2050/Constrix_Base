@@ -5,6 +5,7 @@ import { useFunctionalContractualCxt } from "../../../context";
 import { JobOffer } from "@/modules/user-profile/types/job-offer";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   offer?: JobOffer;
@@ -13,6 +14,7 @@ type PropsT = {
 export const JobOfferFormConfig = ({ offer }: PropsT) => {
   const { userId } = useUserProfileCxt();
   const { handleRefetchJobOffer } = useFunctionalContractualCxt();
+  const t = useTranslations("UserProfile.tabs.financialData.jobOffer");
 
   const jobOfferFormConfig: FormConfig = {
     formId: `job-offer-data-form-${offer?.id}`,
@@ -21,16 +23,16 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
         fields: [
           {
             name: "job_offer_number",
-            label: "رقم العرض",
+            label: t("jobOfferNumberLabel"),
             type: "text",
-            placeholder: "رقم العرض",
+            placeholder: t("jobOfferNumberPlaceholder"),
             validation: [],
           },
           {
-            label: "تاريخ الارسال",
+            label: t("dateSendLabel"),
             type: "date",
             name: "date_send",
-            placeholder: "تاريخ الارسال",
+            placeholder: t("dateSendPlaceholder"),
             maxDate: {
               formId: `job-offer-data-form-${offer?.id}`,
               field: "date_accept",
@@ -38,10 +40,10 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             validation: [],
           },
           {
-            label: "تاريخ الموافقة",
+            label: t("dateAcceptLabel"),
             type: "date",
             name: "date_accept",
-            placeholder: "تاريخ الموافقة",
+            placeholder: t("dateAcceptPlaceholder"),
             minDate: {
               formId: `job-offer-data-form-${offer?.id}`,
               field: "date_send",
@@ -49,7 +51,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             validation: [],
           },
           {
-            label: "ارفاق العرض",
+            label: t("fileLabel"),
             type: "file",
             fileConfig: {
               allowedFileTypes: [
@@ -60,7 +62,7 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
             },
             name: "file",
             isMulti: true,
-            placeholder: "job_offer.pdf",
+            placeholder: t("filePlaceholder"),
           },
         ],
       },
@@ -71,8 +73,8 @@ export const JobOfferFormConfig = ({ offer }: PropsT) => {
       date_accept: offer?.date_accept,
       file: offer?.files,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

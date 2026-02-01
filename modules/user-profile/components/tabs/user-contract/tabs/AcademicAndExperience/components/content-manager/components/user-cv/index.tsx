@@ -8,18 +8,20 @@ import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
 import NoDataFounded from "@/modules/user-profile/components/NoDataFounded";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useTranslations } from "next-intl";
 
 export default function UserCV() {
   const [open, setOpen] = useState(false);
   const { userCV } = useUserAcademicTabsCxt();
+    const t = useTranslations("UserProfile");
 
   return (
     <div className="flex flex-col gap-6">
       <p className="text-lg font-bold text-gray-700">
-        البيانات الوظيفية والتعاقدية
+        {t("tabs.academicAndExperience.cv")}
       </p>
       <FormFieldSet
-        title={"السيرة الذاتية"}
+        title={t("tabs.academicAndExperience.cv")}
         secondTitle={
           <Can check={[PERMISSIONS.profile.cv.update]}>
             <Button variant={"ghost"} onClick={() => setOpen(true)}>
@@ -33,8 +35,8 @@ export default function UserCV() {
             <PdfViewer src={userCV?.files?.url ?? ""} />
           ) : (
             <NoDataFounded
-              title="لا يوجد بيانات"
-              subTitle="لا يوجد سيرة ذاتية , قم بارفاق السيرة الذاتية"
+              title={t("tabs.academicAndExperience.cvNoData")}
+              subTitle={t("tabs.academicAndExperience.cvNoDataSubTitle")}
             />
           )}
         </Can>

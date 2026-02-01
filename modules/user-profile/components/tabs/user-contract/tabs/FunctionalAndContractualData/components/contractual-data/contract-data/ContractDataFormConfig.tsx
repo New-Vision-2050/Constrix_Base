@@ -6,6 +6,7 @@ import { useFunctionalContractualCxt } from "../../../context";
 import { Contract } from "@/modules/user-profile/types/Contract";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   contract?: Contract;
@@ -44,6 +45,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
     useUserProfileCxt();
   const { handleRefetchContractData, timeUnits } =
     useFunctionalContractualCxt();
+  const t = useTranslations("UserProfile.tabs.financialData.workContract");
 
   const contractDataFormConfig: FormConfig = {
     formId: `user-contract-data-form-${contract?.id}`,
@@ -53,16 +55,16 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
         fields: [
           {
             name: "contract_number",
-            label: "رقم العقد",
+            label: t("contractNumberLabel"),
             type: "text",
-            placeholder: "رقم العقد",
+            placeholder: t("contractNumberPlaceholder"),
             validation: [],
           },
           {
             name: "start_date",
-            label: "تاريخ المباشرة",
+            label: t("startDateLabel"),
             type: "date",
-            placeholder: "تاريخ المباشرة",
+            placeholder: t("startDatePlaceholder"),
             maxDate: {
               formId: `user-contract-data-form-${contract?.id}`,
               field: "commencement_date",
@@ -71,9 +73,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "commencement_date",
-            label: "تاريخ البدء",
+            label: t("commencementDateLabel"),
             type: "date",
-            placeholder: "تاريخ البدء",
+            placeholder: t("commencementDatePlaceholder"),
             minDate: {
               formId: `user-contract-data-form-${contract?.id}`,
               field: "start_date",
@@ -89,9 +91,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "contract_duration",
-            label: "مدة العقد",
+            label: t("contractDurationLabel"),
             type: "text",
-            placeholder: "مدة العقد",
+            placeholder: t("contractDurationPlaceholder"),
             onChange: (
               newValue: any,
               values: Record<string, any>,
@@ -202,7 +204,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "مدة العقد يجب أن تكون أرقام فقط",
+                message: t("contractDurationPattern"),
               },
             ],
           },
@@ -215,9 +217,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "notice_period",
-            label: "فترة الاشعار",
+            label: t("noticePeriodLabel"),
             type: "text",
-            placeholder: "فترة الاشعار",
+            placeholder: t("noticePeriodPlaceholder"),
             postfix: (
               <div className="w-full h-full">
                 <select
@@ -272,7 +274,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "فترة الاشعار يجب أن تكون أرقام فقط",
+                message: t("noticePeriodPattern"),
               },
               {
                 type: "custom",
@@ -315,7 +317,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
                   );
                   return noticePeriodInDays <= contractDurationInDays;
                 },
-                message: "فترة الاشعار يجب أن لا تكون أكبر من مدة العقد",
+                message: t("noticePeriodValidation"),
               },
             ],
           },
@@ -333,9 +335,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "probation_period",
-            label: "فترة التجربة",
+            label: t("probationPeriodLabel"),
             type: "text",
-            placeholder: "فترة التجربة",
+            placeholder: t("probationPeriodPlaceholder"),
             postfix: (
               <div className="w-full h-full">
                 <select
@@ -390,7 +392,7 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "فترة التجربة يجب أن تكون أرقام فقط",
+                message: t("probationPeriodPattern"),
               },
               {
                 type: "custom",
@@ -422,15 +424,15 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
 
                   return probationPeriodInDays <= contractDurationInDays;
                 },
-                message: "فترة التجربة يجب أن لا تكون أكبر من مدة العقد",
+                message: t("probationPeriodValidation"),
               },
             ],
           },
           {
             name: "type_working_hour_id",
-            label: "نوع ساعات العمل",
+            label: t("typeWorkingHourLabel"),
             type: "select",
-            placeholder: "نوع ساعات العمل",
+            placeholder: t("typeWorkingHourPlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/type_working_hours`,
               valueField: "id",
@@ -443,29 +445,29 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "working_hours",
-            label: "ساعات العمل الاسبوعية",
+            label: t("workingHoursLabel"),
             type: "text",
-            placeholder: "ساعات العمل الاسبوعية",
-            postfix: "ساعة",
+            placeholder: t("workingHoursPlaceholder"),
+            postfix: t("hourLabel"),
             validation: [
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "ساعات العمل يجب أن تكون أرقام فقط",
+                message: t("workingHoursPattern"),
               },
             ],
           },
           {
             name: "annual_leave",
-            label: "ايام الاجازات السنوية",
+            label: t("annualLeaveLabel"),
             type: "text",
-            placeholder: "ايام الاجازات السنوية",
-            postfix: "ايام",
+            placeholder: t("annualLeavePlaceholder"),
+            postfix: t("dayLabel"),
             validation: [
               {
                 type: "pattern",
                 value: "^[0-9]+$",
-                message: "أيام الإجازات يجب أن تكون أرقام فقط",
+                message: t("annualLeavePattern"),
               },
               {
                 type: "custom",
@@ -502,8 +504,8 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           {
             type: "select",
             name: "state_id",
-            label: "مكان العمل",
-            placeholder: "اختر مكان العمل",
+            label: t("workPlaceLabel"),
+            placeholder: t("workPlacePlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/countries/get-states-by-branch`,
               valueField: "id",
@@ -519,9 +521,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "right_terminate_id",
-            label: "حق الانهاء خلال فترة التجربة",
+            label: t("rightTerminateLabel"),
             type: "select",
-            placeholder: "حق الانهاء خلال فترة التجربة",
+            placeholder: t("rightTerminatePlaceholder"),
             dynamicOptions: {
               url: `${baseURL}/right_terminates`,
               valueField: "id",
@@ -534,9 +536,9 @@ export const ContractDataFormConfig = ({ contract }: PropsT) => {
           },
           {
             name: "file",
-            label: "ارفاق العقد",
+            label: t("attachContractLabel"),
             type: "file",
-            placeholder: "ارفاق العقد",
+            placeholder: t("attachContractPlaceholder"),
             isMulti: true,
             fileConfig: {
               allowedFileTypes: [

@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/button";
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { useEffect, useState } from "react";
 import AddPrivilegeDialog from "./AddPrivilegeDialog";
-
+import { useTranslations } from "next-intl";
 export function AddNewPrivilege() {
   const { privileges, addedPrivilegesList } = useFinancialDataCxt();
   const [addedPrivilegesTypes, setAddedPrivilegesTypes] = useState<string[]>();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [privilegeId, setPrivilegeId] = useState("");
-
+  const t = useTranslations("UserProfile");
   // handle side effects
   useEffect(() => {
     if (addedPrivilegesList) {
@@ -37,7 +37,7 @@ export function AddNewPrivilege() {
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <Button>اضافة امتياز</Button>
+          <Button>{t("tabs.financialData.addNewPrivilege")}</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-auto">
           <DropdownMenuGroup>

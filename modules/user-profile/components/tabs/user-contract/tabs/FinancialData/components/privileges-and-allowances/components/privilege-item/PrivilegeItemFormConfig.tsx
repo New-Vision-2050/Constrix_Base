@@ -6,6 +6,7 @@ import { useFinancialDataCxt } from "../../../../context/financialDataCxt";
 import { UserPrivilege } from "@/modules/user-profile/types/privilege";
 import { AllowancesTypes } from "../../AllowancesEnum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   privilegeData?: UserPrivilege;
@@ -21,6 +22,7 @@ export const PrivilegeItemFormConfig = ({
   const isEdit = privilegeData ? true : false;
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefreshPrivilegesList } = useFinancialDataCxt();
+  const t = useTranslations("UserProfile.tabs.financialData.privilegeForm");
 
   const privilegeItemFormConfig: FormConfig = {
     formId: `privilege-form-${privilegeData?.id}`,
@@ -34,8 +36,8 @@ export const PrivilegeItemFormConfig = ({
           {
             type: "select",
             name: "type_privilege_id",
-            label: "نوع البدل (عائلي - فردي)",
-            placeholder: "اختر البدل",
+            label: t("typePrivilegeLabel"),
+            placeholder: t("typePrivilegePlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/type_privileges`,
@@ -51,15 +53,15 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل البدل",
+                message: t("typePrivilegeRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "type_allowance_code",
-            label: "نوع البدل (ثابت - نسبة - توفير)",
-            placeholder: "اختر البدل",
+            label: t("typeAllowanceLabel"),
+            placeholder: t("typeAllowancePlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/type_allowances`,
@@ -71,59 +73,59 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل البدل",
+                message: t("typeAllowanceRequired"),
               },
             ],
           },
           {
             name: "charge_amount",
-            label: "معدل حساب النسبة من اصل الراتب",
+            label: t("chargeAmountPercentageLabel"),
             type: "text",
             postfix: "%",
             condition: (values) => {
               if (values.type_allowance_code == null) return false;
               return values.type_allowance_code === AllowancesTypes?.Percentage;
             },
-            placeholder: "معدل حساب النسبة من اصل الراتب",
+            placeholder: t("chargeAmountPercentagePlaceholder"),
             validation: [
               {
                 type: "required",
-                message: "معدل حساب النسبة من اصل الراتب مطلوب",
+                message: t("chargeAmountPercentageRequired"),
               },
               {
                 type: "pattern",
                 value: /^\d+(\.\d+)?$/,
-                message: "يجب إدخال رقم فقط",
+                message: t("numberOnlyValidation"),
               }
             ],
           },
           {
             name: "charge_amount",
-            label: "المبلغ",
+            label: t("chargeAmountLabel"),
             type: "text",
             postfix: "ر.س",
             condition: (values) => {
               if (values.type_allowance_code == null) return false;
               return values.type_allowance_code === AllowancesTypes?.Constant;
             },
-            placeholder: "المبلغ",
+            placeholder: t("chargeAmountPlaceholder"),
             validation: [
               {
                 type: "required",
-                message: "المبلغ مطلوب",
+                message: t("chargeAmountRequired"),
               },
               {
                 type: "pattern",
                 value: /^\d+(\.\d+)?$/,
-                message: "يجب إدخال رقم فقط",
+                message: t("numberOnlyValidation"),
               }
             ],
           },
           {
             type: "select",
             name: "period_id",
-            label: "وحدة المدة",
-            placeholder: "اختر البدل",
+            label: t("periodLabel"),
+            placeholder: t("periodPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/periods`,
@@ -143,15 +145,15 @@ export const PrivilegeItemFormConfig = ({
             validation: [
               {
                 type: "required",
-                message: "ادخل البدل",
+                message: t("periodRequired"),
               },
             ],
           },
           {
             name: "description",
-            label: "وصف",
+            label: t("descriptionLabel"),
             type: "textarea",
-            placeholder: "وصف",
+            placeholder: t("descriptionPlaceholder"),
           },
         ],
         columns: 2,
@@ -164,8 +166,8 @@ export const PrivilegeItemFormConfig = ({
       period_id: privilegeData?.period_id,
       description: privilegeData?.description,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,
