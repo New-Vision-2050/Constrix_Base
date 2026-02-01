@@ -4,6 +4,9 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { SalaryTypes } from "./salary_type_enum";
+import { useTranslations } from "next-intl";
+
+
 
 // Helper to get period name from period ID
 const getPeriodName = async (periodId: string) => {
@@ -20,6 +23,7 @@ const getPeriodName = async (periodId: string) => {
     return null;
   }
 };
+
 
 // Helper function to calculate hourly rate based on payment period and salary
 const calculateHourlyRate = (
@@ -67,7 +71,7 @@ export const SalaryFormConfig = () => {
   // declare and define component state and variables
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
-
+const t = useTranslations("UserProfile");
   const salaryFormConfig: FormConfig = {
     formId: "salary-data-form",
     apiUrl: `${baseURL}/user_salaries`,
@@ -80,9 +84,9 @@ export const SalaryFormConfig = () => {
         fields: [
           {
             name: "salary_type_code",
-            label: "الراتب الاساسي",
+            label: t("tabs.contractTabs.salaryType"),
             type: "select",
-            placeholder: "الراتب الاساسي",
+            placeholder:t("tabs.contractTabs.salaryType") ,
             required: true,
             dynamicOptions: {
               url: `${baseURL}/salary_types`,
@@ -211,8 +215,8 @@ export const SalaryFormConfig = () => {
           {
             type: "select",
             name: "period_id",
-            label: "دورة القبض",
-            placeholder: "اختر دورة القبض",
+            label: t("tabs.contractTabs.PaymentCycle"),
+            placeholder: t("tabs.contractTabs.PaymentCycle"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/periods`,
