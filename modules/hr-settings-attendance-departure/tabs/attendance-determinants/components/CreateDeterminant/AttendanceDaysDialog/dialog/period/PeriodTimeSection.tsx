@@ -28,7 +28,15 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
     }
 
     const isEndAt24 = newEndTime === "24:00";
-    if (newStartTime && newEndTime && newStartTime > newEndTime && !isEndAt24) {
+    // Only clear end time if start > end AND not extending to next day AND not 24:00
+    // When extends_to_next_day is enabled, end time can be less than start time (e.g., 22:00 - 08:00)
+    if (
+      newStartTime &&
+      newEndTime &&
+      newStartTime > newEndTime &&
+      !isEndAt24 &&
+      !period.extends_to_next_day
+    ) {
       newEndTime = "";
     }
 
