@@ -5,13 +5,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
 import PickupMap from "@/components/shared/pickup-map";
-
+import { useTranslations } from "next-intl";
 export const updateBranchFormConfig = (
   branches: Branch[],
   branch: Branch,
   isMainBranch?: boolean
 ) => {
   const mainBranch = branches.find((branch) => !Boolean(branch.parent_id));
+  const t = useTranslations("UserProfile.header.branches");
   const { company_id }: { company_id: string | undefined } = useParams();
 
   const queryClient = useQueryClient();
@@ -25,7 +26,7 @@ export const updateBranchFormConfig = (
         queryKey: ["company-branches", company_id],
       });
     },
-    title: "تعديل الفرع",
+    title: t("updateBranchFormTitle"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -35,18 +36,18 @@ export const updateBranchFormConfig = (
         fields: [
           {
             name: "name",
-            label: "اسم الفرع",
-            placeholder: "اسم الفرع",
+            label: t("addNewBranchFormFieldsNameLabel"),
+            placeholder: t("addNewBranchFormFieldsNamePlaceholder"),
             type: "text",
             validation: [
               {
                 type: "required",
-                message: "ادخل اسم الفرع",
+                message: t("addNewBranchFormValidationRequired"),
               },
             ],
           },
           {
-            label: "تعديل الموقع من الخريطة",
+            label: t("addNewBranchFormFieldsMapLabel"),
             name: "map",
             type: "text",
             render: () => (
@@ -71,15 +72,15 @@ export const updateBranchFormConfig = (
             type: "text",
             render: () => (
               <p className="text-xs">
-                - يجب اختيار خطوط الطول و دوائر العرض من الخريطة
+                - {t("addNewBranchFormFieldsMapRule")}
               </p>
             ),
           },
           {
             type: "select",
             name: "country_id",
-            label: "الدولة",
-            placeholder: "الدولة",
+            label: t("addNewBranchFormFieldsCountryIdLabel"),
+            placeholder: t("addNewBranchFormFieldsCountryId"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries`,
@@ -95,15 +96,15 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "الدولة",
+                message: t("addNewBranchFormFieldsCountryIdValidationRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "state_id",
-            label: "المحافظة",
-            placeholder: "المحافظة",
+            label: t("addNewBranchFormFieldsStateIdLabel"),
+            placeholder: t("addNewBranchFormFieldsStateId")   ,
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
@@ -121,15 +122,15 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل المنطقة",
+                message: t("addNewBranchFormFieldsStateIdValidationRequired"),
               },
             ],
           },
           {
             type: "select",
             name: "city_id",
-            label: "المدينة",
-            placeholder: "المدينة",
+            label: t("MainBranch"),
+            placeholder: t("MainBranch"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
@@ -147,15 +148,15 @@ export const updateBranchFormConfig = (
           },
           {
             name: "parent_name",
-            label: "الفرع الرئيسي",
+            label: t("addNewBranchFormFieldsParentNameLabel"),
             type: "text",
             disabled: true,
           },
           {
             type: "select",
             name: "manager_id",
-            label: "مدير الفرع",
-            placeholder: "اختر مدير الفرع",
+            label: t("addNewBranchFormFieldsManagerIdLabel"),
+            placeholder: t("addNewBranchFormFieldsManagerIdPlaceholder")  ,
             required: true,
             dynamicOptions: {
               url: `${baseURL}/users`,
@@ -171,13 +172,13 @@ export const updateBranchFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "مدير الفرع",
+                message: t("addNewBranchFormFieldsManagerIdValidationRequired"),
               },
             ],
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("addNewBranchFormFieldsPhoneLabel"),
             type: "phone",
             required: true,
             validation: [
@@ -189,42 +190,42 @@ export const updateBranchFormConfig = (
           },
           {
             name: "email",
-            label: "البريد الإلكتروني",
+            label: t("addNewBranchFormFieldsEmailLabel"),
             type: "email",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("addNewBranchFormFieldsEmail"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل البريد الالكتروني",
+                message: t("addNewBranchFormFieldsEmailValidationRequired"),
               },
               {
                 type: "email",
-                message: "البريد الالكتروني غير صحيح",
+                message: t("addNewBranchFormFieldsEmailValidationEmail"),
               },
             ],
           },
           {
             name: "latitude",
-            label: "latitude",
+            label: t("addNewBranchFormFieldsLatitudeLabel"),
             placeholder: "latitude",
             type: "hiddenObject",
             validation: [
               {
                 type: "required",
-                message: "ادخل دائرة العرض",
+                message: t("addNewBranchFormFieldsLatitudeValidationRequired"),
               },
             ],
           },
           {
             name: "longitude",
-            label: "longitude",
-            placeholder: "longitude",
+            label: t("addNewBranchFormFieldsLongitudeLabel"),
+            placeholder: t("addNewBranchFormFieldsLongitudePlaceholder"),
             type: "hiddenObject",
             validation: [
               {
                 type: "required",
-                message: "ادخل خط الطول",
+                message: t("addNewBranchFormFieldsLongitudeValidationRequired") ,
               },
             ],
           },
@@ -236,10 +237,10 @@ export const updateBranchFormConfig = (
       parent_id: mainBranch?.id ?? "",
       parent_name: mainBranch?.name ?? "",
     },
-    submitButtonText: "تعديل",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("updateBranchFormSubmitButtonText"),
+    cancelButtonText: t("updateBranchFormCancelButtonText"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("updateBranchFormResetButtonText"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import withPermissions from "@/lib/permissions/client/withPermissions";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
-
+import { useTranslations } from "next-intl";
 const NationalAddress = ({
   id,
   currentCompanyId,
@@ -51,7 +51,7 @@ const NationalAddress = ({
       <p className="text-center px-5">يجب تحديد عنوان واحد على الاقل</p>
     </div>
   );
-
+const t = useTranslations("UserProfile.header.officialData");
   return (
     <>
       {isPending && (
@@ -64,7 +64,7 @@ const NationalAddress = ({
 
       {isSuccess && (
         <FormFieldSet
-          title="العنوان الوطني"
+          title={t("nationalAddress")}
           valid={!!companyAddress}
           secondTitle={
             <Can check={[PERMISSIONS.companyProfile.address.update]}>

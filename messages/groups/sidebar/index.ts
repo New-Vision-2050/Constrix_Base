@@ -2,6 +2,9 @@ import { _m, MessagesGroup } from "../../types";
 
 export const sidebarMessages = new MessagesGroup({
   Dashboard: _m("Profile", "الملف الشخصي"),
+  Roles: _m("Roles", "الادوار"),
+  Permissions: _m("Permissions", "الصلاحيات"),
+  CompanyProfileSettings: _m("Company Profile Settings", "اعدادات ملف الشركة"),
   Companies: _m("Companies", "الشركات"),
   CompaniesList: _m("Companies List", "عرض الشركات"),
   Users: _m("Users", "المستخدمين"),

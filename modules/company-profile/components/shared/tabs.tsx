@@ -8,12 +8,15 @@ import Branches from "../branches";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
+import {useTranslations} from "next-intl";
+
 
 const CompanyProfileTabs = (): Tab[] => {
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.header.address");
   const tabs: (Tab & { show: boolean })[] = [
     {
-      label: "البيانات الرسمية",
+      label: t("official-data"),
       icon: <User size={18} />,
       value: "official-data",
       component: <OfficialData />,
@@ -26,7 +29,7 @@ const CompanyProfileTabs = (): Tab[] => {
       ]),
     },
     {
-      label: "الفروع",
+      label: t("branches"),
       icon: <MapPin size={18} />,
       value: "branches",
       component: <Branches />,
@@ -49,10 +52,11 @@ export const CompanyProfile = () => {
 };
 export const CompanyTabs = (): Tab[] => {
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.header.address");
 
   const tabs: (Tab & { show: boolean })[] = [
     {
-      label: "ملف الشركة",
+      label:t("company"),
       icon: <User size={18} />,
       value: "company",
       component: <CompanyProfile />,
@@ -66,31 +70,31 @@ export const CompanyTabs = (): Tab[] => {
       ]),
     },
     {
-      label: "اعدادات الموقع والتطبيق",
+        label: t("location"),
       icon: <Users size={18} />,
       value: "location",
       show: true,
     },
     {
-      label: "المشاريع",
+      label: t("projects"),
       icon: <Lock size={18} />,
       value: "projects",
       show: true,
     },
     {
-      label: "البيانات المالية",
+      label: t("finance"),
       icon: <DollarSign size={18} />,
       value: "finance",
       show: true,
     },
     {
-      label: "الاجازات",
+      label: t("leaves"),
       icon: <Send size={18} />,
       value: "leaves",
       show: true,
     },
     {
-      label: "اجراءات المستخدم",
+      label: t("userActions"),
       icon: <Lock size={18} />,
       value: "user-actions",
       show: true,

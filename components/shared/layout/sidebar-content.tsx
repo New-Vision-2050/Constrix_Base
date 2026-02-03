@@ -136,7 +136,7 @@ export function SidebarContentWrapper({
       ROUTER.COMPANY_PROFILE,
     ];
     const rolesObj = {
-      name: "الادوار",
+      name: t("Sidebar.Roles"),
       url: ROUTER.ROLES,
       icon: RollerCoasterIcon,
       isActive: pageName === ROUTER.ROLES,
@@ -144,7 +144,7 @@ export function SidebarContentWrapper({
     };
 
     const permissionsObj = {
-      name: "الصلاحيات",
+      name: t("Sidebar.Permissions"),
       url: ROUTER.PERMISSIONS,
       icon: LayoutDashboardIcon,
       isActive: pageName === ROUTER.PERMISSIONS,
@@ -304,7 +304,7 @@ export function SidebarContentWrapper({
             ]),
           },
           {
-            name: "اعداد ملف الشركة",
+            name: t("Sidebar.CompanyProfileSettings"),
             url: ROUTER.COMPANY_PROFILE,
             icon: InboxIcon,
             isActive: pageName === ROUTER.COMPANY_PROFILE,

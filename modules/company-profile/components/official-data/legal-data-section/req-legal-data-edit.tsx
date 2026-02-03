@@ -1,10 +1,11 @@
 import { FormConfig } from "@/modules/form-builder";
 import { baseURL } from "@/config/axios-config";
-
+import { useTranslations } from "next-intl";
 export const ReqLegalDataEdit = () => {
+  const t = useTranslations("UserProfile.header.officialData");
   const ReqLegalDataEdit: FormConfig = {
     formId: "ReqOfficialDataEdit",
-    title: "طلب تعديل البيانات الرسمية",
+    title: t("requestEdit"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -15,8 +16,8 @@ export const ReqLegalDataEdit = () => {
           {
             type: "select",
             name: "country_id",
-            label: "دولة المركز الرئيسي",
-            placeholder: "اختر دولة المركز الرئيسي",
+            label: t("countryName"),
+            placeholder: t("selectCountry") ,
             dynamicOptions: {
               url: `${baseURL}/countries`,
               valueField: "id",
@@ -31,73 +32,73 @@ export const ReqLegalDataEdit = () => {
             validation: [
               {
                 type: "required",
-                message: "ادخل دولة المركز الرئيسي",
+                message: t("countryNameRequired"),
               },
             ],
           },
           {
             name: "company_type",
-            label: "كيان الشركة",
+            label: t("companyType"),
             type: "select",
-            options: [{ label: "هندسي", value: "هندسي" }],
+            options: [{ label: t("companyTypeEngineer"), value:t("companyTypeEngineer") }],
             validation: [
               {
                 type: "required",
-                message: "ادخل كيان الشركة",
+                message: t("companyTypeRequired"),
               },
             ],
           },
           {
             name: "company_field",
-            label: "مجال الشركة",
+            label: t("companyField"),
             type: "select",
-            options: [{ label: "استشارات هندسية", value: "استشارات هندسية" }],
+            options: [{ label: t("companyFieldEngineer"), value:t("companyFieldEngineer") }],
             validation: [
               {
                 type: "required",
-                message: "ادخل مجال الشركة",
+                message: t("companyFieldRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "اسم الشركة",
+            label: t("name"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("enterCompanyName"),
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("nameRequired"),
               },
             ],
           },
           {
             name: "bucket",
-            label: "الباقة",
+            label: t("packages"),
             type: "select",
-            options: [{ label: "متميز", value: "متميز" }],
+            options: [{ label: t("packagesPremium"), value: t("packagesPremium") }],
             validation: [
               {
                 type: "required",
-                message: "الباقة مطلوبة",
+                message: t("packagesRequired"),
               },
             ],
           },
           {
             name: "notes",
-            label: "ملاحظات",
+            label: t("notes"),
             type: "text",
-            placeholder: "ملاحظات",
+            placeholder: t("enterNotes"),
           },
           {
             type: "file",
             name: "mainDocument",
-            label: "Main Document",
+            label: t("mainDocument"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "Main document is required",
+                message: t("mainDocumentRequired")    ,
               },
             ],
             isMulti: true,
@@ -123,12 +124,12 @@ export const ReqLegalDataEdit = () => {
       name: "",
       branch: "",
       name_en: "",
-      company_type: "هندسي",
+      company_type:  t("companyTypeEngineer"),
     },
-    submitButtonText: "ارسال طلب التعديل",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("requestEdit"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

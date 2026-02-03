@@ -1,7 +1,7 @@
 import FormFieldSet from "@/modules/user-profile/components/tabs/user-contract/tabs/components/FormFieldSet";
 import React from "react";
 import { GeneralManager } from "../../types/company";
-
+import { useTranslations } from "next-intl";
 const SupportData = ({
   generalManager,
 }: {
@@ -15,23 +15,23 @@ const SupportData = ({
       nationality: generalManager?.nationality,
     },
   ];
-
+const t = useTranslations("UserProfile.header.officialData");
   return (
-    <FormFieldSet title="بيانات الدعم">
+    <FormFieldSet title={t("supportData")}>
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr>
             <th className="border-b border-gray-500 px-4 py-2 text-center font-normal">
-              الاسم
+              {t("name")}
             </th>
             <th className="border-b border-gray-500 px-4 py-2 text-center font-normal">
-              الهاتف
+              {t("phone")}
             </th>
             <th className="border-b border-gray-500 px-4 py-2 text-center font-normal">
-              البريد الإلكتروني
+              {t("email")}
             </th>
             <th className="border-b border-gray-500 px-4 py-2 text-center font-normal">
-              الجنسية
+              {t("nationality")}
             </th>
           </tr>
         </thead>

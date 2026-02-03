@@ -27,7 +27,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import SetLegalDataForm from "./set-legal-data";
 import AddLegalDataSheet from "./set-legal-data/AddLegalDataSheet";
-
+import { useTranslations } from "next-intl";
 const LegalDataSection = ({
   currentCompanyId,
   id,
@@ -61,6 +61,7 @@ const LegalDataSection = ({
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyForm, handleOpenMyForm, handleCloseMyForm] = useModal();
+  const t = useTranslations("UserProfile.header.officialData");
 
   // add legal data sheet
   const [
@@ -84,7 +85,7 @@ const LegalDataSection = ({
 
       {isSuccess && (
         <FormFieldSet
-          title="البيانات القانونية"
+          title={t("legalData")}
           valid={
             !!companyLegalData &&
             companyLegalData.length > 0 &&
@@ -99,15 +100,15 @@ const LegalDataSection = ({
               settingsBtn={{
                 items: [
                   {
-                    title: "طلباتي",
+                    title: t("myRequests"),
                     onClick: handleOpenMyReq,
                   },
                   {
-                    title: "طلب تعديل البيانات القانونية",
+                    title: t("requestEdit"),
                     onClick: handleOpenReqForm,
                   },
                   {
-                    title: "اضافة بيان قانوني",
+                    title: t("addLegalData"),
                     onClick: () => {
                       handleOpenAddLegalDataSheet();
                     },
@@ -158,7 +159,7 @@ const LegalDataSection = ({
           ) : (
             <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
               <InfoIcon additionClass="text-orange-500 " />
-              <p className="text-center px-5">يجب إكمال بيانات التسجيل</p>
+              <p className="text-center px-5">{t("legalDataRequired")}</p>
             </div>
           )}
           <AddLegalDataSheet
@@ -179,7 +180,7 @@ const LegalDataSection = ({
           className={`h-fit max-h-[100vh] overflow-scroll`}
         >
           <SheetHeader>
-            <SheetTitle>طلباتي</SheetTitle>
+            <SheetTitle>{t("myRequests")}</SheetTitle>
           </SheetHeader>
           <MyRequests
             type="companyLegalDataUpdate"
@@ -187,7 +188,7 @@ const LegalDataSection = ({
             branch_id={id}
           />
           <Button className="mt-6 w-full" onClick={handleCloseMyReq}>
-            الرجوع
+            {t("back")}
           </Button>
         </SheetContent>
       </Sheet>
