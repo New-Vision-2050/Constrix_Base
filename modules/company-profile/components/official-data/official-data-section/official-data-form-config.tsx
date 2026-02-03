@@ -4,6 +4,7 @@ import { officialData } from "@/modules/company-profile/types/company";
 import { useQueryClient } from "@tanstack/react-query";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export const CompanyOfficialData = (
   officialData: officialData,
@@ -12,6 +13,8 @@ export const CompanyOfficialData = (
   const { company_id }: { company_id: string | undefined } = useParams();
   console.log("officialData", officialData);
   const queryClient = useQueryClient();
+  const t = useTranslations("UserProfile.header.officialData");
+
   const OfficialDataFormConfig: FormConfig = {
     formId: `company-official-data-form-${id}-${company_id}`,
     // apiUrl: `${baseURL}/companies/company-profile/official-data`,
@@ -25,41 +28,41 @@ export const CompanyOfficialData = (
         fields: [
           {
             name: "name",
-            label: "اسم الشركة",
+            label: t("name"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("enterCompanyName"),
             disabled: true,
           },
           {
             name: "branch_name",
-            label: "اسم الفرع",
+            label: t("branch"),
             type: "text",
-            placeholder: "اسم الفرع",
+            placeholder: t("enterBranch"),
             validation: [
               {
                 type: "required",
-                message: "اسم الفرع مطلوب",
+                message: t("branchRequired"),
               },
             ],
           },
           {
             name: "name_en",
-            label: "اسم الشركة بالانجليزي",
+            label: t("nameEn"),
             type: "text",
-            placeholder: "يجب كتابة الاسم باللغة الانجليزية",
+            placeholder: t("enterNameEn"),
             validation: [
               {
                 type: "required",
-                message: "اسم الشركة مطلوب",
+                message: t("nameEnRequired"),
               },
             ],
             gridArea: 2,
           },
           {
             name: "company_type_id",
-            label: "كيان الشركة",
+            label: t("companyType"),
             type: "select",
-            placeholder: "كيان الشركة",
+            placeholder: t("selectCompanyType"),
             dynamicOptions: {
               url: `${baseURL}/company_types`,
               valueField: "id",
@@ -74,61 +77,61 @@ export const CompanyOfficialData = (
             validation: [
               {
                 type: "required",
-                message: "كيان الشركة مطلوب",
+                message: t("companyTypeRequired"),
               },
             ],
           },
           {
             name: "country",
-            label: "دولة المركز الرئيسي",
+            label: t("countryName"),
             type: "text",
-            placeholder: "دولة المركز الرئيسي",
+            placeholder: t("enterCountryName"),
             disabled: true,
           },
           {
             name: "company_field",
-            label: "مجال الشركة",
+            label: t("companyField"),
             type: "text",
-            placeholder: "مجال الشركة",
+            placeholder: t("enterCompanyField"),
             disabled: true,
           },
           {
             name: "phone",
-            label: "رقم الجوال",
+            label: t("phone"),
             type: "phone",
-            placeholder: "رقم الجوال",
+            placeholder: t("enterPhone"),
             validation: [
               {
                 type: "phone",
-                message: "",
+                message: t("invalidPhone"),
               },
               {
                 type: "required",
-                message: "field is required",
+                message: t("phoneRequired"),
               },
             ],
           },
           {
             name: "email",
-            label: "البريد الالكتروني",
+            label: t("email"),
             type: "text",
-            placeholder: "البريد الالكتروني",
+            placeholder: t("enterEmail")  ,
             validation: [
               {
                 type: "required",
-                message: "ادخل البريد الالكتروني",
+                message: t("emailRequired"),
               },
               {
                 type: "email",
-                message: "البريد الالكتروني غير صحيح",
+                message: t("invalidEmail"),
               },
             ],
           },
           {
             name: "program_id",
-            label: "البرنامج",
+            label: t("companyAccessPrograms"),
             type: "select",
-            placeholder: "البرنامج",
+            placeholder: t("selectCompanyAccessPrograms")   ,
             dynamicOptions: {
               url: `${baseURL}/company_access_programs/list?company_field=${officialData?.company_field.map(
                 (item) => item.id
@@ -147,9 +150,9 @@ export const CompanyOfficialData = (
           },
           {
             name: "packages",
-            label: "الباقة",
+            label: t("packages"),
             type: "select",
-            placeholder: "الباقة",
+            placeholder: t("selectPackages"),
             dynamicOptions: {
               url: `${baseURL}/packages/list`,
               valueField: "id",
@@ -179,7 +182,7 @@ export const CompanyOfficialData = (
           : "",
       phone: officialData?.phone ?? "",
       email: officialData?.email ?? "",
-      bucket: "متميز",
+      bucket: t("packagesPremium"),
       program_id:
         !!officialData?.company_access_programs &&
         officialData?.company_access_programs.length > 0
@@ -192,10 +195,10 @@ export const CompanyOfficialData = (
           ? officialData?.packages.map((pack) => pack.id)
           : "",
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

@@ -5,7 +5,7 @@ import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmit
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@i18n/navigation";
 import { serialize } from "object-to-formdata";
-
+import { useTranslations } from "next-intl";
 export const updateDocsFormConfig = (
   doc: CompanyDocument,
   id?: string,
@@ -13,10 +13,10 @@ export const updateDocsFormConfig = (
 ) => {
   const { company_id }: { company_id: string | undefined } = useParams();
   const queryClient = useQueryClient();
-
+ const t = useTranslations("UserProfile.header.nationalAddress");
   const updateDocsFormConfig: FormConfig = {
     formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
-    title: "تحديث مستند رسمي",
+    title: t("updateDoc"),
     laravelValidation: {
       enabled: true,
       errorsPath: "errors",
@@ -27,8 +27,8 @@ export const updateDocsFormConfig = (
           {
             type: "select",
             name: "document_type_id",
-            label: "نوع المستند",
-            placeholder: "نوع المستند",
+            label: t("docType"),
+            placeholder: t("docType"),
             dynamicOptions: {
               url: `${baseURL}/document_types`,
               valueField: "id",
@@ -43,40 +43,40 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل نوع المستند",
+                message: t("docTypeRequired"),
               },
             ],
           },
           {
             name: "name",
-            label: "اسم المستند",
+            label: t("docName"),
             type: "text",
-            placeholder: "ادخل اسم المستند",
+            placeholder: t("docNamePlaceholder"),
             required: true,
             validation: [
               {
                 type: "required",
-                message: "ادخل الوصف",
+                message: t("docNameRequired"),
               },
             ],
           },
           {
             name: "description",
-            label: "الوصف",
+            label: t("docDescription"),
             type: "text",
-            placeholder: "ادخل الوصف",
+            placeholder: t("docDescriptionPlaceholder") ,
           },
           {
             name: "document_number",
-            label: "رقم المستند",
+            label: t("docNumber"),
             type: "text",
-            placeholder: "ادخل رقم المستند",
+            placeholder: t("docNumberPlaceholder"),
           },
           {
             name: "start_date",
-            label: "تاريخ الإصدار",
+            label: t("startDate"),
             type: "date",
-            placeholder: "تاريخ الإصدار",
+            placeholder: t("startDatePlaceholder"),
             maxDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "end_date",
@@ -84,15 +84,15 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الاصدار",
+                message: t("startDateRequired"),
               },
             ],
           },
           {
             name: "end_date",
-            label: "تاريخ الانتهاء",
+            label: t("endDate"),
             type: "date",
-            placeholder: "تاريخ الانتهاء",
+            placeholder: t("endDatePlaceholder")  ,
             minDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
@@ -104,7 +104,7 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الانتهاء",
+                message: t("endDateRequired"),
               },
             ],
             onChange: (value) => {
@@ -123,9 +123,9 @@ export const updateDocsFormConfig = (
           },
           {
             name: "notification_date",
-            label: "تاريخ الاشعار",
+            label: t("notificationDate"),
             type: "date",
-            placeholder: "تاريخ الاشعار",
+            placeholder: t("notificationDatePlaceholder") ,
             minDate: {
               formId: `updateDocsFormConfig-${doc.id}-${id}-${company_id}`,
               field: "start_date",
@@ -138,18 +138,18 @@ export const updateDocsFormConfig = (
             validation: [
               {
                 type: "required",
-                message: "ادخل تاريخ الاشعار",
+                message: t("notificationDateRequired"),
               },
             ],
           },
           {
             type: "file",
             name: "files",
-            label: "اضافة مستندات",
+            label: t("addDocFiles"),
             validation: [
               {
                 type: "required",
-                message: "يجب ادخال مرفق على الاقل",
+                message: t("addDocFilesRequired") ,
               },
             ],
             isMulti: true,
@@ -176,10 +176,10 @@ export const updateDocsFormConfig = (
     initialValues: {
       ...doc,
     },
-    submitButtonText: "تحديث",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("update"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

@@ -13,7 +13,7 @@ import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { Tab } from "@/types/Tab";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-
+import { useTranslations } from "next-intl";
 const Branches = () => {
   const { company_id } = useParams();
 
@@ -46,7 +46,7 @@ const Branches = () => {
   const handleBranchesRefetch = () => {
     refetchBranches();
   };
-
+const t = useTranslations("UserProfile.header.branches");
   const dynamicBranchTabs =
     branches.length > 0
       ? branches.map((branch) => ({
@@ -60,7 +60,7 @@ const Branches = () => {
 
   const tabs: (Tab & { show: boolean; disabled: boolean })[] = [
     {
-      label: "معلومات الفروع",
+      label: t("branches"),
       value: "general",
       component: (
         <Can check={[PERMISSIONS.companyProfile.branch.list]}>

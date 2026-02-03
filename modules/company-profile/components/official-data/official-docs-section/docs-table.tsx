@@ -1,5 +1,5 @@
 "use client";
-
+import { useTranslations } from "next-intl";
 import DeleteConfirmationDialog from "@/components/shared/DeleteConfirmationDialog";
 import {
   Dialog,
@@ -43,7 +43,7 @@ const DocTableRow = ({
   const [isOpenShow, handleOpenShow, handleCloseShow] = useModal();
 
   const queryClient = useQueryClient();
-
+ const t = useTranslations("UserProfile.header.nationalAddress");
   return (
     <>
       <tr>
@@ -109,7 +109,7 @@ const DocTableRow = ({
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{doc.files.length - 4} مرفقات إضافية</p>
+                    <p>{doc.files.length - 4} {t("additionalFiles")}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -123,7 +123,7 @@ const DocTableRow = ({
         </td>
         <td className="py-3 px-3 border-b">
           <button onClick={handleOpenShow} className="text-primary underline">
-            عرض
+            {t("view")}
           </button>
         </td>
         <td className="py-3 px-3 border-b">
@@ -142,7 +142,7 @@ const DocTableRow = ({
                 }
                 `}
                 >
-                  تحديث
+                  {t("update")}
                 </button>
               }
             />
@@ -183,7 +183,7 @@ const DocTableRow = ({
       <Dialog open={isOpenShow} onOpenChange={handleCloseShow}>
         <DialogContent withCrossButton className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-center my-5">الاحداث</DialogTitle>
+            <DialogTitle className="text-center my-5">{t("activityLog")}</DialogTitle>
           </DialogHeader>
           <UserActivityLog activities={doc.logs} />
         </DialogContent>
@@ -202,21 +202,23 @@ const DocsTable = ({
   id?: string;
   onSuccess?: () => void;
 }) => {
+  const t = useTranslations("UserProfile.header.nationalAddress");
+  
   return (
     <div className="max-h-[500px] overflow-auto">
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            <td className="text-start p-3 border-b">نوع المستند</td>
-            <td className="text-start p-3 border-b">أسم المستند</td>
-            <td className="text-start p-3 border-b">وصف المستند</td>
-            <td className="text-start p-3 border-b">رقم المستند</td>
-            <td className="text-start p-3 border-b">تاريخ الاصدار</td>
-            <td className="text-start p-3 border-b">تاريخ الانتهاء</td>
-            <td className="text-start p-3 border-b">تاريخ الاشعار</td>
-            <td className="text-start p-3 border-b">المرفقات</td>
-            <td className="text-start p-3 border-b">الاحداث</td>
-            <td className="text-start p-3 border-b">الاجراءات</td>
+            <td className="text-start p-3 border-b">{t("docType")}</td>
+            <td className="text-start p-3 border-b">{t("docName")}</td>
+            <td className="text-start p-3 border-b">{t("docDescription")}</td>
+            <td className="text-start p-3 border-b">{t("docNumber")}</td>
+            <td className="text-start p-3 border-b">{t("docIssueDate")}</td>
+            <td className="text-start p-3 border-b">{t("docEndDate")}</td>
+            <td className="text-start p-3 border-b">{t("docNotificationDate")}</td>
+            <td className="text-start p-3 border-b">{t("docAttachments")}</td>
+            <td className="text-start p-3 border-b">{t("docActivityLog")}</td>
+            <td className="text-start p-3 border-b">{t("docActions")}</td>
           </tr>
         </thead>
         <tbody>

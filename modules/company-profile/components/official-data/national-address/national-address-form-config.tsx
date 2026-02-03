@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import PickupMap from "../../../../../components/shared/pickup-map";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useParams } from "@i18n/navigation";
-
+import { useTranslations } from "next-intl";
 export const NationalAddressFormConfig = (
   companyAddress?: CompanyAddress,
   id?: string,
@@ -13,10 +13,10 @@ export const NationalAddressFormConfig = (
 ) => {
   const formId = `NationalAddressFormConfig-${id}-${company_id}`;
   const queryClient = useQueryClient();
-
+  const t = useTranslations("UserProfile.header.nationalAddress");
   const NationalAddressFormConfig: FormConfig = {
     formId,
-    title: "اضافة بيان قانوني",
+    title: t("addNewBranchForm")  ,
     apiUrl: `${baseURL}/write-the-url`,
     laravelValidation: {
       enabled: true,
@@ -27,7 +27,7 @@ export const NationalAddressFormConfig = (
         columns: 2,
         fields: [
           {
-            label: "تعديل الموقع من الخريطة",
+            label: t("map"),
             name: "map",
             type: "text",
             render: () => (
@@ -64,16 +64,16 @@ export const NationalAddressFormConfig = (
           },
           {
             name: "country_name",
-            label: "الدولة",
+            label: t("country"),
             type: "text",
-            placeholder: "الدولة",
+            placeholder: t("country"),
             disabled: true,
           },
           {
             type: "select",
             name: "state_id",
-            label: "المنطقة",
-            placeholder: "المنطقة",
+            label: t("state"),
+            placeholder: t("state"),
             dynamicOptions: {
               url: `${baseURL}/countries/get-country-states-cities`,
               valueField: "id",
@@ -121,65 +121,65 @@ export const NationalAddressFormConfig = (
           },
           {
             name: "neighborhood_name",
-            label: "الحي",
+            label: t("neighborhood"),
             type: "text",
-            placeholder: "الحي",
+            placeholder: t("neighborhood"),
             validation: [
               {
                 type: "required",
-                message: "الحي مطلوب",
+                message: t("neighborhoodRequired"),
               },
             ],
           },
           {
             name: "building_number",
-            label: "رقم المبنى",
+            label: t("buildingNumber"),
             type: "text",
-            placeholder: "رقم المبنى",
+            placeholder: t("buildingNumber"),
             validation: [
               {
                 type: "required",
-                message: "رقم المبنى مطلوب",
+                message: t("buildingNumberRequired"),
               },
             ],
           },
           {
             name: "additional_phone",
-            label: "الرقم الاضافي",
+            label: t("additionalPhone"),
             type: "phone",
-            placeholder: "الرقم الاضافي",
+            placeholder: t("additionalPhone"),
             validation: [
               {
                 type: "phone",
-                message: "رقم الهاتف غير صالح",
+                message: t("additionalPhoneInvalid"),
               },
               {
                 type: "required",
-                message: "الرقم الاضافي مطلوب",
+                message: t("additionalPhoneRequired"),
               },
             ],
           },
           {
             name: "postal_code",
-            label: "الرمز البريدي",
+            label: t("postalCode"),
             type: "text",
-            placeholder: "الرمز البريدي",
+            placeholder: t("postalCode"),
             validation: [
               {
                 type: "required",
-                message: "الرمز البريدي مطلوب",
+                message: t("postalCodeRequired"),
               },
             ],
           },
           {
             name: "street_name",
-            label: "الشارع",
+            label: t("street"),
             type: "text",
-            placeholder: "الشارع",
+            placeholder: t("street"),
             validation: [
               {
                 type: "required",
-                message: "الشارع مطلوب",
+                message: t("streetRequired"),
               },
             ],
           },
@@ -199,10 +199,10 @@ export const NationalAddressFormConfig = (
       longitude: companyAddress?.country_long ?? "",
       latitude: companyAddress?.country_lat ?? "",
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("clearForm") ,
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

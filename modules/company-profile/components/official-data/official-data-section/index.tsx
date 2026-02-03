@@ -21,7 +21,7 @@ import { officialData } from "@/modules/company-profile/types/company";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
-
+import { useTranslations } from "next-intl";
 const OfficialDataSection = ({
   officialData,
   currentCompanyId,
@@ -36,6 +36,7 @@ const OfficialDataSection = ({
   const [mode, setMode] = useState<"Preview" | "Edit">("Preview");
 
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.header.officialData");
 
   const [isOpenReqForm, handleOpenReqForm, handleCloseReqForm] = useModal();
   const [isOpenMyReq, handleOpenMyReq, handleCloseMyReq] = useModal();
@@ -47,7 +48,7 @@ const OfficialDataSection = ({
   return (
     <>
       <FormFieldSet
-        title="البيانات الرسمية"
+        title={t("title")}
         valid={Object.values(officialData).every((value) =>
           Array.isArray(value) ? value.length > 0 : Boolean(value)
         )}
@@ -58,11 +59,11 @@ const OfficialDataSection = ({
             settingsBtn={{
               items: [
                 {
-                  title: "طلباتي",
+                  title: t("myRequests"),
                   onClick: handleOpenMyReq,
                 },
                 {
-                  title: "طلب تعديل البيانات الرسمية",
+                  title: t("requestEdit"),
                   onClick: handleOpenReqForm,
                 },
               ],

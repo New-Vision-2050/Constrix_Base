@@ -26,7 +26,7 @@ import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import Can from "@/lib/permissions/client/Can";
 import DocsSettingsDialog from "./docs-settings-dialog";
 import { useOfficialDocsData } from "../useOfficialDocsData";
-
+import { useTranslations } from "next-intl";
 const OfficialDocsSection = ({
   id,
   currentCompanyId,
@@ -52,14 +52,15 @@ const OfficialDocsSection = ({
   const [isOpenAddDoc, handleOpenAddDoc, handleCloseAddDoc] = useModal();
 
   const [isOpenSettings, handleOpenSettings, handleCloseSettings] = useModal();
+  const t = useTranslations("UserProfile.header.nationalAddress");
 
   const dropdownItems = [
     {
-      label: "اضافة مستند رسمي",
+      label: t("addNewDoc"),
       onClick: handleOpenAddDoc,
     },
     {
-      label: "اعدادات المستندات",
+      label: t("docsSettings"),
       onClick: handleOpenSettings,
     },
   ];
@@ -76,7 +77,7 @@ const OfficialDocsSection = ({
 
       {isSuccess && (
         <FormFieldSet
-          title="المستندات الرسمية"
+          title={t("officialDocs")}
           valid={
             !!companyOfficialDocuments && companyOfficialDocuments.length > 0
           }
@@ -112,7 +113,7 @@ const OfficialDocsSection = ({
             <div className="mx-auto w-64 rounded-md flex flex-col bg-background items-center justify-center gap-3 p-3">
               <InfoIcon additionClass="text-orange-500 " />
               <p className="text-center px-5">
-                يجب اضافة مستند رسمي واحد على الاقل
+                {t("noDocs")}
               </p>
             </div>
           )}
