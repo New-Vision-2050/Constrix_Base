@@ -123,7 +123,9 @@ jobs:
         env:
           BE_URL: ${{ env.BE_URL }}
           NODE_ENV: ${{ env.NODE_ENV }}
+          MAPAPIKEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         with:
+          envs: MAPAPIKEY
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           port: ${{ secrets.DEPLOY_PORT }}

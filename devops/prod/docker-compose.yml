@@ -19,11 +19,11 @@ services:
       - DEPLOYMENT_ID=${DEPLOYMENT_ID}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.default-router.rule=HostRegexp(`^(?!website-)(.+\\.)?constrix-nv\\.com$`)"
+      - "traefik.http.routers.default-router.rule=HostRegexp(`^([a-z0-9-]+\\.)*constrix-nv\\.com$`) && !HostRegexp(`^(core-|website-)[a-z0-9-]*\\.constrix-nv\\.com$`)"
       - "traefik.http.routers.default-router.entrypoints=https"
       - "traefik.http.routers.default-router.tls.certresolver=letsencrypt"
       - "traefik.http.services.default-router.loadbalancer.server.port=3000"
-      - "traefik.http.routers.default-router.priority=11"
+      - "traefik.http.routers.default-router.priority=20"
     networks:
       - traefik_network
 
