@@ -43,6 +43,13 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
   const [selectedBranch, setSelectedBranch] = useState("");
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
+  const normalizeRadius = (value: string) => {
+    if (value === "") return "200";
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return "200";
+    return numericValue < 200 ? "200" : value;
+  };
+
   // Initialize selected branch when branches are available
   React.useEffect(() => {
     if (selectedBranches.length > 0 && !selectedBranch) {
@@ -138,6 +145,17 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
         ...updateData,
       });
     }
+  };
+
+  const handleRadiusBlur = (value: string) => {
+    if (!selectedBranch) return;
+    const normalized = normalizeRadius(value);
+    if (normalized === value) return;
+    updateBranchLocation(selectedBranch, { radius: normalized });
+    setCurrentBranchData({
+      ...currentBranchData,
+      radius: normalized,
+    });
   };
 
   // Handle map click
@@ -256,6 +274,7 @@ function LocationDialogContent({ onClose }: { onClose: () => void }) {
             handleCoordinateChange("latitude", value)
           }
           onRadiusChange={(value) => handleCoordinateChange("radius", value)}
+          onRadiusBlur={handleRadiusBlur}
           disabled={currentBranchData.isDefault}
         />
 
