@@ -23,7 +23,12 @@ const UsersPage = () => {
     <div className="px-8 space-y-7">
       <StatisticsRow toggleRefetch={refreshWidget} config={statisticsConfig} />{" "}
       <TableBuilder
-        config={config}
+        config={
+          {
+            ...(config as unknown as object),
+            onDeleteSuccess: () => setRefreshWidget((prev) => prev + 1),
+          } as unknown as object
+        }
         searchBarActions={
           <div className="flex items-center gap-3">
             <Can check={[PERMISSIONS.user.create]}>
@@ -31,7 +36,7 @@ const UsersPage = () => {
                 config={GetCompanyUserFormConfig(t)}
                 trigger={<Button>إنشاء مستخدم</Button>}
                 onSuccess={(values) => {
-                  setRefreshWidget(prev => ++prev)
+                  setRefreshWidget((prev) => ++prev);
                   const tableStore = useTableStore.getState();
                   tableStore.reloadTable(config.tableId);
                 }}
