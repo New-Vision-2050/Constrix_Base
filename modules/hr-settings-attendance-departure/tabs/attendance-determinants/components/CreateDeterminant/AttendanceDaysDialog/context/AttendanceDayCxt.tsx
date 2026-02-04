@@ -53,6 +53,10 @@ type AttendanceDayCxtType = {
 
   // end time of extended period from previous day (blocks hours before this)
   previousDayExtendedEndTime: string;
+
+  // next day has conflicting periods - cannot extend
+  nextDayHasConflict: boolean;
+  nextDayConflictMsg: string;
 };
 
 export const AttendanceDayCxt = createContext<AttendanceDayCxtType>(
@@ -89,6 +93,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
   // end time of extended period from previous day
   const [previousDayExtendedEndTime, setPreviousDayExtendedEndTime] =
     useState<string>("");
+  // next day has conflicting periods - cannot extend
+  const [nextDayHasConflict, setNextDayHasConflict] = useState<boolean>(false);
+  const [nextDayConflictMsg, setNextDayConflictMsg] = useState<string>("");
 
   useEffect(() => {
     const _n = dayPeriods.length;
@@ -200,8 +207,65 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         }
         setMinEdgeInNextDay(_nextDayPeriodsMinEdge);
       }
+    } else {
+      // Reset extends message when no period extends to next day
+      SetExtendsToNextDayMsg("");
+      setMinEdgeInNextDay("");
     }
-  }, [dayPeriods]);
+  }, [dayPeriods, selectedDay]);
+
+  // Check if next day has any periods that would conflict with extension
+  useEffect(() => {
+    if (!selectedDay) {
+      setNextDayHasConflict(false);
+      setNextDayConflictMsg("");
+      return;
+    }
+
+    // Get next day
+    const currentDayIndex = DAYS_OF_WEEK.findIndex(
+      (d) => d.value === selectedDay,
+    );
+    const nextDayIndex = (currentDayIndex + 1) % DAYS_OF_WEEK.length;
+    const nextDayValue = DAYS_OF_WEEK[nextDayIndex].value;
+    const nextDayName = DAYS_OF_WEEK[nextDayIndex].labelAr;
+
+    // Get weekly schedule
+    const _weekly_schedule = useFormStore
+      ?.getState()
+      .getValue("create-determinant-form", "weekly_schedule");
+
+    // Find next day config
+    const nextDayConfig = _weekly_schedule?.find(
+      (day: any) => day.day === nextDayValue,
+    );
+
+    if (nextDayConfig && nextDayConfig.periods?.length > 0) {
+      // Next day has periods - check if any start from 00:00 or early morning
+      // which would conflict with an extended period
+      const hasConflictingPeriod = nextDayConfig.periods.some((period: any) => {
+        const startTime = period.from || "";
+        // If any period starts before or at the potential extended end time,
+        // there's a conflict. We check if any period exists that starts early.
+        // The extended period would occupy 00:00 to end_time on next day
+        return startTime !== ""; // Any period on next day is a potential conflict
+      });
+
+      if (hasConflictingPeriod) {
+        setNextDayHasConflict(true);
+        setNextDayConflictMsg(
+          `لا يمكن التمديد لليوم التالي (${nextDayName}) لأنه يحتوي على فترات عمل قد تتعارض مع الفترة الممتدة`,
+        );
+      } else {
+        setNextDayHasConflict(false);
+        setNextDayConflictMsg("");
+      }
+    } else {
+      // No periods on next day - no conflict
+      setNextDayHasConflict(false);
+      setNextDayConflictMsg("");
+    }
+  }, [selectedDay]);
 
   // edited day
   const _editedDay = useFormStore
@@ -425,6 +489,9 @@ export const AttendanceDayCxtProvider = (props: React.PropsWithChildren) => {
         minEdgeInNextDay,
         // end time of extended period from previous day
         previousDayExtendedEndTime,
+        // next day has conflicting periods
+        nextDayHasConflict,
+        nextDayConflictMsg,
       }}
     >
       {children}

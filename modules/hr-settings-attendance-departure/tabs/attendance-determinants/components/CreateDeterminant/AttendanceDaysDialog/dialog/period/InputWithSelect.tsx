@@ -1,12 +1,4 @@
 import React from "react";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +25,6 @@ interface InputWithSelectProps {
   selectOptions: SelectOptionType[];
   selectValue: string;
   onSelectChange: (value: string) => void;
-  selectDisabled?: boolean;
 
   // Common props
   label?: string;
@@ -55,13 +46,11 @@ export const InputWithSelect: React.FC<InputWithSelectProps> = ({
   inputValue,
   onInputChange,
   inputPlaceholder = "",
-  inputDisabled = false,
 
   // Select props
   selectOptions,
   selectValue,
   onSelectChange,
-  selectDisabled = false,
 
   // Common props
   label,
@@ -78,7 +67,7 @@ export const InputWithSelect: React.FC<InputWithSelectProps> = ({
         <label
           className={cn(
             "text-sm font-medium transition-colors",
-            isDarkTheme ? "text-gray-300" : "text-gray-700"
+            isDarkTheme ? "text-gray-300" : "text-gray-700",
           )}
         >
           {label}
@@ -90,13 +79,11 @@ export const InputWithSelect: React.FC<InputWithSelectProps> = ({
           value={inputValue}
           onChange={(e) => onInputChange(e.target.value)}
           placeholder={inputPlaceholder}
-          disabled={inputDisabled}
           className="focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent h-full border border-1 border-gray-400"
         />
         <select
           value={selectValue}
           onChange={(e) => onSelectChange(e.target.value)}
-          disabled={selectDisabled}
           className="rounded-l-none border-l-0 focus:ring-0 focus:ring-offset-0 bg-pink-500 text-white"
         >
           {selectOptions.map((option) => (
