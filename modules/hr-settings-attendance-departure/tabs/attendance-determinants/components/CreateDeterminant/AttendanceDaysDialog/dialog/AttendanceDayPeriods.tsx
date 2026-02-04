@@ -12,15 +12,14 @@ import { useTranslations } from "next-intl";
 import { Clock } from "lucide-react";
 
 export default function AttendanceDayPeriods() {
-  const {
-    dayPeriods,
-    isEdit,
-    handleEmptyDayPeriods,
-    handleAddDayPeriod,
-    selectedDay,
-  } = useAttendanceDayCxt();
+  const { dayPeriods, handleAddDayPeriod, selectedDay } = useAttendanceDayCxt();
   const t = useTranslations(
     "HRSettingsAttendanceDepartureModule.attendanceDeterminants.form.AttendanceDaysDialog",
+  );
+
+  // Check if any period extends to next day
+  const hasExtendedPeriod = dayPeriods.some(
+    (period) => period.extends_to_next_day,
   );
 
   return (
@@ -29,46 +28,29 @@ export default function AttendanceDayPeriods() {
         <p className="text-lg font-semibold">فترات عمل اليوم</p>
         <TooltipProvider>
           <div className="flex items-center gap-2">
-            {isEdit && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <Button
-                      onClick={handleEmptyDayPeriods}
-                      disabled={!selectedDay}
-                      className={
-                        !selectedDay ? "opacity-50 cursor-not-allowed" : ""
-                      }
-                    >
-                      {t("editPeriods")}
-                    </Button>
-                  </div>
-                </TooltipTrigger>
-                {!selectedDay && (
-                  <TooltipContent>
-                    <p>{t("selectDayFirst") || "يجب اختيار اليوم أولا"}</p>
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            )}
-
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
                   <Button
                     onClick={handleAddDayPeriod}
-                    disabled={!selectedDay}
+                    disabled={!selectedDay || hasExtendedPeriod}
                     className={
-                      !selectedDay ? "opacity-50 cursor-not-allowed" : ""
+                      !selectedDay || hasExtendedPeriod
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
                     }
                   >
                     {t("addPeriod")}
                   </Button>
                 </div>
               </TooltipTrigger>
-              {!selectedDay && (
+              {(!selectedDay || hasExtendedPeriod) && (
                 <TooltipContent>
-                  <p>{t("selectDayFirst") || "يجب اختيار اليوم أولا"}</p>
+                  <p>
+                    {!selectedDay
+                      ? t("selectDayFirst") || "يجب اختيار اليوم أولا"
+                      : "لا يمكن إضافة فترة جديدة عند وجود فترة ممتدة لليوم التالي"}
+                  </p>
                 </TooltipContent>
               )}
             </Tooltip>

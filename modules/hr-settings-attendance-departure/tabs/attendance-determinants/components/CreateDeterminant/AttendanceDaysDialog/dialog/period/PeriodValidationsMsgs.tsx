@@ -18,8 +18,13 @@ const convertTimeToMinutes = (timeString: string): number => {
 };
 
 export default function PeriodValidationsMsgs({ t, period }: PropsT) {
-  const { handleUpdateDayPeriod, maxEdge, extendsToNextDayMsg } =
-    useAttendanceDayCxt();
+  const {
+    handleUpdateDayPeriod,
+    maxEdge,
+    extendsToNextDayMsg,
+    nextDayHasConflict,
+    nextDayConflictMsg,
+  } = useAttendanceDayCxt();
 
   // handle change
   const handleChange = (checked: boolean) => {
@@ -53,13 +58,20 @@ export default function PeriodValidationsMsgs({ t, period }: PropsT) {
             id="extends-next-day"
             checked={period.extends_to_next_day || false}
             onCheckedChange={handleChange}
+            disabled={nextDayHasConflict && !period.extends_to_next_day}
           />
           <Label
             htmlFor="extends-next-day"
-            className="text-sm font-medium cursor-pointer"
+            className={`text-sm font-medium cursor-pointer ${nextDayHasConflict && !period.extends_to_next_day ? "text-gray-400" : ""}`}
           >
             {t("extendsToNextDay")}
           </Label>
+        </div>
+      )}
+      {/* Show conflict message if next day has periods that would conflict */}
+      {nextDayHasConflict && !period.extends_to_next_day && (
+        <div className="flex gap-1 flex-col">
+          <span className="italic text-red-500">{nextDayConflictMsg}</span>
         </div>
       )}
       {/* warning message if extends_to_next_day is checked and end_time is less than start_time */}
