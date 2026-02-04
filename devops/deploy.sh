@@ -3,6 +3,12 @@
 set -e
 set -x
 
+
+echo "Validating required environment variables..."
+
+REQUIRED_VARS=(
+    "MAPAPIKEY"
+)
 # Generate a unique cache bust value using the current timestamp and a random string
 CACHEBUST=$(date +%s)-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 8)
 echo "Cache bust value: $CACHEBUST"
@@ -37,7 +43,7 @@ NEXT_PUBLIC_API_VERSION=v1
 NODE_ENV=$DEPLOYMENT_ID
 NEXT_PUBLIC_CACHE_BUST=$CACHEBUST
 DEPLOYMENT_ID=$DEPLOYMENT_ID
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyD5izq7FZI-nHdrt6mx5UeKRkUSjvagS5g
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$MAPAPIKEY
 EOF
 
 cat .env
