@@ -136,8 +136,8 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       handleRefetchUserCourses();
     },
     onSubmit: async (formData: Record<string, unknown>) => {
-      const dateObtain = new Date(formData?.date_obtain as string);
-      const endDate = new Date(formData?.date_end as string);
+      const dateObtain = formData?.date_obtain ? new Date(formData.date_obtain as string) : null;
+      const endDate = formData?.date_end ? new Date(formData.date_end as string) : null;
 
       // Create a copy of the form data
       const formDataCopy = { ...formData };
@@ -148,12 +148,23 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       }
 
       // Create the final body
-      const body = {
+      const body: any = {
         ...formDataCopy,
         user_id: userId,
-        date_obtain: formatDateYYYYMMDD(dateObtain),
-        date_end: formatDateYYYYMMDD(endDate),
       };
+
+      // Only add dates if they are valid
+      if (dateObtain && !isNaN(dateObtain.getTime())) {
+        body.date_obtain = formatDateYYYYMMDD(dateObtain);
+      } else {
+        delete body.date_obtain;
+      }
+
+      if (endDate && !isNaN(endDate.getTime())) {
+        body.date_end = formatDateYYYYMMDD(endDate);
+      } else {
+        delete body.date_end;
+      }
 
       const url =
         formType === "Create"
