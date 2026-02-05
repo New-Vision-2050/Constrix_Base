@@ -16,7 +16,7 @@ type PropsT = {
 export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
   //  constext
   const { handleUpdateDayPeriod } = useAttendanceDayCxt();
- 
+
   // handle change periods edges
   const handleTimeChange = (type: "start" | "end", value: string) => {
     let newStartTime = period.start_time;
@@ -27,8 +27,16 @@ export default function PeriodTimeSection({ period, t, labelClass }: PropsT) {
       newEndTime = value;
     }
 
-    // if type start and end exist and start > end reset end
-    if (type === "start" && newStartTime && newEndTime && newStartTime > newEndTime) {
+    const isEndAt24 = newEndTime === "24:00";
+    // Only clear end time if start > end AND not extending to next day AND not 24:00
+    // When extends_to_next_day is enabled, end time can be less than start time (e.g., 22:00 - 08:00)
+    if (
+      newStartTime &&
+      newEndTime &&
+      newStartTime > newEndTime &&
+      !isEndAt24 &&
+      !period.extends_to_next_day
+    ) {
       newEndTime = "";
     }
 

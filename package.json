@@ -87,6 +87,7 @@
     "next-themes": "^0.3.0",
     "nextjs-breadcrumbs": "^1.1.9",
     "nextjs-toploader": "^3.9.17",
+    "nuqs": "^2.8.6",
     "object-to-formdata": "^4.5.1",
     "react": "^19.1.2",
     "react-apexcharts": "^1.7.0",

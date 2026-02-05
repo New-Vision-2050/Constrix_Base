@@ -1,5 +1,6 @@
 import { ColumnDef } from "../table-component/types";
 import { TableParams } from "../table-params/types";
+import { ColumnVisibilityState } from "../column-visibility";
 
 // ============================================================================
 // Table State Types (After Query)
@@ -21,6 +22,23 @@ export type TableStateV2Options<TRow> = {
   selectable?: boolean;
   getRowId?: (row: TRow) => string;
 
+  // Search
+  searchable?: boolean;
+
+  // Column Visibility
+  columnVisibility?: {
+    columnVisibility: ColumnVisibilityState;
+    toggleColumn: (columnKey: string) => void;
+    showAllColumns: () => void;
+    hideAllColumns: () => void;
+    resetColumnVisibility: () => void;
+    visibleColumns: ColumnDef<TRow>[];
+    allColumns: ColumnDef<TRow>[];
+    visibleCount: number;
+    totalCount: number;
+    hasHiddenColumns: boolean;
+  };
+
   // Loading & Filtering
   loading?: boolean;
   filtered?: boolean;
@@ -41,6 +59,21 @@ export type TableStateV2<TRow> = {
     filtered: boolean;
     handleSort: (key: string) => void;
     selectable: boolean;
+    searchable: boolean;
+  };
+
+  // Column Visibility state (optional, only if prefix provided)
+  columnVisibility?: {
+    columnVisibility: ColumnVisibilityState;
+    toggleColumn: (columnKey: string) => void;
+    showAllColumns: () => void;
+    hideAllColumns: () => void;
+    resetColumnVisibility: () => void;
+    visibleColumns: ColumnDef<TRow>[];
+    allColumns: ColumnDef<TRow>[];
+    visibleCount: number;
+    totalCount: number;
+    hasHiddenColumns: boolean;
   };
 
   // Pagination state
@@ -56,6 +89,12 @@ export type TableStateV2<TRow> = {
     canNextPage: boolean;
     canPrevPage: boolean;
     paginatedData: TRow[]; // Same as table.data (for backward compatibility)
+  };
+
+  // Search state
+  search: {
+    search: string;
+    setSearch: (search: string) => void;
   };
 
   // Selection state

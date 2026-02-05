@@ -6,7 +6,7 @@ import { FormConfig } from "../types/formTypes";
  */
 export const handleFormSubmissionError = (
   error: any,
-  config: FormConfig
+  config: FormConfig,
 ): {
   success: boolean;
   message?: string;
@@ -14,12 +14,11 @@ export const handleFormSubmissionError = (
 } => {
   console.log("Form submission error:", error);
 
-  // Handle Laravel validation errors
-  if (error.response?.status === 422 && config.laravelValidation?.enabled) {
-    const errorsPath = config.laravelValidation.errorsPath || "errors";
+  // Handle 422 validation errors - always extract message and errors
+  if (error.response?.status === 422) {
+    const errorsPath = config.laravelValidation?.errorsPath || "errors";
     const validationErrors = error.response.data?.[errorsPath] || {};
 
-    // Return the validation errors in the expected format
     return {
       success: false,
       message: error.response.data?.message || "Validation failed",
@@ -27,10 +26,11 @@ export const handleFormSubmissionError = (
     };
   }
 
-  // Handle other errors
+  // Handle other errors - also extract errors if present
   return {
     success: false,
     message:
       error.response?.data?.message || error.message || "An error occurred",
+    errors: error.response?.data?.errors || {},
   };
 };

@@ -14,13 +14,16 @@ export interface CreateDealOfDayParams {
 export interface UpdateDealOfDayParams extends Partial<CreateDealOfDayParams> {}
 
 export const DealDaysApi = {
+  list: (params?: { search?: string; page?: number; per_page?: number }) =>
+    baseApi.get("ecommerce/dashboard/deal_days", { params }),
+
   create: (params: CreateDealOfDayParams) =>
     baseApi.post(
       "/ecommerce/dashboard/deal_days",
       serialize(params, {
         indices: true,
         booleansAsIntegers: true,
-      })
+      }),
     ),
 
   update: (id: string, params: UpdateDealOfDayParams) =>

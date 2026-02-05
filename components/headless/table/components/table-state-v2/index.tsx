@@ -1,13 +1,19 @@
 import { useState, useMemo, useCallback } from "react";
 import { TableStateV2, TableStateV2Options } from "./types";
+import { createColumnVisibilityHook } from "../column-visibility";
 
 // ============================================================================
 // Table State Hook V2 (After Query)
 // ============================================================================
 
-export function createTableStateV2Hook<TRow>() {
+export function createTableStateV2Hook<TRow>(prefix?: string) {
+  // Create column visibility hook if prefix is provided, otherwise create a no-op hook
+  const useColumnVisibilityHook = prefix
+    ? createColumnVisibilityHook<TRow>(prefix)
+    : () => null;
+
   return function useTableState(
-    options: TableStateV2Options<TRow>
+    options: TableStateV2Options<TRow>,
   ): TableStateV2<TRow> {
     const {
       data,
@@ -16,12 +22,23 @@ export function createTableStateV2Hook<TRow>() {
       totalItems = 0,
       params,
       selectable = false,
+      searchable = false,
       getRowId,
       loading = false,
       filtered = false,
       onExport,
       onDelete,
+      columnVisibility: externalColumnVisibility,
     } = options;
+
+    // Automatically create column visibility if prefix exists and not provided externally
+    // Hook is always called unconditionally (returns null if no prefix)
+    const internalColumnVisibility = useColumnVisibilityHook(columns);
+    const columnVisibility =
+      externalColumnVisibility ?? internalColumnVisibility ?? undefined;
+
+    // Use visible columns if column visibility is enabled, otherwise use all columns
+    const activeColumns = columnVisibility?.visibleColumns ?? columns;
 
     // Selection state
     const [selectedRows, setSelectedRows] = useState<TRow[]>([]);
@@ -35,7 +52,7 @@ export function createTableStateV2Hook<TRow>() {
       (row: TRow): string => {
         return getRowId ? getRowId(row) : JSON.stringify(row);
       },
-      [getRowId]
+      [getRowId],
     );
 
     // Data with sticky selected rows at top
@@ -62,30 +79,30 @@ export function createTableStateV2Hook<TRow>() {
       (row: TRow): boolean => {
         const rowId = getRowIdentifier(row);
         return selectedRows.some(
-          (selectedRow) => getRowIdentifier(selectedRow) === rowId
+          (selectedRow) => getRowIdentifier(selectedRow) === rowId,
         );
       },
-      [selectedRows, getRowIdentifier]
+      [selectedRows, getRowIdentifier],
     );
 
     const toggleRow = useCallback(
       (row: TRow) => {
         const rowId = getRowIdentifier(row);
         const isSelected = selectedRows.some(
-          (selectedRow) => getRowIdentifier(selectedRow) === rowId
+          (selectedRow) => getRowIdentifier(selectedRow) === rowId,
         );
 
         if (isSelected) {
           setSelectedRows((prev) =>
             prev.filter(
-              (selectedRow) => getRowIdentifier(selectedRow) !== rowId
-            )
+              (selectedRow) => getRowIdentifier(selectedRow) !== rowId,
+            ),
           );
         } else {
           setSelectedRows((prev) => [...prev, row]);
         }
       },
-      [selectedRows, getRowIdentifier]
+      [selectedRows, getRowIdentifier],
     );
 
     const clearSelection = useCallback(() => {
@@ -110,12 +127,12 @@ export function createTableStateV2Hook<TRow>() {
       (row: TRow): boolean => {
         const rowId = getRowIdentifier(row);
         const isInCurrentPage = data.some(
-          (pageRow) => getRowIdentifier(pageRow) === rowId
+          (pageRow) => getRowIdentifier(pageRow) === rowId,
         );
 
         return !isInCurrentPage && isRowSelected(row);
       },
-      [data, getRowIdentifier, isRowSelected]
+      [data, getRowIdentifier, isRowSelected],
     );
 
     // Action handlers
@@ -135,7 +152,7 @@ export function createTableStateV2Hook<TRow>() {
     // Return structured state
     return {
       table: {
-        columns,
+        columns: activeColumns,
         data: dataWithStickyRows,
         sortBy: params.sortBy,
         sortDirection: params.sortDirection,
@@ -143,7 +160,9 @@ export function createTableStateV2Hook<TRow>() {
         filtered,
         handleSort: params.handleSort,
         selectable,
+        searchable,
       },
+      columnVisibility,
       pagination: {
         page: params.page,
         limit: params.limit,
@@ -156,6 +175,10 @@ export function createTableStateV2Hook<TRow>() {
         canNextPage,
         canPrevPage,
         paginatedData: dataWithStickyRows,
+      },
+      search: {
+        search: params.search,
+        setSearch: params.setSearch,
       },
       selection: {
         selectedRows,

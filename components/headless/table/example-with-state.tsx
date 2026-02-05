@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import HeadlessTableLayout from "./index";
 import { Box, Paper, Chip, TextField, Button, Stack } from "@mui/material";
-import { Search, Refresh } from "@mui/icons-material";
+import { Refresh } from "@mui/icons-material";
 
 // ============================================================================
 // Example Usage with Two-Hook Pattern
@@ -112,7 +112,7 @@ const fetchUsers = async (
   sortBy?: string,
   sortDirection?: "asc" | "desc",
   search?: string,
-  role?: string
+  role?: string,
 ): Promise<{ data: User[]; totalPages: number; totalItems: number }> => {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -142,11 +142,9 @@ const fetchUsers = async (
   return { data: paginatedData, totalPages, totalItems };
 };
 
+const UserTable = HeadlessTableLayout<User>("users");
 export function ExampleWithState() {
-  const UserTable = HeadlessTableLayout<User>();
-
   // Filter state
-  const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
 
   // ✅ STEP 1: useTableParams (BEFORE query)
@@ -155,6 +153,7 @@ export function ExampleWithState() {
     initialLimit: 5,
     initialSortBy: "name",
     initialSortDirection: "asc",
+    initialSearch: "",
   });
 
   // ✅ STEP 2: Fetch data using useQuery
@@ -165,7 +164,7 @@ export function ExampleWithState() {
       params.limit,
       params.sortBy,
       params.sortDirection,
-      searchQuery,
+      params.search,
       roleFilter,
     ],
     queryFn: () =>
@@ -174,8 +173,8 @@ export function ExampleWithState() {
         params.limit,
         params.sortBy,
         params.sortDirection,
-        searchQuery,
-        roleFilter
+        params.search,
+        roleFilter,
       ),
   });
 
@@ -231,9 +230,10 @@ export function ExampleWithState() {
     totalItems,
     params,
     selectable: true,
+    searchable: true,
     getRowId: (user: User) => user.id.toString(),
     loading: isLoading,
-    filtered: searchQuery !== "" || roleFilter !== "all",
+    filtered: params.search !== "" || roleFilter !== "all",
     onExport: async (selectedRows: User[]) => {
       console.log("Exporting rows:", selectedRows);
       alert(`Exporting ${selectedRows.length} rows`);
@@ -245,7 +245,6 @@ export function ExampleWithState() {
   });
 
   const handleReset = () => {
-    setSearchQuery("");
     setRoleFilter("all");
     params.reset();
   };
@@ -255,23 +254,7 @@ export function ExampleWithState() {
       <UserTable
         filters={
           <Stack spacing={2}>
-            {/* Filter Controls */}
             <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                size="small"
-                placeholder="Search by name or email..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  params.setPage(1);
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <Search sx={{ mr: 1, color: "action.active" }} />
-                  ),
-                }}
-                sx={{ flexGrow: 1 }}
-              />
               <TextField
                 select
                 size="small"
@@ -297,9 +280,17 @@ export function ExampleWithState() {
                 Reset
               </Button>
             </Stack>
-
-            {/* Top Actions */}
-            <UserTable.TopActions state={state} />
+            <UserTable.TopActions
+              state={state}
+              searchComponent={
+                state.table.searchable ? (
+                  <UserTable.Search
+                    search={state.search}
+                    placeholder="Search by name or email..."
+                  />
+                ) : undefined
+              }
+            />
           </Stack>
         }
         table={<UserTable.Table state={state} loadingOptions={{ rows: 5 }} />}
@@ -323,7 +314,7 @@ export function ExampleWithState() {
           </div>
           <div>Loading: {isLoading ? "Yes" : "No"}</div>
           <div>
-            Filters: {searchQuery || "(none)"} | Role: {roleFilter}
+            Search: {params.search || "(none)"} | Role: {roleFilter}
           </div>
         </Box>
       </Paper>

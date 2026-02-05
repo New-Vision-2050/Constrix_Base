@@ -29,4 +29,16 @@ export const tableMessages = new MessagesGroup({
   NoDataDescription: _m("There is no data to display", "لا توجد بيانات لعرضها"),
   NoResultsFound: _m("No results found", "لم يتم العثور على نتائج"),
   NoResultsDescription: _m("Try adjusting your filters", "حاول تعديل الفلاتر"),
+
+  // Column Visibility translations
+  Columns: _m("Columns", "الأعمدة"),
+  ColumnVisibility: _m("Column Visibility", "رؤية الأعمدة"),
+  ColumnVisibilityDescription: _m(
+    "Showing {visible} of {total} columns",
+    "عرض {visible} من {total} عمود",
+  ),
+  ShowAll: _m("Show All", "إظهار الكل"),
+  HideAll: _m("Hide All", "إخفاء الكل"),
+  Reset: _m("Reset", "إعادة تعيين"),
+  Close: _m("Close", "إغلاق"),
 });

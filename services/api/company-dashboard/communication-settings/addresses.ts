@@ -1,6 +1,7 @@
 import { baseApi } from "@/config/axios/instances/base";
 import { ShowAddressResponse, GetAllAddressesResponse } from "./types/response";
 import { CreateAddressParams, UpdateAddressParams } from "./types/params";
+import { exportRequest } from "@/utils/exportRequest";
 
 /**
  * Communication Settings Addresses API
@@ -14,6 +15,8 @@ export const CommunicationSettingsAddressesApi = {
     page?: number;
     per_page?: number;
     title?: string;
+    sort_by?: string;
+    sort_direction?: "asc" | "desc";
     city_id?: string;
     status?: number;
   }) => baseApi.get<GetAllAddressesResponse>("website-addresses", { params }),
@@ -39,4 +42,9 @@ export const CommunicationSettingsAddressesApi = {
    * Delete address
    */
   delete: (id: string) => baseApi.delete(`website-addresses/${id}`),
+
+  /**
+   * Export addresses
+   */
+  export: exportRequest("website-addresses/export"),
 };

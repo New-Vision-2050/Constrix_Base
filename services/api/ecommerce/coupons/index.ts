@@ -17,6 +17,9 @@ export interface CreateCouponParams {
 export interface UpdateCouponParams extends Partial<CreateCouponParams> {}
 
 export const CouponsApi = {
+  list: (params?: { search?: string; page?: number; per_page?: number }) =>
+    baseApi.get("ecommerce/dashboard/coupons", { params }),
+
   create: (params: CreateCouponParams) =>
     baseApi.post("ecommerce/dashboard/coupons", params),
 

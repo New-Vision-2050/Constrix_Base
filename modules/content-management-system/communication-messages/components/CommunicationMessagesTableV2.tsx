@@ -9,7 +9,6 @@ import { CommunicationMessagesApi } from "@/services/api/company-dashboard/commu
 import { toast } from "sonner";
 import Can from "@/lib/permissions/client/Can";
 import { createColumns } from "./table-v2/columns";
-import { TableFilters } from "./table-v2/filters";
 import { RowActions } from "./table-v2/actions";
 import { useTableData } from "./table-v2/use-table-data";
 import ReplyMessageDialog from "./ReplyMessageDialog";
@@ -18,7 +17,7 @@ import ConfirmDeleteDialog from "@/modules/company-profile/components/official-d
 import { CommunicationMessage } from "../types";
 
 // Create typed table instance
-const MessageTable = HeadlessTableLayout<CommunicationMessage>();
+const MessageTable = HeadlessTableLayout<CommunicationMessage>("cscm");
 
 /**
  * Communication Messages Table V2 - HeadlessTable Implementation
@@ -34,10 +33,6 @@ export default function CommunicationMessagesTableV2() {
   const [viewingDetailsId, setViewingDetailsId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
   // ✅ STEP 1: useTableParams (BEFORE query)
   const params = MessageTable.useTableParams({
     initialPage: 1,
@@ -45,13 +40,12 @@ export default function CommunicationMessagesTableV2() {
   });
 
   // ✅ STEP 2: Fetch data using custom hook
-  const {
-    messages,
-    isLoading,
-    totalPages,
-    totalItems,
-    refetch,
-  } = useTableData(params.page, params.limit, searchQuery, statusFilter);
+  const { messages, isLoading, totalPages, totalItems, refetch } = useTableData(
+    params.page,
+    params.limit,
+    params.search,
+    "all",
+  );
 
   // Permission checks
   const canView = can(PERMISSIONS.CMS.communicationContactMessages.list);
@@ -77,23 +71,6 @@ export default function CommunicationMessagesTableV2() {
 
   const cancelDelete = () => {
     setDeleteConfirmId(null);
-  };
-
-  // Filter handlers
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    params.setPage(1);
-  };
-
-  const handleStatusChange = (value: string) => {
-    setStatusFilter(value);
-    params.setPage(1);
-  };
-
-  const handleReset = () => {
-    setSearchQuery("");
-    setStatusFilter("all");
-    params.reset();
   };
 
   // Table columns with actions
@@ -127,7 +104,8 @@ export default function CommunicationMessagesTableV2() {
     params,
     getRowId: (msg) => msg.id,
     loading: isLoading,
-    filtered: searchQuery !== "" || statusFilter !== "all",
+    searchable: true,
+    filtered: params.search !== "",
   });
 
   return (
@@ -136,16 +114,7 @@ export default function CommunicationMessagesTableV2() {
         <h1 className="text-2xl font-bold">{t("title")}</h1>
 
         <MessageTable
-          filters={
-            <TableFilters
-              searchQuery={searchQuery}
-              statusFilter={statusFilter}
-              onSearchChange={handleSearchChange}
-              onStatusChange={handleStatusChange}
-              onReset={handleReset}
-              t={t}
-            />
-          }
+          filters={<MessageTable.TopActions state={state} />}
           table={
             <MessageTable.Table state={state} loadingOptions={{ rows: 5 }} />
           }
