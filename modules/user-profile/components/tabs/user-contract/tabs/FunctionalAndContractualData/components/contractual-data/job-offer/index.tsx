@@ -5,15 +5,17 @@ import TabTemplate from "@/components/shared/TabTemplate/TabTemplate";
 import { useFunctionalContractualCxt } from "../../../context";
 import Can from "@/lib/permissions/client/Can";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   offer: JobOffer | undefined;
 };
 export default function JobOfferForm({ offer }: PropsT) {
   const { userJobOffersDataLoading } = useFunctionalContractualCxt();
+  const t = useTranslations("UserProfile.tabs.financialData.jobOffer");
   return (
     <TabTemplate
-      title={"العرض الوظيفي"}
+      title={t("title")}
       loading={userJobOffersDataLoading}
       reviewMode={
         <Can check={[PERMISSIONS.profile.jobOffer.view]}>

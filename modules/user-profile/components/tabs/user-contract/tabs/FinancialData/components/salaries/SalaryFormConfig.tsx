@@ -4,6 +4,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { useFinancialDataCxt } from "../../context/financialDataCxt";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { SalaryTypes } from "./salary_type_enum";
+import {useTranslations} from "next-intl";
 
 // Helper to get period name from period ID
 const getPeriodName = async (periodId: string) => {
@@ -64,6 +65,7 @@ const calculateHourlyRate = (
 };
 
 export const SalaryFormConfig = () => {
+  const t = useTranslations("UserProfile");
   // declare and define component state and variables
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { userSalary, handleRefreshSalaryData } = useFinancialDataCxt();
@@ -80,9 +82,9 @@ export const SalaryFormConfig = () => {
         fields: [
           {
             name: "salary_type_code",
-            label: "الراتب الاساسي",
+            label: t("header.salary.basicSalary"),
             type: "select",
-            placeholder: "الراتب الاساسي",
+            placeholder: t("header.salary.basicSalary"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/salary_types`,
@@ -95,7 +97,7 @@ export const SalaryFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "الراتب الاساسي مطلوب",
+                message: t("header.salary.basicSalaryRequired"),
               },
             ],
             onChange: async (
@@ -138,13 +140,13 @@ export const SalaryFormConfig = () => {
           },
           {
             name: "salary",
-            label: "مبلغ الراتب الاساسي",
+            label: t("header.salary.basicSalaryAmount"),
             type: "text",
-            placeholder: "مبلغ الراتب الاساسي",
+            placeholder: t("header.salary.basicSalaryAmount"),
             validation: [
               {
                 type: "required",
-                message: "مبلغ الراتب الاساسي مطلوب",
+                message: t("header.salary.basicSalaryAmountRequired"),
               },
             ],
             condition: (values) =>
@@ -167,13 +169,13 @@ export const SalaryFormConfig = () => {
           },
           {
             name: "salary",
-            label: "مبلغ الراتب الاساسي",
+            label: t("header.salary.basicSalaryAmount"),
             type: "text",
-            placeholder: "مبلغ الراتب الاساسي",
+            placeholder: t("header.salary.basicSalaryAmount"),
             validation: [
               {
                 type: "required",
-                message: "مبلغ الراتب الاساسي مطلوب",
+                message: t("header.salary.basicSalaryAmountRequired"),
               },
             ],
             condition: (values) =>
@@ -211,8 +213,8 @@ export const SalaryFormConfig = () => {
           {
             type: "select",
             name: "period_id",
-            label: "دورة القبض",
-            placeholder: "اختر دورة القبض",
+            label: t("header.salary.paymentPeriod"),
+            placeholder: t("header.salary.paymentPeriodPlaceholder"),
             required: true,
             dynamicOptions: {
               url: `${baseURL}/periods`,
@@ -228,7 +230,7 @@ export const SalaryFormConfig = () => {
             validation: [
               {
                 type: "required",
-                message: "ادخل دورة القبض",
+                message: t("header.salary.paymentPeriodRequired"),
               },
             ],
             onChange: async (
@@ -270,30 +272,30 @@ export const SalaryFormConfig = () => {
           },
           {
             name: "description",
-            label: "وصف اساس حساب الراتب",
+            label: t("header.salary.salaryDescription"),
             type: "text",
-            placeholder: "وصف اساس حساب الراتب",
+            placeholder: t("header.salary.salaryDescriptionPlaceholder"),
             condition: (values) =>
               values.salary_type_code === SalaryTypes.percentage,
             validation: [
               {
                 type: "required",
-                message: "وصف اساس حساب الراتب مطلوب",
+                message: t("header.salary.salaryDescriptionRequired"),
               },
             ],
           },
           {
             name: "hour_rate",
-            label: "قيمة الساعة",
+            label: t("header.salary.hourlyRate"),
             type: "number",
             postfix: "ر.س",
-            placeholder: "قيمة الساعة",
+            placeholder: t("header.salary.hourlyRatePlaceholder") ,
             condition: (values) =>
               values.salary_type_code === SalaryTypes.constants,
             validation: [
               {
                 type: "required",
-                message: "قيمة الساعة مطلوب",
+                message: t("header.salary.hourlyRateRequired"),
               },
             ],
             // Make this field readonly since it's now calculated automatically
@@ -310,8 +312,8 @@ export const SalaryFormConfig = () => {
       description: userSalary?.description,
       hour_rate: userSalary?.hour_rate,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("header.salary.save"),
+    cancelButtonText: t("header.salary.cancel"),
     showReset: false,
     resetButtonText: "Clear Form",
     showSubmitLoader: true,

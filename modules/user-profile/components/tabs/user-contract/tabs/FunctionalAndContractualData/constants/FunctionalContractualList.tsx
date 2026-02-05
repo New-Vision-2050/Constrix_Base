@@ -5,13 +5,15 @@ import JobInformation from "../components/job-information";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { usePermissions } from "@/lib/permissions/client/permissions-provider";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
-
+import { useTranslations } from "next-intl";
 export const FunctionalContractualList = (): UserProfileNestedTab[] => {
   const { can } = usePermissions();
+  const t = useTranslations("UserProfile.header.placeholder");
+
   const tabs: (UserProfileNestedTab & { show: boolean })[] = [
     {
       id: "functional-tab-contractual-contract-data",
-      title: "البيانات التعاقدية",
+      title: t("contractualContractData"),
       icon: <GraduationCapIcon />,
       type: "employment_contract",
       content: <ContractualDataTab />,
@@ -22,7 +24,7 @@ export const FunctionalContractualList = (): UserProfileNestedTab[] => {
     },
     {
       id: "functional-tab-contractual-job-data",
-      title: "البيانات الوظيفية",
+      title: t("contractualJobData"),
       type: "user_professional_data",
       icon: <GraduationCapIcon />,
       content: <JobInformation />,
