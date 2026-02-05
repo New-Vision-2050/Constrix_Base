@@ -16,6 +16,7 @@ import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-c
 import { apiClient } from "@/config/axios-config";
 import { serialize } from "object-to-formdata";
 import { useUserAcademicTabsCxt } from "../UserAcademicTabsCxt";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   open: boolean;
@@ -27,6 +28,7 @@ export default function UploadCvDialog(props: PropsT) {
   const { open, setOpen } = props;
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCV } = useUserAcademicTabsCxt();
+  const t = useTranslations("UserProfile");
   const [loading, setLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File>();
 
@@ -69,7 +71,7 @@ export default function UploadCvDialog(props: PropsT) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-center text-lg">
-            السيرة الذاتية
+            {t("tabs.contractTabs.cvData.cv")}
           </DialogTitle>
         </DialogHeader>
 
@@ -78,9 +80,9 @@ export default function UploadCvDialog(props: PropsT) {
           <div className="flex flex-col gap-4 items-center justify-center">
             <label className="w-10/12 h-60 p-3 bg-sidebar flex flex-col items-center justify-around text-black cursor-pointer gap-4">
               <CloudUploadIcon additionalClass="w-[70px] h-[70px] text-pink-600" />
-              <p className="text-md font-bold dark:text-white">قم بارفاق المستند </p>
+              <p className="text-md font-bold dark:text-white">{t("tabs.contractTabs.cvData.uploadCv")}</p>
               <p className="text-center text-sm text-gray-500">
-                يُسمح بتنسيق PDF أو JPG أو PNG، والحجم الأقصى هو 200 ميجابايت
+                {t("tabs.contractTabs.cvData.uploadCvDescription")}
               </p>
               <VisuallyHiddenInput
                 type="file"
@@ -89,14 +91,14 @@ export default function UploadCvDialog(props: PropsT) {
               />
 
               <span className="text-white border p-2 rounded-lg bg-pink-600">
-                أرفاق
+                {t("tabs.contractTabs.cvData.attach")}
               </span>
             </label>
           </div>
           {/* cv files */}
           {uploadedFile && (
             <div className="flex flex-col items-center justify-center gap-6">
-              <FormFieldSet title={"ارفاق السيرة الذاتية"}>
+              <FormFieldSet title={t("tabs.contractTabs.cvData.cv")}>
                 <UploadedFile
                   file={uploadedFile}
                   setUploadedFile={setUploadedFile}

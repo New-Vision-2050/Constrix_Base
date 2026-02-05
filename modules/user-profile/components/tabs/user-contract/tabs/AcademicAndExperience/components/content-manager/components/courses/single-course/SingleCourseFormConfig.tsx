@@ -5,6 +5,7 @@ import { Course } from "@/modules/user-profile/types/Course";
 import { formatDateYYYYMMDD } from "@/utils/format-date-y-m-d";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { serialize } from "object-to-formdata";
+import { useTranslations } from "next-intl";
 
 type PropsT = {
   course?: Course;
@@ -16,6 +17,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
   const formType = course ? "Edit" : "Create";
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserCourses } = useUserAcademicTabsCxt();
+  const t = useTranslations("UserProfile.tabs.contractTabs.experience");
 
   const singleCourseFormConfig: FormConfig = {
     formId: `user-courses-data-form-${course?.id ?? ""}`,
@@ -28,44 +30,44 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
         fields: [
           {
             name: "company_name",
-            label: "اسم الشركة",
+            label: t("companyName"),
             type: "text",
-            placeholder: "اسم الشركة",
+            placeholder: t("companyName"),
             validation: [],
           },
           {
             name: "authority",
-            label: "الجهة",
+            label: t("entity"),
             type: "text",
-            placeholder: "الجهة",
+            placeholder: t("entity"),
             validation: [],
           },
           {
             name: "name",
-            label: "اسم الدورة التدريبية ",
+            label: t("courseName"),
             type: "text",
-            placeholder: "اسم الدورة التدريبية ",
+            placeholder: t("courseName"),
             validation: [],
           },
           {
             name: "institute",
-            label: "جهة الاعتماد",
+            label: t("accreditationBody"),
             type: "text",
-            placeholder: "جهة الاعتماد",
+            placeholder: t("accreditationBody"),
             validation: [],
           },
           {
             name: "certificate",
-            label: "الشهادات الممنوحة",
+            label: t("awardedCertificates"),
             type: "text",
-            placeholder: "الشهادات الممنوحة",
+            placeholder: t("awardedCertificates"),
             validation: [],
           },
           {
             name: "date_obtain",
-            label: "تاريخ الحصول على الشهادة",
+            label: t("dateOfObtainingCertificate"),
             type: "date",
-            placeholder: "تاريخ الشهادة",
+            placeholder: t("dateOfObtainingCertificate"),
             validation: [],
             maxDate: {
               formId: `user-courses-data-form-${course?.id ?? ""}`,
@@ -74,9 +76,9 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
           },
           {
             name: "date_end",
-            label: "تاريخ انتهاء الشهادة",
+            label: t("certificateExpirationDate"),
             type: "date",
-            placeholder: "تاريخ انتهاء الشهادة",
+            placeholder: t("certificateExpirationDate"),
             minDate: {
               formId: `user-courses-data-form-${course?.id ?? ""}`,
               field: "date_obtain",
@@ -95,7 +97,7 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
           },
           {
             name: "file",
-            label: "ارفاق الشهادة",
+            label: t("attachCertificate"),
             type: "file",
             // isMulti: true,
             fileConfig: {
@@ -122,10 +124,10 @@ export const SingleCourseFormConfig = ({ onSuccess, course }: PropsT) => {
       date_end: course?.date_end,
       file: course?.file,
     },
-    submitButtonText: "حفظ",
-    cancelButtonText: "إلغاء",
+    submitButtonText: t("save"),
+    cancelButtonText: t("cancel"),
     showReset: false,
-    resetButtonText: "Clear Form",
+    resetButtonText: t("clearForm"),
     showSubmitLoader: true,
     resetOnSuccess: false,
     showCancelButton: false,

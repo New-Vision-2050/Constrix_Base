@@ -18,10 +18,10 @@ export default function UserCV() {
   return (
     <div className="flex flex-col gap-6">
       <p className="text-lg font-bold text-gray-700">
-        {t("tabs.academicAndExperience.cv")}
+        {t("tabs.contractTabs.cvData.cv")}
       </p>
       <FormFieldSet
-        title={t("tabs.academicAndExperience.cv")}
+        title={t("tabs.contractTabs.cvData.cv")}
         secondTitle={
           <Can check={[PERMISSIONS.profile.cv.update]}>
             <Button variant={"ghost"} onClick={() => setOpen(true)}>
@@ -35,8 +35,8 @@ export default function UserCV() {
             <PdfViewer src={userCV?.files?.url ?? ""} />
           ) : (
             <NoDataFounded
-              title={t("tabs.academicAndExperience.cvNoData")}
-              subTitle={t("tabs.academicAndExperience.cvNoDataSubTitle")}
+              title={t("tabs.contractTabs.cvData.cvNoData")}
+              subTitle={t("tabs.contractTabs.cvData.cvNoDataSubTitle")}
             />
           )}
         </Can>
