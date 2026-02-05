@@ -5,6 +5,7 @@ export type Relative = {
   marital_status: {
     name: string;
     id: string;
+    type?: string;
   };
   name: string;
   phone: string;
