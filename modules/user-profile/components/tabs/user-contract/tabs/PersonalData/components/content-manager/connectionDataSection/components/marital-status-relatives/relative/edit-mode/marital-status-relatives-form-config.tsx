@@ -60,14 +60,10 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             placeholder: t("name"),
             condition: (values) => {
               const val = values.marital_status_id;
+              console.log("marital_status_id value:", val, "type:", typeof val);
               if (!val) return false;
-              try {
-                const parsed = JSON.parse(val);
-                return parsed.type !== "not-married";
-              } catch {
-                // Fallback: check raw string for "not-married"
-                return !String(val).includes("not-married");
-              }
+              const strVal = typeof val === "object" ? JSON.stringify(val) : String(val);
+              return !strVal.includes("not-married");
             },
             validation: [
               {
@@ -90,13 +86,8 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const val = values.marital_status_id;
               if (!val) return false;
-              try {
-                const parsed = JSON.parse(val);
-                return parsed.type !== "not-married";
-              } catch {
-                // Fallback: check raw string for "not-married"
-                return !String(val).includes("not-married");
-              }
+              const strVal = typeof val === "object" ? JSON.stringify(val) : String(val);
+              return !strVal.includes("not-married");
             },
             validation: [
               {
@@ -119,13 +110,8 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const val = values.marital_status_id;
               if (!val) return false;
-              try {
-                const parsed = JSON.parse(val);
-                return parsed.type !== "not-married";
-              } catch {
-                // Fallback: check raw string for "not-married"
-                return !String(val).includes("not-married");
-              }
+              const strVal = typeof val === "object" ? JSON.stringify(val) : String(val);
+              return !strVal.includes("not-married");
             },
             validation: [
               {
