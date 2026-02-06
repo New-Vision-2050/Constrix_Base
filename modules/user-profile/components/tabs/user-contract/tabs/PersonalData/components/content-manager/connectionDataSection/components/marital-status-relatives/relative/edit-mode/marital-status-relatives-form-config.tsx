@@ -59,11 +59,14 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "text",
             placeholder: t("name"),
             condition: (values) => {
+              const val = values.marital_status_id;
+              if (!val) return false;
+              if (typeof val === "string" && val.includes("not-married")) return false;
               try {
-                const parsed = JSON.parse(values.marital_status_id || "{}");
+                const parsed = JSON.parse(val);
                 return parsed.type !== "not-married";
               } catch {
-                return true;
+                return false;
               }
             },
             validation: [
@@ -85,11 +88,14 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "text",
             placeholder: t("relationship"),
             condition: (values) => {
+              const val = values.marital_status_id;
+              if (!val) return false;
+              if (typeof val === "string" && val.includes("not-married")) return false;
               try {
-                const parsed = JSON.parse(values.marital_status_id || "{}");
+                const parsed = JSON.parse(val);
                 return parsed.type !== "not-married";
               } catch {
-                return true;
+                return false;
               }
             },
             validation: [
@@ -111,11 +117,14 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "phone",
             placeholder: t("phone"),
             condition: (values) => {
+              const val = values.marital_status_id;
+              if (!val) return false;
+              if (typeof val === "string" && val.includes("not-married")) return false;
               try {
-                const parsed = JSON.parse(values.marital_status_id || "{}");
+                const parsed = JSON.parse(val);
                 return parsed.type !== "not-married";
               } catch {
-                return true;
+                return false;
               }
             },
             validation: [
