@@ -61,12 +61,12 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const val = values.marital_status_id;
               if (!val) return false;
-              if (typeof val === "string" && val.includes("not-married")) return false;
               try {
                 const parsed = JSON.parse(val);
                 return parsed.type !== "not-married";
               } catch {
-                return false;
+                // Fallback: check raw string for "not-married"
+                return !String(val).includes("not-married");
               }
             },
             validation: [
@@ -90,12 +90,12 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const val = values.marital_status_id;
               if (!val) return false;
-              if (typeof val === "string" && val.includes("not-married")) return false;
               try {
                 const parsed = JSON.parse(val);
                 return parsed.type !== "not-married";
               } catch {
-                return false;
+                // Fallback: check raw string for "not-married"
+                return !String(val).includes("not-married");
               }
             },
             validation: [
@@ -119,12 +119,12 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             condition: (values) => {
               const val = values.marital_status_id;
               if (!val) return false;
-              if (typeof val === "string" && val.includes("not-married")) return false;
               try {
                 const parsed = JSON.parse(val);
                 return parsed.type !== "not-married";
               } catch {
-                return false;
+                // Fallback: check raw string for "not-married"
+                return !String(val).includes("not-married");
               }
             },
             validation: [
