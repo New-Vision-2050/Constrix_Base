@@ -117,10 +117,7 @@ export default function UploadProfileImageDialog({
             previewImage={croppedImageBase64}
             disabled={false}
             cropOptions={{
-              maxHeight: 1080,
-              maxWidth: 1920,
-              minHeight: 1080,
-              minWidth: 1920,
+              minWidth: 100,
               aspect: 16 / 9,
             }}
           />
