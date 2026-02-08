@@ -6,6 +6,7 @@ import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 import { MaritalStatusList } from "../../marital-status-enum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 type PropsT = {
   relative?: Relative;
@@ -16,7 +17,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { relative, onSuccess } = props;
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
-  const formMode = !relative ? "Create" : "Edit";
+  const formMode = !relative ? "CreatesetIsMaritalStatusSingle" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
 
   const maritalStatusRelativesFormConfig: FormConfig = {
@@ -39,6 +40,17 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
               url: `${baseURL}/marital_statuses`,
               valueField: "id",
               labelField: "name",
+              transformResponse: (data: unknown) => {
+                const items = data as Array<{
+                  id: string;
+                  name: string;
+                  type: string;
+                }>;
+                return items.map((item) => ({
+                  value: JSON.stringify({ id: item.id, type: item.type }),
+                  label: item.name,
+                }));
+              },
             },
             placeholder: t("maritalStatus"),
           },
@@ -47,6 +59,15 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: t("name"),
             type: "text",
             placeholder: t("name"),
+            condition: (values) => {
+              if (
+                values.marital_status_id ===
+                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
+              ) {
+                return false;
+              }
+              return true;
+            },
             validation: [
               {
                 type: "custom",
@@ -65,6 +86,15 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: t("relationship"),
             type: "text",
             placeholder: t("relationship"),
+            condition: (values) => {
+              if (
+                values.marital_status_id ===
+                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
+              ) {
+                return false;
+              }
+              return true;
+            },
             validation: [
               {
                 type: "custom",
@@ -83,6 +113,15 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             label: t("phone"),
             type: "phone",
             placeholder: t("phone"),
+            condition: (values) => {
+              if (
+                values.marital_status_id ===
+                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
+              ) {
+                return false;
+              }
+              return true;
+            },
             validation: [
               {
                 type: "phone",
@@ -94,7 +133,12 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       },
     ],
     initialValues: {
-      marital_status_id: relative?.marital_status?.id?.toString(),
+      marital_status_id: relative?.marital_status
+        ? JSON.stringify({
+            id: relative.marital_status.id,
+            type: relative.marital_status.type,
+          })
+        : undefined,
       name: relative?.name,
       phone: relative?.phone,
       relationship: relative?.relationship,
@@ -119,8 +163,18 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
           : `/user_relatives/${relative?.id}`;
       const method = formMode === "Create" ? "POST" : `PUT`;
 
+      const maritalStatusValue = formData.marital_status_id as string;
+      let maritalStatusId: string | undefined;
+      try {
+        const parsed = JSON.parse(maritalStatusValue || "{}");
+        maritalStatusId = parsed.id;
+      } catch {
+        maritalStatusId = maritalStatusValue;
+      }
+
       const body = {
         ...formData,
+        marital_status_id: maritalStatusId,
         user_id: userId,
       };
 
@@ -130,7 +184,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
         {
           url: url,
           method: method,
-        }
+        },
       );
     },
   };
