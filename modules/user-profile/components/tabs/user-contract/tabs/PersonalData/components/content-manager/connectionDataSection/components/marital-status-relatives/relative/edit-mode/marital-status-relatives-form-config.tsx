@@ -6,6 +6,7 @@ import { useConnectionDataCxt } from "../../../../context/ConnectionDataCxt";
 import { MaritalStatusList } from "../../marital-status-enum";
 import { defaultSubmitHandler } from "@/modules/form-builder/utils/defaultSubmitHandler";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 type PropsT = {
   relative?: Relative;
@@ -16,7 +17,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { relative, onSuccess } = props;
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
-  const formMode = !relative ? "Create" : "Edit";
+  const formMode = !relative ? "CreatesetIsMaritalStatusSingle" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
 
   const maritalStatusRelativesFormConfig: FormConfig = {
@@ -59,12 +60,13 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "text",
             placeholder: t("name"),
             condition: (values) => {
-              try {
-                const parsed = JSON.parse(values.marital_status_id || "{}");
-                return parsed.type !== "not-married";
-              } catch {
-                return true;
+              if (
+                values.marital_status_id ===
+                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
+              ) {
+                return false;
               }
+              return true;
             },
             validation: [
               {
@@ -85,12 +87,13 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "text",
             placeholder: t("relationship"),
             condition: (values) => {
-              try {
-                const parsed = JSON.parse(values.marital_status_id || "{}");
-                return parsed.type !== "not-married";
-              } catch {
-                return true;
+              if (
+                values.marital_status_id ===
+                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
+              ) {
+                return false;
               }
+              return true;
             },
             validation: [
               {
@@ -111,12 +114,13 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "phone",
             placeholder: t("phone"),
             condition: (values) => {
-              try {
-                const parsed = JSON.parse(values.marital_status_id || "{}");
-                return parsed.type !== "not-married";
-              } catch {
-                return true;
+              if (
+                values.marital_status_id ===
+                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
+              ) {
+                return false;
               }
+              return true;
             },
             validation: [
               {
