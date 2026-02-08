@@ -6,8 +6,7 @@ import { ProfileImageMsg } from "@/modules/dashboard/types/valdation-message-use
 
 import UploadProfileImageDialogHeader from "./UploadProfileImageDialogHeader";
 import ShowFeedbackMessages from "./ShowFeedbackMessages";
-import PreviewImage from "./PreviewImage";
-import PlaceholderImage from "./PlaceholderImage";
+import ImageUploadWithCrop from "@/components/shared/image-upload-with-crop";
 import { useTranslations } from "next-intl";
 import { ValidCompanyProfileImage } from "@/modules/company-profile/types/valdation-message-company-image";
 
@@ -17,7 +16,9 @@ type PropsT = {
   open: boolean;
   onSuccess?: (url: string) => void;
   setOpen: React.Dispatch<SetStateAction<boolean>>;
-  validateImageFn(image: File): Promise<ProfileImageMsg[] | ValidCompanyProfileImage[]>; // external image validation logic
+  validateImageFn(
+    image: File,
+  ): Promise<ProfileImageMsg[] | ValidCompanyProfileImage[]>; // external image validation logic
   uploadImageFn(image: File): Promise<{ image_url: string }>; // external upload logic
 };
 
@@ -41,34 +42,27 @@ export default function UploadProfileImageDialog({
   const [loading, setLoading] = useState(false);
   const t = useTranslations("UserProfile.header.uploadPhoto");
   const [feedbackMessages, setFeedbackMessages] = useState(
-    getInitialValidateMsgs(t)
+    getInitialValidateMsgs(t),
   );
-  const [uploadedFile, setUploadedFile] = useState<File>();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  // access user profile updater
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [croppedImageBase64, setCroppedImageBase64] = useState<string | null>(
+    null,
+  );
 
   // reset dialog state when opened
   useEffect(() => {
     setValid(false);
-    setPreviewUrl("");
+    setUploadedFile(null);
+    setCroppedImageBase64(null);
     setFeedbackMessages(getInitialValidateMsgs(t));
   }, [open, t]);
 
-  // handle file input changes and preview image
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+  // handle cropped image from ImageUploadWithCrop
+  const handleImageCropped = (file: File | null, base64: string | null) => {
     setUploadedFile(file);
-  };
-
-  // reset the image state
-  const handleClearImage = () => {
-    setPreviewUrl(null);
+    setCroppedImageBase64(base64);
+    // Reset validation when new image is selected
     setValid(false);
-    setUploadedFile(undefined);
     setFeedbackMessages(getInitialValidateMsgs(t));
   };
 
@@ -108,27 +102,28 @@ export default function UploadProfileImageDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
+      <DialogContent className="max-w-4xl">
         <UploadProfileImageDialogHeader title={title} />
 
         {/* Content section with upload instructions and file input UI */}
-        <div className="flex justify-around gap-8">
+        <div className="flex justify-around gap-8 items-start">
           {/* Instructional text section */}
           <ShowFeedbackMessages messages={feedbackMessages} />
 
-          {/* Upload UI section */}
-          {!previewUrl && (
-            <PlaceholderImage handleFileChange={handleFileChange} />
-          )}
-
-          {/* Preview Uploaded Image */}
-          {previewUrl && (
-            <PreviewImage
-              loading={loading}
-              previewUrl={previewUrl}
-              handleClearImage={handleClearImage}
-            />
-          )}
+          {/* Image Upload with Crop */}
+          <ImageUploadWithCrop
+            onChange={handleImageCropped}
+            loading={loading}
+            previewImage={croppedImageBase64}
+            disabled={false}
+            cropOptions={{
+              maxHeight: 1080,
+              maxWidth: 1920,
+              minHeight: 1080,
+              minWidth: 1920,
+              aspect: 16 / 9,
+            }}
+          />
         </div>
 
         {/* Dialog Actions Buttons */}
@@ -149,8 +144,8 @@ export default function UploadProfileImageDialog({
                 ? t("actions.loadingLabel")
                 : t("actions.checkLabel")
               : loading
-              ? t("actions.loadingLabel")
-              : t("actions.saveLabel")}
+                ? t("actions.loadingLabel")
+                : t("actions.saveLabel")}
           </Button>
         </div>
       </DialogContent>
