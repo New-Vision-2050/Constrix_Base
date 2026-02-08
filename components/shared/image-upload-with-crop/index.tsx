@@ -43,15 +43,15 @@ export default function ImageUploadWithCrop({
   renderButton,
 }: ImageUploadWithCropProps) {
   const t = useTranslations("ImageUploadCrop");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [, setSelectedFile] = useState<File | null>(null);
   const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(
-    previewImage
+    previewImage,
   );
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [tempSelectedFile, setTempSelectedFile] = useState<File | null>(null);
-  const [tempCroppedImageUrl, setTempCroppedImageUrl] = useState<
-    string | null
-  >(null);
+  const [tempCroppedImageUrl, setTempCroppedImageUrl] = useState<string | null>(
+    null,
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,14 +91,14 @@ export default function ImageUploadWithCrop({
     if (tempCroppedImageUrl) {
       // Convert the cropped image URL to File
       const file = base64ToFile(tempCroppedImageUrl, "cropped-image.png");
-      
+
       setCroppedImageUrl(tempCroppedImageUrl);
       setCroppedFile(file);
       setSelectedFile(tempSelectedFile);
-      
+
       // Call onChange with both file and base64 string
       onChange(file, tempCroppedImageUrl);
-      
+
       // Close dialog
       setDialogOpen(false);
       setTempSelectedFile(null);
@@ -108,7 +108,7 @@ export default function ImageUploadWithCrop({
 
   const handleClearImage = useCallback(() => {
     if (disabled || loading) return;
-    
+
     setSelectedFile(null);
     setCroppedImageUrl(null);
     setCroppedFile(null);
@@ -283,7 +283,14 @@ export default function ImageUploadWithCrop({
         )}
       </Box>
     ),
-    [croppedImageUrl, handleButtonClick, disabled, loading, handleClearImage, t]
+    [
+      croppedImageUrl,
+      handleButtonClick,
+      disabled,
+      loading,
+      handleClearImage,
+      t,
+    ],
   );
 
   return (

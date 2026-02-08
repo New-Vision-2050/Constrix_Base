@@ -5,7 +5,6 @@ import ReactCrop, {
   type Crop,
   type PixelCrop,
   centerCrop,
-  makeAspectCrop,
 } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,7 +57,7 @@ function getCroppedImg(
   // Get the displayed image dimensions
   const displayedWidth = image.clientWidth;
   const displayedHeight = image.clientHeight;
-  
+
   // Get the natural image dimensions
   const naturalWidth = image.naturalWidth;
   const naturalHeight = image.naturalHeight;
@@ -111,7 +110,7 @@ function getCroppedImg(
   try {
     const base64Image = canvas.toDataURL("image/png", 1);
     return Promise.resolve(base64Image);
-  } catch (error) {
+  } catch {
     return Promise.reject(new Error("Failed to convert canvas to image"));
   }
 }
@@ -235,7 +234,10 @@ export default function ImageCrop({
       // Apply min constraints (in displayed pixels)
       if (computedMinCropPx) {
         initialCropWidth = Math.max(initialCropWidth, computedMinCropPx.width);
-        initialCropHeight = Math.max(initialCropHeight, computedMinCropPx.height);
+        initialCropHeight = Math.max(
+          initialCropHeight,
+          computedMinCropPx.height,
+        );
       }
 
       // Ensure crop doesn't exceed displayed dimensions
@@ -325,7 +327,7 @@ export default function ImageCrop({
       const displayedHeight = img.clientHeight;
       const naturalWidth = img.naturalWidth;
       const naturalHeight = img.naturalHeight;
-      
+
       if (
         displayedWidth > 0 &&
         displayedHeight > 0 &&
@@ -334,7 +336,7 @@ export default function ImageCrop({
       ) {
         const scaleX = naturalWidth / displayedWidth;
         const scaleY = naturalHeight / displayedHeight;
-        
+
         // Update max crop constraints
         if (maxWidth != null && maxHeight != null) {
           setMaxCropPx({
@@ -342,7 +344,7 @@ export default function ImageCrop({
             height: Math.floor(maxHeight / scaleY),
           });
         }
-        
+
         // Update min crop constraints
         if (minWidth != null && minHeight != null) {
           setMinCropPx({
