@@ -3,11 +3,11 @@
 import React, { createContext, useContext, ReactNode, useState } from "react";
 import useDocsData from "../hooks/useDocsData";
 import { DocsResPaginatedT, GetDocsResT } from "../apis/get-docs";
-import { DocumentT } from "../types/Directory";
-import useFoldersList from "../hooks/useFoldersList";
+import { DocumentT } from "../../publicDocs/types/Directory";
+import useFoldersList from "../../publicDocs/hooks/useFoldersList";
 import { SelectOption } from "@/types/select-option";
-import { SearchFormData } from "../components/search-fields";
-import useUsersData from "../hooks/useUsersData";
+import { SearchFormData } from "../../publicDocs/components/search-fields";
+import useUsersData from "../../publicDocs/hooks/useUsersData";
 
 // Define context type
 interface CxtType {
@@ -97,13 +97,9 @@ const Cxt = createContext<CxtType | undefined>(undefined);
 // Provider component
 interface PropsT {
   children: ReactNode;
-  fixedType?: string;
 }
 
-export const PublicDocsCxtProvider: React.FC<PropsT> = ({
-  children,
-  fixedType,
-}) => {
+export const EmpsDocsCxtProvider: React.FC<PropsT> = ({ children }) => {
   // ** declare and define helper variables
   const [selectedDocument, setSelectedDocument] = useState<DocumentT>();
   const [showItemDetials, setShowItemDetials] = useState(false);
@@ -157,7 +153,6 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
     page,
     searchData,
     sort,
-    fixedType,
   );
 
   const handleRefetchUsersList = () => refetchUsersList();
@@ -273,12 +268,10 @@ export const PublicDocsCxtProvider: React.FC<PropsT> = ({
 };
 
 // Custom hook to use the context
-export const usePublicDocsCxt = () => {
+export const useEmpsDocsCxt = () => {
   const context = useContext(Cxt);
   if (context === undefined) {
-    throw new Error(
-      "usePublicDocsCxt must be used within a PublicDocsCxtProvider",
-    );
+    throw new Error("useEmpsDocsCxt must be used within a EmpsDocsCxtProvider");
   }
   return context;
 };
