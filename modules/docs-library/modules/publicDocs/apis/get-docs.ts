@@ -31,10 +31,11 @@ export default async function getDocs(
   limit?: number,
   page?: number,
   searchData?: SearchFormData,
-  sort?: string
+  sort?: string,
+  fixedType?: string,
 ) {
   // Build params object with only defined values
-  const params: Record<string, any> = {};
+  const params: Record<string, string | number> = {};
 
   if (parentId) params.parent_id = parentId;
   if (branchId && branchId !== "all") params.branch_id = branchId;
@@ -43,7 +44,9 @@ export default async function getDocs(
   if (page) params.page = page;
 
   // Add search filters only if they have valid values
-  if (searchData?.type && searchData.type !== "all") {
+  if (fixedType) {
+    params.type = fixedType;
+  } else if (searchData?.type && searchData.type !== "all") {
     params.type = searchData.type;
   }
   if (searchData?.documentType && searchData.documentType !== "all") {
