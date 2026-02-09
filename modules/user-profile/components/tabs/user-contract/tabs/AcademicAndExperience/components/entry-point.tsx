@@ -4,7 +4,8 @@ import { GetAcademicAndExperienceSidebarItems } from "../constants/AcademicAndEx
 import { useAcademicAndExperienceCxt } from "../context/AcademicAndExperienceCxt";
 
 export default function AcademicAndExperienceEntryPoint() {
-  const { handleChangeActiveSection } = useAcademicAndExperienceCxt();
+  const { handleChangeActiveSection, activeSection } =
+    useAcademicAndExperienceCxt();
   return (
     <div className="flex gap-8">
       <VerticalBtnsList
@@ -13,6 +14,7 @@ export default function AcademicAndExperienceEntryPoint() {
             handleChangeActiveSection(section);
           },
         })}
+        activeSection={activeSection}
       />
       <div className="p-4 flex-grow gap-8 min-h-[400px] transition-all duration-300">
         <AcademicAndExperienceContentManager />

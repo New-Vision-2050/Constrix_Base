@@ -7,11 +7,19 @@ import { truncateString } from "@/utils/truncate-string";
 type PropsT = {
   items: UserProfileNestedTab[];
   defaultValue?: UserProfileNestedTab;
+  activeSection?: UserProfileNestedTab;
 };
 
-export default function VerticalBtnsList({ items, defaultValue }: PropsT) {
+export default function VerticalBtnsList({
+  items,
+  defaultValue,
+  activeSection,
+}: PropsT) {
   return (
-    <VerticalListCxtProvider defaultSection={defaultValue ?? items[0]}>
+    <VerticalListCxtProvider
+      defaultSection={defaultValue ?? items[0]}
+      activeSection={activeSection}
+    >
       <div className="w-[200px] p-4 m-2 flex flex-col gap-6 bg-sidebar rounded-md shadow-md">
         <RegularList<UserProfileNestedTab, "btn">
           items={items}
