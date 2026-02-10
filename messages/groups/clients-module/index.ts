@@ -5,12 +5,18 @@ export const clientsModuleMessages = new MessagesGroup({
     totalClients: _m("Total Clients", "إجمالي عدد العملاء"),
     activeClients: _m("Active Clients", "العملاء النشطيين"),
     inactiveClients: _m("Inactive Clients", "العملاء المعلقين"),
-    totalClientsInLastMonth: _m("Clients Added Last Month", "العملاء المضافين اخر شهر")
+    totalClientsInLastMonth: _m(
+      "Clients Added Last Month",
+      "العملاء المضافين اخر شهر",
+    ),
   }),
   table: new MessagesGroup({
     active: _m("Active", "نشط"),
     inactive: _m("Inactive", "غير نشط"),
-    DeleteConfirmMessage: _m("Are you sure you want to delete this client?", "هل انت متأكد من حذف هذا العميل؟"),
+    DeleteConfirmMessage: _m(
+      "Are you sure you want to delete this client?",
+      "هل انت متأكد من حذف هذا العميل؟",
+    ),
     columns: new MessagesGroup({
       name: _m("Name", "اسم العميل"),
       identity: _m("Identity", "رقم الهوية"),
@@ -19,12 +25,12 @@ export const clientsModuleMessages = new MessagesGroup({
       broker: _m("Broker", "الوسيط"),
       status: _m("Status", "حالة العميل"),
       branches: _m("Branches", "الفروع"),
-      projectsNumber: _m("Projects Number", "عدد المشاريع")
+      projectsNumber: _m("Projects Number", "عدد المشاريع"),
     }),
     filters: new MessagesGroup({
       branchesFilter: _m("Branches", "الفروع"),
-      statusFilter: _m("Status", "حالة العميل")
-    })
+      statusFilter: _m("Status", "حالة العميل"),
+    }),
   }),
   form: new MessagesGroup({
     individualClient: _m("Individual Client", "فرد"),
@@ -37,36 +43,84 @@ export const clientsModuleMessages = new MessagesGroup({
     email: _m("Email", "البريد الإلكتروني"),
     emailPlaceholder: _m("Enter email", "ادخل البريد الإلكتروني"),
     emailRequired: _m("Email is required", "البريد الإلكتروني مطلوب"),
-    emailInvalid: _m("Please enter a valid email address.", "يرجى إدخال عنوان بريد إلكتروني صالح."),
-    clientMailExist: _m("The email is already registered as a client in the current branch.", "البريد الألكتروني مسجل كعميل فى الفرع الحالي بالفعل"),
-    mailExistAsEmployee: _m("The email is already registered as an employee in the following branches :", "البريد الألكتروني مسجل كموظف فى الفروع الأتية :"),
-    mailExistAsBroker: _m("The email is already registered as a broker in the following branches :", "البريد الألكتروني مسجل كوسيط فى الفروع الأتية :"),
-    mailExistAsClient: _m("The email is already registered as a client in the following branches :", "البريد الألكتروني مسجل كعميل فى الفروع الأتية :"),
-    mailExistInSystem: _m("The email is already registered in the system.", "البريد الألكتروني مسجل بالفعل فى النظام"),
+    emailInvalid: _m(
+      "Please enter a valid email address.",
+      "يرجى إدخال عنوان بريد إلكتروني صالح.",
+    ),
+    clientMailExist: _m(
+      "The email is already registered as a client in the current branch.",
+      "البريد الألكتروني مسجل كعميل فى الفرع الحالي بالفعل",
+    ),
+    mailExistAsEmployee: _m(
+      "The email is already registered as an employee in the following branches :",
+      "البريد الألكتروني مسجل كموظف فى الفروع الأتية :",
+    ),
+    mailExistAsBroker: _m(
+      "The email is already registered as a broker in the following branches :",
+      "البريد الألكتروني مسجل كوسيط فى الفروع الأتية :",
+    ),
+    mailExistAsClient: _m(
+      "The email is already registered as a client in the following branches :",
+      "البريد الألكتروني مسجل كعميل فى الفروع الأتية :",
+    ),
+    mailExistInSystem: _m(
+      "The email is already registered in the system.",
+      "البريد الألكتروني مسجل بالفعل فى النظام",
+    ),
     retrieveData: _m("Retrieve Data", "استرجاع البيانات"),
     phone: _m("Phone", "الهاتف"),
     phonePlaceholder: _m("Enter phone", "ادخل رقم الهاتف"),
     phoneRequired: _m("Phone is required", "رقم الهاتف مطلوب"),
-    phoneInvalid: _m("Please enter a valid phone number.", "يرجى إدخال رقم هاتف صالح."),
+    phoneInvalid: _m(
+      "Please enter a valid phone number.",
+      "يرجى إدخال رقم هاتف صالح.",
+    ),
     name: _m("Name", "الاسم"),
     namePlaceholder: _m("Enter name", "ادخل الاسم"),
     nameRequired: _m("Name is required", "الاسم مطلوب"),
-    nameThreeTerms: _m("The name must contain exactly three terms (first, middle, and last name)", "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)"),
-    nameLettersOnly: _m("Name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)"),
-    nameMinLength: _m("Name must contain at least two letters.", "الاسم يجب أن يحتوي على حرفين على الأقل."),
-    arabicName: _m("The name must contain only letters (no numbers or symbols)", "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)"),
+    nameThreeTerms: _m(
+      "The name must contain exactly three terms (first, middle, and last name)",
+      "الاسم يجب أن يتكون من ثلاثة مقاطع فقط (الأول والأوسط والأخير)",
+    ),
+    nameLettersOnly: _m(
+      "Name must contain only letters (no numbers or symbols)",
+      "يجب أن يحتوي الاسم على حروف فقط (بدون أرقام أو رموز)",
+    ),
+    nameMinLength: _m(
+      "Name must contain at least two letters.",
+      "الاسم يجب أن يحتوي على حرفين على الأقل.",
+    ),
+    arabicName: _m(
+      "The name must contain only letters (no numbers or symbols)",
+      "الاسم يجب أن يحتوي على حروف عربية فقط (بدون أرقام أو رموز)",
+    ),
     identity: _m("The identity number", "الرقم الهوية "),
     identityPlaceholder: _m("Enter the identity number", "ادخل الرقم الهوية "),
-    identityRequired: _m("The identity number is required", "الرقم الهوية  مطلوب"),
-    identityPattern: _m("The identity number must consist of 10 numbers and start with the number 1 or 2", "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2"),
-    identityMinLength: _m("The identity number must consist of 10 numbers", "رقم الهوية يجب أن يتكون من 10 أرقام"),
-    identityMaxLength: _m("The identity number must consist of 10 numbers", "رقم الهوية يجب أن يتكون من 10 أرقام"),
+    identityRequired: _m(
+      "The identity number is required",
+      "الرقم الهوية  مطلوب",
+    ),
+    identityPattern: _m(
+      "The identity number must consist of 10 numbers and start with the number 1 or 2",
+      "رقم الهوية يجب أن يتكون من 10 أرقام ويبدأ بالرقم 1 أو 2",
+    ),
+    identityMinLength: _m(
+      "The identity number must consist of 10 numbers",
+      "رقم الهوية يجب أن يتكون من 10 أرقام",
+    ),
+    identityMaxLength: _m(
+      "The identity number must consist of 10 numbers",
+      "رقم الهوية يجب أن يتكون من 10 أرقام",
+    ),
     branches: _m("Branch", "الفرع"),
     branchesPlaceholder: _m("Select branch", "اختر الفرع"),
     broker: _m("Broker", "الوسيط"),
     brokerPlaceholder: _m("Select broker", "اختر الوسيط"),
     correspondenceAddress: _m("Correspondence Address", "عنوان المراسلات"),
-    correspondenceAddressPlaceholder: _m("Enter correspondence address", "ادخل عنوان المراسلات"),
+    correspondenceAddressPlaceholder: _m(
+      "Enter correspondence address",
+      "ادخل عنوان المراسلات",
+    ),
     country: _m("Country", "الدولة"),
     countryPlaceholder: _m("Select Country", "اختر الدولة"),
     countryRequired: _m("Country is required", "الدولة مطلوبة"),
@@ -75,25 +129,62 @@ export const clientsModuleMessages = new MessagesGroup({
     companyFieldRequired: _m("Company Field is required", "النشاط مطلوب"),
     commerceName: _m("Commercial Name", "اسم التجاري"),
     commerceNamePlaceholder: _m("Enter Commercial Name", "ادخل اسم التجاري"),
-    commerceNameRequired: _m("Commercial Name is required", "اسم التجاري مطلوب"),
+    commerceNameRequired: _m(
+      "Commercial Name is required",
+      "اسم التجاري مطلوب",
+    ),
     shortName: _m("Short Name", "اسم المختصر"),
     shortNamePlaceholder: _m("Enter Short Name", "ادخل اسم المختصر"),
     shortNameRequired: _m("Short Name is required", "اسم المختصر مطلوب"),
     supportResponsible: _m("Support Responsible", "المسؤول عن الدعم"),
-    supportResponsiblePlaceholder: _m("Select Support Responsible", "اختر المسؤول عن الدعم"),
-    supportResponsibleRequired: _m("Support Responsible is required", "المسؤول عن الدعم مطلوب"),
+    supportResponsiblePlaceholder: _m(
+      "Select Support Responsible",
+      "اختر المسؤول عن الدعم",
+    ),
+    supportResponsibleRequired: _m(
+      "Support Responsible is required",
+      "المسؤول عن الدعم مطلوب",
+    ),
     companyClientFormTitle: _m("Create Company Client", "أنشاء جهة العميل"),
-    individualClientFormTitle: _m("Create Individual Client", "أنشاء الفرد الممثل للجهة"),
+    individualClientFormTitle: _m(
+      "Create Individual Client",
+      "أنشاء الفرد الممثل للجهة",
+    ),
     Validation: new MessagesGroup({
-      arabicName: _m("The name must contain only letters (no numbers or symbols)", "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)"),
-      englishName: _m("The short name must be in English and not contain symbols", "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز")
+      arabicName: _m(
+        "The name must contain only letters (no numbers or symbols)",
+        "يجب أن يحتوي الاسم على أحرف فقط (بدون أرقام أو رموز)",
+      ),
+      englishName: _m(
+        "The short name must be in English and not contain symbols",
+        "الاسم المختصر يجب ان يكون باللغه الانجليزية ولا يتخلله رموز",
+      ),
     }),
     companyBrokerFormTitle: _m("", "إنشاء وسيط شركة"),
-    individualBrokerFormTitle: _m("", "إنشاء وسيط فرد")
+    individualBrokerFormTitle: _m("", "إنشاء وسيط فرد"),
+    selectIndividualClient: _m(
+      "Select Individual Client",
+      "اختر الفرد الممثل للجهة",
+    ),
+    selectIndividualClientPlaceholder: _m(
+      "Select Individual Client",
+      "اختر الفرد الممثل للجهة",
+    ),
+    selectIndividualClientRequired: _m(
+      "Individual Client is required",
+      "الفرد الممثل للجهة  مطلوب",
+    ),
+    individualClientRequired: _m(
+      "Individual Client is required",
+      "الفرد الممثل للجهة  مطلوب",
+    ),
   }),
   dialog: new MessagesGroup({
     triggerText: _m("Select location from map", "اختر الموقع من الخريطة"),
-    title: _m("Select coordinates of the national address", "اختر احداثيات موقع العنوان الوطني"),
+    title: _m(
+      "Select coordinates of the national address",
+      "اختر احداثيات موقع العنوان الوطني",
+    ),
     latitude: _m("Latitude", "خط العرض"),
     latitudePlaceholder: _m("Enter latitude", "ادخل خط العرض"),
     latitudeRequired: _m("Latitude is required", "خط العرض مطلوب"),
@@ -114,7 +205,10 @@ export const clientsModuleMessages = new MessagesGroup({
     neighborhoodRequired: _m("Neighborhood is required", "الحي مطلوب"),
     buildingNumber: _m("Building Number", "رقم المبنى"),
     buildingNumberPlaceholder: _m("Enter Building Number", "ادخل رقم المبنى"),
-    buildingNumberRequired: _m("Building Number is required", "رقم المبنى مطلوب"),
+    buildingNumberRequired: _m(
+      "Building Number is required",
+      "رقم المبنى مطلوب",
+    ),
     phoneNumber: _m("Phone Number", "رقم الهاتف"),
     phoneNumberPlaceholder: _m("Enter Phone Number", "ادخل رقم الهاتف"),
     phoneNumberRequired: _m("Phone Number is required", "رقم الهاتف مطلوب"),
@@ -126,6 +220,6 @@ export const clientsModuleMessages = new MessagesGroup({
     streetRequired: _m("Street is required", "الشارع مطلوب"),
     submitButtonText: _m("Add", "إضافة"),
     cancelButtonText: _m("Cancel", "إلغاء"),
-    resetButtonText: _m("Clear Form", "مسح النموذج")
-  })
+    resetButtonText: _m("Clear Form", "مسح النموذج"),
+  }),
 });
