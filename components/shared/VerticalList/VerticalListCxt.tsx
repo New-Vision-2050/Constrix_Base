@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 // types
 import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-nested-tabs-content";
 
@@ -12,7 +12,7 @@ type VerticalListCxtType = {
 };
 
 export const VerticalListCxt = createContext<VerticalListCxtType>(
-  {} as VerticalListCxtType
+  {} as VerticalListCxtType,
 );
 
 // ** create a custom hook to use the context
@@ -20,7 +20,7 @@ export const useVerticalListCxt = () => {
   const context = useContext(VerticalListCxt);
   if (!context) {
     throw new Error(
-      "useVerticalListCxt must be used within a VerticalListCxtProvider"
+      "useVerticalListCxt must be used within a VerticalListCxtProvider",
     );
   }
   return context;
@@ -29,16 +29,24 @@ export const useVerticalListCxt = () => {
 type PropsT = {
   children: ReactNode;
   defaultSection: UserProfileNestedTab;
+  activeSection?: UserProfileNestedTab;
 };
 export const VerticalListCxtProvider = ({
   defaultSection,
+  activeSection: externalActiveSection,
   children,
 }: PropsT) => {
   // ** declare and define component state and variables
-  const [activeSection, setActiveSection] =
-    useState<UserProfileNestedTab>(defaultSection);
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
+    externalActiveSection ?? defaultSection,
+  );
 
   // ** handle side effects
+  useEffect(() => {
+    if (externalActiveSection) {
+      setActiveSection(externalActiveSection);
+    }
+  }, [externalActiveSection]);
 
   // ** declare and define component helper methods
   const handleChangeActiveSection = (section: UserProfileNestedTab) =>

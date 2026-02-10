@@ -7,6 +7,7 @@ import TabsContentList from "./TabsContentList";
 
 type PropsT = {
   defaultValue?: string;
+  value?: string;
   list: SystemTab[];
   onTabClick?: (tab: SystemTab) => void;
   bgStyleApproach?: boolean;
@@ -17,6 +18,7 @@ export default function HorizontalTabs({
   list,
   onTabClick,
   defaultValue,
+  value,
   bgStyleApproach,
   additionalClassiess,
 }: PropsT) {
@@ -24,12 +26,14 @@ export default function HorizontalTabs({
   const locale = useLocale();
   const isRtl = locale === "ar";
   const bgColor = bgStyleApproach ? "bg-sidebar" : "bg-transparent";
-  const justifyContent = list?.length > 3 ? "justify-between" : "justify-start gap-4";
+  const justifyContent =
+    list?.length > 3 ? "justify-between" : "justify-start gap-4";
   // declare and define component helper methods.
   // return component ui.
   return (
     <Tabs
-      defaultValue={defaultValue || list?.[0]?.id ||  "_"}
+      value={value}
+      defaultValue={defaultValue || list?.[0]?.id || "_"}
       dir={isRtl ? "rtl" : "ltr"}
       className={`${isRtl ? "text-right" : "text-left"} w-full gap-3`}
     >
