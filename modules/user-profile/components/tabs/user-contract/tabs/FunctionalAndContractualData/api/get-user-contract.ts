@@ -8,9 +8,13 @@ type ResponseT = {
 };
 
 export default async function GetUserContractData(userId: string) {
+  console.log("🔍 Fetching contract data for userId:", userId);
   const res = await apiClient.get<ResponseT>(
-    `/employment_contracts/user${Boolean(userId) ? "/" + userId : ""}`
+    `/contractual-relationship/${userId}`
   );
 
+  console.log("📦 API Response:", res.data);
+  console.log("📋 Contract Payload:", res.data.payload);
+  
   return res.data.payload;
 }
