@@ -5,7 +5,7 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 import { financialDataSections } from "../constants/financial-data-sections";
 import useUserSalaryData from "../hooks/useUserSalaryData";
@@ -35,7 +35,7 @@ type FinancialDataCxtType = {
 };
 
 export const FinancialDataCxt = createContext<FinancialDataCxtType>(
-  {} as FinancialDataCxtType
+  {} as FinancialDataCxtType,
 );
 
 // ** create a custom hook to use the context
@@ -43,7 +43,7 @@ export const useFinancialDataCxt = () => {
   const context = useContext(FinancialDataCxt);
   if (!context) {
     throw new Error(
-      "useFinancialDataCxt must be used within a FinancialDataCxtProvider"
+      "useFinancialDataCxt must be used within a FinancialDataCxtProvider",
     );
   }
   return context;
@@ -55,10 +55,22 @@ export const FinancialDataCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { userId } = useUserProfileCxt();
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    financialDataSections()?.[0]
-  );
+  const { userId, verticalSection, setVerticalSection } = useUserProfileCxt();
+  const sections = financialDataSections();
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
+
+  useEffect(() => {
+    if (verticalSection) {
+      const section = sections.find((s) => s.id === verticalSection);
+      if (section) {
+        setActiveSection(section);
+      } else {
+        setActiveSection(sections[0]);
+      }
+    } else {
+      setActiveSection(sections[0]);
+    }
+  }, [verticalSection]);
 
   // user salary data
   const {
@@ -86,8 +98,10 @@ export const FinancialDataCxtProvider = ({
     refreshPrivileges();
   };
 
-  const handleChangeActiveSection = (section: UserProfileNestedTab) =>
+  const handleChangeActiveSection = (section: UserProfileNestedTab) => {
     setActiveSection(section);
+    setVerticalSection(section.id);
+  };
 
   const handleRefreshSalaryData = () => {
     refetchSalaryData();

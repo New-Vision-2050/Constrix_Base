@@ -37,8 +37,9 @@ type PropsT = {
 export const GetFinancialDataSections = (props: PropsT) => {
   const { handleChangeActiveSection } = props;
   const { userDataStatus } = useUserProfileCxt();
+  const sections = financialDataSections();
 
-  return financialDataSections().map((btn) => ({
+  return sections.map((btn) => ({
     ...btn,
     valid: btn?.type
       ? userDataStatus?.[btn?.type as keyof typeof userDataStatus]

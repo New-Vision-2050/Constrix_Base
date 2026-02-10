@@ -5,7 +5,7 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import useUserPersonalData from "../hooks/useUserPersonalData";
 import { PersonalUserDataSectionT } from "../api/get-personal-data";
 import { UserConnectionInformationT } from "../api/get-user-connection-data";
@@ -42,7 +42,7 @@ type PersonalDataTabCxtType = {
 };
 
 export const PersonalDataTabCxt = createContext<PersonalDataTabCxtType>(
-  {} as PersonalDataTabCxtType
+  {} as PersonalDataTabCxtType,
 );
 
 // ** create a custom hook to use the context
@@ -50,7 +50,7 @@ export const usePersonalDataTabCxt = () => {
   const context = useContext(PersonalDataTabCxt);
   if (!context) {
     throw new Error(
-      "usePersonalDataTabCxt must be used within a PersonalDataTabCxtProvider"
+      "usePersonalDataTabCxt must be used within a PersonalDataTabCxtProvider",
     );
   }
   return context;
@@ -83,9 +83,29 @@ export const PersonalDataTabCxtProvider = ({
     isLoading: userIdentityDataLoading,
     refetch: refetchIdentityData,
   } = useUserIdentityData(userId);
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    PersonalDataSections(t)[0]
-  );
+  const { verticalSection, setVerticalSection } = useUserProfileCxt();
+  const sections = PersonalDataSections(t);
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
+
+  useEffect(() => {
+    console.log("verticalSection changed:", verticalSection);
+    console.log(
+      "available sections:",
+      sections.map((s) => s.id),
+    );
+
+    if (verticalSection) {
+      const section = sections.find((s) => s.id === verticalSection);
+      console.log("found section:", section);
+      if (section) {
+        setActiveSection(section);
+      } else {
+        setActiveSection(sections[0]);
+      }
+    } else {
+      setActiveSection(sections[0]);
+    }
+  }, [verticalSection]);
 
   // ** declare and define component helper methods
   const handleRefreshIdentityData = () => {
@@ -100,8 +120,10 @@ export const PersonalDataTabCxtProvider = ({
     refreshConnectionData();
   };
 
-  const handleChangeActiveSection = (section: UserProfileNestedTab) =>
+  const handleChangeActiveSection = (section: UserProfileNestedTab) => {
     setActiveSection(section);
+    setVerticalSection(section.id);
+  };
 
   // ** return component ui
   return (

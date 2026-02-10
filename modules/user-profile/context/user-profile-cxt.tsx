@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "@i18n/navigation";
+import { useSearchParams } from "@i18n/navigation";
 
 // types
 import type { ReactNode, SetStateAction } from "react";
@@ -42,6 +42,7 @@ type UserProfileCxtType = {
   setTab1: React.Dispatch<SetStateAction<string>>;
   setTab2: React.Dispatch<SetStateAction<string>>;
   verticalSection: string | null;
+  setVerticalSection: React.Dispatch<SetStateAction<string>>;
 
   // company id
   companyId: string | null;
@@ -55,7 +56,7 @@ type UserProfileCxtType = {
 };
 
 export const UserProfileCxt = createContext<UserProfileCxtType>(
-  {} as UserProfileCxtType
+  {} as UserProfileCxtType,
 );
 
 // ** create a custom hook to use the context
@@ -63,7 +64,7 @@ export const useUserProfileCxt = () => {
   const context = useContext(UserProfileCxt);
   if (!context) {
     throw new Error(
-      "useUserProfileCxt must be used within a UserProfileCxtProvider"
+      "useUserProfileCxt must be used within a UserProfileCxtProvider",
     );
   }
   return context;
@@ -76,11 +77,16 @@ export const UserProfileCxtProvider = ({
   companyId,
 }: PropsT) => {
   // ** declare and define component state and variables
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const [tab1, setTab1] = useState(searchParams.get("tab1") ?? "");
-  const [tab2, setTab2] = useState(searchParams.get("tab2") ?? "");
-  const verticalSection = searchParams.get("verticalSection");
+  const [tab1, setTab1] = useState(
+    searchParams.get("tab1") || "edit-mode-tabs-profile",
+  );
+  const [tab2, setTab2] = useState(
+    searchParams.get("tab2") || "user-contract-tab-personal-data",
+  );
+  const [verticalSection, setVerticalSection] = useState(
+    searchParams.get("verticalSection") || "contract-tab-personal-data-section",
+  );
   const [user, setUser] = useState<UserProfileData>();
   const {
     data: _user,
@@ -116,8 +122,14 @@ export const UserProfileCxtProvider = ({
       params.delete("tab2");
     }
 
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [tab1, tab2, router, searchParams]);
+    if (verticalSection) {
+      params.set("verticalSection", verticalSection);
+    } else {
+      params.delete("verticalSection");
+    }
+
+    window.history.replaceState(null, "", `?${params.toString()}`);
+  }, [tab1, tab2, verticalSection, searchParams]);
 
   // ** declare and define component helper methods
   const handleRefetchWidgetData = () => {
@@ -168,6 +180,7 @@ export const UserProfileCxtProvider = ({
         setTab1,
         setTab2,
         verticalSection,
+        setVerticalSection,
 
         // company id
         companyId,
