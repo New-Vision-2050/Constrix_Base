@@ -17,7 +17,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { relative, onSuccess } = props;
   const { userId, handleRefetchDataStatus } = useUserProfileCxt();
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
-  const formMode = !relative ? "CreatesetIsMaritalStatusSingle" : "Edit";
+  const formMode = !relative ? "Create" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
 
   const maritalStatusRelativesFormConfig: FormConfig = {
