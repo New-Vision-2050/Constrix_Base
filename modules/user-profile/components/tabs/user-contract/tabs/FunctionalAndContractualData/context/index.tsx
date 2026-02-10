@@ -5,7 +5,7 @@ import { UserProfileNestedTab } from "@/modules/user-profile/types/user-profile-
 import type { ReactNode } from "react";
 
 // import packages
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { FunctionalContractualList } from "../constants/FunctionalContractualList";
 import useUserJobOffersData from "../hooks/useUserJobOffersData";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
@@ -43,7 +43,7 @@ type FunctionalContractualCxtType = {
 
 export const FunctionalContractualCxt =
   createContext<FunctionalContractualCxtType>(
-    {} as FunctionalContractualCxtType
+    {} as FunctionalContractualCxtType,
   );
 
 // ** create a custom hook to use the context
@@ -51,7 +51,7 @@ export const useFunctionalContractualCxt = () => {
   const context = useContext(FunctionalContractualCxt);
   if (!context) {
     throw new Error(
-      "useFunctionalContractualCxt must be used within a FunctionalContractualCxtProvider"
+      "useFunctionalContractualCxt must be used within a FunctionalContractualCxtProvider",
     );
   }
   return context;
@@ -63,12 +63,24 @@ export const FunctionalContractualCxtProvider = ({
   children: ReactNode;
 }) => {
   // ** declare and define component state and variables
-  const { userId } = useUserProfileCxt();
+  const { userId, verticalSection, setVerticalSection } = useUserProfileCxt();
   const { data: companyData } = useCurrentCompany();
   const company = useMemo(() => companyData?.payload, [companyData]);
-  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>(
-    FunctionalContractualList()[0]
-  );
+  const sections = FunctionalContractualList();
+  const [activeSection, setActiveSection] = useState<UserProfileNestedTab>();
+
+  useEffect(() => {
+    if (verticalSection) {
+      const section = sections.find((s) => s.id === verticalSection);
+      if (section) {
+        setActiveSection(section);
+      } else {
+        setActiveSection(sections[0]);
+      }
+    } else {
+      setActiveSection(sections[0]);
+    }
+  }, [verticalSection]);
 
   // user job offers data
   const {
@@ -104,8 +116,10 @@ export const FunctionalContractualCxtProvider = ({
     refetchJobOffer();
   };
 
-  const handleChangeActiveSection = (section: UserProfileNestedTab) =>
+  const handleChangeActiveSection = (section: UserProfileNestedTab) => {
     setActiveSection(section);
+    setVerticalSection(section.id);
+  };
 
   // ** return component ui
   return (
