@@ -19,6 +19,24 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
   const { handleRefetchUserRelativesData } = useConnectionDataCxt();
   const formMode = !relative ? "Create" : "Edit";
   const t = useTranslations("UserProfile.nestedTabs.maritalStatusRelatives");
+  const [maritalStatusOptions, setMaritalStatusOptions] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+  }>>([]);
+
+  const getMaritalStatusType = (id: string): string | undefined => {
+    // First try to find in loaded options
+    const foundType = maritalStatusOptions.find((item) => item.id === id)?.type;
+    if (foundType) return foundType;
+
+    // Fallback to relative's marital_status if in edit mode
+    if (relative?.marital_status?.id === id) {
+      return relative.marital_status.type;
+    }
+
+    return undefined;
+  };
 
   const maritalStatusRelativesFormConfig: FormConfig = {
     formId: `ConnectionInformation-relatives-data-form-${relative?.id ?? ""}`,
@@ -46,9 +64,11 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
                   name: string;
                   type: string;
                 }>;
+                setMaritalStatusOptions(items);
                 return items.map((item) => ({
-                  value: JSON.stringify({ id: item.id, type: item.type }),
+                  value: item.id,
                   label: item.name,
+                  type: item.type,
                 }));
               },
             },
@@ -60,13 +80,9 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "text",
             placeholder: t("name"),
             condition: (values) => {
-              if (
-                values.marital_status_id ===
-                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
-              ) {
-                return false;
-              }
-              return true;
+              const maritalStatusId = values.marital_status_id as string;
+              const type = getMaritalStatusType(maritalStatusId);
+              return type !== "not-married";
             },
             validation: [
               {
@@ -87,13 +103,9 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "text",
             placeholder: t("relationship"),
             condition: (values) => {
-              if (
-                values.marital_status_id ===
-                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
-              ) {
-                return false;
-              }
-              return true;
+              const maritalStatusId = values.marital_status_id as string;
+              const type = getMaritalStatusType(maritalStatusId);
+              return type !== "not-married";
             },
             validation: [
               {
@@ -114,13 +126,9 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
             type: "phone",
             placeholder: t("phone"),
             condition: (values) => {
-              if (
-                values.marital_status_id ===
-                "8b8a32cd-a369-443b-a134-dfd2b33ea1e3"
-              ) {
-                return false;
-              }
-              return true;
+              const maritalStatusId = values.marital_status_id as string;
+              const type = getMaritalStatusType(maritalStatusId);
+              return type !== "not-married";
             },
             validation: [
               {
@@ -133,12 +141,7 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
       },
     ],
     initialValues: {
-      marital_status_id: relative?.marital_status
-        ? JSON.stringify({
-            id: relative.marital_status.id,
-            type: relative.marital_status.type,
-          })
-        : undefined,
+      marital_status_id: relative?.marital_status?.id,
       name: relative?.name,
       phone: relative?.phone,
       relationship: relative?.relationship,
@@ -163,18 +166,8 @@ export const MaritalStatusRelativesFormConfig = (props: PropsT) => {
           : `/user_relatives/${relative?.id}`;
       const method = formMode === "Create" ? "POST" : `PUT`;
 
-      const maritalStatusValue = formData.marital_status_id as string;
-      let maritalStatusId: string | undefined;
-      try {
-        const parsed = JSON.parse(maritalStatusValue || "{}");
-        maritalStatusId = parsed.id;
-      } catch {
-        maritalStatusId = maritalStatusValue;
-      }
-
       const body = {
         ...formData,
-        marital_status_id: maritalStatusId,
         user_id: userId,
       };
 
