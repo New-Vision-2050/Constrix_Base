@@ -56,7 +56,8 @@ const SingleItem = ({ activityItem }: { activityItem: InfoAlertItem }) => {
   };
 
   return (
-    <div className="flex gap-4 items-center">
+    <div className="flex gap-4 items-center justify-between mt-3">
+      <p className="font-md my-1">{activityItem.title}</p>
       <button
         onClick={handleNavigate}
         className="hover:opacity-70 transition-opacity cursor-pointer"
@@ -64,7 +65,6 @@ const SingleItem = ({ activityItem }: { activityItem: InfoAlertItem }) => {
       >
         <SettingsIcon />
       </button>
-      <p className="font-md my-1">{activityItem.title}</p>
     </div>
   );
 };

@@ -107,6 +107,14 @@ export const UserProfileCxtProvider = ({
     if (_user) setUser(_user);
   }, [_user]);
 
+  // Clear tab2 and verticalSection when tab1 is "edit-mode-tabs-profile"
+  useEffect(() => {
+    if (tab1 === "edit-mode-tabs-profile") {
+      setTab2("");
+      setVerticalSection("");
+    }
+  }, [tab1]);
+
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
 
