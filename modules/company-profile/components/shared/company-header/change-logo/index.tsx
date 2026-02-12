@@ -1,23 +1,15 @@
 "use client";
 
-import AutoHeight from "@/components/animation/auto-height";
-
-import { useForm } from "react-hook-form";
-
-import { AlertCircle, UploadCloud } from "lucide-react";
-import Image from "next/image";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import validCompanyProfileImage from "@/modules/company-profile/service/validate-company-image";
 import { cn } from "@/lib/utils";
 import uploadCompanyImage from "@/modules/company-profile/service/upload-company-image";
-import { deleteCookie, getCookie } from "cookies-next";
+import { deleteCookie } from "cookies-next";
 import { useParams } from "@i18n/navigation";
-
-interface FormValues {
-  image: FileList;
-}
+import ImageUploadWithCrop from "@/components/shared/image-upload-with-crop";
 
 interface IChangeLogo {
   handleClose: () => void;
@@ -30,32 +22,37 @@ interface ValidationRule {
   validate: string;
 }
 
+const getInitialRules = (): ValidationRule[] => [
+  {
+    sentence: "حجم الصورة يجب أن لا يتعدى 5 ميجابايت",
+    sub_title: null,
+    status: 0,
+    validate: "required",
+  },
+  {
+    sentence: "أبعاد الصورة غير صحيحة. يجب أن تكون الأبعاد بين  1920*1080",
+    sub_title: null,
+    status: 0,
+    validate: "required",
+  },
+  {
+    sentence: "تأكد ان الخلفية بيضاء",
+    sub_title: null,
+    status: 0,
+    validate: "required",
+  },
+];
+
 const ChangeLogo = ({ handleClose }: IChangeLogo) => {
-  const queryClient = useQueryClient();
   const { company_id }: { company_id: string | undefined } = useParams();
 
   const [valid, setValid] = useState(false);
-
-  const [rules, setRules] = useState<ValidationRule[]>([
-    {
-      sentence: "حجم الصورة يجب أن لا يتعدى 5 ميجابايت",
-      sub_title: null,
-      status: 0,
-      validate: "required",
-    },
-    {
-      sentence: "أبعاد الصورة غير صحيحة. يجب أن تكون الأبعاد بين  1920*1080",
-      sub_title: null,
-      status: 0,
-      validate: "required",
-    },
-    {
-      sentence: "تأكد ان الخلفية بيضاء",
-      sub_title: null,
-      status: 0,
-      validate: "required",
-    },
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [rules, setRules] = useState<ValidationRule[]>(getInitialRules());
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [croppedImageBase64, setCroppedImageBase64] = useState<string | null>(
+    null,
+  );
 
   const { mutate: mutateValidation, isPending: isValidationPending } =
     useMutation({
@@ -68,81 +65,87 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
       await uploadCompanyImage(file, company_id),
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setError,
-    watch,
-  } = useForm<FormValues>();
-
-  const imageFile = watch("image")?.[0];
-  const imagePreview = imageFile ? URL.createObjectURL(imageFile) : null;
-
   useEffect(() => {
-    const test = rules.every((rules) => rules.status === 1);
+    const test = rules.every((rule) => rule.status === 1);
     setValid(test);
   }, [rules]);
 
-  const onSubmit = (data: FormValues) => {
-    const file = data.image[0];
+  // Handle cropped image from ImageUploadWithCrop
+  const handleImageCropped = (file: File | null, base64: string | null) => {
+    setUploadedFile(file);
+    setCroppedImageBase64(base64);
+    // Reset validation when new image is selected
+    setValid(false);
+    setRules(getInitialRules());
+  };
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError("image", {
-        type: "manual",
-        message: "حجم الصورة يتجاوز 5 ميجابايت",
-      });
-      return;
-    }
+  // Validate image
+  const handleValidateImage = async () => {
+    if (!uploadedFile) return;
 
-    if (!valid) {
-      // Just validate
-      mutateValidation(file, {
-        onSuccess: () => {
-          setRules((prev) =>
-            prev.map((rule) => ({
-              ...rule,
-              status: 1,
-            }))
-          );
-          setValid(true); // Allow next submit to proceed with upload
-        },
-        onError: (err: any) => {
-          const messageObj = err?.response?.data?.message;
-          const newRule = Object.values(messageObj).filter(
-            (item) =>
-              item !== null && typeof item === "object" && !Array.isArray(item)
-          );
-          setRules(newRule as ValidationRule[]);
-          setValid(false);
-        },
-      });
-    } else {
-      mutateUpload(file, {
-        onSuccess: () => {
-          deleteCookie("company-data");
-          window.location.reload();
-          handleClose();
-        },
-      });
-    }
+    setLoading(true);
+    mutateValidation(uploadedFile, {
+      onSuccess: () => {
+        setRules((prev) =>
+          prev.map((rule) => ({
+            ...rule,
+            status: 1,
+          })),
+        );
+        setValid(true);
+        setLoading(false);
+      },
+      onError: (err: unknown) => {
+        const messageObj = (
+          err as { response?: { data?: { message?: Record<string, unknown> } } }
+        )?.response?.data?.message;
+        const newRule = messageObj
+          ? Object.values(messageObj).filter(
+              (item) =>
+                item !== null &&
+                typeof item === "object" &&
+                !Array.isArray(item),
+            )
+          : [];
+        setRules(newRule as ValidationRule[]);
+        setValid(false);
+        setLoading(false);
+      },
+    });
+  };
+
+  // Upload image
+  const handleSaveImage = async () => {
+    if (!uploadedFile) return;
+
+    setLoading(true);
+    mutateUpload(uploadedFile, {
+      onSuccess: () => {
+        deleteCookie("company-data");
+        window.location.reload();
+        handleClose();
+        setLoading(false);
+      },
+      onError: () => {
+        setLoading(false);
+      },
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-10 ">
-        <div className="grid grid-cols-2 items-center">
+    <div>
+      <div className="mb-10">
+        <div className="grid grid-cols-2 items-center gap-8">
           <div className="space-y-3 text-right">
             <ul className="list-decimal pr-5 space-y-2 text-sm">
               {rules.map((rule) => (
                 <li key={rule.sentence} className="flex items-center gap-2">
                   <AlertCircle
                     className={cn(
-                      "w-4 h-4  shrink-0",
+                      "w-4 h-4 shrink-0",
                       Boolean(rule.status)
                         ? "text-green-500"
-                        : "text-yellow-400"
+                        : "text-yellow-400",
                     )}
                   />
                   <p className="text-lg">{rule.sentence}</p>
@@ -150,67 +153,34 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
               ))}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 bg-sidebar rounded-2xl aspect-square items-center justify-center">
-            <div className="w-full flex items-center justify-center">
-              <div className="w-40 h-32 flex items-center justify-center">
-                {imagePreview ? (
-                  <Image
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-contain"
-                    width={160}
-                    height={128}
-                  />
-                ) : (
-                  <UploadCloud className="w-16 h-16" />
-                )}
-              </div>
-            </div>
 
-            <label className="w-32 px-4 py-2 border border-primary rounded-lg cursor-pointer text-center text-sm">
-              ارفاق
-              <input
-                type="file"
-                accept=".jpeg,.jpg,.png,.gif,.svg"
-                className="hidden"
-                {...register("image", {
-                  required: "الرجاء اختيار صورة",
-                  validate: {
-                    format: (fileList) => {
-                      if (!fileList?.[0]) return true;
-                      const validFormats = [
-                        "image/jpeg",
-                        "image/jpg",
-                        "image/png",
-                        "image/gif",
-                        "image/svg+xml",
-                      ];
-                      return (
-                        validFormats.includes(fileList[0].type) ||
-                        "يجب أن يكون حقل logo ملفًا من نوع: jpeg, jpg, png, gif, svg."
-                      );
-                    },
-                  },
-                })}
-              />
-            </label>
-          </div>
+          {/* Image Upload with Crop */}
+          <ImageUploadWithCrop
+            onChange={handleImageCropped}
+            loading={loading || isValidationPending || isUploadPending}
+            previewImage={croppedImageBase64}
+            disabled={false}
+            cropOptions={{
+              minWidth: 100,
+              aspect: 16 / 9,
+            }}
+          />
         </div>
-
-        <AutoHeight condition={!!errors.image}>
-          <div className="text-red-500 text-sm text-right">
-            {errors?.image?.message as string}
-          </div>
-        </AutoHeight>
       </div>
 
       <div className="flex items-center justify-center gap-4 text-xs">
         <Button
-          type="submit"
+          onClick={!valid ? handleValidateImage : handleSaveImage}
           className="w-32"
-          loading={isValidationPending || isUploadPending}
+          loading={loading || isValidationPending || isUploadPending}
+          disabled={
+            !Boolean(uploadedFile) ||
+            loading ||
+            isValidationPending ||
+            isUploadPending
+          }
         >
-          {valid ? "حفظ" : " تحقق من الصوره"}
+          {valid ? "حفظ" : "تحقق من الصوره"}
         </Button>
         <Button
           type="button"
@@ -221,7 +191,7 @@ const ChangeLogo = ({ handleClose }: IChangeLogo) => {
           الغاء
         </Button>
       </div>
-    </form>
+    </div>
   );
 };
 

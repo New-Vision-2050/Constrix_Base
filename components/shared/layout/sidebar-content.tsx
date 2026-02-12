@@ -190,11 +190,18 @@ export function SidebarContentWrapper({
       {
         name: t("Sidebar.HumanResources"),
         icon: LayoutDashboardIcon,
-        urls: [ROUTER.Organizational_Structure],
+        urls: [ROUTER.Organizational_Structure, ROUTER.WORK_PANEL],
         isActive: pageName === ROUTER.Organizational_Structure,
         slug: SUPER_ENTITY_SLUG.HRM,
         show: !isCentralCompany,
         sub_entities: [
+          {
+            name: t("WorkPanel.title"),
+            url: ROUTER.WORK_PANEL,
+            icon: LayoutDashboardIcon,
+            isActive: pageName === ROUTER.WORK_PANEL,
+            show: !isCentralCompany,
+          },
           {
             name: t("Sidebar.OrganizationalStructure"),
             url: ROUTER.Organizational_Structure,

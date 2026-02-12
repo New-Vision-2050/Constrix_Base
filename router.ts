@@ -25,6 +25,7 @@ export const ROUTER = {
   },
   HR_SETTINGS: "/hr-settings",
   Organizational_Structure: "/organizational-structure",
+  WORK_PANEL: "/work-panel",
   ROLES: "/roles",
   PERMISSIONS: "/permissions",
   AttendanceDeparture: "/attendance-departure",
