@@ -35,6 +35,7 @@ export const breadcrumbsMessages = new MessagesGroup({
   "docs-library": _m("Docs Library", "مكتبة المستندات"),
   "human-resources": _m("Human Resources", "الموارد البشرية"),
   "organizational-structure": _m("Organizational Structure", "هيكل المنظمة"),
+  "work-panel": _m("Work Panel", "لوحة العمل"),
   permissions: _m("Permissions", "صلاحيات"),
   programs: _m("Programs", "البرامج"),
   roles: _m("Roles", "الصلاحيات"),
