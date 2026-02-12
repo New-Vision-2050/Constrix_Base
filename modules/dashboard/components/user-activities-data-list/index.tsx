@@ -9,11 +9,11 @@ import { InfoAlertItem } from "../../api/fetch-user-info-alert";
 import { useUserProfileCxt } from "@/modules/user-profile/context/user-profile-cxt";
 
 const TYPE_TO_TAB2_MAP: Record<string, string> = {
-  work_permit: "functional-tab-contractual-contract-data",
-  passport: "contract-tab-personal-data-section",
   identity: "contract-tab-personal-data-section",
-  border_number: "contract-tab-personal-data-section",
-  entry_number: "contract-tab-personal-data-section",
+  entry_number: "contract-tab-iqama-data-section",
+  border_number: "contract-tab-iqama-data-section",
+  work_permit: "contract-tab-iqama-data-section",
+  passport: "contract-tab-personal-data-section",
   bank_account: "contract-tab-banking-data-section",
 };
 
