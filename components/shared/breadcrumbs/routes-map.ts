@@ -82,6 +82,7 @@ export const getRoutesMap = (
       "organizational-structure",
       "هيكل المنظمة"
     ),
+    "work-panel": getText("work-panel", "لوحة العمل"),
     permissions: getText("permissions", "صلاحيات"),
     programs: getText("programs", "البرامج"),
     roles: getText("roles", "الصلاحيات"),
