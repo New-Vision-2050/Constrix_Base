@@ -37,7 +37,7 @@ export function Shipping() {
   }, [getAllChartsData]);
 
   return (
-    <div className="w-full h-64 bg-yellow-700 rounded-lg p-4 flex flex-col">
+    <div className="w-full h-64 bg-[#5A4409] rounded-lg p-4 flex flex-col">
       <h3 className="text-white text-lg font-semibold text-right mb-2">حالات الفيزا</h3>
       <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">

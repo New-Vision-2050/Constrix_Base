@@ -37,7 +37,7 @@ export function Guarantor() {
   }, [getAllChartsData]);
 
   return (
-    <div className="w-full h-64 bg-green-700 rounded-lg p-4 flex flex-col">
+    <div className="w-full h-64 bg-[#4A7080] rounded-lg p-4 flex flex-col">
       <h3 className="text-white text-lg font-semibold text-right mb-2">حالة العقد</h3>
       <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">

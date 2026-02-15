@@ -37,7 +37,7 @@ export function Identity() {
   }, [getAllChartsData]);
 
   return (
-    <div className="w-full h-64 bg-blue-700 rounded-lg p-4 flex flex-col">
+    <div className="w-full h-64 bg-[#4A7A4C] rounded-lg p-4 flex flex-col">
       <h3 className="text-white text-lg font-semibold text-right mb-2">الحالة الاجتماعية</h3>
       <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
