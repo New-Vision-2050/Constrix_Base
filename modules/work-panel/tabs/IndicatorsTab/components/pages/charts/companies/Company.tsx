@@ -42,7 +42,6 @@ export function CompanyChart() {
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={contractData}>
-                    <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
