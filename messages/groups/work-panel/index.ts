@@ -35,6 +35,15 @@ export const workPanelMessages = new MessagesGroup({
   riyadhBranch: _m("Riyadh Branch", "فرع الرياض"),
   qassimBranch: _m("Qassim Branch", "فرع القصيم"),
 
+  // Expired IDs table columns
+  name: _m("Name", "الاسم"),
+  endDate: _m("End Date", "تاريخ الانتهاء"),
+  entryNumber: _m("Identity Number", "رقم الهوية"),
+  workPermit: _m("Work Permit", "رخصة العمل"),
+  // Table actions
+  actions: _m("Actions", "الإجراءات"),
+  edit: _m("Edit", "تعديل"),
+
   // Content placeholders
   contentUnderDevelopment: _m(
     "Content under development...",
@@ -48,5 +57,6 @@ export const workPanelMessages = new MessagesGroup({
     "Services content under development...",
     "محتوى الخدمات قيد الإنشاء..."
   ),
+  loading: _m("Loading...", "جاري التحميل..."),
 });
 
