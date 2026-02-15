@@ -4,6 +4,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { ChartsLabelCustomMarkProps } from "@mui/x-charts/ChartsLabel";
+import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
+
+interface GenderData {
+    value: number;
+    label: string;
+    color: string;
+    labelMarkType: string;
+}
 
 function HTMLDiamond({ className, color }: ChartsLabelCustomMarkProps) {
   return (
@@ -26,24 +34,49 @@ function SVGStar({ className, color }: ChartsLabelCustomMarkProps) {
   );
 }
 
-export const Employees = () => {
+export const EmployeesChart = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [size, setSize] = useState({ width: 200, height: 240 });
-  const data = [
+  const [chartSize, setChartSize] = useState({ width: 200, height: 240 });
+  const [genderData, setGenderData] = useState<GenderData[]>([
     { value: 90, label: "ذكر", color: "#7086FD", labelMarkType: "circle" },
     { value: 50, label: "انثي", color: "#6fd195", labelMarkType: "circle" },
     { value: 10, label: "غير محدد", color: "#FFA500", labelMarkType: "circle" }
-  ];
+  ]);
+  const { getAllChartsData } = useIndicatorsService();
 
   useEffect(() => {
-    const update = () => {
-      const w = containerRef.current?.clientWidth ?? 200;
-      const h = Math.max(220, Math.min(380, Math.round(w * 0.65)));
-      setSize({ width: w, height: h });
+    const fetchGenderData = async () => {
+      try {
+        const apiResponse = await getAllChartsData();
+        
+        if (apiResponse && apiResponse.code === "SUCCESS_WITH_SINGLE_PAYLOAD_OBJECT" && 
+            apiResponse.payload && apiResponse.payload.gender) {
+          const formattedGenderData = apiResponse.payload.gender.data.map((item: any) => ({
+            value: item.count,
+            label: item.label,
+            color: item.code === "male" ? "#7086FD" : 
+                   item.code === "female" ? "#6fd195" : "#FFA500",
+            labelMarkType: "circle"
+          }));
+          setGenderData(formattedGenderData);
+        }
+      } catch (error) {
+        console.error('Error fetching gender data:', error);
+      }
     };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+
+    fetchGenderData();
+  }, [getAllChartsData]);
+
+  useEffect(() => {
+    const updateChartSize = () => {
+      const containerWidth = containerRef.current?.clientWidth ?? 200;
+      const containerHeight = Math.max(220, Math.min(380, Math.round(containerWidth * 0.65)));
+      setChartSize({ width: containerWidth, height: containerHeight });
+    };
+    updateChartSize();
+    window.addEventListener("resize", updateChartSize);
+    return () => window.removeEventListener("resize", updateChartSize);
   }, []);
 
   return (
@@ -54,7 +87,7 @@ export const Employees = () => {
       <PieChart
         series={[
           {
-            data: data,
+            data: genderData,
             innerRadius: 0,
             outerRadius: undefined,
           },
@@ -65,8 +98,8 @@ export const Employees = () => {
             position: { vertical: 'middle', horizontal: 'end' },
           },
         }}
-        width={size.width}
-        height={size.height}
+        width={chartSize.width}
+        height={chartSize.height}
       />
     </Box>
   );

@@ -1,43 +1,56 @@
 "use client";
 
 import * as React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
 
-const data = [
-  { name: 'شركة 1', value: 35, color: '#3B82F6' },
-  { name: 'شركة 2', value: 25, color: '#10B981' },
-  { name: 'شركة 3', value: 20, color: '#F59E0B' },
-  { name: 'شركة 4', value: 20, color: '#EF4444' }
-];
+interface ContractExpirationData {
+    name: string;
+    value: number;
+}
 
-export function Company() {
+export function CompanyChart() {
+    const [contractData, setContractData] = React.useState<ContractExpirationData[]>([
+        { name: 'ديسمبر 2025', value: 1 },
+        { name: 'فبراير 2027', value: 1 },
+        { name: 'بدون عقد', value: 11 }
+    ]);
+    const { getAllChartsData } = useIndicatorsService();
+
+    React.useEffect(() => {
+        const fetchContractData = async () => {
+            try {
+                const apiResponse = await getAllChartsData();
+                
+                if (apiResponse && apiResponse.code === "SUCCESS_WITH_SINGLE_PAYLOAD_OBJECT" && 
+                    apiResponse.payload && apiResponse.payload.contract_expiration_by_month) {
+                    const formattedContractData = apiResponse.payload.contract_expiration_by_month.data.map((item: any) => ({
+                        name: item.label,
+                        value: item.count
+                    }));
+                    setContractData(formattedContractData);
+                }
+            } catch (error) {
+                console.error('Error fetching contract expiration data:', error);
+            }
+        };
+
+        fetchContractData();
+    }, [getAllChartsData]);
+
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                    <Pie
-                        data={data}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={40}
-                        outerRadius={70}
-                        paddingAngle={2}
-                        dataKey="value"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                    </Pie>
+                <BarChart data={contractData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
                     <Tooltip />
-                    <Legend 
-                        verticalAlign="bottom" 
-                        height={36}
-                        formatter={(value) => value}
-                    />
-                </PieChart>
+                    <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
             </ResponsiveContainer>
             <div className="text-center mt-2">
-                <h3 className="text-lg font-semibold">الشركات</h3>
+                <h3 className="text-lg font-semibold">انتهاء العقود شهرياً</h3>
             </div>
         </div>
     );

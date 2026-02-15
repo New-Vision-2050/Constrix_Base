@@ -1,16 +1,40 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
 
 const COLORS = ['#FFBB28', '#0088FE', '#8884d8'];
 
 export function Identity() {
-  const data = [
+  const [data, setData] = useState<any[]>([
     { value: 1, name: 'منتهي', percentage: '1%' },
     { value: 145, name: 'جاري', percentage: '84%' },
     { value: 26, name: 'لا يوجد', percentage: '15%' }
-  ];
+  ]);
+  const { getAllChartsData } = useIndicatorsService();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAllChartsData();
+        
+        if (response && response.code === "SUCCESS_WITH_SINGLE_PAYLOAD_OBJECT" && 
+            response.payload && response.payload.marital_status) {
+          const maritalStatusData = response.payload.marital_status.data.map((item: any) => ({
+            value: item.count,
+            name: item.label,
+            percentage: `${item.percentage}%`
+          }));
+          setData(maritalStatusData);
+        }
+      } catch (error) {
+        console.error('Error fetching identity data:', error);
+      }
+    };
+
+    fetchData();
+  }, [getAllChartsData]);
 
   return (
     <div className="w-full h-64 bg-blue-700 rounded-lg p-4 flex flex-col justify-between">

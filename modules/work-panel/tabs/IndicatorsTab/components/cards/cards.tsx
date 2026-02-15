@@ -2,8 +2,8 @@
 
 import React from "react";
 import {Box,Typography} from "@mui/material";
-import {Employees} from "./employees/Employees"
-import {Sections} from "./sections/Sections"
+import {EmployeesChart} from "./employees/Employees"
+import {SectionsChart} from "./sections/Sections"
 
 export function cards() {
     return (
@@ -13,13 +13,13 @@ export function cards() {
                 <Typography variant="h6" sx={{ mb: 2 }}>
                     Sections
                 </Typography>
-                <Sections/>
+                <SectionsChart/>
             </Box>
             <Box   className="col-span-1 flex justify-center items-center">
                 <Typography  variant="h6" className="col-span-1" >
                     Employees
                 </Typography>
-                <Employees/>
+                <EmployeesChart/>
             </Box>
 
         </Box>

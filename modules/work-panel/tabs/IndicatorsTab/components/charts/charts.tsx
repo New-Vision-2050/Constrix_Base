@@ -1,24 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { useIndicatorsService } from '@/services/api/indicators/indicatorsService';
 
 export function ZoomBarChart() {
-  const data = [
-    { month: 'Jan', count: 12 },
-    { month: 'Feb', count: 8 },
-    { month: 'Mar', count: 15 },
-    { month: 'Apr', count: 22 },
-    { month: 'May', count: 18 },
-    { month: 'Jun', count: 25 },
-    { month: 'Jul', count: 30 },
-    { month: 'Aug', count: 28 },
-    { month: 'Sep', count: 20 },
-    { month: 'Oct', count: 16 },
-    { month: 'Nov', count: 12 },
-    { month: 'Dec', count: 10 }
-  ];
+  const [data, setData] = useState<any[]>([]);
+  const { getAllChartsData } = useIndicatorsService();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAllChartsData();
+        
+        if (response && response.code === "SUCCESS_WITH_SINGLE_PAYLOAD_OBJECT" && 
+            response.payload && response.payload.visa_expiration_by_month) {
+          const visaData = response.payload.visa_expiration_by_month.data.map((item: any) => ({
+            month: item.label,
+            count: item.count
+          }));
+          setData(visaData);
+        }
+      } catch (error) {
+        console.error('Error fetching visa expiration data:', error);
+      }
+    };
+
+    fetchData();
+  }, [getAllChartsData]);
 
   const xLabels = data.map(d => d.month);
 
