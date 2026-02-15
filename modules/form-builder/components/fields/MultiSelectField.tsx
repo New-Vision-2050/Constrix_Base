@@ -2,6 +2,7 @@ import React, { memo, useEffect, useState, useRef, useCallback } from "react";
 import Select, { MultiValue, components } from "react-select";
 import { FieldConfig, DropdownOption } from "../../types/formTypes";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { Search, X } from "lucide-react";
 import { Label } from "@/modules/table/components/ui/label";
 import { apiClient } from "@/config/axios-config";
@@ -22,46 +23,52 @@ const CustomInput = (props: any) => (
 );
 
 // Custom Menu component with loading indicator
-const CustomMenu = (props: any) => (
-  <components.Menu {...props}>
-    {props.children}
-    {props.selectProps.isLoading && (
-      <div className="flex items-center justify-center py-2 text-sm text-muted-foreground">
-        <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        Loading options...
-      </div>
-    )}
-  </components.Menu>
-);
+const CustomMenu = (props: any) => {
+  const t = useTranslations();
+  return (
+    <components.Menu {...props}>
+      {props.children}
+      {props.selectProps.isLoading && (
+        <div className="flex items-center justify-center py-2 text-sm text-muted-foreground">
+          <svg
+            className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {t("Table.LoadingOptions")}
+        </div>
+      )}
+    </components.Menu>
+  );
+};
 
 // Custom NoOptionsMessage component
-const CustomNoOptionsMessage = (props: any) => (
-  <components.NoOptionsMessage {...props}>
-    <div className="flex items-center justify-center text-sm text-muted-foreground">
-      <Search className="mr-2 h-4 w-4" />
-      No options found
-    </div>
-  </components.NoOptionsMessage>
-);
+const CustomNoOptionsMessage = (props: any) => {
+  const t = useTranslations();
+  return (
+    <components.NoOptionsMessage {...props}>
+      <div className="flex items-center justify-center text-sm text-muted-foreground">
+        <Search className="mr-2 h-4 w-4" />
+        {t("Table.NoOptionsFound")}
+      </div>
+    </components.NoOptionsMessage>
+  );
+};
 
 const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   field,
@@ -72,6 +79,7 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
   onBlur,
   dependencyValues = {},
 }) => {
+  const t = useTranslations();
   const [options, setOptions] = useState<DropdownOption[]>(field.options || []);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -313,8 +321,8 @@ const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
         inputValue={inputValue}
         isDisabled={field.disabled}
         isLoading={isLoading}
-        placeholder={field.placeholder || "Select options..."}
-        noOptionsMessage={() => "No options found"}
+        placeholder={field.placeholder || t("Main.NoResultsFound")}
+        noOptionsMessage={() => t("Table.NoOptionsFound")}
         components={{
           Input: CustomInput,
           Menu: CustomMenu,

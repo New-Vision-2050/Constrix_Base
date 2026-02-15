@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,6 +38,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   setFieldValue,
   isHorizontal = false,
 }) => {
+  const t = useTranslations();
   // State for collapsible
   const [isOpen, setIsOpen] = useState(true);
 
@@ -272,7 +274,7 @@ const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
           {loading && (
             <div className="flex items-center text-muted-foreground text-sm mt-2">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading options...
+              {t("Table.LoadingOptions")}
             </div>
           )}
 

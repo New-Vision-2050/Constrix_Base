@@ -45,12 +45,11 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
   isMulti = false,
   setFirstAsDefault = dynamicConfig?.setFirstAsDefault ?? false,
 }) => {
-  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+const t = useTranslations();
   const { options, loading, error, dataFetched, fetchOptions, hasMore } =
     useDropdownSearch({
       searchTerm: searchValue,
@@ -234,7 +233,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
             <div className="flex items-center border-b px-3">
               <CommandInput
                 ref={inputRef}
-                placeholder="بحث..."
+                placeholder={t("Table.Search")}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex-1 py-3 px-1 outline-none"
@@ -246,8 +245,8 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
               className="max-h-[200px] overflow-auto"
               onScroll={(event) => {
                 const target = event.target as HTMLElement;
-                let total = target.scrollTop + target.clientHeight;
-                let content = target.querySelector(
+                const total = target.scrollTop + target.clientHeight;
+                const content = target.querySelector(
                   `[id='inner-list']`
                 ) as HTMLElement | null;
                 if (
@@ -271,7 +270,7 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                   </div>
                 ) : (
                   <div className="py-6 text-center text-sm">
-                    {t("Main.NoResultsRound")}
+                    {t("Main.NoResultsFound")}
                   </div>
                 )}
               </CommandEmpty>
