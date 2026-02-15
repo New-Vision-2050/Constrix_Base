@@ -1,16 +1,16 @@
 "use client";
-
+import {DashbaordPage} from "./components/DashbaordPage";
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { Box,  } from "@mui/material";
+
 
 export default function IndicatorsTab() {
-  const t = useTranslations("WorkPanel");
+
 
   return (
     <Box className="mt-6">
-      <Typography variant="h6">{t("indicators")}</Typography>
-    </Box>
+        <DashbaordPage />
+          </Box>
   );
 }
 
