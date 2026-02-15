@@ -29,6 +29,11 @@ function SVGStar({ className, color }: ChartsLabelCustomMarkProps) {
 export const Employees = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ width: 200, height: 240 });
+  const data = [
+    { value: 90, label: "ذكر", color: "#7086FD", labelMarkType: "circle" },
+    { value: 50, label: "انثي", color: "#6fd195", labelMarkType: "circle" },
+    { value: 10, label: "غير محدد", color: "#FFA500", labelMarkType: "circle" }
+  ];
 
   useEffect(() => {
     const update = () => {
@@ -46,14 +51,10 @@ export const Employees = () => {
       ref={containerRef}
       className="mt-6 flex justify-center items-center"
     >
-
       <PieChart
         series={[
           {
-            data: [
-              { value: 70, label: "figma", color: "#7086FD", labelMarkType: "circle"  },
-              { value: 35, label: "sketch", color: "#6fd195", labelMarkType: HTMLDiamond },
-            ],
+            data: data,
             innerRadius: 0,
             outerRadius: undefined,
           },
@@ -62,7 +63,6 @@ export const Employees = () => {
           legend: { 
             hidden: true,
             position: { vertical: 'middle', horizontal: 'end' },
-            
           },
         }}
         width={size.width}
