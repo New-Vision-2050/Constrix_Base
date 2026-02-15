@@ -49,7 +49,7 @@ export function CompanyChart() {
                     <Bar dataKey="value" fill="#8884d8" />
                 </BarChart>
             </ResponsiveContainer>
-            <div className="text-center mt-2">
+            <div className="text-center mt-1">
                 <h3 className="text-lg font-semibold">انتهاء العقود شهرياً</h3>
             </div>
         </div>

@@ -38,9 +38,9 @@ export function NationalityChart() {
   }, [getAllChartsData]);
 
   return (
-    <div className="w-full h-64 bg-purple-700 rounded-lg p-4 flex flex-col justify-between">
-      <h3 className="text-white text-lg font-semibold mb-4 text-right">الجنسية</h3>
-      <div className="flex-grow flex items-center justify-center">
+    <div className="w-full h-64 bg-purple-700 rounded-lg p-4 flex flex-col">
+      <h3 className="text-white text-lg font-semibold mb-2 text-right">الجنسية</h3>
+      <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={nationalityData}>
             <CartesianGrid strokeDasharray="3 3" />

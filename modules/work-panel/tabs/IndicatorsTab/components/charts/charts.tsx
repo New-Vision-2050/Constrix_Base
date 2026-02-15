@@ -34,7 +34,7 @@ export function ZoomBarChart() {
 
   return (
     <Box className="mt-6">
-      <Typography variant="h6" className="text-right mb-4">
+      <Typography variant="h6" className="text-right mb-2">
         انتهاء التأشيرات شهرياً
       </Typography>
       <BarChart

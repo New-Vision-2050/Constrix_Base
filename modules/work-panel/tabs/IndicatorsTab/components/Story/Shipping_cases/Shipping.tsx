@@ -37,9 +37,9 @@ export function Shipping() {
   }, [getAllChartsData]);
 
   return (
-    <div className="w-full h-64 bg-yellow-700 rounded-lg p-4 flex flex-col justify-between">
-      <h3 className="text-white text-lg font-semibold mb-4 text-right">حالات الشحن</h3>
-      <div className="flex-grow flex items-center justify-center">
+    <div className="w-full h-64 bg-yellow-700 rounded-lg p-4 flex flex-col">
+      <h3 className="text-white text-lg font-semibold text-right mb-2">حالات الفيزا</h3>
+      <div className="flex-1 flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -60,7 +60,7 @@ export function Shipping() {
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex justify-around mt-4">
+      <div className="flex justify-around mt-2">
         {data.map((entry, index) => (
           <div key={`legend-${index}`} className="flex items-center">
             <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>

@@ -11,13 +11,13 @@ export function cards() {
 
             <Box className="col-span-1 flex justify-center items-center">
                 <Typography variant="h6" sx={{ mb: 2 }}>
-                    Sections
+                    نوع الوظيفة
                 </Typography>
                 <SectionsChart/>
             </Box>
             <Box   className="col-span-1 flex justify-center items-center">
                 <Typography  variant="h6" className="col-span-1" >
-                    Employees
+                    الجنس
                 </Typography>
                 <EmployeesChart/>
             </Box>
