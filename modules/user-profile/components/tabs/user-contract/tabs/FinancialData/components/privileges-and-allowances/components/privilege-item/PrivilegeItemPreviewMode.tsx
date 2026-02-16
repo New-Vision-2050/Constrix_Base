@@ -13,6 +13,11 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
     privilegeData?.type_allowance_code === AllowancesTypes?.Percentage;
   const chargeAmountValue = isPercentage?privilegeData?.charge_amount:`${privilegeData?.charge_amount} ر.س`;
   
+  // Check if this privilege is medical insurance
+  const isMedicalInsurance = privilegeData?.privilege?.type === "MedicalInsurance" ||
+                             privilegeData?.privilege?.name?.includes("تأمين طبي") ||
+                             privilegeData?.type === "MedicalInsurance" ||
+                             privilegeData?.name?.includes("تأمين طبي");
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -55,6 +60,17 @@ export default function PrivilegeItemPreviewMode({ privilegeData }: PropsT) {
             </div>
           )}
         </>
+      )}
+
+      {isMedicalInsurance && (
+        <div className="p-2">
+          <PreviewTextField
+            label="التأمين الطبي"
+            value={privilegeData?.medical_insurance?.name}
+            valid={Boolean(privilegeData?.medical_insurance?.name)}
+            required
+          />
+        </div>
       )}
 
       <div className={`p-2 ${isSaving ? "col-span-2" : ""}`}>
