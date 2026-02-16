@@ -87,7 +87,7 @@ export default function ExpiredWorkPermitsContent() {
       key: "actions",
       name: t("actions"),
       sortable: false,
-      render: (row: InfoAlertItem) => (
+      render: () => (
         <CustomMenu
           renderAnchor={({ onClick }) => (
             <Button onClick={onClick}>{t("actions")}</Button>
@@ -95,7 +95,7 @@ export default function ExpiredWorkPermitsContent() {
         >
           <MenuItem
             onClick={() => {
-              router.push(`/user-profile/${row.id}`);
+              router.push(`user-profile?tab1=edit-mode-tabs-contract&tab2=user-contract-tab-personal-data&verticalSection=contract-tab-iqama-data-section`);
             }}
           >
             <EditIcon className="w-4 h-4 ml-2" />
