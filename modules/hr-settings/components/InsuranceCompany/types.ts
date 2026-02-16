@@ -6,6 +6,7 @@ export interface MedicalInsuranceRow {
   employee?: Employee;
   employee_name?: string;
   status: number;
+  end_date?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -15,6 +16,7 @@ export interface CreateMedicalInsuranceForm {
   policy_number: string;
   employee_id: string;
   status?: number;
+  end_date?: string;
 }
 
 export interface UpdateMedicalInsuranceForm {
@@ -22,6 +24,7 @@ export interface UpdateMedicalInsuranceForm {
   policy_number: string;
   employee_id: string;
   status?: number;
+  end_date?: string;
 }
 
 export interface Employee {

@@ -65,6 +65,18 @@ export function createColumns({ onEdit, onDelete, canEdit, canDelete }: ColumnsP
       },
     },
     {
+      key: "end_date",
+      name: "تاريخ الانتهاء",
+      sortable: true,
+      render: (row: MedicalInsuranceRow) => {
+        return (
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            {row.end_date || "-"}
+          </span>
+        );
+      },
+    },
+    {
       key: "actions",
       name: t("actions"),
       sortable: false,
