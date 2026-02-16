@@ -33,6 +33,7 @@ export default function AddMedicalInsuranceDialog({
     policy_number: "",
     employee_id: "",
     status: 1,
+    end_date: "",
   });
 
   // Fetch employees for dropdown
@@ -56,6 +57,7 @@ export default function AddMedicalInsuranceDialog({
           policy_number: editingInsurance.policy_number,
           employee_id: editingInsurance.employee_id,
           status: editingInsurance.status,
+          end_date: editingInsurance.end_date || "",
         });
       } else {
         setFormData({
@@ -63,6 +65,7 @@ export default function AddMedicalInsuranceDialog({
           policy_number: "",
           employee_id: "",
           status: 1,
+          end_date: "",
         });
       }
     }
@@ -154,6 +157,19 @@ export default function AddMedicalInsuranceDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                تاريخ الانتهاء
+              </label>
+              <Input
+                type="date"
+                value={formData.end_date}
+                onChange={(e) => handleInputChange("end_date", e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                className="bg-sidebar border-gray-700"
+              />
             </div>
 
             <div>
