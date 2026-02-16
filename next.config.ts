@@ -21,6 +21,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://core-be-dev.constrix-hr-nv.com/api/v1/:path*'
+      }
+    ]
+  },
   // Add cache busting for static assets
   generateBuildId: async () => {
     // Use environment variable if available, otherwise use timestamp
