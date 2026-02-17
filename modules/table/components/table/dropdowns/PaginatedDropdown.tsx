@@ -240,6 +240,28 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                 className="flex-1 py-3 px-1 outline-none"
               />
             </div>
+            {/* Select All button for multi-select */}
+            {isMulti && options.length > 0 && (
+              <div className="flex items-center justify-between px-3 py-2 border-b bg-gray-50">
+                <button
+                  className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 font-medium transition-colors"
+                  onClick={() => {
+                    const allValues = options.map(opt => opt.value);
+                    onChange(allValues);
+                  }}
+                >
+                  تحديد الكل
+                </button>
+                <button
+                  className="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 font-medium transition-colors"
+                  onClick={() => {
+                    onChange([]);
+                  }}
+                >
+                  إلغاء الكل
+                </button>
+              </div>
+            )}
             <CommandList
               onWheel={(e) => e.stopPropagation()}
               ref={listRef}
@@ -295,7 +317,19 @@ const PaginatedDropdown: React.FC<PaginatedDropdownProps> = ({
                         setOpen(false);
                       }
                     }}
-                    className="cursor-pointer"
+                    className={cn(
+                      "cursor-pointer",
+                      "hover:bg-gray-50",
+                      "transition-colors duration-150",
+                      "text-foreground",
+                      isMulti
+                        ? Array.isArray(value) && value.includes(option.value)
+                          ? "bg-blue-500 text-white"
+                          : ""
+                        : value == option.value
+                          ? "bg-blue-500 text-white"
+                          : ""
+                    )}
                   >
                     <Check
                       className={cn(
