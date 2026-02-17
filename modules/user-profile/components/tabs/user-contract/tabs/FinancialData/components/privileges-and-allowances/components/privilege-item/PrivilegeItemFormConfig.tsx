@@ -33,6 +33,40 @@ export const PrivilegeItemFormConfig = ({
         fields: [
           {
             type: "select",
+            name: "medical_insurance_id",
+            label: "رقم البوليصة التامين الطبي",
+            placeholder: "اختر رقم البوليصة",
+            condition: (values) => {
+              // Show this field only when privilege is MedicalInsurance
+              const selectedPrivilege = privileges?.find(p => p.id === values.privilege_id);
+              const isMedicalInsurance = selectedPrivilege?.type === "MedicalInsurance" ||
+                  selectedPrivilege?.name?.includes("تأمين طبي") ||
+                  privilegeData?.privilege?.type === "MedicalInsurance" ||
+                  privilegeData?.privilege?.name?.includes("تأمين طبي") ||
+                  privilegeData?.type === "MedicalInsurance" ||
+                  privilegeData?.name?.includes("تأمين طبي");
+              return isMedicalInsurance;
+            },
+            dynamicOptions: {
+              url: `${baseURL}/medical-insurances`,
+              valueField: "id",
+              labelField: "policy_number",
+              searchParam: "policy_number",
+              paginationEnabled: true,
+              pageParam: "page",
+              limitParam: "per_page",
+              itemsPerPage: 10,
+              totalCountHeader: "X-Total-Count",
+            },
+            validation: [
+              {
+                type: "required",
+                message: "اختر رقم البوليصة",
+              },
+            ],
+          },
+          {
+            type: "select",
             name: "type_privilege_id",
             label: "نوع البدل (عائلي - فردي)",
             placeholder: "اختر البدل",
@@ -147,40 +181,7 @@ export const PrivilegeItemFormConfig = ({
               },
             ],
           },
-          {
-            type: "select",
-            name: "medical_insurance_id",
-            label: "التأمين الطبي",
-            placeholder: "اختر التأمين الطبي",
-            condition: (values) => {
-              // Show this field only when privilege is MedicalInsurance
-              const selectedPrivilege = privileges?.find(p => p.id === values.privilege_id);
-              const isMedicalInsurance = selectedPrivilege?.type === "MedicalInsurance" ||
-                                     selectedPrivilege?.name?.includes("تأمين طبي") ||
-                                     privilegeData?.privilege?.type === "MedicalInsurance" ||
-                                     privilegeData?.privilege?.name?.includes("تأمين طبي") ||
-                                     privilegeData?.type === "MedicalInsurance" ||
-                                     privilegeData?.name?.includes("تأمين طبي");
-              return isMedicalInsurance;
-            },
-            dynamicOptions: {
-              url: `${baseURL}/medical-insurances`,
-              valueField: "id",
-              labelField: "name",
-              searchParam: "name",
-              paginationEnabled: true,
-              pageParam: "page",
-              limitParam: "per_page",
-              itemsPerPage: 10,
-              totalCountHeader: "X-Total-Count",
-            },
-            validation: [
-              {
-                type: "required",
-                message: "اختر التأمين الطبي",
-              },
-            ],
-          },
+
           {
             name: "description",
             label: "وصف",
