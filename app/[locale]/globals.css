@@ -196,3 +196,56 @@ html {
     background-position: 200% 0;
   }
 }
+
+/* Comprehensive solution to prevent blue backgrounds */
+input {
+  background-color: transparent !important;
+}
+
+input::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+input::-moz-selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* React-select specific */
+.react-select__input input::selection {
+  background: transparent !important;
+}
+
+/* CMDK specific - prevent all blue backgrounds */
+[cmdk-input],
+[data-cmdk-input],
+[cmdk-item],
+[data-cmdk-item] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+[cmdk-item][data-selected],
+[cmdk-item][aria-selected],
+[cmdk-item][data-highlighted] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Override any inline styles that add background */
+[style*="background"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Prevent text selection background */
+::selection {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+::-moz-selection {
+  background: transparent !important;
+  color: inherit !important;
+}
