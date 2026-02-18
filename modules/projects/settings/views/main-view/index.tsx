@@ -1,15 +1,12 @@
 "use client";
 
 import { Checkbox, Paper, Tab, Tabs, Typography } from "@mui/material";
-import { useState } from "react";
-import DetailsView from "./tab-views/details";
-import ProjectTermsView from "./tab-views/project-terms";
-import AttachmentsView from "./tab-views/attachments";
-import ContractorsView from "./tab-views/contractors";
-import TeamView from "./tab-views/team";
-import WorkOrdersView from "./tab-views/work-orders";
-import FinancialView from "./tab-views/financial";
-import ContractManagementView from "./tab-views/contract-management";
+import { useState, useCallback } from "react";
+import { CURRENT_TABS } from "../../constants/current-tabs";
+import RootLevelTabs from "./levels/root-level-tabs";
+import SecondLevelTabs from "./levels/second-level-tabs";
+import SchemaLevelTabs from "./levels/schema-level-tabs";
+import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 
 const TabWithCheckbox = ({
   label,
@@ -36,71 +33,70 @@ const TabWithCheckbox = ({
   );
 };
 
-const CurrentTabs: {
-  name: string;
-  value: string;
-  component?: React.ReactNode;
-}[] = [
-  {
-    name: "بيانات المشروع",
-    value: "project-details",
-    component: <DetailsView />,
-  },
-  {
-    name: "بنود المشروع",
-    value: "project-terms",
-    component: <ProjectTermsView />,
-  },
-  {
-    name: "المرفقات",
-    value: "attachments",
-    component: <AttachmentsView />,
-  },
-  {
-    name: "المقاولين",
-    value: "contractors",
-    component: <ContractorsView />,
-  },
-  {
-    name: "الكادر",
-    value: "team",
-    component: <TeamView />,
-  },
-  {
-    name: "اوامر العمل",
-    value: "work-orders",
-    component: <WorkOrdersView />,
-  },
-  {
-    name: "المالية",
-    value: "financial",
-    component: <FinancialView />,
-  },
-  {
-    name: "ادارة العقد",
-    value: "contract-management",
-    component: <ContractManagementView />,
-  },
-];
-
 function ProjectsSettingsMainView() {
-  const [selectedTab, setSelectedTab] = useState<string>(CurrentTabs[0].value);
+  const [selectedTab, setSelectedTab] = useState<string>(CURRENT_TABS[0].value);
+  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
+  const [selectedSecondLevel, setSelectedSecondLevel] =
+    useState<PRJ_ProjectType | null>(null);
+  const [selectedSchema, setSelectedSchema] = useState<PRJ_ProjectType | null>(
+    null,
+  );
+
+  const handleSelectRoot = useCallback((root: PRJ_ProjectType) => {
+    setSelectedRoot(root);
+    setSelectedSecondLevel(null);
+    setSelectedSchema(null);
+  }, []);
+
+  const handleSelectSecondLevel = useCallback((item: PRJ_ProjectType) => {
+    setSelectedSecondLevel(item);
+    setSelectedSchema(null);
+  }, []);
+
+  const handleSelectSchema = useCallback((item: PRJ_ProjectType) => {
+    setSelectedSchema(item);
+  }, []);
+
   return (
     <div className="px-8 space-y-4">
       <Paper>
-        <Tabs value={selectedTab}>
-          {CurrentTabs.map((tab) => (
-            <TabWithCheckbox
-              key={tab.value}
-              onClick={() => setSelectedTab(tab.value)}
-              label={tab.name}
-              value={tab.value}
-            />
-          ))}
-        </Tabs>
-      </Paper>
-      <Paper className="p-4">
-        {CurrentTabs.find((tab) => tab.value === selectedTab)?.component}
+        <RootLevelTabs
+          selectedRootId={selectedRoot?.id ?? null}
+          onSelectRoot={handleSelectRoot}
+        >
+          <Paper>
+            <SecondLevelTabs
+              parentId={selectedRoot?.id ?? null}
+              selectedSecondLevelId={selectedSecondLevel?.id ?? null}
+              onSelectSecondLevel={handleSelectSecondLevel}
+            >
+              <Paper>
+                <SchemaLevelTabs
+                  parentId={selectedSecondLevel?.id ?? null}
+                  selectedSchemaId={selectedSchema?.id ?? null}
+                  onSelectSchema={handleSelectSchema}
+                >
+                  <Paper>
+                    <Tabs value={selectedTab}>
+                      {CURRENT_TABS.map((tab) => (
+                        <TabWithCheckbox
+                          key={tab.value}
+                          onClick={() => setSelectedTab(tab.value)}
+                          label={tab.name}
+                          value={tab.value}
+                        />
+                      ))}
+                    </Tabs>
+                  </Paper>
+                  <Paper className="p-4">
+                    {CURRENT_TABS.find((tab) => tab.value === selectedTab)
+                      ?.component}
+                  </Paper>
+                </SchemaLevelTabs>
+              </Paper>
+            </SecondLevelTabs>
+          </Paper>
+        </RootLevelTabs>
       </Paper>
     </div>
   );
