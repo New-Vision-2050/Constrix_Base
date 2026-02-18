@@ -1,0 +1,32 @@
+import { _m, MessagesGroup } from "../../types";
+
+export const hrSettingsInsuranceMessages = new MessagesGroup({
+    addInsurance: _m("Add Insurance", "إضافة تأمين"),
+    editInsurance: _m("Edit Insurance", "تعديل تأمين"),
+    name: _m("Name", "الاسم"),
+    policyNumber: _m("Policy Number", "رقم البوليصة"),
+    employee: _m("Employee", "الموظف"),
+    status: _m("Status", "الحالة"),
+    active: _m("Active", "نشط"),
+    inactive: _m("Inactive", "غير نشط"),
+    add: _m("Add", "إضافة"),
+    edit: _m("Edit", "تعديل"),
+    clear: _m("Clear", "مسح"),
+    delete: _m("Delete", "حذف"),
+    actions: _m("Actions", "إجراءات"),
+    action: _m("Action", "إجراء"),
+    addNewInsurance: _m("Add New Insurance", "إضافة تأمين جديد"),
+    noInsurances: _m("No Insurances Found", "لا توجد تأمينات"),
+    selectEmployee: _m("Select Employee", "اختر الموظف"),
+    enterName: _m("Enter Name", "أدخل الاسم"),
+    enterPolicyNumber: _m("Enter Policy Number", "أدخل رقم البوليصة"),
+    selectStatus: _m("Select Status", "اختر الحالة"),
+    allFieldsRequired: _m("All fields are required", "جميع الحقول مطلوبة"),
+    addSuccess: _m("Insurance added successfully", "تم إضافة التأمين بنجاح"),
+    updateSuccess: _m("Insurance updated successfully", "تم تحديث التأمين بنجاح"),
+    deleteSuccess: _m("Insurance deleted successfully", "تم حذف التأمين بنجاح"),
+    saveError: _m("Error saving insurance", "خطأ في حفظ التأمين"),
+    deleteError: _m("Error deleting insurance", "خطأ في حذف التأمين"),
+    deleteConfirmMessage: _m("Are you sure you want to delete this insurance?", "هل أنت متأكد من حذف هذا التأمين؟"),
+    update: _m("Update", "تحديث")
+});
