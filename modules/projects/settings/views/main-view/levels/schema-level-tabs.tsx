@@ -1,12 +1,13 @@
 "use client";
 
-import { Grid, MenuItem, MenuList, Paper, Typography } from "@mui/material";
+import { Box, Grid, MenuItem, MenuList, Paper, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
-import { useEffect } from "react";
-import DialogTrigger from "@/components/headless/dialog-trigger";
-import AddProjectTypeDialog from "../../../components/dialogs/add-project-type";
+import { useEffect, useState } from "react";
+import AddSubProjectTypeDialog from "../../../components/dialogs/add-sub-project-type";
+import { APP_ICONS } from "@/constants/icons";
 
 interface SchemaLevelTabsProps {
   parentId: number | null;
@@ -21,7 +22,9 @@ export default function SchemaLevelTabs({
   onSelectSchema,
   children,
 }: SchemaLevelTabsProps) {
-  const { data, isLoading } = useQuery({
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["project-types", "schemas", parentId],
     queryFn: async () => {
       if (!parentId) return [];
@@ -48,38 +51,45 @@ export default function SchemaLevelTabs({
           {showContent && (
             <Paper>
               <MenuList>
-                {schemas.map((schema) => (
-                  <MenuItem
-                    selected={selectedSchemaId === schema.id}
-                    onClick={() => onSelectSchema(schema)}
-                    key={schema.id}
-                    value={schema.id}
-                    sx={{ px: 2, py: 1, borderRadius: 1 }}
-                  >
-                    <Typography variant="subtitle1" fontWeight={500}>
-                      {schema.name}
-                    </Typography>
-                  </MenuItem>
-                ))}
-                <DialogTrigger
-                  component={AddProjectTypeDialog}
-                  dialogProps={{
-                    parentId: parentId ?? 0,
-                    onSuccess: () => {},
-                  }}
-                  render={({ onOpen }) => (
+                {schemas.map((schema) => {
+                  const appIcon = APP_ICONS.find((i) => i.id === schema.icon);
+                  const IconComponent = appIcon?.component;
+                  return (
                     <MenuItem
-                      onClick={onOpen}
+                      selected={selectedSchemaId === schema.id}
+                      onClick={() => onSelectSchema(schema)}
+                      key={schema.id}
+                      value={schema.id}
                       sx={{ px: 2, py: 1, borderRadius: 1 }}
                     >
-                      <Typography variant="subtitle1" fontWeight={500}>
-                        اضافة
-                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        {IconComponent && <IconComponent size={18} />}
+                        <Typography variant="subtitle1" fontWeight={500}>
+                          {schema.name}
+                        </Typography>
+                      </Box>
                     </MenuItem>
-                  )}
-                />
+                  );
+                })}
+                <MenuItem
+                  onClick={() => setAddDialogOpen(true)}
+                  sx={{ px: 2, py: 1, borderRadius: 1, color: "primary.main" }}
+                >
+                  <AddIcon fontSize="small" sx={{ mr: 1 }} />
+                  <Typography variant="subtitle1" fontWeight={500}>
+                    اضافة
+                  </Typography>
+                </MenuItem>
               </MenuList>
             </Paper>
+          )}
+          {parentId && (
+            <AddSubProjectTypeDialog
+              open={addDialogOpen}
+              onClose={() => setAddDialogOpen(false)}
+              onSuccess={() => refetch()}
+              parentId={parentId}
+            />
           )}
         </Grid>
         <Grid size={9}>{children}</Grid>
