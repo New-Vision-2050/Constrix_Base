@@ -1,6 +1,6 @@
 "use client";
 
-import { Tab, Tabs } from "@mui/material";
+import { Paper, Tab, Tabs } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
@@ -37,21 +37,23 @@ export default function RootLevelTabs({
   const showContent = !isLoading;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {isLoading && <LinearProgress />}
       {showContent && (
         <>
-          <Tabs
-            value={selectedRootId ?? false}
-            onChange={(_, value: number) => {
-              const root = roots.find((r) => r.id === value);
-              if (root) onSelectRoot(root);
-            }}
-          >
-            {roots.map((root) => (
-              <Tab key={root.id} label={root.name} value={root.id} />
-            ))}
-          </Tabs>
+          <Paper>
+            <Tabs
+              value={selectedRootId ?? false}
+              onChange={(_, value: number) => {
+                const root = roots.find((r) => r.id === value);
+                if (root) onSelectRoot(root);
+              }}
+            >
+              {roots.map((root) => (
+                <Tab key={root.id} label={root.name} value={root.id} />
+              ))}
+            </Tabs>
+          </Paper>
           {children}
         </>
       )}
