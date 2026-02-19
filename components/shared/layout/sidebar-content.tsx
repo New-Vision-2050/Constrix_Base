@@ -238,6 +238,31 @@ export function SidebarContentWrapper({
         ],
       },
       {
+        name: t("WorkPanel.title"),
+        icon: LayoutDashboardIcon,
+        urls: [ROUTER.WORK_PANEL],
+        isActive: pageName === ROUTER.WORK_PANEL,
+        slug: "workboard",
+        show: !isCentralCompany,
+        sub_entities: [
+
+          {
+            name: "إعدادات",
+            url: `${ROUTER.SETTINGS}?fromWorkPanel=true`,
+            icon: Settings,
+            isActive: pageName === ROUTER.SETTINGS,
+            show: !isCentralCompany,
+          },
+          {
+            name: "المشاريع",
+            url: "/projects",
+            icon: FolderClosed,
+            isActive: pageName === "/projects",
+            show: !isCentralCompany,
+          },
+        ],
+      },
+      {
         name: t("Sidebar.ProgramManagement"),
         slug: SUPER_ENTITY_SLUG.PM,
         icon: LayoutDashboardIcon,

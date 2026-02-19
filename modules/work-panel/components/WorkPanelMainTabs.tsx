@@ -1,25 +1,14 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
-import HorizontalTabs from "@/components/shared/HorizontalTabs";
-import { useWorkPanelContext } from "../context/WorkPanelContext";
-import { GetWorkPanelMainTabs } from "../constants/WorkPanelMainTabs";
+import { Box, Typography } from "@mui/material";
 
 export default function WorkPanelMainTabs() {
-  const { tab1, setTab1 } = useWorkPanelContext();
-  const t = useTranslations("WorkPanel");
-
   return (
-    <HorizontalTabs
-      bgStyleApproach
-      onTabClick={(tab) => {
-        setTab1(tab.id);
-      }}
-      list={GetWorkPanelMainTabs(t)}
-      value={tab1 || undefined}
-      defaultValue={tab1 !== null ? tab1 : undefined}
-    />
+    <Box className="text-center py-12">
+      <Typography variant="h6" className="text-muted-foreground">
+        لوحة العمل قيد التطوير
+      </Typography>
+    </Box>
   );
 }
-
