@@ -18,4 +18,5 @@ export type UserPrivilege = {
   period_id: string;
   type_allowance_code: string;
   type_privilege_id: string;
+  medical_insurance: { id: string; name: string };
 };

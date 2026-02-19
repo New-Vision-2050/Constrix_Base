@@ -16,6 +16,9 @@ export function getCreateCompanyClientFormConfig(
   sub_entity_id?: string,
 ): FormConfig {
   const formId = "company-client-form";
+  
+  // Debounce timer for username generation
+  let usernameGenerationTimer: NodeJS.Timeout | null = null;
 
   return {
     formId,
@@ -92,6 +95,73 @@ export function getCreateCompanyClientFormConfig(
             type: "text",
             placeholder: t("form.commerceNamePlaceholder"),
             required: true,
+            onChange: (newVal, formValues) => {
+              if (!newVal || typeof newVal !== 'string') return;
+              
+              // Clear previous timer
+              if (usernameGenerationTimer) {
+                clearTimeout(usernameGenerationTimer);
+              }
+              
+              // Set new timer to generate username after user stops typing
+              usernameGenerationTimer = setTimeout(async () => {
+                // Check if username field already has a value - if so, don't regenerate
+                const currentUsername = formValues?.user_name;
+                if (currentUsername && currentUsername.trim() !== '') {
+                  return; // Don't regenerate if username already exists
+                }
+                
+                // Generate base username from Arabic name
+                const generateUsername = (name: string): string => {
+                  const translitMap: Record<string, string> = {
+                    'ا': 'a', 'أ': 'a', 'إ': 'a', 'آ': 'a',
+                    'ب': 'b', 'ت': 't', 'ث': 'th',
+                    'ج': 'j', 'ح': 'h', 'خ': 'kh',
+                    'د': 'd', 'ذ': 'dh', 'ر': 'r',
+                    'ز': 'z', 'س': 's', 'ش': 'sh',
+                    'ص': 's', 'ض': 'd', 'ط': 't',
+                    'ظ': 'z', 'ع': 'a', 'غ': 'gh',
+                    'ف': 'f', 'ق': 'q', 'ك': 'k',
+                    'ل': 'l', 'م': 'm', 'ن': 'n',
+                    'ه': 'h', 'و': 'w', 'ي': 'y',
+                    'ى': 'a', 'ة': 'h', 'ئ': 'e',
+                    'ؤ': 'o', ' ': '', '-': ''
+                  };
+                  
+                  return name.split('').map(char => translitMap[char] || '').join('').toLowerCase();
+                };
+                
+                // Generate unique username instantly
+                let baseUsername = generateUsername(newVal);
+                if (!baseUsername) return; // Skip if transliteration resulted in empty string
+                
+                // Add timestamp to make it unique instantly without API calls
+                const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+                let finalUsername = `${baseUsername}${timestamp}`;
+                
+                // Set the generated username immediately
+                useFormStore.getState().setValue(formId, "user_name", finalUsername);
+                
+                // Then validate in background - if not unique, add random suffix
+                try {
+                  const response = await fetch(`${baseURL}/companies/validated`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: finalUsername })
+                  });
+                  const data = await response.json();
+                  
+                  // If not unique, append random number
+                  if (data.payload?.status !== 1) {
+                    const randomSuffix = Math.floor(Math.random() * 999);
+                    finalUsername = `${baseUsername}${timestamp}${randomSuffix}`;
+                    useFormStore.getState().setValue(formId, "user_name", finalUsername);
+                  }
+                } catch (error) {
+                  console.error('Username validation error:', error);
+                }
+              }, 300); // Wait 300ms after user stops typing
+            },
             validation: [
               {
                 type: "pattern",
@@ -126,7 +196,7 @@ export function getCreateCompanyClientFormConfig(
               },
               {
                 type: "pattern",
-                value: /^[a-zA-Z]+$/,
+                value: /^[a-zA-Z0-9]+$/,
                 message: t("form.Validation.englishName"),
               },
               {
