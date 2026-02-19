@@ -35,7 +35,9 @@ const TabWithCheckbox = ({
 
 function ProjectsSettingsMainView() {
   const [selectedTab, setSelectedTab] = useState<string>(CURRENT_TABS[0].value);
-  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(null);
+  const [selectedRoot, setSelectedRoot] = useState<PRJ_ProjectType | null>(
+    null,
+  );
   const [selectedSecondLevel, setSelectedSecondLevel] =
     useState<PRJ_ProjectType | null>(null);
   const [selectedSchema, setSelectedSchema] = useState<PRJ_ProjectType | null>(
@@ -59,45 +61,38 @@ function ProjectsSettingsMainView() {
 
   return (
     <div className="px-8 space-y-4">
-      <Paper>
-        <RootLevelTabs
-          selectedRootId={selectedRoot?.id ?? null}
-          onSelectRoot={handleSelectRoot}
+      <RootLevelTabs
+        selectedRootId={selectedRoot?.id ?? null}
+        onSelectRoot={handleSelectRoot}
+      >
+        <SecondLevelTabs
+          parentId={selectedRoot?.id ?? null}
+          selectedSecondLevelId={selectedSecondLevel?.id ?? null}
+          onSelectSecondLevel={handleSelectSecondLevel}
         >
-          <Paper>
-            <SecondLevelTabs
-              parentId={selectedRoot?.id ?? null}
-              selectedSecondLevelId={selectedSecondLevel?.id ?? null}
-              onSelectSecondLevel={handleSelectSecondLevel}
-            >
-              <Paper>
-                <SchemaLevelTabs
-                  parentId={selectedSecondLevel?.id ?? null}
-                  selectedSchemaId={selectedSchema?.id ?? null}
-                  onSelectSchema={handleSelectSchema}
-                >
-                  <Paper>
-                    <Tabs value={selectedTab}>
-                      {CURRENT_TABS.map((tab) => (
-                        <TabWithCheckbox
-                          key={tab.value}
-                          onClick={() => setSelectedTab(tab.value)}
-                          label={tab.name}
-                          value={tab.value}
-                        />
-                      ))}
-                    </Tabs>
-                  </Paper>
-                  <Paper className="p-4">
-                    {CURRENT_TABS.find((tab) => tab.value === selectedTab)
-                      ?.component}
-                  </Paper>
-                </SchemaLevelTabs>
-              </Paper>
-            </SecondLevelTabs>
-          </Paper>
-        </RootLevelTabs>
-      </Paper>
+          <SchemaLevelTabs
+            parentId={selectedSecondLevel?.id ?? null}
+            selectedSchemaId={selectedSchema?.id ?? null}
+            onSelectSchema={handleSelectSchema}
+          >
+            <Paper sx={{ mb: 2 }}>
+              <Tabs value={selectedTab}>
+                {CURRENT_TABS.map((tab) => (
+                  <TabWithCheckbox
+                    key={tab.value}
+                    onClick={() => setSelectedTab(tab.value)}
+                    label={tab.name}
+                    value={tab.value}
+                  />
+                ))}
+              </Tabs>
+            </Paper>
+            <Paper className="p-4">
+              {CURRENT_TABS.find((tab) => tab.value === selectedTab)?.component}
+            </Paper>
+          </SchemaLevelTabs>
+        </SecondLevelTabs>
+      </RootLevelTabs>
     </div>
   );
 }

@@ -4,7 +4,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogTitle,
@@ -25,10 +24,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
-import { CompanyDashboardIconsApi } from "@/services/api/company-dashboard/icons";
+import IconPicker from "@/components/shared/icon-picker";
 import { CURRENT_TABS } from "../../../constants/current-tabs";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
 
@@ -64,20 +63,7 @@ export default function AddProjectTypeDialog({
     enabled: open,
   });
 
-  const { data: iconsData } = useQuery({
-    queryKey: ["icons-list", "add-project-type"],
-    queryFn: async () => {
-      const response = await CompanyDashboardIconsApi.list({
-        page: 1,
-        limit: 100,
-      });
-      return response.data?.payload ?? [];
-    },
-    enabled: open,
-  });
-
   const roots: PRJ_ProjectType[] = rootsData ?? [];
-  const icons = Array.isArray(iconsData) ? iconsData : [];
 
   const form = useForm<AddProjectTypeFormData>({
     resolver: zodResolver(addProjectTypeSchema),
@@ -111,17 +97,18 @@ export default function AddProjectTypeDialog({
 
   const handleFormSubmit = async (data: AddProjectTypeFormData) => {
     try {
-      const selectedIcon = icons.find(
-        (icon: { id: string; icon?: string }) =>
-          icon.id.toString() === data.icon_id,
-      );
-      const iconValue = selectedIcon?.icon ?? data.icon_id;
+      const iconValue = data.icon_id;
 
-      const schemaIds = (data.selected_tab_values ?? [])
-        .map(
-          (value) => CURRENT_TABS.find((tab) => tab.value === value)?.schema_id,
-        )
-        .filter((id): id is number => typeof id === "number");
+      // Map selected tab values to schema IDs
+      const schemaIds =
+        data.selected_tab_values && data.selected_tab_values.length > 0
+          ? data.selected_tab_values
+              .map(
+                (value) =>
+                  CURRENT_TABS.find((tab) => tab.value === value)?.schema_id,
+              )
+              .filter((id): id is number => typeof id === "number")
+          : [];
 
       await ProjectTypesApi.createSecondLevelProjectType({
         name: data.name,
@@ -204,33 +191,12 @@ export default function AddProjectTypeDialog({
           />
 
           {/* اختيار Icon */}
-          <FormControl
-            fullWidth
-            error={!!errors.icon_id}
+          <IconPicker
+            value={watch("icon_id")}
+            onChange={(id) => setValue("icon_id", id, { shouldValidate: true })}
             disabled={isSubmitting}
-          >
-            <InputLabel id="icon-select-label">اختيار Icon</InputLabel>
-            <Select
-              labelId="icon-select-label"
-              label="اختيار Icon"
-              value={watch("icon_id")}
-              onChange={(e) => setValue("icon_id", e.target.value)}
-            >
-              <MenuItem value="">
-                <em>اختيار Icon</em>
-              </MenuItem>
-              {icons.map(
-                (icon: { id: string; name_ar?: string; name?: string }) => (
-                  <MenuItem key={icon.id} value={icon.id.toString()}>
-                    {icon.name_ar ?? icon.name ?? icon.id}
-                  </MenuItem>
-                ),
-              )}
-            </Select>
-            {errors.icon_id && (
-              <FormHelperText>{errors.icon_id.message}</FormHelperText>
-            )}
-          </FormControl>
+            error={errors.icon_id?.message}
+          />
 
           {/* مرجعية المشروع */}
           <FormControl
@@ -266,27 +232,29 @@ export default function AddProjectTypeDialog({
           </FormControl>
 
           {/* تحديد عناصر المشروع - CURRENT_TABS as checkboxes */}
-          <Box sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              تحديد عناصر المشروع
-            </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, pt: 1 }}>
-              {CURRENT_TABS.map((tab) => (
-                <FormControlLabel
-                  key={tab.value}
-                  disabled={isSubmitting || !isCheckboxesEnabled}
-                  control={
-                    <Checkbox
-                      checked={(selectedTabValues ?? []).includes(tab.value)}
-                      onChange={() => toggleTabValue(tab.value)}
-                      disabled={isSubmitting || !isCheckboxesEnabled}
-                    />
-                  }
-                  label={tab.name}
-                />
-              ))}
+          {isCheckboxesEnabled && (
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                تحديد عناصر المشروع
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, pt: 1 }}>
+                {CURRENT_TABS.map((tab) => (
+                  <FormControlLabel
+                    key={tab.value}
+                    disabled={isSubmitting}
+                    control={
+                      <Checkbox
+                        checked={(selectedTabValues ?? []).includes(tab.value)}
+                        onChange={() => toggleTabValue(tab.value)}
+                        disabled={isSubmitting}
+                      />
+                    }
+                    label={tab.name}
+                  />
+                ))}
+              </Box>
             </Box>
-          </Box>
+          )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleClose} disabled={isSubmitting}>
