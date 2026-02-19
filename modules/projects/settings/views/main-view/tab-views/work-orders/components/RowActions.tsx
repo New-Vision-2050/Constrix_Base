@@ -1,4 +1,4 @@
-import { Edit, Eye, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,16 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { WorkOrderType } from "../types";
-
-interface RowActionsProps {
-  row: WorkOrderType;
-  onShow: (id: string) => void;
-  onEdit: (id: string) => void;
-  canEdit: boolean;
-  canShow: boolean;
-  t?: (key: string) => string;
-}
+import { RowActionsProps } from "../types";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 
 export function RowActions({
   row,
@@ -33,14 +26,19 @@ export function RowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {/* show */}
-        <DropdownMenuItem disabled={!canShow} onClick={() => onShow(row.id)}>
-          <Eye className="mr-2 h-4 w-4" />
+        <DropdownMenuItem
+          disabled={!canShow}
+          onClick={() => onShow(row.id, "display")}
+        >
+          <VisibilityIcon className="mr-2 h-4 w-4" color="primary" />
           show
         </DropdownMenuItem>
-        {/* Edit */}
-        <DropdownMenuItem disabled={!canEdit} onClick={() => onEdit(row.id)}>
-          <Edit className="mr-2 h-4 w-4" />
+
+        <DropdownMenuItem
+          disabled={!canEdit}
+          onClick={() => onEdit(row.id, "edit")}
+        >
+          <BorderColorIcon className="mr-2 h-4 w-4" color="primary"/>
           editFounder
         </DropdownMenuItem>
       </DropdownMenuContent>

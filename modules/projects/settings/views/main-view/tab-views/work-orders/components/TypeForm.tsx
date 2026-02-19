@@ -3,9 +3,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { CARDTYPE } from "..";
 import { Dispatch, SetStateAction, useState } from "react";
 import HeadlessTableLayout from "@/components/headless/table";
-import { WorkOrderType } from "../types";
+import { ActionType, WorkOrderType } from "../types";
 import { RowActions } from "./RowActions";
-import DetailsModal from "./DetailsModal";
+import DetailsDialog from "./DetailsDialog";
 
 const WorkOrderTypeTable = HeadlessTableLayout<WorkOrderType>("pswo");
 
@@ -14,9 +14,23 @@ export default function WorkOrderTypeForm({
 }: {
   setActiveCard: Dispatch<SetStateAction<CARDTYPE>>;
 }) {
-  const [showRowId, setShowRowId] = useState<string | null>(null);
+  const [displayedRowId, setDisplayedRowId] = useState<string | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  const [openModal, setOpenModal] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [actionType, setActionType] = useState<ActionType | null>(null);
+
+  const handleDisplay = (id: string) => {
+    setActionType("display");
+    setDisplayedRowId(id);
+    setOpenModal(true);
+    // console.log("displayedRowId", id);
+  };
+  const handleEdit = (id: string) => {
+    setActionType("edit");
+    setEditingRowId(id);
+    setOpenModal(true);
+    // console.log("editingRowId", id);
+  };
 
   const params = WorkOrderTypeTable.useTableParams({
     initialPage: 1,
@@ -82,8 +96,8 @@ export default function WorkOrderTypeForm({
       render: (row: WorkOrderType) => (
         <RowActions
           row={row}
-          onShow={setShowRowId}
-          onEdit={setEditingRowId}
+          onShow={handleDisplay}
+          onEdit={handleEdit}
           canShow={true}
           canEdit={true}
           // t={tTable}  const tTable = useTranslations("Work order type");
@@ -145,10 +159,11 @@ export default function WorkOrderTypeForm({
         />
       </Box>
 
-      <DetailsModal
+      <DetailsDialog
         open={openModal}
         setOpenModal={setOpenModal}
-        title="عرض نوع امر العمل"
+        rowId={displayedRowId || editingRowId}
+        action={actionType}
       />
     </Box>
   );
