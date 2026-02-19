@@ -1,11 +1,12 @@
 import DetailsView from "../views/main-view/tab-views/details";
 import ProjectTermsView from "../views/main-view/tab-views/project-terms";
-import AttachmentsView from "../views/main-view/tab-views/attachments";
+import AttachmentsView from "../views/main-view/tab-views/attachments/index";
 import ContractorsView from "../views/main-view/tab-views/contractors";
 import TeamView from "../views/main-view/tab-views/team";
 import WorkOrdersView from "../views/main-view/tab-views/work-orders";
 import FinancialView from "../views/main-view/tab-views/financial";
 import ContractManagementView from "../views/main-view/tab-views/contract-management";
+
 
 export interface ProjectSettingsTab {
   name: string;
