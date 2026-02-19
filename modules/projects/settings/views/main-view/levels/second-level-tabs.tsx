@@ -1,6 +1,6 @@
 "use client";
 
-import { Tab, Tabs } from "@mui/material";
+import { Paper, Tab, Tabs } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
@@ -41,21 +41,23 @@ export default function SecondLevelTabs({
   const showContent = !parentId || !isLoading;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {(isLoading || isFetching) && <LinearProgress />}
       {showContent && (
         <>
-          <Tabs
-            value={selectedSecondLevelId ?? false}
-            onChange={(_, value: number) => {
-              const item = items.find((i) => i.id === value);
-              if (item) onSelectSecondLevel(item);
-            }}
-          >
-            {items.map((item) => (
-              <Tab key={item.id} label={item.name} value={item.id} />
-            ))}
-          </Tabs>
+          <Paper>
+            <Tabs
+              value={selectedSecondLevelId ?? false}
+              onChange={(_, value: number) => {
+                const item = items.find((i) => i.id === value);
+                if (item) onSelectSecondLevel(item);
+              }}
+            >
+              {items.map((item) => (
+                <Tab key={item.id} label={item.name} value={item.id} />
+              ))}
+            </Tabs>
+          </Paper>
           {children}
         </>
       )}

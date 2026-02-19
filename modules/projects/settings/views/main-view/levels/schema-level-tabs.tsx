@@ -1,10 +1,9 @@
 "use client";
 
-import { Button, Tab, Tabs } from "@mui/material";
+import { Grid, MenuItem, MenuList, Paper, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { ProjectTypesApi } from "@/services/api/projects/project-types";
 import { PRJ_ProjectType } from "@/types/api/projects/project-type";
-import LinearProgress from "@mui/material/LinearProgress";
 import { useEffect } from "react";
 import DialogTrigger from "@/components/headless/dialog-trigger";
 import AddProjectTypeDialog from "../../../components/dialogs/add-project-type";
@@ -22,7 +21,7 @@ export default function SchemaLevelTabs({
   onSelectSchema,
   children,
 }: SchemaLevelTabsProps) {
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["project-types", "schemas", parentId],
     queryFn: async () => {
       if (!parentId) return [];
@@ -43,36 +42,48 @@ export default function SchemaLevelTabs({
   const showContent = !parentId || !isLoading;
 
   return (
-    <div className="space-y-2">
-      {(isLoading || isFetching) && <LinearProgress />}
-      {showContent && (
-        <>
-          <Tabs
-            value={selectedSchemaId ?? false}
-            onChange={(_, value: number) => {
-              const item = schemas.find((s) => s.id === value);
-              if (item) onSelectSchema(item);
-            }}
-          >
-            {schemas.map((schema) => (
-              <Tab key={schema.id} label={schema.name} value={schema.id} />
-            ))}
-          </Tabs>
-          <DialogTrigger
-            component={AddProjectTypeDialog}
-            dialogProps={{
-              parentId: parentId,
-              onSuccess: () => {},
-            }}
-            render={({ onOpen }) => (
-              <Button variant="contained" color="primary" onClick={onOpen}>
-                اضافة
-              </Button>
-            )}
-          />
-          {children}
-        </>
-      )}
+    <div className="space-y-4">
+      <Grid container spacing={2}>
+        <Grid size={3}>
+          {showContent && (
+            <Paper>
+              <MenuList>
+                {schemas.map((schema) => (
+                  <MenuItem
+                    selected={selectedSchemaId === schema.id}
+                    onClick={() => onSelectSchema(schema)}
+                    key={schema.id}
+                    value={schema.id}
+                    sx={{ px: 2, py: 1, borderRadius: 1 }}
+                  >
+                    <Typography variant="subtitle1" fontWeight={500}>
+                      {schema.name}
+                    </Typography>
+                  </MenuItem>
+                ))}
+                <DialogTrigger
+                  component={AddProjectTypeDialog}
+                  dialogProps={{
+                    parentId: parentId ?? 0,
+                    onSuccess: () => {},
+                  }}
+                  render={({ onOpen }) => (
+                    <MenuItem
+                      onClick={onOpen}
+                      sx={{ px: 2, py: 1, borderRadius: 1 }}
+                    >
+                      <Typography variant="subtitle1" fontWeight={500}>
+                        اضافة
+                      </Typography>
+                    </MenuItem>
+                  )}
+                />
+              </MenuList>
+            </Paper>
+          )}
+        </Grid>
+        <Grid size={9}>{children}</Grid>
+      </Grid>
     </div>
   );
 }
