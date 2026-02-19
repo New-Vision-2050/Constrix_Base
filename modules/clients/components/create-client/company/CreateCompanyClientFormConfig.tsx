@@ -131,34 +131,55 @@ export function getCreateCompanyClientFormConfig(
                   return name.split('').map(char => translitMap[char] || '').join('').toLowerCase();
                 };
                 
-                // Generate unique username instantly
+                // Generate unique username
                 let baseUsername = generateUsername(newVal);
                 if (!baseUsername) return; // Skip if transliteration resulted in empty string
                 
-                // Add timestamp to make it unique instantly without API calls
-                const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
-                let finalUsername = `${baseUsername}${timestamp}`;
+                // Set the base username immediately for instant feedback
+                useFormStore.getState().setValue(formId, "user_name", baseUsername);
                 
-                // Set the generated username immediately
-                useFormStore.getState().setValue(formId, "user_name", finalUsername);
-                
-                // Then validate in background - if not unique, add random suffix
-                try {
-                  const response = await fetch(`${baseURL}/companies/validated`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_name: finalUsername })
-                  });
-                  const data = await response.json();
-                  
-                  // If not unique, append random number
-                  if (data.payload?.status !== 1) {
-                    const randomSuffix = Math.floor(Math.random() * 999);
-                    finalUsername = `${baseUsername}${timestamp}${randomSuffix}`;
-                    useFormStore.getState().setValue(formId, "user_name", finalUsername);
+                // Check username uniqueness via API
+                const checkUsernameUnique = async (username: string): Promise<boolean> => {
+                  try {
+                    const response = await fetch(`${baseURL}/companies/validated`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ user_name: username })
+                    });
+                    const data = await response.json();
+                    return data.payload?.status === 1;
+                  } catch (error) {
+                    console.error('Username validation error:', error);
+                    return false;
                   }
-                } catch (error) {
-                  console.error('Username validation error:', error);
+                };
+                
+                // Validate and adjust if needed
+                let finalUsername = baseUsername;
+                const isUnique = await checkUsernameUnique(finalUsername);
+                
+                if (!isUnique) {
+                  // Try with small numbers 1-9 first
+                  let counter = 1;
+                  let found = false;
+                  
+                  while (counter <= 9 && !found) {
+                    finalUsername = `${baseUsername}${counter}`;
+                    if (await checkUsernameUnique(finalUsername)) {
+                      found = true;
+                    } else {
+                      counter++;
+                    }
+                  }
+                  
+                  // If still not unique after 1-9, use timestamp
+                  if (!found) {
+                    const timestamp = Date.now().toString().slice(-4);
+                    finalUsername = `${baseUsername}${timestamp}`;
+                  }
+                  
+                  // Update with the unique username
+                  useFormStore.getState().setValue(formId, "user_name", finalUsername);
                 }
               }, 300); // Wait 300ms after user stops typing
             },
