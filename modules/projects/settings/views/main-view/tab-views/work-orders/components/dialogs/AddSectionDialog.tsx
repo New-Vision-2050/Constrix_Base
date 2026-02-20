@@ -10,7 +10,7 @@ import {
 import { Dispatch, SetStateAction } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
-export default function AddWorkOrderDialog({
+export default function AddSectionDialog({
   open,
   setOpenModal,
 }: {
@@ -39,7 +39,7 @@ export default function AddWorkOrderDialog({
       <DialogContent className="max-w-6xl w-full bg-sidebar">
         <DialogHeader>
           <DialogTitle className="text-start">
-            إضافة نوع أمر العمل
+            إضافة قسم
           </DialogTitle>
         </DialogHeader>
         <IconButton
@@ -56,8 +56,8 @@ export default function AddWorkOrderDialog({
 
         <div className="flex flex-col gap-4">
           <TextField
-            label="كود الاستشاري"
-            placeholder="كود الاستشاري"
+            label="كود القسم"
+            placeholder="كود القسم"
             // error={!!errors.name}
             // helperText={errors.name?.message}
             // disabled={isSubmitting}
@@ -65,17 +65,8 @@ export default function AddWorkOrderDialog({
             size="medium"
           />
           <TextField
-            label="وصف أمر العمل"
-            placeholder="وصف أمر العمل"
-            // error={!!errors.name}
-            // helperText={errors.name?.message}
-            // disabled={isSubmitting}
-            fullWidth
-            size="medium"
-          />
-          <TextField
-            label="نوع أمر العمل"
-            placeholder="نوع أمر العمل"
+            label="وصف القسم"
+            placeholder="وصف القسم"
             // error={!!errors.name}
             // helperText={errors.name?.message}
             // disabled={isSubmitting}

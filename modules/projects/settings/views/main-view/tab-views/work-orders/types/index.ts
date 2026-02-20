@@ -11,8 +11,14 @@ export interface WorkOrderType {
   procedureId?: string;
 }
 
+export interface Section {
+  id: string;
+  sectionCode: number;
+  sectionDescription: string;
+}
+
 export interface RowActionsProps {
-  row: WorkOrderType;
+  row: WorkOrderType | Section;
   onShow: (id: string) => void;
   onEdit: (id: string) => void;
   canEdit: boolean;

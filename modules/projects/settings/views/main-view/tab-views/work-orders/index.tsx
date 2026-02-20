@@ -1,5 +1,6 @@
 // import ElectricitySettings from "./electricity-settings";
 import WorkOrderTypeView from "./WorkOrderTypeView";
+import SectionView from "./SectionView";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -50,6 +51,27 @@ export default function WorkOrdersIndex() {
                   </IconButton>
                 </CardActions>
               </Card>
+              <Card
+                sx={{
+                  minWidth: 275,
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  "&:hover": { backgroundColor: "#2d2d5a" },
+                }}
+              >
+                <CardContent>
+                  <Typography>القسم</Typography>
+                </CardContent>
+                <CardActions>
+                  <IconButton
+                    className="cursor-pointer"
+                    onClick={() => setActiveCard("SECTIONS")}
+                  >
+                    <KeyboardArrowRightIcon />
+                  </IconButton>
+                </CardActions>
+              </Card>
             </AccordionDetails>
           </Accordion>
         </div>
@@ -57,6 +79,9 @@ export default function WorkOrdersIndex() {
 
       {activeCard === "WORK_ORDER_TYPES" && (
         <WorkOrderTypeView setActiveCard={setActiveCard} />
+      )}
+      {activeCard === "SECTIONS" && (
+        <SectionView setActiveCard={setActiveCard} />
       )}
     </Paper>
   );
