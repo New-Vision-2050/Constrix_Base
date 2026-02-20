@@ -4,7 +4,8 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { WorkPanelProvider } from "./context/WorkPanelContext";
-import WorkPanelMainTabs from "./components/WorkPanelMainTabs";
+import { GetWorkPanelMainTabs } from "./constants/WorkPanelMainTabs";
+import HorizontalTabs from "@/components/shared/HorizontalTabs";
 
 export default function WorkPanelIndex() {
   const t = useTranslations("WorkPanel");
@@ -13,14 +14,9 @@ export default function WorkPanelIndex() {
     <WorkPanelProvider>
       <Box className="container mx-auto p-6">
         <Box className="mb-6">
-          <Typography variant="h4" className="font-bold">
-            {t("title")}
-          </Typography>
-          <Typography variant="body1" className="text-muted-foreground mt-2">
-            {t("description")}
-          </Typography>
+
         </Box>
-        <WorkPanelMainTabs />
+        <HorizontalTabs list={GetWorkPanelMainTabs(t)} />
       </Box>
     </WorkPanelProvider>
   );

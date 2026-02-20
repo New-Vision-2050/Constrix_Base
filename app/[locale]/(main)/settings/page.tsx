@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import TabsManager from "@/modules/settings/views/TabsManager";
-import WorkPanelSettingsPage from "@/modules/work-panel/components/WorkPanelSettingsPage";
+import WorkPanelSettingsPage from "@/modules/work_panel_sidbar/components/WorkPanelSettingsPage";
 import { PERMISSIONS } from "@/lib/permissions/permission-names";
 import withServerPermissionsPage from "@/lib/permissions/server/withServerPermissionsPage";
 

@@ -58,5 +58,6 @@ export const workPanelMessages = new MessagesGroup({
     "محتوى الخدمات قيد الإنشاء..."
   ),
   loading: _m("Loading...", "جاري التحميل..."),
+  noBranches: _m("No branches found", "لم يتم العثور على فروع"),
 });
 

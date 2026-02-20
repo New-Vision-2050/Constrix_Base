@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import HorizontalTabs from "@/components/shared/HorizontalTabs";
 import { useWorkPanelContext } from "../../context/WorkPanelContext";
 import { GetProceduresSubTabs } from "./constants/ProceduresSubTabs";
-import BranchesVerticalSection from "../../components/BranchesVerticalSection";
+import BranchesVerticalSection from "@/modules/work_panel_sidbar/components/BranchesVerticalSection";
 
 export default function ProceduresTab() {
   const { tab2, setTab2 } = useWorkPanelContext();
