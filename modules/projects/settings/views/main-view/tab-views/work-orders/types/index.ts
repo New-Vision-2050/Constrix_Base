@@ -5,12 +5,16 @@ export interface WorkOrderType {
   consultantCode: number;
   description: string;
   type: number;
+  workOrderDescription?: string;
+  workOrderType?: number;
+  taskId?: string;
+  procedureId?: string;
 }
 
 export interface RowActionsProps {
   row: WorkOrderType;
-  onShow: (id: string, action: string) => void;
-  onEdit: (id: string, action: string) => void;
+  onShow: (id: string) => void;
+  onEdit: (id: string) => void;
   canEdit: boolean;
   canShow: boolean;
   t?: (key: string) => string;
@@ -22,7 +26,6 @@ export interface DetailsDialogProps {
   open: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
   rowId: string | null;
-  action: ActionType | null;
 }
 
 export interface TasksType {

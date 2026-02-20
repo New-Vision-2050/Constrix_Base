@@ -28,7 +28,7 @@ export function RowActions({
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           disabled={!canShow}
-          onClick={() => onShow(row.id, "display")}
+          onClick={() => onShow(row.id)}
         >
           <VisibilityIcon className="mr-2 h-4 w-4" color="primary" />
           show
@@ -36,10 +36,10 @@ export function RowActions({
 
         <DropdownMenuItem
           disabled={!canEdit}
-          onClick={() => onEdit(row.id, "edit")}
+          onClick={() => onEdit(row.id)}
         >
           <BorderColorIcon className="mr-2 h-4 w-4" color="primary"/>
-          editFounder
+          edit
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

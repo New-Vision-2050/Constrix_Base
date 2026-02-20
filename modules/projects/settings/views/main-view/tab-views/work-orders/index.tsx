@@ -1,5 +1,5 @@
 // import ElectricitySettings from "./electricity-settings";
-export default WorkOrdersView;
+import WorkOrderTypeView from "./WorkOrderTypeView";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -14,11 +14,10 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import WorkOrderTypeForm from "./components/TypeForm";
 
 export type CARDTYPE = "WORK_ORDER_TYPES" | "SECTIONS" | "HIDE";
 
-function WorkOrdersView() {
+export default function WorkOrdersIndex() {
   const [activeCard, setActiveCard] = useState<CARDTYPE>("HIDE");
 
   return (
@@ -57,7 +56,7 @@ function WorkOrdersView() {
       )}
 
       {activeCard === "WORK_ORDER_TYPES" && (
-        <WorkOrderTypeForm setActiveCard={setActiveCard} />
+        <WorkOrderTypeView setActiveCard={setActiveCard} />
       )}
     </Paper>
   );

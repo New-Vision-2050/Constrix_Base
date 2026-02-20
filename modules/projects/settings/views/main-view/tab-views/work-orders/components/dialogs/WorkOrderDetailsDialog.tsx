@@ -9,22 +9,21 @@ import {
   Box,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DetailsDialogProps, TasksType } from "../types";
+import { DetailsDialogProps, TasksType } from "../../types";
 import HeadlessTableLayout from "@/components/headless/table";
 
 const TasksTypeTable = HeadlessTableLayout<TasksType>("wott");
 
-const DetailsDialog = ({
+const WorkOrderDetailsDialog = ({
   open,
   setOpenModal,
   rowId,
-  action,
 }: DetailsDialogProps) => {
   const handleClose = () => setOpenModal(false);
 
   // Dummy data
   const tasks: TasksType[] = [
-    { id: "401", desc: "تركيب عداد" },
+    { id: rowId || "400", desc: "تركيب عداد" },
     { id: "402", desc: "ضخ وتمديد" },
     { id: "403", desc: "سيفتي - قص - ضخ - تمديد" },
   ];
@@ -79,7 +78,7 @@ const DetailsDialog = ({
         onClick={handleClose}
         sx={{
           position: "absolute",
-          left: 16,
+          right: 16,
           top: 16,
           color: "rgba(255,255,255,0.5)",
         }}
@@ -95,8 +94,7 @@ const DetailsDialog = ({
           mb: 2,
         }}
       >
-        {action == "display" ? "عرض نوع أمر العمل" : "تعديل نوع أمر العمل"}
-        {rowId}
+        عرض نوع أمر العمل
       </DialogTitle>
 
       <DialogContent>
@@ -124,7 +122,20 @@ const DetailsDialog = ({
             <Typography textAlign="center" sx={{ mb: 2 }}>
               اجراءات امر العمل
             </Typography>
-            {/* <InnerTable tableState={tableState} /> */}
+            <Box
+              sx={{
+                color: "white",
+              }}
+            >
+              <TasksTypeTable
+                table={
+                  <TasksTypeTable.Table
+                    state={tableState}
+                    loadingOptions={{ rows: 5 }}
+                  />
+                }
+              />
+            </Box>
           </Grid>
         </Grid>
       </DialogContent>
@@ -132,4 +143,4 @@ const DetailsDialog = ({
   );
 };
 
-export default DetailsDialog;
+export default WorkOrderDetailsDialog;
