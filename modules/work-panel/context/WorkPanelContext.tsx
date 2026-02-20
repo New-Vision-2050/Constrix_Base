@@ -10,6 +10,8 @@ interface WorkPanelContextType {
   setTab2: React.Dispatch<React.SetStateAction<string>>;
   verticalSection: string;
   setVerticalSection: React.Dispatch<React.SetStateAction<string>>;
+  selectedBranchId: string | null;
+  setSelectedBranchId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const WorkPanelContext = createContext<WorkPanelContextType | undefined>(
@@ -28,6 +30,10 @@ export function WorkPanelProvider({ children }: { children: React.ReactNode }) {
   const [verticalSection, setVerticalSection] = useState<string>(
     searchParams.get("verticalSection") || "all-branches"
   );
+  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+
+  console.log("WorkPanelProvider rendered!");
+  console.log("selectedBranchId in context:", selectedBranchId);
 
   // Update URL params when tabs change
   useEffect(() => {
@@ -63,6 +69,8 @@ export function WorkPanelProvider({ children }: { children: React.ReactNode }) {
         setTab2,
         verticalSection,
         setVerticalSection,
+        selectedBranchId,
+        setSelectedBranchId,
       }}
     >
       {children}

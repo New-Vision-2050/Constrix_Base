@@ -6,7 +6,8 @@ import {
   Building2, 
   Calendar, 
   Heart, 
-  ClipboardList 
+  ClipboardList,
+  Database
 } from "lucide-react";
 import ExpiredIDsContent from "../tabs/ExpiredIDsContent";
 import ExpiredWorkPermitsContent from "../tabs/ExpiredWorkPermitsContent";
@@ -15,6 +16,7 @@ import ExpiredEngineeringLicensesContent from "../tabs/ExpiredEngineeringLicense
 import LeaveBalancesContent from "../tabs/LeaveBalancesContent";
 import MedicalInsuranceContent from "../tabs/MedicalInsuranceContent";
 import EmployeeRequestsManagementContent from "../tabs/EmployeeRequestsManagementContent";
+import ProjectDataTab from "@/modules/work-panel/components/ProjectDataTab";
 
 export const GetProceduresSubTabs = (
   t: (key: string) => string
@@ -61,6 +63,12 @@ export const GetProceduresSubTabs = (
       title: t("employeeRequests"),
       icon: <ClipboardList />,
       content: <EmployeeRequestsManagementContent />,
+    },
+    {
+      id: "procedures-project-data",
+      title: t("projectData"),
+      icon: <Database />,
+      content: <ProjectDataTab />,
     },
   ];
 
