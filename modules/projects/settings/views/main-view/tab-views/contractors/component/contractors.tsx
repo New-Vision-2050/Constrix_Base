@@ -1,20 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Box, Typography } from "@mui/material";
 import HorizontalSwitch from "@/modules/projects/settings/components/horizontal-switch";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ProjectTypesApi } from "@/services/api/projects/project-types";
+import { UpdateContractorContractSettingsArgs } from "@/services/api/projects/project-types/types/args";
 
-const attachmentItems = [
-    {
-        label: "     إظهار جميع بيانات الخاصة بالمقاولين",
-        value: "file-name",
-    },
+interface ContractorsProps {
+    projectTypeId: number | null;
+}
 
+function Contractors({ projectTypeId }: ContractorsProps) {
+    const queryClient = useQueryClient();
 
-];
+    const { data, isLoading } = useQuery({
+        queryKey: ["contractor-contract-settings", projectTypeId],
+        queryFn: async () => {
+            if (!projectTypeId) return null;
+            const response = await ProjectTypesApi.getContractorContractSettings(projectTypeId);
+            return response.data.payload;
+        },
+        enabled: projectTypeId !== null,
+    });
 
-function Contract() {
-    const [activeAttachments, setActiveAttachments] = useState<string[]>([]);
+    const updateMutation = useMutation({
+        mutationFn: async (args: UpdateContractorContractSettingsArgs) => {
+            if (!projectTypeId) throw new Error("No project type ID");
+            return ProjectTypesApi.updateContractorContractSettings(projectTypeId, args);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["contractor-contract-settings", projectTypeId],
+            });
+        },
+    });
+
+    const handleSwitchChange = (checked: boolean) => {
+        updateMutation.mutate({
+            is_all_data_visible: checked ? 1 : 0,
+        });
+    };
+
+    if (!projectTypeId) {
+        return <div className="w-full">الرجاء اختيار نوع مشروع</div>;
+    }
+
+    if (isLoading) {
+        return <div className="w-full">جاري التحميل...</div>;
+    }
 
     return (
         <div className="w-full">
@@ -23,28 +57,19 @@ function Contract() {
                 <Typography variant="h5" fontWeight="bold">
                    المقاولين
                 </Typography>
-
             </Box>
 
             {/* Attachment Items List */}
             <div className="space-y-2">
-                {attachmentItems.map((item) => (
-                    <HorizontalSwitch
-                        key={item.value}
-                        checked={activeAttachments.includes(item.value)}
-                        onChange={(checked) => {
-                            if (checked) {
-                                setActiveAttachments([...activeAttachments, item.value]);
-                            } else {
-                                setActiveAttachments(activeAttachments.filter((i) => i !== item.value));
-                            }
-                        }}
-                        label={item.label}
-                    />
-                ))}
+                <HorizontalSwitch
+                    checked={data?.is_all_data_visible === 1}
+                    onChange={handleSwitchChange}
+                    label="إظهار جميع بيانات الخاصة بالمقاولين"
+                    disabled={updateMutation.isPending}
+                />
             </div>
         </div>
     );
 }
 
-export default Contract;
+export default Contractors;

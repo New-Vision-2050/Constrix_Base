@@ -36,3 +36,61 @@ export interface DataSettings {
 export interface GetDataSettingsResponse extends ApiBaseResponse<DataSettings> {}
 
 export interface UpdateDataSettingsResponse extends ApiBaseResponse<DataSettings> {}
+
+export interface AttachmentContractSettings {
+  id: number;
+  project_type_id: number;
+  is_name: number;
+  is_type: number;
+  is_size: number;
+  is_creator: number;
+  is_create_date: number;
+  is_downloadable: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AttachmentTermsContractSettings {
+  id: number;
+  project_type_id: number;
+  is_name: number;
+  is_type: number;
+  is_size: number;
+  is_creator: number;
+  is_create_date: number;
+  is_downloadable: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetAttachmentContractSettingsResponse extends ApiBaseResponse<AttachmentContractSettings> {}
+
+export interface UpdateAttachmentContractSettingsResponse extends ApiBaseResponse<AttachmentContractSettings> {}
+
+export interface GetAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {}
+
+export interface UpdateAttachmentTermsContractSettingsResponse extends ApiBaseResponse<AttachmentTermsContractSettings> {}
+
+export interface ContractorContractSettings {
+  id: number;
+  project_type_id: number;
+  is_all_data_visible: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {}
+
+export interface UpdateContractorContractSettingsResponse extends ApiBaseResponse<ContractorContractSettings> {}
+
+export interface EmployeeContractSettings {
+  id: number;
+  project_type_id: number;
+  is_all_data_visible: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {}
+
+export interface UpdateEmployeeContractSettingsResponse extends ApiBaseResponse<EmployeeContractSettings> {}

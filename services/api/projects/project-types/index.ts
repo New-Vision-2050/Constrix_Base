@@ -3,6 +3,10 @@ import {
   CreateSecondLevelProjectTypeArgs,
   CreateThirdLevelProjectTypeArgs,
   UpdateDataSettingsArgs,
+  UpdateAttachmentContractSettingsArgs,
+  UpdateAttachmentTermsContractSettingsArgs,
+  UpdateContractorContractSettingsArgs,
+  UpdateEmployeeContractSettingsArgs,
 } from "./types/args";
 import {
   CreateSecondLevelProjectTypeResponse,
@@ -12,6 +16,14 @@ import {
   GetRootsProjectTypesResponse,
   GetDataSettingsResponse,
   UpdateDataSettingsResponse,
+  GetAttachmentContractSettingsResponse,
+  UpdateAttachmentContractSettingsResponse,
+  GetAttachmentTermsContractSettingsResponse,
+  UpdateAttachmentTermsContractSettingsResponse,
+  GetContractorContractSettingsResponse,
+  UpdateContractorContractSettingsResponse,
+  GetEmployeeContractSettingsResponse,
+  UpdateEmployeeContractSettingsResponse,
 } from "./types/response";
 
 export const ProjectTypesApi = {
@@ -37,6 +49,54 @@ export const ProjectTypesApi = {
   ) =>
     baseApi.put<UpdateDataSettingsResponse>(
       `project-types/${projectTypeId}/data-settings`,
+      args,
+    ),
+  getAttachmentContractSettings: (projectTypeId: number | string) =>
+    baseApi.get<GetAttachmentContractSettingsResponse>(
+      `project-types/${projectTypeId}/attachment-contract-settings`,
+    ),
+  updateAttachmentContractSettings: (
+    projectTypeId: number | string,
+    args: UpdateAttachmentContractSettingsArgs,
+  ) =>
+    baseApi.put<UpdateAttachmentContractSettingsResponse>(
+      `project-types/${projectTypeId}/attachment-contract-settings`,
+      args,
+    ),
+  getAttachmentTermsContractSettings: (projectTypeId: number | string) =>
+    baseApi.get<GetAttachmentTermsContractSettingsResponse>(
+      `project-types/${projectTypeId}/attachment-terms-contract-settings`,
+    ),
+  updateAttachmentTermsContractSettings: (
+    projectTypeId: number | string,
+    args: UpdateAttachmentTermsContractSettingsArgs,
+  ) =>
+    baseApi.put<UpdateAttachmentTermsContractSettingsResponse>(
+      `project-types/${projectTypeId}/attachment-terms-contract-settings`,
+      args,
+    ),
+  getContractorContractSettings: (projectTypeId: number | string) =>
+    baseApi.get<GetContractorContractSettingsResponse>(
+      `project-types/${projectTypeId}/contractor-contract-settings`,
+    ),
+  updateContractorContractSettings: (
+    projectTypeId: number | string,
+    args: UpdateContractorContractSettingsArgs,
+  ) =>
+    baseApi.put<UpdateContractorContractSettingsResponse>(
+      `project-types/${projectTypeId}/contractor-contract-settings`,
+      args,
+    ),
+  getEmployeeContractSettings: (projectTypeId: number | string) =>
+    baseApi.get<GetEmployeeContractSettingsResponse>(
+      `project-types/${projectTypeId}/employee-contract-settings`,
+    ),
+  updateEmployeeContractSettings: (
+    projectTypeId: number | string,
+    args: UpdateEmployeeContractSettingsArgs,
+  ) =>
+    baseApi.put<UpdateEmployeeContractSettingsResponse>(
+      `project-types/${projectTypeId}/employee-contract-settings`,
       args,
     ),
 };
