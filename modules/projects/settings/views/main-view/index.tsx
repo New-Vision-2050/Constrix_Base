@@ -88,7 +88,11 @@ function ProjectsSettingsMainView() {
               </Tabs>
             </Paper>
             <Paper className="p-4">
-              {CURRENT_TABS.find((tab) => tab.value === selectedTab)?.component}
+              {(() => {
+                const activeTab = CURRENT_TABS.find((tab) => tab.value === selectedTab);
+                const Component = activeTab?.component;
+                return Component ? <Component projectTypeId={selectedSchema?.id ?? null} /> : null;
+              })()}
             </Paper>
           </SchemaLevelTabs>
         </SecondLevelTabs>
